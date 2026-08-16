@@ -56,6 +56,28 @@ The session stops when the evidence package is complete and delivered. It does *
 ### 10. Owner questions rule
 Ask the owner only for genuine owner decisions (design choices, approvals). Never ask the owner to reconstruct technical progress; recover it from durable state.
 
+### 11. Capability Ledger Delta — Expected (fill BEFORE implementation)
+Declare the exact ledger change this goal is allowed to make. A goal is not permitted to change ledger status as a side effect; the delta must be stated up front and verified at close.
+
+| Field | Value |
+| --- | --- |
+| Capability | `CAPABILITY_ID` from `capability-index.json` |
+| Current | ledger status at contract open, with SHA-256 of the ledger snapshot |
+| Target | ledger status this goal will write, and ONLY this status |
+| Reason | which criterion and evidence justifies the change |
+| Evidence required | artifact list that must exist and pass before the delta is recorded |
+| Dependencies affected | every `capability_id` whose `dependencies` or `next_condition` this goal may touch |
+| Roadmap impact | whether `roadmap` items change; roadmap changes go through governance, not the ledger |
+
+**Owner-acceptance rule.** An owner-accepted capability (`origin_type: OWNER_ACCEPTED_PROPOSAL`) is intent only: it enters the roadmap as `PLANNED`. Acceptance in chat is NEVER equivalent to `VERIFIED_IMPLEMENTED`. The Ledger is the only place capability implementation status lives; a Goal Contract that claims implementation without the corresponding Ledger delta is invalid.
+
+### 12. Capability Ledger Delta — Actual (fill AT close, from verification)
+Record what was actually verified, using only these delta types: `ADDED` (new record), `STATUS_CHANGED`, `DEFERRED`, `REJECTED`, `ORIGIN_UPDATED`, `DEPENDENCIES_UPDATED`, `EVIDENCE_REFS_UPDATED`, `ROADMAP_SYNC`. Each row must cite the verifying artifact.
+
+| Delta type | Capability | From | To | Verifying artifact |
+| --- | --- | --- | --- | --- |
+| (e.g., `STATUS_CHANGED`) | | | | |
+
 ---
 
-*Template version 1 — created by P2P-C25. Extend only through a goal with evidence.*
+*Template version 2 — extended by P2P-C26 (Capability Ledger Delta). Extend only through a goal with evidence.*
