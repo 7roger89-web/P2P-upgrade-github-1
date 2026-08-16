@@ -1,0 +1,251 @@
+{
+  "schema": "p2p-first-material-decision-routing-fixture/1",
+  "purpose": "Prove the earliest planning decision separately from final capability routing.",
+  "classification_fields": [
+    "INITIAL_PLANNING_CLASSIFICATION",
+    "FINAL_ROUTING_CLASSIFICATION"
+  ],
+  "minimum_cases": 20,
+  "cases": [
+    {
+      "id": "FM01",
+      "category": "beginner_uiux",
+      "language": "vi",
+      "request": "Tôi không biết thiết kế. Tôi đang hình dung một bảng điều phối kho cho nhân viên vận hành. Màn hình có KPI hàng nhập và hàng xuất ở phía trên; bảng đơn hàng đang chạy; bộ lọc; khu vực cảnh báo ngoại lệ; loading / empty / error states; phải dùng được bằng bàn phím; phải dễ sử dụng trên màn hình nhỏ. Hiện tôi thấy bố cục như vậy có vẻ khá rối. Hãy giúp tôi phân tích để giao diện dễ hiểu, dễ thao tác và dễ đọc hơn.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true
+    },
+    {
+      "id": "FM02",
+      "category": "beginner_uiux",
+      "language": "en",
+      "request": "I do not know design, but this existing operations dashboard is hard to read and use. Make the hierarchy and next action clearer.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM03",
+      "category": "clear_uiux",
+      "language": "en",
+      "request": "This warehouse dashboard is confusing; make the next action easier to find.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM04",
+      "category": "clear_uiux",
+      "language": "vi",
+      "request": "Giao diện này rối quá, hãy làm cho người dùng hiểu ngay việc cần làm.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM05",
+      "category": "accessibility",
+      "language": "en",
+      "request": "Make this screen usable with a keyboard and give focus states clear visibility.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true
+    },
+    {
+      "id": "FM06",
+      "category": "accessibility",
+      "language": "vi",
+      "request": "Hãy cải thiện khả năng truy cập của màn hình để người dùng bàn phím thấy rõ trạng thái focus.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true
+    },
+    {
+      "id": "FM07",
+      "category": "responsive",
+      "language": "en",
+      "request": "On mobile screens the warehouse cards overflow and the main action disappears.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM08",
+      "category": "responsive",
+      "language": "vi",
+      "request": "Trên màn hình nhỏ, các thẻ kho bị tràn và nút hành động chính biến mất; hãy cải thiện bố cục responsive.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM09",
+      "category": "readability",
+      "language": "en",
+      "request": "Improve the typography, spacing, and information hierarchy so the report is easier to scan.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM10",
+      "category": "readability",
+      "language": "vi",
+      "request": "Hãy làm màn hình thanh toán dễ đọc hơn và giảm lỗi nhập liệu.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM11",
+      "category": "navigation",
+      "language": "en",
+      "request": "Please redesign the navigation so first-time users can find reports quickly.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM12",
+      "category": "navigation",
+      "language": "vi",
+      "request": "Hãy đơn giản hóa điều hướng trên màn hình để nhân viên tìm được báo cáo nhanh hơn.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM13",
+      "category": "genuine_idea",
+      "language": "en",
+      "request": "I have an app idea but do not know which problem or features to choose first.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM14",
+      "category": "genuine_idea",
+      "language": "vi",
+      "request": "Tôi có ý tưởng làm một ứng dụng nhưng chưa biết nên chọn tính năng nào.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM15",
+      "category": "gameplay_ideation",
+      "language": "en",
+      "request": "Help expand the gameplay concept and decide what the game should be about.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM16",
+      "category": "gameplay_ideation",
+      "language": "vi",
+      "request": "Hãy mở rộng ý tưởng gameplay và quyết định trò chơi nên có hướng nào.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM17",
+      "category": "mixed_uiux_primary",
+      "language": "en",
+      "request": "I have an idea for a warehouse app; improve the main screen so operators can find the next action quickly.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "MIXED",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM18",
+      "category": "mixed_uiux_primary",
+      "language": "vi",
+      "request": "Tôi có ý tưởng về ứng dụng kho; hãy cải thiện màn hình chính để nhân viên thao tác nhanh hơn.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "MIXED",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM19",
+      "category": "mixed_idea_primary",
+      "language": "en",
+      "request": "Help choose the product features first; screen design can come after the product direction.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM20",
+      "category": "mixed_idea_primary",
+      "language": "vi",
+      "request": "Hãy quyết định hướng sản phẩm và tính năng trước; thiết kế màn hình có thể làm sau.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM21",
+      "category": "backend_non_ui",
+      "language": "en",
+      "request": "Optimize the backend API caching and database indexes for reports.",
+      "INITIAL_PLANNING_CLASSIFICATION": "BACKEND",
+      "FINAL_ROUTING_CLASSIFICATION": "BACKEND",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM22",
+      "category": "backend_non_ui",
+      "language": "vi",
+      "request": "Tôi muốn tối ưu backend API và database cho báo cáo.",
+      "INITIAL_PLANNING_CLASSIFICATION": "BACKEND",
+      "FINAL_ROUTING_CLASSIFICATION": "BACKEND",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM23",
+      "category": "trivial_ui_restraint",
+      "language": "en",
+      "request": "Increase the primary button padding by two pixels and keep everything else unchanged.",
+      "INITIAL_PLANNING_CLASSIFICATION": "COSMETIC_UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "COSMETIC_UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FM24",
+      "category": "trivial_ui_restraint",
+      "language": "vi",
+      "request": "Chỉ tăng padding nút chính thêm hai pixel, không đổi gì khác.",
+      "INITIAL_PLANNING_CLASSIFICATION": "COSMETIC_UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "COSMETIC_UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    }
+  ]
+}

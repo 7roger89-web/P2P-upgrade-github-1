@@ -1,0 +1,85 @@
+{
+  "schema": "p2p-context-efficiency-ab-proxy-evidence/1",
+  "recorded_at": "2026-08-14T01:17:03+07:00",
+  "project": "P2P-8.4.6-C-Codex-Edition-v4",
+  "official_baseline": {
+    "version": "8.4.7-C-codex.15",
+    "artifact": "D:/AI/P2P_dev/P2P-8.4.7-C-Codex-Edition-v15.zip",
+    "sha256": "af4d63a882dabfde20ac237574590ec584ee2944bc4cdc30b6a07bf7f681e195"
+  },
+  "fixture": {
+    "path": ".p2p/evals/fixtures/2026-08-14-context-efficiency-cases.json",
+    "sha256": "978f29fe493be5ce6e2d2b0fbd820945880df6303fb561f74bbe36127eeac166"
+  },
+  "execution_boundary": {
+    "type": "contract_level_proxy",
+    "runtime_task_executed": false,
+    "provider_called": false,
+    "child_worker_called": false,
+    "same_input": true,
+    "isolated_trials": true,
+    "protected_project_mutated": false,
+    "quality_claim_allowed": false,
+    "reason": "The local workflow selects worker metadata but does not expose a worker/provider executor or host token/tool telemetry."
+  },
+  "conditions": {
+    "A": "CURRENT_15_EXECUTION_CONTRACT",
+    "B": "CANDIDATE_CONTEXT_EFFICIENT_CONTRACT"
+  },
+  "trial_counts": {
+    "scenarios": 12,
+    "trials_per_condition": 24,
+    "total_contract_proxy_trials": 48,
+    "quality_rubric_trials": 0
+  },
+  "metric_authority": {
+    "explicit_context_bytes": "DETERMINISTIC_PROXY",
+    "context_item_count": "DETERMINISTIC_PROXY",
+    "knowledge_delta_bytes": "DETERMINISTIC_PROXY",
+    "model_input_tokens": "UNAVAILABLE",
+    "cached_input_tokens": "UNAVAILABLE",
+    "output_tokens": "UNAVAILABLE",
+    "provider_calls": "UNAVAILABLE",
+    "child_calls": "UNAVAILABLE",
+    "tool_calls": "UNAVAILABLE",
+    "worker_return_bytes": "UNAVAILABLE",
+    "raw_tool_output_volume": "UNAVAILABLE",
+    "retry_count": "UNAVAILABLE",
+    "duplicate_retrieval_count": "UNAVAILABLE",
+    "wall_clock": "UNAVAILABLE",
+    "provider_cost": "UNAVAILABLE"
+  },
+  "aggregate_proxy_metrics": {
+    "A_context_bytes_total_24_trials": 122260,
+    "A_context_bytes_mean": 5094.17,
+    "B_context_bytes_total_24_trials": 109110,
+    "B_context_bytes_mean": 4546.25,
+    "B_knowledge_delta_bytes_total_24_trials": 12042,
+    "B_knowledge_delta_bytes_mean": 501.75,
+    "proxy_context_delta_bytes_total_B_minus_A": -13150,
+    "proxy_context_delta_percent_B_vs_A": -10.76,
+    "quality_noninferiority": "UNKNOWN"
+  },
+  "scenario_metrics": [
+    {"case_id":"C1","A_context_bytes":5054,"B_context_bytes":3494,"B_minus_A":-1560,"A_context_items":8,"B_context_pointers":3,"B_delta_bytes":470,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C2","A_context_bytes":5083,"B_context_bytes":4182,"B_minus_A":-901,"A_context_items":8,"B_context_pointers":4,"B_delta_bytes":496,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C3","A_context_bytes":5081,"B_context_bytes":5003,"B_minus_A":-78,"A_context_items":8,"B_context_pointers":6,"B_delta_bytes":494,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C4","A_context_bytes":5091,"B_context_bytes":4533,"B_minus_A":-558,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":497,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C5","A_context_bytes":5073,"B_context_bytes":4755,"B_minus_A":-318,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":518,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C6","A_context_bytes":5052,"B_context_bytes":4167,"B_minus_A":-885,"A_context_items":8,"B_context_pointers":4,"B_delta_bytes":507,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C7","A_context_bytes":5294,"B_context_bytes":4837,"B_minus_A":-457,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":506,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C8","A_context_bytes":5080,"B_context_bytes":4579,"B_minus_A":-501,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":507,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C9","A_context_bytes":5074,"B_context_bytes":4527,"B_minus_A":-547,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":500,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C10","A_context_bytes":5095,"B_context_bytes":4671,"B_minus_A":-424,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":501,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C11","A_context_bytes":5075,"B_context_bytes":5080,"B_minus_A":5,"A_context_items":8,"B_context_pointers":6,"B_delta_bytes":504,"Q1_Q12":"UNKNOWN"},
+    {"case_id":"C12","A_context_bytes":5078,"B_context_bytes":4727,"B_minus_A":-351,"A_context_items":8,"B_context_pointers":5,"B_delta_bytes":521,"Q1_Q12":"UNKNOWN"}
+  ],
+  "quality_review": {
+    "rubric": ["Q1 correctness","Q2 acceptance coverage","Q3 evidence quality","Q4 project-fact fidelity","Q5 invariant preservation","Q6 scope discipline","Q7 safety/permission discipline","Q8 regression awareness","Q9 actionability","Q10 completeness","Q11 unsupported claims","Q12 beginner usefulness"],
+    "condition_A": "UNKNOWN_NOT_EXECUTED",
+    "condition_B": "UNKNOWN_NOT_EXECUTED",
+    "independent_blinded_review": "NOT_AVAILABLE",
+    "noninferiority_decision": "INSUFFICIENT_EVIDENCE"
+  },
+  "interpretation": "The negative B-minus-A context byte values are deterministic serialization proxies for the two contract shapes, not token or cost savings. They cannot certify real task correctness, evidence quality, acceptance coverage, or provider economics."
+}

@@ -1,0 +1,174 @@
+{
+  "baseline_gap_confirmed": true,
+  "canonical_safety": {
+    "aesthetica_canonical": false,
+    "denominator": 8,
+    "full_quorum": "8/8",
+    "identities": [
+      "p2p_iris",
+      "p2p_tecton",
+      "p2p_axiom",
+      "p2p_vector",
+      "p2p_datos",
+      "p2p_anon",
+      "p2p_architecton",
+      "p2p_helios"
+    ]
+  },
+  "case_count": 24,
+  "cases": [
+    {
+      "case_id": "DT1",
+      "name": "baseline gap",
+      "notes": "historical certification records distributed WHY evidence without a native trace",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT2",
+      "name": "minimal schema",
+      "notes": "minimal record validates",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT3",
+      "name": "deterministic reconstruction",
+      "notes": "decision reconstructs from the existing ledger",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT4",
+      "name": "fact evidence source links",
+      "notes": "fact, evidence, and source links resolve",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT5",
+      "name": "approval evidence",
+      "notes": "bare approval boolean is rejected",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT6",
+      "name": "governance references",
+      "notes": "governance links do not mutate FACT_LEDGER",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT7",
+      "name": "material categories",
+      "notes": "all material categories capture explicitly",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT8",
+      "name": "routine no spam",
+      "notes": "routine activity creates no trace",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT9",
+      "name": "contradiction",
+      "notes": "SUPPORTS, CONTRADICTS, and UNKNOWN relationships remain explicit",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT10",
+      "name": "supersession",
+      "notes": "supersession is explicit and old record remains",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT11",
+      "name": "temporal reconstruction",
+      "notes": "decision creation and reference freshness are distinguished",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT12",
+      "name": "missing reference",
+      "notes": "missing reference is explicit",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT13",
+      "name": "stale reference",
+      "notes": "stale reference is not silently rewritten",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT14",
+      "name": "beginner WHY",
+      "notes": "beginner WHY is plain language",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT15",
+      "name": "redaction",
+      "notes": "secrets and private reasoning are redacted",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT16",
+      "name": "integrity",
+      "notes": "payload checksum detects tampering",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT17",
+      "name": "canonical eight",
+      "notes": "canonical identity set and denominator remain exact",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT18",
+      "name": "Aesthetica separation",
+      "notes": "unverified Aesthetica cannot be fabricated",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT19",
+      "name": "backward compatibility",
+      "notes": "projects without trace history continue safely",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT20",
+      "name": "invalid trace resilience",
+      "notes": "invalid legacy trace is diagnosed without taking P2P unavailable",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT21",
+      "name": "JSON export",
+      "notes": "JSON export is deterministic",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT22",
+      "name": "Markdown export",
+      "notes": "Markdown export is readable and safe",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT23",
+      "name": "external dependency boundary",
+      "notes": "native trace reports no external dependency",
+      "status": "PASS"
+    },
+    {
+      "case_id": "DT24",
+      "name": "existing regression",
+      "notes": "existing foundation/workflow regression suite passed",
+      "status": "PASS"
+    }
+  ],
+  "environment_isolation": {
+    "protected_hashes_unchanged": true,
+    "temporary_root": "C:\\Users\\Admin\\AppData\\Local\\Temp\\p2p-decision-trace-eval-5xpuf51d"
+  },
+  "evaluated_at": "2026-08-12T16:09:45+00:00",
+  "external_dependencies": [],
+  "pass_count": 24,
+  "schema": "p2p-decision-trace-eval/1",
+  "status": "PASS"
+}

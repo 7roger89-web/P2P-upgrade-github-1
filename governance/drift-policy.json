@@ -1,0 +1,111 @@
+{
+  "schema_version": "p2p-codex-drift-policy/2",
+  "active_scan_paths": [
+    "AGENTS.md",
+    "BAT-DAU.md",
+    ".agents/skills",
+    ".codex/agents",
+    "docs",
+    "scripts"
+  ],
+  "excluded_path_fragments": [
+    "/legacy/",
+    "model_templates_source.txt"
+  ],
+  "package_protected_paths": [
+    "AGENTS.md",
+    "BAT-DAU.md",
+    "VERSION",
+    "install.ps1",
+    "install.sh",
+    "doctor.ps1",
+    ".agents/skills",
+    ".codex/agents",
+    ".codex/config.toml",
+    "governance",
+    "scripts",
+    "docs",
+    "manifest/package.json",
+    "manifest/build-report.json"
+  ],
+  "installed_protected_paths": [
+    ".agents/skills",
+    ".codex/agents",
+    ".p2p/system/governance",
+    ".p2p/system/scripts"
+  ],
+  "runtime_lock_excluded_fragments": [
+    "/governance/runtime-manifest.lock.json",
+    "/.p2p/system/governance/runtime-manifest.lock.json",
+    "/.p2p/approvals/",
+    "/.p2p/gates/",
+    "/__pycache__/",
+    "/docs/plans/",
+    "/reports/",
+    "/docs/execution/2026-08-12-p2p-beginner-lifecycle-certification.md",
+    "/scripts/p2p_beginner_certification.py",
+    "/scripts/p2p_decision_trace_eval.py"
+  ],
+  "volatile_patterns": [
+    "(?i)\\b(?:gpt|claude|gemini|grok|deepseek|qwen|glm|kimi|haiku|sonnet|opus)[-_ ]?[0-9]+(?:\\.[0-9]+)*(?:[-_ ][a-z0-9.]+)*",
+    "(?i)\\bG[0-9]{1,3}\\b",
+    "(?i)\\b[0-9]+(?:[.,][0-9]+)?\\s*(?:K|M)\\s*(?:tokens?|context|characters?|documents?|sources?)\\b",
+    "(?i)\\b(?:under|over|less than|more than|<|>)\\s*[0-9]+\\s*(?:documents?|docs?|sources?)\\b"
+  ],
+  "live_fact_marker": "FACT_REF:",
+  "historical_marker": "HISTORICAL_ONLY:",
+  "scoped_volatile_paths": {
+    ".agents/skills/mcp-builder/reference/evaluation.md": {
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP evaluation reference; its example model defaults are not P2P runtime facts."
+    },
+    ".agents/skills/mcp-management/assets/tools.json": {
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    ".agents/skills/mcp-management/references/gemini-cli-integration.md": {
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    ".agents/skills/mcp-management/SKILL.md": {
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional MCP-management skill material; provider examples are outside P2P runtime governance."
+    },
+    ".agents/skills/payment-integration/references/polar/usage-based-billing.md": {
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional payment-integration reference; provider examples are outside P2P runtime governance."
+    },
+    ".agents/skills/supervisor/SKILL.md": {
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Supervisor report-naming examples; model names are illustrative metadata, not P2P runtime facts."
+    },
+    ".agents/skills/UI-taste-skill/research/laziness/findings/empirical-results.md": {
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Dated research notes retained for reference; not an active P2P routing or product fact."
+    },
+    ".agents/skills/UI-taste-skill/research/laziness/findings/references.md": {
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Research bibliography retained for reference; cited model names do not enter P2P runtime."
+    },
+    ".agents/skills/UI-taste-skill/research/laziness/remediation/parameter-tuning.md": {
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Research/remediation notes retained for reference; provider parameter examples are not active P2P facts."
+    },
+    ".agents/skills/UI-taste-skill/research/laziness/root-causes/cognitive-shortcuts.md": {
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Dated research notes retained for reference; model references are not active P2P facts."
+    }
+  },
+  "generated_targets": ["governance/live-specs.json"],
+  "approval_required_for_lock_promotion": true
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "rag-router"
+  short_description: "Chọn môi trường và chiến lược RAG"
+  default_prompt: "Use $rag-router to recommend the right RAG setup for this corpus."
+policy:
+  allow_implicit_invocation: true

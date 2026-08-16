@@ -1,0 +1,22 @@
+[
+  {"id":"CR1","name":"tiny local deterministic task","expected_status":"SUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR2","name":"clear implementation direct refs","expected_status":"SUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR3","name":"cross-module symbol refs","expected_status":"SUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR4","name":"stale repo map","expected_status":"STALE","expected_class":"EXPANDED"},
+  {"id":"CR5","name":"matching cached context","expected_status":"REUSABLE","expected_class":"MINIMAL"},
+  {"id":"CR6","name":"changed cached source","expected_status":"STALE","expected_class":"MINIMAL"},
+  {"id":"CR7","name":"broad security review","expected_status":"SUFFICIENT","expected_class":"EXPANDED"},
+  {"id":"CR8","name":"relevant files miss acceptance area","expected_status":"INSUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR9","name":"minimal expands to standard","expected_status":"INSUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR10","name":"standard expands to expanded","expected_status":"SUFFICIENT","expected_class":"EXPANDED"},
+  {"id":"CR11","name":"required authority unavailable","expected_status":"BLOCKED","expected_class":"MINIMAL"},
+  {"id":"CR12","name":"contradictory sources","expected_status":"CONTRADICTED","expected_class":"MINIMAL"},
+  {"id":"CR13","name":"permission protected source","expected_status":"BLOCKED","expected_class":"MINIMAL"},
+  {"id":"CR14","name":"huge repository isolated task","expected_status":"SUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR15","name":"overlapping worker context","expected_status":"REUSABLE","expected_class":"MINIMAL"},
+  {"id":"CR16","name":"routed design intelligence","expected_status":"SUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR17","name":"research before plan","expected_status":"SUFFICIENT","expected_class":"EXPANDED"},
+  {"id":"CR18","name":"stale generated summary","expected_status":"STALE","expected_class":"MINIMAL"},
+  {"id":"CR19","name":"external source conflicts with owner truth","expected_status":"SUFFICIENT","expected_class":"MINIMAL"},
+  {"id":"CR20","name":"beginner invocation","expected_status":"SUFFICIENT","expected_class":"MINIMAL"}
+]

@@ -1,0 +1,22 @@
+{
+  "schema_version": "p2p-codex-approval-record/2",
+  "request_id": "P2P-APR-20260809T112800Z-fact-ledger-v2",
+  "state": "APPROVED",
+  "action": "promote_live_specs",
+  "scope": "Migrate the P2P Codex FACT_LEDGER to revision 2 and rebuild Live Specs for codex.4.",
+  "subject": "governance/fact-ledger.json",
+  "subject_sha256": "18033bc4037191865a2ef47e951f5904b41926759a838a39af45db0597bc4510",
+  "requested_at": "2026-08-09T11:28:00+00:00",
+  "request_expires_at": "2026-08-10T11:28:00+00:00",
+  "requested_by": "Codex",
+  "risk_summary": "Changing the canonical fact schema and generated runtime facts can change P2P routing; stale and legacy claims must remain excluded.",
+  "technical_report": "governance/live-specs-preview-report.json",
+  "technical_report_sha256": "e0fad269100813c4cdf2e33f925ecd800821ec81e5ecf1fea5280cd3fc6db041",
+  "decision": "APPROVE",
+  "decided_at": "2026-08-09T11:28:30+00:00",
+  "decided_by": "current-package-owner",
+  "decision_note": "The user explicitly requested completion of FACT_LEDGER, eval, drift, and mandatory user-approval safeguards in the active conversation.",
+  "approval_method": "conversation_explicit",
+  "identity_assurance": "active_user_message",
+  "recorded_by": "Codex"
+}

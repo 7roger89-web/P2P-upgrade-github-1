@@ -1,0 +1,122 @@
+[
+  {
+    "group_id": "P2P-DUP-001",
+    "sha256": "1da9e4a13d8e40d50df68b9af4f65a3ec05b3930358f5b705f8bb55d96f43c8d",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0043",
+        "path": "8.4.6-C/for-chat/_live/live_specs.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0128",
+        "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/live_specs.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-002",
+    "sha256": "292d1594d86a89a1c57214d4e239bea07b8f81487558a465750b8042481d0cb5",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0057",
+        "path": "8.4.6-C/for-chat/vendors/tier3.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0131",
+        "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier3.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-003",
+    "sha256": "327860e4ba6c2e89cb7aaddb8787ced482d583b4f0afcdea719f93348465413d",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0056",
+        "path": "8.4.6-C/for-chat/vendors/tier2.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0130",
+        "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier2.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-004",
+    "sha256": "3609ec556a62499dbcb6b17d64cca4df7f3b910c29a888aec1c8dc41f727fc17",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0038",
+        "path": "8.4.6-C/for-chat/_glossary.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0105",
+        "path": "8.4.6-C/plugin/.claude/skills/p2p/glossary.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-005",
+    "sha256": "408b9901a428a379b38f1eb1a84ab18ad70a0e7625add96a1ba5da04b2fa50f4",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0090",
+        "path": "8.4.6-C/plugin/.claude/skills/notebook-pack/reference/rag_metaprompt_standard.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0148",
+        "path": "8.4.6-C/plugin/.claude/skills/rag-prep/reference/rag_metaprompt_standard.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-006",
+    "sha256": "5b65f743b215eea94aca33ec5ae7b9548b7cea32dd12261dac58b4cebecd6f27",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0055",
+        "path": "8.4.6-C/for-chat/vendors/tier1.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0129",
+        "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier1.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-007",
+    "sha256": "5fca3bdec3db37e71a5b7dc79e2f0cc1c61f3c50ff52e448d9d8ea12e9eac6b2",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0058",
+        "path": "8.4.6-C/for-chat/vendors/tier4.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0132",
+        "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier4.md"
+      }
+    ]
+  },
+  {
+    "group_id": "P2P-DUP-008",
+    "sha256": "d46cd19ed5529332327636304595ca4e3cedfc0902a0e25c4a747e7f0c6a7266",
+    "member_count": 2,
+    "members": [
+      {
+        "stable_id": "P2P-FILE-0006",
+        "path": "8.4.6-C/docs/CREDITS_TECHNIQUES.md"
+      },
+      {
+        "stable_id": "P2P-FILE-0048",
+        "path": "8.4.6-C/for-chat/docs/CREDITS_TECHNIQUES.md"
+      }
+    ]
+  }
+]

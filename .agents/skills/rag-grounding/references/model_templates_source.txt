@@ -1,0 +1,8 @@
+HISTORICAL SOURCE POINTER
+
+The unmodified source template is preserved at:
+source/8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates_source.txt
+
+Do not use its provider names, model IDs, numerical limits, product capabilities, or bug
+labels as current facts. Promote a claim only through governance/fact-ledger.json and rebuild
+governance/live-specs.json.

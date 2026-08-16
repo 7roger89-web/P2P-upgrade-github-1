@@ -1,0 +1,6 @@
+interface:
+  display_name: "pxpipe"
+  short_description: "Kiểm toán PXPIPE, mặc định không bật"
+  default_prompt: "Use $pxpipe to audit the preserved PXPIPE component without enabling it."
+policy:
+  allow_implicit_invocation: true

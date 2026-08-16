@@ -1,0 +1,104 @@
+{
+  "schema": "p2p-uiux-eval-suite/1",
+  "cases": [
+    {
+      "id": "EVAL-A-LOGISTICS",
+      "request": "Design a multi-step logistics receiving workflow form for dispatchers with validation dependencies and exception handling",
+      "product_type": "logistics",
+      "stack": "react",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": true,
+      "assertions": ["operational", "scannable", "low_decoration"]
+    },
+    {
+      "id": "EVAL-B-NARRATIVE",
+      "request": "Create an interactive narrative game scene that is reading-first and immersive, not a SaaS dashboard",
+      "product_type": "interactive_narrative_game",
+      "stack": "html-tailwind",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["reading_first", "immersive", "not_dashboard"]
+    },
+    {
+      "id": "EVAL-C-ECOMMERCE",
+      "request": "Improve an ecommerce product page for conversion, trust, catalog clarity, and checkout confidence",
+      "product_type": "ecommerce",
+      "stack": "nextjs",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["conversion", "trust", "catalog"]
+    },
+    {
+      "id": "EVAL-D-FINANCE",
+      "request": "Design a finance admin review table with clear status, low ambiguity, and audit-friendly density",
+      "product_type": "finance_admin",
+      "stack": "vue",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["clarity", "low_ambiguity", "audit"]
+    },
+    {
+      "id": "EVAL-E-MOBILE",
+      "request": "Design a mobile content reader with hierarchy, readable type, and predictable bottom navigation",
+      "product_type": "mobile_content",
+      "stack": "react-native",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["mobile_hierarchy", "readability", "bottom_navigation"]
+    },
+    {
+      "id": "EVAL-F-BACKEND",
+      "request": "Add a backend API endpoint and database index for account reconciliation; no interface changes",
+      "product_type": "backend",
+      "stack": "python",
+      "expect_scope": "NON_UI",
+      "expect_aesthetica": false,
+      "assertions": ["no_ui_skill", "no_specialist"]
+    },
+    {
+      "id": "EVAL-G-QUORUM",
+      "request": "Run the full P2P release certification with the optional UI/UX specialist enabled",
+      "product_type": "governance",
+      "stack": "generic",
+      "expect_scope": "NON_UI",
+      "expect_aesthetica": false,
+      "assertions": ["denominator_8", "full_8_of_8"]
+    },
+    {
+      "id": "EVAL-H-MULTI-AESTHETICA",
+      "request": "Evaluate two optional UI/UX specialist profiles for the same product direction",
+      "product_type": "uiux",
+      "stack": "generic",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["same_optional_identity", "denominator_8"]
+    },
+    {
+      "id": "EVAL-I-DRIFT-MATERIAL",
+      "request": "Review a proposed change to the approved primary navigation and core color tokens",
+      "product_type": "saas",
+      "stack": "nextjs",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["material_drift", "owner_approval"]
+    },
+    {
+      "id": "EVAL-J-DRIFT-COSMETIC",
+      "request": "Review a harmless change to a non-material note in the approved Design System",
+      "product_type": "saas",
+      "stack": "nextjs",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["no_false_positive"]
+    },
+    {
+      "id": "EVAL-K-BEGINNER",
+      "request": "I am new: help me choose the look and flow for a small app screen, then tell me what needs approval",
+      "product_type": "saas",
+      "stack": "unknown",
+      "expect_scope": "UI_UX",
+      "expect_aesthetica": false,
+      "assertions": ["plain_language", "approval_boundary", "stack_adaptation"]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "rag-prep"
+  short_description: "Chuẩn hóa tài liệu để dùng cho RAG"
+  default_prompt: "Use $rag-prep to make this document retrieval-ready."
+policy:
+  allow_implicit_invocation: true

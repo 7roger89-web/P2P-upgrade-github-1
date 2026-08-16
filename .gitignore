@@ -1,0 +1,34 @@
+# ============================================================
+# P2P Codex Edition — .gitignore
+# Loại: bytecode, trạng thái cục bộ, dữ liệu tool, artifact tạm
+# Không loại: source, governance, docs, tests, reports, candidates
+# ============================================================
+
+# --- Bytecode Python (tự sinh lại được) ---
+__pycache__/
+*.py[cod]
+*.pyo
+.coverage
+.pytest_cache/
+
+# --- Trạng thái cục bộ của máy (không chia sẻ qua Git) ---
+.p2p/state/
+.p2p/edge-runs/
+.p2p/install-backups/
+.p2p/evals/runs/
+.p2p/evals/*.json
+.p2p/gates/
+.p2p/approvals/
+.p2p/project-profile.json
+.p2p/usage.json
+
+# --- Dữ liệu tool điều hướng cục bộ ---
+.anvien/
+
+# --- Artifact tạm ---
+.tmp/
+
+# --- Môi trường / bí mật ---
+.env
+*.key
+*.pem

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-codex-fact-ledger/2",
+  "title": "P2P Codex FACT_LEDGER",
+  "type": "object",
+  "required": ["schema_version", "ledger_revision", "updated_at", "change_control", "expiry_policy", "claims"],
+  "properties": {
+    "schema_version": {"const": "p2p-codex-fact-ledger/2"},
+    "ledger_revision": {"type": "integer", "minimum": 1},
+    "updated_at": {"type": "string", "format": "date"},
+    "change_control": {
+      "type": "object",
+      "required": ["promotion_requires_user_approval", "approval_action", "approval_policy", "generated_target"],
+      "properties": {
+        "promotion_requires_user_approval": {"const": true},
+        "approval_action": {"const": "promote_live_specs"},
+        "approval_policy": {"const": "approval-policy.json"},
+        "generated_target": {"const": "live-specs.json"}
+      },
+      "additionalProperties": false
+    },
+    "expiry_policy": {
+      "type": "object",
+      "required": ["expiring_window_days", "runtime_evidence_levels", "max_age_days_by_kind"],
+      "properties": {
+        "expiring_window_days": {"type": "integer", "minimum": 1},
+        "runtime_evidence_levels": {
+          "type": "array",
+          "items": {"enum": ["A", "B", "C", "D"]},
+          "uniqueItems": true
+        },
+        "max_age_days_by_kind": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "integer", "minimum": 1}
+        }
+      },
+      "additionalProperties": false
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "claim_id", "kind", "claim", "value", "scope", "source_url",
+          "source_type", "evidence_level", "checked_at", "expires_at",
+          "verification_status", "route_action", "runtime_eligible",
+          "independence_key", "provenance_note", "risk_tier",
+          "affected_components", "verification_method"
+        ],
+        "properties": {
+          "claim_id": {"type": "string", "pattern": "^P2P-FACT-[0-9]{4}$"},
+          "kind": {
+            "enum": [
+              "host_capability", "product_limit", "model_id", "model_limit",
+              "model_bug", "pricing", "routing_heuristic", "retrieval_fact",
+              "eval_principle"
+            ]
+          },
+          "claim": {"type": "string", "minLength": 1},
+          "value": {},
+          "scope": {
+            "type": "object",
+            "required": ["product", "surface"],
+            "properties": {
+              "product": {"type": "string"},
+              "surface": {"type": "string"},
+              "provider": {"type": "string"},
+              "model": {"type": "string"},
+              "region": {"type": "string"},
+              "plan": {"type": "string"},
+              "client": {"type": "string"}
+            },
+            "additionalProperties": false
+          },
+          "source_url": {"type": "string"},
+          "source_type": {
+            "enum": ["official", "benchmark", "reproducible_issue", "community", "legacy"]
+          },
+          "evidence_level": {"enum": ["A", "B", "C", "D"]},
+          "checked_at": {"type": "string", "format": "date"},
+          "expires_at": {"type": "string", "format": "date"},
+          "verification_status": {
+            "enum": [
+              "CONFIRMED_ACTIVE", "NOT_RECHECKED", "NO_EVIDENCE_OF_FIX",
+              "DISPUTED", "RETIRED"
+            ]
+          },
+          "route_action": {"enum": ["block", "warn", "prefer", "monitor", "ignore"]},
+          "runtime_eligible": {"type": "boolean"},
+          "independence_key": {"type": "string"},
+          "provenance_note": {"type": "string"},
+          "risk_tier": {"enum": ["low", "medium", "high", "critical"]},
+          "affected_components": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          },
+          "verification_method": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

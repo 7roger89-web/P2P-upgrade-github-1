@@ -1,0 +1,1218 @@
+[
+  {
+    "stable_id": "P2P-FILE-0001",
+    "path": "8.4.6-C/ARCHITECTURE_MAP.md",
+    "source_snapshot_path": "source/8.4.6-C/ARCHITECTURE_MAP.md",
+    "size": 15575,
+    "crc32": "9F6D26A6",
+    "sha256": "e522bd3175f4a0c0d2eaa239fdb78981182f492f7fd37e0859a6fd0d849673c9"
+  },
+  {
+    "stable_id": "P2P-FILE-0002",
+    "path": "8.4.6-C/CHANGELOG.md",
+    "source_snapshot_path": "source/8.4.6-C/CHANGELOG.md",
+    "size": 30021,
+    "crc32": "57E3226E",
+    "sha256": "2ee433d0571f55bfea2a43826a21374fe0900a01633330249f5685850cc51e10"
+  },
+  {
+    "stable_id": "P2P-FILE-0003",
+    "path": "8.4.6-C/README.en.md",
+    "source_snapshot_path": "source/8.4.6-C/README.en.md",
+    "size": 2244,
+    "crc32": "ECF9A220",
+    "sha256": "1b7e2d282fef971ca11b8268a65d6d489419a3ab00e187330f366f32af031e3f"
+  },
+  {
+    "stable_id": "P2P-FILE-0004",
+    "path": "8.4.6-C/README.md",
+    "source_snapshot_path": "source/8.4.6-C/README.md",
+    "size": 4152,
+    "crc32": "64A63756",
+    "sha256": "21fef43c11562d59c9ed66997c5d78dfda5913f737fa90bd477507a2d55a233f"
+  },
+  {
+    "stable_id": "P2P-FILE-0005",
+    "path": "8.4.6-C/docs/AGENTS_GUIDE.md",
+    "source_snapshot_path": "source/8.4.6-C/docs/AGENTS_GUIDE.md",
+    "size": 4837,
+    "crc32": "149B0B6D",
+    "sha256": "762bf3ef02d8f032c67feed2f1db3c17a20deb41c3a7bffb7426a1969526a598"
+  },
+  {
+    "stable_id": "P2P-FILE-0006",
+    "path": "8.4.6-C/docs/CREDITS_TECHNIQUES.md",
+    "source_snapshot_path": "source/8.4.6-C/docs/CREDITS_TECHNIQUES.md",
+    "size": 5204,
+    "crc32": "BA80EB3C",
+    "sha256": "d46cd19ed5529332327636304595ca4e3cedfc0902a0e25c4a747e7f0c6a7266"
+  },
+  {
+    "stable_id": "P2P-FILE-0007",
+    "path": "8.4.6-C/docs/FAQ_И_ОШИБКИ.md",
+    "source_snapshot_path": "source/8.4.6-C/docs/FAQ_И_ОШИБКИ.md",
+    "size": 7168,
+    "crc32": "C0C22A90",
+    "sha256": "fc13142efb1bfab74edc9b1174db2b3460e5aedb4e568dd66bb727b687c89fdb"
+  },
+  {
+    "stable_id": "P2P-FILE-0008",
+    "path": "8.4.6-C/docs/INSTALL_GUIDE.md",
+    "source_snapshot_path": "source/8.4.6-C/docs/INSTALL_GUIDE.md",
+    "size": 5174,
+    "crc32": "E1F1A1A7",
+    "sha256": "926c589af26d5f122ca287896a8812787e47b256fd3e6239f45403e3b0ccea35"
+  },
+  {
+    "stable_id": "P2P-FILE-0009",
+    "path": "8.4.6-C/docs/PXPIPE_GUIDE.md",
+    "source_snapshot_path": "source/8.4.6-C/docs/PXPIPE_GUIDE.md",
+    "size": 9276,
+    "crc32": "4B2DB6DC",
+    "sha256": "d46cb58189631bfba7bcce8464188bddedabeb859330dc22e85b47961318638b"
+  },
+  {
+    "stable_id": "P2P-FILE-0010",
+    "path": "8.4.6-C/docs/README.md",
+    "source_snapshot_path": "source/8.4.6-C/docs/README.md",
+    "size": 3884,
+    "crc32": "DBB330B9",
+    "sha256": "18e09d8a9c559a974aad609510c43e8ebd19a81c6216a39c591a78ff3ea488d2"
+  },
+  {
+    "stable_id": "P2P-FILE-0011",
+    "path": "8.4.6-C/for-chat/!!core_v8C.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!!core_v8C.md",
+    "size": 38895,
+    "crc32": "4A83773A",
+    "sha256": "372b813d7ba02887a6ccbe188f4a8ba1d424dea6340d03399cb75a4e451fe74b"
+  },
+  {
+    "stable_id": "P2P-FILE-0012",
+    "path": "8.4.6-C/for-chat/!!db_v8C.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!!db_v8C.md",
+    "size": 62849,
+    "crc32": "3A1DE659",
+    "sha256": "fbe6aa1c5664b387bf21c64d494064a41b5c879e193cb072b5b8886b3799d8b7"
+  },
+  {
+    "stable_id": "P2P-FILE-0013",
+    "path": "8.4.6-C/for-chat/!agents.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!agents.md",
+    "size": 17121,
+    "crc32": "3B2B2E33",
+    "sha256": "f8a173d1264a2b25ed185625af49bd16d20cd26446095ee303c46d63ae57b667"
+  },
+  {
+    "stable_id": "P2P-FILE-0014",
+    "path": "8.4.6-C/for-chat/!art.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!art.md",
+    "size": 4631,
+    "crc32": "721C609B",
+    "sha256": "97a49b2252812baab713d22731ed25473671ce4479bcb34c0f49f388770ffa16"
+  },
+  {
+    "stable_id": "P2P-FILE-0015",
+    "path": "8.4.6-C/for-chat/!compression.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!compression.md",
+    "size": 7447,
+    "crc32": "9209AC10",
+    "sha256": "67833925b5f5da7f75decefe2ca15b50117e03ea3b370895b665ceb25632d03d"
+  },
+  {
+    "stable_id": "P2P-FILE-0016",
+    "path": "8.4.6-C/for-chat/!contract.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!contract.md",
+    "size": 17363,
+    "crc32": "8C6A1DE1",
+    "sha256": "fb6afaa5069b09acd74ba31caa875d7c7a2d3b6ca74575626eedde575373bbd3"
+  },
+  {
+    "stable_id": "P2P-FILE-0017",
+    "path": "8.4.6-C/for-chat/!debug.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!debug.md",
+    "size": 12653,
+    "crc32": "C7A34587",
+    "sha256": "69efaca464c57ed84baadc13c43aa5849e9ab36f2c0df1ae9295ee9d730b28c7"
+  },
+  {
+    "stable_id": "P2P-FILE-0018",
+    "path": "8.4.6-C/for-chat/!domain.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!domain.md",
+    "size": 22090,
+    "crc32": "80B80BAF",
+    "sha256": "f17a6a3623ff293375c398d21d08a13094a0e453d70342f5b7f205a9df14bb2e"
+  },
+  {
+    "stable_id": "P2P-FILE-0019",
+    "path": "8.4.6-C/for-chat/!exploration.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!exploration.md",
+    "size": 9849,
+    "crc32": "0EFD9DD1",
+    "sha256": "9c89ec6ab97e6b103e2e0e737927d0e6864c72a0e0756309f7c657c15b7e9871"
+  },
+  {
+    "stable_id": "P2P-FILE-0020",
+    "path": "8.4.6-C/for-chat/!intent.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!intent.md",
+    "size": 13836,
+    "crc32": "AEC33E1A",
+    "sha256": "4560843c7af4880775e0d44a401670fb308286bff120308ac62f23e1f4545c18"
+  },
+  {
+    "stable_id": "P2P-FILE-0021",
+    "path": "8.4.6-C/for-chat/!memory.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!memory.md",
+    "size": 10411,
+    "crc32": "7AAE320E",
+    "sha256": "12e8e9c2ae32d75c9b3db8ea829d23be87db96bd0089f8d0e732114e6371d055"
+  },
+  {
+    "stable_id": "P2P-FILE-0022",
+    "path": "8.4.6-C/for-chat/!mentor.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!mentor.md",
+    "size": 13779,
+    "crc32": "6CF69964",
+    "sha256": "405df305db431ee38437b0b70de651c2d436f78a20b572c19a451b35e374fea2"
+  },
+  {
+    "stable_id": "P2P-FILE-0023",
+    "path": "8.4.6-C/for-chat/!metrics.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!metrics.md",
+    "size": 11019,
+    "crc32": "5D97B386",
+    "sha256": "ec288e3823e692a8a309af966bda438f07237165d461ab9511ad18864a229c12"
+  },
+  {
+    "stable_id": "P2P-FILE-0024",
+    "path": "8.4.6-C/for-chat/!optimization.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!optimization.md",
+    "size": 9435,
+    "crc32": "CFBC20C0",
+    "sha256": "d21f9bc5842cafe545cc17ed7a4e333c6c5c73dda02b9c4e5adc1374e904936f"
+  },
+  {
+    "stable_id": "P2P-FILE-0025",
+    "path": "8.4.6-C/for-chat/!rag.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!rag.md",
+    "size": 5995,
+    "crc32": "D53BBC30",
+    "sha256": "4c28e2f765d38530a6939406f3387a2e0fe4e6fea0f506399db55cc66961b17f"
+  },
+  {
+    "stable_id": "P2P-FILE-0026",
+    "path": "8.4.6-C/for-chat/!reasoning.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!reasoning.md",
+    "size": 7345,
+    "crc32": "60367A7B",
+    "sha256": "63eeb0e10cc4a6a1a65076bdb651dee2d8006b96aac8f230b349377cca623d1d"
+  },
+  {
+    "stable_id": "P2P-FILE-0027",
+    "path": "8.4.6-C/for-chat/!routing.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!routing.md",
+    "size": 6816,
+    "crc32": "435A1FC9",
+    "sha256": "cfe45f4a0345500bb29de8b4fa68e0f6d161d6ff5e955330364fc28757dc33b5"
+  },
+  {
+    "stable_id": "P2P-FILE-0028",
+    "path": "8.4.6-C/for-chat/!sandbox.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!sandbox.md",
+    "size": 5345,
+    "crc32": "5E4E4FAC",
+    "sha256": "47b883e8ff961dcf37db11275e5c5cf29a3252520d1d2abef184e6a108e3faf2"
+  },
+  {
+    "stable_id": "P2P-FILE-0029",
+    "path": "8.4.6-C/for-chat/!scope.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!scope.md",
+    "size": 14864,
+    "crc32": "08FC5D6C",
+    "sha256": "3fae743d1cf787d10615a016d1fd189ff8fc8dd7579425bee761d3f98008e545"
+  },
+  {
+    "stable_id": "P2P-FILE-0030",
+    "path": "8.4.6-C/for-chat/!security.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!security.md",
+    "size": 6340,
+    "crc32": "884BCA2C",
+    "sha256": "b2efd7c4f68dd8875cc425026748fad0d667b81b9730290363f91f5f5ef12978"
+  },
+  {
+    "stable_id": "P2P-FILE-0031",
+    "path": "8.4.6-C/for-chat/!skills.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!skills.md",
+    "size": 10370,
+    "crc32": "94513198",
+    "sha256": "fede23972ce1b397d1b7aa2f8506b021181fc44bc052050c5f6c02445c0cad85"
+  },
+  {
+    "stable_id": "P2P-FILE-0032",
+    "path": "8.4.6-C/for-chat/!teacher.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!teacher.md",
+    "size": 32878,
+    "crc32": "DDC2A335",
+    "sha256": "6c87c959d1f433cc490c27ea6b9c3bc4df9b6162ead274c9fcff5fb5547fc5d1"
+  },
+  {
+    "stable_id": "P2P-FILE-0033",
+    "path": "8.4.6-C/for-chat/!templates.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!templates.md",
+    "size": 16046,
+    "crc32": "70F97FFD",
+    "sha256": "b56b38fa33749a2bde463a0604319b2a1c17b17debb5d24607602d00e0a997b9"
+  },
+  {
+    "stable_id": "P2P-FILE-0034",
+    "path": "8.4.6-C/for-chat/!tool_budget.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!tool_budget.md",
+    "size": 3886,
+    "crc32": "EEC83DF1",
+    "sha256": "1a9e89c32bc21c32c755f656215b4bc101905e05cf355cf9c433932f04c05d27"
+  },
+  {
+    "stable_id": "P2P-FILE-0035",
+    "path": "8.4.6-C/for-chat/!user_context.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!user_context.md",
+    "size": 4966,
+    "crc32": "F0FCE6A8",
+    "sha256": "e172267c8e43d5478100bbef6bf2f43938c10d941b872d15e8403feaf6a021bb"
+  },
+  {
+    "stable_id": "P2P-FILE-0036",
+    "path": "8.4.6-C/for-chat/!visual.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!visual.md",
+    "size": 7257,
+    "crc32": "E4A8BD65",
+    "sha256": "aca295ee84c9b1d912b2c8cbe9110c4d64b6fb4cde4aedb7ed1eb95d883a1426"
+  },
+  {
+    "stable_id": "P2P-FILE-0037",
+    "path": "8.4.6-C/for-chat/!writing.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/!writing.md",
+    "size": 13214,
+    "crc32": "9BFCD428",
+    "sha256": "f8153e72f0d0a3da82c5ba4f0338ea79e3ce7673405e14403bcfe0224863f2d0"
+  },
+  {
+    "stable_id": "P2P-FILE-0038",
+    "path": "8.4.6-C/for-chat/_glossary.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_glossary.md",
+    "size": 6152,
+    "crc32": "A9F39606",
+    "sha256": "3609ec556a62499dbcb6b17d64cca4df7f3b910c29a888aec1c8dc41f727fc17"
+  },
+  {
+    "stable_id": "P2P-FILE-0039",
+    "path": "8.4.6-C/for-chat/_index.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_index.md",
+    "size": 8853,
+    "crc32": "985EBCA4",
+    "sha256": "2ef29bff5a570a8737f91a1e0b120a41acd9aabea709c42d1b315f3ee4f732aa"
+  },
+  {
+    "stable_id": "P2P-FILE-0040",
+    "path": "8.4.6-C/for-chat/_live/MANIFEST.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_live/MANIFEST.md",
+    "size": 7701,
+    "crc32": "74B93702",
+    "sha256": "3b5de3e04c333bf60cdababbcd1ffcd1ce95a587aeb1d60b65d871b909417b55"
+  },
+  {
+    "stable_id": "P2P-FILE-0041",
+    "path": "8.4.6-C/for-chat/_live/live_claude.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_live/live_claude.md",
+    "size": 8261,
+    "crc32": "B114AE94",
+    "sha256": "1b55084d295cc2cb8a7f3e55ff7c9aa8ae5d9b96a387e681b57ceabf4f4415d2"
+  },
+  {
+    "stable_id": "P2P-FILE-0042",
+    "path": "8.4.6-C/for-chat/_live/live_core.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_live/live_core.md",
+    "size": 2669,
+    "crc32": "6398C8D1",
+    "sha256": "af100f30a47e1a9db6aa047ce015f89ec1624d753629d3f1821826fc6f12a201"
+  },
+  {
+    "stable_id": "P2P-FILE-0043",
+    "path": "8.4.6-C/for-chat/_live/live_specs.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_live/live_specs.md",
+    "size": 38568,
+    "crc32": "64C65DDA",
+    "sha256": "1da9e4a13d8e40d50df68b9af4f65a3ec05b3930358f5b705f8bb55d96f43c8d"
+  },
+  {
+    "stable_id": "P2P-FILE-0044",
+    "path": "8.4.6-C/for-chat/_live/live_vendors.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_live/live_vendors.md",
+    "size": 20494,
+    "crc32": "B45B0812",
+    "sha256": "b39255df485e5cbc4421e0b70432aa89bad392665f179675fc6656a553c17c3a"
+  },
+  {
+    "stable_id": "P2P-FILE-0045",
+    "path": "8.4.6-C/for-chat/_master.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_master.md",
+    "size": 4309,
+    "crc32": "98347974",
+    "sha256": "33aa11a0d91a006265bceddb90f76e22578450b5649990107c7bc9e195ee50e4"
+  },
+  {
+    "stable_id": "P2P-FILE-0046",
+    "path": "8.4.6-C/for-chat/_preloader.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/_preloader.md",
+    "size": 10550,
+    "crc32": "A8719994",
+    "sha256": "cec9f827951655b09d9668e33795284ba60c8b76975822a624f390eb4ebfeba3"
+  },
+  {
+    "stable_id": "P2P-FILE-0047",
+    "path": "8.4.6-C/for-chat/docs/CHANGELOG_v8C3.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/CHANGELOG_v8C3.md",
+    "size": 5566,
+    "crc32": "26F33867",
+    "sha256": "017a948d58d7140d54f026c7d3b76d9824fea8b0907270d462f9023f0f992ce9"
+  },
+  {
+    "stable_id": "P2P-FILE-0048",
+    "path": "8.4.6-C/for-chat/docs/CREDITS_TECHNIQUES.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/CREDITS_TECHNIQUES.md",
+    "size": 5204,
+    "crc32": "BA80EB3C",
+    "sha256": "d46cd19ed5529332327636304595ca4e3cedfc0902a0e25c4a747e7f0c6a7266"
+  },
+  {
+    "stable_id": "P2P-FILE-0049",
+    "path": "8.4.6-C/for-chat/docs/INSTALL_GUIDE.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/INSTALL_GUIDE.md",
+    "size": 7456,
+    "crc32": "1351FB65",
+    "sha256": "2d7fb3da7ae8c453d04330efdcbdf37446bbf45c262306df242450b0e1c5a495"
+  },
+  {
+    "stable_id": "P2P-FILE-0050",
+    "path": "8.4.6-C/for-chat/docs/MINDMAP_v8C3.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/MINDMAP_v8C3.md",
+    "size": 13109,
+    "crc32": "9516991C",
+    "sha256": "9225e731cb8a99516da7a3c8493341ff60222a3cb871844c786d4194eb6ff69e"
+  },
+  {
+    "stable_id": "P2P-FILE-0051",
+    "path": "8.4.6-C/for-chat/docs/MODES_GUIDE.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/MODES_GUIDE.md",
+    "size": 4939,
+    "crc32": "6DD60A8D",
+    "sha256": "a2fb91760d545bd8287ceb2bd8ae11f7d7481c1c532a83fd4fad7bdcddd99e8f"
+  },
+  {
+    "stable_id": "P2P-FILE-0052",
+    "path": "8.4.6-C/for-chat/docs/MODULE_REFERENCE.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/MODULE_REFERENCE.md",
+    "size": 11577,
+    "crc32": "DB9566AB",
+    "sha256": "bcc49c852502f2657c469b3b46c944ed350fbfa2af7a9d45c3d80876263d7995"
+  },
+  {
+    "stable_id": "P2P-FILE-0053",
+    "path": "8.4.6-C/for-chat/docs/TECHNIQUES_v8C3.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/TECHNIQUES_v8C3.md",
+    "size": 12868,
+    "crc32": "4A118820",
+    "sha256": "c696e32e133deb9cd7fb11ebeae11e6cc83a276fabb8d70c87f3d183ff592fc5"
+  },
+  {
+    "stable_id": "P2P-FILE-0054",
+    "path": "8.4.6-C/for-chat/docs/ЧТО_ЗАГРУЖАТЬ.txt",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/docs/ЧТО_ЗАГРУЖАТЬ.txt",
+    "size": 8439,
+    "crc32": "AB58F99E",
+    "sha256": "9af0681791c7eb8b39ddece9513829c0802f1f8128bf9e9e28d318fe8c2ad23a"
+  },
+  {
+    "stable_id": "P2P-FILE-0055",
+    "path": "8.4.6-C/for-chat/vendors/tier1.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/vendors/tier1.md",
+    "size": 4965,
+    "crc32": "1E68D4BB",
+    "sha256": "5b65f743b215eea94aca33ec5ae7b9548b7cea32dd12261dac58b4cebecd6f27"
+  },
+  {
+    "stable_id": "P2P-FILE-0056",
+    "path": "8.4.6-C/for-chat/vendors/tier2.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/vendors/tier2.md",
+    "size": 2946,
+    "crc32": "77202E54",
+    "sha256": "327860e4ba6c2e89cb7aaddb8787ced482d583b4f0afcdea719f93348465413d"
+  },
+  {
+    "stable_id": "P2P-FILE-0057",
+    "path": "8.4.6-C/for-chat/vendors/tier3.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/vendors/tier3.md",
+    "size": 4682,
+    "crc32": "3D524F4D",
+    "sha256": "292d1594d86a89a1c57214d4e239bea07b8f81487558a465750b8042481d0cb5"
+  },
+  {
+    "stable_id": "P2P-FILE-0058",
+    "path": "8.4.6-C/for-chat/vendors/tier4.md",
+    "source_snapshot_path": "source/8.4.6-C/for-chat/vendors/tier4.md",
+    "size": 5683,
+    "crc32": "E2130F54",
+    "sha256": "5fca3bdec3db37e71a5b7dc79e2f0cc1c61f3c50ff52e448d9d8ea12e9eac6b2"
+  },
+  {
+    "stable_id": "P2P-FILE-0059",
+    "path": "8.4.6-C/plugin/.claude-plugin/plugin.json",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude-plugin/plugin.json",
+    "size": 1614,
+    "crc32": "088B85B0",
+    "sha256": "596eef6d02ffc13e025c23eb0801c089e4ed709be164bd49741c2827407b9187"
+  },
+  {
+    "stable_id": "P2P-FILE-0060",
+    "path": "8.4.6-C/plugin/.claude/CLAUDE.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/CLAUDE.md",
+    "size": 2021,
+    "crc32": "F286218A",
+    "sha256": "5d78dc7f746cca5524f411d8f8546e56eeeda5506e991b3aa01ae4f52e81a978"
+  },
+  {
+    "stable_id": "P2P-FILE-0061",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-anon.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-anon.md",
+    "size": 2038,
+    "crc32": "5BA3F99D",
+    "sha256": "9aed08d613596fe94b59aa1da5e6e00c22da727097bc0e4c8f85951bec1fe6a3"
+  },
+  {
+    "stable_id": "P2P-FILE-0062",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-architecton.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-architecton.md",
+    "size": 2130,
+    "crc32": "E02A1912",
+    "sha256": "4c6b1bfce09cc2961d4390074cd5d470f0277134da56594ce2e9e345cd8bbf1b"
+  },
+  {
+    "stable_id": "P2P-FILE-0063",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-axiom.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-axiom.md",
+    "size": 2848,
+    "crc32": "C6FA3ABA",
+    "sha256": "610c9aa0c92ce6637da9fd3074222dba3f87e62810cdb97ad936f083b664c433"
+  },
+  {
+    "stable_id": "P2P-FILE-0064",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-datos.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-datos.md",
+    "size": 2138,
+    "crc32": "E8852A88",
+    "sha256": "906d88fb2c3d1f4279f8ff799c5762e3abb05c1cc29670519e8a33314fd3c176"
+  },
+  {
+    "stable_id": "P2P-FILE-0065",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-helios.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-helios.md",
+    "size": 2810,
+    "crc32": "C625C729",
+    "sha256": "e04904475384c899327978c890dfcb17a7ce337f96709e2c89abc3bda0185282"
+  },
+  {
+    "stable_id": "P2P-FILE-0066",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-iris.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-iris.md",
+    "size": 2850,
+    "crc32": "C3785CA5",
+    "sha256": "7f8086abc46bdc28fc528601ee160750b3ef901ba527d06264c66d0c501586e4"
+  },
+  {
+    "stable_id": "P2P-FILE-0067",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-tecton.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-tecton.md",
+    "size": 2554,
+    "crc32": "DD55628B",
+    "sha256": "4433be7a3b32613c8b6f572f83c8a80cca107b9db7fa21523899427de466e738"
+  },
+  {
+    "stable_id": "P2P-FILE-0068",
+    "path": "8.4.6-C/plugin/.claude/agents/p2p-vector.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/agents/p2p-vector.md",
+    "size": 2234,
+    "crc32": "D5D4FF7D",
+    "sha256": "5bf3585472409e0818a06a79525412b0b8deaff8a951ab6580aceb78d600c3b3"
+  },
+  {
+    "stable_id": "P2P-FILE-0069",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-atlas.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-atlas.md",
+    "size": 1566,
+    "crc32": "F84AB5A4",
+    "sha256": "4a494972c61bb0ce6651a09f1e138aa848746f58d19381f720b2f9a037f638ae"
+  },
+  {
+    "stable_id": "P2P-FILE-0070",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-capsule.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-capsule.md",
+    "size": 1373,
+    "crc32": "7C030B7B",
+    "sha256": "bff788dda9ab75b78c229e875d482cebc9dde073bc9f29ebc193d361c08542b5"
+  },
+  {
+    "stable_id": "P2P-FILE-0071",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-chain.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-chain.md",
+    "size": 1168,
+    "crc32": "1DD058F4",
+    "sha256": "ab11b7b4e3caf75e616699bbd86f9d161d80693d3849ea1952fd2b6c77984f03"
+  },
+  {
+    "stable_id": "P2P-FILE-0072",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-download.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-download.md",
+    "size": 1293,
+    "crc32": "14FA54EC",
+    "sha256": "8c1c4a34b90088e6187553dfce9e319c8eb55c08664491ef8c805aa005c41537"
+  },
+  {
+    "stable_id": "P2P-FILE-0073",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-explore.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-explore.md",
+    "size": 1174,
+    "crc32": "F6223CCB",
+    "sha256": "fbb3232d2c46701cf1497a9577f9db5ad006dd0375fcdf9bf0d5c227104e0853"
+  },
+  {
+    "stable_id": "P2P-FILE-0074",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-feedback.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-feedback.md",
+    "size": 1157,
+    "crc32": "47B83087",
+    "sha256": "23ea4f3e3fde8d0f8de9995832bb4477011e9ebe40762780512c4bd979b5e2cb"
+  },
+  {
+    "stable_id": "P2P-FILE-0075",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-karpathy.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-karpathy.md",
+    "size": 2303,
+    "crc32": "54B84481",
+    "sha256": "391b642ea05c1cc88f0402a9e01ef1da3b4e9069e61626b4c46af758b08d6b49"
+  },
+  {
+    "stable_id": "P2P-FILE-0076",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-metrics.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-metrics.md",
+    "size": 1045,
+    "crc32": "33888F03",
+    "sha256": "7194a567e76ed2a2a02e976734d3a4ae5940d6fd77e8c2ffd85d01db4e124462"
+  },
+  {
+    "stable_id": "P2P-FILE-0077",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-pxpipe.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-pxpipe.md",
+    "size": 3962,
+    "crc32": "EB5A5CD3",
+    "sha256": "f5fda8228502af56134449cc14b7e6741e5f5c402dd67a9fb6691c8c5be06024"
+  },
+  {
+    "stable_id": "P2P-FILE-0078",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-quorum.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-quorum.md",
+    "size": 1795,
+    "crc32": "50FF811B",
+    "sha256": "86c4eaa9ae0e34b732e963e9489a2a5e53d94b5d16c134e618f614429ff6e877"
+  },
+  {
+    "stable_id": "P2P-FILE-0079",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-scope.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-scope.md",
+    "size": 1262,
+    "crc32": "3C295D92",
+    "sha256": "46a927a4b8bdf88544004b98e141bd7779bcd6ce68c4f7fc13e4a5510e14c70b"
+  },
+  {
+    "stable_id": "P2P-FILE-0080",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p-teacher.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p-teacher.md",
+    "size": 8472,
+    "crc32": "D39C9570",
+    "sha256": "164448238ca6b3a845f29357acfd94e2b1a4e8b110f84cf3ed6879d7056932b4"
+  },
+  {
+    "stable_id": "P2P-FILE-0081",
+    "path": "8.4.6-C/plugin/.claude/commands/p2p.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/commands/p2p.md",
+    "size": 4519,
+    "crc32": "EDE86773",
+    "sha256": "b1f73b2ad4da4613474a277c4e91843dc4d6bd885c2c6363ebb03c061af0cea1"
+  },
+  {
+    "stable_id": "P2P-FILE-0082",
+    "path": "8.4.6-C/plugin/.claude/settings.json",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/settings.json",
+    "size": 1662,
+    "crc32": "D585F5E0",
+    "sha256": "116e774621e6a00c35f9619466fe634df4c7ae2f6d209b04f8b23f220b120dc9"
+  },
+  {
+    "stable_id": "P2P-FILE-0083",
+    "path": "8.4.6-C/plugin/.claude/skills/bb4pda/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/bb4pda/SKILL.md",
+    "size": 8618,
+    "crc32": "3D2ADB81",
+    "sha256": "91c30ba817bbb67f25f47dfb896e3ce399d7cf75606455f6d359482207827919"
+  },
+  {
+    "stable_id": "P2P-FILE-0084",
+    "path": "8.4.6-C/plugin/.claude/skills/bb4pda/reference/bb_4pda_db.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/bb4pda/reference/bb_4pda_db.md",
+    "size": 20420,
+    "crc32": "3EFCE732",
+    "sha256": "0adb96b3f68ca8d45ffdf0871c425185d6b66ab89aa1376530f04f2e7b039448"
+  },
+  {
+    "stable_id": "P2P-FILE-0085",
+    "path": "8.4.6-C/plugin/.claude/skills/bb4pda/reference/common_codes.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/bb4pda/reference/common_codes.md",
+    "size": 4597,
+    "crc32": "58C279C0",
+    "sha256": "aa3a52da649a2e91dc063bb6bb90de0e7b855b82989c33389f15c85b24ef2aa2"
+  },
+  {
+    "stable_id": "P2P-FILE-0086",
+    "path": "8.4.6-C/plugin/.claude/skills/bb4pda/reference/edge_cases.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/bb4pda/reference/edge_cases.md",
+    "size": 3061,
+    "crc32": "A1FB6934",
+    "sha256": "8962b375fef4e502d348f08b232593560d1988add11b53772b156b3003891b66"
+  },
+  {
+    "stable_id": "P2P-FILE-0087",
+    "path": "8.4.6-C/plugin/.claude/skills/bb4pda/reference/images_4pda.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/bb4pda/reference/images_4pda.md",
+    "size": 11081,
+    "crc32": "50C77DF9",
+    "sha256": "cb190f8b1098f600fb72cf92c02fd7cd816264e6ce6cd492957508b8208e029c"
+  },
+  {
+    "stable_id": "P2P-FILE-0088",
+    "path": "8.4.6-C/plugin/.claude/skills/bb4pda/reference/symbols_fontello.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/bb4pda/reference/symbols_fontello.md",
+    "size": 4135,
+    "crc32": "ECE6D452",
+    "sha256": "288bf362b5015295873cb5adb19f66a4e74831949ba8324966675a2b6ef8f8f3"
+  },
+  {
+    "stable_id": "P2P-FILE-0089",
+    "path": "8.4.6-C/plugin/.claude/skills/notebook-pack/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/notebook-pack/SKILL.md",
+    "size": 4484,
+    "crc32": "C83C1979",
+    "sha256": "3572d996bb373b0d7ee7b72b3c38d3454ad3e7bf9356020c7c6bcbec471944f6"
+  },
+  {
+    "stable_id": "P2P-FILE-0090",
+    "path": "8.4.6-C/plugin/.claude/skills/notebook-pack/reference/rag_metaprompt_standard.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/notebook-pack/reference/rag_metaprompt_standard.md",
+    "size": 49161,
+    "crc32": "4B95ED1A",
+    "sha256": "408b9901a428a379b38f1eb1a84ab18ad70a0e7625add96a1ba5da04b2fa50f4"
+  },
+  {
+    "stable_id": "P2P-FILE-0091",
+    "path": "8.4.6-C/plugin/.claude/skills/notebook-pack/reference/rag_notebook_prompt.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/notebook-pack/reference/rag_notebook_prompt.md",
+    "size": 32034,
+    "crc32": "07C41B99",
+    "sha256": "7bdecd5e04874400177b3d84d6947fecdda63b01fcc4cb1679ee5c24ec5bbe9c"
+  },
+  {
+    "stable_id": "P2P-FILE-0092",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p-quorum/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p-quorum/SKILL.md",
+    "size": 1520,
+    "crc32": "442E31E2",
+    "sha256": "ac085e9939f31ebd48c232bac327c93db2b4020091ea35d95af25abf3606e7bf"
+  },
+  {
+    "stable_id": "P2P-FILE-0093",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p-teacher/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p-teacher/SKILL.md",
+    "size": 2924,
+    "crc32": "8BE25758",
+    "sha256": "c9329d7e1f9691816d8407937631227a2d525be9106557c67937cc65f89b3115"
+  },
+  {
+    "stable_id": "P2P-FILE-0094",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/SKILL.md",
+    "size": 3516,
+    "crc32": "DEAAD2FE",
+    "sha256": "e1108a43fcfb3724b75ff978b90e1e266a0aff06409322e081d3e074d6388cc3"
+  },
+  {
+    "stable_id": "P2P-FILE-0095",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/agents.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/agents.md",
+    "size": 19039,
+    "crc32": "4D23AF2B",
+    "sha256": "1f267d54f8fc96e53dea240949ebfe8f404330f611e84a33518ac9320d23388d"
+  },
+  {
+    "stable_id": "P2P-FILE-0096",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/art.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/art.md",
+    "size": 5176,
+    "crc32": "DABACFD2",
+    "sha256": "8ecbb30d7928ff55fb56014c902b14fac37079ea06939762feedddc6d96190bc"
+  },
+  {
+    "stable_id": "P2P-FILE-0097",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/compression.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/compression.md",
+    "size": 9888,
+    "crc32": "75193E42",
+    "sha256": "d3b6277de8649e192145ce815cf35c20d92a216d95d9cfc7dc6b88f25e151f37"
+  },
+  {
+    "stable_id": "P2P-FILE-0098",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/contract_builder.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/contract_builder.md",
+    "size": 17186,
+    "crc32": "D5F8B2E4",
+    "sha256": "40f86a6e5a529df083d75917398a9f9b5731dad28e76e3897883f807c3ee2cf8"
+  },
+  {
+    "stable_id": "P2P-FILE-0099",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/core.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/core.md",
+    "size": 41182,
+    "crc32": "91E21BEA",
+    "sha256": "64e33cf4592bcf241695b342ba4ea3f0983ec975f8fa324f48631a16a8367598"
+  },
+  {
+    "stable_id": "P2P-FILE-0100",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/db.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/db.md",
+    "size": 62813,
+    "crc32": "29A91513",
+    "sha256": "f846339ccf820428bb47a5c1cc0370fbefefb7aa7783a1384bb9bf67f534329b"
+  },
+  {
+    "stable_id": "P2P-FILE-0101",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/debug_engine.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/debug_engine.md",
+    "size": 12647,
+    "crc32": "9F080211",
+    "sha256": "c288f03aba460913de30bedf2e365227e03d3e46c754fb8224bb5b4d6a566f1c"
+  },
+  {
+    "stable_id": "P2P-FILE-0102",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/domain_knowledge.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/domain_knowledge.md",
+    "size": 22098,
+    "crc32": "6EB9EA74",
+    "sha256": "d724ee470491bdc9675cd1218ef72b0cdb388bae20015a65373800f3737b3d21"
+  },
+  {
+    "stable_id": "P2P-FILE-0103",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/exploration_mode.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/exploration_mode.md",
+    "size": 9844,
+    "crc32": "4C265FA5",
+    "sha256": "89e6d7536ad1f32295e4b01daa82b2512fe2eae085917e7b05a9799be477a010"
+  },
+  {
+    "stable_id": "P2P-FILE-0104",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/global_index.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/global_index.md",
+    "size": 8376,
+    "crc32": "CD0C7653",
+    "sha256": "8c3000eaf2cc48ef42bde5573dde1264ec660576aac5e1d9ef7443b24b214773"
+  },
+  {
+    "stable_id": "P2P-FILE-0105",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/glossary.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/glossary.md",
+    "size": 6152,
+    "crc32": "A9F39606",
+    "sha256": "3609ec556a62499dbcb6b17d64cca4df7f3b910c29a888aec1c8dc41f727fc17"
+  },
+  {
+    "stable_id": "P2P-FILE-0106",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/intent_engine.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/intent_engine.md",
+    "size": 13815,
+    "crc32": "095DE7A9",
+    "sha256": "12147d0add5e650bc198e3c6e930ac6044fc8f1343d4a6f6600ffe9b8de5a5d9"
+  },
+  {
+    "stable_id": "P2P-FILE-0107",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/master.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/master.md",
+    "size": 4216,
+    "crc32": "9B3730D0",
+    "sha256": "1ab131670de1b058adcf72e07dcaee482a38cc8f1592c3894d3e76562f378628"
+  },
+  {
+    "stable_id": "P2P-FILE-0108",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/memory_bridge.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/memory_bridge.md",
+    "size": 11413,
+    "crc32": "9829CC41",
+    "sha256": "724152f986425c74b7ee3bbb1a26348b9d7bb046fb136911db7cbaed1a9947d2"
+  },
+  {
+    "stable_id": "P2P-FILE-0109",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/mentor_method.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/mentor_method.md",
+    "size": 13826,
+    "crc32": "3840E346",
+    "sha256": "62c274eb89a2f28bf238af26af212895e51425b878bb542126c4a7a4f020954e"
+  },
+  {
+    "stable_id": "P2P-FILE-0110",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/optimization.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/optimization.md",
+    "size": 9424,
+    "crc32": "ECA29788",
+    "sha256": "960cb82bf72353b23d5f2ff7c3926104625361714af23f4f5008560504883ef1"
+  },
+  {
+    "stable_id": "P2P-FILE-0111",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/p2p.config.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/p2p.config.md",
+    "size": 2028,
+    "crc32": "EA9ED561",
+    "sha256": "9e206c4f4e4be84a9a5a5fb7bc1c2323c2431adfb40d31d0f6bfb32403800406"
+  },
+  {
+    "stable_id": "P2P-FILE-0112",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/preloader.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/preloader.md",
+    "size": 10942,
+    "crc32": "E13DCC1A",
+    "sha256": "8dd18253cbc479455e023f69365f852e4e8b74ef3123402707bdadc0443f8183"
+  },
+  {
+    "stable_id": "P2P-FILE-0113",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/rag.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/rag.md",
+    "size": 5972,
+    "crc32": "1CA4C937",
+    "sha256": "8b859a4607c51be025036a029a5224b429ea06ba02a2afbf119d52e985648243"
+  },
+  {
+    "stable_id": "P2P-FILE-0114",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/reasoning.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/reasoning.md",
+    "size": 7335,
+    "crc32": "D3C8ED31",
+    "sha256": "97b908ba249431e5ecb2c207f37204a40a97efa0d4b1bd8b56a151931666ae1d"
+  },
+  {
+    "stable_id": "P2P-FILE-0115",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/routing.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/routing.md",
+    "size": 6814,
+    "crc32": "28433D4E",
+    "sha256": "e11d357229999700ad1b2fcc431915931e1175241628f8017302532c74a7eb28"
+  },
+  {
+    "stable_id": "P2P-FILE-0116",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/sandbox_user.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/sandbox_user.md",
+    "size": 5360,
+    "crc32": "AC55343F",
+    "sha256": "962d67100464eaf388df4284c8e1101cb3fd541186433abd88103dd093008b47"
+  },
+  {
+    "stable_id": "P2P-FILE-0117",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/scope_helm.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/scope_helm.md",
+    "size": 14875,
+    "crc32": "FCCA620F",
+    "sha256": "91fc5198c16d0ff4966708691dc6e4b9029f3669aee484ca8cadd7e01f9a6a7c"
+  },
+  {
+    "stable_id": "P2P-FILE-0118",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/security.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/security.md",
+    "size": 6333,
+    "crc32": "21F7B7AC",
+    "sha256": "5d9b65b244f07ae5875efc8cce300da5d2b83938a0df3e6ee5243033fe67a601"
+  },
+  {
+    "stable_id": "P2P-FILE-0119",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/session_metrics.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/session_metrics.md",
+    "size": 11036,
+    "crc32": "CB597F39",
+    "sha256": "301577bd5241716abc77e98b99a475d019f25a3b590c31ba9d0f655e20175b93"
+  },
+  {
+    "stable_id": "P2P-FILE-0120",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/teacher.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/teacher.md",
+    "size": 32841,
+    "crc32": "85F89410",
+    "sha256": "9ee19b77a92c71fb0271f03a31c45db730fe54b3b6c2326060e325062c8d002e"
+  },
+  {
+    "stable_id": "P2P-FILE-0121",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/templates_library.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/templates_library.md",
+    "size": 16034,
+    "crc32": "255A0705",
+    "sha256": "a53587f0c76b620d41ef75aff8966ab8fb98f191d5bf3fd39134c6ec0b061e3d"
+  },
+  {
+    "stable_id": "P2P-FILE-0122",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/tool_budget.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/tool_budget.md",
+    "size": 3879,
+    "crc32": "64B6008A",
+    "sha256": "614d1a8d35edd376584b4478acc1b37cc5dfb9cf318736b3d527dc3f0541089b"
+  },
+  {
+    "stable_id": "P2P-FILE-0123",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/user_context.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/user_context.md",
+    "size": 4959,
+    "crc32": "6F4137DB",
+    "sha256": "ed00139a90d8d757083c04d6ba26733d9d7eafd57a715b2db7addde39950ac3b"
+  },
+  {
+    "stable_id": "P2P-FILE-0124",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_claude.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_claude.md",
+    "size": 7385,
+    "crc32": "D848C3AA",
+    "sha256": "19d06062f2d571feec219eff78babf3dd100faf36acbd7d3d35f326084529a26"
+  },
+  {
+    "stable_id": "P2P-FILE-0125",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_core.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_core.md",
+    "size": 4046,
+    "crc32": "6FD3DA09",
+    "sha256": "2f61497926a6bc945d2c26d8972648529855458e77116ee43836c15f34cbf137"
+  },
+  {
+    "stable_id": "P2P-FILE-0126",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_manifest.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_manifest.md",
+    "size": 9463,
+    "crc32": "1B978F06",
+    "sha256": "49f4977e2dedf29dbe0bf20726eba1b4d874fc4cbb86cf36959dde044b45e160"
+  },
+  {
+    "stable_id": "P2P-FILE-0127",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_specs.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/_live_specs.md",
+    "size": 12569,
+    "crc32": "40CC26CF",
+    "sha256": "2c93174b6da3005999f7a6e29fbe0113391bf9f75e0f2d62e9ecb0eb9389af49"
+  },
+  {
+    "stable_id": "P2P-FILE-0128",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/live_specs.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/live_specs.md",
+    "size": 38568,
+    "crc32": "64C65DDA",
+    "sha256": "1da9e4a13d8e40d50df68b9af4f65a3ec05b3930358f5b705f8bb55d96f43c8d"
+  },
+  {
+    "stable_id": "P2P-FILE-0129",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier1.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/tier1.md",
+    "size": 4965,
+    "crc32": "1E68D4BB",
+    "sha256": "5b65f743b215eea94aca33ec5ae7b9548b7cea32dd12261dac58b4cebecd6f27"
+  },
+  {
+    "stable_id": "P2P-FILE-0130",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier2.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/tier2.md",
+    "size": 2946,
+    "crc32": "77202E54",
+    "sha256": "327860e4ba6c2e89cb7aaddb8787ced482d583b4f0afcdea719f93348465413d"
+  },
+  {
+    "stable_id": "P2P-FILE-0131",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier3.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/tier3.md",
+    "size": 4682,
+    "crc32": "3D524F4D",
+    "sha256": "292d1594d86a89a1c57214d4e239bea07b8f81487558a465750b8042481d0cb5"
+  },
+  {
+    "stable_id": "P2P-FILE-0132",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/vendors/tier4.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/vendors/tier4.md",
+    "size": 5683,
+    "crc32": "E2130F54",
+    "sha256": "5fca3bdec3db37e71a5b7dc79e2f0cc1c61f3c50ff52e448d9d8ea12e9eac6b2"
+  },
+  {
+    "stable_id": "P2P-FILE-0133",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/visual_suite.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/visual_suite.md",
+    "size": 7269,
+    "crc32": "1214B327",
+    "sha256": "4efddb100cea7eae5ee7647e49fabb06e9a00af9dff26d8f3da178239416beda"
+  },
+  {
+    "stable_id": "P2P-FILE-0134",
+    "path": "8.4.6-C/plugin/.claude/skills/p2p/writing_suite.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/p2p/writing_suite.md",
+    "size": 13183,
+    "crc32": "7A06EF24",
+    "sha256": "6a729569fc75835dde2604dabbafa267de72b695184e440794adecc7b3802ccd"
+  },
+  {
+    "stable_id": "P2P-FILE-0135",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/SKILL.md",
+    "size": 5494,
+    "crc32": "343F09F2",
+    "sha256": "4a946fd22e4045d07a96531fbe11c81126c94ac1ad717146a3c3ce75ff221ee7"
+  },
+  {
+    "stable_id": "P2P-FILE-0136",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/VERIFICATION.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/VERIFICATION.md",
+    "size": 7408,
+    "crc32": "7C3A8655",
+    "sha256": "515cade28a892363b885cbf0be4a48a7c0b447d5f4f166303668fe5256286f8a"
+  },
+  {
+    "stable_id": "P2P-FILE-0137",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/byte-guard.mjs",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/byte-guard.mjs",
+    "size": 2430,
+    "crc32": "93E50011",
+    "sha256": "7e72dbe37ca5e2c8682a26876a9b55d94167d0d4461ed893fece29b20d9afe96"
+  },
+  {
+    "stable_id": "P2P-FILE-0138",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/compress.mjs",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/compress.mjs",
+    "size": 5595,
+    "crc32": "F3EC71E8",
+    "sha256": "7d8f2cc9eb18af429e5183fde01037919c43f084974b078b23f252efec107bd4"
+  },
+  {
+    "stable_id": "P2P-FILE-0139",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/lib-resolve.mjs",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/lib-resolve.mjs",
+    "size": 1143,
+    "crc32": "075F707E",
+    "sha256": "91d2e7acf9faecfc0fbb56d0d835069b44d0aebf928a8f16dae946d455e69a52"
+  },
+  {
+    "stable_id": "P2P-FILE-0140",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/measure.mjs",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/measure.mjs",
+    "size": 3970,
+    "crc32": "61F240E2",
+    "sha256": "5f25ec4ed7b70f1744b569e92b48e4e02da9e3cd734473c4036a219dfbc557c6"
+  },
+  {
+    "stable_id": "P2P-FILE-0141",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/package-lock.json",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/package-lock.json",
+    "size": 1204,
+    "crc32": "C85987B3",
+    "sha256": "5f98b41f625617cd5a4dcbc34c2ff0de7a4066d62a6ac8c0808bef498a973e06"
+  },
+  {
+    "stable_id": "P2P-FILE-0142",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/package.json",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/package.json",
+    "size": 467,
+    "crc32": "3C251DB4",
+    "sha256": "e275c89880903d27356f739e18a3afad4a3c264e0d6d07f1db7f0ef0141bd317"
+  },
+  {
+    "stable_id": "P2P-FILE-0143",
+    "path": "8.4.6-C/plugin/.claude/skills/pxpipe/samples/gen-needles.mjs",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/pxpipe/samples/gen-needles.mjs",
+    "size": 7013,
+    "crc32": "58A91FE8",
+    "sha256": "37614add3afdee012d42d283b10a4bc8822e04914836070209f83bc952870a34"
+  },
+  {
+    "stable_id": "P2P-FILE-0144",
+    "path": "8.4.6-C/plugin/.claude/skills/rag-grounding/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/rag-grounding/SKILL.md",
+    "size": 4525,
+    "crc32": "856CBB01",
+    "sha256": "c47d8505f1cb95065430b78e6a0b220ca03f214a00cfed7ee0583b3212249df6"
+  },
+  {
+    "stable_id": "P2P-FILE-0145",
+    "path": "8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates.md",
+    "size": 4767,
+    "crc32": "95A27284",
+    "sha256": "1869622ae16eed06659ce8c835a0f1466c77c1a472f7e96b5b775fb34c7611c0"
+  },
+  {
+    "stable_id": "P2P-FILE-0146",
+    "path": "8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates_source.txt",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates_source.txt",
+    "size": 8869,
+    "crc32": "D5C11987",
+    "sha256": "6a25909970e7edc32623c82152fdde10bba671ceb04f2ef7da043bc5bcdd07c2"
+  },
+  {
+    "stable_id": "P2P-FILE-0147",
+    "path": "8.4.6-C/plugin/.claude/skills/rag-prep/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/rag-prep/SKILL.md",
+    "size": 4833,
+    "crc32": "7271F713",
+    "sha256": "8663e2e96800550b82d93de7629ed21e9855bd5595d2f44a497db156423d08d2"
+  },
+  {
+    "stable_id": "P2P-FILE-0148",
+    "path": "8.4.6-C/plugin/.claude/skills/rag-prep/reference/rag_metaprompt_standard.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/rag-prep/reference/rag_metaprompt_standard.md",
+    "size": 49161,
+    "crc32": "4B95ED1A",
+    "sha256": "408b9901a428a379b38f1eb1a84ab18ad70a0e7625add96a1ba5da04b2fa50f4"
+  },
+  {
+    "stable_id": "P2P-FILE-0149",
+    "path": "8.4.6-C/plugin/.claude/skills/rag-router/SKILL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/.claude/skills/rag-router/SKILL.md",
+    "size": 4157,
+    "crc32": "9AEEA612",
+    "sha256": "4e64c603fbb98bc1f6e9d1a20ceb5558dadf363913a2de6e3101f61171ef427b"
+  },
+  {
+    "stable_id": "P2P-FILE-0150",
+    "path": "8.4.6-C/plugin/INSTALL.md",
+    "source_snapshot_path": "source/8.4.6-C/plugin/INSTALL.md",
+    "size": 3831,
+    "crc32": "C5707EE3",
+    "sha256": "6aeb42f7dea62b7d4571189baa7fe6a40d63d6e74b8ab3bcf167bc1cd9d5e036"
+  },
+  {
+    "stable_id": "P2P-FILE-0151",
+    "path": "8.4.6-C/plugin/pack.ps1",
+    "source_snapshot_path": "source/8.4.6-C/plugin/pack.ps1",
+    "size": 6839,
+    "crc32": "E50F7527",
+    "sha256": "ca3bb727c8c1d066f156ea9db4d0d1c5bcdc5fa73b2021f318ade51a753db5bd"
+  },
+  {
+    "stable_id": "P2P-FILE-0152",
+    "path": "8.4.6-C/plugin/pack.sh",
+    "source_snapshot_path": "source/8.4.6-C/plugin/pack.sh",
+    "size": 3746,
+    "crc32": "3A71CBF8",
+    "sha256": "ba43646e7696a0865fc652e691f459c94d2fdbac40c578e38deb42e7e9f112ff"
+  }
+]

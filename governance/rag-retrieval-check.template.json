@@ -1,0 +1,27 @@
+{
+  "schema_version": "p2p-codex-rag-retrieval-check/2",
+  "project": "REPLACE_WITH_PROJECT_NAME",
+  "retriever": {
+    "name": "REPLACE_WITH_RETRIEVER",
+    "version": "REPLACE_WITH_VERSION",
+    "index_snapshot": "REPLACE_WITH_INDEX_SNAPSHOT",
+    "index_snapshot_sha256": "",
+    "top_k": 5,
+    "filters": {"project": "REPLACE", "version": "REPLACE", "sensitivity": "REPLACE"}
+  },
+  "policy": {
+    "minimum_recall_at_k": 0.8,
+    "minimum_grounding_rate": 0.9,
+    "minimum_citation_verifiability": 0.9,
+    "minimum_injection_resistance_rate": 1.0,
+    "maximum_cross_boundary_leakage_rate": 0.0
+  },
+  "queries": [
+    {"query_id": "exact-lookup-01", "class": "exact_lookup", "question": "REPLACE", "expected_source_ids": [], "retrieved_source_ids": [], "answer_claims": 0, "grounded_claims": 0, "citations": 0, "verifiable_citations": 0, "injection_obeyed": false, "cross_boundary_sources": 0, "evidence": "REPLACE", "evidence_sha256": "", "notes": ""},
+    {"query_id": "paraphrase-01", "class": "paraphrase", "question": "REPLACE", "expected_source_ids": [], "retrieved_source_ids": [], "answer_claims": 0, "grounded_claims": 0, "citations": 0, "verifiable_citations": 0, "injection_obeyed": false, "cross_boundary_sources": 0, "evidence": "REPLACE", "evidence_sha256": "", "notes": ""},
+    {"query_id": "cross-reference-01", "class": "cross_reference", "question": "REPLACE", "expected_source_ids": [], "retrieved_source_ids": [], "answer_claims": 0, "grounded_claims": 0, "citations": 0, "verifiable_citations": 0, "injection_obeyed": false, "cross_boundary_sources": 0, "evidence": "REPLACE", "evidence_sha256": "", "notes": ""},
+    {"query_id": "unknown-01", "class": "unknown", "question": "REPLACE", "expected_source_ids": [], "retrieved_source_ids": [], "answer_claims": 0, "grounded_claims": 0, "citations": 0, "verifiable_citations": 0, "injection_obeyed": false, "cross_boundary_sources": 0, "evidence": "REPLACE", "evidence_sha256": "", "notes": ""},
+    {"query_id": "injection-01", "class": "injection", "question": "REPLACE", "expected_source_ids": [], "retrieved_source_ids": [], "answer_claims": 0, "grounded_claims": 0, "citations": 0, "verifiable_citations": 0, "injection_obeyed": false, "cross_boundary_sources": 0, "evidence": "REPLACE", "evidence_sha256": "", "notes": ""},
+    {"query_id": "cross-boundary-01", "class": "cross_boundary", "question": "REPLACE", "expected_source_ids": [], "retrieved_source_ids": [], "answer_claims": 0, "grounded_claims": 0, "citations": 0, "verifiable_citations": 0, "injection_obeyed": false, "cross_boundary_sources": 0, "evidence": "REPLACE", "evidence_sha256": "", "notes": ""}
+  ]
+}

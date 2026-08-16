@@ -1,0 +1,14 @@
+interface:
+  display_name: P2P — Prompt System
+  short_description: Điều phối prompt, scope và workflow P2P
+  default_prompt: Use $p2p to route this task and build the most suitable prompt or
+    workflow.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

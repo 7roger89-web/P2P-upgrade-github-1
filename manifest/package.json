@@ -1,0 +1,75 @@
+{
+  "schema_version": "p2p-codex-project-bundle/1",
+  "name": "P2P 8.4.7-C Codex Edition",
+  "version": "8.4.7-C-codex.21",
+  "language": "vi",
+  "upstream": {
+    "project": "sanic732/P2P-4PDA-edition",
+    "release": "v8.4.6",
+    "edition": "8.4.6-C",
+    "url": "https://github.com/sanic732/P2P-4PDA-edition/releases/tag/v8.4.6"
+  },
+  "baseline": {
+    "file_count": 152,
+    "zip_sha256": "cafa5bbfa48048a9f2e6c54f6cfc329d2b25b34ea764809175dbae0e8f233fd8",
+    "immutable_snapshot": "source/8.4.6-C",
+    "original_archive": "source/releases/8.4.6-C-original.zip"
+  },
+  "supplemental_sources": {
+    "manifest": "manifest/external-sources.json",
+    "stored_snapshot_count": 4,
+    "living_link_count": 1,
+    "baseline_effect": "NONE_BASELINE_REMAINS_152"
+  },
+  "codex_layer": {
+    "skill_count": 23,
+    "skill_root": ".agents/skills",
+    "custom_agent_count": 8,
+    "custom_agent_root": ".codex/agents",
+    "project_config": ".codex/config.toml",
+    "project_instructions": "AGENTS.md"
+  },
+  "gates": {
+    "source_inventory": "VERIFIED_152_OF_152",
+    "skill_structure": "VALIDATED_23_OF_23_INCLUDING_P2P_UIUX",
+    "supplemental_sources": "MANIFESTED_5_WITH_4_HASHED_SNAPSHOTS",
+    "agent_profiles": "TOML_PARSED_8_OF_8_PLUS_OPTIONAL_AESTHETICA",
+    "installer_linux": "FRESH_INSTALL_REINSTALL_AND_MERGE_TEST_PASS",
+    "installer_windows": "STATIC_REVIEW_ONLY_NO_POWERSHELL_HOST",
+    "eight_thread_runtime": "NOT_EXECUTED_REQUIRES_CODEX_HOST",
+    "fact_ledger": "VALIDATED_REVISION_2_WITH_9_CLAIMS_AND_5_RUNTIME_ELIGIBLE",
+    "live_specs_sync": "TECHNICAL_PREVIEW_USER_APPROVAL_GENERATION_AND_HASH_CHAIN_VERIFIED",
+    "active_runtime_drift": "PROTECTED_RUNTIME_MANIFEST_REQUIRED_AND_TAMPER_SENSITIVE",
+    "project_eval": "V2_GATE_REQUIRES_5_CLASSES_2_TRIALS_HASHED_FIXTURES_AND_EVIDENCE",
+    "rag_retrieval_eval": "SIX_CLASS_BOUNDARY_GATE_READY_NO_CORPUS_RESULT_CLAIMED",
+    "user_approval": "MANDATORY_AFTER_TECHNICAL_PASS_BOUND_TO_SUBJECT_AND_REPORT_HASHES",
+    "live_model_vendor_data": "LEGACY_QUARANTINED_RUNTIME_USES_ONLY_UNEXPIRED_LEDGER_FACTS",
+    "pxpipe": "PRESERVED_DISABLED_PENDING_SECURITY_AND_COMPATIBILITY_AUDIT"
+  },
+  "entrypoints": {
+    "beginner_guide": "BAT-DAU.md",
+    "release_notes": "RELEASE-NOTES.md",
+    "beginner_idea_skill": ".agents/skills/p2p-idea/SKILL.md",
+    "usage": "docs/SU-DUNG.md",
+    "updates": "docs/CAP-NHAT.md",
+    "cross_chat_handoff": "docs/AI-HANDOFF.md",
+    "governance_guide": "docs/QUAN-TRI-FACT-EVAL-RAG.md",
+    "horizontal_vertical_analysis": "docs/PHAN-TICH-CHIEU-NGANG-DOC.md",
+    "fact_ledger": "governance/fact-ledger.json",
+    "live_specs": "governance/live-specs.json",
+    "project_eval_skill": ".agents/skills/p2p-eval/SKILL.md",
+    "workflow_helper": "scripts/p2p_workflow.py",
+    "workflow_classify": "scripts/p2p_workflow.py classify",
+    "workflow_update": "scripts/p2p_workflow.py update",
+    "workflow_approach": "scripts/p2p_workflow.py approach",
+    "workflow_acceptance": "scripts/p2p_workflow.py acceptance",
+    "decision_trace_cli": "scripts/p2p_decision_trace.py",
+    "development_control": "scripts/p2p_development_control.py",
+    "development_control_record": "governance/development-control.json",
+    "release_builder": "scripts/package_release.py",
+    "approval_skill": ".agents/skills/p2p-approval/SKILL.md",
+    "drift_gate": "scripts/p2p_governance.py",
+    "release_gate": "scripts/p2p_gate.py",
+    "doctor": "scripts/doctor.py"
+  }
+}

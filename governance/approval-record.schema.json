@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-codex-approval-record/2",
+  "title": "P2P user approval request or record",
+  "type": "object",
+  "required": [
+    "schema_version", "request_id", "state", "action", "scope",
+    "subject", "subject_sha256", "requested_at", "request_expires_at",
+    "requested_by", "risk_summary", "technical_report", "technical_report_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "p2p-codex-approval-record/2"},
+    "request_id": {"type": "string", "pattern": "^P2P-APR-[A-Za-z0-9._-]+$"},
+    "state": {"enum": ["PENDING", "APPROVED", "REJECTED"]},
+    "action": {"type": "string", "minLength": 1},
+    "scope": {"type": "string", "minLength": 1},
+    "subject": {"type": "string", "minLength": 1},
+    "subject_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "requested_at": {"type": "string", "format": "date-time"},
+    "request_expires_at": {"type": "string", "format": "date-time"},
+    "requested_by": {"type": "string", "minLength": 1},
+    "risk_summary": {"type": "string", "minLength": 1},
+    "technical_report": {"type": "string", "minLength": 1},
+    "technical_report_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "decision": {"enum": ["APPROVE", "REJECT"]},
+    "decided_at": {"type": "string", "format": "date-time"},
+    "decided_by": {"type": "string", "minLength": 1},
+    "decision_note": {"type": "string"},
+    "approval_method": {"enum": ["manual_cli", "conversation_explicit"]},
+    "identity_assurance": {"enum": ["local_interactive", "active_user_message"]},
+    "recorded_by": {"type": "string"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"enum": ["APPROVED", "REJECTED"]}}},
+      "then": {
+        "required": [
+          "decision", "decided_at", "decided_by", "decision_note",
+          "approval_method", "identity_assurance", "recorded_by"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false
+}

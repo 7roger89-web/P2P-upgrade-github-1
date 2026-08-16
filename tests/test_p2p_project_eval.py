@@ -1,0 +1,63 @@
+from __future__ import annotations
+
+import json
+import sys
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+import p2p_eval  # noqa: E402
+
+
+class P2PProjectEvalTests(unittest.TestCase):
+    def test_trial_commands_are_part_of_the_existing_eval_helper(self) -> None:
+        parser = p2p_eval.parser()
+        run_args = parser.parse_args(
+            [
+                "run",
+                "--suite",
+                ".p2p/evals/suite.json",
+                "--variant",
+                "baseline",
+                "--trial",
+                "1",
+                "--target-root",
+                ".tmp/eval-target",
+            ]
+        )
+        record_args = parser.parse_args(
+            [
+                "record",
+                "--suite",
+                ".p2p/evals/suite.json",
+                "--trial-record",
+                ".tmp/eval-record.json",
+            ]
+        )
+        self.assertEqual(run_args.variant, "baseline")
+        self.assertEqual(run_args.trial, 1)
+        self.assertEqual(record_args.trial_record, ".tmp/eval-record.json")
+
+    def test_current_suite_has_real_recorded_trial_pairs(self) -> None:
+        suite = json.loads((REPO_ROOT / ".p2p" / "evals" / "suite.json").read_text(encoding="utf-8"))
+        self.assertEqual(p2p_eval.validate(suite), [])
+        self.assertEqual(
+            [len(case["baseline_runs"]) for case in suite["cases"]],
+            [2] * len(suite["cases"]),
+        )
+        self.assertEqual(
+            [len(case["p2p_runs"]) for case in suite["cases"]],
+            [2] * len(suite["cases"]),
+        )
+        failures, summary = p2p_eval.gate(suite, REPO_ROOT / ".p2p" / "evals" / "suite.json")
+        self.assertEqual(failures, [])
+        self.assertEqual(summary["completed_case_pairs"], 5)
+        self.assertEqual(summary["p2p_pass_rate"], 1.0)
+        self.assertEqual(summary["delta"], 0.0)
+
+
+if __name__ == "__main__":
+    unittest.main()

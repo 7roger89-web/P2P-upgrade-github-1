@@ -1,0 +1,7 @@
+{
+  "schema": "p2p-nui-registry-lock/1",
+  "registry_path": "nui_registry.json",
+  "registry_sha256": "b1790ff1c5b793996cf2d57905b556d54fee2eb975cc2a0b0504c8a08eddd0d3",
+  "upstream_revision": "46780cdd58e41bea8338b2d27269d339c95e28e7",
+  "graph_sha256": "c90185bdda45ccd8d86716d4b565d2ac33c99644e732329ad7d8949a6a8117c6"
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "p2p-codex-approval-policy/1",
+  "default_request_ttl_hours": 24,
+  "principles": {
+    "technical_gates_run_before_approval": true,
+    "approval_cannot_override_failed_gate": true,
+    "subject_change_invalidates_approval": true,
+    "silence_is_not_approval": true,
+    "agent_may_create_request": true,
+    "agent_may_record_explicit_chat_approval": true,
+    "agent_may_self_approve": false,
+    "manual_cli_is_preferred_for_release_or_deploy": true,
+    "audit_control_not_os_identity_boundary": true
+  },
+  "protected_actions": {
+    "promote_live_specs": {
+      "description": "Promote changed FACT_LEDGER content into generated Live Specs.",
+      "required_technical_gates": ["fact_ledger", "live_specs_projection"],
+      "approval_ttl_hours": 24
+    },
+    "update_or_create_skill": {
+      "description": "Create, replace, or materially change a persistent skill.",
+      "required_technical_gates": ["skill_validation", "affected_eval"],
+      "approval_ttl_hours": 24
+    },
+    "release_or_deploy": {
+      "description": "Release, deploy, publish, merge, or promote an artifact or project state.",
+      "required_technical_gates": ["drift", "project_eval", "rag_if_affected", "rollback"],
+      "approval_ttl_hours": 24
+    },
+    "enable_external_io": {
+      "description": "Enable network calls, hooks, proxying, messaging, cloud memory, or a new external connector.",
+      "required_technical_gates": ["security_review", "data_boundary"],
+      "approval_ttl_hours": 8
+    },
+    "persistent_memory_write": {
+      "description": "Persist a new durable memory, preference, or learned rule.",
+      "required_technical_gates": ["source_and_scope_review"],
+      "approval_ttl_hours": 24
+    },
+    "destructive_change": {
+      "description": "Delete, overwrite, migrate, or irreversibly alter material project data.",
+      "required_technical_gates": ["backup", "target_resolution", "rollback"],
+      "approval_ttl_hours": 2
+    },
+    "external_communication": {
+      "description": "Send, publish, invite, notify, or otherwise act toward another person or external system.",
+      "required_technical_gates": ["recipient_resolution", "content_preview"],
+      "approval_ttl_hours": 2
+    }
+  }
+}

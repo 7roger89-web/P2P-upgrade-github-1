@@ -1,0 +1,85 @@
+{
+  "schema_version": "p2p-codex-project-eval/2",
+  "project": "REPLACE_WITH_PROJECT_NAME",
+  "policy": {
+    "minimum_cases": 5,
+    "minimum_trials_per_variant": 2,
+    "minimum_p2p_pass_rate": 0.8,
+    "maximum_mean_regression": 0.0,
+    "maximum_case_regressions": 0,
+    "maximum_score_spread": 0.25,
+    "blocked_cases_allowed": false
+  },
+  "comparison_contract": {
+    "same_input": true,
+    "same_environment": true,
+    "isolate_runs": true,
+    "record_model_and_surface": true,
+    "leakage_check": true,
+    "criteria_defined_before_runs": true,
+    "frozen_fixtures": true,
+    "no_cross_run_memory": true
+  },
+  "cases": [
+    {
+      "case_id": "replace-frequent-task",
+      "class": "frequent",
+      "title": "Replace with a frequent project task",
+      "task": "REPLACE_WITH_EXACT_TASK",
+      "fixture": "REPLACE_WITH_FROZEN_FIXTURE_PATH",
+      "fixture_sha256": "",
+      "tags": ["frequent", "project-specific"],
+      "checks": [{"check_id": "observable-success", "grader": "human", "weight": 1, "criterion": "REPLACE_WITH_OBSERVABLE_PASS_FAIL_CRITERION"}],
+      "baseline_runs": [],
+      "p2p_runs": []
+    },
+    {
+      "case_id": "replace-consequential-task",
+      "class": "consequential",
+      "title": "Replace with a consequential project task",
+      "task": "REPLACE_WITH_EXACT_TASK",
+      "fixture": "REPLACE_WITH_FROZEN_FIXTURE_PATH",
+      "fixture_sha256": "",
+      "tags": ["consequential", "project-specific"],
+      "checks": [{"check_id": "observable-success", "grader": "human", "weight": 1, "criterion": "REPLACE_WITH_OBSERVABLE_PASS_FAIL_CRITERION"}],
+      "baseline_runs": [],
+      "p2p_runs": []
+    },
+    {
+      "case_id": "replace-failure-prone-task",
+      "class": "failure_prone",
+      "title": "Replace with a failure-prone project task",
+      "task": "REPLACE_WITH_EXACT_TASK",
+      "fixture": "REPLACE_WITH_FROZEN_FIXTURE_PATH",
+      "fixture_sha256": "",
+      "tags": ["failure-prone", "project-specific"],
+      "checks": [{"check_id": "known-failure-fixed", "grader": "human", "weight": 1, "criterion": "REPLACE_WITH_OBSERVABLE_PASS_FAIL_CRITERION"}],
+      "baseline_runs": [],
+      "p2p_runs": []
+    },
+    {
+      "case_id": "replace-security-boundary-task",
+      "class": "security_boundary",
+      "title": "Replace with a permission or data-boundary task",
+      "task": "REPLACE_WITH_EXACT_TASK",
+      "fixture": "REPLACE_WITH_FROZEN_FIXTURE_PATH",
+      "fixture_sha256": "",
+      "tags": ["security", "boundary"],
+      "checks": [{"check_id": "boundary-respected", "grader": "human", "weight": 1, "criterion": "REPLACE_WITH_OBSERVABLE_PASS_FAIL_CRITERION"}],
+      "baseline_runs": [],
+      "p2p_runs": []
+    },
+    {
+      "case_id": "replace-regression-task",
+      "class": "regression",
+      "title": "Replace with a known project regression",
+      "task": "REPLACE_WITH_EXACT_TASK",
+      "fixture": "REPLACE_WITH_FROZEN_FIXTURE_PATH",
+      "fixture_sha256": "",
+      "tags": ["regression", "project-specific"],
+      "checks": [{"check_id": "regression-absent", "grader": "human", "weight": 1, "criterion": "REPLACE_WITH_OBSERVABLE_PASS_FAIL_CRITERION"}],
+      "baseline_runs": [],
+      "p2p_runs": []
+    }
+  ]
+}

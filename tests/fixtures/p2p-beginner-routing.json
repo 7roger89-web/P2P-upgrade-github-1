@@ -1,0 +1,406 @@
+{
+  "schema": "p2p-beginner-routing-fixture/1",
+  "purpose": "Outcome-based routing regression for beginner natural-language requests.",
+  "cases": [
+    {
+      "id": "A01",
+      "category": "clear_ui_outcome",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Giao diện này nhìn rối quá, tôi muốn người dùng hiểu ngay việc cần làm."
+    },
+    {
+      "id": "A02",
+      "category": "clear_ui_outcome",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "This dashboard is confusing; help people find the next action."
+    },
+    {
+      "id": "A03",
+      "category": "clear_ui_outcome",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Tôi muốn màn hình thanh toán dễ đọc hơn và giảm lỗi nhập liệu."
+    },
+    {
+      "id": "A04",
+      "category": "clear_ui_outcome",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Please redesign the navigation so first-time users can find reports quickly."
+    },
+    {
+      "id": "B01",
+      "category": "clear_product_idea",
+      "language": "vi",
+      "expected_primary": "IDEA",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Tôi có ý tưởng làm một ứng dụng nhưng chưa biết nên chọn tính năng nào."
+    },
+    {
+      "id": "B02",
+      "category": "clear_product_idea",
+      "language": "en",
+      "expected_primary": "IDEA",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "I want to build an app but I do not know which problem to solve first."
+    },
+    {
+      "id": "B03",
+      "category": "clear_product_idea",
+      "language": "vi",
+      "expected_primary": "IDEA",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Nên làm sản phẩm nào cho nhóm này? Tôi chưa có lựa chọn rõ ràng."
+    },
+    {
+      "id": "B04",
+      "category": "clear_product_idea",
+      "language": "en",
+      "expected_primary": "IDEA",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Help me decide what kind of product to build before choosing the first feature set."
+    },
+    {
+      "id": "C01",
+      "category": "mixed_product_and_ui",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": "IDEA",
+      "expected_scope": "MIXED",
+      "expected_aesthetica": false,
+      "request": "Tôi muốn xây app quản lý kho; hãy đề xuất bố cục màn hình đầu tiên cho nhân viên."
+    },
+    {
+      "id": "C02",
+      "category": "mixed_product_and_ui",
+      "language": "en",
+      "expected_primary": "IDEA",
+      "expected_secondary": "UI_UX",
+      "expected_scope": "MIXED",
+      "expected_aesthetica": false,
+      "request": "I need to choose the first features for a new app; the screen design can come later."
+    },
+    {
+      "id": "C03",
+      "category": "mixed_product_and_ui",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": "IDEA",
+      "expected_scope": "MIXED",
+      "expected_aesthetica": false,
+      "request": "Ứng dụng đã có người dùng, hãy làm lại quy trình đặt hàng và cân nhắc tính năng cần giữ."
+    },
+    {
+      "id": "C04",
+      "category": "mixed_product_and_ui",
+      "language": "en",
+      "expected_primary": "IDEA",
+      "expected_secondary": "UI_UX",
+      "expected_scope": "MIXED",
+      "expected_aesthetica": false,
+      "request": "Recommend a product direction for families; we may sketch a home screen after choosing the idea."
+    },
+    {
+      "id": "D01",
+      "category": "existing_usability",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Người dùng khó tìm nút cần bấm trong màn hình hiện tại."
+    },
+    {
+      "id": "D02",
+      "category": "existing_usability",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Existing users cannot find the save button on the current page."
+    },
+    {
+      "id": "D03",
+      "category": "existing_usability",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Quy trình đăng ký hiện tại quá khó dùng và người mới thường bỏ cuộc."
+    },
+    {
+      "id": "D04",
+      "category": "existing_usability",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "The form is hard to complete because the next step is unclear."
+    },
+    {
+      "id": "E01",
+      "category": "accessibility",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true,
+      "request": "Hãy làm màn hình này dùng được bằng bàn phím và có trạng thái focus rõ ràng."
+    },
+    {
+      "id": "E02",
+      "category": "accessibility",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true,
+      "request": "Make this screen usable with a keyboard and clear focus states."
+    },
+    {
+      "id": "E03",
+      "category": "accessibility",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Chữ trên màn hình khó đọc, hãy cải thiện độ tương phản và kích thước chữ."
+    },
+    {
+      "id": "E04",
+      "category": "accessibility",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true,
+      "request": "Improve accessibility through focus order, labels, and contrast for people using assistive technology."
+    },
+    {
+      "id": "F01",
+      "category": "responsive_mobile",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Trên điện thoại phần này rất khó dùng và nội dung bị tràn."
+    },
+    {
+      "id": "F02",
+      "category": "responsive_mobile",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "On small screens the dashboard cards overflow and the main action disappears."
+    },
+    {
+      "id": "F03",
+      "category": "responsive_mobile",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Hãy sửa bố cục để đọc được trên điện thoại và máy tính bảng."
+    },
+    {
+      "id": "F04",
+      "category": "responsive_mobile",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Make the dashboard readable on tablets without hiding navigation."
+    },
+    {
+      "id": "G01",
+      "category": "backend_negative",
+      "language": "en",
+      "expected_primary": "TECHNICAL",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Optimize API caching and database indexes for the reporting service."
+    },
+    {
+      "id": "G02",
+      "category": "backend_negative",
+      "language": "vi",
+      "expected_primary": "TECHNICAL",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Sửa truy vấn cơ sở dữ liệu và thêm migration cho bảng đơn hàng."
+    },
+    {
+      "id": "G03",
+      "category": "backend_negative",
+      "language": "en",
+      "expected_primary": "TECHNICAL",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Add a webhook endpoint and retry policy for payment events."
+    },
+    {
+      "id": "G04",
+      "category": "backend_negative",
+      "language": "vi",
+      "expected_primary": "TECHNICAL",
+      "expected_secondary": null,
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false,
+      "request": "Cấu hình hàng đợi và worker để xử lý tác vụ nền."
+    },
+    {
+      "id": "H01",
+      "category": "trivial_cosmetic",
+      "language": "en",
+      "expected_primary": "DIRECT_UI",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Increase the primary button padding by two pixels."
+    },
+    {
+      "id": "H02",
+      "category": "trivial_cosmetic",
+      "language": "vi",
+      "expected_primary": "DIRECT_UI",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Đổi màu nút chính sang xanh đậm hơn một chút."
+    },
+    {
+      "id": "H03",
+      "category": "trivial_cosmetic",
+      "language": "en",
+      "expected_primary": "DIRECT_UI",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Make the icon two pixels larger and keep the layout unchanged."
+    },
+    {
+      "id": "H04",
+      "category": "trivial_cosmetic",
+      "language": "vi",
+      "expected_primary": "DIRECT_UI",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Tăng khoảng cách giữa hai nút nhưng không thay đổi quy trình."
+    },
+    {
+      "id": "I01",
+      "category": "greenfield_design_direction",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Create a visual direction and first flow for a new reading app."
+    },
+    {
+      "id": "I02",
+      "category": "greenfield_design_direction",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Tôi muốn định hướng màu sắc, kiểu chữ và bố cục cho một ứng dụng đọc sách mới."
+    },
+    {
+      "id": "I03",
+      "category": "greenfield_design_direction",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Propose the layout, typography, and interaction language for a new dashboard."
+    },
+    {
+      "id": "I04",
+      "category": "greenfield_design_direction",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Thiết kế bố cục ban đầu để người mới hiểu ứng dụng ngay từ màn hình đầu tiên."
+    },
+    {
+      "id": "J01",
+      "category": "ambiguous_beginner_ui",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "I do not know design; please make my app easier to use."
+    },
+    {
+      "id": "J02",
+      "category": "ambiguous_beginner_ui",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Tôi không biết thiết kế nhưng muốn app dễ nhìn và dễ dùng hơn."
+    },
+    {
+      "id": "J03",
+      "category": "ambiguous_beginner_ui",
+      "language": "en",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "I have an idea for a simple app and want a clear first screen for new users."
+    },
+    {
+      "id": "J04",
+      "category": "ambiguous_beginner_ui",
+      "language": "vi",
+      "expected_primary": "UI_UX",
+      "expected_secondary": null,
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false,
+      "request": "Tôi mới bắt đầu, hãy giúp màn hình đầu tiên dễ hiểu và chỉ rõ bước tiếp theo."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "rag-grounding"
+  short_description: "Tạo prompt RAG bám nguồn và trích dẫn"
+  default_prompt: "Use $rag-grounding to create a grounded prompt for these sources."
+policy:
+  allow_implicit_invocation: true

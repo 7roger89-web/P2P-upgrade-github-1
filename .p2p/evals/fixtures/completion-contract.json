@@ -1,0 +1,12 @@
+{
+  "schema_version": "p2p-workflow-fixture/1",
+  "project": "p2p-beginner-uiux-routing",
+  "project_type": "logistics_software",
+  "goal": "P2P Beginner UI/UX Routing and Native AESTHETICA Release Closure",
+  "test_type": "completion",
+  "markers": [
+    "tests",
+    "docs"
+  ],
+  "expected_observation": "The completion checks return PASS or identify one concrete blocker."
+}

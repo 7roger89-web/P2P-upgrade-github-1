@@ -1,0 +1,6 @@
+interface:
+  display_name: "bb4pda"
+  short_description: "Chuyển nội dung thành BBCode 4PDA"
+  default_prompt: "Use $bb4pda to format this content as valid 4PDA BBCode."
+policy:
+  allow_implicit_invocation: true

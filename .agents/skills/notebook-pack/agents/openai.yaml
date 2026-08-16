@@ -1,0 +1,6 @@
+interface:
+  display_name: "notebook-pack"
+  short_description: "Tạo bộ tài liệu RAG hoàn chỉnh"
+  default_prompt: "Use $notebook-pack to turn these materials into a RAG-ready source bundle."
+policy:
+  allow_implicit_invocation: true

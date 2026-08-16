@@ -1,0 +1,76 @@
+{
+  "schema_version": "p2p-codex-external-sources/1",
+  "audited_at": "2026-08-07",
+  "baseline_boundary": "These sources supplement but do not alter the immutable 152-file 8.4.6-C release inventory.",
+  "sources": [
+    {
+      "source_id": "P2P-EXT-0001",
+      "type": "living_published_document",
+      "title": "Инструкция P2P — с оглавлением (ред.)",
+      "url": "https://docs.google.com/document/d/e/2PACX-1vS2Xo8p7cEFYfrW7Lfxr2YxrbxSojmMp6-ueRgq3_9-Q-MGKeSiRUDuQmHSj1QUHXaHA3LFvYyPNI2e/pub",
+      "audited_at": "2026-08-07",
+      "stored_path": null,
+      "sha256": null,
+      "known_metrics_at_audit": {
+        "body_characters": 487484,
+        "body_lines": 13800,
+        "scenarios": 60,
+        "practical_examples": 40,
+        "edge_cases": 18
+      },
+      "integration_status": "INDEXED_NOT_MIRRORED",
+      "local_index": ".agents/skills/p2p/references/live-handbook-index.md",
+      "update_rule": "Re-open the published page and compare relevant sections when exact current content matters.",
+      "rights_note": "Link, cite, and attribute the original source; do not mirror the full living document without confirmed rights."
+    },
+    {
+      "source_id": "P2P-EXT-0002",
+      "type": "user_supplied_text_snapshot",
+      "title": "P2P overview, architecture and technique catalog",
+      "original_name": "Văn bản đã dán (1).txt",
+      "language": "ru",
+      "stored_path": "source/supplemental/P2P-overview-architecture-catalog.ru.txt",
+      "size_bytes": 22542,
+      "line_count": 287,
+      "character_count": 15313,
+      "sha256": "90d1cd03d15667b5aa8ec12ded6245fe84f5aacd9de478f09f5777301e829341",
+      "audited_in_full": true,
+      "relationship": "Separate condensed overview/catalog; not a verbatim copy of the living Google handbook.",
+      "integration_status": "EXACT_SNAPSHOT_PRESERVED_AND_INDEXED",
+      "local_index": ".agents/skills/p2p/references/catalog-index.md"
+    },
+    {
+      "source_id": "P2P-EXT-0003",
+      "type": "user_supplied_docx_snapshot",
+      "title": "Hướng dẫn phần 1",
+      "original_name": "Hướng dẫn phần 1.docx",
+      "stored_path": "source/supplemental/Hướng dẫn phần 1.docx",
+      "size_bytes": 80668,
+      "sha256": "af2b75407e3e5fe0cda63fe5ec9c2a3c652e6e3678882173ef16994a3caf1048",
+      "audited_in_full": true,
+      "integration_status": "EXACT_SNAPSHOT_PRESERVED"
+    },
+    {
+      "source_id": "P2P-EXT-0004",
+      "type": "user_supplied_docx_snapshot",
+      "title": "Hướng dẫn phần 2",
+      "original_name": "Hướng dẫn phần 2.docx",
+      "stored_path": "source/supplemental/Hướng dẫn phần 2.docx",
+      "size_bytes": 97665,
+      "sha256": "25707a21eba6772dcc9a9f424af3c7ef6256d33ed4e0a0e1e86c8b043824c8c5",
+      "audited_in_full": true,
+      "integration_status": "EXACT_SNAPSHOT_PRESERVED"
+    },
+    {
+      "source_id": "P2P-EXT-0005",
+      "type": "user_supplied_docx_snapshot",
+      "title": "skill",
+      "original_name": "skill.docx",
+      "stored_path": "source/supplemental/skill.docx",
+      "size_bytes": 110011,
+      "sha256": "e040a3ca47ca74236c245345a76c9740825e4355cc4e96c585083892877c4ddb",
+      "audited_in_full": true,
+      "integration_status": "EXACT_SNAPSHOT_PRESERVED"
+    }
+  ]
+}

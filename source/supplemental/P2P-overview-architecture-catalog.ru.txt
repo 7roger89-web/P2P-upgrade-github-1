@@ -1,0 +1,288 @@
+Как всё начиналось
+P2P (Prompt-to-Prompt) родился из простой лени — мне надоело каждый раз руками собирать структуру промптов. Так появились версии с 1 по 4.
+
+Эволюция: от Текста к Операционной Системе
+Начиная с 5-й версии (Chimera) и 6-й (Legion), стало понятно, что одного промпта мало. Нейросети начали страдать от потери контекста, галлюцинаций и аппаратных багов.
+
+Чтобы бороться с этим, P2P эволюционировал. В v7 и текущей v8 NEXUS это уже не просто текст. Это алгоритмический мост. Это операционная система, которая берет на себя весь "грязный" менеджмент контекста.
+
+Истинное назначение P2P
+Моя главная цель — убить классический Prompt Engineering для обычного пользователя.
+
+Вы не должны знать, что такое Chain-of-Thought или как правильно экранировать XML-теги для защиты от Prompt Injection. Вы не должны держать в голове, что у DeepSeek нужно принудительно очищать `reasoning_content` при многошаговом диалоге, иначе он сойдет с ума (наша G15 ошибка).
+
+Ваша задача — просто скинуть в чат поток сознания: "Хочу сделать приложение для учета расходов, данные берем из экселя, дизайн темный".
+
+Всё остальное — декомпозицию, маршрутизацию, подбор агентов, расстановку жестких рамок и защиту от галлюцинаций — P2P v8 сделает за вас "под капотом".
+
+
+
+ # 
+⚙️ RAG-АРХИТЕКТУРА и мастер-сборка (Как это работает под капотом)
+Система P2P v8 спроектирована по принципам RAG (Retrieval-Augmented Generation). Она разбита на 20+ markdown-файлов. Вы можете загрузить их в NotebookLM, Claude Projects или скормить через Gemini API с включенным Context Caching.
+
+Структура модулей:
+BASE (Всегда загружаются): `_preloader.md` (настройки среды), `!!core_v8.md` (оркестратор и меню), `!!db_v8.md` (база знаний, каталоги техник).
+LIVE (Динамические): `_live/MANIFEST.md`, `_live/live_vendors.md` (квоты, прайсы, баги).
+ON-DEMAND (По требованию): Вызываются только по ключевым словам.
+- `!agents.md` (профили QUORUM),
+- `!contract.md` (9-шаговый генератор промптов),
+- `!scope.md` (декомпозиция больших проектов),
+- `!debug.md` (поиск ошибок в ваших старых промптах),
+- `!memory.md` (перенос контекста между сессиями).
+
+
+Концепция SCOPE.HELM v1.2 (Для огромных проектов)
+Если ваша задача требует написания целого приложения или огромной статьи, стандартный промпт не справится. P2P использует триаду:
+1. SPLITTER — разбивает задачу на атомарные шаги без скрытых зависимостей.
+2. ROUTER — направляет каждый шаг профильному специалисту.
+3. CAPSULE — после 60-80 сообщений система формирует сверхплотный сжатый markdown-блок (капсулу памяти). Вы вставляете его в новый чистый чат, и нейросеть продолжает работу с полным пониманием контекста, обнулив счетчик токенов.
+
+Template M (Karpathy Mode)
+В библиотеку шаблонов добавлен минималистичный режим, основанный на философии Андрея Карпати: "Лучший промпт — отсутствие промпта, только чистый контекст". Используется для простых задач (Tier 0-1), где жесткая структура мешает свободе модели.
+ # 
+👥 ЭКОСИСТЕМА АГЕНТОВ QUORUM (8 потоков мышления)
+Если задача классифицируется как Tier 3 или Tier 4 (высокая сложность, архитектурные решения, продакшен), P2P не решает ее "в лоб". Он запускает симуляцию консилиума из 8 независимых субагентов. В ветке Hybrid Edition (8H.3) эти агенты вызываются *нативно параллельно* через Tool Calling (Heavy 16) при HOST_MODEL=grok, либо эмулируются на других хостах.
+
+🟣 IRIS (Strategist & Cartographer): Разведчик проблемного пространства. Не пишет код. Составляет карту задачи, выявляет скрытые зависимости и задает правильные вопросы до начала работы.
+🟢 TECTON (System Architect): Проектировщик. Строит структурный каркас промпта (переменные, логические блоки) или архитектуру кода (Decision Trees).
+🟡 AXIOM (Logician & Verifier): Адвокат дьявола. Занимается Red Teaming'ом. Намеренно ищет дыры в логике, противоречия и возможные галлюцинации в плане TECTON'а. Выставляет Confidence Score (0-100).
+🟠 VECTOR (Optimization & Security): Отвечает за защиту от prompt-injection, санитизацию данных и алгоритмическую оптимизацию.
+🟤 DATOS (Data Analyst): Фактчекер. Отвечает за эмпирическую верификацию. В ветке Grok нативно интегрирован с X Firehose для вытягивания real-time данных.
+⚫ ANON (Code Specialist): Пишет чистый, production-ready код с жесткими Stop Conditions. Самый прожорливый агент (лимит 18 tool calls в Grok).
+🔵 ARCHITECTON (Integrator): Старший интегратор. Разрешает конфликты между агентами (например, если ANON хочет написать быстро, а VECTOR требует сложную защиту). Специалист по UI/UX и визуалу.
+☀️ HELIOS (Final Synthesizer): Новое звено. Собирает многочасовую шизофрению 7 агентов в один чистый, скопированный код или инструкцию формата "Главный вывод → Действия по приоритету → Код".
+
+
+Вы можете вызывать их по отдельности: `/p2p-chain IRIS→TECTON→AXIOM` для быстрого ресерча без полного консилиума.
+ # 
+🧰 ДЛЯ НОВИЧКОВ: как с этим работать (Мануал за 1 минуту)
+Вам не нужно учить наизусть все 20 файлов. Система интерактивна.
+
+Шаг 1. Вы загрузили базовые файлы (preloader, core, db, live) в свою нейросеть.
+Шаг 2. Вы пишете: `СТАРТ`
+Шаг 3. P2P выводит вам удобное меню из 30+ пунктов (в зависимости от версии).
+Шаг 4. Вы можете просто отправить свой сырой запрос: "Хочу сделать телеграм бота на питоне, который парсит погоду".
+Шаг 5. P2P анализирует ваш запрос по методологии 5D (Цель, Контекст, Формат, Модель, Критерии качества), задаст вам 2-3 уточняющих вопроса и выдаст идеальный, профессиональный промпт.
+Шаг 6. Вы копируете этот промпт, открываете новый чат (или другую нейросеть) и вставляете его туда. Результат вас поразит, на моих кейсах наконец-то предсказуемость появилась.
+Шаг 7. Если что-то не так выполняется, делаем скриншот возвращаем в p2p и говорим что нужно...
+
+P.S. Если хотите, чтобы P2P сам решил вашу задачу (без выдачи промпта), используйте пункт "QUORUM" (для сложных задач) или просто укажите "Реши задачу сам".
+ # 
+ℹ️ ОБЩИЕ КОМАНДЫ для всех редакций P2P
+─ Базовые режимы обработки:
+Q: [ваш запрос] — Принудительный запуск режима QUORUM (Совет агентов). Для задач, где нужен глубокий многосторонний анализ.
+AUTO: [ваш запрос] — Режим IDEALIST. Авто-выбор лучшей целевой "llm" без учёта экономии ресурсов. Фокус на качестве.
+MANUAL: [ваш запрос] — Режим PRAGMATIST. Ручной выбор стратегии для оптимизации скорости и лимитов.
+MAX: [ваш запрос] — Максимальная информация. Выводит полный лог рассуждений, SIR-анализ и технические метрики.
+
+
+─ Прямой вызов профильных специалистов:
+T: (или @TECTON:) — Архитектор. Структура БД, системные промпты и логика систем.
+I: (или @IRIS:) — Стратег. UX/UI, планирование, концепты и нарратив.
+A: (или @ANON:) — Кодер. Чистый код без лишних пояснений.
+@AXIOM: — Логик. Верификация данных, поиск ошибок и логических дыр.
+@VECTOR: — Безопасность. Поиск уязвимостей и очистка промпта от шума.
+@DATOS: — Исследователь. Глубокий фактчекинг и работа с источниками.
+
+
+─ Системные инструменты:
+/scope — Активация SCOPE.HELM. Декомпозиция проекта на этапы.
+/chain — Режим цепочки. Разделение задачи на последовательные промпты.
+/explore — Режим исследования. Предлагает 2-3 разных подхода к одной задаче.
+/debug — Диагностика системных ошибок генерации.
+/metrics — Вывод статистики текущей сессии.
+
+
+Вдруг не отображается стартовое меню на любой версии, пишем:
+full ui menu
+-------
+В КАТАЛОГЕ: ~140+ техник, протоколов и паттернов в 10 категориях
+
+Изображение
+
+● STABLE — проверенная техника, production-ready
+● EXPERIMENTAL — работает в ограниченных сценариях
+
+
+§1. Фундаментальные фреймворки и шаблоны
+
+9-Step Algorithm — пошаговый алгоритм построения промпта
+9D Intent Extraction — 9-мерное извлечение намерения пользователя
+RTF (Role-Task-Format) — минимальный каркас промпта
+CO-STAR — Context-Objective-Style-Tone-Audience-Response
+RISEN — Role-Instructions-Steps-Expectations-Narrowing
+CRISPE — Capacity-Request-Insight-Style-Parameters-Examples
+CTCO — Context-Task-Constraints-Output framework
+30/55/15 Rule — Primacy/Middle/Recency позиционирование инструкций
+Constraint Prompting — ограничения вместо давления
+Template Library A–M — 13 готовых шаблонов с MUST/MUST NOT парами
+Доменные шаблоны — Data Analysis, API Design OpenAPI 3.1, Refactoring SOLID
+SP Extensions — XML-блоки: stakeholders, success_looks_like, quality_assurance, fallback_protocol
+Prompt Patterns — 4 универсальных скелета: Analysis / Creation / Problem-solving / Evaluation
+
+
+§2. Управление логикой и рассуждениями
+
+STEP_BY_STEP — пошаговое рассуждение (стандартные модели)
+GO_SLOW — замедление вывода для сложных задач
+CoT (Chain of Thought) — цепочка рассуждений
+DEVILS_ADVOCATE — анализ слабых мест через оппозицию
+SOCRATIC_METHOD — 3-7 уточняющих вопросов перед ответом
+BRANCHING_LOGIC — 3-5 альтернативных подходов
+MENTAL_SANDBOX — ментальное моделирование ответа
+REFLECTION_LOOP — цикл: сгенерировать → критиковать → переписать
+ADVERSARIAL_PAIR — Generator + Critic в одном промпте
+ELI5 — Explain Like I'm 5 (score 92/100)
+TLDR — краткое резюме
+CHECKLIST — структурированный список валидации
+DEEP_REASONING — шаблон для научного/математического анализа
+FABRICATION BANNED LIST — явный запрет MoE/ToT/GoT/USC симуляций
+
+
+§3. Управление контекстом и архитектура
+
+CONTEXT_COMPRESSION — сжатие тяжёлого контекста
+CONTEXT_CACHE_ANCHOR — привязка к кэшу
+ANCHOR_CONTEXT — повтор ключевых инструкций на границах
+NEEDLE_HAYSTACK — работа с иголкой в стоге сена
+MEMORY_BLOCK — блок памяти в промпте
+STRUCTURED_DECOMPOSITION — декомпозиция на sub-prompts
+GATE_PATTERN — классификация перед роутингом
+SCAFFOLD_PATTERN — сначала outline, потом заполнение
+SCOPE.HELM — SPLITTER + CAPSULE + ROUTER + ATLAS v2
+PREFILLING — Claude API: prefill assistant turn для фиксации формата
+CLAUDE_MD — персистентная проектная память (score 94/100)
+LIBRARY_ANCHOR — version locking для библиотек
+CHUNKING STRATEGIES — per-model: Semantic/Document Map/Late/MLA+YaRN
+CONTEXT INTEGRITY DIAGNOSTICS — 5-шаговая проверка целостности
+ZERO-STATE IMMUNITY — защита от placeholder-галлюцинаций
+
+
+§4. Безопасность, граундинг и антигаллюцинации
+
+GASLIGHT_SAFE — honesty mode: разделение факт/гипотеза
+RAG_GROUNDING — «отвечай ТОЛЬКО из контекста»
+SAFE_THINKING — токен [SECURITY_CHECK] между шагами
+LLM_COUNCIL — multi-model консенсус (score 96/100)
+FRESHNESS_PROTOCOL — запрос разрешения перед допущениями
+COT_GUARD — защита от контаминации CoT
+EXCELLENT_TECHNIQUES — 9 методик обхода over-refusal:
+Defensive Framing
+Algorithmic Abstraction
+Clinical Tone
+Environmental Storytelling
+Security Checklists (STRIDE)
+Chunking Protocol
+Objective Abstraction
+Alien Archivist
+Emotional Intimacy
+
+CONTRACT_COMPLIANCE_CHECK — каждый MUST обязан иметь парный MUST NOT
+
+
+§5. Агентские и кросс-модельные техники
+
+KARPATHY Mode — минималистичный шаблон
+AGENT_SWARM — до 100 sub-agents параллельно
+TOOL_BUDGET — MAX_TOOL_CALLS + stop conditions
+MCP_TOOL_PROMPT — prompt для MCP-инструментов
+ReAct+Stop — Reasoning + Acting с условиями остановки
+PERSONA_CASCADE — цепочка ролей Role A → Role B
+MIGRATION_TRANSFORM — адаптация кросс-модельных промптов
+DEEP_THINK_GATE — 3-вопросный гейт для deep thinking
+LOW_TEMP_ANALYTICAL — низкая температура для анализа
+COMBINATOR — комбинирование техник с conflict matrix
+PLACEMENT_RULES — правила размещения техник в промпте
+VISUAL_AGENTIC_CODING — код из скриншотов/мокапов (Kimi/Gemini/Qwen3-VL)
+SPARC_FRAMEWORK — виртуальная команда из 7 ролей
+8-AGENT QUORUM — IRIS/TECTON/AXIOM/VECTOR/DATOS/ANON/ARCHITECTON/HELIOS
+Sub-QUORUM patterns — FAST_TRIO, CODE_QUAD, SECURITY_QUAD, ARCH_PENTA
+SPAWN ECONOMY — Tier → max агентов таблица
+BUDGET DECLARATION — объявление бюджета перед QUORUM
+DYNAMIC WEIGHTING — веса агентов по task type
+CROSS-AGENT COLLISION_PATCH — разрешение конфликтов между агентами
+
+
+§6. Оркестрация цепочек и pipeline
+
+CHAIN ORCHESTRATOR v1.0 — 3 готовых паттерна:
+WRITING_PIPELINE: Research → Draft → Critique → Polish
+CODE_PIPELINE: Architecture → Implementation → Test → Security
+CROSS_VALIDATE: Model A + Model B → Model C (judge)
+
+HANDOFF PROTOCOL — INPUT/OUTPUT/HANDOFF_INSTRUCTION
+COST ESTIMATION per step — маршрутизация дорогих шагов
+
+
+§7. Диагностика и feedback
+
+Error Types A–P catalog — 16 типов ошибок с injection-скриптами:
+A Silent timeout | B Mid-stop | C Truncation
+D Long response drift | E Context Drift | F Gemini drift
+G Self-revert | H Tool confusion | I Overthinking
+J Zero-state | K Topic drift | L Silent Degradation
+M1 Correction Loop | M2 Kitchen Sink | M3 Infinite Explore
+N Hallucinated Tool | O Safety Over-Refusal | P Format Oscillation
+
+Silent Degradation L1–L5 — 5 индикаторов для Claude
+FEEDBACK LOOP PROTOCOL v1.0 — Diagnose → Locate → Patch → Verify
+36 ANTI-PATTERNS (Pattern Guard) — полная таблица антипаттернов
+Anti-Pattern Scanner Type A–P — pre-flight скан промпта
+
+
+§8. Метрики, маршрутизация, состояние сессии
+
+SIR Scanner v3.3 — Signal → Intent → Route классификация
+COGNITIVE LOAD FORMULA — LoadScore = f(Constraints, Domain, Format, Context, Precision)
+ROUTING MEMORY — bias агентов на основе past performance
+SESSION METRICS — SE = (TASKS × QUALITY_WEIGHT) / MESSAGES × 100
+CONSTRAINT_REINJECTION_PROTOCOL v2 — каждые 25/50/75 msg
+DEEP_THINK_VALUE_GATE v2 — 3-вопросный гейт
+TRI_MODE_BRIDGE v3 — автоопределение Code/API/Projects/Chat
+GUARDIAN PROTOCOL — защита от scope creep
+ATLAS — карта задач сессии (GOAL/PROGRESS/NEXT_STEP/BLOCKERS)
+CAPSULE — YAML-снимок состояния сессии
+EXPLORATION MODE — дивергентный режим (Cortex Patch A)
+
+
+§9. Writing-suite (творческие/контентные техники)
+
+HUMANIZED WRITING MASTER TEMPLATE — каркас anti-AI-detector
+ANTI-AI-DETECTOR CHECKLIST — burstiness stdev>6, em-dash=0 и т.д.
+TONE SPECTRUM (9 контекстов):
+TECHNICAL_POST | CASUAL_COMMENT | EXPLANATION
+TECH_ANALYSIS | CORPORATE_FORMAL | STARTUP_CASUAL
+ACADEMIC_PAPER | MARKETING_COPY | TECH_DOCUMENTATION
+
+EXTENDED BANNED LISTS — buzzwords/hedging/filler/AI-typical
+CONSTRAINT vs PRESSURE PROMPTING — спецификация vs ALL CAPS
+4 QUALITY-CHECK CRITERIA — плотность, направление, натуральность, отсутствие воды
+UI Replication Agent — воспроизведение интерфейсов из скриншотов
+
+
+§10. Тестирование и качественная оценка
+
+ARENA BUILDER — A/B-тестирование промптов с trap markers
+ARENA_SCORE 0–100 — числовая шкала эффективности техники
+G-ERRORS CATALOG G1–G20 — каталог известных ошибок моделей:
+G1 Gemini temp≠1.0 | G2 Gemini XML CoH | G3 Grok drift
+G4 Gemini thinking_budget | G6 Opus 4.7 inflation | G7 Claude temp+thinking
+G8 Opus 4.7 MRCR | G9 GPT-5.5 rule pairs | G10 GPT-5.5 272K pricing
+G11 Gemini billing shock | G12 Gemini hard 429 | G13 Gemini memory nuke
+G14 Grok unsupported params | G15 DeepSeek reasoning carryover
+G16 DeepSeek retire | G17 Qwen prefix | G18 Qwen preserve_thinking
+G19 GLM context collapse | G20 Kimi swarm timeout
+
+
+
+
+§11. Экспериментальные модули 8x.3 (ON-DEMAND)
+
+!rag.md — RAPTOR (Stanford 2024), LongRAG, Dynamic RAPTOR
+!reasoning.md — Self-Consistency, rStar-Math/MCTS, s1 Budget Forcing
+!routing.md — Semantic Router, Cascade, Cost-Aware, LLM-Router/RouteLLM
+!compression.md — LLMLingua / LLMLingua-2, Gist Tokens
+!security.md — Injection Scanner, Jailbreak Classification, SelfCheckGPT
+!optimization.md — OPRO, APO, EvoPrompt
+-------

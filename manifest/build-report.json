@@ -1,0 +1,112 @@
+{
+  "schema_version": "p2p-codex-build-report/2",
+  "package_version": "8.4.7-C-codex.9",
+  "verified_at": "2026-08-12",
+  "overall_structural_result": "PASS_WITH_HOST_AND_REAL_PROJECT_DATA_GATES",
+  "checks": [
+    {
+      "name": "source_snapshot",
+      "result": "PASS",
+      "evidence": "152/152 preserved source files match the recorded inventory; the original archive SHA-256 matches the immutable baseline."
+    },
+    {
+      "name": "conversion_traceability",
+      "result": "PASS",
+      "evidence": "The conversion map contains 152 unique stable IDs and 152 rows; every declared Codex target exists."
+    },
+    {
+      "name": "supplemental_sources",
+      "result": "PASS",
+      "evidence": "Five supplemental sources remain identified separately from the 152-file baseline; four stored snapshots are hash recorded and one living handbook remains linked and indexed."
+    },
+    {
+      "name": "skills",
+      "result": "PASS",
+      "evidence": "23/23 Skill directories pass the Codex quick validator, including reusable p2p-uiux; p2p-approval remains the protected-action entry point."
+    },
+    {
+      "name": "custom_agent_profiles",
+      "result": "PASS_STRUCTURAL",
+      "evidence": "8/8 canonical p2p-*.toml profiles plus the real optional p2p_aesthetica profile parse and preserve the non-canonical classification."
+    },
+    {
+      "name": "eight_thread_quorum_runtime",
+      "result": "NOT_EXECUTED_IN_THIS_BUILD",
+      "evidence": "A real Codex host must resolve the eight custom profiles and return eight distinct thread or agent IDs; package structure alone is not labeled profile-verified."
+    },
+    {
+      "name": "fact_ledger_and_live_specs",
+      "result": "PASS",
+      "evidence": "FACT_LEDGER revision 2 validates nine claims; five official CONFIRMED_ACTIVE claims enter the deterministic Live Specs projection and four expired legacy hypotheses stay excluded. The preview, ledger, generated target, technical report, and approval record are SHA-256 bound."
+    },
+    {
+      "name": "mandatory_user_approval",
+      "result": "PASS_FRAMEWORK_AND_NEGATIVE_TESTS",
+      "evidence": "Protected requests require a PASS technical report and bind action, scope, subject SHA-256, and report SHA-256. Non-interactive approval was rejected, and changing the candidate after approval caused finalization to fail. An agent can prepare a request but cannot execute the interactive approve or reject decision."
+    },
+    {
+      "name": "project_eval",
+      "result": "FRAMEWORK_PASS_NO_REAL_PROJECT_RESULT_CLAIMED",
+      "evidence": "Eval schema v2 requires five project-specific case classes, at least two baseline and two P2P trials per case, comparable environments, frozen fixture hashes, evidence hashes, and zero unexpected writes. Empty templates fail closed. A synthetic harness passed only to verify gate behavior."
+    },
+    {
+      "name": "rag_boundary_and_retrieval_eval",
+      "result": "FRAMEWORK_PASS_NO_REAL_CORPUS_RESULT_CLAIMED",
+      "evidence": "The RAG gate covers exact lookup, paraphrase, cross-reference, unknown, prompt injection, and cross-boundary leakage. Index snapshots and per-query evidence require SHA-256; empty templates fail closed. A synthetic six-class corpus passed only to verify gate behavior."
+    },
+    {
+      "name": "active_runtime_drift",
+      "result": "PASS_AND_TAMPER_SENSITIVE",
+      "evidence": "The protected runtime manifest covers active skills, agents, governance, helper scripts, and core documentation. FACT preview tampering and subject tampering were both detected. Environment-dependent missing-history-source notices remain warnings and cannot change the hash-bound technical verdict."
+    },
+    {
+      "name": "rollback_and_release_gate",
+      "result": "PASS_FRAMEWORK",
+      "evidence": "Release preparation requires drift, project eval, RAG when affected, rollback evidence, then user approval. Finalization rehashes the candidate and never deploys by itself."
+    },
+    {
+      "name": "capsule_profiles",
+      "result": "PASS",
+      "evidence": "Task, brainstorm, research, and incident CAPSULE profiles retain schema p2p-capsule/2."
+    },
+    {
+      "name": "linux_macos_installer",
+      "result": "PASS",
+      "evidence": "Fresh project installation, existing config and AGENTS.md preservation, 23 skills, eight canonical agents plus optional Aesthetica, UI/UX runtime installation, governance installation, reinstall, recoverable backup creation, runtime locking, and installed-root doctor all passed."
+    },
+    {
+      "name": "windows_installer",
+      "result": "STATIC_REVIEW_ONLY",
+      "evidence": "PowerShell fresh-install, existing-project upgrade, same-version reinstall, UI/UX runtime, and doctor checks are executed as part of this Windows release packaging goal."
+    },
+    {
+      "name": "update_engine",
+      "result": "PASS_WITH_MANDATORY_POST_INVENTORY_BLOCK",
+      "evidence": "The immutable baseline reconciles 152 unchanged files. A new-release comparison remains BLOCKED after inventory until semantic review, FACT technical preview and approval, affected eval and RAG, runtime drift, rollback, doctor, and final approval are recorded."
+    },
+    {
+      "name": "workbook",
+      "result": "PASS",
+      "evidence": "Mapping schema 2.4 contains 17 worksheets, including FACT_LEDGER v2, five-class project eval, six-class RAG, mandatory gate order, and self-contained cross-chat handoff. All sheets rendered during QA, formula-error searches returned zero matches, the full-release metadata is aligned, and XLSX archive integrity passed."
+    },
+    {
+      "name": "pxpipe",
+      "result": "PRESERVED_DISABLED",
+      "evidence": "Original PXPIPE material remains preserved, while active instructions prohibit implicit enablement pending security, compatibility, and explicit user-approval gates."
+    },
+    {
+      "name": "live_model_vendor_data",
+      "result": "LEGACY_QUARANTINED",
+      "evidence": "Historical model identifiers, limits, and bug labels remain auditable in the immutable source and expired ledger rows but cannot enter runtime without a current, scoped, expiring claim."
+    }
+  ],
+  "negative_tests": [
+    "blank eval template is blocked",
+    "blank RAG template is blocked",
+    "non-interactive agent approval is blocked",
+    "candidate change after approval is blocked",
+    "FACT technical-preview tampering is blocked",
+    "new-release inventory alone cannot authorize release"
+  ],
+  "claim_boundary": "This report proves source preservation, package structure, governance behavior, synthetic gate behavior, workbook integrity, and installer behavior on Linux. It does not prove behavioral parity for every historical Claude workflow, effectiveness on a real project, retrieval quality on a real corpus, PowerShell execution, or an actual eight-thread Codex QUORUM run in this build. User approval is an auditable workflow control, not operating-system identity or access control."
+}

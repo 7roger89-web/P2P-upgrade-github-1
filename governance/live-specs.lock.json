@@ -1,0 +1,15 @@
+{
+  "schema_version": "p2p-codex-live-specs-lock/3",
+  "ledger_revision": 2,
+  "generated_on": "2026-08-09",
+  "ledger_sha256": "18033bc4037191865a2ef47e951f5904b41926759a838a39af45db0597bc4510",
+  "target_sha256": {
+    "live-specs.json": "452d3cb9a8d3531546b1dede4f32c4415f78976e26eb5630aed22f7825ed6645"
+  },
+  "claim_count": 9,
+  "runtime_fact_count": 5,
+  "technical_report": "live-specs-preview-report.json",
+  "technical_report_sha256": "e0fad269100813c4cdf2e33f925ecd800821ec81e5ecf1fea5280cd3fc6db041",
+  "approval_record": "approvals/P2P-APR-20260809T112800Z-fact-ledger-v2.json",
+  "approval_sha256": "dcaece41d784e1fdb7aa61f828200ddd84def2f237ee578f649bd84bcfb57e10"
+}

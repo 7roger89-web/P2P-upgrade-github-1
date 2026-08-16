@@ -1,0 +1,100 @@
+{
+  "schema": "p2p-first-decision-routing-fixture/1",
+  "purpose": "Separate planner intent classification from later capability routing.",
+  "classification_fields": [
+    "INITIAL_PLANNING_CLASSIFICATION",
+    "FINAL_ROUTING_CLASSIFICATION"
+  ],
+  "cases": [
+    {
+      "id": "FD01",
+      "category": "clear_uiux",
+      "request": "This warehouse dashboard is confusing; make the next action easier to find.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD02",
+      "category": "clear_idea",
+      "request": "I want to build an app but do not know which problem or features to choose.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD03",
+      "category": "mixed_uiux_primary",
+      "request": "We are building a warehouse app; improve the first screen so staff can complete receiving quickly.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "MIXED",
+      "expected_scope": "MIXED",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD04",
+      "category": "mixed_idea_primary",
+      "request": "Help choose the first features for a new app; screen design can come after the product direction.",
+      "INITIAL_PLANNING_CLASSIFICATION": "IDEA",
+      "FINAL_ROUTING_CLASSIFICATION": "IDEA",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD05",
+      "category": "beginner_uncertain_concrete_uiux",
+      "request": "I do not know design or what to do, but this existing dashboard is hard to read and use.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD06",
+      "category": "backend",
+      "request": "Optimize the backend API caching and database indexes for reports.",
+      "INITIAL_PLANNING_CLASSIFICATION": "BACKEND",
+      "FINAL_ROUTING_CLASSIFICATION": "BACKEND",
+      "expected_scope": "NON_UI",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD07",
+      "category": "cosmetic",
+      "request": "Increase the primary button padding by two pixels and keep everything else unchanged.",
+      "INITIAL_PLANNING_CLASSIFICATION": "COSMETIC_UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "COSMETIC_UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD08",
+      "category": "accessibility",
+      "request": "Make this screen usable with a keyboard and give focus states clear visibility.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": true
+    },
+    {
+      "id": "FD09",
+      "category": "responsive",
+      "request": "On mobile screens the warehouse cards overflow and the main action disappears.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    },
+    {
+      "id": "FD10",
+      "category": "greenfield_visual_direction",
+      "request": "Create the visual direction, first flow, and layout for a new reading app.",
+      "INITIAL_PLANNING_CLASSIFICATION": "UIUX",
+      "FINAL_ROUTING_CLASSIFICATION": "UIUX",
+      "expected_scope": "UI_UX",
+      "expected_aesthetica": false
+    }
+  ]
+}

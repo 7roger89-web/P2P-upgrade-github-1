@@ -1,0 +1,137 @@
+{
+  "schema_version": "p2p-codex-live-specs/2",
+  "ledger_revision": 2,
+  "generated_on": "2026-08-09",
+  "source_ledger_sha256": "18033bc4037191865a2ef47e951f5904b41926759a838a39af45db0597bc4510",
+  "rules": {
+    "stale_claims_are_excluded": true,
+    "block_requires_official_evidence_A": true,
+    "unknown_or_unlisted_claims_require_verification": true
+  },
+  "facts": [
+    {
+      "claim_id": "P2P-FACT-0001",
+      "kind": "product_limit",
+      "claim": "Codex limits the initial skill list to two percent of the context window, or eight thousand characters when the window is unknown; descriptions may be shortened and skills may be omitted when the list is large.",
+      "value": {
+        "context_percent": 2,
+        "fallback_characters": 8000
+      },
+      "scope": {
+        "product": "Codex",
+        "surface": "skill discovery"
+      },
+      "evidence_level": "A",
+      "verification_status": "CONFIRMED_ACTIVE",
+      "checked_at": "2026-08-08",
+      "expires_at": "2026-11-06",
+      "lifecycle": "current",
+      "route_action": "warn",
+      "source_url": "https://learn.chatgpt.com/docs/build-skills",
+      "risk_tier": "medium",
+      "affected_components": [
+        "skill-discovery",
+        "p2p-router"
+      ]
+    },
+    {
+      "claim_id": "P2P-FACT-0002",
+      "kind": "host_capability",
+      "claim": "Current Codex releases support subagent workflows and surface separate agent threads; each subagent performs its own model and tool work.",
+      "value": {
+        "separate_threads": true,
+        "separate_model_and_tool_work": true
+      },
+      "scope": {
+        "product": "Codex",
+        "surface": "subagents"
+      },
+      "evidence_level": "A",
+      "verification_status": "CONFIRMED_ACTIVE",
+      "checked_at": "2026-08-08",
+      "expires_at": "2026-11-06",
+      "lifecycle": "current",
+      "route_action": "monitor",
+      "source_url": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+      "risk_tier": "high",
+      "affected_components": [
+        "p2p-quorum",
+        "custom-agents"
+      ]
+    },
+    {
+      "claim_id": "P2P-FACT-0003",
+      "kind": "retrieval_fact",
+      "claim": "OpenAI File Search requires a vector store with files uploaded before it can retrieve from that knowledge base.",
+      "value": {
+        "vector_store_required": true,
+        "uploaded_files_required": true
+      },
+      "scope": {
+        "product": "OpenAI API",
+        "surface": "Responses API file_search"
+      },
+      "evidence_level": "A",
+      "verification_status": "CONFIRMED_ACTIVE",
+      "checked_at": "2026-08-08",
+      "expires_at": "2026-11-06",
+      "lifecycle": "current",
+      "route_action": "warn",
+      "source_url": "https://developers.openai.com/api/docs/guides/tools-file-search",
+      "risk_tier": "high",
+      "affected_components": [
+        "rag-router",
+        "rag-grounding"
+      ]
+    },
+    {
+      "claim_id": "P2P-FACT-0004",
+      "kind": "retrieval_fact",
+      "claim": "OpenAI File Search can filter results using file metadata attributes.",
+      "value": {
+        "metadata_filtering": true
+      },
+      "scope": {
+        "product": "OpenAI API",
+        "surface": "Responses API file_search"
+      },
+      "evidence_level": "A",
+      "verification_status": "CONFIRMED_ACTIVE",
+      "checked_at": "2026-08-08",
+      "expires_at": "2026-11-06",
+      "lifecycle": "current",
+      "route_action": "prefer",
+      "source_url": "https://developers.openai.com/api/docs/guides/tools-file-search",
+      "risk_tier": "medium",
+      "affected_components": [
+        "rag-router",
+        "rag-prep"
+      ]
+    },
+    {
+      "claim_id": "P2P-FACT-0005",
+      "kind": "eval_principle",
+      "claim": "An eval should test a prompt against a representative sample with test inputs and ground-truth labels or explicit grading criteria.",
+      "value": {
+        "representative_sample": true,
+        "ground_truth_or_grader_required": true
+      },
+      "scope": {
+        "product": "OpenAI API",
+        "surface": "evals"
+      },
+      "evidence_level": "A",
+      "verification_status": "CONFIRMED_ACTIVE",
+      "checked_at": "2026-08-08",
+      "expires_at": "2026-11-06",
+      "lifecycle": "current",
+      "route_action": "prefer",
+      "source_url": "https://developers.openai.com/api/docs/guides/evals",
+      "risk_tier": "high",
+      "affected_components": [
+        "p2p-eval",
+        "release-gate"
+      ]
+    }
+  ]
+}

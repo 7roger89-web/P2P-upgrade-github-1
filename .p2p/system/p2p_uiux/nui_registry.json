@@ -1,0 +1,1365 @@
+{
+  "schema": "p2p-nui-registry/1",
+  "registry_version": "c13.1",
+  "integration": {
+    "strategy": "A_PROVENANCE_BOUND_SNAPSHOT_PLUS_D_THIN_ADAPTATION",
+    "status": "ADOPT_NOW",
+    "bodies_loaded_at_bootstrap": 0,
+    "runtime_network_fetch": false,
+    "automatic_update": false,
+    "faculties_are_agents": false,
+    "permission_authority": "HOST_AND_P2P_GOVERNANCE",
+    "strategies": [
+      {
+        "id": "A_PROVENANCE_BOUND_SNAPSHOT",
+        "disposition": "ADOPT_NOW",
+        "reason": "Preserves exact revision/hash evidence while keeping local runtime offline and bounded."
+      },
+      {
+        "id": "B_THIN_BRIDGE",
+        "disposition": "ADOPT_NOW",
+        "reason": "Exposes canonical metadata through the existing p2p-uiux router without duplicating the graph."
+      },
+      {
+        "id": "C_SIDECAR",
+        "disposition": "DEFER",
+        "reason": "Useful when a real host needs deep faculty bodies; no C13 runtime-sidecar authority exists."
+      },
+      {
+        "id": "D_SELECTIVE_ADAPTATION",
+        "disposition": "ADOPT_NOW",
+        "reason": "P2P needs local materiality, C10/C11/C12 projections, and synthetic evaluation contracts."
+      },
+      {
+        "id": "E_FULL_VENDOR_OR_FORK",
+        "disposition": "REJECT",
+        "reason": "Would copy/update 174 bodies, widen drift and supply-chain surface, and exceed C13 scope."
+      },
+      {
+        "id": "F_EXTERNAL_BENCHMARK_REPLICATION",
+        "disposition": "DEFER",
+        "reason": "C13 records structural hypotheses only; no expensive efficacy benchmark is authorized."
+      }
+    ]
+  },
+  "provenance": {
+    "upstream_repository": "Nolane-x/Nolane-UI-Intelligence",
+    "upstream_revision": "46780cdd58e41bea8338b2d27269d339c95e28e7",
+    "upstream_branch": "main",
+    "upstream_version": "v0.10.0",
+    "upstream_license": "MIT",
+    "graph_blob_sha": "e15f57ef5b7d77ea17b952d9171f601b32f3605e",
+    "graph_sha256": "c90185bdda45ccd8d86716d4b565d2ac33c99644e732329ad7d8949a6a8117c6",
+    "snapshot_policy": "NO_AUTO_UPDATE; REVERIFY_REVISION_AND_HASH_BEFORE_ACCEPTANCE",
+    "source_state": "UPSTREAM_PRESERVED",
+    "adaptation_state": "P2P_ADAPTED_AND_EXTENDED",
+    "inspected_at_utc": "2026-08-14T17:20:42Z"
+  },
+  "version": 2,
+  "root": "using-nolane-ui",
+  "lifecycle": [
+    "INTAKE",
+    "CONTRACTED",
+    "ROUTED",
+    "DISCOVERED",
+    "ARCHITECTED",
+    "DIVERGED",
+    "DESIGN_SELECTED",
+    "SYSTEMIZED",
+    "SPECIFIED",
+    "IMPLEMENTABLE",
+    "RENDERED",
+    "CRITIQUED",
+    "VERIFIED",
+    "RELEASED"
+  ],
+  "exception_states": [
+    "RECOVERY",
+    "BLOCKED"
+  ],
+  "authority_order": [
+    "explicit-product-and-safety-constraints",
+    "applicable-law-regulation-and-normative-standards",
+    "safety-and-regulatory-authority-guidance",
+    "platform-authoritative-guidance",
+    "project-design-system-and-validated-product-evidence",
+    "empirical-human-factors-and-usability-evidence",
+    "mature-design-system-guidance",
+    "high-quality-community-heuristics",
+    "model-aesthetic-preference"
+  ],
+  "agent_projection_count": 9,
+  "canonical_faculty_count": 174,
+  "kernel_faculty_count": 13,
+  "skills": {
+    "using-nolane-ui": {
+      "family": "kernel",
+      "parent": null,
+      "output": "bootstrap-directive",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "nolane-ui": {
+      "family": "kernel",
+      "parent": "using-nolane-ui",
+      "output": "ui-session",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "ui-contracting": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "ui-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "routing-ui-work": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "ui-task-profile",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "compiling-ui-obligations": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "obligation-ledger",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "binding-ui-evidence": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "evidence-ledger",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "challenging-ui-designs": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "critic-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "gating-ui-completion": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "completion-decision",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "recovering-ui-work": {
+      "family": "kernel",
+      "parent": "nolane-ui",
+      "output": "recovery-record",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-product-intent": {
+      "family": "product",
+      "parent": "routing-ui-work",
+      "output": "product-intent-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-users-and-tasks": {
+      "family": "product",
+      "parent": "routing-ui-work",
+      "output": "user-task-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "architecting-information": {
+      "family": "architecture",
+      "parent": "routing-ui-work",
+      "output": "information-architecture-map",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-task-flows": {
+      "family": "architecture",
+      "parent": "routing-ui-work",
+      "output": "task-flow-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-interactions": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "interaction-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-component-semantics": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "component-semantic-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-component-states": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "component-state-matrix",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-forms": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "form-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-navigation": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "navigation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-search": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "search-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "exploring-aesthetic-directions": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "visual-direction-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "directing-visual-hierarchy": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "hierarchy-map",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "composing-layouts": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "composition-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "crafting-typography": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "typography-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "crafting-color": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "color-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "crafting-spacing-and-rhythm": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "spacing-rhythm-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "crafting-depth-and-surfaces": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "surface-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "directing-iconography-and-imagery": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "asset-direction-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "preventing-generic-ui": {
+      "family": "visual",
+      "parent": "routing-ui-work",
+      "output": "anti-slop-findings",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "architecting-design-tokens": {
+      "family": "system",
+      "parent": "routing-ui-work",
+      "output": "token-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "architecting-component-systems": {
+      "family": "system",
+      "parent": "routing-ui-work",
+      "output": "component-system-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "adapting-responsive-layouts": {
+      "family": "system",
+      "parent": "routing-ui-work",
+      "output": "responsive-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "adapting-platform-conventions": {
+      "family": "system",
+      "parent": "routing-ui-work",
+      "output": "platform-delta",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-accessible-interfaces": {
+      "family": "inclusive",
+      "parent": "routing-ui-work",
+      "output": "accessibility-obligations",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-localized-interfaces": {
+      "family": "inclusive",
+      "parent": "routing-ui-work",
+      "output": "locale-stress-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "writing-interface-copy": {
+      "family": "inclusive",
+      "parent": "routing-ui-work",
+      "output": "content-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-motion": {
+      "family": "inclusive",
+      "parent": "routing-ui-work",
+      "output": "motion-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-data-dense-interfaces": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "dense-surface-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-data-visualization": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "data-viz-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-empty-loading-error-states": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "system-state-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-onboarding": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "onboarding-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "verifying-design-fidelity": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "fidelity-ledger",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-visual-design": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-user-experience": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-accessibility": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-design-system": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-responsive-behavior": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-platform-fit": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "researching-ui-frontiers": {
+      "family": "research",
+      "parent": "routing-ui-work",
+      "output": "research-wave",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "calibrating-ui-authority": {
+      "family": "research",
+      "parent": "researching-ui-frontiers",
+      "output": "authority-resolution",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "maintaining-ui-domain-atlas": {
+      "family": "research",
+      "parent": "researching-ui-frontiers",
+      "output": "coverage-delta",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "measuring-research-saturation": {
+      "family": "research",
+      "parent": "researching-ui-frontiers",
+      "output": "saturation-decision",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "translating-standards-into-obligations": {
+      "family": "research",
+      "parent": "calibrating-ui-authority",
+      "output": "standard-obligation-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "engineering-human-factors": {
+      "family": "human-factors",
+      "parent": "routing-ui-work",
+      "output": "human-factors-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-cognitive-load-and-attention": {
+      "family": "human-factors",
+      "parent": "routing-ui-work",
+      "output": "attention-budget",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-perception-and-motor-control": {
+      "family": "human-factors",
+      "parent": "routing-ui-work",
+      "output": "perceptual-motor-envelope",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "conducting-task-analysis": {
+      "family": "human-factors",
+      "parent": "routing-ui-work",
+      "output": "task-analysis",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "planning-usability-research": {
+      "family": "research-method",
+      "parent": "routing-ui-work",
+      "output": "research-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "evaluating-usability-evidence": {
+      "family": "research-method",
+      "parent": "routing-ui-work",
+      "output": "usability-evidence-assessment",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-high-stakes-decisions": {
+      "family": "human-factors",
+      "parent": "routing-ui-work",
+      "output": "high-stakes-decision-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-keyboard-power-user-ux": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "keyboard-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-pointer-touch-pen-input": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "direct-input-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-accessible-drag-and-drop": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "drag-drop-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-gamepad-remote-focus": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "directional-focus-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-voice-conversational-ui": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "voice-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-gaze-hand-spatial-input": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "spatial-input-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-haptics-and-multisensory-feedback": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "multisensory-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-alternative-input": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "alternative-input-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-desktop-windowed-workspaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "desktop-workspace-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-foldable-large-screen-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "large-screen-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-tv-ten-foot-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "tv-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-wearable-glanceable-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "wearable-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-automotive-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "automotive-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-spatial-xr-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "spatial-xr-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-game-hud-and-menus": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "game-ui-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-cli-tui-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "terminal-ui-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-embedded-kiosk-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "embedded-kiosk-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-human-ai-interaction": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "human-ai-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-agent-autonomy-and-control": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "autonomy-envelope",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-ai-uncertainty-and-provenance": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "provenance-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-streaming-ai-responses": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "stream-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-ai-feedback-and-correction": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "correction-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-multi-agent-surfaces": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "multi-agent-context-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-generative-ui": {
+      "family": "ai",
+      "parent": "routing-ui-work",
+      "output": "generative-ui-runtime-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-authentication-and-passkeys": {
+      "family": "trust",
+      "parent": "routing-ui-work",
+      "output": "authentication-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-permissions-and-consent": {
+      "family": "trust",
+      "parent": "routing-ui-work",
+      "output": "consent-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-privacy-sensitive-interfaces": {
+      "family": "trust",
+      "parent": "routing-ui-work",
+      "output": "privacy-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-medical-safety-critical-ui": {
+      "family": "safety",
+      "parent": "routing-ui-work",
+      "output": "medical-safety-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-financial-transaction-ui": {
+      "family": "transaction",
+      "parent": "routing-ui-work",
+      "output": "financial-transaction-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-commerce-checkout": {
+      "family": "transaction",
+      "parent": "routing-ui-work",
+      "output": "checkout-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-collaboration-and-presence": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "collaboration-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-editor-canvas-workspaces": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "editor-workspace-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-latency-and-progressive-feedback": {
+      "family": "temporal",
+      "parent": "routing-ui-work",
+      "output": "latency-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-offline-degraded-experiences": {
+      "family": "temporal",
+      "parent": "routing-ui-work",
+      "output": "degraded-mode-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-notifications-and-interruptions": {
+      "family": "temporal",
+      "parent": "routing-ui-work",
+      "output": "interruption-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-real-time-updates": {
+      "family": "temporal",
+      "parent": "routing-ui-work",
+      "output": "realtime-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "governing-design-systems": {
+      "family": "design-ops",
+      "parent": "routing-ui-work",
+      "output": "design-system-governance",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "evolving-component-apis": {
+      "family": "design-ops",
+      "parent": "routing-ui-work",
+      "output": "component-migration-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "managing-theming-and-personalization": {
+      "family": "design-ops",
+      "parent": "routing-ui-work",
+      "output": "theme-personalization-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "documenting-design-decisions": {
+      "family": "design-ops",
+      "parent": "routing-ui-work",
+      "output": "design-decision-record",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "annotating-accessibility-intent": {
+      "family": "design-ops",
+      "parent": "routing-ui-work",
+      "output": "accessibility-annotation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-cognitive-accessibility": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "cognitive-accessibility-obligations",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-low-vision-and-high-contrast": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "low-vision-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-screen-reader-experiences": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "screen-reader-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-reduced-motion-and-photosensitivity": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "motion-safety-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-human-factors-and-safety": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-ai-trust-and-agency": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-input-modality": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-cognitive-load": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-security-and-privacy": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-research-validity": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-performance-and-resilience": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-localization": {
+      "family": "verification",
+      "parent": "challenging-ui-designs",
+      "output": "finding-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-robotic-teleoperation-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "robotic-teleoperation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-ambient-context-aware-interfaces": {
+      "family": "surface",
+      "parent": "routing-ui-work",
+      "output": "ambient-context-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-brain-computer-interface-ux": {
+      "family": "modality",
+      "parent": "routing-ui-work",
+      "output": "bci-interaction-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-supervisory-control-room-hmi": {
+      "family": "safety",
+      "parent": "routing-ui-work",
+      "output": "supervisory-control-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-affective-adaptive-interfaces": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "affective-adaptation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-avatar-embodied-representation": {
+      "family": "specialist",
+      "parent": "routing-ui-work",
+      "output": "avatar-representation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-aac-communication-interfaces": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "aac-communication-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-cross-device-action-equivalence": {
+      "family": "system",
+      "parent": "routing-ui-work",
+      "output": "cross-device-action-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-accessibility-settings-and-profiles": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "accessibility-settings-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-accessible-media-alternatives": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-interfaces",
+      "output": "accessible-media-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-sign-language-presentation": {
+      "family": "inclusive-specialist",
+      "parent": "designing-accessible-media-alternatives",
+      "output": "sign-language-presentation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-flight-deck-interfaces": {
+      "family": "safety",
+      "parent": "routing-ui-work",
+      "output": "flight-deck-interface-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-in-product-assistance": {
+      "family": "interaction",
+      "parent": "routing-ui-work",
+      "output": "user-assistance-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "inventorying-product-capabilities": {
+      "family": "product",
+      "parent": "modeling-product-intent",
+      "output": "capability-ledger",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "registering-ui-actions": {
+      "family": "interaction",
+      "parent": "designing-interactions",
+      "output": "action-registry",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "proving-interface-reachability": {
+      "family": "architecture",
+      "parent": "designing-navigation",
+      "output": "reachability-proof",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "covering-product-scenarios": {
+      "family": "architecture",
+      "parent": "designing-task-flows",
+      "output": "scenario-coverage",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "compiling-ui-implementation-specifications": {
+      "family": "system",
+      "parent": "routing-ui-work",
+      "output": "ui-specification",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-functional-completeness": {
+      "family": "critic",
+      "parent": "challenging-ui-designs",
+      "output": "functional-completeness-findings",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "verifying-runtime-ui-behavior": {
+      "family": "verification",
+      "parent": "binding-ui-evidence",
+      "output": "behavior-verification-ledger",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "researching-visual-references": {
+      "family": "visual",
+      "parent": "exploring-aesthetic-directions",
+      "output": "visual-reference-set",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "iterating-rendered-visual-design": {
+      "family": "visual",
+      "parent": "critiquing-visual-design",
+      "output": "visual-iteration-evidence",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "maintaining-project-design-memory": {
+      "family": "research",
+      "parent": "routing-ui-work",
+      "output": "design-memory",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "researching-ui-implementation-ecosystems": {
+      "family": "research",
+      "parent": "routing-ui-work",
+      "output": "ui-ecosystem-query",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "selecting-ui-building-blocks": {
+      "family": "system",
+      "parent": "researching-ui-implementation-ecosystems",
+      "output": "ui-source-selection",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "adapting-external-ui-patterns": {
+      "family": "system",
+      "parent": "selecting-ui-building-blocks",
+      "output": "ui-adaptation-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "engineering-rich-interactive-components": {
+      "family": "interaction",
+      "parent": "designing-interactions",
+      "output": "rich-interaction-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "auditing-ui-library-integration": {
+      "family": "critic",
+      "parent": "selecting-ui-building-blocks",
+      "output": "ui-integration-audit",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "maintaining-ui-resource-registry": {
+      "family": "research",
+      "parent": "researching-ui-frontiers",
+      "output": "ui-resource-registry-delta",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "preserving-experiential-intent": {
+      "family": "kernel",
+      "parent": "ui-contracting",
+      "output": "experiential-intent",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "directing-visual-ambition": {
+      "family": "kernel",
+      "parent": "routing-ui-work",
+      "output": "visual-ambition-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "modeling-aspirational-identity": {
+      "family": "strategy",
+      "parent": "modeling-users-and-tasks",
+      "output": "aspirational-identity-model",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "composing-spatial-dramaturgy": {
+      "family": "visual",
+      "parent": "composing-layouts",
+      "output": "spatial-drama-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "detecting-aesthetic-attractors": {
+      "family": "critic",
+      "parent": "preventing-generic-ui",
+      "output": "aesthetic-attractor-audit",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "engineering-visual-legibility": {
+      "family": "visual",
+      "parent": "crafting-typography",
+      "output": "visual-legibility-evidence",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "directing-visual-energy": {
+      "family": "visual",
+      "parent": "crafting-color",
+      "output": "visual-energy-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "deepening-signature-mechanisms": {
+      "family": "visual",
+      "parent": "exploring-aesthetic-directions",
+      "output": "signature-depth-contract",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "proving-visual-encoding-semantics": {
+      "family": "verification",
+      "parent": "designing-data-visualization",
+      "output": "encoding-provenance-table",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "critiquing-aesthetic-adequacy": {
+      "family": "verification",
+      "parent": "critiquing-visual-design",
+      "output": "aesthetic-adequacy-findings",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "escaping-aesthetic-basins": {
+      "family": "visual",
+      "parent": "iterating-rendered-visual-design",
+      "output": "aesthetic-basin-decision",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "evaluating-perceptual-diversity": {
+      "family": "verification",
+      "parent": "gating-ui-completion",
+      "output": "workspace-visual-matrix",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "testing-skill-interactions": {
+      "family": "verification",
+      "parent": "gating-ui-completion",
+      "output": "skill-interaction-evidence",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "performing-ui-repository-archaeology": {
+      "family": "research",
+      "parent": "researching-ui-implementation-ecosystems",
+      "output": "ui-source-research-dossier",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "synthesizing-cross-source-ui-language": {
+      "family": "integration",
+      "parent": "selecting-ui-building-blocks",
+      "output": "ui-cross-source-synthesis",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "auditing-ui-research-depth": {
+      "family": "verification",
+      "parent": "critiquing-research-validity",
+      "output": "ui-research-depth-findings",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "benchmarking-ui-skill-effect": {
+      "family": "verification",
+      "parent": "testing-skill-interactions",
+      "output": "ui-skill-effect-benchmark",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "routing-to-ui-authorities": {
+      "family": "research",
+      "parent": "routing-ui-work",
+      "output": "ui-authority-route-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "compiling-concrete-design-packets": {
+      "family": "integration",
+      "parent": "routing-to-ui-authorities",
+      "output": "concrete-design-packet",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "adapting-institutional-design-knowledge": {
+      "family": "research",
+      "parent": "synthesizing-cross-source-ui-language",
+      "output": "institutional-knowledge-synthesis",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "orchestrating-implementation-authorities": {
+      "family": "implementation",
+      "parent": "selecting-ui-building-blocks",
+      "output": "implementation-authority-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "validating-rendered-perception": {
+      "family": "verification",
+      "parent": "iterating-rendered-visual-design",
+      "output": "rendered-perception-evidence",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "designing-domain-native-signatures": {
+      "family": "visual",
+      "parent": "deepening-signature-mechanisms",
+      "output": "domain-signature-brief",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "building-agent-readable-ui-context": {
+      "family": "research",
+      "parent": "performing-ui-repository-archaeology",
+      "output": "agent-readable-ui-context",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "compressing-ui-decisions-for-execution": {
+      "family": "kernel",
+      "parent": "compiling-ui-implementation-specifications",
+      "output": "ui-execution-brief",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "exporting-nui-to-agent-harnesses": {
+      "family": "kernel",
+      "parent": "building-agent-readable-ui-context",
+      "output": "agent-harness-export-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "governing-external-agent-skills": {
+      "family": "verification",
+      "parent": "auditing-ui-research-depth",
+      "output": "external-skill-trust-decision",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "mapping-visual-media-opportunities": {
+      "family": "visual",
+      "parent": "directing-visual-ambition",
+      "output": "visual-media-opportunity-map",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "sourcing-rights-safe-visual-media": {
+      "family": "research",
+      "parent": "researching-visual-references",
+      "output": "visual-asset-provenance-ledger",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "authoring-domain-native-visual-assets": {
+      "family": "visual",
+      "parent": "designing-domain-native-signatures",
+      "output": "domain-native-asset-brief",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "orchestrating-creative-toolchains": {
+      "family": "implementation",
+      "parent": "orchestrating-implementation-authorities",
+      "output": "creative-toolchain-plan",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "replacing-shape-substitution": {
+      "family": "visual",
+      "parent": "preventing-generic-ui",
+      "output": "shape-substitution-audit",
+      "source_state": "UPSTREAM_PRESERVED"
+    },
+    "validating-visual-asset-integration": {
+      "family": "verification",
+      "parent": "validating-rendered-perception",
+      "output": "visual-asset-integration-evidence",
+      "source_state": "UPSTREAM_PRESERVED"
+    }
+  },
+  "routing_rules": [
+    {
+      "id": "material-baseline",
+      "disposition": "REQUIRED",
+      "reason": "Every material UI task needs product intent, user/task semantics, information architecture, interaction/state closure, and evidence-bound completion.",
+      "any_signals": [
+        "material",
+        "new_surface",
+        "workflow",
+        "navigation",
+        "visual_redesign",
+        "design_system",
+        "high_fidelity"
+      ],
+      "skills": [
+        "modeling-product-intent",
+        "modeling-users-and-tasks",
+        "architecting-information",
+        "designing-task-flows",
+        "designing-interactions",
+        "modeling-component-semantics",
+        "modeling-component-states",
+        "designing-empty-loading-error-states",
+        "directing-visual-hierarchy",
+        "architecting-design-tokens",
+        "adapting-responsive-layouts",
+        "designing-accessible-interfaces",
+        "critiquing-user-experience",
+        "critiquing-visual-design",
+        "verifying-runtime-ui-behavior",
+        "validating-rendered-perception",
+        "gating-ui-completion"
+      ]
+    },
+    {
+      "id": "professional-workspace",
+      "disposition": "EXPECTED",
+      "reason": "Operational, manager, reconciliation, or dense work needs broad workspace closure and stable comparison surfaces.",
+      "any_signals": [
+        "operational",
+        "manager_visibility",
+        "dense_data",
+        "reconciliation",
+        "exceptions",
+        "professional_workspace",
+        "audit_history"
+      ],
+      "skills": [
+        "designing-desktop-windowed-workspaces",
+        "designing-data-dense-interfaces",
+        "designing-navigation",
+        "designing-search",
+        "inventorying-product-capabilities",
+        "registering-ui-actions",
+        "proving-interface-reachability",
+        "covering-product-scenarios",
+        "critiquing-functional-completeness",
+        "designing-latency-and-progressive-feedback",
+        "designing-real-time-updates",
+        "designing-offline-degraded-experiences",
+        "documenting-design-decisions",
+        "governing-design-systems"
+      ]
+    },
+    {
+      "id": "consequential-decisions",
+      "disposition": "REQUIRED",
+      "reason": "Financial, destructive, privacy, security, or consequential workflows require consequence, reversibility, authority, confirmation, recovery, and independent safety critique.",
+      "any_signals": [
+        "high_impact",
+        "financial",
+        "destructive",
+        "privacy",
+        "security",
+        "medical",
+        "autonomous_action"
+      ],
+      "skills": [
+        "designing-high-stakes-decisions",
+        "designing-financial-transaction-ui",
+        "designing-permissions-and-consent",
+        "designing-privacy-sensitive-interfaces",
+        "designing-authentication-and-passkeys",
+        "critiquing-human-factors-and-safety",
+        "critiquing-security-and-privacy"
+      ]
+    },
+    {
+      "id": "consumer-visual-direction",
+      "disposition": "EXPECTED",
+      "reason": "Materially open consumer or narrative visual work benefits from divergent directions before selecting a design language.",
+      "any_signals": [
+        "visual_redesign",
+        "visual_ambition_open",
+        "consumer",
+        "narrative",
+        "story",
+        "game"
+      ],
+      "skills": [
+        "exploring-aesthetic-directions",
+        "composing-layouts",
+        "crafting-typography",
+        "crafting-color",
+        "crafting-spacing-and-rhythm",
+        "designing-motion",
+        "writing-interface-copy",
+        "preventing-generic-ui",
+        "critiquing-aesthetic-adequacy",
+        "designing-domain-native-signatures"
+      ]
+    },
+    {
+      "id": "game-surface",
+      "disposition": "EXPECTED",
+      "reason": "Game or controller-oriented interfaces need game surface and input/focus obligations instead of professional-workspace defaults.",
+      "any_signals": [
+        "game",
+        "gamepad",
+        "controller",
+        "narrative"
+      ],
+      "skills": [
+        "designing-game-hud-and-menus",
+        "designing-gamepad-remote-focus",
+        "critiquing-input-modality"
+      ]
+    },
+    {
+      "id": "accessibility-depth",
+      "disposition": "REQUIRED",
+      "reason": "Explicit accessibility, assistive technology, keyboard, low vision, cognitive, motion, or screen-reader risks require specialized inclusive obligations.",
+      "any_signals": [
+        "accessibility_heavy",
+        "a11y",
+        "keyboard",
+        "screen_reader",
+        "low_vision",
+        "cognitive_accessibility",
+        "reduced_motion"
+      ],
+      "skills": [
+        "designing-keyboard-power-user-ux",
+        "designing-cognitive-accessibility",
+        "designing-low-vision-and-high-contrast",
+        "designing-screen-reader-experiences",
+        "designing-reduced-motion-and-photosensitivity",
+        "critiquing-accessibility"
+      ]
+    },
+    {
+      "id": "human-ai",
+      "disposition": "REQUIRED",
+      "reason": "AI involvement requires uncertainty, provenance, agency, control, correction, and trust obligations.",
+      "any_signals": [
+        "ai",
+        "human_ai",
+        "agent",
+        "streaming",
+        "autonomous_action"
+      ],
+      "skills": [
+        "designing-human-ai-interaction",
+        "designing-ai-uncertainty-and-provenance",
+        "designing-agent-autonomy-and-control",
+        "designing-streaming-ai-responses",
+        "designing-ai-feedback-and-correction",
+        "critiquing-ai-trust-and-agency"
+      ]
+    },
+    {
+      "id": "reference-transfer",
+      "disposition": "EXPECTED",
+      "reason": "Named references inform mechanisms and authority, but require transfer to local product context rather than trade-dress cloning.",
+      "any_signals": [
+        "references",
+        "named_reference",
+        "external_pattern"
+      ],
+      "skills": [
+        "researching-visual-references",
+        "adapting-external-ui-patterns"
+      ]
+    },
+    {
+      "id": "runtime-evidence",
+      "disposition": "REQUIRED",
+      "reason": "Material UI completion must bind implementation claims to current rendered/runtime evidence when the host can provide it.",
+      "any_signals": [
+        "material",
+        "high_fidelity",
+        "runtime_render"
+      ],
+      "skills": [
+        "binding-ui-evidence"
+      ]
+    }
+  ],
+  "p2p_extension": {
+    "materiality_categories": [
+      "new_surface",
+      "navigation",
+      "visual_redesign",
+      "design_system",
+      "consequential_interaction",
+      "high_fidelity",
+      "tiny_local_edit"
+    ],
+    "dispositions": [
+      "REQUIRED",
+      "EXPECTED",
+      "OPTIONAL",
+      "EXCLUDED",
+      "UNKNOWN"
+    ],
+    "single_router": "p2p_uiux.router.classify_request",
+    "canonical_quorum_denominator": 8,
+    "canonical_quorum": "8/8",
+    "optional_specialist": "p2p_aesthetica",
+    "optional_specialist_in_denominator": false,
+    "no_permission_grant": true,
+    "c10_authority": "p2p-decision-trace/1",
+    "c11_authority": "p2p-task-state/1",
+    "c12_authority": "p2p-foreground-execution/1"
+  }
+}

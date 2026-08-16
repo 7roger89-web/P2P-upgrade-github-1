@@ -1,0 +1,39 @@
+{
+  "schema": "p2p-c13-design-intelligence-fixture/1",
+  "synthetic_fixtures": [
+    {
+      "id": "logistics_like",
+      "request": "Design a shipment operations workspace for dispatchers and managers with reconciliation, financial status, search, exception review, dense tables, and audit history.",
+      "context": {
+        "product_surface": "shipment operations workspace",
+        "users_roles": ["dispatcher", "operations manager", "finance reviewer"],
+        "job": "review shipment status and resolve exceptions",
+        "workflow": ["search shipment", "compare status", "reconcile charge", "review exception"],
+        "platforms": ["desktop web"],
+        "devices": ["large monitor", "laptop"],
+        "modalities": ["pointer", "keyboard"],
+        "risk": "HIGH",
+        "visual_ambition": "CONTROLLED",
+        "constraints": ["preserve operational accuracy", "support dense comparison"]
+      }
+    },
+    {
+      "id": "consumer_story_game",
+      "request": "Create an interactive narrative game scene that is reading-first, immersive, and visually distinctive with controller-friendly focus.",
+      "context": {
+        "product_surface": "consumer narrative game",
+        "users_roles": ["reader-player"],
+        "job": "read the scene and choose the next story action",
+        "workflow": ["read scene", "inspect choice", "continue narrative"],
+        "platforms": ["web", "console"],
+        "devices": ["monitor", "television"],
+        "modalities": ["pointer", "gamepad"],
+        "risk": "LOW",
+        "visual_ambition": "OPEN",
+        "constraints": ["reading-first hierarchy", "preserve narrative tone"]
+      }
+    }
+  ],
+  "design_cases": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12"],
+  "structural_cases": ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "F23", "F24", "F25", "F26"]
+}

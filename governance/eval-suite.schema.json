@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-codex-project-eval/2",
+  "title": "P2P project-specific evaluation suite",
+  "type": "object",
+  "required": ["schema_version", "project", "policy", "comparison_contract", "cases"],
+  "properties": {
+    "schema_version": {"const": "p2p-codex-project-eval/2"},
+    "project": {"type": "string", "minLength": 1},
+    "policy": {
+      "type": "object",
+      "required": [
+        "minimum_cases", "minimum_trials_per_variant", "minimum_p2p_pass_rate",
+        "maximum_mean_regression", "maximum_case_regressions",
+        "maximum_score_spread", "blocked_cases_allowed"
+      ],
+      "properties": {
+        "minimum_cases": {"type": "integer", "minimum": 1},
+        "minimum_trials_per_variant": {"type": "integer", "minimum": 1},
+        "minimum_p2p_pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "maximum_mean_regression": {"type": "number", "minimum": 0, "maximum": 1},
+        "maximum_case_regressions": {"type": "integer", "minimum": 0},
+        "maximum_score_spread": {"type": "number", "minimum": 0, "maximum": 1},
+        "blocked_cases_allowed": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "comparison_contract": {
+      "type": "object",
+      "required": [
+        "same_input", "same_environment", "isolate_runs",
+        "record_model_and_surface", "leakage_check",
+        "criteria_defined_before_runs", "frozen_fixtures", "no_cross_run_memory"
+      ],
+      "properties": {
+        "same_input": {"const": true},
+        "same_environment": {"const": true},
+        "isolate_runs": {"const": true},
+        "record_model_and_surface": {"const": true},
+        "leakage_check": {"const": true},
+        "criteria_defined_before_runs": {"const": true},
+        "frozen_fixtures": {"const": true},
+        "no_cross_run_memory": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "case_id", "class", "title", "task", "fixture", "fixture_sha256",
+          "tags", "checks", "baseline_runs", "p2p_runs"
+        ],
+        "properties": {
+          "case_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+          "class": {"enum": ["frequent", "consequential", "failure_prone", "security_boundary", "regression", "retrieval", "other"]},
+          "title": {"type": "string", "minLength": 1},
+          "task": {"type": "string", "minLength": 1},
+          "fixture": {"type": "string", "minLength": 1},
+          "fixture_sha256": {"type": "string", "pattern": "^$|^[a-f0-9]{64}$"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "checks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["check_id", "grader", "weight", "criterion"],
+              "properties": {
+                "check_id": {"type": "string", "minLength": 1},
+                "grader": {"enum": ["exact", "contains", "rubric", "human", "retrieval"]},
+                "weight": {"type": "number", "exclusiveMinimum": 0},
+                "criterion": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            }
+          },
+          "baseline_runs": {"type": "array", "items": {"$ref": "#/$defs/run"}},
+          "p2p_runs": {"type": "array", "items": {"$ref": "#/$defs/run"}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "run": {
+      "type": "object",
+      "required": [
+        "run_id", "status", "model", "surface", "environment_id", "run_at",
+        "score", "evidence", "evidence_sha256", "unexpected_writes", "notes"
+      ],
+      "properties": {
+        "run_id": {"type": "string", "minLength": 1},
+        "status": {"enum": ["pass", "fail", "blocked"]},
+        "model": {"type": "string", "minLength": 1},
+        "surface": {"type": "string", "minLength": 1},
+        "environment_id": {"type": "string", "minLength": 1},
+        "run_at": {"type": "string", "format": "date-time"},
+        "score": {"type": "number", "minimum": 0, "maximum": 1},
+        "evidence": {"type": "string", "minLength": 1},
+        "evidence_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "unexpected_writes": {"type": "integer", "minimum": 0},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

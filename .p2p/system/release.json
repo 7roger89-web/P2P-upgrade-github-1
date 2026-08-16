@@ -1,0 +1,15 @@
+{
+  "backups": [],
+  "canonical_denominator": 8,
+  "changed_files": [],
+  "install_class": "SAME_VERSION_REINSTALL",
+  "installed_at": "20260812T065837Z",
+  "managed_file_count": 24,
+  "optional_specialist": "p2p_aesthetica",
+  "package_name": "p2p-uiux-capability",
+  "package_version": "8.4.7-C-codex.3",
+  "preserved_existing_canonical_profiles": true,
+  "preserved_existing_core_skill": true,
+  "protected_state_hashes": {},
+  "schema": "p2p-install-release/1"
+}

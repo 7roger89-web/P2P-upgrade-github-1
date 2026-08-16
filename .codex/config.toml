@@ -1,0 +1,15 @@
+# P2P Codex project configuration.
+# No model is pinned; the active Codex client chooses current defaults.
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 8
+
+[[hooks.SubagentStart]]
+matcher = "^(?:default|p2p_(?:iris|tecton|axiom|vector|datos|anon|architecton|helios|aesthetica))$"
+
+[[hooks.SubagentStart.hooks]]
+type = "command"
+command = "python3 .p2p/system/scripts/p2p_host_identity_hook.py --root ."
+command_windows = "py -3 .p2p/system/scripts/p2p_host_identity_hook.py --root ."
+timeout = 3

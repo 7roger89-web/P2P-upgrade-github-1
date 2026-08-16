@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-codex-release-gates/2",
+  "title": "P2P update release-gate tracker",
+  "type": "object",
+  "required": [
+    "schema_version", "release_zip_sha256", "inventory",
+    "semantic_source_review", "fact_ledger_review",
+    "fact_ledger_technical_preview", "fact_ledger_user_approval",
+    "live_specs_sync", "project_evals",
+    "rag_retrieval_checks", "protected_runtime_manifest",
+    "active_runtime_drift", "rollback_artifact", "package_doctor",
+    "technical_gate_report", "final_user_approval",
+    "candidate_hash_recheck", "final_gate_report", "release_decision"
+  ],
+  "properties": {
+    "schema_version": {"const": "p2p-codex-release-gates/2"},
+    "release_zip_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "inventory": {"enum": ["PASS", "FAIL"]},
+    "semantic_source_review": {"type": "string"},
+    "fact_ledger_review": {"type": "string"},
+    "fact_ledger_technical_preview": {"type": "string"},
+    "fact_ledger_user_approval": {"type": "string"},
+    "live_specs_sync": {"type": "string"},
+    "project_evals": {"type": "string"},
+    "rag_retrieval_checks": {"type": "string"},
+    "protected_runtime_manifest": {"type": "string"},
+    "active_runtime_drift": {"type": "string"},
+    "rollback_artifact": {"type": "string"},
+    "package_doctor": {"type": "string"},
+    "technical_gate_report": {"type": "string"},
+    "final_user_approval": {"type": "string"},
+    "candidate_hash_recheck": {"type": "string"},
+    "final_gate_report": {"type": "string"},
+    "release_decision": {"enum": ["BLOCKED", "PASS"]}
+  },
+  "additionalProperties": false
+}
