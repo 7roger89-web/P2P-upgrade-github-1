@@ -13,7 +13,7 @@
     },
     "schema_version": {
       "type": "integer",
-      "minimum": 1,
+      "minimum": 2,
       "description": "Bump when the record shape changes; older records are migrated or preserved in history."
     },
     "canonical_source_statement": {
@@ -57,7 +57,7 @@
   "$defs": {
     "capability": {
       "type": "object",
-      "required": ["capability_id", "name", "family", "status", "beginner_value", "principle", "origin_refs"],
+      "required": ["capability_id", "name", "family", "status", "beginner_value", "principle", "origin_refs", "origin_type", "dependencies"],
       "properties": {
         "capability_id": {
           "type": "string",
@@ -79,6 +79,11 @@
           "description": "Recoverable origin: goal documents, plans, reports, research notes. If origin cannot be durably recovered, use exactly 'origin_unknown_or_not_durably_recovered'. Do not fabricate precise origins.",
           "items": { "type": "string" }
         },
+        "origin_type": {
+          "type": "string",
+          "enum": ["IMPLEMENTATION_GOAL", "RESEARCH_DECISION", "OWNER_ACCEPTED_PROPOSAL", "ARCHITECTURE_INVARIANT", "UPSTREAM_SPECIFICATION", "PROJECT_LEARNING", "REJECTED_DESIGN", "RECOVERED_LEGACY", "UNKNOWN"],
+          "description": "Categorical origin class. IMPLEMENTATION_GOAL = born from a durable implementation Goal. RESEARCH_DECISION = born from the research decision registry. OWNER_ACCEPTED_PROPOSAL = born from owner-accepted chat/context proposals; it MUST enter the roadmap as PLANNED and is NOT an implementation. ARCHITECTURE_INVARIANT = born from a charter invariant or structural requirement. UPSTREAM_SPECIFICATION = born from an upstream host/spec requirement. PROJECT_LEARNING = born from evaluation or learning history. REJECTED_DESIGN = a rejected pattern kept on the ledger to prevent reintroduction. RECOVERED_LEGACY = reconstructed from recovered legacy artifacts (evidence-only). UNKNOWN = origin cannot be durably recovered; origin_refs must then be exactly ['origin_unknown_or_not_durably_recovered']."
+        },
         "status": { "type": "string", "enum": ["VERIFIED_IMPLEMENTED", "FOUNDATION_READY", "PARTIAL", "PLANNED", "DEFERRED", "REJECTED", "OBSOLETE", "UNKNOWN"] },
         "implementation_refs": {
           "type": "array",
@@ -92,8 +97,8 @@
         },
         "dependencies": {
           "type": "array",
-          "description": "capability_ids this depends on; each must reference a valid record in this ledger.",
-          "items": { "type": "string" }
+          "description": "capability_ids this record depends on; each must reference a valid capability_id in this ledger. The field itself is REQUIRED: an empty list is a valid declaration meaning 'no dependencies'. Dependency intent must always be explicitly declared, never implied by absence.",
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,60}$" }
         },
         "known_gaps": {
           "type": "array",

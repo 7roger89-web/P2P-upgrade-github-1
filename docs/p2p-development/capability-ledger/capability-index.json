@@ -1,9 +1,9 @@
 {
   "ledger_id": "capability-index",
-  "schema_version": 1,
+  "schema_version": 2,
   "canonical_source_statement": "Derived from governance/development-control.json (architectural_invariants, roadmap, capability_status, candidate_records, research_decisions), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, docs/plans/, and per-goal evidence reports in reports/. This ledger is capability knowledge, status, and roadmap intent only; it is NOT runtime truth, NOT Task State, and NOT a second FACT store. Where this ledger contradicts development-control.json, development-control.json wins.",
   "authority_boundary": "This ledger records capability knowledge, capability status, and development intent. It does not control runtime task completion. Runtime task authority lives in Task State; goal/development governance authority lives in governance/development-control.json; factual and evidence authority lives in governance/fact-ledger.json and governance/live-specs.json with their evidence files.",
-  "generated_at": "2026-08-17T00:00:00Z",
+  "generated_at": "2026-08-17T00:00:00+07:00",
   "families": {
     "TRUTH_AND_GOVERNANCE": {
       "name": "Truth & Governance",
@@ -84,7 +84,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: four separate states.",
-      "rejected_reason": "Rejected_reason: four separate states."
+      "rejected_reason": "Rejected_reason: four separate states.",
+      "origin_type": "REJECTED_DESIGN"
     },
     {
       "capability_id": "DECISION_TRACE",
@@ -116,7 +117,8 @@
       "next_condition": "Keep deterministic trace semantics under cross-platform reconciliation.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Native decision trace verified across C14 release certification and C19 regression."
+      "notes": "Native decision trace verified across C14 release certification and C19 regression.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "DOCTOR_VALIDATION",
@@ -144,7 +146,8 @@
       "next_condition": "Extend doctor checks to each new subsystem deterministically.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "DRIFT_GATE",
@@ -174,7 +177,8 @@
       "next_condition": "Maintain the locked manifest; extend sealed set only via approval.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "FACT_LEDGER",
@@ -206,7 +210,8 @@
       "next_condition": "Refresh volatile facts through the expiry policy; add facts only via the approval workflow.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "FACT_TO_LIVE_SPEC_SYNC",
@@ -239,7 +244,8 @@
       "next_condition": "Tighten sync when a goal adds continuous reconciliation with durable evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Governance artifacts exist and are used together; continuous automated sync is not implemented."
+      "notes": "Governance artifacts exist and are used together; continuous automated sync is not implemented.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "GOAL_CANDIDATE_RELEASE_PROMOTION_LIFECYCLE",
@@ -273,7 +279,8 @@
       "next_condition": "Promotions require a separate approval record per C14 precedent.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Official baseline 8.4.7-C-codex.19 immutable; C15..C21 UNPROMOTED; C25 candidate will also remain UNPROMOTED."
+      "notes": "Official baseline 8.4.7-C-codex.19 immutable; C15..C21 UNPROMOTED; C25 candidate will also remain UNPROMOTED.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "HASH_BOUND_APPROVAL",
@@ -304,7 +311,8 @@
       "next_condition": "Maintain through the release gates.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "LIVE_SPECS",
@@ -338,7 +346,8 @@
       "next_condition": "Keep specs updated only through the approved drift/approval workflow.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "OWNER_APPROVAL_BINDING",
@@ -369,7 +378,8 @@
       "next_condition": "Keep approval records in the approvals/ directory; extend schema only via the approval workflow.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PERMISSION_ENVELOPE",
@@ -399,7 +409,8 @@
       "next_condition": "Revisit if a goal adds cryptographically sealed envelopes.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Intent-is-not-permission enforcement across transport channels."
+      "notes": "Intent-is-not-permission enforcement across transport channels.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PROVENANCE",
@@ -428,7 +439,8 @@
       "next_condition": "Extend provenance coverage to every new artifact family a goal introduces.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ROLLBACK_GATE",
@@ -461,7 +473,8 @@
       "next_condition": "Maintain install-backups discipline on every release.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "VOLATILE_FACT_EXPIRY",
@@ -492,7 +505,8 @@
       "next_condition": "Add automated expiry enforcement if host metadata freshness work requires it.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ATLAS_CAPSULE",
@@ -524,7 +538,8 @@
       "next_condition": "Define durable retrieval behavior before promoting Atlas/Capsule to VERIFIED.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "Optional knowledge snapshot layer; not self-created in this session (isolation)."
+      "notes": "Optional knowledge snapshot layer; not self-created in this session (isolation).",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "CHAT_HISTORY_AS_PROJECT_STATE",
@@ -545,7 +560,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: state is not chat history.",
-      "rejected_reason": "Rejected_reason: state is not chat history."
+      "rejected_reason": "Rejected_reason: state is not chat history.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "DAG_TASK_DECOMPOSITION",
@@ -578,7 +594,8 @@
       "next_condition": "Expose DAG as a distinct, reusable subsystem if a goal requires explicit graph planning.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": "DAG behavior is embedded in orchestration and parallel execution evidence."
+      "notes": "DAG behavior is embedded in orchestration and parallel execution evidence.",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "DETERMINISTIC_STATE_MACHINE",
@@ -607,7 +624,8 @@
       "next_condition": "Maintain serialization determinism across platforms (C19 reconciliation covers this).",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Cross-platform reconciliation (C19) fixed determinism defects."
+      "notes": "Cross-platform reconciliation (C19) fixed determinism defects.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "DURABLE_TASK_STATE",
@@ -639,7 +657,8 @@
       "next_condition": "Portable task state requires the portable execution envelope (C20) plus cross-host continuation.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "EVIDENCE_BOUND_COMPLETION",
@@ -667,7 +686,8 @@
       "next_condition": "Every goal must close with a terminal evidence record.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Terminal PASS + UNPROMOTED discipline enforced in every recovered goal."
+      "notes": "Terminal PASS + UNPROMOTED discipline enforced in every recovered goal.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "EXECUTION_LEDGER",
@@ -697,7 +717,8 @@
       "next_condition": "Keep append-only semantics.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Append-only ledger in .p2p/state/execution-ledger.jsonl."
+      "notes": "Append-only ledger in .p2p/state/execution-ledger.jsonl.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "INTERRUPTION_RESUME",
@@ -728,7 +749,8 @@
       "next_condition": "Live resume testing across a real interruption event.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": "Foundation verified via task_state tests; live interruption testing not durably recorded."
+      "notes": "Foundation verified via task_state tests; live interruption testing not durably recorded.",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "MUTATION_CERTAINTY",
@@ -758,7 +780,8 @@
       "next_condition": "Lock manifest refresh on every release.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "SECOND_TASK_TRUTH_STORE",
@@ -779,7 +802,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: single runtime truth store discipline.",
-      "rejected_reason": "Rejected_reason: single runtime truth store discipline."
+      "rejected_reason": "Rejected_reason: single runtime truth store discipline.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "CACHE_AWARE_REUSE",
@@ -810,7 +834,8 @@
       "next_condition": "Cross-session cache policy requires a goal with durability evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C19 foundation verified; validity requires freshness re-check."
+      "notes": "C19 foundation verified; validity requires freshness re-check.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CONTEXT_CAPSULES",
@@ -843,7 +868,8 @@
       "next_condition": "Durable capsule contract test before promotion to FOUNDATION_READY.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "CONTEXT_DELIVERY",
@@ -872,7 +898,8 @@
       "next_condition": "Delivery contract stable under reconciliation.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CONTEXT_FALLBACK",
@@ -903,7 +930,8 @@
       "next_condition": "Live fallback test under partial state loss.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CONTEXT_FRESHNESS_BOUNDARY",
@@ -934,7 +962,8 @@
       "next_condition": "Add scheduled re-validation if goals add long-lived cached context.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CONTEXT_GATING_ESCALATION",
@@ -963,7 +992,8 @@
       "next_condition": "Escalation ladder stays three-tier; new tiers require a goal.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Three-tier escalation verified in C19 tests."
+      "notes": "Three-tier escalation verified in C19 tests.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CONTEXT_MODES_POINTERS_HASH",
@@ -991,7 +1021,8 @@
       "next_condition": "Keep mode/pointer/hash/stale contracts stable; changes require evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "FILESYSTEM_CONTEXT_OFFLOAD",
@@ -1020,7 +1051,8 @@
       "next_condition": "Pointer conventions stable.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Hash-bound adapter writes structured outputs with evidence pointers."
+      "notes": "Hash-bound adapter writes structured outputs with evidence pointers.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "FULL_CONTEXT_PRELOAD",
@@ -1041,7 +1073,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: task-targeted retrieval only.",
-      "rejected_reason": "Rejected_reason: task-targeted retrieval only."
+      "rejected_reason": "Rejected_reason: task-targeted retrieval only.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "KNOWLEDGE_DELTA",
@@ -1068,7 +1101,8 @@
       "next_condition": "Requires hash-bounded baseline mechanism and a goal with evidence contract.",
       "last_reviewed": "2026-08-17",
       "freshness": "origin_unknown_or_not_durably_recovered",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "PROGRESSIVE_DISCLOSURE_MODES",
@@ -1097,7 +1131,8 @@
       "next_condition": "Modes evolve only through goals with coverage evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "Mode set fixed by governance; C19 implements targeted retrieval on top."
+      "notes": "Mode set fixed by governance; C19 implements targeted retrieval on top.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "PROJECT_MAP",
@@ -1131,7 +1166,8 @@
       "next_condition": "Extend reading maps when RAG scope is re-opened by a goal.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Ledger index itself (this file) is the newest map entry."
+      "notes": "Ledger index itself (this file) is the newest map entry.",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "RAG_SCOPE",
@@ -1156,7 +1192,8 @@
       "deferred_reason": "Vector retrieval deferred in C19 scope decisions; retrieval coverage and cache-aware reuse foundations preferred for durability.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": "Schema/template artifacts exist for a future retrieval check."
+      "notes": "Schema/template artifacts exist for a future retrieval check.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "RETRIEVAL_COVERAGE_ACCOUNTING",
@@ -1183,7 +1220,8 @@
       "next_condition": "Coverage enum stable; fail-closed sufficiency check retained.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Sufficiency check is fail-closed per C19 evidence."
+      "notes": "Sufficiency check is fail-closed per C19 evidence.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "TASK_TARGETED_CONTEXT_RETRIEVAL",
@@ -1218,7 +1256,8 @@
       "next_condition": "Vector retrieval requires a dedicated goal with durability, not an inline feature.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C19 PASS; UNPROMOTED candidate; vector retrieval remains outside current governance."
+      "notes": "C19 PASS; UNPROMOTED candidate; vector retrieval remains outside current governance.",
+      "origin_type": "IMPLEMENTATION_GOAL"
     },
     {
       "capability_id": "BOOK_TO_SKILL_CONVERSION",
@@ -1247,7 +1286,8 @@
       "next_condition": "Formalize conversion with tests before promotion.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "SKILL_DISCOVERY_PROGRESSIVE_LOAD",
@@ -1278,7 +1318,8 @@
       "next_condition": "New skills adopt the standard before registration.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "23 skills on-demand per architecture doc."
+      "notes": "23 skills on-demand per architecture doc.",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "SKILL_PROVENANCE",
@@ -1309,7 +1350,8 @@
       "next_condition": "Rollback records kept per skill.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Includes untrusted-content boundary enforcement."
+      "notes": "Includes untrusted-content boundary enforcement.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "SKILL_ROLLBACK",
@@ -1341,7 +1383,8 @@
       "next_condition": "Backups retained per release discipline.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "UNTRUSTED_CONTENT_BOUNDARY",
@@ -1369,7 +1412,8 @@
       "next_condition": "Security scan retained in every release gate.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ADAPTIVE_SHAPE_COUNT_QUORUM",
@@ -1400,7 +1444,8 @@
       "next_condition": "Live quorum requires multi-host adapter certification (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "Canonical set 8/8 quorum in governance; runtime adaptation foundation-ready."
+      "notes": "Canonical set 8/8 quorum in governance; runtime adaptation foundation-ready.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "BACKGROUND_DAEMON_AUTONOMY",
@@ -1421,7 +1466,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: durable state != background autonomy.",
-      "rejected_reason": "Rejected_reason: durable state != background autonomy."
+      "rejected_reason": "Rejected_reason: durable state != background autonomy.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "BLIND_RETRY",
@@ -1442,7 +1488,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: safe retry requires certainty.",
-      "rejected_reason": "Rejected_reason: safe retry requires certainty."
+      "rejected_reason": "Rejected_reason: safe retry requires certainty.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "BOUNDED_EXECUTION",
@@ -1469,7 +1516,8 @@
       "next_condition": "Keep bounds enforced for every execution path.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "COMPETING_ROUTER",
@@ -1490,7 +1538,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: p2p-is-sole-orchestrator invariant.",
-      "rejected_reason": "Rejected_reason: p2p-is-sole-orchestrator invariant."
+      "rejected_reason": "Rejected_reason: p2p-is-sole-orchestrator invariant.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "DELEGATION",
@@ -1523,7 +1572,8 @@
       "next_condition": "Live delegation certification requires the multi-host adapter evidence (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "C15 foundation BOUNDED_DELEGATION_FOUNDATION_READY; live_delegation_status NOT_CERTIFIED."
+      "notes": "C15 foundation BOUNDED_DELEGATION_FOUNDATION_READY; live_delegation_status NOT_CERTIFIED.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "DETERMINISTIC_FIRST_STRATEGY",
@@ -1550,7 +1600,8 @@
       "next_condition": "Maintain strategy ladder.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "EXECUTION_POLICY",
@@ -1572,15 +1623,15 @@
       ],
       "dependencies": [
         "BOUNDED_EXECUTION",
-        "DELEGATION",
-        "PARALLEL_EXECUTION"
+        "DELEGATION"
       ],
       "known_gaps": [],
       "do_not_duplicate_with": [],
       "next_condition": "Four context classes (C18) stable; policy changes require supervisor evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C18 PASS."
+      "notes": "C18 PASS.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PARALLEL_EXECUTION",
@@ -1600,8 +1651,7 @@
         "tests/test_p2p_parallel_execution.py"
       ],
       "dependencies": [
-        "DELEGATION",
-        "EXECUTION_POLICY"
+        "DELEGATION"
       ],
       "known_gaps": [
         "Live parallel execution not certified for live hosts (NOT_CERTIFIED per capability_status)."
@@ -1612,7 +1662,8 @@
       "next_condition": "Live certification requires adapter evidence; C17 cognitive economy EVALUATED_BOUNDED_PARALLEL_SLICE.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "C17; cognitive economy parallel orchestration evaluated."
+      "notes": "C17; cognitive economy parallel orchestration evaluated.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PREFLIGHT",
@@ -1641,7 +1692,8 @@
       "next_condition": "Preflight scope grows with each subsystem.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "SAFE_RETRY",
@@ -1670,7 +1722,8 @@
       "next_condition": "Retry classification retained under new strategies.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "SECOND_EXECUTOR",
@@ -1691,7 +1744,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: P2P has one execution engine.",
-      "rejected_reason": "Rejected_reason: P2P has one execution engine."
+      "rejected_reason": "Rejected_reason: P2P has one execution engine.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "TASK_AS_AGENT",
@@ -1712,7 +1766,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: task is bounded work, not an identity; naming a task does not make it an agent.",
-      "rejected_reason": "Rejected_reason: task is bounded work, not an identity; naming a task does not make it an agent."
+      "rejected_reason": "Rejected_reason: task is bounded work, not an identity; naming a task does not make it an agent.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "UNBOUNDED_SWARM",
@@ -1733,7 +1788,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: bounded parallelism only.",
-      "rejected_reason": "Rejected_reason: bounded parallelism only."
+      "rejected_reason": "Rejected_reason: bounded parallelism only.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "WORKER_OUTPUT_VERIFICATION",
@@ -1762,7 +1818,8 @@
       "next_condition": "Verification gates every delegated/parallel result.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C17/C18 evidence."
+      "notes": "C17/C18 evidence.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "DESIGN_ROUTING_VERIFICATION",
@@ -1791,7 +1848,8 @@
       "next_condition": "Routing tests retained in regression.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "FACULTIES_AS_AGENTS",
@@ -1812,7 +1870,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: faculties are metadata.",
-      "rejected_reason": "Rejected_reason: faculties are metadata."
+      "rejected_reason": "Rejected_reason: faculties are metadata.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "FACULTY_TARGETED_LOADING",
@@ -1841,7 +1900,8 @@
       "next_condition": "Selective routing semantics stable.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Aesthetica is supporting-optional only, never canonical."
+      "notes": "Aesthetica is supporting-optional only, never canonical.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "NUI_FACULTIES",
@@ -1869,7 +1929,8 @@
       "next_condition": "Faculty catalog is metadata; never expanded into agents.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "UIUX_EVAL",
@@ -1895,7 +1956,8 @@
       "next_condition": "Eval suite schema retained.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "UIUX_GUIDANCE",
@@ -1924,7 +1986,8 @@
       "next_condition": "UIUX eval retained in release gates.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Cross-platform JSON/path fix reconciled in C19."
+      "notes": "Cross-platform JSON/path fix reconciled in C19.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ADAPTER_CONFORMANCE",
@@ -1958,7 +2021,8 @@
       "next_condition": "Live adapter certification requires C22-C24 evidence, which is not durably recovered in this copy.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": "Handoff prompt expects C24 adapter conformance evidence at SHA 6c5b3b29...; that candidate does not exist in this filesystem. Recorded as not durably recovered here."
+      "notes": "Handoff prompt expects C24 adapter conformance evidence at SHA 6c5b3b29...; that candidate does not exist in this filesystem. Recorded as not durably recovered here.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "C08_LIVE_MEMORY_RESEARCH",
@@ -1980,7 +2044,8 @@
       "deferred_reason": "Preserved as a deferred historical roadmap item (capability_status).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": ""
+      "notes": "",
+      "origin_type": "IMPLEMENTATION_GOAL"
     },
     {
       "capability_id": "C09_LIVE_HOST_EVENT_EVIDENCE",
@@ -2001,7 +2066,8 @@
       "rejected_reason": "EVENT_EVIDENCE_UNAVAILABLE at evaluation time (capability_status C09).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": ""
+      "notes": "",
+      "origin_type": "IMPLEMENTATION_GOAL"
     },
     {
       "capability_id": "C22_C24_ADAPTER_LIVE_CERTIFICATION",
@@ -2010,7 +2076,11 @@
       "beginner_value": "P2P would run verified live on multiple AI hosts with certified adapters, so the owner could switch hosts without re-validating the project.",
       "principle": "UNKNOWN_IS_NOT_SUPPORTED",
       "origin_refs": [
-        "origin_unknown_or_not_durably_recovered"
+        "SHA-256: 6c5b3b29fbaaab6df0b9f0c8a2f88ff579390b3b060c5c0d2f076cadec37d879 (verified 2026-08-17 against owner-supplied C24 package)",
+        "reports/candidates/P2P-8-4-7-C-codex-24-c24-evidence-backed-multi-host-adapter-conformance-candidate-v1.zip",
+        "SHA-256: 8303efa866e9a6b1e33b94e4fe9e5c2afd0bfd71b6fe9a1344f53731f33fc7d1 (verified 2026-08-17 against owner-supplied C23 package)",
+        "reports/candidates/P2P-8-4-7-C-codex-23-c23-portable-ai-continuation-round-trip-candidate-v1.zip",
+        "governance/development-control.json (C23/C24 lineage records)"
       ],
       "status": "UNKNOWN",
       "implementation_refs": [],
@@ -2020,16 +2090,19 @@
         "ADAPTER_CONFORMANCE"
       ],
       "known_gaps": [
-        "No governance record, plan, candidate zip, or supervisor report for C22/C23/C24 exists in this copy of the project.",
-        "The C25 handoff prompt expects a C24 PASS with candidate SHA 6c5b3b29fbaaab6df0b9f0c8a2f88ff579390b3b060c5c0d2f076cadec37d879, which could not be found durably."
+        "C24 multi-host adapter conformance package recovered and SHA-256 verified on 2026-08-17.",
+        "C23 portable AI-continuation round-trip package recovered and SHA-256 verified on 2026-08-17.",
+        "C22 package was NOT recovered; evidence for C22 remains unavailable.",
+        "Live adapter certification is still NOT verified against any recovered package; UNKNOWN status preserved."
       ],
       "do_not_duplicate_with": [
         "HOST_SELECTION"
       ],
       "next_condition": "Recover or recreate C22-C24 evidence through the standard goal/verification workflow before claiming this capability.",
       "last_reviewed": "2026-08-17",
-      "freshness": "origin_unknown_or_not_durably_recovered",
-      "notes": "Honesty rule applied: status UNKNOWN pending durable evidence; the expected C24 candidate is preserved here as a referenced-but-unverified expectation only."
+      "freshness": "from_governance_record",
+      "notes": "Partial reconciliation on 2026-08-17: owner-supplied C23 and C24 candidate packages were recovered and SHA-256 verified (C24=6c5b3b29fbaaab6df0b9f0c8a2f88ff579390b3b060c5c0d2f076cadec37d879, C23=8303efa866e9a6b1e33b94e4fe9e5c2afd0bfd71b6fe9a1344f53731f33fc7d1). Package contents were not durably certified as matching the original implementations; live certification remains unverified. Per reconciliation rule, UNKNOWN implementation semantics are preserved; history is not rewritten.",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "CROSS_HOST_CONTINUATION_CONTRACT",
@@ -2061,7 +2134,8 @@
       "next_condition": "Live continuation test on a real host pair.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "DEEPSEEK_HARNESS",
@@ -2082,7 +2156,8 @@
       "deferred_reason": "Explicitly out of C11 runtime scope (research_decisions).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "HASH_BOUND_ADAPTER",
@@ -2109,7 +2184,8 @@
       "next_condition": "Adapter contract stable across hosts.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "HOSTS_AS_CANONICAL_AGENTS",
@@ -2130,7 +2206,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: host is infrastructure.",
-      "rejected_reason": "Rejected_reason: host is infrastructure."
+      "rejected_reason": "Rejected_reason: host is infrastructure.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "HOST_CAPABILITY_DISCOVERY",
@@ -2159,7 +2236,8 @@
       "next_condition": "Dynamic live discovery requires adapter evidence (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "HOST_EXECUTOR_NEUTRALITY",
@@ -2192,7 +2270,8 @@
       "next_condition": "Live adapter certification is C22-C24 scope; evidence not present in this copy.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "C20 PASS; candidate UNPROMOTED. portable_execution_envelope_ready, portable_result_receipt_ready, cross_host_continuation_contract_ready = true."
+      "notes": "C20 PASS; candidate UNPROMOTED. portable_execution_envelope_ready, portable_result_receipt_ready, cross_host_continuation_contract_ready = true.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "HOST_IDENTITY_VERIFICATION",
@@ -2219,7 +2298,8 @@
       "next_condition": "Identity hook retained in runtime; unknown hosts remain UNKNOWN/NOT_CERTIFIED.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "HOST_OUTPUT_AS_FINAL_EVIDENCE",
@@ -2240,7 +2320,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: verification precedes trust.",
-      "rejected_reason": "Rejected_reason: verification precedes trust."
+      "rejected_reason": "Rejected_reason: verification precedes trust.",
+      "origin_type": "ARCHITECTURE_INVARIANT"
     },
     {
       "capability_id": "HOST_SELECTION",
@@ -2272,7 +2353,8 @@
       "next_condition": "Live routing is C22-C24 scope; adapter evidence not present in this copy.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "C21 PASS; host_requirement_profile_ready and host_capability_discovery_foundation_ready = true; automatic_host_routing_ready = false."
+      "notes": "C21 PASS; host_requirement_profile_ready and host_capability_discovery_foundation_ready = true; automatic_host_routing_ready = false.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "INDEPENDENT_RESULT_VERIFICATION",
@@ -2302,7 +2384,8 @@
       "next_condition": "Live verification evidence via adapter certification.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PORTABLE_EXECUTION_ENVELOPE",
@@ -2333,7 +2416,8 @@
       "next_condition": "Live cross-host envelope round trip test.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": "C20 foundation record; live certification pending adapter evidence."
+      "notes": "C20 foundation record; live certification pending adapter evidence.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PORTABLE_RESULT_RECEIPT",
@@ -2364,7 +2448,8 @@
       "next_condition": "Cross-host receipt verification test.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PROVIDER_HARDCODE",
@@ -2385,7 +2470,8 @@
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
       "notes": "Rejected_reason: provider neutrality; research decisions vendor research only.",
-      "rejected_reason": "Rejected_reason: provider neutrality; research decisions vendor research only."
+      "rejected_reason": "Rejected_reason: provider neutrality; research decisions vendor research only.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ROUND_TRIP_BINDING",
@@ -2416,7 +2502,8 @@
       "next_condition": "Live round-trip evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "SEMANTICA_PROVIDER_SEAM",
@@ -2437,7 +2524,8 @@
       "deferred_reason": "Provider seam research only (research_decisions).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "COGNITIVE_ECONOMY_POLICY",
@@ -2465,7 +2553,8 @@
       "next_condition": "Policy evolves only through eval evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": "C17 evidence: bounded parallel slice evaluated."
+      "notes": "C17 evidence: bounded parallel slice evaluated.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CONTEXT_BUDGET_ADAPTATION",
@@ -2493,7 +2582,8 @@
       "next_condition": "Budget knobs evidenced per goal.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "MINIMUM_SUFFICIENT_HOST",
@@ -2524,7 +2614,8 @@
       "next_condition": "Live routing requires adapter certification (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "QUALITY_ADJUSTED_ROUTING",
@@ -2552,7 +2643,8 @@
       "next_condition": "Requires quality evidence per host, which depends on adapter certification (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "origin_unknown_or_not_durably_recovered",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "BEHAVIORAL_CERTIFICATION",
@@ -2581,7 +2673,8 @@
       "next_condition": "Behavioral certs retained in every release regression.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Includes beginner routing and capability dimension certs (UI/UX K dimension reconciled in C19)."
+      "notes": "Includes beginner routing and capability dimension certs (UI/UX K dimension reconciled in C19).",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CODE_IMPACT_CONTRACT",
@@ -2610,7 +2703,8 @@
       "next_condition": "Package verify on every candidate.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C19 package verify: 413 files, 414 checksums, embedded control PASS (Manus session verification)."
+      "notes": "C19 package verify: 413 files, 414 checksums, embedded control PASS (Manus session verification).",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "PROJECT_EVALS",
@@ -2641,7 +2735,8 @@
       "next_condition": "Every new subsystem ships project evals before claiming VERIFIED.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "28+ test modules in tests/."
+      "notes": "28+ test modules in tests/.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "REGRESSION_CLASSIFICATION",
@@ -2669,7 +2764,8 @@
       "next_condition": "Pre-change baseline recorded before every modification (this session's practice).",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Baseline state here differs from other copies of the project; honesty rule: report the recovered baseline, never the expected one."
+      "notes": "Baseline state here differs from other copies of the project; honesty rule: report the recovered baseline, never the expected one.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "RELEASE_ACCEPTANCE",
@@ -2700,7 +2796,8 @@
       "next_condition": "Gate schema stable; changes via approval workflow.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "SUPERVISOR_REVIEW",
@@ -2728,7 +2825,8 @@
       "next_condition": "Goal Contract and Supervisor templates (this C25 goal) standardize the practice.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C14, C15, C17, C18, C19, C20, C21 supervisor reports present."
+      "notes": "C14, C15, C17, C18, C19, C20, C21 supervisor reports present.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "CROSS_HOST_RESUME",
@@ -2762,7 +2860,8 @@
       "next_condition": "Live cross-host resume evidence (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "DURABLE_RESUME",
@@ -2795,7 +2894,8 @@
       "next_condition": "This C25 goal extends resume with the charter/ledger/recovery tooling.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Manus session C19 recovery and this C25 session are live evidence."
+      "notes": "Manus session C19 recovery and this C25 session are live evidence.",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "HOST_FALLBACK",
@@ -2823,7 +2923,8 @@
       "next_condition": "Depends on live adapter certification (C22-C24 scope).",
       "last_reviewed": "2026-08-17",
       "freshness": "origin_unknown_or_not_durably_recovered",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "MUTATION_FREEZE",
@@ -2852,7 +2953,8 @@
       "next_condition": "Explicit freeze mode if live recovery testing requires it.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "STALE_REJECTION",
@@ -2882,7 +2984,8 @@
       "next_condition": "Lineage checks retained on every candidate workflow.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "BEGINNER_CONTROL_CENTER",
@@ -2912,7 +3015,8 @@
       "next_condition": "Owner-facing dashboard requires a goal with beginner evidence.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "BEGINNER_DECISION_INBOX",
@@ -2941,7 +3045,8 @@
       "next_condition": "Persistent inbox with a goal.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "BEGINNER_HEALTH_GOAL_VIEWS",
@@ -2970,7 +3075,8 @@
       "next_condition": "View layer with a goal.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_plan_or_report",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "INSTALL_UPDATE",
@@ -3000,7 +3106,8 @@
       "next_condition": "Cross-platform beginner install guide if a goal addresses it.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ISOLATED_ENVIRONMENT",
@@ -3025,7 +3132,8 @@
       "next_condition": "Isolation boundary retained.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "MINIMAL_OWNER_PROMPTS",
@@ -3052,7 +3160,8 @@
       "next_condition": "Question discipline retained in every goal.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "ONE_COMMAND_CONTINUE",
@@ -3082,7 +3191,8 @@
       "next_condition": "Continue prompt remains minimal; automation grows in P2P, not in the owner's burden.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "RECOVERED_LEGACY"
     },
     {
       "capability_id": "CONTROLLED_POLICY_EVOLUTION",
@@ -3111,7 +3221,8 @@
       "next_condition": "Evolution always via approval; no autonomous policy mutation.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Superlearn: principles adapted, no vendored source."
+      "notes": "Superlearn: principles adapted, no vendored source.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "SUPERLEARN_PRINCIPLES",
@@ -3135,7 +3246,8 @@
       "next_condition": "Principle set changes only through governance.",
       "last_reviewed": "2026-08-17",
       "freshness": "from_governance_record",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "VERIFIED_OUTCOME_CAPTURE",
@@ -3163,7 +3275,420 @@
       "next_condition": "Outcome capture remains evidence-bound.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": ""
+      "notes": "",
+      "origin_type": "PROJECT_LEARNING"
+    },
+    {
+      "capability_id": "CACHE_HIT_TELEMETRY",
+      "name": "Cache hit telemetry for reusable knowledge",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "SESSION_CONFIGURATION_STABILITY",
+      "name": "Session configuration stability",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "CACHE_AFFECTING_CONFIGURATION_FINGERPRINT",
+      "name": "Cache-affecting configuration fingerprint",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "CONTEXT_PRESSURE_MONITORING",
+      "name": "Context pressure monitoring",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "CONTEXT_COST_TELEMETRY",
+      "name": "Context cost telemetry",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "QUALITY_ADJUSTED_CONTEXT_OPTIMIZATION",
+      "name": "Quality-adjusted context optimization",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "SAFE_CONTEXT_COMPACTION",
+      "name": "Safe context compaction",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "DURABLE_PRE_COMPACTION_CHECKPOINT",
+      "name": "Durable pre-compaction checkpoint",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "TASK_SESSION_BOUNDARY_MANAGEMENT",
+      "name": "Task-session boundary management",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "ONE_COMMAND_CONTINUE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "SESSION_REUSE_DECISION",
+      "name": "Session reuse decision",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "ONE_COMMAND_CONTINUE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "BOUNDED_TOOL_OUTPUT",
+      "name": "Bounded tool output",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "BOUNDED_EXECUTION"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "RAW_OUTPUT_ARTIFACT_OFFLOADING",
+      "name": "Raw output artifact offloading",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "BOUNDED_EXECUTION"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "VERBOSE_WORK_CONTEXT_ISOLATION",
+      "name": "Verbose work context isolation",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "SUBAGENT_CONTEXT_ISOLATION",
+      "name": "Subagent context isolation",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "TASK_TARGETED_TOOL_LOADING",
+      "name": "Task-targeted tool loading",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "TASK_TARGETED_CONTEXT_RETRIEVAL"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "TASK_TARGETED_MCP_LOADING",
+      "name": "Task-targeted MCP loading",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "TASK_TARGETED_CONTEXT_RETRIEVAL"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "TASK_TARGETED_SKILL_LOADING",
+      "name": "Task-targeted skill loading",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "TASK_TARGETED_CONTEXT_RETRIEVAL"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "CODE_INTELLIGENCE_FIRST_NAVIGATION",
+      "name": "Code intelligence-first navigation",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "SYMBOL_AWARE_RETRIEVAL",
+      "name": "Symbol-aware retrieval",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+    },
+    {
+      "capability_id": "CACHE_AWARE_MODEL_EFFORT_STABILITY",
+      "name": "Cache-aware model effort stability",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/current-roadmap.md",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "CACHE_AWARE_REUSE"
+      ],
+      "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "from_governance_record",
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
     }
   ]
 }

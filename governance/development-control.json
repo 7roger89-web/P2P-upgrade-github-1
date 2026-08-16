@@ -51,8 +51,8 @@
     }
   },
   "current_development": {
-    "development_goal": "C21",
-    "status": "PASS",
+    "development_goal": "C26",
+    "status": "CANDIDATE_UNPROMOTED",
     "source_version": "8.4.7-C-codex.21",
     "source_version_status": "CANDIDATE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
@@ -94,10 +94,10 @@
         "E1-P1A-LINEAGE1"
       ]
     },
-    "candidate_id": "C21",
-    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
-    "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
-    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
+    "candidate_id": "C26",
+    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+    "candidate_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5",
+    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
     "promotion_status": "UNPROMOTED",
     "foundation_status": "HOST_SELECTION_POLICY_FOUNDATION_READY",
     "portable_execution_envelope_ready": true,
@@ -297,6 +297,26 @@
         "CL1-CL40 PASS (tests/test_p2p_development_charter.py)",
         "framework validator 19/19 PASS (scripts/validate_p2p_development_framework.py)",
         "E3-P3-C25-PACKAGE (package_release.py build/verify on candidate)"
+      ]
+    },
+    {
+      "candidate_id": "C26",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C26",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "candidate_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "evidence_refs": [
+        "CP1-CP50 PASS (tests/test_p2p_ledger_provenance.py)",
+        "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py; V11-V17 added)",
+        "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
+        "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%",
+        "EXECUTION_POLICY<->PARALLEL_EXECUTION dependency cycle broken and documented"
       ]
     }
   ],
@@ -634,17 +654,23 @@
         "id": "C25",
         "status": "DONE",
         "notes": "C25 framework complete (Charter, Capability Ledger 109 records, Goal Contract & Supervisor templates, roadmap projection, validator, CL1-CL40); candidate UNPROMOTED pending owner review."
+      },
+      {
+        "id": "C26",
+        "status": "DONE",
+        "title": "Durable Capability Provenance, Dependency & Goal-to-Ledger Governance",
+        "evidence_ref": "P2P-C26 intake; chat-discussion intake rule; dependency & provenance model"
       }
     ],
     "current": {
-      "id": "C21",
-      "status": "DONE",
-      "title": "Compatible host discovery and minimum-sufficient selection policy foundation"
+      "id": "C26",
+      "status": "ACTIVE",
+      "title": "Durable capability provenance, dependency & goal-to-ledger governance"
     },
     "likely_next": {
-      "id": "C21",
+      "id": "C26",
       "status": "DONE",
-      "title": "Compatible host discovery and minimum-sufficient selection policy foundation"
+      "title": "Durable Capability Provenance, Dependency & Goal-to-Ledger Governance"
     },
     "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion."
   },
@@ -1024,42 +1050,6 @@
       ]
     },
     {
-      "ts": "2026-08-17",
-      "session": "manus-p2p-c25",
-      "event": "C25 framework created; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN/not-recovered per durability rule.",
-      "change_id": "p2p-c25-migrate",
-      "changed_at": "2026-08-17",
-      "what_changed": "C25 framework created; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN/not-recovered per durability rule.",
-      "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
-      "evidence_refs": [
-        "E1-P2-C25-PROVENANCE-MIGRATION"
-      ]
-    },
-    {
-      "ts": "2026-08-17",
-      "session": "manus-p2p-c25",
-      "event": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
-      "change_id": "p2p-c25-migrate",
-      "changed_at": "2026-08-17",
-      "what_changed": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
-      "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
-      "evidence_refs": [
-        "E1-P2-C25-PROVENANCE-MIGRATION"
-      ]
-    },
-    {
-      "ts": "2026-08-17",
-      "session": "manus-p2p-c25",
-      "event": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
-      "change_id": "p2p-c25-migrate",
-      "changed_at": "2026-08-17",
-      "what_changed": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
-      "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
-      "evidence_refs": [
-        "E1-P2-C25-PROVENANCE-MIGRATION"
-      ]
-    },
-    {
       "change_id": "C25-prebuild-reconcile-manus",
       "changed_at": "2026-08-17",
       "what_changed": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
@@ -1089,6 +1079,32 @@
         "CL1-CL40",
         "E1-P2-C25-VALIDATOR"
       ]
+    },
+    {
+      "change_id": "C26-INTAKE-022",
+      "changed_at": "2026-08-17T00:00:00+07:00",
+      "changed_by": "p2p-c26-session",
+      "what_changed": "C26 intake: current_development -> C26; roadmap current -> C25/DONE; C26 PLANNED item; C26 candidate record UNPROMOTED; capability provenance/dependency model and Goal-Contract Ledger Delta standard introduced",
+      "why": "Owner accepted durable capability provenance, dependency and Goal-to-Ledger governance as C26; accepted chat ideas must durably enter the roadmap (PLANNED), never chat-authority status.",
+      "evidence_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/capability-ledger/capability-index.json",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ]
+    },
+    {
+      "change_id": "P2P-C26-CANDIDATE",
+      "changed_at": "2026-08-17T00:00:00Z",
+      "what_changed": "C26 candidate built and verified (package_release verify PASS): P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "why": "Goal C26 reached terminal state with a verified candidate package; governance advanced current_development to C26",
+      "evidence_refs": [
+        "CP1-CP50 PASS (tests/test_p2p_ledger_provenance.py)",
+        "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py; V11-V17 added)",
+        "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
+        "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%"
+      ],
+      "artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "artifact_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5"
     }
   ]
 }

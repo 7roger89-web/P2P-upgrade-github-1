@@ -35,6 +35,7 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `DETERMINISTIC_FIRST` | Deterministic checks come before AI inference wherever sufficient. |
 | `PROGRESSIVE_DISCLOSURE` | Load only the context a task needs; small index, deep detail on retrieval. |
 | `CORRECTNESS_OVER_TOKEN_SAVING` | Correctness always outranks token or credit economy. |
+| `RAW_OUTPUT_NOT_MODEL_CONTEXT` | Raw outputs (filesystem artifacts, logs, test results, terminal output) are durable evidence, not disposable model context; they must be preserved on disk and never silently discarded to save context, and they are never treated as verified without deterministic checking (`DETERMINISTIC_FIRST`). |
 | `NO_SECOND_TRUTH_STORE` | No second runtime truth store competes with development-control, Task State, or FACT/Evidence. |
 | `NO_SECOND_EXECUTOR` | No execution engine competes with the bounded foreground model. |
 | `NO_COMPETING_ROUTER` | P2P remains the sole orchestrator; no second router. |

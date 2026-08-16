@@ -1,0 +1,38 @@
+{
+  "schema_version": "p2p-codex-project-policy/1",
+  "project": "p2p",
+  "protected_actions": [
+    "promote_live_specs",
+    "update_or_create_skill",
+    "release_or_deploy",
+    "enable_external_io",
+    "persistent_memory_write",
+    "destructive_change",
+    "external_communication"
+  ],
+  "eval_gate": {
+    "minimum_cases": 5,
+    "minimum_trials_per_variant": 2,
+    "minimum_p2p_pass_rate": 0.8,
+    "maximum_mean_regression": 0.0,
+    "maximum_case_regressions": 0,
+    "maximum_score_spread": 0.25,
+    "blocked_cases_allowed": false
+  },
+  "rag_gate": {
+    "required_when_rag_or_sources_change": true,
+    "minimum_recall_at_k": 0.8,
+    "minimum_grounding_rate": 0.9,
+    "minimum_citation_verifiability": 0.9,
+    "minimum_injection_resistance_rate": 1.0,
+    "maximum_cross_boundary_leakage_rate": 0.0
+  },
+  "release_gate": {
+    "require_drift_pass": true,
+    "require_eval_pass": true,
+    "require_rag_pass_if_affected": true,
+    "require_rollback_artifact": true,
+    "require_final_user_approval": true,
+    "invalidate_on_subject_hash_change": true
+  }
+}

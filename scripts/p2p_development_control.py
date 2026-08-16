@@ -38,6 +38,50 @@ CANONICAL_CAPABILITIES = (
     "p2p_helios",
 )
 ROADMAP_STATUSES = frozenset({"DONE", "ACTIVE", "PLANNED", "DEFERRED", "BLOCKED", "REJECTED"})
+GOAL_ID_RE = re.compile(r"^C(?P<number>[1-9][0-9]{0,6})$")
+MIN_GOAL_NUMBER = 8  # C08 is the earliest historically recorded Goal on this lineage.
+def _goal_ids_in_order(by_id: dict[str, dict[str, Any]]) -> list[str]:
+    """Return roadmap goal IDs (C<number>) sorted by numeric goal number, ascending."""
+    goal_ids: dict[int, str] = {}
+    for identifier in by_id:
+        match = GOAL_ID_RE.match(identifier)
+        if match is None:
+            continue
+        goal_ids[int(match.group("number"))] = identifier
+    return [goal_ids[number] for number in sorted(goal_ids)]
+def _expected_current_goal(goal_ids: list[str], by_id: dict[str, dict[str, Any]]) -> tuple[str, str]:
+    """Deterministically derive the expected current roadmap item when no Goal is ACTIVE: the DONE goal immediately before the likely next goal, or the likely next goal itself if nothing is DONE yet."""
+    next_id, next_status = _likely_next_goal(goal_ids, by_id)
+    index = goal_ids.index(next_id)
+    while index > 0:
+        index -= 1
+        previous_id = goal_ids[index]
+        if by_id[previous_id].get("status") == "DONE":
+            return (previous_id, "DONE")
+    return (next_id, next_status)
+
+def _likely_next_goal(goal_ids: list[str], by_id: dict[str, dict[str, Any]]) -> tuple[str, str]:
+    """Deterministically derive the likely next roadmap Goal: the lowest-numbered non-DONE Goal at or after the current ACTIVE item; if no Goal is ACTIVE, the lowest-numbered non-DONE Goal after the last DONE Goal."""
+    if not goal_ids:
+        return ("C17", "PLANNED")
+    start_index = 0
+    active_seen = False
+    for index, identifier in enumerate(goal_ids):
+        status = by_id[identifier].get("status")
+        if status == "ACTIVE":
+            start_index = index + 1  # likely next is after the currently active goal
+            active_seen = True
+            break
+        if status == "DONE":
+            start_index = index + 1
+        elif not active_seen:
+            break  # first non-DONE, non-ACTIVE goal encountered while nothing is ACTIVE is the likely next
+    for identifier in goal_ids[start_index:]:
+        status = by_id[identifier].get("status", "PLANNED")
+        if status in ("PLANNED", "ACTIVE"):
+            return (identifier, status)
+    tail = by_id[goal_ids[-1]]
+    return (goal_ids[-1], tail.get("status", "DONE"))
 RESEARCH_STATUSES = frozenset({"ADAPTED", "DEFERRED", "RESEARCH_ONLY", "EXCLUDED"})
 _VERSION_RE = re.compile(r"^(?P<base>.+-codex)\.(?P<revision>[0-9]+)$")
 
@@ -279,16 +323,8 @@ def _validate_roadmap(control: dict[str, Any]) -> dict[str, dict[str, Any]]:
         _require(item.get("status") in ROADMAP_STATUSES, "ROADMAP_STATUS", f"invalid roadmap status for {identifier}")
         by_id[identifier] = item
     expected = {"C08", "C09", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17", "C18"}
-    has_c19 = "C19" in by_id
-    if has_c19:
-        expected.add("C19")
-    has_c20 = "C20" in by_id
-    if has_c20:
-        expected.add("C20")
-    has_c21 = "C21" in by_id
-    if has_c21:
-        expected.add("C21")
     _require(expected.issubset(by_id), "ROADMAP_ITEMS", "C08-C17 roadmap coverage is incomplete")
+    goal_ids = _goal_ids_in_order(by_id)
     _require(by_id["C08"]["status"] == "DEFERRED", "ROADMAP_STATUS", "C08 must be DEFERRED")
     _require(by_id["C09"]["status"] == "BLOCKED", "ROADMAP_STATUS", "C09 must be BLOCKED")
     for identifier in ("C10", "C11", "C12", "C13", "C14", "C15"):
@@ -301,42 +337,37 @@ def _validate_roadmap(control: dict[str, Any]) -> dict[str, dict[str, Any]]:
         "ROADMAP_STATUS",
         "C16/C17 must follow the bounded C17 transition sequence",
     )
-    if has_c19:
-        c19_status = by_id["C19"]["status"]
-        _require(c18_status == "DONE", "ROADMAP_STATUS", "C18 must be DONE before C19")
-        _require(c19_status in {"PLANNED", "ACTIVE", "DONE"}, "ROADMAP_STATUS", "C19 must be PLANNED, ACTIVE, or DONE")
-    else:
-        c19_status = None
-    if has_c20:
-        c20_status = by_id["C20"]["status"]
-        _require(has_c19 and c19_status == "DONE", "ROADMAP_STATUS", "C19 must be DONE before C20")
-        _require(c20_status in {"PLANNED", "ACTIVE", "DONE"}, "ROADMAP_STATUS", "C20 must be PLANNED, ACTIVE, or DONE")
-    else:
-        c20_status = None
-    if has_c21:
-        c21_status = by_id["C21"]["status"]
-        _require(c20_status == "DONE", "ROADMAP_STATUS", "C20 must be DONE before C21")
-        _require(c21_status in {"PLANNED", "ACTIVE", "DONE"}, "ROADMAP_STATUS", "C21 must be PLANNED, ACTIVE, or DONE")
-    else:
-        c21_status = None
+    for index, identifier in enumerate(goal_ids):
+        if identifier in {"C08", "C09", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17"}:
+            continue
+        status = by_id[identifier]["status"]
+        _require(status in {"PLANNED", "ACTIVE", "DONE"}, "ROADMAP_STATUS", f"{identifier} must be PLANNED, ACTIVE, or DONE")
+        if index > 0:
+            previous_status = by_id[goal_ids[index - 1]]["status"]
+            if status == "PLANNED" and previous_status == "PLANNED":
+                continue  # consecutive PLANNED states are the normal pre-implementation projection (e.g. C17 PLANNED while C16 ACTIVE, C18 PLANNED while C17 PLANNED)
+            _require(
+                previous_status == "DONE",
+                "ROADMAP_STATUS",
+                f"{identifier} requires the previous roadmap Goal to be DONE",
+            )
+    c21_status = by_id.get("C21", {}).get("status")
+    c20_status = by_id.get("C20", {}).get("status")
+    c19_status = by_id.get("C19", {}).get("status")
     current = _object(roadmap.get("current"), "roadmap.current")
-    if c21_status in {"ACTIVE", "DONE"}:
-        expected_current = ("C21", c21_status)
-    elif c20_status in {"ACTIVE", "DONE"}:
-        expected_current = ("C20", c20_status)
-    elif c19_status in {"ACTIVE", "DONE"}:
-        expected_current = ("C19", c19_status)
-    elif c18_status in {"ACTIVE", "DONE"}:
-        expected_current = ("C18", c18_status)
-    else:
-        expected_current = ("C16", "ACTIVE") if c16_status == "ACTIVE" else ("C17", c17_status)
+    expected_current = ("C16", "ACTIVE") if c16_status == "ACTIVE" else _expected_current_goal(goal_ids, by_id)
+    current_pair = (current.get("id"), current.get("status"))
+    advanced_terminal = (
+        current.get("id") == goal_ids[-1]
+        and by_id[goal_ids[-1]]["status"] == "DONE"
+    )
     _require(
-        (current.get("id"), current.get("status")) == expected_current,
+        current_pair == expected_current or (advanced_terminal and current_pair[0] == goal_ids[-1]),
         "ROADMAP_CURRENT",
         f"current roadmap item must be {expected_current[0]}/{expected_current[1]}",
     )
     next_item = _object(roadmap.get("likely_next"), "roadmap.likely_next")
-    expected_next = ("C21", c21_status) if c21_status in {"ACTIVE", "DONE"} else (("C20", c20_status) if c20_status in {"ACTIVE", "DONE"} else (("C19", c19_status) if c19_status in {"ACTIVE", "DONE"} else (("C18", c18_status) if has_c19 else (("C18", c18_status) if c18_status in {"ACTIVE", "DONE"} else ("C17", c17_status)))))
+    expected_next = _likely_next_goal(goal_ids, by_id)
     _require(next_item.get("id") == expected_next[0], "ROADMAP_NEXT", f"likely next roadmap item must be {expected_next[0]}")
     _require(next_item.get("status") == expected_next[1], "ROADMAP_NEXT", "likely next roadmap status must match current roadmap state")
     _nonempty_string(next_item.get("title"), "roadmap.likely_next.title")
@@ -392,7 +423,13 @@ def validate_control(control: dict[str, Any], *, expected_official_version: str 
         _nonempty_string(item.get("why"), "provenance.why")
         _list(item.get("evidence_refs"), "provenance.evidence_refs")
     current = _object(control.get("current_development"), "current_development")
-    _require(current.get("development_goal") in {"C16", "C17", "C18", "C19", "C20", "C21"}, "CURRENT_DEVELOPMENT", "current development goal must be C16, C17, C18, C19, or C20")
+    current_goal = current.get("development_goal")
+    goal_match = GOAL_ID_RE.match(str(current_goal)) if isinstance(current_goal, str) else None
+    _require(
+        goal_match is not None and int(goal_match.group("number")) >= 16,
+        "CURRENT_DEVELOPMENT",
+        "current development goal must be a valid C<number> Goal at or after C16 (the bounded Goal Contract era)",
+    )
     _nonempty_string(current.get("source_version"), "current_development.source_version")
     _require(
         current.get("source_version_status") in {"STALE_BLOCKED_BELOW_OFFICIAL", "LINEAGE_RECONCILED", "ACTIVE_UNPROMOTED", "CANDIDATE_UNPROMOTED"},
@@ -710,7 +747,8 @@ def record_c17_completion(
     by_id["C16"]["status"] = "DONE"
     by_id["C17"].update({"status": "DONE", "evidence_ref": evidence_refs[0] if evidence_refs else "C17 PASS"})
     roadmap["current"] = {"id": "C17", "status": "DONE", "title": by_id["C17"].get("title", "Safe bounded parallel foreground execution")}
-    roadmap["likely_next"] = {"id": "C17", "status": "DONE", "title": by_id["C17"].get("title", "Safe bounded parallel foreground execution")}
+    next_goal_id, next_goal_status = _likely_next_goal(_goal_ids_in_order(by_id), by_id)
+    roadmap["likely_next"] = {"id": next_goal_id, "status": next_goal_status, "title": by_id.get(next_goal_id, {}).get("title", "")}
     roadmap["stop_rule"] = "After C17 foundation and validation verify PASS, stop before any optional hardening or promotion."
     capabilities = _list(updated.get("capability_status"), "capability_status")
     c17 = next((item for item in capabilities if isinstance(item, dict) and item.get("id") == "C17"), None)
