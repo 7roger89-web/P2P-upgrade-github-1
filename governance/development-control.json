@@ -51,10 +51,10 @@
     }
   },
   "current_development": {
-    "development_goal": "C30",
-    "status": "CANDIDATE_UNPROMOTED",
+    "development_goal": "C31",
+    "status": "BLOCKED_TERMINAL",
     "source_version": "8.4.7-C-codex.24",
-    "source_version_status": "CANDIDATE_UNPROMOTED",
+    "source_version_status": "ACTIVE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
     "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
     "source_drift_classification": {
@@ -102,10 +102,25 @@
     "live_manus_adapter_certified": false,
     "host_requirement_profile_ready": true,
     "host_capability_discovery_foundation_ready": true,
-    "candidate_id": "C30",
+    "candidate_id": null,
     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
-    "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
-    "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip"
+    "candidate_sha256": null,
+    "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
+    "terminal_verdict": "BLOCKED / OWNER_ACTION_REQUIRED",
+    "terminal_at": "2026-08-17T06:27:20Z",
+    "terminal_evidence": "evidence/c31_live_probe.json",
+    "blocker": {
+      "dependency": "real auth session for a supported execution host",
+      "observed": {
+        "codex_cli_0_147_0": "AUTH_INVALID (HTTP 401 before model contact)",
+        "manus_connector": "AUTH_CONFIG_ABSENT (no connector enabled)"
+      },
+      "owner_actions": [
+        "codex login with a real account (outside chat)",
+        "enable Manus project connector in session configuration"
+      ],
+      "reopen_condition": "fresh probe: supported host reaches connection_status AUTH_REQUIRED or stronger"
+    }
   },
   "candidate_records": [
     {
@@ -373,6 +388,24 @@
         "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.24, official baseline 8.4.7-C-codex.19",
         "docs/p2p-development/reports/P2P-C30-terminal-report.md"
       ]
+    },
+    {
+      "candidate_id": "C31",
+      "development_goal": "C31",
+      "candidate_version": "8.4.7-C-codex.24",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c31-live-host-certification-candidate-v1.zip",
+      "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+      "embedded_version": "8.4.7-C-codex.24",
+      "built": false,
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "artifact_path": null,
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "BUILD_SKIPPED_BY_POLICY: terminal verdict BLOCKED; no release artifact minted for a BLOCKED terminal; candidate_sha256/embedded_version anchor to the last built artifact (C30) so lineage remains continuous and reconcilable per C29 policy",
+      "package_verify_evidence": null,
+      "evidence_refs": [
+        "C29 candidate policy: PASS+governance/runtime/release changes -> REQUIRED; BLOCKED terminal -> no release artifact minted"
+      ]
     }
   ],
   "capability_status": [
@@ -504,6 +537,20 @@
       "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
       "promotion_status": "UNPROMOTED",
       "evidence_ref": "E0-C30-ET1-ET60; C30 candidate built, verify PASS, UNPROMOTED"
+    },
+    {
+      "id": "C31",
+      "status": "BLOCKED",
+      "result": "CERTIFICATION_BLOCKED_OWNER_ACTION_REQUIRED",
+      "live_probe": {
+        "performed": true,
+        "auth_verdict": "AUTH_INVALID",
+        "evidence": "evidence/c31_live_probe.json"
+      },
+      "candidate_id": null,
+      "candidate_sha256": null,
+      "promotion_status": null,
+      "evidence_ref": "E31-PROBE-5e3364ee; machinery reused C27/C28 + C30 target contract"
     }
   ],
   "design_intelligence": {
@@ -750,6 +797,13 @@
         "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
         "evidence_ref": "GOAL-C30",
         "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery)."
+      },
+      {
+        "id": "C31",
+        "status": "PLANNED",
+        "title": "Complete Live Host Certification Before Cross-Host Continuation — honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
+        "evidence_ref": "GOAL-C31",
+        "notes": "C31 terminal verdict 2026-08-17: BLOCKED / OWNER_ACTION_REQUIRED. Fresh live probe (evidence/c31_live_probe.json, fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b) reached Codex CLI 0.147.0's own auth layer and returned HTTP 401 before model contact (AUTH_INVALID); Manus connector path is AUTH_CONFIG_ABSENT (no connector enabled). Unresolved dependency: a real auth session. Smallest owner actions: (a) `codex login` with a real OpenAI/Codex account outside chat; or (b) enable the Manus project connector in the Manus session configuration. Reopen condition: a supported host reaches connection_status AUTH_REQUIRED or stronger on a fresh probe."
       }
     ],
     "current": {
@@ -1309,7 +1363,8 @@
     "p2p-c27-real-host-certification": "p2p-c26-capability-provenance",
     "p2p-c28-secure-onboarding": "p2p-c27-real-host-certification",
     "p2p-c29-goal-closure-integrity": "p2p-c28-secure-onboarding",
-    "p2p-c30-composable-execution-target": "p2p-c29-goal-closure-integrity"
+    "p2p-c30-composable-execution-target": "p2p-c29-goal-closure-integrity",
+    "p2p-c31-live-host-certification": "p2p-c30-composable-execution-target"
   },
   "provenance": [
     {
@@ -1343,6 +1398,19 @@
         "docs/p2p-development/reports/P2P-C30-terminal-report.md",
         "scripts/package_release.py build+verify"
       ]
+    },
+    {
+      "change_id": "C31-PROBE-001",
+      "when": "2026-08-17T06:15:29Z",
+      "what": "fresh live probe of installed Codex CLI 0.147.0 reached own auth layer",
+      "why": "C31 honest certification attempt",
+      "evidence": "evidence/c31_live_probe.json"
+    },
+    {
+      "change_id": "C31-BLOCKED-001",
+      "when": "2026-08-17T06:15:29Z",
+      "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
+      "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
     }
   ]
 }
