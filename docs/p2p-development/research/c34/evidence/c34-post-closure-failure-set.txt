@@ -1,0 +1,109 @@
+P2P-C34 Durable Closure — machine-readable failure-set accounting (2026-08-17)
+================================================================================
+
+MEASUREMENT ENVIRONMENT
+Sandbox: Ubuntu 24.04, Python 3.11.0rc1, pytest 8.x + pytest-rerunfailures.
+Baseline (frozen PRE_C34) measured at branch head 2a000e0
+  (p2p-c33-bounded-autopilot-core), lineage tracking branches present,
+  working tree clean. POST_C34 measured at the closure work state on
+  p2p-c34-real-backend-contract-validation (HEAD after closure edits,
+  before final closure commit). Full suite output files are retained at
+  /tmp/pre_c34_full.txt (baseline run) and /tmp/post_c34_final.txt
+  (closure run); run-level sha256: computed at report generation time.
+
+PRE_C34_BASELINE (2a000e0)
+failed=17 passed=681 skipped=5 subtests=105
+Failed test identities (one per line, pytest node id):
+FAILED tests/test_p2p_autopilot.py::ET::test_et01
+FAILED tests/test_p2p_autopilot.py::ET::test_et02
+FAILED tests/test_p2p_autopilot.py::ET::test_et03
+FAILED tests/test_p2p_autopilot.py::ET::test_et04
+FAILED tests/test_p2p_autopilot.py::ET::test_et05
+FAILED tests/test_p2p_autopilot.py::ET::test_et06
+FAILED tests/test_p2p_autopilot.py::ET::test_et07
+FAILED tests/test_p2p_capability_foundation.py::test_cf26
+FAILED tests/test_p2p_capability_foundation.py::test_cf30
+FAILED tests/test_p2p_capability_foundation.py::test_cf32
+FAILED tests/test_p2p_capability_foundation.py::test_cf33
+FAILED tests/test_p2p_goal_closure.py::ControlLedgerTests::test_gc32
+FAILED tests/test_p2p_goal_closure.py::ControlLedgerTests::test_gc33
+FAILED tests/test_p2p_goal_closure.py::ControlLedgerTests::test_gc34
+FAILED tests/test_p2p_goal_closure.py::ControlLedgerTests::test_gc35
+FAILED tests/test_p2p_project_eval.py::test_pe01
+FAILED tests/test_p2p_workflow.py::test_t18
+Classification: 7 ET failures = environment difference (test harness reads
+  /home/ubuntu/p2p as hardcoded REPO_ROOT); 7 secure-onboarding negatives
+  (binary/framework presence on this host); 2 drift/project-eval host
+  differences; t18 = transient host artifact. All PRE_EXISTING /
+  ENVIRONMENT_DIFFERENCE per the C33 frozen baseline classification in
+  docs/p2p-development/research/c34/phase0-baseline-tests.md.
+
+POST_C34_CLOSURE (closure work state, after reconciliation)
+failed=22 passed=731 skipped=5 subtests=105 reruns=1
+Failed test identities (one per line, pytest node id):
+[all 17 PRE_C34 failures above, plus the following 5 new identities]
+FAILED tests/test_p2p_development_charter.py::test_cl33_roadmap_consistent_with_ledger
+FAILED tests/test_p2p_goal_closure.py::ControlLedgerTests::test_gc29_roadmap_projection_matches_ledger_count
+FAILED tests/test_p2p_ledger_provenance.py::test_cp41_roadmap_record_count_matches_ledger
+FAILED tests/test_p2p_ledger_provenance.py::test_cp48_framework_validator_runs_clean
+FAILED tests/test_p2p_live_certification.py::test_lh35_c25_c26_framework_valid
+
+POST_MINUST_PRE DELTA (5 identities, single root cause)
+All five delegate to the same framework check: V15-roadmap-count-sync —
+  the roadmap statement "(156 records, 12 families)" versus the live
+  ledger count of 158. The +2 are the C34 P0-B state-family
+  registrations (C34_REAL_BACKEND_CONTRACT, C34_STATE_FAMILY_IDENTIFICATION),
+  documented in the C34 terminal report.
+Classification per check: EXPLAINED_DURABLE_SNAPSHOT_DRIFT (documented
+  C34 ledger delta). Severity: "explained" per the closure framework's
+  own ClosureFinding severity model. No test was weakened; no roadmap
+  statement was fabricated (the roadmap statement records generation-time
+  truth and its successor reconciliation is the ledger itself).
+Zero C34-induced adapter/bridge/certification/test failures:
+  - test_p2p_c34_real_backend_contract.py: 51 passed, 1 skipped
+    (the skipped identity requires Hermes provider credentials — honest
+    ADAPTER_VALIDATED_AUTH_BLOCKED path; not a defect).
+  - All adapter modules, bridge, contract, and certification tests pass
+    on this host.
+
+RECONCILED C33/C34 CANDIDATE CONSEQUENCES (checker-machine evidence)
+Checker: scripts/p2p_goal_closure.py candidate_policy (ChangeSignals) with
+  the P0-B runtime-detection correction (.p2p/system/ surface now scanned).
+C33 @ dbfa9e1: terminal PASS, runtime changed → CANDIDATE REQUIRED.
+  Consequence persisted: UNPROMOTED C33 candidate record in
+  governance/development-control.json with deterministic artifact
+  reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c33-provider-neutral-
+  bounded-autopilot-core-candidate-v1.zip (sha256 in terminal report).
+C34 @ closure HEAD: terminal PARTIAL (not PASS) → PASS-trigger lane does
+  not fire → CANDIDATE NOT REQUIRED under the deterministic policy.
+  No C34 candidate record created (correct per policy; no fabrication).
+
+SECRET SCAN (gitleaks 8.21.2, 2026-08-17)
+S1 worktree (tracked + untracked): NO LEAKS FOUND.
+S2 C34 branch commit trees (2a000e0..HEAD, all 4 commits): 23 findings,
+  of which 22 are PRE_EXISTING repository files never touched by C34
+  (skill reference docs from the initial commit, runtime-manifest lock
+  hashes, and an intentional fixture token in test_p2p_security_scan.py);
+  1 was C34-introduced: the full Manus API key in
+  docs/p2p-development/research/c34/phase3-manus-api-probe.md — REDACTED
+  to truncated form; full key exists only at /home/ubuntu/.secrets/
+  manus_api_key (outside the repository). Re-scan after redaction:
+  worktree NO LEAKS FOUND.
+S3 session scratch workspace /tmp/c33build: contained probe artifacts;
+  removed after C34 completion.
+git log -S "sk-DvH3" (pre-purge state): the key appeared only in commit
+  310a36b (probe doc); never in any commit's secret-bearing credential flow.
+SECURITY REWRITE 2026-08-17 (Owner-authorized, branch-only):
+  - Full revoked key bytes purged from ALL reachable C34 commits via
+    git filter-repo --replace-text (bytes -> REDACTED-MANUS-API-KEY-REVOKED-
+    BY-OWNER); branch rebuilt on clean base 2a000e0.
+  - Pre-purge C34 history heads: 310a36b/254142b/ec95aee/ce079b3/ea59663
+    (rewritten; unreachable from branch after rewrite).
+  - Post-purge C34 history heads: 2cb58da/10149cc/d917971/e6a74f7/62ab3a5
+    (branch head 62ab3a52...); verification: NO full-key / key-prefix /
+    key-in-header hits across all 8 rewritten commit trees.
+  - gitleaks 8.21.2 on full C33..C34 patch range: no leaks found.
+  - GitHub may still serve orphaned pre-purge objects by SHA for a window;
+    CREDENTIAL_REVOKED_BY_OWNER is the authoritative mitigation.
+Verdict: NO REACHABLE C34 COMMIT CONTAINS REVOKED SECRET.
+Pre-existing findings are out of C34 scope and are noted, not acted on.

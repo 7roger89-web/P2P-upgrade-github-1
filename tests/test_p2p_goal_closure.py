@@ -683,5 +683,71 @@ class PreservedStateTests(unittest.TestCase):
             any(r.get("candidate_id") == "C28" for r in load_gov()["candidate_records"]))
 
 
+# ---------------------------------------------------------------------------
+# GC51-GC54: C34 closure-reconciliation regression (runtime surface correction).
+# ChangeSignals.detect must recognize the .p2p/system/ runtime capability
+# family surface as runtime, exactly as scripts/ and source/ are recognized.
+# The correction only ADDS detection; no candidate requirement is weakened.
+# ---------------------------------------------------------------------------
+
+class TestC34RuntimeSurfaceRegression(unittest.TestCase):
+    """Runtime-surface blind spot fixed at C34 closure reconciliation.
+
+    Before the correction, files like .p2p/system/p2p_capabilities/*.py
+    changed nothing in runtime_changed (POLICY_BLIND_SPOT_CONFIRMED).
+    After, they must flip runtime_changed True. These tests prevent silent
+    reversion: any narrowing of the runtime surface fails a deterministic
+    regression check.
+    """
+
+    def test_gc51_p2p_system_py_is_runtime(self) -> None:
+        ch = closure.ChangeSignals.detect([
+            ".p2p/system/p2p_capabilities/manus_adapter.py"])
+        self.assertTrue(ch.runtime_changed,
+                        ".p2p/system/adapter.py must be detected as runtime")
+
+    def test_gc52_p2p_system_markdown_is_not_runtime(self) -> None:
+        ch = closure.ChangeSignals.detect([
+            ".p2p/system/p2p_capabilities/README.md"])
+        self.assertFalse(ch.runtime_changed,
+                         "markdown research docs must not flip runtime")
+
+    def test_gc53_c34_runtime_surface_set_is_runtime(self) -> None:
+        # The actual C34 runtime surface (contract + bridge + 2 adapters).
+        c34_runtime = [
+            ".p2p/system/p2p_capabilities/backend_contract.py",
+            ".p2p/system/p2p_capabilities/backend_execution_bridge.py",
+            ".p2p/system/p2p_capabilities/hermes_adapter.py",
+            ".p2p/system/p2p_capabilities/manus_adapter.py",
+        ]
+        ch = closure.ChangeSignals.detect(c34_runtime)
+        self.assertTrue(ch.runtime_changed)
+        # PASS + runtime change -> candidate required (core policy invariant).
+        self.assertEqual(
+            closure.candidate_policy("PASS", None, ch), "YES")
+
+    def test_gc54_c33_runtime_surface_set_is_runtime(self) -> None:
+        # The actual C33 runtime surface (autopilot core family).
+        c33_runtime = [
+            ".p2p/system/p2p_capabilities/autopilot_state.py",
+            ".p2p/system/p2p_capabilities/autopilot_contract.py",
+            ".p2p/system/p2p_capabilities/autopilot_gate.py",
+            ".p2p/system/p2p_capabilities/autopilot_loop.py",
+            ".p2p/system/p2p_capabilities/autopilot_budget.py",
+            ".p2p/system/p2p_capabilities/autopilot_verifier.py",
+            ".p2p/system/p2p_capabilities/fake_execution_backend.py",
+        ]
+        ch = closure.ChangeSignals.detect(c33_runtime)
+        self.assertTrue(ch.runtime_changed)
+        self.assertEqual(
+            closure.candidate_policy("PASS", None, ch), "YES")
+        # No other boundary flipped by the runtime-only surface:
+        self.assertFalse(ch.governance_changed)
+        self.assertFalse(ch.release_artifact_changed)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
 if __name__ == "__main__":
     unittest.main()

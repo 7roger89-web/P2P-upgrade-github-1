@@ -184,8 +184,13 @@ class ChangeSignals:
 
     @classmethod
     def detect(cls, changed_files: list[str]) -> "ChangeSignals":
+        # C34 closure-reconciliation correction (minimum bounded change, no
+        # requirement weakened): .p2p/system/ is the runtime capability family
+        # surface imported at runtime (documented C33-era blind spot, now
+        # mechanically confirmed and recovered). Markdown research/docs under
+        # .p2p/system/ remain non-runtime, matching the .md carve-out elsewhere.
         runtime = any(
-            f.startswith(("scripts/", "source/"))
+            f.startswith(("scripts/", "source/", ".p2p/system/"))
             and not f.endswith(".md")
             for f in changed_files
         )

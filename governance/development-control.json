@@ -406,6 +406,25 @@
       "evidence_refs": [
         "C29 candidate policy: PASS+governance/runtime/release changes -> REQUIRED; BLOCKED terminal -> no release artifact minted"
       ]
+    },
+    {
+      "candidate_id": "C33",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c33-provider-neutral-bounded-autopilot-core-candidate-v1.zip",
+      "candidate_sha256": "b1cdcfd881156726fdfa054ae5186e0aee728bde5d4536d0c6f184181b6ae6ed",
+      "promotion_status": "UNPROMOTED",
+      "development_goal": "C33",
+      "created_at": "2026-08-17T06:00:00Z",
+      "created_by": "C34-closure-reconciliation",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "lineage_status": "LINEAGE_REGISTERED",
+      "evidence_refs": [
+        "docs/p2p-development/research/c34/evidence/c34-capability-scoped-certification.json"
+      ],
+      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift \u2014 see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged.",
+      "identity_semantics_note": "candidate_version 8.4.7-C-codex.24 identifies SOURCE STATE, not artifact uniqueness \u2014 established precedent: C18-C21/C25/C26 all share 8.4.7-C-codex.21 with distinct candidate_sha256/artifacts. Canonical identity = (candidate_id, development_goal, candidate_sha256). No governance change, no promotion implied."
     }
   ],
   "capability_status": [
@@ -787,21 +806,21 @@
       {
         "id": "C28",
         "status": "DONE",
-        "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
+        "title": "Secure Host Connection & Credential Onboarding \u2014 determine required auth, verify safely, minimal Owner action outside chat",
         "evidence_ref": "GOAL-C28",
         "notes": "C28 terminal state: PASS (machinery). Full provider-neutral connection + credential onboarding layer implemented and verified (70 HO tests, 31/31 validator, secret scan 0). No host claimed live-certified; owner action codex login / Manus connector remains the irreducible next step."
       },
       {
         "id": "C30",
         "status": "PLANNED",
-        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
+        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
         "evidence_ref": "GOAL-C30",
         "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery)."
       },
       {
         "id": "C31",
         "status": "PLANNED",
-        "title": "Complete Live Host Certification Before Cross-Host Continuation — honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
+        "title": "Complete Live Host Certification Before Cross-Host Continuation \u2014 honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
         "evidence_ref": "GOAL-C31",
         "notes": "C31 terminal verdict 2026-08-17: BLOCKED / OWNER_ACTION_REQUIRED. Fresh live probe (evidence/c31_live_probe.json, fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b) reached Codex CLI 0.147.0's own auth layer and returned HTTP 401 before model contact (AUTH_INVALID); Manus connector path is AUTH_CONFIG_ABSENT (no connector enabled). Unresolved dependency: a real auth session. Smallest owner actions: (a) `codex login` with a real OpenAI/Codex account outside chat; or (b) enable the Manus project connector in the Manus session configuration. Reopen condition: a supported host reaches connection_status AUTH_REQUIRED or stronger on a fresh probe."
       }
@@ -814,13 +833,13 @@
     "likely_next": {
       "id": "C30",
       "status": "PLANNED",
-      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
     },
     "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion.",
     "likely_next_goal": {
       "id": "C30",
       "status": "PLANNED",
-      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
     }
   },
   "research_decisions": [
@@ -1410,7 +1429,7 @@
       "change_id": "C31-BLOCKED-001",
       "when": "2026-08-17T06:15:29Z",
       "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
-      "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
+      "why": "C31 terminal rule \u00a714/\u00a761: honest BLOCKED, no fabrication"
     }
   ]
 }
