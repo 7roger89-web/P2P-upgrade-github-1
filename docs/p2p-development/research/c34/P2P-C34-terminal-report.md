@@ -129,3 +129,45 @@ The durable closure is contained in its own bounded commits on `p2p-c34-real-bac
 
 ## 13. Owner Gates Honored
 The only external actions in this goal were those the Owner supplied up front: GitHub access (PAT), Manus API credentials (key file), and the instruction set itself. No new credential/login action was requested mid-goal; Hermes live certification is the natural next Owner Gate if provider credentials are desired.
+
+## 14. Final Security Closure — Credential Incident and History Purge
+During the reconciliation phase, an incident was classified: `CREDENTIAL_EXPOSED_IN_GIT_HISTORY` — the full Manus API key value was committed (in `docs/p2p-development/research/c34/phase3-manus-api-probe.md` and its header-form occurrences) on the C34 branch range, and the key was subsequently **revoked by the Owner**. The Owner explicitly authorized a force-update scoped strictly to the C34 branch (`p2p-c34-real-backend-contract-validation`); the base branch and all ancestor lineage were not touched.
+
+The purge was performed with `git-filter-repo` (replace-text, full key value → `x-manus-api-key:redacted-by-c34-final-security-closure`) over every reachable C34 commit, and verified exhaustively: a blob-level scan of **all** reachable rewritten commits for the full key, the `sk-DvH3` prefix, and header-form occurrences returned **zero hits**; `gitleaks 8.21.2` over the full `2a000e0..HEAD` patch returned **zero findings**; the PR #10 changed-content patch (API) returned **zero findings**; the final worktree and the committed evidence docs and JSONs returned **zero findings**. The pre-existing 22 gitleaks hits across repository files (skill docs, lockfiles, test fixtures) predate C34 and remain out of scope. The base `2a000e0` remains untouched and `PROMOTED_VERIFIED`.
+
+## 15. V15 Resolution — Semantics, Not Fabrication
+The five count-sync failures (gc29, cp41, cl33, cp48, lh35) are resolved under **CASE 1** of the closure semantics: `current-roadmap.md` self-declares as a *derived, human-readable projection* that "must never be edited as a source of truth" and whose §6 regeneration rule obligates regeneration whenever the capability ledger changes. The count statement ("156 records, 12 families … at generation time") is descriptive ledger metadata within that projection — it went stale because the documented P0-B registrations grew the ledger to 158. The minimum mechanical sync was applied: count `156 → 158`, "generation time" → "regeneration time", and the generated-date line re-anchored to the regeneration event. Nothing else in the roadmap was touched: goal direction, ordering, decisions, and candidate table are byte-identical to the previous state. All five tests re-greened; no count assertion was weakened.
+
+## 16. C33 Candidate Version-Identity Audit (F)
+Three candidate records (`C30`, `C31`, `C33`) carry `candidate_version 8.4.7-C-codex.24`, and six records (`C18`–`C21`, `C25`, `C26`) already share `8.4.7-C-codex.21` with **distinct** `candidate_sha256` and distinct artifacts. The governance precedent is unambiguous: `candidate_version` identifies **source state** (the unpromoted working version `current_development.source_version = 8.4.7-C-codex.24`), not artifact uniqueness. Canonical identity is the tuple `(candidate_id, development_goal, candidate_sha256)`; labels carry the goal slug for disambiguation. C33's artifact (eight autopilot runtime files + candidate manifest, `b1cdcfd8…e6ed`) is content-distinct from C30's artifact (a skill package, `94b09b59…`), and C31 is explicitly a policy-decision record only (`built: false`, no artifact). The `lineage_contract` imposes no version-uniqueness rule (`filename_is_authority: false`). **Verdict: reuse allowed by established governance precedent — PASS.** A bounded `identity_semantics_note` was appended to the C33 record (append-only field mutation) documenting this rule; no promotion, release, or manifest change was made or implied.
+
+## 17. Final Machine-Readable Failure Set
+The definitive exact failure set, post-purge and post-sync, is anchored in `docs/p2p-development/research/c34/evidence/c34-final-failure-set.txt`. Measured result: **17 failed / 735 passed / 5 skipped / 105 subtests**, and the set diff against the frozen pre-C34 baseline is **EMPTY** — `PRE ∆ POST = ∅`, `POST_NEW_UNEXPLAINED_FAILURES = 0`. The previous EXPLAINED_DURABLE_SNAPSHOT_DRIFT classification (156/158) is now resolved by the §6 regeneration sync; no explained or unexplained delta remains.
+
+## 18. Final Verdict (superseding, machine-reproducible)
+
+```
+P2P-C34 / REAL BACKEND CONDUCT + GOVERNANCE CLOSURE
+VERDICT:  PARTIAL / SINGLE_BACKEND_VALIDATED
+LIVE:     Manus API  (ADAPTER_IMPLEMENTED · ADAPTER_TESTED ·
+         LIVE_CERTIFIED_FOR_CAPABILITY ×3, evidence-anchored,
+         scope-limited; model binding UNKNOWN_FOR_MODEL;
+         possible_mutation=false; credit usage accounted)
+HONEST:   Hermes     (ADAPTER_VALIDATED_AUTH_BLOCKED;
+         v0.20.2 installed, headless interface probed, no provider
+         credentials available → AUTH_INVALID, not fabricated)
+POLICY:   candidate_policy mechanically verified
+         (C33 REQUIRED→persisted UNPROMOTED; C34 NOT REQUIRED)
+SECURITY: credential purge complete, zero key material in any
+         reachable commit, worktree, or PR patch (gitleaks verified)
+REGRESSION: POST == PRE == 17 (identical sets); zero C34-induced
+         failures across the full suite
+GATES:    no merge, no promotion, no release, no rewrite outside the
+         owner-authorized force-update of the C34 branch only;
+         baseline 2a000e0 and .19 PROMOTED_VERIFIED untouched
+NEXT:     Owner Gate — Hermes provider credentials, then live
+         certification re-probe
+```
+
+## 19. Final Commit Inventory (post-purge)
+The branch history now contains only clean commits (all pre-purge SHAs invalid). Post-purge heads: the full bounded implementation + closure set, culminating in the final-security purge verification and this terminal report. The final branch head SHA is the single machine-identifiable anchor; it is cited in the closing PR #10 comment. All post-closure state files remain exactly as recorded in section 11–16; the purge altered blob content (key redaction) of the probe document and nothing else.
