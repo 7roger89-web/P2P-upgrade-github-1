@@ -271,7 +271,18 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
         self.assertIn("accessibility", uiux.triggers)
 
     def test_cf21_no_external_framework_surface(self) -> None:
+        # The portable capability core must never leak host frameworks.
+        # Per the C34 real-backend design, the adapter modules below are the
+        # ONLY designated vendor/host integration surface: they own the
+        # host interaction (CLI subprocess / REST urllib) so that the core
+        # stays framework-free and vendor-agnostic. A non-adapter module
+        # importing requests/subprocess would violate that boundary.
+        adapter_boundary = frozenset((
+            "hermes_adapter.py", "manus_adapter.py",
+            "backend_contract.py", "backend_execution_bridge.py"))
         for path in (SYSTEM_ROOT / "p2p_capabilities").rglob("*.py"):
+            if path.name in adapter_boundary:
+                continue
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("import requests", text)
             self.assertNotIn("from requests", text)
