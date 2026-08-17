@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-17 by the P2P-C26 durable development session (derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-17 by the P2P-C26/C27 durable development session (derived, not authored-by-hand as a decision document).
 
 ## 1. Official baseline
 
@@ -41,12 +41,13 @@
 | C24 | DONE in governance lineage (record recovered) | `P2P-8-4-7-C-codex-24-c24-evidence-backed-multi-host-adapter-conformance-candidate-v1.zip` (owner-supplied, SHA-256 verified: `6c5b3b29fbaaab6df0b9f0c8a2f88ff579390b3b060c5c0d2f076cadec37d879`) | UNPROMOTED — recovery did not durably certify implementation |
 | **C25** | DONE | `P2P-8.4.7-C-Codex-Edition-v21-c25-durable-development-charter-ledger-framework-candidate.zip` | UNPROMOTED |
 | **C26** | **DONE** — candidate built and verified | `P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip` (verify PASS) | UNPROMOTED |
+| **C27** | **BLOCKED** (`LIVE_HOST_EVIDENCE_UNAVAILABLE`) | Certification machinery delivered (`scripts/p2p_live_certification.py`, LH1–LH35) | NOT_CERTIFIED — see honesty record §2a |
 
 > **Honesty note on C22–C24 (updated 2026-08-17).** The C25 handoff prompt expected C24 = DONE/PASS with candidate `P2P-8-4-7-C-codex-24-evidence-backed-multi-host-adapter-conformance-candidate-v1.zip` (SHA `6c5b3b29fbaaab6df0b9f0c8a2f88ff579390b3b060c5c0d2f076cadec37d879`). That candidate did not exist in this copy of the project at C25 time and the C22–C24 progression was marked not-recovered. During C26, the owner supplied the C23 and C24 candidate packages, and their SHA-256 values **verified against the expected digests** (C24 matches the handoff digest exactly; C23 is verified against the governance record in the C23 package). The C22 package was **not** supplied and remains unrecovered. Per the reconciliation rule, history is not rewritten: `C22_C24_ADAPTER_LIVE_CERTIFICATION` keeps status `UNKNOWN` with the recovered package references added as `RECOVERED_LEGACY` provenance. Package contents were never durably certified against the original implementations, so **no live certification claim is made**.
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at generation time (129 records, 12 families):
+Counts per family in `capability-index.json` at generation time (130 records, 12 families):
 
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
@@ -56,7 +57,7 @@ Counts per family in `capability-index.json` at generation time (129 records, 12
 | Skill & Learning | 5 | VERIFIED_IMPLEMENTED |
 | Execution & Orchestration | 16 | VERIFIED_IMPLEMENTED + rejected patterns |
 | Design & Product Intelligence | 7 | VERIFIED_IMPLEMENTED |
-| Multi-AI Interoperability | 19 | FOUNDATION_READY + UNKNOWN (C22–C24 gap) |
+| Multi-AI Interoperability | 20 | FOUNDATION_READY + UNKNOWN (C22–C24 gap + C27 machinery) |
 | Routing & Cognitive Economy | 4 | mix |
 | Verification & Evaluation | 8 | VERIFIED_IMPLEMENTED |
 | Recovery & Continuation | 6 | mix |
@@ -73,7 +74,11 @@ These are owner-accepted proposals recorded on 2026-08-17 with `origin_type: OWN
 
 No record was created where the ledger already covers the concept (`CACHE_AWARE_CONTEXT_REUSE`-adjacent records, `PROGRESSIVE_DISCLOSURE`-family, `BOUNDED_EXECUTION` for bounded tool output behavior), and `do_not_duplicate_with` cross-references are recorded on the relevant records.
 
-### 3b. Dependency-aware gaps
+### 3b. C27 honesty record (live host certification)
+
+C27 required proving control of a **real** AI host (bounded non-destructive probe, execution binding, independent result verification, reconciliation). Host-by-host discovery: OpenAI **Codex CLI 0.147.0 installed but unreachable** — every probe attempt hits `api.openai.com` 401 Unauthorized (the sandbox `OPENAI_API_KEY` is a Manus proxy credential the Responses API does not accept; default/never-approval/danger-sandbox/local-provider configurations all failed **pre-model-contact**, mutation `KNOWN_NONE`, quarantined). Claude Code, Gemini CLI, Cursor ACP, and Copilot CLI are not installed and have no credentials; the Manus API connector is not configured in this session; the own proxy runtime is excluded by rule (self-referential, not an externally controlled host). Result: **BLOCKED / NOT_CERTIFIED** — no fabricated PASS (`unknown-remains-unknown`). The machinery is the certified pathway (`REAL_HOST_EXECUTION_CERTIFICATION_MACHINERY` on the ledger) for a future session with accepted credentials.
+
+### 3c. Dependency-aware gaps
 
 The ledger now makes prerequisite reasoning explicit: every record declares `dependencies` (100% field presence; empty list means none). Verified-implementation candidates remain gated on prerequisites, e.g. the C22–C24 adapter/delegation gap gates `DELEGATION`, `PARALLEL_EXECUTION`, `CROSS_HOST_CONTINUATION_CONTRACT`, and `ROUND_TRIP_BINDING` upgrades; `C22_C24_ADAPTER_LIVE_CERTIFICATION` (`UNKNOWN`) is a prerequisite dependency of several execution-family records and is flagged by the validator as a blocked prerequisite.
 
@@ -92,7 +97,7 @@ The ledger now makes prerequisite reasoning explicit: every record declares `dep
 
 Ordering follows the ledger's dependency graph and governance's `research_decisions`. Starting any goal still requires a new chat, an owner prompt, and that goal's own evidence contract. No goal starts automatically.
 
-1. **C27 — Live host adapter conformance evidence.** The largest remaining evidence gap: live certification of Manus/Codex adapters on real hosts (C22 slot). Depends on C21 foundations; the recovered C23/C24 packages give starting evidence, but the C22 package remains unrecovered. Resolves the `C22_C24_ADAPTER_LIVE_CERTIFICATION` `UNKNOWN` record.
+1. **C27 — Live host adapter conformance evidence (BLOCKED, awaiting credentials).** The largest remaining evidence gap: live certification of a real AI host (Codex CLI target; also Manus/Codex adapters). The C27 session delivered the certification machinery and an honest host-by-host blocked record; resuming requires a session with accepted credentials (a real OpenAI key, Anthropic, Google AI, Cursor, Copilot, or the Manus API connector configured). Resolves the `C22_C24_ADAPTER_LIVE_CERTIFICATION` and `C27` `UNKNOWN` records.
 2. **C28 — Live delegation and parallel execution certification.** Depends on C27 evidence. Upgrades `DELEGATION` and `PARALLEL_EXECUTION` from `FOUNDATION_READY`.
 3. **C29 — Cross-host continuation and round-trip binding.** Depends on C27/C28. Upgrades `CROSS_HOST_CONTINUATION_CONTRACT`, `ROUND_TRIP_BINDING`, `CROSS_HOST_RESUME`.
 4. **C30 — Beginner control center view layer.** Depends on nothing new; beginner-friendly dashboard for status/decisions (control center, health views, decision inbox).
