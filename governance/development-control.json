@@ -667,6 +667,13 @@
     "status": "BLOCKED",
     "notes": "BLOCKED: LIVE_HOST_EVIDENCE_UNAVAILABLE. Host-by-host: Codex CLI 0.147.0 installed but 401 on api.openai.com (no real OpenAI key); Claude Code / Gemini CLI / Cursor ACP / Copilot CLI absent; Manus API connector unconfigured. C26 remains the active goal (CANDIDATE_UNPROMOTED).",
     "evidence_ref": "docs/p2p-development/reports/P2P-C27-terminal-report.md"
+   },
+   {
+    "id": "C28",
+    "status": "PLANNED",
+    "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
+    "evidence_ref": "GOAL-C28",
+    "notes": "C28 terminal state: PASS (machinery + verification; no live certification claimed)."
    }
   ],
   "current": {
@@ -675,9 +682,9 @@
    "title": "Durable Capability Provenance, Dependency & Goal-to-Ledger Governance"
   },
   "likely_next": {
-   "id": "C27",
-   "status": "BLOCKED",
-   "title": "Real Host Execution Certification"
+   "id": "C28",
+   "status": "PLANNED",
+   "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat"
   },
   "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion."
  },
@@ -1124,6 +1131,20 @@
     "P2P-C27 terminal report (docs/p2p-development/reports/)",
     "codex doctor health summary (auth env, 401 evidence)",
     "probe attempts 1-4 evidence (E27-PROBE, session ids, request ids)"
+   ]
+  },
+  {
+   "goal": "C28",
+   "change_id": "C28-2026T08T17T02T22T56Z",
+   "changed_at": "2026-08-17T02:22:56Z",
+   "what_changed": "Secure host connection & credential onboarding machinery implemented: provider-neutral state model, auth requirement discovery, credential-reference model (never secret value), endpoint binding, zero-credit verification, beginner owner-action model, drift detection, connection doctor",
+   "why": "Turn discovered-but-unusable hosts into securely connected, verified, live-probe-eligible hosts without technical Owner intervention (C27 gap).",
+   "evidence_refs": [
+    "docs/p2p-development/reports/P2P-C28-terminal-report.md",
+    "HO1-HO70 PASS (tests/test_p2p_secure_onboarding.py)",
+    "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py)",
+    "C27 Codex 401 evidence reused (E27-PROBE-1f71d9b55eb78d8e)",
+    "codex doctor + preflight zero-model-call evidence (model_calls_used_for_onboarding = 0)"
    ]
   }
  ]
