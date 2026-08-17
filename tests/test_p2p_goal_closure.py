@@ -347,23 +347,26 @@ class RoadmapTerminalTests(unittest.TestCase):
         self.assertIn(derived["status"], ("DONE", "BLOCKED", "PLANNED", "ACTIVE"))
         gov = load_gov()
         ln = gov["roadmap"]["likely_next"]
-        # Once the last roadmap goal is terminal (C28 DONE), likely_next
-        # points at the next viable goal declared PLANNED (C30) — never at a
-        # goal that will never execute, and never stale/contradictory:
-        if derived["status"] in ("DONE", "BLOCKED"):
-            later = [
-                i for i in self.items
-                if str(i.get("status", "")).upper()
-                in ("PLANNED", "ACTIVE")
-            ]
-            if later:
-                self.assertEqual(ln["id"], later[0]["id"])
-                self.assertEqual(ln["status"],
-                                 str(later[0]["status"]).upper())
-            else:
-                self.assertEqual(ln["id"], derived["id"])
-        else:
-            self.assertEqual(ln["id"], derived["id"])
+        # Control.py derives likely_next deterministically: after the last
+        # DONE goal (C28), the lowest-numbered non-DONE goal (C30, since C29
+        # is absent from the roadmap and C31 is later than C30). likely_next
+        # must never be stale or contradict the durable roadmap order:
+        numbered = [(int(re.search(r"\d+", i["id"]).group()), i)
+                    for i in self.items
+                    if re.match(r"^C\d+$", i["id"])]
+        done_ids = {i["id"] for i in self.items
+                    if str(i.get("status", "")).upper() == "DONE"}
+        numbered.sort(key=lambda pair: pair[0])
+        last_done = None
+        for number, i in numbered:
+            if i["id"] in done_ids:
+                last_done = number
+        expect = next(i for number, i in numbered
+                      if number > (last_done or 0)
+                      and str(i.get("status", "")).upper() != "DONE")
+        self.assertEqual(ln["id"], expect["id"])
+        self.assertEqual(ln["status"],
+                         str(expect["status"]).upper())
         # gc22-style determinism: derived next goal id is stable:
         again = closure.roadmap_terminal_next(self.items)
         self.assertEqual(again["id"], derived["id"])

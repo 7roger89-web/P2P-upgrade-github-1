@@ -1,0 +1,59 @@
+{
+  "goal": "C31",
+  "kind": "live_auth_probe",
+  "observed_at": "2026-08-17T06:14:33Z",
+  "probe_policy": "zero_model_contact; non-destructive; no secrets stored",
+  "harness": {
+    "id": "CODEX_CLI_0_147_0_LINUX",
+    "binary": "codex-cli 0.147.0"
+  },
+  "host_machine": {
+    "os": "Linux 87cd0e940adf 6.1.102 #1 SMP PREEMPT_DYNAMIC Tue Mar 25 09:02:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux",
+    "cwd": "/home/ubuntu/p2p",
+    "repo_binding": "/home/ubuntu/p2p",
+    "git_branch": "p2p-c30-composable-execution-target"
+  },
+  "credential_reference": "OPENAI_API_KEY (sandbox proxy credential, presence-only; value never read)",
+  "credential_presence": true,
+  "endpoint": "https://api.openai.com (codex hardcoded transport)",
+  "probes": [
+    {
+      "id": "doctor-auth",
+      "result": {
+        "rc": 0,
+        "stdout": "Codex Doctor v0.147.0 · linux-x86_64\n\nNotes\n   ⚠ updates      update configuration is locally consistent\n   ⚠ websocket    Responses WebSocket failed; HTTPS fallback may still work - Check proxy, VPN, firewall, DNS, custom CA, and WebSocket policy support.\n─────────────────────────────────────────────────────────────\n\nEnvironment\n  ✓ system       C\n      os                       Ubuntu 24.4.0 [64-bit]\n      OS language              C\n      LANG                     C.UTF-8\n      VISUAL                   not set\n      EDITOR                   not set\n      PAGER                    cat\n      GIT_PAGER                cat\n      LESS                     FRX\n  ✓ runtime      npm (package /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl, bin /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin, resources /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-resources, path /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path)\n      version                  0.147.0\n      install method           npm (package /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl, bin /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin, resources /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-resources, path /home/ubuntu/.nvm/versions/node/v22.13.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-",
+        "stderr": ""
+      },
+      "observed_at": "2026-08-17T06:14:34Z"
+    },
+    {
+      "id": "exec-help",
+      "result": {
+        "rc": 0,
+        "stdout": "Run Codex non-interactively\n\n\u001b[1m\u001b[4mUsage:\u001b[0m codex exec [OPTIONS] [PROMPT]\n       codex exec [OPTIONS] <COMMAND> [ARGS]\n\n\u001b[1m\u001b[4mCommands:\u001b[0m\n  \u001b[1mresume\u001b[0m  Resume a previous session by id or pick the most recent with --last\n  \u001b[1mreview\u001b[0m  Run a code review against the current repository\n  \u001b[1mhelp\u001b[0m    Print this message or the help of the given subcommand(s)\n\n\u001b[1m\u001b[4mArguments:\u001b[0m\n  [PROMPT]\n          Initial instructions for the agent. If not provided as an argument (or\n          if `-` is used), instructions are read from stdin. If stdin is piped\n          and a prompt is also provided, stdin is appended as a `<stdin>` block\n\n\u001b[1m\u001b[4mOptions:\u001b[0m\n  \u001b[1m-c\u001b[0m, \u001b[1m--config\u001b[0m <key=value>\n          Override a configuration value that would otherwise be loaded from\n          `~/.codex/config.toml`. Use a dotted path (`foo.bar.baz`) to override\n          nested values. The `value` portion is parsed as TOML. If it fails to\n          parse as TOML, the raw string is used as a literal.\n          \n          Examples: - `-c model=\"o3\"` - `-c\n          'sandbox_permissions=[\"disk-full-read-access\"]'` - `-c\n          shell_environment_policy.inherit=all`\n\n      \u001b[1m--enable\u001b[0m <FEATURE>\n          Enable a feature (repeatable). Equivalent to `-c features.<name>=true`\n\n      \u001b[1m--strict-config\u001b[0m\n          Error out when config.toml contains fields that are not recognized by\n          this version of Codex\n\n      \u001b[1m--disable\u001b[0m <FEATURE>\n          Disable a feature (repeatable). Equivalent to `-c\n          features.<name>=false`\n\n  \u001b[1m-i\u001b[0m, \u001b[1m--image\u001b[0m <FILE>...\n          Optional image(s) to attach to the initial prompt\n\n  \u001b[1m-m\u001b[0m, \u001b[1m--model\u001b[0m <MODEL>\n          Model the agent should use\n\n      \u001b[1m--oss\u001b[0m\n          Use open-source provider\n\n      \u001b[1m--local-provider\u001b[0m <OSS_PROVIDER>\n          Specify which local provider to use (lmstudio or ollama). If not\n          specified with --oss, will use config default or show selection\n\n  \u001b",
+        "stderr": ""
+      },
+      "observed_at": "2026-08-17T06:14:34Z"
+    },
+    {
+      "id": "bounded-exec-probe",
+      "workspace": "/tmp/tmpujgfuzsk",
+      "result": {
+        "rc": 1,
+        "stdout": "",
+        "stderr": "OpenAI Codex v0.147.0\n--------\n\u001b[1mworkdir:\u001b[0m /home/ubuntu/p2p\n\u001b[1mmodel:\u001b[0m auto\n\u001b[1mprovider:\u001b[0m openai\n\u001b[1mapproval:\u001b[0m never\n\u001b[1msandbox:\u001b[0m read-only\n\u001b[1mreasoning effort:\u001b[0m none\n\u001b[1mreasoning summaries:\u001b[0m none\n\u001b[1msession id:\u001b[0m 01a00e5b-86de-79b0-9dc9-803c80839357\n--------\n\u001b[36muser\u001b[0m\nReply with exactly the word PONG and nothing else.\n\u001b[1m\u001b[33mwarning:\u001b[0m\u001b[0m Codex could not find bubblewrap on PATH. Install bubblewrap with your OS package manager. See the sandbox prerequisites: https://developers.openai.com/codex/concepts/sandboxing#prerequisites. Codex will use the bundled bubblewrap in the meantime.\n\u001b[1m\u001b[33mwarning:\u001b[0m\u001b[0m Model metadata for `auto` not found. Defaulting to fallback metadata; this can degrade performance and cause issues.\n\u001b[2m2026-08-17T06:14:35.333189Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n\u001b[2m2026-08-17T06:14:36.222985Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n\u001b[2m2026-08-17T06:14:37.157918Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n\u001b[1m\u001b[31mERROR:\u001b[0m\u001b[0m Reconnecting... 2/5\n\u001b[2m2026-08-17T06:14:38.315066Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n\u001b[1m\u001b[31mERROR:\u001b[0m\u001b[0m Reconnecting... 3/5\n\u001b[2m2026-08-17T06:14:39.859414Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[2mcodex_api::endpoint::responses_websocket\u001b[0m\u001b[2m:\u001b[0m failed to connect to websocket: HTTP error: 401 Unauthorized, url: wss://api.openai.com/v1/responses\n\u001b[1m\u001b[31mERROR:\u001b[0m\u001b[0m Reconnecting... 4/5\n\u001b[2m2026-08-17T06:14:42.063794Z\u001b[0m \u001b[31mERRO"
+      },
+      "observed_at": "2026-08-17T06:14:53Z"
+    }
+  ],
+  "auth_verdict": "AUTH_INVALID",
+  "freshness": "FRESH",
+  "c27_immutable_fact_ref": "E27-PROBE-1f71d9b55eb78d8e",
+  "protocol": "unknown: no successful transport handshake",
+  "workspace_binding": {
+    "class": "EPHEMERAL_SANDBOX",
+    "tmpdir": "/tmp/tmpujgfuzsk"
+  },
+  "probe_finished_at": "2026-08-17T06:14:53Z",
+  "fingerprint": "5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b"
+}

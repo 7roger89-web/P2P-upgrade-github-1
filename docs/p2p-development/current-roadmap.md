@@ -63,7 +63,7 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at generation time (153 records, 12 families):
+Counts per family in `capability-index.json` at generation time (156 records, 12 families):
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
 | Truth & Governance | 20 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
@@ -72,10 +72,10 @@ Counts per family in `capability-index.json` at generation time (153 records, 12
 | Skill & Learning | 5 | VERIFIED_IMPLEMENTED + PARTIAL |
 | Execution & Orchestration | 22 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
 | Design & Product Intelligence | 6 | VERIFIED_IMPLEMENTED + REJECTED |
-| Multi-AI Interoperability | 29 | FOUNDATION_READY + REJECTED |
+| Multi-AI Interoperability | 31 | FOUNDATION_READY + REJECTED |
 | Routing & Cognitive Economy | 4 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
 | Verification & Evaluation | 6 | VERIFIED_IMPLEMENTED |
-| Recovery & Continuation | 5 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
+| Recovery & Continuation | 6 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
 | Beginner Lifecycle | 7 | VERIFIED_IMPLEMENTED + PARTIAL |
 | Outcome Learning | 4 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
 Status vocabulary used by the ledger: `VERIFIED_IMPLEMENTED`, `FOUNDATION_READY`, `PARTIAL`, `PLANNED`, `DEFERRED`, `REJECTED`, `OBSOLETE`, `UNKNOWN`.
@@ -115,6 +115,12 @@ The ledger now makes prerequisite reasoning explicit: every record declares `dep
 ### 3e. C30 composable execution target foundation (2026-08-17)
 C30 delivered the **provider-neutral, deterministic composable execution target foundation** — `scripts/p2p_execution_target.py` — with 60 passing tests (`tests/test_p2p_execution_target.py` ET1..ET60) and a durable research intake artifact (`docs/p2p-development/research/execution-target-pattern-research.md`, nine source repositories, patterns A–O, no code copied). The module models execution as an honest composition of a harness, a provider, a model, a protocol, a toolset, a workspace, an environment, auth (harness and provider kept separate), and a permission envelope; `UNKNOWN` and stale evidence fail closed, protocol compatibility is never certification, permission composition never widens, and the registry enumerates but never routes. Honest gaps are durably recorded: no router, no autopilot, no background autonomy, no real execution, no second executor, and no secrets stored. Terminal state: **PASS (foundation)**, candidate UNPROMOTED per the C29 deterministic policy.
 
+### 3e. C30 composable execution target foundation (2026-08-17)
+C30 delivered the **provider-neutral, deterministic composable execution target foundation** — `scripts/p2p_execution_target.py` — with 60 passing tests (`tests/test_p2p_execution_target.py` ET1..ET60) and a durable research intake artifact (`docs/p2p-development/research/execution-target-pattern-research.md`, nine source repositories, patterns A–O, no code copied). The module models execution as an honest composition of a harness, a provider, a model, a protocol, a toolset, a workspace, an environment, auth (harness and provider kept separate), and a permission envelope; `UNKNOWN` and stale evidence fail closed, protocol compatibility is never certification, permission composition never widens, and the registry enumerates but never routes. Honest gaps are durably recorded: no router, no autopilot, no background autonomy, no real execution, no second executor, and no secrets stored. Terminal state: **PASS (foundation)**, candidate UNPROMOTED per the C29 deterministic policy.
+
+### 3e. C30 composable execution target foundation (2026-08-17)
+C30 delivered the **provider-neutral, deterministic composable execution target foundation** — `scripts/p2p_execution_target.py` — with 60 passing tests (`tests/test_p2p_execution_target.py` ET1..ET60) and a durable research intake artifact (`docs/p2p-development/research/execution-target-pattern-research.md`, nine source repositories, patterns A–O, no code copied). The module models execution as an honest composition of a harness, a provider, a model, a protocol, a toolset, a workspace, an environment, auth (harness and provider kept separate), and a permission envelope; `UNKNOWN` and stale evidence fail closed, protocol compatibility is never certification, permission composition never widens, and the registry enumerates but never routes. Honest gaps are durably recorded: no router, no autopilot, no background autonomy, no real execution, no second executor, and no secrets stored. Terminal state: **PASS (foundation)**, candidate UNPROMOTED per the C29 deterministic policy.
+
 ## 5. Recommended next goals (ordered, NOT auto-started)
 
 Ordering follows the ledger's dependency graph and governance's `research_decisions`. Starting any goal still requires a new chat, an owner prompt, and that goal's own evidence contract. No goal starts automatically.
@@ -128,3 +134,7 @@ Ordering follows the ledger's dependency graph and governance's `research_decisi
 ## 6. Regeneration rule
 
 Any session that changes `development-control.json`, `capability-index.json`, or the charter must regenerate this file so that the projection never drifts from its sources.
+
+### 3f. C31 live host certification — honest BLOCKED (2026-08-17)
+
+C31 attempted to close the highest-priority evidence gap left after C30: an honest **live** certification of one real execution path using the generic C30 execution-target contract and the existing C27/C28 machinery (no parallel certification system, no vendor-specific core). The environment was inspected from observable evidence only: Codex CLI 0.147.0 is installed; the sandbox `OPENAI_API_KEY` is a Manus proxy credential; **no** Manus project connector is enabled; Claude/Gemini/Cursor/Copilot are absent (confirming C27 evidence). A fresh, non-destructive, zero-model-contact probe (`evidence/c31_live_probe.json`, fingerprint `5e3364ee…854b`) reached Codex's own auth layer and returned **HTTP 401 Unauthorized before model contact** — verdict `AUTH_INVALID`. The Manus connector path is `AUTH_CONFIG_ABSENT`. Terminal verdict: **BLOCKED / OWNER_ACTION_REQUIRED**. The smallest owner actions are a real `codex login` (outside chat, no secrets in chat) or enabling the Manus project connector in session configuration; certification reopens only when a fresh probe returns `AUTH_REQUIRED` or stronger on a supported host. Per the honesty boundary, no live certification record was fabricated: ledger and governance carry only the honest BLOCKED state, and no candidate release artifact was minted (`NOT_APPLICABLE_BLOCKED`). `AUTHENTICATED != CERTIFIED`; `UNKNOWN != SUPPORTED`; `GOAL PASS != PROMOTION`.
