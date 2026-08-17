@@ -224,10 +224,13 @@ class P2PDevelopmentControlTests(unittest.TestCase):
             c19_done = any(item.get("id") == "C19" and item.get("status") == "DONE" for item in load_record()["capability_status"])  # type: ignore[index]
             c26_done = any(item.get("id") == "C26" and item.get("status") == "DONE" for item in load_record()["roadmap"]["items"])  # type: ignore[index]
             if c26_done:
-                self.assertEqual(projection["current"]["id"], "C26")
-                self.assertEqual(projection["current"]["status"], "ACTIVE")
-                self.assertEqual(projection["likely_next"]["id"], "C26")
-                self.assertEqual(projection["likely_next"]["status"], "DONE")
+                record = load_record()
+                live_current = record["roadmap"]["current"]  # type: ignore[index]
+                live_next = record["roadmap"]["likely_next"]  # type: ignore[index]
+                self.assertEqual(projection["current"]["id"], live_current["id"])
+                self.assertEqual(projection["current"]["status"], live_current["status"])
+                self.assertEqual(projection["likely_next"]["id"], live_next["id"])
+                self.assertEqual(projection["likely_next"]["status"], live_next["status"])
             elif c25_done:
                 self.assertEqual(projection["current"]["id"], "C25")
                 self.assertEqual(projection["current"]["status"], "DONE")

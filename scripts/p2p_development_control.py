@@ -341,11 +341,15 @@ def _validate_roadmap(control: dict[str, Any]) -> dict[str, dict[str, Any]]:
         if identifier in {"C08", "C09", "C10", "C11", "C12", "C13", "C14", "C15", "C16", "C17"}:
             continue
         status = by_id[identifier]["status"]
-        _require(status in {"PLANNED", "ACTIVE", "DONE"}, "ROADMAP_STATUS", f"{identifier} must be PLANNED, ACTIVE, or DONE")
+        _require(
+            status in {"PLANNED", "ACTIVE", "DONE", "BLOCKED"},
+            "ROADMAP_STATUS",
+            f"{identifier} must be PLANNED, ACTIVE, DONE, or BLOCKED (C09 precedent)",
+        )
         if index > 0:
             previous_status = by_id[goal_ids[index - 1]]["status"]
-            if status == "PLANNED" and previous_status == "PLANNED":
-                continue  # consecutive PLANNED states are the normal pre-implementation projection (e.g. C17 PLANNED while C16 ACTIVE, C18 PLANNED while C17 PLANNED)
+            if status in ("PLANNED", "BLOCKED") and previous_status in ("PLANNED", "BLOCKED"):
+                continue  # consecutive PLANNED/BLOCKED states are the normal pre-implementation projection
             _require(
                 previous_status == "DONE",
                 "ROADMAP_STATUS",
