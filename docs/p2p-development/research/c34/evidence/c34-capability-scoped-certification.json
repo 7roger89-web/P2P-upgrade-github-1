@@ -1,0 +1,66 @@
+{
+  "schema": "p2p-capability-scoped-certification/1",
+  "goal": "C34",
+  "generated_at": "2026-08-17T06:00:00Z",
+  "generated_by": "C34-closure-reconciliation",
+  "principle": "LIVE_CERTIFIED is never a blanket adapter property. Every scope without independent bounded evidence is UNKNOWN for that scope. Requested target and observed effective profile are distinct attestation fields; equality is claimed only when runtime evidence binds them.",
+  "five_state_chain": {
+    "description": "Architectural, never declarative. An adapter never claims CURRENTLY_ELIGIBLE before a task contract is bound; eligibility is evaluated at task-gate time, with the owner gate applying when a required capability is UNKNOWN.",
+    "states": [
+      "ARCHITECTURALLY_COMPATIBLE",
+      "ADAPTER_IMPLEMENTED",
+      "ADAPTER_TESTED",
+      "LIVE_CERTIFIED_FOR_CAPABILITY",
+      "CURRENTLY_ELIGIBLE_FOR_TASK"
+    ]
+  },
+  "adapters": {
+    "manus-api": {
+      "requested_target": "manus-1.6-lite",
+      "observed_effective": "manus-1.6-lite",
+      "attestation_profile": "PROFILE_BOUND",
+      "attestation_binding_evidence": [
+        "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-detail.json",
+        "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-messages.json"
+      ],
+      "certifications": [
+        {"scope": "SYNTHETIC_TEXT_EXECUTION", "status": "LIVE_CERTIFIED_FOR_CAPABILITY",
+         "evidence": ["docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-messages.json"],
+         "note": "Task 8Eqa4QGo4x35raVTPnnA7c: single-turn bounded text Q&A, answer 'Four', ~11s runtime."},
+        {"scope": "API_TRANSPORT", "status": "LIVE_CERTIFIED_FOR_CAPABILITY",
+         "evidence": ["docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-create.json",
+                      "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-detail.json",
+                      "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-messages.json"],
+         "note": "task.create -> task.detail -> messages round-trip completed; auth VALID via API key (id jYvuZTtFLRAZtthF3Hrd7Y)."},
+        {"scope": "NON_MUTATING_TASK", "status": "LIVE_CERTIFIED_FOR_CAPABILITY",
+         "evidence": ["docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-detail.json"],
+         "note": "possible_mutation=false; no workspace or filesystem surface touched; single-turn prompt."},
+        {"scope": "FILE_WORKSPACE_OPERATION", "status": "UNKNOWN", "evidence": [],
+         "note": "Not exercised by the bounded probe; honest UNKNOWN, not NOT_TESTED by assumption."},
+        {"scope": "CODE_MUTATION", "status": "UNKNOWN", "evidence": []},
+        {"scope": "TEST_EXECUTION", "status": "UNKNOWN", "evidence": []},
+        {"scope": "BROWSER_RUNTIME", "status": "UNKNOWN", "evidence": []},
+        {"scope": "LONG_HORIZON_EXECUTION", "status": "UNKNOWN", "evidence": []}
+      ]
+    },
+    "hermes-cli": {
+      "requested_target": "hermes v0.20.2 (NousResearch/hermes-agent)",
+      "observed_effective": "hermes v0.20.2 (headless -z)",
+      "attestation_profile": "UNKNOWN",
+      "attestation_binding_evidence": [],
+      "certifications": [
+        {"scope": "SYNTHETIC_TEXT_EXECUTION", "status": "UNKNOWN", "evidence": [],
+         "note": "No provider credentials on the execution host; hermes returned 403 AUTH_INVALID. Adapter classified honestly; no certified execution."},
+        {"scope": "API_TRANSPORT", "status": "UNKNOWN", "evidence": [],
+         "note": "Harness installed and headless CLI probed, but zero successful end-to-end transport observed."},
+        {"scope": "NON_MUTATING_TASK", "status": "NOT_TESTED", "evidence": []},
+        {"scope": "FILE_WORKSPACE_OPERATION", "status": "NOT_TESTED", "evidence": []},
+        {"scope": "CODE_MUTATION", "status": "NOT_TESTED", "evidence": []},
+        {"scope": "TEST_EXECUTION", "status": "NOT_TESTED", "evidence": []},
+        {"scope": "BROWSER_RUNTIME", "status": "NOT_TESTED", "evidence": []},
+        {"scope": "LONG_HORIZON_EXECUTION", "status": "NOT_TESTED", "evidence": []}
+      ],
+      "adapter_state": "ADAPTER_TESTED"
+    }
+  }
+}

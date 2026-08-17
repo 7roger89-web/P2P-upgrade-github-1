@@ -29,6 +29,7 @@ import json
 import os
 import subprocess
 import re
+import pathlib
 import sys
 import time
 
@@ -43,6 +44,8 @@ from p2p_capabilities.backend_contract import (  # noqa: E402
     ADAPTER_STATES, BackendAdapterIdentity, BackendContractError,
     BackendExecutionResult, normalize_adapter_error,
     state_family_schema_for, verify_request_receipt_binding,
+    BackendCapabilityCertification, CERTIFICATION_SCOPES,
+    validate_attestation_binding,
 )
 from p2p_capabilities.backend_execution_bridge import (  # noqa: E402
     ADAPTER_CURRENTLY_ELIGIBLE, ADAPTER_IMPLEMENTED,
@@ -648,12 +651,37 @@ class TestCandidatePolicyAudit:
             ".p2p/system/p2p_capabilities/manus_adapter.py",
             "docs/p2p-development/research/c34/",
             "tests/test_p2p_c34_real_backend_contract.py",
+            # C34 closure-reconciliation C33 candidate artifact (unpromoted,
+            # persisted per the deterministic candidate policy applied to C33).
+            "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c33-provider-neutral-bounded-autopilot-core-candidate-v1.zip",
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.
         c34_approved_modifications = frozenset((
             "tests/test_p2p_capability_foundation.py",
             "docs/p2p-development/capability-ledger/capability-index.json",
+            # C34 closure-reconciliation: capability-scoped certification
+            # vocabulary + requested-vs-observed attestation binding.
+            ".p2p/system/p2p_capabilities/backend_contract.py",
+            "scripts/p2p_goal_closure.py",
+            "governance/development-control.json",
+            "reports/candidates",
+            # C34 durable-closure ledger coherence pass: vocabulary
+            # convergence (test + schema enum reverts), C33 candidate
+            # lineage record repair, C34 record field normalization,
+            # ledger status fix, and this test's own approved set growth.
+            "docs/p2p-development/capability-ledger/capability-ledger.schema.json",
+            "scripts/validate_p2p_development_framework.py",
+            # C34 closure terminal report (the durable-closure deliverable).
+            "docs/p2p-development/research/c34/P2P-C34-terminal-report.md",
+            # Secret-scan redaction (full Manus key replaced with truncated
+            # form per the closure security audit — an approved closure edit).
+            "docs/p2p-development/research/c34/phase3-manus-api-probe.md",
+            "tests/test_p2p_goal_closure.py",
+            "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
+            "tests/test_p2p_live_certification.py",
+            "tests/test_p2p_ledger_provenance.py",
+            "tests/test_p2p_c34_real_backend_contract.py",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:
@@ -704,3 +732,88 @@ class TestNoBackgroundAutonomy:
             if "--yolo" in line and "FORBIDDEN" not in line.upper():
                 raise AssertionError(
                     f"adapter may inject --yolo: {line.strip()}")
+
+
+# ================================================================ certification
+
+
+class TestCapabilityScopedCertification:
+    """C34 closure-reconciliation: certification is capability-scoped.
+
+    LIVE_CERTIFIED is never a blanket adapter property; each CERTIFICATION
+    scope is evaluated against independent bounded evidence, and unknown
+    scopes are UNKNOWN. Requested target vs observed effective profile are
+    separate attestation fields that are only equal when runtime evidence
+    binds them.
+    """
+
+    def test_certification_scope_is_enum_bounded(self) -> None:
+        cert = BackendCapabilityCertification(
+            "manus-api", "NON_MUTATING_TASK",
+            "LIVE_CERTIFIED_FOR_CAPABILITY",
+            ("evidence-1",))
+        assert cert.scope in CERTIFICATION_SCOPES
+
+    def test_unknown_scope_rejected(self) -> None:
+        with pytest.raises(BackendContractError) as exc:
+            BackendCapabilityCertification(
+                "manus-api", "SOME_NEW_CAPABILITY", "UNKNOWN")
+        assert "CERTIFICATION_SCOPE_INVALID" in str(exc.value)
+
+    def test_invalid_status_rejected(self) -> None:
+        with pytest.raises(BackendContractError) as exc:
+            BackendCapabilityCertification(
+                "manus-api", "CODE_MUTATION", "LIVE_CERTIFIED")
+        assert "CERTIFICATION_STATUS_INVALID" in str(exc.value)
+
+    def test_c34_certification_evidence_is_machine_readable(self) -> None:
+        registry = (
+            pathlib.Path(REPO_ROOT) / "docs" / "p2p-development" / "research"
+            / "c34" / "evidence"
+            / "c34-capability-scoped-certification.json"
+        )
+        assert registry.exists()
+        data = json.loads(registry.read_text(encoding="utf-8"))
+        assert data["schema"] == "p2p-capability-scoped-certification/1"
+        for adapter_name, adapter in data["adapters"].items():
+            assert adapter_name in ("manus-api", "hermes-cli")
+            seen = {c["scope"] for c in adapter["certifications"]}
+            assert (set(seen) <=
+                    set(CERTIFICATION_SCOPES))
+
+    def test_manus_not_certified_for_mutation_without_evidence(self) -> None:
+        registry = (
+            pathlib.Path(REPO_ROOT) / "docs" / "p2p-development" / "research"
+            / "c34" / "evidence"
+            / "c34-capability-scoped-certification.json"
+        )
+        data = json.loads(registry.read_text(encoding="utf-8"))
+        scopes = {c["scope"]: c["status"] for c in
+                  data["adapters"]["manus-api"]["certifications"]}
+        # The bounded probe certified text/transport/non-mutation only.
+        assert (scopes["SYNTHETIC_TEXT_EXECUTION"] ==
+                "LIVE_CERTIFIED_FOR_CAPABILITY")
+        assert scopes["API_TRANSPORT"] == "LIVE_CERTIFIED_FOR_CAPABILITY"
+        assert scopes["NON_MUTATING_TASK"] == "LIVE_CERTIFIED_FOR_CAPABILITY"
+        for scope in ("FILE_WORKSPACE_OPERATION", "CODE_MUTATION",
+                      "TEST_EXECUTION", "BROWSER_RUNTIME",
+                      "LONG_HORIZON_EXECUTION"):
+            assert scopes[scope] == "UNKNOWN"
+
+    def test_attestation_binding_requires_observation_evidence(self) -> None:
+        ok, detail = validate_attestation_binding(
+            "manus-1.6-lite", "manus-1.6-lite",
+            ("evidence-pointer",))
+        assert ok
+        assert detail["reason"] == "REQUEST_MATCHES_OBSERVED"
+        assert detail["attestation_profile"] == "PROFILE_BOUND"
+
+        # No evidence anchors -> binding rejected (no copy-equal shortcut).
+        ok2, _ = validate_attestation_binding(
+            "manus-1.6-lite", "manus-1.6-lite")
+        assert not ok2
+
+        # Observed missing -> binding rejected regardless of requested value.
+        ok3, _ = validate_attestation_binding(
+            "manus-1.6-lite", None, ("evidence-pointer",))
+        assert not ok3

@@ -83,6 +83,67 @@ ADAPTER_STATES = (
     "CURRENTLY_ELIGIBLE",
 )
 
+# ---------------------------------------------------------------------------
+# C34 closure-reconciliation: capability-scoped certification.
+#
+# LIVE_CERTIFIED is NOT a blanket property of an adapter. It is always scoped
+# to a bounded capability. A backend certified for a bounded, non-mutating,
+# single-turn text task is NOT certified for code mutation, file-workspace
+# operation, browser runtime, or long-horizon execution. Any scope without
+# independent bounded evidence is UNKNOWN for that scope.
+#
+# The five-state chain is architectural, not declarative:
+#   ARCHITECTURALLY_COMPATIBLE -> ADAPTER_IMPLEMENTED -> ADAPTER_TESTED ->
+#   LIVE_CERTIFIED_FOR_CAPABILITY (per scope) ->
+#   CURRENTLY_ELIGIBLE_FOR_TASK (task-gated; never pre-declared).
+# An adapter must never claim CURRENTLY_ELIGIBLE before a task contract is
+# bound to it; eligibility is evaluated against task requirements and
+# capabilities at task-gate time (owner gate applies when a required
+# capability is UNKNOWN).
+# ---------------------------------------------------------------------------
+
+CERTIFICATION_SCOPES = (
+    "SYNTHETIC_TEXT_EXECUTION",        # single-turn bounded text Q&A
+    "API_TRANSPORT",                   # request/response transport works
+    "NON_MUTATING_TASK",               # no filesystem/code mutation observed
+    "FILE_WORKSPACE_OPERATION",        # file read/write in a task workspace
+    "CODE_MUTATION",                   # code edit/generation execution
+    "TEST_EXECUTION",                  # running test suites
+    "BROWSER_RUNTIME",                 # browser automation
+    "LONG_HORIZON_EXECUTION",          # multi-step / multi-wave autonomy
+)
+
+
+@dataclass(frozen=True)
+class BackendCapabilityCertification:
+    """Per-scope certification record. Unknown scopes stay UNKNOWN."""
+
+    adapter_id: str
+    scope: str               # CERTIFICATION_SCOPES member
+    status: str              # LIVE_CERTIFIED_FOR_CAPABILITY | UNKNOWN | NOT_TESTED
+    evidence_pointers: tuple[str, ...] = ()
+    certified_at: str | None = None
+
+    def __post_init__(self) -> None:
+        _limited_text(self.adapter_id, "adapter_id", 128)
+        if self.scope not in CERTIFICATION_SCOPES:
+            raise BackendContractError("CERTIFICATION_SCOPE_INVALID")
+        if self.status not in ("LIVE_CERTIFIED_FOR_CAPABILITY", "UNKNOWN", "NOT_TESTED"):
+            raise BackendContractError("CERTIFICATION_STATUS_INVALID")
+        if not isinstance(self.evidence_pointers, tuple) or not all(
+            isinstance(p, str) for p in self.evidence_pointers
+        ):
+            raise BackendContractError("CERTIFICATION_EVIDENCE_INVALID")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "adapter_id": self.adapter_id,
+            "scope": self.scope,
+            "status": self.status,
+            "evidence_pointers": list(self.evidence_pointers),
+            "certified_at": self.certified_at,
+        }
+
 _BACKEND_EXECUTION_STATUSES = _EXECUTION_STATUSES
 _BACKEND_VERIFICATION_STATUSES = _VERIFICATION_STATUSES
 
@@ -430,3 +491,47 @@ def state_family_schema_for(path: str) -> str | None:
         if base.endswith(suffix) or "/" + suffix in "/" + base:
             return schema
     return None
+
+
+# ---------------------------------------------------------------------------
+# C34 closure-reconciliation: requested-vs-observed profile attestation.
+#
+# The profile/model the task contract requests (REQUESTED_TARGET) is a
+# declaration. What the backend actually ran (OBSERVED_EFFECTIVE) must come
+# from runtime evidence (receipt, usage log, message history) — never from
+# the request echo. The two are separate fields; they are only equal when
+# runtime evidence independently binds them. Where the receipt gives only
+# profile granularity (no independent model identifier), model binding is
+# UNKNOWN_FOR_MODEL and is reported honestly instead of copied.
+# ---------------------------------------------------------------------------
+
+ATTESTATION_PROFILES = ("UNKNOWN", "PROFILE_BOUND", "MODEL_BOUND")
+
+
+def validate_attestation_binding(
+    requested: str | None,
+    observed: str | None,
+    evidence_pointers: tuple[str, ...] = (),
+) -> tuple[bool, dict[str, Any]]:
+    """Validate the REQUESTED vs OBSERVED profile attestation.
+
+    Returns (ok, detail). ok is True only when an OBSERVED value exists and
+    is anchored in at least one evidence pointer. Requested-only or
+    copy-equal claims without evidence are REJECTED.
+    """
+    if not isinstance(evidence_pointers, tuple) or not evidence_pointers:
+        return False, {"reason": "NO_OBSERVATION_EVIDENCE",
+                       "attestation_profile": "UNKNOWN"}
+    if not observed or not isinstance(observed, str):
+        return False, {"reason": "OBSERVED_PROFILE_MISSING",
+                       "attestation_profile": "UNKNOWN"}
+    profile = (ATTESTATION_PROFILES[1] if len(observed) <= 64
+               else ATTESTATION_PROFILES[2])
+    match = (requested is not None and str(requested).strip() == str(observed).strip())
+    return True, {
+        "reason": "REQUEST_MATCHES_OBSERVED" if match else "REQUEST_OBSERVED_DISTINCT",
+        "requested_target": requested,
+        "observed_effective": observed,
+        "attestation_profile": profile,
+        "evidence_pointers": list(evidence_pointers),
+    }
