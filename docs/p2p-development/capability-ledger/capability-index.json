@@ -3,7 +3,7 @@
  "schema_version": 2,
  "canonical_source_statement": "Derived from governance/development-control.json (architectural_invariants, roadmap, capability_status, candidate_records, research_decisions), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, docs/plans/, and per-goal evidence reports in reports/. This ledger is capability knowledge, status, and roadmap intent only; it is NOT runtime truth, NOT Task State, and NOT a second FACT store. Where this ledger contradicts development-control.json, development-control.json wins.",
  "authority_boundary": "This ledger records capability knowledge, capability status, and development intent. It does not control runtime task completion. Runtime task authority lives in Task State; goal/development governance authority lives in governance/development-control.json; factual and evidence authority lives in governance/fact-ledger.json and governance/live-specs.json with their evidence files.",
- "generated_at": "2026-08-17T00:00:00+07:00",
+ "generated_at": "2026-08-17T03:00:00+07:00",
  "families": {
   "TRUTH_AND_GOVERNANCE": {
    "name": "Truth & Governance",
@@ -3701,7 +3701,7 @@
     "scripts/p2p_live_certification.py (C27 certification machinery)",
     "docs/p2p-development/reports/P2P-C27-terminal-report.md"
    ],
-   "status": "UNKNOWN",
+   "status": "FOUNDATION_READY",
    "implementation_refs": [
     "scripts/p2p_live_certification.py",
     "tests/test_p2p_live_certification.py"
@@ -3722,8 +3722,8 @@
    "do_not_duplicate_with": "BOUNDED_EXECUTION (sandbox task execution; this is host-control certification of an external AI host)",
    "next_condition": "A reachable real AI host with accepted credentials (OpenAI key, Anthropic, Google AI, Cursor, Copilot, or Manus API connector) — then run the bounded non-destructive probe and record the live certificate.",
    "last_reviewed": "2026-08-17",
-   "freshness": "from_plan_or_report",
-   "notes": "C27 goal is BLOCKED (LIVE_HOST_EVIDENCE_UNAVAILABLE) after honest host-by-host discovery. Machinery is the certified pathway; no fabricated PASS. Host-by-host: Codex CLI 0.147.0 installed (401), Claude Code/Gemini CLI/Cursor ACP/Copilot CLI absent, Manus API not configured, own proxy excluded (not externally controlled).",
+   "freshness": "verified_against_filesystem",
+   "notes": "C29 machinery audit (evidence-based): certification machinery delivered in C27 (scripts/p2p_live_certification.py), LH1-LH35 suite fully passing (tests/test_p2p_live_certification.py), and C27 blocked evidence durable. Machinery is verifiable and implementable => FOUNDATION_READY. Outcome capability REAL_HOST_EXECUTION_CERTIFICATION remains UNKNOWN: no live host execution evidence exists (C27 BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE). Goal status BLOCKED; capability status FOUNDATION_READY — statuses are distinct and not conflated per C29.",
    "origin_type": "IMPLEMENTATION_GOAL"
   },
   {
@@ -3756,6 +3756,96 @@
    ],
    "origin_type": "IMPLEMENTATION_GOAL",
    "beginner_value": "Giúp chủ dự án kết nối P2P với một AI host thật một cách an toàn: phát hiện host nào đã cài, xác minh cấu hình đăng nhập mà không đọc mật khẩu, kiểm tra đúng điểm cuối máy chủ, và hướng dẫn chủ dự án đúng MỘT bước ngoài chat (ví dụ 'codex login'), sau đó kiểm tra lại ngay trong chat."
+  },
+  {
+   "capability_id": "C28_CANDIDATE_PACKAGING_AND_C29_CLOSURE_RECONCILIATION",
+   "name": "C28 candidate packaging and C29 closure reconciliation",
+   "family": "TRUTH_AND_GOVERNANCE",
+   "origin_type": "PROJECT_LEARNING",
+   "dependencies": [
+    "SECURE_HOST_CONNECTION_ONBOARDING"
+   ],
+   "origin_refs": [
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v22-c28-secure-host-connection-credential-onboarding-candidate-v1.zip",
+    "docs/p2p-development/reports/P2P-C28-terminal-report.md",
+    "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+    "scripts/package_release.py"
+   ],
+   "implementation_refs": [],
+   "evidence_refs": [
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v22-c28-secure-host-connection-credential-onboarding-candidate-v1.zip",
+    "scripts/package_release.py verify: status PASS"
+   ],
+   "beginner_value": "C28 closure was recorded as PASS with a missing candidate (its contract required one). Under the C29 deterministic candidate policy the candidate became REQUIRED; canonical packaging built, verified, and bound to the governance lineage record with the true artifact SHA-256.",
+   "principle": "Closure verdicts are only complete when every contract obligation, including the immutable candidate artifact, is durably satisfied and cryptographically bound.",
+   "status": "FOUNDATION_READY",
+   "known_gaps": [],
+   "do_not_duplicate_with": [],
+   "next_condition": "C29 terminal report published; candidate SHA bound to governance lineage record",
+   "last_reviewed": "2026-08-17T02:57:00+07:00",
+   "freshness": "verified_against_filesystem",
+   "notes": "",
+   "rejected_reason": null
+  },
+  {
+   "capability_id": "GOAL_CLOSURE_INTEGRITY_CHECK",
+   "title": "Deterministic goal closure consistency checker: terminal verdict verified against roadmap, development-control, candidate policy, capability/goal separation",
+   "status": "FOUNDATION_READY",
+   "family": "TRUTH_AND_GOVERNANCE",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Every terminal verdict (PASS/BLOCKED/FAIL) is verified deterministically against the roadmap, governance, candidate records and capability/goal separation, so a ghost inconsistency (roadmap DONE but no candidate) can never silently recur.",
+   "principle": "TERMINAL_VERDICT_IS_RECONCILED",
+   "origin_refs": [
+    "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+    "GC1-GC50 real test execution"
+   ],
+   "dependencies": [
+    "GOAL_CANDIDATE_RELEASE_PROMOTION_LIFECYCLE",
+    "C22_C24_ADAPTER_LIVE_CERTIFICATION"
+   ],
+   "freshness": "from_plan_or_report"
+  },
+  {
+   "capability_id": "DETERMINISTIC_CANDIDATE_REQUIREMENT_POLICY",
+   "title": "Candidate requirement is a deterministic policy (contract declaration + artifact-change signals), never AI judgment at terminal time",
+   "status": "FOUNDATION_READY",
+   "family": "TRUTH_AND_GOVERNANCE",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Whether a candidate is required is decided by deterministic contract declarations and artifact-change signals, never by AI judgment at terminal time, so the beginner always sees the same answer on every surface.",
+   "principle": "CANDIDATE_REQUIREMENT_IS_POLICY_NOT_JUDGMENT",
+   "origin_refs": [
+    "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+    "GC module real exercise on C27/C28 closure"
+   ],
+   "dependencies": [
+    "GOAL_CANDIDATE_RELEASE_PROMOTION_LIFECYCLE",
+    "GOAL_CLOSURE_INTEGRITY_CHECK"
+   ],
+   "freshness": "from_plan_or_report"
+  },
+  {
+   "capability_id": "C29_GOAL_CLOSURE_PACKAGING",
+   "title": "C29 self-packaging: the goal-closure checker's own terminal state (PASS + durable changes) passed the deterministic candidate policy and produced the C29 candidate",
+   "status": "FOUNDATION_READY",
+   "family": "TRUTH_AND_GOVERNANCE",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "The closure machinery applies its own candidate policy to itself, so the beginner can trust that no goal ever exempts itself from the durability contract.",
+   "principle": "SELF_APPLYING_CANDIDATE_POLICY",
+   "origin_refs": [
+    "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip",
+    "scripts/package_release.py build+verify PASS (embedded 8.4.7-C-codex.23)"
+   ],
+   "dependencies": [
+    "GOAL_CANDIDATE_RELEASE_PROMOTION_LIFECYCLE",
+    "GOAL_CLOSURE_INTEGRITY_CHECK",
+    "DETERMINISTIC_CANDIDATE_REQUIREMENT_POLICY"
+   ],
+   "freshness": "from_governance_record",
+   "implementation_refs": [
+    "scripts/p2p_goal_closure.py",
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip"
+   ]
   }
  ]
 }

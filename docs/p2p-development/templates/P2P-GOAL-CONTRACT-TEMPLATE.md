@@ -78,6 +78,30 @@ Record what was actually verified, using only these delta types: `ADDED` (new re
 | --- | --- | --- | --- | --- |
 | (e.g., `STATUS_CHANGED`) | | | | |
 
+### 13. Candidate requirement (`CANDIDATE_REQUIRED`)
+Determine before implementation using the deterministic policy: a Goal whose terminal verdict is `PASS` and which changes runtime, governance, or the release layer requires a candidate artifact (`YES`); a `BLOCKED` or `FAIL` Goal with no durable changes requires none (`NO`). The verdict recorded at close must never contradict this declared value.
+
+| Field | Value |
+| --- | --- |
+| `CANDIDATE_REQUIRED` | `YES` / `NO` |
+| Basis | terminal verdict + changed surfaces (per §5) |
+
+### 14. Goal terminal-state policy (`GOAL_TERMINAL_STATE_POLICY`)
+A Goal admits exactly one terminal verdict: `PASS` (machinery verified), `BLOCKED` (evidence durably unavailable), or `FAIL` (contradiction not recoverable).
+
+- The terminal verdict in the terminal report must equal the roadmap item status it writes: `PASS` → `DONE`, `BLOCKED` → `BLOCKED`, `FAIL` → governance records `FAIL`.
+- `BLOCKED` may never silently become `DONE`; `DONE` may never be written without the terminal report this contract demands.
+- A `PASS` that changes runtime or governance **must** produce a candidate (see §13): build, verify, SHA-256, `UNPROMOTED` record — all part of the evidence package.
+
+### 15. Roadmap expected terminal change
+State before implementation the exact roadmap row this Goal will write on closure; any divergence discovered at close stops the session and requires owner approval.
+
+| Field | Value |
+| --- | --- |
+| Expected `current` at close | `C<id>` / `<status>` |
+| Expected item status | `DONE` / `BLOCKED` / `FAIL` |
+| Expected candidate record | `YES` (label + SHA-256) / `NO` |
+
 ---
 
-*Template version 2 — extended by P2P-C26 (Capability Ledger Delta). Extend only through a goal with evidence.*
+*Template version 3 — extended by P2P-C29 (Goal Closure & Durable State Integrity: candidate requirement, terminal-state policy, roadmap expected terminal change) and by P2P-C26 (Capability Ledger Delta). Extend only through a goal with evidence.*

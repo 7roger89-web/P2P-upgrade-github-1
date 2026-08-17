@@ -20,7 +20,7 @@ Repository `7roger89-web/P2P-upgrade-github-1`. Working branch recovered as `p2p
 | --- | --- | --- | --- |
 | #1 | C25 | `main` | open, unmerged |
 | #2 | C26 | `p2p-c25-charter-ledger` | open, unmerged |
-| #3 | C27 | `p2p-c25-charter-ledger` | open, unmerged |
+| #3 | C27 | `p2p-c25-charter-ledger` at C28 time; retargeted to `p2p-c26-capability-provenance` by C29 (see C29 report §34/§35) | open, unmerged |
 | #4 | C28 | `p2p-c27-real-host-certification` | **created by this session**, open, unmerged |
 
 ## 4. C27 RECOVERED
@@ -266,3 +266,14 @@ Yes — **additive only**: `scripts/p2p_secure_onboarding.py` (new onboarding ru
 ## 60. NEXT HIGH-VALUE GAP / OWNER ACTION
 
 **The irreducible Owner action is the single highest-value unblocking move:** sign in to Codex with a real account outside chat (`codex login`), or enable the Manus API connector. One of these makes the entire C27→C28→delegation chain resume automatically (re-preflight, verify, drift-record, then re-run live certification) with zero additional technical burden on the Owner. Secondary: locate the C22 candidate package in another copy the Owner may hold (C23/C24 already recovered and SHA-verified), which gates `DELEGATION`/`PARALLEL_EXECUTION` upgrades. **STOP** — per §58, no C29 start, no C27 re-run, no live certification of Codex or Manus, no additional provider installation, no routing/controller work, no promotion.
+
+### Canonical closure metadata fields
+
+| Field | Value |
+| --- | --- |
+| `GOAL_ID` | `P2P-C28` |
+| `GOAL_TERMINAL_STATUS` | `PASS` (machinery) — roadmap status `DONE` |
+| `CANDIDATE_REQUIRED` | `YES` (terminal verdict PASS with governance and release-layer changes) |
+| `CANDIDATE_LABEL` | `P2P-8.4.7-C-Codex-Edition-v22-c28-secure-host-connection-credential-onboarding-candidate-v1.zip` |
+| `CANDIDATE_SHA256` | `7706bdcd1012225234ca31a64ee430d63902b9e6a0b278af9322b2b1ace8cb95` |
+| `ROADMAP EXPECTED TERMINAL CHANGE` | `current` -> C28/DONE; C28 item status -> DONE; candidate record appended (UNPROMOTED) |

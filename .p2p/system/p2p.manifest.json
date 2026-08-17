@@ -1,73 +1,73 @@
 {
-  "manifest_schema": "p2p-capability-manifest/1",
-  "package_name": "p2p-uiux-capability",
-  "package_version": "8.4.7-C-codex.21",
-  "baseline_compatibility": {
-    "previous_package_version": "8.4.7-C-codex.14",
-    "canonical_quorum_denominator": 8
-  },
-  "canonical_agents": [
-    "p2p_iris",
-    "p2p_tecton",
-    "p2p_axiom",
-    "p2p_vector",
-    "p2p_datos",
-    "p2p_anon",
-    "p2p_architecton",
-    "p2p_helios"
-  ],
-  "quorum": {
-    "adaptive": true,
-    "canonical_denominator": 8,
-    "full_quorum": "8/8",
-    "optional_specialists_excluded_from_denominator": true
-  },
-  "optional_specialists": [
-    {
-      "name": "p2p_aesthetica",
-      "classification": "SUPPORTING / OPTIONAL DOMAIN SPECIALIST",
-      "optional_specialist": true,
-      "canonical_quorum_member": false
-    }
-  ],
-  "capability_foundation": {
-    "registry": "p2p_capabilities/capabilities.json",
-    "runtime_root": "p2p_capabilities",
-    "doctor": "scripts/p2p_capability_doctor.py",
-    "canonical_denominator": 8,
-    "full_quorum": "8/8",
-    "optional_specialists_excluded_from_denominator": true,
-    "external_providers_required": false
-  },
-  "decision_trace": {
-    "schema": "p2p-decision-trace/1",
-    "implementation": "P2P_NATIVE",
-    "runtime": "p2p_capabilities/decision_trace.py",
-    "cli": "scripts/p2p_decision_trace.py",
-    "storage": ".p2p/state/execution-ledger.jsonl",
-    "external_dependencies_required": false
-  },
-  "upstream": {
-    "name": "ui-ux-pro-max",
-    "repository": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
-    "commit": "abb7f2fd5a083fa1ff55c326a963ff0d95c33f99",
-    "skill_metadata_version": "2.13.0",
-    "observed_tag_at_commit": "v2.14.1",
-    "license": "MIT",
-    "license_url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/LICENSE",
-    "last_verified": "2026-08-12",
-    "recheck_after": "2026-09-12",
-    "integration_mode": "PINNED REFERENCE ADAPTER; NO RUNTIME NETWORK DEPENDENCY"
-  },
-  "managed_install_roots": [
-    ".agents/skills/p2p",
-    ".agents/skills/p2p-uiux",
-    ".codex/agents",
-    ".p2p/system"
-  ],
-  "protected_project_paths": [
-    ".p2p/design",
-    ".p2p/project-state.json",
-    ".p2p/user-config.json"
-  ]
+ "manifest_schema": "p2p-capability-manifest/1",
+ "package_name": "p2p-uiux-capability",
+ "package_version": "8.4.7-C-codex.23",
+ "baseline_compatibility": {
+  "previous_package_version": "8.4.7-C-codex.14",
+  "canonical_quorum_denominator": 8
+ },
+ "canonical_agents": [
+  "p2p_iris",
+  "p2p_tecton",
+  "p2p_axiom",
+  "p2p_vector",
+  "p2p_datos",
+  "p2p_anon",
+  "p2p_architecton",
+  "p2p_helios"
+ ],
+ "quorum": {
+  "adaptive": true,
+  "canonical_denominator": 8,
+  "full_quorum": "8/8",
+  "optional_specialists_excluded_from_denominator": true
+ },
+ "optional_specialists": [
+  {
+   "name": "p2p_aesthetica",
+   "classification": "SUPPORTING / OPTIONAL DOMAIN SPECIALIST",
+   "optional_specialist": true,
+   "canonical_quorum_member": false
+  }
+ ],
+ "capability_foundation": {
+  "registry": "p2p_capabilities/capabilities.json",
+  "runtime_root": "p2p_capabilities",
+  "doctor": "scripts/p2p_capability_doctor.py",
+  "canonical_denominator": 8,
+  "full_quorum": "8/8",
+  "optional_specialists_excluded_from_denominator": true,
+  "external_providers_required": false
+ },
+ "decision_trace": {
+  "schema": "p2p-decision-trace/1",
+  "implementation": "P2P_NATIVE",
+  "runtime": "p2p_capabilities/decision_trace.py",
+  "cli": "scripts/p2p_decision_trace.py",
+  "storage": ".p2p/state/execution-ledger.jsonl",
+  "external_dependencies_required": false
+ },
+ "upstream": {
+  "name": "ui-ux-pro-max",
+  "repository": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+  "commit": "abb7f2fd5a083fa1ff55c326a963ff0d95c33f99",
+  "skill_metadata_version": "2.13.0",
+  "observed_tag_at_commit": "v2.14.1",
+  "license": "MIT",
+  "license_url": "https://raw.githubusercontent.com/nextlevelbuilder/ui-ux-pro-max-skill/main/LICENSE",
+  "last_verified": "2026-08-12",
+  "recheck_after": "2026-09-12",
+  "integration_mode": "PINNED REFERENCE ADAPTER; NO RUNTIME NETWORK DEPENDENCY"
+ },
+ "managed_install_roots": [
+  ".agents/skills/p2p",
+  ".agents/skills/p2p-uiux",
+  ".codex/agents",
+  ".p2p/system"
+ ],
+ "protected_project_paths": [
+  ".p2p/design",
+  ".p2p/project-state.json",
+  ".p2p/user-config.json"
+ ]
 }

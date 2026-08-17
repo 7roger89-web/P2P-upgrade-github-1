@@ -71,7 +71,7 @@ class P2PDevelopmentControlTests(unittest.TestCase):
             destination = root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             content = (REPO_ROOT / relative).read_text(encoding="utf-8")
-            destination.write_text(content.replace("8.4.7-C-codex.21", "8.4.7-C-codex.15").replace("8.4.7-C-codex.20", "8.4.7-C-codex.15"), encoding="utf-8")
+            destination.write_text(content.replace("8.4.7-C-codex.21", "8.4.7-C-codex.15").replace("8.4.7-C-codex.20", "8.4.7-C-codex.15").replace("8.4.7-C-codex.22", "8.4.7-C-codex.15").replace("8.4.7-C-codex.23", "8.4.7-C-codex.15"), encoding="utf-8")
         record = copy.deepcopy(load_record())
         roadmap = record["roadmap"]  # type: ignore[index]
         items = roadmap["items"]
@@ -92,8 +92,8 @@ class P2PDevelopmentControlTests(unittest.TestCase):
         record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C17"]  # type: ignore[index]
         record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C19"]  # type: ignore[index]
         record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C20"]  # type: ignore[index]
-        record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C21"]  # type: ignore[index]
-        roadmap["items"] = [item for item in items if item.get("id") not in {"C19", "C20", "C21", "C25", "C26", "C27", "C28"}]
+        record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") not in {"C21", "C28"}]  # type: ignore[index]
+        roadmap["items"] = [item for item in items if item.get("id") not in {"C19", "C20", "C21", "C25", "C26", "C27", "C28", "C29"}]
         record["current_development"]["source_version"] = "8.4.7-C-codex.15"  # type: ignore[index]
         record["current_development"]["source_version_status"] = "STALE_BLOCKED_BELOW_OFFICIAL"  # type: ignore[index]
         record["current_development"]["source_drift_classification"] = {  # type: ignore[index]
