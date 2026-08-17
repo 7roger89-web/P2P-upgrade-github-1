@@ -4426,6 +4426,73 @@
       "notes": "Terminal blocker for C31: BLOCKED / OWNER_ACTION_REQUIRED (CODEX_AUTH). Smallest actions identified by adapter safe_owner_action fields. Secrets never pasted into chat; no unofficial browser automation substituted.",
       "provenance_notes": "Directly established in C31 probe loop. Governance: development-control current_development.blocker. Extends the safe_owner_action contract of scripts/p2p_secure_onboarding.py adapters.",
       "origin_type": "PROJECT_LEARNING"
+    },
+    {
+      "capability_id": "C34_REAL_BACKEND_CONTRACT",
+      "name": "C34 Real Backend Contract Validation Surface",
+      "family": "EXECUTION_AND_ORCHESTRATION",
+      "beginner_value": "The AutoPilot core loop (C33) can drive REAL execution backends through a normalized contract: adapters translate transport only; P2P state, permissions, and verification stay authoritative.",
+      "principle": "TRANSPORT_SEPARATION",
+      "origin_refs": [
+        ".p2p/system/p2p_capabilities/backend_contract.py",
+        ".p2p/system/p2p_capabilities/backend_execution_bridge.py"
+      ],
+      "status": "VALIDATED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/hermes_adapter.py",
+        ".p2p/system/p2p_capabilities/manus_adapter.py"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_c34_real_backend_contract.py",
+        "docs/p2p-development/research/c34/P2P-C34-terminal-report.md",
+        "c34-notes/evidence/manus-probe/c34-manus-probe-create.json",
+        "c34-notes/evidence/manus-probe/c34-manus-probe-detail.json",
+        "c34-notes/evidence/manus-probe/c34-manus-probe-messages.json"
+      ],
+      "dependencies": [
+        "C33 Provider-Neutral Bounded AutoPilot Core Loop"
+      ],
+      "known_gaps": [
+        "Hermes path is ADAPTER_VALIDATED_AUTH_BLOCKED: binary v0.20.2 installed and interface-probed, but no provider credentials exist in this environment (403 AUTH_INVALID)."
+      ],
+      "do_not_duplicate_with": [
+        "C30 ExecutionTarget foundation (eligibility registry, not a request/receipt contract surface)."
+      ],
+      "next_condition": "Hermes provider credentials may elevate Hermes to LIVE_CERTIFIED; additional providers remain future candidate families.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "live_validated_for_manus_adapter_validated_for_hermes",
+      "notes": "Registry is NOT a router: no ranking, fallback, or routing semantics. Canonical 8 agents unchanged; 8/8 quorum unaffected.",
+      "origin_type": "C34_GOAL"
+    },
+    {
+      "capability_id": "C34_STATE_FAMILY_IDENTIFICATION",
+      "name": "C34 State-Family Identification and Collision Prevention",
+      "family": "EXECUTION_AND_ORCHESTRATION",
+      "beginner_value": "Durable P2P state families are identified by path keywords (autopilot-goal-state, goal-ledger, execution-ledger, evidence, capability-ledger, p2p_capabilities runtime). Conflicting semantics for the same identifier are rejected.",
+      "principle": "STATE_FAMILY_COLLISION_FREE",
+      "origin_refs": [
+        ".p2p/system/p2p_capabilities/backend_contract.py (state_family_schema_for)"
+      ],
+      "status": "VALIDATED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/backend_execution_bridge.py (state_family_identifier_for_adapter)"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_c34_real_backend_contract.py (TestStateFamilyIdentification)"
+      ],
+      "dependencies": [
+        "C33 GoalStateStore durable state"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [
+        "C30 fingerprint/drift of ExecutionTargets"
+      ],
+      "next_condition": "New durable state families register via state_family_schema_for path keywords before use.",
+      "last_reviewed": "2026-08-17",
+      "freshness": "deterministic_tested",
+      "notes": "Prevents silent aliasing of distinct durable state domains.",
+      "origin_type": "C34_GOAL"
     }
-  ]
+  ],
+  "last_reviewed": "2026-08-17"
 }
