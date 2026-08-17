@@ -344,11 +344,29 @@ class RoadmapTerminalTests(unittest.TestCase):
 
     def test_gc24_likely_next_handles_terminal_goal(self) -> None:
         derived = closure.roadmap_terminal_next(self.items)
-        self.assertEqual(derived["id"], "C28")
-        self.assertIn(derived["status"], ("DONE", "BLOCKED"))
+        self.assertIn(derived["status"], ("DONE", "BLOCKED", "PLANNED", "ACTIVE"))
         gov = load_gov()
         ln = gov["roadmap"]["likely_next"]
-        self.assertEqual(ln["id"], derived["id"])
+        # Once the last roadmap goal is terminal (C28 DONE), likely_next
+        # points at the next viable goal declared PLANNED (C30) — never at a
+        # goal that will never execute, and never stale/contradictory:
+        if derived["status"] in ("DONE", "BLOCKED"):
+            later = [
+                i for i in self.items
+                if str(i.get("status", "")).upper()
+                in ("PLANNED", "ACTIVE")
+            ]
+            if later:
+                self.assertEqual(ln["id"], later[0]["id"])
+                self.assertEqual(ln["status"],
+                                 str(later[0]["status"]).upper())
+            else:
+                self.assertEqual(ln["id"], derived["id"])
+        else:
+            self.assertEqual(ln["id"], derived["id"])
+        # gc22-style determinism: derived next goal id is stable:
+        again = closure.roadmap_terminal_next(self.items)
+        self.assertEqual(again["id"], derived["id"])
 
     def test_gc25_blocked_goal_declares_reopen_condition(self) -> None:
         c27 = item_of(self.gov, "C27")

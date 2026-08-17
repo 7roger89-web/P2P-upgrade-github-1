@@ -45,6 +45,11 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `UNKNOWN_IS_NOT_SUPPORTED` | What cannot be verified remains UNKNOWN; UNKNOWN is not "supported". |
 | `GOAL_PASS_NOT_PROMOTION` | Goal PASS, candidate verification, release readiness, and promotion are separate states. |
 | `OWNER_ONLY_FOR_GENUINE_OWNER_DECISIONS` | Ask the owner only for material decisions that cannot safely be resolved technically. |
+| `COMPONENT_IS_NOT_INTERCHANGEABLE` | Harness, provider, model, protocol, and workspace are distinct composition dimensions; the identity of one is never a proxy for the capability or auth state of another. |
+| `COMPATIBILITY_IS_NOT_CERTIFICATION` | Transport or API compatibility never implies behavioral certification; certification requires the live-certification path, never a declaration. |
+| `PERMISSION_ENVELOPE_NEVER_WIDENS` | Composing permission envelopes can only narrow or preserve the allowed set; composition never produces a permission neither side allowed. |
+| `DRIFT_FAIL_CLOSED` | Unknown contract or quiesce states fail closed for destructive lifecycle changes; an old certification never silently remains current. |
+| `REGISTRY_IS_NOT_ROUTER` | A neutral execution backend registry enumerates; it never ranks, selects, routes, or auto-falls-back for a task. |
 
 ## 4. Owner Gate — what P2P asks the owner about
 
