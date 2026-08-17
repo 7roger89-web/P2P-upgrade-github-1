@@ -71,7 +71,7 @@ class P2PDevelopmentControlTests(unittest.TestCase):
             destination = root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             content = (REPO_ROOT / relative).read_text(encoding="utf-8")
-            destination.write_text(content.replace("8.4.7-C-codex.21", "8.4.7-C-codex.15").replace("8.4.7-C-codex.20", "8.4.7-C-codex.15").replace("8.4.7-C-codex.22", "8.4.7-C-codex.15").replace("8.4.7-C-codex.23", "8.4.7-C-codex.15"), encoding="utf-8")
+            destination.write_text(content.replace("8.4.7-C-codex.21", "8.4.7-C-codex.15").replace("8.4.7-C-codex.20", "8.4.7-C-codex.15").replace("8.4.7-C-codex.22", "8.4.7-C-codex.15").replace("8.4.7-C-codex.23", "8.4.7-C-codex.15").replace("8.4.7-C-codex.24", "8.4.7-C-codex.15"), encoding="utf-8")
         record = copy.deepcopy(load_record())
         roadmap = record["roadmap"]  # type: ignore[index]
         items = roadmap["items"]

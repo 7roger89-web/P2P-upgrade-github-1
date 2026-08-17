@@ -63,24 +63,23 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at generation time (135 records, 12 families):
-
+Counts per family in `capability-index.json` at generation time (153 records, 12 families):
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
-| Truth & Governance | 18 | VERIFIED_IMPLEMENTED + FOUNDATION_READY (adds GOAL_CLOSURE_INTEGRITY_CHECK, DETERMINISTIC_CANDIDATE_REQUIREMENT_POLICY from C29) |
-| Durable Project Intelligence | 10 | mix, incl. rejected-pattern preservation |
-| Context & Knowledge | 35 | VERIFIED_IMPLEMENTED + FOUNDATION_READY + 20 owner-accepted PLANNED intakes |
-| Skill & Learning | 5 | VERIFIED_IMPLEMENTED |
-| Execution & Orchestration | 15 | VERIFIED_IMPLEMENTED + rejected patterns |
-| Design & Product Intelligence | 6 | VERIFIED_IMPLEMENTED |
-| Multi-AI Interoperability | 21 | FOUNDATION_READY + UNKNOWN (C22–C24 gap + C27 machinery) + C28 onboarding |
-| Routing & Cognitive Economy | 4 | mix |
+| Truth & Governance | 20 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
+| Durable Project Intelligence | 10 | VERIFIED_IMPLEMENTED + REJECTED |
+| Context & Knowledge | 35 | PLANNED + VERIFIED_IMPLEMENTED |
+| Skill & Learning | 5 | VERIFIED_IMPLEMENTED + PARTIAL |
+| Execution & Orchestration | 22 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
+| Design & Product Intelligence | 6 | VERIFIED_IMPLEMENTED + REJECTED |
+| Multi-AI Interoperability | 29 | FOUNDATION_READY + REJECTED |
+| Routing & Cognitive Economy | 4 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
 | Verification & Evaluation | 6 | VERIFIED_IMPLEMENTED |
-| Recovery & Continuation | 5 | mix |
-| Beginner Lifecycle | 7 | mix |
-| Outcome Learning | 3 | mix |
-
+| Recovery & Continuation | 5 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
+| Beginner Lifecycle | 7 | VERIFIED_IMPLEMENTED + PARTIAL |
+| Outcome Learning | 4 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
 Status vocabulary used by the ledger: `VERIFIED_IMPLEMENTED`, `FOUNDATION_READY`, `PARTIAL`, `PLANNED`, `DEFERRED`, `REJECTED`, `OBSOLETE`, `UNKNOWN`.
+
 
 ### 3a. Owner-accepted context/session capability intake (C26, 20 records, all `PLANNED`)
 
@@ -113,16 +112,18 @@ The ledger now makes prerequisite reasoning explicit: every record declares `dep
 - `TASK_TARGETED_STATE_ARCHITECTURE_FOUNDATION_READY`, `RECOVERY_TESTABILITY_FOUNDATION_READY`, `TASK_STATE_RECOVERY_IMPLEMENTED` (C13/C19 lineage)
 - `DURABLE_PROJECT_TRUTH_PACKAGING_FOUNDATION_READY` (C25)
 
+### 3e. C30 composable execution target foundation (2026-08-17)
+C30 delivered the **provider-neutral, deterministic composable execution target foundation** — `scripts/p2p_execution_target.py` — with 60 passing tests (`tests/test_p2p_execution_target.py` ET1..ET60) and a durable research intake artifact (`docs/p2p-development/research/execution-target-pattern-research.md`, nine source repositories, patterns A–O, no code copied). The module models execution as an honest composition of a harness, a provider, a model, a protocol, a toolset, a workspace, an environment, auth (harness and provider kept separate), and a permission envelope; `UNKNOWN` and stale evidence fail closed, protocol compatibility is never certification, permission composition never widens, and the registry enumerates but never routes. Honest gaps are durably recorded: no router, no autopilot, no background autonomy, no real execution, no second executor, and no secrets stored. Terminal state: **PASS (foundation)**, candidate UNPROMOTED per the C29 deterministic policy.
+
 ## 5. Recommended next goals (ordered, NOT auto-started)
 
 Ordering follows the ledger's dependency graph and governance's `research_decisions`. Starting any goal still requires a new chat, an owner prompt, and that goal's own evidence contract. No goal starts automatically.
 
 1. **C27/C28 completion — live host certification with real credentials (reopen condition, metadata only, never auto-executed).** The largest remaining evidence gap: live certification of a real AI host (Codex CLI target; also Manus/Codex adapters). The C27 session delivered the certification machinery and an honest host-by-host blocked record; the C28 session delivered the secure connection onboarding layer that makes resuming cheap and beginner-safe. Reopen condition (durably recorded on the C27 roadmap item): at least one real host reaches `connection_status AUTH_REQUIRED` or stronger (live probe eligible). Meeting it still requires one irreducible Owner action performed outside chat — sign in to Codex (`codex login` with a real account) or configure the Manus API connector — then say "continue" in a new chat and P2P re-verifies automatically. Resolves the `C22_C24_ADAPTER_LIVE_CERTIFICATION`, `REAL_HOST_EXECUTION_CERTIFICATION`, and Codex `AUTH_INVALID` records.
-2. **C30 — Live delegation and parallel execution certification.** Depends on C27 evidence. Upgrades `DELEGATION` and `PARALLEL_EXECUTION` from `FOUNDATION_READY`.
-3. **C31 — Cross-host continuation and round-trip binding.** Depends on C27/C28. Upgrades `CROSS_HOST_CONTINUATION_CONTRACT`, `ROUND_TRIP_BINDING`, `CROSS_HOST_RESUME`.
-4. **C32 — Beginner control center view layer.** Depends on nothing new; beginner-friendly dashboard for status/decisions (control center, health views, decision inbox).
-5. **C33 — Context/session/cache efficiency implementation (first batch).** Owner-accepted intakes (§3a); pick the batch with the strongest beginner value and dependency readiness, with one primary objective per goal contract.
-6. **Roadmap hygiene (ongoing):** reconcile the recovered C23/C24 packages' internals against the original implementations, and search for the C22 package in other copies the owner may hold, before claiming progression beyond recovery-level provenance.
+2. **C31 — Cross-host continuation and round-trip binding.** Depends on C27/C28. Upgrades `CROSS_HOST_CONTINUATION_CONTRACT`, `ROUND_TRIP_BINDING`, `CROSS_HOST_RESUME`.
+3. **C32 — Beginner control center view layer.** Depends on nothing new; beginner-friendly dashboard for status/decisions (control center, health views, decision inbox).
+4. **C33 — Context/session/cache efficiency implementation (first batch).** Owner-accepted intakes (§3a); pick the batch with the strongest beginner value and dependency readiness, with one primary objective per goal contract.
+5. **Roadmap hygiene (ongoing):** reconcile the recovered C23/C24 packages' internals against the original implementations, and search for the C22 package in other copies the owner may hold, before claiming progression beyond recovery-level provenance.
 
 ## 6. Regeneration rule
 

@@ -165,7 +165,8 @@
     "governance/drift-policy.json"
    ],
    "evidence_refs": [
-    "tests/test_p2p_governance_drift.py"
+    "tests/test_p2p_governance_drift.py",
+    "C30-LEDGER-RECONCILE-001"
    ],
    "dependencies": [
     "PROVENANCE"
@@ -177,7 +178,7 @@
    "next_condition": "Maintain the locked manifest; extend sealed set only via approval.",
    "last_reviewed": "2026-08-17",
    "freshness": "verified_against_filesystem",
-   "notes": "",
+   "notes": "C30: contract-identity drift and target fingerprinting build on the drift gate.",
    "origin_type": "PROJECT_LEARNING"
   },
   {
@@ -2402,10 +2403,12 @@
     ".p2p/system/p2p_capabilities/host_executor.py"
    ],
    "evidence_refs": [
-    "tests/test_p2p_host_executor.py (HN1-HN24)"
+    "tests/test_p2p_host_executor.py (HN1-HN24)",
+    "C30-LEDGER-RECONCILE-001"
    ],
    "dependencies": [
-    "HOST_EXECUTOR_NEUTRALITY"
+    "HOST_EXECUTOR_NEUTRALITY",
+    "COMPOSABLE_EXECUTION_TARGET"
    ],
    "known_gaps": [
     "End-to-end cross-host envelope execution not durably evidenced in this copy."
@@ -2416,7 +2419,7 @@
    "next_condition": "Live cross-host envelope round trip test.",
    "last_reviewed": "2026-08-17",
    "freshness": "from_plan_or_report",
-   "notes": "C20 foundation record; live certification pending adapter evidence.",
+   "notes": "C20 foundation record; live certification pending adapter evidence. C30: execution target composition extends the portable execution envelope.",
    "origin_type": "PROJECT_LEARNING"
   },
   {
@@ -2911,10 +2914,13 @@
    "implementation_refs": [
     ".p2p/system/p2p_capabilities/routing.py"
    ],
-   "evidence_refs": [],
+   "evidence_refs": [
+    "C30-LEDGER-RECONCILE-001"
+   ],
    "dependencies": [
     "HOST_SELECTION",
-    "DURABLE_TASK_STATE"
+    "DURABLE_TASK_STATE",
+    "HEALTH_OWNERSHIP_LADDER"
    ],
    "known_gaps": [
     "Not implemented; requires live multi-host evidence."
@@ -2923,7 +2929,7 @@
    "next_condition": "Depends on live adapter certification (C22-C24 scope).",
    "last_reviewed": "2026-08-17",
    "freshness": "origin_unknown_or_not_durably_recovered",
-   "notes": "",
+   "notes": "C30: health/ownership ladder extends host fallback with an honesty vocabulary.",
    "origin_type": "PROJECT_LEARNING"
   },
   {
@@ -3288,7 +3294,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3309,7 +3316,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3330,7 +3338,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3351,7 +3360,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3372,7 +3382,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3393,7 +3404,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3414,7 +3426,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3435,7 +3448,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3456,7 +3470,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3477,7 +3492,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3498,7 +3514,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3519,7 +3536,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3540,7 +3558,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [],
@@ -3559,7 +3578,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [],
@@ -3578,7 +3598,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3599,7 +3620,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3620,7 +3642,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3641,7 +3664,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [],
@@ -3660,7 +3684,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [],
@@ -3679,7 +3704,8 @@
    "origin_refs": [
     "docs/p2p-development/P2P-C26-terminal-report.md",
     "docs/p2p-development/current-roadmap.md",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
    ],
    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
    "dependencies": [
@@ -3846,6 +3872,455 @@
     "scripts/p2p_goal_closure.py",
     "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip"
    ]
+  },
+  {
+   "capability_id": "C30_COMPOSABLE_EXECUTION_TARGET_PACKAGING",
+   "title": "C30 self-packaging: the composable ExecutionTarget foundation (provider-neutral architecture, eligibility evaluation, fingerprint/drift, backend registry) passed its own candidate policy and produced the C30 candidate",
+   "status": "FOUNDATION_READY",
+   "family": "TRUTH_AND_GOVERNANCE",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Execution is described as a composition of neutral parts (Harness + Provider + Model + Protocol + ToolSet + Workspace + Environment + Auth + Permission + Freshness). No single AI vendor is hard-coded, so the beginner can swap providers without rewriting the project.",
+   "principle": "PROVIDER_NEUTRAL_COMPOSABLE_EXECUTION",
+   "origin_refs": [
+    "docs/p2p-development/reports/P2P-C30-terminal-report.md",
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
+    "scripts/package_release.py build+verify PASS (embedded 8.4.7-C-codex.24)"
+   ],
+   "dependencies": [
+    "GOAL_CANDIDATE_RELEASE_PROMOTION_LIFECYCLE",
+    "DETERMINISTIC_CANDIDATE_REQUIREMENT_POLICY",
+    "GOAL_CLOSURE_INTEGRITY_CHECK"
+   ],
+   "freshness": "from_governance_record",
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py",
+    "docs/p2p-development/research/execution-target-pattern-research.md",
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip"
+   ]
+  },
+  {
+   "capability_id": "COMPOSABLE_EXECUTION_TARGET",
+   "name": "Composable Execution Target",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Task execution requirements, the harness that runs them, the model provider behind the model, and the protocol surface are checked as one honest composition instead of one assumed promise, so a beginner never gets an execution environment that merely looks capable.",
+   "principle": "COMPOSITION_HONESTY",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md",
+    "C30 terminal report"
+   ],
+   "dependencies": [
+    "PERMISSION_ENVELOPE",
+    "DRIFT_GATE"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [
+    "Runtime wiring to an actual harness provider is deliberately out of scope (no router, no real execution)."
+   ],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "MODEL_PROVIDER_ABSTRACTION",
+   "name": "Model Provider Abstraction",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "The model's provider is a separate identity from the model itself, so switching providers never silently changes what the model claims to be able to do.",
+   "principle": "PROVIDER_NEUTRALITY",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "PORTABLE_EXECUTION_ENVELOPE"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [
+    "Endpoint identity recorded; no live endpoint discovery."
+   ],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "MODEL_PROFILE",
+   "name": "Model Profile",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Each model's tool-calling, structured output, and freshness state are recorded explicitly, so an undocumented model behavior is treated as unknown, never as supported.",
+   "principle": "EVIDENCE_HONESTY",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "MODEL_PROVIDER_ABSTRACTION"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "EFFECTIVE_CAPABILITY_COMPOSITION",
+   "name": "Effective Capability Composition",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "FOUNDATION_READY",
+   "origin_type": "ARCHITECTURE_INVARIANT",
+   "beginner_value": "A capability is only supported when every component that owns it says so; one 'no' outvotes many 'yes', so claimed ability is never assumed.",
+   "principle": "INTERSECTION_CONSENSUS",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "EXECUTION_BACKEND_REGISTRY",
+   "name": "Execution Backend Registry",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Known harnesses, providers, models, and protocols are enumerated in a neutral registry that never picks, ranks, or routes — the beginner sees the landscape without the tool making silent choices for them.",
+   "principle": "NEUTRAL_ENUMERATION",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET",
+    "MODEL_PROVIDER_ABSTRACTION"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [
+    "Distinct from the Capability Ledger by design; no task state is stored."
+   ],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "TASK_WORKSPACE_ISOLATION",
+   "name": "Task Workspace Isolation (modeled)",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "The workspace class a task needs (sandbox, current repo, read-only) is declared and checked before execution, so a task never silently runs in the wrong place.",
+   "principle": "ISOLATION_BY_CONTRACT",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET",
+    "PERMISSION_ENVELOPE"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [
+    "Profile/eligibility only; actual isolation runtime is a later goal."
+   ],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "STRUCTURED_HEADLESS_EXECUTION",
+   "name": "Structured Headless Execution (contract)",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Execution is a structured request/lifecycle/result/receipt contract rather than UI scraping, so every run produces the same honest evidence shape regardless of surface.",
+   "principle": "STRUCTURED_RESULT_CONTRACT",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "FAILURE_ONLY_DIAGNOSTICS",
+   "name": "Failure-Only Diagnostics",
+   "family": "OUTCOME_LEARNING",
+   "status": "FOUNDATION_READY",
+   "origin_type": "ARCHITECTURE_INVARIANT",
+   "beginner_value": "Success produces minimal structured evidence and failure produces richer bounded diagnostics, so the beginner is never flooded with noise when things go right and never left guessing when they fail.",
+   "principle": "FAILURE_DIAGNOSTICS_BUDGET",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "HARNESS_AUTH_PROFILE",
+   "name": "Harness Auth Profile",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "The harness credential reference is kept separate from the provider credential reference, and neither value is stored, so the beginner's accounts never leak into the data model.",
+   "principle": "SECRET_NEVER_STORED",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "MODEL_PROVIDER_AUTH_PROFILE",
+   "name": "Model Provider Auth Profile",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Provider auth is a separate state from harness auth and presence is never promoted to validity, so a stored but unverified key never pretends to work.",
+   "principle": "AUTH_PRESENCE_HONESTY",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "MODEL_PROVIDER_ABSTRACTION",
+    "HARNESS_AUTH_PROFILE"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "PROTOCOL_CAPABILITY_PROFILE",
+   "name": "Protocol Capability Profile",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Tool-protocol support is declared as a distinct profile that can never satisfy an execution-capability requirement on its own, so protocol compatibility is never mistaken for real execution power.",
+   "principle": "COMPATIBILITY_NEVER_CERTIFICATION",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "EXECUTION_BACKEND_REGISTRY"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "TARGET_FINGERPRINT_DRIFT",
+   "name": "Target Fingerprint and Contract Drift",
+   "family": "TRUTH_AND_GOVERNANCE",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "Every execution target gets a stable fingerprint that changes on material change, and an old certification can never silently stay current, so nothing drifts into being trusted by accident.",
+   "principle": "MATERIAL_CHANGE_INVALIDATES_CERTIFICATION",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "DRIFT_GATE",
+    "COMPOSABLE_EXECUTION_TARGET"
+   ],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "HEALTH_OWNERSHIP_LADDER",
+   "name": "Health and Ownership Ladder",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "FOUNDATION_READY",
+   "origin_type": "IMPLEMENTATION_GOAL",
+   "beginner_value": "A process being healthy is not the same as belonging to P2P: health and ownership are separate rungs on one ladder, so a borrowed healthy process is never claimed as the project's own.",
+   "principle": "HEALTHY_NOT_OWNED",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [],
+   "implementation_refs": [
+    "scripts/p2p_execution_target.py"
+   ],
+   "evidence_refs": [
+    "tests/test_p2p_execution_target.py"
+   ],
+   "known_gaps": [
+    "Probe mechanics are a later goal; the vocabulary is the durable part."
+   ],
+   "freshness": "verified_against_filesystem",
+   "last_reviewed": "2026-08-17"
+  },
+  {
+   "capability_id": "SAFE_QUIESCE_AND_DRAIN",
+   "name": "Safe Quiesce and Drain",
+   "family": "EXECUTION_AND_ORCHESTRATION",
+   "status": "PLANNED",
+   "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+   "beginner_value": "Work can be drained and the executor quiesced before a destructive lifecycle change, with unknown states failing closed, so nothing mid-task is silently killed.",
+   "principle": "DRAIN_BEFORE_DESTRUCT",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md",
+    "C30 terminal report"
+   ],
+   "dependencies": [
+    "COMPOSABLE_EXECUTION_TARGET",
+    "HEALTH_OWNERSHIP_LADDER"
+   ],
+   "implementation_refs": [],
+   "evidence_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md (pattern J)"
+   ],
+   "known_gaps": [
+    "Implementation is a later goal; vocabulary + fail-closed semantics only so far."
+   ],
+   "freshness": "from_governance_record",
+   "last_reviewed": "2026-08-17",
+   "notes": "Recorded intent only — implementation is not claimed; runtime work requires a later goal with its own evidence contract."
+  },
+  {
+   "capability_id": "PROVIDER_NEUTRAL_AUTOPILOT",
+   "name": "Provider-Neutral Autopilot (intent only)",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "PLANNED",
+   "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+   "beginner_value": "Autopilot intent is recorded as a neutral capability, not tied to any vendor's autopilot feature, so the beginner's autonomy level is chosen by policy and never inherited from a product default.",
+   "principle": "RECORDED_NOT_IMPLEMENTED",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md",
+    "C30 terminal report"
+   ],
+   "dependencies": [],
+   "implementation_refs": [],
+   "evidence_refs": [],
+   "known_gaps": [
+    "Explicitly recorded-not-implemented; no autopilot behavior exists in the codebase."
+   ],
+   "freshness": "from_governance_record",
+   "last_reviewed": "2026-08-17",
+   "notes": "Recorded intent only — implementation is not claimed; runtime work requires a later goal with its own evidence contract."
+  },
+  {
+   "capability_id": "PLANNER_PROVIDER_NEUTRALITY",
+   "name": "Planner Provider Neutrality",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "PLANNED",
+   "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+   "beginner_value": "Planning logic does not assume any specific provider's planning surface, so a planning skill portable across providers is possible without vendor lock-in.",
+   "principle": "PROVIDER_NEUTRALITY",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "MODEL_PROVIDER_ABSTRACTION"
+   ],
+   "implementation_refs": [],
+   "evidence_refs": [],
+   "known_gaps": [
+    "Recorded intent; implementation deferred to a later goal."
+   ],
+   "freshness": "from_governance_record",
+   "last_reviewed": "2026-08-17",
+   "notes": "Recorded intent only — implementation is not claimed; runtime work requires a later goal with its own evidence contract."
+  },
+  {
+   "capability_id": "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
+   "name": "Model Provider Swap Without Core Change",
+   "family": "MULTI_AI_INTEROPERABILITY",
+   "status": "PLANNED",
+   "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+   "beginner_value": "The core execution contract does not encode any provider, so swapping the provider later does not force a rewrite of the project's core.",
+   "principle": "PROVIDER_NEUTRALITY",
+   "origin_refs": [
+    "docs/p2p-development/research/execution-target-pattern-research.md"
+   ],
+   "dependencies": [
+    "MODEL_PROVIDER_ABSTRACTION",
+    "EXECUTION_BACKEND_REGISTRY"
+   ],
+   "implementation_refs": [],
+   "evidence_refs": [],
+   "known_gaps": [
+    "Foundation (profiles) exists; full swap mechanics deferred."
+   ],
+   "freshness": "from_governance_record",
+   "last_reviewed": "2026-08-17",
+   "notes": "Recorded intent only — implementation is not claimed; runtime work requires a later goal with its own evidence contract."
   }
  ]
 }

@@ -51,9 +51,9 @@
     }
   },
   "current_development": {
-    "development_goal": "C29",
+    "development_goal": "C30",
     "status": "CANDIDATE_UNPROMOTED",
-    "source_version": "8.4.7-C-codex.23",
+    "source_version": "8.4.7-C-codex.24",
     "source_version_status": "CANDIDATE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
     "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
@@ -79,8 +79,8 @@
         "E3-P3-C21-PACKAGE"
       ]
     },
-    "historical_maintenance_mode": "DISABLED",
-    "owner_action_required": "C29 terminal PASS (closure integrity reconciled); candidates remain UNPROMOTED; C27 reopen needs one Owner action outside chat (codex login or Manus API connector); no goal auto-started.",
+    "historical_maintenance_mode": false,
+    "owner_action_required": "C30 terminal PASS (provider-neutral execution foundation + durable research intake); candidates remain UNPROMOTED; C27 reopen needs one Owner action outside chat (codex login or Manus API connector); no goal auto-started.",
     "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
     "lineage_reconciliation": {
       "from_source_version": "8.4.7-C-codex.15",
@@ -94,11 +94,6 @@
         "E1-P1A-LINEAGE1"
       ]
     },
-    "candidate_id": "C29",
-    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip",
-    "candidate_sha256": "61ed699297f91cdc6e545c796f046c313e2318b8838da9442f5e82f1d2825e8f",
-    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-    "promotion_status": "UNPROMOTED",
     "foundation_status": "ONBOARDING_MACHINERY_FOUNDATION_READY",
     "portable_execution_envelope_ready": true,
     "portable_result_receipt_ready": true,
@@ -107,7 +102,10 @@
     "live_manus_adapter_certified": false,
     "host_requirement_profile_ready": true,
     "host_capability_discovery_foundation_ready": true,
-    "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip"
+    "candidate_id": "C30",
+    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
+    "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+    "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip"
   },
   "candidate_records": [
     {
@@ -356,6 +354,25 @@
         "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.23, official baseline 8.4.7-C-codex.19",
         "docs/p2p-development/reports/P2P-C29-terminal-report.md"
       ]
+    },
+    {
+      "candidate_id": "C30",
+      "development_goal": "C30",
+      "candidate_version": "8.4.7-C-codex.24",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
+      "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+      "embedded_version": "8.4.7-C-codex.24",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "verify PASS; full lineage verify pending owner action (codex login / Manus connector)",
+      "package_verify_evidence": "status PASS, embedded 8.4.7-C-codex.24, official baseline 8.4.7-C-codex.19",
+      "evidence_refs": [
+        "scripts/package_release.py build on staged source: RC 0",
+        "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.24, official baseline 8.4.7-C-codex.19",
+        "docs/p2p-development/reports/P2P-C30-terminal-report.md"
+      ]
     }
   ],
   "capability_status": [
@@ -475,6 +492,18 @@
       "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
       "promotion_status": "UNPROMOTED",
       "evidence_ref": "E2-P2-C21-HS1-HS30"
+    },
+    {
+      "id": "C30",
+      "status": "IN_PROGRESS",
+      "result": "MACHINERY_FOUNDATION_READY",
+      "composable_execution_target_foundation": true,
+      "provider_neutral_intake_recorded": true,
+      "candidate_id": "C30",
+      "candidate_version": "8.4.7-C-codex.24",
+      "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+      "promotion_status": "UNPROMOTED",
+      "evidence_ref": "E0-C30-ET1-ET60; C30 candidate built, verify PASS, UNPROMOTED"
     }
   ],
   "design_intelligence": {
@@ -714,19 +743,31 @@
         "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
         "evidence_ref": "GOAL-C28",
         "notes": "C28 terminal state: PASS (machinery). Full provider-neutral connection + credential onboarding layer implemented and verified (70 HO tests, 31/31 validator, secret scan 0). No host claimed live-certified; owner action codex login / Manus connector remains the irreducible next step."
+      },
+      {
+        "id": "C30",
+        "status": "PLANNED",
+        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
+        "evidence_ref": "GOAL-C30",
+        "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery)."
       }
     ],
     "current": {
       "id": "C28",
       "status": "DONE",
-      "title": "Secure Host Connection & Credential Onboarding - determine required auth, verify safely, minimal Owner action outside chat"
+      "title": "Controlled continuation"
     },
     "likely_next": {
-      "id": "C28",
-      "status": "DONE",
-      "title": "Secure Host Connection & Credential Onboarding - determine required auth, verify safely, minimal Owner action outside chat"
+      "id": "C30",
+      "status": "PLANNED",
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
     },
-    "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion."
+    "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion.",
+    "likely_next_goal": {
+      "id": "C30",
+      "status": "PLANNED",
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+    }
   },
   "research_decisions": [
     {
@@ -875,6 +916,43 @@
       "authority_refs": [
         "governance/approval-policy.json",
         "scripts/package_release.py"
+      ]
+    },
+    {
+      "id": "component-is-not-interchangeable",
+      "statement": "Harness, provider, model, protocol, and workspace are distinct composition dimensions; the identity of one is never a proxy for the capability or auth state of another.",
+      "authority_refs": [
+        "scripts/p2p_execution_target.py",
+        "docs/p2p-development/research/execution-target-pattern-research.md"
+      ]
+    },
+    {
+      "id": "compatibility-is-not-certification",
+      "statement": "Transport or API compatibility never implies behavioral certification; certification requires the live-certification path, never a declaration.",
+      "authority_refs": [
+        "scripts/p2p_execution_target.py"
+      ]
+    },
+    {
+      "id": "permission-envelope-never-widens",
+      "statement": "Composing permission envelopes can only narrow or preserve the allowed set; composition never produces a permission neither side allowed.",
+      "authority_refs": [
+        "scripts/p2p_execution_target.py"
+      ]
+    },
+    {
+      "id": "drift-fail-closed",
+      "statement": "Unknown contract or quiesce states fail closed for destructive lifecycle changes; an old certification never silently remains current.",
+      "authority_refs": [
+        "scripts/p2p_execution_target.py",
+        "governance/drift-policy.json"
+      ]
+    },
+    {
+      "id": "registry-is-not-router",
+      "statement": "A neutral execution backend registry enumerates; it never ranks, selects, routes, or auto-falls-back for a task.",
+      "authority_refs": [
+        "scripts/p2p_execution_target.py"
       ]
     }
   ],
@@ -1230,7 +1308,8 @@
     "p2p-c26-capability-provenance": "p2p-c25-charter-ledger",
     "p2p-c27-real-host-certification": "p2p-c26-capability-provenance",
     "p2p-c28-secure-onboarding": "p2p-c27-real-host-certification",
-    "p2p-c29-goal-closure-integrity": "p2p-c28-secure-onboarding"
+    "p2p-c29-goal-closure-integrity": "p2p-c28-secure-onboarding",
+    "p2p-c30-composable-execution-target": "p2p-c29-goal-closure-integrity"
   },
   "provenance": [
     {
@@ -1243,6 +1322,25 @@
       ],
       "origin_refs": [
         "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+        "scripts/package_release.py build+verify"
+      ]
+    },
+    {
+      "change_id": "C30-IMPLEMENTATION-001",
+      "goal": "C30",
+      "action": "C30 goal declared; roadmap item PLANNED; current_development moved to C30 (IN_PROGRESS, source 8.4.7-C-codex.24); research intake artifact durable; candidate per C29 policy after packaging",
+      "evidence_ref": "docs/p2p-development/research/execution-target-pattern-research.md"
+    },
+    {
+      "change_id": "C30-PACKAGING",
+      "goal": "C30",
+      "timestamp": "2026-08-17T05:45:28Z",
+      "description": "C30 terminal PASS + governance/runtime/release changes; deterministic candidate policy self-applied: C30 candidate built (RC 0), verified (PASS, embedded 8.4.7-C-codex.24), SHA-256 recorded; UNPROMOTED.",
+      "artifact_refs": [
+        "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip"
+      ],
+      "origin_refs": [
+        "docs/p2p-development/reports/P2P-C30-terminal-report.md",
         "scripts/package_release.py build+verify"
       ]
     }
