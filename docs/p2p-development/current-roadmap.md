@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-17 by the P2P-C26/C27/C28/C29 durable development session (derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-17 (regenerated per §6 by the C34 final-security closure session) (derived, not authored-by-hand as a decision document).
 
 ## 1. Official baseline
 
@@ -63,7 +63,7 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at generation time (156 records, 12 families):
+Counts per family in `capability-index.json` at regeneration time (158 records, 12 families):
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
 | Truth & Governance | 20 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
