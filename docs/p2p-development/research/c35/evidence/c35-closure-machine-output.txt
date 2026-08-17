@@ -1,0 +1,21 @@
+policy_check_result: {
+  "status": "NON_CANONICAL_TERMINAL_STATUS",
+  "error": "report lacks a canonical GOAL_TERMINAL_STATUS",
+  "lane": "PASS-trigger does not fire; candidate minted under fail-closed governance per the C33 precedent (runtime surface changed while terminal state is non-canonical)"
+}
+Goal C35: INCONSISTENT
+  [PASS] CURRENT_DEVELOPMENT_SEMANTICS: current_development.development_goal='C31' == roadmap.current.id='C28'
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability REAL_HOST_EXECUTION_CERTIFICATION status='' (correctly not a machinery claim)
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability HOST_AUTH_STATE_VERIFICATION status='' (correctly not a machinery claim)
+  [PASS] CLAIM_BOUNDARY: ROUTER not introduced
+  [PASS] CLAIM_BOUNDARY: CONTEXT_CONTROLLER not introduced
+  [PASS] CLAIM_BOUNDARY: AUTH_ACTION not introduced
+  [PASS] CLAIM_BOUNDARY: SECOND_EXECUTOR not introduced
+  [PASS] CLAIM_BOUNDARY: BACKGROUND_AUTONOMY not introduced
+  [FAIL] ROADMAP_ITEM_EXISTS: C35 has no roadmap item (roadmap ends at C31 PLANNED; C35 closed on this branch; roadmap sync is C36 metadata work)
+  [PASS] CANDIDATE_POLICY_NON_CANONICAL_LANE: PASS-trigger does not fire; candidate minted under fail-closed governance per the C33 precedent (runtime surface changed while terminal state is non-canonical)
+{
+  "goal_closure_machine": "INCONSISTENT",
+  "findings": 10,
+  "hard_fails": 1
+}

@@ -654,6 +654,11 @@ class TestCandidatePolicyAudit:
             # C34 closure-reconciliation C33 candidate artifact (unpromoted,
             # persisted per the deterministic candidate policy applied to C33).
             "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c33-provider-neutral-bounded-autopilot-core-candidate-v1.zip",
+            # C35 final-governance-closure C35 candidate artifact (unpromoted,
+            # minted under fail-closed governance per the C33 precedent).
+            "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip",
+            # C35 closure research evidence tree (authorized closure growth).
+            "docs/p2p-development/research/c35/",
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.
@@ -690,6 +695,19 @@ class TestCandidatePolicyAudit:
             "tests/test_p2p_live_certification.py",
             "tests/test_p2p_ledger_provenance.py",
             "tests/test_p2p_c34_real_backend_contract.py",
+            # C35 final-governance-closure: canonical terminal report, this
+            # test's C35-authorized approved-set growth, and the C35 runtime
+            # surface (authorized closure edit per the C34 precedent).
+            "docs/p2p-development/reports/P2P-C35-terminal-report.md",
+            "tests/test_p2p_c35_provider_neutral_runtime.py",
+            ".p2p/system/p2p_capabilities/agent_role.py",
+            ".p2p/system/p2p_capabilities/role_contract.py",
+            ".p2p/system/p2p_capabilities/role_eligibility.py",
+            ".p2p/system/p2p_capabilities/role_receipt.py",
+            ".p2p/system/p2p_capabilities/role_verifier.py",
+            ".p2p/system/p2p_capabilities/role_bridge.py",
+            ".p2p/system/p2p_capabilities/role_quorum.py",
+            ".p2p/system/p2p_capabilities/fake_targets.py",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:

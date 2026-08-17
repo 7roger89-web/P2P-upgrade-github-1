@@ -63,9 +63,14 @@ Full-repo regression was measured against the C34 baseline (17 failing / 736 pas
 
 **Constraints honored**: no live backend calls, no Manus certification expansion, no BackendExecutionBridge fork, no vendor branching, bounded dispatch, deterministic everywhere.
 
-## 7. Remaining governance steps (not part of this change set)
+## 7. Final governance closure (this change set — closure evidence)
+The C35 final governance closure was executed on `p2p-c34-real-backend-contract-validation`-stacked branch `c35-provider-neutral-runtime` (final head `ca12d57`):
+- **Candidate artifact** minted and deterministically verified (`ARTIFACT_VERIFY_PASS`, RC 0): `reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip` (8 runtime modules + `c35-candidate-manifest.json`; content hash `9ca8215d…`, ZIP SHA256 `077971e3…`).
+- **Candidate policy machine lane**: terminal verdict `PROVIDER_NEUTRAL_AGENT_RUNTIME_READY` is non-canonical (`normalize_terminal_status` → `None`), so the canonical `PASS`-trigger lane does not fire; the candidate was minted under fail-closed governance per the C33 precedent (runtime surface changed while terminal state is non-canonical).
+- **Goal-closure machinery run** (scripts/p2p_goal_closure.py checks, saved at `docs/p2p-development/research/c35/evidence/c35-closure-machine-output.txt`): `INCONSISTENT` with 1 hard fail (`ROADMAP_ITEM_EXISTS` — the roadmap ends at C31; a C35 item and sync belong to C36 metadata work and are not force-fixed) and 9 passing checks including claim-boundary and capability-separation checks.
+- **Verdict**: `C35_CANDIDATE_GOVERNANCE_COMPLETE` — candidate minted, UNPROMOTED, evidence persisted; no merge, no promote, no release, no C36 start.
 
-The candidate artifact (`reports/candidates/…-c35-…zip`), terminal report finalization, and candidate-policy compliance run belong to the standard C33/C34 goal-closure workflow on `p2p_goal_closure.py` and should be executed in a follow-up commit once this PR is reviewed, since they are tracked governance artifacts rather than runtime code.
+Governance artifacts are tracked per the C34 approved-modifications precedent: the candidate artifact, the canonical terminal report (`docs/p2p-development/reports/P2P-C35-terminal-report.md`), the C35 candidate record in `governance/development-control.json`, and the closure-machine evidence.
 
 ---
 
@@ -98,6 +103,6 @@ The candidate artifact (`reports/candidates/…-c35-…zip`), terminal report fi
 25. **Draft PR #11** đã được tạo nhắm vào nhánh C34: https://github.com/7roger89-web/P2P-upgrade-github-1/pull/11
 26. Mô tả PR đầy đủ bảng module, invariants, và kết quả xác minh; để ở trạng thái Draft theo yêu cầu "Draft PR #11".
 27. Terminal verdict: `PROVIDER_NEUTRAL_AGENT_RUNTIME_READY` (ứng viên, chưa promoted — promotion thuộc workflow quản trị riêng).
-28. Việc còn lại (candidate artifact zip, terminal report C35 trong chuỗi candidate-policy, goal-closure CLI) nên thực hiện trong commit tiếp theo sau khi PR được review, vì chúng là artifact quản trị được theo dõi chứ không phải mã runtime.
-29. Token của bạn được lưu ở `/home/ubuntu/upload/pasted_file_GaCliW_token-manus-new.txt`; remote origin đã cấu hình dùng token này.
+28. Closure artifacts (candidate artifact zip, canonical terminal report, candidate record, closure-machine evidence) đã được hoàn tất trong final governance closure commit; bản report này được cập nhật tương ứng.
+29. Quyền đẩy GitHub đã được cấp qua connector/token đã xác minh quyền repo; đường dẫn tệp token cá nhân đã được xóa khỏi report theo kiểm toán bảo mật cuối (tiền lệ redaction của C34). Remote origin đã cấu hình dùng token này.
 30. Nhiệm vụ hoàn tất: đặc tả đã được thực hiện theo đúng trình tự "khôi phục chân lý Git → phân tích → thiết kế → triển khai → kiểm chứng → commit + Draft PR".
