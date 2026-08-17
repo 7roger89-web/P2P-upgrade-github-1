@@ -406,6 +406,24 @@
       "evidence_refs": [
         "C29 candidate policy: PASS+governance/runtime/release changes -> REQUIRED; BLOCKED terminal -> no release artifact minted"
       ]
+    },
+    {
+      "candidate_id": "C33",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c33-provider-neutral-bounded-autopilot-core-candidate-v1.zip",
+      "candidate_sha256": "b1cdcfd881156726fdfa054ae5186e0aee728bde5d4536d0c6f184181b6ae6ed",
+      "promotion_status": "UNPROMOTED",
+      "development_goal": "C33",
+      "created_at": "2026-08-17T06:00:00Z",
+      "created_by": "C34-closure-reconciliation",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "lineage_status": "LINEAGE_REGISTERED",
+      "evidence_refs": [
+        "docs/p2p-development/research/c34/evidence/c34-capability-scoped-certification.json"
+      ],
+      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift — see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged."
     }
   ],
   "capability_status": [
