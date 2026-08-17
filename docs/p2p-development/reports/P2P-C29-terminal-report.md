@@ -248,13 +248,23 @@ Self-application declared before implementation: `CANDIDATE_REQUIRED` (terminal 
 
 Supervisor checklist (v3 items): `TERMINAL_STATE_CONSISTENCY` PASS, `CANDIDATE_POLICY_COMPLIANCE` PASS, `CAPABILITY_CLAIM_SEPARATION` PASS, `ROADMAP_SYNC` PASS, `DEVELOPMENT_CONTROL_SYNC` PASS, `PR_LINEAGE_INTEGRITY` PASS (retarget disclosed, §35), `CLAIM_BOUNDARY` (all five) PASS, `SECRET_SAFETY` PASS, `AUTO_MERGE=NO` PASS, `OWNER_ACTION_BOUNDARY` PASS. Verdict: **PASS (closure integrity, no new runtime claims)**.
 
-## 60. NEXT CAPABILITY GAP / OWNER ACTION
+## 60. NEXT CAPABILITY GAP / OWNER ACTION REQUIRED
 
 The single highest-value move remains exactly one **Owner action outside chat**: sign in to Codex (`codex login`) or enable the Manus API connector. That unblocks `LIVE_HOST_EVIDENCE_UNAVAILABLE`, lets a future session re-preflight, certify a real host, and promote candidates. Next goal in the governance sequence is **C30 (Owner-approved, never auto-started)**; per §51 this session stopped at its terminal verdict: no C30 work, no C27 retry, no codex login, no connector activation, no routing, no promotion.
 
----
+## 61. FUTURE RESEARCH PRESERVATION (§36)
 
-**STOP** — PASS. Per the terminal rule, no C30, no C27 retry, no live certification attempts, no promotion, no auto-merge.
+The post-C28 Owner-approved research directions (provider-neutral AutoPilot; composable execution targets; Harness ≠ Provider ≠ Model ≠ Protocol; replaceable execution backends; task workspace isolation; structured/headless execution; runtime health/ownership; safe quiesce/drain; contract identity/drift protection; token-bounded repo maps; failure-focused diagnostics) were audited against the Capability Ledger. They are **not yet durably recorded** in the ledger (only the older DeepSeek Harness defer decision exists, from C11). Per §36, C29 did **not** expand into their implementation and did not perform bulk intake — the C26 durable-intake mechanism applies to accepted roadmap *capability* decisions, not an unvetted brainstorm list; persisting them wholesale would have expanded C29 scope. They remain non-executing future-roadmap analysis, eligible for a dedicated intake Goal. Ledger integrity checks (`GC29`/V15) remain green: no undocumented records were added.
+
+## 62. BEGINNER IMPACT REVIEW (§50)
+
+**BEFORE:** The Owner could read three contradictory stories about the same Goal — terminal report said PASS, the roadmap said PLANNED, and the candidate section said "N/A" despite the contract requiring one; the ledger said machinery "UNKNOWN" despite 35 passing tests and real probe evidence; governance pointed at an older goal while the latest one appeared finished. A beginner asking "Goal này rốt cuộc đã hoàn thành chưa?" received no single answer: every durable surface had to be hand-reconciled, and prose reports competed with test evidence.
+
+**AFTER:** One trustworthy closure answer: run `python3 scripts/p2p_goal_closure.py` (or the validator, or `p2p_development_control validate`) and read `CONSISTENT` / `INCONSISTENT` with severity-tiered findings. The terminal report itself carries machine-extractable metadata fields (GOAL_TERMINAL_STATUS, CANDIDATE_REQUIRED/SHA256, ROADMAP SYNC, PROMOTION_STATUS), so the report can never again silently contradict the durable state — V18–V21 detect the contradiction deterministically.
+
+**OWNER TECHNICAL ACTION REMOVED:** No more manual reconciliation between terminal report / roadmap / governance / ledger / candidate / SHA / promotion / PR lineage; no more Git ancestry or PR-base auditing; no more verifying that "PASS" actually produced the contract-required candidate; no more distinguishing machinery maturity from goal outcome by reading multiple files.
+
+**NEW OWNER TECHNICAL BURDEN: NO.** The layer is self-checking: the checker validates itself (GC37–GC50, C29_SELF_CLOSURE_VALIDATION=PASS) and the Owner action that remains is outside this scope entirely — one authentication step (codex login or Manus connector) to unblock live-host evidence.
 
 ### Canonical closure metadata fields
 
@@ -266,3 +276,6 @@ The single highest-value move remains exactly one **Owner action outside chat**:
 | `CANDIDATE_LABEL` | `P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip` |
 | `CANDIDATE_SHA256` | `61ed699297f91cdc6e545c796f046c313e2318b8838da9442f5e82f1d2825e8f` |
 | `ROADMAP EXPECTED TERMINAL CHANGE` | `current` -> C28/DONE terminal sentinel; C29 item status -> DONE; C29 candidate record appended (UNPROMOTED) |
+
+---
+**STOP** — PASS. Per the terminal rule, no C30, no C27 retry, no live certification attempts, no promotion, no auto-merge.
