@@ -61,14 +61,15 @@ POST_NEW_UNEXPLAINED_FAILURES = 0
 ## Purge record (history rewrite, owner-authorized force-update of C34 branch only)
 - Incident: CREDENTIAL_EXPOSED_IN_GIT_HISTORY (Manus API key full value
   present in reachable blobs of docs/p2p-development/research/c34/phase3-manus-api-probe.md
-  after purge; header-form key values also present; no other committed file
-  on the C34 range contained the key full value).
+  BEFORE purge; header-form key values also present before purge; no other
+  committed file on the C34 range contained the key full value).
 - Tool: git-filter-repo 2.47.0 replace-text (full key → redaction placeholder
   "x-manus-api-key:redacted-by-c34-final-security-closure"), scoped to the
   C34 branch reachable commits (2a000e0 exclusive → HEAD inclusive).
 - Verification: exhaustive blob scan of ALL reachable C34 commits for
   (a) full key value, (b) prefix sk-DvH3, (c) key in Authorization header
-  form — 0 hits each post-purge. gitleaks 8.21.2 on git-log patch of the
+  form — 0 hits each post-purge (before-purge presence confirmed above by
+  incident classification). gitleaks 8.21.2 on git-log patch of the
   full C33..C34 range: 0 findings. Worktree scan: 0 findings.
 - PR #10 patch (API) scan: 0 findings. Evidence docs + committed JSONs at
   final HEAD: 0 findings.

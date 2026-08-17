@@ -91,7 +91,19 @@ S2 C34 branch commit trees (2a000e0..HEAD, all 4 commits): 23 findings,
   worktree NO LEAKS FOUND.
 S3 session scratch workspace /tmp/c33build: contained probe artifacts;
   removed after C34 completion.
-git log -S "sk-DvH3": the key appears only in 310a36b (probe doc, now
-  redacted); never in any commit's secret-bearing credential flow.
-Verdict: NO UNREDACTED LIVE CREDENTIAL COMMITTED ON THE C34 RANGE.
+git log -S "sk-DvH3" (pre-purge state): the key appeared only in commit
+  310a36b (probe doc); never in any commit's secret-bearing credential flow.
+SECURITY REWRITE 2026-08-17 (Owner-authorized, branch-only):
+  - Full revoked key bytes purged from ALL reachable C34 commits via
+    git filter-repo --replace-text (bytes -> REDACTED-MANUS-API-KEY-REVOKED-
+    BY-OWNER); branch rebuilt on clean base 2a000e0.
+  - Pre-purge C34 history heads: 310a36b/254142b/ec95aee/ce079b3/ea59663
+    (rewritten; unreachable from branch after rewrite).
+  - Post-purge C34 history heads: 2cb58da/10149cc/d917971/e6a74f7/62ab3a5
+    (branch head 62ab3a52...); verification: NO full-key / key-prefix /
+    key-in-header hits across all 8 rewritten commit trees.
+  - gitleaks 8.21.2 on full C33..C34 patch range: no leaks found.
+  - GitHub may still serve orphaned pre-purge objects by SHA for a window;
+    CREDENTIAL_REVOKED_BY_OWNER is the authoritative mitigation.
+Verdict: NO REACHABLE C34 COMMIT CONTAINS REVOKED SECRET.
 Pre-existing findings are out of C34 scope and are noted, not acted on.

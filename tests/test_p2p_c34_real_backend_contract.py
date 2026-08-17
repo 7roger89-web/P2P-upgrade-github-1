@@ -677,7 +677,15 @@ class TestCandidatePolicyAudit:
             # Secret-scan redaction (full Manus key replaced with truncated
             # form per the closure security audit — an approved closure edit).
             "docs/p2p-development/research/c34/phase3-manus-api-probe.md",
+            # Security-rewrite evidence update: purge record appended to the
+            # machine-readable failure-set (authorized closure edit).
+            "docs/p2p-development/research/c34/evidence/c34-post-closure-failure-set.txt",
+            # Final-security closure definitive artifact (supersedes post-closure set).
+            "docs/p2p-development/research/c34/evidence/c34-final-failure-set.txt",
             "tests/test_p2p_goal_closure.py",
+            # Final-security closure: minimum roadmap regeneration sync
+            # (V15 count 156->158 per §6 regeneration rule — authorized metadata refresh).
+            "docs/p2p-development/current-roadmap.md",
             "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
             "tests/test_p2p_live_certification.py",
             "tests/test_p2p_ledger_provenance.py",
