@@ -1,7 +1,7 @@
 # Phase 3 — Manus API Probe (ACTUAL observed/verified contract, 2026-08-17)
 
 ## Credentials supplied by user
-- Manus API key: REDACTED-MANUS-API-KEY-REVOKED-BY-OWNER (stored in /home/ubuntu/.secrets, see c34 notes)
+- Manus API key: redacted to `sk-DvH3…bzbTr` in this document (full key stored only at /home/ubuntu/.secrets/manus_api_key, outside the repository; see c34 notes)
 - GitHub PAT: github_pat_11B3CGRWI... (already used for clone)
 
 ## Verified interface facts (docs open.manus.ai/v2, observed 2026-08-17)
