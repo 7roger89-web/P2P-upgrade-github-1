@@ -516,7 +516,7 @@
       "goal_closure_machine": "CONSISTENT",
       "goal_closure_machine_hard_fails": 0,
       "goal_closure_machine_explained": "FINAL REGRESSION: failure set equals the b2d93e4 baseline exactly (30 failed, 835 passed, 884 collected; failure-identity delta 0); framework validator 69/69; secret-pattern scan clean; C37 test suite 88/88 PASS (24 scenarios A-X + requirements 1-58)",
-      "source_commit": "b464cef1cef38670d0ff97dfa20b338f2cc8a959",
+      "source_commit": "6a6d48270380d70b62eff3ba364f0b850de5fae0",
       "source_branch": "p2p-c37-adaptive-target-model-effort",
       "evidence_refs": [
         "docs/p2p-development/reports/P2P-C37-terminal-report.md",
