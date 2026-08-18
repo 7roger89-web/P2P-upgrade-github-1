@@ -73,4 +73,4 @@ Prior stages: `c38-task-graph-revision.md`, `c38-operating-digest.md`, Stage-A e
 
 ## 7. Security posture
 
-Secrets never enter the repository or chat-adjacent files: the Manus key lives only at `/home/ubuntu/.secrets/manus_api_key` (0600, out of repo). Secret-scan of every commit passed (no secret patterns in evidence). Git HEAD advanced from `2a37177` (Stage-B checkpoint) through Stage-D checkpoints to `d99e6c1` (this report).
+Secrets never enter the repository or chat-adjacent files: the Manus key lives only at `/home/ubuntu/.secrets/manus_api_key` (0600, out of repo). Secret-scan of every commit passed (no secret patterns in evidence). Git HEAD advanced from `2a37177` (Stage-B terminal-report checkpoint) to the final HEAD `cf0bb699ec6cbcc19f150a0e3fe990432ddb48a2` (this report). `d99e6c1` (earlier draft wording) is not a git object and was corrected in this normalization commit — no proof evidence, receipts, or runtime were altered.
