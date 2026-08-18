@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-17 (regenerated per §6 by the C34 final-security closure session) (derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-18 (regenerated per §6 by the C35 final governance normalization session — C35 roadmap item synced as DONE) (derived, not authored-by-hand as a decision document).
 
 ## 1. Official baseline
 

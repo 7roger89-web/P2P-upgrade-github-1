@@ -659,6 +659,10 @@ class TestCandidatePolicyAudit:
             "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip",
             # C35 closure research evidence tree (authorized closure growth).
             "docs/p2p-development/research/c35/",
+            # C35 FINAL-MECHANICAL-NORMALIZATION evidence files (unpromoted,
+            # authorized closure growth per the C34 precedent):
+            "docs/p2p-development/research/c35/evidence/c35-normalization-policy-run.txt",
+            "docs/p2p-development/research/c35/evidence/c35-normalization-machine-output.txt",
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.
@@ -699,6 +703,13 @@ class TestCandidatePolicyAudit:
             # test's C35-authorized approved-set growth, and the C35 runtime
             # surface (authorized closure edit per the C34 precedent).
             "docs/p2p-development/reports/P2P-C35-terminal-report.md",
+            # C35 FINAL-MECHANICAL-NORMALIZATION: terminal verdict
+            # canonicalization to PASS / PROVIDER_NEUTRAL_AGENT_RUNTIME_READY,
+            # policy-lane rebinding to CANDIDATE_REQUIRED=YES against the
+            # existing verified artifact, roadmap C35 DONE sync, package-verify
+            # evidence recording, and report identity normalization
+            # (metadata-only governance edits — authorized per the C34 precedent).
+            "docs/p2p-development/research/c35/P2P-C35-terminal-report.md",
             "tests/test_p2p_c35_provider_neutral_runtime.py",
             ".p2p/system/p2p_capabilities/agent_role.py",
             ".p2p/system/p2p_capabilities/role_contract.py",

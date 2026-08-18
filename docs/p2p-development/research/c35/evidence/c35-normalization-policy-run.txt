@@ -1,0 +1,28 @@
+== Step 1: terminal fields from normalized report ==
+  GOAL_TERMINAL_STATUS: PASS
+  ROADMAP_STATUS: NOT_ON_ROADMAP
+  DEVELOPMENT_CONTROL_STATUS: CANDIDATE_GOVERNANCE_RECONCILED
+  CAPABILITY_LEDGER_SYNC: N/A
+  CANDIDATE_REQUIRED: YES
+  CANDIDATE_STATUS: UNPROMOTED
+  SUPERVISOR_VERDICT: PASS
+  PROMOTION_STATUS: UNPROMOTED
+  normalized terminal: 'PASS'  (expected 'PASS')
+== Step 2: ChangeSignals (since C34 baseline e16a4d2) ==
+  runtime_changed: True
+  governance_changed: True
+  release_artifact_changed: False
+  changed_file_count: 15
+== Step 3: candidate policy (machine-derived, from report fields) ==
+  declared in report: 'YES'
+  candidate_policy_from_report_fields -> YES
+== Step 4: candidate_policy(terminal, None, changes) ==
+  candidate_policy('PASS', None, changes) -> YES
+== Step 5: existing artifact bind ==
+  artifact exists: reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip
+  sha256: 077971e3a7ab308b713c7c5deb744e0b89fb9e6c58c102168a7bb4426f677427
+  matches expected: True (077971e3a7ab308b713c7c5deb744e0b89fb9e6c58c102168a7bb4426f677427)
+
+RESULT: POLICY_LANE_BOUND_OK
+The existing verified artifact is bound to the CANDIDATE_REQUIRED=YES lane.
+No duplicate artifact was minted. Promotion status remains UNPROMOTED.
