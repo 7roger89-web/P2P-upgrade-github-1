@@ -686,6 +686,20 @@ class TestCandidatePolicyAudit:
             ".p2p/system/p2p_capabilities/context_loop_guard.py",
             "docs/p2p-development/research/c36/",
             "tests/test_p2p_c36_evidence_bound_context.py",
+            # C37 adaptive target / model / reasoning-effort selection
+            # (provider-neutral selection pipeline; authorized closure
+            # growth per the C34/C35R/C36 precedent):
+            ".p2p/system/p2p_capabilities/selection_request.py",
+            ".p2p/system/p2p_capabilities/selection_risk.py",
+            ".p2p/system/p2p_capabilities/selection_quality.py",
+            ".p2p/system/p2p_capabilities/selection_target.py",
+            ".p2p/system/p2p_capabilities/selection_filter.py",
+            ".p2p/system/p2p_capabilities/selection_trace.py",
+            ".p2p/system/p2p_capabilities/selection_receipt.py",
+            ".p2p/system/p2p_capabilities/selection_policy.py",
+            "docs/p2p-development/research/c37/",
+            "docs/p2p-development/reports/P2P-C37-terminal-report.md",
+            "tests/test_p2p_c37_adaptive_selection.py",
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.
@@ -779,6 +793,22 @@ class TestCandidatePolicyAudit:
             "tests/test_p2p_c36_evidence_bound_context.py",
             # C36 canonical terminal report (tracked closure artifact).
             "docs/p2p-development/reports/P2P-C36-terminal-report.md",
+            # C37 adaptive target/model/effort selection: provider-neutral
+            # selection pipeline runtime surface (ELIGIBILITY ->
+            # QUALITY/RISK GATE -> OPTIMIZATION -> MODEL/EFFORT BINDING ->
+            # SELECTION RECEIPT). Authorized closure growth per the
+            # C34/C35R/C36 precedent — candidate-gated runtime surface
+            # governed by the canonical candidate-policy machinery.
+            ".p2p/system/p2p_capabilities/selection_request.py",
+            ".p2p/system/p2p_capabilities/selection_risk.py",
+            ".p2p/system/p2p_capabilities/selection_quality.py",
+            ".p2p/system/p2p_capabilities/selection_target.py",
+            ".p2p/system/p2p_capabilities/selection_filter.py",
+            ".p2p/system/p2p_capabilities/selection_trace.py",
+            ".p2p/system/p2p_capabilities/selection_receipt.py",
+            ".p2p/system/p2p_capabilities/selection_policy.py",
+            "docs/p2p-development/reports/P2P-C37-terminal-report.md",
+            "tests/test_p2p_c37_adaptive_selection.py",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:
