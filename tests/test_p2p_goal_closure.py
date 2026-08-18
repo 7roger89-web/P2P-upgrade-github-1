@@ -334,7 +334,12 @@ class RoadmapTerminalTests(unittest.TestCase):
 
     def test_gc22_roadmap_current_handles_pass(self) -> None:
         road_current = self.gov["roadmap"]["current"]
-        self.assertEqual(road_current["id"], "C28")
+        # C35R roadmap-integrity sync (authorized-growth precedent, C34):
+        # roadmap.current must equal the deterministic derivation
+        # roadmap_terminal_next (last DONE goal = C35R), mirroring the
+        # framework validator's V18 rule — never a hardcoded goal id.
+        expected = closure.roadmap_terminal_next(self.items)
+        self.assertEqual(road_current["id"], expected["id"])
         self.assertEqual(road_current["status"], "DONE")
 
     def test_gc23_roadmap_current_blocks_without_auto_done(self) -> None:

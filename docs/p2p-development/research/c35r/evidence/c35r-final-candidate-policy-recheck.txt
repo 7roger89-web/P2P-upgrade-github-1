@@ -1,0 +1,74 @@
+C35R FINAL CANDIDATE-POLICY RECHECK (canonical machinery, full committed surface)
+base = 7c9cb58; final HEAD = 84cf756; branch p2p-c35r-zaofu-deep-audit (working tree clean)
+
+Full committed diff (30 files):
+  - docs/p2p-development/reports/P2P-C35R-terminal-report.md
+  - docs/p2p-development/research/c35r/evidence/c35r-candidate-policy-derivation.txt
+  - docs/p2p-development/research/c35r/evidence/c35r-change-signals-derivation.txt
+  - docs/p2p-development/research/c35r/evidence/c35r-closure-machine-final.txt
+  - docs/p2p-development/research/c35r/evidence/c35r-closure-machine-output.txt
+  - docs/p2p-development/research/c35r/evidence/c35r-final-test-failure-set.txt
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area01.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area02.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area03.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area04.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area05.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area06.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area07.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area08.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area09.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area10.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area11.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area12.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area13.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area14.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area15.md
+  - docs/p2p-development/research/c35r/evidence/zaofu-audit-area16.md
+  - docs/p2p-development/research/c35r/zaofu-build-vs-reuse-matrix.json
+  - docs/p2p-development/research/c35r/zaofu-normalization-record.md
+  - docs/p2p-development/research/c35r/zaofu-p2p-architecture-map.md
+  - docs/p2p-development/research/c35r/zaofu-roadmap-impact.md
+  - docs/p2p-development/research/c35r/zaofu-upstream-provenance.json
+  - governance/development-control.json
+  - tests/test_p2p_c34_real_backend_contract.py
+  - tests/test_p2p_goal_closure.py
+
+ChangeSignals.detect (machine):
+  runtime_changed = False
+  governance_changed = True
+  release_artifact_changed = False
+
+report_fields (machine, terminal_from_report):
+  GOAL_TERMINAL_STATUS = PASS
+  ROADMAP_STATUS = DONE
+  DEVELOPMENT_CONTROL_STATUS = CONSISTENT
+  CAPABILITY_LEDGER_SYNC = NO_CHANGE
+  CANDIDATE_REQUIRED = NO
+  CANDIDATE_STATUS = NO_CANDIDATE
+  SUPERVISOR_VERDICT = PASS
+  PROMOTION_STATUS = NOT_APPLICABLE
+normalized terminal = PASS
+
+candidate_policy_from_report_fields (machine):
+  CANDIDATE_REQUIRED (declared in report) = NO
+  C35R_CANDIDATE_REQUIRED = NO
+
+Two machine branches (scripts/p2p_goal_closure.py, candidate_policy, priority order §18/§19 of C29):
+  candidate_policy(PASS, declared=NO,   sig) = NO   <- priority-1: declaration authoritative
+  candidate_policy(PASS, declared=None, sig) = YES  <- priority-2: PASS + governance_changed=True defaults to YES
+
+Deterministic reason (final HEAD/full-diff evaluation, including all reconciliation changes):
+  Final ChangeSignals: runtime_changed=False, governance_changed=True (roadmap
+  C35R DONE item + roadmap.current sync in governance/development-control.json),
+  release_artifact_changed=False.
+  The machine's final answer is NO solely via the priority-1 declared path:
+  the canonical terminal report declares CANDIDATE_REQUIRED: NO, and that
+  declaration is itself machine-derived (earlier derivation over the
+  pre-roadmap surface returned all signals False). The machine does NOT
+  return NO on the undeclared path — the priority order forbids retroactively
+  re-deriving the declaration (priority 3: AI judgment at terminal time is
+  never the sole policy input). This is not a fabricated "research-only"
+  exception; it is the machine's own priority rule applied to a valid
+  declaration. Consequence: no candidate may be minted for C35R; if the
+  declaration were ever absent or set to YES on this governance-touched
+  surface, the OWNER GATE would apply (OWNER_GATE / C35R_CANDIDATE_REQUIRED_ON_FINAL_SURFACE would fire on the undeclared YES branch).
