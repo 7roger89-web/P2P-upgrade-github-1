@@ -1,0 +1,29 @@
+{
+  "schema": "c41-promotion/1",
+  "goal_id": "P2P-C41",
+  "executed_at": "2026-08-18T15:22:19+00:00",
+  "owner_instruction": "PROMOTE (explicit chat instruction)",
+  "action": "promote_candidate",
+  "candidate": {
+    "label": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+    "sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+    "n_entries": 1383
+  },
+  "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+  "approval_record_sha256": "e38fedac446c715eede232fe67eaeb2d6d2926457c420564a0a6490648087e09",
+  "technical_report": "docs/p2p-development/research/c41/c41-pilot-extension-summary.md",
+  "technical_report_sha256": "ae6cdbe546be6c216a6c3e687989365c0109c56ec18ae0281806ddbabe8ad387",
+  "terminal_report_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md",
+  "terminal_report_sha256": "64ac40502da8e970134e987e758c210af7d17aac3c76daeb7f3b2cd2df2fff90",
+  "pilot_bar": {
+    "game_truyen": "3/3 proofs PASS (dispatch, fresh-process, rollback fingerprint)",
+    "gia_pha": "3/3 proofs PASS (dispatch, fresh-process, rollback fingerprint)"
+  },
+  "regression": "NEW_UNEXPLAINED_FAILURES=0 (baseline 8b751f6), validator 75/75",
+  "honest_caveats": [
+    "Full release-gates flow NOT run: drift gate currently FAIL (pre-existing unledgered claims + unlocked docs files), fact-ledger renewal + live-specs rebuild + final hash-bound approval not performed — promotion is governance-side only",
+    "release_decision not set to PASS; no deploy or release was executed",
+    "Scope limited per Owner: similar Owner web projects only; owner-gate and rollback retained"
+  ],
+  "release_decision": "NOT_RUN (full release gates pending; Owner approved candidate promotion, not full release)"
+}

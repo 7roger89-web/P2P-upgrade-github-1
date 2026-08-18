@@ -37,7 +37,7 @@
     "framework_validator": "75/75"
   },
   "closure_machinery": "PARTIAL is now a native terminal lane (scripts/p2p_goal_closure.py); C40 closure re-ran machine-verified CONSISTENT",
-  "promotion_decision": "PENDING_OWNER_DECISION",
+  "promotion_decision": "OWNER_PROMOTE_EXECUTED",
   "n_evidence_files": 18,
   "evidence": [
     {
@@ -148,5 +148,12 @@
       "note": "C41 regression differential (NEW_UNEXPLAINED_FAILURES=0, validator 75/75)",
       "verdict_or_status": "PASS"
     }
-  ]
+  ],
+  "promotion": {
+    "executed_at": "2026-08-18T15:22:19+00:00",
+    "status": "PROMOTED (governance-side; full release gates pending)",
+    "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+    "technical_report": "docs/p2p-development/research/c41/c41-pilot-extension-summary.md",
+    "evidence_file": "docs/p2p-development/research/c41/evidence/c41-promotion.json"
+  }
 }
