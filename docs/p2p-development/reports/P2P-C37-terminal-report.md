@@ -9,7 +9,7 @@ CANDIDATE_STATUS: UNPROMOTED
 PROMOTION_STATUS: NONE (no promotion approval; candidate remains UNPROMOTED)
 GOAL_BASE_COMMIT: b2d93e4 (p2p-c36-evidence-bound-context-efficiency)
 GOAL_BRANCH: p2p-c37-adaptive-target-model-effort
-FINAL_COMMIT_SHA: 6a6d48270380d70b62eff3ba364f0b850de5fae0
+FINAL_COMMIT_SHA: 55a0fe99b05a0e9a1d4d99a38e6a97b2f63a3d0e
 GOAL_SCOPE_GATE: PASS (no credentials, live benchmarking, daemons, ML routers, new DBs, swarms, new council, or C34/C35/C36 replacement)
 
 ==================================================
