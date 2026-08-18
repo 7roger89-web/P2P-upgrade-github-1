@@ -244,6 +244,16 @@ class EligibilitySnapshot:
         if not isinstance(self.evidence_pointers, tuple):
             raise BackendContractError("ELIGIBILITY_EVIDENCE_MUST_BE_TUPLE")
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema": "p2p-eligibility-snapshot/1",
+            "target": self.target,
+            "eligible": self.eligible,
+            "failure_class": self.failure_class,
+            "evidence_pointers": list(self.evidence_pointers),
+            "detail": self.detail,
+        }
+
 
 def snapshot_eligibility(
     target: str,
@@ -299,9 +309,10 @@ def decide_next_action(
 
     Decision order (each rule is deterministic, no floating logic):
 
-    1. No failure given -> RETRY_SAME_TARGET is NOT emitted.  The machine only
-       responds to recorded failure classes; absence of failure is a no-op
-       caller case (caller dispatches normally).
+    1. No recorded failure + dispatched=False (pre-dispatch, safe state) ->
+       RETRY_SAME_TARGET as DISPATCH AUTHORIZATION: caller MAY dispatch one
+       bounded request on current_target.  Pre-dispatch AUTH_DRIFT observed
+       alone -> RESELECT_TARGET on an eligible alternative.
     2. OWNER action needed -> OWNER_GATE.
     3. Unknown failure class / unknown mutation / unknown dispatch state ->
        STOP_FAIL_CLOSED when dispatch occurred; REVERIFY_REQUIRED otherwise.
@@ -318,6 +329,46 @@ def decide_next_action(
     """
     observed = tuple(str(fc) for fc in failure_class_observed)
     primary = _classify(str(failure_class)) if failure_class else None
+
+    # Rule 1: no recorded failure + dispatch state known safe (dispatched=False)
+    # -> dispatch authorization: caller MAY dispatch one bounded request on the
+    # current target ("RETRY_SAME_TARGET" as the dispatch-authorizing decision).
+    # The Owner gate ALWAYS outranks dispatch authorization: a pending owner
+    # action blocks dispatch even when no failure is recorded (Rule 2 semantics).
+    if primary is None and dispatched is False:
+        if owner_action_needed:
+            return FailoverDecision(
+                decision="OWNER_GATE",
+                failure_class=None,
+                failure_class_observed=observed,
+                reason="OWNER_ACTION_REQUIRED:dispatch_authorization_pending",
+                mutation_status=mutation_status,
+                old_target=current_target,
+            )
+        drift = bool({"AUTH_DRIFT"} & set(observed))
+        if drift:
+            return FailoverDecision(
+                decision="RESELECT_TARGET",
+                failure_class=None,
+                failure_class_observed=observed,
+                reason="PRE_DISPATCH_AUTH_DRIFT_SAFE_RESELECTION",
+                mutation_status=mutation_status or "NO_MUTATION_OBSERVED",
+                old_target=current_target,
+                new_target=next(
+                    (str(t) for t in eligible_targets if str(t) != str(current_target)),
+                    "",
+                ),
+                details={"eligible_targets": [str(t) for t in eligible_targets]},
+                revision=selection_revision(str(current_target), "AUTH_DRIFT"),
+            )
+        return FailoverDecision(
+            decision="RETRY_SAME_TARGET",
+            failure_class=None,
+            failure_class_observed=observed,
+            reason="NO_FAILURE_RECORDED_PRE_DISPATCH_ELIGIBILITY_SAFE",
+            mutation_status=mutation_status or "NO_MUTATION_OBSERVED",
+            old_target=current_target,
+        )
 
     # Rule 2: Owner gate outranks everything else.
     if owner_action_needed:

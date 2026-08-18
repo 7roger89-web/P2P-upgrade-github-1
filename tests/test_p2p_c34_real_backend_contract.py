@@ -700,6 +700,19 @@ class TestCandidatePolicyAudit:
             "docs/p2p-development/research/c37/",
             "docs/p2p-development/reports/P2P-C37-terminal-report.md",
             "tests/test_p2p_c37_adaptive_selection.py",
+            # C38 live role certification & multi-backend execution proof
+            # (stage B Manus / stage C Hermes×Gemini / stage D capsule;
+            # research + terminal report; authorized closure growth per the
+            # C34/C35R/C36 precedent):
+            "docs/p2p-development/research/c38/",
+            "docs/p2p-development/reports/P2P-C38-terminal-report.md",
+            "docs/p2p-development/reports/P2P-C35R-terminal-report.md",
+            # C39 governed live target selection & safe failover
+            # (failover-boundary decision surface + four proofs: normal
+            # selection / pre-dispatch drift-reselection / capsule
+            # continuity / unsafe post-dispatch fail-closed; authorized
+            # closure growth per the C34/C35R/C36/C37 precedent):
+            "docs/p2p-development/research/c39/",
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.
@@ -808,7 +821,22 @@ class TestCandidatePolicyAudit:
             ".p2p/system/p2p_capabilities/selection_receipt.py",
             ".p2p/system/p2p_capabilities/selection_policy.py",
             "docs/p2p-development/reports/P2P-C37-terminal-report.md",
+            # C38 governance roadmap normalization (C38 DONE item +
+            # roadmap.current = C38/DONE; docs-only, terminal report).
+            # Authorized closure growth per the C34 precedent:
+            "governance/development-control.json",
+            "docs/p2p-development/reports/P2P-C38-terminal-report.md",
+            # C39 failover-boundary extension to the backend contract surface
+            # (Rule 1 dispatch-authorization + owner-gate guard + 102+
+            # deterministic tests; authorized closure growth per the
+            # C34/C35R/C36/C37 precedent):
+            ".p2p/system/p2p_capabilities/failover_boundary.py",
+            "tests/p2p_capabilities/test_failover_boundary.py",
             "tests/test_p2p_c37_adaptive_selection.py",
+            # C39 failover-boundary runtime surface (single CREATE_ONLY_IF_NECESSARY
+            # decision machine; fail-closed by construction; authorized closure
+            # growth per the C34/C35R/C36/C37 precedent):
+            ".p2p/system/p2p_capabilities/failover_boundary.py",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:

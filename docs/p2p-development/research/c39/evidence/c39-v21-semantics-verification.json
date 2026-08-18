@@ -1,0 +1,28 @@
+{
+  "schema": "c39-v21-semantics-verification/1",
+  "validator": "scripts/validate_p2p_development_framework.py",
+  "findings": {
+    "terminal_report_glob_sites": [
+      {
+        "line": 337,
+        "code": "reports = sorted(_gl.glob(str(ROOT / \"docs/p2p-development/reports/P2P-C*-terminal-report.md\")))",
+        "consumes_last_element_only": true,
+        "iterates_all_reports": false
+      }
+    ],
+    "v21_field_mentions": [
+      {
+        "line": 341,
+        "code": "\"CANDIDATE_SHA256\", \"CANDIDATE_LABEL\", \"GOAL_ID\"):"
+      }
+    ],
+    "candidate_record_scoping_mentions": []
+  },
+  "conclusion": {
+    "latest_terminal_report_only": true,
+    "terminal_report_glob_sites_count": 1,
+    "earlier_reports_never_scanned_for_v21_fields": true,
+    "interpretation": "V21 evaluates ONLY the lexicographically latest P2P-C*-terminal-report.md. Creating the C39 terminal report does not conceal any defect in the C38 report: the C38 report is frozen terminal truth and is no longer in the validator's scope. A defect in C38 would be 'hidden' only if the validator were expected to police all historical reports, which its code does not do.",
+    "c38_v21_gaps": "The C38 report lacks CANDIDATE_SHA256/CANDIDATE_LABEL because it predates the V21 checks (checks added in C29 68af45a, C38 report finalized e6b9d1d). These are PRE-EXISTING gaps, not regressions introduced by C39."
+  }
+}

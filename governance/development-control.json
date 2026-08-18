@@ -535,6 +535,50 @@
         "verified_at": "2026-08-18",
         "verified_by": "C37-adaptive-target-model-effort-closure"
       }
+    },
+    {
+      "goal": "P2P-C39",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
+      "sha256": "a999552538adb98332c039af8bb117a13fad3991605c543668034a89da4eb387",
+      "status": "UNPROMOTED",
+      "promotion": "NONE",
+      "evidence_ref": "docs/p2p-development/research/c39/evidence/c39-candidate-mint.json",
+      "why": "canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True)) = YES: C39 added the failover-boundary runtime surface. Contract mandates exactly one UNPROMOTED candidate; no promotion, no release."
+    },
+    {
+      "candidate_id": "C39",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
+      "candidate_sha256": "a999552538adb98332c039af8bb117a13fad3991605c543668034a89da4eb387",
+      "promotion_status": "UNPROMOTED",
+      "development_goal": "C39",
+      "created_at": "2026-08-18T10:56:37Z",
+      "created_by": "C39-governed-live-failover-closure",
+      "based_on_official_version": "8.4.7-C-codex.24",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "terminal_verdict": "PASS / GOVERNED_LIVE_FAILOVER_READY",
+      "candidate_policy_lane": "candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=False)) = YES (priority-2 rule: PASS terminal with durable runtime change requires a candidate; runtime surface: failover_boundary.py)",
+      "status": "UNPROMOTED",
+      "evidence_ref": "docs/p2p-development/research/c39/evidence/c39-candidate-policy-run.json",
+      "package_verify_evidence": {
+        "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
+        "verdict": "ARTIFACT_VERIFY_PASS",
+        "build_exit_code": 0,
+        "zip_sha256": "a999552538adb98332c039af8bb117a13fad3991605c543668034a89da4eb387",
+        "content_hash": "435f2549cbaa31b0ae879bf43da8ce07ed7828be3a6f878b6cf6b0cf4010ce4c (binds all zip entries incl. manifest + failover_boundary.py + evidence + tests)",
+        "manifest": "candidate-manifest.json",
+        "surface_files": 1,
+        "entry_hash_check": "ALL PASS (failover_boundary.py)",
+        "entry_results": [
+          {
+            "entry": "modules/failover_boundary.py",
+            "expected": "08e5e426059fa0239ec737a495df292ff9cd322e9e9cbf4bfb4554e4756429b3",
+            "actual": "08e5e426059fa0239ec737a495df292ff9cd322e9e9cbf4bfb4554e4756429b3",
+            "ok": true
+          }
+        ],
+        "zip_entry_count": 24
+      }
     }
   ],
   "capability_status": [
@@ -966,12 +1010,25 @@
         "status": "DONE",
         "evidence_ref": "GOAL-C38 (docs/p2p-development/reports/P2P-C38-terminal-report.md)",
         "notes": "C38 terminal verdict: PASS / LIVE_MULTI_BACKEND_ROLE_CERTIFIED (Stages B, C, D each independently VERIFIED with the fail-closed role verifier; Stage A AUTH_VALID for Manus; Framework validator 71/71; regression delta = 0 vs f4a2090; secret scan clean). Machine-derived C38_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C39 implementation. current_development retained as C31/BLOCKED_TERMINAL historical snapshot (explained CURRENT_DEVELOPMENT_SEMANTICS per C35R precedent)."
+      },
+      {
+        "id": "C39",
+        "status": "DONE",
+        "title": "Governed Live Target Selection & Safe Failover (failover-boundary decision machine; 4 proofs live+deterministic; regression clean; candidate UNPROMOTED)",
+        "goal": "P2P-C39",
+        "terminal_verdict": "PASS / GOVERNED_LIVE_FAILOVER_READY",
+        "evidence_ref": "docs/p2p-development/reports/P2P-C39-terminal-report.md",
+        "candidate": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
+        "candidate_status": "UNPROMOTED",
+        "no_merge_no_promotion_no_release_no_deploy": true,
+        "what_changed": "Created the failover-boundary decision surface (CREATE_ONLY_IF_NECESSARY; 33 failure classes; 5 decisions; fail-closed; Rule 1 dispatch authorization with owner-gate guard) plus 104 deterministic tests; four proofs (normal live selection on Manus; reversible pre-dispatch drift -> RESELECT_TARGET -> Hermes×Gemini; capsule continuity 11/11; unsafe post-dispatch fail-closed 5/5); NEW_UNEXPLAINED_FAILURES=0; candidate policy YES -> exactly one UNPROMOTED candidate minted."
       }
     ],
     "current": {
-      "id": "C38",
+      "id": "C39",
       "status": "DONE",
-      "title": "C38 Live Role Certification & Multi-Backend Execution Proof (provider-neutral live certification of canonical role p2p_iris on two independent backends: Manus API v2 and Hermes CLI × Gemini; Stage B/C/D all VERIFIED; candidate policy NO — no candidate minted)"
+      "title": "Governed Live Target Selection & Safe Failover (failover-boundary decision machine; 4 proofs live+deterministic; regression clean; candidate UNPROMOTED)",
+      "evidence_ref": "docs/p2p-development/reports/P2P-C39-terminal-report.md"
     },
     "likely_next": {
       "id": "C30",

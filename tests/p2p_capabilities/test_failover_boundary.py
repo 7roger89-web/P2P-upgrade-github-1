@@ -261,3 +261,27 @@ def test_reversible_drift_no_revoke_needed():
     assert d.old_target == A
     assert d.new_target == B
     assert d.revision.startswith("reselect-")
+
+# ---------------------------------------------------------------------------
+# 21. Rule 1 owner-gate guard: dispatch authorization never outranks a pending
+#     Owner action, even when no failure is recorded (fail-closed by
+#     authority, not by failure).
+def test_rule1_owner_gate_outranks_dispatch_authorization():
+    """No recorded failure + dispatched=False + owner_action_needed=True must
+    yield OWNER_GATE, NOT dispatch authorization.  The Owner gate semantics
+    (Rule 2) always outrank the Rule 1 pre-dispatch authorization."""
+    d = _run(None, dispatched=False, owner=True)
+    assert d.decision == "OWNER_GATE", d.decision
+    assert d.reason.startswith("OWNER_ACTION_REQUIRED:"), d.reason
+    # Without a pending owner action the same inputs authorize dispatch.
+    d2 = _run(None, dispatched=False, owner=False)
+    assert d2.decision == "RETRY_SAME_TARGET", d2.decision
+
+def test_rule1_drift_still_reselects_with_owner_guard_absent():
+    """Pre-dispatch AUTH_DRIFT observed must still yield RESELECT_TARGET when
+    no owner action is pending (Rule 1 drift path unaffected by the guard)."""
+    d = _run("AUTH_DRIFT", dispatched=False, observed=("AUTH_DRIFT",))
+    assert d.decision == "RESELECT_TARGET", d.decision
+    # With a pending owner action, drift yields OWNER_GATE instead (guard).
+    d2 = _run("AUTH_DRIFT", dispatched=False, observed=("AUTH_DRIFT",), owner=True)
+    assert d2.decision == "OWNER_GATE", d2.decision

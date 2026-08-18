@@ -1,0 +1,32 @@
+{
+  "schema": "c39-proof-2-drift-evidence/1",
+  "timestamp": "2026-08-18T10:27:49Z",
+  "drift_method": "env-binding-unset-REVERSIBLE",
+  "drift_cause": "MANUS_API_KEY removed from env; key file untouched",
+  "probe_snapshot": {
+    "schema": "p2p-eligibility-snapshot/1",
+    "target": "manus-api-v2",
+    "eligible": false,
+    "failure_class": "AUTH_INVALID",
+    "evidence_pointers": [
+      "health-check-401"
+    ],
+    "detail": ""
+  },
+  "failover_decision": {
+    "schema": "p2p-failover-decision/1",
+    "decision": "RESELECT_TARGET",
+    "failure_class": "AUTH_INVALID",
+    "failure_class_observed": [],
+    "revision": "reselect-9dbd9f82ddb2f6f3828b2252",
+    "old_target": "manus-api-v2",
+    "new_target": "hermes-cli:gemini:gemini-2.5-flash",
+    "old_receipt_pointer": "",
+    "new_receipt_pointer": "",
+    "reason": "SAFE_RESELECTION_EVIDENCE",
+    "mutation_status": "NO_MUTATION_OBSERVED",
+    "evidence_pointers": [],
+    "details": {}
+  },
+  "credential_file_state": "INTACT_NOT_REVOKED"
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "p2p-role-execution-contract/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "goal_id": "C39",
+  "task_id": "c39-proof-3-capsule-continuity",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "workspace_binding": "",
+  "objective": "BOUNDED NON-MUTATING FRESH-SESSION CAPSULE PROOF: reconstruct C39 task state from the delivered continuation capsule only; return the required structured result.",
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "dependencies": [],
+  "context_package": [
+    "SYNTHETIC_TEXT_EXECUTION"
+  ],
+  "context_digest": "444ffe16bff1c65c778e0b36ccad6dbd48b8a6556913a5dbd037a1d1f5926367",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "required_capabilities": [],
+  "acceptance_criteria": [
+    "structured_result_fields_exact",
+    "challenge_hash_sha256_capsule_id_exact",
+    "git_revision_exact",
+    "stage_exact",
+    "owner_gate_exact"
+  ],
+  "required_evidence": [
+    "role_binding",
+    "target_attestation",
+    "terminal_result"
+  ],
+  "verification_policy": "INDEPENDENT",
+  "explicit_execution_target": "manus-api-v2",
+  "target_fingerprint": "844bc8e7fe36f6291a6f08793499d9b00e8b88b9cb3b3a41c890a5db92053f8b",
+  "requested_target_attestation": "REQUESTED_ONLY",
+  "budget": "BOUNDED",
+  "request_fingerprint": "9bae19239b101eb6afbee9e2d110872a429cd81fea9a9701049c434b53d49fc6"
+}

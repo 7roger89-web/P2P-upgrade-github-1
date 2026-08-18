@@ -1,0 +1,24 @@
+{
+  "schema": "c39-goal-closure/2",
+  "report_fields": {
+    "GOAL_TERMINAL_STATUS": "PASS",
+    "ROADMAP_STATUS": null,
+    "DEVELOPMENT_CONTROL_STATUS": null,
+    "CAPABILITY_LEDGER_SYNC": null,
+    "CANDIDATE_REQUIRED": "YES",
+    "CANDIDATE_STATUS": null,
+    "SUPERVISOR_VERDICT": null,
+    "PROMOTION_STATUS": null
+  },
+  "candidate_artifact_exists": true,
+  "consistent": true,
+  "hard_findings": [],
+  "explained_findings": [
+    {
+      "check": "CURRENT_DEVELOPMENT_SEMANTICS",
+      "ok": false,
+      "detail": "current_development.development_goal='C31' vs roadmap.current.id='C39' — explained: development_goal advanced to a newer packaged goal (C31) with a verified UNPROMOTED candidate, while C39 already closed DONE; the snapshot verdict remains durable"
+    }
+  ],
+  "mechanism": "goal_closure_verdict via terminal_from_report (canonical)"
+}

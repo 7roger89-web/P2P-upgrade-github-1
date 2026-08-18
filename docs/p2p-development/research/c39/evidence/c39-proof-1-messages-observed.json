@@ -1,0 +1,45 @@
+{
+  "has_more": false,
+  "messages": [
+    {
+      "id": "kSTZ5WvVLLkcE92OSklerC",
+      "status_update": {
+        "agent_status": "stopped",
+        "brief": "Manus finished working",
+        "description": "Manus has completed the current task and is ready for new requests or revisions."
+      },
+      "timestamp": "1787048701716",
+      "type": "status_update"
+    },
+    {
+      "assistant_message": {
+        "content": "Hanoi"
+      },
+      "id": "2fpplReftbGGIymfOy7sOe",
+      "timestamp": "1787048701513",
+      "type": "assistant_message"
+    },
+    {
+      "id": "q58IVbxToXwCL7LXbbFve2-1",
+      "status_update": {
+        "agent_status": "running",
+        "brief": "Manus is running",
+        "description": "Manus is working on your request"
+      },
+      "timestamp": "1787048699366",
+      "type": "status_update"
+    },
+    {
+      "id": "O4xHHTKKREK8Js1IjCF9Io",
+      "timestamp": "1787048698979",
+      "type": "user_message",
+      "user_message": {
+        "content": "Answer the question: What is the capital of Vietnam? Reply with exactly the city name and nothing else.",
+        "message_type": "text"
+      }
+    }
+  ],
+  "ok": true,
+  "request_id": "266fea7f1f3c022d1bf9263ce812fe68",
+  "task_id": "4wRTkQZvRd5hxBe2ZkWM29"
+}
