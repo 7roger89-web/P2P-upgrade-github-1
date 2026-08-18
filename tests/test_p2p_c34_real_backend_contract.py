@@ -713,6 +713,15 @@ class TestCandidatePolicyAudit:
             # continuity / unsafe post-dispatch fail-closed; authorized
             # closure growth per the C34/C35R/C36/C37 precedent):
             "docs/p2p-development/research/c39/",
+            # C40 project-usable release & pilot installation
+            # (installable package candidate + install/upgrade/rollback/doctor
+            # interface, fresh-install/upgrade/pilot-task/fresh-process
+            # proofs; authorized closure growth per the
+            # C34/C35R/C36/C37/C38/C39 precedent):
+            "docs/p2p-development/research/c40/",
+            "scripts/p2p_install_release.py",
+            "reports/candidates",
+
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.

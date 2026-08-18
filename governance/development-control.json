@@ -579,6 +579,27 @@
         ],
         "zip_entry_count": 24
       }
+    },
+    {
+      "candidate_id": "C40",
+      "candidate_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+      "candidate_zip": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+      "promotion_status": "UNPROMOTED",
+      "based_on_official_version": "8.4.7-C-codex.24",
+      "candidate_policy_lane": "runtime_changed=YES",
+      "terminal_verdict": "PASS / PROJECT_USABLE_RELEASE_PILOT",
+      "terminal_report_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md",
+      "package_verify_evidence": {
+        "schema": "c40-package-verify-evidence/1",
+        "zip_path": "/home/ubuntu/p2p-repo/reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+        "zip_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+        "n_zip_entries": 1383,
+        "manifest_entries_checked": 1382,
+        "entries_matching": 1382,
+        "mismatches": [],
+        "verdict": "PASS",
+        "created_utc": ""
+      }
     }
   ],
   "capability_status": [
@@ -1022,13 +1043,19 @@
         "candidate_status": "UNPROMOTED",
         "no_merge_no_promotion_no_release_no_deploy": true,
         "what_changed": "Created the failover-boundary decision surface (CREATE_ONLY_IF_NECESSARY; 33 failure classes; 5 decisions; fail-closed; Rule 1 dispatch authorization with owner-gate guard) plus 104 deterministic tests; four proofs (normal live selection on Manus; reversible pre-dispatch drift -> RESELECT_TARGET -> Hermes×Gemini; capsule continuity 11/11; unsafe post-dispatch fail-closed 5/5); NEW_UNEXPLAINED_FAILURES=0; candidate policy YES -> exactly one UNPROMOTED candidate minted."
+      },
+      {
+        "id": "C40",
+        "status": "DONE",
+        "title": "Project-Usable Release & Pilot Installation (installable package + install/upgrade/rollback/doctor; fresh-install, drift-gated pilot task, fresh-process recovery, upgrade rollback proofs; regression clean; candidate UNPROMOTED)",
+        "evidence_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md"
       }
     ],
     "current": {
-      "id": "C39",
+      "id": "C40",
       "status": "DONE",
-      "title": "Governed Live Target Selection & Safe Failover (failover-boundary decision machine; 4 proofs live+deterministic; regression clean; candidate UNPROMOTED)",
-      "evidence_ref": "docs/p2p-development/reports/P2P-C39-terminal-report.md"
+      "title": "Project-Usable Release & Pilot Installation",
+      "evidence_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md"
     },
     "likely_next": {
       "id": "C30",

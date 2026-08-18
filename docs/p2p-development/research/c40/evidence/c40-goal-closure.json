@@ -1,0 +1,83 @@
+{
+ "consistent": true,
+ "findings": [
+  {
+   "severity": "hard",
+   "check": "ROADMAP_ITEM_EXISTS",
+   "ok": true,
+   "detail": "C40 roadmap item status='DONE'"
+  },
+  {
+   "severity": "hard",
+   "check": "PASS_WITH_DONE_ROADMAP",
+   "ok": true,
+   "detail": "terminal PASS requires roadmap DONE; found 'DONE'"
+  },
+  {
+   "severity": "explained",
+   "check": "CURRENT_DEVELOPMENT_SEMANTICS",
+   "ok": false,
+   "detail": "current_development.development_goal='C31' vs roadmap.current.id='C40' — explained: development_goal advanced to a newer packaged goal (C31) with a verified UNPROMOTED candidate, while C40 already closed DONE; the snapshot verdict remains durable"
+  },
+  {
+   "severity": "hard",
+   "check": "PASS_CURRENT_IS_DONE",
+   "ok": true,
+   "detail": "terminal PASS with roadmap.current=C40 requires DONE; found 'DONE'"
+  },
+  {
+   "severity": "hard",
+   "check": "CANDIDATE_REQUIRED_PRESENT",
+   "ok": true,
+   "detail": "contract requires candidate for C40; record=present"
+  },
+  {
+   "severity": "hard",
+   "check": "CANDIDATE_SHA_IMPLIES_ARTIFACT",
+   "ok": true,
+   "detail": "SHA claimed but artifact exists"
+  },
+  {
+   "severity": "hard",
+   "check": "CANDIDATE_VERIFY_EVIDENCE",
+   "ok": true,
+   "detail": "package verify evidence=recorded"
+  },
+  {
+   "severity": "hard",
+   "check": "CANDIDATE_UNPROMOTED_UNTIL_APPROVAL",
+   "ok": true,
+   "detail": "candidate C40 promotion_status='UNPROMOTED'; promotion needs separate approval"
+  },
+  {
+   "severity": "hard",
+   "check": "CLAIM_BOUNDARY",
+   "ok": true,
+   "detail": "ROUTER not introduced"
+  },
+  {
+   "severity": "hard",
+   "check": "CLAIM_BOUNDARY",
+   "ok": true,
+   "detail": "CONTEXT_CONTROLLER not introduced"
+  },
+  {
+   "severity": "hard",
+   "check": "CLAIM_BOUNDARY",
+   "ok": true,
+   "detail": "AUTH_ACTION not introduced"
+  },
+  {
+   "severity": "hard",
+   "check": "CLAIM_BOUNDARY",
+   "ok": true,
+   "detail": "SECOND_EXECUTOR not introduced"
+  },
+  {
+   "severity": "hard",
+   "check": "CLAIM_BOUNDARY",
+   "ok": true,
+   "detail": "BACKGROUND_AUTONOMY not introduced"
+  }
+ ]
+}

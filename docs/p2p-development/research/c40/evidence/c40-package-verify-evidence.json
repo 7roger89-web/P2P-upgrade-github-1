@@ -1,0 +1,11 @@
+{
+  "schema": "c40-package-verify-evidence/1",
+  "candidate_id": "C40",
+  "zip": "/home/ubuntu/p2p-repo/reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+  "zip_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+  "manifest_entries_checked": 1382,
+  "entries_matching": 1382,
+  "mismatches": [],
+  "n_zip_entries": 1383,
+  "verdict": "PASS"
+}
