@@ -1,0 +1,86 @@
+{
+  "schema": "p2p-role-execution-receipt/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "task_id": "c38-stage-c-hermes-second-backend-proof",
+  "goal_id": "C38",
+  "request_fingerprint": "62044a86ed76ede96ffb3e3957f598ef0eda70c21599c95bcc2696e0b6387d6e",
+  "permission_profile_fingerprint": "d91982c163580fe6af1f8aa27defadbe71dd8b7d44ce99d1aa45e0e0953da5f2",
+  "task_fingerprint": "62044a86ed76ede96ffb3e3957f598ef0eda70c21599c95bcc2696e0b6387d6e",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "context_digest": "92da41a5f62c04fa1b04074b78f55ad9fd13ca89832d52af27e8e374c376844b",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "explicit_execution_target": "hermes-cli:gemini:gemini-2.5-flash",
+  "target_fingerprint": "4a27ff90e8824cdfff4f0a4883975c23352a04e0504e31cc679b09c6fa964e01",
+  "requested_target": "hermes-cli:gemini:gemini-2.5-flash",
+  "observed_target": "4a27ff90e8824cdfff4f0a4883975c23352a04e0504e31cc679b09c6fa964e01",
+  "target_attestation_status": "ATTESTED_MATCH",
+  "execution_status": "SUCCEEDED",
+  "backend_result": {
+    "request_id": "c38-stage-c-01",
+    "request_fingerprint_hex": "62044a86ed76ede96ffb3e3957f598ef0eda70c21599c95bcc2696e0b6387d6e",
+    "task_id": "c38-stage-c-hermes-second-backend-proof",
+    "goal_id": "C38",
+    "adapter_id": "hermes-cli",
+    "execution_status": "SUCCEEDED",
+    "verification_status": "VERIFIED",
+    "started_at": "2026-08-18T08:33:41+0000",
+    "finished_at": "2026-08-18T08:33:45+0000",
+    "exit_status": "0",
+    "target_fingerprint": "4a27ff90e8824cdfff4f0a4883975c23352a04e0504e31cc679b09c6fa964e01",
+    "output_pointers": [],
+    "artifact_pointers": [],
+    "mutation_surface": "NONE",
+    "usage_evidence": {
+      "estimated_cost_usd": 0.00189045,
+      "cost_status": "estimated",
+      "cost_source": "official_docs_snapshot",
+      "input_tokens": 12595,
+      "output_tokens": 2,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "reasoning_tokens": 0,
+      "total_tokens": 12597,
+      "api_calls": 1,
+      "model": "gemini-2.5-flash",
+      "provider": "gemini",
+      "session_id": "20260818_083343_db7dfd",
+      "completed": true,
+      "failed": false,
+      "service_tier": null
+    },
+    "error_class": null,
+    "auth_state_after": "VALID",
+    "raw_backend_receipt_pointer": "hermes-session:gemini:gemini-2.5-flash",
+    "possible_mutation": false
+  },
+  "output_pointers": [],
+  "artifact_pointers": [
+    "docs/p2p-development/research/c38/harness/c38_stage_c_hermes_proof.py",
+    "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-live-receipt.json",
+    "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-contract.json"
+  ],
+  "evidence_pointers": [
+    "role_binding:contract-on-disk",
+    "target_attestation:hermes-cli:gemini:gemini-2.5-flash",
+    "terminal_result:cli-stdout:exit0:\"Hanoi\""
+  ],
+  "verifier_result": "VERIFIED",
+  "mutation_state": "NO_MUTATION_OBSERVED",
+  "failure_class": "NONE",
+  "timestamps": {
+    "started_at": "2026-08-18T08:33:41+0000",
+    "finished_at": "2026-08-18T08:33:45+0000",
+    "executed_at": "UNKNOWN",
+    "verified_at": "UNKNOWN"
+  },
+  "raw_backend_receipt_pointer": "hermes-session:gemini:gemini-2.5-flash"
+}

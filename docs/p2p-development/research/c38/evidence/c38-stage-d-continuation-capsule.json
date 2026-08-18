@@ -1,0 +1,31 @@
+{
+  "schema": "p2p-continuation-capsule/1",
+  "capsule_id": "challenge-1d19b45139c2ae99",
+  "project_id": "P2P-upgrade-github-1",
+  "goal_id": "C38",
+  "current_stage": "D",
+  "previous_verified_stage": "B",
+  "current_verified_git_revision": "2a371777438c88867138203e0b0bcc04283d8bed",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "previous_backend_id": "manus-rest-api-v2",
+  "previous_receipt_pointer": "manus-task:NWnoWkrrJeQiYWZMv8jCS5",
+  "mutation_state": "NO_MUTATION_OBSERVED",
+  "current_owner_gate": "SECOND_BACKEND_AUTH_REQUIRED",
+  "next_task_id": "c38-stage-d-fresh-session-capsule-proof",
+  "verification_rule": "Fresh execution must return a structured result containing: project_id, goal_id, current_stage, role_id, current_verified_git_revision, capsule_id, next_owner_gate, plus challenge_hash = sha256(capsule_id) exactly. Acceptance: exact string equality for every field; accidental success probability <= 2^-128 on the challenge hash.",
+  "challenge_hash_source_field": "capsule_id",
+  "source_evidence_pointers": [
+    "docs/p2p-development/research/c38/evidence/c38-stage-b-role-contract.json",
+    "docs/p2p-development/research/c38/evidence/c38-stage-b-live-receipt.json",
+    "docs/p2p-development/research/c38/evidence/c38-stage-b-role-receipt.json",
+    "docs/p2p-development/research/c38/evidence/c38-stage-b-messages-observed.json",
+    "docs/p2p-development/research/c38/c38-task-graph-revision.md"
+  ],
+  "notes": {
+    "transcript_excluded": true,
+    "conversation_history_excluded": true,
+    "no_credential_data": true
+  },
+  "challenge_hash_expected": "7eb15e5ac78ca369e77f0d3ce5cd61b983c501a7096f45e038f94eadaad86d7f"
+}

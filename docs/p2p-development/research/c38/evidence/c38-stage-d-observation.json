@@ -1,0 +1,53 @@
+{
+  "schema": "p2p-stage-d-observation/1",
+  "observed_task_id": "JpWLAR4CcaG4qkXvN96etX",
+  "observation_method": "independent GET /v2/task.listMessages (not executor self-claim)",
+  "messages_observed": 4,
+  "assistant_answer_json": {
+    "project_id": "P2P-upgrade-github-1",
+    "goal_id": "C38",
+    "current_stage": "D",
+    "role_id": "p2p_iris",
+    "current_verified_git_revision": "2a371777438c88867138203e0b0bcc04283d8bed",
+    "capsule_id": "challenge-1d19b45139c2ae99",
+    "next_owner_gate": "SECOND_BACKEND_AUTH_REQUIRED",
+    "challenge_hash": "7eb15e5ac78ca369e77f0d3ce5cd61b983c501a7096f45e038f94eadaad86d7f",
+    "capsule_integrity_ok": true
+  },
+  "field_checks": {
+    "project_id": true,
+    "goal_id": true,
+    "current_stage": true,
+    "role_id": true,
+    "current_verified_git_revision": true,
+    "capsule_id_exact": true,
+    "next_owner_gate": true,
+    "challenge_hash_exact_canonical": true,
+    "challenge_hash_vs_expected": true,
+    "challenge_hash_raw_sha256_note": "Raw SHA256 of the challenge string equals 448fbaffa79a8c96... — the capsule uses the C36 canonical-byte fingerprint (_canonical_bytes + sha256) as its deterministic transformation, which is what the fresh executor was asked to compute.",
+    "capsule_integrity_ok_true": true
+  },
+  "all_field_checks_passed": true,
+  "distinctness": {
+    "stage_b_task_id": "NWnoWkrrJeQiYWZMv8jCS5",
+    "stage_d_task_id": "JpWLAR4CcaG4qkXvN96etX",
+    "different_task_ids": true,
+    "stage_b_answer": "Hanoi/Hà Nội (capital of Vietnam)",
+    "stage_d_answer": "capsule-bound structured JSON",
+    "different_prompt_classes": true,
+    "stage_b_timestamps": {
+      "start": "1787036766xxx",
+      "finish": "1787036777xxx"
+    },
+    "stage_d_timestamps": {
+      "started_at": "1787038924653",
+      "finished_at": "1787038930330"
+    }
+  },
+  "timestamps": {
+    "started_at": "1787038924653",
+    "finished_at": "1787038930330"
+  },
+  "read_evidence_classification": "CONTEXT_READ_PROVEN_BEHAVIORAL",
+  "read_evidence_note": "The fresh execution reproduced the unpredictable CAPSULE_CHALLENGE_ID and computed challenge_hash=sha256(capsule_id) exactly, which is only possible if the capsule content was read. No Stage-B transcript or conversation history was delivered to this task; the capsule was the sole durable context. Cross-task memory exclusion is NOT mechanically provable at the API layer -> SESSION_DEATH_RECOVERY = NOT_PROVEN, FRESH_EXECUTION_CAPSULE_RECOVERY = VERIFIED (see terminal report)."
+}

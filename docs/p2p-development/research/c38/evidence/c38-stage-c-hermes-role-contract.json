@@ -1,0 +1,39 @@
+{
+  "schema": "p2p-role-execution-contract/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "goal_id": "C38",
+  "task_id": "c38-stage-c-hermes-second-backend-proof",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "workspace_binding": "",
+  "objective": "BOUNDED NON-MUTATING PROOF (Backend B): Answer 'What is the capital of Vietnam?' with exactly the city name and nothing else, via Hermes CLI with the Gemini provider.",
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "dependencies": [],
+  "context_package": [
+    "SYNTHETIC_TEXT_EXECUTION"
+  ],
+  "context_digest": "92da41a5f62c04fa1b04074b78f55ad9fd13ca89832d52af27e8e374c376844b",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "required_capabilities": [],
+  "acceptance_criteria": [
+    "answer_is_capital_of_vietnam"
+  ],
+  "required_evidence": [
+    "role_binding",
+    "target_attestation",
+    "terminal_result"
+  ],
+  "verification_policy": "INDEPENDENT",
+  "explicit_execution_target": "hermes-cli:gemini:gemini-2.5-flash",
+  "target_fingerprint": "4a27ff90e8824cdfff4f0a4883975c23352a04e0504e31cc679b09c6fa964e01",
+  "requested_target_attestation": "REQUESTED_ONLY",
+  "budget": "BOUNDED",
+  "request_fingerprint": "62044a86ed76ede96ffb3e3957f598ef0eda70c21599c95bcc2696e0b6387d6e"
+}

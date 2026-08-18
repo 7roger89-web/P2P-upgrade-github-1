@@ -1,0 +1,43 @@
+{
+  "schema": "p2p-role-execution-contract/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "goal_id": "C38",
+  "task_id": "c38-stage-d-fresh-session-capsule-proof",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "workspace_binding": "",
+  "objective": "BOUNDED NON-MUTATING FRESH-SESSION PROOF: reconstruct P2P task state from the delivered continuation capsule only; return the required structured result.",
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "dependencies": [],
+  "context_package": [
+    "SYNTHETIC_TEXT_EXECUTION"
+  ],
+  "context_digest": "cd935dff216b62598b4fa4e65fbfc1731dc2ccc6768e1a4235d92caf794b2ec3",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "required_capabilities": [],
+  "acceptance_criteria": [
+    "structured_result_fields_exact",
+    "challenge_hash_sha256_capsule_id_exact",
+    "git_revision_exact",
+    "stage_exact",
+    "owner_gate_exact"
+  ],
+  "required_evidence": [
+    "role_binding",
+    "target_attestation",
+    "terminal_result"
+  ],
+  "verification_policy": "INDEPENDENT",
+  "explicit_execution_target": "manus-api-v2",
+  "target_fingerprint": "680fdf1ca355ae6dad7be3ffa3a60b847b9d4f620115af4be1fdaa8c86284f65",
+  "requested_target_attestation": "REQUESTED_ONLY",
+  "budget": "BOUNDED",
+  "request_fingerprint": "055a19c8d9f72c51cb580e4104ad678ec9c184c0c83ec3c3c1e8d2602d5decc5"
+}

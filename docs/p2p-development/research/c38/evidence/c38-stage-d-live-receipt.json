@@ -1,0 +1,37 @@
+{
+  "schema": "p2p-live-execution-receipt/1",
+  "goal_id": "C38",
+  "task_id": "c38-stage-d-fresh-session-capsule-proof",
+  "requested_role": "p2p_iris",
+  "verified_role": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "requested_target": "manus-rest-api-v2",
+  "observed_target": null,
+  "observed_model": "UNKNOWN (not observable at API layer)",
+  "context_delivered": "p2p-continuation-capsule/1 (inline, bounded)",
+  "read_evidence": "UNKNOWN",
+  "permission": "NON_MUTATING_TASK",
+  "execution_status": "SUCCEEDED",
+  "verification_status": "UNKNOWN",
+  "exit_status": "stopped",
+  "output_pointers": [],
+  "artifact_pointers": [
+    "docs/p2p-development/research/c38/evidence/c38-stage-d-continuation-capsule.json",
+    "docs/p2p-development/research/c38/harness/c38_stage_d_fresh_execution.py"
+  ],
+  "evidence_pointers": [
+    "role_binding:contract-on-disk",
+    "target_attestation:manus-task:JpWLAR4CcaG4qkXvN96etX",
+    "terminal_result:listMessages:pending"
+  ],
+  "verifier_result": "UNKNOWN",
+  "mutation_state": "NO_MUTATION_OBSERVED",
+  "failure_class": "NONE",
+  "timestamps": {
+    "started_at": "2026-08-18T07:42:03+0000",
+    "finished_at": "2026-08-18T07:42:14+0000",
+    "elapsed_seconds": 11.02
+  },
+  "raw_backend_receipt_pointer": "manus-task:JpWLAR4CcaG4qkXvN96etX",
+  "usage_evidence": {}
+}

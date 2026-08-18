@@ -423,8 +423,8 @@
       "evidence_refs": [
         "docs/p2p-development/research/c34/evidence/c34-capability-scoped-certification.json"
       ],
-      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift \u2014 see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged.",
-      "identity_semantics_note": "candidate_version 8.4.7-C-codex.24 identifies SOURCE STATE, not artifact uniqueness \u2014 established precedent: C18-C21/C25/C26 all share 8.4.7-C-codex.21 with distinct candidate_sha256/artifacts. Canonical identity = (candidate_id, development_goal, candidate_sha256). No governance change, no promotion implied."
+      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift — see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged.",
+      "identity_semantics_note": "candidate_version 8.4.7-C-codex.24 identifies SOURCE STATE, not artifact uniqueness — established precedent: C18-C21/C25/C26 all share 8.4.7-C-codex.21 with distinct candidate_sha256/artifacts. Canonical identity = (candidate_id, development_goal, candidate_sha256). No governance change, no promotion implied."
     },
     {
       "candidate_id": "C35",
@@ -442,7 +442,7 @@
       "candidate_policy_lane": "NON_CANONICAL_TERMINAL_STATUS: canonical PASS-trigger lane does not fire; candidate minted voluntarily under fail-closed governance per C33 precedent (runtime surface changed while terminal state is non-canonical)",
       "goal_closure_machine": "INCONSISTENT",
       "goal_closure_machine_hard_fails": 1,
-      "goal_closure_machine_explained": "ROADMAP_ITEM_EXISTS \u2014 roadmap items end at C31; C35 roadmap item and sync belong to C36 metadata refresh; not force-fixed",
+      "goal_closure_machine_explained": "ROADMAP_ITEM_EXISTS — roadmap items end at C31; C35 roadmap item and sync belong to C36 metadata refresh; not force-fixed",
       "source_commit": "ca12d57255c34fe059678d79be77559a238fb7a7",
       "source_branch": "c35-provider-neutral-runtime",
       "evidence_refs": [
@@ -916,42 +916,42 @@
       {
         "id": "C28",
         "status": "DONE",
-        "title": "Secure Host Connection & Credential Onboarding \u2014 determine required auth, verify safely, minimal Owner action outside chat",
+        "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
         "evidence_ref": "GOAL-C28",
         "notes": "C28 terminal state: PASS (machinery). Full provider-neutral connection + credential onboarding layer implemented and verified (70 HO tests, 31/31 validator, secret scan 0). No host claimed live-certified; owner action codex login / Manus connector remains the irreducible next step."
       },
       {
         "id": "C30",
         "status": "PLANNED",
-        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
+        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
         "evidence_ref": "GOAL-C30",
         "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery)."
       },
       {
         "id": "C31",
         "status": "PLANNED",
-        "title": "Complete Live Host Certification Before Cross-Host Continuation \u2014 honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
+        "title": "Complete Live Host Certification Before Cross-Host Continuation — honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
         "evidence_ref": "GOAL-C31",
         "notes": "C31 terminal verdict 2026-08-17: BLOCKED / OWNER_ACTION_REQUIRED. Fresh live probe (evidence/c31_live_probe.json, fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b) reached Codex CLI 0.147.0's own auth layer and returned HTTP 401 before model contact (AUTH_INVALID); Manus connector path is AUTH_CONFIG_ABSENT (no connector enabled). Unresolved dependency: a real auth session. Smallest owner actions: (a) `codex login` with a real OpenAI/Codex account outside chat; or (b) enable the Manus project connector in the Manus session configuration. Reopen condition: a supported host reaches connection_status AUTH_REQUIRED or stronger on a fresh probe."
       },
       {
         "id": "C35",
         "status": "DONE",
-        "title": "Provider-Neutral P2P Agent Runtime \u2014 portable role specs, deterministic role execution contract, eligibility validation, execution receipts, independent receipt verification, 8/8 verified role-receipt quorum gate",
+        "title": "Provider-Neutral P2P Agent Runtime — portable role specs, deterministic role execution contract, eligibility validation, execution receipts, independent receipt verification, 8/8 verified role-receipt quorum gate",
         "evidence_ref": "docs/p2p-development/reports/P2P-C35-terminal-report.md",
         "notes": "C35 terminal verdict (normalized): PASS / PROVIDER_NEUTRAL_AGENT_RUNTIME_READY (canonical PASS of the controlling C35 execution contract). 8 canonical roles + aesthetica (optional); 57/57 deterministic tests pass at HEAD ca12d57255c34fe059678d79be77559a238fb7a7; 0 regression deltas vs C34 baseline e16a4d2; governance-integrity review 0 violations; BackendExecutionBridge (C34) reused, no fork. Candidate P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip (UNPROMOTED, ARTIFACT_VERIFY_PASS, SHA 077971e3a7ab308b713c7c5deb744e0b89fb9e6c58c102168a7bb4426f677427); candidate-policy lane CANDIDATE_REQUIRED=YES bound to the existing artifact. Governance promotion is a separate, Owner-gated workflow."
       },
       {
         "id": "C35R",
         "status": "DONE",
-        "title": "ZaoFu Deep Architecture Audit (Research Only) \u2014 upstream provenance, 16-area subsystem audit, BUILD-vs-REUSE matrix (ADAPT 7 / DEFER 5 / REJECT 4), 12 architectural verdicts, C36/C37 MINOR_REFINEMENT research inputs (no implementation)",
+        "title": "ZaoFu Deep Architecture Audit (Research Only) — upstream provenance, 16-area subsystem audit, BUILD-vs-REUSE matrix (ADAPT 7 / DEFER 5 / REJECT 4), 12 architectural verdicts, C36/C37 MINOR_REFINEMENT research inputs (no implementation)",
         "evidence_ref": "GOAL-C35R (docs/p2p-development/reports/P2P-C35R-terminal-report.md)",
-        "notes": "C35R terminal verdict: PASS / ZAOFU_ARCHITECTURE_AUDIT_COMPLETE (research only). Machine-derived C35R_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) \u2014 no candidate minted, no release artifact, no capability promotion, no C36/C37 implementation. Normalization \u00a7A-J completed: matrix counts mechanically reconciled (7/5/4, invariant holds), closure machinery final CONSISTENT 0 hard findings, C31/C28 divergence classified as legitimate historical snapshot semantics."
+        "notes": "C35R terminal verdict: PASS / ZAOFU_ARCHITECTURE_AUDIT_COMPLETE (research only). Machine-derived C35R_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C36/C37 implementation. Normalization §A-J completed: matrix counts mechanically reconciled (7/5/4, invariant holds), closure machinery final CONSISTENT 0 hard findings, C31/C28 divergence classified as legitimate historical snapshot semantics."
       },
       {
         "id": "C36",
         "status": "DONE",
-        "title": "Evidence-Bound Context & Efficiency Intelligence \u2014 ContextManifest (authority classification + deterministic identity), DeliveryEnvelope/Receipt (DELIVERED != READ), ReadEvidence/ReadGap, ContextCache (identity/freshness/ transformation provenance), efficiency telemetry + soft budget, bounded loop/overwrite guards (no provider routing, no fallback, no vendor branching, zero live backend calls)",
+        "title": "Evidence-Bound Context & Efficiency Intelligence — ContextManifest (authority classification + deterministic identity), DeliveryEnvelope/Receipt (DELIVERED != READ), ReadEvidence/ReadGap, ContextCache (identity/freshness/ transformation provenance), efficiency telemetry + soft budget, bounded loop/overwrite guards (no provider routing, no fallback, no vendor branching, zero live backend calls)",
         "evidence_ref": "GOAL-C36 (docs/p2p-development/reports/P2P-C36-terminal-report.md)",
         "notes": "C36 terminal verdict: PASS / EVIDENCE_BOUND_CONTEXT_EFFICIENCY_READY. Machine-derived C36_CANDIDATE_REQUIRED=YES (runtime_changed=True); UNPROMOTED candidate minted at reports/candidates; no promotion, no release, no merge, no C37 start."
       },
@@ -959,23 +959,30 @@
         "id": "C37",
         "status": "DONE",
         "title": "C37 Adaptive Target / Model / Reasoning-Effort Selection (provider-neutral selection pipeline; candidate UNPROMOTED)"
+      },
+      {
+        "id": "C38",
+        "title": "C38 Live Role Certification & Multi-Backend Execution Proof (provider-neutral live certification of canonical role p2p_iris on two independent backends: Manus API v2 and Hermes CLI × Gemini; Stage B/C/D all VERIFIED; candidate policy NO — no candidate minted)",
+        "status": "DONE",
+        "evidence_ref": "GOAL-C38 (docs/p2p-development/reports/P2P-C38-terminal-report.md)",
+        "notes": "C38 terminal verdict: PASS / LIVE_MULTI_BACKEND_ROLE_CERTIFIED (Stages B, C, D each independently VERIFIED with the fail-closed role verifier; Stage A AUTH_VALID for Manus; Framework validator 71/71; regression delta = 0 vs f4a2090; secret scan clean). Machine-derived C38_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C39 implementation. current_development retained as C31/BLOCKED_TERMINAL historical snapshot (explained CURRENT_DEVELOPMENT_SEMANTICS per C35R precedent)."
       }
     ],
     "current": {
-      "id": "C37",
+      "id": "C38",
       "status": "DONE",
-      "title": "C37 Adaptive Target / Model / Reasoning-Effort Selection (provider-neutral selection pipeline; candidate UNPROMOTED)"
+      "title": "C38 Live Role Certification & Multi-Backend Execution Proof (provider-neutral live certification of canonical role p2p_iris on two independent backends: Manus API v2 and Hermes CLI × Gemini; Stage B/C/D all VERIFIED; candidate policy NO — no candidate minted)"
     },
     "likely_next": {
       "id": "C30",
       "status": "PLANNED",
-      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
     },
     "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion.",
     "likely_next_goal": {
       "id": "C30",
       "status": "PLANNED",
-      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
     }
   },
   "research_decisions": [
@@ -1565,7 +1572,7 @@
       "change_id": "C31-BLOCKED-001",
       "when": "2026-08-17T06:15:29Z",
       "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
-      "why": "C31 terminal rule \u00a714/\u00a761: honest BLOCKED, no fabrication"
+      "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
     }
   ]
 }
