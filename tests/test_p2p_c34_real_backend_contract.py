@@ -729,8 +729,22 @@ class TestCandidatePolicyAudit:
             # C35R ZaoFu architecture audit: canonical terminal report and
             # this test's C35R-authorized approved-set growth (research-only
             # authorized closure edit per the C34 precedent — no runtime,
-            # governance, or candidate mutation).
+            # governance-capability, or candidate mutation).
             "docs/p2p-development/reports/P2P-C35R-terminal-report.md",
+            # C35R FINAL RESEARCH GOVERNANCE NORMALIZATION (mechanical
+            # reconciliation): matrix summary recount (ADAPT 7/DEFER 5/
+            # REJECT 4, row-count invariant), normalization record, machine-
+            # derivation evidence, final closure-machine transcript, and the
+            # minimum roadmap-integrity syncs (C35R DONE item +
+            # roadmap.current = roadmap_terminal_next; gc22 derivation rule).
+            "docs/p2p-development/research/c35r/zaofu-normalization-record.md",
+            "docs/p2p-development/research/c35r/evidence/c35r-candidate-policy-derivation.txt",
+            "docs/p2p-development/research/c35r/evidence/c35r-closure-machine-final.txt",
+            "docs/p2p-development/research/c35r/evidence/c35r-change-signals-derivation.txt",
+            "tests/test_p2p_goal_closure.py",
+            # C35R matrix summary recount (ADAPT 7/DEFER 5/REJECT 4; rows
+            # unchanged — aggregation-only mechanical reconciliation).
+            "docs/p2p-development/research/c35r/zaofu-build-vs-reuse-matrix.json",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:

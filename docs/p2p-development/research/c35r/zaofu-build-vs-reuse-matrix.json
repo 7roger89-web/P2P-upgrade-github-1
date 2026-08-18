@@ -245,9 +245,9 @@
     }
   ],
   "summary": {
-    "ADAPT": 5,
+    "ADAPT": 7,
     "BUILD": 0,
-    "DEFER": 4,
+    "DEFER": 5,
     "REJECT": 4,
     "REUSE": 0,
     "interpretation": "No capability should be wholesale REUSED (ZaoFu is too young and its integration layer is Codex-deep) and nothing needs to be newly BUILT because of ZaoFu. The correct posture is SELECTIVE ADAPT for concepts (contract shape, CAS revisioning, capability matrix, Thin-Judge pattern, bounded recovery, context delivery, control actions) while P2P retains full authority over governance, verification determinism, and the beginner-first layer. Raw execution harness work is left to upstream — P2P never planned to build it."

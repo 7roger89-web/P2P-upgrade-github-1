@@ -867,12 +867,19 @@
         "title": "Provider-Neutral P2P Agent Runtime — portable role specs, deterministic role execution contract, eligibility validation, execution receipts, independent receipt verification, 8/8 verified role-receipt quorum gate",
         "evidence_ref": "docs/p2p-development/reports/P2P-C35-terminal-report.md",
         "notes": "C35 terminal verdict (normalized): PASS / PROVIDER_NEUTRAL_AGENT_RUNTIME_READY (canonical PASS of the controlling C35 execution contract). 8 canonical roles + aesthetica (optional); 57/57 deterministic tests pass at HEAD ca12d57255c34fe059678d79be77559a238fb7a7; 0 regression deltas vs C34 baseline e16a4d2; governance-integrity review 0 violations; BackendExecutionBridge (C34) reused, no fork. Candidate P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip (UNPROMOTED, ARTIFACT_VERIFY_PASS, SHA 077971e3a7ab308b713c7c5deb744e0b89fb9e6c58c102168a7bb4426f677427); candidate-policy lane CANDIDATE_REQUIRED=YES bound to the existing artifact. Governance promotion is a separate, Owner-gated workflow."
+      },
+      {
+        "id": "C35R",
+        "status": "DONE",
+        "title": "ZaoFu Deep Architecture Audit (Research Only) — upstream provenance, 16-area subsystem audit, BUILD-vs-REUSE matrix (ADAPT 7 / DEFER 5 / REJECT 4), 12 architectural verdicts, C36/C37 MINOR_REFINEMENT research inputs (no implementation)",
+        "evidence_ref": "GOAL-C35R (docs/p2p-development/reports/P2P-C35R-terminal-report.md)",
+        "notes": "C35R terminal verdict: PASS / ZAOFU_ARCHITECTURE_AUDIT_COMPLETE (research only). Machine-derived C35R_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C36/C37 implementation. Normalization §A-J completed: matrix counts mechanically reconciled (7/5/4, invariant holds), closure machinery final CONSISTENT 0 hard findings, C31/C28 divergence classified as legitimate historical snapshot semantics."
       }
     ],
     "current": {
-      "id": "C28",
+      "id": "C35R",
       "status": "DONE",
-      "title": "Controlled continuation"
+      "title": "Research-complete checkpoint (ZaoFu deep architecture audit; research-only, no capability promotion, no C36/C37 start)"
     },
     "likely_next": {
       "id": "C30",
