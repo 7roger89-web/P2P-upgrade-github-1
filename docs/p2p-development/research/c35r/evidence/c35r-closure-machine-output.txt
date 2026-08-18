@@ -1,0 +1,26 @@
+roadmap_terminal_next derived: C35/DONE; roadmap.current = C28/DONE
+reopen_condition_is_metadata = True
+Goal C35R: INCONSISTENT
+  [FAIL] ROADMAP_ITEM_EXISTS: C35R has no roadmap item
+  [FAIL] CURRENT_DEVELOPMENT_SEMANTICS: current_development.development_goal='C31' vs roadmap.current.id='C28'
+  [FAIL] CANDIDATE_REQUIRED_PRESENT: contract requires candidate for C35R; record=absent
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability REAL_HOST_EXECUTION_CERTIFICATION status='' (correctly not a machinery claim)
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability HOST_AUTH_STATE_VERIFICATION status='' (correctly not a machinery claim)
+  [PASS] CLAIM_BOUNDARY: ROUTER not introduced
+  [PASS] CLAIM_BOUNDARY: CONTEXT_CONTROLLER not introduced
+  [PASS] CLAIM_BOUNDARY: AUTH_ACTION not introduced
+  [PASS] CLAIM_BOUNDARY: SECOND_EXECUTOR not introduced
+  [PASS] CLAIM_BOUNDARY: BACKGROUND_AUTONOMY not introduced
+C27 machinery current status: FOUNDATION_READY
+Goal C35R: INCONSISTENT
+  [FAIL] ROADMAP_ITEM_EXISTS: C35R has no roadmap item
+  [FAIL] CURRENT_DEVELOPMENT_SEMANTICS: current_development.development_goal='C31' vs roadmap.current.id='C28'
+  [FAIL] CANDIDATE_REQUIRED_PRESENT: contract requires candidate for C35R; record=absent
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability REAL_HOST_EXECUTION_CERTIFICATION status='' (correctly not a machinery claim)
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability HOST_AUTH_STATE_VERIFICATION status='' (correctly not a machinery claim)
+  [PASS] CLAIM_BOUNDARY: ROUTER not introduced
+  [PASS] CLAIM_BOUNDARY: CONTEXT_CONTROLLER not introduced
+  [PASS] CLAIM_BOUNDARY: AUTH_ACTION not introduced
+  [PASS] CLAIM_BOUNDARY: SECOND_EXECUTOR not introduced
+  [PASS] CLAIM_BOUNDARY: BACKGROUND_AUTONOMY not introduced
+C27 machinery current status: FOUNDATION_READY

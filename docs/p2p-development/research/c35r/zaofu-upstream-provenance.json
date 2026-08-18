@@ -1,0 +1,48 @@
+{
+  "goal": "C35R",
+  "goal_title": "ZaoFu Deep Architecture Audit — BUILD-vs-REUSE decision audit (research only)",
+  "upstream": {
+    "repository_url": "https://github.com/uisee-ai/zaofu",
+    "owner": "uisee-ai",
+    "description": "An open-source Coding Harness Platform for long-horizon, multi-agent software delivery.",
+    "default_branch": "main",
+    "head_commit_sha": "b5e569dd45a9743ddfa82cf08e8d3f4b8a4bdcd3",
+    "head_commit_date_utc": "2026-08-17T12:32:10Z",
+    "license": "Apache-2.0",
+    "license_spdx": "Apache-2.0",
+    "latest_release": "v0.0.5",
+    "latest_release_date_utc": "2026-08-17",
+    "all_tags": ["v0.0.1", "v0.0.2", "v0.0.3", "v0.0.4", "v0.0.5"],
+    "first_activity_date_utc": "2026-08-04",
+    "repo_age_days": "approximately 14 at retrieval time",
+    "python_version_requirement": ">=3.11",
+    "package_manager": "uv (pyproject.toml + uv.lock)",
+    "code_scale": {
+      "python_files_src_zf": 1006,
+      "runtime_flat_files": 646,
+      "core_modules": 154,
+      "autoresearch_modules": 31,
+      "cli_modules": 77,
+      "integration_modules": 48,
+      "tests_files": 968,
+      "notes": "src/zf/runtime is flattened (no subdirectory layering); CLI is thin over zf.core"
+    }
+  },
+  "audit_method": {
+    "approach": "Implementation inspection of upstream source at HEAD, NOT README-only review",
+    "parallel_audit_groups": 16,
+    "findings_artifacts": "docs/p2p-development/research/c35r/evidence/zaofu-audit-area{01..16}.md",
+    "no_runtime_mutation": true,
+    "no_live_backend_calls": true,
+    "license_respected": true,
+    "evidence_style": "pointer-based (module path + class/function names); no large upstream source copies"
+  },
+  "retrieval": {
+    "retrieved_by": "C35R ZaoFu deep audit",
+    "retrieval_date": "2026-08-18",
+    "retrieval_timezone_note": "GMT+7 user timezone; UTC dates per GitHub API",
+    "local_clone_path": "/home/ubuntu/zaofu-audit (cloned at commit b5e569dd)"
+  },
+  "governance_note": "RESEARCH ONLY per C35R spec: no promotion, no merge, no vendoring decision made at audit time, no P2P runtime mutation. Downstream BUILD-vs-REUSE decisions are recorded in zaofu-build-vs-reuse-matrix.json.",
+  "created_at": "2026-08-18"
+}
