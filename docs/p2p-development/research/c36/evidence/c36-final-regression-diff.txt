@@ -1,0 +1,38 @@
+C36 FINAL REGRESSION DIFF (measured, not assumed)
+==================================================
+Baseline: HEAD 9dc0811 (p2p-c35r-zaofu-deep-audit, before any C36 change).
+  Result: 30 failed, 835 passed (measured at C36 CP0: /home/ubuntu/analysis/c36_baseline_failures.txt)
+
+C36 final surface (9dc0811 + six new C36 modules + C36 test file +
+  approved-set growth to test_p2p_c34_real_backend_contract.py):
+  Result: 30 failed, 835 passed
+
+comm diff (sorted failure lists):
+  NEW-ONLY (failures introduced by C36): 0
+  FIXED (failures removed by C36): 0
+
+Interpretation: zero new regressions. The 30 pre-existing failures are
+documented at the C35R recheck and are environmental/lineage (missing remote
+refs, pre-existing V15/V21 lineage assertions, gc22-style derivation rule —
+all outside the C36 surface). Per the C36 prompt: "Do NOT assume a hardcoded
+current failure count. Measure the actual starting baseline."
+
+Note on one intermittently failing test
+  (test_full_behavioral_certification_is_isolated_and_honest,
+   test_p2p_beginner_certification.py): passes in isolation (2 passed);
+  appears in some full-suite runs due to order-dependent subprocess/git state.
+  It is NOT on the base-commit failure set, NOT caused by C36 modules
+  (they do not touch onboarding/beginner-certification code paths), and does
+  not appear in a stabilized final run.
+
+Stabilization evidence: two consecutive final full-suite runs produced the
+identical 30-test failure set, matching the baseline list via comm
+(same lines, sorted); one intermediate run showed an ordering-flaky extra
+failure that disappeared on rerun — classic xdist/git-state flakiness, not
+a regression.
+
+C36-specific test suite: tests/test_p2p_c36_evidence_bound_context.py —
+69 tests, ALL PASS (69 passed in ~0.2s), deterministic, no backend calls.
+Covers prompt requirements 1-55 100% (30+31 combined in one test; additional
+11b/12b/12c/14b/16b/19b/20b/22b/24b/30b/43b tests are "add more if actual
+implementation needs them" per prompt).

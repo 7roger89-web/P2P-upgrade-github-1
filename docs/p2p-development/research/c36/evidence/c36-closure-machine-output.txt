@@ -1,0 +1,25 @@
+FINAL HEAD (at closure): 47cc9450d68f2fbcb9b553073b659a9c47cc39d5
+
+C36 CLOSURE MACHINE — FULL OUTPUT (Goal C36, final surface)
+roadmap_terminal_next derived: C36/DONE; roadmap.current = C36/DONE
+reopen_condition_is_metadata = True
+Goal C36: CONSISTENT
+  [PASS] ROADMAP_ITEM_EXISTS: C36 roadmap item status='DONE'
+  [PASS] PASS_WITH_DONE_ROADMAP: terminal PASS requires roadmap DONE; found 'DONE'
+  [FAIL] CURRENT_DEVELOPMENT_SEMANTICS: current_development.development_goal='C31' vs roadmap.current.id='C36' — explained: development_goal advanced to a newer packaged goal (C31) with a verified UNPROMOTED candidate, while C36 already closed DONE; the snapshot verdict remains durable
+  [PASS] PASS_CURRENT_IS_DONE: terminal PASS with roadmap.current=C36 requires DONE; found 'DONE'
+  [PASS] CANDIDATE_REQUIRED_PRESENT: contract requires candidate for C36; record=present
+  [PASS] CANDIDATE_SHA_IMPLIES_ARTIFACT: SHA claimed but artifact exists
+  [PASS] CANDIDATE_VERIFY_EVIDENCE: package verify evidence=recorded
+  [PASS] CANDIDATE_UNPROMOTED_UNTIL_APPROVAL: candidate C36 promotion_status='UNPROMOTED'; promotion needs separate approval
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability REAL_HOST_EXECUTION_CERTIFICATION status='' (correctly not a machinery claim)
+  [PASS] OUTCOME_NOT_CLAIMED_BY_MACHINERY: outcome capability HOST_AUTH_STATE_VERIFICATION status='' (correctly not a machinery claim)
+  [PASS] CLAIM_BOUNDARY: ROUTER not introduced
+  [PASS] CLAIM_BOUNDARY: CONTEXT_CONTROLLER not introduced
+  [PASS] CLAIM_BOUNDARY: AUTH_ACTION not introduced
+  [PASS] CLAIM_BOUNDARY: SECOND_EXECUTOR not introduced
+  [PASS] CLAIM_BOUNDARY: BACKGROUND_AUTONOMY not introduced
+C27 machinery current status: FOUNDATION_READY
+
+CHANGE SIGNALS (pre-metadata-sync snapshot): runtime_changed=True (6 new .p2p/system modules); governance_changed=False; release_artifact_changed=True (candidate zip, required lane)
+CANDIDATE POLICY: candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=True)) = YES
