@@ -1,0 +1,32 @@
+{
+  "prompt_integration": {
+    "project_agents_md_exists": false,
+    "project_agents_md_bytes": null,
+    "original_agents_md_backed_up": false,
+    "collisions_backup_dir_bytes": 0,
+    "note": "No AGENTS.md collision — prompt surface intact. P2P instruction entry point: .p2p/system (README.md inside it)."
+  },
+  "fresh_process_discovery": {
+    "verdict": "PASS",
+    "fresh_python_process": true,
+    "state_file": "/home/ubuntu/gia-pha-production/.p2p/system/p2p-install-manifest.json",
+    "detail": {
+      "P2P_SYSTEM_PRESENT": true,
+      "P2P_STATE_FILE_PRESENT": true,
+      "MODULE_LOADABLE": [
+        "p2p_task_state",
+        "p2p_workflow",
+        "p2p_governance",
+        "p2p_capabilities.backend_contract"
+      ],
+      "pid": 46739
+    }
+  },
+  "rollback_readiness": {
+    "verdict": "PASS",
+    "rolled_back_fingerprint": "c21d18e9036c938acabd7528967fed36e538a123c938ef3e363c23057e9a93ae",
+    "pre_install_fingerprint": "c21d18e9036c938acabd7528967fed36e538a123c938ef3e363c23057e9a93ae",
+    "pre_install_revision": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+    "note": "Simulated rollback: git clean -fd -e .p2p -e .codex (P2P footprint removed, tracked tree untouched)."
+  }
+}

@@ -723,6 +723,11 @@ class TestCandidatePolicyAudit:
             # evidence pack; authorized closure growth per the
             # C34/C35R/C36/C37/C38/C39/C40 precedent):
             "docs/p2p-development/research/c41/",
+            # C43 production-install evidence tree (Game Truyện + Gia Phà
+            # production installs, activation proofs, council audit +
+            # smoke; authorized closure growth per the
+            # C34/C35R/C36/C37/C38/C39/C40/C41 precedent):
+            "docs/p2p-development/research/c43/",
             "scripts/p2p_install_release.py",
             "reports/candidates",
 

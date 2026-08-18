@@ -1,0 +1,20 @@
+{
+ "ok": true,
+ "request_id": "70db9a2387702a68d0d84a61aa139265",
+ "task": {
+  "agent_profile": "manus-1.6-lite",
+  "created_at": "1787074039",
+  "created_by_api_key": {
+   "id": "L2CtVXFCqJ86KxqrwAj8L8",
+   "name": "p2p-c39-live-target-selection"
+  },
+  "credit_usage": 0,
+  "id": "YKCsVkoKZUo3KUv4aZPmpM",
+  "share_visibility": "private",
+  "status": "stopped",
+  "task_type": "standard",
+  "task_url": "https://manus.im/app/YKCsVkoKZUo3KUv4aZPmpM",
+  "title": "P2P-C43 activation Gia Ph\u1ea3",
+  "updated_at": "1787074086"
+ }
+}
