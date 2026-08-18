@@ -27,7 +27,7 @@
 
 ## 2. WHAT THIS SESSION CHANGED (CHANGELOG)
 
-The closeout commit sequence changed only `governance/development-control.json` (roadmap `C38` DONE item + `roadmap.current` = C38/DONE, mechanical normalization per C35R precedent) and this terminal report. Earlier commits on the branch (Stages A–D) changed only `docs/p2p-development/research/c38/` evidence and harnesses. **No runtime file in `source/` or `.p2p/system/p2p_capabilities/` was added or modified by C38.** Adapter modules `manus_adapter.py` / `hermes_adapter.py` and the verifier pre-exist (C34/C35 era). Therefore `ChangeSignals(runtime_changed=False, governance_changed=True[docs-only], release_artifact_changed=False)` → machine-derived `CANDIDATE_REQUIRED = NO` → no candidate minted. The framework validator (71/71) and regression suite (delta = 0) pass.
+The closeout commit sequence changed only `governance/development-control.json` (roadmap `C38` DONE item + `roadmap.current` = C38/DONE, mechanical normalization per C35R precedent) and this terminal report. Earlier commits on the branch (Stages A–D) changed only `docs/p2p-development/research/c38/` evidence and harnesses. **No runtime file in `source/` or `.p2p/system/p2p_capabilities/` was added or modified by C38.** Adapter modules `manus_adapter.py` / `hermes_adapter.py` and the verifier pre-exist (C34/C35 era). Therefore the closeout's `ChangeSignals(runtime_changed=False, governance_changed=True[docs-only], release_artifact_changed=False)` triggers the C35R-classified priority-1 declared path: the final-surface undeclared machine path returns YES, but the already machine-derived terminal declaration `CANDIDATE_REQUIRED = NO` is authoritative → no candidate minted (exact path recorded in §13). The framework validator (71/71) and regression suite (delta = 0) pass.
 
 ## 3. TERMINAL VERDICT (machine)
 
@@ -95,9 +95,17 @@ Framework validator: **71/71 PASS**. Targeted test suites (role contract, role v
 
 `Goal C38: CONSISTENT` — hard findings 0; 1 EXPLAINED (`CURRENT_DEVELOPMENT_SEMANTICS`, C35R precedent); `CANDIDATE_NOT_REQUIRED_ABSENT` PASS; all `CLAIM_BOUNDARY` checks PASS. Governance normalized: roadmap item `C38` = DONE with `evidence_ref` to this report; `roadmap.current = C38/DONE`.
 
-## 13. CANDIDATE POLICY
+## 13. CANDIDATE POLICY (exact machine path — reconciled)
 
-`candidate_policy(PASS, None, ChangeSignals(runtime_changed=False, governance_changed=docs-only, release_artifact_changed=False)) = NO`. Machine-derived; **no candidate minted** (correct per contract — not a judgment call).
+Mechanically verified on the committed machinery (`scripts/p2p_goal_closure.py`, last touched `10149cc` in C34; behavior identical to C35R):
+
+| Checkpoint | Surface | Signals | `candidate_policy(PASS, None, signals)` | Declared path |
+|---|---|---|---|---|
+| A. Pre-metadata sync | 32 files vs C37 base `4e5ef54` (docs/evidence only) | runtime=F, governance=F, release=F | **NO** (C36 precedent; no candidate would exist even undeclared) | — |
+| B. Terminal declaration | terminal report declares `CANDIDATE_REQUIRED = NO` | — | — | declaration frozen (priority-1, C35R) |
+| C. Final committed surface | 33 files vs C37 base (`+governance/development-control.json`) | runtime=F, **governance=T**, release=F | **YES** (C35R default) | `candidate_policy(PASS, declared=NO, …) = NO` → authoritative |
+
+**CLASSIFICATION: `CASE_B_DECLARED_PRIORITY_PATH`** (single class): final surface has governance-only change, the undeclared machine path returns YES, but the machine-derived declaration NO is authoritative via priority-1, matching C35R semantics. The pre-metadata surface independently corroborating NO (C36 precedent) makes the outcome doubly stable — no candidate exists on either reading, so no minting occurred and none can retroactively arise. **CANDIDATE_REQUIRED = NO is deterministic and policy-correct; no candidate minted** (correct per contract — not a judgment call).
 
 ## 14. PROJECT-USE ASSESSMENT
 
