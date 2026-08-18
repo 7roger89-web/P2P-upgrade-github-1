@@ -159,16 +159,16 @@ Proven: a sequence A→B→A on the same operation is detected by the attempt lo
 `tests/test_p2p_c36_evidence_bound_context.py`: **69 tests, ALL PASS, deterministic, no backend calls.** Covers every required scenario from the C36 spec (1–55) plus additional binding/edge tests. Synthetic values only.
 
 ## 46. FULL REGRESSION BASELINE
-Measured at CP0 before any mutation: HEAD `9dc0811`, **30 failed / 835 passed / 19 skipped** (two stable runs, identity list saved at `docs/p2p-development/research/c36/evidence/c36-final-regression-diff.txt`; baseline identity = the pre-existing 7c9cb58 set).
+Measured at CP0 before any mutation: HEAD `9dc0811`, **30 failed / 766 passed / 19 skipped (815 collected)**. After the C36 final normalization (mechanical reconciliation), this line records the mechanically verified truth: the CP0 baseline suite did not yet contain the 69 C36 tests, so 766 passed is the correct baseline count for the 815-test baseline suite (raw preserved evidence: `analysis/c36_baseline_failures.txt`, 30 lines, unique; identity list preserved). Baseline identity = the pre-existing 7c9cb58 set.
 
 ## 47. FINAL REGRESSION
-After all C36 changes + governance sync: **30 failed / 835 passed / 19 skipped** — identical identity set (comm diff: 0 new, 0 fixed). One intermediate flaky ordering artifact (a beginner-cert test that passes in isolation) disappeared on re-run; not counted as a regression.
+After all C36 changes: **30 failed / 835 passed / 19 skipped (884 collected)** — the 69 new C36 tests all pass and are included in this count. Failure-identity comm diff against the baseline list: 0 new, 0 fixed. The +69 pass count is exactly the new C36 test file, not a recount of the same suite. One intermediate flaky ordering artifact (a beginner-cert test that passes in isolation) disappeared on re-run; not counted as a regression.
 
 ## 48. NEW FAILURE DELTA
 **ZERO.** New failures introduced by C36: 0. Zero unexplained C36 regression (PASS requirement 42).
 
 ## 49. GOVERNANCE VALIDATORS
-`python3 scripts/validate_p2p_development_framework.py`: **67/67 checks passed, 0 failed** (including V18 last-DONE current sync, V20/V21 lineage and report-field checks, V15 registry).
+`python3 scripts/validate_p2p_development_framework.py`: **69/69 checks passed, 0 failed** (final normalization measurement: two registry checks grew the count as the C36 modules joined the capability registry; no check was modified to reach 69 — measured raw output preserved in the C36 normalization record). The 67/67 figure cited elsewhere reflects the earlier C35R-era registry state.
 
 ## 50. SECRET SCAN
 Clean on the entire C36 surface (6 modules + test file + research/evidence docs): zero secret-pattern matches. `_assert_no_secret_fields` from C19 is additionally enforced at manifest build time.
@@ -186,11 +186,12 @@ Zero changes to any C34/C35 module, C35 candidate, source files, or deployment c
 Single C36 commit chain on `p2p-c36-evidence-bound-context-efficiency` (final HEAD in machine transcript). No force-push; lineage from `p2p-c35r-zaofu-deep-audit @ 9dc0811` intact.
 
 ## 53. CANDIDATE POLICY FINAL CHANGE SIGNALS
-Measured over the final committed surface BEFORE metadata sync:
-`runtime_changed=True` (6 new .p2p/system modules), `governance_changed=False` (metadata edits applied after the signal snapshot; the metadata sync itself is the canonical closure record, not a capability change), `release_artifact_changed=True` (candidate zip minted — required lane, not an autonomous release), all claim-boundary detectors clean.
+Measured over BOTH surfaces (mechanical normalization, §E of the C36 normalization record):
+**Committed surface `9dc0811..64d4387`:** `runtime_changed=True` (6 new `.p2p/system` modules), `governance_changed=False`, `release_artifact_changed=False` (the candidate zip already existed in this committed surface — no autonomous release change between base and HEAD).
+**Working surface (metadata sync applied):** `runtime_changed=True`, `governance_changed=True` (metadata-only governance sync), `release_artifact_changed=False`. All claim-boundary detectors clean on both surfaces. The committed-surface reading is the durable record; the working-surface reading confirms the metadata sync cannot alter the lane.
 
 ## 54. CANDIDATE POLICY RESULT
-`candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=True)) = YES` (priority-2 rule: PASS with a durable runtime-surface change mandates a candidate). Machine transcript: `docs/p2p-development/research/c36/evidence/c36-closure-machine-output.txt`. Final closure machine run: **Goal C36: CONSISTENT** (0 hard findings; final transcript records current_development semantics as the durable snapshot it is).
+`candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=False)) = YES` (priority-2 rule: PASS with a durable runtime-surface change mandates a candidate) — measured over the committed surface by the actual machinery. The working-surface reading (`governance_changed=True`) also returns YES; the lane is irreversible on either surface. Machine transcript: `docs/p2p-development/research/c36/evidence/c36-closure-machine-output.txt`. Final closure machine run: **Goal C36: CONSISTENT** (0 hard findings; final transcript records current_development semantics as the durable snapshot it is).
 
 ## 55. CANDIDATE ARTIFACT/HASH
 Minted: `reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c36-evidence-bound-context-efficiency-candidate-v1.zip`

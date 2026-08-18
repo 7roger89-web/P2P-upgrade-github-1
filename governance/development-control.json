@@ -462,6 +462,43 @@
         "verified_at": "2026-08-18",
         "verified_by": "C35-final-governance-closure"
       }
+    },
+    {
+      "candidate_id": "C36",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c36-evidence-bound-context-efficiency-candidate-v1.zip",
+      "candidate_sha256": "c8915363462d12cde7e3a3db398bbd7a2457755bacb1a0f64274d8559fe354c5",
+      "promotion_status": "UNPROMOTED",
+      "development_goal": "C36",
+      "created_at": "2026-08-18T10:30:00Z",
+      "created_by": "C36-evidence-bound-context-efficiency-closure",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "terminal_verdict": "PASS / EVIDENCE_BOUND_CONTEXT_EFFICIENCY_READY",
+      "candidate_policy_lane": "candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=False)) = YES (priority-2 rule: PASS terminal with a durable runtime-surface change mandates a candidate)",
+      "goal_closure_machine": "CONSISTENT",
+      "goal_closure_machine_hard_fails": 0,
+      "goal_closure_machine_explained": "FINAL REGRESSION: failure set equals the 9dc0811 baseline exactly (30 failed, 835 passed; comm diff zero-new, zero-fixed); framework validator 67/67; secret scan clean; C36 test suite 69/69 PASS",
+      "source_commit": "64d4387e73fa1451ba527adeb44c2dd1ff52a9f9",
+      "source_branch": "p2p-c36-evidence-bound-context-efficiency",
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-C36-terminal-report.md",
+        "docs/p2p-development/research/c36/evidence/c36-cp0-evidence.md",
+        "docs/p2p-development/research/c36/evidence/c36-final-regression-diff.txt"
+      ],
+      "package_verify_evidence": {
+        "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c36-evidence-bound-context-efficiency-candidate-v1.zip",
+        "verdict": "ARTIFACT_VERIFY_PASS",
+        "build_exit_code": 0,
+        "zip_sha256": "c8915363462d12cde7e3a3db398bbd7a2457755bacb1a0f64274d8559fe354c5",
+        "content_hash": "c68e37be8fcf36ec5e139086f15f1a331b0a8517511a2117c627a6347a8f02f6 (binds the 6 surface modules + manifest content, per manifest scope)",
+        "manifest": "c36-candidate-manifest.json",
+        "surface_files": 6,
+        "entry_hash_check": "ALL PASS (every zip entry hash matches committed content)",
+        "verified_at": "2026-08-18",
+        "verified_by": "C36-evidence-bound-context-efficiency-closure"
+      }
     }
   ],
   "capability_status": [
@@ -874,12 +911,19 @@
         "title": "ZaoFu Deep Architecture Audit (Research Only) — upstream provenance, 16-area subsystem audit, BUILD-vs-REUSE matrix (ADAPT 7 / DEFER 5 / REJECT 4), 12 architectural verdicts, C36/C37 MINOR_REFINEMENT research inputs (no implementation)",
         "evidence_ref": "GOAL-C35R (docs/p2p-development/reports/P2P-C35R-terminal-report.md)",
         "notes": "C35R terminal verdict: PASS / ZAOFU_ARCHITECTURE_AUDIT_COMPLETE (research only). Machine-derived C35R_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C36/C37 implementation. Normalization §A-J completed: matrix counts mechanically reconciled (7/5/4, invariant holds), closure machinery final CONSISTENT 0 hard findings, C31/C28 divergence classified as legitimate historical snapshot semantics."
+      },
+      {
+        "id": "C36",
+        "status": "DONE",
+        "title": "Evidence-Bound Context & Efficiency Intelligence — ContextManifest (authority classification + deterministic identity), DeliveryEnvelope/Receipt (DELIVERED != READ), ReadEvidence/ReadGap, ContextCache (identity/freshness/ transformation provenance), efficiency telemetry + soft budget, bounded loop/overwrite guards (no provider routing, no fallback, no vendor branching, zero live backend calls)",
+        "evidence_ref": "GOAL-C36 (docs/p2p-development/reports/P2P-C36-terminal-report.md)",
+        "notes": "C36 terminal verdict: PASS / EVIDENCE_BOUND_CONTEXT_EFFICIENCY_READY. Machine-derived C36_CANDIDATE_REQUIRED=YES (runtime_changed=True); UNPROMOTED candidate minted at reports/candidates; no promotion, no release, no merge, no C37 start."
       }
     ],
     "current": {
-      "id": "C35R",
+      "id": "C36",
       "status": "DONE",
-      "title": "Research-complete checkpoint (ZaoFu deep architecture audit; research-only, no capability promotion, no C36/C37 start)"
+      "title": "C36 Evidence-Bound Context & Efficiency Intelligence (deterministic context governance; candidate UNPROMOTED)"
     },
     "likely_next": {
       "id": "C30",
