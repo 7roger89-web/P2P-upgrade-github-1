@@ -1,0 +1,34 @@
+{
+  "schema": "c40-fresh-process-capsule/1",
+  "generated_by": "c40_fresh_process_recovery.py (new process)",
+  "capsule_hash": "4e93ce2acf243cc53104753577f9083af82c1a583c007edeecc953ad13a8c4bb",
+  "capsule": {
+    "project": "Game Truyện (tiên hiệp) — 7roger89-web/game-truyen-github",
+    "session_death": {
+      "explanation": "Toàn bộ bối cảnh cuộc hội thoại trước đã mất. Không còn transcript, không còn bộ nhớ. Chỉ còn trạng thái bền vững JSON trong dự án bên dưới."
+    },
+    "durable_state": {
+      "last_dispatch": {
+        "request_id": "c40-pilot-ea10dd53d9d6",
+        "goal_id": null,
+        "execution_status": "SUCCEEDED",
+        "remote_task": null
+      },
+      "last_independent_observation": {
+        "remote_task_id": "dTCyg9pA7h6V9YXYwuMHAR",
+        "verdict": "PASS",
+        "verification_against_tasks_md": true,
+        "answer": "T-next: T14A — NPC tuần tra phản ứng ở tick kế tiếp với SECURITY đã được người chơi hỗ trợ. Đây là bước tiếp theo duy nhất được TASKS.md xác định, nối trực tiếp sau T13B và kiểm chứng vòng phản ứng World Pulse kế tiếp."
+      },
+      "project_tasks_file_hash": "3ff0d5ffbdde091325331ab9fc7c0941822a7d2956266810c2cf6d3f69fedb3c",
+      "project_state_claim": "Theo TASKS.md của dự án, task tiếp theo sau T13B đã hoàn thành là T14A (NPC tuần tra phản ứng tick kế tiếp với SECURITY đã được người chơi hỗ trợ)."
+    },
+    "instruction": "Xác nhận bạn đọc được capsule này. Sau đó, KHÔNG tự tạo task mới: hãy cho biết task tiếp theo của dự án theo capsule (đáp bắt đầu bằng 'T-next:') và một câu nói rõ trạng thái trước đó được khôi phục từ đâu."
+  },
+  "dispatch": {
+    "request_id": "c40-freshproc-ee6db369474b",
+    "execution_status": "SUCCEEDED",
+    "task_pointer": "manus-task:ZQVbWT43P6vmVPh78i2bSg",
+    "exit_status": "stopped"
+  }
+}

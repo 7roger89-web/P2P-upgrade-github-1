@@ -719,6 +719,10 @@ class TestCandidatePolicyAudit:
             # proofs; authorized closure growth per the
             # C34/C35R/C36/C37/C38/C39 precedent):
             "docs/p2p-development/research/c40/",
+            # C41 pilot-extension evidence tree (Gia Phà pilot + promotion
+            # evidence pack; authorized closure growth per the
+            # C34/C35R/C36/C37/C38/C39/C40 precedent):
+            "docs/p2p-development/research/c41/",
             "scripts/p2p_install_release.py",
             "reports/candidates",
 
@@ -846,6 +850,13 @@ class TestCandidatePolicyAudit:
             # decision machine; fail-closed by construction; authorized closure
             # growth per the C34/C35R/C36/C37 precedent):
             ".p2p/system/p2p_capabilities/failover_boundary.py",
+            # C40 PARTIAL-lane closure normalization + C41 pilot-extension
+            # (closure-machine PARTIAL-lane native support run and pilot
+            # evidence artifacts; authorized closure growth per the
+            # C34/C35R/C36/C37 precedent):
+            "docs/p2p-development/research/c40/evidence/c40-goal-closure.json",
+            "docs/p2p-development/research/c40/evidence/c40-pilot-project-rollback.json",
+            "docs/p2p-development/research/c40/evidence/c41-regression-differential.json",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:

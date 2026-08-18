@@ -1,0 +1,37 @@
+{
+ "phase": "PILOT_PROJECT_ROLLBACK",
+ "pilot_source_revision": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+ "pilot_repo": "/home/ubuntu/game-truyen-pilot",
+ "pre_rollback": {
+  "head": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+  "tracked_tree_sha256": "8f050d3a051896d9125884db289599c14dda75900e3737a790a985f4324da8f7",
+  "source_tree_sha256": "8f050d3a051896d9125884db289599c14dda75900e3737a790a985f4324da8f7",
+  "untracked_files": [
+   "docs/p2p-development/research/c40/evidence/c40-fresh-process-dispatch.json",
+   "docs/p2p-development/research/c40/evidence/c40-fresh-process-observation.json",
+   "docs/p2p-development/research/c40/evidence/c40-install-collision.json",
+   "docs/p2p-development/research/c40/evidence/c40-messages-ZQVbWT43P6vmVPh78i2bSg.json",
+   "docs/p2p-development/research/c40/evidence/c40-messages-dTCyg9pA7h6V9YXYwuMHAR.json",
+   "docs/p2p-development/research/c40/evidence/c40-pilot-dispatch.json",
+   "docs/p2p-development/research/c40/evidence/c40-pilot-observation.json",
+   "docs/p2p-development/research/c40/evidence/c40-pilot-upgrade-proof.json"
+  ],
+  "head_matches_source": true
+ },
+ "rollback_command": "git clean -fdx",
+ "rollback_returncode": 0,
+ "post_rollback": {
+  "head": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+  "tracked_tree_sha256": "8f050d3a051896d9125884db289599c14dda75900e3737a790a985f4324da8f7",
+  "untracked_files": [],
+  "untracked_count": 0
+ },
+ "verification": {
+  "head_matches_source": true,
+  "tracked_tree_matches_source": true,
+  "tree_matches_pre_rollback": true,
+  "no_untracked_left": true
+ },
+ "PILOT_PROJECT_ROLLBACK": "VERIFIED",
+ "summary": "rollback VERIFIED; HEAD == 354203ee7c23\u2026: True; tree fingerprint match: True; untracked remaining: 0"
+}

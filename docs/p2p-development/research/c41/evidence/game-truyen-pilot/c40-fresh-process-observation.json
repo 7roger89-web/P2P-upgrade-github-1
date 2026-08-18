@@ -1,0 +1,11 @@
+{
+  "schema": "c40-fresh-process-observation/1",
+  "remote_task_id": "ZQVbWT43P6vmVPh78i2bSg",
+  "observed_at": "2026-08-18T11:55:57.695265+00:00",
+  "source": "api.manus.ai/v2/task.listMessages (independent raw fetch)",
+  "n_messages": 4,
+  "fresh_agent_answer": "Đã đọc và xác nhận capsule.\n\nT-next: T14A — NPC tuần tra phản ứng ở tick kế tiếp với SECURITY đã được người chơi hỗ trợ.\n\nTrạng thái trước đó được khôi phục từ JSON trạng thái bền vững trong capsule của dự án, đối chiếu với TASKS.md và quan sát độc lập gần nhất có verdict PASS.",
+  "confirms_t14a": true,
+  "recovery_claimed_from": "capsule JSON bền vững (không transcript)",
+  "verdict": "PASS"
+}

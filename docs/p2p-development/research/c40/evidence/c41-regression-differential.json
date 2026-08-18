@@ -1,0 +1,15 @@
+{
+ "schema": "c41-regression-differential/1",
+ "baseline_head": "8b751f6",
+ "current_head": "working tree of p2p-c40-project-usable-release-pilot (C41 steps 1-4)",
+ "current_failures": 44,
+ "baseline_failures": 46,
+ "new_unexplained_failures": 0,
+ "new_failures": [],
+ "fixed_by_this_branch": [
+  "tests/test_p2p_ledger_provenance.py::test_cp48_framework_validator_runs_clean",
+  "tests/test_p2p_live_certification.py::test_lh35_c25_c26_framework_valid"
+ ],
+ "framework_validator": "75/75 checks passed. 0 failed.",
+ "verdict": "PASS"
+}

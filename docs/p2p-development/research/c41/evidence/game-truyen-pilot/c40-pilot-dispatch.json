@@ -1,0 +1,57 @@
+{
+  "schema": "c40-pilot-dispatch/1",
+  "request_id": "c40-pilot-ea10dd53d9d6",
+  "capsule_hash": "473655d29e03b4c2b013abdee6996ae5f9a358bddf214db536346d14a92e4c63",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "failover_gate_decision": "RETRY_SAME_TARGET",
+  "failover_gate_reason": "NO_FAILURE_RECORDED_PRE_DISPATCH_ELIGIBILITY_SAFE",
+  "dispatched": true,
+  "backend_result_task_id": null,
+  "backend_result_pointer": "manus-task:dTCyg9pA7h6V9YXYwuMHAR",
+  "execution_status": "SUCCEEDED",
+  "created_utc": "2026-08-18T11:53:25.836882+00:00",
+  "capsule": {
+    "PROJECT_BRIEF.md": {
+      "sha256": "2536877a2f8f6b459a83212c78ed447fb6c811cf909593baeabe313b6e317047",
+      "chars": 4668
+    },
+    "TASKS.md": {
+      "sha256": "3ff0d5ffbdde091325331ab9fc7c0941822a7d2956266810c2cf6d3f69fedb3c",
+      "chars": 5042
+    },
+    "README_V09818_NARRATIVE_SIMULATION.md": {
+      "sha256": "21d69853b5bf9342efbc56ba0ea59ab4ac23ba0a036f8a7d66a7511dfca6695e",
+      "chars": 1741
+    }
+  },
+  "backend_result": {
+    "schema": "p2p-backend-execution-result/1",
+    "request_id": "c40-pilot-ea10dd53d9d6",
+    "request_fingerprint": "0bbc12a1e3fbbece5f4393b9e3e06565c177cf6b31e63135a644454564a79628",
+    "task_id": null,
+    "goal_id": "P2P-C40",
+    "adapter_id": "manus-api",
+    "execution_status": "SUCCEEDED",
+    "verification_status": "UNKNOWN",
+    "completion_status": "NOT_DONE",
+    "started_at": "2026-08-18T11:52:39+0000",
+    "finished_at": "2026-08-18T11:53:25+0000",
+    "exit_status": "stopped",
+    "target_fingerprint": null,
+    "output_pointers": [],
+    "artifact_pointers": [
+      "manus-task:dTCyg9pA7h6V9YXYwuMHAR",
+      "manus-messages:dTCyg9pA7h6V9YXYwuMHAR"
+    ],
+    "mutation_surface": "UNKNOWN",
+    "usage_evidence": {
+      "credit_usage": 0,
+      "units": "manus-credits",
+      "source": "task.detail.credit_usage"
+    },
+    "error_class": null,
+    "auth_state_after": "VALID",
+    "raw_backend_receipt_pointer": "manus-task:dTCyg9pA7h6V9YXYwuMHAR",
+    "possible_mutation": false
+  }
+}
