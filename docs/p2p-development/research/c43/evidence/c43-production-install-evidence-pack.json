@@ -5,7 +5,7 @@
   "candidate_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
   "release_tag": "c40-promoted-pilot-release-draft",
   "release_commit": "7481009",
-  "install_commit": null,
+  "install_commit": "88bd0b730c0f0f9e5c2fa68431933fb6def259d3",
   "evidence_count": 15,
   "evidence": [
     {
@@ -90,5 +90,6 @@
     "package_dir": "/home/ubuntu/c43-pkg",
     "rollback_instruction": "git clean -fdx docs/p2p-development && git checkout -- .",
     "logistics": "DO_NOT_INSTALL_YET"
-  }
+  },
+  "generated_at_branch": "p2p-c40-project-usable-release-pilot"
 }
