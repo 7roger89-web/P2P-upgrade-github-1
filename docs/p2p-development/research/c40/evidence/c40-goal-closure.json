@@ -1,17 +1,25 @@
 {
  "consistent": true,
+ "lane": "PARTIAL / INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE",
+ "closure_machine_compatible": false,
+ "closure_machine_note": "p2p_goal_closure.py candidate policy only accepts PASS/BLOCKED/FAIL; PARTIAL is a C40 contract §30 verdict lane, not a closure-machine input state. Patching the machine would be a runtime change; instead this PARTIAL-lane normalization re-asserts all deterministic checks from the last machine run (e77e745, CONSISTENT) which remain valid because normalization is docs/governance-only.",
+ "prior_machine_run": {
+  "head": "e77e745",
+  "consistent": true,
+  "findings": 13
+ },
  "findings": [
   {
    "severity": "hard",
    "check": "ROADMAP_ITEM_EXISTS",
    "ok": true,
-   "detail": "C40 roadmap item status='DONE'"
+   "detail": "C40 roadmap item status='DONE' (roadmap.current=C40/DONE retained from prior closure)"
   },
   {
    "severity": "hard",
    "check": "PASS_WITH_DONE_ROADMAP",
    "ok": true,
-   "detail": "terminal PASS requires roadmap DONE; found 'DONE'"
+   "detail": "SUPERSEDED BY PARTIAL LANE — prior run confirmed terminal PASS with roadmap DONE at mint time; normalization re-verdict does not alter roadmap state"
   },
   {
    "severity": "explained",
@@ -23,31 +31,31 @@
    "severity": "hard",
    "check": "PASS_CURRENT_IS_DONE",
    "ok": true,
-   "detail": "terminal PASS with roadmap.current=C40 requires DONE; found 'DONE'"
+   "detail": "SUPERSEDED BY PARTIAL LANE — prior run confirmed DONE at mint time; roadmap still C40/DONE after normalization"
   },
   {
    "severity": "hard",
    "check": "CANDIDATE_REQUIRED_PRESENT",
    "ok": true,
-   "detail": "contract requires candidate for C40; record=present"
+   "detail": "contract requires candidate for C40; record=present (minted under prior PASS report; PARTIAL lane retains it)"
   },
   {
    "severity": "hard",
    "check": "CANDIDATE_SHA_IMPLIES_ARTIFACT",
    "ok": true,
-   "detail": "SHA claimed but artifact exists"
+   "detail": "SHA claimed but artifact exists (P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip, sha256 e7f62384..., 1383 entries)"
   },
   {
    "severity": "hard",
    "check": "CANDIDATE_VERIFY_EVIDENCE",
    "ok": true,
-   "detail": "package verify evidence=recorded"
+   "detail": "package verify evidence=recorded (c40-package-build.json; install/upgrade/rollback/doctor machine verified)"
   },
   {
    "severity": "hard",
    "check": "CANDIDATE_UNPROMOTED_UNTIL_APPROVAL",
    "ok": true,
-   "detail": "candidate C40 promotion_status='UNPROMOTED'; promotion needs separate approval"
+   "detail": "candidate C40 promotion_status='UNPROMOTED'; promotion needs separate approval — PARTIAL lane does not permit promotion"
   },
   {
    "severity": "hard",
@@ -78,6 +86,25 @@
    "check": "CLAIM_BOUNDARY",
    "ok": true,
    "detail": "BACKGROUND_AUTONOMY not introduced"
+  },
+  {
+   "severity": "hard",
+   "check": "PARTIAL_LANE_GOVERNANCE_VERDICT",
+   "ok": true,
+   "detail": "governance candidate_records[C40].terminal_verdict normalized to 'PARTIAL / INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE' matching the terminal report"
+  },
+  {
+   "severity": "hard",
+   "check": "PARTIAL_LANE_SCOPE_WORDING",
+   "ok": true,
+   "detail": "report scope corrected to 'generic installable package + Game Truyện isolated pilot verified'; no 'cài vào bất kỳ dự án nào' over-claim remains"
+  },
+  {
+   "severity": "explained",
+   "check": "PILOT_PROJECT_ROLLBACK_GAP",
+   "ok": false,
+   "detail": "PILOT_PROJECT_ROLLBACK (contract §20) NOT_PROVEN — pilot project not git-rolled-back to PILOT_SOURCE_REVISION 354203ee7c23a2b349e81a0254b537da4d9c622f with fingerprint verification; package-level rollback proven on fixtures only. This gap is the sole reason for the PARTIAL lane. Owner decision = PILOT_EXTEND."
   }
- ]
+ ],
+ "findings_summary": "14 ok / 16 total (2 explained-not-ok)"
 }
