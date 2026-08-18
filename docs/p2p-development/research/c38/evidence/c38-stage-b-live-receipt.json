@@ -1,0 +1,31 @@
+{
+  "schema": "p2p-live-execution-receipt/1",
+  "goal_id": "C38",
+  "task_id": "c38-stage-b-first-live-role-proof",
+  "requested_role": "p2p_iris",
+  "verified_role": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "requested_target": "manus-api-v2",
+  "observed_target": null,
+  "observed_model": "UNKNOWN (agent_profile manus-1.6 requested; model identity not observable at API layer)",
+  "context_delivered": "SYNTHETIC_TEXT_EXECUTION",
+  "read_evidence": "UNKNOWN",
+  "permission": "NON_MUTATING_TASK",
+  "execution_status": "SUCCEEDED",
+  "verification_status": "UNKNOWN",
+  "exit_status": "stopped",
+  "output_pointers": [],
+  "mutation_status": "NO_MUTATION (bounded non-mutating task; possible_mutation=False)",
+  "started_at": "2026-08-18T07:26:06+0000",
+  "finished_at": "2026-08-18T07:26:17+0000",
+  "latency_seconds": 11.1,
+  "cost": "UNKNOWN",
+  "usage_evidence": {
+    "credit_usage": 0,
+    "units": "manus-credits",
+    "source": "task.detail.credit_usage"
+  },
+  "execution_session_id": "manus-im-task:manus-task:NWnoWkrrJeQiYWZMv8jCS5",
+  "request_id": "c38-stage-b-01",
+  "at": "2026-08-18T07:26:17+0000"
+}
