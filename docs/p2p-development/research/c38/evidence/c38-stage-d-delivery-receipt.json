@@ -1,0 +1,14 @@
+{
+  "goal_id": "C38",
+  "task_id": "c38-stage-d-fresh-session-capsule-proof",
+  "manifest_id": "p2p-c38-stage-d-capsule-manifest",
+  "envelope_id": "ctx-envelope-ba0388329cd61871ef95a1a303137f44df4f15836f55a26ef6d41753705a92d5",
+  "envelope_hash": "a0f58b9f3e5736e0f412f947a1a356a8f8c5b7d00d9d03ce7c49d60e5bfacb70",
+  "target": "manus-api-v2",
+  "session_id": null,
+  "items_delivered": [],
+  "delivery_status": "PARTIAL",
+  "delivery_timestamp": null,
+  "delivery_failures": [],
+  "raw_pointer": null
+}
