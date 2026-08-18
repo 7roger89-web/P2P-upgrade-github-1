@@ -1,0 +1,11 @@
+{
+  "schema": "c40-pilot-observation/1",
+  "remote_task_id": "dTCyg9pA7h6V9YXYwuMHAR",
+  "observed_at": "2026-08-18T11:54:18.739077+00:00",
+  "source": "api.manus.ai/v2/task.listMessages (independent raw fetch)",
+  "n_messages": 5,
+  "answer_text": "T-next: T14A — NPC tuần tra phản ứng ở tick kế tiếp với SECURITY đã được người chơi hỗ trợ. Đây là bước tiếp theo duy nhất được TASKS.md xác định, nối trực tiếp sau T13B và kiểm chứng vòng phản ứng World Pulse kế tiếp.",
+  "answer_starts_with_tnext": true,
+  "verification_against_tasks_md": true,
+  "verdict": "PASS"
+}

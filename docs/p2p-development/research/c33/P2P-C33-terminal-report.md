@@ -25,7 +25,7 @@ The C33 branch introduces exactly one bounded capability family — `autopilot_*
 | Module | Role |
 |---|---|
 | `autopilot_state.py` | `GoalPlan` (schema-bound dataclass with `ExecutionBound`, budget usage, wave, gate payloads), `GoalStateStore` (durable `.p2p/state/autopilot-goal-state.json` + append-only `goal-ledger.jsonl`), `ALLOWED_GOAL_TRANSITIONS` (fail-closed graph), canonical hashing |
-| `autopilot_gate.py` | `ContinueGate` with 14 gates (G1–G14), fail-closed scope classification, `OwnerGate` with 13 reason classes (`CONTINUE_GATES_PASS`, `BLOCKED`, `OWNER_GATE` required as gate states), validate-no-op guards |
+HISTORICAL_ONLY: | `autopilot_gate.py` | `ContinueGate` with 14 gates (G1–G14), fail-closed scope classification, `OwnerGate` with 13 reason classes (`CONTINUE_GATES_PASS`, `BLOCKED`, `OWNER_GATE` required as gate states), validate-no-op guards |
 | `autopilot_budget.py` | `BudgetController`: attempt-based policy (`max_execution_attempts` etc.), `record_execution`, `can_execute_task`, `resume_point` |
 | `autopilot_verifier.py` | `TaskVerifier`: `ACCEPTABLE / UNACCEPTABLE / UNKNOWN` verdicts, fail-closed on `UNKNOWN`, task_id-keyed fixtures |
 | `autopilot_contract.py` | `TaskContractBuilder`: composes permission profile (never widens), `ContractDecisionTrace`, out-of-scope rejection before preflight |

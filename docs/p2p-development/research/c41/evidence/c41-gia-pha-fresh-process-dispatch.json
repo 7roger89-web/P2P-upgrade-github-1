@@ -1,0 +1,33 @@
+{
+  "schema": "c41-fresh-process-capsule/1",
+  "generated_by": "c41_gia_pha_fresh_process_recovery.py (new process)",
+  "capsule_hash": "cf866d2c15dda6c294ef0c3482b5773626100d4e19c5ea83842aca27e3e4d402",
+  "capsule": {
+    "project": "Gia Phả OS — 7roger89-web/Du_An_Gia_Pha-github",
+    "session_death": {
+      "explanation": "Toàn bộ bối cảnh cuộc hội thoại trước đã mất. Không còn transcript, không còn bộ nhớ. Chỉ còn trạng thái bền vững JSON trong dự án bên dưới."
+    },
+    "durable_state": {
+      "last_dispatch": {
+        "request_id": "c41-gia-pha-pilot-eea340818fcd",
+        "goal_id": null,
+        "execution_status": "SUCCEEDED",
+        "remote_task": "manus-task:UfXGenXfDVzyx4vRjYRcts"
+      },
+      "last_independent_observation": {
+        "remote_task_id": "UfXGenXfDVzyx4vRjYRcts",
+        "verdict": "PASS",
+        "answer": "N-next: Thực hiện một lượt kiểm chứng Gate J mới, đúng đủ 8/8 trên TEST subject hiện tại, rồi ghi nhận bằng chứng và mời Supervisor độc lập xác nhận; không sửa code, không đụng production hay thay đổi credential. Tôi sẽ chỉ đối chiếu nội dung tài liệu đã cung cấp, không đọc kho code, không dùng credential và không thực hiện thay đổi nào. Đây là Gia Phả OS (ứng dụng quản lý gia phả dòng họ, Next.js + Supabase). Dựa TRÊN nội dung các tài liệu dự án đã được dán đầy đủ bên dưới (README.md, bản kế hoạch c01-foundation-safety, trạng thái thực tế của c02-data-foundation), KHÔNG đọc kho code, KHÔNG viết hay sửa code, KHÔNG dùng bất kỳ credential nào: cho biết MỘT nhiệm vụ cụ thể, rủi ro thấp, an toàn nhất mà dự án nên làm tiếp theo (ví dụ: hoàn thiện tài liệu, kiểm tra dữ liệu, bước kế tiếp đã nêu trong tài liệu dự án), trong một đoạn ngắn tối đa 60 từ. Câu trả lời bắt đầu bằng 'N-next:'.\n\n===== README.md =====\n# Gia Phả OS (Gia Phả Open Source)\n\nĐây là mã nguồn mở cho ứng dụng quản lý gia phả dòng họ, cung cấp giao diện trực quan để xem sơ đồ phả hệ, quản lý thành viên, tìm kiếm và lọc danh sách thành viên.\n\nPhù hợp với người Việt Nam.\n\n## Các tính năng chính\n\n- **Hiển thị Sơ đồ Gia phả đa dạng**: Hỗ trợ xem dạng Sơ đồ cây (Tree) và Sơ đồ tư duy (Mindmap).\n- **Quản lý Thành viên**: Thêm, sửa, xóa thông tin thành viên chi tiết\n...(message too long, full content saved as attachment \"pasted_cont*****Ij.txt\")"
+      },
+      "project_readme_hash": "3eebb58b37ab3cd28f4fee9af2183a34f623f022d4b79d23ada61b7fd86f1d33",
+      "project_state_claim": "Theo tài liệu dự án (c02-data-foundation actual-status), nhiệm vụ tiếp theo an toàn là kiểm chứng Gate J 8/8 trên TEST subject, ghi nhận bằng chứng, mời Supervisor độc lập xác nhận; không sửa code, không đụng production, không thay đổi credential."
+    },
+    "instruction": "Xác nhận bạn đọc được capsule này. Sau đó, KHÔNG tự tạo task mới: hãy cho biết nhiệm vụ tiếp theo của dự án theo capsule (đáp bắt đầu bằng 'N-next:') và một câu nói rõ trạng thái trước đó được khôi phục từ đâu."
+  },
+  "dispatch": {
+    "request_id": "c41-freshproc-3d84bb8999bc",
+    "execution_status": "SUCCEEDED",
+    "task_pointer": "manus-task:ZAL2SNuDfxhrgJJvvPgnzY",
+    "exit_status": "stopped"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "prompt_integration": {
+    "project_agents_md_exists": true,
+    "project_agents_md_bytes": 128285,
+    "p2p_instruction_entry_point": "/home/ubuntu/game-truyen-production/.p2p/system/README.md",
+    "p2p_instruction_entry_exists": false,
+    "original_agents_md_backed_up": true,
+    "original_agents_md_backup_sha256": "5a4e2c72900ccbcfa191411e30232c52b766239fa7fe65841e3ee7c9c29a56f9",
+    "original_agents_md_unchanged_content": true,
+    "note": "Project prompt surface (AGENTS.md) kept 100% intact by COLLISIONS_BACKED_UP_INSTALL — P2P instruction entry point is the installed .p2p/system, discoverable by the host agent."
+  },
+  "fresh_process_discovery": {
+    "verdict": "PASS",
+    "fresh_python_process": true,
+    "state_file": "/home/ubuntu/game-truyen-production/docs/p2p-development/state.json",
+    "detail": {
+      "P2P_SYSTEM_PRESENT": true,
+      "P2P_STATE_FILE_PRESENT": true,
+      "MODULE_LOADABLE": [
+        "p2p_task_state",
+        "p2p_workflow",
+        "p2p_governance",
+        "p2p_capabilities.backend_contract"
+      ],
+      "pid": 46281
+    }
+  },
+  "rollback_readiness": {
+    "verdict": "PASS",
+    "rolled_back_fingerprint": "5b37132b6932fe96d4359775bc951e8ac8e1cf76503085041aa6df530a480ea0",
+    "pre_install_fingerprint": "5b37132b6932fe96d4359775bc951e8ac8e1cf76503085041aa6df530a480ea0",
+    "pre_install_revision": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+    "rollback_steps": "rm -rf .p2p; rm -rf docs/p2p-development; (git status clean — no tracked files touched)",
+    "collisions_backup_restorable": true
+  }
+}

@@ -35,7 +35,13 @@ __version__ = "1"
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-TERMINAL_STATES = ("PASS", "BLOCKED", "FAIL")
+TERMINAL_STATES = ("PASS", "BLOCKED", "FAIL", "PARTIAL")
+
+# PARTIAL verdict lanes (contract §30): verdict substatus classification for
+# goals whose evidence bar was met only in part. The primary state remains
+# PASS/BLOCKED/FAIL; PARTIAL carries a slash-separated lane label (e.g.
+# PARTIAL/INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE).
+PARTIAL_LANE_RE = re.compile(r"^PARTIAL(?:/[A-Z_0-9]+)?$", re.IGNORECASE)
 
 GOAL_LIFECYCLE_STATUSES = ("PLANNED", "ACTIVE", "DONE", "BLOCKED", "DEFERRED")
 
@@ -125,9 +131,35 @@ def _git_rc(*args: str, cwd: pathlib.Path | None = None) -> int:
 # ---------------------------------------------------------------------------
 
 def normalize_terminal_status(value: str) -> str | None:
-    """Normalize any casing into canonical PASS / BLOCKED / FAIL or None."""
+    """Normalize any casing into canonical PASS / BLOCKED / FAIL / PARTIAL or
+    None. Slash-separated lane labels are stripped to the primary state (e.g.
+    'PARTIAL/INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE' -> 'PARTIAL').
+
+    Guard: a slashed value is only valid when the suffix is a genuine lane
+    label, never another terminal state — 'PASS/FAIL' must NOT coerce to
+    'PASS' (a forged verdict would otherwise pass the parser).
+    """
     upper = str(value).strip().upper()
-    return upper if upper in TERMINAL_STATES else None
+    if upper in TERMINAL_STATES:
+        return upper
+    if "/" in upper:
+        primary, suffix = upper.split("/", 1)
+        suffix_token = suffix.strip()
+        if primary in TERMINAL_STATES and suffix_token and \
+                suffix_token not in TERMINAL_STATES and \
+                re.fullmatch(r"[A-Z_0-9]+", suffix_token):
+            return primary
+    if PARTIAL_LANE_RE.match(upper):
+        return "PARTIAL"
+    return None
+
+def terminal_lane_label(value: str) -> str | None:
+    """Return the full lane label (e.g. 'PARTIAL/…') if the value is a lane
+    declaration, else None. Used by closure findings to record the exact lane."""
+    upper = str(value).strip().upper()
+    if upper in TERMINAL_STATES or PARTIAL_LANE_RE.match(upper):
+        return upper
+    return None
 
 
 def terminal_from_report(report_path: pathlib.Path) -> dict:
@@ -154,12 +186,24 @@ def terminal_from_report(report_path: pathlib.Path) -> dict:
         # Bold terminal states, optionally followed by a parenthesized note or
         # a slash-separated substatus (e.g. "**BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE**").
         result = re.search(
-            r"\*\*(PASS|BLOCKED|FAIL)(?:\s*(?:\([^)]*\)|/[A-Z_0-9. \-/]+))?\*\*",
+            r"\*\*(PASS|BLOCKED|FAIL|PARTIAL)(?:\s*(?:\([^)]*\)|/[A-Z_0-9. \-/]+))?\*\*",
             text,
             re.IGNORECASE,
         )
         if result:
-            fields["GOAL_TERMINAL_STATUS"] = result.group(1).upper()
+            fields["GOAL_TERMINAL_STATUS"] = result.group(0)
+    # Also accept a fully bold lane label value (e.g. '**PARTIAL / …**') when
+    # the first regex captured only the primary token.
+    if fields.get("GOAL_TERMINAL_STATUS"):
+        full_lane = re.search(
+            rf"{re.escape(fields['GOAL_TERMINAL_STATUS'])}\s*(?:/\s*[A-Z_0-9 ]+)?",
+            text,
+            re.IGNORECASE,
+        )
+        if full_lane and "/" in full_lane.group(0):
+            candidate = re.sub(r"[^A-Z_0-9/]", "", full_lane.group(0).upper())
+            if PARTIAL_LANE_RE.match(candidate):
+                fields["GOAL_TERMINAL_STATUS"] = candidate
     return fields
 
 
@@ -258,6 +302,16 @@ def candidate_policy(
         # PASS with no durable change at all: machinery-only in-session work
         # that left no lasting artifact does not manufacture a candidate.
         return "NO"
+    if terminal_status == "PARTIAL":
+        # PARTIAL: a goal that closed on a partial-evidence lane still produced
+        # durable artifacts (the verified installable package). Exactly like
+        # PASS, a PARTIAL Goal that changed runtime, governance, or release
+        # artifacts requires a candidate as the immutable closure record; a
+        # PARTIAL Goal with no durable change does not fabricate one.
+        if any((changes.runtime_changed, changes.governance_changed,
+                changes.release_artifact_changed)):
+            return "YES"
+        return "NO"
     # BLOCKED / FAIL without an explicit contract declaration: NO.
     return "NO"
 
@@ -326,6 +380,15 @@ def check_roadmap_goal_consistency(
         findings.append(ClosureFinding(
             "FAIL_WITH_TERMINAL_ROADMAP", ok,
             f"terminal FAIL requires roadmap DEFERRED/BLOCKED; found {status!r}",
+        ))
+    elif terminal == "PARTIAL":
+        # A PARTIAL goal may truthfully sit in DONE (its remaining gap is
+        # deferred to a follow-up goal) or BLOCKED/DEFERRED (gap unresolved).
+        ok = status in ("DONE", "BLOCKED", "DEFERRED")
+        findings.append(ClosureFinding(
+            "PARTIAL_WITH_TERMINAL_ROADMAP", ok,
+            f"terminal PARTIAL requires roadmap DONE/BLOCKED/DEFERRED; "
+            f"found {status!r}",
         ))
     return findings
 
@@ -403,6 +466,14 @@ def check_development_control_consistency(
             "PASS_CURRENT_IS_DONE", ok,
             f"terminal PASS with roadmap.current={goal_id} requires DONE; "
             f"found {road_current.get('status')!r}",
+        ))
+    elif terminal == "PARTIAL" and road_current_id == goal_id:
+        ok = str(road_current.get("status", "")).upper() == "DONE"
+        findings.append(ClosureFinding(
+            "PARTIAL_CURRENT_IS_DONE", ok,
+            f"terminal PARTIAL with roadmap.current={goal_id} requires DONE "
+            f"(the closed gap is deferred to a follow-up goal, not to the "
+            f"roadmap lifecycle); found {road_current.get('status')!r}",
         ))
     return findings
 

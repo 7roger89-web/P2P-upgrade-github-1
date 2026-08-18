@@ -1,0 +1,57 @@
+{
+  "schema": "c41-pilot-dispatch/1",
+  "request_id": "c41-gia-pha-pilot-eea340818fcd",
+  "capsule_hash": "a8bb8f620b4181df1813f19a92d802305382f21e7b5c2724889fed9ae87ec6cc",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "failover_gate_decision": "RETRY_SAME_TARGET",
+  "failover_gate_reason": "NO_FAILURE_RECORDED_PRE_DISPATCH_ELIGIBILITY_SAFE",
+  "dispatched": true,
+  "backend_result_task_id": null,
+  "backend_result_pointer": "manus-task:UfXGenXfDVzyx4vRjYRcts",
+  "execution_status": "SUCCEEDED",
+  "created_utc": "2026-08-18T14:16:21.627965+00:00",
+  "capsule": {
+    "README.md": {
+      "sha256": "3eebb58b37ab3cd28f4fee9af2183a34f623f022d4b79d23ada61b7fd86f1d33",
+      "chars": 4933
+    },
+    "docs/plans/2026-08-15-p2p-c02-data-foundation/2026-08-15-p2p-c02-data-foundation-actual-status.md": {
+      "sha256": "d8fce91e43020565452913cd2600814e42a37a083393fe78611b46c9d242df68",
+      "chars": 26510
+    },
+    "docs/plans/2026-08-14-p2p-c01-foundation-safety/2026-08-14-p2p-c01-foundation-safety-plan.md": {
+      "sha256": "6188abfff399bcc0e13ee0df408ff197ebc8de6fdfcbe59c75f1efba3d8a4037",
+      "chars": 41469
+    }
+  },
+  "backend_result": {
+    "schema": "p2p-backend-execution-result/1",
+    "request_id": "c41-gia-pha-pilot-eea340818fcd",
+    "request_fingerprint": "4863fa7196ef51ada05d77f7a6517a95b32588cf8581c95d6d08c8b0784918c7",
+    "task_id": null,
+    "goal_id": "P2P-C41",
+    "adapter_id": "manus-api",
+    "execution_status": "SUCCEEDED",
+    "verification_status": "UNKNOWN",
+    "completion_status": "NOT_DONE",
+    "started_at": "2026-08-18T14:15:44+0000",
+    "finished_at": "2026-08-18T14:16:21+0000",
+    "exit_status": "stopped",
+    "target_fingerprint": null,
+    "output_pointers": [],
+    "artifact_pointers": [
+      "manus-task:UfXGenXfDVzyx4vRjYRcts",
+      "manus-messages:UfXGenXfDVzyx4vRjYRcts"
+    ],
+    "mutation_surface": "UNKNOWN",
+    "usage_evidence": {
+      "credit_usage": 0,
+      "units": "manus-credits",
+      "source": "task.detail.credit_usage"
+    },
+    "error_class": null,
+    "auth_state_after": "VALID",
+    "raw_backend_receipt_pointer": "manus-task:UfXGenXfDVzyx4vRjYRcts",
+    "possible_mutation": false
+  }
+}

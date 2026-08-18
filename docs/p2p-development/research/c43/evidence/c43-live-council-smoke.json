@@ -1,0 +1,50 @@
+{
+  "session_id": "c43-live-council-smoke-20260819",
+  "question": "Synthetic governance question (no project/business data, no mutation): The P2P governance fact-ledger has multiple evidence categories (capability, candidate, release). Which category should a change to the canonical capability-set metadata be recorded under, and why? Answer in one sentence.",
+  "bounded": {
+    "max_turns": 1,
+    "rounds": 1,
+    "recursive_delegation": false,
+    "mutation": false,
+    "business_data": false
+  },
+  "receipts": [
+    {
+      "ROLE_ID": "p2p_axiom",
+      "BACKEND": "manus (adapter.execute via Manus API)",
+      "TASK_REQUEST_BINDING": "c43-live-council-smoke-20260819/c43-council-smoke-3",
+      "permission": "READ_ONLY_GOVERNANCE_QUESTION",
+      "observed_result": "It should be recorded under the **capability** category because canonical capability-set metadata defines the authoritative set of system capabilities, rather than a proposed candidate change or a released version.",
+      "answer_sha256": "25c014cd285207387a662863fc526d2e2428f795833d81b74ad97daa886afe4c",
+      "execution_status": "SUCCEEDED",
+      "verification_status": "UNKNOWN",
+      "exit_status": "stopped",
+      "possible_mutation": false,
+      "credit_usage": {
+        "credit_usage": 0,
+        "units": "manus-credits",
+        "source": "task.detail.credit_usage"
+      },
+      "raw_backend_receipt_pointer": "manus-task:mhTGhnbfonHrm7bLWWR5QJ",
+      "started_at": "2026-08-18T17:41:55+0000",
+      "finished_at": "2026-08-18T17:42:06+0000"
+    }
+  ],
+  "adaptive_participant_set": {
+    "schema": "p2p-role-quorum-evaluation/1",
+    "task_risk_class": "LOW",
+    "participant_roles": [
+      "p2p_datos"
+    ],
+    "canonical_registry_unchanged": true,
+    "canonical_denominator": 8,
+    "participant_count_bounded": true
+  },
+  "participant_set": 1,
+  "expected_denominator": 8,
+  "actual_denominator": 1,
+  "quorum_result": "QUORUM_NOT_MET_BY_DESIGN (single readable role for a synthetic governance question; deliberate)",
+  "council_decision": "NONE (smoke test produced an observed answer only; no governance decision was made)",
+  "dissent_evidence": null,
+  "verdict": "LIVE_COUNCIL_8_OF_8 = NOT_PROVEN. Exact boundary: the Manus adapter proves one canonical role can be executed live through Manus as backend (execution_status = SUCCEEDED, verification = UNKNOWN, no mutation). A full 8-role live dispatch with per-role receipts requires a role-fan-out orchestration layer on top of the adapter; the machinery exposes role_quorum.evaluate_role_quorum/adaptive_participant_set (schema + evaluation exist) but does not auto-instantiate live execution. Orchestration development gap, NOT proof failure. No second round, no recursive delegation."
+}

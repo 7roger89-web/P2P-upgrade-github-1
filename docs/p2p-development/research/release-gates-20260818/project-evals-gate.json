@@ -1,0 +1,133 @@
+{
+  "schema_version": "p2p-codex-project-eval-gate/1",
+  "checked_at": "2026-08-18T15:39:55+00:00",
+  "suite": "/home/ubuntu/p2p-repo/.p2p/system/docs/evals/p2p-uiux-eval-suite.json",
+  "status": "FAIL",
+  "failures": [
+    "schema_version must be p2p-codex-project-eval/2"
+  ],
+  "summary": {
+    "schema_version": "p2p-codex-project-eval-summary/2",
+    "created_at": "2026-08-18T15:39:55+00:00",
+    "project": null,
+    "case_count": 11,
+    "completed_case_pairs": 0,
+    "baseline_mean": null,
+    "p2p_mean": null,
+    "delta": null,
+    "p2p_pass_rate": null,
+    "case_regressions": 0,
+    "cases": [
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      },
+      {
+        "case_id": null,
+        "baseline_trials": 0,
+        "p2p_trials": 0,
+        "baseline_mean": null,
+        "p2p_mean": null,
+        "delta": null,
+        "baseline_spread": null,
+        "p2p_spread": null
+      }
+    ]
+  }
+}

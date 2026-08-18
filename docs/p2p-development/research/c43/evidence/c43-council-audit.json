@@ -1,0 +1,154 @@
+{
+  "sources_checked": {
+    "governance": "DENOMINATOR_ROSTER",
+    "repo_bundle": {
+      "canonical_members": [
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_axiom",
+        "p2p_datos",
+        "p2p_helios",
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_vector"
+      ],
+      "matches_governance_roster": true,
+      "statuses": {
+        "p2p_iris": "ACTIVE",
+        "p2p_tecton": "ACTIVE",
+        "p2p_axiom": "ACTIVE",
+        "p2p_vector": "ACTIVE",
+        "p2p_datos": "ACTIVE",
+        "p2p_anon": "ACTIVE",
+        "p2p_architecton": "ACTIVE",
+        "p2p_helios": "ACTIVE"
+      },
+      "all_active": true,
+      "invocation_class_distinct": true,
+      "prohibited_unchangeable": true
+    },
+    "game_truyen": {
+      "canonical_members": [
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_axiom",
+        "p2p_datos",
+        "p2p_helios",
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_vector"
+      ],
+      "matches_governance_roster": true,
+      "statuses": {
+        "p2p_iris": "ACTIVE",
+        "p2p_tecton": "ACTIVE",
+        "p2p_axiom": "ACTIVE",
+        "p2p_vector": "ACTIVE",
+        "p2p_datos": "ACTIVE",
+        "p2p_anon": "ACTIVE",
+        "p2p_architecton": "ACTIVE",
+        "p2p_helios": "ACTIVE"
+      },
+      "all_active": true,
+      "invocation_class_distinct": true,
+      "prohibited_unchangeable": true
+    },
+    "gia_pha": {
+      "canonical_members": [
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_axiom",
+        "p2p_datos",
+        "p2p_helios",
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_vector"
+      ],
+      "matches_governance_roster": true,
+      "statuses": {
+        "p2p_iris": "ACTIVE",
+        "p2p_tecton": "ACTIVE",
+        "p2p_axiom": "ACTIVE",
+        "p2p_vector": "ACTIVE",
+        "p2p_datos": "ACTIVE",
+        "p2p_anon": "ACTIVE",
+        "p2p_architecton": "ACTIVE",
+        "p2p_helios": "ACTIVE"
+      },
+      "all_active": true,
+      "invocation_class_distinct": true,
+      "prohibited_unchangeable": true
+    },
+    "candidate_zip": {
+      "canonical_members": [
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_axiom",
+        "p2p_datos",
+        "p2p_helios",
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_vector"
+      ],
+      "matches_governance_roster": true,
+      "statuses": {
+        "p2p_iris": "ACTIVE",
+        "p2p_tecton": "ACTIVE",
+        "p2p_axiom": "ACTIVE",
+        "p2p_vector": "ACTIVE",
+        "p2p_datos": "ACTIVE",
+        "p2p_anon": "ACTIVE",
+        "p2p_architecton": "ACTIVE",
+        "p2p_helios": "ACTIVE"
+      },
+      "all_active": true,
+      "invocation_class_distinct": true,
+      "prohibited_unchangeable": true
+    }
+  },
+  "roster": {
+    "denominator": 8,
+    "quorum_rule": "8/8",
+    "members": [
+      "p2p_iris",
+      "p2p_tecton",
+      "p2p_axiom",
+      "p2p_vector",
+      "p2p_datos",
+      "p2p_anon",
+      "p2p_architecton",
+      "p2p_helios"
+    ],
+    "aesthetica_policy": "supporting optional only; never canonical and never counted",
+    "member_count_matches_denominator": true
+  },
+  "integrity": {
+    "repo_bundle": "e162e9499d62c0a369aa2045c021d8d1e7d72eba183a881fe95bd1c07ed24edf",
+    "game_truyen": "e162e9499d62c0a369aa2045c021d8d1e7d72eba183a881fe95bd1c07ed24edf",
+    "gia_pha": "e162e9499d62c0a369aa2045c021d8d1e7d72eba183a881fe95bd1c07ed24edf",
+    "candidate_zip": "e162e9499d62c0a369aa2045c021d8d1e7d72eba183a881fe95bd1c07ed24edf",
+    "all_sources_byte_identical": true
+  },
+  "invariants": {
+    "adapter_not_canonical_agent": true,
+    "adapter_entries_absent_from_registry": true,
+    "quorum_8_of_8_representable": true,
+    "canonical_set_unchanged_by_install": true,
+    "note": "Per C34 terminal report §Council invariants: backend adapters are NOT canonical agents; adapter registration does not change council membership; the 8/8 gate remains representable. This audit mechanically re-verifies the roster and byte-identical registry across governance, repo bundle, and both production installs."
+  },
+  "readiness": {
+    "game_truyen": {
+      "council_registry_present": true,
+      "roster_intact": true,
+      "all_members_active": true,
+      "council_ready": true
+    },
+    "gia_pha": {
+      "council_registry_present": true,
+      "roster_intact": true,
+      "all_members_active": true,
+      "council_ready": true
+    }
+  },
+  "verdicts": {}
+}

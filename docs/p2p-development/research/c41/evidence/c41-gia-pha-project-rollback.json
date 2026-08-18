@@ -1,0 +1,32 @@
+{
+  "schema": "c41-pilot-project-rollback/1",
+  "goal_id": "P2P-C41",
+  "pilot_project": "7roger89-web/Du_An_Gia_Pha-github",
+  "pilot_branch": "p2p-c41-pilot-gia-pha",
+  "pilot_source_revision": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+  "before": {
+    "head": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+    "branch": "p2p-c41-pilot-gia-pha",
+    "n_tracked": 115,
+    "n_untracked": 1408,
+    "p2p_footprint_exists": true
+  },
+  "after": {
+    "head": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+    "n_tracked": 115,
+    "n_untracked": 0,
+    "p2p_footprint_exists": false,
+    "dirty": false
+  },
+  "fingerprint": {
+    "source_revision": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+    "source_n_files": 115,
+    "current_n_files": 115,
+    "missing_files": [],
+    "extra_files": [],
+    "changed_files": [],
+    "matches_exactly": true
+  },
+  "verdict": "PASS",
+  "executed_at": "2026-08-18T14:24:57.567336+00:00"
+}

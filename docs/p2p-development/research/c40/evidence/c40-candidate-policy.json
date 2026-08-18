@@ -1,0 +1,25 @@
+{
+  "schema": "c40-candidate-policy/1",
+  "diff_base": "e826327",
+  "n_changed_files": 11,
+  "changed_files": [
+    "docs/p2p-development/research/c40/evidence/c40-starting-truth-verification.json",
+    "tests/test_p2p_c34_real_backend_contract.py",
+    "docs/p2p-development/research/c39/evidence/c39-messages-dpKqtTRjfHKVqVyqE62qcL.json",
+    "docs/p2p-development/research/c40/evidence/c40-package-build.json",
+    "docs/p2p-development/research/c40/evidence/c40-package-verify.json",
+    "docs/p2p-development/research/c40/evidence/c40-regression-differential.json",
+    "docs/p2p-development/research/c40/evidence/c40-upgrade-proof.json",
+    "docs/p2p-development/research/c40/harness/c40_fresh_process_recovery.py",
+    "docs/p2p-development/research/c40/harness/c40_pilot_task.py",
+    "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+    "scripts/p2p_install_release.py"
+  ],
+  "change_signals": {
+    "runtime": true,
+    "governance": false,
+    "release_artifact": false
+  },
+  "candidate_policy_result": "YES",
+  "candidate_policy_details": "YES"
+}

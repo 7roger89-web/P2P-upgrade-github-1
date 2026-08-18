@@ -67,7 +67,7 @@ Manus API v2: `GET /v2/task.list` → HTTP 200 `ok: true`; `POST /v2/task.create
 
 ## 9. STAGE C — SECOND LIVE ROLE PROOF (Hermes × Gemini)
 
-Hermes Agent v0.20.4 installed (globally via npm in sandbox; reversible; no P2P modification). Target `hermes-cli:gemini:gemini-2.5-flash`. Same role, same contract hash, same bounded task; **answer independently read from CLI stdout = "Hanoi" → acceptance TRUE**. Receipt: SUCCEEDED, exit 0, latency 3.9s, `NO_MUTATION (bounded non-mutating task; possible_mutation=False)`. Independent fail-closed verifier: **VERIFIED, failure_class NONE**, receipt persisted. Evidence: `research/c38/evidence/c38-stage-c-hermes-{live-receipt,role-receipt,role-contract}.json` + `harness/c38_stage_c_hermes_proof.py` + `c38_stage_c_independent_verify.py`.
+HISTORICAL_ONLY: Hermes Agent v0.20.4 installed (globally via npm in sandbox; reversible; no P2P modification). Target `hermes-cli:gemini:gemini-2.5-flash`. Same role, same contract hash, same bounded task; **answer independently read from CLI stdout = "Hanoi" → acceptance TRUE**. Receipt: SUCCEEDED, exit 0, latency 3.9s, `NO_MUTATION (bounded non-mutating task; possible_mutation=False)`. Independent fail-closed verifier: **VERIFIED, failure_class NONE**, receipt persisted. Evidence: `research/c38/evidence/c38-stage-c-hermes-{live-receipt,role-receipt,role-contract}.json` + `harness/c38_stage_c_hermes_proof.py` + `c38_stage_c_independent_verify.py`.
 
 ### 9.1 Multi-backend equivalence (mechanical)
 
@@ -79,7 +79,7 @@ Hermes Agent v0.20.4 installed (globally via npm in sandbox; reversible; no P2P 
 | execution_status | SUCCEEDED | SUCCEEDED | YES |
 | mutation_status | NO_MUTATION | NO_MUTATION | YES |
 | verifier verdict | VERIFIED / NONE | VERIFIED / NONE | YES |
-| target | `manus-rest-api-v2` (remote task) | `hermes-cli:gemini:gemini-2.5-flash` (local CLI) | NO — the independence is the point |
+HISTORICAL_ONLY: | target | `manus-rest-api-v2` (remote task) | `hermes-cli:gemini:gemini-2.5-flash` (local CLI) | NO — the independence is the point |
 
 Both backends satisfied the same provider-neutral contract; neither result was trusted self-claimed — both were read independently (task-messages API; CLI stdout capture) and verified by the same fail-closed verifier.
 

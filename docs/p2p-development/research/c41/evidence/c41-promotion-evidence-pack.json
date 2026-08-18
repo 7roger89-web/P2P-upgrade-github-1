@@ -1,0 +1,159 @@
+{
+  "schema": "c41-promotion-evidence-pack/1",
+  "goal_id": "P2P-C41",
+  "assembled_at": "2026-08-18T14:31:32Z",
+  "p2p_head": "36e2621d593aae6fa54492d630ba9014be2e36d2",
+  "p2p_branch": "p2p-c40-project-usable-release-pilot",
+  "candidate": {
+    "label": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+    "sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+    "status": "UNPROMOTED (bằng chứng promotion được gom, CHƯA promote)"
+  },
+  "pilots": [
+    {
+      "project": "7roger89-web/game-truyen-github",
+      "source_revision": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+      "pilot_branch": "p2p-c40-project-usable-release-pilot",
+      "proofs": [
+        "pilot-task (T14A PASS)",
+        "fresh-process-recovery (PASS)",
+        "PILOT_PROJECT_ROLLBACK fingerprint (PASS)"
+      ]
+    },
+    {
+      "project": "7roger89-web/Du_An_Gia_Pha-github",
+      "source_revision": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+      "pilot_branch": "p2p-c41-pilot-gia-pha",
+      "proofs": [
+        "pilot-task (N-next Gate-J PASS)",
+        "fresh-process-recovery (PASS)",
+        "PILOT_PROJECT_ROLLBACK fingerprint (PASS)"
+      ]
+    }
+  ],
+  "regression": {
+    "baseline": "8b751f6",
+    "new_unexplained_failures": 0,
+    "framework_validator": "75/75"
+  },
+  "closure_machinery": "PARTIAL is now a native terminal lane (scripts/p2p_goal_closure.py); C40 closure re-ran machine-verified CONSISTENT",
+  "promotion_decision": "OWNER_PROMOTE_EXECUTED",
+  "n_evidence_files": 18,
+  "evidence": [
+    {
+      "file": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+      "sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+      "note": "candidate P2P-C40 v1 (8.4.7-C-codex.24, 1383 entries, SHA e7f62384, UNPROMOTED)",
+      "verdict_or_status": "zip-archive"
+    },
+    {
+      "file": "docs/p2p-development/research/c40/evidence/c40-package-build.json",
+      "sha256": "5b5d1937c7cf4c031c14a50ad8e14614141ed956252e1d72f4b8faa0da325d01",
+      "note": "C40 package build evidence",
+      "verdict_or_status": "BUILT"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/game-truyen-pilot/c40-pilot-dispatch.json",
+      "sha256": "4625e4774a2bd7fad51a34f7a952146433fd649f7c113b6f7249e57139d0703d",
+      "note": "Game Truyện pilot dispatch (task dTCyg9pA7h6V9YXYwuMHAR)",
+      "verdict_or_status": "SUCCEEDED"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/game-truyen-pilot/c40-pilot-observation.json",
+      "sha256": "1ee5b44630701c11a901bf1c9812c197074bc45f9b63529667ec57d435e2bbb4",
+      "note": "Game Truyện pilot independent observation (verdict PASS)",
+      "verdict_or_status": "PASS"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/game-truyen-pilot/c40-messages-dTCyg9pA7h6V9YXYwuMHAR.json",
+      "sha256": "86f1ba5f98466bba762a1d412cb81a3993ade492285b0f4d359658b0ebc7dfe4",
+      "note": "Game Truyện pilot raw messages",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/game-truyen-pilot/c40-fresh-process-dispatch.json",
+      "sha256": "b2fc60ed40d4f1578f58c99f85f7a57e6d1b188ae18448b8b61798c3a0ae5097",
+      "note": "Game Truyện fresh-process dispatch (task ZQVbWT43P6vmVPh78i2bSg)",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/game-truyen-pilot/c40-fresh-process-observation.json",
+      "sha256": "17f65a74eedea1f551eb416da8eb588c2d34cbff49ba9056dc3796289d3b7927",
+      "note": "Game Truyện fresh-process observation (verdict PASS)",
+      "verdict_or_status": "PASS"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/game-truyen-pilot/c40-messages-ZQVbWT43P6vmVPh78i2bSg.json",
+      "sha256": "719853ad08eb2bee5709be0c8852b57aeae2113dc75ee22e969ce098c48ca2d4",
+      "note": "Game Truyện fresh-process raw messages",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-pilot-dispatch.json",
+      "sha256": "72f9586caa588552eebe76359cc9222ac1e1e31b10e99ae7a3d2f57792e8d852",
+      "note": "Gia Phả pilot dispatch (task UfXGenXfDVzyx4vRjYRcts)",
+      "verdict_or_status": "SUCCEEDED"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-observation.json",
+      "sha256": "1ac1ae92dee2f9d5f6eefc76dc1142216bca40ff4f647dfcd7e3f93fd3685400",
+      "note": "Gia Phả pilot independent observation (verdict PASS)",
+      "verdict_or_status": "PASS"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-messages-UfXGenXfDVzyx4vRjYRcts.json",
+      "sha256": "017702f7515ca48a00c1f033869ebe219c100dd6d8925a4e6a7f01ebe0edbece",
+      "note": "Gia Phả pilot raw messages",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-fresh-process-dispatch.json",
+      "sha256": "37d49dff53f08bec9f9368655f70fb65cdd6d8f585856eb1550ff5f5245d5ce3",
+      "note": "Gia Phả fresh-process dispatch (task ZAL2SNuDfxhrgJJvvPgnzY)",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-fresh-process-observation.json",
+      "sha256": "31ca56f9542f2fc14fb426d6b6dec9083611fa8a417ee2bac7b47c000cb61699",
+      "note": "Gia Phả fresh-process observation (verdict PASS)",
+      "verdict_or_status": "PASS"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-freshproc-messages-ZAL2SNuDfxhrgJJvvPgnzY.json",
+      "sha256": "f8625842cb7976bcddce46cfbaceec5db91e077172a15b9aacb71909396cfc92",
+      "note": "Gia Phả fresh-process raw messages",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c41/evidence/c41-gia-pha-project-rollback.json",
+      "sha256": "0d66746da0b7a4d89c549ffc3b9ff30750bc26ae175afbdfa1130f46dedd1a80",
+      "note": "Gia Phả PILOT_PROJECT_ROLLBACK (fingerprint match, verdict PASS)",
+      "verdict_or_status": "PASS"
+    },
+    {
+      "file": "docs/p2p-development/research/c40/evidence/c40-pilot-project-rollback.json",
+      "sha256": "37f9cbafd0f31d83cc41fa4f2ffb384e8f750ffdd78f6b19bac20a1caf5f45db",
+      "note": "Game Truyện PILOT_PROJECT_ROLLBACK (fingerprint match, verdict PASS)",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c40/evidence/c40-goal-closure.json",
+      "sha256": "71e5b4b601b513bb2daab9d6d452ab7f01f6c350090956771f437560b1d90996",
+      "note": "C40 goal closure (PARTIAL lane, CONSISTENT)",
+      "verdict_or_status": "?"
+    },
+    {
+      "file": "docs/p2p-development/research/c40/evidence/c41-regression-differential.json",
+      "sha256": "4d645286549fbaca61f1b0f6b9aeb92b9713e38455c1dd2d32ad290a58820088",
+      "note": "C41 regression differential (NEW_UNEXPLAINED_FAILURES=0, validator 75/75)",
+      "verdict_or_status": "PASS"
+    }
+  ],
+  "promotion": {
+    "executed_at": "2026-08-18T15:22:19+00:00",
+    "status": "PROMOTED (governance-side; full release gates pending)",
+    "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+    "technical_report": "docs/p2p-development/research/c41/c41-pilot-extension-summary.md",
+    "evidence_file": "docs/p2p-development/research/c41/evidence/c41-promotion.json"
+  }
+}
