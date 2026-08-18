@@ -1,0 +1,3034 @@
+{
+  "schema_version": "p2p-codex-drift-report/1",
+  "checked_at": "2026-08-18T15:42:14+00:00",
+  "as_of": "2026-08-18",
+  "status": "PASS",
+  "failures": [],
+  "warnings": [],
+  "volatile_findings": [],
+  "scoped_volatile_references": [
+    {
+      "path": ".agents/skills/UI-taste-skill/research/laziness/findings/empirical-results.md",
+      "line": 5,
+      "matches": [
+        "GPT-4 variants and DeepSeek. Three experiments were conducted"
+      ],
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Dated research notes retained for reference; not an active P2P routing or product fact."
+    },
+    {
+      "path": ".agents/skills/UI-taste-skill/research/laziness/findings/references.md",
+      "line": 7,
+      "matches": [
+        "GPT-4",
+        "Gemini 1.5 Pro"
+      ],
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Research bibliography retained for reference; cited model names do not enter P2P runtime."
+    },
+    {
+      "path": ".agents/skills/UI-taste-skill/research/laziness/remediation/parameter-tuning.md",
+      "line": 31,
+      "matches": [
+        "Gemini 3 models replaced the legacy"
+      ],
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Research/remediation notes retained for reference; provider parameter examples are not active P2P facts."
+    },
+    {
+      "path": ".agents/skills/UI-taste-skill/research/laziness/root-causes/cognitive-shortcuts.md",
+      "line": 5,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "C",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Dated research notes retained for reference; model references are not active P2P facts."
+    },
+    {
+      "path": ".agents/skills/mcp-builder/reference/evaluation.md",
+      "line": 488,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP evaluation reference; its example model defaults are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-builder/reference/evaluation.md",
+      "line": 599,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP evaluation reference; its example model defaults are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/SKILL.md",
+      "line": 61,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional MCP-management skill material; provider examples are outside P2P runtime governance."
+    },
+    {
+      "path": ".agents/skills/mcp-management/SKILL.md",
+      "line": 81,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional MCP-management skill material; provider examples are outside P2P runtime governance."
+    },
+    {
+      "path": ".agents/skills/mcp-management/SKILL.md",
+      "line": 127,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional MCP-management skill material; provider examples are outside P2P runtime governance."
+    },
+    {
+      "path": ".agents/skills/mcp-management/SKILL.md",
+      "line": 156,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional MCP-management skill material; provider examples are outside P2P runtime governance."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 420,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 422,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1684,
+      "matches": [
+        "32k tokens"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1727,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1728,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1730,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1839,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1840,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 1842,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 2003,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 2004,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 2006,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 2095,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 2096,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/assets/tools.json",
+      "line": 2098,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Generated MCP tool catalog; model/tool metadata is not a P2P runtime fact source."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 56,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 57,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 65,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 70,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 75,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 80,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/mcp-management/references/gemini-cli-integration.md",
+      "line": 85,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Bundled MCP integration reference; provider examples are not P2P runtime facts."
+    },
+    {
+      "path": ".agents/skills/payment-integration/references/polar/usage-based-billing.md",
+      "line": 45,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional payment-integration reference; provider examples are outside P2P runtime governance."
+    },
+    {
+      "path": ".agents/skills/payment-integration/references/polar/usage-based-billing.md",
+      "line": 63,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Optional payment-integration reference; provider examples are outside P2P runtime governance."
+    },
+    {
+      "path": ".agents/skills/supervisor/SKILL.md",
+      "line": 233,
+      "matches": [
+        "gpt-4",
+        "gpt-5-codex",
+        "sonnet-4-6"
+      ],
+      "classification": "D",
+      "status": "NONCANONICAL_REFERENCE",
+      "reason": "Supervisor report-naming examples; model names are illustrative metadata, not P2P runtime facts."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-01-usage.json",
+      "line": 12,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes live usage record (2026-07-09); provider model name is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-live-receipt.json",
+      "line": 8,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes CLI live receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-live-receipt.json",
+      "line": 10,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes CLI live receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-live-receipt.json",
+      "line": 34,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes CLI live receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-contract.json",
+      "line": 34,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role contract snapshot; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json",
+      "line": 21,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json",
+      "line": 23,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json",
+      "line": 53,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json",
+      "line": 62,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json",
+      "line": 73,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json",
+      "line": 85,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/P2P-C39-starting-truth-report.md",
+      "line": 30,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Starting-truth report for C39 (2026-08-09); model identifiers are snapshot evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/P2P-C39-starting-truth-report.md",
+      "line": 49,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Starting-truth report for C39 (2026-08-09); model identifiers are snapshot evidence metadata."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-auth-preflight.json",
+      "line": 9,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-01-usage.json",
+      "line": 12,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-drift-evidence.json",
+      "line": 23,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json",
+      "line": 7,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json",
+      "line": 30,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json",
+      "line": 42,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json",
+      "line": 58,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json",
+      "line": 72,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-2-role-contract.json",
+      "line": 35,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/c39/evidence/c39-proof-4-unsafe-postdispatch.json",
+      "line": 29,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 14,
+      "matches": [
+        "GPT-4 variants and DeepSeek. Three experiments were conducted"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 24,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 25,
+      "matches": [
+        "Gemini 1.5 Pro"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 35,
+      "matches": [
+        "Gemini 3 models replaced the legacy"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 45,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 55,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 65,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 75,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 85,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 95,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 105,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 115,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 125,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 135,
+      "matches": [
+        "32k tokens"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 145,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 155,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 165,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 175,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 185,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 195,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 205,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 215,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 225,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 235,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 245,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 255,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 265,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 275,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 285,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 295,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 305,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 315,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 325,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 335,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 345,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 355,
+      "matches": [
+        "gpt-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 356,
+      "matches": [
+        "gpt-5-codex"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 357,
+      "matches": [
+        "sonnet-4-6"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 367,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 377,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 387,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 397,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 407,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 417,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 427,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 437,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 447,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 457,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 467,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 477,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 487,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 497,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 507,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 517,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 527,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 537,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 547,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 557,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 567,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 577,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 587,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 597,
+      "matches": [
+        "GPT-4 variants and DeepSeek. Three experiments were conducted"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 607,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 617,
+      "matches": [
+        "Gemini 1.5 Pro"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 627,
+      "matches": [
+        "Gemini 3 models replaced the legacy"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 637,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 647,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 657,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 667,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 677,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 687,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 697,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 707,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 717,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 727,
+      "matches": [
+        "32k tokens"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 737,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 747,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 757,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 767,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 777,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 787,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 797,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 807,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 817,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 827,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 837,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 847,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 857,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 867,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 877,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 887,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 897,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 907,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 917,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 927,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 937,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 947,
+      "matches": [
+        "gpt-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 957,
+      "matches": [
+        "gpt-5-codex"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 967,
+      "matches": [
+        "sonnet-4-6"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 977,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 987,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 997,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1007,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1017,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1027,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1037,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1047,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1057,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1067,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1077,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1087,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1097,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1107,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1117,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1127,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1137,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1147,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1157,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1167,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1177,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1187,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1197,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1207,
+      "matches": [
+        "GPT-4 variants and DeepSeek. Three experiments were conducted"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1217,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1227,
+      "matches": [
+        "Gemini 1.5 Pro"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1237,
+      "matches": [
+        "Gemini 3 models replaced the legacy"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1247,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1257,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1267,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1277,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1287,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1297,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1307,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1317,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1327,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1337,
+      "matches": [
+        "32k tokens"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1347,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1357,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1367,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1377,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1387,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1397,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1407,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1417,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1427,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1437,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1447,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1457,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1467,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1477,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1487,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1497,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1507,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1517,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1527,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1537,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1547,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1557,
+      "matches": [
+        "gpt-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1567,
+      "matches": [
+        "gpt-5-codex"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1577,
+      "matches": [
+        "sonnet-4-6"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1587,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1597,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1607,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1617,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1627,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1637,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1647,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1657,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1667,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1677,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1687,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1697,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1707,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1717,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1727,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1737,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1747,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1757,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1767,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1777,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1787,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1797,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1807,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1817,
+      "matches": [
+        "GPT-4 variants and DeepSeek. Three experiments were conducted"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1827,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1837,
+      "matches": [
+        "Gemini 1.5 Pro"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1847,
+      "matches": [
+        "Gemini 3 models replaced the legacy"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1857,
+      "matches": [
+        "GPT-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1867,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1877,
+      "matches": [
+        "claude-3-7-sonnet-20250219"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1887,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1897,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1907,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1917,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1927,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1937,
+      "matches": [
+        "gemini-2.5-flash-image-preview"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1947,
+      "matches": [
+        "32k tokens"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1957,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1967,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1977,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1987,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 1997,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2007,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2017,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2027,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2037,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2047,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2057,
+      "matches": [
+        "gemini-2.5-pro-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2067,
+      "matches": [
+        "gemini-2.5-flash-preview-tts"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2077,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2087,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2097,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2107,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2117,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2127,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2137,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2147,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2157,
+      "matches": [
+        "gpt-4.1-nano"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2167,
+      "matches": [
+        "gpt-4"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2177,
+      "matches": [
+        "gpt-5-codex"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2187,
+      "matches": [
+        "sonnet-4-6"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2197,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2207,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2217,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2227,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2237,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2247,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2257,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2267,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2277,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2287,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2297,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2307,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2317,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2327,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2337,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2347,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2357,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2367,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2377,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2387,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2397,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2407,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    {
+      "path": "docs/p2p-development/research/release-gates-20260818/drift-final-report.json",
+      "line": 2417,
+      "matches": [
+        "gemini-2.5-flash"
+      ],
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    }
+  ]
+}

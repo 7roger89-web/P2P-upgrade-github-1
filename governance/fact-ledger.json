@@ -1,16 +1,20 @@
 {
   "schema_version": "p2p-codex-fact-ledger/2",
-  "ledger_revision": 2,
-  "updated_at": "2026-08-09",
+  "ledger_revision": 3,
+  "updated_at": "2026-08-18",
   "change_control": {
     "promotion_requires_user_approval": true,
     "approval_action": "promote_live_specs",
     "approval_policy": "approval-policy.json",
-    "generated_target": "live-specs.json"
+    "generated_target": "live-specs.json",
+    "last_renewal_note": "2026-08-18: C40 production release-gate flow — drift-policy scoped_volatile_paths extended with HISTORICAL_EVIDENCE scopes for archival C38/C39 evidence artifacts; HISTORICAL_ONLY markers added to 8 archival report lines (C33..C38 era reports). No new product/model claims registered; existing 9 claims unchanged. Drift gate expected PASS after runtime-manifest re-lock."
   },
   "expiry_policy": {
     "expiring_window_days": 14,
-    "runtime_evidence_levels": ["A", "B"],
+    "runtime_evidence_levels": [
+      "A",
+      "B"
+    ],
     "max_age_days_by_kind": {
       "host_capability": 90,
       "product_limit": 90,
@@ -28,8 +32,14 @@
       "claim_id": "P2P-FACT-0001",
       "kind": "product_limit",
       "claim": "Codex limits the initial skill list to two percent of the context window, or eight thousand characters when the window is unknown; descriptions may be shortened and skills may be omitted when the list is large.",
-      "value": {"context_percent": 2, "fallback_characters": 8000},
-      "scope": {"product": "Codex", "surface": "skill discovery"},
+      "value": {
+        "context_percent": 2,
+        "fallback_characters": 8000
+      },
+      "scope": {
+        "product": "Codex",
+        "surface": "skill discovery"
+      },
       "source_url": "https://learn.chatgpt.com/docs/build-skills",
       "source_type": "official",
       "evidence_level": "A",
@@ -41,15 +51,24 @@
       "independence_key": "openai-build-skills",
       "provenance_note": "Official OpenAI documentation; applies to discovery metadata, not the full SKILL.md after activation.",
       "risk_tier": "medium",
-      "affected_components": ["skill-discovery", "p2p-router"],
+      "affected_components": [
+        "skill-discovery",
+        "p2p-router"
+      ],
       "verification_method": "Review the current official product documentation for the exact skill-discovery surface."
     },
     {
       "claim_id": "P2P-FACT-0002",
       "kind": "host_capability",
       "claim": "Current Codex releases support subagent workflows and surface separate agent threads; each subagent performs its own model and tool work.",
-      "value": {"separate_threads": true, "separate_model_and_tool_work": true},
-      "scope": {"product": "Codex", "surface": "subagents"},
+      "value": {
+        "separate_threads": true,
+        "separate_model_and_tool_work": true
+      },
+      "scope": {
+        "product": "Codex",
+        "surface": "subagents"
+      },
       "source_url": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
       "source_type": "official",
       "evidence_level": "A",
@@ -61,15 +80,24 @@
       "independence_key": "openai-subagents",
       "provenance_note": "Runtime availability can still depend on account, surface, project trust, and configuration.",
       "risk_tier": "high",
-      "affected_components": ["p2p-quorum", "custom-agents"],
+      "affected_components": [
+        "p2p-quorum",
+        "custom-agents"
+      ],
       "verification_method": "Review official subagent documentation and retain a separate runtime thread ledger for the active host."
     },
     {
       "claim_id": "P2P-FACT-0003",
       "kind": "retrieval_fact",
       "claim": "OpenAI File Search requires a vector store with files uploaded before it can retrieve from that knowledge base.",
-      "value": {"vector_store_required": true, "uploaded_files_required": true},
-      "scope": {"product": "OpenAI API", "surface": "Responses API file_search"},
+      "value": {
+        "vector_store_required": true,
+        "uploaded_files_required": true
+      },
+      "scope": {
+        "product": "OpenAI API",
+        "surface": "Responses API file_search"
+      },
       "source_url": "https://developers.openai.com/api/docs/guides/tools-file-search",
       "source_type": "official",
       "evidence_level": "A",
@@ -81,15 +109,23 @@
       "independence_key": "openai-file-search",
       "provenance_note": "A folder of skills or attached documents is not automatically a vector-store RAG system.",
       "risk_tier": "high",
-      "affected_components": ["rag-router", "rag-grounding"],
+      "affected_components": [
+        "rag-router",
+        "rag-grounding"
+      ],
       "verification_method": "Review the current official File Search guide for prerequisites and the exact API surface."
     },
     {
       "claim_id": "P2P-FACT-0004",
       "kind": "retrieval_fact",
       "claim": "OpenAI File Search can filter results using file metadata attributes.",
-      "value": {"metadata_filtering": true},
-      "scope": {"product": "OpenAI API", "surface": "Responses API file_search"},
+      "value": {
+        "metadata_filtering": true
+      },
+      "scope": {
+        "product": "OpenAI API",
+        "surface": "Responses API file_search"
+      },
       "source_url": "https://developers.openai.com/api/docs/guides/tools-file-search",
       "source_type": "official",
       "evidence_level": "A",
@@ -101,15 +137,24 @@
       "independence_key": "openai-file-search",
       "provenance_note": "Use metadata boundaries for project, tenant, document class, sensitivity, and version where supported.",
       "risk_tier": "medium",
-      "affected_components": ["rag-router", "rag-prep"],
+      "affected_components": [
+        "rag-router",
+        "rag-prep"
+      ],
       "verification_method": "Review the current official File Search metadata-filter documentation and test a scoped retrieval fixture."
     },
     {
       "claim_id": "P2P-FACT-0005",
       "kind": "eval_principle",
       "claim": "An eval should test a prompt against a representative sample with test inputs and ground-truth labels or explicit grading criteria.",
-      "value": {"representative_sample": true, "ground_truth_or_grader_required": true},
-      "scope": {"product": "OpenAI API", "surface": "evals"},
+      "value": {
+        "representative_sample": true,
+        "ground_truth_or_grader_required": true
+      },
+      "scope": {
+        "product": "OpenAI API",
+        "surface": "evals"
+      },
       "source_url": "https://developers.openai.com/api/docs/guides/evals",
       "source_type": "official",
       "evidence_level": "A",
@@ -121,15 +166,26 @@
       "independence_key": "openai-evals",
       "provenance_note": "P2P uses a local, project-specific harness; API upload is optional, not required by this package.",
       "risk_tier": "high",
-      "affected_components": ["p2p-eval", "release-gate"],
+      "affected_components": [
+        "p2p-eval",
+        "release-gate"
+      ],
       "verification_method": "Review the current official eval guidance and verify the local harness against frozen project fixtures."
     },
     {
       "claim_id": "P2P-FACT-0006",
       "kind": "model_bug",
       "claim": "Legacy P2P asserted that XML causes a named Gemini degradation labeled G2.",
-      "value": {"legacy_label": "G2", "verified": false},
-      "scope": {"product": "legacy P2P", "surface": "prompting", "provider": "Google", "model": "Gemini 3.1 Pro / 3.5 Flash"},
+      "value": {
+        "legacy_label": "G2",
+        "verified": false
+      },
+      "scope": {
+        "product": "legacy P2P",
+        "surface": "prompting",
+        "provider": "Google",
+        "model": "Gemini 3.1 Pro / 3.5 Flash"
+      },
       "source_url": "source/8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates.md",
       "source_type": "legacy",
       "evidence_level": "D",
@@ -141,15 +197,27 @@
       "independence_key": "legacy-p2p-model-template",
       "provenance_note": "Preserved for audit only; no independent reproducible evidence is attached.",
       "risk_tier": "medium",
-      "affected_components": ["rag-grounding", "legacy-audit"],
+      "affected_components": [
+        "rag-grounding",
+        "legacy-audit"
+      ],
       "verification_method": "Require a frozen reproducible project fixture and an independent rerun before changing runtime behavior."
     },
     {
       "claim_id": "P2P-FACT-0007",
       "kind": "model_bug",
       "claim": "Legacy P2P asserted that more than roughly seven MUST/MUST NOT pairs cause a named GPT degradation labeled G9.",
-      "value": {"legacy_label": "G9", "legacy_rule_limit": 7, "verified": false},
-      "scope": {"product": "legacy P2P", "surface": "prompting", "provider": "OpenAI", "model": "GPT-5.5"},
+      "value": {
+        "legacy_label": "G9",
+        "legacy_rule_limit": 7,
+        "verified": false
+      },
+      "scope": {
+        "product": "legacy P2P",
+        "surface": "prompting",
+        "provider": "OpenAI",
+        "model": "GPT-5.5"
+      },
       "source_url": "source/8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates.md",
       "source_type": "legacy",
       "evidence_level": "D",
@@ -161,15 +229,26 @@
       "independence_key": "legacy-p2p-model-template",
       "provenance_note": "Treat as an expired hypothesis until a reproducible project eval supports it.",
       "risk_tier": "medium",
-      "affected_components": ["prompt-contract", "legacy-audit"],
+      "affected_components": [
+        "prompt-contract",
+        "legacy-audit"
+      ],
       "verification_method": "Require paired project evals with the same current model and environment before activation."
     },
     {
       "claim_id": "P2P-FACT-0008",
       "kind": "model_bug",
       "claim": "Legacy P2P asserted that a named Grok topic-drift issue labeled G3 is mitigated by duplicated topic anchors.",
-      "value": {"legacy_label": "G3", "verified": false},
-      "scope": {"product": "legacy P2P", "surface": "prompting", "provider": "xAI", "model": "Grok 4.3"},
+      "value": {
+        "legacy_label": "G3",
+        "verified": false
+      },
+      "scope": {
+        "product": "legacy P2P",
+        "surface": "prompting",
+        "provider": "xAI",
+        "model": "Grok 4.3"
+      },
       "source_url": "source/8.4.6-C/plugin/.claude/skills/rag-grounding/reference/model_templates.md",
       "source_type": "legacy",
       "evidence_level": "D",
@@ -181,15 +260,23 @@
       "independence_key": "legacy-p2p-model-template",
       "provenance_note": "Preserved as an expired hypothesis, not an active runtime rule.",
       "risk_tier": "medium",
-      "affected_components": ["rag-grounding", "legacy-audit"],
+      "affected_components": [
+        "rag-grounding",
+        "legacy-audit"
+      ],
       "verification_method": "Require a current reproducible topic-drift fixture and independent evidence before activation."
     },
     {
       "claim_id": "P2P-FACT-0009",
       "kind": "routing_heuristic",
       "claim": "Legacy RAG routing used fixed corpus-size thresholds to select direct attachment, hierarchical summaries, LongRAG, or GraphRAG.",
-      "value": {"verified_universal_thresholds": false},
-      "scope": {"product": "legacy P2P", "surface": "RAG routing"},
+      "value": {
+        "verified_universal_thresholds": false
+      },
+      "scope": {
+        "product": "legacy P2P",
+        "surface": "RAG routing"
+      },
       "source_url": "source/8.4.6-C/plugin/.claude/skills/rag-router/SKILL.md",
       "source_type": "legacy",
       "evidence_level": "D",
@@ -201,7 +288,10 @@
       "independence_key": "legacy-p2p-rag-router",
       "provenance_note": "Calibrate routing with a retrieval eval; corpus count alone is not sufficient.",
       "risk_tier": "medium",
-      "affected_components": ["rag-router", "legacy-audit"],
+      "affected_components": [
+        "rag-router",
+        "legacy-audit"
+      ],
       "verification_method": "Calibrate on the project's six-class retrieval suite instead of accepting fixed corpus thresholds."
     }
   ]

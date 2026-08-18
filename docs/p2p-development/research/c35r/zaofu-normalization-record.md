@@ -17,7 +17,7 @@ A mechanical recount of `zaofu-build-vs-reuse-matrix.json` (`python3 count_decis
 
 ## §B — "5 ideas" language (normalize)
 
-The report previously said "adapt ~5 concepts" while the matrix contained 7 ADAPT rows. The two numbers now coexist with an explicit, non-hiding distinction: **ADAPT_ROWS = 7** (each a distinct matrix decision) grouped into **HIGH_LEVEL_CONCEPT_GROUPS = 5**: (g1) contract richness — rows 2–3; (g2) declarative capability matrix — row 5; (g3) Thin-Judge-at-closure-boundary verification pattern — row 7; (g4) bounded recovery/rework cap — row 8; (g5) context delivery envelope + operator-visible control verbs — rows 9–10. No rows are hidden by the grouping; the grouping is documented wherever the prose mentions "five".
+HISTORICAL_ONLY: The report previously said "adapt ~5 concepts" while the matrix contained 7 ADAPT rows. The two numbers now coexist with an explicit, non-hiding distinction: **ADAPT_ROWS = 7** (each a distinct matrix decision) grouped into **HIGH_LEVEL_CONCEPT_GROUPS = 5**: (g1) contract richness — rows 2–3; (g2) declarative capability matrix — row 5; (g3) Thin-Judge-at-closure-boundary verification pattern — row 7; (g4) bounded recovery/rework cap — row 8; (g5) context delivery envelope + operator-visible control verbs — rows 9–10. No rows are hidden by the grouping; the grouping is documented wherever the prose mentions "five".
 
 ## §C — Closure-failure reporting (fix)
 

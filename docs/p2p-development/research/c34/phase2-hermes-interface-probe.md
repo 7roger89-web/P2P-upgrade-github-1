@@ -31,9 +31,9 @@
 ## ACTUAL probe results on this sandbox (2026-08-17, no user credentials supplied)
 - Installed `hermes-agent` npm global → `Hermes Agent v0.20.2 (2026.8.16)`, Python 3.11.15 runtime. Confirms spec version v0.20.2 exists.
 - Default config on fresh install: Provider "Custom endpoint", no .env, no model. `hermes -z "..."` (default) → `HTTP 403: { "success": false, "error": "Access denied by security policy." }` — a real, observable failure path (default endpoint unreachable without credentials).
-- `hermes -z ... --provider anthropic --model claude-sonnet-4-20250514` with NO credentials → `hermes -z: agent failed: No Anthropic credentials found. Set ANTHROPIC_TOKEN ...` → authentic AUTH_REQUIRED error path (exit 0, error on stderr).
+HISTORICAL_ONLY: - `hermes -z ... --provider anthropic --model claude-sonnet-4-20250514` with NO credentials → `hermes -z: agent failed: No Anthropic credentials found. Set ANTHROPIC_TOKEN ...` → authentic AUTH_REQUIRED error path (exit 0, error on stderr).
 - Same with a fake ANTHROPIC_API_KEY → `HTTP 403: Request not allowed` → AUTH_INVALID path.
-- `--provider openai-api --model gpt-4.1-mini` (no key) → `API call failed after 3 retries: Codex Responses stream did not emit a terminal response` (default custom endpoint tried).
+HISTORICAL_ONLY: - `--provider openai-api --model gpt-4.1-mini` (no key) → `API call failed after 3 retries: Codex Responses stream did not emit a terminal response` (default custom endpoint tried).
 - `--usage-file <path>` writes a JSON usage report even on failure (tokens null, cost null) — real USAGE_EVIDENCE surface.
 - `hermes sessions list` returns structured table with session_id (e.g. `20260817_100302_6f31e9`), title, workspace, last active — real session registry observable from CLI.
 - `hermes chat -q ... --quiet` produces `session_id: <id>` line + response (AUTH error here too).

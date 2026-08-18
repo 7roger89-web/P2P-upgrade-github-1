@@ -1,0 +1,22 @@
+{
+  "schema_version": "p2p-codex-approval-record/2",
+  "state": "APPROVED",
+  "decision": "APPROVE",
+  "request_id": "P2P-APR-20260818T155200Z-c40-release-gates-live-specs",
+  "action": "promote_live_specs",
+  "scope": "C40 production release-gate flow: build Live Specs from fact ledger revision 3 (subject hash-bound) and lock them; part of the Owner-authorized full release-gate run for candidate e7f62384.",
+  "subject": "governance/fact-ledger.json (revision 3)",
+  "subject_sha256": "dc33783d306c73e6897e1ce9ef28df2041a44f6c222a38b45a54a7034459297c",
+  "requested_at": "2026-08-18T15:52:00+00:00",
+  "request_expires_at": "2026-08-19T15:52:00+00:00",
+  "requested_by": "p2p-codex-agent (on behalf of Owner instruction)",
+  "risk_summary": "Live Specs regeneration from the renewed ledger; no runtime code change. Archival evidence scopes are metadata-only.",
+  "technical_report": "/home/ubuntu/p2p-repo/docs/p2p-development/research/release-gates-20260818/technical-preview.json",
+  "technical_report_sha256": "e96a1d5b7e21a20bf4a0dcd55257c42b6aa7dea0341e1e37488bf23499eeb5bf",
+  "decided_at": "2026-08-18T15:52:00+00:00",
+  "decided_by": "7roger89-web (Owner)",
+  "approval_method": "conversation_explicit",
+  "identity_assurance": "active_user_message",
+  "decision_note": "Owner chat instruction: 'Chạy đủ release gates để hoàn tất phát hành sản xuất cho gói C40' — covers ledger renewal, technical preview approval, live-specs build, manifest lock, drift gate, rollback artifact, doctor, technical gate report, and final approval for this candidate release flow.",
+  "recorded_by": "p2p-codex-agent"
+}

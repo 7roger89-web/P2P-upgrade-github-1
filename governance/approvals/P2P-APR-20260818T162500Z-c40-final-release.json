@@ -1,0 +1,22 @@
+{
+  "schema_version": "p2p-codex-approval-record/2",
+  "state": "APPROVED",
+  "decision": "APPROVE",
+  "request_id": "P2P-APR-20260818T162500Z-c40-final-release",
+  "action": "release_or_deploy",
+  "scope": "Final step of the Owner-authorized C40 production release-gate flow: bring the release artifact live (GitHub release published, no install on any project without owner-gate). Candidate hash must remain unchanged.",
+  "subject": "C40 candidate zip + technical gate report",
+  "subject_sha256": "640f28d19bcd9b87933f2a4e8c18eaca361b83b0607f58a3198bec109007812b",
+  "requested_at": "2026-08-18T16:25:00+00:00",
+  "request_expires_at": "2026-08-19T16:25:00+00:00",
+  "requested_by": "p2p-codex-agent (on behalf of Owner instruction)",
+  "risk_summary": "Publishes the release artifact on GitHub (documentation + distributable zip). No project is modified; every future install keeps the owner-gate and rollback contract. Disclosures in the technical gate report remain visible to anyone auditing the release.",
+  "technical_report": "/home/ubuntu/p2p-repo/docs/p2p-development/research/release-gates-20260818/technical-gate-report.md",
+  "technical_report_sha256": "640f28d19bcd9b87933f2a4e8c18eaca361b83b0607f58a3198bec109007812b",
+  "decided_at": "2026-08-18T16:25:00+00:00",
+  "decided_by": "7roger89-web (Owner)",
+  "approval_method": "conversation_explicit",
+  "identity_assurance": "active_user_message",
+  "decision_note": "Owner chat instruction 2026-08-18: 'Chạy đủ release gates để hoàn tất phát hành sản xuất cho gói C40' — completing the release-gate flow (including going live) is the explicit intent of that instruction; candidate hash re-verified unchanged.",
+  "recorded_by": "p2p-codex-agent"
+}
