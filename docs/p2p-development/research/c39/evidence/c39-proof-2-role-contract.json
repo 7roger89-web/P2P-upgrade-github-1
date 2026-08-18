@@ -1,0 +1,40 @@
+{
+  "schema": "p2p-role-execution-contract/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "goal_id": "C39",
+  "task_id": "c39-proof-2-drift-safe-reselection",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "workspace_binding": "",
+  "objective": "BOUNDED NON-MUTATING DRIFT PROOF: pre-dispatch auth drift on the primary target must yield a governed RESELECT_TARGET onto an eligible alternative; execution runs on the reselected target only.",
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "dependencies": [],
+  "context_package": [
+    "SYNTHETIC_TEXT_EXECUTION"
+  ],
+  "context_digest": "92da41a5f62c04fa1b04074b78f55ad9fd13ca89832d52af27e8e374c376844b",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "required_capabilities": [],
+  "acceptance_criteria": [
+    "answer_is_capital_of_vietnam"
+  ],
+  "required_evidence": [
+    "role_binding",
+    "target_attestation",
+    "terminal_result",
+    "drift_reselection"
+  ],
+  "verification_policy": "INDEPENDENT",
+  "explicit_execution_target": "hermes-cli:gemini:gemini-2.5-flash",
+  "target_fingerprint": "2489a457b9adc774be180b7141199b4222598233946acb46c2f8bbc485eb6026",
+  "requested_target_attestation": "REQUESTED_ONLY",
+  "budget": "BOUNDED",
+  "request_fingerprint": "ec19a7c6763f0f3f1f7ba71ece8786868ce33b2afea0daf727883823bf680a80"
+}

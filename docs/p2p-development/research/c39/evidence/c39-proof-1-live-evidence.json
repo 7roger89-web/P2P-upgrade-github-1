@@ -1,0 +1,42 @@
+{
+  "schema": "c39-proof-1-live-evidence/1",
+  "timestamp": "2026-08-18T10:25:09Z",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "selected_target": "manus-api-v2",
+  "pre_dispatch_eligibility": {
+    "schema": "p2p-eligibility-snapshot/1",
+    "target": "manus-api-v2",
+    "eligible": true,
+    "failure_class": null,
+    "evidence_pointers": [
+      "health-check"
+    ],
+    "detail": ""
+  },
+  "failover_decision": {
+    "schema": "p2p-failover-decision/1",
+    "decision": "RETRY_SAME_TARGET",
+    "failure_class": null,
+    "failure_class_observed": [],
+    "revision": "",
+    "old_target": "manus-api-v2",
+    "new_target": "",
+    "old_receipt_pointer": "",
+    "new_receipt_pointer": "",
+    "reason": "NO_FAILURE_RECORDED_PRE_DISPATCH_ELIGIBILITY_SAFE",
+    "mutation_status": "NO_MUTATION_OBSERVED",
+    "evidence_pointers": [],
+    "details": {}
+  },
+  "execution_status": "SUCCEEDED",
+  "error_class": null,
+  "latency_seconds": 11.1,
+  "transcript_pointer": null,
+  "raw_backend_receipt_pointer": "manus-task:4wRTkQZvRd5hxBe2ZkWM29",
+  "manus_task_id": "4wRTkQZvRd5hxBe2ZkWM29",
+  "output_pointers": [],
+  "verification_status": "UNKNOWN",
+  "contract_fingerprint": "9f82d2abfa52d94093a9e41f0b4c9cf88a5351e29235b4dad98adfcc442a7c17",
+  "git_revision": "p2p-c39-governed-live-failover"
+}

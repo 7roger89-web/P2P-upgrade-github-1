@@ -1,0 +1,39 @@
+{
+  "schema": "p2p-role-execution-contract/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "goal_id": "C39",
+  "task_id": "c39-proof-1-governed-live-selection",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "workspace_binding": "",
+  "objective": "BOUNDED NON-MUTATING PROOF: Answer 'What is the capital of Vietnam?' with exactly the city name and nothing else.",
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "dependencies": [],
+  "context_package": [
+    "SYNTHETIC_TEXT_EXECUTION"
+  ],
+  "context_digest": "92da41a5f62c04fa1b04074b78f55ad9fd13ca89832d52af27e8e374c376844b",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "required_capabilities": [],
+  "acceptance_criteria": [
+    "answer_is_capital_of_vietnam"
+  ],
+  "required_evidence": [
+    "role_binding",
+    "target_attestation",
+    "terminal_result"
+  ],
+  "verification_policy": "INDEPENDENT",
+  "explicit_execution_target": "manus-api-v2",
+  "target_fingerprint": "316487129bb02fae239ace4a7e3b99cc7268119f95b4c973a041d0061488de81",
+  "requested_target_attestation": "REQUESTED_ONLY",
+  "budget": "BOUNDED",
+  "request_fingerprint": "9f82d2abfa52d94093a9e41f0b4c9cf88a5351e29235b4dad98adfcc442a7c17"
+}

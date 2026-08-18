@@ -1,0 +1,43 @@
+{
+  "schema": "p2p-c39-proof-3-observation/1",
+  "observed_task_id": "2HX2kPL6PFiUphu6NybjNw",
+  "observation_method": "independent GET /v2/task.listMessages (not executor self-claim)",
+  "messages_observed": 4,
+  "assistant_answer_json": {
+    "project_id": "P2P-upgrade-github-1",
+    "goal_id": "C39",
+    "current_stage": "C39",
+    "role_id": "p2p_iris",
+    "current_verified_git_revision": "p2p-c39-governed-live-failover",
+    "capsule_id": "challenge-f5290ba2966edf4a",
+    "next_owner_gate": "NONE_REQUIRED",
+    "proofs_bound": [
+      "c39-proof-1-governed-live-selection",
+      "c39-proof-2-drift-safe-reselection"
+    ],
+    "challenge_hash": "653d0842c7af05ba28a3878d7d8cf959bb9cc382a08a08a71ee727ed55f73b2e",
+    "capsule_integrity_ok": true
+  },
+  "field_checks": {
+    "project_id": true,
+    "goal_id": true,
+    "current_stage": true,
+    "role_id": true,
+    "current_verified_git_revision": true,
+    "capsule_id_exact": true,
+    "next_owner_gate": true,
+    "proofs_bound_exact": true,
+    "challenge_hash_exact": true,
+    "challenge_hash_vs_expected": true,
+    "capsule_integrity_ok_true": true
+  },
+  "all_field_checks_passed": true,
+  "git_revision_at_proof": "p2p-c39-governed-live-failover",
+  "capsule_id": "challenge-f5290ba2966edf4a",
+  "read_evidence_classification": "CONTEXT_READ_PROVEN_BEHAVIORAL",
+  "read_evidence_note": "The fresh execution reproduced the unpredictable CAPSULE_CHALLENGE_ID and computed challenge_hash=sha256 (C36 canonical fingerprint) exactly, which is only possible if the capsule content was read. No transcript or conversation history was delivered; the capsule was the sole durable context. Cross-task memory exclusion is NOT mechanically provable at the API layer -> SESSION_DEATH_RECOVERY = NOT_PROVEN.",
+  "timestamps": {
+    "finished_at": "1787048946570",
+    "started_at": "1787048941508"
+  }
+}

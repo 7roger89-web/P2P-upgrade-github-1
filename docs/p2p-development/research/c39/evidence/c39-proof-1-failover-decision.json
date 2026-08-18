@@ -1,0 +1,15 @@
+{
+  "schema": "p2p-failover-decision/1",
+  "decision": "RETRY_SAME_TARGET",
+  "failure_class": null,
+  "failure_class_observed": [],
+  "revision": "",
+  "old_target": "manus-api-v2",
+  "new_target": "",
+  "old_receipt_pointer": "",
+  "new_receipt_pointer": "",
+  "reason": "NO_FAILURE_RECORDED_PRE_DISPATCH_ELIGIBILITY_SAFE",
+  "mutation_status": "NO_MUTATION_OBSERVED",
+  "evidence_pointers": [],
+  "details": {}
+}
