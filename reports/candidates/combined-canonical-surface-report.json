@@ -1,0 +1,23 @@
+{
+  "report_id": "combined-canonical-surface-report",
+  "generated_from_commit": "2ace5e1f7d321c3cde5dc7e9381db7082746c206",
+  "parent_commit": "aea006b1c9c1d1899e3d972c677dde298ba5e8d6",
+  "branch": "p2p-host-attestation-canonical",
+  "goal": "CANONICAL_HOST_ATTESTATION_INTEGRATION",
+  "summary": "Exact reuse of proven host_attestation.py (c36 lane, SHA256 c7d684eb2be2ef5ed98aa2dd6df01ca0ed85a4d17ffe1451387bf39b7a7262b4); registration in capabilities.json + exports; provider-neutral 16-test suite (A-O + fixtures) all PASS; LIVE_CERTIFICATION_RECORD reconciled to canonical surface with lineage fields (fixes pre-existing validate_control defect); 8/8 live evidence re-verified immutable, no rerun; C31/C36/C02/FW01 preserved.",
+  "runtime_canonicality_final": {
+    "role_bridge.py": "ALREADY_CANONICAL (byte-identical base)",
+    "role_receipt.py": "ALREADY_CANONICAL (byte-identical base)",
+    "role_verifier.py": "ALREADY_CANONICAL (byte-identical base)",
+    "host_attestation.py": "CANONICAL_INTEGRATED_BY_EXACT_REUSE"
+  },
+  "verification_status": {
+    "CANONICAL_ROLE_REAL_EXECUTION_BINDING": "VERIFIED",
+    "EXACT_8_OF_8_ROLE_BINDING": "VERIFIED",
+    "SINGLE_HOST_LIVE_COUNCIL": "VERIFIED",
+    "MULTIHOST_LIVE_COUNCIL": "NOT_PROVEN"
+  },
+  "candidate_policy_machine_decision": "CANDIDATE_REQUIRED=YES (runtime change)",
+  "promoted": false,
+  "released": false
+}
