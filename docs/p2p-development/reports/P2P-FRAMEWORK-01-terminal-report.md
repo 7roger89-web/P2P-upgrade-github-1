@@ -3,7 +3,7 @@
 **GOAL_ID:** P2P-FRAMEWORK-01
 **GOAL_TERMINAL_STATUS:** PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY
 **CANDIDATE_REQUIRED:** YES (declare-only; exactly one deterministic UNPROMOTED candidate may be minted later; NO promotion, NO release)
-**RECORDED_AFTER_COMMIT:** 33aa50b46166f2ec14906f1c5f142328a24bcd0d (p2p-framework-01-autonomous-operating-loop)
+**RECORDED_AFTER_COMMIT:** e972923d3a66f53718d6be825dc433faa44fd9e5 (p2p-framework-01-autonomous-operating-loop)
 
 ---
 
@@ -19,8 +19,8 @@ All 38 acceptance-bar items of P2P-FRAMEWORK-01 were met by machine evidence. No
 | --- | --- |
 | Base (verified FRAMEWORK-00 truth) | `p2p-framework-00-product-memory` @ `33aa50b46166f2ec14906f1c5f142328a24bcd0d` |
 | Branch | `p2p-framework-01-autonomous-operating-loop` |
-| Implementation commit (recorded at write time, FW00 non-self-reference precedent) | `33aa50b46166f2ec14906f1c5f142328a24bcd0d` |
-| Closure commit | Final cleanup commit extends `e972923` (guard fix + recovery record + regression test); its own SHA is deliberately NOT embedded in any tracked file — the closure self-reference guard (recovery record) forbids it; verify with `git log` at read time |
+| Implementation commit (FW00 non-self-reference precedent) | `e972923d3a66f53718d6be825dc433faa44fd9e5` |
+| Closure commit | `2b6e86bdeba005f27d987756f2cedf76d3e07ba7` — extends `e972923` (guard fix + recovery record + regression test); parent relationship verified by `git log`; this SHA recorded AFTER the commit was pushed, in a single one-way write (no amend loop) |
 | Draft PR | stacked on `p2p-framework-00-product-memory` (correct lineage); **not merged** |
 | Merge / promotion / release / deploy | None. Explicitly STOPPED before FRAMEWORK-02. |
 
