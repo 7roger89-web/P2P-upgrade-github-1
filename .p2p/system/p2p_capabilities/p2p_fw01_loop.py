@@ -372,7 +372,45 @@ class Fw01Loop:
                      in list(rec.get("skills", ())) or True][:0]
 
         # Role / team + target via existing machinery.
-        role_team = self.select_role_team(dict(rec, task_id=task_id))
+        # FW02 PLANNING phase (information only; NO authority):
+        # capability requirements must be known BEFORE team selection.
+        _fw02_handoff = None
+        try:
+            from p2p_capabilities import capability_intelligence as _ci
+            _fw02_reqs = _ci.infer_required_capabilities(
+                dict(rec, task_id=task_id))
+            _fw02_reqs = _ci._narrow_harness_requirements(
+                dict(rec, task_id=task_id), _fw02_reqs)
+            from p2p_capabilities.capability_intelligence import (
+                UNKNOWN, build_project_profile, build_source_inventory)
+            _fw02_prof = build_project_profile(self.root)
+            _fw02_inv = build_source_inventory(self.root)
+            _fw02_cov = _ci.evaluate_coverage(_fw02_reqs, _fw02_inv)
+            _fw02_handoff = _ci.build_capability_handoff(
+                task_id=str(task_id),
+                requirements=_fw02_reqs,
+                coverage=_fw02_cov,
+                sources_eligibility={s.capability_id: str(s.eligibility)
+                                     for s in _fw02_inv},
+                context_items=(),
+                permission_requirements=tuple(
+                    str(p) for p in (rec.get("permission_needs", ()) or ())))
+            self._trace(task_id, {"mutation_class": "READ_ONLY",
+                          "permission": "",
+                          "verification": "REQUIRED"},
+                      "CAPABILITY_HANDOFF_BUILT",
+                      "requirements=" + str(len(_fw02_reqs)) +
+                      " required=" + str(sum(
+                          1 for r in _fw02_reqs
+                          if r.required_or_optional == "REQUIRED")) +
+                      " eligible=" + str(len(_fw02_cov.satisfied)) +
+                      " unknown=" + str(len(_fw02_cov.unknown)))
+        except Exception:
+            _fw02_handoff = None
+        _rec_with_handoff = dict(rec, task_id=task_id)
+        if _fw02_handoff is not None:
+            _rec_with_handoff["capability_requirements"] = _fw02_handoff
+        role_team = self.select_role_team(_rec_with_handoff)
         target = self.builder.registry_targets[0] if self.builder.registry_targets else None
 
         # FW02 capability intelligence: deterministic, evidence-bound,
@@ -382,7 +420,7 @@ class Fw01Loop:
         try:
             from p2p_capabilities import capability_intelligence as _ci
             _fw02 = _ci.compute_execution_requirements(
-                dict(rec, task_id=task_id), self.root,
+                _rec_with_handoff, self.root,
                 installed_skills=tuple(
                     str(s.get("capability_id", "")) for s in eligible))
         except Exception:

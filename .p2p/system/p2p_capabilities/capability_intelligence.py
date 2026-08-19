@@ -1255,6 +1255,10 @@ class ExecutionRequirements:
     decision_trace: CapabilityDecisionTrace
     dispatch_allowed: bool
     failure_class: str  # NONE | capability gap class
+    # Additive (planning-phase handoff): existing callers unaffected.
+    optional_capabilities: tuple = ()
+    source_eligibility: tuple = ()
+    permission_requirements: tuple = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1268,6 +1272,9 @@ class ExecutionRequirements:
             "decision_trace": self.decision_trace.to_dict(),
             "dispatch_allowed": self.dispatch_allowed,
             "failure_class": self.failure_class,
+            "optional_capabilities": list(self.optional_capabilities),
+            "source_eligibility": list(self.source_eligibility),
+            "permission_requirements": list(self.permission_requirements),
         }
 
 
@@ -1289,6 +1296,48 @@ def classify_task(task_record: Mapping[str, Any]) -> str:
     if re.search(r"security|auth|permission", text):
         return "SECURITY_BOUNDARY"
     return "GENERAL"
+
+
+def build_capability_handoff(
+    task_id: str,
+    requirements: "list[CapabilityRequirement]",
+    coverage: "CapabilityCoverage",
+    sources_eligibility: "dict[str, str]",
+    context_items: "tuple[str, ...]",
+    permission_requirements: "tuple[str, ...]" = (),
+    trace_evidence_pointers: "tuple[str, ...]" = (),
+) -> dict:
+    """Minimal structured handoff from FW02 capability intelligence to the
+    existing FW01 role/team selection boundary (planning phase).
+
+    Reuse-only: every value derives from existing contracts/state
+    (CapabilityRequirement, CapabilityCoverage, CapabilitySource,
+    CapabilityDecisionTrace.evidence_pointers). No new schemas, no
+    orchestration authority. Selection reads but does not depend on this
+    input (pass-through proven mechanically); adaptation belongs to FW03.
+
+    Permission requirements are passed through from task-state evidence,
+    never widened (invariant: permission_never_widened stays True in the
+    decision trace because this handoff is read-only).
+    """
+    required = [r.to_dict() for r in requirements if r.required_or_optional == "REQUIRED"]
+    optional = [r.to_dict() for r in requirements if r.required_or_optional == "OPTIONAL"]
+    return {
+        "task_id": task_id,
+        "required_capabilities": tuple(required),
+        "optional_capabilities": tuple(optional),
+        "current_source_eligibility": dict(sources_eligibility),
+        "capability_gaps": tuple(dict.fromkeys(coverage.gaps)),
+        "context_requirements": tuple(context_items),
+        "quality_requirements": tuple(dict.fromkeys(
+            r.quality_requirement for r in requirements
+            if r.quality_requirement and r.quality_requirement != UNKNOWN)),
+        "permission_requirements": tuple(permission_requirements),
+        "fallback_constraints": tuple(dict.fromkeys(
+            f"{r.capability_id}:{'ALLOWED' if r.fallback_allowed else 'DISALLOWED'}"
+            for r in requirements)),
+        "evidence_pointers": tuple(trace_evidence_pointers),
+    }
 
 
 def compute_execution_requirements(
@@ -1355,4 +1404,9 @@ def compute_execution_requirements(
         decision_trace=trace,
         dispatch_allowed=coverage.dispatch_allowed,
         failure_class=failure,
+        optional_capabilities=tuple(s for s in requirements
+                                    if s.required_or_optional == "OPTIONAL"),
+        source_eligibility=tuple(dict.fromkeys(
+            f"{s.capability_id}:{str(s.eligibility)}" for s in selected)),
+        permission_requirements=tuple(str(p) for p in (task_record.get("permission_needs", ()) or ())),
     )

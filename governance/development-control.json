@@ -905,6 +905,36 @@
    "built": true,
    "artifact_path": "reports/candidates/fw02-capability-intelligence-candidate.zip",
    "notes": "Capability intelligence layer inside FW01 — no competing router. Predecessor 8.4.7-C-codex.25 (COMBINED-CANONICAL-SURFACE) preserved verbatim UNPROMOTED. No promotion, no release. FW03 not started (Owner gate). SHA bound to tree artifact: 579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930 (binding correction — zip bytes unchanged, honest artifact binding) Lineage corrected to official baseline 8.4.7-C-codex.19 (validate_control contract); lineage_anchor remains predecessor .25 (c0b485bd)."
+  },
+  {
+   "candidate_id": "FW02_HANDOFF_BOUNDARY",
+   "candidate_version": "8.4.7-C-codex.27",
+   "embedded_version": "8.4.7-C-codex.27",
+   "candidate_label": "fw02-handoff-boundary-8.4.7-C-codex.27",
+   "promotion_status": "UNPROMOTED",
+   "candidate_sha256": "a7648e979fea9e855806eafe2f1eb55de676f3c78d8c5a1042479ea8a2d54fbf",
+   "based_on_official_version": "8.4.7-C-codex.19",
+   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+   "development_goal": "FW02_CAPABILITY_TO_TEAM_HANDOFF_BOUNDARY_CLOSURE",
+   "built": true,
+   "lineage_anchor_sha256": "579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930",
+   "lineage_anchor_note": "FW02 handoff closure candidate: planning-phase capability handoff BEFORE role/team selection + preserved post-selection fail-closed enforcement gate. Ancestor = FW02 candidate 8.4.7-C-codex.26 (579e02bd..., UNPROMOTED), which remains untouched as historical record. Successor of COMBINED-CANONICAL-SURFACE .25 (c0b485bd..., UNPROMOTED) in the lineage sequence. Minted per canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True)) = YES. No promotion, no release. FW03 not started (Owner gate). SHA256 bound to this exact normalized zip.",
+   "surface_scope": [
+    "FW02 planning-phase capability handoff (capability_intelligence.py)",
+    "FW01 loop boundary integration (p2p_fw01_loop.py)",
+    "handoff boundary tests + preserved 26-case A-Z suite",
+    "governance candidate lineage"
+   ],
+   "exclusions": [
+    "no role/team selection adaptation (FW03)",
+    "no project-specific data",
+    "no secrets",
+    "no GT/GP runtime or state",
+    "no Supabase/RLS/deployment",
+    "no live credentials"
+   ],
+   "artifact_path": "reports/candidates/fw02-handoff-boundary-candidate.zip",
+   "minted_at": "2026-08-19T16:10:15Z"
   }
  ],
  "capability_status": [
