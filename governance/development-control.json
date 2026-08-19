@@ -638,7 +638,7 @@
     {
       "candidate_id": "FW01",
       "candidate_label": "P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip",
-      "candidate_sha256": "2f34b659257cb8587f39a7424cdac4747c1e35c6220a59e01f6513b5a75cb978",
+      "candidate_sha256": "eb396dc17bd5cfb7c67a80ceff43ccd9050a6bd6fde25afe5919425d100d3d7d",
       "promotion_status": "UNPROMOTED",
       "development_goal": "P2P-FRAMEWORK-01",
       "created_at": "2026-08-19T03:13:00Z",
@@ -1744,6 +1744,26 @@
         "docs/p2p-development/research/c41/evidence/c41-promotion.json",
         "docs/p2p-development/research/c43/evidence/c43-production-install-evidence-pack.json"
       ]
+    },
+    {
+      "goal": "P2P-FRAMEWORK-01",
+      "change_id": "FW01-C40-INSTALLER-SNAPSHOT-FIX",
+      "changed_at": "2026-08-19T04:01:43Z",
+      "what_changed": "scripts/p2p_install_release.py: marker `snapshots` entry now registered only when the backup directory was actually created (system.exists() AND backup_system.exists()); a fresh install with no pre-existing system no longer records a phantom snapshot path. Rollback remain fail-closed when no snapshot exists.",
+      "why": "Release readiness: verified rollback must restore an actual backup. The previous registration pointed at a non-existent directory after fresh installs, making rollback fail-closed in a scenario where restoration was vacuously unnecessary. Kept fail-closed semantics; no silent overwrites; legacy/upgrade-path rollback verified end-to-end.",
+      "evidence_refs": [
+        "docs/p2p-development/research/framework-01/fw01-pilot-evidence.json"
+      ]
+    },
+    {
+      "goal": "P2P-FRAMEWORK-01",
+      "change_id": "FW01-ISOLATED-PILOT",
+      "changed_at": "2026-08-19T04:01:43Z",
+      "what_changed": "Isolated FW01 candidate pilot executed on two Owner project clones (game-truyen-github, Du_An_Gia_Pha-github) in /home/ubuntu/fw01-pilot; chain: install -> upgrade (same-version no-op, idempotent) -> doctor (HEALTHY) -> rollback (source fingerprint restored) -> bounded primary proof (OWNER_GATE_STOP, NO_DUPLICATE_EXECUTION VERIFIED). No push to either production repo.",
+      "why": "Owner request: demonstrate install/upgrade/doctor/rollback and a bounded operating-loop proof before promotion; production untouched.",
+      "evidence_refs": [
+        "docs/p2p-development/research/framework-01/fw01-pilot-evidence.json"
+      ]
     }
   ],
   "research_intake_ledger": "governance/research-intake-ledger.json",
@@ -1773,7 +1793,7 @@
         "title": "Autonomous Project Operating Loop — one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md; docs/p2p-development/research/framework-01/; .p2p/system/p2p_capabilities/p2p_entry.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py; .p2p/system/p2p_capabilities/p2p_skill_eligibility.py; .p2p/system/p2p_capabilities/p2p_loop_guard.py; .p2p/system/p2p_capabilities/p2p_decision_runtime.py; scripts/fw01/p2p_fw01_proof.py; scripts/fw01/p2p_fw01_discovery.py; scripts/fw01/p2p_fw01_live.py",
         "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
-        "commit": "88311cb610d29228d2caf519e3c2008e1eb2d37f",
+        "commit": "f7b338f4dfabebedbf5367e68eea08cc5abbd961",
         "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
       }
     ],

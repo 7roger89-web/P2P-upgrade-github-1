@@ -4,8 +4,8 @@
 **GOAL_TERMINAL_STATUS:** PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY
 **CANDIDATE_REQUIRED:** YES (exactly one deterministic UNPROMOTED candidate minted; NO promotion, NO release)
 **CANDIDATE_STATUS:** MINTED, UNPROMOTED — one candidate: `P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip` (`reports/candidates/`)
-**CANDIDATE_SHA256:** `916e7786701cf9961c8c143d463fe5d6f64d257ade5a56ad5ca35c2c752d4349` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
-**RECORDED_AFTER_COMMIT:** 88311cb610d29228d2caf519e3c2008e1eb2d37f (p2p-framework-01-autonomous-operating-loop)
+**CANDIDATE_SHA256:** `eb396dc17bd5cfb7c67a80ceff43ccd9050a6bd6fde25afe5919425d100d3d7d` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
+**RECORDED_AFTER_COMMIT:** f7b338f4dfabebedbf5367e68eea08cc5abbd961 (p2p-framework-01-autonomous-operating-loop)
 
 ---
 
@@ -127,3 +127,4 @@ The goal was interrupted by a Manus server error (code 10091) after the implemen
 **P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE**
 
 **STOP.** FRAMEWORK-02 was not started.
+| FW01 isolated pilot (Game Truyện + Gia Phả, clones only) | install PASS, upgrade SAME_VERSION_NOOP, doctor HEALTHY, rollback fingerprint_restored=True, bounded primary proof OWNER_GATE_STOP VERIFIED — production remotes untouched | `docs/p2p-development/research/framework-01/fw01-pilot-evidence.json` |

@@ -990,9 +990,10 @@
     "docs/p2p-development/research/framework-01/discovery/game_truyen-discovery-proof.json": "73c5374f6cbd05274722c3eeb00afae6e8f3c9a7e802e78376f713e1f04ded35",
     "docs/p2p-development/research/framework-01/discovery/gia_pha-discovery-proof.json": "6c597eaae3c5cd341bc0c030dfb62b4a3ac67ffda6c1189279ec5bc3fdc7253c",
     "docs/p2p-development/research/framework-01/doctor-fresh-candidate-governance.json": "d9fea08d73f173156ddfcb04776cb6fd480571e87504bc0929a211b0ed666045",
-    "docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json": "84cae810bb7ffa8ddcd8c3e133e0b30d916d5efe6601b0d4ab5341648332837d",
+    "docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json": "13fbb7aa0c9405b99a2154fe4ecbc02886b79560a9c092d7b07d4005daa2d162",
     "docs/p2p-development/research/framework-01/fw01-negative-proofs-summary.json": "ff37ffcb3b9ee2f01bfa70260d570b48dfa6f971cdd2a395e649e69999080833",
     "docs/p2p-development/research/framework-01/fw01-normalization-regression.json": "90a29ac215285252de035d309d7fdf71a6ad80a8d2620b6c1c1b72895333c230",
+    "docs/p2p-development/research/framework-01/fw01-pilot-evidence.json": "5ceecd7d19a9977e676acf84d9789dcf8a0f052ded22848c39364b83c914050c",
     "docs/p2p-development/research/framework-01/fw01-primary-proof-summary.json": "b385809c1d7d19695f23cad2bcf293fb73574b11ac297b2062b04ca316f3b781",
     "docs/p2p-development/research/framework-01/fw01-recovery-regression.json": "80c07c32459ad70e5e9b45fcda504083ff24658493dedde99a22583edabf08f3",
     "docs/p2p-development/research/framework-01/fw01-recovery.json": "7396133439081ef5856671c212edac8a158983808489e461dae047ab65ca5f63",
@@ -1066,7 +1067,7 @@
     "governance/approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json": "e38fedac446c715eede232fe67eaeb2d6d2926457c420564a0a6490648087e09",
     "governance/approvals/P2P-APR-20260818T155200Z-c40-release-gates-live-specs.json": "306a44f380baee39618637eab5343be24196fa21462a38aa0e7ff07400e60937",
     "governance/approvals/P2P-APR-20260818T162500Z-c40-final-release.json": "2c5e4fc5cfe8ff828f7b468e71fcac810c1351bd54536199c2ec731d077ea419",
-    "governance/development-control.json": "86bbfb3dd2797a08ab9ebe741d6f9fb83783575fff01112f333702a39045a9d0",
+    "governance/development-control.json": "1d6c5dc2d783964238cc7c0e34ba10e4060194c7e9ec1b1e79e4aaa5cb90b0dc",
     "governance/drift-policy.json": "3db92b6ad3da26eb8879faf18b43067127d9f10ab6a686fcdb8c201f0b21ec98",
     "governance/eval-suite.schema.json": "5eb2788a7b6fefedea5d01555a9c572809a693176d4187dd01b2c64201d6fe79",
     "governance/fact-ledger.json": "dc33783d306c73e6897e1ce9ef28df2041a44f6c222a38b45a54a7034459297c",
@@ -1098,7 +1099,7 @@
     "scripts/p2p_gate.py": "71b2dc0ba1d84dd7a202f3a6d8abc449efffb264f2dc7240c93206ee00a62569",
     "scripts/p2p_goal_closure.py": "d324449381c67be903239961044460e027c67417b33721ff3abf857269c819bd",
     "scripts/p2p_governance.py": "f4a6031e9b057ea9d5aa27deb10b67acaccdc4132050fda534e1c5c57ac3f4af",
-    "scripts/p2p_install_release.py": "7ff882093d9d5b9b109f35dcdc3cf187d74c351ffe6730fa4de377f6ccb27cf9",
+    "scripts/p2p_install_release.py": "b66460ec7adf43499bf14e8d7057e4c577e4b9e1fa6302beba8404bd1a2f022e",
     "scripts/p2p_live_certification.py": "201f4f3c140bbd3f5092a3388aaddeaacb3fcd7bb602186269e78e018a18cbfe",
     "scripts/p2p_parallel.py": "3f7fd15914cbf8bbed214a9a0ed4e05977cbedce7a653c6cd7b8b692e3b397ee",
     "scripts/p2p_secure_onboarding.py": "0d3b976f6d774af002b06ef476d32f128eb6899f72139bd7466a1a08f1bd2108",
@@ -1114,6 +1115,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-19T03:55:28+00:00",
+  "generated_at": "2026-08-19T04:02:36+00:00",
   "reason": "Release package build"
 }
