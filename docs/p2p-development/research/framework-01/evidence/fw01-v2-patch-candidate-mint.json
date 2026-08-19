@@ -1,0 +1,29 @@
+{
+  "schema": "fw01-candidate-mint/2",
+  "goal": "P2P-FRAMEWORK-01",
+  "policy_verdict": "YES",
+  "policy_basis": "FW01 §39 candidate policy with runtime_changed=True and verified self-contained patch machinery",
+  "label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+  "zip_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+  "zip_size": 2728740,
+  "status": "UNPROMOTED",
+  "promotion": "NONE",
+  "published": false,
+  "exactly_one": true,
+  "source_branch": "p2p-framework-01-autonomous-operating-loop",
+  "source_commit": "local-patch-working-tree",
+  "package_version": "8.4.7-C-codex.24",
+  "relative_ref_binding": true,
+  "technical_report_sha256_ok": true,
+  "approval_binding_ok": true,
+  "external_dev_path_dependency": 0,
+  "dev_path_refs": [
+    "governance/approvals/P2P-APR-20260818T155200Z-c40-release-gates-live-specs.json",
+    "governance/approvals/P2P-APR-20260818T162500Z-c40-final-release.json",
+    "governance/development-control.json",
+    "governance/release-evidence/technical-preview.json"
+  ],
+  "file_count": 461,
+  "checksum_count": 462,
+  "verification_exit_code": 0
+}
