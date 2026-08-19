@@ -3,7 +3,7 @@
 **GOAL_ID:** P2P-FRAMEWORK-01
 **GOAL_TERMINAL_STATUS:** PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY
 **CANDIDATE_REQUIRED:** YES (declare-only; exactly one deterministic UNPROMOTED candidate may be minted later; NO promotion, NO release)
-**RECORDED_AFTER_COMMIT:** 3efe61cadc43196007efc3073f2bb8b6b95f1451
+**RECORDED_AFTER_COMMIT:** 33aa50b46166f2ec14906f1c5f142328a24bcd0d (p2p-framework-01-autonomous-operating-loop)
 
 ---
 
@@ -19,7 +19,8 @@ All 38 acceptance-bar items of P2P-FRAMEWORK-01 were met by machine evidence. No
 | --- | --- |
 | Base (verified FRAMEWORK-00 truth) | `p2p-framework-00-product-memory` @ `33aa50b46166f2ec14906f1c5f142328a24bcd0d` |
 | Branch | `p2p-framework-01-autonomous-operating-loop` |
-| Final HEAD | `3efe61cadc43196007efc3073f2bb8b6b95f1451` |
+| Implementation commit (recorded at write time, FW00 non-self-reference precedent) | `33aa50b46166f2ec14906f1c5f142328a24bcd0d` |
+| Closure commit | Final cleanup commit extends `e972923` (guard fix + recovery record + regression test); its own SHA is deliberately NOT embedded in any tracked file — the closure self-reference guard (recovery record) forbids it; verify with `git log` at read time |
 | Draft PR | stacked on `p2p-framework-00-product-memory` (correct lineage); **not merged** |
 | Merge / promotion / release / deploy | None. Explicitly STOPPED before FRAMEWORK-02. |
 
@@ -96,8 +97,19 @@ Production project source: NOT MUTATED (read-only proofs only; `.p2p` writes occ
 | cf21 / ho47 / DT behavioral cert | PASS (core adapter-boundary fix: pure-pathlib git resolution in p2p_entry) |
 | Closure machinery | Consistent with explained findings |
 | Candidate policy | `ChangeSignals.detect` → runtime changed → **CANDIDATE_REQUIRED = YES**, declare-only (no mint in this goal) |
+| Recovery regression (baseline `e972923`) | 45 failed vs 45 failed; **NEW_UNEXPLAINED_FAILURES = 0** — recovery change set adds only passing guard test + recovery record |
+| Closure self-reference guard | PASS (4/4): HEAD-equal SHA rejected, invalid SHA rejected, ancestor SHA accepted, fill script never reads rev-parse |
 
-## 11. Exact remaining gaps (explicit)
+## 11. Recovery record (server error 10091 + closure self-reference loop)
+
+The goal was interrupted by a Manus server error (code 10091) after the implementation commit `e972923` had landed. The subsequent closure script embedded `git rev-parse HEAD` into the terminal report and governance, then amended that same commit — each amend changed HEAD, requiring another fill: an unbounded self-referential loop, plus repeated amend/push cycles. Resolution (recorded in `docs/p2p-development/research/framework-01/fw01-recovery.json`):
+
+1. All pre-loop evidence was mechanically re-verified: primary E2E (4/4), negative proofs A–J (10/10, G/H deterministically rerun, J corrupt-by-design), restart proof, live backend leg, both discovery proofs — no evidence was invalidated by the incident.
+2. Lineage model switched to the FW00 non-self-referential precedent: tracked files record the implementation commit (`e972923`) written at report time; the final closure commit records `e972923` as its parent and is itself verified only by `git log`.
+3. A deterministic guard was added (`tests/test_p2p_fw01_closure_no_self_reference.py`): a lineage fill targeting the current HEAD is rejected with a non-zero exit and mutates nothing; the fill script reads its target from an external file and never calls `git rev-parse HEAD`.
+4. The regression differential was recomputed on the final change set: **NEW_UNEXPLAINED_FAILURES = 0**.
+
+## 12. Exact remaining gaps (explicit)
 
 1. Session-death recovery: NOT_PROVEN (separate property; not claimed).
 2. Production installs still run older snapshots; they are NOT yet upgraded to FRAMEWORK-01 — no production-project change in this goal.
@@ -105,7 +117,7 @@ Production project source: NOT MUTATED (read-only proofs only; `.p2p` writes occ
 4. Adaptive skill selection beyond eligibility: not implemented (not claimed).
 5. Background/independent operation beyond the owner session: prohibited and unimplemented.
 
-## 12. Next framework (defined, not started)
+## 13. Next framework (defined, not started)
 
 **P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE**
 
