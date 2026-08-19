@@ -899,12 +899,12 @@
    "candidate_label": "fw02-capability-intelligence-8.4.7-C-codex.26",
    "promotion_status": "UNPROMOTED",
    "candidate_sha256": "579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930",
-   "based_on_official_version": "8.4.7-C-codex.25",
-   "based_on_official_sha256": "c0b485bd66587fa9b30bd355c99dcd50045a8f217b4eb3dcc58c75620263c8a8",
+   "based_on_official_version": "8.4.7-C-codex.19",
+   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
    "development_goal": "FW02_CAPABILITY_INTELLIGENCE",
    "built": true,
    "artifact_path": "reports/candidates/fw02-capability-intelligence-candidate.zip",
-   "notes": "Capability intelligence layer inside FW01 — no competing router. Predecessor 8.4.7-C-codex.25 (COMBINED-CANONICAL-SURFACE) preserved verbatim UNPROMOTED. No promotion, no release. FW03 not started (Owner gate). SHA bound to tree artifact: 579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930 (binding correction — zip bytes unchanged, honest artifact binding)"
+   "notes": "Capability intelligence layer inside FW01 — no competing router. Predecessor 8.4.7-C-codex.25 (COMBINED-CANONICAL-SURFACE) preserved verbatim UNPROMOTED. No promotion, no release. FW03 not started (Owner gate). SHA bound to tree artifact: 579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930 (binding correction — zip bytes unchanged, honest artifact binding) Lineage corrected to official baseline 8.4.7-C-codex.19 (validate_control contract); lineage_anchor remains predecessor .25 (c0b485bd)."
   }
  ],
  "capability_status": [
