@@ -16,6 +16,7 @@ Reject at minimum:
 UNKNOWN fails closed. RECEIPT_COMPLETE != ROLE_EXECUTED != ROLE_VERIFIED.
 """
 from __future__ import annotations
+from datetime import datetime, timezone
 
 import hashlib
 import json
@@ -82,6 +83,8 @@ def verify_role_execution_receipt(
     observed_target_evidence_pointers: Iterable[str] = (),
     certification_records: Iterable[BackendCapabilityCertification] = (),
     require_fresh_certification: bool = False,
+    attestation_policy: str = "STANDARD",
+    now_reference: str = "",
 ) -> dict[str, Any]:
     """Independent verification of a role execution receipt.
 
@@ -223,6 +226,108 @@ def verify_role_execution_receipt(
             reasons.append("CERTIFICATION_STALE_NO_TIMESTAMP")
             failure_class = failure_class or "CERTIFICATION_STALE"
 
+
+    # ------------------------------------------------------------------
+    # 12. Real host attestation (Owner condition; only under REAL_REQUIRED).
+    # STANDARD keeps the C35 behavior byte-identical.
+    # ------------------------------------------------------------------
+    if attestation_policy == "REAL_REQUIRED":
+        from .host_attestation import (  # noqa: PLC0415
+            verify_all_attestation_sources, attestation_already_used)
+        record_value = receipt.host_attestation if receipt.host_attestation else None
+        if record_value is None:
+            reasons.append("REAL_HOST_ATTESTATION_ABSENT")
+            failure_class = failure_class or "REAL_ATTESTATION_MISSING"
+        else:
+            from .host_attestation import HostAttestationRecord  # noqa: PLC0415
+            try:
+                attestation = HostAttestationRecord.from_mapping(record_value)
+            except Exception as exc:  # fail closed: any malformed record rejects
+                reasons.append("REAL_ATTESTATION_RECORD_MALFORMED:" + str(exc)[:128])
+                failure_class = failure_class or "REAL_ATTESTATION_MISSING"
+                attestation = None
+            if attestation is not None:
+                # 12a. Contract/run/dispatch binding (Owner amendment 1).
+                if attestation.execution_contract_digest != receipt.request_fingerprint:
+                    reasons.append("REAL_ATTESTATION_CONTRACT_MISMATCH")
+                    failure_class = failure_class or "REPLAY_CONTRACT_MISMATCH"
+                if attestation.run_id and f"c36:{expected_contract.goal_id}" != str(attestation.run_id):
+                    reasons.append("REAL_ATTESTATION_RUN_MISMATCH")
+                    failure_class = failure_class or "REPLAY_RUN_MISMATCH"
+                # 12b. Identity surface fingerprint re-derivation.
+                identity_surface = {
+                    "adapter_id": attestation.adapter_id,
+                    "harness": attestation.harness,
+                    "provider": attestation.provider,
+                    "model": attestation.model,
+                    "host_execution_identity": attestation.host_execution_identity,
+                }
+                recomputed = hashlib.sha256(canonical_identity_bytes(
+                    identity_surface)).hexdigest()
+                if recomputed != attestation.host_identity_fingerprint:
+                    reasons.append("REAL_ATTESTATION_IDENTITY_FINGERPRINT_MISMATCH")
+                    failure_class = failure_class or "BINDING_MISMATCH"
+                # 12c. Evidence sources must really exist and bind
+                # (Owner amendment 2): pointer strings self-authored by
+                # the executor are verified, never assumed.
+                source_check = verify_all_attestation_sources(attestation)
+                if not source_check["all_sources_present"]:
+                    reasons.append("REAL_ATTESTATION_EVIDENCE_SOURCE_ABSENT")
+                    failure_class = failure_class or "EVIDENCE_SOURCE_UNVERIFIABLE"
+                elif source_check["digest_mismatch"]:
+                    reasons.append("REAL_ATTESTATION_EVIDENCE_DIGEST_MISMATCH")
+                    failure_class = failure_class or "EVIDENCE_SOURCE_UNVERIFIABLE"
+                # 12d. Observation must bind to the attestation record,
+                # not float freely.
+                attestation_pointer_set = set(attestation.attestation_evidence_pointers)
+                observed_binding = any(pointer in attestation_pointer_set
+                                       for pointer in observed_target_evidence_pointers)
+                if not observed_binding:
+                    reasons.append("REAL_ATTESTATION_OBSERVATION_NOT_BOUND")
+                    failure_class = failure_class or "REAL_ATTESTATION_MISSING"
+                # 12e. Freshness window (replay part of Owner amendment 3).
+                if attestation.attested_at:
+                    try:
+                        attested_dt = datetime.fromisoformat(
+                            attestation.attested_at.replace("Z", "+00:00"))
+                        ref = datetime.now(timezone.utc)
+                        if now_reference:
+                            ref = datetime.fromisoformat(
+                                now_reference.replace("Z", "+00:00"))
+                        if abs((attested_dt - ref).total_seconds()) > 3600:
+                            reasons.append("REAL_ATTESTATION_STALE")
+                            failure_class = failure_class or "CERTIFICATION_STALE"
+                    except (TypeError, ValueError):
+                        reasons.append("REAL_ATTESTATION_TIMESTAMP_UNPARSEABLE")
+                        failure_class = failure_class or "CERTIFICATION_STALE"
+
+    # ------------------------------------------------------------------
+    # 13. Replay protection (Owner amendment 3): attestations that were
+    # already consumed by any prior run/dispatch reject. STANDARD never
+    # consults the ledger, so C35 behavior stays byte-identical.
+    # ------------------------------------------------------------------
+    if attestation_policy == "REAL_REQUIRED" and receipt.host_attestation:
+        from .host_attestation import (  # noqa: PLC0415
+            HostAttestationRecord, attestation_already_used)
+        try:
+            attestation2 = HostAttestationRecord.from_mapping(receipt.host_attestation)
+            fp = attestation2.attestation_fingerprint
+            from .host_attestation import load_attestation_ledger  # noqa: PLC0415
+            ledger_entries = load_attestation_ledger()
+            matching = [e for e in ledger_entries
+                        if e.get("attestation_fingerprint") == fp]
+            own = attestation2.to_dict()
+            foreign = [e for e in matching
+                       if not (e.get("run_id") == own.get("run_id")
+                               and e.get("dispatch_id") == own.get("dispatch_id")
+                               and e.get("execution_contract_digest")
+                               == own.get("execution_contract_digest"))]
+            if len(matching) > 1 or foreign:
+                reasons.append("REAL_ATTESTATION_REPLAYED")
+                failure_class = failure_class or "REPLAY_ALREADY_USED"
+        except Exception:
+            pass  # malformed records already rejected by group 12
+
     if reasons:
         verdict = "REJECTED"
     else:
@@ -237,6 +342,10 @@ def verify_role_execution_receipt(
         "failure_class": failure_class if reasons else "NONE",
         "verifier_authority": "INDEPENDENT",
     }
+
+
+def canonical_identity_bytes(mapping: Mapping[str, Any]) -> bytes:
+    return json.dumps(mapping, sort_keys=True, ensure_ascii=False).encode("utf-8")
 
 
 def permission_profile_fingerprint(permission_profile: Iterable[str]) -> str:

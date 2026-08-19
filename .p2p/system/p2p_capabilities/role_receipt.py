@@ -66,7 +66,9 @@ class RoleReceiptError(ValueError):
 
 
 def role_receipt_to_dict(receipt: "RoleExecutionReceipt") -> dict[str, Any]:
-    return {
+    # an absent host_attestation keeps the C35 serialization
+    # byte-identical (dict equality with C35 receipts).
+    result = {
         "schema": ROLE_RECEIPT_SCHEMA,
         "role_id": receipt.role_id,
         "role_spec_hash": receipt.role_spec_hash,
@@ -94,6 +96,11 @@ def role_receipt_to_dict(receipt: "RoleExecutionReceipt") -> dict[str, Any]:
         "timestamps": dict(receipt.timestamps),
         "raw_backend_receipt_pointer": receipt.raw_backend_receipt_pointer,
     }
+    if receipt.host_attestation is not None:
+        result["host_attestation"] = receipt.host_attestation
+    if receipt.dispatch_id:
+        result["dispatch_id"] = receipt.dispatch_id
+    return result
 
 
 def new_role_receipt(**fields: Any) -> dict[str, Any]:
@@ -132,6 +139,9 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
         "failure_class": str(fields.get("failure_class") or "NONE"),
         "timestamps": timestamps,
         "raw_backend_receipt_pointer": fields.get("raw_backend_receipt_pointer") or "",
+        # Optional C36 fields: absent by default (C35 byte-identical).
+        "host_attestation": fields.get("host_attestation"),
+        "dispatch_id": fields.get("dispatch_id") or "",
     }
 
 
@@ -210,6 +220,19 @@ class RoleExecutionReceipt:
         self.timestamps = timestamps
         self.raw_backend_receipt_pointer = _validate_text(
             raw.get("raw_backend_receipt_pointer") or "", "raw_backend_receipt_pointer", 512)
+        # Optional C36 fields (declared-only validation, fail closed
+        # when a value IS declared):
+        host_attestation_value = raw.get("host_attestation")
+        if host_attestation_value is not None:
+            from .host_attestation import HostAttestationRecord
+            if not isinstance(host_attestation_value, dict):
+                raise RoleReceiptError("RECEIPT_HOST_ATTESTATION_NOT_A_MAPPING", {})
+            self.host_attestation = HostAttestationRecord.from_mapping(
+                host_attestation_value).to_dict()
+        else:
+            self.host_attestation = None
+        self.dispatch_id = _validate_text(
+            raw.get("dispatch_id") or "", "dispatch_id", 128)
 
     def to_dict(self) -> dict[str, Any]:
         return role_receipt_to_dict(self)

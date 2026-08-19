@@ -39,6 +39,12 @@ from .backend_execution_bridge import (
     contract_request_fingerprint,
 )
 from .fake_execution_backend import CONTRACT_SCHEMA as TASK_CONTRACT_SCHEMA
+from .host_attestation import (
+    HostAttestationError,
+    HostAttestationRecord,
+    mint_dispatch_id,
+    record_attestation_use,
+)
 from .role_contract import RoleExecutionContract
 from .role_receipt import RoleExecutionReceipt, new_role_receipt
 from .role_verifier import permission_profile_fingerprint
@@ -95,6 +101,7 @@ class RoleExecutionBridge:
                  adapter_id: str,
                  backend_outcome: str = "SUCCEEDED",
                  backend_verification_status: str = "VERIFIED",
+                 host_attestation: HostAttestationRecord | None = None,
                  ) -> dict[str, Any]:
         """Dispatch one bounded role contract through the reused backend
         bridge. The explicit adapter MUST already be registered in the
@@ -160,6 +167,35 @@ class RoleExecutionBridge:
             + list(backend_result.artifact_pointers)
             + [backend_result.raw_backend_receipt_pointer or ""]
         )
+        dispatch_sequence = len(self._dispatch_log)
+        dispatch_id = mint_dispatch_id(
+            f"c36:{contract.goal_id}", contract.role_id,
+            contract.task_id, dispatch_sequence)
+        receipt_kwargs: dict[str, Any] = {}
+        if host_attestation is not None:
+            if not isinstance(host_attestation, HostAttestationRecord):
+                raise RoleBridgeError("HOST_ATTESTATION_REQUIRED_RECORD", {})
+            # The attestation MUST bind this exact contract and run.
+            if host_attestation.execution_contract_digest != role_request_fingerprint:
+                raise RoleBridgeError("ATTESTATION_CONTRACT_MISMATCH", {})
+            if host_attestation.adapter_id != adapter_id:
+                raise RoleBridgeError("ATTESTATION_ADAPTER_MISMATCH", {})
+            if host_attestation.dispatch_id and (
+                    host_attestation.dispatch_id != dispatch_id):
+                raise RoleBridgeError("ATTESTATION_DISPATCH_MISMATCH", {})
+            if not host_attestation.dispatch_id:
+                # Fail closed: an attestation without a dispatch binding is
+                # not an attestation.
+                raise RoleBridgeError("ATTESTATION_DISPATCH_BINDING_MISSING", {})
+            record_attestation_use(host_attestation)
+            receipt_kwargs["host_attestation"] = host_attestation.to_dict()
+            receipt_kwargs["dispatch_id"] = dispatch_id
+            receipt_kwargs["evidence_pointers"] = tuple(
+                list(tuple(pointer for pointer in observation_pointers if pointer))
+                + list(host_attestation.attestation_evidence_pointers))
+        else:
+            receipt_kwargs["evidence_pointers"] = tuple(
+                pointer for pointer in observation_pointers if pointer)
         receipt_dict = new_role_receipt(
             role_id=contract.role_id,
             role_spec_hash=contract.role_spec_hash,
@@ -181,8 +217,8 @@ class RoleExecutionBridge:
             execution_status=backend_result.execution_status,
             output_pointers=backend_result.output_pointers,
             artifact_pointers=backend_result.artifact_pointers,
-            evidence_pointers=tuple(pointer for pointer in observation_pointers if pointer),
             verifier_result="UNKNOWN",
+            **receipt_kwargs,
             mutation_state="NO_MUTATION_OBSERVED" if backend_result.possible_mutation is False
             and backend_result.mutation_surface is None else "MUTATION_UNKNOWN",
             failure_class="NONE",
@@ -200,6 +236,9 @@ class RoleExecutionBridge:
             "backend_verification_status": backend_result.verification_status,
             "role_receipt": receipt.to_dict(),
             "dispatched_at": now,
+            "dispatch_id": dispatch_id,
+            "host_attestation": host_attestation.to_dict()
+            if host_attestation is not None else None,
         }
         self._dispatch_log.append(entry)
         return {
