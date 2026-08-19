@@ -1,0 +1,42 @@
+{
+  "evaluated_at": "2026-08-19T08:23:29Z",
+  "hosts": [
+    {
+      "host": "Codex CLI (codex-cli 0.147.0, Windows)",
+      "HOST_AVAILABLE": true,
+      "ADAPTER_AVAILABLE": "codex adapter class exists in P2P system (host_kind=codex allow-listed)",
+      "AUTH_AVAILABLE": false,
+      "auth_detail": "codex login status = 'Not logged in'; no OPENAI_API_KEY/OPENAI_API_BASE exported; service_tier=default in config.toml",
+      "REAL_EXECUTION_AVAILABLE": false,
+      "INDEPENDENT_IDENTITY_EVIDENCE_AVAILABLE": "partially (Codex session/thread SQLite exists in ~/.codex/logs_2.sqlite, but no active logged-in session to mint an identity)",
+      "ROLE_BINDING_CAPABLE": true
+    },
+    {
+      "host": "Manus runtime/session",
+      "HOST_AVAILABLE": true,
+      "ADAPTER_AVAILABLE": false,
+      "auth_detail": "No manus-side identity surface reachable from inside the sandbox/runtime; platform task id observable only via platform API/UI with Owner-side visibility",
+      "REAL_EXECUTION_AVAILABLE": false,
+      "INDEPENDENT_IDENTITY_EVIDENCE_AVAILABLE": false,
+      "ROLE_BINDING_CAPABLE": true,
+      "note": "Owner amendment 4: Manus self-reported task/thread identity is NOT accepted; honest pending unless the platform independently exposes an observable handle"
+    },
+    {
+      "host": "Claude Code (2.1.143)",
+      "HOST_AVAILABLE": true,
+      "ADAPTER_AVAILABLE": false,
+      "AUTH_AVAILABLE": false,
+      "auth_detail": "Claude CLI present but no auth session observable; ANTHROPIC_API_KEY absent; Owner instruction forbids requesting new paid access",
+      "REAL_EXECUTION_AVAILABLE": false,
+      "INDEPENDENT_IDENTITY_EVIDENCE_AVAILABLE": false,
+      "ROLE_BINDING_CAPABLE": true
+    }
+  ],
+  "conclusion": {
+    "any_host_with_auth_and_identity": false,
+    "L2_genuine_e2e_possible": false,
+    "L3_second_heterogeneous_host": false,
+    "verdict": "MULTIHOST_LIVE_CERT_PENDING_EXTERNAL_UNAVAILABLE",
+    "honest_statement": "No real-backend execution was performed for L2. No historical PENDING row was converted to VERIFIED. The deterministic fake adapter remains the only executable surface until the Owner logs in (codex login / claude login) or grants an authorized credential surface."
+  }
+}

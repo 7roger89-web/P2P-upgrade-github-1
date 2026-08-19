@@ -1,0 +1,85 @@
+{
+  "subject": "c36-gatej-integration",
+  "timestamp": "2026-08-19T08:13:56Z",
+  "host": "windows-host",
+  "gate_run_reference": "p2p-c02-gatej-ui-20260819-114604-manus-01",
+  "gate_artifact_exists": false,
+  "c36_suite": "37/37 PASS (run6)",
+  "c35_regression": "57/57 PASS (byte-identical)",
+  "verdict_matrix": [
+    {
+      "role": "p2p_iris",
+      "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+      "contract_fingerprint": "8b5b826c41970bdc2925f2ae73fe3c60b9559ed370854b4d818559efa7c516dd",
+      "dispatch_id": "102e78e68063cf52a89d177c35577280282c573f4a60287f3d07c5d078694b2c",
+      "verdict": "VERIFIED",
+      "attestation_status": "real-execution-live-proof",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_tecton",
+      "role_spec_hash": "a3ed7f93a8822b059737a6eb49ba63f03e7e52c090dd59bfae71b7939a43c88a",
+      "contract_fingerprint": "0d1e3222c8caa8815b88984ce4482c5d52cf46900b1366fee1aa29afb9892d3c",
+      "dispatch_id": "f575e78f4b1f13344748b03cf4266a2170a645f845d8919f3052a466a610b622",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_axiom",
+      "role_spec_hash": "397315e248029fcec6f600de8612f99e5638b21085f6d1ad98f2bf37a693ff95",
+      "contract_fingerprint": "56f1331d0bc0a3a09a3d8880a372ba7bd9749b0ba24e862c604fe0506c6da063",
+      "dispatch_id": "5c75a602cd50c010a193656f688b1d3cfaaf1dfeaefca3ff711b3b50c017b3f5",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_vector",
+      "role_spec_hash": "66f1909a69df68ac2edc05b98c7f1a9d39d48503bb9f60ee60743b182f17533f",
+      "contract_fingerprint": "4bec96f2aeacf401b0e01364bb6b988ced37ec037a8b23373b43a230ec669211",
+      "dispatch_id": "cc81e3a018bbca0d21ddd253d968652e298fb37fa381e3b8d71568f483cd29c3",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_datos",
+      "role_spec_hash": "88b92a66d7744edadc169f1dd17ee5135a3b1c82b5fa2423da4cef4efb71c47b",
+      "contract_fingerprint": "31341728627af00c2ea7b4821d48aeb34b7a18ed662f81daa1732a7b02e87817",
+      "dispatch_id": "72b8c102887e45a4c189ea80d4c133eb7cc3a54fb2343984b5fc7c342f01af3b",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_anon",
+      "role_spec_hash": "6062e0bbbd09fe00efd88053903b653b42c721ed4ceac259523b3d88e6ed53af",
+      "contract_fingerprint": "73a2fb1783b8f1712f6032beb37fbdbe7a795828abb0895bb3cdf09b422f4e4d",
+      "dispatch_id": "87c451048612bf628af12311cf82f68905c803df4155871a8f7c5a80c0ccb319",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_architecton",
+      "role_spec_hash": "502dd76550b7b8176f46ee9645d397851ac1af27bae10989594224f47e280601",
+      "contract_fingerprint": "e87f1c223b4d6696fe792405b51bb3ba39a7988c21fe0108f54d0e0f9fd00af5",
+      "dispatch_id": "1b9f8e097904dd806b97dc97e32182cee82fab93d2e9b59c2de29984426a753d",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    },
+    {
+      "role": "p2p_helios",
+      "role_spec_hash": "9596c2d01befd6e15cc528a000259721be7b4fc315a18ae188dcaa0bda5cb1dd",
+      "contract_fingerprint": "691d657fad45ae8a948391bdc4b90031a4f579f438b3f321a0a880b22a23420c",
+      "dispatch_id": "b366e70293f9f00e26ecfb9a624184102412189beb64843647c45639293f9ad9",
+      "verdict": "PENDING_HOST_ATTESTATION",
+      "attestation_status": "honest-pending",
+      "gate_j_reference": ""
+    }
+  ],
+  "owner_amendment_5_status": "1/8 VERIFIED bindings via real host attestation; 7/8 PENDING_HOST_ATTESTATION (no real execution on this host; Owner amendment 4 forbids self-reported identities)",
+  "notes": "Gate J 8-role completion requires 7 more distinct real executions on hosts that can expose observable evidence. STOP before promotion per Owner instruction."
+}

@@ -1,0 +1,26 @@
+{
+  "codex": {
+    "name": "codex",
+    "which": "C:\\Users\\Admin\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.EXE",
+    "version": "codex-cli 0.147.0",
+    "cli_help": "Codex CLI\n\nIf no subcommand is specified, options will be forwarded to the interactive CLI.\n\nUsage: codex [OPTIONS] [PROMPT]\n       codex [OPTIONS] <COMMAND> [ARGS]\n\nCommands:\n  exec            Run Codex non-interactively [aliases: e]\n  review          Run a code review non-interactively\n  login           Manage login\n  logout          Remove stored authentication credentials\n  mcp             Manage external MCP servers for Codex\n  plugin          Manage Codex plugins\n  mcp-server      Start Co",
+    "runtime_dir_exists": true,
+    "node_in_runtime": true
+  },
+  "manus": {
+    "name": "manus",
+    "session_visible_from_inside": "partial - current task is a Manus task executing against the Owner's connected machine; the platform task id is observable only via the Manus platform API or UI, not from inside the sandbox runtime",
+    "manus_upload_present": false
+  },
+  "claude": {
+    "name": "claude",
+    "which": "C:\\Users\\Admin\\AppData\\Roaming\\npm\\claude.CMD",
+    "claude_desktop_dir": false
+  },
+  "registry_adapters": [],
+  "env_keys_present": {
+    "ANTHROPIC_API_KEY": false,
+    "OPENAI_API_KEY": false,
+    "CODDEX_API_KEY": false
+  }
+}

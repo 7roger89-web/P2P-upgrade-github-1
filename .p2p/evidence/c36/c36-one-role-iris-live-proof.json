@@ -1,0 +1,16 @@
+{
+  "subject": "c36-one-role-iris-live-proof",
+  "verdict": "VERIFIED",
+  "reasons": [],
+  "attested_at": "2026-08-19T08:12:23Z",
+  "host": "windows-host",
+  "user": "Admin",
+  "evidence_file": "D:\\AI\\P2P_dev\\P2P-upgrade-github\\.p2p\\state\\reports\\c36\\iris-live-execution.txt",
+  "evidence_digest": "f9be504bffc1ad56fd2287a7447900e0b61397a76afb201761b38519fac73727",
+  "attestation_fingerprint": "056f2ec2b48c415d455459a5db023c30bffaa1d3a146aed6f784c8c0f36639e3",
+  "dispatch_id": "65db07888f4c46f9ba09cf9f02c490bb6247663965ef67f2f43a99d99ffed5d4",
+  "contract_fingerprint": "aad1c025dae0d418e96bb861b30d2c37814d2864100226fd3b4eec52fd05703c",
+  "receipt_fingerprint": null,
+  "ledger_path": "D:\\AI\\P2P_dev\\P2P-upgrade-github\\.p2p\\system\\evidence\\c36\\c36-replay-ledger.jsonl",
+  "ledger_entries": "{\"adapter_id\": \"adapter-codex-official\", \"attestation_fingerprint\": \"056f2ec2b48c415d455459a5db023c30bffaa1d3a146aed6f784c8c0f36639e3\", \"attested_at\": \"2026-08-19T08:12:23Z\", \"dispatch_id\": \"65db07888f4c46f9ba09cf9f02c490bb6247663965ef67f2f43a99d99ffed5d4\", \"execution_contract_digest\": \"aad1c025dae0d418e96bb861b30d2c37814d2864100226fd3b4eec52fd05703c\", \"host_execution_identity\": \"codex-thread-c36-one-role-iris-live-proof-live\", \"run_id\": \"c36:gia-pha-goal\"}\n"
+}
