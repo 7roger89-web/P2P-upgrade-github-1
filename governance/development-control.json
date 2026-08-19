@@ -778,7 +778,9 @@
       "release_decision": "RELEASED",
       "release_identifier": "p2p-8.4.7-C-codex.24-fw01-v2",
       "release_published_at": "2026-08-19T09:05:00+00:00",
-      "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v2/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip"
+      "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v2/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+      "promoted_artifact_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+      "promoted_artifact_label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip"
     }
   ],
   "capability_status": [
