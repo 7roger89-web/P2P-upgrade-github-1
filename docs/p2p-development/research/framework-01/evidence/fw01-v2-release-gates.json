@@ -39,8 +39,8 @@
     },
     {
       "gate": "release_asset_sha",
-      "result": "PENDING_UPLOADED_ASSET_VERIFICATION",
-      "detail": "LOCAL_FROZEN_SHA == APPROVAL_BOUND_SHA == 2a42e815... verified; UPLOADED_ASSET_SHA to be verified byte-by-byte after upload."
+      "result": "PASS",
+      "detail": "LOCAL_FROZEN_SHA == APPROVAL_BOUND_SHA == UPLOADED_ASSET_SHA == 2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61; mechanical byte-level retrieval of published asset (2728740 bytes) and cmp verification: byte-identical. Release 372915158, asset 520619801."
     }
   ]
 }

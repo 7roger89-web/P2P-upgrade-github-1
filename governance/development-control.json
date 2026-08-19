@@ -766,13 +766,19 @@
           "decision_note": "PROMOTE + RELEASE FW01 v2 SELF-CONTAINED PATCH"
         },
         {
-          "event": "RELEASE_PENDING",
+          "event": "RELEASE_PUBLISHED",
           "at": "2026-08-19T09:05:00+00:00",
-          "note": "GitHub release publication in progress; release_id/asset_id to be bound after uploaded-asset SHA verification."
+          "note": "Release artifact published per canonical release machinery (identifier p2p-8.4.7-C-codex.24-fw01-v2). Uploaded asset SHA verified byte-by-byte against frozen candidate.",
+          "release_id": 372915158,
+          "release_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/tag/p2p-8.4.7-C-codex.24-fw01-v2",
+          "asset_id": 520619801,
+          "asset_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61"
         }
       ],
       "release_decision": "RELEASED",
-      "release_identifier": "p2p-8.4.7-C-codex.24-fw01-v2"
+      "release_identifier": "p2p-8.4.7-C-codex.24-fw01-v2",
+      "release_published_at": "2026-08-19T09:05:00+00:00",
+      "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v2/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip"
     }
   ],
   "capability_status": [

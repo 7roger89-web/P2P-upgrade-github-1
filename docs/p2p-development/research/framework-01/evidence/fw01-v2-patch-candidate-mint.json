@@ -8,7 +8,7 @@
   "zip_size": 2728740,
   "status": "PROMOTED_OWNER_VERIFIED",
   "promotion": "OWNER_AUTHORIZED_PROMOTE_RELEASE",
-  "published": false,
+  "published": true,
   "exactly_one": true,
   "source_branch": "p2p-framework-01-autonomous-operating-loop",
   "source_commit": "local-patch-working-tree",
@@ -29,8 +29,8 @@
   "approval_record": "governance/approvals/P2P-APR-20260819T090500+0000-fw01-v2-promote-release.json",
   "source_binding_commit": "a5f2997d982c18fc9b6005e2408dc8527a7dd0f0",
   "final_release_source_head": "ae569f06b22a5ec21acde98444a90039ce4c19df",
-  "github_release_id": null,
-  "github_asset_id": null,
-  "github_asset_download_url": null,
+  "github_release_id": "372915158",
+  "github_asset_id": "520619801",
+  "github_asset_download_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v2/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
   "updated_at": "2026-08-19T09:05:00+00:00"
 }
