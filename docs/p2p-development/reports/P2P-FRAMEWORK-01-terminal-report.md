@@ -4,8 +4,8 @@
 **GOAL_TERMINAL_STATUS:** PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY
 **CANDIDATE_REQUIRED:** YES (exactly one deterministic UNPROMOTED candidate minted; NO promotion, NO release)
 **CANDIDATE_STATUS:** MINTED, UNPROMOTED — one candidate: `P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip` (`reports/candidates/`)
-**CANDIDATE_SHA256:** `3d0e34cd8b05c2479e0eca3010f7524583857bd275e6ef2b10577e6f4edf1ca8` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
-**RECORDED_AFTER_COMMIT:** 4a01b41704451dee547cecb64e9a268ea4bd714d (p2p-framework-01-autonomous-operating-loop)
+**CANDIDATE_SHA256:** `916e7786701cf9961c8c143d463fe5d6f64d257ade5a56ad5ca35c2c752d4349` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
+**RECORDED_AFTER_COMMIT:** 88311cb610d29228d2caf519e3c2008e1eb2d37f (p2p-framework-01-autonomous-operating-loop)
 
 ---
 
@@ -94,7 +94,7 @@ Production project source: NOT MUTATED (read-only proofs only; `.p2p` writes occ
 
 | Check | Result |
 | --- | --- |
-| Framework validator | 77/78 PASS; 1 documented gap: `V19-c31-no-fabricated-candidate` — C31 record (BLOCKED, `built=false`, `BUILD_SKIPPED_BY_POLICY`) carries the documented C30-artifact lineage anchor `94b09b59…` which the primary canon (LINEAGE_HASH) requires as a real 64-char sha; the two-canon ontology conflict is recorded in governance provenance `FW01-C31-CANDIDATE-ANCHOR-RESOLUTION` and reported here rather than resolving one canon silently (see section 14) |
+| Framework validator | 78/78 PASS (clean); Owner approved the schema extension — C31 anchor moved to its own field `lineage_anchor_sha256`, `candidate_sha256` keeps a single meaning, `PROMOTED_OWNER_VERIFIED` added for Owner-approved promotions not equal to the official baseline (see section 14) |
 | Regression (baseline `8b751f6`; mechanical re-run at closure normalization) | Failure-set diff clean HEAD vs branch: NEW_UNEXPLAINED_FAILURES = 0; lineage repair resolved 10 dev-control suite tests that asserted the stale baseline/C31 state; 2 pre-existing failures remain (`r19`/`r20`, reconcilable-root harness fixture artifacts at clean base) — evidence `docs/p2p-development/research/framework-01/fw01-normalization-regression.json` |
 | fresh_clone_recovery | PASS after C34 authorized approved-set growth (FRAMEWORK-01 core + scripts/fw01 + research/framework-01) |
 | cf21 / ho47 / DT behavioral cert | PASS (core adapter-boundary fix: pure-pathlib git resolution in p2p_entry) |
@@ -116,7 +116,7 @@ The goal was interrupted by a Manus server error (code 10091) after the implemen
 ## 12. Exact remaining gaps (explicit)
 
 1. Session-death recovery: NOT_PROVEN (separate property; not claimed).
-2. Schema-ontology gap (`V19-c31-no-fabricated-candidate`): the C31 candidate record is BLOCKED / `built=false` / `BUILD_SKIPPED_BY_POLICY`, yet its `candidate_sha256` names the real C30 artifact (`94b09b59…`) — a documented lineage anchor per the 2026-08-17 C31 terminal report. The primary canon (`LINEAGE_HASH`) requires a real 64-char sha while the validator's BLOCKED-goal rule requires `TO_BE_FILLED`; replacing the anchor with a placeholder would pass the validator but erase the documented anchor history, keeping it would fail the row. Neither canon was silently overridden: the tiebreak is recorded in governance provenance (`FW01-C31-CANDIDATE-ANCHOR-RESOLUTION`) and the row remains failing by design until a schema change (anchor field) is approved by the Owner. 77/78 is the honest result.
+2. Schema-ontology gap (`V19-c31-no-fabricated-candidate`): RESOLVED by Owner command (2026-08-19). The C31 record's historical C30-artifact anchor `94b09b59…` now lives in its own field `lineage_anchor_sha256` (validated 64-hex, required non-empty note), `candidate_sha256` is `TO_BE_FILLED` because C31 was never built (`built=false`, `BUILD_SKIPPED_BY_POLICY`), and the validator's BLOCKED-goal rule accepts that exact honest pairing. Each field keeps a single meaning: built artifacts vs never-built anchors.
 3. Production installs still run older snapshots; they are NOT yet upgraded to FRAMEWORK-01 — no production-project change in this goal.
 4. Council 8/8 live certification: NOT_PROVEN (1/8 CERTIFIED, per FW00 reconciliation).
 5. Adaptive skill selection beyond eligibility: not implemented (not claimed).

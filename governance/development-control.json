@@ -394,18 +394,20 @@
       "development_goal": "C31",
       "candidate_version": "8.4.7-C-codex.24",
       "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c31-live-host-certification-candidate-v1.zip",
-      "candidate_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+      "candidate_sha256": "TO_BE_FILLED",
       "embedded_version": "8.4.7-C-codex.24",
       "built": false,
       "based_on_official_version": "8.4.7-C-codex.19",
       "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
       "artifact_path": null,
       "promotion_status": "UNPROMOTED",
-      "lineage_status": "BUILD_SKIPPED_BY_POLICY: terminal verdict BLOCKED; no release artifact minted for a BLOCKED terminal; candidate_sha256/embedded_version anchor to the last built artifact (C30) so lineage remains continuous and reconcilable per C29 policy",
+      "lineage_status": "BUILD_SKIPPED_BY_POLICY: terminal verdict BLOCKED; no release artifact minted for a BLOCKED terminal; the historical C30-artifact anchor is preserved in lineage_anchor_sha256 per FW01 schema extension.",
       "package_verify_evidence": null,
       "evidence_refs": [
         "C29 candidate policy: PASS+governance/runtime/release changes -> REQUIRED; BLOCKED terminal -> no release artifact minted"
-      ]
+      ],
+      "lineage_anchor_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+      "lineage_anchor_note": "The real SHA-256 of the never-built C31 candidate does not exist; the C31 terminal report (2026-08-17, line 13) anchored C31's lineage to the C30 artifact 94b09b59... as an honesty-preserving continuity anchor. Per FW01 schema extension this anchor now lives in its own field so candidate_sha256 keeps a single meaning (built artifact digest). RESOLVED by Owner command (2026-08-19 FW01 schema extension): the anchor now lives in lineage_anchor_sha256; candidate_sha256=TO_BE_FILLED reflects never-built truth; validator row V19-c31 now PASS."
     },
     {
       "candidate_id": "C33",
@@ -580,7 +582,7 @@
       "candidate_id": "C40",
       "candidate_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
       "candidate_zip": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
-      "promotion_status": "UNPROMOTED",
+      "promotion_status": "PROMOTED_OWNER_VERIFIED",
       "based_on_official_version": "8.4.7-C-codex.19",
       "candidate_policy_lane": "runtime_changed=YES",
       "terminal_verdict": "PARTIAL / INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE",
@@ -608,12 +610,35 @@
       "candidate_version": "8.4.7-C-codex.24",
       "embedded_version": "8.4.7-C-codex.24",
       "development_goal": "C40",
-      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C40 closure recorded the candidate as UNPROMOTED with terminal PARTIAL / INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE. Owner instruction 'PROMOTE' (2026-08-18T15:22:19Z; approval record approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json) then promoted the candidate governance-side per Owner decision; the pipeline PROMOTED_VERIFIED gate requires candidate == official baseline == v19, which the v24 C40 artifact (e7f62384...) is not, so per single-slot baseline authority the record status normalizes to UNPROMOTED. Owner approval evidence preserved in approvals/ and docs/p2p-development/research/c41/; release_decision remains unset/BLOCKED until full release gates run."
+      "reconciliation_note": "FW01 SCHEMA EXTENSION: Owner promotion/release did occur (Owner 'PROMOTE' 2026-08-18T15:22:19Z; approval record approvals/P2P-APR-20260818T152219+0000; pilot installs Game Truyện + Gia Phà verified in c43 pack). The vocabulary PROMOTED_VERIFIED requires the promoted artifact to equal the official baseline (v19), which the v24 C40 artifact is not, so the previous normalization to UNPROMOTED erased an expressible historical truth. The extended schema adds PROMOTED_OWNER_VERIFIED for exactly this state: an Owner-approved promotion whose artifact is NOT the official build baseline; full release_decision remains NOT_RUN.",
+      "promoted_artifact_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+      "promoted_version": "8.4.7-C-codex.24",
+      "release_decision": "NOT_RUN",
+      "promotion_history": [
+        {
+          "promoted_at": "2026-08-18T15:22:19+00:00",
+          "promoted_by": "7roger89-web (Owner)",
+          "approval_method": "conversation_explicit",
+          "identity_assurance": "active_user_message",
+          "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+          "approval_record_sha256": "e38fedac446c715eede232fe67eaeb2d6d2926457c420564a0a6490648087e09",
+          "promoted_artifact_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+          "promoted_artifact_label": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+          "promotion_scope": "Owner web projects similar to piloted projects (Game Truyen, Gia Pha — web/Next.js style); owner-gate and rollback preserved for every new install",
+          "full_release_gates": "NOT_RUN (drift gate, fact-ledger renewal, final hash-bound approval pending) — Owner approved CANDIDATE promotion, not full release",
+          "evidence_refs": [
+            "governance/approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+            "docs/p2p-development/research/c41/evidence/c41-promotion.json",
+            "docs/p2p-development/research/c41/evidence/c41-promotion-evidence-pack.json",
+            "docs/p2p-development/research/c43/evidence/c43-production-install-evidence-pack.json"
+          ]
+        }
+      ]
     },
     {
       "candidate_id": "FW01",
       "candidate_label": "P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip",
-      "candidate_sha256": "3d0e34cd8b05c2479e0eca3010f7524583857bd275e6ef2b10577e6f4edf1ca8",
+      "candidate_sha256": "2f34b659257cb8587f39a7424cdac4747c1e35c6220a59e01f6513b5a75cb978",
       "promotion_status": "UNPROMOTED",
       "development_goal": "P2P-FRAMEWORK-01",
       "created_at": "2026-08-19T03:13:00Z",
@@ -630,7 +655,7 @@
         "candidate_path": "reports/candidates/P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip",
         "verdict": "ARTIFACT_VERIFY_PASS",
         "build_exit_code": 0,
-        "zip_sha256": "3d0e34cd8b05c2479e0eca3010f7524583857bd275e6ef2b10577e6f4edf1ca8",
+        "zip_sha256": "2f34b659257cb8587f39a7424cdac4747c1e35c6220a59e01f6513b5a75cb978",
         "zip_entry_count": 462,
         "manifest": "candidate-manifest.json",
         "deterministic_rebuild_identical_sha": true
@@ -1708,6 +1733,17 @@
       "when": "2026-08-17T06:15:29Z",
       "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
       "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
+    },
+    {
+      "change_id": "FW01-SCHEMA-EXTENSION-MIGRATION",
+      "changed_at": "2026-08-19T05:00:00+00:00",
+      "what_changed": "candidate_records schema extended (lineage_anchor_sha256, lineage_anchor_note, promotion_history, promoted_artifact_sha256, promoted_version, release_decision; PROMOTED_OWNER_VERIFIED status; TO_BE_FILLED allowed for never-built records); C31 anchor field migration; C40 canonical-truth promotion migration",
+      "why": "Owner command: C31 lineage anchor must have its own field so candidate_sha256 keeps a single meaning (resolve V19-c31 conflict, clean 78/78 validator); C40 Owner promotion/release is historical truth the schema must be able to express rather than normalizing to UNPROMOTED because the vocabulary lacked the state",
+      "evidence_refs": [
+        "governance/approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+        "docs/p2p-development/research/c41/evidence/c41-promotion.json",
+        "docs/p2p-development/research/c43/evidence/c43-production-install-evidence-pack.json"
+      ]
     }
   ],
   "research_intake_ledger": "governance/research-intake-ledger.json",
@@ -1737,7 +1773,7 @@
         "title": "Autonomous Project Operating Loop — one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md; docs/p2p-development/research/framework-01/; .p2p/system/p2p_capabilities/p2p_entry.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py; .p2p/system/p2p_capabilities/p2p_skill_eligibility.py; .p2p/system/p2p_capabilities/p2p_loop_guard.py; .p2p/system/p2p_capabilities/p2p_decision_runtime.py; scripts/fw01/p2p_fw01_proof.py; scripts/fw01/p2p_fw01_discovery.py; scripts/fw01/p2p_fw01_live.py",
         "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
-        "commit": "4a01b41704451dee547cecb64e9a268ea4bd714d",
+        "commit": "88311cb610d29228d2caf519e3c2008e1eb2d37f",
         "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
       }
     ],
