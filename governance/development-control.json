@@ -863,6 +863,33 @@
       "candidate_sha256": "TO_BE_FILLED",
       "lineage_anchor_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
       "lineage_anchor_note": "Anchored to official FW01 v2 baseline; never built as patch artifact — certification record only. No promotion, no release."
+    },
+    {
+      "candidate_id": "COMBINED-CANONICAL-SURFACE",
+      "candidate_label": "combined-canonical-surface-host-attestation-integrated",
+      "candidate_version": "8.4.7-C-codex.25",
+      "embedded_version": "8.4.7-C-codex.25",
+      "candidate_sha256": "c0b485bd66587fa9b30bd355c99dcd50045a8f217b4eb3dcc58c75620263c8a8",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "CANONICAL_HOST_ATTESTATION_INTEGRATION",
+      "built": true,
+      "lineage_anchor_sha256": "c0b485bd66587fa9b30bd355c99dcd50045a8f217b4eb3dcc58c75620263c8a8",
+      "lineage_anchor_note": "Deterministic combined candidate: FW01 v2 canonical runtime + host attestation exact reuse + governance reconcile. Artifact in reports/combined-canonical-surface-candidate.zip.",
+      "promotion_status": "UNPROMOTED",
+      "superseded_note": "Supersedes governance-only candidate 51d07062 (that candidate covered governance reconcile only; this covers the final combined canonical surface including runtime change). Prior governance-only candidate preserved unchanged as historical record.",
+      "surface_scope": [
+        "canonical runtime .p2p/system",
+        "governance truth",
+        "goal terminal report"
+      ],
+      "exclusions": [
+        "no project-specific data",
+        "no secrets",
+        "no GT/GP runtime or state",
+        "no live credentials",
+        "no transcripts-as-state"
+      ]
     }
   ],
   "capability_status": [
