@@ -63,6 +63,7 @@ P2P asks the owner only for: product/business intent, real-world business data, 
 | Task State (`.p2p/state`) | Runtime task authority for the current task. |
 | FACT / Evidence (`governance/fact-ledger.json`, `governance/live-specs.json`, evidence files) | Factual and evidence authority. |
 | **This charter + Capability Ledger** | **Capability knowledge, status, and development intent only.** Never runtime task completion, never task state, never a second FACT store. |
+| `docs/p2p-development/framework/` | Derived product memory (architecture, master roadmap, capability & skill map). References, never duplicates, governance and ledger truth; on conflict the canonical sources win. |
 
 The ledger references governance and evidence files; it never copies their full contents. Derived artifacts (templates, roadmap projection) declare their source in a header. If the charter, schema, ledger, and projection ever silently contradict, that is a defect to be fixed by reconciliation against the canonical sources — never by editing a derived copy to match another derived copy.
 

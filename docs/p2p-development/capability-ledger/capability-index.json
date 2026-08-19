@@ -4489,5 +4489,8 @@
       "origin_type": "IMPLEMENTATION_GOAL"
     }
   ],
-  "last_reviewed": "2026-08-17"
+  "last_reviewed": "2026-08-19",
+  "review_notes": [
+    "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions."
+  ]
 }

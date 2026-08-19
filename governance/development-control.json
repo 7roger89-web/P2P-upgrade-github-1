@@ -994,10 +994,10 @@
       },
       {
         "id": "C30",
-        "status": "PLANNED",
+        "status": "DONE",
         "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
         "evidence_ref": "GOAL-C30",
-        "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery)."
+        "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery). | C30 closure normalization (FRAMEWORK-00): terminal PASS (machinery only) 2026-08-17 with sealed candidate 94b09b59; historical DONE normalization, no new runtime/promotion."
       },
       {
         "id": "C31",
@@ -1665,5 +1665,34 @@
       "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
       "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
     }
-  ]
+  ],
+  "research_intake_ledger": "governance/research-intake-ledger.json",
+  "framework_artifacts": {
+    "product_architecture": "docs/p2p-development/framework/product-architecture.md",
+    "master_roadmap": "docs/p2p-development/framework/master-roadmap.md",
+    "capability_skill_map": "docs/p2p-development/framework/capability-skill-map.json"
+  },
+  "framework_roadmap": {
+    "schema": "p2p-framework-roadmap/1",
+    "authority": "Owner instruction 2026-08-18/19; this list is governed alongside the C-goal roadmap but kept separate: C-items are feature/proof goals with candidate policy; framework items are consolidation/meta goals with docs-only changes.",
+    "items": [
+      {
+        "id": "FRAMEWORK-00",
+        "status": "IN_PROGRESS",
+        "terminal_status_when_done": "PASS / PRODUCT_ARCHITECTURE_RESEARCH_SKILL_MEMORY_READY",
+        "title": "P2P Product Memory Foundation — C43 evidence reconciliation, canonical product architecture, master roadmap FRAMEWORK-00..06, research intake ledger, capability & skill map, governance/charter sync, validation & closure",
+        "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md; docs/p2p-development/framework/",
+        "artifact_ref": "p2p-framework-00-product-memory",
+        "commit": "0c2ab01204e19f82a158f502860c3a0d96eb06aa",
+        "notes": "Docs/governance only. candidate_policy=NO (ChangeSignals runtime=False, release_artifact=False). Stops before FRAMEWORK-01 execution."
+      }
+    ],
+    "likely_next": {
+      "id": "FRAMEWORK-01",
+      "status": "NOT_STARTED",
+      "title": "Autonomous Project Operating Loop — the next operating loop that lets P2P resume from durable project truth without re-briefing.",
+      "scope_rule": "FRAMEWORK-01 is the SINGLE next framework goal. Candidate next goal (LIVE_COUNCIL_8_OF_8 full certification) belongs to FRAMEWORK-03 scope; C30 is historical DONE and is not a FRAMEWORK-01 candidate. No work on FRAMEWORK-01 in this goal."
+    },
+    "stop_rule": "Each framework goal stops after its terminal report. No merge, promotion, release, deploy or install is performed inside a framework goal."
+  }
 }
