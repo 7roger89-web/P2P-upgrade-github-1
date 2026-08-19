@@ -1678,20 +1678,30 @@
     "items": [
       {
         "id": "FRAMEWORK-00",
-        "status": "IN_PROGRESS",
+        "status": "DONE",
         "terminal_status_when_done": "PASS / PRODUCT_ARCHITECTURE_RESEARCH_SKILL_MEMORY_READY",
         "title": "P2P Product Memory Foundation — C43 evidence reconciliation, canonical product architecture, master roadmap FRAMEWORK-00..06, research intake ledger, capability & skill map, governance/charter sync, validation & closure",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md; docs/p2p-development/framework/",
         "artifact_ref": "p2p-framework-00-product-memory",
         "commit": "0c2ab01204e19f82a158f502860c3a0d96eb06aa",
         "notes": "Docs/governance only. candidate_policy=NO (ChangeSignals runtime=False, release_artifact=False). Stops before FRAMEWORK-01 execution."
+      },
+      {
+        "id": "FRAMEWORK-01",
+        "status": "DONE",
+        "terminal_status_when_done": "PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY",
+        "title": "Autonomous Project Operating Loop — one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
+        "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md; docs/p2p-development/research/framework-01/; .p2p/system/p2p_capabilities/p2p_entry.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py; .p2p/system/p2p_capabilities/p2p_skill_eligibility.py; .p2p/system/p2p_capabilities/p2p_loop_guard.py; .p2p/system/p2p_capabilities/p2p_decision_runtime.py; scripts/fw01/p2p_fw01_proof.py; scripts/fw01/p2p_fw01_discovery.py; scripts/fw01/p2p_fw01_live.py",
+        "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
+        "commit": "339f2ffc131795a5acf799237184092955e4d7f5",
+        "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
       }
     ],
     "likely_next": {
-      "id": "FRAMEWORK-01",
+      "id": "FRAMEWORK-02",
       "status": "NOT_STARTED",
-      "title": "Autonomous Project Operating Loop — the next operating loop that lets P2P resume from durable project truth without re-briefing.",
-      "scope_rule": "FRAMEWORK-01 is the SINGLE next framework goal. Candidate next goal (LIVE_COUNCIL_8_OF_8 full certification) belongs to FRAMEWORK-03 scope; C30 is historical DONE and is not a FRAMEWORK-01 candidate. No work on FRAMEWORK-01 in this goal."
+      "title": "Project & Skill Intelligence — the next framework goal that makes P2P evaluate and reason about project truth and skill fit; defined, not started.",
+      "scope_rule": "FRAMEWORK-02 is the SINGLE next framework goal. It is defined in the master roadmap only; no implementation work was performed in this goal."
     },
     "stop_rule": "Each framework goal stops after its terminal report. No merge, promotion, release, deploy or install is performed inside a framework goal."
   }

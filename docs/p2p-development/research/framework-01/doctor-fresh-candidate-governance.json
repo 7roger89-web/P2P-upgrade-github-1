@@ -1,0 +1,108 @@
+{
+  "root": "/home/ubuntu/p2p-repo",
+  "role": "development",
+  "detected_role": "development",
+  "ok": false,
+  "checks": [
+    {
+      "level": "PASS",
+      "check": "skills-count",
+      "message": "All 23 expected skills are present"
+    },
+    {
+      "level": "WARN",
+      "check": "skills-extra",
+      "message": "Additional skills are present: Architect-review, Data-Integrity, Edge-Case, Spec-to-SVG-Flow-Map, System-Architect, UI-animation-design, UI-taste-skill, api-surface, backend-development, better-auth, bunny, coder, databases, debugging, devops, docs-seeker, frontend-design, frontend-development, mcp-builder, mcp-management, media-processing, mermaidjs-v11, payment-integration, planner, plugin-marketplace, qa, refactoring, repo-bootstrap, sequential-thinking, shopify, skill-creator, spec-architecture-discussion, supervisor, threejs, ui-be-binding-skill, ui-driven-spec, ui-styling, web-frameworks"
+    },
+    {
+      "level": "PASS",
+      "check": "agents-count",
+      "message": "All eight custom P2P agent profiles parse correctly"
+    },
+    {
+      "level": "PASS",
+      "check": "optional-agents",
+      "message": "The real optional Aesthetica profile is present and separate from the canonical set"
+    },
+    {
+      "level": "PASS",
+      "check": "config-agents-enabled",
+      "message": "Multi-agent tools are enabled"
+    },
+    {
+      "level": "PASS",
+      "check": "config-agent-limit",
+      "message": "Agent thread limit is 8"
+    },
+    {
+      "level": "PASS",
+      "check": "instructions",
+      "message": "P2P guidance found in /home/ubuntu/p2p-repo/AGENTS.md"
+    },
+    {
+      "level": "FAIL",
+      "check": "governance-drift",
+      "message": "{   \"schema_version\": \"p2p-codex-drift-report/1\",   \"checked_at\": \"2026-08-19T01:33:29+00:00\",   \"as_of\": \"2026-08-19\",   \"status\": \"FAIL\",   \"failures\": [     \"unlocked runtime files added: docs/p2p-development/framework/_skill-inventory-raw.json, docs/p2p-development/framework/capability-skill-map.json, docs/p2p-development/framework/capability-skill-map.md, docs/p2p-development/framework/master-roadmap.md, docs/p2p-development/framework/product-architecture.md, docs/p2p-development/research/c43/evidence/c43-council-audit.json, docs/p2p-development/research/c43/evidence/c43-council-selection-machinery.json, docs/p2p-development/research/c43/evidence/c43-game-truyen-acceptance-bar.json\",     \"protected runtime files changed: docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md, docs/p2p-develo"
+    },
+    {
+      "level": "PASS",
+      "check": "helper:p2p_approval.py",
+      "message": "Protection helper exists: p2p_approval.py"
+    },
+    {
+      "level": "PASS",
+      "check": "helper:p2p_eval.py",
+      "message": "Protection helper exists: p2p_eval.py"
+    },
+    {
+      "level": "PASS",
+      "check": "helper:p2p_gate.py",
+      "message": "Protection helper exists: p2p_gate.py"
+    },
+    {
+      "level": "PASS",
+      "check": "helper:p2p_governance.py",
+      "message": "Protection helper exists: p2p_governance.py"
+    },
+    {
+      "level": "PASS",
+      "check": "helper:p2p_workflow.py",
+      "message": "Protection helper exists: p2p_workflow.py"
+    },
+    {
+      "level": "PASS",
+      "check": "project-guard-templates",
+      "message": "Project policy and eval v2 templates are present"
+    },
+    {
+      "level": "PASS",
+      "check": "development-package-metadata",
+      "message": "Development source metadata is bound to 8.4.7-C-codex.24"
+    },
+    {
+      "level": "PASS",
+      "check": "development-runtime-contract",
+      "message": "Development runtime source satisfies the package builder's UI/UX and Capability Foundation contracts"
+    },
+    {
+      "level": "FAIL",
+      "check": "development-uiux-runtime",
+      "message": "Traceback (most recent call last):   File \"/home/ubuntu/p2p-repo/.p2p/system/scripts/doctor.py\", line 16, in <module>     from p2p_uiux.governance import load_manifest, validate_manifest   File \"/home/ubuntu/p2p-repo/.p2p/system/scripts/p2p_uiux.py\", line 15, in <module>     from p2p_uiux.accessibility import audit_design_system ModuleNotFoundError: No module named 'p2p_uiux.accessibility'; 'p2p_uiux' is not a package"
+    },
+    {
+      "level": "PASS",
+      "check": "installed-foundation",
+      "message": "Installed Capability Foundation validates with canonical 8/8 and optional-provider independence"
+    },
+    {
+      "level": "PASS",
+      "check": "installed-decision-trace-manifest",
+      "message": "Native Decision Trace is bound to runtime 8.4.7-C-codex.24 and the existing execution ledger"
+    },
+    {
+      "level": "PASS",
+      "check": "installed-decision-trace-doctor",
+      "message": "Decision Trace doctor PASS; trace_count=0"
+    }
+  ]
+}

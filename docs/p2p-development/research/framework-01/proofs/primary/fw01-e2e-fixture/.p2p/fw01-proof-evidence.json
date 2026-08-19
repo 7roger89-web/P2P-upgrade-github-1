@@ -1,0 +1,23 @@
+{
+  "leg": "PRIMARY_E2E",
+  "timestamp": "2026-08-19T01:50:02.376804+00:00",
+  "AUTONOMOUS_MULTI_TASK_CONTINUATION": "VERIFIED",
+  "FRESH_PROCESS_RECOVERY": "VERIFIED",
+  "OWNER_GATE_STOP": "VERIFIED",
+  "NO_DUPLICATE_EXECUTION": "VERIFIED",
+  "status_sequence_leg1": [
+    "TASK_DONE_CONTINUE",
+    "TASK_DONE_CONTINUE",
+    "TASK_DONE_CONTINUE",
+    "PRE_DISPATCH_BLOCKED"
+  ],
+  "status_sequence_leg2": [
+    "PRE_DISPATCH_BLOCKED"
+  ],
+  "execution_counts_after_restart": {
+    "A": 0,
+    "B": 0,
+    "C": 0,
+    "D": 0
+  }
+}

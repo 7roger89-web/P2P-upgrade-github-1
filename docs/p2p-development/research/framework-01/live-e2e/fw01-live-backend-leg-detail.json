@@ -1,0 +1,20 @@
+{
+ "ok": true,
+ "request_id": "db26d07206b17e010ae59419b8d6ad81",
+ "task": {
+  "agent_profile": "manus-1.6-lite",
+  "created_at": "1787102801",
+  "created_by_api_key": {
+   "id": "L2CtVXFCqJ86KxqrwAj8L8",
+   "name": "p2p-c39-live-target-selection"
+  },
+  "credit_usage": 0,
+  "id": "T5tQPyCaLxrSZtAKPpKFjg",
+  "share_visibility": "private",
+  "status": "stopped",
+  "task_type": "standard",
+  "task_url": "https://manus.im/app/T5tQPyCaLxrSZtAKPpKFjg",
+  "title": "P2P-FRAMEWORK-01 live backend leg",
+  "updated_at": "1787102808"
+ }
+}

@@ -738,6 +738,20 @@ class TestCandidatePolicyAudit:
             "docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md",
             "docs/p2p-development/research/framework-00/",
             "governance/research-intake-ledger.json",
+            # FRAMEWORK-01 autonomous project operating loop
+            # (entry contract, skill eligibility, loop guard, decision
+            # runtime, loop orchestration in core; deterministic E2E
+            # proof runner + read-only installed-project discovery in
+            # scripts/fw01 as the designated host-interaction surface;
+            # authorized closure growth per the C34/.../FW00 precedent):
+            ".p2p/system/p2p_capabilities/p2p_entry.py",
+            ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
+            ".p2p/system/p2p_capabilities/p2p_loop_guard.py",
+            ".p2p/system/p2p_capabilities/p2p_decision_runtime.py",
+            ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+            ".p2p/system/p2p_capabilities/p2p_fw01_live.py",
+            "scripts/fw01/",
+            "docs/p2p-development/research/framework-01/",
 
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
@@ -792,6 +806,14 @@ class TestCandidatePolicyAudit:
             "docs/p2p-development/research/c43/evidence/c43-reconciliation.json",
             "docs/p2p-development/research/framework-00/fw00-regression-explanation.json",
             "docs/p2p-development/research/framework-00/fw00-closure-evidence.json",
+            # FRAMEWORK-01 closure (core entry contract cf21/ho47/DT
+            # normalization + research evidence + terminal report;
+            # authorized closure growth per the C34/.../FW00 precedent):
+            ".p2p/system/p2p_capabilities/p2p_entry.py",
+            "scripts/fw01/p2p_fw01_proof.py",
+            "scripts/fw01/p2p_fw01_discovery.py",
+            "docs/p2p-development/research/framework-01/",
+            "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md",
             # C35 final-governance-closure: canonical terminal report, this
             # test's C35-authorized approved-set growth, and the C35 runtime
             # surface (authorized closure edit per the C34 precedent).

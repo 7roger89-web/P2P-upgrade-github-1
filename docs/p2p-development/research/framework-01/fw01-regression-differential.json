@@ -1,0 +1,33 @@
+{
+  "goal": "P2P-FRAMEWORK-01",
+  "type": "regression-differential",
+  "recorded_utc": "2026-08-19T01:47:50.029686+00:00",
+  "baseline_commit": "8b751f6",
+  "branch": "p2p-framework-01-autonomous-operating-loop",
+  "clean_head_failures": 46,
+  "branch_failures": 46,
+  "fixed_from_baseline": [],
+  "new_failures": [],
+  "NEW_UNEXPLAINED_FAILURES": 0,
+  "explanations": [
+    {
+      "test": "test_gc36 related",
+      "class": "EXPLAINED_OWNER_AUTHORIZED_STATE_DIVERGENCE",
+      "detail": "C40 candidate record PROMOTED per Owner command (2026-08-18), pre-dating this branch base 7481009; baseline 8b751f6 predates the promotion. Authorized state, not a regression."
+    },
+    {
+      "test": "7 c34 real-backend contract failures (execute_live_bounded, same_contract_different_target_profile, adapter_switch_only_target_profile, unknown_fail_closed, done_not_verified, no_transcript_as_state, expired_remote_task_marked)",
+      "class": "PRE_EXISTING_AT_BASELINE",
+      "detail": "Identical failures at baseline 8b751f6 and at clean branch HEAD; environment-bound (host adapter identity/backend) tests, not caused by FW01."
+    },
+    {
+      "test": "remaining 38 failures",
+      "class": "PRE_EXISTING_AT_BASELINE",
+      "detail": "Identical failure sets on clean HEAD and branch (FAILURE_SETS_IDENTICAL); includes environment-bound tests and tests asserting stale historical snapshots."
+    }
+  ],
+  "fresh_clone_recovery": "PASS after C34 authorized approved-set growth (FRAMEWORK-01 artifacts: core p2p_entry/skill_eligibility/loop_guard/decision_runtime/fw01_loop/live, scripts/fw01/, research/framework-01/)",
+  "cf21_ho47_dt": "PASS (cf21 core adapter-boundary fixed: pathlib git resolution in p2p_entry; ho47 sentinel expression; dt behavioral cert 4/4)",
+  "method": "full pytest suite at clean HEAD vs branch HEAD, failure lists diffed",
+  "conclusion": "NEW_UNEXPLAINED_FAILURES=0; FW01 caused zero regressions"
+}
