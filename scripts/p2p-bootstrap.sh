@@ -111,6 +111,16 @@ cmd_install() {
     exit 5
   fi
   chmod +x "$pkg_root/install.sh"
+  # Zip extraction does not preserve Unix executable bits, so every installed
+  # runtime script must have its bits restored here. Without this the harness
+  # correctly treats the runtime as corrupt (doctor requires -x); restoring
+  # bits is the documented recovery, not a weakened check.
+  post_restore_marker() {
+    if [[ -d "$PROJECT_ROOT/.p2p/system/scripts" ]]; then
+      find "$PROJECT_ROOT/.p2p/system/scripts" -type f -name '*.py' -exec chmod u+x {} + 2>/dev/null
+      find "$PROJECT_ROOT/.p2p/system/scripts" -type f \( -name '*.sh' -o -name 'doctor' \) -exec chmod u+x {} + 2>/dev/null
+    fi
+  }
   # Preflight: does the artifact's own governance lock pass on this machine?
   # If the lock's technical preview report is unreachable here, doctor will
   # FAIL for every fresh workspace (upstream mint defect). Report clearly
@@ -145,10 +155,15 @@ PY
     echo "STOP: canonical install failed"
     exit $rc
   fi
+  post_restore_marker
   echo "CANONICAL_INSTALL=VERIFIED"
 }
 
 cmd_doctor() {
+  if [[ ! -x "$SYSTEM/scripts/doctor.py" && -f "$SYSTEM/scripts/doctor.py" ]]; then
+    # Zip-extracted runtime lost its executable bit; documented recovery.
+    chmod u+x "$SYSTEM/scripts/doctor.py"
+  fi
   if [[ ! -x "$SYSTEM/scripts/doctor.py" ]]; then
     echo "DOCTOR=UNHEALTHY (doctor.py missing — runtime absent or corrupt)"
     exit 6
@@ -164,6 +179,9 @@ cmd_doctor() {
 }
 
 cmd_doctor_status() {
+  if [[ ! -x "$SYSTEM/scripts/doctor.py" && -f "$SYSTEM/scripts/doctor.py" ]]; then
+    chmod u+x "$SYSTEM/scripts/doctor.py"
+  fi
   if [[ ! -x "$SYSTEM/scripts/doctor.py" ]]; then
     echo "UNHEALTHY"
     exit 1

@@ -467,6 +467,19 @@ def scan_volatile(
                 continue
             relative_path = path.relative_to(root).as_posix()
             scope = scoped_paths.get(relative_path)
+            if scope is None:
+                # Prefix scope: a scoped entry ending in '/' classifies every
+                # file beneath it (host-project docs tree), so host project
+                # evidence is classified instead of flagged as unledgered.
+                normalized = "/" + relative_path
+                for scoped_path, scoped_scope in sorted(
+                    scoped_paths.items(), key=lambda item: -len(item[0])
+                ):
+                    if scoped_path.endswith("/") and normalized.startswith(
+                        "/" + scoped_path
+                    ):
+                        scope = scoped_scope
+                        break
             for number, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), start=1):
                 matches = sorted({match.group(0) for pattern in patterns for match in pattern.finditer(line)})
                 if historical_marker in line:
