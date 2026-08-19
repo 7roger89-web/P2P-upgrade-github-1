@@ -17,7 +17,7 @@ Bảng dưới suy ra từ Capability Ledger (158 khả năng, 12 nhóm, trạng
 
 | Nhóm kỹ năng | Trạng thái ledger | Bằng chứng thực |
 | --- | --- | --- |
-| Vai trò & hội đồng | Hỗn hợp: machinery quorum VERIFIED; chứng nhận 8/8 thật NOT_PROVEN | C35 cổng quorum 8/8 (xác định), C38 chứng nhận p2p_iris thật, C43 smoke p2p_datos |
+| Vai trò & hội đồng | Machinery quorum VERIFIED; chứng nhận 8/8 thật NOT_PROVEN | Xem ma trận 8 vai trò bên dưới |
 | Chọn lựa hội đồng thích nghi | VERIFIED_IMPLEMENTED (xác định) | C43 phân loại SINGLE_ROLE/SMALL_REVIEW_SET/FULL_COUNCIL_REQUIRED + bounded live smoke |
 | Thực thi | VERIFIED (giới hạn foreground; live thực hiện theo nhà cung cấp) | C12/C15/C17 thực thi giới hạn; C38–C43 thực thi Manus thật |
 | Failover & an toàn | VERIFIED_IMPLEMENTED | C39 bốn bằng chứng thật (chọn bình thường, drift chọn lại, liên tục capsule, fail-closed) |
@@ -34,7 +34,29 @@ Bảng dưới suy ra từ Capability Ledger (158 khả năng, 12 nhóm, trạng
 1. **LIVE_COUNCIL_8_OF_8 = NOT_PROVEN** — hội đồng đầy đủ 8/8 qua fan-out tự động chưa chứng minh (chỉ 1 vai trò × 1 vòng).
 2. Không có hệ thống RAG (theo thiết kế hiện tại).
 3. Project evals chưa có kết quả thử nghiệm đã ghi nhận.
-4. 6/8 vai trò hội đồng chưa được chứng nhận trực tiếp (chỉ p2p_iris đủ; p2p_datos mới dừng ở smoke-test giới hạn).
+
+
+## Ma trận 8 vai trò chuẩn tắc: ACTIVE / CERTIFIED / LIVE_CERTIFIED
+
+Ma trận này loại bỏ mâu thuẫn chữ (1/8 vs 6/8) bằng ba cột nghĩa rõ, đo theo bằng chứng trong kho. Không vai trò nào "thất bại" — mọi trạng thái là bằng chứng hiện có, không suy diễn vượt ngoài bằng chứng.
+
+| Vai trò | ACTIVE (runtime nạp) | CERTIFIED (chứng nhận qua lifecycle goal) | LIVE_CERTIFIED (CERTIFIED + biên lai thực thi thật) |
+| --- | --- | --- | --- |
+| p2p_iris | ACTIVE (gói runtime `.p2p/system` + C43 install) | CERTIFIED (C38 live role certification receipt) | LIVE_CERTIFIED (C38: chứng nhận + thực thi thật qua goal C38) |
+| p2p_datos | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED (C43 smoke-test: thực thi 1 vòng giới hạn nhưng dispatch không ràng buộc vai trò — 2A reconciliation → verification UNKNOWN) |
+| p2p_tecton | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED |
+| p2p_axiom | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED (receipt C43 ROLE_ID=p2p_axiom là chuỗi cứng viết tay — 2A reconciliation) |
+| p2p_vector | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED |
+| p2p_anon | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED |
+| p2p_architecton | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED |
+| p2p_helios | ACTIVE | NOT_CERTIFIED | NOT_LIVE_CERTIFIED |
+
+**Đọc đúng mẫu số:**
+- **CERTIFIED: 1/8** (p2p_iris, qua C38). Dòng "6/8 chưa chứng nhận" trước đây tính cùng một sự thật nhưng theo mẫu số ngược (7/8 NOT_CERTIFIED ≈ "6/8 chưa chứng nhận" khi loại biên lai smoke); ma trận trên dùng mẫu số thống nhất 8 và bỏ cả hai cách viết mập mờ.
+- **LIVE_CERTIFIED: 1/8** (p2p_iris). Live smoke C43 KHÔNG tính live certification vì dispatch không ràng buộc vai trò (2A: LIVE_EXECUTED_ROLE = UNBOUND, verification UNKNOWN).
+- **LIVE_COUNCIL_8_OF_8 (8 vai trò × fan-out tự động): NOT_PROVEN.** Đây là mục tiêu tiếp theo cần chứng minh thật, thuộc scope FRAMEWORK-03.
+
+**Nolane UI Intelligence (NUI):** nguyên tắc Design Intelligence của NUI vẫn ADAPTED theo bằng chứng kho hiện có (C13 beginner design intelligence lineage + pilot beginner). Tuyên bố bên ngoài "174 NUI faculties" được machinery phân loại **PROVENANCE_NOT_RECOVERED / NOT_PROVEN** (không có artifact kho nào tái hiện con số này) — không phải REJECTED, không phải accepted-as-fact.
 
 ## Nguyên tắc liên kết
 

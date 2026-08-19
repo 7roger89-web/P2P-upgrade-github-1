@@ -994,10 +994,10 @@
       },
       {
         "id": "C30",
-        "status": "PLANNED",
+        "status": "DONE",
         "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
         "evidence_ref": "GOAL-C30",
-        "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery)."
+        "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery). | C30 closure normalization (FRAMEWORK-00): terminal PASS (machinery only) 2026-08-17 with sealed candidate 94b09b59; historical DONE normalization, no new runtime/promotion."
       },
       {
         "id": "C31",
@@ -1690,8 +1690,8 @@
     "likely_next": {
       "id": "FRAMEWORK-01",
       "status": "NOT_STARTED",
-      "title": "Definition of next goal — Owner chooses: (1) LIVE_COUNCIL_8_OF_8 full certification, or (2) C30 Composable Execution Target Foundation.",
-      "note": "FRAMEWORK-01 is defined but NOT implemented; it becomes ACTIVE only on explicit Owner instruction."
+      "title": "Autonomous Project Operating Loop — the next operating loop that lets P2P resume from durable project truth without re-briefing.",
+      "scope_rule": "FRAMEWORK-01 is the SINGLE next framework goal. Candidate next goal (LIVE_COUNCIL_8_OF_8 full certification) belongs to FRAMEWORK-03 scope; C30 is historical DONE and is not a FRAMEWORK-01 candidate. No work on FRAMEWORK-01 in this goal."
     },
     "stop_rule": "Each framework goal stops after its terminal report. No merge, promotion, release, deploy or install is performed inside a framework goal."
   }

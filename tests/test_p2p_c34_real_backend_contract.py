@@ -730,6 +730,14 @@ class TestCandidatePolicyAudit:
             "docs/p2p-development/research/c43/",
             "scripts/p2p_install_release.py",
             "reports/candidates",
+            # FRAMEWORK-00 product-memory foundation (docs/governance only;
+            # canonical architecture, master roadmap, research intake ledger,
+            # capability & skill map, C43 reconciliation, closure evidence;
+            # authorized closure growth per the C34/.../C43 precedent):
+            "docs/p2p-development/framework/",
+            "docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md",
+            "docs/p2p-development/research/framework-00/",
+            "governance/research-intake-ledger.json",
 
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
@@ -767,6 +775,23 @@ class TestCandidatePolicyAudit:
             "tests/test_p2p_live_certification.py",
             "tests/test_p2p_ledger_provenance.py",
             "tests/test_p2p_c34_real_backend_contract.py",
+            # FRAMEWORK-00 closure normalization (docs/governance only):
+            # C30 historical DONE normalization, framework_roadmap sync,
+            # capability ledger last_reviewed, charter authority row;
+            # authorized closure growth per the C34/.../C43 precedent.
+            # development-control.json already listed above (shared entry).
+            "governance/development-control.json",
+            "docs/p2p-development/capability-ledger/capability-index.json",
+            "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
+            # FRAMEWORK-00 canonical artifacts (docs/governance only):
+            "docs/p2p-development/framework/capability-skill-map.json",
+            "docs/p2p-development/framework/capability-skill-map.md",
+            "docs/p2p-development/framework/master-roadmap.md",
+            "docs/p2p-development/framework/product-architecture.md",
+            "governance/research-intake-ledger.json",
+            "docs/p2p-development/research/c43/evidence/c43-reconciliation.json",
+            "docs/p2p-development/research/framework-00/fw00-regression-explanation.json",
+            "docs/p2p-development/research/framework-00/fw00-closure-evidence.json",
             # C35 final-governance-closure: canonical terminal report, this
             # test's C35-authorized approved-set growth, and the C35 runtime
             # surface (authorized closure edit per the C34 precedent).

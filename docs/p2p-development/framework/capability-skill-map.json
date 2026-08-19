@@ -11,11 +11,78 @@
       "count_skill_files": 89,
       "source_path": ".agents/skills/",
       "families": {
-        "p2p_platform_skills": ["p2p", "p2p-approval", "p2p-atlas", "p2p-capsule", "p2p-chain", "p2p-download", "p2p-eval", "p2p-explore", "p2p-feedback", "p2p-idea", "p2p-karpathy", "p2p-metrics", "p2p-pxpipe", "p2p-quorum", "p2p-scope", "p2p-teacher", "p2p-uiux"],
-        "engineering_skills": ["backend-development", "frontend-development", "frontend-design", "databases", "debugging", "devops", "refactoring", "qa", "problem-solving", "planner", "sequential-thinking", "repo-bootstrap", "api-surface", "document-skills", "docs-seeker", "mcp-builder", "mcp-management", "notebook-pack", "media-processing", "payment-integration", "plugin-marketplace", "shopify", "web-frameworks"],
-        "design_and_spec_skills": ["Architect-review", "System-Architect", "Spec-to-SVG-Flow-Map", "spec-architecture-discussion", "ui-driven-spec", "ui-styling", "ui-be-binding-skill", "UI-taste-skill", "UI-animation-design", "threejs", "mermaidjs-v11"],
-        "data_and_quality_skills": ["Data-Integrity", "Edge-Case", "rag-grounding", "rag-prep", "rag-router"],
-        "experimental_skills": ["bb4pda", "bunny", "coder", "supervisor", "skill-creator", "pxpipe"]
+        "p2p_platform_skills": [
+          "p2p",
+          "p2p-approval",
+          "p2p-atlas",
+          "p2p-capsule",
+          "p2p-chain",
+          "p2p-download",
+          "p2p-eval",
+          "p2p-explore",
+          "p2p-feedback",
+          "p2p-idea",
+          "p2p-karpathy",
+          "p2p-metrics",
+          "p2p-pxpipe",
+          "p2p-quorum",
+          "p2p-scope",
+          "p2p-teacher",
+          "p2p-uiux"
+        ],
+        "engineering_skills": [
+          "backend-development",
+          "frontend-development",
+          "frontend-design",
+          "databases",
+          "debugging",
+          "devops",
+          "refactoring",
+          "qa",
+          "problem-solving",
+          "planner",
+          "sequential-thinking",
+          "repo-bootstrap",
+          "api-surface",
+          "document-skills",
+          "docs-seeker",
+          "mcp-builder",
+          "mcp-management",
+          "notebook-pack",
+          "media-processing",
+          "payment-integration",
+          "plugin-marketplace",
+          "shopify",
+          "web-frameworks"
+        ],
+        "design_and_spec_skills": [
+          "Architect-review",
+          "System-Architect",
+          "Spec-to-SVG-Flow-Map",
+          "spec-architecture-discussion",
+          "ui-driven-spec",
+          "ui-styling",
+          "ui-be-binding-skill",
+          "UI-taste-skill",
+          "UI-animation-design",
+          "threejs",
+          "mermaidjs-v11"
+        ],
+        "data_and_quality_skills": [
+          "Data-Integrity",
+          "Edge-Case",
+          "rag-grounding",
+          "rag-prep",
+          "rag-router"
+        ],
+        "experimental_skills": [
+          "bb4pda",
+          "bunny",
+          "coder",
+          "supervisor",
+          "skill-creator",
+          "pxpipe"
+        ]
       },
       "maturity": "Production-loaded in the Codex Edition. Per-skills status lives in the Capability Ledger; see ledger families TRUTH_AND_GOVERNANCE, EXECUTION_AND_ORCHESTRATION, CONTEXT_AND_KNOWLEDGE, SKILL_AND_LEARNING, MULTI_AI_INTEROPERABILITY, ROUTING_AND_COGNITIVE_ECONOMY, VERIFICATION_AND_EVALUATION, RECOVERY_AND_CONTINUATION, BEGINNER_LIFECYCLE, OUTCOME_LEARNING, DESIGN_AND_PRODUCT_INTELLIGENCE, DURABLE_PROJECT_INTELLIGENCE."
     },
@@ -24,15 +91,79 @@
       "count": 54,
       "source_path": ".p2p/system/p2p_capabilities/",
       "families": {
-        "roles_and_council": ["agent_role", "role_contract", "role_eligibility", "role_bridge", "role_receipt", "role_verifier", "role_quorum"],
-        "council_selection": ["selection_policy", "selection_request", "selection_target", "selection_filter", "selection_risk", "selection_trace", "selection_receipt", "selection_quality", "routing"],
-        "execution": ["foreground_execution", "live_execution", "parallel_execution", "bounded_delegation", "isolation", "host_executor", "host_selection"],
-        "backends_and_targets": ["backend_contract", "backend_execution_bridge", "providers", "model", "hermes_adapter", "manus_adapter", "fake_execution_backend", "fake_targets", "p2p_execution_target"],
-        "failover_and_safety": ["failover_boundary", "autopilot_contract", "autopilot_loop", "autopilot_state", "autopilot_gate", "autopilot_budget", "autopilot_verifier"],
-        "context": ["context", "context_manifest", "context_envelope", "context_cache", "context_efficiency", "context_loop_guard", "read_evidence"],
-        "state_and_evidence": ["task_state", "evidence", "decision_trace", "trust", "evidence"],
-        "beginner": ["beginner", "specialist", "domain"],
-        "other": ["skill_standard"]
+        "roles_and_council": [
+          "agent_role",
+          "role_contract",
+          "role_eligibility",
+          "role_bridge",
+          "role_receipt",
+          "role_verifier",
+          "role_quorum"
+        ],
+        "council_selection": [
+          "selection_policy",
+          "selection_request",
+          "selection_target",
+          "selection_filter",
+          "selection_risk",
+          "selection_trace",
+          "selection_receipt",
+          "selection_quality",
+          "routing"
+        ],
+        "execution": [
+          "foreground_execution",
+          "live_execution",
+          "parallel_execution",
+          "bounded_delegation",
+          "isolation",
+          "host_executor",
+          "host_selection"
+        ],
+        "backends_and_targets": [
+          "backend_contract",
+          "backend_execution_bridge",
+          "providers",
+          "model",
+          "hermes_adapter",
+          "manus_adapter",
+          "fake_execution_backend",
+          "fake_targets",
+          "p2p_execution_target"
+        ],
+        "failover_and_safety": [
+          "failover_boundary",
+          "autopilot_contract",
+          "autopilot_loop",
+          "autopilot_state",
+          "autopilot_gate",
+          "autopilot_budget",
+          "autopilot_verifier"
+        ],
+        "context": [
+          "context",
+          "context_manifest",
+          "context_envelope",
+          "context_cache",
+          "context_efficiency",
+          "context_loop_guard",
+          "read_evidence"
+        ],
+        "state_and_evidence": [
+          "task_state",
+          "evidence",
+          "decision_trace",
+          "trust",
+          "evidence"
+        ],
+        "beginner": [
+          "beginner",
+          "specialist",
+          "domain"
+        ],
+        "other": [
+          "skill_standard"
+        ]
       },
       "maturity": "Shipped inside the released C40 package (e7f62384) installed on Game Truyện and Gia Phả. Verified live on both production pilots (2026-08-18)."
     },
@@ -44,7 +175,16 @@
     },
     "governance_canonical_roles": {
       "description": "Eight canonical council member roles per governance/development-control.json canonical_capability_set.",
-      "members": ["p2p_iris", "p2p_tecton", "p2p_axiom", "p2p_vector", "p2p_datos", "p2p_anon", "p2p_architecton", "p2p_helios"],
+      "members": [
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_axiom",
+        "p2p_vector",
+        "p2p_datos",
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_helios"
+      ],
       "quorum": "8/8",
       "denominator": 8,
       "live_certified": "p2p_iris only (C38, Stage B/C/D VERIFIED). p2p_datos executed the live council smoke test on 2026-08-18 through the Manus backend (C43). Other six: IN_TRAINING / NOT_CERTIFIED — council audit (C43) recorded LIVE_COUNCIL_8_OF_8 = NOT_PROVEN."
@@ -67,17 +207,61 @@
   "skill_maturity_audit": {
     "note": "Maturity per skill is derived from the ledger status of the matching capability family plus live-execution evidence. A skill family is 'LIVE_VERIFIED' when at least one of its capabilities ran a real proof on a real project.",
     "families": [
-      {"family": "roles_and_council", "ledger_status": "MIXED (quorum machinery VERIFIED_IMPLEMENTED; live 8/8 certification NOT_PROVEN)", "live_evidence": "C35 8/8 verified role-receipt quorum gate (deterministic), C38 p2p_iris live cert, C43 p2p_datos smoke"},
-      {"family": "council_selection", "ledger_status": "VERIFIED_IMPLEMENTED (deterministic)", "live_evidence": "C43 council selection machinery test (SINGLE_ROLE/SMALL_REVIEW_SET/FULL_COUNCIL_REQUIRED classification) + bounded live smoke"},
-      {"family": "execution", "ledger_status": "VERIFIED_IMPLEMENTED (bounded foreground; live execution provider-bound)", "live_evidence": "C12/C15/C17 bounded execution; C38/C39/C40/C43 live Manus execution"},
-      {"family": "failover_and_safety", "ledger_status": "VERIFIED_IMPLEMENTED", "live_evidence": "C39 four live proofs (normal selection, drift reselection, capsule continuity, unsafe post-dispatch fail-closed)"},
-      {"family": "context", "ledger_status": "VERIFIED_IMPLEMENTED (manifest/envelope/cache deterministically; fresh-process recovery live)", "live_evidence": "C36 evidence-bound context; C40 fresh-process recovery on both pilots"},
-      {"family": "state_and_evidence", "ledger_status": "VERIFIED_IMPLEMENTED", "live_evidence": "C10/C11 evidence authority + task state across all milestones"},
-      {"family": "installation_and_release", "ledger_status": "VERIFIED_IMPLEMENTED", "live_evidence": "C40 package + install/upgrade/rollback/doctor; C43 production installs on Game Truyện and Gia Phả"},
-      {"family": "beginner", "ledger_status": "VERIFIED_IMPLEMENTED", "live_evidence": "C13 design intelligence; beginner lifecycle verified through production pilots (2026-08-18)"},
-      {"family": "host_discovery_selection", "ledger_status": "VERIFIED_IMPLEMENTED (policy foundation)", "live_evidence": "C21 host discovery; C28 secure onboarding; C30 PLANNED"},
-      {"family": "rag", "ledger_status": "PARTIAL", "live_evidence": "No RAG system exists in the product — RAG checks NOT_APPLICABLE per C42 release gates"},
-      {"family": "evals", "ledger_status": "PARTIAL", "live_evidence": "UI/UX eval suite present but never executed with recorded trials (C42 disclosure)"}
+      {
+        "family": "roles_and_council",
+        "ledger_status": "MIXED (quorum machinery VERIFIED_IMPLEMENTED; live 8/8 certification NOT_PROVEN)",
+        "live_evidence": "C35 8/8 verified role-receipt quorum gate (deterministic), C38 p2p_iris live cert, C43 p2p_datos smoke"
+      },
+      {
+        "family": "council_selection",
+        "ledger_status": "VERIFIED_IMPLEMENTED (deterministic)",
+        "live_evidence": "C43 council selection machinery test (SINGLE_ROLE/SMALL_REVIEW_SET/FULL_COUNCIL_REQUIRED classification) + bounded live smoke"
+      },
+      {
+        "family": "execution",
+        "ledger_status": "VERIFIED_IMPLEMENTED (bounded foreground; live execution provider-bound)",
+        "live_evidence": "C12/C15/C17 bounded execution; C38/C39/C40/C43 live Manus execution"
+      },
+      {
+        "family": "failover_and_safety",
+        "ledger_status": "VERIFIED_IMPLEMENTED",
+        "live_evidence": "C39 four live proofs (normal selection, drift reselection, capsule continuity, unsafe post-dispatch fail-closed)"
+      },
+      {
+        "family": "context",
+        "ledger_status": "VERIFIED_IMPLEMENTED (manifest/envelope/cache deterministically; fresh-process recovery live)",
+        "live_evidence": "C36 evidence-bound context; C40 fresh-process recovery on both pilots"
+      },
+      {
+        "family": "state_and_evidence",
+        "ledger_status": "VERIFIED_IMPLEMENTED",
+        "live_evidence": "C10/C11 evidence authority + task state across all milestones"
+      },
+      {
+        "family": "installation_and_release",
+        "ledger_status": "VERIFIED_IMPLEMENTED",
+        "live_evidence": "C40 package + install/upgrade/rollback/doctor; C43 production installs on Game Truyện and Gia Phả"
+      },
+      {
+        "family": "beginner",
+        "ledger_status": "VERIFIED_IMPLEMENTED",
+        "live_evidence": "C13 design intelligence; beginner lifecycle verified through production pilots (2026-08-18)"
+      },
+      {
+        "family": "host_discovery_selection",
+        "ledger_status": "VERIFIED_IMPLEMENTED (policy foundation)",
+        "live_evidence": "C21 host discovery; C28 secure onboarding; C30 PLANNED"
+      },
+      {
+        "family": "rag",
+        "ledger_status": "PARTIAL",
+        "live_evidence": "No RAG system exists in the product — RAG checks NOT_APPLICABLE per C42 release gates"
+      },
+      {
+        "family": "evals",
+        "ledger_status": "PARTIAL",
+        "live_evidence": "UI/UX eval suite present but never executed with recorded trials (C42 disclosure)"
+      }
     ],
     "open_gaps": [
       "LIVE_COUNCIL_8_OF_8: single adaptive participant set executed one bounded round; 8/8 full council not yet proven",
@@ -85,5 +269,63 @@
       "Project evals have no recorded trials",
       "Six of eight council roles remain NOT live-certified (only p2p_iris fully, p2p_datos smoke-bounded)"
     ]
-  }
+  },
+  "role_matrix": {
+    "description": "ACTIVE=CERTIFIED≠LIVE_CERTIFIED semantics per FRAMEWORK-00 2C; resolves 1/8 vs 6/8 wording conflict with a single 8-denominator table",
+    "certified_count": 1,
+    "live_certified_count": 1,
+    "live_council_8_of_8": "NOT_PROVEN",
+    "nui_classification": "Design Intelligence principles ADAPTED (repo-evidence-backed, C13 lineage); external '174 faculties' claim = PROVENANCE_NOT_RECOVERED / NOT_PROVEN (machinery classification, not REJECTED)",
+    "rows": {
+      "p2p_iris": {
+        "active": "ACTIVE",
+        "certified": "CERTIFIED",
+        "live_certified": "LIVE_CERTIFIED",
+        "evidence": "C38 live role certification + execution"
+      },
+      "p2p_datos": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "C43 bounded smoke; dispatch role-unbound (2A: verification UNKNOWN)"
+      },
+      "p2p_tecton": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "present in runtime package; no certification/live receipt"
+      },
+      "p2p_axiom": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "present in runtime package; no certification/live receipt"
+      },
+      "p2p_vector": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "present in runtime package; no certification/live receipt"
+      },
+      "p2p_anon": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "present in runtime package; no certification/live receipt"
+      },
+      "p2p_architecton": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "present in runtime package; no certification/live receipt"
+      },
+      "p2p_helios": {
+        "active": "ACTIVE",
+        "certified": "NOT_CERTIFIED",
+        "live_certified": "NOT_LIVE_CERTIFIED",
+        "evidence": "present in runtime package; no certification/live receipt"
+      }
+    }
+  },
+  "last_reviewed": "2026-08-19"
 }

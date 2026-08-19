@@ -30,5 +30,16 @@
   "framework_validator": "75/75 PASS",
   "internal_validation": "36/36 PASS",
   "candidate_policy": "NO",
-  "secret_scan": "CLEAN"
+  "secret_scan": "CLEAN",
+  "normalization_2026-08-19": {
+    "note": "Owner-directed closure normalization. gc36 reclassified EXPLAINED -> NEW_UNEXPLAINED_FAILURES = 0 (recomputed).",
+    "regression": {
+      "current_failures": 45,
+      "baseline_failures": 46,
+      "explained": 1,
+      "NEW_UNEXPLAINED_FAILURES": 0,
+      "fixed": 2
+    },
+    "closure_status": "CONSISTENT"
+  }
 }
