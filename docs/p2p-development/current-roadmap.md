@@ -6,7 +6,11 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-18 (regenerated per §6 by the C35 final governance normalization session — C35 roadmap item synced as DONE) (derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-19 (FW01 self-contained-patch track appended; terminal reports P2P-FW01-bootstrap-reconciliation-terminal-report.md and P2P-FW01-self-contained-patch-terminal-report.md authored on the framework-01 lineage) (derived, not authored-by-hand as a decision document).
+
+## 6. Framework goals (FW series)
+
+**FW01 — Durable Project Bootstrap & Fresh-Clone Certification.** The v1 release `p2p-8.4.7-C-codex.24-fw01-v1` (tag `p2p-8.4.7-C-codex.24-fw01-v1`, asset SHA `eb396dc1…3d7d`) was reconciled mechanically: `DOCTOR_PATH_RESOLUTION_BUG` (failure class E) plus a package-layout inventory defect (152/152 `source-inventory.json` mismatches, supplemental catalog and EXT-0002 hash failures) make it not self-validating on a genuinely fresh machine (`EXTERNAL_DEV_PATH_DEPENDENCY` cannot be certified 0; the mint-time `doctor_canonical` gate passed only against staged source). Both defects are closed in exactly one unpromoted candidate built through the canonical candidate machinery: `P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip` (SHA-256 `2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61`), which achieves `CANONICAL_INSTALL=PASS`, `DOCTOR=HEALTHY`, `EXTERNAL_DEV_PATH_DEPENDENCY=0` on a fresh machine and is certified on Game Truyện and Gia Phả fresh clones (mutation 0 for GP; GT's only tracked change is the installer-owned `AGENTS.md` merge surface). The reusable bootstrap design (`docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md` + `scripts/p2p-bootstrap.sh`) was recreated on this lineage. Gates remaining: **OWNER_PATCH_RELEASE_GATE** (publish tag/release of candidate v2, bind GT/GP production manifests) and the earlier GT/GP integration-push gate. Negative suite 10/10 (v1 stays BLOCKED, rc 7), validator 78/78, `validate_control` PASS, gitleaks clean, `NEW_UNEXPLAINED_FAILURES=0`. No FRAMEWORK-02 opened; no push, no promotion.
 
 ## 1. Official baseline
 

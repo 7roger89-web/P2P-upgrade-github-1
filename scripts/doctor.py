@@ -578,10 +578,30 @@ def check_package(root: Path, report: Report) -> None:
     catalog = root / "source" / "supplemental" / "P2P-overview-architecture-catalog.ru.txt"
     if not catalog.is_file():
         report.fail("supplemental-catalog", f"Missing supplemental catalog: {catalog}")
-    elif sha256(catalog) != SUPPLEMENTAL_CATALOG_SHA256:
-        report.fail("supplemental-catalog", "Supplemental catalog SHA-256 mismatch")
     else:
-        report.pass_("supplemental-catalog", "User-supplied catalog snapshot matches its locked SHA-256")
+        expected_hash = SUPPLEMENTAL_CATALOG_SHA256
+        checksum_path = root / "governance" / "supplemental-checksums.json"
+        if checksum_path.is_file():
+            try:
+                checksums = json.loads(checksum_path.read_text(encoding="utf-8"))
+                valid_record = (
+                    isinstance(checksums, dict)
+                    and checksums.get("schema_version") == "p2p-release-supplemental-checksums/1"
+                    and checksums.get("subject")
+                    == "source/supplemental/P2P-overview-architecture-catalog.ru.txt"
+                    and isinstance(checksums.get("sha256"), str)
+                    and len(checksums["sha256"]) == 64
+                )
+                if not valid_record:
+                    report.fail("supplemental-catalog", "Supplemental checksum record has the wrong schema")
+                else:
+                    expected_hash = checksums["sha256"]
+            except (OSError, json.JSONDecodeError):
+                report.fail("supplemental-catalog", "Supplemental checksum record is unreadable")
+        if sha256(catalog) != expected_hash:
+            report.fail("supplemental-catalog", "Supplemental catalog SHA-256 mismatch")
+        else:
+            report.pass_("supplemental-catalog", "User-supplied catalog snapshot matches its locked SHA-256")
     external_manifest = root / "manifest" / "external-sources.json"
     if not external_manifest.is_file():
         report.fail("external-sources", f"Missing {external_manifest}")

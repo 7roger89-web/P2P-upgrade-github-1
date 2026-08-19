@@ -472,7 +472,9 @@ def build(root: Path, output: Path) -> dict[str, object]:
         output.parent.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for path in iter_files(stage):
-                archive.write(path, path.relative_to(stage).as_posix())
+                info = zipfile.ZipInfo(path.relative_to(stage).as_posix(), date_time=(2010, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                archive.writestr(info, path.read_bytes())
     finally:
         shutil.rmtree(stage, ignore_errors=True)
     return {
