@@ -45,3 +45,16 @@ P2P-FRAMEWORK-00 là mục tiêu "memory" (bộ nhớ dài hạn của sản ph�
 GOAL_TERMINAL_STATUS: PASS / PRODUCT_ARCHITECTURE_RESEARCH_SKILL_MEMORY_READY
 
 P2P hiện có: bộ nhớ sản phẩm chuẩn tắc (kiến trúc + roadmap FRAMEWORK-00..06), sổ tiếp nhận nghiên cứu, bản đồ năng lực & kỹ năng, đối chiếu C43 hoàn tất. Framework-01 đã được ĐỊNH NGHỊA (hai ứng viên mục tiêu tiếp theo) nhưng KHÔNG thực thi — chờ chỉ thị Owner.
+## Chuẩn hóa closure (Owner 2026-08-19)
+
+Bốn điều chỉnh chuẩn hóa đã được thực hiện (docs/governance only):
+
+| # | Mục | Trước | Sau |
+| --- | --- | --- | --- |
+| 1 | Next goal | `likely_next` liệt kê 2 ứng viên (LIVE_COUNCIL_8_OF_8 hoặc C30) | **Duy nhất P2P-FRAMEWORK-01 — AUTONOMOUS PROJECT OPERATING LOOP**; C30 là historical DONE; LIVE_COUNCIL_8_OF_8 full certification thuộc scope FRAMEWORK-03 |
+| 2 | Regression metric | gc36 được ghi explained nhưng metric vẫn `NEW_UNEXPLAINED_FAILURES = 1` (double count) | Tính lại máy: gc36 EXPLAINED_OWNER_AUTHORIZED_STATE_DIVERGENCE → **`NEW_UNEXPLAINED_FAILURES = 0`**, fixed = 2, 45 vs 46 baseline |
+| 3 | NUI classification | Claim "174 faculties" bị ghi REJECTED do thiếu repo provenance | Giữ Design Intelligence/NUI ADAPTED theo evidence repo (C13 lineage); claim "174 faculties" phân loại **PROVENANCE_NOT_RECOVERED / NOT_PROVEN** qua machinery (RI-003) — không REJECTED, không accepted |
+| 4 | Role matrix | Wording mâu thuẫn 1/8 CERTIFIED vs "6/8 chưa chứng nhận" (mẫu số khác nhau) | **Ma trận 8 vai trò** mẫu số thống nhất 8: CERTIFIED 1/8 (p2p_iris, C38), LIVE_CERTIFIED 1/8 (p2p_iris), 8/8 fan-out NOT_PROVEN; C43 smoke = NOT_LIVE_CERTIFIED (dispatch role-unbound, 2A) |
+
+Kết quả sau chuẩn hóa: validator 77/77 PASS; regression differential — 1 failure mới so baseline (gc36) đã được phân loại EXPLAINED, unexplained = 0; secret scan sạch; candidate_policy NO; runtime KHÔNG đổi.
+
