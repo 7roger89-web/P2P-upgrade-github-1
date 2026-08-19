@@ -5,7 +5,7 @@
 **CANDIDATE_REQUIRED:** YES (exactly one deterministic UNPROMOTED candidate minted; NO promotion, NO release)
 **CANDIDATE_STATUS:** MINTED, UNPROMOTED — one candidate: `P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip` (`reports/candidates/`)
 **CANDIDATE_SHA256:** `eb396dc17bd5cfb7c67a80ceff43ccd9050a6bd6fde25afe5919425d100d3d7d` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
-**RECORDED_AFTER_COMMIT:** f7b338f4dfabebedbf5367e68eea08cc5abbd961 (p2p-framework-01-autonomous-operating-loop)
+**RECORDED_AFTER_COMMIT:** f661dd583d5a793c318764755f31848cdce307da (p2p-framework-01-autonomous-operating-loop)
 
 ---
 

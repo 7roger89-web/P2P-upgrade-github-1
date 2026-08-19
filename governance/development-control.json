@@ -1764,6 +1764,16 @@
       "evidence_refs": [
         "docs/p2p-development/research/framework-01/fw01-pilot-evidence.json"
       ]
+    },
+    {
+      "change_id": "FW01-FINAL-RELEASE-GATES",
+      "changed_at": "2026-08-19T04:20:54.598257+00:00",
+      "what_changed": "Final release-gates evidence record persisted (fw01-release-gates.json): 12 gates PASS_WITH_DISCLOSURE -> PASS / READY_FOR_OWNER_PROMOTION_RELEASE_GATE; no governance or runtime change.",
+      "why": "Owner instruction FINAL RELEASE GATES for the FW01 candidate; durable evidence required.",
+      "evidence_refs": [
+        "docs/p2p-development/research/framework-01/evidence/fw01-release-gates.json"
+      ],
+      "goal": "P2P-FRAMEWORK-01"
     }
   ],
   "research_intake_ledger": "governance/research-intake-ledger.json",
@@ -1793,7 +1803,7 @@
         "title": "Autonomous Project Operating Loop — one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md; docs/p2p-development/research/framework-01/; .p2p/system/p2p_capabilities/p2p_entry.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py; .p2p/system/p2p_capabilities/p2p_skill_eligibility.py; .p2p/system/p2p_capabilities/p2p_loop_guard.py; .p2p/system/p2p_capabilities/p2p_decision_runtime.py; scripts/fw01/p2p_fw01_proof.py; scripts/fw01/p2p_fw01_discovery.py; scripts/fw01/p2p_fw01_live.py",
         "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
-        "commit": "f7b338f4dfabebedbf5367e68eea08cc5abbd961",
+        "commit": "f661dd583d5a793c318764755f31848cdce307da",
         "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
       }
     ],
