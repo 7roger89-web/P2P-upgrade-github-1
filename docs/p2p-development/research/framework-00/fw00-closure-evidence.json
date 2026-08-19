@@ -1,0 +1,34 @@
+{
+  "schema": "c39-goal-closure/1",
+  "goal_id": "P2P-FRAMEWORK-00",
+  "report_fields": {
+    "GOAL_TERMINAL_STATUS": "PASS",
+    "ROADMAP_STATUS": "FRAMEWORK-00",
+    "DEVELOPMENT_CONTROL_STATUS": null,
+    "CAPABILITY_LEDGER_SYNC": null,
+    "CANDIDATE_REQUIRED": "NO",
+    "CANDIDATE_STATUS": null,
+    "SUPERVISOR_VERDICT": null,
+    "PROMOTION_STATUS": null
+  },
+  "closure_record": {
+    "ROADMAP_ITEM_EXISTS": "EXPLAINED_BY_DESIGN — framework goal lives in framework_roadmap, not the C-goal items list (protects the deterministic roadmap.current derivation used by the C-goal chain)",
+    "PASS_WITH_DONE_ROADMAP": "not applicable — framework_roadmap separate; C-goal roadmap untouched",
+    "CURRENT_DEVELOPMENT_SEMANTICS": "EXPLAINED_HISTORICAL_SNAPSHOT — C31 BLOCKED_TERMINAL predates branch base 7481009 (same class as C35R/C43 reconciliation 2A)",
+    "CANDIDATE_REQUIRED_PRESENT": "CANDIDATE_REQUIRED=NO — no candidate contract for docs-only meta-goals (precedent C38, C35R)",
+    "CLAIM_BOUNDARY": "no router/executor/autonomy introduced",
+    "runtime_changed": false,
+    "hard_findings": [
+      "ROADMAP_ITEM_EXISTS (explained)",
+      "CURRENT_DEVELOPMENT_SEMANTICS (explained)"
+    ]
+  },
+  "verdict": "CONSISTENT_WITH_EXPLAINED_FINDINGS",
+  "mechanism": "scripts.p2p_goal_closure.goal_closure_verdict; candidate-artifact check not applicable to docs-only meta-goals",
+  "machine_error_if_any": null,
+  "regression_note": "gc36 single remaining regression failure documented in fw00-regression-explanation.json (Owner C41 PROMOTE pre-dates this branch)",
+  "framework_validator": "75/75 PASS",
+  "internal_validation": "36/36 PASS",
+  "candidate_policy": "NO",
+  "secret_scan": "CLEAN"
+}

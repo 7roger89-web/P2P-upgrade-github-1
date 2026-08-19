@@ -1,7 +1,7 @@
 # P2P-FRAMEWORK-00 Terminal Report
 
 GOAL_ID: P2P-FRAMEWORK-00
-GOAL_TERMINAL_STATUS: PASS / PRODUCT_ARCHITECTURE_RESEARCH_SKILL_MEMORY_READY
+GOAL_TERMINAL_STATUS: PASS / PRODUCT_MEMORY_FOUNDATION_READY
 CANDIDATE_REQUIRED: NO
 ROADMAP_STATUS: FRAMEWORK-00 DONE (terminal report written); FRAMEWORK-01 defined-only, NOT_STARTED; Owner decides next goal
 CANDIDATE_SHA256: NOT_APPLICABLE (no candidate — docs/governance only, candidate_policy=NO per ChangeSignals runtime=False/release_artifact_changed=False)
@@ -41,6 +41,6 @@ P2P-FRAMEWORK-00 là mục tiêu "memory" (bộ nhớ dài hạn của sản ph�
 
 ## 4. Verdict
 
-GOAL_TERMINAL_STATUS: PASS / PRODUCT_ARCHITECTURE_RESEARCH_SKILL_MEMORY_READY
+GOAL_TERMINAL_STATUS: PASS / PRODUCT_MEMORY_FOUNDATION_READY
 
 P2P hiện có: bộ nhớ sản phẩm chuẩn tắc (kiến trúc + roadmap FRAMEWORK-00..06), sổ tiếp nhận nghiên cứu, bản đồ năng lực & kỹ năng, đối chiếu C43 hoàn tất. Framework-01 đã được ĐỊNH NGHỊA (hai ứng viên mục tiêu tiếp theo) nhưng KHÔNG thực thi — chờ chỉ thị Owner.

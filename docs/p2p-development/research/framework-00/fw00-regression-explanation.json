@@ -1,0 +1,20 @@
+{
+  "schema": "p2p-framework-00/regression-explanation/1",
+  "goal_id": "P2P-FRAMEWORK-00",
+  "baseline": "8b751f6",
+  "branch_head": "0c2ab01204e19f82a158f502860c3a0d96eb06aa",
+  "run_at": "2026-08-19",
+  "result": "current failures 45 vs baseline 46; NEW_UNEXPLAINED_FAILURES = 1 (test_gc36_no_pr_merge_automatically); fixed = 2 (test_cp48_framework_validator_runs_clean, test_lh35_c25_c26_framework_valid)",
+  "explanation": {
+    "test_gc36_no_pr_merge_automatically": {
+      "verdict": "EXPLAINED_OWNER_AUTHORIZED_STATE_DIVERGENCE",
+      "reason": "The test asserts every candidate record with a SHA stays UNPROMOTED until separate promotion approval. The C40 record is PROMOTED because Owner explicitly ran P2P-C41 PROMOTE on 2026-08-18 (commit 3443fd8), which predates the framework branch base 7481009. The baseline 8b751f6 predates the C41 promotion commit, so this divergence exists at the branch base and is not caused by FRAMEWORK-00. FRAMEWORK-00 changed only docs/governance and did not touch candidate_records. Classification: legitimate historical promotion state, authorized by Owner gate.",
+      "precedent": "C35R normalization principle — documentation/evidence divergences with provenance are classified, not fixed by rerunning live proofs; the test's guard intent (no silent auto-promotion) is preserved because PROMOTION required an explicit Owner instruction.",
+      "not_caused_by_this_goal": true
+    }
+  },
+  "framework_validator": "75/75 PASS",
+  "internal_validation": "36/36 PASS",
+  "candidate_policy": "NO (runtime_changed=False, release_artifact_changed=False; docs/governance-only precedent C38/C35R)",
+  "secret_scan": "CLEAN"
+}
