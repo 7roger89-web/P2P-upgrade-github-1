@@ -977,6 +977,28 @@
         "FW03 test suite 41 cases + regression 74 cases (115 total PASS)",
         "governance candidate lineage"
       ]
+    },
+    {
+      "candidate_id": "FW04_QUALITY_EVIDENCE_LEARNING",
+      "candidate_version": "8.4.7-C-codex.30",
+      "embedded_version": "8.4.7-C-codex.30",
+      "candidate_label": "fw04-quality-evidence-learning-8.4.7-C-codex.30",
+      "promotion_status": "UNPROMOTED",
+      "candidate_sha256": "b6730a36aff6b57849b75b904e1528bd6ca36867f7540936fcece7291fa7e976",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW04_QUALITY_EVIDENCE_AND_LEARNING",
+      "built": true,
+      "lineage_anchor_sha256": "1f821a7cc735cf9d38c1f417e86912d80f0229e703b96e7f7a11a3393879f486",
+      "lineage_anchor_note": "FW04 quality, evidence & learning candidate: per-task Quality Contract derived from evidence; evidence-backed eval registry (deterministic-first, NOT a router; RepoWise NOT_EVALUATED due to AGPL, never installed in core); Code-Impact Evidence Contract (native AST import graph, CHANGED_FILES != FULL_AFFECTED_SURFACE, UNKNOWN impact fail-closed) with synthetic ground-truth fixture demonstrating precision/recall on affected-surface detection; capability certification scope exactness (ROLE_EXECUTION_BINDING != capability certification; freshness STALE/UNBOUND fail-closed); structured quality verdict (SUCCESS != QUALITY_PROVEN; QUALITY_UNKNOWN fail-closed when required evals missing or impact unknown); adaptive verification (impact-conditional depth); independent verifier identity + evidence; bounded learning candidates (TRANSCRIPT != STATE; owner correction scoped; owner-gated promotion, never auto-promoted); FW01 post-execution info-only hook with checkpoint guard (no VERIFIED checkpoint on unknown quality). Ancestor = FW03 adaptive team & council candidate 8.4.7-C-codex.29, which remains untouched as historical record. Minted per canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=False)) = YES. No promotion, no release. FW05 not started (Owner gate). SHA256 bound to this exact normalized zip.",
+      "surface_scope": [
+        "quality_intelligence.py NEW module (eval registry, evidence pointers/freshness, code-impact AST contract, certification scope exactness, quality verdict, adaptive verification, independent verifier, learning candidates with owner-gated promotion)",
+        "eval_registry.json NEW evidence-backed registry (12 evals, deterministic-first, explicit failure semantics)",
+        "impact_ground_truth synthetic fixture (precision/recall ground truth for affected-surface detection)",
+        "FW04 post-execution hook in FW01 loop AFTER step() outcome, BEFORE checkpoint (info-only trace; checkpoint VERIFIED gate on impact known + evidence present)",
+        "FW04 test suite 44 cases (incl. live shadow-eval read-only verification over owner projects) + regression 115 cases (159 total PASS)",
+        "governance candidate lineage"
+      ]
     }
   ],
   "capability_status": [

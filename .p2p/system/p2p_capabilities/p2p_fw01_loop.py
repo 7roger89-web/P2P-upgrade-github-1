@@ -594,6 +594,46 @@ class Fw01Loop:
         evidence = outcome.get("evidence") or {}
         done_tasks = {t for t, r in self.loop._task_records.items()
                       if r.get("status") == "DONE"}
+
+        # P2P-FRAMEWORK-04 — post-execution quality intelligence.
+        # Info-only at loop level: never grants permission, never blocks
+        # dispatch (enforcement already completed above). Its only
+        # authority is HONESTY: a SUCCESS execution must not be
+        # checkpointed as QUALITY_VERIFIED without proven evidence
+        # (EXECUTION_SUCCESS != QUALITY_PROVEN, checkpoint guard below).
+        _fw04 = None
+        try:
+            from p2p_capabilities import quality_intelligence as _qi
+            _fw04_changed = tuple(str(p) for p in (
+                (evidence.get("changed_surface") or [])
+                if isinstance(evidence, Mapping)
+                else ()))
+            _fw04_impact = _qi.affected_surface(
+                changed_paths=_fw04_changed,
+                project_root=self.root,
+                analysis_complete=True)
+            _fw04_verdict = _qi.build_quality_verdict(
+                execution_status=status or "UNKNOWN",
+                required_eval_results={},
+                declared_required_evals=None,
+                impact_known=not _fw04_impact["impact_unknown"],
+                required_evidence_present=bool(
+                    (evidence.get("verification_result") or "")
+                    if isinstance(evidence, Mapping) else False),
+                independent_verifier_result=(
+                    evidence.get("independent_verdict") or "")
+                if isinstance(evidence, Mapping) else "")
+            self._trace(task_id, {"mutation_class": "READ_ONLY",
+                          "permission": "",
+                          "verification": "REQUIRED"},
+                      "POST_EXECUTION_QUALITY_ASSESSED",
+                      "quality_status=" + _fw04_verdict["quality_status"] +
+                      " checkpoint_allowed=" +
+                      str(_fw04_verdict["checkpoint_allowed"]) +
+                      " failures=" +
+                      json.dumps(list(_fw04_verdict["quality_failures"])))
+        except Exception:
+            _fw04 = None
         state_hash = _sha256(done_tasks)
         self.guard.append(IterationRecord(
             iteration=self.iteration, task_id=task_id or "NONE",
