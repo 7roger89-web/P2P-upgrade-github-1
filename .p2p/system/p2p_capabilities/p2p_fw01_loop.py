@@ -375,6 +375,33 @@ class Fw01Loop:
         role_team = self.select_role_team(dict(rec, task_id=task_id))
         target = self.builder.registry_targets[0] if self.builder.registry_targets else None
 
+        # FW02 capability intelligence: deterministic, evidence-bound,
+        # fail-closed. Role/team selection already happened above via
+        # existing machinery (FW01 stays the sole operating loop).
+        _fw02 = None
+        try:
+            from p2p_capabilities import capability_intelligence as _ci
+            _fw02 = _ci.compute_execution_requirements(
+                dict(rec, task_id=task_id), self.root,
+                installed_skills=tuple(
+                    str(s.get("capability_id", "")) for s in eligible))
+        except Exception:
+            _fw02 = None
+        if _fw02 is not None:
+            self._trace(task_id, {"mutation_class": "READ_ONLY",
+                          "permission": "",
+                          "verification": "REQUIRED"},
+                      "CAPABILITY_COVERAGE_OK"
+                      if _fw02.dispatch_allowed
+                      else "CAPABILITY_COVERAGE_BLOCKED",
+                      "coverage_state=" + _fw02.coverage.state +
+                      " failure_class=" + _fw02.failure_class +
+                      " decision_trace=" + json.dumps(
+                          _fw02.decision_trace.to_dict())[:2500])
+            if not _fw02.dispatch_allowed:
+                return {"status": "CAPABILITY_COVERAGE_BLOCKED",
+                        "failure_class": _fw02.failure_class,
+                        "decision_trace": _fw02.decision_trace.to_dict()}
         # Permission pre-dispatch revalidation (C39 semantics).
         bad = self.pre_dispatch_revalidation(
             {"task_id": task_id}, dict(rec, task_id=task_id))

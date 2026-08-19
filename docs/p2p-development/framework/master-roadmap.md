@@ -23,7 +23,7 @@ File chuẩn tắc tổng hợp hai dòng thời gian: dòng goal C01–C43 đã
 | --- | --- | --- |
 | FRAMEWORK-00 | **Product Memory Foundation** — reconciliation C43, product architecture, master roadmap, research intake ledger, capability & skill map, governance sync, validation, closure, terminal report | IN_PROGRESS (goal này) |
 | FRAMEWORK-01 | **Autonomous Project Operating Loop** (DONE — PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY; FW01_V2_DEFAULT_BRANCH_DURABILITY_COMPLETE; v1 eb396dc1 + v2 2a42e815 released) | DONE |
-| FRAMEWORK-02 | Thực thi mục tiêu được phê duyệt tại FRAMEWORK-01 (phạm vi theo phê duyệt) | NOT_STARTED |
+| FRAMEWORK-02 | **Project & Capability Intelligence** — DONE, PASS / PROJECT_CAPABILITY_INTELLIGENCE_READY; lớp trí tuệ năng lực trong FW01 (task → năng lực bắt buộc → nguồn đa dạng → coverage fail-closed → decision trace), shadow eval GT+GP PASS, không orchestrator cạnh tranh | DONE |
 | FRAMEWORK-03 | Pilot mở rộng (dự án thứ 3 hoặc ngôn ngữ/framework khác) + **Council Full Certification** — LIVE_COUNCIL_8_OF_8 qua fan-out tự động, chứng nhận thật 8/8 vai trò | NOT_STARTED |
 | FRAMEWORK-04 | Release gates tái kiểm tra + re-promotion sau thay đổi runtime | NOT_STARTED |
 | FRAMEWORK-05 | Quality & Evidence learning layer (học từ bằng chứng các pilot để cải thiện validation) | NOT_STARTED |
@@ -42,6 +42,28 @@ Scope đề xuất (định nghĩa, không thực thi):
 Acceptance bar dự kiến: project truth phục hồi đúng (HEAD, roadmap, evidence), loop parse→resume deterministically, không runtime change trong giai đoạn định nghĩa, validator + regression sạch.
 
 Stop rule: định nghĩa xong → terminal report → STOP; việc thực thi chỉ bắt đầu khi Owner ra lệnh "chạy FRAMEWORK-01".
+
+## FRAMEWORK-02 — Định nghĩa mục tiêu tiếp theo (dừng trước thực thi)
+
+Chuẩn hóa closure FRAMEWORK-01 theo chỉ thị Owner (2026-08-19): FRAMEWORK-02 có
+**duy nhất một mục tiêu** — **PROJECT & CAPABILITY INTELLIGENCE**: tầng trí tuệ
+năng lực chuẩn tắc — project truth → profile năng lực dự án; task → tập năng lực
+bắt buộc; năng lực đến từ nhiều nguồn (skill chỉ là một nguồn); selection giới
+hạn; coverage/eligibility/freshness fail-closed; context retrieval có mục tiêu;
+decision trace cấu trúc; FW01 consume qua coverage gate; GT/GP shadow eval
+read-only PASS.
+
+Scope đề xuất (đã thực thi và chứng minh, theo phê duyệt Owner):
+- Hợp đồng năng lực + nguồn năng lực (module/capabilities.json/skill/harness/auth/tooling/owner).
+- Skill intelligence đọc skill manifest và evidence bound (không keyword hallucination).
+- Bounded skill selection (IRRELEVANT loại bỏ), capability coverage đánh giá tường minh.
+- FW01 loop hook sau role selection, trước permission revalidation — fail-closed, không nới quyền.
+- Decision trace lưu per-step; beginner output vẫn đơn giản.
+
+Acceptance bar (20 mục, §36): đã chứng minh cơ học toàn bộ.
+
+Stop rule: terminal report → STOP; việc thực thi FRAMEWORK-03 chỉ bắt đầu khi
+Owner ra lệnh "chạy FRAMEWORK-03".
 
 ## Stop rule
 

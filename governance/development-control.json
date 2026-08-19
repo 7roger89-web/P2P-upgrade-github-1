@@ -2064,6 +2064,26 @@
     "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
     "commit": "4156fa8017e092beb905fb30faa8ed0129d0d727",
     "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
+   },
+   {
+    "id": "FRAMEWORK-02",
+    "status": "DONE",
+    "terminal_status_when_done": "PASS / PROJECT_CAPABILITY_INTELLIGENCE_READY",
+    "title": "Project & Capability Intelligence — task -> required capabilities -> multi-source capability providers -> bounded skill selection -> coverage/eligibility/freshness fail-closed -> decision trace -> FW01 handoff; installed-project read-only shadow eval PASS on GT and GP",
+    "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-02-terminal-report.md; .p2p/system/p2p_capabilities/capability_intelligence.py; .p2p/system/p2p_capabilities/tests/test_capability_intelligence.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py (coverage gate hook); /tmp/fw02_shadow_eval/fw02-shadow-eval.json",
+    "artifact_ref": "p2p-framework-02-capability-intelligence",
+    "commit": "1e242c6",
+    "notes": "Layer inside FW01 — no competing router/orchestrator. candidate_policy per closure machinery (separate step). No promotion, no release, no deploy. Predecessor candidate 8.4.7-C-codex.25 (c0b485bd...) UNPROMOTED preserved verbatim. Stops before FRAMEWORK-03 execution."
+   },
+   {
+    "id": "FRAMEWORK-03",
+    "status": "NOT_STARTED",
+    "terminal_status_when_done": "",
+    "title": "Adaptive Team & Council — LIVE_COUNCIL_8_OF_8 via automatic fan-out, real 8/8 role certification on live hosts (per master-roadmap).",
+    "evidence_ref": "",
+    "artifact_ref": "p2p-framework-03-adaptive-team-council",
+    "commit": "",
+    "notes": "NOT_STARTED. Execution requires explicit Owner authorization."
    }
   ],
   "likely_next": {

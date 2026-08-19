@@ -250,6 +250,40 @@ from .host_selection import (
 # Host attestation — evidence-verification capability (C36 lane, exact reuse).
 # Evidence surface only: no orchestration, no routing, no auth/permission
 # authority, no model selection. CERTIFIED != CURRENTLY_ELIGIBLE.
+# Capability intelligence — FRAMEWORK-02 deterministic-first, evidence-bound
+# layer (provider-neutral, FAIL-CLOSED). One export surface; FW01 remains
+# the sole operating loop.
+from .capability_intelligence import (
+    UNKNOWN,
+    REQUIRED_OR_OPTIONAL,
+    FAIL_CLOSED,
+    MINIMUM_EVIDENCE_LEVELS,
+    FRESHNESS_CLASSES,
+    SOURCE_TYPES,
+    CANONICAL_CAPABILITIES,
+    CAPABILITY_VOCABULARY,
+    COVERAGE_STATES,
+    GAP_CLASSES,
+    CapabilityRequirement,
+    CapabilitySource,
+    CapabilityIntelligenceError,
+    ProjectProfile,
+    SkillIntelligenceResult,
+    CapabilityCoverage,
+    CapabilityDecisionTrace,
+    ExecutionRequirements,
+    build_project_profile,
+    build_source_inventory,
+    infer_required_capabilities,
+    resolve_eligibility,
+    select_skills_bounded,
+    evaluate_coverage,
+    required_context_items,
+    classify_task,
+    compute_execution_requirements,
+    beginner_status,
+)
+
 from .host_attestation import (
     HostAttestationError,
     HostAttestationRecord,
@@ -261,3 +295,34 @@ from .host_attestation import (
     record_attestation_use,
     mint_dispatch_id,
 )
+
+__all__ += [
+    "UNKNOWN",
+    "REQUIRED_OR_OPTIONAL",
+    "FAIL_CLOSED",
+    "MINIMUM_EVIDENCE_LEVELS",
+    "FRESHNESS_CLASSES",
+    "SOURCE_TYPES",
+    "CANONICAL_CAPABILITIES",
+    "CAPABILITY_VOCABULARY",
+    "COVERAGE_STATES",
+    "GAP_CLASSES",
+    "CapabilityRequirement",
+    "CapabilitySource",
+    "CapabilityIntelligenceError",
+    "ProjectProfile",
+    "SkillIntelligenceResult",
+    "CapabilityCoverage",
+    "CapabilityDecisionTrace",
+    "ExecutionRequirements",
+    "build_project_profile",
+    "build_source_inventory",
+    "infer_required_capabilities",
+    "resolve_eligibility",
+    "select_skills_bounded",
+    "evaluate_coverage",
+    "required_context_items",
+    "classify_task",
+    "compute_execution_requirements",
+    "beginner_status",
+]
