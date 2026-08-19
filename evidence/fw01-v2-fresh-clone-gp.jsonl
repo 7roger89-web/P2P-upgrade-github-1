@@ -1,0 +1,11 @@
+{"step": "fresh_clone", "project": "gp", "clone_rc": 0, "base": "343454851a5e8f7c7b9d6e2f4a0c8b6d3e1f5a2b", "head": "08aa6aa68db8722707cd53bf563f20fcc0904f65"}
+{"step": "harness_discover", "project": "gp", "rc": 0, "tail": ["PROJECT_BINDING_MODE=repository-root-manifest", "DOCTOR_REQUIREMENT=mandatory before first managed task", "FAIL_CLOSED_POLICY=deny — without a verified runtime, no P2P-managed task"]}
+{"step": "harness_verify-sha", "project": "gp", "rc": 0, "tail": ["RELEASE_SHA_BINDING=VERIFIED (2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61)"]}
+{"step": "harness_detect-runtime", "project": "gp", "rc": 0, "tail": ["LOCAL_RUNTIME=MISSING"]}
+{"step": "harness_install", "project": "gp", "rc": 0, "tail": ["RESULT: PASS", "Release marker: /home/ubuntu/fw01_work/fw01-certs/gp/.p2p/system/release.json", "CANONICAL_INSTALL=VERIFIED"]}
+{"step": "harness_doctor", "project": "gp", "rc": 0, "tail": ["[PASS] installed-decision-trace-doctor: Decision Trace doctor PASS; trace_count=0", "RESULT: PASS", "DOCTOR=HEALTHY"]}
+{"step": "harness_install_idempotent", "project": "gp", "rc": 0}
+{"step": "rollback_remove_runtime", "project": "gp", "manifest_preserved": true}
+{"step": "reinstall_after_rollback", "project": "gp", "rc": 0, "tail": ["Release marker: /home/ubuntu/fw01_work/fw01-certs/gp/.p2p/system/release.json", "CANONICAL_INSTALL=VERIFIED"]}
+{"step": "mutation_audit", "project": "gp", "tracked_changes_excluding_untracked": 0, "unexpected_tracked_project_mutation": 0, "unexpected_files": [], "expected_installer_owned_merge": {"files": [], "classification": "B", "scope": "P2P_CODEX_BLOCK_ONLY", "disclosure": "installer merges the P2P CODEX block in AGENTS.md; surrounding content untouched"}, "tracked_lines": []}
+{"step": "gp_supabase_untouched", "project": "gp", "supabase_present": true, "rls_sql_present": false}
