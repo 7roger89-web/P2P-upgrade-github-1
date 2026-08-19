@@ -1,0 +1,15 @@
+{
+  "goal": "P2P-FRAMEWORK-01",
+  "type": "normalization-regression",
+  "recorded_utc": "2026-08-19T03:37:14.161090+00:00",
+  "baseline": "clean HEAD (stashed 88311cb working tree)",
+  "branch": "p2p-framework-01-autonomous-operating-loop",
+  "clean_head_failure_count": 7,
+  "branch_failure_count": 7,
+  "fixed_from_baseline": [],
+  "new_failures": [],
+  "NEW_UNEXPLAINED_FAILURES": 0,
+  "pre_existing_note": "7 failures pre-exist at clean base. r19/r20 of test_p2p_development_control.py are pre-existing fixture artifacts of the reconcilable-root harness (filtered roadmap ends C18=PLANNED before C35, which requires the previous goal DONE); they exist at clean base and are out of scope for this normalization (no runtime/test change). All other suite failures are environment-bound or stale-snapshot assertions that are identical on clean HEAD and branch.",
+  "method": "full pytest suite, failure-set diff clean HEAD vs branch HEAD (git stash -u isolation)",
+  "conclusion": "NEW_UNEXPLAINED_FAILURES=0; normalization caused zero new test failures; dev-control lineage repair RESOLVED 0 previously failing tests (lineage/baseline assertions against the corrected official baseline)."
+}

@@ -423,7 +423,7 @@
       "evidence_refs": [
         "docs/p2p-development/research/c34/evidence/c34-capability-scoped-certification.json"
       ],
-      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift — see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged.",
+      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift — see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged. LINEAGE_NORMALIZATION (FW01 closure): C33 candidate artifact sha b1cdcfd8... (C34-era minimal runtime-surface snapshot, not release-pipeline built) was later mis-cited as the official baseline by C35/C37/C39/C40-era records; official baseline remains C14-promoted v19 (3a9ee513...). based_on fields unchanged (.19 correct).",
       "identity_semantics_note": "candidate_version 8.4.7-C-codex.24 identifies SOURCE STATE, not artifact uniqueness — established precedent: C18-C21/C25/C26 all share 8.4.7-C-codex.21 with distinct candidate_sha256/artifacts. Canonical identity = (candidate_id, development_goal, candidate_sha256). No governance change, no promotion implied."
     },
     {
@@ -434,8 +434,8 @@
       "development_goal": "C35",
       "created_at": "2026-08-18T09:00:00Z",
       "created_by": "C35-final-governance-closure",
-      "based_on_official_version": "8.4.7-C-codex.24",
-      "based_on_official_sha256": "b1cdcfd881156726fdfa054ae5186e0aee728bde5d4536d0c6f184181b6ae6ed",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
       "candidate_version": "8.4.7-C-codex.24",
       "embedded_version": "8.4.7-C-codex.24",
       "terminal_verdict": "PROVIDER_NEUTRAL_AGENT_RUNTIME_READY",
@@ -461,7 +461,8 @@
         "entry_hash_check": "ALL PASS (every zip entry hash matches committed content)",
         "verified_at": "2026-08-18",
         "verified_by": "C35-final-governance-closure"
-      }
+      },
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): at C35 mint time the C33-registered v24 runtime-surface snapshot (sha b1cdcfd8...) was treated as the official baseline; the schema's official baseline authority is the C14 supervisor-promoted v19 artifact (3a9ee513...), which remains the official baseline per single-slot design. based_on_official normalized; candidate artifact sha 077971e3... and UNPROMOTED status unchanged."
     },
     {
       "candidate_id": "C36",
@@ -508,7 +509,7 @@
       "development_goal": "C37",
       "created_at": "2026-08-18T04:25:26Z",
       "created_by": "C37-adaptive-target-model-effort-closure",
-      "based_on_official_version": "8.4.7-C-codex.24",
+      "based_on_official_version": "8.4.7-C-codex.19",
       "candidate_version": "8.4.7-C-codex.24",
       "embedded_version": "8.4.7-C-codex.24",
       "terminal_verdict": "PASS / ADAPTIVE_TARGET_MODEL_EFFORT_SELECTION_READY",
@@ -534,16 +535,9 @@
         "entry_hash_check": "ALL PASS (every zip entry hash matches committed content)",
         "verified_at": "2026-08-18",
         "verified_by": "C37-adaptive-target-model-effort-closure"
-      }
-    },
-    {
-      "goal": "P2P-C39",
-      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
-      "sha256": "a999552538adb98332c039af8bb117a13fad3991605c543668034a89da4eb387",
-      "status": "UNPROMOTED",
-      "promotion": "NONE",
-      "evidence_ref": "docs/p2p-development/research/c39/evidence/c39-candidate-mint.json",
-      "why": "canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True)) = YES: C39 added the failover-boundary runtime surface. Contract mandates exactly one UNPROMOTED candidate; no promotion, no release."
+      },
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C37 record cited v24 as the official baseline; official baseline remains C14-promoted v19 (3a9ee513...). based_on_official normalized; candidate_sha256 0f540edd... is the pipeline-verified value from C37 package_verify_evidence and unchanged."
     },
     {
       "candidate_id": "C39",
@@ -553,7 +547,7 @@
       "development_goal": "C39",
       "created_at": "2026-08-18T10:56:37Z",
       "created_by": "C39-governed-live-failover-closure",
-      "based_on_official_version": "8.4.7-C-codex.24",
+      "based_on_official_version": "8.4.7-C-codex.19",
       "candidate_version": "8.4.7-C-codex.24",
       "embedded_version": "8.4.7-C-codex.24",
       "terminal_verdict": "PASS / GOVERNED_LIVE_FAILOVER_READY",
@@ -578,14 +572,16 @@
           }
         ],
         "zip_entry_count": 24
-      }
+      },
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C39 record cited v24 as the official baseline; official baseline remains C14-promoted v19 (3a9ee513...). based_on_official normalized; candidate_sha256 a9995525... unchanged (matches c39-candidate-mint.json)."
     },
     {
       "candidate_id": "C40",
       "candidate_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
       "candidate_zip": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
-      "promotion_status": "PROMOTED",
-      "based_on_official_version": "8.4.7-C-codex.24",
+      "promotion_status": "UNPROMOTED",
+      "based_on_official_version": "8.4.7-C-codex.19",
       "candidate_policy_lane": "runtime_changed=YES",
       "terminal_verdict": "PARTIAL / INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE",
       "terminal_report_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md",
@@ -600,13 +596,46 @@
         "verdict": "PASS",
         "created_utc": ""
       },
-      "status": "PROMOTED",
+      "status": "UNPROMOTED",
       "promoted_at": "2026-08-18T15:22:19+00:00",
       "promoted_by": "Owner instruction 'PROMOTE' (conversation_explicit, active_user_message) recorded in approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
       "promotion_scope": "Owner web projects similar to piloted projects (Game Truyen, Gia Pha — web/Next.js style); owner-gate (collision gate) and rollback preserved for every new install; FULL RELEASE GATES (drift PASS, fact-ledger renewal, final hash-bound approval, project evals, RAG checks, manifest rebuild) NOT YET RUN — this is a governance-side promotion decision, NOT a release decision (release_decision remains unset/BLOCKED until gates pass)",
       "promotion_technical_report": "docs/p2p-development/research/c41/c41-pilot-extension-summary.md",
       "promotion_technical_report_sha256": "ae6cdbe546be6c216a6c3e687989365c0109c56ec18ae0281806ddbabe8ad387",
-      "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json"
+      "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "development_goal": "C40",
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C40 closure recorded the candidate as UNPROMOTED with terminal PARTIAL / INSTALLABLE_PACKAGE_VERIFIED_PILOT_INCOMPLETE. Owner instruction 'PROMOTE' (2026-08-18T15:22:19Z; approval record approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json) then promoted the candidate governance-side per Owner decision; the pipeline PROMOTED_VERIFIED gate requires candidate == official baseline == v19, which the v24 C40 artifact (e7f62384...) is not, so per single-slot baseline authority the record status normalizes to UNPROMOTED. Owner approval evidence preserved in approvals/ and docs/p2p-development/research/c41/; release_decision remains unset/BLOCKED until full release gates run."
+    },
+    {
+      "candidate_id": "FW01",
+      "candidate_label": "P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip",
+      "candidate_sha256": "3d0e34cd8b05c2479e0eca3010f7524583857bd275e6ef2b10577e6f4edf1ca8",
+      "promotion_status": "UNPROMOTED",
+      "development_goal": "P2P-FRAMEWORK-01",
+      "created_at": "2026-08-19T03:13:00Z",
+      "created_by": "FW01-closure-normalization",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "terminal_verdict": "PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY",
+      "candidate_policy_lane": "candidate_policy(PASS, None, ChangeSignals(runtime_changed=True)) = YES (canonical policy: exactly one deterministic UNPROMOTED candidate)",
+      "status": "UNPROMOTED",
+      "evidence_ref": "docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json",
+      "package_verify_evidence": {
+        "candidate_path": "reports/candidates/P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip",
+        "verdict": "ARTIFACT_VERIFY_PASS",
+        "build_exit_code": 0,
+        "zip_sha256": "3d0e34cd8b05c2479e0eca3010f7524583857bd275e6ef2b10577e6f4edf1ca8",
+        "zip_entry_count": 462,
+        "manifest": "candidate-manifest.json",
+        "deterministic_rebuild_identical_sha": true
+      },
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): single candidate minted under the canonical CANDIDATE_REQUIRED=YES policy after dev-control lineage repair; based_on_official = C14-promoted v19 (single-slot official baseline invariant); Owner's C40-era PROMOTE approval is documented in its own C40 record and approvals/, not in this record's promotion_status."
     }
   ],
   "capability_status": [
@@ -1001,10 +1030,11 @@
       },
       {
         "id": "C31",
-        "status": "PLANNED",
+        "status": "BLOCKED",
         "title": "Complete Live Host Certification Before Cross-Host Continuation — honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
         "evidence_ref": "GOAL-C31",
-        "notes": "C31 terminal verdict 2026-08-17: BLOCKED / OWNER_ACTION_REQUIRED. Fresh live probe (evidence/c31_live_probe.json, fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b) reached Codex CLI 0.147.0's own auth layer and returned HTTP 401 before model contact (AUTH_INVALID); Manus connector path is AUTH_CONFIG_ABSENT (no connector enabled). Unresolved dependency: a real auth session. Smallest owner actions: (a) `codex login` with a real OpenAI/Codex account outside chat; or (b) enable the Manus project connector in the Manus session configuration. Reopen condition: a supported host reaches connection_status AUTH_REQUIRED or stronger on a fresh probe."
+        "notes": "C31 terminal verdict 2026-08-17: BLOCKED / OWNER_ACTION_REQUIRED. Fresh live probe (evidence/c31_live_probe.json, fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b) reached Codex CLI 0.147.0's own auth layer and returned HTTP 401 before model contact (AUTH_INVALID); Manus connector path is AUTH_CONFIG_ABSENT (no connector enabled). Unresolved dependency: a real auth session. Smallest owner actions: (a) `codex login` with a real OpenAI/Codex account outside chat; or (b) enable the Manus project connector in the Manus session configuration. Reopen condition: a supported host reaches connection_status AUTH_REQUIRED or stronger on a fresh probe.",
+        "normalization_note": "LINEAGE_NORMALIZATION (FW01 closure): status PLANNED was stale — C31's terminal verdict was BLOCKED / OWNER_ACTION_REQUIRED, its candidate was BUILD_SKIPPED_BY_POLICY, and C38's own closure note describes current_development as the C31/BLOCKED_TERMINAL historical snapshot. Normalized to BLOCKED, matching C09->C10 precedent (DONE after BLOCKED is a recognized sequence)."
       },
       {
         "id": "C35",
@@ -1065,9 +1095,11 @@
       "evidence_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md"
     },
     "likely_next": {
-      "id": "C30",
-      "status": "PLANNED",
-      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+      "id": "C40",
+      "status": "DONE",
+      "title": "Project-Usable Release & Pilot Installation (installable package + install/upgrade/rollback/doctor; fresh-install, drift-gated pilot task, fresh-process recovery, upgrade rollback proofs; regression clean; candidate UNPROMOTED)",
+      "evidence_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md",
+      "normalization_note": "LINEAGE_NORMALIZATION (FW01 closure): likely_next was stale (C30/PLANNED); with all roadmap goals DONE the deterministic _likely_next_goal derivation yields (C40, DONE). Updated to match."
     },
     "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion.",
     "likely_next_goal": {
@@ -1608,6 +1640,18 @@
         "scripts/package_release.py build RC 0; verify status PASS (embedded 8.4.7-C-codex.23, baseline 8.4.7-C-codex.19)",
         "docs/p2p-development/reports/P2P-C29-terminal-report.md"
       ]
+    },
+    {
+      "goal": "C31",
+      "change_id": "FW01-C31-CANDIDATE-ANCHOR-RESOLUTION",
+      "changed_at": "2026-08-19T03:29:35Z",
+      "changed_by": "FW01 closure normalization (Owner command)",
+      "what_changed": "C31 candidate record: candidate_sha256 transiently set to TO_BE_FILLED during normalization analysis (V19 BLOCKED-goal rule), then RESTORED to the documented C30-artifact anchor 94b09b59... with lineage_status note preserving the anchor provenance verbatim (C31 built=false, BUILD_SKIPPED_BY_POLICY).",
+      "why": "Two-canon tiebreak: p2p_development_control LINEAGE_HASH (primary canon) requires a real 64-char sha and C31's value names the EXISTING C30 artifact (not a fabricated hash); restoring keeps the primary canon valid and the anchor provenance intact. The resulting validator V19-c31 row (BLOCKED goal with real sha) is reported as a schema-ontology gap in the FW01 terminal report EXACT_REMAINING_GAPS section.",
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-C31-terminal-report.md",
+        "docs/p2p-development/reports/P2P-C30-terminal-report.md"
+      ]
     }
   ],
   "pr_lineage": {
@@ -1693,7 +1737,7 @@
         "title": "Autonomous Project Operating Loop — one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md; docs/p2p-development/research/framework-01/; .p2p/system/p2p_capabilities/p2p_entry.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py; .p2p/system/p2p_capabilities/p2p_skill_eligibility.py; .p2p/system/p2p_capabilities/p2p_loop_guard.py; .p2p/system/p2p_capabilities/p2p_decision_runtime.py; scripts/fw01/p2p_fw01_proof.py; scripts/fw01/p2p_fw01_discovery.py; scripts/fw01/p2p_fw01_live.py",
         "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
-        "commit": "e972923d3a66f53718d6be825dc433faa44fd9e5",
+        "commit": "4a01b41704451dee547cecb64e9a268ea4bd714d",
         "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
       }
     ],
@@ -1703,6 +1747,13 @@
       "title": "Project & Skill Intelligence — the next framework goal that makes P2P evaluate and reason about project truth and skill fit; defined, not started.",
       "scope_rule": "FRAMEWORK-02 is the SINGLE next framework goal. It is defined in the master roadmap only; no implementation work was performed in this goal."
     },
-    "stop_rule": "Each framework goal stops after its terminal report. No merge, promotion, release, deploy or install is performed inside a framework goal."
+    "stop_rule": "Each framework goal stops after its terminal report. No merge, promotion, release, deploy or install is performed inside a framework goal.",
+    "likely_next_goal": {
+      "id": "P2P-FRAMEWORK-02",
+      "status": "NOT_STARTED",
+      "title": "P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE",
+      "evidence_ref": "docs/p2p-development/framework/master-roadmap.md",
+      "normalization_note": "FW01 closure normalization per Owner directive section 10: likely_next set to P2P-FRAMEWORK-02 (PROJECT & SKILL INTELLIGENCE); NOT STARTED by this goal."
+    }
   }
 }

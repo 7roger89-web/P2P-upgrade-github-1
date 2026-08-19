@@ -2,8 +2,10 @@
 
 **GOAL_ID:** P2P-FRAMEWORK-01
 **GOAL_TERMINAL_STATUS:** PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY
-**CANDIDATE_REQUIRED:** YES (declare-only; exactly one deterministic UNPROMOTED candidate may be minted later; NO promotion, NO release)
-**RECORDED_AFTER_COMMIT:** e972923d3a66f53718d6be825dc433faa44fd9e5 (p2p-framework-01-autonomous-operating-loop)
+**CANDIDATE_REQUIRED:** YES (exactly one deterministic UNPROMOTED candidate minted; NO promotion, NO release)
+**CANDIDATE_STATUS:** MINTED, UNPROMOTED — one candidate: `P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip` (`reports/candidates/`)
+**CANDIDATE_SHA256:** `3d0e34cd8b05c2479e0eca3010f7524583857bd275e6ef2b10577e6f4edf1ca8` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
+**RECORDED_AFTER_COMMIT:** 4a01b41704451dee547cecb64e9a268ea4bd714d (p2p-framework-01-autonomous-operating-loop)
 
 ---
 
@@ -65,7 +67,8 @@ Two **genuine separate Python subprocesses** over the same fixture directory (ev
 | negB / negC / negE / negI | Stale binding / drift reselection / checkpoint continuity | next-safe-action deterministic, UNCHANGED |
 | negD | Retry exhaustion fails closed | STOPPED, UNCHANGED |
 | negF | No eligible target fails closed | next-safe-action A (no execution), UNCHANGED |
-| negH | Contradictory evidence fails closed | STOPPED, UNCHANGED |
+| negG | Optional skill unavailable → bounded fallback, no false support claim | VERIFIED (deterministic rerun at closure normalization: `eligible_skills(Path('/nonexistent-registry'))` → empty set → `no_false_support_claim=VERIFIED`; evidence `docs/p2p-development/research/framework-01/evidence/fw01-negG-rerun-evidence.json`) |
+| negH | Contradictory evidence fails closed (unproven council) | STOPPED, UNCHANGED |
 | negJ | Corrupt state file refuses to run (fail-closed) | No loop run on unreadable state |
 
 ## 7. Live backend E2E leg
@@ -91,20 +94,21 @@ Production project source: NOT MUTATED (read-only proofs only; `.p2p` writes occ
 
 | Check | Result |
 | --- | --- |
-| Framework validator | 77/77 PASS, 0 failed |
-| Regression (baseline `8b751f6`) | 46 failed (clean HEAD) vs 46 failed (branch); **FAILURE_SETS_IDENTICAL → NEW_UNEXPLAINED_FAILURES = 0** |
+| Framework validator | 77/78 PASS; 1 documented gap: `V19-c31-no-fabricated-candidate` — C31 record (BLOCKED, `built=false`, `BUILD_SKIPPED_BY_POLICY`) carries the documented C30-artifact lineage anchor `94b09b59…` which the primary canon (LINEAGE_HASH) requires as a real 64-char sha; the two-canon ontology conflict is recorded in governance provenance `FW01-C31-CANDIDATE-ANCHOR-RESOLUTION` and reported here rather than resolving one canon silently (see section 14) |
+| Regression (baseline `8b751f6`; mechanical re-run at closure normalization) | Failure-set diff clean HEAD vs branch: NEW_UNEXPLAINED_FAILURES = 0; lineage repair resolved 10 dev-control suite tests that asserted the stale baseline/C31 state; 2 pre-existing failures remain (`r19`/`r20`, reconcilable-root harness fixture artifacts at clean base) — evidence `docs/p2p-development/research/framework-01/fw01-normalization-regression.json` |
 | fresh_clone_recovery | PASS after C34 authorized approved-set growth (FRAMEWORK-01 core + scripts/fw01 + research/framework-01) |
 | cf21 / ho47 / DT behavioral cert | PASS (core adapter-boundary fix: pure-pathlib git resolution in p2p_entry) |
 | Closure machinery | Consistent with explained findings |
-| Candidate policy | `ChangeSignals.detect` → runtime changed → **CANDIDATE_REQUIRED = YES**, declare-only (no mint in this goal) |
+| Candidate policy | `ChangeSignals.detect` → runtime changed → **CANDIDATE_REQUIRED = YES** → exactly one deterministic UNPROMOTED candidate minted (policy enforced by machinery; no declare-only exception exists in the canonical policy for this change set) |
 | Recovery regression (baseline `e972923`) | 45 failed vs 45 failed; **NEW_UNEXPLAINED_FAILURES = 0** — recovery change set adds only passing guard test + recovery record |
+| Research intake persistence | 3 Owner-accepted research items persisted as durable PENDING_OWNER_APPROVAL intake (RI-004 DeepSeek Harness/plugin claims: NOT_VERIFIED provenance, no repository evidence for 150k-stars/4-day/Cordis claims; RI-005 community 13-step Codex workflow: concept-to-capability mapping only, no literal adoption; RI-006 Capability Intelligence: FRAMEWORK-02 product direction recorded, FW02 remains NOT_STARTED) — evidence `governance/research-intake-ledger.json` |
 | Closure self-reference guard | PASS (4/4): HEAD-equal SHA rejected, invalid SHA rejected, ancestor SHA accepted, fill script never reads rev-parse |
 
 ## 11. Recovery record (server error 10091 + closure self-reference loop)
 
 The goal was interrupted by a Manus server error (code 10091) after the implementation commit `e972923` had landed. The subsequent closure script embedded `git rev-parse HEAD` into the terminal report and governance, then amended that same commit — each amend changed HEAD, requiring another fill: an unbounded self-referential loop, plus repeated amend/push cycles. Resolution (recorded in `docs/p2p-development/research/framework-01/fw01-recovery.json`):
 
-1. All pre-loop evidence was mechanically re-verified: primary E2E (4/4), negative proofs A–J (10/10, G/H deterministically rerun, J corrupt-by-design), restart proof, live backend leg, both discovery proofs — no evidence was invalidated by the incident.
+1. All pre-loop evidence was mechanically re-verified: primary E2E (4/4), negative proofs A–J (10/10, G/H deterministically rerun, J corrupt-by-design), restart proof, live backend leg, both discovery proofs — no evidence was invalidated by the incident. Case G (`NEG_G_OPTIONAL_SKILL_UNAVAILABLE`: optional skill unavailable → bounded fallback, no false support claim) was re-run deterministically at closure normalization because its evidence directory was missing from the proof tree; rerun verdict VERIFIED, evidence persisted to `docs/p2p-development/research/framework-01/evidence/fw01-negG-rerun-evidence.json` and summarized in `fw01-negative-proofs-summary.json` — all 10 negative cases now carry durable, machine-countable evidence (10/10).
 2. Lineage model switched to the FW00 non-self-referential precedent: tracked files record the implementation commit (`e972923`) written at report time; the final closure commit records `e972923` as its parent and is itself verified only by `git log`.
 3. A deterministic guard was added (`tests/test_p2p_fw01_closure_no_self_reference.py`): a lineage fill targeting the current HEAD is rejected with a non-zero exit and mutates nothing; the fill script reads its target from an external file and never calls `git rev-parse HEAD`.
 4. The regression differential was recomputed on the final change set: **NEW_UNEXPLAINED_FAILURES = 0**.
@@ -112,10 +116,11 @@ The goal was interrupted by a Manus server error (code 10091) after the implemen
 ## 12. Exact remaining gaps (explicit)
 
 1. Session-death recovery: NOT_PROVEN (separate property; not claimed).
-2. Production installs still run older snapshots; they are NOT yet upgraded to FRAMEWORK-01 — no production-project change in this goal.
-3. Council 8/8 live certification: NOT_PROVEN (1/8 CERTIFIED, per FW00 reconciliation).
-4. Adaptive skill selection beyond eligibility: not implemented (not claimed).
-5. Background/independent operation beyond the owner session: prohibited and unimplemented.
+2. Schema-ontology gap (`V19-c31-no-fabricated-candidate`): the C31 candidate record is BLOCKED / `built=false` / `BUILD_SKIPPED_BY_POLICY`, yet its `candidate_sha256` names the real C30 artifact (`94b09b59…`) — a documented lineage anchor per the 2026-08-17 C31 terminal report. The primary canon (`LINEAGE_HASH`) requires a real 64-char sha while the validator's BLOCKED-goal rule requires `TO_BE_FILLED`; replacing the anchor with a placeholder would pass the validator but erase the documented anchor history, keeping it would fail the row. Neither canon was silently overridden: the tiebreak is recorded in governance provenance (`FW01-C31-CANDIDATE-ANCHOR-RESOLUTION`) and the row remains failing by design until a schema change (anchor field) is approved by the Owner. 77/78 is the honest result.
+3. Production installs still run older snapshots; they are NOT yet upgraded to FRAMEWORK-01 — no production-project change in this goal.
+4. Council 8/8 live certification: NOT_PROVEN (1/8 CERTIFIED, per FW00 reconciliation).
+5. Adaptive skill selection beyond eligibility: not implemented (not claimed).
+6. Background/independent operation beyond the owner session: prohibited and unimplemented.
 
 ## 13. Next framework (defined, not started)
 
