@@ -3,7 +3,7 @@
   "schema_version": 2,
   "canonical_source_statement": "Derived from governance/development-control.json (architectural_invariants, roadmap, capability_status, candidate_records, research_decisions), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, docs/plans/, and per-goal evidence reports in reports/. This ledger is capability knowledge, status, and roadmap intent only; it is NOT runtime truth, NOT Task State, and NOT a second FACT store. Where this ledger contradicts development-control.json, development-control.json wins.",
   "authority_boundary": "This ledger records capability knowledge, capability status, and development intent. It does not control runtime task completion. Runtime task authority lives in Task State; goal/development governance authority lives in governance/development-control.json; factual and evidence authority lives in governance/fact-ledger.json and governance/live-specs.json with their evidence files.",
-  "generated_at": "2026-08-17T03:00:00+07:00",
+  "generated_at": "2026-08-19T13:15:00Z",
   "families": {
     "TRUTH_AND_GOVERNANCE": {
       "name": "Truth & Governance",
@@ -4355,7 +4355,7 @@
       "next_condition": "Re-open only when a fresh probe against a supported host returns connection_status AUTH_REQUIRED or stronger (owner action: codex login, or enable the Manus project connector).",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Fresh probe 2026-08-17: Codex CLI 0.147.0 reached its own auth layer (wss://api.openai.com/v1/responses) and returned HTTP 401 Unauthorized before model contact; verdict AUTH_INVALID. Confirms the immutable C27 fact with fresh evidence. Manus connector path: AUTH_CONFIG_ABSENT (no connector enabled in session configuration). No model call, no mutation, ephemeral session, no secrets stored.",
+      "notes": "Fresh probe 2026-08-17: Codex CLI 0.147.0 reached its own auth layer (wss://api.openai.com/v1/responses) and returned HTTP 401 Unauthorized before model contact; verdict AUTH_INVALID. Confirms the immutable C27 fact with fresh evidence. Manus connector path: AUTH_CONFIG_ABSENT (no connector enabled in session configuration). No model call, no mutation, ephemeral session, no secrets stored. | GOVERNANCE-TRUTH-SYNC (2026-08-19): historical verdict BLOCKED / OWNER_ACTION_REQUIRED preserved; live-cert lane c36-real-host-binding @ 8a1ad30 supersedes only the blocker observation at evidence time 2026-08-19T08:55:00Z; CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED.",
       "provenance_notes": "Directly implemented in C31. Evidence: evidence/c31_live_probe.json (fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b). Extends the deterministic probe surface of scripts/p2p_live_certification.py and the CODEX_CLI_0_147_0_LINUX adapter of scripts/p2p_secure_onboarding.py. Upstream research: C27 terminal report E27-PROBE-1f71d9b55eb78d8e.",
       "origin_type": "PROJECT_LEARNING"
     },
@@ -4392,7 +4392,7 @@
       "next_condition": "Populate ExecutionTarget profile from real probe evidence once a host reaches AUTH_REQUIRED or stronger; produce target_fingerprint and record it in the live spec.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "C31 intended (planned, not yet implemented) to exercise the C30 provider-neutral contract as the intake surface for certification (harness=CODEX_CLI_0_147_0_LINUX, transport=openai-completion-ws). No router, no autopilot, no vendor-specific core. Implementation is not claimed; blocked by owner auth action.",
+      "notes": "C31 intended (planned, not yet implemented) to exercise the C30 provider-neutral contract as the intake surface for certification (harness=CODEX_CLI_0_147_0_LINUX, transport=openai-completion-ws). No router, no autopilot, no vendor-specific core. Implementation is not claimed; blocked by owner auth action. | GOVERNANCE-TRUTH-SYNC (2026-08-19): historical verdict BLOCKED / OWNER_ACTION_REQUIRED preserved; live-cert lane c36-real-host-binding @ 8a1ad30 supersedes only the blocker observation at evidence time 2026-08-19T08:55:00Z; CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED.",
       "provenance_notes": "Planned in C31 on top of the C30 durable research artifact (execution-target-pattern-research.md). Reuses COMPOSABLE_EXECUTION_TARGET machinery; no code copied from third-party repositories.",
       "origin_type": "OWNER_ACCEPTED_PROPOSAL"
     },
@@ -4423,7 +4423,7 @@
       "next_condition": "Owner performs `codex login` (real OpenAI/Codex account, outside chat) or enables the Manus project connector; fresh probe then re-evaluates.",
       "last_reviewed": "2026-08-17",
       "freshness": "verified_against_filesystem",
-      "notes": "Terminal blocker for C31: BLOCKED / OWNER_ACTION_REQUIRED (CODEX_AUTH). Smallest actions identified by adapter safe_owner_action fields. Secrets never pasted into chat; no unofficial browser automation substituted.",
+      "notes": "Terminal blocker for C31: BLOCKED / OWNER_ACTION_REQUIRED (CODEX_AUTH). Smallest actions identified by adapter safe_owner_action fields. Secrets never pasted into chat; no unofficial browser automation substituted. | GOVERNANCE-TRUTH-SYNC (2026-08-19): historical verdict BLOCKED / OWNER_ACTION_REQUIRED preserved; live-cert lane c36-real-host-binding @ 8a1ad30 supersedes only the blocker observation at evidence time 2026-08-19T08:55:00Z; CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED.",
       "provenance_notes": "Directly established in C31 probe loop. Governance: development-control current_development.blocker. Extends the safe_owner_action contract of scripts/p2p_secure_onboarding.py adapters.",
       "origin_type": "PROJECT_LEARNING"
     },
@@ -4487,13 +4487,57 @@
       "freshness": "from_governance_record",
       "notes": "Prevents silent aliasing of distinct durable state domains.",
       "origin_type": "IMPLEMENTATION_GOAL"
+    },
+    {
+      "capability_id": "LIVE_CERTIFICATION_RECORD",
+      "name": "Live Certification Record — 8/8 canonical role binding, single real host (Codex)",
+      "family": "TRUTH_AND_GOVERNANCE",
+      "beginner_value": "Certified != currently eligible: evidence timestamp bound; no credential freshness implied.",
+      "principle": "One certification record, not eight canonical capabilities; bound to C35/C36 runtime capability surface.",
+      "origin_refs": [
+        "branch c36-real-host-binding @ 8a1ad30",
+        ".p2p/state/reports/c36/c36-live-cert/*"
+      ],
+      "status": "FOUNDATION_READY",
+      "implementation_refs": [
+        "host_attestation.py (lane-only)",
+        "role_bridge/role_receipt/role_verifier (canonical, byte-identical base)"
+      ],
+      "evidence_refs": [
+        "branch c36-real-host-binding @ 8a1ad30",
+        ".p2p/state/reports/c36/c36-live-cert/c36-gate-j-exact-8of8-bundle.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-iris-evidence-001.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_axiom-evidence-002.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_vector-evidence-003.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_datos-evidence-004.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_anon-evidence-005.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_architecton-evidence-006.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_helios-evidence-007.json",
+        ".p2p/state/reports/c36/c36-live-cert/c36-l2-codex-iris-real-proof.json",
+        ".p2p/state/reports/c36/c36-live-cert/c36-l4-seven-roles-real-proof.json"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "MULTIHOST_LIVE_COUNCIL = NOT_PROVEN",
+        "host_attestation.py NOT in canonical runtime"
+      ],
+      "do_not_duplicate_with": [
+        "C36 candidate c8915363... (UNPROMOTED, preserved)",
+        "C31 terminal (BLOCKED, preserved)"
+      ],
+      "next_condition": "Owner decision: integrate host_attestation.py into canonical runtime or keep lane-only",
+      "last_reviewed": "2026-08-19T13:15:00Z",
+      "freshness": "from_governance_record",
+      "notes": "Certification record NOT a development candidate; DO NOT PROMOTE.",
+      "rejected_reason": "",
+      "origin_type": "RESEARCH_DECISION"
     }
   ],
-  "last_reviewed": "2026-08-19",
+  "last_reviewed": "2026-08-19T13:15:00Z",
   "review_notes": [
     "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions."
   ],
-  "reviewed_after_goal": "P2P-FRAMEWORK-01",
+  "reviewed_after_goal": "GOVERNANCE-TRUTH-SYNC",
   "notes": [
     "FW01 adds skill eligibility surface but does not change capability statuses; reviewed after FW01."
   ]

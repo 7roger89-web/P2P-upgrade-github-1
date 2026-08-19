@@ -14,15 +14,15 @@ File chuẩn tắc tổng hợp hai dòng thời gian: dòng goal C01–C43 đã
 | BLOCKED | C09, C27 | C09 EVENT_EVIDENCE_UNAVAILABLE; C27 LIVE_HOST_EVIDENCE_UNAVAILABLE (môi trường host thật thiếu key) |
 | DEFERRED | C08 | Controlled continuation — defer |
 | DONE (historical) | C30 | C30 Composable Execution Target Foundation + provider-neutral intake — PASS (machinery only) 2026-08-17, candidate sealed 94b09b59; chuẩn hóa historical DONE trong FRAMEWORK-00 closure normalization. |
-| PLANNED | C31 | Hoàn tất live host certification trước cross-host continuation — bị chặn: LIVE_HOST_EVIDENCE_UNAVAILABLE (C27/C31) |
-| NOT_PROVEN | LIVE_COUNCIL_8_OF_8 | Hội đồng 8/8 thật chưa chứng minh (C43) |
+| BLOCKED (historical) | C31 | Verdict BLOCKED / OWNER_ACTION_REQUIRED bảo tồn; blocker Codex bị supercede tại evidence time 2026-08-19T08:55:00Z (lane c36-real-host-binding 8/8 VERIFIED); CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED |
+| CERTIFIED (single host) | LIVE_COUNCIL_8_OF_8 | Chứng minh thật 8/8 vai trò trên 1 host Codex @ 8a1ad30; MULTIHOST = NOT_PROVEN; CERTIFIED != CURRENTLY_ELIGIBLE (UNKNOWN_NOT_PROBED) |
 
 ## Dòng framework (FRAMEWORK-00..06)
 
 | ID | Tên | Trạng thái |
 | --- | --- | --- |
 | FRAMEWORK-00 | **Product Memory Foundation** — reconciliation C43, product architecture, master roadmap, research intake ledger, capability & skill map, governance sync, validation, closure, terminal report | IN_PROGRESS (goal này) |
-| FRAMEWORK-01 | **Autonomous Project Operating Loop** — vòng vận hành tự động: P2P tự khôi phục project truth và tiếp tục mục tiêu mà không cần briefing lại | NOT_STARTED — đã ĐỊNH NGHỊA (scope, acceptance bar, stop rule), chưa thực thi |
+| FRAMEWORK-01 | **Autonomous Project Operating Loop** (DONE — PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY; FW01_V2_DEFAULT_BRANCH_DURABILITY_COMPLETE; v1 eb396dc1 + v2 2a42e815 released) | DONE |
 | FRAMEWORK-02 | Thực thi mục tiêu được phê duyệt tại FRAMEWORK-01 (phạm vi theo phê duyệt) | NOT_STARTED |
 | FRAMEWORK-03 | Pilot mở rộng (dự án thứ 3 hoặc ngôn ngữ/framework khác) + **Council Full Certification** — LIVE_COUNCIL_8_OF_8 qua fan-out tự động, chứng nhận thật 8/8 vai trò | NOT_STARTED |
 | FRAMEWORK-04 | Release gates tái kiểm tra + re-promotion sau thay đổi runtime | NOT_STARTED |

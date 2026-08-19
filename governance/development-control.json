@@ -120,6 +120,17 @@
         "enable Manus project connector in session configuration"
       ],
       "reopen_condition": "fresh probe: supported host reaches connection_status AUTH_REQUIRED or stronger"
+    },
+    "stale_projection_note": "GOVERNANCE-TRUTH-SYNC (2026-08-19): this current_development block remains the C31 historical snapshot (BLOCKED_TERMINAL at evidence time 2026-08-17T06:27:20Z) and MUST NOT be re-read as the globally current project state. Historical verdict preserved: BLOCKED / OWNER_ACTION_REQUIRED. Later evidence (LIVE_CERTIFICATION_RECORD below) supersedes only the specific blocker observation for the Codex host: at a later evidence time, real Codex role executions were VERIFIED (8/8 canonical roles, single host, Gate J exact binding). Current auth freshness is NOT deduced from historical evidence: CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED (zero-model-contact probe unavailable in current environment; no Owner login requested). Certification != current eligibility.",
+    "later_capability_evidence": {
+      "classification": "LATER_CAPABILITY_EVIDENCE",
+      "supersedes_blocker": "C31 real-auth-host blocker (Codex path)",
+      "superseded_at_evidence_time": "2026-08-19T08:55:00Z",
+      "evidence_branch": "c36-real-host-binding",
+      "evidence_head": "8a1ad30cb607df30b4f76f3624d0e26aa529aecd",
+      "verdict": "VERIFIED_AT_EVIDENCE_TIME",
+      "not_permanent": "AUTH_VALID_FOREVER is NOT claimed",
+      "current_auth_state": "UNKNOWN_NOT_PROBED"
     }
   },
   "candidate_records": [
@@ -781,6 +792,67 @@
       "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v2/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
       "promoted_artifact_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
       "promoted_artifact_label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip"
+    },
+    {
+      "candidate_id": "LIVE_CERTIFICATION_RECORD",
+      "classification": "CERTIFICATION_RECORD_NOT_A_DEVELOPMENT_CANDIDATE",
+      "certification_type": "LIVE_CERTIFICATION_RECORD",
+      "evidence_timestamp": "2026-08-19T08:55:00Z",
+      "evidence_scope": "Canonical 8-role live execution council on one real host (Codex CLI, Windows), proving exact role->real-execution binding for the full canonical role set: p2p_iris, p2p_tecton, p2p_axiom, p2p_vector, p2p_datos, p2p_anon, p2p_architecton, p2p_helios. RoleExecutionContract binding + attestation fingerprint + receipt + verifier result per role; distinct dispatch per role; replay protection (unique dispatch_id/attestation fingerprint/session_id per role).",
+      "canonical_role_set": [
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_axiom",
+        "p2p_vector",
+        "p2p_datos",
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_helios"
+      ],
+      "role_count": 8,
+      "real_execution_count": 8,
+      "host_family": "Codex CLI (codex-platform-minted session IDs, exec stdout attestation)",
+      "host_count": 1,
+      "evidence_pointers": [
+        "branch c36-real-host-binding @ 8a1ad30cb607",
+        ".p2p/state/reports/c36/c36-live-cert/c36-gate-j-exact-8of8-bundle.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-iris-evidence-001.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_axiom-evidence-002.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_vector-evidence-003.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_datos-evidence-004.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_anon-evidence-005.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_architecton-evidence-006.json",
+        ".p2p/state/reports/c36/c36-live-cert/codex-p2p_helios-evidence-007.json",
+        ".p2p/state/reports/c36/c36-live-cert/c36-l2-codex-iris-real-proof.json",
+        ".p2p/state/reports/c36/c36-live-cert/c36-l4-seven-roles-real-proof.json"
+      ],
+      "verification_status": {
+        "CANONICAL_ROLE_REAL_EXECUTION_BINDING": "VERIFIED",
+        "EXACT_8_OF_8_ROLE_BINDING": "VERIFIED",
+        "SINGLE_HOST_LIVE_COUNCIL": "VERIFIED",
+        "MULTIHOST_LIVE_COUNCIL": "NOT_PROVEN"
+      },
+      "replay_protection_status": "VERIFIED (8 distinct dispatch_id + 8 distinct attestation_fingerprint + 8 distinct platform session_id; reused attestation fails closed per lane machinery)",
+      "runtime_canonicality": {
+        "role_bridge.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical to FW01 v2; lane variant = canonical + optional attestation integration)",
+        "role_receipt.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical to FW01 v2; lane variant = canonical + optional C36 fields, fail-closed when declared)",
+        "role_verifier.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical base to FW01 v2; lane variant = canonical + optional REAL_REQUIRED attestation policy)",
+        "host_attestation.py": "LIVE_CERT_LANE_ONLY_NOT_CANONICAL (absent from FW01 v2 artifact and FW01 branch runtime)"
+      },
+      "canonicality_note": "LIVE_CERT_EVIDENCE_VALID_RUNTIME_CANONICALITY_PENDING — 3 of 4 modules already canonical (equivalent); host_attestation.py integration remains a separate implementation/integration decision. NO silent cherry-pick into the canonical runtime in this goal.",
+      "certified_vs_eligible": {
+        "CERTIFIED": true,
+        "CURRENTLY_ELIGIBLE": "UNKNOWN — certification proves evidenced behavior at evidence time only; it guarantees neither current auth, credits, host availability, provider health nor future model availability. CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED."
+      },
+      "freshness_semantics": "EVIDENCE_TIMESTAMP = 2026-08-19T08:55:00Z (cycle-3 completion, lane branch c36-real-host-binding). No freshness claim beyond that timestamp.",
+      "does_not_create_eight_capabilities": "This is ONE certification record bound to the canonical role-execution capability surface (C35 RoleExecutionContract + C36 receipts), NOT eight canonical capabilities.",
+      "supersedes": {
+        "historical": "C31 real-auth blocker observation (Codex path) — superseded at evidence time only",
+        "preserved": "C31 terminal verdict BLOCKED / OWNER_ACTION_REQUIRED preserved as historical truth; HISTORICAL_C31_STATUS unchanged"
+      },
+      "created_at": "2026-08-19T13:00:00Z",
+      "created_by": "governance-truth-sync",
+      "promotion_status": "NOT_A_CANDIDATE_DO_NOT_PROMOTE"
     }
   ],
   "capability_status": [
@@ -1970,5 +2042,18 @@
       "evidence_ref": "docs/p2p-development/framework/master-roadmap.md",
       "normalization_note": "FW01 closure normalization per Owner directive section 10: likely_next set to P2P-FRAMEWORK-02 (PROJECT & SKILL INTELLIGENCE); NOT STARTED by this goal."
     }
-  }
+  },
+  "normalization_records": [
+    {
+      "goal": "GOVERNANCE-TRUTH-SYNC",
+      "change_id": "LIVE-CERT-IDENTITY-SEPARATION",
+      "changed_at": "2026-08-19T13:00:00Z",
+      "changed_by": "governance-truth-sync",
+      "what_changed": "Append LIVE_CERTIFICATION_RECORD to candidate_records (non-colliding identity; the later real-host certification lane is recorded as LIVE_CERTIFICATION_RECORD, NOT as a second canonical C36). Historical C36 (candidate c8915363..., UNPROMOTED, branch p2p-c36-evidence-bound-context-efficiency) untouched. C31 historical terminal verdict preserved verbatim; stale current_development snapshot annotated (not deleted); current-roadmap.md / master-roadmap.md / capability-index.json regenerated as derived projections.",
+      "evidence_refs": [
+        "governance/evidence/governance-truth-sync-20260819.json",
+        "branch c36-real-host-binding @ 8a1ad30cb607"
+      ]
+    }
+  ]
 }

@@ -67,7 +67,7 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at regeneration time (158 records, 12 families):
+Counts per family in `capability-index.json` at regeneration time (159 records, 12 families):
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
 | Truth & Governance | 20 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |

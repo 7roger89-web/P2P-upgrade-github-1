@@ -1,0 +1,99 @@
+{
+  "schema": "governance-truth-sync/1",
+  "goal_id": "GOVERNANCE-TRUTH-SYNC",
+  "recorded_at": "2026-08-19T13:10:00Z",
+  "scope": "read-only governance reconciliation + bounded normalization branch p2p-governance-truth-sync",
+  "parent_lineage": "origin/p2p-fw01-bootstrap-reconciliation @ dbf82c02ae8b",
+  "verifications": {
+    "fw01_closure_external": {
+      "gt_main_head": "896759a",
+      "gp_main_head": "7250f17",
+      "status": "FW01_V2_DEFAULT_BRANCH_DURABILITY_COMPLETE",
+      "source": "previous goal evidence files in /home/ubuntu/fw01_work/evidence/"
+    },
+    "c31_historical_verdict_preserved": {
+      "terminal": "BLOCKED / OWNER_ACTION_REQUIRED",
+      "candidate_required": "NO (BUILD_SKIPPED_BY_POLICY)",
+      "anchor_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
+      "source": "docs/p2p-development/reports/P2P-C31-terminal-report.md (read-only verified)"
+    },
+    "live_cert_evidence_mechanical": {
+      "branch": "c36-real-host-binding",
+      "head_sha256": "8a1ad30cb607df30b4f76f3624d0e26aa529aecd",
+      "gate_j_8of8_bundle": ".p2p/state/reports/c36/c36-live-cert/c36-gate-j-exact-8of8-bundle.json",
+      "roles": [
+        "p2p_iris",
+        "p2p_tecton",
+        "p2p_axiom",
+        "p2p_vector",
+        "p2p_datos",
+        "p2p_anon",
+        "p2p_architecton",
+        "p2p_helios"
+      ],
+      "role_count": 8,
+      "real_execution_count": 8,
+      "per_role_fields": "verdict=VERIFIED, execution_ok=true, marker_printed=true, distinct session_id/dispatch_id/attestation_fingerprint/contract_digest per role, rejection_reasons=[]",
+      "host_family": "Codex CLI (platform-minted session IDs)",
+      "host_count": 1,
+      "multihost": "NOT_PROVEN",
+      "replay_protection": "8 distinct dispatch_id + 8 distinct attestation_fingerprint; reuse fails closed",
+      "evidence_timestamp": "2026-08-19T08:55:00Z"
+    },
+    "module_canonicality": {
+      "role_bridge.py": {
+        "classification": "B_ALREADY_PRESENT_EQUIVALENT",
+        "canonical_sha_prefix": "6d8880be42db",
+        "lane_sha_prefix": "dde0e527877b",
+        "note": "canonical byte-identical across FW01 branch + v2 asset; lane variant = superset with optional attestation"
+      },
+      "role_receipt.py": {
+        "classification": "B_ALREADY_PRESENT_EQUIVALENT",
+        "canonical_sha_prefix": "55e607f6e7c5",
+        "lane_sha_prefix": "ec619b021bca"
+      },
+      "role_verifier.py": {
+        "classification": "B_ALREADY_PRESENT_EQUIVALENT",
+        "canonical_sha_prefix": "963c2012755f",
+        "lane_sha_prefix": "81e206c6bb2f"
+      },
+      "host_attestation.py": {
+        "classification": "C_LANE_ONLY",
+        "canonical_presence": "ABSENT from FW01 branch + v2 artifact",
+        "lane_sha256_prefix": "c7d684eb2be2ef5e"
+      }
+    },
+    "historical_c36_preserved": {
+      "branch": "p2p-c36-evidence-bound-context-efficiency @ b2d93e487cbb",
+      "terminal_verdict": "PASS / EVIDENCE_BOUND_CONTEXT_EFFICIENCY_READY",
+      "candidate_sha256": "c8915363462d12cde7e3a3db398bbd7a2457755bacb1a0f64274d8559fe354c5",
+      "promotion_status": "UNPROMOTED",
+      "status": "PRESERVED_UNTOUCHED"
+    },
+    "c02_truth": "GIA_C02_HISTORICAL_CLOSURE_EVIDENCE_INCOMPLETE (PRODUCT_TEST_DURABLE_EVIDENCE=INCOMPLETE; HISTORICAL_CLOSURE_EVENT=PRESERVED)",
+    "zero_contact_probe": {
+      "result": "CURRENT_AUTH_STATE=UNKNOWN_NOT_PROBED",
+      "codex_cli_available": false,
+      "no_credentials_requested": true,
+      "no_owner_login_requested": true,
+      "certification_does_not_imply_current_eligibility": true
+    },
+    "canonical_candidate_policy": {
+      "terminal_status": "PASS (this goal)",
+      "change_signals": {
+        "runtime_changed": false,
+        "governance_changed": true,
+        "release_artifact_changed": false
+      },
+      "policy_result": "CANDIDATE_REQUIRED=YES (per p2p_goal_closure.candidate_policy)"
+    },
+    "boundary_guards": {
+      "no_framework_02_start": true,
+      "no_gt_gp_mutation": true,
+      "no_rerun_council_or_c02": true,
+      "no_rewrite_historical_verdict": true,
+      "no_git_history_rewrite": true,
+      "no_promotion": true
+    }
+  }
+}
