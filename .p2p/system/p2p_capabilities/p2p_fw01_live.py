@@ -14,6 +14,7 @@ BLOCKED_EXTERNAL_AUTH_OR_PROVIDER (never fabricated).
 """
 import hashlib
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -21,19 +22,41 @@ from pathlib import Path
 P2P_SYSTEM = Path(__file__).resolve().parent
 sys.path.insert(0, str(P2P_SYSTEM))
 
-API_KEY_PATH = Path("/home/ubuntu/.secrets/manus_api_key_new")
-EVIDENCE_DIR = Path("/home/ubuntu/p2p-repo/docs/p2p-development/research/framework-01/live-e2e")
+API_KEY_PATHS = [
+    Path(path) for path in (
+        os.environ.get("MANUS_API_KEY_FILE", ""),
+        os.environ.get("P2P_SECRETS_DIR", "") and (
+            Path(os.environ["P2P_SECRETS_DIR"]) / "manus_api_key_new"),
+        str(Path.home() / ".secrets" / "manus_api_key_new"),
+    ) if path
+]
 REQUEST_ID = "fw01-live-backend-leg"
+
+
+def _find_evidence_dir() -> Path:
+    """Resolve the live-E2E evidence directory without any hard-coded host
+    path: search upward from this module for the tracked research tree."""
+    marker = Path("docs") / "p2p-development" / "research" / "framework-01"
+    candidate = Path(__file__).resolve().parent
+    for _ in range(6):
+        root = candidate
+        if (root / marker / "live-e2e").is_dir():
+            return root / marker / "live-e2e"
+        candidate = candidate.parent
+        if candidate == candidate.parent:
+            break
+    return Path("docs") / "p2p-development" / "research" / "framework-01" / "live-e2e"
 
 
 def main() -> int:
     from p2p_capabilities.manus_adapter import ManusAdapter
 
-    evidence = EVIDENCE_DIR
+    evidence = _find_evidence_dir()
     evidence.mkdir(parents=True, exist_ok=True)
 
+    key_path = next((path for path in API_KEY_PATHS if path.exists()), None)
     # --- 1. Auth availability (honest gate) ---
-    if not API_KEY_PATH.exists():
+    if key_path is None:
         out = {
             "leg": "FW01_LIVE_E2E",
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -44,7 +67,7 @@ def main() -> int:
         print(json.dumps(out, indent=2, ensure_ascii=False))
         return 0
 
-    key = API_KEY_PATH.read_text(encoding="utf-8").strip()
+    key = key_path.read_text(encoding="utf-8").strip()
     adapter = ManusAdapter(api_key=key)
 
     # --- 2. Owner intent (canonical phrase) ---
