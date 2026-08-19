@@ -21,7 +21,7 @@ All 38 acceptance-bar items of P2P-FRAMEWORK-01 were met by machine evidence. No
 | Branch | `p2p-framework-01-autonomous-operating-loop` |
 | Implementation commit (FW00 non-self-reference precedent) | `e972923d3a66f53718d6be825dc433faa44fd9e5` |
 | Closure commit | `2b6e86bdeba005f27d987756f2cedf76d3e07ba7` — extends `e972923` (guard fix + recovery record + regression test); parent relationship verified by `git log`; this SHA recorded AFTER the commit was pushed, in a single one-way write (no amend loop) |
-| Draft PR | stacked on `p2p-framework-00-product-memory` (correct lineage); **not merged** |
+| Draft PR | [#19](https://github.com/7roger89-web/P2P-upgrade-github-1/pull/19), stacked on `p2p-framework-00-product-memory` (correct lineage); **not merged** |
 | Merge / promotion / release / deploy | None. Explicitly STOPPED before FRAMEWORK-02. |
 
 ## 3. What was built (REUSE → EXTEND → CREATE)
