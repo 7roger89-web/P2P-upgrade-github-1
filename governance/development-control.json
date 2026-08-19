@@ -891,6 +891,20 @@
     "no transcripts-as-state"
    ],
    "artifact_path": "reports/candidates/combined-canonical-surface-candidate.zip"
+  },
+  {
+   "candidate_id": "FW02",
+   "candidate_version": "8.4.7-C-codex.26",
+   "embedded_version": "8.4.7-C-codex.26",
+   "candidate_label": "fw02-capability-intelligence-8.4.7-C-codex.26",
+   "promotion_status": "UNPROMOTED",
+   "candidate_sha256": "7d9d1f0b115009bd78cf377577d8bd24b38b5c03cb48874a71e4768699cdc591",
+   "based_on_official_version": "8.4.7-C-codex.25",
+   "based_on_official_sha256": "c0b485bd66587fa9b30bd355c99dcd50045a8f217b4eb3dcc58c75620263c8a8",
+   "development_goal": "FW02_CAPABILITY_INTELLIGENCE",
+   "built": true,
+   "artifact_path": "reports/candidates/fw02-capability-intelligence-candidate.zip",
+   "notes": "Capability intelligence layer inside FW01 — no competing router. Predecessor 8.4.7-C-codex.25 (COMBINED-CANONICAL-SURFACE) preserved verbatim UNPROMOTED. No promotion, no release. FW03 not started (Owner gate)."
   }
  ],
  "capability_status": [
@@ -2072,7 +2086,7 @@
     "title": "Project & Capability Intelligence — task -> required capabilities -> multi-source capability providers -> bounded skill selection -> coverage/eligibility/freshness fail-closed -> decision trace -> FW01 handoff; installed-project read-only shadow eval PASS on GT and GP",
     "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-02-terminal-report.md; .p2p/system/p2p_capabilities/capability_intelligence.py; .p2p/system/p2p_capabilities/tests/test_capability_intelligence.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py (coverage gate hook); /tmp/fw02_shadow_eval/fw02-shadow-eval.json",
     "artifact_ref": "p2p-framework-02-capability-intelligence",
-    "commit": "1e242c6",
+    "commit": "07d9400",
     "notes": "Layer inside FW01 — no competing router/orchestrator. candidate_policy per closure machinery (separate step). No promotion, no release, no deploy. Predecessor candidate 8.4.7-C-codex.25 (c0b485bd...) UNPROMOTED preserved verbatim. Stops before FRAMEWORK-03 execution."
    },
    {
