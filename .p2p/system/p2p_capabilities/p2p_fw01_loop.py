@@ -304,8 +304,24 @@ class Fw01Loop:
         boundaries honored (ACTIVE != LIVE_CERTIFIED)."""
         task_id = str(task_record.get("task_id", ""))
         team = list(task_record.get("team", ()))
-        role_class = ("SMALL_REVIEW_SET" if len(team) > 1
-                      else "SINGLE_ROLE")
+        # P2P-FRAMEWORK-03: when the evidence-backed adaptive team
+        # decision hook ran above, honor its deterministic mode as the
+        # role class; without a FW03 decision, behavior is byte-identical
+        # to the pre-FW03 rule.
+        _fw03_role_class = None
+        try:
+            _fw03_d = task_record.get("fw03_decision")
+            if isinstance(_fw03_d, dict) and str(
+                    _fw03_d.get("team_mode", "")) in (
+                    "SINGLE_ROLE", "SMALL_TEAM", "COUNCIL"):
+                _fw03_role_class = str(_fw03_d["team_mode"])
+        except Exception:
+            _fw03_role_class = None
+        if _fw03_role_class is not None:
+            role_class = _fw03_role_class
+        else:
+            role_class = ("SMALL_REVIEW_SET" if len(team) > 1
+                          else "SINGLE_ROLE")
         return {"task_id": task_id, "role_class": role_class,
                 "team": team, "participant_count": len(team)}
 
@@ -410,6 +426,56 @@ class Fw01Loop:
         _rec_with_handoff = dict(rec, task_id=task_id)
         if _fw02_handoff is not None:
             _rec_with_handoff["capability_requirements"] = _fw02_handoff
+        # P2P-FRAMEWORK-03 — adaptive team & council intelligence.
+        # Deterministic, evidence-backed, info-only at decision
+        # time: fail-closed gates below keep enforcement authority.
+        # FW03 enriches the record the EXISTING select_role_team
+        # surface consumes (no duplicate router, no second loop).
+        _fw03_decision = None
+        try:
+            from p2p_capabilities import team_intelligence as _ti
+            _fw03_registry = _ti.load_registry()
+            _fw03_requirements = (
+                tuple(r.capability_id for r in _fw02_reqs
+                      if r.is_required())
+                if _fw02_handoff is not None and _fw02_reqs
+                else ())
+            _fw03_task_class = str(rec.get("task_risk_class")
+                                   or "LOW")
+            _fw03_mutation = str(rec.get("mutation_class")
+                                 or "READ_ONLY")
+            _fw03_decision = _ti.build_team_decision(
+                required_capabilities=_fw03_requirements,
+                registry_records=_fw03_registry,
+                live_required=True,
+                task_risk_class=_fw03_task_class,
+                mutation_class=_fw03_mutation,
+                fan_out_bound=8)
+            self._trace(task_id, {"mutation_class": "READ_ONLY",
+                          "permission": "",
+                          "verification": "REQUIRED"},
+                      "ADAPTIVE_TEAM_DECISION",
+                      "mode=" + _fw03_decision.team_mode +
+                      " participants=" +
+                      str(len(_fw03_decision.participant_roles)) +
+                      " provided=" +
+                      str(len(_fw03_decision.provided_capabilities)) +
+                      " trace_items=" +
+                      str(len(_fw03_decision.decision_trace)))
+        except Exception:
+            _fw03_decision = None
+        if _fw03_decision is not None:
+            _existing_team = tuple(
+                _rec_with_handoff.get("team") or ())
+            _rec_with_handoff["team"] = tuple(dict.fromkeys(
+                list(_existing_team) + list(
+                    _fw03_decision.participant_roles)))
+            _rec_with_handoff["role_class"] = (
+                _fw03_decision.team_mode)
+            _rec_with_handoff["provided_capabilities"] = (
+                _fw03_decision.provided_capabilities)
+            _rec_with_handoff["fw03_decision"] = (
+                _fw03_decision.to_dict())
         role_team = self.select_role_team(_rec_with_handoff)
         target = self.builder.registry_targets[0] if self.builder.registry_targets else None
 
