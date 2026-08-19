@@ -2,10 +2,14 @@
 
 **GOAL_ID:** P2P-FRAMEWORK-01
 **GOAL_TERMINAL_STATUS:** PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY
-**CANDIDATE_REQUIRED:** YES (exactly one deterministic UNPROMOTED candidate minted; NO promotion, NO release)
-**CANDIDATE_STATUS:** MINTED, UNPROMOTED — one candidate: `P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip` (`reports/candidates/`)
+**CANDIDATE_REQUIRED:** YES (exactly one deterministic candidate minted per contract)
+**PROMOTION_STATUS (Owner-authorized 2026-08-19):** PROMOTED_OWNER_VERIFIED — RELEASED — published as GitHub release tag `p2p-8.4.7-C-codex.24-fw01-v1` (release 372798382)
+**PROMOTION_EVIDENCE:** approval `governance/approvals/P2P-APR-20260819T043000Z-fw01-promote-release.json` (sha256 `637938c5527371c433e73ef45c6bf6e128ba0c2078f83f53604279c84979f75f`, hash-bound to candidate `eb396dc1`) + `docs/p2p-development/research/framework-01/evidence/fw01-release-final.json`
+**RELEASE_SCOPE:** Game Truyen + Gia Pha + equivalent already-proven project profiles; Logistics `DO_NOT_INSTALL_YET`; NO production project mutated; NO Supabase mutation; NO deploy; NO project upgrade performed in this goal
+**NOT IMPLIED:** `LIVE_COUNCIL_8_OF_8 = NOT_PROVEN` (kept); adaptive skill selection NOT claimed proven (FRAMEWORK-02 not started); `SESSION_DEATH_RECOVERY = NOT_PROVEN` (kept); no background autonomy; no Logistics support
+**CANDIDATE_STATUS:** PROMOTED, RELEASED — one candidate: `P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip` (`reports/candidates/`)
 **CANDIDATE_SHA256:** `eb396dc17bd5cfb7c67a80ceff43ccd9050a6bd6fde25afe5919425d100d3d7d` (deterministic rebuild identical; verify PASS; evidence `docs/p2p-development/research/framework-01/evidence/fw01-candidate-mint.json`; governance record `FW01`)
-**RECORDED_AFTER_COMMIT:** f661dd583d5a793c318764755f31848cdce307da (p2p-framework-01-autonomous-operating-loop)
+**RECORDED_AFTER_COMMIT:** 4156fa8017e092beb905fb30faa8ed0129d0d727 (p2p-framework-01-autonomous-operating-loop)
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "goal": "P2P-FRAMEWORK-01",
   "type": "normalization-regression",
-  "recorded_utc": "2026-08-19T03:54:34.320081+00:00",
+  "recorded_utc": "2026-08-19T04:33:48.368463+00:00",
   "baseline": "clean HEAD (stashed 88311cb working tree)",
   "branch": "p2p-framework-01-autonomous-operating-loop",
   "clean_head_failure_count": 7,
