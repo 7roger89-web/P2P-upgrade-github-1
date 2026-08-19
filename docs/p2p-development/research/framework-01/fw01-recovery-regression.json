@@ -1,0 +1,11 @@
+{
+  "goal": "P2P-FRAMEWORK-01",
+  "type": "recovery-regression-differential",
+  "baseline_commit": "e972923d3a66f53718d6be825dc433faa44fd9e5",
+  "baseline_failures": 45,
+  "branch_failures": 45,
+  "new_failures": [],
+  "fixed_from_baseline": [],
+  "NEW_UNEXPLAINED_FAILURES": 0,
+  "explanation": "Recovery-only change set: adds closure self-reference guard regression test (4 passing), recovery record, lineage fill semantics. No runtime or regression surface change; failure sets identical except for the intentionally added passing test."
+}

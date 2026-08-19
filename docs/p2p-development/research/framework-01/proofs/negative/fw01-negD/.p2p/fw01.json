@@ -1,0 +1,21 @@
+{
+  "current_task": null,
+  "dependencies": [],
+  "evidence_pointers": [],
+  "execution_attempts": {},
+  "goal_id": "fw01-proof-goal",
+  "guard_state_hash": null,
+  "last_safe_checkpoint": "2026-08-19T01:50:02.605758+00:00",
+  "loop_status": "STOPPED",
+  "mutation_state": "UNCHANGED",
+  "next_safe_action": "STOP",
+  "owner_gate": null,
+  "project_binding": "docs/p2p-development/research/framework-01/proofs/negative/fw01-negD",
+  "project_revision": "fixture-head-1",
+  "schema": "p2p-fw01-checkpoint/1",
+  "state_ref": ".p2p/fw01.json",
+  "task_revision": null,
+  "task_status": "NOT_VERIFIED",
+  "updated_utc": "2026-08-19T01:50:02.605765+00:00",
+  "verification_state": "NOT_VERIFIED"
+}

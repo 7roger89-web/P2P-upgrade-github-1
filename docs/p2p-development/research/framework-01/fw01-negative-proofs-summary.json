@@ -1,0 +1,59 @@
+{
+    "goal": "P2P-FRAMEWORK-01",
+    "type": "negative-proofs",
+    "verdicts": {
+        "fw01-negA": {
+            "loop_status": "STOPPED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "STOP",
+            "verification_state": "NOT_VERIFIED"
+        },
+        "fw01-negB": {
+            "loop_status": "CHECKPOINTED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "B",
+            "verification_state": null
+        },
+        "fw01-negC": {
+            "loop_status": "CHECKPOINTED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "D",
+            "verification_state": null
+        },
+        "fw01-negD": {
+            "loop_status": "STOPPED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "STOP",
+            "verification_state": "NOT_VERIFIED"
+        },
+        "fw01-negE": {
+            "loop_status": "CHECKPOINTED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "D",
+            "verification_state": null
+        },
+        "fw01-negF": {
+            "loop_status": "CHECKPOINTED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "A",
+            "verification_state": null
+        },
+        "fw01-negI": {
+            "loop_status": "CHECKPOINTED",
+            "mutation_state": "UNCHANGED",
+            "next_safe_action": "D",
+            "verification_state": null
+        },
+        "fw01-negJ": {
+            "fixture_state_file": "INTENTIONALLY_CORRUPT",
+            "meaning": "fail-closed: loop refuses to run on unreadable state"
+        },
+        "fw01-negG": {
+            "eligible_set": [],
+            "no_false_support_claim": "VERIFIED",
+            "verdict": "VERIFIED",
+            "mechanism": "eligible_skills(Path('/nonexistent-registry')) -> empty set -> bounded fallback, no false support claim",
+            "rerun_evidence": "docs/p2p-development/research/framework-01/evidence/fw01-negG-rerun-evidence.json"
+        }
+    }
+}

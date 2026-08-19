@@ -288,7 +288,8 @@ def _install_files(project_root: Path, package_dir: Path, install_class: str,
         "package_label": manifest["package_label"],
         "installed_at": manifest["installed_at"],
         "managed_file_count": manifest["managed_file_count"],
-        "snapshots": [{"stamp": st, "location": str(backup_system)}] if system.exists() else [],
+        "snapshots": [{"stamp": st, "location": str(backup_system)}]
+        if system.exists() and backup_system.exists() else [],
         "protected_state_hashes": {},
         "changed_files": [],
     }

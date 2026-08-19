@@ -1,0 +1,42 @@
+{
+  "goal": "P2P-FRAMEWORK-01",
+  "type": "recovery-record",
+  "recorded_at": "2026-08-19",
+  "incident": {
+    "server_error": "10091 (Manus server error; session interrupted mid-goal, after implementation commit e972923 had landed)",
+    "closure_self_reference_loop": {
+      "description": "The closure script embedded git rev-parse HEAD into the terminal report and governance, then amended that same commit — each amend changed HEAD, requiring another fill: an unbounded self-referential loop, plus repeated amend/push cycles.",
+      "mechanism": "tracked files recorded the SHA of the commit being amended; each amend invalidated the recorded SHA",
+      "root_cause": "self-referential git ancestry: a commit embedded a reference to its own future SHA (impossible to stabilize)",
+      "resolution": "Non-self-referential lineage model adopted (per FW00 precedent): the terminal report and governance record IMPLEMENTATION_COMMIT e972923 (the commit carrying implementation + proofs), written at report time and never embedded again. The final closure commit records e972923 as its parent and is itself verified only by git log at read time; its own SHA is deliberately NOT embedded in any tracked file.",
+      "guard": "fill script reads its target from .tmp/fw01_lineage_sha.txt, never from git rev-parse HEAD, and rejects any target equal to current HEAD (SELF_REFERENCE_GUARD, deterministic). Guard is protected by tests/test_p2p_fw01_closure_no_self_reference.py (4/4 PASS).",
+      "status": "RESOLVED"
+    }
+  },
+  "evidence_classification": {
+    "primary_e2e_proof": "VALID",
+    "negative_proofs_A_F_I": "VALID (persisted artifacts, JSON parseable, verdicts VERIFIED)",
+    "negative_proof_G": "RERUN (artifact not persisted; deterministic rerun -> no_false_support_claim=VERIFIED)",
+    "negative_proof_H": "RERUN (artifact not persisted; deterministic rerun -> no_fake_8_of_8=VERIFIED)",
+    "negative_proof_J": "VALID (fw01.json INTENTIONALLY_CORRUPT is itself the fail-closed proof)",
+    "restart_proof": "VALID",
+    "live_backend_leg": "VALID (task T5tQPyCaLxrSZtAKPpKFjg, stopped, credit_usage=0, READ_ONLY_NO_MUTATION)",
+    "discovery_game_truyen": "VALID",
+    "discovery_gia_pha": "VALID",
+    "regression_differential": "VALID (NEW_UNEXPLAINED_FAILURES=0 at both baselines 8b751f6 and e972923)",
+    "doctor_fresh_candidate_governance": "VALID"
+  },
+  "lineage": {
+    "implementation_commit": "e972923d3a66f53718d6be825dc433faa44fd9e5",
+    "implementation_parent": "33aa50b46166f2ec14906f1c5f142328a24bcd0d (FW00 tip, verified)",
+    "branch": "p2p-framework-01-autonomous-operating-loop",
+    "transient_shas_during_loop": [
+      "3efe61cadc43196007efc3073f2bb8b6b95f1451",
+      "748deddc9101e00e0462b3756e65e3e2c7f4c94d",
+      "339f2ffc131795a5acf799237184092955e4d7f5"
+    ],
+    "transient_shas_note": "All three exist as orphan commits in the amend chain; none is the final truth. Final implementation commit = e972923."
+  },
+  "terminal_verdict": "PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY",
+  "candidate_policy": "YES (declare-only; exactly one deterministic UNPROMOTED candidate may be minted)"
+}

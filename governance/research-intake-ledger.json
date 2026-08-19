@@ -52,6 +52,48 @@
       "status": "RECONCILED",
       "evidence_ref": "docs/p2p-development/framework/capability-skill-map.md (NUI row); docs/p2p-development/framework/_skill-inventory-raw.json (NUI skill dir metadata)",
       "machinery_rule": "Provenance classification follows the capability ledger vocabulary: repository-evidenced claims stay ADAPTED/VERIFIED as they were; claims with no matching repository artifact are PROVENANCE_NOT_RECOVERED (not evidence-of-absence) and remain NOT_PROVEN until recovered or disproven. Not REJECTED."
+    },
+    {
+      "id": "RI-004",
+      "subject": "DeepSeek Harness (DSH) / plugin architecture claims",
+      "classification": "PENDING_OWNER_APPROVAL",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — DeepSeek Harness / plugin architecture claims",
+      "scope": "DSH public claims (150k stars / four-day release / Cordis identity): classification NOT_VERIFIED — no repository or web provenance artifact for the specific claims exists in durable evidence (verified by full-text repository search; no DSH evidence files or decision records present in docs/, governance/, manifest/); the repo's pre-existing research_decisions entry 'DeepSeek Harness (DEFERRED, C11-scoped)' covers the general subject but not these claims. Everything-is-plugin: ADAPT_SELECTIVELY (Owner instruction; map selectively to existing P2P governance rather than wholesale adoption). Hot reload: candidate idea GOVERNED_HOT_SWAP / safe quiescent-boundary activation. Open plugin market: DEFER / SECURITY_GATED.",
+      "status": "PENDING_OWNER_APPROVAL",
+      "evidence_refs": [
+        "/home/ubuntu/upload/pasted_content_3.txt (Owner directive section 10)",
+        "governance/development-control.json research_decisions 'DeepSeek Harness' (DEFERRED)",
+        "docs/p2p-development/reports/P2P-C35R-terminal-report.md (execution-harness audit precedent: P2P stays out of raw execution-harness layer; selective concept adaptation only)"
+      ],
+      "machinery_rule": "Specific public claims without repository/web provenance are NOT_VERIFIED by machinery (no evidence-of-absence claim; they remain NOT_PROVEN until provenance is recovered or disproven) — same provenance discipline as the NUI '174 faculties' reconciliation (RI-003)."
+    },
+    {
+      "id": "RI-005",
+      "subject": "Community 13-step Codex efficiency workflow",
+      "classification": "PENDING_OWNER_APPROVAL",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — community 13-step Codex efficiency workflow",
+      "scope": "Community-derived 13-step Codex efficiency workflow. Per Owner instruction: do NOT copy the workflow literally; instead map its concepts to existing P2P capabilities and framework gaps (concept-to-capability mapping intake). No community source artifact is stored in durable evidence today; intake records the concept-mapping request, not the workflow text.",
+      "status": "PENDING_OWNER_APPROVAL",
+      "evidence_refs": [
+        "/home/ubuntu/upload/pasted_content_3.txt (Owner directive section 10)"
+      ],
+      "machinery_rule": "Research-only intake: no vendoring into .p2p/system without a goal milestone with its own contract (intake_rule). Adaptation decisions are made per-step against the existing capability ledger (docs/p2p-development/capability-ledger/) rather than as a wholesale import."
+    },
+    {
+      "id": "RI-006",
+      "subject": "Capability Intelligence concept (FRAMEWORK-02 product direction)",
+      "classification": "PENDING_OWNER_APPROVAL",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — Capability Intelligence concept; set FRAMEWORK-02 likely_next name 'P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE' without starting it",
+      "scope": "Accepted product direction for FRAMEWORK-02: TASK -> REQUIRED_CAPABILITIES -> eligible skill/tool/retriever/model/backend/etc. Skill is only ONE capability source. Intake records the direction only; FRAMEWORK-02 remains NOT_STARTED and this directive explicitly forbids starting it.",
+      "status": "PENDING_OWNER_APPROVAL",
+      "evidence_refs": [
+        "/home/ubuntu/upload/pasted_content_3.txt (Owner directive section 10)",
+        "docs/p2p-development/framework/master-roadmap.md (FRAMEWORK-02 row, NOT_STARTED)"
+      ],
+      "machinery_rule": "Product-direction intake: no implementation, no runtime change. Execution requires a future FRAMEWORK-02 goal contract approved by the Owner."
     }
   ],
   "inherited_decisions": {
@@ -69,5 +111,6 @@
     ]
   },
   "intake_rule": "New research intake requests are appended to this ledger before any research work begins. The Owner decides classification. Research-only subjects never become runtime dependencies (no vendoring into .p2p/system without a goal milestone with its own contract).",
-  "last_reviewed": "2026-08-19"
+  "last_reviewed": "2026-08-19",
+  "intake_rule_note": "RI-004..RI-006 persisted at FW01 closure normalization per Owner directive section 10; full consolidation delegated to FRAMEWORK-02 opening. Entries are durable pending intake: nothing is executed until the Owner opens and approves the corresponding goal."
 }

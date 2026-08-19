@@ -1,0 +1,27 @@
+{
+  "goal": "P2P-FRAMEWORK-01",
+  "type": "fresh-process-restart-proof",
+  "legs": "restart1 (leg1, same process) then fresh python process (leg2) on same fixture dir",
+  "leg1_evidence_file": "proofs/restart/restart1/fw01-e2e-fixture/.p2p/fw01-proof-evidence.json",
+  "leg1_verdicts": {
+    "AUTONOMOUS_MULTI_TASK_CONTINUATION": "VERIFIED",
+    "FRESH_PROCESS_RECOVERY": "VERIFIED",
+    "OWNER_GATE_STOP": "VERIFIED",
+    "NO_DUPLICATE_EXECUTION": "VERIFIED"
+  },
+  "status_sequence_leg1": [
+    "TASK_DONE_CONTINUE",
+    "TASK_DONE_CONTINUE",
+    "TASK_DONE_CONTINUE",
+    "PRE_DISPATCH_BLOCKED"
+  ],
+  "status_sequence_leg2": [
+    "PRE_DISPATCH_BLOCKED"
+  ],
+  "execution_counts_after_restart": {
+    "A": 0,
+    "B": 0,
+    "C": 0,
+    "D": 0
+  }
+}

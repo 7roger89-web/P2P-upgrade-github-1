@@ -1,0 +1,62 @@
+{
+  "project": "GAME_TRUYEN",
+  "project_dir": "/home/ubuntu/game-truyen-production",
+  "intent": "Tiếp tục hoàn thiện dự án bằng P2P.",
+  "fresh_process_invoked": true,
+  "entry_cli": "/home/ubuntu/game-truyen-production/.p2p/system/p2p_entry.py",
+  "returncode": 2,
+  "cli_leg_worked": false,
+  "before_git": {
+    "head": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+    "dirty": true,
+    "dirty_files": [
+      "docs/p2p-development/"
+    ]
+  },
+  "after_git": {
+    "head": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+    "dirty": true,
+    "dirty_files": [
+      "docs/p2p-development/"
+    ]
+  },
+  "source_level_mutated": false,
+  "entry_event": {
+    "raw_error": "/usr/bin/python3: can't open file '/home/ubuntu/game-truyen-production/.p2p/system/p2p_entry.py': [Errno 2] No such file or directory\n",
+    "fallback_via_repo_entry": {
+      "schema": "p2p-entry-event-fw01/1",
+      "project_root": "/home/ubuntu/game-truyen-production",
+      "discovery": {
+        "installed": true,
+        "project_root": "/home/ubuntu/game-truyen-production",
+        "marker": "/home/ubuntu/game-truyen-production/.p2p/system/p2p-install-manifest.json",
+        "package_version": "8.4.7-C-codex.24",
+        "install_class": "COLLISIONS_BACKED_UP_INSTALL",
+        "managed_file_count": 1380
+      },
+      "binding": {
+        "project_root": "/home/ubuntu/game-truyen-production",
+        "current_revision": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+        "binding_git_revision": null,
+        "binding_status": "CURRENT",
+        "binding_recovery": "OK",
+        "live_inventory": {
+          "file_inventory_sha256": "8f3c990917e52c4a7fe97e490f0824ea96a3ba9ec5377d4dfe39c8a0110eb57c",
+          "file_count": 604
+        }
+      },
+      "intent": {
+        "schema": "p2p-owner-intent-fw01/1",
+        "project_root": "/home/ubuntu/game-truyen-production",
+        "raw_text_sha256": "e25575c795ea28de2ef0c007e018d30a3a7a3ac332a41c2e9166285bf0455633",
+        "intent_id": "CONTINUE_PROJECT",
+        "confidence": "CANONICAL",
+        "recorded_utc": "2026-08-19T01:32:20.435721+00:00"
+      },
+      "entry_result": "OK",
+      "no_rebriefing_required": true,
+      "recorded_utc": "2026-08-19T01:32:20.436087+00:00"
+    }
+  },
+  "RELEASE_REQUIRED_FOR_PROJECT_USE": true
+}

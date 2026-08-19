@@ -1,0 +1,24 @@
+{
+  "current_task": null,
+  "dependencies": [],
+  "evidence_pointers": [],
+  "execution_attempts": {
+    "identical_attempts": 0,
+    "retry_remaining": -1
+  },
+  "goal_id": "fw01-proof-goal",
+  "guard_state_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "last_safe_checkpoint": "2026-08-19T01:50:02.649192+00:00",
+  "loop_status": "CHECKPOINTED",
+  "mutation_state": "UNCHANGED",
+  "next_safe_action": "A",
+  "owner_gate": null,
+  "project_binding": "docs/p2p-development/research/framework-01/proofs/negative/fw01-negF",
+  "project_revision": "fixture-head-1",
+  "schema": "p2p-fw01-checkpoint/1",
+  "state_ref": ".p2p/fw01.json",
+  "task_revision": null,
+  "task_status": null,
+  "updated_utc": "2026-08-19T01:50:02.649196+00:00",
+  "verification_state": null
+}

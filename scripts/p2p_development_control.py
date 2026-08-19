@@ -228,8 +228,28 @@ def _validate_candidates(control: dict[str, Any], baseline: dict[str, Any]) -> N
         embedded_version = _nonempty_string(candidate.get("embedded_version"), f"candidate {candidate_id}.embedded_version")
         _version_key(candidate_version, f"candidate {candidate_id}.candidate_version")
         _version_key(embedded_version, f"candidate {candidate_id}.embedded_version")
-        _require(candidate.get("candidate_sha256") and re.fullmatch(r"[0-9a-f]{64}", str(candidate.get("candidate_sha256"))) is not None, "LINEAGE_HASH", f"candidate {candidate_id} SHA-256 is invalid")
-        _require(candidate.get("promotion_status") in {"UNPROMOTED", "PROMOTED_VERIFIED", "REJECTED"}, "LINEAGE_STATUS", f"candidate {candidate_id} has an invalid promotion status")
+        _candidate_sha = str(candidate.get("candidate_sha256") or "")
+        _never_built = candidate.get("built") is False
+        _anchor = candidate.get("lineage_anchor_sha256")
+        _sha_valid = bool(re.fullmatch(r"[0-9a-f]{64}", _candidate_sha))
+        _placeholder_ok = _never_built and _candidate_sha == "TO_BE_FILLED" and isinstance(_anchor, str) and bool(re.fullmatch(r"[0-9a-f]{64}", _anchor))
+        _require(_sha_valid or _placeholder_ok, "LINEAGE_HASH", f"candidate {candidate_id} SHA-256 is invalid (real digest required; TO_BE_FILLED only for never-built records with a lineage_anchor_sha256)")
+
+        _require(candidate.get("promotion_status") in {"UNPROMOTED", "PROMOTED_VERIFIED", "PROMOTED_OWNER_VERIFIED", "REJECTED"}, "LINEAGE_STATUS", f"candidate {candidate_id} has an invalid promotion status")
+        _anchor_sha = candidate.get("lineage_anchor_sha256")
+        if _anchor_sha is not None:
+            _require(isinstance(_anchor_sha, str) and bool(re.fullmatch(r"[0-9a-f]{64}", _anchor_sha)), "LINEAGE_ANCHOR", f"candidate {candidate_id} lineage_anchor_sha256 must be a 64-hex digest")
+            _anchor_note = candidate.get("lineage_anchor_note")
+            _require(isinstance(_anchor_note, str) and len(_anchor_note) > 0, "LINEAGE_ANCHOR", f"candidate {candidate_id} has an anchor without a note")
+        if candidate.get("promotion_status") == "PROMOTED_OWNER_VERIFIED":
+            _history = candidate.get("promotion_history")
+            _require(isinstance(_history, list) and len(_history) > 0, "OWNER_PROMOTION", f"promoted-by-owner candidate {candidate_id} requires a non-empty promotion_history")
+            _pa_sha = candidate.get("promoted_artifact_sha256")
+            _require(isinstance(_pa_sha, str) and bool(re.fullmatch(r"[0-9a-f]{64}", _pa_sha)), "OWNER_PROMOTION", f"promoted-by-owner candidate {candidate_id} promoted_artifact_sha256 must be a 64-hex digest")
+            _event = _history[0]
+            _approval = _event.get("approval_record")
+            _require(isinstance(_approval, str) and _approval.startswith("approvals/"), "OWNER_PROMOTION", f"promoted-by-owner candidate {candidate_id} first promotion event must reference a governance approval record")
+
         if candidate.get("promotion_status") == "PROMOTED_VERIFIED":
             _require(candidate_version == baseline.get("version"), "PROMOTION_LINEAGE", f"promoted candidate {candidate_id} is not the official version")
             _require(embedded_version == baseline.get("version"), "PROMOTION_LINEAGE", f"promoted candidate {candidate_id} has a mismatched embedded version")

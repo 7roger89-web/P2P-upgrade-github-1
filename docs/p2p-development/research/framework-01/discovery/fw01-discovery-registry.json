@@ -1,0 +1,142 @@
+{
+  "leg": "FW01_INSTALLED_PROJECT_DISCOVERY",
+  "timestamp": "2026-08-19T01:32:20+0000",
+  "mode": "READ_ONLY",
+  "supabase_untouched": true,
+  "rls_untouched": true,
+  "all_source_clean": true,
+  "verdicts": {
+    "GAME_TRUYEN_NO_BRIEFING_RECOVERY": "NOT_PROVEN",
+    "GAME_TRUYEN_REPO_ENTRY_OVER_INSTALLED_SYSTEM": "VERIFIED",
+    "GIA_PHA_NO_BRIEFING_RECOVERY": "NOT_PROVEN",
+    "GIA_PHA_REPO_ENTRY_OVER_INSTALLED_SYSTEM": "VERIFIED"
+  },
+  "records": [
+    {
+      "project": "GAME_TRUYEN",
+      "project_dir": "/home/ubuntu/game-truyen-production",
+      "intent": "Tiếp tục hoàn thiện dự án bằng P2P.",
+      "fresh_process_invoked": true,
+      "entry_cli": "/home/ubuntu/game-truyen-production/.p2p/system/p2p_entry.py",
+      "returncode": 2,
+      "cli_leg_worked": false,
+      "before_git": {
+        "head": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+        "dirty": true,
+        "dirty_files": [
+          "docs/p2p-development/"
+        ]
+      },
+      "after_git": {
+        "head": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+        "dirty": true,
+        "dirty_files": [
+          "docs/p2p-development/"
+        ]
+      },
+      "source_level_mutated": false,
+      "entry_event": {
+        "raw_error": "/usr/bin/python3: can't open file '/home/ubuntu/game-truyen-production/.p2p/system/p2p_entry.py': [Errno 2] No such file or directory\n",
+        "fallback_via_repo_entry": {
+          "schema": "p2p-entry-event-fw01/1",
+          "project_root": "/home/ubuntu/game-truyen-production",
+          "discovery": {
+            "installed": true,
+            "project_root": "/home/ubuntu/game-truyen-production",
+            "marker": "/home/ubuntu/game-truyen-production/.p2p/system/p2p-install-manifest.json",
+            "package_version": "8.4.7-C-codex.24",
+            "install_class": "COLLISIONS_BACKED_UP_INSTALL",
+            "managed_file_count": 1380
+          },
+          "binding": {
+            "project_root": "/home/ubuntu/game-truyen-production",
+            "current_revision": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+            "binding_git_revision": null,
+            "binding_status": "CURRENT",
+            "binding_recovery": "OK",
+            "live_inventory": {
+              "file_inventory_sha256": "8f3c990917e52c4a7fe97e490f0824ea96a3ba9ec5377d4dfe39c8a0110eb57c",
+              "file_count": 604
+            }
+          },
+          "intent": {
+            "schema": "p2p-owner-intent-fw01/1",
+            "project_root": "/home/ubuntu/game-truyen-production",
+            "raw_text_sha256": "e25575c795ea28de2ef0c007e018d30a3a7a3ac332a41c2e9166285bf0455633",
+            "intent_id": "CONTINUE_PROJECT",
+            "confidence": "CANONICAL",
+            "recorded_utc": "2026-08-19T01:32:20.435721+00:00"
+          },
+          "entry_result": "OK",
+          "no_rebriefing_required": true,
+          "recorded_utc": "2026-08-19T01:32:20.436087+00:00"
+        }
+      },
+      "RELEASE_REQUIRED_FOR_PROJECT_USE": true
+    },
+    {
+      "project": "GIA_PHA",
+      "project_dir": "/home/ubuntu/gia-pha-production",
+      "intent": "Tiếp tục hoàn thiện dự án bằng P2P.",
+      "fresh_process_invoked": true,
+      "entry_cli": "/home/ubuntu/gia-pha-production/.p2p/system/p2p_entry.py",
+      "returncode": 2,
+      "cli_leg_worked": false,
+      "before_git": {
+        "head": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+        "dirty": true,
+        "dirty_files": [
+          ".codex/",
+          ".p2p/"
+        ]
+      },
+      "after_git": {
+        "head": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+        "dirty": true,
+        "dirty_files": [
+          ".codex/",
+          ".p2p/"
+        ]
+      },
+      "source_level_mutated": false,
+      "entry_event": {
+        "raw_error": "/usr/bin/python3: can't open file '/home/ubuntu/gia-pha-production/.p2p/system/p2p_entry.py': [Errno 2] No such file or directory\n",
+        "fallback_via_repo_entry": {
+          "schema": "p2p-entry-event-fw01/1",
+          "project_root": "/home/ubuntu/gia-pha-production",
+          "discovery": {
+            "installed": true,
+            "project_root": "/home/ubuntu/gia-pha-production",
+            "marker": "/home/ubuntu/gia-pha-production/.p2p/system/p2p-install-manifest.json",
+            "package_version": "8.4.7-C-codex.24",
+            "install_class": "FRESH_INSTALL",
+            "managed_file_count": 1371
+          },
+          "binding": {
+            "project_root": "/home/ubuntu/gia-pha-production",
+            "current_revision": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+            "binding_git_revision": null,
+            "binding_status": "CURRENT",
+            "binding_recovery": "OK",
+            "live_inventory": {
+              "file_inventory_sha256": "d59c32f49e7ae4db3c8cbe67ef2496336d2147425f513951838062dc590dc89b",
+              "file_count": 124
+            }
+          },
+          "intent": {
+            "schema": "p2p-owner-intent-fw01/1",
+            "project_root": "/home/ubuntu/gia-pha-production",
+            "raw_text_sha256": "e25575c795ea28de2ef0c007e018d30a3a7a3ac332a41c2e9166285bf0455633",
+            "intent_id": "CONTINUE_PROJECT",
+            "confidence": "CANONICAL",
+            "recorded_utc": "2026-08-19T01:32:20.747583+00:00"
+          },
+          "entry_result": "OK",
+          "no_rebriefing_required": true,
+          "recorded_utc": "2026-08-19T01:32:20.747973+00:00"
+        }
+      },
+      "RELEASE_REQUIRED_FOR_PROJECT_USE": true
+    }
+  ]
+}
