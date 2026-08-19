@@ -1,0 +1,46 @@
+{
+  "recorded_at": "2026-08-19T08:28:26Z",
+  "mandate_cycle": 2,
+  "fresh_l0_checks": {
+    "branch": "c36-real-host-binding",
+    "head": "9aeeedb49db8d95b83f0cee5e038c1340b131d26",
+    "working_tree_clean": true,
+    "c36_suite": "37/37 PASS",
+    "c35_regression": "57/57 PASS",
+    "iris_bundle_intact": true,
+    "gate_bundle_1_verified_7_pending": true
+  },
+  "fresh_l1_checks": {
+    "codex_login_status": "Not logged in",
+    "claude_version": "2.1.144 (still unauthenticated)",
+    "manus_observable_identity": false
+  },
+  "l2_one_role_e2e": {
+    "status": "NOT_RUN",
+    "reason": "Codex host remains logged out; no authorized real backend; local evidence file alone is insufficient; deterministic fake adapter is not counted as real."
+  },
+  "l3_second_heterogeneous_host": {
+    "status": "NOT_RUN",
+    "record": "MULTIHOST_LIVE_CERT_PENDING_EXTERNAL_UNAVAILABLE"
+  },
+  "l4_eight_role_proof": {
+    "status": "NOT_RUN",
+    "gate_condition": "requires at least one genuine real-backend p2p_iris execution first"
+  },
+  "l5_gate_j": {
+    "status": "NOT_RUN",
+    "frozen_evidence_valid": true,
+    "reason": "exact 8/8 real-attested PASS impossible with honest matrix 1/8; do not rerun expensive TEST suite; do not fabricate"
+  },
+  "l6_l7_l8": {
+    "certification_state": "P2P_C36_EXTERNAL_HOST_BLOCKED",
+    "gia_c02": "GIA_C02_READY_AFTER_C36_PROMOTION",
+    "promotion": "NOT_DONE",
+    "lg01": "NOT_STARTED"
+  },
+  "owner_action_required": [
+    "Log into Codex CLI on this machine (codex login), or",
+    "Provide a self-hosted / authorized local executor surface (e.g., a local LLM runtime the Owner controls) that can serve as a first real backend, or",
+    "Grant Manus platform-side identity observability (Owner-side, not self-reported from inside the sandbox)."
+  ]
+}

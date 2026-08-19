@@ -1,0 +1,31 @@
+{
+  "git_branch": "c36-real-host-binding",
+  "git_head": "9aeeedb49db8d95b83f0cee5e038c1340b131d26",
+  "git_status_s": "",
+  "git_log_oneline_2": "9aeeedb C36 live certification final: L0 recover PASS, L1 target discovery (Codex logged-out, Manus no observable identity, Claude no auth), L2/L3/L4 blocked by external auth, MULTIHOST_LIVE_CERT_PENDING_EXTERNAL_UNAVAILABLE, final verdicts P2P_C36_EXTERNAL_HOST_BLOCKED + GIA_C02_READY_AFTER_C36_PROMOTION, STOP before promotion\n8b22a51 C36 Independent Supervisor report (evidence): 37/37 green, 57/57 byte-identical regression, one-role iris live proof VERIFIED, Gate J 1 VERIFIED / 7 PENDING_HOST_ATTESTATION, candidate, STOP before promotion",
+  "c36_tests": "----------------------------------------------------------------------\nRan 37 tests in 0.123s\n\nOK\nC36_RUN=37 FAILURES=0 ERRORS=0",
+  "c36_last_lines": [
+    "Ran 37 tests in 0.123s",
+    "OK"
+  ],
+  "c35_regression": "----------------------------------------------------------------------\nRan 57 tests in 0.257s\n\nOK\nRUN=57 FAILURES=0 ERRORS=0",
+  "c35_last_lines": [
+    "Ran 57 tests in 0.257s",
+    "OK"
+  ],
+  "iris_bundle_exists": true,
+  "gate_bundle_exists": true,
+  "gate_bundle_verdicts": [
+    "p2p_iris=VERIFIED",
+    "p2p_tecton=PENDING_HOST_ATTESTATION",
+    "p2p_axiom=PENDING_HOST_ATTESTATION",
+    "p2p_vector=PENDING_HOST_ATTESTATION",
+    "p2p_datos=PENDING_HOST_ATTESTATION",
+    "p2p_anon=PENDING_HOST_ATTESTATION",
+    "p2p_architecton=PENDING_HOST_ATTESTATION",
+    "p2p_helios=PENDING_HOST_ATTESTATION"
+  ],
+  "codex_login_status": "Not logged in",
+  "claude_version": "2.1.144 (Claude Code)",
+  "codex_sessions_recent": "'Sort-Object' is not recognized as an internal or external command,\noperable program or batch file."
+}
