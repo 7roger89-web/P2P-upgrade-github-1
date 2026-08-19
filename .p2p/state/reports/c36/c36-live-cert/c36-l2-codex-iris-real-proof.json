@@ -1,0 +1,35 @@
+{
+  "phase": "L2",
+  "executed_at": "2026-08-19T08:49:04Z",
+  "real_execution": {
+    "host": "Codex CLI 0.147.0 (openai provider, sandbox read-only)",
+    "session_id": "01a0192c-bf0d-7c11-afa0-4a3bf387c647",
+    "contract_marker_printed_by_codex": true,
+    "tokens_used": 26529,
+    "working_directory": "D:\\AI\\P2P_dev\\P2P-upgrade-github"
+  },
+  "independent_evidence": {
+    "path": "D:\\AI\\P2P_dev\\P2P-upgrade-github\\.p2p\\state\\reports\\c36\\c36-live-cert\\codex-iris-evidence-001.json",
+    "digest": "c7bfdb18ca25a2b0a96a19f249185513498ae3eb2e8bac72321c3c419d2e2acc",
+    "source_is_codex_platform_record": false
+  },
+  "role_id": "p2p_iris",
+  "role_spec_digest": "919c5e0db433c275aeb5dd0d4c949a3d9ba6eed82d15483dbe4403714b7450f2",
+  "contract_digest": "a6adcb7b25bb476a16251ff04d379e3e5330c95397c59cbe70c72989cb087043",
+  "attestation": {
+    "fingerprint": "69f9018305bfd5b85f9936eaca11b14933a6c48025923b21cb19e54b66f28b4c",
+    "run_id": "c36:gia-pha-goal",
+    "dispatch_id": "b2df62125fcd804e2023cdca5c38b954f0d203f455d6c7a3e7e15fa944878151",
+    "execution_contract_digest": "a6adcb7b25bb476a16251ff04d379e3e5330c95397c59cbe70c72989cb087043",
+    "host_execution_identity": "01a0192c-bf0d-7c11-afa0-4a3bf387c647",
+    "host_kind": "codex"
+  },
+  "receipt": {
+    "verdict": "UNKNOWN",
+    "dispatch_id": "b2df62125fcd804e2023cdca5c38b954f0d203f455d6c7a3e7e15fa944878151"
+  },
+  "real_required_verification": {
+    "verdict": "VERIFIED",
+    "rejection_reasons": []
+  }
+}

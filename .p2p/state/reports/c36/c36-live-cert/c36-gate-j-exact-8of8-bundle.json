@@ -1,0 +1,118 @@
+{
+  "gate": "GATE_J_C36_REAL_HOST_BINDING",
+  "run_id": "c36:gia-pha-goal",
+  "subject": "Gia Phả Gate J run (same subject across all roles)",
+  "executed_at": "2026-08-19T09:08:36Z",
+  "host": "Codex CLI 0.147.0 (openai/gpt-5.6-luna), Owner Windows host, logged-in session",
+  "evidence_policy": "Only freshly recorded real executions on this run; deterministic/fake adapter proofs excluded",
+  "roles": [
+    {
+      "role": "p2p_iris",
+      "verdict": "VERIFIED",
+      "session_id": "01a0192c-bf0d-7c11-afa0-4a3bf387c647",
+      "evidence_digest": "c7bfdb18ca25a2b0a96a19f249185513498ae3eb2e8bac72321c3c419d2e2acc",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "69f9018305bfd5b85f9936eaca11b14933a6c48025923b21cb19e54b66f28b4c",
+      "dispatch_id": "b2df62125fcd804e2023cdca5c38b954f0d203f455d6c7a3e7e15fa944878151",
+      "contract_digest": "a6adcb7b25bb476a16251ff04d379e3e5330c95397c59cbe70c72989cb087043",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_tecton",
+      "verdict": "VERIFIED",
+      "session_id": "01a01942-6922-7d80-a3c5-20efdb9e674e",
+      "evidence_digest": "f90cb4bdf6ea6d67f3d5d917e20fe5263600d5e702d4afbff0d09b14bb43e9bb",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "d07ee7b5110c56c8fced4944eb236cbb8945f120ec42a1fe40f28f2482503f07",
+      "dispatch_id": "c4f2d4aa1c8645c96c37fb90810a1cf5297d81530c27712450713a5d7f14a634",
+      "contract_digest": "834f023572f2af300101f7609638a4dc157c0a55b75d927d6c3fb76eaa87244a",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_axiom",
+      "verdict": "VERIFIED",
+      "session_id": "01a01943-109e-7e50-abeb-85c823a39188",
+      "evidence_digest": "377ad227ac9a523b5907867021c954aab770ccf44c50ef905e9d602db7d0f48a",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "0bcda4002d060678bfa39fb8295f7673cbeb5ee7b68f3df92a9f801cedda5960",
+      "dispatch_id": "df51e69fad297c679825a0e194534a5329a682b7d9a9d6f0de8aebdf4fe0a513",
+      "contract_digest": "42b300c4e403cb793b265904050eb8f784e1c4aea80670f322c4691f885493a6",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_vector",
+      "verdict": "VERIFIED",
+      "session_id": "01a01943-ad38-7dd2-900c-804cac069fd3",
+      "evidence_digest": "dbde32fe86d6dfbe6ec9e148c97299548f5f4549f7846b50976895bee800b21d",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "f33afac6e73f6e527edf138cb1d8447e2b97d8ce1908a2c2753091370f44468e",
+      "dispatch_id": "e3d8987dce56ce8e16dce9e901e8957c085a22892987e0c598cc6dda820d8718",
+      "contract_digest": "53bc0524171371c41e21848dd9f55450325012859ca3e7f833525bfa03dbb2ed",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_datos",
+      "verdict": "VERIFIED",
+      "session_id": "01a01944-6081-7303-9c8e-8e6fcf882e6f",
+      "evidence_digest": "56a3cd8bfa9375661968f02011e4ba96624639949d4d18388b1b9999879aa231",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "705a4504ec32c465f99ef45dbcce1189aea83042b88d631ee7c5c8282270088f",
+      "dispatch_id": "b572546abdd1a490d5f6a5d092aef4f87ac5ca9f407e4818409114f23ce37212",
+      "contract_digest": "1cec0225c8f8b1b6786c741bb80b3bfcf11a98c6286175cf8dc432c78f189fc5",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_anon",
+      "verdict": "VERIFIED",
+      "session_id": "01a01945-59ef-7603-90b3-f3db0a665699",
+      "evidence_digest": "036a7ef80c708ab960f92e0f6e541e78bd5bee2e6246f622d4f9e8ef3629fbba",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "736ba88e7017ae32c80ed0a66692f16ffa29c9259414090c83a871ba45bd1237",
+      "dispatch_id": "80e2720648da3200f2a25b217f548070ae81239353568e08c5d1e7800d932485",
+      "contract_digest": "8cdc194a2520b70bce63b8f72dcf2eaa7b3f1532affa6e3cc26c62f736addea4",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_architecton",
+      "verdict": "VERIFIED",
+      "session_id": "01a01945-ed51-7a23-8b73-6804e29779bb",
+      "evidence_digest": "9cb326f1742a4a216e62db63d69332aa804b25507377e5d7cde6ebe59454139c",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "b584de426ab8cfb5394352d52f595dfe9a78438b9717941d02bcc63691a45798",
+      "dispatch_id": "765cfa8c2b5d65f1b6bc3101b77eafa9e8f7dfedcc45b1343b75e843321d1fe3",
+      "contract_digest": "88cbe65095f3875e4a7a8f9062b9fb06e1bc0daa984f5ec4a316fd56a1065cee",
+      "rejection_reasons": []
+    },
+    {
+      "role": "p2p_helios",
+      "verdict": "VERIFIED",
+      "session_id": "01a01946-5687-7af1-bc79-6983b83565ff",
+      "evidence_digest": "b8b40e34701c752ab19f50fd8913384584fa4429633101d29ca400c36bf9a7d1",
+      "execution_ok": true,
+      "marker_printed": true,
+      "attestation_fingerprint": "562c8d01dcd99fc9eecf84046cf3b9698544633471f936e7651e4641a2680fde",
+      "dispatch_id": "0606ef229222545e2308be246854a642e6f1ff73c68071673390f66637bd737b",
+      "contract_digest": "d515a6aa34f6c7ead295dfdef76accec404b0e0326bc8c9447fc9ab69bbb987b",
+      "rejection_reasons": []
+    }
+  ],
+  "verified_count": 8,
+  "required_count": 8,
+  "exact_8_of_8": true,
+  "run_fingerprint": "de6646118d7401a7db74cbf24c7188888d81cb4c8c84b958de5d8573ba246351",
+  "verdict": "GATE_J_PASS_EXACT_8_OF_8",
+  "notes": [
+    "All 8 roles executed as distinct real executions via Codex CLI exec; each session id minted independently by the Codex platform and read from platform rollout records (not self-reported).",
+    "Each role binding: run_id + dispatch_id + execution_contract_digest, REAL_REQUIRED verifier VERIFIED with 0 rejection reasons.",
+    "Replay ledger consumed each attestation at dispatch; no attestation reused across roles.",
+    "Second host (Claude Code) unavailable: 'Credit balance is too low' — honest L3 NOT_RUN, documented in supervisor report. All 8 real executions on the single authorized Codex host (distinct runs remain valid per amendment 5).",
+    "Manus platform identity not observable from within sandbox runtime — honest NOT_RUN per amendment 4, no downgrade of standard."
+  ]
+}

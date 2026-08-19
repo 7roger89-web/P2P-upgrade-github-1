@@ -1,0 +1,5 @@
+{
+  "session_id": "01a0192c-bf0d-7c11-afa0-4a3bf387c647",
+  "source": "codex exec stdout session header",
+  "note": "session id minted by Codex platform, printed in exec stdout before any model response"
+}
