@@ -204,6 +204,41 @@
       "classification": "D",
       "status": "HISTORICAL_EVIDENCE",
       "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    "docs/CURRENT_STATE.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project's own fact record; P2P-FACT references are host-project governance, not P2P runtime claims, and are outside the P2P claims ledger scope."
+    },
+    "docs/RUNBOOK.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project runbook; provider/model identifiers are operational metadata of the host project, not P2P runtime claims."
+    },
+    "docs/SESSION_BOOTSTRAP.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project session contract; provider identifiers are host-level configuration, not P2P runtime claims."
+    },
+    "docs/GUIDANCE_INDEX.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project guidance index; cited provider names are host documentation metadata, not P2P runtime claims."
+    },
+    "docs/HANDOFF.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project handoff document; provider references are host documentation metadata, not P2P runtime claims."
+    },
+    "package.json": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project manifest; dependency and engine metadata is host-level, not P2P runtime governance."
+    },
+    "docs/": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project documentation tree (including docs/plans/ and fact records); provider references and P2P-FACT records are host-project governance, not P2P runtime claims — covered by prefix scope."
     }
   },
   "generated_targets": [

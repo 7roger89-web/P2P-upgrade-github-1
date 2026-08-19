@@ -8,7 +8,7 @@
   },
   "claim_count": 9,
   "runtime_fact_count": 5,
-  "technical_report": "/home/ubuntu/p2p-repo/docs/p2p-development/research/release-gates-20260818/technical-preview.json",
+  "technical_report": "release-evidence/technical-preview.json",
   "technical_report_sha256": "e96a1d5b7e21a20bf4a0dcd55257c42b6aa7dea0341e1e37488bf23499eeb5bf",
   "approval_record": "approvals/P2P-APR-20260818T155200Z-c40-release-gates-live-specs.json",
   "approval_sha256": "306a44f380baee39618637eab5343be24196fa21462a38aa0e7ff07400e60937"
