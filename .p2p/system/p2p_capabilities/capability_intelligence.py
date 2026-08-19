@@ -597,6 +597,9 @@ def infer_required_capabilities(
     """
     declared: tuple[str, ...] = task_record.get("required_capabilities", ()) or ()
     optional: tuple[str, ...] = task_record.get("optional_capabilities", ()) or ()
+    # Explicit unknown requirements (authoritative task contract,
+    # preserved fail-closed; EXPLICIT_REQUIRED_UNKNOWN != DROPPED).
+    explicit_unknown: list[str] = []
     text = " ".join(str(v) for v in (
         task_record.get("title", ""),
         task_record.get("purpose", ""),
@@ -610,6 +613,16 @@ def infer_required_capabilities(
     def _add(cap: str, optional_: bool, origin: str, pointers: tuple[str, ...],
              permission: tuple[str, ...] = ()) -> None:
         if cap not in CAPABILITY_VOCABULARY:
+            # Distinguish the two safe-closed cases per fail-closed
+            # contract: (A) a model/heuristic-proposed unknown capability is
+            # never added as a fact (no hallucination); (B) an unknown
+            # capability explicitly declared in the authoritative task
+            # contract is PRESERVED as an explicit-unknown REQUIRED
+            # requirement (EXPLICIT_REQUIRED_UNKNOWN != DROPPED;
+            # UNKNOWN != SAFE — see unknown_explicit_required below).
+            if "task_record.required_capabilities" in pointers or \
+                    "task_record.optional_capabilities" in pointers:
+                explicit_unknown.append(cap)
             return  # unknown capability → no hallucination
         existing = want.get(cap)
         if existing is None:
@@ -1259,6 +1272,10 @@ class ExecutionRequirements:
     optional_capabilities: tuple = ()
     source_eligibility: tuple = ()
     permission_requirements: tuple = ()
+    # Issue A (fail-closed hardening): explicit unknown required
+    # capabilities declared in the authoritative task contract — preserved
+    # with SUPPORT=UNKNOWN, never silently dropped; UNKNOWN != SAFE.
+    unknown_explicit_required: tuple[CapabilityRequirement, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1275,6 +1292,8 @@ class ExecutionRequirements:
             "optional_capabilities": list(self.optional_capabilities),
             "source_eligibility": list(self.source_eligibility),
             "permission_requirements": list(self.permission_requirements),
+            "unknown_explicit_required": [r.to_dict()
+                                          for r in self.unknown_explicit_required],
         }
 
 
@@ -1306,6 +1325,7 @@ def build_capability_handoff(
     context_items: "tuple[str, ...]",
     permission_requirements: "tuple[str, ...]" = (),
     trace_evidence_pointers: "tuple[str, ...]" = (),
+    unknown_explicit_required: "tuple[CapabilityRequirement, ...]" = (),
 ) -> dict:
     """Minimal structured handoff from FW02 capability intelligence to the
     existing FW01 role/team selection boundary (planning phase).
@@ -1337,8 +1357,78 @@ def build_capability_handoff(
             f"{r.capability_id}:{'ALLOWED' if r.fallback_allowed else 'DISALLOWED'}"
             for r in requirements)),
         "evidence_pointers": tuple(trace_evidence_pointers),
+        "unknown_explicit_required": tuple(dict.fromkeys(
+            r.capability_id for r in unknown_explicit_required)),
     }
 
+
+
+# ---------------------------------------------------------------------------
+# 8b. Selected-composition capability coverage (fail-closed)
+# ---------------------------------------------------------------------------
+COMPOSITION_COVERAGE_STATES = ("COMPLETE", "INCOMPLETE", "UNKNOWN")
+
+
+@dataclass(frozen=True)
+class CompositionCapabilityEvidence:
+    """Minimal truthful contract for the SELECTED execution composition.
+    FW03 owns adaptive team selection; this contract only lets the
+    post-selection enforcement stage evaluate what the selected
+    composition actually provides, and keep it SEPARATE from
+    PROJECT_CAPABILITY_AVAILABILITY (invariant:
+    AVAILABLE_SOMEWHERE != PROVIDED_BY_SELECTED_COMPOSITION).
+    When the selector does not advertise meaningful provided-capability
+    metadata the honest outcome is COMPOSITION_CAPABILITY_COVERAGE =
+    UNKNOWN — never upgraded to COMPLETE.
+    """
+    selected_roles: tuple[str, ...] = ()
+    selected_target: str = UNKNOWN
+    selected_capability_sources: tuple[dict[str, Any], ...] = ()
+    provided_capabilities: tuple[str, ...] = ()
+    evidence_pointers: tuple[str, ...] = ()
+
+    @property
+    def has_capability_evidence(self) -> bool:
+        return bool(self.provided_capabilities) or bool(
+            self.selected_capability_sources)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "selected_roles": list(self.selected_roles),
+            "selected_target": self.selected_target,
+            "selected_capability_sources": [
+                dict(s) for s in self.selected_capability_sources],
+            "provided_capabilities": list(self.provided_capabilities),
+            "evidence_pointers": list(self.evidence_pointers),
+        }
+
+
+def evaluate_composition_coverage(
+    requirements: Sequence[CapabilityRequirement],
+    composition: CompositionCapabilityEvidence,
+) -> tuple[str, tuple[str, ...], bool]:
+    """Evaluate REQUIRED capabilities against the SELECTED composition.
+    Returns (coverage_state, missing_from_composition,
+             composition_dispatch_contribution).
+    Fail-closed semantics: no proven evidence for the selected composition
+    -> UNKNOWN (never treated as COMPLETE); a required capability that is
+    available in the PROJECT but not proven for the selected composition
+    -> INCOMPLETE with dispatch remaining blocked.
+    """
+    required_ids = tuple(r.capability_id for r in requirements
+                         if r.required_or_optional == "REQUIRED")
+    proven = set(composition.provided_capabilities)
+    missing: list[str] = []
+    for cap in required_ids:
+        if cap not in proven:
+            missing.append(cap)
+    if not composition.has_capability_evidence:
+        # No truthful composition capability evidence exists: UNKNOWN.
+        # Do NOT convert UNKNOWN into COMPLETE.
+        return ("UNKNOWN", tuple(dict.fromkeys(required_ids)), False)
+    if missing:
+        return ("INCOMPLETE", tuple(dict.fromkeys(missing)), False)
+    return ("COMPLETE", (), True)
 
 def compute_execution_requirements(
     task_record: Mapping[str, Any],
@@ -1361,6 +1451,22 @@ def compute_execution_requirements(
         design_skills_present=any("ui" in s.lower() or "design" in s.lower()
                                   for s in installed_skills))
     requirements = infer_required_capabilities(task_record, profile)
+    # Issue A (fail-closed): explicit unknown required capabilities from the
+    # authoritative task contract are preserved as REQUIRED requirements
+    # with origin DETERMINISTIC and task-contract provenance; support stays
+    # UNKNOWN and coverage becomes UNKNOWN (dispatch_allowed=False).
+    # EXPLICIT_REQUIRED_UNKNOWN != DROPPED; UNKNOWN != SAFE.
+    _declared_unknown = tuple(
+        c for c in (task_record.get("required_capabilities", ()) or ())
+        if c not in CAPABILITY_VOCABULARY
+        and _ID_RE.fullmatch(str(c)))
+    for _cap in _declared_unknown:
+        requirements.append(CapabilityRequirement(
+            capability_id=str(_cap),
+            purpose=f"explicit_unknown_task_contract:{_cap}",
+            required_or_optional="REQUIRED",
+            origin="DETERMINISTIC",
+            evidence_pointers=("task_record.required_capabilities",)))
     requirements = _narrow_harness_requirements(task_record, requirements)
     coverage = evaluate_coverage(requirements, inv)
     skill_sel = select_skills_bounded(requirements, profile, installed_skills)
@@ -1409,4 +1515,7 @@ def compute_execution_requirements(
         source_eligibility=tuple(dict.fromkeys(
             f"{s.capability_id}:{str(s.eligibility)}" for s in selected)),
         permission_requirements=tuple(str(p) for p in (task_record.get("permission_needs", ()) or ())),
+        unknown_explicit_required=tuple(
+            r for r in requirements if r.required_or_optional == "REQUIRED"
+            and r.capability_id in _declared_unknown),
     )

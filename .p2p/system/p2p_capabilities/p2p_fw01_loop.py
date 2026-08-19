@@ -440,6 +440,42 @@ class Fw01Loop:
                 return {"status": "CAPABILITY_COVERAGE_BLOCKED",
                         "failure_class": _fw02.failure_class,
                         "decision_trace": _fw02.decision_trace.to_dict()}
+        # Issue B (fail-closed hardening): selected-composition capability
+        # coverage. The project may possess capability X somewhere while
+        # the selected role/team/target composition may not provide X
+        # (AVAILABLE_SOMEWHERE != PROVIDED_BY_SELECTED_COMPOSITION).
+        _comp = None
+        try:
+            from p2p_capabilities import capability_intelligence as _ci2
+            _comp = _ci2.CompositionCapabilityEvidence(
+                selected_roles=tuple(str(t) for t in
+                                     (role_team.get("team") or ())),
+                selected_target=str(target) if target else _ci2.UNKNOWN,
+                provided_capabilities=tuple(dict.fromkeys(
+                    str(c) for c in (role_team.get(
+                        "provided_capabilities", ()) or ()))),
+                evidence_pointers=("role_team_selection_output",)
+                if role_team.get("provided_capabilities") else (),
+            )
+            _comp_state, _comp_missing, _comp_ok = (
+                _ci2.evaluate_composition_coverage(
+                    _fw02.required_capabilities, _comp)
+                if _fw02 is not None else ("UNKNOWN", (), False))
+        except Exception:
+            _comp_state, _comp_missing, _comp_ok = ("UNKNOWN", (), False)
+        _comp_trace = f"comp_state={_comp_state} missing=" + json.dumps(
+            list(_comp_missing))[:200]
+        self._trace(task_id, {"mutation_class": "READ_ONLY",
+                      "permission": "", "verification": "REQUIRED"},
+                    "COMPOSITION_CAPABILITY_COVERAGE_OK"
+                    if (_comp is not None and _comp_state == "COMPLETE")
+                    else "COMPOSITION_CAPABILITY_COVERAGE_BLOCKED",
+                    _comp_trace)
+        if _comp is not None and _comp_state != "COMPLETE":
+            return {"status": "COMPOSITION_CAPABILITY_BLOCKED",
+                    "composition_coverage_state": _comp_state,
+                    "missing_from_composition": list(_comp_missing),
+                    "composition_evidence": _comp.to_dict()}
         # Permission pre-dispatch revalidation (C39 semantics).
         bad = self.pre_dispatch_revalidation(
             {"task_id": task_id}, dict(rec, task_id=task_id))
