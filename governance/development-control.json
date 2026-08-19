@@ -1056,6 +1056,13 @@
         "status": "DONE",
         "title": "Project-Usable Release & Pilot Installation (installable package + install/upgrade/rollback/doctor; fresh-install, drift-gated pilot task, fresh-process recovery, upgrade rollback proofs; regression clean; candidate UNPROMOTED)",
         "evidence_ref": "docs/p2p-development/reports/P2P-C40-terminal-report.md"
+      },
+      {
+        "id": "FRAMEWORK-00",
+        "status": "IN_PROGRESS",
+        "title": "P2P Product Memory Foundation — C43 evidence reconciliation (role identity, commit lineage, council semantics, evidence count), canonical product architecture, master roadmap (FRAMEWORK-00..06), research intake ledger, capability & skill map, governance/charter sync, validation & closure",
+        "evidence_ref": "docs/p2p-development/framework/product-architecture.md",
+        "notes": "Meta-goal: consolidation + durable memory. No runtime change, no merge/promotion/release/deploy/install. Stops before FRAMEWORK-01 execution. Terminal artifact: docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md (status DRAFT until goal close)."
       }
     ],
     "current": {
@@ -1665,5 +1672,11 @@
       "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
       "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
     }
-  ]
+  ],
+  "research_intake_ledger": "governance/research-intake-ledger.json",
+  "framework_artifacts": {
+    "product_architecture": "docs/p2p-development/framework/product-architecture.md",
+    "master_roadmap": "docs/p2p-development/framework/master-roadmap.md",
+    "capability_skill_map": "docs/p2p-development/framework/capability-skill-map.json"
+  }
 }

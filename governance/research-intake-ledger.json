@@ -1,0 +1,40 @@
+{
+  "document": "research-intake-ledger",
+  "schema": "p2p-framework/research-intake-ledger/1",
+  "generated_at": "2026-08-19T00:00:00+00:00",
+  "generated_by": "P2P-FRAMEWORK-00 product memory recovery",
+  "authority": "Research intake authority lives with the Owner. The ledger records intake requests, their classification, and outcomes. It does not execute anything.",
+  "vocabulary": {
+    "classifications": ["INTAKE_REQUESTED", "ACCEPTED", "RESEARCH_ONLY", "ADAPTED", "DEFERRED", "REJECTED", "VENDORED_BLOCKED", "COMPLETED"],
+    "intake_sources": ["owner_instruction", "upstream_discovery", "session_derived"]
+  },
+  "intake_records": [
+    {
+      "id": "RI-001",
+      "subject": "P2P-FRAMEWORK-00 — Product Memory Foundation",
+      "classification": "ACCEPTED",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner message 2026-08-18/19 (P2P-FRAMEWORK-00)",
+      "scope": "Product architecture, master roadmap FRAMEWORK-00..06, research intake ledger, capability & skill map, governance sync, validation, closure; read-only on runtime",
+      "status": "IN_PROGRESS",
+      "evidence_ref": "docs/p2p-development/research/framework-00/evidence/"
+    },
+    {
+      "id": "RI-002",
+      "subject": "Framework-01 goal definition",
+      "classification": "PLANNED_NEXT",
+      "source": "owner_instruction",
+      "instruction_ref": "P2P-FRAMEWORK-00 item 32: define FRAMEWORK-01 as next goal, stop before executing it",
+      "scope": "Proposal only; not executed",
+      "status": "PENDING_OWNER_APPROVAL",
+      "evidence_ref": "docs/p2p-development/framework/master-roadmap.md"
+    }
+  ],
+  "inherited_decisions": {
+    "source": "governance/development-control.json research_decisions",
+    "note": "Eight pre-existing research decisions are preserved unchanged in development-control.json and remain authoritative for their subjects.",
+    "subjects": ["Comp AI CRM (ADAPTED)", "Semantica (DEFERRED)", "TencentDB Agent Memory (RESEARCH_ONLY)", "Zimster (RESEARCH_ONLY)", "Agent TaskGraph Protocol (RESEARCH_ONLY)", "DeepSeek Harness (DEFERRED)", "Nolane UI Intelligence (ADAPTED)", "Superlearn (ADAPTED)"]
+  },
+  "intake_rule": "New research intake requests are appended to this ledger before any research work begins. The Owner decides classification. Research-only subjects never become runtime dependencies (no vendoring into .p2p/system without a goal milestone with its own contract).",
+  "last_reviewed": "2026-08-19"
+}
