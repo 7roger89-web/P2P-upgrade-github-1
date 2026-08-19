@@ -795,7 +795,6 @@
     },
     {
       "candidate_id": "LIVE_CERTIFICATION_RECORD",
-      "classification": "CERTIFICATION_RECORD_NOT_A_DEVELOPMENT_CANDIDATE",
       "certification_type": "LIVE_CERTIFICATION_RECORD",
       "evidence_timestamp": "2026-08-19T08:55:00Z",
       "evidence_scope": "Canonical 8-role live execution council on one real host (Codex CLI, Windows), proving exact role->real-execution binding for the full canonical role set: p2p_iris, p2p_tecton, p2p_axiom, p2p_vector, p2p_datos, p2p_anon, p2p_architecton, p2p_helios. RoleExecutionContract binding + attestation fingerprint + receipt + verifier result per role; distinct dispatch per role; replay protection (unique dispatch_id/attestation fingerprint/session_id per role).",
@@ -837,9 +836,9 @@
         "role_bridge.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical to FW01 v2; lane variant = canonical + optional attestation integration)",
         "role_receipt.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical to FW01 v2; lane variant = canonical + optional C36 fields, fail-closed when declared)",
         "role_verifier.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical base to FW01 v2; lane variant = canonical + optional REAL_REQUIRED attestation policy)",
-        "host_attestation.py": "LIVE_CERT_LANE_ONLY_NOT_CANONICAL (absent from FW01 v2 artifact and FW01 branch runtime)"
+        "host_attestation.py": "CANONICAL_INTEGRATED_THIS_GOAL (exact reuse of c36-real-host-binding proven source, SHA256 c7d684eb2be2ef5ed98aa2dd6df01ca0ed85a4d17ffe1451387bf39b7a7262b4; no semantic rewrite; registered in capabilities.json + exports + provider-neutral suite)"
       },
-      "canonicality_note": "LIVE_CERT_EVIDENCE_VALID_RUNTIME_CANONICALITY_PENDING — 3 of 4 modules already canonical (equivalent); host_attestation.py integration remains a separate implementation/integration decision. NO silent cherry-pick into the canonical runtime in this goal.",
+      "canonicality_note": "LIVE_CERT_EVIDENCE_RUNTIME_CANONICALITY_NOW_RESOLVED — all 4 modules canonical: role_bridge/role_receipt/role_verifier were already canonical-equivalent; host_attestation.py integrated by exact reuse in this goal. One canonical capability; no duplicate implementations. Historical 8/8 evidence unchanged; no rerun.",
       "certified_vs_eligible": {
         "CERTIFIED": true,
         "CURRENTLY_ELIGIBLE": "UNKNOWN — certification proves evidenced behavior at evidence time only; it guarantees neither current auth, credits, host availability, provider health nor future model availability. CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED."
@@ -852,7 +851,18 @@
       },
       "created_at": "2026-08-19T13:00:00Z",
       "created_by": "governance-truth-sync",
-      "promotion_status": "NOT_A_CANDIDATE_DO_NOT_PROMOTE"
+      "promotion_status": "UNPROMOTED",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C36-LIVE-CERTIFICATION-8OF8",
+      "candidate_version": "8.4.7-C-codex.19",
+      "embedded_version": "8.4.7-C-codex.19",
+      "superseded_note": "TRUTHFUL_STATUS: this record is a certification record, not a patch candidate; UNPROMOTED kept with explicit note. No promotion, no release.",
+      "candidate_label": "live-certification-record-not-a-patch-candidate",
+      "built": false,
+      "candidate_sha256": "TO_BE_FILLED",
+      "lineage_anchor_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "lineage_anchor_note": "Anchored to official FW01 v2 baseline; never built as patch artifact — certification record only. No promotion, no release."
     }
   ],
   "capability_status": [

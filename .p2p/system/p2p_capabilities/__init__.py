@@ -246,3 +246,18 @@ from .host_selection import (
     safe_reselection_allowed,
     compare_naive_policies,
 )
+
+# Host attestation — evidence-verification capability (C36 lane, exact reuse).
+# Evidence surface only: no orchestration, no routing, no auth/permission
+# authority, no model selection. CERTIFIED != CURRENTLY_ELIGIBLE.
+from .host_attestation import (
+    HostAttestationError,
+    HostAttestationRecord,
+    make_host_attestation,
+    verify_role_evidence_source,
+    verify_all_attestation_sources,
+    load_attestation_ledger,
+    attestation_already_used,
+    record_attestation_use,
+    mint_dispatch_id,
+)

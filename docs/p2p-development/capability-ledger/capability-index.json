@@ -4528,9 +4528,15 @@
       "next_condition": "Owner decision: integrate host_attestation.py into canonical runtime or keep lane-only",
       "last_reviewed": "2026-08-19T13:15:00Z",
       "freshness": "from_governance_record",
-      "notes": "Certification record NOT a development candidate; DO NOT PROMOTE.",
+      "notes": "Certification record NOT a development candidate; DO NOT PROMOTE. | HOST_ATTESTATION_CANONICALIZED: all 4 live-cert modules canonical; certification bound to canonical runtime surface; no rerun; verified 2026-08-19 evidence time only.",
       "rejected_reason": "",
-      "origin_type": "RESEARCH_DECISION"
+      "origin_type": "RESEARCH_DECISION",
+      "integration_reference": {
+        "module": ".p2p/system/p2p_capabilities/host_attestation.py",
+        "source_branch": "c36-real-host-binding",
+        "source_sha256": "c7d684eb2be2ef5ed98aa2dd6df01ca0ed85a4d17ffe1451387bf39b7a7262b4",
+        "exact_reuse": true
+      }
     }
   ],
   "last_reviewed": "2026-08-19T13:15:00Z",
