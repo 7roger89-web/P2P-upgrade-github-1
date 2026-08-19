@@ -956,6 +956,27 @@
         "FW02 test suites: A-Z 26, handoff boundary 14, composition coverage 11, composition gate loop 7, host attestation 16",
         "governance candidate lineage"
       ]
+    },
+    {
+      "candidate_id": "FW03_ADAPTIVE_TEAM_COUNCIL",
+      "candidate_version": "8.4.7-C-codex.29",
+      "embedded_version": "8.4.7-C-codex.29",
+      "candidate_label": "fw03-adaptive-team-council-8.4.7-C-codex.29",
+      "promotion_status": "UNPROMOTED",
+      "candidate_sha256": "1f821a7c199fd04defb4ee5fdc1abda861164f06fa19991f59894a31b730e51c",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW03_ADAPTIVE_TEAM_AND_COUNCIL",
+      "built": true,
+      "lineage_anchor_sha256": "d8f0d4cad40734ae3dab06e1b237549f2f715f517a8ab9f7224dec5fb8083373",
+      "lineage_anchor_note": "FW03 adaptive team & council candidate: minimal-sufficient adaptive team selection (SINGLE_ROLE / SMALL_TEAM / COUNCIL, fan-out bounded 8, trace-backed) integrated BEFORE the existing select_role_team; evidence tiers (DECLARED != VERIFIED != CERTIFIED != LIVE_CERTIFIED; ACTIVE != CERTIFIED; UNKNOWN != SAFE; DECLARED never counts for live-required tasks); composition evidence grounds FW02's fail-closed gate; bounded adaptive council with honest N/8 reporting (8/8 claim void when any receipt disqualified) and task-aware aggregation (conflicts never majority-washed); revalidation before dispatch (POST_SELECTION_DRIFT fail-closed); council execution contract bounds (read-only first). Ancestor = FW02 hardening candidate 8.4.7-C-codex.28, which remains untouched as historical record. Minted per canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=False, release_artifact_changed=False)) = YES. No promotion, no release. FW04 not started (Owner gate). SHA256 bound to this exact normalized zip.",
+      "surface_scope": [
+        "team_intelligence.py NEW module (evidence tiers, minimal sufficient team policy, composition evidence provider, bounded adaptive council, task-aware aggregation, revalidation, owner summary)",
+        "FW03 adaptive team hook in FW01 loop BEFORE select_role_team, after FW02 handoff (p2p_fw01_loop.py; info-only decision trace; enforcement retains sole authority)",
+        "select_role_team honors FW03 mode as role class (byte-identical fallback without FW03 decision)",
+        "FW03 test suite 41 cases + regression 74 cases (115 total PASS)",
+        "governance candidate lineage"
+      ]
     }
   ],
   "capability_status": [
