@@ -1,0 +1,33 @@
+{
+  "schema_version": "p2p-codex-approval-record/2",
+  "request_id": "P2P-APR-20260819T090500+0000-fw01-v2-promote-release",
+  "state": "APPROVED",
+  "action": "promote_and_release_candidate",
+  "scope": "FW01 v2 self-contained patch — PROMOTE + PUBLISH the verified candidate to GitHub Release; P2P repository only. NOT authorized: GT/GP push, production install/upgrade, Supabase/RLS, deployment, FRAMEWORK-02, Council/Gate J.",
+  "subject": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+  "subject_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+  "final_release_source_head": "ae569f06b22a5ec21acde98444a90039ce4c19df",
+  "source_binding_commit": "a5f2997d982c18fc9b6005e2408dc8527a7dd0f0",
+  "authoritative_base_branch": "p2p-framework-01-autonomous-operating-loop",
+  "authoritative_fw01_base_head": "ad5c39d927d3034261ea3ade5fcdb06cd7af6b79",
+  "patch_branch": "p2p-fw01-bootstrap-reconciliation",
+  "requested_at": "2026-08-19T09:05:00+00:00",
+  "request_expires_at": "2026-08-19T09:05:00+00:00",
+  "requested_by": "7roger89-web (Owner)",
+  "hash_bindings": {
+    "exact_candidate_sha": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+    "final_release_source_head": "ae569f06b22a5ec21acde98444a90039ce4c19df",
+    "source_binding_commit": "a5f2997d982c18fc9b6005e2408dc8527a7dd0f0",
+    "final_reconciliation_evidence": "scripts/fw01-v2-final-reconciliation.json",
+    "fresh_machine_proof": "scripts/fw01-v2-exact-fresh-machine-proof.json",
+    "candidate_verification": "EXPECTED_SHA == OBSERVED_SHA == 2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61; SHA_MATCH=true; CANONICAL_INSTALL=PASS; DOCTOR=HEALTHY; EXTERNAL_DEV_PATH_DEPENDENCY=0"
+  },
+  "risk_summary": "FW01 v2 sửa 4 khuyết tật của v1 (fresh-machine doctor path-resolution, package inventory/layout, self-contained technical-preview binding, portable fresh-machine install); evidence v2 đã qua đối chiếu cuối: kế toán nguồn 463 thành viên rời nhau (363+86+5+7+2, UNACCOUNTED=0), lineage fast-forward từ ad5c39d (không rewrite), validator 78/78, validate_control PASS, secret scan CLEAN (scope v2), UNEXPECTED_TRACKED_MUTATION=0 trên cả GT và GP (DECLARED_TRACKED_INSTALLER_MUTATION=AGENTS.md hạng B cho GT; GP Supabase/RLS=0). Byte-identical rebuild toàn phần qua các lượt mint KHÔNG được khẳng định (generated_at khai báo); quyền phát hành là frozen candidate hash. v1 giữ nguyên lịch sử bất biến với khuyết tật FRESH_MACHINE_DOCTOR_PATH_DEPENDENCY ghi nhận tường minh.",
+  "decision": "APPROVE",
+  "decided_at": "2026-08-19T09:05:00+00:00",
+  "decided_by": "7roger89-web (Owner)",
+  "decision_note": "PROMOTE + RELEASE FW01 v2 SELF-CONTAINED PATCH — Owner chỉ thị trực tiếp (19/08/2026) sau khi evidence reconciliation PASS/FW01_V2_RELEASE_EVIDENCE_RECONCILED. Chỉ bind vào v2, không bind vào v1.",
+  "approval_method": "conversation_explicit",
+  "identity_assurance": "active_user_message",
+  "recorded_by": "fw01-v2-owner-authorized-release-session"
+}

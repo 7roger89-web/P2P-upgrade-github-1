@@ -683,6 +683,96 @@
       ],
       "release_published_at": "2026-08-19T05:55:00+00:00",
       "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v1/P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip"
+    },
+    {
+      "candidate_id": "FW01-V2",
+      "candidate_label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+      "candidate_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+      "promotion_status": "PROMOTED_OWNER_VERIFIED",
+      "development_goal": "P2P-FRAMEWORK-01",
+      "created_at": "2026-08-19T09:05:00Z",
+      "created_by": "fw01-v2-owner-authorized-release-session",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_version": "8.4.7-C-codex.24",
+      "embedded_version": "8.4.7-C-codex.24",
+      "terminal_verdict": "PASS / FW01_V2_RELEASE_EVIDENCE_RECONCILED",
+      "candidate_policy_lane": "owner_patch_release: v2 patch of FW01 v1; exactly one deterministic UNPROMOTED candidate (v2) under CANDIDATE_REQUIRED policy until Owner authorize",
+      "status": "PROMOTED_OWNER_VERIFIED",
+      "evidence_ref": "docs/p2p-development/research/framework-01/evidence/fw01-v2-patch-candidate-mint.json",
+      "patch_of": {
+        "candidate_id": "FW01",
+        "release_identifier": "p2p-8.4.7-C-codex.24-fw01-v1",
+        "historical_limitation_recorded": "FRESH_MACHINE_DOCTOR_PATH_DEPENDENCY",
+        "v1_preserved": "immutable historical truth, no rewrite"
+      },
+      "fixes": [
+        "FW01 v1 fresh-machine doctor path-resolution defect (portable env-first key resolution)",
+        "package inventory/layout defect (source-inventory + integrity files aligned to candidate payload)",
+        "self-contained packaged technical-preview binding (technical-preview.json carried in package)",
+        "portable fresh-machine installation (EXTERNAL_DEV_PATH_DEPENDENCY=0)"
+      ],
+      "source_binding_commit": "a5f2997d982c18fc9b6005e2408dc8527a7dd0f0",
+      "final_release_source_head": "ae569f06b22a5ec21acde98444a90039ce4c19df",
+      "fresh_machine_evidence": "scripts/fw01-v2-exact-fresh-machine-proof.json",
+      "determinism_disclosure": {
+        "CONTENT_LAYOUT_DETERMINISM": "PASS",
+        "EXECUTABLE_PAYLOAD_DETERMINISM": "PASS",
+        "BYTE_IDENTICAL_REBUILD": "NOT_REQUIRED_BY_CURRENT_POLICY",
+        "FROZEN_CANDIDATE_IMMUTABILITY": "VERIFIED"
+      },
+      "v2_limitations_disclosed": [
+        "v1 remains historical and unchanged",
+        "full byte-identical rebuild across mint timestamps is not claimed",
+        "release is frozen/hash-bound",
+        "Game Truyen / Gia Pha bootstrap integration is NOT yet pushed",
+        "Logistics remains unsupported / DO_NOT_INSTALL_YET",
+        "LIVE_COUNCIL_8_OF_8 remains NOT_PROVEN",
+        "adaptive skill selection remains NOT_PROVEN",
+        "FRAMEWORK-02 has not started"
+      ],
+      "package_verify_evidence": {
+        "candidate_path": "reports/candidates/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+        "verdict": "ARTIFACT_VERIFY_PASS",
+        "zip_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+        "zip_size": 2728740,
+        "zip_entry_count": 463,
+        "accounting": {
+          "UNIQUE_CANDIDATE_MEMBERS": 463,
+          "ACCOUNTED_UNIQUE_MEMBERS": 463,
+          "UNACCOUNTED_MEMBERS": 0,
+          "disjoint_classes": {
+            "exact_tree_match": 363,
+            "runtime_remap_byte_verified": 86,
+            "legacy_stable_absent_from_tree": 5,
+            "mint_generated_integrity_committed_to_tree": 7,
+            "self_referencing_mint_unbound": 2
+          },
+          "UNBOUND_COUNT": 2,
+          "UNBOUND_FILES": [
+            "RELEASE-SHA256SUMS.txt",
+            "release-manifest.json"
+          ],
+          "checker_script": "scripts/accounting_check.py"
+        },
+        "manifest": "release-manifest.json"
+      },
+      "promotion_history": [
+        {
+          "event": "OWNER_PROMOTE_AUTHORIZE",
+          "at": "2026-08-19T09:05:00+00:00",
+          "approval_record": "approvals/P2P-APR-20260819T090500+0000-fw01-v2-promote-release.json",
+          "approval_sha256": "605ec71152e5dd11036fc92261ba6bdbecc9f315e60eb8dc7e48cd984a1f93b1",
+          "decision_note": "PROMOTE + RELEASE FW01 v2 SELF-CONTAINED PATCH"
+        },
+        {
+          "event": "RELEASE_PENDING",
+          "at": "2026-08-19T09:05:00+00:00",
+          "note": "GitHub release publication in progress; release_id/asset_id to be bound after uploaded-asset SHA verification."
+        }
+      ],
+      "release_decision": "RELEASED",
+      "release_identifier": "p2p-8.4.7-C-codex.24-fw01-v2"
     }
   ],
   "capability_status": [

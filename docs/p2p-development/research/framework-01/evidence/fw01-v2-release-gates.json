@@ -1,0 +1,46 @@
+{
+  "schema": "fw01-release-gates/2",
+  "candidate_label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+  "candidate_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+  "git_ref": "ae569f06b22a5ec21acde98444a90039ce4c19df",
+  "source_binding_commit": "a5f2997d982c18fc9b6005e2408dc8527a7dd0f0",
+  "ran_at": "2026-08-19T09:05:00+00:00",
+  "final_verdict": "PASS / FW01_V2_PATCH_PROMOTED_RELEASED",
+  "gates": [
+    {
+      "gate": "candidate_integrity_and_freeze",
+      "result": "PASS_WITH_DISCLOSURE",
+      "detail": "Zip sha256 == record, git blob and pre-promote/pre-upload byte measurements (2a42e815...). No re-mint, no replacement. Executable payload byte-identical across mint runs; 4 mint-metadata members carry declared generated_at / self-referencing digests — disclosed, not claimed as full byte-identical rebuild."
+    },
+    {
+      "gate": "source_binding",
+      "result": "PASS",
+      "detail": "Mutually exclusive accounting 463/463 (363 exact + 86 byte-verified runtime remap + 5 legacy stable absent + 7 mint-generated integrity committed + 2 self-referencing mint). UNACCOUNTED_MEMBERS=0, UNBOUND_COUNT=2 (RELEASE-SHA256SUMS.txt, release-manifest.json). source_binding_commit a5f2997 ancestor of final HEAD."
+    },
+    {
+      "gate": "lineage",
+      "result": "PASS",
+      "detail": "22ba171 -> 250daa2 -> ae569f0 linear evidence/report progression; ae569f0 descendant of authoritative base ad5c39d; no rewrite, no divergent lineage."
+    },
+    {
+      "gate": "fresh_machine_release_gate",
+      "result": "PASS",
+      "detail": "Reuse of fw01-v2-exact-fresh-machine-proof.json: EXPECTED_SHA == OBSERVED_SHA == final candidate, SHA_MATCH=true, CANONICAL_INSTALL=PASS, DOCTOR=HEALTHY, EXTERNAL_DEV_PATH_DEPENDENCY=0. Hash still binds to frozen candidate."
+    },
+    {
+      "gate": "project_proofs",
+      "result": "PASS_WITH_DISCLOSURE",
+      "detail": "Game Truyện: UNEXPECTED_TRACKED_MUTATION=0, DECLARED_TRACKED_INSTALLER_MUTATION=AGENTS.md, class B (declared installer-managed merge); UTF-8 normalization is NOT a P2P feature. Gia Pha: UNEXPECTED_TRACKED_MUTATION=0, SUPABASE_MUTATION=0, RLS_WEAKENING=0."
+    },
+    {
+      "gate": "approval_binding",
+      "result": "PASS",
+      "detail": "Approval P2P-APR-20260819T090500+0000-fw01-v2-promote-release hash-binds candidate SHA, final release source HEAD, source-binding commit, reconciliation evidence, fresh-machine proof, candidate verification. Decision: PROMOTE + RELEASE FW01 v2 SELF-CONTAINED PATCH."
+    },
+    {
+      "gate": "release_asset_sha",
+      "result": "PENDING_UPLOADED_ASSET_VERIFICATION",
+      "detail": "LOCAL_FROZEN_SHA == APPROVAL_BOUND_SHA == 2a42e815... verified; UPLOADED_ASSET_SHA to be verified byte-by-byte after upload."
+    }
+  ]
+}
