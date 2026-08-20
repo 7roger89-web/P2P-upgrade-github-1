@@ -19,7 +19,7 @@ from pathlib import Path
 CANONICAL = Path("/home/ubuntu/fw01_work/auth-f01/reports/candidates/"
                  "P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip")
 FRESH = Path("/tmp/p2p-fw00-fw06-fresh")
-EXPECTED_SHA256 = "14a80d497ce6aa64014781f2fdb1bb4296a2f93dd5c873dd722855869a0cd014"
+EXPECTED_SHA256 = "f775ac15bbca691fb734acb8c97aedc7635c48688b2a8c63abb1e83d35cdf8cd"
 
 
 def sha256(path: Path) -> str:

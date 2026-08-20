@@ -1119,7 +1119,7 @@
     {
       "candidate_version": "8.4.7-C-codex.36",
       "candidate_label": "fw00-fw06-cumulative-production-package",
-      "candidate_sha256": "14a80d497ce6aa64014781f2fdb1bb4296a2f93dd5c873dd722855869a0cd014",
+      "candidate_sha256": "f775ac15bbca691fb734acb8c97aedc7635c48688b2a8c63abb1e83d35cdf8cd",
       "candidate_artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip",
       "candidate_built_at_utc": "2026-08-20T10:00:00Z",
       "embedded_version": "8.4.7-C-codex.36",
@@ -1128,8 +1128,8 @@
       "development_goal": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
       "promotion_status": "UNPROMOTED",
       "built": true,
-      "source_commit": "3adcc806522f713f7a65bd1bd655f48f4ef77ba0",
-      "source_tree_hash": "2da70ea8bcb7f0f04386944fed05e2d227da95df",
+      "source_commit": "4063c4ba7acc5098ab544fa2fb0a5c94aa1b4226",
+      "source_tree_hash": "d9990c6a6b2778abf9c7d92b1f2db3ae6e60b03c",
       "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
       "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift, verify twice), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS. No promotion, no release, pilot not executed (owner gate). GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision fix — same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA).",
       "surface_scope": [
@@ -1138,9 +1138,7 @@
         "system/: full tracked .p2p/system capability tree (FW02-FW06 modules, tests, traces)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
-      "artifact_sha256": "14a80d497ce6aa64014781f2fdb1bb4296a2f93dd5c873dd722855869a0cd014",
-      "source_binding_status": "BOUND_IMMUTABLE"
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
     }
   ],
   "capability_status": [

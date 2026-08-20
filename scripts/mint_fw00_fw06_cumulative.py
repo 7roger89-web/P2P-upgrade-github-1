@@ -35,7 +35,7 @@ CHECKSUMS = "RELEASE-SHA256SUMS.txt"
 SCHEMA = "p2p-codex-release-manifest/1"
 FORBIDDEN = ("/.tmp/", "/docs/plans/", "/experimental/", "/.p2p/", "/__pycache__/")
 FORBIDDEN_AT_ROOT = ("/reports/")
-SYSTEM_EXCLUDE_PREFIXES = ("__pycache__", ".pyc", ".pyo")
+SYSTEM_EXCLUDE_PREFIXES = ("__pycache__", ".pyc", ".pyo", ".p2p")
 
 
 def sha256(path: Path) -> str:
