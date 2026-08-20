@@ -405,7 +405,8 @@ def build_mutation_ready_receipt(
             "source_commit": str(source_commit).lower(),
             "project_commit": str(project_commit).lower(),
             "binding_status": _g1_registry_freshness_binding(
-                capability_id, source_commit, project_commit),
+                capability_id, source_commit, project_commit,
+                subject=role_id),
         },
         "run_sequence": run_sequence,
         "backend_request_id": str(backend_request_id),
@@ -477,7 +478,7 @@ def _g1_build_time_target_block(role_id: str, capability_id: str,
         from . import quality_intelligence as _qi
         sb = _qi.source_bound_status(
             capability_id=str(capability_id),
-            subject=str(capability_id),
+            subject=str(role_id),
             current_source_commit=str(source_commit),
             current_project_commit=str(project_commit))
         st = sb.get("status", "NO_SOURCE_BOUND_RECORD")
@@ -518,7 +519,8 @@ def _g1_build_time_target_block(role_id: str, capability_id: str,
 def _g1_registry_freshness_binding(
         capability_id: str,
         source_commit: str,
-        project_commit: str) -> str:
+        project_commit: str,
+        subject: str = "") -> str:
     """Registry-anchored freshness: the receipt is only FRESHLY BOUND when
     the source registry carries a source-bound certification record for
     this capability whose commits match the runtime truth EXACTLY
@@ -529,7 +531,8 @@ def _g1_registry_freshness_binding(
         from . import quality_intelligence as _qi
         st = _qi.source_bound_status(
             capability_id=str(capability_id),
-            subject=str(capability_id),
+            subject=str(subject) if str(subject).strip()
+            else str(capability_id),
             current_source_commit=str(source_commit),
             current_project_commit=str(project_commit))
     except Exception:
@@ -547,10 +550,11 @@ def _g1_receipt_eligibility_check(receipt: Mapping[str, Any]) -> dict:
     try:
         from . import quality_intelligence as _qi
         cap = str(receipt.get("capability_id", ""))
+        rid = str(receipt.get("canonical_role_id", cap))
         sc = str(receipt["freshness"]["source_commit"]).lower()
         pc = str(receipt["freshness"]["project_commit"]).lower()
         sb = _qi.source_bound_status(
-            capability_id=cap, subject=cap,
+            capability_id=cap, subject=rid,
             current_source_commit=sc, current_project_commit=pc)
         st = sb.get("status", "NO_SOURCE_BOUND_RECORD")
         reasons = sb.get("source_reasons") or []
@@ -575,7 +579,9 @@ def _g1_dispatch_binding_check(receipt: Mapping[str, Any]) -> dict:
     as the contract/receipt (one fingerprint domain); dispatch and
     receipt ids must match the identity chain exactly."""
     dispatch = dict(receipt.get("backend", {}) or {})
-    recorded_rf = str(dispatch.get("request_fingerprint", "")).lower()
+    recorded_rf = str(dispatch.get(
+        "request_fingerprint",
+        dispatch.get("request_fingerprint_hex", ""))).lower()
     canonical = str(receipt["role_execution_contract_digest"]).lower()
     contract_bound = bool(dispatch) and (recorded_rf == canonical)
     return {
@@ -585,8 +591,9 @@ def _g1_dispatch_binding_check(receipt: Mapping[str, Any]) -> dict:
         "dispatch_execution_status": str(
             dispatch.get("execution_status", "UNKNOWN")),
         "dispatch_possible_mutation": bool(
-            dispatch.get("execution_receipt",
-                {}).get("possible_mutation", True)),
+            dispatch.get("possible_mutation",
+                dispatch.get("execution_receipt",
+                    {}).get("possible_mutation", True))),
         "dispatch_changed_surface": list(
             dispatch.get("changed_surface", [])),
     }
@@ -634,8 +641,9 @@ def _g1_mutation_state_check(receipt: Mapping[str, Any]) -> dict:
                              and str(th.get("h1")).lower()
                              == str(th.get("h2")).lower()),
         "dispatch_possible_mutation": bool(
-            dispatch.get("execution_receipt", {}).get(
-                "possible_mutation", True)),
+            dispatch.get("possible_mutation",
+                dispatch.get("execution_receipt", {}).get(
+                    "possible_mutation", True))),
         "dispatch_changed_surface": list(
             dispatch.get("changed_surface", [])),
         "application_mutation": (
@@ -728,6 +736,8 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
         if not os.path.isfile(str(_ptr)):
             evidence_ok = False
     checks["evidence_existence"] = evidence_ok
+    checks["evidence_pointers"] = [str(_p) for _p in
+                                   receipt.get("execution_artifact", ())]
 
     return {
         "schema": MUTATION_READY_RECEIPT_SCHEMA,
