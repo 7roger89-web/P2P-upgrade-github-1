@@ -224,18 +224,11 @@ def _restore_composition(orig):
 
 
 def _patch_pre_dispatch():
-    """Instrumentation only: logs the record the loop hands to the
-    permission gate and delegates to the REAL pre_dispatch_revalidation."""
+    """Harness boundary: replaces nothing — exists so the permission
+    gate boundary is exercisable without side effects (kept for
+    symmetry with composition gating)."""
     import p2p_capabilities.p2p_fw01_loop as _l
     _orig = _l.Fw01Loop.pre_dispatch_revalidation
-
-    def _dbg(self, contract, task_record):
-        import sys
-        print("DEBUG pre_dispatch rec keys:", sorted(task_record.keys()),
-              "permission_needs=", task_record.get("permission_needs"),
-              flush=True)
-        return _orig(self, contract, task_record)
-    _l.Fw01Loop.pre_dispatch_revalidation = _dbg
     return _orig
 
 def _restore_pre_dispatch(orig):
@@ -304,10 +297,19 @@ class SeamACheckpointTests(unittest.TestCase):
                      quality_status="QUALITY_UNKNOWN",
                      failures=("SUCCESS_WITHOUT_PROVEN_QUALITY",))
         out = self._step(qa)
-        self.assertEqual(out.get("status"), "TASK_DONE_CONTINUE", out)
+        # P2P-FW04 QUALITY STOP — REQUIRED INVARIANT:
+        # QUALITY_BLOCKED != TASK_DONE_CONTINUE. When quality is not
+        # proven, the iteration result MUST be an honest stop, never a
+        # continue semantic that any caller could read as permission to
+        # advance to the next task.
+        self.assertEqual(out.get("status"), "STOP_BLOCKED", out)
+        self.assertEqual(out.get("reason"), "QUALITY_REVIEW_REQUIRED")
+        self.assertEqual(out.get("task_id"), "task-a")
+        self.assertEqual(out.get("quality_status"), "QUALITY_UNKNOWN")
+        self.assertEqual(out.get("next_safe_action"),
+                         "QUALITY_REVIEW:task-a")
         cp = _last_checkpoint(self.root)
         self.assertIsNotNone(cp, self._testMethodName)
-        print("CP-DUMP", self._testMethodName, json.dumps(cp)[:300])
         self.assertEqual(cp["verification_state"], "QUALITY_REVIEW")
         self.assertEqual(cp["loop_status"], "BLOCKED")
         self.assertEqual(cp["next_safe_action"], "QUALITY_REVIEW:task-a")
@@ -324,7 +326,6 @@ class SeamACheckpointTests(unittest.TestCase):
         self.assertEqual(out.get("status"), "TASK_DONE_CONTINUE")
         cp = _last_checkpoint(self.root)
         self.assertIsNotNone(cp, self._testMethodName)
-        print("CP-DUMP", self._testMethodName, json.dumps(cp)[:300])
         self.assertEqual(cp["verification_state"], "VERIFIED")
         self.assertEqual(cp["loop_status"], "CHECKPOINTED")
         self.assertIn("NONE", cp.get("next_safe_action", ""))
@@ -334,7 +335,13 @@ class SeamACheckpointTests(unittest.TestCase):
                      quality_status="QUALITY_REJECTED",
                      failures=("REQUIRED_EVAL_FAILED",))
         out = self._step(qa)
-        self.assertEqual(out.get("status"), "TASK_DONE_CONTINUE")
+        # P2P-FW04 QUALITY STOP — QUALITY_REJECTED also stops:
+        # a failed quality verdict can never surface as continue.
+        self.assertEqual(out.get("status"), "STOP_BLOCKED", out)
+        self.assertEqual(out.get("reason"), "QUALITY_REVIEW_REQUIRED")
+        self.assertEqual(out.get("quality_status"), "QUALITY_REJECTED")
+        self.assertEqual(out.get("next_safe_action"),
+                         "QUALITY_REVIEW:task-a")
         cp = _last_checkpoint(self.root)
         self.assertEqual(cp["verification_state"], "QUALITY_REVIEW")
         self.assertEqual(cp["loop_status"], "BLOCKED")
@@ -359,7 +366,19 @@ class SeamACheckpointTests(unittest.TestCase):
                 __builtins__.__import__ = orig_import  # type: ignore
             _restore_qa(orig)
             _restore_composition(comp_orig)
-        self.assertEqual(out.get("status"), "TASK_DONE_CONTINUE")
+        # P2P-FW04 QUALITY STOP — quality-intelligence absent/unusable
+        # fails closed: whether the fallback verdict is reached directly
+        # (QUALITY_UNKNOWN) or the mock verdict is unreachable because
+        # the intelligence path itself faults, the observable iteration
+        # result for a quality-blocked execution is an honest stop,
+        # never continue.
+        self.assertEqual(out.get("status"), "STOP_BLOCKED", out)
+        self.assertEqual(out.get("reason"), "QUALITY_REVIEW_REQUIRED")
+        self.assertEqual(out.get("next_safe_action"),
+                         "QUALITY_REVIEW:task-a")
+        self.assertIn(out.get("quality_status"),
+                      ("QUALITY_UNKNOWN", "QUALITY_REJECTED",
+                       "QUALITY_VERIFIED"))
         cp = _last_checkpoint(self.root)
         self.assertEqual(cp["verification_state"], "QUALITY_REVIEW")
         self.assertEqual(cp["loop_status"], "BLOCKED")
@@ -377,7 +396,12 @@ class SeamACheckpointTests(unittest.TestCase):
             out = loop.step()
         finally:
             _restore_composition(comp_orig)
-        self.assertEqual(out.get("status"), "TASK_DONE_CONTINUE")
+        # P2P-FW04 QUALITY STOP — the iteration result for a
+        # quality-blocked execution is an honest stop, not continue.
+        self.assertEqual(out.get("status"), "STOP_BLOCKED", out)
+        self.assertEqual(out.get("reason"), "QUALITY_REVIEW_REQUIRED")
+        self.assertEqual(out.get("next_safe_action"),
+                         "QUALITY_REVIEW:task-a")
         # Quality review is a CHECKPOINT attribute only: the task record
         # status was never rewritten by the checkpoint path — resume-dedup
         # guarantees a previously-executed task is not blind re-executed;
@@ -385,6 +409,49 @@ class SeamACheckpointTests(unittest.TestCase):
         # only reports honest quality state.
         self.assertEqual(loop.loop._task_records["task-a"]["status"],
                          "DONE")
+        # DURABLE PRE-STEP QUALITY STOP: a fresh/resumed loop honors the
+        # persisted QUALITY_REVIEW checkpoint — no task is selected,
+        # the completed task is not re-executed, and the honest blocked
+        # state persists across resume
+        # (QUALITY_REVIEW_PERSISTS_ACROSS_RESUME).
+        root2 = _make_root()
+        try:
+            _write_ledger(root2, [{"event": "goal_plan_initialized",
+                                   "goal_id": "p2p-goals-v003",
+                                   "at": _now(),
+                                   "details": {"title": "t",
+                                               "purpose": "d"}},
+                                  {"event": "task_executed",
+                                   "task_id": "task-a",
+                                   "at": _now(),
+                                   "details": {}},
+                                  {"event": "task_verified",
+                                   "task_id": "task-a",
+                                   "at": _now(),
+                                   "details": {"status": "VERIFIED",
+                                               "evidence_ref": "ev-a"}},
+                                  {"event": "task_done",
+                                   "task_id": "task-a",
+                                   "at": _now(),
+                                   "details": {"evidence_ref": "ev-a"}}])
+            fresh_loop = _build_loop(root2)
+            comp2 = _make_composition_pass()
+            try:
+                fresh_out = fresh_loop.step()
+            finally:
+                _restore_composition(comp2)
+            self.assertEqual(fresh_out.get("status"), "STOP_BLOCKED",
+                             fresh_out)
+            self.assertEqual(fresh_out.get("reason"),
+                             "QUALITY_REVIEW_REQUIRED")
+            self.assertEqual(fresh_out.get("next_safe_action"),
+                             "QUALITY_REVIEW:task-a")
+            # No task selected, no execution: the resume stop returns
+            # before select_next_safe_task and never touches the inner
+            # execution backend.
+            self.assertIsNone(fresh_loop.loop.select_next_safe_task())
+        finally:
+            _remove_root(root2)
         # Cross-session recovery: a fresh process rebuilds honest task
         # statuses from the durable goal-event ledger only. With the
         # verified ledger produced above, task-a recovers as DONE

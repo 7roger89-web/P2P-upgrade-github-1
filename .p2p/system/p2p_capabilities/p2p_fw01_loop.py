@@ -362,6 +362,45 @@ class Fw01Loop:
                 guard_state_hash=None)
             return {"status": "STOP_FAIL_CLOSED", "loop_guard_cause": cause}
 
+        # P2P-FW04 QUALITY STOP — DURABLE PRE-STEP STOP:
+        # a fresh/resumed loop must honor the persisted checkpoint.
+        # If the durable state says the loop is BLOCKED for a pending
+        # quality review (loop_status == BLOCKED and
+        # next_safe_action == QUALITY_REVIEW:<task_id>), the loop MUST
+        # NOT silently select the next task and MUST NOT re-execute the
+        # completed task: it returns an honest blocked/review state
+        # (QUALITY_REVIEW_PERSISTS_ACROSS_RESUME).
+        try:
+            _prev_state = self.state.load()
+        except Exception:
+            _prev_state = None
+        if _prev_state is not None:
+            _prev_status = str(_prev_state.get("loop_status", ""))
+            _prev_action = str(_prev_state.get("next_safe_action", ""))
+            if (_prev_status == "BLOCKED" and _prev_action
+                    and _prev_action.startswith("QUALITY_REVIEW:")):
+                self._trace(
+                    _prev_action.split("QUALITY_REVIEW:", 1)[1] or "NONE",
+                    {"mutation_class": "READ_ONLY", "permission": "",
+                     "verification": "REQUIRED"},
+                    "QUALITY_REVIEW_PERSISTED",
+                    "durable checkpoint requires quality review; no task "
+                    "selected, no re-execution; resolution only through "
+                    "verification/review, evidence completion or owner gate")
+                return {"status": "STOP_BLOCKED",
+                        "reason": "QUALITY_REVIEW_REQUIRED",
+                        "task_id": (_prev_action.split(
+                            "QUALITY_REVIEW:", 1)[1]
+                                    if "QUALITY_REVIEW:" in _prev_action
+                                    else None),
+                        "quality_status": str(
+                            _prev_state.get("verification_state",
+                                            "QUALITY_UNKNOWN"))
+                        if str(_prev_state.get("verification_state",
+                                               "")).strip()
+                        else "QUALITY_REVIEW",
+                        "next_safe_action": _prev_action}
+
         self.iteration += 1
         task_id = self.loop.select_next_safe_task()
         if task_id is None:
@@ -775,7 +814,21 @@ class Fw01Loop:
                         " failures=" + json.dumps(list(
                             _fw04_verdict.get("quality_failures", ()))))
         self._trace(task_id, rec, gate_result,
-                    outcome.get("reason") or "continue")
+                    "QUALITY_REVIEW_REQUIRED" if _quality_review
+                    else (outcome.get("reason") or "continue"))
+        # P2P-FW04 QUALITY STOP — REQUIRED INVARIANT:
+        # QUALITY_BLOCKED != TASK_DONE_CONTINUE. The inner autopilot loop
+        # outcome (which may carry TASK_DONE_CONTINUE) is never surfaced
+        # to callers while quality verification is not proven: a blocked
+        # quality verdict stops continuation, so no caller can read the
+        # returned status as permission to advance to the next task.
+        if _quality_review:
+            return {"status": "STOP_BLOCKED",
+                    "reason": "QUALITY_REVIEW_REQUIRED",
+                    "task_id": task_id,
+                    "quality_status": _fw04_verdict.get(
+                        "quality_status", "QUALITY_UNKNOWN"),
+                    "next_safe_action": "QUALITY_REVIEW:" + str(task_id)}
         return outcome
 
     def _trace(self, task_id: str, rec: Mapping[str, Any],

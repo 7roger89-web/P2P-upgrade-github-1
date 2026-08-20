@@ -627,8 +627,54 @@ def load_certification_evidence(
             "freshness": fresh,
             "currently_eligible": bool(elig.get("currently_eligible", False)),
             "certification_records": _cert_records_for(cap),
+            # P2P-FW04 QUALITY STOP — subject binding: which canonical
+            # registry roles this certification evidence may legally
+            # extend. A certification NEVER attaches to the role that
+            # happens to need it; it attaches to the subject it names.
+            "certified_roles": _certified_roles_for(cap),
         }
     return out
+
+
+def _canonical_role_ids(registry_records: Iterable[Any]) -> Set[str]:
+    """Canonical registry role ids (from build_team_decision's registry
+    records). The subject of a certification must exactly equal one of
+    these ids to extend that role's coverage (subject binding).
+    Non-role subjects (environment, host, arbitrary string) count for
+    NOTHING."""
+    ids: Set[str] = set()
+    for r in registry_records:
+        rec = r if isinstance(r, Mapping) else {}
+        if (rec.get("kind") or "") == "ROLE" and rec.get("id"):
+            ids.add(str(rec["id"]))
+    return ids
+
+
+def _certified_roles_for(capability_id: str) -> Tuple[str, ...]:
+    """Role ids this certification evidence names as subject (subject
+    binding). Only CERTIFIED-result records count; subject binding is
+    computed HERE so the FW03 boundary stays evidence-only. Currency is
+    the consumer's job via currently_eligible — but a record whose
+    freshness_bound is unbound is excluded here too, because an unbound
+    certification can never attest about any role (fail closed on
+    UNKNOWN_STALE/UNBOUND/NO_RECORD)."""
+    matched: List[str] = []
+    for rec in load_certification_records():
+        if str(rec.get("capability_id", "")).lower() \
+                != str(capability_id).lower():
+            continue
+        # CERTIFIED result only: VERIFIED/DECLARED/passing-receipt noise
+        # never binds a role.
+        if str(rec.get("result", "")).upper() != "CERTIFIED":
+            continue
+        # Unbound freshness = currency unprovable = no attestation:
+        # fail closed, never bind any role from this record.
+        if not str(rec.get("freshness_bound", "")).strip():
+            continue
+        subject = str(rec.get("subject", "")).strip()
+        if subject:
+            matched.append(subject)
+    return tuple(sorted(set(matched)))
 
 
 def _tier_meets(tier: str, required: str) -> bool:

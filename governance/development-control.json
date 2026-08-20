@@ -1023,6 +1023,29 @@
         "eval_registry.json unchanged evidence-backed registry (12 evals)",
         "governance candidate lineage record (this record)"
       ]
+    },
+    {
+      "candidate_id": "FW04_QUALITY_STOP_HARDENING",
+      "candidate_version": "8.4.7-C-codex.32",
+      "embedded_version": "8.4.7-C-codex.32",
+      "candidate_label": "fw04-quality-stop-hardening-8.4.7-C-codex.32",
+      "promotion_status": "UNPROMOTED",
+      "candidate_sha256": "5985e0e5dc5bdae143ebe42746226f7649f93fdaa705c8b0ec5e9b951cc376f6",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW04_QUALITY_EVIDENCE_AND_LEARNING",
+      "built": true,
+      "lineage_anchor_sha256": "be3d8d35c72db5877b9638ff7f0cab9d5a1a3f47008d8768c2cf255133a9da7a",
+      "lineage_anchor_note": "FW04 QUALITY STOP hardening candidate (post-handoff; lineage anchor .31 = be3d8d35c72d...): TWO state-contradiction gaps found after the handoff and mechanically fixed + proven on real code/data paths. Issue A (loop return semantics): the quality-blocked checkpoint (VERIFICATION_REVIEW/BLOCKED) coexisted with a step() return of the inner loop's TASK_DONE_CONTINUE — an honest caller could read the continue as permission to advance. Fix: when _quality_review is active the iteration now returns the canonical STOP_BLOCKED outcome with reason=QUALITY_REVIEW_REQUIRED, task_id, quality_status and next_safe_action=QUALITY_REVIEW:<task>; the checkpoint's BLOCKED + next_safe_action and the QUALITY_CHECKPOINT_NOT_VERIFIED trace event remain the durable record. A durable PRE-STEP quality stop is added before next-task selection: a process that restarts with a persisted QUALITY_REVIEW checkpoint halts immediately at the loop boundary and never re-executes the task — resume dedup is preserved via the real event ledger (no status mutation of task records). Issue B (subject-bound certification): capability certifications were recorded without a subject binding, so in principle a cert recorded under one identity could leak coverage to any role. Fix: certifications carry a subject; quality_intelligence.certified_roles requires result=CERTIFIED with a freshness bound, and build_team_decision's extension now requires exact subject equality with a canonical registry role id — a subject that is not a canonical role id extends NO role (fail-closed), and every inspected role records a ROLE_CERTIFICATION trace with subject_match=. Coverage extension stays coverage-only: no eligibility, permission or gate state changes. Verification: 6 seam-A loop-level tests (real Fw01Loop + FakeDeterministicExecutionBackend against real registry and real gates) + 9 seam-B certification consumption tests (A-I: certified+eligible counts subject-bound only; X cert never satisfies Y; generic receipt never certifies; stale cert does not count; unknown currency fail-closed; malformed pointer fail-closed; decision changes only with valid evidence; certification never grants permission; subject mismatch extends no role) + full regression 159 existing tests = 174 PASS, 0 new failures, NEW_UNEXPLAINED_FAILURES=0. FW04 remains post-execution verification authority only; FW05 not started (owner gate). Ancestors = .31 quality-checkpoint-certification-handoff and .30 quality-evidence-learning candidates, untouched as historical records. Minted per canonical candidate_policy (PASS, None, ChangeSignals(runtime_changed=True, governance_changed=True, release_artifact_changed=False)) = YES. No promotion, no release. SHA256 bound to this exact normalized zip.",
+      "surface_scope": [
+        "p2p_fw01_loop.py Issue A: quality-blocked iteration returns STOP_BLOCKED with reason QUALITY_REVIEW_REQUIRED, task_id, quality_status and next_safe_action=QUALITY_REVIEW:<task> — never a continue semantic (QUALITY_BLOCKED != TASK_DONE_CONTINUE)",
+        "p2p_fw01_loop.py Issue A: durable PRE-STEP quality stop — a persisted QUALITY_REVIEW/BLOCKED checkpoint halts the loop before next-task selection on any restart; no task record status is mutated (resume dedup preserved)",
+        "quality_intelligence.py Issue B: certified_roles derived from records with result=CERTIFIED and a freshness bound (CURRENT per freshness contract), subject-bound to canonical registry role ids",
+        "team_intelligence.py Issue B: build_team_decision extension requires exact subject equality (subject_match trace per inspected role); non-matching subjects extend no role; certification evidence extends coverage ONLY — no eligibility/permission/gate change (failure_class remains NO_ELIGIBLE_ROLE)",
+        "test_checkpoint_quality_gate.py: 6 loop-level cases (A quality unknown stops; B quality proven honest continue; C rejected stops; D failed execution fail-closed; E quality module absent fail-closed; F resume without duplicate execution via event ledger)",
+        "test_certification_consumption.py: 9 cases (A-I: subject-bound certified eligible counts; X cert does not satisfy Y; generic execution receipt never certifies; stale cert does not count; unknown currency fails closed; malformed evidence fails closed; decision changes only with valid evidence; certification never grants permission; subject mismatch extends no role)",
+        "governance candidate lineage record (this record)"
+      ]
     }
   ],
   "capability_status": [

@@ -383,14 +383,44 @@ def build_team_decision(
         # Certification evidence (FW04): a required capability that is
         # certified AND currently eligible extends coverage even when no
         # registry tier qualifies. Capability-scoped only: the
-        # certification's capability_id is the only identifier used; it
-        # never upgrades a role's own claim. Fail-closed: absence of a
-        # certification key or currently_eligible=False never counts.
+        # certification's capability_id is the only capability
+        # identifier used — X certification never satisfies Y.
+        # P2P-FW04 QUALITY STOP — SUBJECT BINDING: a certification also
+        # carries a subject (the identity it attests about). The subject
+        # must exactly equal THIS role's id for the evidence to count;
+        # a certification for subject "role_audit" can never extend
+        # "role_dev"'s coverage, regardless of eligibility. Non-role
+        # subjects (environment, host, arbitrary string) count for
+        # nothing. Fail-closed: absence of a certification key, missing
+        # subject, currently_eligible=False, or subject≠role all never
+        # count.
         for cap in reqs:
             c = certs.get(cap) or {}
             if cap in covers:
                 continue
             if not bool(c.get("currently_eligible", False)):
+                continue
+            certified_roles = tuple(str(x) for x in
+                                    (c.get("certified_roles") or ()))
+            certified_roles = tuple(x for x in certified_roles if x)
+            # Role scope is exact: the role's own id must be named by
+            # the evidence (subject binding). No fallback to "someone is
+            # certified so this role gets it".
+            role_is_certified = bool(certified_roles and
+                                     str(role) in set(certified_roles))
+            trace.append(TeamDecisionTraceItem(
+                step="ROLE_CERTIFICATION",
+                fact=f"{role} cap={cap} certified_roles="
+                     + str(certified_roles)[:120]
+                     + f" subject_match={role_is_certified}",
+                rationale="A capability certification extends this role"
+                          " ONLY when the evidence names this exact role"
+                          " as subject (subject binding) and the"
+                          " certification is current. A certification"
+                          " for another role, an environment, or an"
+                          " arbitrary subject never transfers.",
+                tie_breaker=""))
+            if not role_is_certified:
                 continue
             covers.add(cap)
         provide[role] = covers

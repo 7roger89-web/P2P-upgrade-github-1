@@ -20,6 +20,11 @@ from p2p_capabilities import team_intelligence as ti  # noqa: E402
 
 CAP = "security_audit"
 
+# Canonical registry role id used as the subject of test fixtures. Subject
+# binding (P2P-FW04 QUALITY STOP): the certification's subject must exactly
+# equal a canonical role CAPABILITY_ID for that role to gain the capability.
+BOUND_ROLE = "p2p_helios"
+
 
 def _current_commit() -> str:
     result = subprocess.run(
@@ -90,7 +95,7 @@ class CertificationConsumptionTests(unittest.TestCase):
         commit = _current_commit()
         records = [
             {"eval_id": "eval-fw04-001", "eval_version": "1.0",
-             "capability_id": CAP, "subject": "p2p_security_audit",
+             "capability_id": CAP, "subject": BOUND_ROLE,
              "target_environment": "",
              "timestamp": "2026-08-19T00:00:00Z", "result": "CERTIFIED",
              "evidence_pointers": ["ptr-security-audit-v1"],
@@ -109,9 +114,16 @@ class CertificationConsumptionTests(unittest.TestCase):
             decision = _build((CAP,), certs)
             base_covers = _role_covers(baseline)
             with_covers = _role_covers(decision)
-            # Coverage extension: roles that could not previously claim
-            # CAP must gain exactly CAP — no capability invention beyond
-            # the certified scope.
+            # Subject binding: ONLY the role named as subject (BOUND_ROLE)
+            # gains the certified capability; every other role's coverage
+            # is byte-identical to baseline. Subject "p2p_security_audit"
+            # (not a canonical role id) would extend NOTHING — that is
+            # the exact leakage the seam forbids, proven here by the
+            # contrast with the role-bound fixture.
+            self.assertIn(BOUND_ROLE, with_covers,
+                          "bound role must be present in decision")
+            self.assertIn(CAP, with_covers[BOUND_ROLE],
+                          "bound role gains exactly the certified cap")
             for role in with_covers:
                 added = with_covers[role] - base_covers.get(role, set())
                 if CAP in added:
@@ -119,7 +131,10 @@ class CertificationConsumptionTests(unittest.TestCase):
                                      f"role {role} gained {sorted(added)} "
                                      "from a security_audit-only "
                                      "certification")
-            # The certified cap now appears in more roles' coverage.
+                    self.assertEqual(role, BOUND_ROLE,
+                                     ("a certification whose subject is "
+                                      "'%s' must NEVER extend role '%s'"
+                                      % (BOUND_ROLE, role)))
             roles_with = {r for r, s in with_covers.items() if CAP in s}
             roles_base = {r for r, s in base_covers.items() if CAP in s}
             self.assertGreater(len(roles_with), len(roles_base),
@@ -270,7 +285,7 @@ class CertificationConsumptionTests(unittest.TestCase):
         baseline = _build((CAP,))
         records = [
             {"eval_id": "eval-fw04-005", "eval_version": "1.0",
-             "capability_id": CAP, "subject": "p2p_security_audit",
+             "capability_id": CAP, "subject": BOUND_ROLE,
              "target_environment": "",
              "timestamp": "2026-08-19T00:00:00Z", "result": "CERTIFIED",
              "evidence_pointers": ["ptr-g-v1"],
@@ -294,13 +309,22 @@ class CertificationConsumptionTests(unittest.TestCase):
                                      f"role {role} gained {sorted(added)} "
                                      "beyond the certified capability")
             self.assertNotEqual(base_covers, with_covers,
-                                "valid capability evidence must change "
-                                "the coverage decision")
+                                "a subject-bound certification must "
+                                "change the coverage decision")
+            # Subject exactness at the decision layer: only the role
+            # named as subject shows the coverage change; the decision
+            # trace records the subject-match for every inspected role.
+            for item in with_evidence.decision_trace:
+                if item.step == "ROLE_CERTIFICATION":
+                    self.assertIn("subject_match=", item.fact,
+                                  item.to_dict())
             # The decision must remain fail-closed at the dispatch gate:
             # certification evidence extends COVERAGE, never eligibility.
-            self.assertIn(with_evidence.failure_class,
-                          ("", "NO_ELIGIBLE_ROLE"),
-                          with_evidence.to_dict())
+            self.assertEqual(with_evidence.failure_class,
+                             "NO_ELIGIBLE_ROLE",
+                             "certification evidence extends coverage "
+                             "ONLY; eligibility remains fail-closed, so "
+                             "the decision must stay NO_ELIGIBLE_ROLE")
         finally:
             _restore_records(orig)
 
@@ -340,6 +364,38 @@ class CertificationConsumptionTests(unittest.TestCase):
         finally:
             _restore_records(orig)
 
-
+    def test_i_subject_mismatch_fails_closed(self):
+        commit = _current_commit()
+        # A certification whose subject is not a canonical registry role
+        # id must certify NO role — the exact leak class this seam
+        # hardening eliminates.
+        records = [
+            {"eval_id": "eval-fw04-007", "eval_version": "1.0",
+             "capability_id": CAP, "subject": "p2p_security_audit",
+             "target_environment": "",
+             "timestamp": "2026-08-19T00:00:00Z", "result": "CERTIFIED",
+             "evidence_pointers": ["ptr-i-v1"],
+             "freshness_bound": commit,
+             "kind": "CAPABILITY_CERTIFICATION"},
+        ]
+        orig = _with_records(records)
+        try:
+            certs = _cert_map(commit)
+            baseline = _build((CAP,))
+            decision = _build((CAP,), certs)
+            base_covers = _role_covers(baseline)
+            with_covers = _role_covers(decision)
+            # The mismatched subject must not extend ANY role's coverage.
+            self.assertEqual(with_covers, base_covers,
+                             "a certification whose subject is not a "
+                             "canonical role id must extend no role")
+            # The certified capability still appears in the evidence map
+            # (it was recorded honestly) — but binding filters it out.
+            self.assertIn(CAP, certs,
+                          "recorded evidence must not be silently "
+                          "deleted; only its role-scoped scope is "
+                          "rejected")
+        finally:
+            _restore_records(orig)
 if __name__ == "__main__":
     unittest.main()
