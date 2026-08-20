@@ -416,7 +416,18 @@ class Fw01Loop:
                 attempt_counters={},
                 loop_status="DONE",
                 guard_state_hash=None)
-            return {"status": "GOAL_DONE"}
+            _fw05_done = {"status": "GOAL_DONE"}
+            try:
+                from p2p_capabilities import (  # noqa: E402
+                    fw05_owner_experience as _fw05)
+                _fw05_done["fw05_owner_experience"] = {
+                    "schema": "p2p-fw05-owner-experience/1",
+                    "status": _fw05.project_status_snapshot(self.root),
+                    "read_only": True,
+                }
+            except Exception:  # noqa: BLE001 - never blocks the loop
+                pass
+            return _fw05_done
 
         rec = self.loop._task_records.get(task_id, {})
 
@@ -640,8 +651,24 @@ class Fw01Loop:
                 guard_state_hash=None)
             self._trace(task_id, rec, "OWNER_GATE",
                         "Owner Gate: quyết định sản phẩm/dữ liệu thuộc về Owner")
-            return {"status": "OWNER_GATE_REQUIRED",
-                    "owner_gate": og, "task_id": task_id}
+            _fw05_og = {"status": "OWNER_GATE_REQUIRED",
+                        "owner_gate": og, "task_id": task_id}
+            try:
+                from p2p_capabilities import (  # noqa: E402
+                    fw05_owner_experience as _fw05)
+                _fw05_og["fw05_owner_experience"] = {
+                    "schema": "p2p-fw05-owner-experience/1",
+                    "status": _fw05.project_status_snapshot(self.root),
+                    "decision_trace_record_count": len(
+                        _fw05.read_decision_records(self.root)
+                        .get("records", [])),
+                    "open_owner_decisions": _fw05.render_project_experience(
+                        self.root, level=2).get("blocked_items", []),
+                    "read_only": True,
+                }
+            except Exception:  # noqa: BLE001 - never blocks the loop
+                pass
+            return _fw05_og
         except PreflightError:
             return {"status": "PRE_DISPATCH_FAILED", "task_id": task_id}
 
@@ -823,13 +850,36 @@ class Fw01Loop:
         # quality verdict stops continuation, so no caller can read the
         # returned status as permission to advance to the next task.
         if _quality_review:
-            return {"status": "STOP_BLOCKED",
-                    "reason": "QUALITY_REVIEW_REQUIRED",
-                    "task_id": task_id,
-                    "quality_status": _fw04_verdict.get(
-                        "quality_status", "QUALITY_UNKNOWN"),
-                    "next_safe_action": "QUALITY_REVIEW:" + str(task_id)}
-        return outcome
+            _fw05_exit = {"status": "STOP_BLOCKED",
+                          "reason": "QUALITY_REVIEW_REQUIRED",
+                          "task_id": task_id,
+                          "quality_status": _fw04_verdict.get(
+                              "quality_status", "QUALITY_UNKNOWN"),
+                          "next_safe_action": "QUALITY_REVIEW:" + str(task_id)}
+        else:
+            _fw05_exit = dict(outcome)
+        # P2P-FRAMEWORK-05 — INFO-ONLY OWNER EXPERIENCE ENRICHMENT.
+        # Read-only facade: this hook appends an honest Owner-facing view of
+        # canonical durable state (checkpoint + inbox + trace) to the step
+        # result. It NEVER selects tasks, grants permission, executes code,
+        # or blocks the loop (blockers already enforced above). Any FW05
+        # failure downgrades to {} (information loss only).
+        try:
+            from p2p_capabilities import (  # noqa: E402
+                fw05_owner_experience as _fw05)
+            _fw05_exit["fw05_owner_experience"] = {
+                "schema": "p2p-fw05-owner-experience/1",
+                "status": _fw05.project_status_snapshot(self.root),
+                "decision_trace_record_count": len(
+                    _fw05.read_decision_records(self.root)
+                    .get("records", [])),
+                "open_owner_decisions": _fw05.render_project_experience(
+                    self.root, level=2).get("blocked_items", []),
+                "read_only": True,
+            }
+        except Exception:  # noqa: BLE001 - never blocks the loop
+            pass
+        return _fw05_exit
 
     def _trace(self, task_id: str, rec: Mapping[str, Any],
                gate_result: str, why: str) -> None:

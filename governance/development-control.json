@@ -1046,6 +1046,28 @@
         "test_certification_consumption.py: 9 cases (A-I: subject-bound certified eligible counts; X cert does not satisfy Y; generic execution receipt never certifies; stale cert does not count; unknown currency fails closed; malformed evidence fails closed; decision changes only with valid evidence; certification never grants permission; subject mismatch extends no role)",
         "governance candidate lineage record (this record)"
       ]
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.33",
+      "candidate_label": "fw05-owner-experience-decision-trace",
+      "candidate_sha256": "a4c3161b711a1c9dae6870401f8135e0e77b445c7703ac7fa0ed9c983a06bbb9",
+      "candidate_artifact": "reports/candidates/fw05-owner-experience-decision-trace-candidate.zip",
+      "candidate_built_at_utc": "2026-08-20T02:21:25Z",
+      "embedded_version": "8.4.7-C-codex.33",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW05_OWNER_EXPERIENCE_DECISION_TRACE",
+      "promotion_status": "UNPROMOTED",
+      "built": true,
+      "lineage_anchor_sha256": "5985e0e5dc5bdae143ebe42746226f7649f93fdaa705c8b0ec5e9b951cc376f6",
+      "lineage_anchor_note": "FW05 owner experience + decision trace candidate (lineage anchor .32 quality-stop hardening). FW05 is NOT a new orchestrator: a read-only owner-facing facade over canonical durable state (FW01 remains the sole operating loop). New surface: p2p_capabilities/fw05_owner_experience.py (~1.5k lines) implementing the structured decision-trace contract (DECISION_ID, GOAL_ID, TASK_ID, DECISION_TYPE, TIMESTAMP, INPUT_FACTS, APPLIED_POLICY_OR_RULE, SELECTED_ACTION, MATERIAL_ALTERNATIVES, REJECTED_ALTERNATIVES_WITH_REASON, EVIDENCE_POINTERS, EVIDENCE_VERSION, UNKNOWN_OR_GAPS, OWNER_DECISION_REQUIRED, DECISION_STATUS, SCOPE), the durable Owner Decision Inbox (append-only .p2p/state/owner-inbox.jsonl with deterministic DECISION_ID hashing for cross-process deduplication; exactly one unresolved item per blocking cause+scope+evidence version), the Owner Answer Contract (parse_owner_response/resolve_owner_answer: validate against DECISION_ID + evidence version + option; invalid/stale/already-resolved answers fail closed; raw transcript never becomes state; ONE_TIME narrow scope, auto_grants_nothing), progressive disclosure L1/L2/L3 derived from the same durable truth, project status view with Goal Pass vs Promotion distinction, and durable QUALITY_REVIEW triage (technical-resolvable routed without an inbox item; owner-owned creates exactly one item). FW01 loop receives an info-only enrichment hook (fw05_owner_experience field on step() outcomes) that never affects control flow. Evidence over claims: test_fw05_owner_experience.py 29 cases PASS (full A-Z matrix incl. dedup K/L, cold-process boundary recovery M/N via real subprocess restart, owner answer contract O-S, decision resume U/V with no duplicate execution, progressive disclosure W, Goal Pass vs Promotion X, evidence-not-CoT Y, FW01-FW04 regression Z) + full regression 203/203 PASS (NEW_UNEXPLAINED_FAILURES=0) + independent supervisor 16/16 PASS over real code/data paths + shadow evaluation READ-ONLY over the GT/GP cert trees (byte-identical before/after). DECISION_TRACE stores structured evidence, never private reasoning; OWNER_MESSAGE never equals DURABLE_DECISION; OWNER_APPROVAL is narrowly scoped (single decision, single task, one-time). Minted per candidate_policy: runtime behavior changed (FW01 step() output enriched + new durable inbox + new module) -> YES. No promotion, no release, FW06 not started (owner gate).",
+      "surface_scope": [
+        "fw05_owner_experience.py: decision-trace record contract, owner inbox (append-only JSONL, stable DECISION_ID, dedup), owner answer contract (fail-closed: invalid/stale/resolved), progressive disclosure L1/L2/L3, project status snapshot (blocker, next action, open decisions, goal-pass vs promotion), quality review integration (owner-owned -> exactly 1 inbox item; technical -> no item)",
+        "test_fw05_owner_experience.py: 29 cases — matrix A-Z, cold-process boundary recovery (real subprocess), decision resume, fail-closed answer contract, GT/GP read-only shadow",
+        "p2p_fw01_loop.py: info-only fw05_owner_experience enrichment field appended to step() outcomes at all exit points; no control-flow change",
+        "scripts/fw05_supervisor.py: independent 16-check supervisor over real code/data paths",
+        "governance/development-control.json: candidate lineage record (this record)"
+      ]
     }
   ],
   "capability_status": [
