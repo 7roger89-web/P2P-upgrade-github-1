@@ -31,6 +31,7 @@ from .backend_contract import (
     ADAPTER_STATES,
     AUTH_STATES,
     BackendCapabilityCertification,
+    CAPABILITY_EXECUTION_SCOPE_MAP,
     CERTIFICATION_SCOPES,
 )
 
@@ -175,14 +176,28 @@ def evaluate_role_target_eligibility(
     cap_results: dict[str, str] = {}
     for scope in role_caps:
         if scope not in CERTIFICATION_SCOPES:
-            # Closure seam: bounded capability→backend-scope # bridge (PROVIDER_SCOPE, registry-governed).
+            # Closure seam (01A): bounded capability→execution-scope
+            # bridge is EXPLICIT and registry-governed. Priority:
+            #   1. registry record EXECUTION_SCOPE field (canonical),
+            #   2. CAPABILITY_EXECUTION_SCOPE_MAP (module-level fallback),
+            #   3. legacy PROVIDER_SCOPE field (backward compat),
+            #   4. hard BLOCK — a capability with no certified scope
+            #      mapping is never mapped implicitly (fail-closed).
             _cap_rec = None
             for _r in (registry_records or ()):
                 if str(_r.get("CAPABILITY_ID", "")) == scope:
                     _cap_rec = _r
                     break
             _prov = None
-            if _cap_rec and _cap_rec.get("PROVIDER_SCOPE"):
+            if _cap_rec and _cap_rec.get("EXECUTION_SCOPE"):
+                _ps = str(_cap_rec["EXECUTION_SCOPE"])
+                if _ps in CERTIFICATION_SCOPES:
+                    _prov = _ps
+            if not _prov and str(scope) in CAPABILITY_EXECUTION_SCOPE_MAP:
+                _ps = str(CAPABILITY_EXECUTION_SCOPE_MAP[str(scope)])
+                if _ps in CERTIFICATION_SCOPES:
+                    _prov = _ps
+            if not _prov and _cap_rec and _cap_rec.get("PROVIDER_SCOPE"):
                 _ps = str(_cap_rec["PROVIDER_SCOPE"])
                 if _ps in CERTIFICATION_SCOPES:
                     _prov = _ps

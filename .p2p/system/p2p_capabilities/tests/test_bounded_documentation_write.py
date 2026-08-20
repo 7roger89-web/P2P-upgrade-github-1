@@ -82,6 +82,11 @@ def _env(root):
 
 def _run_mutation(root, contract=None, **call_overrides):
     contract = contract or _base_contract()
+    # BW01 fixtures are typed TEST_ONLY: the 01A real-attestation gate
+    # (Owner amendment 1/§6) requires mutation-ready executions to carry
+    # a real canonical HostAttestation; the derived-id legacy path stays
+    # valid only under this explicit non-authority fixture typing.
+    call_overrides.setdefault("mutation_authority_mode", "TEST_ONLY")
     return _bdw.execute_bounded_document_mutation(
         contract, root,
         dispatch_id="dispatch-fw01-doc-1",

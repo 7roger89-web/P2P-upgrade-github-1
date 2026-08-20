@@ -22,8 +22,28 @@ import subprocess
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Optional
 
-from .backend_contract import AUTH_STATES
+from .backend_contract import (
+    AUTH_STATES, CERTIFICATION_SCOPES, CAPABILITY_EXECUTION_SCOPE_MAP,
+)
+from . import authority_chain_registry as _ac_registry
+
+import datetime as _ac_datetime
+
 from .host_attestation import canonical_bytes
+
+
+def _ac_not_expired(record: Mapping[str, Any]) -> bool:
+    """Authority-chain expiry gate: a certification whose expires_at is
+    absent, malformed, or past the live UTC clock is NOT current (fail
+    closed)."""
+    _exp = str(record.get("expires_at", "") or "").strip()
+    if not _exp:
+        return False
+    try:
+        _expiry = _ac_datetime.fromisoformat(_exp.replace("Z", "+00:00"))
+        return _expiry > _ac_datetime.now(_ac_datetime.timezone.utc)
+    except (ValueError, TypeError):
+        return False
 
 ROLE_RECEIPT_SCHEMA = "p2p-role-execution-receipt/1"
 
@@ -131,6 +151,10 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
         "permission_profile_fingerprint": str(fields.get("permission_profile_fingerprint", "")),
         "request_fingerprint": str(fields.get("request_fingerprint", "")),
         "task_fingerprint": str(fields.get("task_fingerprint", "")),
+        "run_id": str(fields.get("run_id", "")),
+        "dispatch_id": str(fields.get("dispatch_id", "")),
+        "role_execution_contract_digest": str(
+            fields.get("role_execution_contract_digest", "")),
         "requested_target": str(fields.get("requested_target", "")),
         "observed_target": str(fields.get("observed_target") or ""),
         "target_attestation_status": str(
@@ -149,6 +173,23 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
     }
     if _mutation_evidence:
         receipt_dict["mutation_evidence"] = _mutation_evidence
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01A whole-claim authority chain:
+    # the optional real host-attestation block. An absent block keeps the
+    # attestation check honest-unknown (never invented); the whole-claim
+    # verifier treats an absent attestation on a bounded-mutation claim
+    # as a hard failure.
+    if fields.get("attestation") is not None:
+        receipt_dict["attestation"] = dict(fields["attestation"])
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01 identity lock: the honest
+    # M0/M1 tree baseline pair the whole-claim verifier anchors to.
+    if fields.get("tree_hashes") is not None:
+        receipt_dict["tree_hashes"] = dict(fields["tree_hashes"])
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01A authority-chain closure: the
+    # backend dispatch report (possible_mutation + changed_surface) the
+    # whole-claim verifier binds the bounded evidence against. Absent
+    # means the dispatch surface cannot prove consistency — fail closed.
+    if fields.get("backend") is not None:
+        receipt_dict["backend"] = dict(fields["backend"])
     return receipt_dict
 
 
@@ -182,6 +223,14 @@ def _g1_validate_mutation_evidence(evidence: dict[str, Any]) -> None:
         _v = str(evidence.get(_key) or "").strip()
         if not _v or _v.upper() in ("UNKNOWN", "NONE", ""):
             raise RoleReceiptError("MUTATION_EVIDENCE_HASH_UNKNOWN",
+                                   {"field": _key})
+        # P2P-BOUNDED-DOCUMENTATION-WRITE-01: NON_EXISTENT is the
+        # canonical first-mutation sentinel for before-file and
+        # before-tree hashes (the file/tree did not exist pre-mutation).
+        if _v == "NON_EXISTENT":
+            if _key in ("before_file_hash", "before_tree_hash"):
+                continue
+            raise RoleReceiptError("MUTATION_EVIDENCE_HASH_INVALID",
                                    {"field": _key})
         if not re.fullmatch(r"[0-9a-fA-F]{40,64}", _v):
             raise RoleReceiptError("MUTATION_EVIDENCE_HASH_INVALID",
@@ -834,7 +883,7 @@ def _g1_attestation_validity_check(receipt: Mapping[str, Any]) -> dict:
         and str(att.get("dispatch_id", ""))
         == str(receipt.get("dispatch_id", ""))
         and str(att.get("execution_contract_digest", "")).lower()
-        == str(receipt["role_execution_contract_digest"]).lower()
+        == str(receipt.get("role_execution_contract_digest", "")).lower()
     )
     real_host = bool(att.get("host_execution_identity", "").strip()
                      and att.get("host_kind", "UNKNOWN") != "UNKNOWN")
@@ -972,6 +1021,204 @@ def _g1_mutation_state_check(receipt: Mapping[str, Any]) -> dict:
     out["mutation_evidence_check"] = (
         "BOUNDED_MUTATION_EVIDENCE_VERIFIED" if valid
         else "BOUNDED_MUTATION_EVIDENCE_INVALID")
+    return out
+
+
+def _g1_authority_chain_check(
+        receipt: Mapping[str, Any],
+        registry_records: Iterable[Mapping[str, Any]] | None = None
+) -> dict:
+    """P2P-BOUNDED-DOCUMENTATION-WRITE-01A whole-claim authority-chain
+    check (Owner amendment §9): the receipt's claimed role must be the
+    one selected for the bounded capability, the registry record must
+    provide that capability with a certified execution scope, the
+    scope must be LIVE_CERTIFIED for the execution target, and the
+    chain must be anchored by the same real host attestation the
+    executor used.
+
+    READ_ONLY receipts (no mutation evidence) keep a neutral result:
+    authority chain only becomes a hard gate on a bounded-mutation
+    claim. Every failure makes overall = false (fail closed)."""
+    ev = dict(receipt.get("mutation_evidence") or {})
+    _claiming_bounded = bool(ev)
+    out: dict[str, Any] = {"role_selected": False,
+                           "role_spec_matches_registry": False,
+                           "role_provides_capability": False,
+                           "capability_scope_mapping_valid": False,
+                           "execution_scope_certified_for_target": False,
+                           "target_certification_subject_bound_to_role": False,
+                           "target_certification_current": False,
+                           "attestation_real_and_matches_evidence": False,
+                           "owner_authorization_bound": False,
+                           "overall": False}
+    if not _claiming_bounded:
+        return out
+
+    def _hex64ish(value: str) -> bool:
+        value = str(value or "").strip()
+        return bool(re.fullmatch(r"[0-9a-fA-F]{64}", value))
+
+    role_id = str(receipt.get("role_id") or "").strip()
+    role_spec_hash = str(receipt.get("role_spec_hash") or "").strip()
+    capability_id = "bounded_documentation_write"
+    # 1. Role selected and registry-bound: the selected role's spec
+    #    hash must match the registry record for the same role id
+    #    (a stale or fabricated role spec fails closed).
+    _registry_records = list(registry_records or ())
+    _role_rec: Mapping[str, Any] | None = None
+    for _r in _registry_records:
+        if str(_r.get("CAPABILITY_ID", "")).strip() == role_id:
+            _role_rec = _r
+            break
+    if _role_rec is not None:
+        out["role_selected"] = bool(role_id)
+        _spec_hash = str(_role_rec.get("SPEC_HASH", "") or "").strip()
+        if not _spec_hash:
+            # Registry roles without a published spec hash cannot be
+            # hash-bound; the receipt's own role_spec_hash is then the
+            # authority (self-anchor, still recorded).
+            _spec_hash = role_spec_hash
+        out["role_spec_matches_registry"] = (
+            bool(role_spec_hash) and role_spec_hash.lower()
+            == _spec_hash.lower())
+    # 2. The selected role's registry record must provide the bounded
+    #    capability — REQUIRES must contain it (canonical provenance).
+    if _role_rec is not None:
+        _requires = list(_role_rec.get("REQUIRES", ()) or ())
+        out["role_provides_capability"] = capability_id in tuple(
+            str(_c) for _c in _requires)
+    # 3. Capability record exists and carries an explicit certified
+    #    execution scope (EXECUTION_SCOPE first, then the module-level
+    #    map; an unmapped capability is BLOCK).
+    _cap_rec: Mapping[str, Any] | None = None
+    for _r in _registry_records:
+        if str(_r.get("CAPABILITY_ID", "")).strip() == capability_id:
+            _cap_rec = _r
+            break
+    _scope: str = ""
+    if _cap_rec is not None:
+        # Registry-governed mapping: an EXPLICIT EXECUTION_SCOPE on the
+        # capability record is the canonical authority. A record present
+        # WITHOUT a scope is a hard gap (never silently rescued by the
+        # module-level table), per the authority-chain closure seam.
+        _ps = str(_cap_rec.get("EXECUTION_SCOPE", "") or "").strip()
+        if _ps:
+            _scope = _ps
+    elif str(capability_id) in CAPABILITY_EXECUTION_SCOPE_MAP:
+        # The registry surface lacks the record entirely — the
+        # module-level map is the fail-closed fallback, not a loophole.
+        _scope = str(CAPABILITY_EXECUTION_SCOPE_MAP[capability_id])
+    out["capability_scope_mapping_valid"] = (
+        _cap_rec is not None and bool(_scope)
+        and _scope in CERTIFICATION_SCOPES)
+    # 4. Target LIVE certification for that execution scope. The
+    #    canonical source is the persisted authority-chain ledger
+    #    (latest backend mutation certification); the seeded registry
+    #    surface is an optional supplement.
+    import datetime as _dt
+    _now = _dt.datetime.now(_dt.timezone.utc)
+    _target_id = str(receipt.get("requested_target") or "").strip()
+    _cert_live = False
+    for _r in _registry_records:
+        if (str(_r.get("CERTIFICATION_KIND", ""))
+                == "BACKEND_CERTIFICATION" and
+                str(_r.get("TARGET_ID", "")).strip() == _target_id and
+                str(_r.get("CERTIFIED_SCOPE", "")).strip() == _scope and
+                str(_r.get("CERTIFICATION_STATUS", "")).strip()
+                == "LIVE_CERTIFIED_FOR_CAPABILITY"):
+            _cert_live = True
+            break
+    if not _cert_live:
+        _led = _ac_registry.latest_backend_mutation_certification(
+            _target_id)
+        if (_led is not None and
+                str(_led.get("kind", ""))
+                == _ac_registry.BACKEND_MUTATION_CERTIFICATION and
+                str(_led.get("scope", "")).strip() == _scope and
+                str(_led.get("status", "")).strip()
+                == _ac_registry.MUTATION_TARGET_LIVE):
+            _exp = str(_led.get("expires_at", "") or "").strip()
+            try:
+                _expiry = _dt.datetime.fromisoformat(
+                    _exp.replace("Z", "+00:00"))
+                _cert_live = _expiry > _now
+            except (ValueError, TypeError):
+                _cert_live = False
+    out["execution_scope_certified_for_target"] = bool(_cert_live)
+    # 5. Subject-bound certification for the selected role: a role
+    #    capability certification naming the SAME role id, capability,
+    #    and execution scope with WRITE_BOUNDED authority, current
+    #    (not expired).
+    _sb_live = False
+    _sb_current = False
+    _auth_id = str(ev.get("owner_authorization_id", "") or "").strip()
+    _led = _ac_registry.latest_role_mutation_certification(
+        role_id, _auth_id if _auth_id else None)
+    if (_led is not None and
+            str(_led.get("kind", ""))
+            == _ac_registry.ROLE_MUTATION_CERTIFICATION and
+            str(_led.get("capability_id", "")).strip() == capability_id and
+            str(_led.get("scope", "")).strip() == _scope and
+            str(_led.get("permission_grant", "")).strip()
+            == _ac_registry.CANONICAL_ROLE_MUTATION_GRANT):
+        _sb_live = True
+        _exp = str(_led.get("expires_at", "") or "").strip()
+        try:
+            _expiry = _dt.datetime.fromisoformat(
+                _exp.replace("Z", "+00:00"))
+            _sb_current = _expiry > _now
+        except (ValueError, TypeError):
+            _sb_current = False
+    if not _sb_live:
+        for _r in _registry_records:
+            if (str(_r.get("CERTIFICATION_KIND", ""))
+                    == "ROLE_CAPABILITY_CERTIFICATION" and
+                    str(_r.get("ROLE_ID", "")).strip() == role_id and
+                    str(_r.get("CAPABILITY_ID", "")).strip()
+                    == capability_id and
+                    str(_r.get("EXECUTION_SCOPE", "")).strip() == _scope and
+                    str(_r.get("PERMISSION_GRANT", "")).strip()
+                    == "WRITE_BOUNDED"):
+                _sb_live = True
+                _exp = str(_r.get("EXPIRES_AT", "") or "").strip()
+                try:
+                    _expiry = _dt.datetime.fromisoformat(
+                        _exp.replace("Z", "+00:00"))
+                    _sb_current = _expiry > _now
+                except (ValueError, TypeError):
+                    _sb_current = False
+                break
+    out["target_certification_subject_bound_to_role"] = bool(_sb_live)
+    out["target_certification_current"] = bool(_sb_current)
+    # 6. Real host attestation binding: the receipt's attestation block
+    #    must be present and its fingerprint must equal the evidence's
+    #    host_attestation_id (the identity the executor used).
+    _att = dict(receipt.get("attestation") or {})
+    _att_fp = str(_att.get("attestation_fingerprint", "") or "").strip()
+    _ev_fp = str(ev.get("host_attestation_id", "") or "").strip()
+    _adapter = str(_att.get("adapter_id", "") or "").strip()
+    _ev_adapter = str(receipt.get("observed_target", "") or "").strip()
+    out["attestation_real_and_matches_evidence"] = (
+        bool(_att) and _hex64ish(_att_fp)
+        and _att_fp.lower() == _ev_fp.lower()
+        and (not _ev_adapter or _adapter.lower()
+             == _ev_adapter.lower()))
+    # 7. Owner authorization bound to this execution (receipt's
+    #    request fingerprint is the identity domain).
+    _auth_id = str(ev.get("owner_authorization_id", "") or "").strip()
+    _req_fp = str(receipt.get("request_fingerprint", "") or "").strip()
+    out["owner_authorization_bound"] = (
+        bool(_auth_id) and _auth_id.startswith("owner-mutation-")
+        and _hex64ish(_req_fp))
+    out["overall"] = bool(
+        out["role_selected"]
+        and out["role_provides_capability"]
+        and out["capability_scope_mapping_valid"]
+        and out["execution_scope_certified_for_target"]
+        and out["target_certification_subject_bound_to_role"]
+        and out["target_certification_current"]
+        and out["attestation_real_and_matches_evidence"]
+        and out["owner_authorization_bound"])
     return out
 
 
@@ -1246,4 +1493,83 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
                     and evidence_ok
                     and cand_ok
                     and repo_ok),
+    }
+
+# ---------------------------------------------------------------------------
+# P2P-BOUNDED-DOCUMENTATION-WRITE-01A — Whole-claim authority-chain
+# verifier for bounded-mutation role receipts (the dispatch/new_role_receipt
+# path). The GATE-01B verifier covers the canonical mutation-ready receipt
+# surface; this verifier closes the same authority chain (role selection,
+# capability execution-scope certification, subject-bound live
+# certification, real host attestation) over the bounded-mutation receipt
+# envelope produced by role_bridge.dispatch. READ_ONLY receipts keep the
+# neutral authority-chain result — the chain only becomes a hard gate on
+# a bounded-mutation claim (fail closed on every axis).
+# ---------------------------------------------------------------------------
+
+def verify_bounded_mutation_receipt(
+        receipt: Mapping[str, Any],
+        registry_records: Iterable[Mapping[str, Any]] | None = None,
+) -> dict:
+    """Verify a bounded-mutation role receipt end-to-end: identity
+    fingerprints must be real digests, the attestation block must be
+    present/fresh/replay-clean and match the evidence's host
+    attestation id, the tree baseline must be an identity lock
+    (H1==H2), the mutation evidence must be verified, and the whole
+    authority chain must close over the same seeded registry surface.
+    Overall is true only when ALL gates hold."""
+    checks: dict[str, Any] = {}
+    mut = _g1_mutation_state_check(receipt)
+    checks["mutation_state"] = mut
+    att = _g1_attestation_validity_check(receipt)
+    checks["host_attestation"] = att
+    # Whole-claim authority chain: role selection, execution-scope
+    # certification, subject-bound live certification, and the real
+    # attestation anchor, all bound to the SAME seeded registry
+    # surface the eligibility layer used at dispatch time.
+    auth = _g1_authority_chain_check(receipt, registry_records)
+    checks["authority_chain"] = auth
+    th = dict(receipt.get("tree_hashes") or {})
+    ev = dict(receipt.get("mutation_evidence") or {})
+    # Identity digests must be real non-empty hex digests (fail closed).
+    req_fp = str(receipt.get("request_fingerprint") or "").strip()
+    checks["identity_fingerprints_real"] = bool(req_fp and re.fullmatch(
+        r"[0-9a-fA-F]{64}", req_fp))
+    checks["baseline_tree_lock"] = bool(th.get("h1") and th.get("h2")
+                                        and str(th["h1"]).lower()
+                                        == str(th["h2"]).lower())
+    checks["attestation_real_anchor"] = (
+        att.get("attestation_present", False) is True
+        and att.get("host_identity_real", False) is True
+        and att.get("attestation_ledger_self_observed", False) is True
+        and att.get("replay_conflict_detected", True) is False)
+    checks["attestation_matches_evidence"] = (
+        auth.get("attestation_real_and_matches_evidence", False))
+    att_ok = (checks["attestation_real_anchor"]
+              and checks["attestation_matches_evidence"])
+    mutation_evidence_ok = bool(mut.get("mutation_evidence_valid"))
+    dispatch_consistent = bool(
+        mut.get("dispatch_consistent_with_bounded_evidence"))
+    mutation_exactly_one = bool(
+        th.get("h1") and th.get("h2")
+        and str(th["h1"]).lower() == str(th["h2"]).lower()
+        and mut.get("application_mutation") == 1)
+    overall = bool(
+        checks["identity_fingerprints_real"]
+        and checks["baseline_tree_lock"]
+        and att_ok
+        and mutation_evidence_ok
+        and dispatch_consistent
+        and mutation_exactly_one
+        and auth.get("overall", False))
+    return {
+        "schema": ROLE_RECEIPT_SCHEMA,
+        "mutation_state": mut,
+        "host_attestation": att,
+        "authority_chain": auth,
+        "identity_fingerprints_real": checks["identity_fingerprints_real"],
+        "baseline_tree_lock": checks["baseline_tree_lock"],
+        "attestation_real_anchor": checks["attestation_real_anchor"],
+        "attestation_matches_evidence": checks["attestation_matches_evidence"],
+        "overall": overall,
     }

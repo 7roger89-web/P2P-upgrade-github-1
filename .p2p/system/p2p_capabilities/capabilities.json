@@ -229,7 +229,9 @@
     "change-canonical-set",
     "create-dynamic-org-chart"
    ],
-   "REQUIRES": [],
+   "REQUIRES": [
+    "bounded_documentation_write"
+   ],
    "CONTEXT_POINTERS": [
     "p2p-governance",
     "approved-specs"
@@ -567,6 +569,7 @@
   {
    "CAPABILITY_ID": "bounded_documentation_write",
    "TYPE": "TASK_CAPABILITY",
+   "EXECUTION_SCOPE": "DOCUMENTATION_MUTATION_BOUNDED",
    "DESCRIPTION": "Provider/model/backend-neutral bounded text-documentation write: exactly one bounded text-document mutation inside an explicitly authorized isolated/non-production workspace, under the canonical bounded_documentation_write primitive. No generic filesystem WRITE. Fail-closed: unknown classification, protected surfaces, or missing Owner authorization always BLOCK.",
    "TRIGGERS": [
     "task.intent.bounded-documentation-write",

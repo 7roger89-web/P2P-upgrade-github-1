@@ -102,6 +102,16 @@ ADAPTER_STATES = (
 # capability is UNKNOWN).
 # ---------------------------------------------------------------------------
 
+# P2P-BOUNDED-DOCUMENTATION-WRITE-01A: explicit capability→execution-scope
+# mapping table (registry-backed). The capability registry record is the
+# canonical source (EXECUTION_SCOPE field); this module-level table is the
+# second-tier data-driven fallback so the eligibility layer never
+# synthesizes a mapping from unverified input. An unknown capability
+# mapping is a hard BLOCK (fail-closed).
+CAPABILITY_EXECUTION_SCOPE_MAP: dict[str, str] = {
+    "bounded_documentation_write": "DOCUMENTATION_MUTATION_BOUNDED",
+}
+
 CERTIFICATION_SCOPES = (
     "SYNTHETIC_TEXT_EXECUTION",        # single-turn bounded text Q&A
     "API_TRANSPORT",                   # request/response transport works

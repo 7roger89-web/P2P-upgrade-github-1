@@ -40,6 +40,7 @@ from .backend_execution_bridge import (
 )
 from .fake_execution_backend import CONTRACT_SCHEMA as TASK_CONTRACT_SCHEMA
 from .role_contract import RoleExecutionContract
+from .host_attestation import make_canonical_host_attestation
 from .role_receipt import RoleExecutionReceipt, new_role_receipt
 from .role_verifier import permission_profile_fingerprint
 
@@ -101,16 +102,26 @@ class RoleExecutionBridge:
                  backend_outcome: str = "SUCCEEDED",
                  backend_verification_status: str = "VERIFIED",
                  execute_bounded_write=None,
+                 # P2P-BOUNDED-DOCUMENTATION-WRITE-01A: the REAL canonical
+                 # HostAttestation object for the mutation-ready path.
+                 # When present and a bounded mutation contract is live,
+                 # it is forwarded to the executor so the primitive's
+                 # authority gate (§6 real attestation) is enforced end-
+                 # to-end. When None the bounded path stays BLOCKED
+                 # (derived identities are never promoted to
+                 # mutation-ready authority).
+                 execute_bounded_write_host_attestation=None,
                  ) -> dict[str, Any]:
         """Dispatch one bounded role contract through the reused backend
         bridge. The explicit adapter MUST already be registered in the
         bridge's registry by an eligibility-validated caller. The bridge
         never selects, ranks, or falls back to another adapter.
 
-        execute_bounded_write: optional callable(project_root) -> evidence
-        dict returned by bounded_documentation_write.execute_bounded_
-        document_mutation. When None (default) the dispatch stays pure
-        READ_ONLY regardless of the contract's mutation class."""
+        execute_bounded_write: optional callable(project_root,
+        host_attestation=...) -> evidence dict returned by
+        bounded_documentation_write.execute_bounded_document_mutation.
+        When None (default) the dispatch stays pure READ_ONLY regardless
+        of the contract's mutation class."""
         now = datetime.now(timezone.utc).isoformat()
         target = str(contract.explicit_execution_target).strip()
         if not target:
@@ -160,6 +171,7 @@ class RoleExecutionBridge:
         # ------------------------------------------------------------------
         mutation_evidence: dict[str, Any] | None = None
         possible_mutation = False
+        receipt_attestation: dict[str, Any] | None = None  # 01A real att block
         mutation_state = ("NO_MUTATION_OBSERVED"
                           if backend_outcome == "SUCCEEDED" else "MUTATION_UNKNOWN")
         quality_evaluator: Any | None = None  # injected project-root -> quality dict
@@ -179,7 +191,9 @@ class RoleExecutionBridge:
             if not _project_root:
                 raise RoleBridgeError("NO_PROJECT_BINDING_FOR_MUTATION", {})
             try:
-                evidence = execute_bounded_write(_project_root)
+                evidence = execute_bounded_write(
+                    _project_root,
+                    host_attestation=execute_bounded_write_host_attestation)
             except _bdw.BoundedDocWriteError as exc:
                 raise RoleBridgeError("BOUND_MUTATION_BLOCKED", {
                     "code": exc.code, "details": exc.details})
@@ -201,6 +215,23 @@ class RoleExecutionBridge:
             mutation_evidence = dict(evidence)
             possible_mutation = True
             mutation_state = "BOUNDED_MUTATION_OBSERVED"
+            # P2P-BOUNDED-DOCUMENTATION-WRITE-01A: bind the receipt to a
+            # REAL canonical host attestation (Owner amendment 1/§6 and
+            # §9 whole-claim verification). The dispatch's role-request
+            # fingerprint is the identity domain the attestation binds
+            # to (run/dispatch/execution identity chain of this dispatch),
+            # so the verifier's identity-binding checks close over the
+            # same fingerprint used by the receipt.
+            _att = make_canonical_host_attestation(
+                adapter_id=adapter_id,
+                run_id=str(contract.task_id) or "p2p-unknown",
+                dispatch_id=f"p2p-{str(contract.task_id)}",
+                execution_contract_digest=role_request_fingerprint,
+                project_root=_project_root,
+                attested_at=now)
+            mutation_evidence["host_attestation_id"] = \
+                _att.attestation_fingerprint
+            receipt_attestation = _att.to_dict()
 
         # Build a synthetic conformant backend result. A real adapter
         # would produce this from runtime execution; C35 uses the same
@@ -262,6 +293,11 @@ class RoleExecutionBridge:
             timestamps={"executed_at": now, "finished_at": now, "verified_at": "UNKNOWN"},
             raw_backend_receipt_pointer=backend_result.raw_backend_receipt_pointer or "",
             mutation_evidence=mutation_evidence,
+            # 01A whole-claim authority chain: the real attestation block
+            # is attached only for the bounded mutation path so the
+            # verifier's host-attestation checks are exercised by the
+            # same evidence the executor used.
+            attestation=receipt_attestation,
         )
         receipt = RoleExecutionReceipt(receipt_dict)
         entry = {

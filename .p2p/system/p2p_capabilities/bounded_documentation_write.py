@@ -629,6 +629,14 @@ def execute_bounded_document_mutation(
         execution_id: str = "",
         before_file_content_override: str | None = None,
         host_attestation_id: str = "",
+        # P2P-BOUNDED-DOCUMENTATION-WRITE-01A: mutation-ready executions
+        # REQUIRES a real canonical HostAttestation object (or any object
+        # exposing an attestation_fingerprint). The legacy derived-id
+        # fallback stays available ONLY for explicitly typed non-authority
+        # fixtures ("TEST_ONLY") so legacy BW01 fixture behavior is not
+        # silently widened into authority paths.
+        host_attestation: Any = None,
+        mutation_authority_mode: str = "MUTATION_READY",
 ) -> BoundedDocWriteEvidence:
     """Execute exactly one bounded text-documentation mutation.
 
@@ -640,6 +648,28 @@ def execute_bounded_document_mutation(
     project_root = Path(str(project_root)).resolve()
     if not project_root.is_dir():
         raise BoundedDocWriteError("PROJECT_ROOT_INVALID")
+
+    # 0. Real host attestation gate (01A Owner amendment 1/§6):
+    #    mutation-ready executions MUST carry a real canonical
+    #    HostAttestation; derived (synthetic) identities are accepted
+    #    ONLY when the caller explicitly types the fixture as
+    #    mutation_authority_mode=TEST_ONLY. Any other value — including
+    #    the default MUTATION_READY — requires the real object.
+    _mode = str(mutation_authority_mode or "").strip()
+    _att_fp: str | None = None
+    if host_attestation is not None:
+        _att_fp = str(getattr(host_attestation, "attestation_fingerprint", "") or "").strip()
+        if not _att_fp:
+            raise BoundedDocWriteError(
+                "HOST_ATTESTATION_FINGERPRINT_MISSING",
+                {"provided_object_type": type(host_attestation).__name__})
+    elif _mode.upper() != "TEST_ONLY":
+        raise BoundedDocWriteError(
+            "MUTATION_BLOCKED_NO_REAL_HOST_ATTESTATION",
+            {"mutation_authority_mode": _mode or "MUTATION_READY",
+             "note": "a real canonical HostAttestation is required for "
+                     "mutation-ready execution; derived ids are only "
+                     "valid for mutation_authority_mode=TEST_ONLY"})
 
     # 1. Permission gate (spec 12: no capability -> BLOCK).
     rel = _normalize_and_validate_path(project_root, contract.allowed_relative_path)
@@ -732,12 +762,14 @@ def execute_bounded_document_mutation(
             dispatch_id=str(dispatch_id),
             execution_id=str(execution_id) or _sha256_hex(
                 (str(dispatch_id) + after_hash).encode("utf-8")),
-            # FW01: the host attestation id must always be bound. If the
-            # canonical attestation is not yet available at execution time,
-            # the identity is derived from the execution pair itself so the
-            # verifier's identity-binding check never fails open.
-            host_attestation_id=str(host_attestation_id).strip() or _sha256_hex(
-                (str(dispatch_id) + str(execution_id)).encode("utf-8")),
+            # FW01/01A: the host attestation id must always be bound.
+            # Priority: real attestation fingerprint > explicit override >
+            # derived id. The derived-id fallback is reachable ONLY for
+            # TEST_ONLY fixtures (gate 0 above already rejected
+            # mutation-ready executions without a real attestation).
+            host_attestation_id=(str(host_attestation_id).strip() or
+                                 _att_fp or _sha256_hex(
+                                     (str(dispatch_id) + str(execution_id)).encode("utf-8"))),
             rollback_required="REQUIRED",
             rollback_state="PENDING",
         )
