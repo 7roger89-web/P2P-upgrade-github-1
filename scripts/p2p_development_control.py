@@ -216,11 +216,30 @@ def _validate_candidates(control: dict[str, Any], baseline: dict[str, Any]) -> N
         "promotion_status",
     }
     ids: set[str] = set()
+    _seen_ids: dict[str, int] = {}
     for index, raw in enumerate(candidates):
         candidate = _object(raw, f"candidate_records[{index}]")
         candidate_id = _nonempty_string(candidate.get("candidate_id"), f"candidate_records[{index}].candidate_id")
-        _require(candidate_id not in ids, "LINEAGE_RECORDS", f"duplicate candidate_id: {candidate_id}")
+        # GATE-01B identity repair: a candidate_id may repeat EXACTLY twice
+        # as a direct successor pair (.35 -> .36), both UNPROMOTED.
+        if candidate_id in ids:
+            _prev_idx = _seen_ids[candidate_id]
+            _prev = _object(candidates[_prev_idx], f"candidate_records[{_prev_idx}]")
+            _require(index == _prev_idx + 1, "LINEAGE_RECORDS",
+                     f"successor candidate_id {candidate_id} must follow the "
+                     f"original immediately")
+            _prev_v = _nonempty_string(_prev.get("candidate_version"), f"candidate_records[{_prev_idx}].candidate_version")
+            _cur_v = _nonempty_string(candidate.get("candidate_version"), f"candidate_records[{index}].candidate_version")
+            _require(_cur_v.split(".")[-1].isdigit() and _prev_v.split(".")[-1].isdigit()
+                     and int(_cur_v.split(".")[-1]) == int(_prev_v.split(".")[-1]) + 1,
+                     "LINEAGE_RECORDS",
+                     f"successor {candidate_id} must be the next canonical "
+                     f"version ({_prev_v} -> {_cur_v})")
+            _require(candidate.get("promotion_status") == "UNPROMOTED" and _prev.get("promotion_status") == "UNPROMOTED",
+                     "LINEAGE_RECORDS",
+                     f"identity-repair successor pair {candidate_id} must be UNPROMOTED")
         ids.add(candidate_id)
+        _seen_ids[candidate_id] = index
         _require(required.issubset(candidate), "LINEAGE_SCHEMA", f"candidate {candidate_id} is missing required lineage fields")
         _require(candidate.get("based_on_official_version") == baseline.get("version"), "LINEAGE_BASELINE_MISMATCH", f"candidate {candidate_id} does not name the official version")
         _require(candidate.get("based_on_official_sha256") == baseline.get("artifact_sha256"), "LINEAGE_BASELINE_MISMATCH", f"candidate {candidate_id} does not name the official SHA-256")
