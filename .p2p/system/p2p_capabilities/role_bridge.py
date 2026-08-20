@@ -252,6 +252,24 @@ def register_explicit_adapter(
 
     registry.register(adapter_id, _factory,
                       live_certified=live_certified, auth_state=auth_state)
+    # P2P-CLOSURE-01 - persist the registration so a fresh process
+    # (the canonical FW01 loop) can evaluate eligibility. Write-only
+    # additive ledger; the in-memory registry is untouched.
+    try:
+        from p2p_capabilities import (quality_intelligence as _rb_qi)
+        _rb_qi.append_adapter_registration(
+            adapter_id=str(adapter_id),
+            provider=str(provider or ''),
+            model=str(model or ''),
+            harness=str(harness or ''),
+            live_certified=bool(live_certified),
+            current_auth_state=str(auth_state),
+            attestation_summary=str(harness)[:500])
+    except Exception:
+        pass  # persistence is best-effort;
+        # dispatch stays in-memory and fail-closed
+        # without it.
+
     return {
         "adapter_id": adapter_id,
         "harness": harness,

@@ -612,7 +612,7 @@ def load_certification_evidence(
     absent key as 'eligible'."""
     commit = current_source_commit if current_source_commit else ""
     if not commit:
-        commit = git_source_commit(Path.cwd())
+        commit = git_source_commit(pathlib.Path.cwd())
     out: Dict[str, Dict[str, Any]] = {}
     for cap in required_capabilities:
         cap = str(cap)
@@ -870,3 +870,65 @@ def shadow_eval_scope_allowed(mutation_class: str) -> bool:
     """READ-ONLY shadow evaluation must never mutate owner projects."""
     return mutation_class in ("READ_ONLY", "ANALYSIS_ONLY")
 
+
+
+
+# P2P-CLOSURE-01 - persisted adapter registry (runtime state, write-only
+# additive ledger; latest entry per adapter_id wins at read time).
+_P2P_ADAPTER_REGISTRY_SENTINEL = True
+ADAPTER_REGISTRY_PATH = pathlib.Path(os.environ.get(
+    "P2P_STATE_DIR", "") or str(
+        pathlib.Path(__file__).resolve().parents[1] / ".p2p" / "state")) / \
+    "adapter_registry.json"
+
+
+def _p2p_adapter_registry() -> list:
+    try:
+        if ADAPTER_REGISTRY_PATH.exists():
+            return list(json.loads(ADAPTER_REGISTRY_PATH.read_text())
+                        or [])
+    except Exception:
+        pass
+    return []
+
+
+def append_adapter_registration(adapter_id: str, provider: str,
+                                model: str, harness: str,
+                                live_certified: bool = False,
+                                current_auth_state: str = "READ",
+                                attestation_summary: str = "") -> None:
+    entry = {"adapter_id": str(adapter_id),
+             "provider": str(provider),
+             "model": str(model),
+             "harness": str(harness),
+             "live_certified": bool(live_certified),
+             "current_auth_state": str(current_auth_state),
+             "attestation_summary": str(attestation_summary)[:500],
+             "registered_at": _utc_now()}
+    records = _p2p_adapter_registry()
+    records.append(entry)
+    ADAPTER_REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ADAPTER_REGISTRY_PATH.write_text(json.dumps(records, indent=2)
+                                     + "\n")
+
+
+def registered_adapter_ids() -> tuple:
+    seen = {}
+    for rec in _p2p_adapter_registry():
+        aid = str(rec.get("adapter_id", ""))
+        if not aid or aid == "unregistered":
+            continue
+        if str(rec.get("status", "registered")) in ("revoked",
+                                                     "retired"):
+            seen.pop(aid, None)
+            continue
+        seen[aid] = None
+    return tuple(sorted(seen))
+
+
+def latest_adapter_record(adapter_id: str):
+    out = None
+    for rec in _p2p_adapter_registry():
+        if str(rec.get("adapter_id", "")) == str(adapter_id):
+            out = dict(rec)
+    return out

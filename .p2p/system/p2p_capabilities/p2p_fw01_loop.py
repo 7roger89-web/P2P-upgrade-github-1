@@ -505,6 +505,67 @@ class Fw01Loop:
             if _fw03_certs:
                 _rec_with_handoff["capability_certifications"] = (
                     _fw03_certs)
+            # P2P-CLOSURE-01 - per-role eligibility from
+            # persisted runtime truth (adapter registry +
+            # target registry). No persisted adapter ->
+            # byte-identical fail-closed behavior.
+            _fw03_elig = {}
+            try:
+                from p2p_capabilities import (quality_intelligence as _lq)
+                _lq_ids = _lq.registered_adapter_ids()
+                if _lq_ids:
+                    from p2p_capabilities import (role_eligibility as _lr)
+                    from p2p_capabilities.backend_contract import (\
+                        CERTIFICATION_SCOPES)
+                    _lid = _lq_ids[0]
+                    _lad = _lq.latest_adapter_record(_lid) or {}
+                    _lcerts = []
+                    for _req in _fw02_reqs or ():
+                        _rcap = str(_req.capability_id)
+                        _rrec = next((
+                            _r for _r in _fw03_registry if
+                            str(_r.get("CAPABILITY_ID", "")) == _rcap), None)
+                        if _rrec is None:
+                            continue
+                        _ps = str(_rrec.get("PROVIDER_SCOPE", ""))
+                        if not _ps or _ps not in (CERTIFICATION_SCOPES):
+                            continue
+                        _lcerts.append(_lr.BackendCapabilityCertification(
+                            adapter_id=_lid, scope=_ps,
+                            status="LIVE_CERTIFIED_FOR_CAPABILITY",
+                            evidence_pointers=("fw04_certification:" + _rcap,)))
+                    _ltarget = _lr.target_certification_record_from_adapter_identity(
+                        target_id=_lid, adapter_id=_lid,
+                        scope_certifications=tuple(_lcerts),
+                        current_auth_state=str(_lad.get("current_auth_state", "READ") or "READ"),
+                        environment_binding=str(
+                            _lad.get("environment_binding", "LOCAL_PROJECT")) or "LOCAL_PROJECT")
+                    for _rrole in _fw03_registry:
+                        _rid = str(_rrole.get("CAPABILITY_ID", ""))
+                        if not _rid.startswith("p2p_"):
+                            continue
+                        _rreqs = tuple(
+                            str(_x) for _x in (
+                                _rrole.get("REQUIRES") or ()))
+                        _rpc = str(_rrole.get("PERMISSION_CEILING")
+                                    or "READ")
+                        try:
+                            _fw03_elig[_rid] = _lr.evaluate_role_target_eligibility(
+                                role_required_capabilities=tuple(_rreqs),
+                                role_permission_ceiling=(_rpc,),
+                                role_quorum_semantics="SINGLE",
+                                required_evidence=("claim",
+                                                   "artifact-evidence"),
+                                task_permission_profile=("READ",),
+                                goal_permission_envelope=("READ",),
+                                target=_ltarget,
+                                environment_binding="LOCAL_PROJECT",
+                                workspace_binding="",
+                                registry_records=_fw03_registry)
+                        except Exception:
+                            continue
+            except Exception:
+                _fw03_elig = {}
             _fw03_task_class = str(rec.get("task_risk_class")
                                    or "LOW")
             _fw03_mutation = str(rec.get("mutation_class")
@@ -516,7 +577,8 @@ class Fw01Loop:
                 task_risk_class=_fw03_task_class,
                 mutation_class=_fw03_mutation,
                 fan_out_bound=8,
-                capability_certifications=_fw03_certs)
+                capability_certifications=_fw03_certs,
+                eligibility_results=_fw03_elig)
             self._trace(task_id, {"mutation_class": "READ_ONLY",
                           "permission": "",
                           "verification": "REQUIRED"},

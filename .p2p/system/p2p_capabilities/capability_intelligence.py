@@ -203,6 +203,8 @@ CANONICAL_CAPABILITIES = (
     "beginner_interface",            # beginner-facing translation
     "project_domain_model",          # project domain reasoning (perspective)
     "evidence_retrieval",            # read-only evidence retrieval
+    "non_mutating_project_analysis",
+
 )
 
 CAPABILITY_VOCABULARY = set(CANONICAL_CAPABILITIES)

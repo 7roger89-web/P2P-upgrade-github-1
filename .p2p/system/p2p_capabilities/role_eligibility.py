@@ -154,6 +154,7 @@ def evaluate_role_target_eligibility(
     target: TargetCertificationRecord,
     environment_binding: str = "LOCAL_PROJECT",
     workspace_binding: str = "",
+    registry_records: Iterable[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Deterministic eligibility decision. Never ranks; never chooses.
 
@@ -169,6 +170,29 @@ def evaluate_role_target_eligibility(
     cap_results: dict[str, str] = {}
     for scope in role_caps:
         if scope not in CERTIFICATION_SCOPES:
+            # Closure seam: bounded capability→backend-scope # bridge (PROVIDER_SCOPE, registry-governed).
+            _cap_rec = None
+            for _r in (registry_records or ()):
+                if str(_r.get("CAPABILITY_ID", "")) == scope:
+                    _cap_rec = _r
+                    break
+            _prov = None
+            if _cap_rec and _cap_rec.get("PROVIDER_SCOPE"):
+                _ps = str(_cap_rec["PROVIDER_SCOPE"])
+                if _ps in CERTIFICATION_SCOPES:
+                    _prov = _ps
+            if _prov:
+                state = certification_for_scope(target, _prov)
+                cap_results[scope] = state
+                if state in ("UNKNOWN", "NOT_TESTED"):
+                    unknown_flags.append(
+                        f"capability-scope-unknown:{scope}"
+                        f":{_prov}")
+                continue
+            cap_results[scope] = "UNKNOWN"
+            unknown_flags.append(
+                f"capability-scope-unknown:{scope}")
+            continue
             # Registry-internal need (FACT_LEDGER etc.) does not depend on
             # backend scope certification — it is satisfied by P2P state.
             if scope in ("FACT_LEDGER", "evidence-contract",
@@ -332,3 +356,86 @@ def target_certification_record_from_adapter_identity(
         current_auth_state=str(current_auth_state),
         environment_binding=str(environment_binding),
     )
+
+
+
+# P2P-CLOSURE-01 - persisted target certification registry (runtime
+# state, write-only additive ledger; latest entry per target_id wins).
+_P2P_TARGET_REGISTRY_SENTINEL = True
+try:
+    import os as _ti_os
+    import pathlib as _ti_pathlib
+    import datetime as _ti_datetime
+except Exception:
+    import os as _ti_os
+    import pathlib as _ti_pathlib
+    import datetime as _ti_datetime
+TARGET_REGISTRY_PATH = _ti_pathlib.Path(_ti_os.environ.get(
+    "P2P_STATE_DIR", "") or str(
+        _ti_pathlib.Path(__file__).resolve().parents[1] / ".p2p" /
+        "state")) / "target_registry.json"
+
+
+def _p2p_target_registry_entries() -> list:
+    try:
+        if TARGET_REGISTRY_PATH.exists():
+            return list(json.loads(TARGET_REGISTRY_PATH.read_text())
+                        or [])
+    except Exception:
+        pass
+    return []
+
+
+def append_target_certification_record(target_id: str, adapter_id: str,
+                                       scope_certifications: tuple = (),
+                                       historical_certification:
+                                       bool = False,
+                                       current_auth_state:
+                                       str = "UNKNOWN",
+                                       environment_binding:
+                                       str = "UNKNOWN") -> None:
+    entry = {"target_id": str(target_id),
+             "adapter_id": str(adapter_id),
+             "scope_certifications": [dict(c) for c in
+                                      scope_certifications],
+             "historical_certification": bool(historical_certification),
+             "current_auth_state": str(current_auth_state),
+             "environment_binding": str(environment_binding),
+             "registered_at": _ti_datetime.datetime.now(
+                 _ti_datetime.timezone.utc).isoformat()}
+    records = _p2p_target_registry_entries()
+    records.append(entry)
+    TARGET_REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    TARGET_REGISTRY_PATH.write_text(json.dumps(records, indent=2)
+                                    + "\n")
+
+
+def load_target_registry() -> dict:
+    latest = {}
+    for rec in _p2p_target_registry_entries():
+        tid = str(rec.get("target_id", ""))
+        if tid and tid != "unregistered":
+            latest[tid] = rec
+    out = {}
+    for tid, rec in latest.items():
+        try:
+            out[tid] = target_certification_record_from_adapter_identity(
+                target_id=tid,
+                adapter_id=str(rec.get("adapter_id", "")),
+                scope_certifications=tuple(
+                    BackendCapabilityCertification(
+                        adapter_id=tid,
+                        scope=str(c.get("scope", "")),
+                        status=str(c.get("status", "UNKNOWN")),
+                        evidence_pointers=tuple(c.get(
+                            "evidence_pointers", ()) or ()))
+                    for c in rec.get("scope_certifications") or ()),
+                historical_certification=bool(
+                    rec.get("historical_certification", False)),
+                current_auth_state=str(
+                    rec.get("current_auth_state", "UNKNOWN")),
+                environment_binding=str(
+                    rec.get("environment_binding", "UNKNOWN")))
+        except Exception:
+            continue
+    return out
