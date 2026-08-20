@@ -111,6 +111,7 @@ CERTIFICATION_SCOPES = (
     "TEST_EXECUTION",                  # running test suites
     "BROWSER_RUNTIME",                 # browser automation
     "LONG_HORIZON_EXECUTION",          # multi-step / multi-wave autonomy
+    "DOCUMENTATION_MUTATION_BOUNDED",  # P2P-BW01: bounded documentation write
 )
 
 

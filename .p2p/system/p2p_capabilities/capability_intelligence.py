@@ -204,7 +204,10 @@ CANONICAL_CAPABILITIES = (
     "project_domain_model",          # project domain reasoning (perspective)
     "evidence_retrieval",            # read-only evidence retrieval
     "non_mutating_project_analysis",
-
+    # bounded_documentation_write (P2P-BOUNDED-DOCUMENTATION-WRITE-01):
+    # the only canonical bounded mutation capability (text documentation
+    # only, fail-closed, host primitive).
+    "bounded_documentation_write",
 )
 
 CAPABILITY_VOCABULARY = set(CANONICAL_CAPABILITIES)
@@ -252,6 +255,7 @@ _CAPABILITY_SOURCE_COVERAGE: dict[str, tuple[str, ...]] = {
     "beginner_interface": ("RUNTIME_DETERMINISTIC",),
     "project_domain_model": ("RUNTIME_DETERMINISTIC",),
     "evidence_retrieval": ("RETRIEVER", "EVIDENCE_STORE"),
+    "bounded_documentation_write": ("RUNTIME_DETERMINISTIC", "WORKSPACE"),
 }
 
 # Evidence floor per capability: what level of evidence must back a source.
@@ -584,6 +588,8 @@ def _narrow_harness_requirements(
 def infer_required_capabilities(
     task_record: Mapping[str, Any],
     project_profile: ProjectProfile | None = None,
+    *,
+    owner_mutation_envelope: str = "NONE",
 ) -> list[CapabilityRequirement]:
     """Deterministic-first inference of required capabilities.
 
@@ -596,12 +602,37 @@ def infer_required_capabilities(
     Capability vocabulary is bounded (CANONICAL_CAPABILITIES); unknown tokens
     map to no capability (never hallucinated). REQUIRED caps default to
     FAIL_CLOSED=NO_DISPATCH unless the task declares a safe fallback scope.
+
+    P2P-BOUNDED-DOCUMENTATION-WRITE-01: only an explicit Owner mutation
+    envelope naming "bounded_documentation_write" (via the
+    owner_mutation_envelope kwarg) introduces the bounded documentation
+    write capability. A WRITE-level permission claim alone never adds it,
+    and the default envelope "NONE" never adds it.
     """
     declared: tuple[str, ...] = task_record.get("required_capabilities", ()) or ()
     optional: tuple[str, ...] = task_record.get("optional_capabilities", ()) or ()
     # Explicit unknown requirements (authoritative task contract,
     # preserved fail-closed; EXPLICIT_REQUIRED_UNKNOWN != DROPPED).
     explicit_unknown: list[str] = []
+
+    def _add_mutation(cap: str, origin: str, pointers: tuple[str, ...],
+                      permission: tuple[str, ...] = ()) -> None:
+        """Add the bounded mutation capability with permission WRITE_BOUNDED.
+
+        Fail-closed: only an exact Owner envelope match adds it; any other
+        value (including WRITE-level permission claims) never adds a
+        mutation capability.
+        """
+        if cap in CAPABILITY_VOCABULARY:
+            if want.get(cap) is None:
+                want[cap] = {
+                    "capability_id": cap,
+                    "purpose": f"cap:{cap}",
+                    "required_or_optional": "REQUIRED",
+                    "origin": origin,
+                    "evidence_pointers": list(pointers),
+                    "permission": list(permission),
+                }
     text = " ".join(str(v) for v in (
         task_record.get("title", ""),
         task_record.get("purpose", ""),
@@ -611,6 +642,18 @@ def infer_required_capabilities(
     paths = " ".join(str(p) for p in (task_record.get("scope", ()) or ())).lower()
 
     want: dict[str, dict[str, Any]] = {}
+
+    def _add_mutation_after_declared() -> None:
+        # P2P-BOUNDED-DOCUMENTATION-WRITE-01: explicit Owner mutation
+        # envelope. Only an exact match adds the bounded write capability;
+        # any other value (including WRITE-level permission claims) never
+        # adds a mutation capability.
+        _mutation_envelope: str = str(owner_mutation_envelope or "NONE").strip()
+        _mutation_envelope = _mutation_envelope if _mutation_envelope else "NONE"
+        if _mutation_envelope == "bounded_documentation_write":
+            _add_mutation("bounded_documentation_write", "DETERMINISTIC",
+                          ("owner_mutation_envelope:bounded_documentation_write",),
+                          ("WRITE_BOUNDED",))
 
     def _add(cap: str, optional_: bool, origin: str, pointers: tuple[str, ...],
              permission: tuple[str, ...] = ()) -> None:
@@ -647,6 +690,7 @@ def infer_required_capabilities(
             existing["evidence_pointers"].extend(pointers)
 
     # 1. Declared (authoritative)
+    _add_mutation_after_declared()
     for cap in declared:
         _add(cap, False, "DETERMINISTIC",
              ("task_record.required_capabilities",))

@@ -43,6 +43,11 @@ from .role_contract import RoleExecutionContract
 from .role_receipt import RoleExecutionReceipt, new_role_receipt
 from .role_verifier import permission_profile_fingerprint
 
+# P2P-BOUNDED-DOCUMENTATION-WRITE-01: the single canonical bounded write
+# primitive. Imported lazily inside dispatch to keep the default READ_ONLY
+# path free of mutation dependencies for runtimes that never bind one.
+from . import bounded_documentation_write as _bdw
+
 ROLE_BRIDGE_SCHEMA = "p2p-role-execution-bridge/1"
 
 
@@ -95,11 +100,17 @@ class RoleExecutionBridge:
                  adapter_id: str,
                  backend_outcome: str = "SUCCEEDED",
                  backend_verification_status: str = "VERIFIED",
+                 execute_bounded_write=None,
                  ) -> dict[str, Any]:
         """Dispatch one bounded role contract through the reused backend
         bridge. The explicit adapter MUST already be registered in the
         bridge's registry by an eligibility-validated caller. The bridge
-        never selects, ranks, or falls back to another adapter."""
+        never selects, ranks, or falls back to another adapter.
+
+        execute_bounded_write: optional callable(project_root) -> evidence
+        dict returned by bounded_documentation_write.execute_bounded_
+        document_mutation. When None (default) the dispatch stays pure
+        READ_ONLY regardless of the contract's mutation class."""
         now = datetime.now(timezone.utc).isoformat()
         target = str(contract.explicit_execution_target).strip()
         if not target:
@@ -128,6 +139,69 @@ class RoleExecutionBridge:
         role_request_fingerprint = contract.request_fingerprint
         fingerprint = contract_request_fingerprint(task_contract)
 
+        # ------------------------------------------------------------------
+        # P2P-BOUNDED-DOCUMENTATION-WRITE-01: optional bounded mutation
+        # execution. The bridge remains READ_ONLY by default. A bounded
+        # documentation mutation is performed ONLY when ALL of these hold:
+        #
+        # 1. the role contract declares the canonical mutation class
+        #    (bounded_documentation_write) AND carries all three material
+        #    bindings (authorization id, target fingerprint, pre-surface
+        #    fingerprint) — the contract layer enforces this coupling;
+        # 2. the permission profile explicitly grants WRITE_BOUNDED —
+        #    READ-only profiles can never mutate;
+        # 3. the caller supplies an explicit executor callback — the
+        #    bridge never decides WHAT to write on its own;
+        # 4. the execution environment exposes the project root the
+        #    contract is bound to.
+        #
+        # Every gate above failing BLOCKS with the default READ_ONLY
+        # outcome — this is the fail-closed rule the first pilot proved.
+        # ------------------------------------------------------------------
+        mutation_evidence: dict[str, Any] | None = None
+        possible_mutation = False
+        mutation_state = ("NO_MUTATION_OBSERVED"
+                          if backend_outcome == "SUCCEEDED" else "MUTATION_UNKNOWN")
+        quality_evaluator: Any | None = None  # injected project-root -> quality dict
+        _mutation_class = str(contract.mutation_class or "").strip()
+        _mutation_contract_live = (
+            _mutation_class == "bounded_documentation_write"
+            and bool(contract.mutation_authorization_id)
+            and bool(contract.mutation_target_fingerprint)
+            and bool(contract.pre_mutation_surface_fingerprint))
+        _write_bounded_granted = "WRITE_BOUNDED" in tuple(
+            str(g) for g in contract.permission_profile or ())
+        if _mutation_contract_live and execute_bounded_write is not None:
+            if not _write_bounded_granted:
+                raise RoleBridgeError("BOUND_MUTATION_PERMISSION_NOT_GRANTED", {
+                    "permission_profile": list(contract.permission_profile)})
+            _project_root = str(contract.project_binding or "").strip()
+            if not _project_root:
+                raise RoleBridgeError("NO_PROJECT_BINDING_FOR_MUTATION", {})
+            try:
+                evidence = execute_bounded_write(_project_root)
+            except _bdw.BoundedDocWriteError as exc:
+                raise RoleBridgeError("BOUND_MUTATION_BLOCKED", {
+                    "code": exc.code, "details": exc.details})
+            if not isinstance(evidence, dict) or not evidence.get("before_file_hash"):
+                raise RoleBridgeError("BOUND_MUTATION_EVIDENCE_MISSING", {})
+            if int(evidence.get("changed_bytes", 0)) <= 0:
+                raise RoleBridgeError("BOUND_MUTATION_NO_CHANGED_BYTES",
+                                      {"changed_bytes": evidence.get("changed_bytes")})
+            # FW04 quality evaluation (spec 16): EXECUTION_SUCCESS !=
+            # QUALITY_VERIFIED. A quality failure BLOCKS the bounded
+            # mutation and forces rollback-required downstream — a
+            # successful write is never accepted as proof of quality.
+            if quality_evaluator is not None:
+                _q = quality_evaluator(_project_root)
+                if not isinstance(_q, dict) or _q.get("overall") != "QUALITY_VERIFIED":
+                    raise RoleBridgeError("BOUND_MUTATION_QUALITY_NOT_VERIFIED", {
+                        "quality": _q})
+                mutation_evidence["quality_evaluation"] = dict(_q)
+            mutation_evidence = dict(evidence)
+            possible_mutation = True
+            mutation_state = "BOUNDED_MUTATION_OBSERVED"
+
         # Build a synthetic conformant backend result. A real adapter
         # would produce this from runtime execution; C35 uses the same
         # normalized envelope without live backend calls. The result is
@@ -147,11 +221,11 @@ class RoleExecutionBridge:
             target_fingerprint=contract.target_fingerprint,
             output_pointers=(f"artifact:{contract.workspace_binding}/task-{contract.task_id}/out",),
             artifact_pointers=(f"artifact:{contract.workspace_binding}/task-{contract.task_id}/art",),
-            mutation_surface=None,
+            mutation_surface=mutation_evidence,
             usage_evidence={"synthetic": True},
             auth_state_after="NO_CREDENTIALS",
             raw_backend_receipt_pointer=f"backend-receipt:{contract.task_id}:{now}",
-            possible_mutation=False,
+            possible_mutation=possible_mutation,
         )
 
         # Lift normalized backend result -> normalized role receipt.
@@ -183,11 +257,11 @@ class RoleExecutionBridge:
             artifact_pointers=backend_result.artifact_pointers,
             evidence_pointers=tuple(pointer for pointer in observation_pointers if pointer),
             verifier_result="UNKNOWN",
-            mutation_state="NO_MUTATION_OBSERVED" if backend_result.possible_mutation is False
-            and backend_result.mutation_surface is None else "MUTATION_UNKNOWN",
+            mutation_state=mutation_state,
             failure_class="NONE",
             timestamps={"executed_at": now, "finished_at": now, "verified_at": "UNKNOWN"},
             raw_backend_receipt_pointer=backend_result.raw_backend_receipt_pointer or "",
+            mutation_evidence=mutation_evidence,
         )
         receipt = RoleExecutionReceipt(receipt_dict)
         entry = {

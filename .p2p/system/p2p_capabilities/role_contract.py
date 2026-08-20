@@ -39,6 +39,7 @@ CONTEXT_POLICIES = ("NONE", "BOUNDED_EXPLICIT", "UNKNOWN")
 PERMISSION_GRANTS = (
     "NONE",
     "READ",
+    "WRITE_BOUNDED",  # bounded documentation write only (BW01)
     "WRITE",
     "EXECUTE",
     "NETWORK",
@@ -77,6 +78,10 @@ _CONTRACT_FIELDS = (
     "requested_target_attestation",
     "budget",
     "request_fingerprint",
+    "mutation_class",
+    "mutation_authorization_id",
+    "mutation_target_fingerprint",
+    "pre_mutation_surface_fingerprint",
 )
 
 
@@ -127,6 +132,12 @@ class RoleExecutionContract:
 
     budget: str = "BOUNDED"
     request_fingerprint: str = ""
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01 mutation contract fields. Empty
+    # values mean NO mutation is bound to this contract (default, safe).
+    mutation_class: str = ""
+    mutation_authorization_id: str = ""
+    mutation_target_fingerprint: str = ""
+    pre_mutation_surface_fingerprint: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "role_id", _role_id(self.role_id))
@@ -149,6 +160,30 @@ class RoleExecutionContract:
         _assert_enum(self.verification_policy, ("INDEPENDENT", "UNKNOWN"),
                      "verification_policy")
         _assert_enum(self.budget, ("BOUNDED", "UNKNOWN"), "budget")
+        _assert_enum(self.mutation_class,
+                     ("", "bounded_documentation_write", "UNKNOWN"),
+                     "mutation_class")
+        for mfield in ("mutation_authorization_id", "mutation_target_fingerprint",
+                       "pre_mutation_surface_fingerprint"):
+            object.__setattr__(self, mfield,
+                               _limited_text(getattr(self, mfield), mfield, 256))
+        # Fail-closed mutation coupling: a live mutation class requires ALL
+        # three material bindings (authorization, target, pre-surface). A
+        # purely READ permission profile never carries a mutation class —
+        # WRITE_BOUNDED must be explicitly granted.
+        _mutation_set = bool(self.mutation_class) and \
+            self.mutation_class != "UNKNOWN"
+        if _mutation_set and not (self.mutation_authorization_id and
+                                  self.mutation_target_fingerprint and
+                                  self.pre_mutation_surface_fingerprint):
+            raise RoleContractError("MUTATION_BINDING_INCOMPLETE",
+                                    {"mutation_class": self.mutation_class})
+        if _mutation_set and self.permission_profile and \
+                "READ" in self.permission_profile and \
+                "WRITE_BOUNDED" not in self.permission_profile:
+            raise RoleContractError("MUTATION_PERMISSION_MISMATCH",
+                                    {"permission_profile": list(
+                                        self.permission_profile)})
         for name, values in (
             ("approved_scope", self.approved_scope),
             ("dependencies", self.dependencies),
@@ -185,6 +220,10 @@ class RoleExecutionContract:
             "requested_target_attestation": self.requested_target_attestation,
             "budget": self.budget,
             "request_fingerprint": self.request_fingerprint,
+            "mutation_class": self.mutation_class,
+            "mutation_authorization_id": self.mutation_authorization_id,
+            "mutation_target_fingerprint": self.mutation_target_fingerprint,
+            "pre_mutation_surface_fingerprint": self.pre_mutation_surface_fingerprint,
         }
 
 
@@ -247,6 +286,10 @@ def build_role_execution_contract(
     budget: str = "BOUNDED",
     explicit_execution_target: str,
     target_fingerprint: str,
+    mutation_class: str = "",
+    mutation_authorization_id: str = "",
+    mutation_target_fingerprint: str = "",
+    pre_mutation_surface_fingerprint: str = "",
 ) -> RoleExecutionContract:
     """Build a bounded role execution contract. FRESH CHILD BY DEFAULT:
     the contract receives only approved context pointers (no parent
@@ -285,6 +328,11 @@ def build_role_execution_contract(
         "target_fingerprint": target_fingerprint,
         "requested_target_attestation": attestation,
         "budget": budget,
+        "mutation_class": str(mutation_class or ""),
+        "mutation_authorization_id": str(mutation_authorization_id or ""),
+        "mutation_target_fingerprint": str(mutation_target_fingerprint or ""),
+        "pre_mutation_surface_fingerprint": str(
+            pre_mutation_surface_fingerprint or ""),
     }
     fingerprint = role_contract_fingerprint(contract_fields)
     contract_fields["request_fingerprint"] = fingerprint

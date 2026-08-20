@@ -563,6 +563,67 @@
    "VERSION": "1.0.0",
    "STATUS": "ACTIVE",
    "PROVIDER_SCOPE": "NON_MUTATING_TASK"
+  },
+  {
+   "CAPABILITY_ID": "bounded_documentation_write",
+   "TYPE": "TASK_CAPABILITY",
+   "DESCRIPTION": "Provider/model/backend-neutral bounded text-documentation write: exactly one bounded text-document mutation inside an explicitly authorized isolated/non-production workspace, under the canonical bounded_documentation_write primitive. No generic filesystem WRITE. Fail-closed: unknown classification, protected surfaces, or missing Owner authorization always BLOCK.",
+   "TRIGGERS": [
+    "task.intent.bounded-documentation-write",
+    "task.intent.documented-mutation-envelope"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "any-code-mutation",
+    "production-surface",
+    "arbitrary-filesystem-write"
+   ],
+   "INVOCATION_CLASS": "HOST_PRIMITIVE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "bounded-documentation-write"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "mutate-application-code",
+    "mutate-database",
+    "mutate-supabase-rls",
+    "mutate-deployment-configuration",
+    "mutate-test-code",
+    "mutate-protected-surfaces",
+    "delete",
+    "rename",
+    "deploy",
+    "grant-permissions",
+    "shell-arbitrary-write"
+   ],
+   "REQUIRES": [
+    "non_mutating_project_analysis"
+   ],
+   "CONTEXT_POINTERS": [
+    "document_classification",
+    "bounded_write_primitive",
+    "rollback_contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-mutation-envelope",
+    "owner-read-only-envelope"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-target-certification",
+    "owner-authorization",
+    "deterministic-evidence",
+    "exact-changed-surface",
+    "rollback-required"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "goal": "P2P-BOUNDED-DOCUMENTATION-WRITE-01",
+    "seam_closed": "BLOCKED / NO_CANONICAL_DOCUMENTATION_MUTATION_CAPABILITY"
+   },
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE",
+   "PROVIDER_SCOPE": "BOUNDED_DOCUMENTATION_TASK"
   }
  ]
 }

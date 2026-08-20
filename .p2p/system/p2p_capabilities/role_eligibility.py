@@ -41,7 +41,12 @@ ELIGIBILITY_SCHEMA = "p2p-role-target-eligibility/1"
 # Canonical permission grant ordering (never-widens: role <= task <=
 # goal-approved envelope; actual executor permission must not exceed the
 # composed envelope).
-PERMISSION_ORDER = ("NONE", "READ", "WRITE", "EXECUTE", "NETWORK")
+# P2P-BOUNDED-DOCUMENTATION-WRITE-01: WRITE_BOUNDED ranks between READ
+# and WRITE. It is strictly weaker than WRITE — a profile containing
+# only WRITE_BOUNDED never satisfies a WRITE ceiling, and a read-only
+# role never gains it implicitly (it must be bound to the bounded
+# documentation primitive explicitly).
+PERMISSION_ORDER = ("NONE", "READ", "WRITE_BOUNDED", "WRITE", "EXECUTE", "NETWORK")
 
 # Read-only role authority markers (roles whose canonical definition is
 # read-only must not become writable).
@@ -248,6 +253,16 @@ def evaluate_role_target_eligibility(
     if role_read_only and target.current_auth_state.upper() in ("WRITE", "EXECUTE"):
         permission_widens = True
         reasons.append("read-only-role-target-reports-write-permission")
+    # The bounded-write primitive is a separate authority surface — a
+    # target claiming WRITE_BOUNDED availability without an explicit
+    # task profile containing WRITE_BOUNDED is a widening attempt.
+    _task_grants_bounded = any(
+        str(item).strip().upper() == "WRITE_BOUNDED"
+        for item in task_permission_profile)
+    if target.current_auth_state.upper() == "WRITE_BOUNDED" and \
+            not _task_grants_bounded:
+        permission_widens = True
+        reasons.append("bounded-write-claim-without-explicit-task-profile")
 
     # Historical certification != current auth availability.
     auth_blocked = False

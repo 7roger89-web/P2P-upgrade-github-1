@@ -109,7 +109,16 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
     timestamps = dict(fields.get("timestamps") or {})
     for key in TIMESTAMP_FIELDS:
         timestamps.setdefault(key, "UNKNOWN")
-    return {
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01: extend the SAME role receipt with
+    # an optional bounded-documentation mutation evidence block. When
+    # present, the block is validated against the canonical
+    # p2p-bounded-documentation-write/1 schema (mandatory hash fields,
+    # changed-byte floor). An absent block is allowed for READ_ONLY
+    # receipts; a malformed block raises (fail closed).
+    _mutation_evidence = dict(fields.get("mutation_evidence") or {})
+    if _mutation_evidence:
+        _g1_validate_mutation_evidence(_mutation_evidence)
+    receipt_dict = {
         "schema": ROLE_RECEIPT_SCHEMA,
         "role_id": str(fields.get("role_id", "")),
         "role_spec_hash": str(fields.get("role_spec_hash", "")),
@@ -138,6 +147,9 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
         "timestamps": timestamps,
         "raw_backend_receipt_pointer": fields.get("raw_backend_receipt_pointer") or "",
     }
+    if _mutation_evidence:
+        receipt_dict["mutation_evidence"] = _mutation_evidence
+    return receipt_dict
 
 
 def _validate_text(value: str, field_name: str, max_length: int = 256) -> str:
@@ -152,6 +164,54 @@ def _validate_hash(value: str, field_name: str) -> str:
     if not re.fullmatch(r"[0-9a-fA-F]{64}", text):
         raise RoleReceiptError("RECEIPT_HASH_FIELD_INVALID", {"field": field_name})
     return text.lower()
+
+
+# ---------------------------------------------------------------------------
+# P2P-BOUNDED-DOCUMENTATION-WRITE-01 — Mutation evidence validation.
+# ---------------------------------------------------------------------------
+
+
+def _g1_validate_mutation_evidence(evidence: dict[str, Any]) -> None:
+    """Validate the bounded-documentation mutation evidence block the
+    receipt carries. Spec 13 + 14: every mandatory field must be
+    present and non-UNKNOWN; a mutation with no changed bytes is NOT
+    a successful mutation proof (fail closed)."""
+    _required_hashes = ("before_file_hash", "after_file_hash",
+                        "before_tree_hash", "after_tree_hash")
+    for _key in _required_hashes:
+        _v = str(evidence.get(_key) or "").strip()
+        if not _v or _v.upper() in ("UNKNOWN", "NONE", ""):
+            raise RoleReceiptError("MUTATION_EVIDENCE_HASH_UNKNOWN",
+                                   {"field": _key})
+        if not re.fullmatch(r"[0-9a-fA-F]{40,64}", _v):
+            raise RoleReceiptError("MUTATION_EVIDENCE_HASH_INVALID",
+                                   {"field": _key})
+    _path = str(evidence.get("changed_relative_path") or "").strip()
+    if not _path or _path.upper() in ("UNKNOWN", "NONE"):
+        raise RoleReceiptError("MUTATION_EVIDENCE_CHANGED_PATH_UNKNOWN",
+                               {"field": "changed_relative_path"})
+    for _key in ("changed_file_count", "changed_line_count", "changed_bytes"):
+        _v = evidence.get(_key)
+        if _v is None or not isinstance(_v, (int, float)):
+            raise RoleReceiptError("MUTATION_EVIDENCE_COUNT_UNKNOWN",
+                                   {"field": _key})
+        if int(_v) < 0:
+            raise RoleReceiptError("MUTATION_EVIDENCE_COUNT_NEGATIVE",
+                                   {"field": _key})
+    if int(evidence.get("changed_bytes", 0)) <= 0:
+        raise RoleReceiptError("MUTATION_EVIDENCE_NO_CHANGED_BYTES",
+                               {"changed_bytes": evidence.get("changed_bytes")})
+    for _key in ("mutation_class", "owner_authorization_id",
+                 "contract_fingerprint", "dispatch_id", "execution_id",
+                 "host_attestation_id"):
+        _v = str(evidence.get(_key) or "").strip()
+        if not _v or _v.upper() in ("UNKNOWN", "NONE", ""):
+            raise RoleReceiptError("MUTATION_EVIDENCE_FIELD_UNKNOWN",
+                                   {"field": _key})
+    if str(evidence.get("schema", "")) not in (
+            "p2p-bounded-documentation-write/1", ""):
+        raise RoleReceiptError("MUTATION_EVIDENCE_SCHEMA_UNKNOWN",
+                               {"schema": str(evidence.get("schema", ""))})
 
 
 class RoleExecutionReceipt:
@@ -808,10 +868,15 @@ def _g1_attestation_validity_check(receipt: Mapping[str, Any]) -> dict:
 
 def _g1_mutation_state_check(receipt: Mapping[str, Any]) -> dict:
     """Mutation evidence: dispatch reports zero writes and
-    possible_mutation=false; receipt tree hashes agree H1==H2."""
+    possible_mutation=false; receipt tree hashes agree H1==H2.
+    P2P-BOUNDED-DOCUMENTATION-WRITE-01 extension: when the receipt
+    carries a bounded-documentation mutation evidence block, the
+    verifier mechanically checks the changed-surface semantics
+    (exactly-one-file evidence, hash delta, byte floor, bound
+    discipline, and identity binding)."""
     th = dict(receipt.get("tree_hashes", {}) or {})
     dispatch = dict(receipt.get("backend", {}) or {})
-    return {
+    out = {
         "h1": str(th.get("h1", "")),
         "h2": str(th.get("h2", "")),
         "h1_equals_h2": bool(th.get("h1") and th.get("h2")
@@ -830,6 +895,84 @@ def _g1_mutation_state_check(receipt: Mapping[str, Any]) -> dict:
                   and not dispatch.get("changed_surface", []))
             else -1),
     }
+    ev = dict(receipt.get("mutation_evidence") or {})
+    if not ev:
+        out["mutation_evidence_present"] = False
+        out["mutation_evidence_valid"] = True  # READ_ONLY receipts
+        out["mutation_evidence_check"] = "NO_BOUNDED_MUTATION_CLAIMED"
+        return out
+    # Bounded-mutation branch: application_mutation is counted from the
+    # verified evidence (exactly one file) instead of from the backend
+    # dispatch surface, and the dispatch surface must stay clean and
+    # consistent with the evidence claim (fail closed).
+    out["application_mutation"] = (
+        int(ev.get("changed_file_count", -1))
+        if isinstance(ev.get("changed_file_count"), int)
+        else -1)
+    out["dispatch_consistent_with_bounded_evidence"] = (
+        out["dispatch_possible_mutation"] is True
+        and len(out["dispatch_changed_surface"]) == 1
+        and str(out["dispatch_changed_surface"][0])
+        == str(ev.get("changed_relative_path", "")).strip())
+    out["mutation_evidence_present"] = True
+    # 1. Schema and mandatory hash fields (fail closed on UNKNOWN).
+    #    The first-mutation sentinel NON_EXISTENT is the only canonical
+    #    non-digest value allowed for the BEFORE fields (a newly created
+    #    document has no prior hash); after_* fields must always be real
+    #    digests.
+    hash_fields = ("before_file_hash", "after_file_hash",
+                   "before_tree_hash", "after_tree_hash")
+
+    def _valid_bounded_hash(value: str) -> bool:
+        value = str(value or "").strip()
+        if not value:
+            return False
+        if re.fullmatch(r"[0-9a-fA-F]{40,64}", value):
+            return True
+        return value == "NON_EXISTENT"
+
+    hashes_ok = all(_valid_bounded_hash(ev.get(_k)) for _k in hash_fields)
+    out["mutation_evidence_hashes_valid"] = bool(hashes_ok)
+    # 2. Changed surface discipline: exactly one file, positive bytes.
+    out["mutation_evidence_changed_file_count"] = ev.get("changed_file_count")
+    out["mutation_evidence_changed_file_count_bounded_to_one"] = (
+        ev.get("changed_file_count") == 1)
+    out["mutation_evidence_changed_bytes"] = ev.get("changed_bytes")
+    out["mutation_evidence_changed_bytes_positive"] = (
+        isinstance(ev.get("changed_bytes"), (int, float))
+        and int(ev.get("changed_bytes", 0)) > 0)
+    # 3. Hash delta: a mutation with no changed bytes is NOT a proof.
+    out["mutation_evidence_file_hash_delta"] = bool(
+        hashes_ok and str(ev.get("before_file_hash", "")).lower()
+        != str(ev.get("after_file_hash", "")).lower())
+    # 4. Mutation-class discipline: only the canonical bounded class.
+    out["mutation_evidence_class_canonical"] = (
+        str(ev.get("mutation_class") or "").strip()
+        == "DOCUMENTATION_WRITE_ONLY")
+    out["mutation_evidence_schema"] = str(ev.get("schema") or "").strip()
+    # 5. Identity binding: dispatch/execution/attestation ids must be
+    # exact non-empty strings bound to this execution.
+    id_fields = ("dispatch_id", "execution_id", "host_attestation_id",
+                 "owner_authorization_id", "contract_fingerprint")
+    out["mutation_evidence_identity_bound"] = all(
+        bool(str(ev.get(_k) or "").strip()) for _k in id_fields)
+    # 6. Rollback required: first pilot class demands rollback-ready
+    # evidence (rollback_required = REQUIRED).
+    out["mutation_evidence_rollback_required"] = (
+        str(ev.get("rollback_required") or "").strip().upper()
+        == "REQUIRED")
+    valid = bool(hashes_ok
+                 and out["mutation_evidence_changed_file_count_bounded_to_one"]
+                 and out["mutation_evidence_changed_bytes_positive"]
+                 and out["mutation_evidence_file_hash_delta"]
+                 and out["mutation_evidence_class_canonical"]
+                 and out["mutation_evidence_identity_bound"]
+                 and out["mutation_evidence_rollback_required"])
+    out["mutation_evidence_valid"] = valid
+    out["mutation_evidence_check"] = (
+        "BOUNDED_MUTATION_EVIDENCE_VERIFIED" if valid
+        else "BOUNDED_MUTATION_EVIDENCE_INVALID")
+    return out
 
 
 def _g1_sha256_file(path: str) -> str:
@@ -1011,9 +1154,23 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
 
     bind = _g1_dispatch_binding_check(receipt)
     checks["dispatch_binding"] = bind
-    dispatch_ok = (bind["contract_to_dispatch_binding"]
-                   and bind["dispatch_possible_mutation"] is False
-                   and len(bind["dispatch_changed_surface"]) == 0)
+    # READ_ONLY receipts: dispatch surface clean, no mutation.
+    # Bounded-mutation receipts (mutation_evidence present): dispatch
+    # surface must carry EXACTLY the one claimed change and report
+    # possible_mutation=True (truthful observation, fail closed).
+    _claiming_bounded = bool(receipt.get("mutation_evidence"))
+    if _claiming_bounded:
+        dispatch_ok = (
+            bind["contract_to_dispatch_binding"]
+            and bind["dispatch_possible_mutation"] is True
+            and len(bind["dispatch_changed_surface"]) == 1
+            and str(bind["dispatch_changed_surface"][0]).strip()
+            == str(receipt["mutation_evidence"].get(
+                "changed_relative_path", "")).strip())
+    else:
+        dispatch_ok = (bind["contract_to_dispatch_binding"]
+                       and bind["dispatch_possible_mutation"] is False
+                       and len(bind["dispatch_changed_surface"]) == 0)
 
     att = _g1_attestation_validity_check(receipt)
     checks["host_attestation"] = att
@@ -1024,7 +1181,20 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
 
     mut = _g1_mutation_state_check(receipt)
     checks["mutation_state"] = mut
-    mutation_zero = mut["h1_equals_h2"] and mut["application_mutation"] == 0
+    # READ_ONLY receipts: zero application mutation.
+    # Bounded-mutation receipts: exactly-one-file evidence counted as
+    # application_mutation==1, H1==H2 unchanged (baseline identity).
+    if _claiming_bounded:
+        mutation_zero = (
+            mut["h1_equals_h2"]
+            and mut["application_mutation"] == 1
+            and mut.get("dispatch_consistent_with_bounded_evidence"))
+    else:
+        mutation_zero = mut["h1_equals_h2"] and mut["application_mutation"] == 0
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01: a receipt that CLAIMS a bounded
+    # mutation must carry a verified mutation evidence block; READ_ONLY
+    # receipts (no claim) keep the zero-mutation path unchanged.
+    mutation_evidence_ok = bool(mut.get("mutation_evidence_valid"))
 
     checks["source_revision"] = {
         "source_commit": str(receipt["freshness"]["source_commit"]),
@@ -1072,6 +1242,7 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
                     and dispatch_ok
                     and att_ok
                     and mutation_zero
+                    and mutation_evidence_ok
                     and evidence_ok
                     and cand_ok
                     and repo_ok),
