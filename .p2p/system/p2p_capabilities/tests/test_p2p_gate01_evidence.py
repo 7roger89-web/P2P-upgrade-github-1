@@ -374,7 +374,7 @@ class Gate01TimestampTests(unittest.TestCase):
         _source_registry_clean()
         _qi.record_source_bound_certification(
             eval_id="pilot-hardening-01", eval_version="C35-rc1",
-            capability_id=CANONICAL_CAPABILITY, subject=CANONICAL_CAPABILITY,
+            capability_id=CANONICAL_CAPABILITY, subject=CANONICAL_ROLE,
             result="CERTIFIED", source_repository_id=SOURCE_REPO_ID,
             source_commit=VALID_SOURCE_COMMIT,
             project_binding="game-truyen",
@@ -593,7 +593,7 @@ class Gate01NegativeMatrixTests(unittest.TestCase):
         _source_registry_clean()
         _qi.record_source_bound_certification(
             eval_id="pilot-hardening-01", eval_version="C35-rc1",
-            capability_id=CANONICAL_CAPABILITY, subject=CANONICAL_CAPABILITY,
+            capability_id=CANONICAL_CAPABILITY, subject=CANONICAL_ROLE,
             result="CERTIFIED", source_repository_id=SOURCE_REPO_ID,
             source_commit=VALID_SOURCE_COMMIT,
             project_binding="game-truyen",
