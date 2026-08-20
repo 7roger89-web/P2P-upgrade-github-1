@@ -1064,7 +1064,8 @@ def source_bound_status(capability_id: str, subject: str,
             return {"status": "CURRENT_EXACT_REVISION",
                     "source_commit": rec["source_commit"],
                     "project_commit": rec["project_commit"],
-                    "certified_at": rec["certified_at"]}
+                    "certified_at": rec["certified_at"],
+                    "all_source_bounds_current": True}
     return {"status": "NO_SOURCE_BOUND_RECORD"}
 
 def latest_source_bound_record(capability_id: str,

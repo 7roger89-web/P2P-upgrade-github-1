@@ -129,6 +129,31 @@ def contract_request_fingerprint(contract: Mapping[str, Any]) -> str:
     return role_contract_fingerprint(dict(contract)).lower()
 
 
+def finalize_identity_chain(chain: Mapping[str, Any],
+                              attestation_fingerprint: str,
+                              outcome: str = "") -> dict:
+    """GATE-01B two-pass identity: the chain is derivable before the
+    host attestation exists (planning side), then FINALIZED with the
+    real attestation fingerprint + discrete outcome so the recorded
+    role_receipt_id equals the canonical receipt identity that the
+    receipt emitter and the verifier will re-derive. The chain is
+    mutated in place (new object returned) and the finalization
+    markers are recorded for verification: an empty attestation
+    fingerprint never counts as a bound receipt (fail-closed — no
+    stale pre-attestation snapshot may masquerade as evidence)."""
+    final = dict(chain)
+    fp = str(attestation_fingerprint or "").strip().lower()
+    if not ID_REGEX.fullmatch(fp):
+        raise ValueError("ATTESTATION_FINGERPRINT_NOT_BOUND",
+                         {"attestation_fingerprint": fp[:32]})
+    final["attestation_fingerprint"] = fp
+    final["outcome"] = str(outcome)
+    final["role_receipt_id"] = mint_receipt_id(
+        final["execution_id"], final["role_execution_contract_digest"],
+        final["request_fingerprint"], fp, outcome)
+    return final
+
+
 def build_identity_chain(*, goal_id: str, task_id: str, role_id: str,
                          contract: Mapping[str, Any],
                          target_id: str,
@@ -229,22 +254,6 @@ def verify_identity_chain(chain: Mapping[str, Any]) -> dict:
         recorded["request_fingerprint"],
         str(recorded.get("attestation_fingerprint", "")),
         str(recorded.get("outcome", "")))
-    if rec_id != str(recorded.get("role_receipt_id", "")):
-        # Recompute from the older four-field identity domain for the
-        # case where the recorded receipt predates the unified schema
-        # (deterministic fallback, still mechanically explainable).
-        from .role_receipt import MUTATION_READY_RECEIPT_SCHEMA as _mrrs2
-        legacy = _sha256_hex({"schema": _mrrs2,
-                              "execution_id": str(exec_id),
-                              "contract_digest":
-                                  str(recorded["role_execution_contract_digest"]).lower(),
-                              "request_fingerprint":
-                                  str(recorded["request_fingerprint"]).lower(),
-                              "attestation_fingerprint":
-                                  str(recorded.get("attestation_fingerprint", "")).lower(),
-                              "outcome": str(recorded.get("outcome", ""))})
-        if legacy == str(recorded.get("role_receipt_id", "")):
-            rec_id = legacy
     checks["receipt_derivation"] = {
         "expected": rec_id,
         "recorded": str(recorded.get("role_receipt_id", "")),

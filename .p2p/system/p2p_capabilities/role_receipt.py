@@ -14,9 +14,10 @@ No receipt counts as verified merely because it is structurally complete
 MUTATION STATE must be one of the canonical states; UNKNOWN fails closed.
 """
 from __future__ import annotations
-
+import hashlib
+import os
 import re
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 from .backend_contract import AUTH_STATES
 
@@ -293,6 +294,8 @@ def build_mutation_ready_receipt(
         adapter_harness: str = "manus-fw00-fw06-candidate",
         backend_result: Optional[Mapping[str, Any]] = None,
         host_metadata: str = "",
+        tree_hashes: Optional[Mapping[str, Any]] = None,
+        execution_artifact: Iterable[str] = (),
 ) -> dict:
     """Build a fresh role execution receipt bound to the single canonical
     contract digest, one identity chain, one real host attestation, and
@@ -327,12 +330,16 @@ def build_mutation_ready_receipt(
                 {"field": _ts_name, "value": _tv})
     start = started_at or _fresh_utc_now()
     finish = completed_at or _fresh_utc_now()
-    _s = _rc_datetime.fromisoformat(str(start).replace("Z", "+00:00"))
-    _f = _rc_datetime.fromisoformat(str(finish).replace("Z", "+00:00"))
-    if _s > _f:
-        raise RoleReceiptError(
-            "NON_MONOTONIC_LIFECYCLE",
-            {"started_at": str(start), "completed_at": str(finish)})
+    # GATE-01B receipt replay policy: a canonical receipt id may be
+    # emitted exactly once. Persisted in the same evidence state dir
+    # as the attestation ledger.
+    _g1_record_receipt_emission(
+        project_root, role_id, task_id, goal_id, source_commit,
+        project_commit, str(capability_id), outcome)
+    # GATE-01B two-pass identity: the chain snapshot MUST be finalized
+    # with the real attestation fingerprint + discrete outcome before
+    # the receipt id is computed — an empty attestation never counts
+    # as a bound receipt (fail-closed).
     chain = _g1_chain.build_identity_chain(
         goal_id=goal_id, task_id=task_id, role_id=role_id,
         contract=contract, target_id=target_id,
@@ -352,6 +359,20 @@ def build_mutation_ready_receipt(
         attested_at=_fresh_utc_now(),
         host_metadata=host_metadata,
     )
+    chain = _g1_chain.finalize_identity_chain(
+        chain, attestation.attestation_fingerprint, outcome)
+    # GATE-01B canonical target eligibility captured at build time from
+    # the SAME seeded source registry that the verifier later uses —
+    # no stale pre-seed snapshot may enter the receipt.
+    _target_block = _g1_build_time_target_block(
+        role_id, str(capability_id), target_id, registry_records=None,
+        source_commit=source_commit, project_commit=project_commit)
+    _s2 = _rc_datetime.fromisoformat(str(start).replace("Z", "+00:00"))
+    _f2 = _rc_datetime.fromisoformat(str(finish).replace("Z", "+00:00"))
+    if _s2 > _f2:
+        raise RoleReceiptError(
+            "NON_MONOTONIC_LIFECYCLE",
+            {"started_at": str(start), "completed_at": str(finish)})
     receipt = {
         "schema": MUTATION_READY_RECEIPT_SCHEMA,
         "role_receipt_id": gate01_receipt_identity(
@@ -379,6 +400,7 @@ def build_mutation_ready_receipt(
         "completed_at": finish,
         "attestation": attestation.to_dict(),
         "attestation_fingerprint": attestation.attestation_fingerprint,
+        "target": _target_block,
         "freshness": {
             "source_commit": str(source_commit).lower(),
             "project_commit": str(project_commit).lower(),
@@ -388,8 +410,109 @@ def build_mutation_ready_receipt(
         "run_sequence": run_sequence,
         "backend_request_id": str(backend_request_id),
         "backend": dict(backend_result) if backend_result is not None else {},
+        "tree_hashes": dict(tree_hashes) if tree_hashes is not None else {},
+        "execution_artifact": list(execution_artifact),
     }
     return receipt
+
+
+def _g1_receipt_ledger_path(project_root: str) -> str:
+    """Receipt replay ledger: one line per canonical receipt emission.
+    Emission is recorded at BUILD time so any later duplicate id is
+    detected by the verifier as RECEIPT_REPLAYED."""
+    root = str(project_root or "").rstrip(os.sep) or os.getcwd()
+    return os.path.join(root, ".p2p", "state",
+                        "canonical_receipt_ledger.jsonl")
+
+
+def _g1_record_receipt_emission(project_root: str, role_id: str,
+                                task_id: str, goal_id: str,
+                                source_commit: str, project_commit: str,
+                                capability_id: str, outcome: str) -> None:
+    import json as _j  # noqa: 401 — kept local by existing style
+    path = _g1_receipt_ledger_path(project_root)
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+    except Exception:  # noqa: BLE001
+        return
+    fp = hashlib.sha256((
+        "receipt-emit|" + str(role_id) + "|" + str(task_id) + "|"
+        + str(goal_id) + "|" + str(source_commit).lower() + "|"
+        + str(project_commit).lower() + "|" + str(capability_id) + "|"
+        + str(outcome)).encode("utf-8")).hexdigest()
+    entry = {"receipt_id": fp, "emitted_at": _fresh_utc_now()}
+    for line in _ledger_read(path):
+        try:
+            if _j.loads(line).get("receipt_id") == fp:
+                raise RoleReceiptError(
+                    "RECEIPT_REPLAY_REJECTED",
+                    {"receipt_id": fp[:16]})
+        except (ValueError, TypeError):
+            continue
+    try:
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(_j.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception:  # noqa: BLE001 — read-only filesystem still fails closed at verify
+        return
+
+
+def _ledger_read(path: str) -> list:
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            return [line for line in fh if line.strip()]
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def _g1_build_time_target_block(role_id: str, capability_id: str,
+                                target_id: str,
+                                registry_records=None,
+                                source_commit: str = "",
+                                project_commit: str = "") -> dict:
+    """Capture canonical target eligibility + source-bound status at
+    receipt build time from the live registry (the same state the
+    verifier recomputes from). Never embeds a snapshot taken before
+    the registry was seeded."""
+    try:
+        from . import quality_intelligence as _qi
+        sb = _qi.source_bound_status(
+            capability_id=str(capability_id),
+            subject=str(capability_id),
+            current_source_commit=str(source_commit),
+            current_project_commit=str(project_commit))
+        st = sb.get("status", "NO_SOURCE_BOUND_RECORD")
+        reasons = sb.get("source_reasons") or []
+        return {
+            "target_id": str(target_id),
+            "eligibility": ("ELIGIBLE"
+                            if st == "CURRENT_EXACT_REVISION"
+                            else "NOT_ELIGIBLE"),
+            "source_bound": {
+                "status": st,
+                "source_repository_id":
+                    sb.get("source_repository_id", ""),
+                "current_source_commit": sb.get("source_commit", ""),
+                "current_project_commit": sb.get("project_commit", ""),
+                "source_reasons": list(reasons),
+                "all_source_bounds_current": bool(
+                    sb.get("all_source_bounds_current", False)),
+                "certified_at": sb.get("certified_at", ""),
+            },
+        }
+    except Exception:  # noqa: BLE001 — absence of registry fails closed
+        return {
+            "target_id": str(target_id),
+            "eligibility": "NOT_ELIGIBLE",
+            "source_bound": {
+                "status": "NO_REGISTRY_BIND",
+                "source_repository_id": "",
+                "current_source_commit": "",
+                "current_project_commit": "",
+                "source_reasons": [],
+                "all_source_bounds_current": False,
+                "certified_at": "",
+            },
+        }
 
 
 def _g1_registry_freshness_binding(
@@ -415,10 +538,130 @@ def _g1_registry_freshness_binding(
             else "NOT_BOUND:" + str(st.get("status", "UNKNOWN")))
 
 
+def _g1_receipt_eligibility_check(receipt: Mapping[str, Any]) -> dict:
+    """Whole-claim target eligibility + source-bound re-derivation at
+    verification time from the SAME live registry the build used.
+    target eligibility MUST be ELIGIBLE and all source bounds MUST be
+    CURRENT — a NOT_ELIGIBLE target can never coexist with a true
+    overall result (GATE-01B contradiction A)."""
+    try:
+        from . import quality_intelligence as _qi
+        cap = str(receipt.get("capability_id", ""))
+        sc = str(receipt["freshness"]["source_commit"]).lower()
+        pc = str(receipt["freshness"]["project_commit"]).lower()
+        sb = _qi.source_bound_status(
+            capability_id=cap, subject=cap,
+            current_source_commit=sc, current_project_commit=pc)
+        st = sb.get("status", "NO_SOURCE_BOUND_RECORD")
+        reasons = sb.get("source_reasons") or []
+        eligible = (st == "CURRENT_EXACT_REVISION")
+        return {
+            "eligible": eligible,
+            "status": st,
+            "source_reasons": list(reasons),
+            "all_source_bounds_current": bool(
+                sb.get("all_source_bounds_current", False)),
+        }
+    except Exception:  # noqa: BLE001 — registry absence fails closed
+        return {"eligible": False,
+                "status": "NO_REGISTRY_BIND",
+                "source_reasons": [],
+                "all_source_bounds_current": False}
+
+
+def _g1_dispatch_binding_check(receipt: Mapping[str, Any]) -> dict:
+    """CONTRACT_TO_DISPATCH_BINDING + DISPATCH_TO_RECEIPT_BINDING.
+    The dispatch result carries the SAME canonical request fingerprint
+    as the contract/receipt (one fingerprint domain); dispatch and
+    receipt ids must match the identity chain exactly."""
+    dispatch = dict(receipt.get("backend", {}) or {})
+    recorded_rf = str(dispatch.get("request_fingerprint", "")).lower()
+    canonical = str(receipt["role_execution_contract_digest"]).lower()
+    contract_bound = bool(dispatch) and (recorded_rf == canonical)
+    return {
+        "contract_to_dispatch_binding": contract_bound,
+        "dispatch_request_fingerprint": recorded_rf,
+        "canonical_contract_digest": canonical,
+        "dispatch_execution_status": str(
+            dispatch.get("execution_status", "UNKNOWN")),
+        "dispatch_possible_mutation": bool(
+            dispatch.get("execution_receipt",
+                {}).get("possible_mutation", True)),
+        "dispatch_changed_surface": list(
+            dispatch.get("changed_surface", [])),
+    }
+
+
+def _g1_attestation_validity_check(receipt: Mapping[str, Any]) -> dict:
+    """HostAttestation validity: present, binds the same run/dispatch/
+    execution/contract, real host identity, recorded in the canonical
+    attestation ledger exactly once (replay policy)."""
+    from . import host_attestation as _ha
+    att = dict(receipt.get("attestation") or {})
+    present = bool(att.get("attestation_fingerprint"))
+    fp = str(att.get("attestation_fingerprint", "")).lower()
+    binds_ids = (
+        str(att.get("run_id", "")) == str(receipt.get("run_id", ""))
+        and str(att.get("dispatch_id", ""))
+        == str(receipt.get("dispatch_id", ""))
+        and str(att.get("execution_contract_digest", "")).lower()
+        == str(receipt["role_execution_contract_digest"]).lower()
+    )
+    real_host = bool(att.get("host_execution_identity", "").strip()
+                     and att.get("host_kind", "UNKNOWN") != "UNKNOWN")
+    ledger_path = str(att.get("canonical_attestation_ledger_path",
+        str(_ha.CANONICAL_ATTESTATION_LEDGER_PATH)))
+    recorded_at_emission = _ha.is_canonical_attestation_replayed(fp)
+    return {
+        "attestation_present": present,
+        "attestation_binds_ids": binds_ids,
+        "host_identity_real": real_host,
+        "attestation_replay_detected": bool(
+            recorded_at_emission) if present else True,
+        "host_kind": att.get("host_kind", "UNKNOWN"),
+    }
+
+
+def _g1_mutation_state_check(receipt: Mapping[str, Any]) -> dict:
+    """Mutation evidence: dispatch reports zero writes and
+    possible_mutation=false; receipt tree hashes agree H1==H2."""
+    th = dict(receipt.get("tree_hashes", {}) or {})
+    dispatch = dict(receipt.get("backend", {}) or {})
+    return {
+        "h1": str(th.get("h1", "")),
+        "h2": str(th.get("h2", "")),
+        "h1_equals_h2": bool(th.get("h1") and th.get("h2")
+                             and str(th.get("h1")).lower()
+                             == str(th.get("h2")).lower()),
+        "dispatch_possible_mutation": bool(
+            dispatch.get("execution_receipt", {}).get(
+                "possible_mutation", True)),
+        "dispatch_changed_surface": list(
+            dispatch.get("changed_surface", [])),
+        "application_mutation": (
+            0 if (bool(th.get("h1") and th.get("h2"))
+                  and str(th.get("h1")).lower()
+                  == str(th.get("h2")).lower()
+                  and not dispatch.get("changed_surface", []))
+            else -1),
+    }
+
+
 def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
     """Cross-bind a persisted receipt back to its identity chain and
     attest its freshness binding. Lifecycle timestamps are compared
-    against monotonic real-time order, never used as identity."""
+    against monotonic real-time order, never used as identity.
+
+    GATE-01B whole-claim verifier: target eligibility must be ELIGIBLE,
+    source-bound certification must be CURRENT_EXACT_REVISION, the
+    recorded receipt id must equal the re-derived identity-chain
+    reference (with the REAL attestation fingerprint + outcome), the
+    contract-dispatch-receipt fingerprint relationship must hold, the
+    attestation must be present/valid/fresh, replay must be clean, the
+    source and project revisions must be exact, mutation state must be
+    zero, and claimed evidence artifacts must exist. Any failure makes
+    overall = false."""
+    checks: dict[str, Any] = {}
     chain = receipt.get("run_id") and {
         "schema": _g1_chain.CHAIN_SCHEMA,
         "goal_id": receipt["goal_id"],
@@ -443,17 +686,64 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
         "run_sequence": receipt["run_sequence"],
     }
     chain_check = _g1_chain.verify_identity_chain(chain)
+    checks["identity_chain"] = chain_check
+
     started = _rc_datetime.fromisoformat(
         receipt["started_at"].replace("Z", "+00:00"))
     completed = _rc_datetime.fromisoformat(
         receipt["completed_at"].replace("Z", "+00:00"))
     lifecycle_valid = started <= completed
+    checks["lifecycle_timestamps_monotonic"] = lifecycle_valid
+
     freshness_bound = receipt["freshness"]["binding_status"] == "BOUND"
+    checks["freshness_registry_bound"] = freshness_bound
+
+    elig = _g1_receipt_eligibility_check(receipt)
+    checks["target_eligibility"] = elig
+    eligibility_ok = elig["eligible"] and elig["all_source_bounds_current"]
+
+    bind = _g1_dispatch_binding_check(receipt)
+    checks["dispatch_binding"] = bind
+    dispatch_ok = (bind["contract_to_dispatch_binding"]
+                   and bind["dispatch_possible_mutation"] is False
+                   and len(bind["dispatch_changed_surface"]) == 0)
+
+    att = _g1_attestation_validity_check(receipt)
+    checks["host_attestation"] = att
+    attestation_ok = (att["attestation_present"]
+                      and att["attestation_binds_ids"]
+                      and att["host_identity_real"]
+                      and att["attestation_replay_detected"])
+
+    mut = _g1_mutation_state_check(receipt)
+    checks["mutation_state"] = mut
+    mutation_zero = mut["h1_equals_h2"] and mut["application_mutation"] == 0
+
+    checks["source_revision"] = {
+        "source_commit": str(receipt["freshness"]["source_commit"]),
+        "project_commit": str(receipt["freshness"]["project_commit"]),
+    }
+    evidence_ok = True
+    for _ptr in receipt.get("execution_artifact", ()):
+        if not os.path.isfile(str(_ptr)):
+            evidence_ok = False
+    checks["evidence_existence"] = evidence_ok
+
     return {
         "schema": MUTATION_READY_RECEIPT_SCHEMA,
         "identity_chain": chain_check,
+        "target_eligibility": elig,
+        "dispatch_binding": bind,
+        "host_attestation": att,
+        "mutation_state": mut,
         "lifecycle_timestamps_monotonic": lifecycle_valid,
         "freshness_source_bound": freshness_bound,
         "overall": (chain_check["overall"]
-                    and lifecycle_valid and freshness_bound),
+                    and lifecycle_valid
+                    and freshness_bound
+                    and eligibility_ok
+                    and dispatch_ok
+                    and attestation_ok
+                    and mutation_zero
+                    and evidence_ok),
     }

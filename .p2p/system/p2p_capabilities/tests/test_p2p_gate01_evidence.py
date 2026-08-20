@@ -380,9 +380,27 @@ class Gate01TimestampTests(unittest.TestCase):
             project_binding="game-truyen",
             project_commit=VALID_PROJECT_COMMIT, evidence_version="0.1.0",
             evidence_pointers=(), certified_at=_fresh_utc(0))
+        # Canonical dispatch evidence: the dispatch result carries the
+        # SAME canonical request fingerprint as the role contract,
+        # reports zero writes and possible_mutation=False.
+        _rfp = _ec.contract_request_fingerprint(CONTRACT)
+        _h = "91661a25dd925d85908b6562e023862c5169afd0"
         r = _rr.build_mutation_ready_receipt(
             **self._base_receipt_params(
-                started_at=_fresh_utc(1), completed_at=_fresh_utc(2)))
+                started_at=_fresh_utc(1), completed_at=_fresh_utc(2),
+                backend_result={
+                    "schema": "p2p-autopilot-execution-result/1",
+                    "request_fingerprint": _rfp,
+                    "outcome": "PASS",
+                    "execution_status": "SUCCEEDED",
+                    "changed_surface": [],
+                    "execution_receipt": {
+                        "schema": "p2p-backend-execution-result/1",
+                        "possible_mutation": False,
+                    },
+                },
+                tree_hashes={"h1": _h, "h2": _h},
+                execution_artifact=()))
         v = _rr.verify_mutation_ready_receipt(r)
         self.assertTrue(v.get("overall"), v)
         self.assertTrue(v.get("lifecycle_timestamps_monotonic"), v)
@@ -594,7 +612,21 @@ class Gate01NegativeMatrixTests(unittest.TestCase):
             outcome="READ_ONLY_PASSED",
             project_root=PROJECT_ROOT,
             started_at=_fresh_utc(1),
-            completed_at=_fresh_utc(2))
+            completed_at=_fresh_utc(2),
+            backend_result={
+                "schema": "p2p-autopilot-execution-result/1",
+                "request_fingerprint": _ec.contract_request_fingerprint(CONTRACT),
+                "outcome": "PASS",
+                "execution_status": "SUCCEEDED",
+                "changed_surface": [],
+                "execution_receipt": {
+                    "schema": "p2p-backend-execution-result/1",
+                    "possible_mutation": False,
+                },
+            },
+            tree_hashes={"h1": "91661a25dd925d85908b6562e023862c5169afd0",
+                         "h2": "91661a25dd925d85908b6562e023862c5169afd0"},
+            execution_artifact=())
         v = _rr.verify_mutation_ready_receipt(r)
         self.assertTrue(v.get("overall"), v)
         self.assertTrue(v["identity_chain"]["overall"], v)

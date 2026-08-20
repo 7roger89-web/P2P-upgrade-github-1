@@ -1113,7 +1113,20 @@
         "system/: full tracked .p2p/system capability tree (FW02-FW06 modules, tests, traces)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "artifact_status_note": "superseded by immutable-identity repair; artifact file no longer present on disk"
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.36",
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "promotion_status": "UNPROMOTED",
+      "artifact_sha256": "14a80d497ce6aa64014781f2fdb1bb4296a2f93dd5c873dd722855869a0cd014",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip",
+      "source_commit": "6a61c8f19f045753dbb2871aa4244ee869d9ecf6",
+      "source_tree_hash": "0a8ffe92d83d4ff09e1cc7afc73a27a3a55807e1",
+      "minted_at": "2026-08-20T09:59:58Z",
+      "identity_policy": "one candidate identity -> one immutable artifact SHA; any runtime change requires a NEW successor version, never a re-use of the same identity with a different artifact",
+      "supersedes": "8.4.7-C-codex.35 (identity-collision repair only; no promotion, no release)"
     }
   ],
   "capability_status": [
