@@ -559,12 +559,30 @@ def _g1_receipt_eligibility_check(receipt: Mapping[str, Any]) -> dict:
         st = sb.get("status", "NO_SOURCE_BOUND_RECORD")
         reasons = sb.get("source_reasons") or []
         eligible = (st == "CURRENT_EXACT_REVISION")
+        # GATE-01B contradiction A: an embedded target block claiming
+        # NOT_ELIGIBLE / non-current bounds can never coexist with a
+        # true whole-claim result — the verifier cross-checks the
+        # embedded block against the re-derived registry state and
+        # fails closed on any conflict.
+        emb = dict(receipt.get("target") or {}) if receipt else {}
+        emb_elig = emb.get("eligible", True)
+        emb_bounds = dict(emb.get("source_bound") or {})
+        emb_bounds_current = emb_bounds.get(
+            "all_source_bounds_current", True)
+        embedded_consistent = bool(emb_elig and emb_bounds_current)
+        conflict = (embedded_consistent is False
+                    or (not eligible and emb_elig is not False)
+                    or (eligible
+                        and (emb.get("status") in ("NOT_ELIGIBLE",)
+                             or emb_bounds_current is False)))
         return {
-            "eligible": eligible,
+            "eligible": eligible and not conflict,
             "status": st,
             "source_reasons": list(reasons),
             "all_source_bounds_current": bool(
-                sb.get("all_source_bounds_current", False)),
+                sb.get("all_source_bounds_current", False)
+                and emb_bounds_current),
+            "embedded_target_consistent": not conflict,
         }
     except Exception:  # noqa: BLE001 — registry absence fails closed
         return {"eligible": False,
