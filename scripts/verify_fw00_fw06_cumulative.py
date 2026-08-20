@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fresh-tree verification for the FW00-FW06 cumulative candidate (.35).
+"""Fresh-tree verification for the FW00-FW06 cumulative candidate (.37).
 
 Proves over the EXTRACTED package alone (no repo imports):
   1. Doctor pass (--package, full gate set)
@@ -19,7 +19,7 @@ from pathlib import Path
 CANONICAL = Path("/home/ubuntu/fw01_work/auth-f01/reports/candidates/"
                  "P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip")
 FRESH = Path("/tmp/p2p-fw00-fw06-fresh")
-EXPECTED_SHA256 = "f775ac15bbca691fb734acb8c97aedc7635c48688b2a8c63abb1e83d35cdf8cd"
+EXPECTED_SHA256 = "4aafdcd383b1002842df2465cfd3ce5f4bb3d9d792ce75ad5000771e629640f7"
 
 
 def sha256(path: Path) -> str:

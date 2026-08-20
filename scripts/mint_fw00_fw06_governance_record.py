@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Replace the .35 candidate governance record with a schema-complete one
-(additive field set matching .33/.34 records — other records untouched)."""
+"""Replace the .36 candidate governance record with the .37 schema-complete
+successor (runtime-bound candidate identity — other records untouched)."""
 import json
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ CTRL = REPO / "governance" / "development-control.json"
 
 ARTIFACT = (REPO / "reports" / "candidates"
             / "P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip")
-ARTIFACT_SHA256 = "f775ac15bbca691fb734acb8c97aedc7635c48688b2a8c63abb1e83d35cdf8cd"
+ARTIFACT_SHA256 = "4aafdcd383b1002842df2465cfd3ce5f4bb3d9d792ce75ad5000771e629640f7"
 ANCHOR_SHA256 = "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa"
 
 BASELINE_VERSION = "8.4.7-C-codex.19"
@@ -27,21 +27,29 @@ def main() -> int:
     assert isinstance(records, list)
     versions = [r.get("candidate_version") for r in records if isinstance(r, dict)]
     assert versions[-1] == "8.4.7-C-codex.36", f"expected .36 tail, got {versions[-3:]}"
+    # GATE-01C: candidate .37 = ONE isolated successor minted because the
+    # runtime changed (.36 carried stale 4063c4-era role_receipt.py; final
+    # runtime HEAD includes candidate binding + repo id + replay split).
+    # Policy: exactly one successor UNPROMOTED cumulative; history untouched.
 
+    # GATE-01C source binding: the implementation commit carrying the
+    # final runtime (committed before mint; HEAD == source).
+    src_commit = "d1a88fceac3eb3877eb9d7b642babc53fca1195b"
+    src_tree = "61b4be97b25f28ca5502f6f0e6d31243c55ee823"
     record = {
-        "candidate_version": "8.4.7-C-codex.36",
+        "candidate_version": "8.4.7-C-codex.37",
         "candidate_label": "fw00-fw06-cumulative-production-package",
         "candidate_sha256": ARTIFACT_SHA256,
         "candidate_artifact": str(ARTIFACT.relative_to(REPO)),
-        "candidate_built_at_utc": "2026-08-20T10:00:00Z",
-        "embedded_version": "8.4.7-C-codex.36",
+        "candidate_built_at_utc": "2026-08-20T12:00:00Z",
+        "embedded_version": "8.4.7-C-codex.37",
         "based_on_official_version": BASELINE_VERSION,
         "based_on_official_sha256": BASELINE_SHA256,
         "development_goal": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
         "promotion_status": "UNPROMOTED",
         "built": True,
-        "source_commit": "4063c4ba7acc5098ab544fa2fb0a5c94aa1b4226",
-        "source_tree_hash": "d9990c6a6b2778abf9c7d92b1f2db3ae6e60b03c",
+        "source_commit": src_commit,
+        "source_tree_hash": src_tree,
         "lineage_anchor_sha256": ANCHOR_SHA256,
         "lineage_anchor_note": (
             "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 "
@@ -54,7 +62,14 @@ def main() -> int:
             "verify twice), Stage-B verification PASS (manifest/checksum cross-check), "
             "governance sanity PASS. No promotion, no release, pilot not executed (owner gate). "
             "GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision "
-            "fix — same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA)."),
+            "fix — same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA). "
+            "GATE-01C runtime binding fix: .37 replaces .36's stale build — the .36 zip bundle "
+            "carried 4063c4-era role_receipt.py (sha 780a1bb5, WITHOUT the fe090e8 embedded-target "
+            "fail-closed fix and WITHOUT GATE-01C candidate/repo binding), i.e. EXECUTED_RUNTIME != "
+            "DECLARED_CANDIDATE_RUNTIME. .37 is minted from the FINAL committed runtime (HEAD "
+            "d1a88fc: candidate binding, stable source_repository_id, split attestation replay "
+            "semantics, whole-claim 17-field verifier), so DECLARED_CANDIDATE_RUNTIME == "
+            "EXECUTED_RUNTIME byte-for-byte."),
         "surface_scope": [
             "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
             "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
@@ -85,11 +100,13 @@ def main() -> int:
                        for i in _idx)
     loaded = json.loads(CTRL.read_text(encoding="utf-8"))
     last = loaded["candidate_records"][-1]
-    assert last["candidate_version"] == "8.4.7-C-codex.36"
+    assert last["candidate_version"] == "8.4.7-C-codex.37"
     assert last["candidate_id"] == "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
     assert last["promotion_status"] == "UNPROMOTED"
     assert last["lineage_anchor_sha256"] == ANCHOR_SHA256
-    print("GOVERNANCE .36 RECORD COMPLETE:", last["candidate_id"], last["candidate_sha256"])
+    print("GOVERNANCE .37 RECORD COMPLETE:", last["candidate_id"], last["candidate_sha256"])
+    assert last["source_commit"] == src_commit, last["source_commit"]
+    assert last["source_tree_hash"] == src_tree, last["source_tree_hash"]
     return 0
 
 
