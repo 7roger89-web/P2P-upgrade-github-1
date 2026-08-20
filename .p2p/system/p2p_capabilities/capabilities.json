@@ -455,11 +455,11 @@
     },
     {
       "CAPABILITY_ID": "p2p_host_attestation",
-      "TYPE": "EVIDENCE_VERIFICATION",
+      "TYPE": "OPTIONAL_SPECIALIST",
       "DESCRIPTION": "Real-host execution attestation: binds run/dispatch/contract, verifies evidence sources, fail-closed replay ledger. Schema p2p-host-attestation/1.",
       "TRIGGERS": [],
       "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "OPTIONAL_SPECIALIST",
+      "INVOCATION_CLASS": "USER_REQUESTED",
       "CANONICAL_QUORUM_MEMBER": false,
       "OPTIONAL_SPECIALIST": true,
       "AUTHORITY": [
@@ -500,7 +500,14 @@
       "SOURCE_REFERENCE": {
         "branch": "c36-real-host-binding",
         "sha256_prefix": "c7d684eb2be2ef5e"
-      }
+      },
+      "STATUS": "ACTIVE",
+      "UPSTREAM_PROVENANCE": {
+        "lane": "p2p_host_attestation",
+        "reused_from": "canonical-host-attestation-c36",
+        "provider_neutral": true
+      },
+      "VERSION": "1.0.0"
     }
   ]
 }

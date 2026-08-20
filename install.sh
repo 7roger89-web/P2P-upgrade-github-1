@@ -145,7 +145,7 @@ if [[ -d "$uiux_runtime" ]]; then
     "$system_destination/scripts/"
 fi
 
-mkdir -p "$root/.p2p/approvals/requests" "$root/.p2p/approvals/records" "$root/.p2p/gates"
+mkdir -p "$root/.p2p/approvals/requests" "$root/.p2p/approvals/records" "$root/.p2p/gates" "$root/.p2p/state"
 if [[ ! -f "$project_policy_path" ]]; then
   python3 - "$package_root/governance/project-policy.template.json" "$project_policy_path" "$root" <<'PY'
 from pathlib import Path
