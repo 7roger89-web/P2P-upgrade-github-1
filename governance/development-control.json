@@ -1117,6 +1117,31 @@
       "artifact_status_note": "superseded by immutable-identity repair; artifact file no longer present on disk"
     },
     {
+      "candidate_version": "8.4.7-C-codex.36",
+      "candidate_label": "fw00-fw06-cumulative-production-package",
+      "candidate_sha256": "f775ac15bbca691fb734acb8c97aedc7635c48688b2a8c63abb1e83d35cdf8cd",
+      "candidate_artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-codex.36-candidate.zip",
+      "candidate_built_at_utc": "2026-08-20T10:00:00Z",
+      "embedded_version": "8.4.7-C-codex.36",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "promotion_status": "UNPROMOTED",
+      "built": true,
+      "source_commit": "4063c4ba7acc5098ab544fa2fb0a5c94aa1b4226",
+      "source_tree_hash": "d9990c6a6b2778abf9c7d92b1f2db3ae6e60b03c",
+      "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
+      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift, verify twice), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS. No promotion, no release, pilot not executed (owner gate). GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision fix — same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA).",
+      "surface_scope": [
+        "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
+        "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
+        "system/: full tracked .p2p/system capability tree (FW02-FW06 modules, tests, traces)",
+        "governance/development-control.json: candidate lineage record (this record)"
+      ],
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "superseded_note": "GATE-01C: runtime identity changed after .36 declaration (EXECUTED_RUNTIME != DECLARED_CANDIDATE_RUNTIME); never installed or promoted; superseded in place by 8.4.7-C-codex.37"
+    },
+    {
       "candidate_version": "8.4.7-C-codex.37",
       "candidate_label": "fw00-fw06-cumulative-production-package",
       "candidate_sha256": "4aafdcd383b1002842df2465cfd3ce5f4bb3d9d792ce75ad5000771e629640f7",

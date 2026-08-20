@@ -51,6 +51,11 @@ class HostAttestationTests(unittest.TestCase):
         # fingerprint binds the whole record with the field itself absent
         d = dict(r.to_dict())
         d.pop("attestation_fingerprint")
+        # GATE-01C: ledger-observation flags are post-hoc observations,
+        # never part of the identity surface — derivation excludes them.
+        for _obs in ("attestation_ledger_self_observed",
+                     "attestation_replay_conflict"):
+            d.pop(_obs, None)
         self.assertEqual(r.attestation_fingerprint[:12], hashlib.sha256(
             json.dumps(d, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12])
 

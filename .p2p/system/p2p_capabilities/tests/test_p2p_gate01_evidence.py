@@ -525,6 +525,7 @@ class Gate01TimestampTests(unittest.TestCase):
 
     def test_fresh_monotonic_real_utc_accepted(self):
         _source_registry_clean()
+        _attestation_ledger_clean()
         _qi.record_source_bound_certification(
             eval_id="pilot-hardening-01", eval_version="C35-rc1",
             capability_id=CANONICAL_CAPABILITY, subject=CANONICAL_ROLE,
