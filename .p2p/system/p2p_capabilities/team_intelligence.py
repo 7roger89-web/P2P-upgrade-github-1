@@ -302,6 +302,7 @@ def build_team_decision(
         council_explicitly_required: bool = False,
         fan_out_bound: int = 8,
         eligibility_results: Mapping[str, Mapping[str, Any]] | None = None,
+        capability_certifications: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> TeamDecision:
     """Deterministic minimal-sufficient team policy.
 
@@ -311,7 +312,12 @@ def build_team_decision(
       2. For every registry role compute its PROVIDE set: registry
          CAPABILITY_ID (self capability) + REQUIRES surface, tiered by
          evidence, with target compatibility enforced when a target
-         record is supplied.
+         record is supplied. A capability with externally-governed
+         certification evidence (capability_certifications map produced
+         by FW04) ALSO counts when its currently_eligible is True and
+         the capability is not already covered by a registry tier that
+         satisfies the live requirement (certification extends the
+         provide set; it never invents a role).
       3. Eligibility filter: roles failing
          role_eligibility.evaluate_role_target_eligibility are excluded
          with a trace item (never silently dropped — recorded).
@@ -332,6 +338,7 @@ def build_team_decision(
     reqs = tuple(dict.fromkeys(str(c) for c in required_capabilities))
     target_results = dict(target_eligibility_results or {})
     elig_results = dict(eligibility_results or {})
+    certs = dict(capability_certifications or {})
     trace: list[TeamDecisionTraceItem] = []
     escalation: list[str] = []
 
@@ -373,6 +380,19 @@ def build_team_decision(
                                   TIER_RANK[MIN_TIER_LIVE_REQUIRED]):
                 continue
             covers.add(e.capability_id)
+        # Certification evidence (FW04): a required capability that is
+        # certified AND currently eligible extends coverage even when no
+        # registry tier qualifies. Capability-scoped only: the
+        # certification's capability_id is the only identifier used; it
+        # never upgrades a role's own claim. Fail-closed: absence of a
+        # certification key or currently_eligible=False never counts.
+        for cap in reqs:
+            c = certs.get(cap) or {}
+            if cap in covers:
+                continue
+            if not bool(c.get("currently_eligible", False)):
+                continue
+            covers.add(cap)
         provide[role] = covers
         trace.append(TeamDecisionTraceItem(
             step="ROLE_PROVIDE",

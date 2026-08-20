@@ -440,6 +440,21 @@ class Fw01Loop:
                       if r.is_required())
                 if _fw02_handoff is not None and _fw02_reqs
                 else ())
+            # P2P-FRAMEWORK-04 — capability certification evidence at the
+            # EXISTING FW03 evidence boundary (info-only; FW03 remains
+            # the sole team authority).
+            _fw03_certs = None
+            if _fw02_reqs is not None and _fw02_handoff is not None:
+                try:
+                    from p2p_capabilities import \
+                        quality_intelligence as _qi2
+                    _fw03_certs = _qi2.load_certification_evidence(
+                        tuple(r.capability_id for r in _fw02_reqs))
+                except Exception:
+                    _fw03_certs = None
+            if _fw03_certs:
+                _rec_with_handoff["capability_certifications"] = (
+                    _fw03_certs)
             _fw03_task_class = str(rec.get("task_risk_class")
                                    or "LOW")
             _fw03_mutation = str(rec.get("mutation_class")
@@ -450,7 +465,8 @@ class Fw01Loop:
                 live_required=True,
                 task_risk_class=_fw03_task_class,
                 mutation_class=_fw03_mutation,
-                fan_out_bound=8)
+                fan_out_bound=8,
+                capability_certifications=_fw03_certs)
             self._trace(task_id, {"mutation_class": "READ_ONLY",
                           "permission": "",
                           "verification": "REQUIRED"},
@@ -595,21 +611,71 @@ class Fw01Loop:
         done_tasks = {t for t, r in self.loop._task_records.items()
                       if r.get("status") == "DONE"}
 
+        # P2P-FRAMEWORK-04 — durable execution-evidence derivation (seam A
+        # part 2). The inner autopilot loop discards the verifier evidence
+        # dict from its step outcome (outcome carries only status/task_id),
+        # so the honest source of execution-evidence truth is the durable
+        # event ledger written by `task_verified` events, plus the task
+        # record's recorded required_evidence pointer (written by
+        # mark_task_done). NEVER fabricate an evidence dict: when no durable
+        # trace exists, verification status stays NOT_VERIFIED (fail closed).
+        _fw04_store_events: list[dict[str, Any]] = []
+        _fw04_task_rec: dict[str, Any] = {}
+        try:
+            from p2p_capabilities.autopilot_state import GoalStateStore  # noqa: E402
+            _fw04_store_events = (
+                GoalStateStore(self.root).read_events().get("events") or [])
+            _fw04_task_rec = dict(self.loop._task_records.get(
+                str(task_id), {}))
+        except Exception:  # noqa: BLE001 - never blocks the loop
+            pass
+        # The goal-ledger events store the verifier status and evidence
+        # pointer inside `details`; the top-level event keys carry only
+        # schema/timestamp/task_id.
+        def _fw04_detail(event: Mapping[str, Any], key: str) -> Any:
+            details = event.get("details")
+            return (details.get(key)
+                    if isinstance(details, Mapping) else None)
+        _fw04_cands = [
+            e for e in _fw04_store_events
+            if e.get("task_id") == str(task_id)
+            and e.get("event") in
+            ("task_verified", "task_done")] if task_id in done_tasks else []
+        _fw04_latest = (_fw04_cands[-1] if _fw04_cands else {})
+        _fw04_verification = (_fw04_latest.get("status")
+                              if isinstance(_fw04_latest, dict)
+                              and _fw04_latest.get("status")
+                              else _fw04_detail(_fw04_latest, "status"))
+        _fw04_evidence_refs = ([_fw04_latest.get("evidence_ref")
+                                or _fw04_detail(_fw04_latest, "evidence_ref")]
+                               if isinstance(_fw04_latest, dict) and
+                               (_fw04_latest.get("evidence_ref")
+                                or _fw04_detail(_fw04_latest, "evidence_ref"))
+                               else (list(
+                                   _fw04_task_rec.get(
+                                       "required_evidence", ()))
+                                    if _fw04_task_rec.get(
+                                        "required_evidence") else []))
+        _fw04_changed_surface = tuple(str(p) for p in (
+            (evidence.get("changed_surface") or [])
+            if isinstance(evidence, Mapping) else ()))
+
         # P2P-FRAMEWORK-04 — post-execution quality intelligence.
         # Info-only at loop level: never grants permission, never blocks
         # dispatch (enforcement already completed above). Its only
         # authority is HONESTY: a SUCCESS execution must not be
-        # checkpointed as QUALITY_VERIFIED without proven evidence
+        # checkpointed as VERIFIED without proven quality evidence
         # (EXECUTION_SUCCESS != QUALITY_PROVEN, checkpoint guard below).
-        _fw04 = None
+        _fw04_verdict = {
+            "quality_status": "QUALITY_UNKNOWN",
+            "checkpoint_allowed": False,
+            "quality_failures": ("QUALITY_INTELLIGENCE_UNAVAILABLE",),
+            "execution_status": "UNKNOWN",
+        }
         try:
             from p2p_capabilities import quality_intelligence as _qi
-            _fw04_changed = tuple(str(p) for p in (
-                (evidence.get("changed_surface") or [])
-                if isinstance(evidence, Mapping)
-                else ()))
             _fw04_impact = _qi.affected_surface(
-                changed_paths=_fw04_changed,
+                changed_paths=_fw04_changed_surface,
                 project_root=self.root,
                 analysis_complete=True)
             _fw04_verdict = _qi.build_quality_verdict(
@@ -633,7 +699,32 @@ class Fw01Loop:
                       " failures=" +
                       json.dumps(list(_fw04_verdict["quality_failures"])))
         except Exception:
-            _fw04 = None
+            _fw04_verdict = {
+                "quality_status": "QUALITY_UNKNOWN",
+                "checkpoint_allowed": False,
+                "quality_failures": ("QUALITY_INTELLIGENCE_UNAVAILABLE",),
+                "execution_status": "UNKNOWN",
+            }
+        # P2P-FRAMEWORK-04 — checkpoint invariant (seam A):
+        # EXECUTION_SUCCESS != QUALITY_PROVEN at the persistence
+        # boundary. The task record status is NEVER changed here
+        # (resume-dedup: previously-executed tasks are not re-run —
+        # unverified executions surface as BLOCKED via the event
+        # ledger and require re-verification, never blind
+        # re-execution). The checkpoint record simply must not lie:
+        # when quality is unproven, verification_result carries the
+        # quality status and the next action is an honest quality
+        # review, not an implicit VERIFIED claim.
+        _quality_review = False
+        _quality_verification = (
+            _fw04_verification or (evidence.get("status")
+                                   if isinstance(evidence, Mapping)
+                                   else None) or "NOT_VERIFIED")
+        if task_id in done_tasks and task_id:
+            if not _fw04_verdict.get("checkpoint_allowed", False):
+                _quality_review = True
+                _quality_verification = _fw04_verdict.get(
+                    "quality_status", "QUALITY_UNKNOWN")
         state_hash = _sha256(done_tasks)
         self.guard.append(IterationRecord(
             iteration=self.iteration, task_id=task_id or "NONE",
@@ -654,22 +745,35 @@ class Fw01Loop:
             goal_id=self.loop.goal_id,
             project_revision=self.guard.expected_project_revision,
             task_completed=task_id if task_id in done_tasks else None,
-            mutation_state="MUTATED" if (evidence.get("changed_surface")
-                                         if isinstance(evidence, Mapping)
-                                         else False) else "UNCHANGED",
-            verification_result=(evidence.get("status")
-                                 if isinstance(evidence, Mapping) else "NOT_VERIFIED"),
-            evidence_refs=[evidence.get("evidence_ref")]
-            if isinstance(evidence, Mapping) and evidence.get("evidence_ref")
-            else [],
-            next_safe_action=self.loop.select_next_safe_task() or "NONE",
+            mutation_state="MUTATED" if (_fw04_changed_surface
+                                         or (evidence.get("changed_surface")
+                                             if isinstance(evidence, Mapping)
+                                             else False)) else "UNCHANGED",
+            verification_result=(
+                "QUALITY_REVIEW" if _quality_review
+                else _quality_verification),
+            evidence_refs=_fw04_evidence_refs,
+            next_safe_action=(
+                ("QUALITY_REVIEW:" + str(task_id)) if _quality_review
+                else self.loop.select_next_safe_task() or "NONE"),
             owner_gate=outcome.get("owner_gate"),
             attempt_counters={"identical_attempts": 0,
                               "retry_remaining": -1},
             loop_status=("DONE" if status == "GOAL_DONE"
-                         else "OWNER_GATE" if status == "OWNER_GATE_REQUIRED"
+                         else "OWNER_GATE"
+                         if status == "OWNER_GATE_REQUIRED"
+                         else "BLOCKED" if _quality_review
                          else "CHECKPOINTED"),
             guard_state_hash=state_hash)
+        if _quality_review:
+            self._trace(task_id, {"mutation_class": "READ_ONLY",
+                          "permission": "",
+                          "verification": "REQUIRED"},
+                        "QUALITY_CHECKPOINT_NOT_VERIFIED",
+                        "quality_status=" + str(
+                            _fw04_verdict.get("quality_status")) +
+                        " failures=" + json.dumps(list(
+                            _fw04_verdict.get("quality_failures", ()))))
         self._trace(task_id, rec, gate_result,
                     outcome.get("reason") or "continue")
         return outcome

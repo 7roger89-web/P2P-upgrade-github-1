@@ -999,6 +999,30 @@
         "FW04 test suite 44 cases (incl. live shadow-eval read-only verification over owner projects) + regression 115 cases (159 total PASS)",
         "governance candidate lineage"
       ]
+    },
+    {
+      "candidate_id": "FW04_CHECKPOINT_CERTIFICATION_HANDOFF",
+      "candidate_version": "8.4.7-C-codex.31",
+      "embedded_version": "8.4.7-C-codex.31",
+      "candidate_label": "fw04-checkpoint-certification-handoff-8.4.7-C-codex.31",
+      "promotion_status": "UNPROMOTED",
+      "candidate_sha256": "be3d8d35c72db5877b9638ff7f0cab9d5a1a3f47008d8768c2cf255133a9da7a",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW04_QUALITY_EVIDENCE_AND_LEARNING",
+      "built": true,
+      "lineage_anchor_sha256": "b6730a36aff6b57849b75b904e1528bd6ca36867f7540936fcece7291fa7e976",
+      "lineage_anchor_note": "FW04 quality-checkpoint + capability-certification handoff closure candidate: THREE seam fixes implemented and mechanically proven on real code/data paths. Seam A: FW01 checkpoint invariant — EXECUTION_SUCCESS != QUALITY_PROVEN; after execution, if task completed but FW04 quality verdict allows no quality-approved checkpoint (checkpoint_allowed=False, including QUALITY_UNKNOWN and REJECTED), the loop writes a fail-closed QUALITY_REVIEW checkpoint (verification_result=QUALITY_REVIEW, loop_status=BLOCKED, next_safe_action=QUALITY_REVIEW:<task>), fires QUALITY_CHECKPOINT_NOT_VERIFIED trace event, and NEVER changes the task record status (resume dedup preserved via the event ledger; executed-without-verified replay uses the real _recover_records_from_store which blocks unverified executions). Evidence derives from the durable task_verified event ledger, never from the empty inner outcome dict. Seam B: FW04 capability-scoped certification consumed by FW03 team intelligence through the existing evidence boundary — quality_intelligence.load_certification_evidence(caps, commit) is capability-scoped, fail-closed (absent key or currently_eligible=False never counts; stale cert does not count), and build_team_decision gains a single capability_certifications parameter that extends per-role coverage by exactly the certified capability; no router, no new authority, no permission grant, no eligibility grant (dispatch gate remains fail-closed NO_ELIGIBLE_ROLE without eligibility evidence). The FW01 loop passes the cert map via its existing handoff (_rec_with_handoff) into FW03. Verification: 6 seam-A loop-level tests (real Fw01Loop + FakeDeterministicExecutionBackend against the real registry and real gates) + 8 seam-B certification consumption tests (real load_certification_evidence + build_team_decision with store-boundary fixtures) + full regression 159 existing tests = 173 PASS, 0 new failures. FW04 remains post-execution verification authority only: it never grants permission, selects team/backend/model, or bypasses the permission gate. Ancestor = FW04 quality, evidence & learning candidate 8.4.7-C-codex.30, untouched as historical record. Minted per canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=True, release_artifact_changed=False)) = YES. No promotion, no release. FW05 not started (owner gate). SHA256 bound to this exact normalized zip.",
+      "surface_scope": [
+        "p2p_fw01_loop.py seam A: post-execution FW04 quality verdict governs checkpoint/Continue (fail-closed QUALITY_REVIEW checkpoint, QUALITY_CHECKPOINT_NOT_VERIFIED trace event, task status preserved for resume dedup)",
+        "p2p_fw01_loop.py seam B: capability_certifications pass-through from FW04 verdict evidence into FW03 build_team_decision via the existing handoff contract",
+        "quality_intelligence.py: load_certification_evidence() and _cert_records_for() — capability-scoped, freshness-bound, currently_eligible fail-closed evidence provider",
+        "team_intelligence.py: capability_certifications param in build_team_decision; PROVIDE set extended by exactly the certified currently-eligible capability (evidence trace records the extension)",
+        "test_checkpoint_quality_gate.py: 6 loop-level cases (A verified allowed; B scope-exact; C fail-closed unknown; D fail-closed rejected/mutation; E import-failure fail-closed; F resume dedup without duplicate execution)",
+        "test_certification_consumption.py: 8 cases (A–H: certified eligible counts; X cert does not satisfy Y; generic execution receipt does not certify; stale cert does not count; unknown currency fails closed; malformed evidence fails closed; decision changes only with valid evidence; certification never grants permission)",
+        "eval_registry.json unchanged evidence-backed registry (12 evals)",
+        "governance candidate lineage record (this record)"
+      ]
     }
   ],
   "capability_status": [

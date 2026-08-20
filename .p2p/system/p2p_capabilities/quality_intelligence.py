@@ -575,6 +575,62 @@ def current_eligibility(capability_id: str,
     }
 
 
+# ---------------------------------------------------------------------------
+# Capability certification evidence provider (FW03 consumption boundary).
+# FW04 produces governed evidence; FW03 reads it at its existing evidence
+# boundary. FW04 never selects roles; FW01 remains sole operator.
+# ---------------------------------------------------------------------------
+
+def _cert_records_for(capability_id: str) -> Tuple[Dict[str, Any], ...]:
+    """Certification records for EXACTLY this capability (scope exactness):
+    subject may vary (different candidates/environments), but the
+    capability_id is fixed. Role execution bindings without this
+    capability in scope are NOT returned."""
+    out: List[Dict[str, Any]] = []
+    for rec in load_certification_records():
+        if str(rec.get("capability_id", "")).lower() \
+                != str(capability_id).lower():
+            continue
+        out.append({
+            "kind": rec.get("kind"),
+            "subject": rec.get("subject", ""),
+            "eval_id": rec.get("eval_id", ""),
+            "eval_version": rec.get("eval_version", ""),
+            "result": rec.get("result", ""),
+            "freshness_bound": rec.get("freshness_bound", ""),
+            "evidence_pointers": tuple(rec.get("evidence_pointers", ())),
+        })
+    return tuple(out)
+
+
+def load_certification_evidence(
+        required_capabilities: Iterable[str],
+        current_source_commit: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    """Certification evidence map (FW03 input). Capability-specific only:
+    X certification never satisfies Y. Missing tier/current eligibility
+    fails closed (currently_eligible=False); callers MUST NOT treat an
+    absent key as 'eligible'."""
+    commit = current_source_commit if current_source_commit else ""
+    if not commit:
+        commit = git_source_commit(Path.cwd())
+    out: Dict[str, Dict[str, Any]] = {}
+    for cap in required_capabilities:
+        cap = str(cap)
+        if not cap:
+            continue
+        tier = certification_tier(cap)
+        fresh = certification_freshness(cap, commit) if commit else "UNKNOWN_STALE"
+        elig = current_eligibility(cap, commit)
+        out[cap] = {
+            "capability_id": cap,
+            "tier": tier,
+            "freshness": fresh,
+            "currently_eligible": bool(elig.get("currently_eligible", False)),
+            "certification_records": _cert_records_for(cap),
+        }
+    return out
+
+
 def _tier_meets(tier: str, required: str) -> bool:
     order = ["UNKNOWN", "DECLARED", "VERIFIED", "CERTIFIED", "LIVE_CERTIFIED"]
     if tier not in order or required not in order:
