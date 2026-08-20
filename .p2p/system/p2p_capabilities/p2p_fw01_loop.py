@@ -879,6 +879,33 @@ class Fw01Loop:
             }
         except Exception:  # noqa: BLE001 - never blocks the loop
             pass
+        # P2P-FRAMEWORK-06 — INFO-ONLY OPERATIONAL RESILIENCE ENRICHMENT.
+        # Read-only facade: appends an honest Owner-facing view of the
+        # durability/resilience state (envelope freshness, lease, quiesce,
+        # paused) derived from canonical durable state to the step result.
+        # It NEVER grants permission, schedules retries, executes code, or
+        # blocks the loop. Any FW06 failure downgrades to {} (information
+        # loss only).
+        try:
+            from p2p_capabilities import (  # noqa: E402
+                fw06_operational_resilience as _fw06)
+            _fw06_view: dict[str, Any] = {"read_only": True}
+            _fw06_project_id = str(self.loop.goal_id or "default")
+            env = _fw06.load_envelope(self.root, _fw06_project_id)
+            if env is not None:
+                _fw06_view["envelope_fresh"] = _fw06.envelope_is_fresh(env)
+            _fw06_view["leases"] = _fw06.lease_summary(
+                self.root, _fw06_project_id)
+            _fw06_view["paused"] = bool(
+                _fw06.is_paused(self.root, _fw06_project_id))
+            _fw06_view["quiesce_state"] = _fw06.quiesce_state(
+                self.root, _fw06_project_id)
+            _fw05_exit["fw06_resilience"] = {
+                "schema": "p2p-fw06-operational-resilience/1",
+                **_fw06_view,
+            }
+        except Exception:  # noqa: BLE001 - never blocks the loop
+            pass
         return _fw05_exit
 
     def _trace(self, task_id: str, rec: Mapping[str, Any],

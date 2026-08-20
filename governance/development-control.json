@@ -1068,6 +1068,28 @@
         "scripts/fw05_supervisor.py: independent 16-check supervisor over real code/data paths",
         "governance/development-control.json: candidate lineage record (this record)"
       ]
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.34",
+      "candidate_label": "fw06-operational-resilience",
+      "candidate_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
+      "candidate_artifact": "reports/candidates/fw06-operational-resilience-candidate.zip",
+      "candidate_built_at_utc": "2026-08-20T03:22:03Z",
+      "embedded_version": "8.4.7-C-codex.34",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW06_PRODUCTION_AUTONOMY_RESILIENCE",
+      "promotion_status": "UNPROMOTED",
+      "built": true,
+      "lineage_anchor_sha256": "a4c3161b711a1c9dae6870401f8135e0e77b445c7703ac7fa0ed9c983a06bbb9",
+      "lineage_anchor_note": "FW06 production autonomy & resilience candidate (lineage anchor .33 FW05 owner experience). FW06 is NOT a new orchestrator: a bounded runtime-contract layer over the existing P2P control plane; FW01 remains the sole operating loop. New surface: p2p_capabilities/fw06_operational_resilience.py implementing the Autonomy Envelope (authorized scope / mutation classes / owner gates / max parallelism / retry policy / resource budget / quality requirements / recovery policy / expiry; fresh-only envelope required), the Safe Continuation Policy (per-gate fail-closed continuation decision), failure classification (UNKNOWN_MUTATION_STATE fail-closed for unrecognized states), bounded retry, execution leases (append-only, split-brain blocked; reclaim fail-closed while owner process observable via heartbeat TTL), crash/session-death recovery with evidence-point failure analysis (A-G failure points; RETRY_BOUNDED/VERIFY_ONLY/BLOCK/PAUSE only; never blind re-execution), quiesce/drain lifecycle, FAILOVER != RETRY deterministic failover decision, tiered runtime health, pause/resume (durable), workspace ownership + parallel-worktree conflict detection (deterministic), cleanup fail-closed until all guards satisfied, multi-project isolation + read-only multi-project view, append-only idempotent event log (no secrets, no chain-of-thought), and auditability. Read-only facade invariant: all view surfaces never create project state directories (mkdirs=False default). FW01 loop receives an info-only enrichment hook (fw06_resilience field on step() outcomes) that never affects control flow. Evidence over claims: test_fw06_operational_resilience.py 37 cases PASS (chaos matrix A-G cold-process recovery via real subprocess, two-process lease split-brain, lease reclaim, pause/resume durability, fail-closed classifications, deterministic failover, tiered health, worktree parallel proof, conflict detection, cleanup guards, GT/GP READ-ONLY shadow eval byte-identical before/after) + full regression 240/240 PASS (NEW_UNEXPLAINED_FAILURES=0) + independent supervisor 16/16 PASS over real code/data paths (incl. read-only facade proof over GT/GP and diff-based zero-mutation probe). No promotion, no release, FW07 not started (owner gate).",
+      "surface_scope": [
+        "fw06_operational_resilience.py: autonomy envelope, safe continuation policy, failure classification, bounded retry, execution leases, crash/session-death recovery, quiesce/drain, failover decision, runtime health, pause/resume, workspace ownership/conflict/cleanup, multi-project isolation/view, event log, audit (all views read-only: never create state dirs)",
+        "test_fw06_operational_resilience.py: 37 cases — A-Z chaos matrix, cold-process subprocess proofs, two-process lease boundary, fail-closed negatives, GT/GP read-only shadow",
+        "p2p_fw01_loop.py: info-only fw06_resilience enrichment field appended to step() outcomes; no control-flow change",
+        "scripts/fw06_supervisor.py: independent 16-check red-team supervisor over real code/data paths",
+        "governance/development-control.json: candidate lineage record (this record)"
+      ]
     }
   ],
   "capability_status": [
