@@ -1188,6 +1188,30 @@
         "governance/development-control.json: candidate lineage record (this record)"
       ],
       "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.39",
+      "candidate_label": "fw00-fw06-cumulative-production-package",
+      "candidate_sha256": "a21d8122a29146970889499dd74ad1fe0eb7be51491f7481cce62132ce82ed69",
+      "candidate_artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip",
+      "candidate_built_at_utc": "2026-08-21T00:00:00Z",
+      "embedded_version": "8.4.7-C-codex.39",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "promotion_status": "UNPROMOTED",
+      "built": true,
+      "source_commit": "587e81a306e62ac9661c11f826c7ddc5c298eac1",
+      "source_tree_hash": "980b19b5fbc209deca5bac99894a7ebdd0ace0ff",
+      "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
+      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS (cumulative lineage .35.. .39 rule: each record pins exactly one artifact SHA, all UNPROMOTED, all directly consecutive). No promotion, no release, pilot not executed (owner gate). BW01A authority-chain closure: .39 replaces .38's build because the committed runtime gained the canonical authority-chain certification layer (authority_chain_registry ledger, CAPABILITY_EXECUTION_SCOPE_MAP registry mapping, role_bridge real HostAttestation enforcement with mutation_authority_mode PRODUCTION/TEST_ONLY, _g1_authority_chain_check + verify_bounded_mutation_receipt whole-claim verifier, 26-test canonical shadow proof incl. positive M0/M1/M2 and negative matrix A-O), so DECLARED_CANDIDATE_RUNTIME == EXECUTED_RUNTIME byte-for-byte at HEAD 587e81a.",
+      "surface_scope": [
+        "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
+        "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
+        "system/: full tracked .p2p/system capability tree (FW02-FW06 modules + bounded_documentation_write primitive, authority_chain_registry ledger, tests, traces)",
+        "governance/development-control.json: candidate lineage record (this record)"
+      ],
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
     }
   ],
   "capability_status": [

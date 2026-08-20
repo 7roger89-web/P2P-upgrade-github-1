@@ -162,16 +162,16 @@ def governance_sanity():
     # twice, and ONLY as a direct numeric successor pair — the successor
     # pins ONE immutable artifact SHA. One cumulative packaging milestone
     # (FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE) is allowed to span the
-    # documented lineage .35/.36/.37/.38: each record pins exactly one
+    # documented lineage .35/.36/.37/.38/.39: each record pins exactly one
     # artifact SHA, all UNPROMOTED, all directly consecutive.
     from collections import Counter
     _cnt = Counter(ids)
     for _k, _v in _cnt.items():
         _idxs = [i for i, r in enumerate(_recs) if r["candidate_id"] == _k]
         if _k == "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE":
-            assert _v in (2, 3), (
+            assert _v in (2, 3, 4, 5), (
                 f"cumulative candidate_id {_k} appears {_v}x "
-                "(allowed lineage span: .35/.36 or .35/.36/.37 or .35/.36/.37/.38)")
+                "(allowed lineage span: .35.. .39 direct chain)")
             assert all(_idxs[j] == _idxs[0] + j for j in range(len(_idxs))), \
                 "cumulative records must be directly consecutive"
             _nums = [int(_recs[i]["candidate_version"].rsplit(".", 1)[1])

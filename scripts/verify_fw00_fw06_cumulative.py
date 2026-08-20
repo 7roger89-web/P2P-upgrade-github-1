@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fresh-tree verification for the FW00-FW06 cumulative candidate (.37).
+"""Fresh-tree verification for the FW00-FW06 cumulative candidate (.39).
 
 Proves over the EXTRACTED package alone (no repo imports):
   1. Doctor pass (--package, full gate set)
@@ -19,7 +19,7 @@ from pathlib import Path
 CANONICAL = Path("/home/ubuntu/fw01_work/auth-f01/reports/candidates/"
                  "P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip")
 FRESH = Path("/tmp/p2p-fw00-fw06-fresh")
-EXPECTED_SHA256 = "d062ec5c4f8d2cb264c0b405de5236850d53d04757e264d871cf12395b0ec253"
+EXPECTED_SHA256 = "a21d8122a29146970889499dd74ad1fe0eb7be51491f7481cce62132ce82ed69"
 
 
 def sha256(path: Path) -> str:
@@ -115,6 +115,15 @@ def check_presence():
         "from p2p_capabilities import role_eligibility as re0\n"
         "assert 'WRITE_BOUNDED' in re0.PERMISSION_ORDER, re0.PERMISSION_ORDER\n"
         "print('BW01 PERMISSION_ORDER OK')\n"
+        "# BW01A: the authority-chain certification layer ships in the candidate.\n"
+        "from p2p_capabilities import authority_chain_registry as acr\n"
+        "assert hasattr(acr, 'append_backend_mutation_certification') and hasattr(acr, 'append_role_mutation_certification')\n"
+        "assert hasattr(acr, 'latest_backend_mutation_certification') and hasattr(acr, 'latest_role_mutation_certification')\n"
+        "print('BW01A authority-chain registry OK')\n"
+        "# BW01A: the whole-claim authority verifier binds every bounded receipt.\n"
+        "from p2p_capabilities import role_receipt as rr0\n"
+        "assert hasattr(rr0, 'verify_bounded_mutation_receipt') and hasattr(rr0, '_g1_authority_chain_check')\n"
+        "print('BW01A authority verifier OK')\n"
     ).replace("SYS", repr(env_path))
     result = subprocess.run([sys.executable, "-c", code], capture_output=True,
                             text=True, env={**ENV, "PYTHONPATH": env_path,
@@ -122,6 +131,10 @@ def check_presence():
     assert result.returncode == 0, result.stderr[-2000:]
     assert "FW05 fields:" in result.stdout, result.stdout
     assert "FW06 classify" in result.stdout, result.stdout
+    assert "BW01 classify" in result.stdout, result.stdout
+    assert "BW01 PERMISSION_ORDER OK" in result.stdout, result.stdout
+    assert "BW01A authority-chain registry OK" in result.stdout, result.stdout
+    assert "BW01A authority verifier OK" in result.stdout, result.stdout
 
 
 @step("fresh-process smoke: lease + decision-ID determinism in isolated subprocess")
@@ -163,7 +176,7 @@ ENV = {**{k: v for k, v in __import__("os").environ.items()
 
 
 def main():
-    print("FW00-FW06 CUMULATIVE (.35) FRESH-TREE VERIFICATION")
+    print("FW00-FW06 CUMULATIVE (.39) FRESH-TREE VERIFICATION")
     check_extract()
     check_doctor()
     check_presence()
