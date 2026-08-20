@@ -10,7 +10,7 @@ CTRL = REPO / "governance" / "development-control.json"
 
 ARTIFACT = (REPO / "reports" / "candidates"
             / "P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip")
-ARTIFACT_SHA256 = "8cd26c23cb57d6821d318312493bcecc0278100cd7b527df1ede63b3dbf14a47"
+ARTIFACT_SHA256 = "14a80d497ce6aa64014781f2fdb1bb4296a2f93dd5c873dd722855869a0cd014"
 ANCHOR_SHA256 = "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa"
 
 BASELINE_VERSION = "8.4.7-C-codex.19"

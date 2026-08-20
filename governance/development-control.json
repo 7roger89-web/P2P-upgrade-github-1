@@ -1096,7 +1096,7 @@
     {
       "candidate_version": "8.4.7-C-codex.35",
       "candidate_label": "fw00-fw06-cumulative-production-package",
-      "candidate_sha256": "11370b57ec98b3cd50be35fe8ad6693c564d04696a95987c6560a5037fca8ca2",
+      "candidate_sha256": "14a80d497ce6aa64014781f2fdb1bb4296a2f93dd5c873dd722855869a0cd014",
       "candidate_artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip",
       "candidate_built_at_utc": "2026-08-20T06:21:00Z",
       "embedded_version": "8.4.7-C-codex.35",

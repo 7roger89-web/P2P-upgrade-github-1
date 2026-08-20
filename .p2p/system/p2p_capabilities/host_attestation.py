@@ -10,11 +10,15 @@ Owner amendments:
 from __future__ import annotations
 
 import hashlib
+import os as _ha_os
+import platform as _ha_platform
+import socket as _ha_socket
 import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Optional, Tuple
+from datetime import datetime, timezone
 
 
 class HostAttestationError(Exception):
@@ -382,3 +386,121 @@ def mint_dispatch_id(run_id: str, role_id: str, task_id: str,
         "sequence": sequence,
     })
     return hashlib.sha256(payload).hexdigest()
+
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-READINESS-GATE-01 — Canonical per-execution host
+# attestation. A fresh HostAttestationRecord witnesses the one execution
+# target actually used; replay is detected through the attestation
+# fingerprint ledger under .p2p/state (independent of any historical
+# Council C36 lane, which remains untouched).
+# ---------------------------------------------------------------------------
+
+CANONICAL_ATTESTATION_LEDGER_PATH = Path(
+    __import__("os").environ.get("P2P_STATE_DIR", "") or str(
+        Path(__file__).resolve().parent.parent.parent / "state")
+) / "canonical_attestation_ledger.jsonl"
+
+DEFAULT_CANONICAL_ADAPTER_ID = "p2p-manus-orchestration"
+
+def _safe_getlogin() -> str:
+    try:
+        return _ha_os.getlogin() or ""
+    except Exception:  # noqa: BLE001 — sandbox without ctty fails closed
+        return ""
+
+def canonical_machine_identity() -> str:
+    """Deterministic vendor-neutral host identity composed from real
+    runtime surfaces: uname, hostname, and login user.
+    Never synthetic, never unknown."""
+    un = _ha_platform.uname()
+    raw = "|".join([
+        un.system or "",
+        un.release or "",
+        un.machine or "",
+        _ha_socket.gethostname() or "",
+        _safe_getlogin(),
+    ])
+    digest = hashlib.sha256(
+        raw.encode("utf-8", "surrogateescape")).hexdigest()
+    return "host-{0}".format(digest[:56])
+
+def attestation_evidence_pointers_for(
+        project_root: str,
+        adapter_id: str = DEFAULT_CANONICAL_ADAPTER_ID) -> Tuple[str, ...]:
+    """Deterministic, observable evidence pointers: the runtime manifest
+    this attestation was produced against, and the observed project
+    snapshot digest."""
+    manifest = Path(__file__).resolve()
+    root = Path(project_root) if project_root else None
+    pointers: list[str] = [
+        "runtime:" + str(manifest),
+        "adapter:" + str(adapter_id),
+    ]
+    if root is not None:
+        try:
+            import subprocess as _sub
+            tree = _sub.run(
+                ["git", "rev-parse", "HEAD^{tree}"],
+                cwd=str(root), capture_output=True, text=True,
+                check=False)
+            if tree.returncode == 0 and tree.stdout.strip():
+                pointers.append(
+                    "project-snapshot:" + tree.stdout.strip())
+        except Exception:  # noqa: BLE001 — ledger stays best-effort
+            pass
+    return tuple(pointers)
+
+def make_canonical_host_attestation(
+        *,
+        adapter_id: str = DEFAULT_CANONICAL_ADAPTER_ID,
+        run_id: str,
+        dispatch_id: str,
+        execution_contract_digest: str,
+        project_root: str,
+        provider: str = "manus",
+        model: str = "manus-models",
+        harness: str = "manus-fw00-fw06-candidate",
+        attested_at: str = "",
+        host_metadata: str = "",
+        attestation_evidence_pointers: Optional[Tuple[str, ...]] = None,
+        ledger_path: Optional[Path] = None,
+) -> HostAttestationRecord:
+    """Fresh real-host attestation for the one execution target actually
+    used. host_kind stays a validated real kind (generic-real), identity
+    is machine-derived, and the attestation is recorded in the replay
+    ledger before it is returned."""
+    pointers = (attestation_evidence_pointers
+                if attestation_evidence_pointers is not None
+                else attestation_evidence_pointers_for(project_root,
+                                                       adapter_id))
+    stamped_at = str(attested_at).strip() or _real_utc_now()
+    record = make_host_attestation(
+        host_kind="generic-real",
+        adapter_id=adapter_id,
+        harness=harness,
+        provider=provider,
+        model=model,
+        host_execution_identity=canonical_machine_identity(),
+        run_id=run_id,
+        dispatch_id=dispatch_id,
+        execution_contract_digest=execution_contract_digest,
+        host_metadata=host_metadata,
+        source_snapshot_digest="",
+        attestation_evidence_pointers=pointers,
+        attested_at=stamped_at,
+    )
+    # Owner amendment: self-authored evidence must be observed before it
+    # is trusted. Record use in the ledger so replay is detectable.
+    ledger = Path(ledger_path) if ledger_path is not None else CANONICAL_ATTESTATION_LEDGER_PATH
+    record_attestation_use(record, path=ledger)
+    return record
+
+def is_canonical_attestation_replayed(
+        fingerprint: str,
+        ledger_path: Optional[Path] = None) -> bool:
+    ledger = Path(ledger_path) if ledger_path is not None else CANONICAL_ATTESTATION_LEDGER_PATH
+    return attestation_already_used(fingerprint, path=ledger)
+
+def _real_utc_now() -> str:
+    """Fresh UTC wall-clock timestamp, normalized to second precision."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

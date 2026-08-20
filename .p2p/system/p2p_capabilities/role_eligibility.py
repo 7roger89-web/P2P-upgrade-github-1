@@ -439,3 +439,91 @@ def load_target_registry() -> dict:
         except Exception:
             continue
     return out
+
+
+# ---------------------------------------------------------------------------
+# GATE01-SOURCE-BOUND-ELIGIBILITY
+# Source-and-project revision binding on top of the closure seam. Eligibility
+# is RE-GATED by the live source/project revision status of the
+# (capability_id, subject) certification. Revision drift, wrong subject, or
+# expiry all fail closed BEFORE any dispatch path uses the eligibility
+# result. This is a narrow gate addition: it wraps the existing
+# evaluate_role_target_eligibility and never widens certification scope.
+# ---------------------------------------------------------------------------
+from p2p_capabilities.quality_intelligence import (
+    source_bound_status as _gate01_source_bound_status,
+)
+
+
+def evaluate_source_bound_role_eligibility(
+    *,
+    role_id: str,
+    role_required_capabilities: Iterable[str],
+    role_permission_ceiling: Iterable[str],
+    role_quorum_semantics: str,
+    required_evidence: Iterable[str],
+    task_permission_profile: Iterable[str],
+    goal_permission_envelope: Iterable[str] = ("NONE",),
+    target: "TargetCertificationRecord",
+    environment_binding: str = "LOCAL_PROJECT",
+    workspace_binding: str = "",
+    registry_records: "Iterable[Mapping[str, Any]] | None" = None,
+    source_repository_id: str = "",
+    current_source_commit: str = "",
+    current_project_commit: str = "",
+) -> dict[str, Any]:
+    """Canonical eligibility with source/project revision gating.
+
+    Returns the standard eligibility decision dict with one added gate:
+    every REQUIRED capability's (capability_id, subject) pair must be
+    CURRENT_EXACT_REVISION against the declared source and project
+    commits. Subject here is the role identity that consumes the
+    capability (the narrow certification subject). Any non-current
+    status is surfaced as a dedicated BLOCKED reason and the decision
+    becomes NOT_ELIGIBLE regardless of backend-scope state.
+    """
+    for name, value in (("source_repository_id", source_repository_id),
+                        ("current_source_commit", current_source_commit),
+                        ("current_project_commit", current_project_commit)):
+        if not str(value or "").strip():
+            raise ValueError(
+                "source-bound eligibility missing " + name)
+    inner = evaluate_role_target_eligibility(
+        role_required_capabilities=role_required_capabilities,
+        role_permission_ceiling=role_permission_ceiling,
+        role_quorum_semantics=role_quorum_semantics,
+        required_evidence=required_evidence,
+        task_permission_profile=task_permission_profile,
+        goal_permission_envelope=goal_permission_envelope,
+        target=target,
+        environment_binding=environment_binding,
+        workspace_binding=workspace_binding,
+        registry_records=registry_records,
+    )
+    source_reasons: list[str] = []
+    for capability_id in tuple(str(item) for item in
+                               role_required_capabilities):
+        status = _gate01_source_bound_status(
+            capability_id=capability_id,
+            subject=str(role_id),
+            current_source_commit=current_source_commit,
+            current_project_commit=current_project_commit)
+        if status.get("status") != "CURRENT_EXACT_REVISION":
+            source_reasons.append(
+                f"source-bound:{capability_id}:"
+                + str(status.get("status",
+                                 "NO_SOURCE_BOUND_RECORD")))
+    decision = dict(inner)
+    if source_reasons:
+        decision["decision"] = "NOT_ELIGIBLE"
+        decision["reasons"] = (list(inner.get("reasons", ()))
+                               + source_reasons)
+    decision["source_bound"] = {
+        "source_repository_id": str(source_repository_id),
+        "current_source_commit": str(current_source_commit).lower(),
+        "current_project_commit": str(current_project_commit).lower(),
+        "source_reasons": source_reasons,
+        "all_source_bounds_current": len(source_reasons) == 0,
+    }
+    return decision
+# GATE01-SOURCE-BOUND-ELIGIBILITY-MARKER-ADDED

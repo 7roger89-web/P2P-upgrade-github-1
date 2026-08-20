@@ -932,3 +932,146 @@ def latest_adapter_record(adapter_id: str):
         if str(rec.get("adapter_id", "")) == str(adapter_id):
             out = dict(rec)
     return out
+
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-READINESS-GATE-01 — Source-bound certification registry.
+# Capability certification now binds an immutable source revision and the
+# exact project revision it was certified against. Freshness fails closed
+# after material source or project drift. Subject remains narrow and
+# subject-bound: the certification record that satisfies eligibility must
+# name its subject, and a mismatching subject is BLOCKED, never coerced.
+# ---------------------------------------------------------------------------
+import platform as _g1_platform
+
+SOURCE_REGISTRY_PATH = pathlib.Path(
+    os.environ.get("P2P_STATE_DIR", "") or str(
+        pathlib.Path(__file__).resolve().parent.parent.parent / "state")
+) / "source_registry.json"
+
+SOURCE_REGISTRY_DEFAULT_EXPIRY_SECONDS = 7 * 24 * 3600  # fail closed weekly
+
+def _source_registry() -> dict:
+    file_path = pathlib.Path(SOURCE_REGISTRY_PATH)
+    if file_path.is_file():
+        return json.loads(file_path.read_text(encoding="utf-8"))
+    return {"records": []}
+
+def _persist_source_registry(data: dict) -> None:
+    file_path = pathlib.Path(SOURCE_REGISTRY_PATH)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(file_path, "w", encoding="utf-8") as handle:
+        handle.write(json.dumps(data, indent=2, sort_keys=True,
+                                ensure_ascii=False) + "\n")
+
+def record_source_bound_certification(
+    *,
+    eval_id: str,
+    eval_version: str,
+    capability_id: str,
+    subject: str,
+    result: str,
+    source_repository_id: str,
+    source_commit: str,
+    project_binding: str,
+    project_commit: str,
+    evidence_version: str,
+    certified_at: Optional[str] = None,
+    expiry_seconds: Optional[int] = None,
+    evidence_pointers: Tuple[str, ...] = (),
+    target_environment: Optional[str] = None,
+    freshness_bound: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Record a narrow, source-and-project-bound capability certification.
+    Every argument is mandatory except expiry overrides; placeholders are
+    never accepted. The certification_store also receives the standard
+    entry so existing freshness paths see a real (non-placeholder)
+    freshness_bound = source_commit."""
+    for name, value in (("source_repository_id", source_repository_id),
+                        ("source_commit", source_commit),
+                        ("project_binding", project_binding),
+                        ("project_commit", project_commit),
+                        ("evidence_version", evidence_version),
+                        ("subject", subject)):
+        if not str(value or "").strip():
+            raise ValueError(f"source-bound certification missing {name}")
+    if not str(source_commit).strip():
+        raise ValueError("source-bound certification missing source_commit")
+    if (certified_at and str(certified_at) == "UNKNOWN"
+            or "REPLACE" in str(source_commit).upper()):
+        raise ValueError("source-bound certification placeholder rejected")
+    bound = freshness_bound if freshness_bound else str(source_commit)
+    store_entry = record_capability_certification(
+        eval_id=eval_id, eval_version=eval_version,
+        capability_id=capability_id, subject=subject, result=result,
+        evidence_pointers=evidence_pointers,
+        target_environment=target_environment,
+        timestamp=certified_at,
+        freshness_bound=bound,
+    )
+    registry = _source_registry()
+    registry["records"].append({
+        "kind": "SOURCE_BOUND_CERTIFICATION",
+        "eval_id": eval_id,
+        "eval_version": eval_version,
+        "capability_id": capability_id,
+        "subject": str(subject),
+        "result": result,
+        "source_repository_id": str(source_repository_id),
+        "source_commit": str(source_commit).lower(),
+        "project_binding": str(project_binding),
+        "project_commit": str(project_commit).lower(),
+        "evidence_version": str(evidence_version),
+        "certified_at": certified_at or _utc_now(),
+        "expiry_seconds": expiry_seconds
+        if expiry_seconds is not None
+        else SOURCE_REGISTRY_DEFAULT_EXPIRY_SECONDS,
+        "evidence_pointers": tuple(evidence_pointers),
+        "target_environment": target_environment,
+    })
+    _persist_source_registry(registry)
+    return store_entry
+
+def source_bound_status(capability_id: str, subject: str,
+                        current_source_commit: str,
+                        current_project_commit: str) -> Dict[str, Any]:
+    """Fail-closed status of the source/project binding for the latest
+    record of (capability_id, subject). Wrong subject, wrong revision,
+    expired freshness, or drift all fail closed."""
+    registry = _source_registry()
+    for rec in reversed(registry.get("records", [])):
+        if (rec.get("capability_id") == capability_id
+                and rec.get("subject") == subject):
+            if rec.get("subject") != subject:
+                return {"status": "WRONG_SUBJECT_BLOCKED"}
+            if rec["source_commit"] != str(current_source_commit).lower():
+                return {"status": "STALE_SOURCE_COMMIT_BLOCKED",
+                        "bound": rec["source_commit"],
+                        "current": str(current_source_commit).lower()}
+            if rec["project_commit"] != str(current_project_commit).lower():
+                return {"status": "STALE_PROJECT_COMMIT_BLOCKED",
+                        "bound": rec["project_commit"],
+                        "current": str(current_project_commit).lower()}
+            expiry = rec.get("expiry_seconds") or 0
+            from datetime import datetime, timezone, timedelta
+            try:
+                certified_at = datetime.fromisoformat(
+                    rec["certified_at"].replace("Z", "+00:00"))
+            except (KeyError, ValueError):
+                return {"status": "CERTIFIED_AT_MISSING_BLOCKED"}
+            if datetime.now(timezone.utc) > certified_at + timedelta(
+                    seconds=expiry):
+                return {"status": "CERTIFICATION_EXPIRED_BLOCKED"}
+            return {"status": "CURRENT_EXACT_REVISION",
+                    "source_commit": rec["source_commit"],
+                    "project_commit": rec["project_commit"],
+                    "certified_at": rec["certified_at"]}
+    return {"status": "NO_SOURCE_BOUND_RECORD"}
+
+def latest_source_bound_record(capability_id: str,
+                               subject: str) -> Optional[Dict[str, Any]]:
+    registry = _source_registry()
+    for rec in reversed(registry.get("records", [])):
+        if (rec.get("capability_id") == capability_id
+                and rec.get("subject") == subject):
+            return dict(rec)
+    return None

@@ -24,6 +24,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping
@@ -550,18 +551,75 @@ class Fw01Loop:
                         _rpc = str(_rrole.get("PERMISSION_CEILING")
                                     or "READ")
                         try:
-                            _fw03_elig[_rid] = _lr.evaluate_role_target_eligibility(
-                                role_required_capabilities=tuple(_rreqs),
-                                role_permission_ceiling=(_rpc,),
-                                role_quorum_semantics="SINGLE",
-                                required_evidence=("claim",
-                                                   "artifact-evidence"),
-                                task_permission_profile=("READ",),
-                                goal_permission_envelope=("READ",),
-                                target=_ltarget,
-                                environment_binding="LOCAL_PROJECT",
-                                workspace_binding="",
-                                registry_records=_fw03_registry)
+                            # P2P-MUTATION-READINESS-GATE-01 - GATE01 source
+                            # -bound eligibility: the live git truth of the
+                            # runtime repository (HEAD) and of the project
+                            # checkout (HEAD^{tree}) is the freshness
+                            # anchor. When either commit cannot be
+                            # resolved as a canonical 40-hex, the loop
+                            # falls back to the byte-identical closure
+                            # seam and gates at the dispatch boundary
+                            # instead of here.
+                            _g1_src = ""
+                            _g1_tree = ""
+                            try:
+                                _g1_p = subprocess.run(
+                                    ("git", "rev-parse", "HEAD"),
+                                    capture_output=True, text=True,
+                                    cwd=str(self.root))
+                                _g1_src = str(
+                                    _g1_p.stdout.strip() or "")
+                            except Exception:
+                                _g1_src = ""
+                            try:
+                                _g1_t = subprocess.run(
+                                    ("git", "rev-parse", "HEAD^{tree}"),
+                                    capture_output=True, text=True,
+                                    cwd=str(self.root))
+                                _g1_tree = str(
+                                    _g1_t.stdout.strip() or "")
+                            except Exception:
+                                _g1_tree = ""
+                            _g1_hex = (len(_g1_src) == 40
+                                       and len(_g1_tree) == 40
+                                       and
+                                       all(_ch in "0123456789abcdef"
+                                           for _ch in _g1_src + _g1_tree))
+                            _g1_repo_id = "auth-f01"
+                            if _g1_hex:
+                                _fw03_elig[_rid] = (
+                                    _lr.evaluate_source_bound_role_eligibility(
+                                        role_id=_rid,
+                                        role_required_capabilities=(
+                                            tuple(_rreqs)),
+                                        role_permission_ceiling=(_rpc,),
+                                        role_quorum_semantics="SINGLE",
+                                        required_evidence=("claim",
+                                                           "artifact-evidence"),
+                                        task_permission_profile=("READ",),
+                                        goal_permission_envelope=("READ",),
+                                        target=_ltarget,
+                                        environment_binding="LOCAL_PROJECT",
+                                        workspace_binding="",
+                                        registry_records=_fw03_registry,
+                                        source_repository_id=_g1_repo_id,
+                                        current_source_commit=_g1_src,
+                                        current_project_commit=_g1_tree))
+                            else:
+                                _fw03_elig[_rid] = (
+                                    _lr.evaluate_role_target_eligibility(
+                                        role_required_capabilities=(
+                                            tuple(_rreqs)),
+                                        role_permission_ceiling=(_rpc,),
+                                        role_quorum_semantics="SINGLE",
+                                        required_evidence=("claim",
+                                                           "artifact-evidence"),
+                                        task_permission_profile=("READ",),
+                                        goal_permission_envelope=("READ",),
+                                        target=_ltarget,
+                                        environment_binding="LOCAL_PROJECT",
+                                        workspace_binding="",
+                                        registry_records=_fw03_registry))
                         except Exception:
                             continue
             except Exception:

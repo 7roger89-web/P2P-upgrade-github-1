@@ -1,0 +1,172 @@
+[
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:29:51.166488+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:29:55.558699+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:30:12.171093+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:30:44.452979+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:30:49.614058+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:11.074110+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:15.340133+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:38.499333+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:43.060467+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:32:20.277275+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:32:57.084376+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:33:07.544057+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:33:52.183857+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T08:07:15.360081+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T08:07:20.292319+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T08:07:25.074010+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T09:05:53.318214+00:00"
+  }
+]

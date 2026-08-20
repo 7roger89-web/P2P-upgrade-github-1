@@ -213,3 +213,247 @@ class RoleExecutionReceipt:
 
     def to_dict(self) -> dict[str, Any]:
         return role_receipt_to_dict(self)
+
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-READINESS-GATE-01 — Fresh real-timestamp, evidence-bound
+# role receipts, plus a mutation-ready receipt builder that wires the
+# identity chain (p2p_evidence_chain) and the canonical host attestation
+# (host_attestation.make_canonical_host_attestation) into one receipt.
+# Timestamps are real UTC wall-clock from the live clock, never
+# placeholders; lifecycle evidence is lifecycle evidence, never identity.
+# ---------------------------------------------------------------------------
+
+from datetime import datetime as _rc_datetime
+from datetime import timezone as _rc_timezone
+
+from .host_attestation import make_canonical_host_attestation
+from . import p2p_evidence_chain as _g1_chain
+
+RECEIPT_UTC_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+MUTATION_READY_RECEIPT_SCHEMA = "p2p-role-receipt/1"
+
+
+def _fresh_utc_now() -> str:
+    """Real wall-clock UTC timestamp at second precision.
+    Never UNKNOWN, never a placeholder."""
+    return _rc_datetime.now(_rc_timezone.utc).strftime(RECEIPT_UTC_FORMAT)
+
+
+def gate01_receipt_identity(
+        *,
+        identity_chain: Mapping[str, Any],
+        outcome: str,
+        started_at: str,
+        completed_at: str,
+        attestation_fingerprint: str,
+        execution_status: str = "SUCCEEDED",
+        verification_status: str = "VERIFIED",
+) -> str:
+    """Deterministic receipt identity bound to the identity chain, the
+    canonical contract digest, the host attestation, and the discrete
+    OUTCOME. Lifecycle timestamps are lifecycle EVIDENCE — they are
+    carried in the receipt but never contribute to its identity (wall-
+    clock must not be identity: two fresh emissions of the same
+    execution share one canonical receipt id; ledger + attestation
+    replay detection handle reuse policy)."""
+    payload = {
+        "schema": MUTATION_READY_RECEIPT_SCHEMA,
+        "execution_id": identity_chain["execution_id"],
+        "contract_digest": identity_chain["role_execution_contract_digest"],
+        "request_fingerprint": identity_chain["request_fingerprint"],
+        "attestation_fingerprint": str(attestation_fingerprint),
+        "outcome": str(outcome),
+    }
+    import hashlib as _g1_h
+    from .host_attestation import canonical_bytes
+    return _g1_h.sha256(canonical_bytes(payload)).hexdigest()
+
+
+def build_mutation_ready_receipt(
+        *,
+        role_id: str,
+        capability_id: str,
+        task_id: str,
+        goal_id: str,
+        contract: Mapping[str, Any],
+        target_id: str,
+        backend_request_id: str,
+        source_commit: str,
+        project_commit: str,
+        outcome: str,
+        execution_status: str = "SUCCEEDED",
+        verification_status: str = "VERIFIED",
+        project_root: str = "",
+        started_at: str = "",
+        completed_at: str = "",
+        run_sequence: int = 1,
+        adapter_provider: str = "manus",
+        adapter_model: str = "manus-models",
+        adapter_harness: str = "manus-fw00-fw06-candidate",
+        backend_result: Optional[Mapping[str, Any]] = None,
+        host_metadata: str = "",
+) -> dict:
+    """Build a fresh role execution receipt bound to the single canonical
+    contract digest, one identity chain, one real host attestation, and
+    real UTC lifecycle timestamps.
+
+    The receipt carries:
+      - canonical chain ids (run/dispatch/execution/receipt id)
+      - role_execution_contract_digest = the ONE request fingerprint domain
+      - host attestation witness (fresh, ledger-recorded, replay-detected)
+      - freshness source binding (source + project commit)
+      - real UTC started_at / completed_at (lifecycle evidence)
+      - backend result pass-through (usage evidence, request ids)
+    """
+    # Evidence-integrity: lifecycle timestamps are evidence, never
+    # placeholders. Empty or UNKNOWN-ish placeholders fail closed.
+    for _ts_name, _ts_value in (("started_at", started_at),
+                                ("completed_at", completed_at)):
+        _tv = str(_ts_value or "").strip()
+        if not _tv:
+            raise RoleReceiptError(
+                "PLACEHOLDER_TIMESTAMP_REJECTED",
+                {"field": _ts_name, "value": str(_ts_value)})
+        if _tv.upper() in ("UNKNOWN", "PLACEHOLDER", ""):
+            raise RoleReceiptError(
+                "PLACEHOLDER_TIMESTAMP_REJECTED",
+                {"field": _ts_name, "value": _tv})
+        try:
+            _rc_datetime.fromisoformat(_tv.replace("Z", "+00:00"))
+        except (ValueError, TypeError):
+            raise RoleReceiptError(
+                "PLACEHOLDER_TIMESTAMP_REJECTED",
+                {"field": _ts_name, "value": _tv})
+    start = started_at or _fresh_utc_now()
+    finish = completed_at or _fresh_utc_now()
+    _s = _rc_datetime.fromisoformat(str(start).replace("Z", "+00:00"))
+    _f = _rc_datetime.fromisoformat(str(finish).replace("Z", "+00:00"))
+    if _s > _f:
+        raise RoleReceiptError(
+            "NON_MONOTONIC_LIFECYCLE",
+            {"started_at": str(start), "completed_at": str(finish)})
+    chain = _g1_chain.build_identity_chain(
+        goal_id=goal_id, task_id=task_id, role_id=role_id,
+        contract=contract, target_id=target_id,
+        backend_request_id=backend_request_id,
+        source_commit=source_commit,
+        project_commit=project_commit,
+        run_sequence=run_sequence)
+    attestation = make_canonical_host_attestation(
+        adapter_id=target_id,
+        run_id=chain["run_id"],
+        dispatch_id=chain["dispatch_id"],
+        execution_contract_digest=chain["role_execution_contract_digest"],
+        project_root=project_root,
+        provider=adapter_provider,
+        model=adapter_model,
+        harness=adapter_harness,
+        attested_at=_fresh_utc_now(),
+        host_metadata=host_metadata,
+    )
+    receipt = {
+        "schema": MUTATION_READY_RECEIPT_SCHEMA,
+        "role_receipt_id": gate01_receipt_identity(
+            identity_chain=chain, outcome=outcome,
+            started_at=start, completed_at=finish,
+            attestation_fingerprint=attestation.attestation_fingerprint,
+            execution_status=execution_status,
+            verification_status=verification_status),
+        "goal_id": goal_id,
+        "task_id": task_id,
+        "run_id": chain["run_id"],
+        "dispatch_id": chain["dispatch_id"],
+        "execution_id": chain["execution_id"],
+        "canonical_role_id": role_id,
+        "capability_id": str(capability_id),
+        "role_execution_contract_digest":
+            chain["role_execution_contract_digest"],
+        "request_fingerprint": chain["request_fingerprint"],
+        "target_id": target_id,
+        "host_execution_identity": chain["host_execution_identity"],
+        "outcome": outcome,
+        "execution_status": execution_status,
+        "verification_status": verification_status,
+        "started_at": start,
+        "completed_at": finish,
+        "attestation": attestation.to_dict(),
+        "attestation_fingerprint": attestation.attestation_fingerprint,
+        "freshness": {
+            "source_commit": str(source_commit).lower(),
+            "project_commit": str(project_commit).lower(),
+            "binding_status": _g1_registry_freshness_binding(
+                capability_id, source_commit, project_commit),
+        },
+        "run_sequence": run_sequence,
+        "backend_request_id": str(backend_request_id),
+        "backend": dict(backend_result) if backend_result is not None else {},
+    }
+    return receipt
+
+
+def _g1_registry_freshness_binding(
+        capability_id: str,
+        source_commit: str,
+        project_commit: str) -> str:
+    """Registry-anchored freshness: the receipt is only FRESHLY BOUND when
+    the source registry carries a source-bound certification record for
+    this capability whose commits match the runtime truth EXACTLY
+    (CURRENT_EXACT_REVISION). Any stale or absent certification makes
+    the receipt buildable but NOT freshness-bound — the verifier then
+    fail-closes the whole chain."""
+    try:
+        from . import quality_intelligence as _qi
+        st = _qi.source_bound_status(
+            capability_id=str(capability_id),
+            subject=str(capability_id),
+            current_source_commit=str(source_commit),
+            current_project_commit=str(project_commit))
+    except Exception:
+        return "NO_REGISTRY_BIND"
+    return ("BOUND" if st.get("status") == "CURRENT_EXACT_REVISION"
+            else "NOT_BOUND:" + str(st.get("status", "UNKNOWN")))
+
+
+def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
+    """Cross-bind a persisted receipt back to its identity chain and
+    attest its freshness binding. Lifecycle timestamps are compared
+    against monotonic real-time order, never used as identity."""
+    chain = receipt.get("run_id") and {
+        "schema": _g1_chain.CHAIN_SCHEMA,
+        "goal_id": receipt["goal_id"],
+        "task_id": receipt["task_id"],
+        "run_id": receipt["run_id"],
+        "dispatch_id": receipt["dispatch_id"],
+        "execution_id": receipt["execution_id"],
+        "role_id": receipt["canonical_role_id"],
+        "role_execution_contract_digest":
+            receipt["role_execution_contract_digest"],
+        "request_fingerprint": receipt["request_fingerprint"],
+        "backend_request_id": str(receipt.get("backend_request_id",
+            receipt.get("backend", {}).get("request_id", ""))),
+        "target_id": receipt["target_id"],
+        "host_execution_identity": receipt["host_execution_identity"],
+        "role_receipt_id": receipt["role_receipt_id"],
+        "attestation_fingerprint": str(receipt.get(
+            "attestation_fingerprint", "")),
+        "outcome": str(receipt.get("outcome", "")),
+        "source_commit": receipt["freshness"]["source_commit"],
+        "project_commit": receipt["freshness"]["project_commit"],
+        "run_sequence": receipt["run_sequence"],
+    }
+    chain_check = _g1_chain.verify_identity_chain(chain)
+    started = _rc_datetime.fromisoformat(
+        receipt["started_at"].replace("Z", "+00:00"))
+    completed = _rc_datetime.fromisoformat(
+        receipt["completed_at"].replace("Z", "+00:00"))
+    lifecycle_valid = started <= completed
+    freshness_bound = receipt["freshness"]["binding_status"] == "BOUND"
+    return {
+        "schema": MUTATION_READY_RECEIPT_SCHEMA,
+        "identity_chain": chain_check,
+        "lifecycle_timestamps_monotonic": lifecycle_valid,
+        "freshness_source_bound": freshness_bound,
+        "overall": (chain_check["overall"]
+                    and lifecycle_valid and freshness_bound),
+    }
