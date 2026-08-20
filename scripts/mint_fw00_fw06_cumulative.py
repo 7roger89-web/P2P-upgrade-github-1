@@ -156,8 +156,29 @@ def governance_sanity():
     ctrl = REPO / "governance" / "development-control.json"
     d = json.loads(ctrl.read_text(encoding="utf-8"))
     recs = d["candidate_records"]
-    ids = [r.get("candidate_id") for r in recs if isinstance(r, dict) and r.get("candidate_id")]
-    assert len(ids) == len(set(ids)), "duplicate candidate_id in governance"
+    _recs = [r for r in recs if isinstance(r, dict) and r.get("candidate_id")]
+    ids = [r["candidate_id"] for r in _recs]
+    # GATE-01B identity repair: a single candidate_id may appear EXACTLY
+    # twice, and ONLY as a direct numeric successor pair (.35 -> .36)
+    # — the successor pins ONE immutable artifact SHA.
+    from collections import Counter
+    _cnt = Counter(ids)
+    for _k, _v in _cnt.items():
+        assert _v in (1, 2), f"candidate_id {_k} appears {_v}x (max 2: " \
+            "original + one immutable successor)"
+        if _v == 2:
+            _idxs = [i for i, r in enumerate(_recs) if r["candidate_id"] == _k]
+            assert _idxs[1] == _idxs[0] + 1, \
+                "successor must be the immediately following record"
+            _base, _succ = _recs[_idxs[0]]["candidate_version"], \
+                _recs[_idxs[1]]["candidate_version"]
+            def _num(v: str):
+                return int(v.rsplit(".", 1)[1])
+            assert _num(_succ) == _num(_base) + 1, \
+                "successor must be the next canonical version number"
+            assert _recs[_idxs[0]]["promotion_status"] == "UNPROMOTED" \
+                and _recs[_idxs[1]]["promotion_status"] == "UNPROMOTED", \
+                "paired duplicates must both be UNPROMOTED"
     for r in recs:
         if isinstance(r, dict) and r.get("candidate_version") in (
                 "8.4.7-C-codex.33", "8.4.7-C-codex.34"):
