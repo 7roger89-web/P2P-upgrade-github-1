@@ -120,3 +120,87 @@ and verification make mid-crash states recoverable as
    remains gated behind the second Owner decision.
 4. One file per execution; multi-file documentation envelopes require chained
    single-file executions, each with its own contract and evidence.
+
+---
+
+# ADDENDUM A — AUTHORITY-CHAIN CLOSURE (P2P-BOUNDED-DOCUMENTATION-WRITE-01A)
+
+**Module:** `.p2p/system/p2p_capabilities/authority_chain_registry.py`
+**Extends:** `bounded_documentation_write` (ledger above), `role_eligibility`,
+`role_bridge`, `role_receipt`, `backend_contract`
+**STATUS:** `READY` — authority-chain closure implemented, schema-admitted,
+verifier-bound, package-shipped in candidate `8.4.7-C-codex.39` (UNPROMOTED).
+**Goal closed:** `P2P-BOUNDED-DOCUMENTATION-WRITE-01A` (closes the seam proven by
+`P2P-BOUNDED-DOCUMENTATION-WRITE-01`: the bounded primitive existed but the
+role×target×host mutation authority chain never closed — role grant was broad,
+no subject-bound certification, no canonical scope mapping, and a derived
+attestation ID was accepted for mutation-ready execution).
+**Ledger version:** 1.1.0 · schema `p2p-authority-chain-ledger/1`
+
+## A1. SEMANTICS
+
+A bounded documentation mutation is now valid **only when all four authority
+links close over the same identity**: (1) the selected role is the minimum
+canonical role whose registry semantics support bounded mutation write
+(`p2p_architecton`, with `bounded_documentation_write` added to its `REQUIRES`;
+`p2p_iris` excluded per Owner constraint); (2) the capability carries an
+explicit `EXECUTION_SCOPE: DOCUMENTATION_MUTATION_BOUNDED` in the registry
+(`CAPABILITY_EXECUTION_SCOPE_MAP` in `backend_contract` is the fail-closed
+module fallback when the registry record is absent — unknown capability → hard
+BLOCK); (3) the backend target holds a current LIVE certification for that
+exact scope (`authority_chain_registry` ledger, kind
+`BACKEND_MUTATION_CERTIFICATION`, status `MUTATION_TARGET_LIVE`); (4) the
+selected role holds a subject-bound certification naming the SAME role id,
+capability, scope and canonical grant `WRITE_BOUNDED`, bound to the exact
+`owner_authorization_id` (kind `ROLE_MUTATION_CERTIFICATION`). The executing
+host attestation must be **real**: `execute_bounded_document_mutation` requires
+a `HostAttestationRecord` produced by `make_canonical_host_attestation` for
+`mutation_authority_mode == PRODUCTION`; derived/fallback IDs are confined to
+`TEST_ONLY` and can never reach a mutation-ready dispatch. The whole-claim
+verifier (`verify_bounded_mutation_receipt`, `_g1_authority_chain_check`)
+re-checks every link mechanically; any broken link fails `authority_chain.overall`
+and `overall`, independent of the mutation-evidence branch.
+
+## A2. PROVENANCE
+
+| Item | Value |
+|---|---|
+| Implementation commit | `587e81a306e62ac9661c11f826c7ddc5c298eac1` |
+| Implementation tree | `980b19b5fbc209deca5bac99894a7ebdd0ace0ff` |
+| Carrying candidate | `8.4.7-C-codex.39` — `a21d8122a29146970889499dd74ad1fe0eb7be51491f7481cce62132ce82ed69` (UNPROMOTED) |
+| Predecessor candidate | `8.4.7-C-codex.38` — `d062ec5c4f8d2cb264c0b405de5236850d53d04757e264d871cf12395b0ec253` (immutable, UNPROMOTED, untouched) |
+| Test evidence | `tests/test_bounded_mutation_authority_chain.py` — 26 tests PASS (M0/M1/M2 positive lifecycle, crash-retry, 15-case negative matrix A-O, scope-mapping, role-selection) |
+
+## A3. FAIL-CLOSED SURFACES PROVEN (negative matrix A-O, fresh disposable Git fixture)
+
+| Row | Broken link | Verifier result |
+|---|---|---|
+| A | No target certification | `authority_chain.overall = False` |
+| B | Expired target certification | `target_certification_current = False` |
+| C | Target certified for different adapter | `execution_scope_certified_for_target = False` |
+| D | No role certification | `target_certification_subject_bound_to_role = False` |
+| E | Wrong role holds the certification | `target_certification_subject_bound_to_role = False` |
+| F | Wrong owner authorization id | `target_certification_subject_bound_to_role = False` |
+| G | Different scope claimed (impossible by construction — scope-locked certification layer; absence closes the chain) | `target_certification_subject_bound_to_role = False` |
+| H | Non-canonical grant (`WRITE`) | `ValueError` at certification append; receipt mutation class mismatch fails evidence check |
+| I | Missing attestation block | `attestation_present = False`, hard failure |
+| J | Synthetic attestation fingerprint | `host_identity_real = False` |
+| K | Attestation fingerprint ≠ evidence anchor | `attestation_matches_evidence = False` |
+| L | Replay-conflicted attestation | `replay_conflict_detected = True` |
+| M | Tree baseline drift (h1 ≠ h2) | `h1_equals_h2 = False`, not identity-locked |
+| N | Role registry no longer provides capability | `role_provides_capability = False` |
+| O | Capability stripped of EXECUTION_SCOPE | `capability_scope_mapping_valid = False`, hard BLOCK |
+
+## A4. LIMITATIONS (addendum to §9 above)
+
+1. The certification ledger is a fresh append-only JSON store
+   (`.p2p/state/authority_chain_registry.json`, path governed by
+   `P2P_STATE_DIR`); it is test-isolated by environment variable and carries no
+   cryptographic signatures — trust derives from the execution-side
+   attestation binding and the whole-claim verifier, not the ledger itself.
+2. Scope-locked by design: the certification layer refuses any scope other
+   than `DOCUMENTATION_MUTATION_BOUNDED`; this makes row-G-style "wrong scope"
+   failures structural rather than data-driven.
+3. Unchanged from §9: working-tree primitive, `NON_EXISTENT` sentinel rules,
+   and the real Game Truyện documentation mutation pilot remain
+   NOT executed, gated behind the second Owner decision.
