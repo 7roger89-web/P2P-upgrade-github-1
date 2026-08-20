@@ -19,7 +19,7 @@ from pathlib import Path
 CANONICAL = Path("/home/ubuntu/fw01_work/auth-f01/reports/candidates/"
                  "P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip")
 FRESH = Path("/tmp/p2p-fw00-fw06-fresh")
-EXPECTED_SHA256 = "4aafdcd383b1002842df2465cfd3ce5f4bb3d9d792ce75ad5000771e629640f7"
+EXPECTED_SHA256 = "d062ec5c4f8d2cb264c0b405de5236850d53d04757e264d871cf12395b0ec253"
 
 
 def sha256(path: Path) -> str:
@@ -85,7 +85,7 @@ def check_doctor():
     assert "RESULT: PASS" in last_line, last_line
 
 
-@step("FW05/FW06 capability presence (fresh PYTHONPATH)")
+@step("FW05/FW06/BW01 capability presence (fresh PYTHONPATH)")
 def check_presence():
     env_path = str(FRESH / "system")
     code = (
@@ -103,6 +103,18 @@ def check_presence():
         "evidence_pointers=[], owner_decision_required=True)\n"
         "print('FW05 fields:', len(rec))\n"
         "print('FW06 classify UNKNOWN_MUTATION_STATE:', fw06.classify_failure('unknown_state'))\n"
+        "# BW01: the canonical bounded-documentation-write primitive ships in the candidate.\n"
+        "from p2p_capabilities import bounded_documentation_write as bdw\n"
+        "assert hasattr(bdw, 'execute_bounded_document_mutation') "
+        "and hasattr(bdw, 'rollback_bounded_document_mutation')\n"
+        "assert hasattr(bdw, 'classify_document_path') "
+        "and hasattr(bdw, 'evaluate_bounded_document_mutation_quality')\n"
+        "print('BW01 classify AGENTS.md:', bdw.classify_document_path('AGENTS.md'))\n"
+        "print('BW01 classify docs/guide.md:', bdw.classify_document_path('docs/guide.md'))\n"
+        "# BW01: bounded-mutation class is NOT the generic WRITE class.\n"
+        "from p2p_capabilities import role_eligibility as re0\n"
+        "assert 'WRITE_BOUNDED' in re0.PERMISSION_ORDER, re0.PERMISSION_ORDER\n"
+        "print('BW01 PERMISSION_ORDER OK')\n"
     ).replace("SYS", repr(env_path))
     result = subprocess.run([sys.executable, "-c", code], capture_output=True,
                             text=True, env={**ENV, "PYTHONPATH": env_path,

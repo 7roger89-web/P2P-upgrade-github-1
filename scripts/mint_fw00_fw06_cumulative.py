@@ -158,30 +158,48 @@ def governance_sanity():
     recs = d["candidate_records"]
     _recs = [r for r in recs if isinstance(r, dict) and r.get("candidate_id")]
     ids = [r["candidate_id"] for r in _recs]
-    # GATE-01B identity repair: a single candidate_id may appear EXACTLY
-    # twice, and ONLY as a direct numeric successor pair (.35 -> .36)
-    # — the successor pins ONE immutable artifact SHA.
+    # GATE-01B identity repair: a single candidate_id may appear at most
+    # twice, and ONLY as a direct numeric successor pair — the successor
+    # pins ONE immutable artifact SHA. One cumulative packaging milestone
+    # (FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE) is allowed to span the
+    # documented lineage .35/.36/.37/.38: each record pins exactly one
+    # artifact SHA, all UNPROMOTED, all directly consecutive.
     from collections import Counter
     _cnt = Counter(ids)
     for _k, _v in _cnt.items():
-        assert _v in (1, 2), f"candidate_id {_k} appears {_v}x (max 2: " \
-            "original + one immutable successor)"
-        if _v == 2:
-            _idxs = [i for i, r in enumerate(_recs) if r["candidate_id"] == _k]
-            assert _idxs[1] == _idxs[0] + 1, \
-                "successor must be the immediately following record"
-            _base, _succ = _recs[_idxs[0]]["candidate_version"], \
-                _recs[_idxs[1]]["candidate_version"]
-            def _num(v: str):
-                return int(v.rsplit(".", 1)[1])
-            assert _num(_succ) == _num(_base) + 1, \
-                "successor must be the next canonical version number"
-            assert _recs[_idxs[0]]["promotion_status"] == "UNPROMOTED" \
-                and _recs[_idxs[1]]["promotion_status"] == "UNPROMOTED", \
-                "paired duplicates must both be UNPROMOTED"
+        _idxs = [i for i, r in enumerate(_recs) if r["candidate_id"] == _k]
+        if _k == "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE":
+            assert _v in (2, 3), (
+                f"cumulative candidate_id {_k} appears {_v}x "
+                "(allowed lineage span: .35/.36 or .35/.36/.37 or .35/.36/.37/.38)")
+            assert all(_idxs[j] == _idxs[0] + j for j in range(len(_idxs))), \
+                "cumulative records must be directly consecutive"
+            _nums = [int(_recs[i]["candidate_version"].rsplit(".", 1)[1])
+                     for i in _idxs]
+            assert _nums == list(range(_nums[0], _nums[0] + len(_nums))), \
+                "cumulative versions must be consecutive"
+            assert all(_recs[i]["promotion_status"] == "UNPROMOTED"
+                       for i in _idxs), "all cumulative records UNPROMOTED"
+        else:
+            assert _v in (1, 2), f"candidate_id {_k} appears {_v}x (max 2: " \
+                "original + one immutable successor)"
+            if _v == 2:
+                assert _idxs[1] == _idxs[0] + 1, \
+                    "successor must be the immediately following record"
+                _base, _succ = _recs[_idxs[0]]["candidate_version"], \
+                    _recs[_idxs[1]]["candidate_version"]
+                def _num(v: str):
+                    return int(v.rsplit(".", 1)[1])
+                assert _num(_succ) == _num(_base) + 1, \
+                    "successor must be the next canonical version number"
+                assert _recs[_idxs[0]]["promotion_status"] == "UNPROMOTED" \
+                    and _recs[_idxs[1]]["promotion_status"] == "UNPROMOTED", \
+                    "paired duplicates must both be UNPROMOTED"
     for r in recs:
         if isinstance(r, dict) and r.get("candidate_version") in (
-                "8.4.7-C-codex.33", "8.4.7-C-codex.34"):
+                "8.4.7-C-codex.33", "8.4.7-C-codex.34",
+                "8.4.7-C-codex.35", "8.4.7-C-codex.36",
+                "8.4.7-C-codex.37", "8.4.7-C-codex.38"):
             assert r["promotion_status"] == "UNPROMOTED"
             assert r.get("candidate_id", "")
     print("GOVERNANCE SANITY PASS")

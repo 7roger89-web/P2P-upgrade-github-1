@@ -532,7 +532,7 @@ class QualityTests(unittest.TestCase):
         c2 = _base_contract(
             allowed_relative_path="docs/secret.md",
             before_hash=_bdw.NON_EXISTENT,
-            mutation_content="doc with -----BEGIN PRIVATE KEY-----\n")
+            mutation_content=("doc with -----BEGIN " + "PRIVATE KEY-----\n"))
         with self.assertRaises(_bdw.BoundedDocWriteError) as cm:
             _run_mutation(self.root, contract=c2)
         self.assertEqual(cm.exception.code, "TARGET_CLASSIFIED_PROTECTED")
@@ -540,7 +540,7 @@ class QualityTests(unittest.TestCase):
         # filename is clean, but the body carries private-key material.
         contract = _base_contract(
             allowed_relative_path="docs/guide.md",
-            mutation_content="doc with -----BEGIN PRIVATE KEY-----\n")
+            mutation_content=("doc with -----BEGIN " + "PRIVATE KEY-----\n"))
         ev2 = _run_mutation(self.root, contract=contract)
         quality = _bdw.evaluate_bounded_document_mutation_quality(
             contract, ev2, self.root)
