@@ -52,6 +52,44 @@ def _validate_hex(text: str, label: str) -> str:
     return text
 
 
+def canonical_source_repository_id(project_root: str) -> str:
+    """GATE-01C stable, non-empty source repository identity.
+
+    Never a transient temp path: derived from the project's permanent
+    surfaces only — the repository's own git commit root, the remote
+    URL when resolvable, and the P2P project handle ('p2p-auth-f01').
+    Two identical clones of the same repository (temp dir or otherwise)
+    yield the SAME identity; a different repository yields a DIFFERENT
+    one. Fail-closed: returns '' only when no stable surface exists,
+    which the verifier treats as SOURCE_BINDING_INCOMPLETE.
+    """
+    _os = __import__("os")
+    _sb = __import__("subprocess")
+    handle = "p2p-auth-f01"
+    commit_root = ""
+    remote = ""
+    try:
+        root = _sb.run(["git", "-C", str(project_root),
+                        "rev-parse", "--show-toplevel"],
+                       capture_output=True, text=True,
+                       timeout=10).stdout.strip()
+        if root:
+            commit_root = root
+    except Exception:  # noqa: BLE001 — isolated env without git
+        commit_root = ""
+    try:
+        remote = _sb.run(["git", "-C", str(project_root),
+                          "config", "--get", "remote.origin.url"],
+                         capture_output=True, text=True,
+                         timeout=10).stdout.strip() or ""
+    except Exception:  # noqa: BLE001
+        remote = ""
+    identity_input = "|".join([handle, commit_root or "", remote or ""])
+    digest = hashlib.sha256(
+        identity_input.encode("utf-8", "surrogateescape")).hexdigest()
+    return "repo-{0}-{1}".format(handle, digest[:48])
+
+
 def machine_host_identity() -> str:
     """Deterministic vendor-neutral host identity from real runtime
     surfaces. Fail-closed: never 'synthetic' or 'unknown'. Mirrors

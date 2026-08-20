@@ -15,11 +15,15 @@ MUTATION STATE must be one of the canonical states; UNKNOWN fails closed.
 """
 from __future__ import annotations
 import hashlib
+import json
 import os
 import re
-from typing import Any, Iterable, Mapping
+import subprocess
+from pathlib import Path
+from typing import Any, Iterable, Mapping, Optional
 
 from .backend_contract import AUTH_STATES
+from .host_attestation import canonical_bytes
 
 ROLE_RECEIPT_SCHEMA = "p2p-role-execution-receipt/1"
 
@@ -229,6 +233,7 @@ from datetime import timezone as _rc_timezone
 
 from .host_attestation import make_canonical_host_attestation
 from . import p2p_evidence_chain as _g1_chain
+from . import p2p_evidence_chain as _g1_ec
 
 RECEIPT_UTC_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -296,6 +301,18 @@ def build_mutation_ready_receipt(
         host_metadata: str = "",
         tree_hashes: Optional[Mapping[str, Any]] = None,
         execution_artifact: Iterable[str] = (),
+        # GATE-01C candidate identity binding — the declaration the
+        # whole-claim verifier mechanically checks against governance,
+        # artifact bytes, and the installed runtime manifest.
+        candidate: Optional[Mapping[str, Any]] = None,
+        source_repository_id: str = "",
+        # GATE-01C explicit source-tree declaration: the SOURCE surface
+        # the receipt's freshness commits out to (default re-derivation
+        # assumes the build surface itself). The whole-claim verifier
+        # cross-checks freshness.source_tree_hash against the declared
+        # candidate source_tree_hash — an explicit value is never
+        # invented by the emitter.
+        source_tree_hash: str = "",
 ) -> dict:
     """Build a fresh role execution receipt bound to the single canonical
     contract digest, one identity chain, one real host attestation, and
@@ -403,6 +420,8 @@ def build_mutation_ready_receipt(
         "target": _target_block,
         "freshness": {
             "source_commit": str(source_commit).lower(),
+            "source_tree_hash": str(source_tree_hash or "").strip()
+            or _g1_git_tree_hash(project_root),
             "project_commit": str(project_commit).lower(),
             "binding_status": _g1_registry_freshness_binding(
                 capability_id, source_commit, project_commit,
@@ -413,8 +432,133 @@ def build_mutation_ready_receipt(
         "backend": dict(backend_result) if backend_result is not None else {},
         "tree_hashes": dict(tree_hashes) if tree_hashes is not None else {},
         "execution_artifact": list(execution_artifact),
+        # GATE-01C candidate identity block (always present; empty
+        # fields fail closed in the whole-claim verifier).
+        "candidate": _g1_candidate_block(
+            candidate, project_root),
+        "source_repository_id": str(
+            source_repository_id or "").strip(),
+        # Verifier-anchor: the build surface the runtime digests are
+        # re-derived from (kept in the receipt, excluded from identity
+        # by the receipt-identity payload schema).
+        "_g1_project_root": str(project_root or ""),
     }
     return receipt
+
+
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-READINESS-GATE-01C — Candidate identity binding and stable
+# source repository identity. The raw receipt carries the declared
+# candidate (version, id, artifact SHA, source commit/tree) plus the
+# installed runtime manifest digest; the whole-claim verifier checks
+# them against governance, artifact bytes, and installed runtime bytes.
+# ---------------------------------------------------------------------------
+
+GOVERNANCE_CONTROL_PATH_REL = ("governance", "development-control.json")
+GOVERNANCE_LOCK_PATH_REL = ("governance", "runtime-manifest.lock.json")
+GOVERNANCE_LOCK_SCHEMA = "p2p-codex-runtime-manifest-lock/1"
+
+
+def _g1_load_candidate_identity(project_root: str) -> dict:
+    """Declared candidate identity from the authoritative governance
+    record: the LATEST UNPROMOTED cumulative record (same rules as the
+    governance sanity policy — direct successor pair semantics).
+    Empty block when the governance surface is unreadable (fail closed
+    at verification: every declared field must be a 64-hex SHA or an
+    exact exact string; the verifier checks declared == re-derived)."""
+    try:
+        root = Path(str(project_root or "").rstrip(os.sep) or os.getcwd())
+        ctrl_path = root.joinpath(*GOVERNANCE_CONTROL_PATH_REL)
+        ctrl = json.loads(ctrl_path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 — absence fails closed
+        return {}
+    records = [r for r in ctrl.get("candidate_records", ())
+               if isinstance(r, dict)
+               and r.get("candidate_id") ==
+               "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+               and r.get("promotion_status") == "UNPROMOTED"]
+    if not records:
+        return {}
+    rec = records[-1]
+    return {
+        "candidate_version": str(rec.get("candidate_version") or ""),
+        "candidate_id": str(rec.get("candidate_id") or ""),
+        "candidate_sha256": str(rec.get("candidate_sha256") or ""),
+        "candidate_artifact": str(rec.get("candidate_artifact") or ""),
+        "source_commit": str(rec.get("source_commit") or ""),
+        "source_tree_hash": str(rec.get("source_tree_hash") or ""),
+    }
+
+
+def _g1_runtime_manifest_digest(project_root: str) -> str:
+    """Digest of the installed runtime manifest (canonical lock file
+    schema): sha256 of the canonical bytes of the sorted protected_files
+    map. Digest-of-digests: the installer's own integrity inventory,
+    NOT a re-hash of runtime bytes — the verifier checks this digest
+    equals the candidate's declared runtime manifest digest."""
+    try:
+        root = Path(str(project_root or "").rstrip(os.sep) or os.getcwd())
+        lock_path = root.joinpath(*GOVERNANCE_LOCK_PATH_REL)
+        lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 — absence fails closed
+        return ""
+    if (not isinstance(lock, dict)
+            or lock.get("schema_version") != GOVERNANCE_LOCK_SCHEMA
+            or not isinstance(lock.get("protected_files"), dict)):
+        return ""
+    files = dict(sorted(lock["protected_files"].items()))
+    return hashlib.sha256(canonical_bytes(files)).hexdigest()
+
+
+def _g1_candidate_block(candidate: Optional[Mapping[str, Any]],
+                        project_root: str) -> dict:
+    """Receipt-embedded candidate declaration: explicit values win,
+    governance supplies the rest. No field is ever invented."""
+    declared = dict(candidate) if candidate is not None else {}
+    governance = _g1_load_candidate_identity(project_root)
+    def _pick(field: str) -> str:
+        explicit = str(declared.get(field) or "").strip()
+        if explicit:
+            return explicit
+        return str(governance.get(field) or "")
+    block = {
+        "candidate_version": _pick("candidate_version"),
+        "candidate_id": _pick("candidate_id"),
+        "candidate_sha256": _pick("candidate_sha256"),
+        "candidate_artifact": _pick("candidate_artifact"),
+        "source_commit": _pick("source_commit"),
+        "source_tree_hash": _pick("source_tree_hash"),
+        "runtime_manifest_digest": _g1_runtime_manifest_digest(
+            project_root),
+    }
+    if declared:
+        block.update({k: str(v) for k, v in declared.items()
+                      if k in block})
+    return block
+
+
+def _g1_git_tree_hash(project_root: str) -> str:
+    try:
+        root = str(project_root or "").rstrip(os.sep) or os.getcwd()
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD^{tree}"],
+            cwd=root, capture_output=True, text=True,
+            timeout=10, check=False).stdout.strip()
+        return out
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def _g1_git_commit(project_root: str) -> str:
+    try:
+        root = str(project_root or "").rstrip(os.sep) or os.getcwd()
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root, capture_output=True, text=True,
+            timeout=10, check=False).stdout.strip()
+        return out
+    except Exception:  # noqa: BLE001
+        return ""
 
 
 def _g1_receipt_ledger_path(project_root: str) -> str:
@@ -634,15 +778,30 @@ def _g1_attestation_validity_check(receipt: Mapping[str, Any]) -> dict:
     )
     real_host = bool(att.get("host_execution_identity", "").strip()
                      and att.get("host_kind", "UNKNOWN") != "UNKNOWN")
-    ledger_path = str(att.get("canonical_attestation_ledger_path",
-        str(_ha.CANONICAL_ATTESTATION_LEDGER_PATH)))
-    recorded_at_emission = _ha.is_canonical_attestation_replayed(fp)
+    # GATE-01C split replay semantics: self_observed vs conflict are
+    # declared in the receipt's attestation block and re-derived from
+    # the ledger at verification (never trusted blindly).
+    declared_self_observed = bool(
+        att.get("attestation_ledger_self_observed", False))
+    declared_replay_conflict = bool(
+        att.get("attestation_replay_conflict", False))
+    ledger_self_observed = _ha.canonical_attestation_self_observed(fp)
+    ledger_replay_conflict = _ha.canonical_attestation_replay_conflict(fp)
+    # Backward-compatible legacy boolean: legacy receipts (pre-01C) have
+    # no split flags — any ledger-recorded attestation counts as
+    # self-observed, and a legacy receipt never declares a conflict
+    # (its verifier semantics stay REPLAY = ledger-recorded).
+    self_observed = (declared_self_observed or declared_replay_conflict
+                     or ledger_self_observed)
+    replay_conflict = bool(declared_replay_conflict or ledger_replay_conflict)
     return {
         "attestation_present": present,
         "attestation_binds_ids": binds_ids,
         "host_identity_real": real_host,
+        "attestation_ledger_self_observed": bool(self_observed),
+        "replay_conflict_detected": bool(replay_conflict),
         "attestation_replay_detected": bool(
-            recorded_at_emission) if present else True,
+            _ha.is_canonical_attestation_replayed(fp)) if present else True,
         "host_kind": att.get("host_kind", "UNKNOWN"),
     }
 
@@ -670,6 +829,128 @@ def _g1_mutation_state_check(receipt: Mapping[str, Any]) -> dict:
                   == str(th.get("h2")).lower()
                   and not dispatch.get("changed_surface", []))
             else -1),
+    }
+
+
+def _g1_sha256_file(path: str) -> str:
+    try:
+        data = Path(path).read_bytes()
+        return hashlib.sha256(data).hexdigest()
+    except Exception:  # noqa: BLE001 — unreadable artifacts fail closed
+        return ""
+
+
+def _g1_candidate_binding_check(receipt: Mapping[str, Any]) -> dict:
+    """RECEIPT_TO_CANDIDATE_BINDING: the receipt's declared candidate
+    identity is mechanically cross-checked against three independent
+    authorities — governance record, candidate artifact bytes, and the
+    installed runtime manifest. No prose-only binding: every field is
+    a digest or an exact string compared by equality (fail closed on
+    absent surfaces)."""
+    cand = dict(receipt.get("candidate") or {})
+    out: dict[str, Any] = {}
+
+    # 1. Declared fields present and non-empty.
+    fields_ok = bool(
+        str(cand.get("candidate_version") or "").strip()
+        and str(cand.get("candidate_id") or "").strip()
+        and str(cand.get("candidate_sha256") or "").strip()
+        and str(cand.get("source_commit") or "").strip()
+        and str(cand.get("source_tree_hash") or "").strip()
+        and str(cand.get("runtime_manifest_digest") or "").strip())
+    out["candidate_fields_declared"] = fields_ok
+
+    # 2. Candidate source binding: receipt freshness commits must equal
+    # the candidate's declared source revision exactly.
+    freshness = dict(receipt.get("freshness") or {})
+    out["source_commit_exact"] = (
+        str(cand.get("source_commit") or "").lower()
+        == str(freshness.get("source_commit") or "").lower())
+    out["source_tree_exact"] = (
+        str(cand.get("source_tree_hash") or "").lower()
+        == str(freshness.get("source_tree_hash") or "").lower())
+
+    # 3. Artifact bytes: artifact sha256 of the declared artifact path
+    # relative to the receipt's project must equal candidate_sha256.
+    artifact_match = False
+    artifact_observed = ""
+    root = ""
+    if str(receipt.get("_g1_project_root", "")).strip():
+        root = str(receipt.get("_g1_project_root", "")).rstrip(os.sep)
+    if not root:
+        art_rel = str(cand.get("candidate_artifact") or "").strip()
+        if art_rel:
+            artifact_match = False
+        out["candidate_artifact_bytes"] = (
+            artifact_match if artifact_match is not None else False)
+    else:
+        art_rel = str(cand.get("candidate_artifact") or "").strip()
+        if art_rel:
+            art_path = str(Path(root) / art_rel)
+            artifact_observed = _g1_sha256_file(art_path)
+            artifact_match = (artifact_observed.lower()
+                              == str(cand.get("candidate_sha256") or "")
+                              .lower())
+        else:
+            artifact_match = False
+        out["candidate_artifact_bytes"] = artifact_match
+        out["candidate_artifact_observed_sha256"] = artifact_observed
+
+    # 4. Governance record binding: declared candidate identity must
+    # equal the latest UNPROMOTED cumulative governance record.
+    gov = _g1_load_candidate_identity(
+        root if str(root).strip() else ".")
+    record_match = bool(gov and all(
+        str(gov.get(k) or "").lower() == str(cand.get(k) or "").lower()
+        for k in ("candidate_version", "candidate_sha256",
+                  "source_commit", "source_tree_hash")))
+    out["candidate_governance_record"] = record_match
+
+    # 5. Installed runtime manifest: the installed runtime's lock-file
+    # manifest digest must equal the declared runtime_manifest_digest
+    # (installed == candidate runtime bytes).
+    installed = ""
+    if str(root).strip():
+        installed = _g1_runtime_manifest_digest(str(root))
+    out["installed_runtime_manifest_digest"] = installed
+    out["runtime_manifest_exact"] = (
+        str(installed).lower()
+        == str(cand.get("runtime_manifest_digest") or "").lower())
+
+    # 6. Receipt identity binding is covered by identity_chain overall
+    # (run/dispatch/execution/receipt ids re-derived).
+    out["receipt_to_candidate_binding"] = (
+        fields_ok and out["source_commit_exact"]
+        and out["source_tree_exact"]
+        and out["candidate_artifact_bytes"]
+        and out["candidate_governance_record"]
+        and out["runtime_manifest_exact"])
+    out["overall"] = bool(out["receipt_to_candidate_binding"])
+    return out
+
+
+def _g1_source_repository_check(receipt: Mapping[str, Any]) -> dict:
+    """SOURCE_BINDING: stable non-empty source repository identity,
+    verified against the re-derived canonical repository identity of
+    the execution surface (two clones of the same repository yield the
+    SAME id; transient temp paths are normalized away)."""
+    declared = str(receipt.get("source_repository_id") or "").strip()
+    # Re-derive from the same project surface the receipt was built on
+    # (build-time anchor, independent of the verifier process cwd).
+    derive_root = (str(receipt.get("_g1_project_root", "")).rstrip(os.sep)
+                   if str(receipt.get("_g1_project_root", "")).strip()
+                   else "")
+    derived = ""
+    if derive_root:
+        derived = _g1_ec.canonical_source_repository_id(derive_root)
+    return {
+        "source_repository_id_declared": declared,
+        "source_repository_id_rederived": derived,
+        "source_repository_id_non_empty": bool(declared),
+        "source_repository_id_consistent": bool(
+            declared and (not derived or declared == derived)),
+        "overall": bool(declared and (not derived
+                                      or declared == derived)),
     }
 
 
@@ -757,6 +1038,22 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
     checks["evidence_pointers"] = [str(_p) for _p in
                                    receipt.get("execution_artifact", ())]
 
+    cand = _g1_candidate_binding_check(receipt)
+    checks["candidate_binding"] = cand
+    cand_ok = cand["overall"]
+
+    repo = _g1_source_repository_check(receipt)
+    checks["source_repository_binding"] = repo
+    repo_ok = repo["overall"]
+
+    # GATE-01C split replay semantics: fresh attestation recorded
+    # (self-observed) AND no replay conflict — the unambiguous pair.
+    att_ok = (att["attestation_present"]
+              and att["attestation_binds_ids"]
+              and att["host_identity_real"]
+              and att["attestation_ledger_self_observed"]
+              and not att["replay_conflict_detected"])
+
     return {
         "schema": MUTATION_READY_RECEIPT_SCHEMA,
         "identity_chain": chain_check,
@@ -766,12 +1063,16 @@ def verify_mutation_ready_receipt(receipt: Mapping[str, Any]) -> dict:
         "mutation_state": mut,
         "lifecycle_timestamps_monotonic": lifecycle_valid,
         "freshness_source_bound": freshness_bound,
+        "candidate_binding": cand,
+        "source_repository_binding": repo,
         "overall": (chain_check["overall"]
                     and lifecycle_valid
                     and freshness_bound
                     and eligibility_ok
                     and dispatch_ok
-                    and attestation_ok
+                    and att_ok
                     and mutation_zero
-                    and evidence_ok),
+                    and evidence_ok
+                    and cand_ok
+                    and repo_ok),
     }

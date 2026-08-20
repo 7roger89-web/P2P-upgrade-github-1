@@ -31,16 +31,149 @@ from p2p_capabilities import quality_intelligence as _qi  # E2
 from p2p_capabilities import role_eligibility as _re  # E3
 from p2p_capabilities import host_attestation as _ha  # E4
 from p2p_capabilities import role_receipt as _rr  # E5
+from p2p_capabilities.host_attestation import canonical_bytes as _cb
 
 CANONICAL_CAPABILITY = "non_mutating_project_analysis"
 CANONICAL_ROLE = "p2p_iris"
-SOURCE_REPO_ID = "auth-f01"
+
+# ---------------------------------------------------------------------------
+# GATE-01C test candidate fixture:
+#   - /tmp/gt-iso-gate01 MUST present tree c35a8d1b (VALID_PROJECT_COMMIT)
+#     so freshness source_tree_hash equals the candidate's declared
+#     source_tree_hash and source_commit equals VALID_SOURCE_COMMIT.
+#   - governance/development-control.json carries one UNPROMOTED
+#     cumulative record; governance/runtime-manifest.lock.json carries
+#     the installed runtime manifest; the candidate zip is the artifact
+#     whose sha256 the verifier re-derives from bytes.
+# ---------------------------------------------------------------------------
+GT_AUTHORITATIVE = "/home/ubuntu/fw01_work/cert/game-truyen"
 VALID_SOURCE_COMMIT = "11370b57ec98b3cd50be35fe8ad6693c564d04696a95987c6560a5037fca8ca2"
 DRIFTED_SOURCE_COMMIT = "0" * 64
-VALID_PROJECT_COMMIT = "c35a8d1b43073b0a63272167e82fa70aa44817bf4002f056935af5e7b9b6143b"
+VALID_PROJECT_COMMIT = "91661a25dd925d85908b6562e023862c5169afd0"
+EXPECTED_PROJECT_TREE = VALID_PROJECT_COMMIT
 ADAPTER_ID = "p2p-manus-orchestration"
 TARGET_ID = ADAPTER_ID
 PROJECT_ROOT = "/tmp/gt-iso-gate01"
+
+# GATE-01C: the stable repository identity must equal the canonical
+# re-derivation for the test project surface (never a hard-coded
+# prose string).
+SOURCE_REPO_ID = _ec.canonical_source_repository_id(PROJECT_ROOT)
+
+
+def _ensure_test_project():
+    """Ensure PROJECT_ROOT is a git clone whose HEAD^{tree} is the
+    authoritative Game Truyện tree, and its governance surfaces carry
+    the test candidate fixture (idempotent)."""
+    import json as _json
+    import shutil as _sh
+    import zipfile as _zip
+    import os as _os
+    want = os.path.isdir(os.path.join(PROJECT_ROOT, ".git"))
+    if not want:
+        _sh.rmtree(PROJECT_ROOT, ignore_errors=True)
+        _sub_run = __import__("subprocess").run
+        _sub_run(["git", "clone", "--depth", "1",
+                  GT_AUTHORITATIVE, PROJECT_ROOT], check=True)
+    else:
+        import subprocess as _sp
+        tree = _sp.run(["git", "rev-parse", "HEAD^{tree}"],
+                       cwd=PROJECT_ROOT,
+                       capture_output=True, text=True).stdout.strip()
+        if tree != EXPECTED_PROJECT_TREE:
+            _sh.rmtree(PROJECT_ROOT, ignore_errors=True)
+            _sp.run(["git", "clone", "--depth", "1",
+                     GT_AUTHORITATIVE, PROJECT_ROOT], check=True)
+    gov_dir = os.path.join(PROJECT_ROOT, "governance")
+    os.makedirs(gov_dir, exist_ok=True)
+    # 1. Installed runtime manifest lock (empty protected surface —
+    # stable digest). The receipt build and the verifier both re-derive
+    # the manifest digest from this same file, so their values agree.
+    lock = {"schema_version": "p2p-codex-runtime-manifest-lock/1",
+            "root_mode": "package",
+            "protected_files": {}, "virtual_hashes": {}}
+    (_os.path.join(gov_dir, "runtime-manifest.lock.json"),) and open(
+        _os.path.join(gov_dir, "runtime-manifest.lock.json"),
+        "w", encoding="utf-8").write(
+        _json.dumps(lock, sort_keys=True, ensure_ascii=False) + "\n")
+    # 2. Test candidate artifact: a fixed zip under the project root
+    # whose sha256 is declared in the governance record.
+    reports_dir = os.path.join(PROJECT_ROOT, "reports", "candidates")
+    os.makedirs(reports_dir, exist_ok=True)
+    artifact_path = os.path.join(reports_dir,
+                                 "p2p-test-candidate.zip")
+    if not os.path.isfile(artifact_path):
+        import hashlib as _hl
+        with _zip.ZipFile(artifact_path, "w") as zf:
+            zf.writestr("release-manifest.json",
+                        '{"schema": "test", "candidate": "fixture"}')
+        artifact_sha = _hl.sha256(
+            open(artifact_path, "rb").read()).hexdigest()
+        _open = open(_os.path.join(reports_dir,
+                                   "p2p-test-candidate.sha"),
+                     "w", encoding="utf-8")
+        _open.write(artifact_sha + "\n")
+        _open.close()
+    else:
+        import hashlib as _hl2
+        artifact_sha = _hl2.sha256(
+            open(artifact_path, "rb").read()).hexdigest()
+    # 3. Governance record binding the test candidate.
+    ctrl = {"candidate_records": [{
+        "candidate_version": "8.4.7-C-codex.37-test",
+        "candidate_label": "p2p-test-fixture",
+        "candidate_sha256": artifact_sha,
+        "candidate_artifact": "reports/candidates/p2p-test-candidate.zip",
+        "candidate_built_at_utc": "2026-08-20T00:00:00Z",
+        "embedded_version": "8.4.7-C-codex.37-test",
+        "based_on_official_version": "8.4.7-C-codex.19",
+        "based_on_official_sha256": "0" * 64,
+        "development_goal": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+        "promotion_status": "UNPROMOTED",
+        "built": True,
+        "source_commit": VALID_SOURCE_COMMIT,
+        "source_tree_hash": EXPECTED_PROJECT_TREE,
+        "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+    }]}
+    (_os.path.join(gov_dir, "development-control.json"),) and open(
+        _os.path.join(gov_dir, "development-control.json"),
+        "w", encoding="utf-8").write(
+        _json.dumps(ctrl, indent=2, ensure_ascii=False) + "\n")
+    return artifact_sha
+
+
+def _test_candidate_block() -> dict:
+    """Receipt-embedded candidate declaration matching the fixture
+    governance record (build-time declared wins; the verifier's
+    re-derivation must agree with this)."""
+    import json as _json
+    import os as _os
+    gov_dir = _os.path.join(PROJECT_ROOT, "governance")
+    ctrl = _json.loads(open(
+        os.path.join(gov_dir, "development-control.json"),
+        encoding="utf-8").read())
+    rec = [r for r in ctrl["candidate_records"]
+           if r.get("candidate_id") ==
+           "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+           and r.get("promotion_status") == "UNPROMOTED"][-1]
+    gov_dir2 = _os.path.join(PROJECT_ROOT, "governance")
+    lock = _json.loads(open(_os.path.join(
+        gov_dir2, "runtime-manifest.lock.json"),
+        encoding="utf-8").read())
+    manifest_digest = _hl.sha256(_cb(dict(sorted(
+        lock["protected_files"].items())))).hexdigest()
+    return {
+        "candidate_version": rec["candidate_version"],
+        "candidate_id": rec["candidate_id"],
+        "candidate_sha256": rec["candidate_sha256"],
+        "candidate_artifact": rec["candidate_artifact"],
+        "source_commit": rec["source_commit"],
+        "source_tree_hash": rec["source_tree_hash"],
+        "runtime_manifest_digest": manifest_digest,
+    }
+
+
+_hl = __import__("hashlib")
 
 CONTRACT = {
     "schema": "p2p-role-execution-contract/1",
@@ -64,10 +197,28 @@ def _fresh_utc(delta: int = 0) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
 
 
+def setUpModule():
+    """Prepare the shared test project surface once (git clone of the
+    authoritative Game Truyện HEAD presenting tree c35a8d1b, plus the
+    governance candidate fixture and artifact)."""
+    _ensure_test_project()
+    _attestation_ledger_clean()
+
+
 def _source_registry_clean():
     """Ensure source registry starts empty for this run (runtime state,
     not versioned; idempotent for CI)."""
     _qi._persist_source_registry({"records": []})
+
+
+def _attestation_ledger_clean():
+    """GATE-01C: wipe the persisted canonical attestation ledger so a
+    freshly minted fingerprint is self-observed without a stale
+    second-use record (replay_conflict_detected=False). Idempotent."""
+    import os as _os
+    ledger = _ha.CANONICAL_ATTESTATION_LEDGER_PATH
+    if ledger.exists():
+        _os.remove(str(ledger))
 
 
 def _register_source_cert(**overrides):
@@ -355,6 +506,8 @@ class Gate01TimestampTests(unittest.TestCase):
             project_commit=VALID_PROJECT_COMMIT,
             outcome="READ_ONLY_PASSED",
             project_root=PROJECT_ROOT,
+            source_repository_id=SOURCE_REPO_ID,
+            candidate=_test_candidate_block(),
         )
         base.update(overrides)
         return base
@@ -611,6 +764,9 @@ class Gate01NegativeMatrixTests(unittest.TestCase):
             project_commit=VALID_PROJECT_COMMIT,
             outcome="READ_ONLY_PASSED",
             project_root=PROJECT_ROOT,
+            source_repository_id=SOURCE_REPO_ID,
+            source_tree_hash=VALID_PROJECT_COMMIT,
+            candidate=_test_candidate_block(),
             started_at=_fresh_utc(1),
             completed_at=_fresh_utc(2),
             backend_result={

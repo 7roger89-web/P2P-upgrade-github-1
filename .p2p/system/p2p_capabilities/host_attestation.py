@@ -75,6 +75,12 @@ class HostAttestationRecord:
     source_snapshot_digest: str = ""
     attestation_evidence_pointers: tuple[str, ...] = ()
     attested_at: str = ""
+    # GATE-01C split replay semantics (read-only ledger observations,
+    # set by make_canonical_host_attestation AFTER recording): a fresh
+    # first emission self-observes (True, False); re-use of the same
+    # fingerprint is a conflict (replay_conflict = True → BLOCK).
+    attestation_ledger_self_observed: bool = False
+    attestation_replay_conflict: bool = False
 
     # --------------------------------------------------------------
     # Validation (Owner amendments 1/2/3/4)
@@ -160,8 +166,14 @@ class HostAttestationRecord:
                            computed_identity)
         # Owner amendment 3: replay-distinguishable identity binds
         # the WHOLE record (computed with the field absent).
+        # GATE-01C: ledger-observation flags are read-only post-hoc
+        # observations, never identity — they must not shift the
+        # attestation fingerprint (receipt identity would drift).
         base = self.to_dict()
         del base["attestation_fingerprint"]
+        for _obs in ("attestation_ledger_self_observed",
+                     "attestation_replay_conflict"):
+            base.pop(_obs, None)
         computed = hashlib.sha256(canonical_bytes(base)).hexdigest()
         if (self.attestation_fingerprint
                 and self.attestation_fingerprint != computed):
@@ -194,6 +206,10 @@ class HostAttestationRecord:
                 self.source_snapshot_digest,
             "attestation_evidence_pointers": list(self.attestation_evidence_pointers),
             "attested_at": self.attested_at,
+            "attestation_ledger_self_observed": bool(
+                self.attestation_ledger_self_observed),
+            "attestation_replay_conflict": bool(
+                self.attestation_replay_conflict),
         }
 
     @classmethod
@@ -209,6 +225,8 @@ class HostAttestationRecord:
             "attestation_fingerprint", "host_metadata",
             "source_snapshot_digest",
             "attestation_evidence_pointers", "attested_at",
+            "attestation_ledger_self_observed",
+            "attestation_replay_conflict",
         }
         kwargs = {key: value for key, value in mapping.items()
                   if key in known}
@@ -493,13 +511,80 @@ def make_canonical_host_attestation(
     # is trusted. Record use in the ledger so replay is detectable.
     ledger = Path(ledger_path) if ledger_path is not None else CANONICAL_ATTESTATION_LEDGER_PATH
     record_attestation_use(record, path=ledger)
+    # GATE-01C ledger-observation report: self_observed vs conflict are
+    # read-only ledger OBSERVATIONS computed AFTER recording, never a
+    # mutable ledger mutation. A fresh first emission observes itself
+    # (count == 1 → self_observed, no conflict); re-use of an existing
+    # fingerprint raises count above 1 → conflict flagged.
+    object.__setattr__(record, "attestation_ledger_self_observed",
+                       canonical_attestation_self_observed(
+                           record.attestation_fingerprint,
+                           ledger_path=ledger))
+    object.__setattr__(record, "attestation_replay_conflict",
+                       canonical_attestation_replay_conflict(
+                           record.attestation_fingerprint,
+                           ledger_path=ledger))
     return record
 
 def is_canonical_attestation_replayed(
         fingerprint: str,
         ledger_path: Optional[Path] = None) -> bool:
+    """Backward-compatible replay probe: an attestation is 'replayed'
+    (i.e. not fresh) only when it is absent from the ledger entirely.
+    Any ledger-recorded attestation — including one freshly recorded by
+    its own emission — returns True (historical self-observation
+    semantics preserved for GATE-01B callers)."""
     ledger = Path(ledger_path) if ledger_path is not None else CANONICAL_ATTESTATION_LEDGER_PATH
     return attestation_already_used(fingerprint, path=ledger)
+
+
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-READINESS-GATE-01C — Explicit replay semantics. One boolean
+# named 'attestation_replay_detected = true' is ambiguous: a valid fresh
+# emission and a conflict reuse would share it. GATE-01C splits the
+# semantics into two canonical, mechanically distinct observations:
+#
+#   ATTESTATION_LEDGER_SELF_OBSERVED  — the attestation fingerprint was
+#       recorded in the canonical ledger at (or before) emission time.
+#       True for every fresh, legitimate emission by construction
+#       (make_canonical_host_attestation records use before returning).
+#
+#   REPLAY_CONFLICT_DETECTED — the same fingerprint was ALREADY in the
+#       ledger BEFORE this emission (ledger count > 1 after recording,
+#       or count > 0 before recording for a re-used fingerprint).
+#       True ONLY for unauthorized second use → BLOCK.
+#
+# Verifier PASS requires self_observed = true AND replay_conflict = false.
+# ---------------------------------------------------------------------------
+
+
+def _canonical_attestation_ledger_count(
+        fingerprint: str,
+        ledger_path: Optional[Path] = None) -> int:
+    """Count ledger entries carrying this attestation fingerprint."""
+    ledger = Path(ledger_path) if ledger_path is not None else CANONICAL_ATTESTATION_LEDGER_PATH
+    return sum(1 for entry in load_attestation_ledger(ledger)
+               if entry.get("attestation_fingerprint") == fingerprint)
+
+
+def canonical_attestation_self_observed(
+        fingerprint: str,
+        ledger_path: Optional[Path] = None) -> bool:
+    """ATTESTATION_LEDGER_SELF_OBSERVED: the fingerprint appears in the
+    canonical ledger — self-observed evidence, recorded at emission."""
+    return _canonical_attestation_ledger_count(
+        str(fingerprint).lower(), ledger_path) >= 1
+
+
+def canonical_attestation_replay_conflict(
+        fingerprint: str,
+        ledger_path: Optional[Path] = None) -> bool:
+    """REPLAY_CONFLICT_DETECTED: a SECOND (or later) use of the same
+    attestation fingerprint — the fingerprint already existed in the
+    ledger before this observation. Fresh first emissions are NOT
+    conflicts (count == 1); only re-use (count > 1) is a conflict."""
+    return _canonical_attestation_ledger_count(
+        str(fingerprint).lower(), ledger_path) > 1
 
 def _real_utc_now() -> str:
     """Fresh UTC wall-clock timestamp, normalized to second precision."""
