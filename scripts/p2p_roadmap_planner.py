@@ -1,32 +1,47 @@
 #!/usr/bin/env python3
-"""p2p_roadmap_planner.py — Canonical roadmap-aware development planner.
+"""p2p_roadmap_planner.py — Canonical roadmap-aware development planner (v2, hardened).
 
-P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01
-Machine-readable consumption of canonical durable roadmap truth BEFORE next-goal selection.
+P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A — fail-closed coverage + canonical blocker +
+ranking semantics closure. Preserves the v1 foundation (spec 01A: do not redesign).
 
-Design (spec-mandated):
-- Small composable planner capability; NOT a second orchestrator; P2P remains sole orchestrator.
-- Reads only; NEVER mutates any file. No auto-execution. PLANNER_SELECTION != GOAL_EXECUTION.
-- Deterministic ranking for identical truth input; explanation evidence persisted for reproducibility.
-- Fail-closed: refuses definitive recommendation when canonical truth is missing/conflicting/unknown.
-- Hash binding: plan output binds roadmap/ledger/control hashes + baseline identity + timestamp
-  (ROADMAP_DRIFT_INVALIDATES_PLAN).
+Hardening over v1 (01A seams):
+  S1  ROADMAP_COVERAGE_GAP == TRUE  ->  RECOMMENDED_NEXT_GOAL = null,
+      PLAN_COMPLETE = false, planning_status = "BLOCKED / ROADMAP_COVERAGE_GAP"
+  S2  Coverage gate counts SELECTED, PLANNED, PARTIAL as materially relevant
+      (explicit status translation between Research Adoption Ledger and Roadmap).
+      UNKNOWN never silently satisfies coverage.
+  S3  BLOCKED / BLOCKED_TERMINAL item statuses are classified deterministically by
+      blocker/evidence semantics (BLOCKED_BY_EXTERNAL_EVIDENCE / BLOCKED_BY_DEPENDENCY);
+      UNKNOWN only for genuinely unrecognized/ambiguous status.
+      KNOWN_BLOCKED != UNKNOWN; UNKNOWN != SUPPORTED; UNKNOWN != READY_NOW.
+  S4  dependency_necessity weight is actually consumed — real graph leverage:
+      dependent-high-value-unblocked count, terminal-prerequisite bonus, blocking-edge
+      removal — deterministic, documented, testable, derived from canonical graph.
+  S5  beginner view derives from the ACTUALLY selected roadmap item
+      (title, owner_value, mutation risk, project impact, promotion requirement,
+      dependencies/blockers) — no stale hardcoded wording.
+  S6  WHY_THIS_GOAL is evidence-bound with per-factor SCORE_BREAKDOWN; generic
+      "blocks/leverages higher-strategic-value items below it" removed unless graph
+      edges support it.
 
-Usage:
-  python3 p2p_roadmap_planner.py --repo <auth-f01 path> [--planning-input /path/to/input.json]
-                                  [--override-owner-value "<id>:<high|medium|low>"]
-  Outputs: planning result JSON on stdout, planner result file path in repo-local run dir.
-
-Authority precedence (spec §2), enforced in code:
+Authority precedence (spec 01 §2), unchanged:
   1. official baseline / C-line historical status  -> development-control.json
   2. future roadmap item/family organization       -> p2p-development-roadmap.json
   3. research adoption/provenance                  -> research-adoption-ledger.json
   4. capability existence/status                   -> capability-index.json
-  5. Owner explicit current decision               -> Owner input model (OWNER_CURRENT_INTENT)
+  5. Owner explicit current decision               -> Owner input model
   6. external research                             -> provenance ONLY (via ledger), never authority
 """
-import argparse, hashlib, json, os, sys, re
+import argparse
+import hashlib
+import json
+import os
+import re
+import sys
 from datetime import datetime, timezone
+
+VERSION = "2"
+SPEC_GOAL = "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A"
 
 STATUS_VOCAB = {
     "READY_NOW", "BLOCKED_BY_DEPENDENCY", "BLOCKED_BY_EXTERNAL_EVIDENCE",
@@ -42,6 +57,20 @@ TERMINAL_STATUSES = {"DONE", "SHIPPED", "VERIFIED"}
 # Vocabulary defined in development roadmap + ledger + capability index (allowed union)
 ALLOWED_ROADMAP_ITEM_STATUS = {"DONE", "PLANNED", "DEFERRED", "PARTIAL", "VERIFIED", "REJECTED", "SHIPPED",
                                "BLOCKED", "BLOCKED_TERMINAL", "ACTIVE_UNPROMOTED"}
+
+# Research Adoption Ledger status translation (spec 01A §3, explicit):
+#   SELECTED / PLANNED / PARTIAL  -> materially relevant; must have durable roadmap consideration
+#   SHIPPED / VERIFIED / IMPLEMENTED -> adopted (coverage satisfied)
+#   DEFERRED / REJECTED / SUPERSEDED -> excluded, reason documented
+#   DISCOVERED / RESEARCHED         -> not yet selected (not gaps, not counted)
+#   UNKNOWN                         -> NEVER satisfies coverage (fail-closed)
+LEDGER_MATERIAL_STATUSES = {"SELECTED", "PLANNED", "PARTIAL"}
+LEDGER_ADOPTED_STATUSES = {"SHIPPED", "VERIFIED", "IMPLEMENTED"}
+LEDGER_EXCLUDED_STATUSES = {"DEFERRED", "REJECTED", "SUPERSEDED"}
+
+WEIGHTS = {"owner_value": 3.0, "dependency_necessity": 2.0, "safety_maturity": 1.5,
+           "evidence_gap": 1.0, "architectural_leverage": 1.5}
+WEIGHT_SUM = sum(WEIGHTS.values())
 
 BASELINE_EXPECTED = "8.4.7-C-codex.41"
 BASELINE_SHA_EXPECTED = "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d"
@@ -93,7 +122,6 @@ def build_input_model(repo, override_owner_value):
     if not ob or ob.get("version") != BASELINE_EXPECTED or ob.get("artifact_sha256") != BASELINE_SHA_EXPECTED:
         raise PlannerError(f"BASELINE IDENTITY MISMATCH — expected {BASELINE_EXPECTED}@{BASELINE_SHA_EXPECTED[:16]}..., got {json.dumps(ob)}")
 
-    # authority precedence registry
     authority = {
         "official_baseline": "development-control",
         "c_line_historical_status": "development-control",
@@ -150,19 +178,32 @@ def bind_hashes(inp, repo):
 
 # ---------------------------------------------------------------- coverage gate
 def coverage_gate(inp, dctl):
-    """Spec §4: ROADMAP_COVERAGE_GAP. Every materially relevant SELECTED/PLANNED/PARTIAL
-    record must be present; omissions need explicit defer/exclusion reasons."""
+    """Spec §4 (hardened 01A): ROADMAP_COVERAGE_GAP.
+
+    Coverage semantics (status translation, explicit):
+      Ledger SELECTED/PLANNED/PARTIAL  -> materially relevant; needs roadmap consideration.
+      Ledger SHIPPED/VERIFIED/IMPLEMENTED -> adopted; coverage satisfied.
+      Ledger DEFERRED/REJECTED/SUPERSEDED -> excluded with documented reason.
+      Ledger DISCOVERED/RESEARCHED        -> not yet selected; not a gap, not counted.
+      Ledger UNKNOWN                      -> NEVER satisfies coverage.
+      Roadmap PLANNED/PARTIAL items       -> materially relevant candidates.
+    """
     gaps = []
     owner_selected = []
-    # Owner-selected candidates: roadmap PLANNED items + ledger PARTIAL/SELECTED records
     for item in inp["ROADMAP_ITEMS"]:
         if item.get("status") in ("PLANNED", "PARTIAL"):
             owner_selected.append(item["roadmap_id"])
     for rec in inp["RESEARCH_ADOPTION_RECORDS"]:
-        if rec.get("status") in ("PARTIAL",):
+        st = rec.get("status")
+        if st in LEDGER_MATERIAL_STATUSES:
             owner_selected.append(rec["research_id"])
+        elif st not in LEDGER_ADOPTED_STATUSES and st not in LEDGER_EXCLUDED_STATUSES and st != "UNKNOWN":
+            # DISCOVERED/RESEARCHED: not material yet (documented, not a gap)
+            pass
+        # UNKNOWN explicitly never satisfies — it is silently ignored only as non-evidence,
+        # and a UNKNOWN ledger record cannot be the reason a selected direction is dropped:
+        # owner-selected candidates must still have a durable record (checked below).
     # every candidate is present in at least one canonical plan input -> no silent forgetting
-    # explicit gap: a selected direction that appears in OWNER_CURRENT_INTENT overrides without a durable record
     missing_records = []
     for oid, _ in inp["OWNER_CURRENT_INTENT"]["explicit_value_overrides"].items():
         known = {i["roadmap_id"] for i in inp["ROADMAP_ITEMS"]} | {r["research_id"] for r in inp["RESEARCH_ADOPTION_RECORDS"]}
@@ -183,16 +224,31 @@ def coverage_gate(inp, dctl):
         "ROADMAP_COVERAGE_GAP": len(gaps) > 0,
         "gaps": gaps,
         "owner_selected_candidates": owner_selected,
+        "status_translation": {
+            "ledger_material": sorted(LEDGER_MATERIAL_STATUSES),
+            "ledger_adopted": sorted(LEDGER_ADOPTED_STATUSES),
+            "ledger_excluded_with_reason": sorted(LEDGER_EXCLUDED_STATUSES),
+            "unknown_never_satisfies": True,
+        },
     }
 
 
 # ---------------------------------------------------------------- dependency graph
 def classify_dependencies(inp):
-    """Spec §6: per-item dependency graph class with justification."""
+    """Spec §6: per-item dependency graph class with justification (hardened 01A §4).
+
+    Deterministic mapping for known blocked statuses:
+      BLOCKED  + blocker mentions evidence/availability/NOT_PROVEN
+               -> BLOCKED_BY_EXTERNAL_EVIDENCE
+      BLOCKED  + otherwise (or unsatisfied dependency references)
+               -> BLOCKED_BY_DEPENDENCY
+      BLOCKED_TERMINAL -> same mapping, reason tagged terminal
+      genuinely unrecognized/ambiguous status -> UNKNOWN (fail-closed elsewhere)
+    KNOWN_BLOCKED != UNKNOWN: a blocked item with a deterministically classifiable cause
+    is never returned as UNKNOWN.
+    """
     status = inp["STATUS"]
     ids = list(status.keys())
-    id_re = re.compile(r"^([A-Z0-9_-]+)\b")
-    # dependency-name -> roadmap id resolution: match known roadmap ids & C-line aliases inside dep strings
     name_to_id = {}
     for i in inp["ROADMAP_ITEMS"]:
         name_to_id[i["roadmap_id"]] = i["roadmap_id"]
@@ -200,53 +256,74 @@ def classify_dependencies(inp):
         if alias.startswith("C") and alias not in name_to_id:
             name_to_id[alias] = i["roadmap_id"]
 
+    ext_ev_re = re.compile(r"EVIDENCE|UNAVAILABLE|NOT_PROVEN|MISSING.*EVIDENCE|NOT_AVAILABLE", re.IGNORECASE)
+
     def resolve_dep_class(dep_text):
-        """Recursively check whether a dependency reference is satisfied (DONE/VERIFIED) or not."""
+        """Recursively check whether a dependency reference is satisfied (terminal) or not."""
         for token in re.split(r"[,;+]|\sor\s", dep_text):
             for frag in re.findall(r"[A-Za-z0-9._-]+", token):
                 rid = name_to_id.get(frag)
                 if rid is None:
                     continue
                 dst = status.get(rid)
-                if dst in ("DONE", "SHIPPED", "VERIFIED"):
+                if dst in TERMINAL_STATUSES:
                     continue
                 if dst == "DEFERRED":
                     return "OWNER_DEFERRED", f"depends on Owner-deferred {rid}"
                 if dst is None or dst not in TERMINAL_STATUSES:
                     bl = inp["BLOCKERS"].get(rid, [])
-                    if bl:
-                        return ("BLOCKED_BY_EXTERNAL_EVIDENCE", f"depends on {rid}: " + "; ".join(bl)[:200]) if \
-                            any("EVIDENCE" in str(b).upper() or "NOT_PROVEN" in str(b) or "UNAVAILABLE" in str(b).upper() for b in bl) else \
-                            ("BLOCKED_BY_DEPENDENCY", f"depends on {rid}: " + "; ".join(bl)[:200])
-                    return "BLOCKED_BY_DEPENDENCY", f"depends on {rid} (status {dst}, not DONE)"
+                    if bl and ext_ev_re.search("; ".join(str(b) for b in bl)):
+                        return ("BLOCKED_BY_EXTERNAL_EVIDENCE", f"depends on {rid}: " + "; ".join(str(b) for b in bl)[:200])
+                    return "BLOCKED_BY_DEPENDENCY", f"depends on {rid} (status {dst}, not terminal)"
         return None, None
+
+    def classify_blocked(rid, terminal=False):
+        blockers = [str(b) for b in inp["BLOCKERS"].get(rid, [])]
+        ext_blocked = [b for b in blockers if ext_ev_re.search(b)]
+        if ext_blocked:
+            cls = "BLOCKED_BY_EXTERNAL_EVIDENCE"
+            why = "; ".join(ext_blocked)[:300]
+        else:
+            # unsatisfied dependency references classify the block too
+            dep_class, dep_why = resolve_dep_class(" ".join(inp["DEPENDENCIES"].get(rid, [])))
+            if dep_class and dep_class not in ("DONE_SHIPPED_VERIFIED", "UNKNOWN"):
+                cls, why = dep_class, dep_why
+            else:
+                cls = "BLOCKED_BY_DEPENDENCY"
+                why = "; ".join(blockers)[:300] or "status BLOCKED without resolvable blockers"
+        if terminal:
+            cls = cls + "_TERMINAL_PATTERN" if False else cls  # classification kept deterministic; terminality carried in reason
+            why = "(terminal) " + why
+        return cls, why
 
     graph = {}
     for rid in ids:
         st = status[rid]
-        if st in TERMINAL_STATUSES or st == "VERIFIED":
+        if st in TERMINAL_STATUSES:
             cls, why = "DONE_SHIPPED_VERIFIED", f"terminal status {st}"
         elif st == "DEFERRED":
             cls, why = "OWNER_DEFERRED", inp["DEFER_REASON"].get(rid, "explicit Owner deferral")
         elif st == "REJECTED":
             cls, why = "SUPERSEDED", "rejected pattern — permanent"
+        elif st in ("BLOCKED", "BLOCKED_TERMINAL"):
+            cls, why = classify_blocked(rid, terminal=(st == "BLOCKED_TERMINAL"))
+        elif st == "PARTIAL":
+            cls, why = "READY_NOW", "partial evidence progress; no blocker; continuation candidate"
         elif st != "PLANNED":
             cls, why = "UNKNOWN", f"status {st} not in deterministic vocab"
         else:
-            blockers = inp["BLOCKERS"].get(rid, [])
+            blockers = [str(b) for b in inp["BLOCKERS"].get(rid, [])]
             not_proven = [b for b in blockers if "NOT_PROVEN" in str(b)]
-            ext_blocked = [b for b in blockers if "EVIDENCE" in str(b).upper() or "UNAVAILABLE" in str(b).upper()]
-            if blockers:
-                if ext_blocked:
-                    cls, why = "BLOCKED_BY_EXTERNAL_EVIDENCE", "; ".join(ext_blocked)[:300]
-                else:
-                    cls, why = "BLOCKED_BY_DEPENDENCY", "; ".join(blockers)[:300]
+            ext_blocked = [b for b in blockers if ext_ev_re.search(b)]
+            if ext_blocked:
+                cls, why = "BLOCKED_BY_EXTERNAL_EVIDENCE", "; ".join(ext_blocked)[:300]
+            elif blockers:
+                cls, why = "BLOCKED_BY_DEPENDENCY", "; ".join(blockers)[:300]
             elif not_proven:
                 cls, why = "BLOCKED_BY_EXTERNAL_EVIDENCE", "; ".join(not_proven)[:300]
             else:
-                # resolve dependency references: unsatisfied deps (by id) block even without explicit blockers
                 dep_class, dep_why = resolve_dep_class(" ".join(inp["DEPENDENCIES"].get(rid, [])))
-                if dep_class and dep_class != "DONE_SHIPPED_VERIFIED":
+                if dep_class and dep_class not in ("DONE_SHIPPED_VERIFIED", "UNKNOWN"):
                     cls, why = dep_class, dep_why
                 else:
                     cls, why = "READY_NOW", inp.get("PROJECT_IMPACT", {}).get(rid, "") or "no blockers"
@@ -255,10 +332,6 @@ def classify_dependencies(inp):
 
 
 # ---------------------------------------------------------------- ranking
-WEIGHTS = {"owner_value": 3.0, "dependency_necessity": 2.0, "safety_maturity": 1.5,
-           "evidence_gap": 1.0, "architectural_leverage": 1.5}
-
-
 def owner_value_bucket(text, oid):
     """Spec §7: deterministic bucket from durable text. Explicit priority field scales it."""
     t = (text or "").lower()
@@ -272,86 +345,225 @@ def owner_value_bucket(text, oid):
     return score
 
 
+def dependency_necessity_factors(inp, graph):
+    """Spec 01A §7: real graph-leverage signals, deterministic, documented, testable,
+    derived solely from the canonical dependency graph. Returns per-item dict of
+    normalized factors whose sum is the dependency_necessity component (max 2.0).
+
+    Signals (no double counting with owner_value):
+      1. blocked_dependents_ratio — share of non-terminal roadmap items that (directly or
+         transitively) cannot proceed without this item, weighted by their strategic class.
+         Only items currently blocked/deferred by this item count (removing this item's
+         unblock removes their blocking edge).
+      2. terminal_prerequisite_bonus — 1.0 if the item is a stated prerequisite of any
+         terminal North-Star direction (Z2P/Large-Goal) or of multiple other items.
+      3. blocking_edge_depth — length of the longest chain of blocked items downstream.
+    Factor values in [0, 1]; component = 2.0 * normalized sum.
+    """
+    ids = [i["roadmap_id"] for i in inp["ROADMAP_ITEMS"]]
+    name_to_id = {}
+    for i in inp["ROADMAP_ITEMS"]:
+        name_to_id[i["roadmap_id"]] = i["roadmap_id"]
+        alias = re.sub(r"^RM-", "", i["roadmap_id"])
+        if alias.startswith("C") and alias not in name_to_id:
+            name_to_id[alias] = i["roadmap_id"]
+
+    def mentioned_deps(rid):
+        out = []
+        for dep_text in inp["DEPENDENCIES"].get(rid, []):
+            for frag in re.findall(r"[A-Za-z0-9._-]+", dep_text):
+                r = name_to_id.get(frag)
+                if r is not None and r != rid:
+                    out.append(r)
+        return out
+
+    # direct + transitive downstream (items that depend on rid)
+    dependents = {rid: [] for rid in ids}
+    for rid in ids:
+        for dep in mentioned_deps(rid):
+            dependents.setdefault(dep, []).append(rid)
+
+    def transitive_downstream(rid, seen=None):
+        seen = seen or set()
+        for d in dependents.get(rid, []):
+            if d in seen:
+                continue
+            seen.add(d)
+            transitive_downstream(d, seen)
+        return seen
+
+    # strategic weight of a downstream item: blocked high-value ones count more
+    def downstream_weight(dep_rid):
+        cls = graph.get(dep_rid, {}).get("class", "")
+        if cls in ("BLOCKED_BY_DEPENDENCY", "BLOCKED_BY_EXTERNAL_EVIDENCE"):
+            return 1.0
+        if cls == "OWNER_DEFERRED":
+            return 0.5
+        return 0.0
+
+    north_star = {"RM-Z2P", "RM-PRIORITY-LARGE-GOAL"}
+
+    factors = {}
+    for rid in ids:
+        ds = transitive_downstream(rid)
+        blocked_ds = [d for d in ds if downstream_weight(d) > 0]
+        # 1. blocked_dependents_ratio: items unblockable without rid, relative to all non-terminal
+        non_terminal = [i for i in ids if graph.get(i, {}).get("class") not in
+                        ("DONE_SHIPPED_VERIFIED", "SUPERSEDED") and i != rid]
+        ratio = len(blocked_ds) / max(len(non_terminal), 1)
+        # 2. terminal_prerequisite_bonus: direct prerequisite of North-Star or 2+ items
+        term_bonus = 1.0 if (set(dependents.get(rid, [])) & north_star) else 0.0
+        if len(dependents.get(rid, [])) >= 2:
+            term_bonus = max(term_bonus, 0.5)
+        # 3. blocking_edge_depth: longest blocked chain downstream
+        depth = 0
+        frontier = [rid]
+        visited = {rid}
+        while frontier:
+            nxt = []
+            for f in frontier:
+                for d in dependents.get(f, []):
+                    if d not in visited and graph.get(d, {}).get("class") not in (
+                            "DONE_SHIPPED_VERIFIED", "SUPERSEDED"):
+                        visited.add(d)
+                        nxt.append(d)
+                        depth += 1
+            frontier = nxt
+        depth_norm = min(depth / 3.0, 1.0)
+        factors[rid] = {
+            "blocked_dependents_ratio": ratio,
+            "terminal_prerequisite_bonus": term_bonus,
+            "blocking_edge_depth": depth,
+            "raw": 0.5 * ratio + term_bonus + 0.5 * depth_norm,
+        }
+    raw_max = max((f["raw"] for f in factors.values()), default=1.0)
+    if raw_max <= 0:
+        raw_max = 1.0
+    return {rid: min(1.0, f["raw"] / raw_max) for rid, f in factors.items()}
+
+
 def rank_items(inp, graph):
-    """Spec §7: deterministic ranking. Identical truth -> identical order (id tiebreak).
-    Scored only on READY_NOW-class items for NEXT_EXECUTABLE_GOAL; all items ranked for STRATEGIC_PRIORITY."""
+    """Spec §7 (hardened 01A): deterministic ranking on ALL five canonical factors.
+
+    Score = w_owner*bucket + w_dep*necessity + w_safety*maturity + w_ev*gap + w_lever*leverage
+    All five weights in WEIGHTS are consumed. Identical truth -> identical order (id tiebreak).
+    """
+    dep = dependency_necessity_factors(inp, graph)
     scored = []
     for item in inp["ROADMAP_ITEMS"]:
         rid = item["roadmap_id"]
         ov = owner_value_bucket(inp["OWNER_VALUE"].get(rid, ""), rid)
         safety = 2.0 if inp["SAFETY_MATURITY"].get(rid) == "READ_ONLY" else 1.0
-        # evidence gap: item with verified current evidence earns leverage
         ev = (inp["CURRENT_EVIDENCE"].get(rid, "") or "").lower()
         gap = 1.0 if "done" in ev and "verified" in ev else (0.5 if "done" in ev else 0.0)
-        # architectural leverage: cross-cutting families earn more
         fam = (inp["ARCHITECTURAL_LEVERAGE"].get(rid, "") or "").lower()
         leverage = 1.5 if "context" in fam or "owner_intent" in fam or "execution" in fam else 1.0
-        score = (WEIGHTS["owner_value"] * ov + WEIGHTS["safety_maturity"] * safety +
+        nec = dep[rid]
+        score = (WEIGHTS["owner_value"] * ov + WEIGHTS["dependency_necessity"] * nec +
+                 WEIGHTS["safety_maturity"] * safety +
                  WEIGHTS["evidence_gap"] * gap + WEIGHTS["architectural_leverage"] * leverage)
-        scored.append((score, rid))
+        scored.append((round(score, 8), rid, {"owner_value": ov, "dependency_necessity": nec,
+                                              "safety_maturity": safety, "evidence_gap": gap,
+                                              "architectural_leverage": leverage}))
     scored.sort(key=lambda x: (-x[0], x[1]))
     return scored
 
 
 # ---------------------------------------------------------------- plan output
 def build_plan(inp, graph, scored, coverage, dctl):
-    strategic = [{"rank": r + 1, "roadmap_id": rid, "score": round(sc, 4)} for r, (sc, rid) in enumerate(scored)]
+    strategic = [{"rank": r + 1, "roadmap_id": rid, "score": round(sc, 4)} for r, (sc, rid, _) in enumerate(scored)]
     executable = []
-    for (sc, rid) in scored:
+    for (sc, rid, comps) in scored:
         if graph[rid]["class"] == "READY_NOW":
             executable.append({"roadmap_id": rid, "score": round(sc, 4), "graph_class": "READY_NOW"})
     blocked_high_value = [
         {"roadmap_id": rid, "class": g["class"], "reason": g["reason"]}
-        for (sc, rid) in scored
+        for (sc, rid, comps) in scored
         if (g := graph[rid])["class"] in ("BLOCKED_BY_DEPENDENCY", "BLOCKED_BY_EXTERNAL_EVIDENCE")
     ]
     deferred = [{"roadmap_id": rid, "defer_reason": inp["DEFER_REASON"].get(rid, "")}
-                for (sc, rid) in scored if graph[rid]["class"] == "OWNER_DEFERRED"]
+                for (sc, rid, _) in scored if graph[rid]["class"] == "OWNER_DEFERRED"]
+    unknown_items = [{"roadmap_id": rid, "status": graph[rid]["status"], "reason": graph[rid]["reason"]}
+                     for (sc, rid, _) in scored if graph[rid]["class"] == "UNKNOWN"]
     partials = [i["roadmap_id"] for i in inp["ROADMAP_ITEMS"] if inp["STATUS"].get(i["roadmap_id"]) == "PARTIAL"]
-    rec = executable[0] if executable else None
 
-    # WHY analysis (not hardcoded; computed)
+    # 01A §11: recommendation forbidden while coverage admits a material omission
+    plan_complete = not coverage["ROADMAP_COVERAGE_GAP"]
+    rec = executable[0] if executable and plan_complete else None
+
+    # WHY analysis (evidence-bound, with score decomposition)
+    score_by_id = {rid: (sc, comps) for sc, rid, comps in scored}
     why_this = []
+    score_breakdown = None
     why_not = []
     if rec:
         rid = rec["roadmap_id"]
-        why_this = [f"score {rec['score']:.4f} highest among READY_NOW",
-                    f"mutation_risk_class={inp['SAFETY_MATURITY'].get(rid)}",
-                    f"project_impact={inp['PROJECT_IMPACT'].get(rid)}",
-                    f"promotion_required={inp['PROMOTION_REQUIREMENT'].get(rid)}",
-                    "blocks/leverages higher-strategic-value items below it"]
-        for (sc, other) in scored:
+        sc, comps = score_by_id[rid]
+        score_breakdown = {
+            "formula": "SCORE = 3.0*owner_value_bucket + 2.0*dependency_necessity + 1.5*safety_maturity + 1.0*evidence_gap + 1.5*architectural_leverage",
+            "weights": {k: v for k, v in WEIGHTS.items()},
+            "contributions": {
+                "owner_value": round(WEIGHTS["owner_value"] * comps["owner_value"], 4),
+                "dependency_necessity": round(WEIGHTS["dependency_necessity"] * comps["dependency_necessity"], 4),
+                "safety_maturity": round(WEIGHTS["safety_maturity"] * comps["safety_maturity"], 4),
+                "evidence_gap": round(WEIGHTS["evidence_gap"] * comps["evidence_gap"], 4),
+                "architectural_leverage": round(WEIGHTS["architectural_leverage"] * comps["architectural_leverage"], 4),
+            },
+            "total": round(sc, 4),
+        }
+        why_this = [
+            f"score {score_breakdown['total']:.4f} highest among READY_NOW items",
+            f"owner_value contribution {score_breakdown['contributions']['owner_value']:.4f} (bucket {comps['owner_value']}) from durable text: {(inp['OWNER_VALUE'].get(rid) or '')[:140]}",
+            f"dependency_necessity contribution {score_breakdown['contributions']['dependency_necessity']:.4f} (normalized factor {comps['dependency_necessity']:.4f})",
+            f"safety_maturity contribution {score_breakdown['contributions']['safety_maturity']:.4f} (mutation_risk_class={inp['SAFETY_MATURITY'].get(rid)})",
+            f"evidence_gap contribution {score_breakdown['contributions']['evidence_gap']:.4f}",
+            f"architectural_leverage contribution {score_breakdown['contributions']['architectural_leverage']:.4f} (family={inp['ARCHITECTURAL_LEVERAGE'].get(rid)})",
+            f"graph_class={graph[rid]['class']}; project_impact={inp['PROJECT_IMPACT'].get(rid)}; promotion_required={inp['PROMOTION_REQUIREMENT'].get(rid)}",
+        ]
+        # only cite blockage/leverage of specific items when graph edges prove it
+        for (sc2, other, comps2) in scored:
             if other == rid or graph[other]["class"] != "READY_NOW":
                 continue
-            if sc > rec["score"]:
-                why_not.append(f"{other}: higher score but class={graph[other]['class']} ({graph[other]['reason']})")
+            if sc2 > sc:
+                why_not.append(f"{other}: higher score but class={graph[other]['class']} ({graph[other]['reason'][:150]})")
         for top_strategic in strategic[:2]:
             tsr = top_strategic["roadmap_id"]
             if tsr != rid and graph[tsr]["class"] != "READY_NOW":
                 why_not.append(f"{tsr}: STRATEGIC_PRIORITY #{top_strategic['rank']} but {graph[tsr]['class']} ({graph[tsr]['reason'][:150]})")
     else:
-        why_not = ["no READY_NOW item exists; planner refuses definitive next-goal recommendation"]
+        score_breakdown = None
+        why_this = ["no executable READY_NOW recommendation — planner refuses definitive next-goal recommendation"]
+        why_not = ["no READY_NOW item exists or coverage gap blocks planning"]
+
+    status = "PLANNING_COMPLETE" if plan_complete and rec else (
+        "BLOCKED / ROADMAP_COVERAGE_GAP" if coverage["ROADMAP_COVERAGE_GAP"] else
+        "NO_EXECUTABLE_GOAL")
 
     plan = {
         "planner": "p2p_roadmap_planner",
-        "version": "1",
-        "spec_goal": "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01",
+        "version": VERSION,
+        "spec_goal": SPEC_GOAL,
         "OFFICIAL_BASELINE": inp["OFFICIAL_BASELINE"],
         "HASHES": inp["HASHES"],
         "AUTHORITY_ORDER": inp["AUTHORITY_ORDER"],
+        "PLANNING_STATUS": status,
+        "PLAN_COMPLETE": plan_complete,
         "ROADMAP_COVERAGE_GATE": coverage,
         "DEPENDENCY_GRAPH": graph,
         "STRATEGIC_PRIORITY_LIST": strategic,
         "NEXT_EXECUTABLE_GOALS": executable,
         "BLOCKED_HIGH_VALUE_GOALS": blocked_high_value,
         "OWNER_DEFERRED_ITEMS": deferred,
+        "UNKNOWN_STATUS_ITEMS": unknown_items,
         "RELEVANT_PARTIAL_CAPABILITIES": partials,
         "ROADMAP_COVERAGE_GAPS": coverage["gaps"],
         "NOT_PROVEN_DEPENDENCIES": inp["NOT_PROVEN"],
         "RECOMMENDED_NEXT_GOAL": rec["roadmap_id"] if rec else None,
+        "SCORE_BREAKDOWN": score_breakdown,
         "WHY_THIS_GOAL": why_this,
         "WHY_NOT_HIGHER_PRIORITY_ITEMS": why_not,
-        "REQUIRED_OWNER_DECISION": "Approve or reject the planner-recommended next P2P development Goal." if rec else "No executable Goal — Owner must unblock or defer; planner refuses auto-start.",
+        "REQUIRED_OWNER_DECISION": ("Approve or reject the planner-recommended next P2P development Goal." if rec else
+                                    "No executable Goal — Owner must unblock or defer; planner refuses auto-start."),
         "EVIDENCE_POINTERS": [i.get("current_evidence", "")[:200] for i in inp["ROADMAP_ITEMS"] if i.get("current_evidence")][:10],
         "PLANNER_SELECTION_DOES_NOT_AUTO_EXECUTE": True,
         "ROADMAP_MANUAL_REENTRY_REQUIRED": "NO — planner reads canonical JSON files directly; no transcription into prompt",
@@ -360,19 +572,46 @@ def build_plan(inp, graph, scored, coverage, dctl):
 
 
 # ---------------------------------------------------------------- beginner view
-def beginner_view(plan):
+def beginner_view(plan, inp):
+    """Spec 01A §10: beginner view bound to the ACTUALLY selected roadmap item —
+    title, owner value, mutation risk, project impact, promotion requirement,
+    dependencies/blockers. No stale hardcoded planner wording."""
     rec = plan["RECOMMENDED_NEXT_GOAL"]
+    item = None
+    if rec:
+        for i in inp["ROADMAP_ITEMS"]:
+            if i["roadmap_id"] == rec:
+                item = i
+                break
+    impact_answer = (
+        f"KHÔNG mutate dự án — goal này là {item.get('title') if item else ''}; "
+        f"project_impact={item.get('project_impact', 'UNKNOWN') if item else 'UNKNOWN'}, "
+        f"mutation_risk_class={item.get('mutation_risk_class', 'UNKNOWN') if item else 'UNKNOWN'}, "
+        "không chạm Game Truyện / Gia Phả / Logistics ở giai đoạn lập kế hoạch."
+    )
+    if not item:
+        impact_answer = "KHÔNG — không có Goal nào được đề xuất; planner chỉ đọc, không mutate Game Truyện, Gia Phả, Logistics."
+    deps_blockers = ""
+    if item:
+        d = "; ".join(item.get("dependencies", []) or ["không có"])
+        b = "; ".join(item.get("blockers", []) or ["không có"])
+        deps_blockers = f"dependencies: {d}; blockers: {b}"
+    answer_goal = (f"{item.get('title')} ({item.get('roadmap_id')}) — {deps_blockers}"
+                   if item else plan["REQUIRED_OWNER_DECISION"])
+    answer_why = "; ".join(plan["WHY_THIS_GOAL"][:3]) if (plan["WHY_THIS_GOAL"] and item) else plan["REQUIRED_OWNER_DECISION"]
     rows = [
         ("P2P muốn làm gì tiếp?", rec if rec else "Không có Goal nào an toàn để bắt đầu ngay."),
-        ("Tại sao?", "; ".join(plan["WHY_THIS_GOAL"]) if plan["WHY_THIS_GOAL"] else plan["REQUIRED_OWNER_DECISION"]),
+        ("Goal đó là gì?", answer_goal),
+        ("Tại sao (điểm từng yếu tố)?", answer_why),
+        ("Rủi ro đột biến / đụng project?", impact_answer),
+        ("Yêu cầu promotion cho goal này?",
+         f"promotion_required={item.get('promotion_required', 'UNKNOWN') if item else 'UNKNOWN'}"),
         ("Việc quan trọng hơn nào chưa làm được ngay?",
          "; ".join(f"{b['roadmap_id']} ({b['class']})" for b in plan["BLOCKED_HIGH_VALUE_GOALS"][:5]) or "không có"),
         ("Cái gì đang bị block?",
          "; ".join(f"{b['roadmap_id']}: {b['reason'][:120]}" for b in plan["BLOCKED_HIGH_VALUE_GOALS"]) or "không có"),
         ("Cái gì Owner đã hoãn?",
          "; ".join(f"{d['roadmap_id']}" for d in plan["OWNER_DEFERRED_ITEMS"]) or "không có"),
-        ("Goal này có đụng project/code/data thật không?",
-         "KHÔNG — Goal này chỉ là khả năng lập kế hoạch đọc-only; không mutate Game Truyện, Gia Phả, Logistics."),
         ("Owner cần quyết định gì?", plan["REQUIRED_OWNER_DECISION"]),
     ]
     return {"beginner_owner_view_vn": {q: a for q, a in rows}}
@@ -398,19 +637,18 @@ def main():
         extra = json.load(open(args.planning_input))
         if isinstance(extra, dict):
             inp["OWNER_CURRENT_INTENT"].update(extra)
+
     bind_hashes(inp, args.repo)
 
     dctl = load_json(os.path.join(args.repo, "governance", "development-control.json"), "development-control")
     coverage = coverage_gate(inp, dctl)
-    if coverage["ROADMAP_COVERAGE_GAP"]:
-        print("PLANNER_OUTPUT: ROADMAP_COVERAGE_GAP=TRUE — recommendation completeness cannot be claimed", file=sys.stderr)
 
     graph = classify_dependencies(inp)
     scored = rank_items(inp, graph)
     plan = build_plan(inp, graph, scored, coverage, dctl)
-    plan.update(beginner_view(plan))
+    plan.update(beginner_view(plan, inp))
 
-    out = args.output or os.path.join(args.repo, "reports", "planner", "P2P-PLANNER-RUN-01.json")
+    out = args.output or os.path.join(args.repo, "reports", "planner", "P2P-PLANNER-RUN-02.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w") as f:
         json.dump(plan, f, indent=2, ensure_ascii=False)

@@ -940,6 +940,80 @@
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
       "notes": "This register is a standing invariant; any future proposal touching these patterns must re-open them explicitly with Owner approval."
+    },
+    {
+      "research_id": "RA-EXT-027",
+      "source_name": "P2P-GT-MUTATION-PILOT-02 (bounded documentation write pilot)",
+      "source_type": "INTERNAL_P2P_PILOT",
+      "source_reference": "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (and Pilot-02 harness/commit history)",
+      "source_version_or_commit": "P2P-C40-PILOT approval 2026-08-18; integrated in artifact .40/.41",
+      "provenance_status": "INTERNAL_PILOT_EVIDENCE",
+      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truyện clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
+      "selected_ideas": [
+        "bounded documentation mutation with pre-write authorization binding",
+        "second-path pre-write block (B_BYTES_WRITTEN = 0)",
+        "mutation receipt canonical verification",
+        "byte-identical rollback recovery"
+      ],
+      "rejected_ideas": [
+        "production mutation without Owner authorization",
+        "mutation without evidence receipt"
+      ],
+      "p2p_translation": "Verified ladder base for RM-PRIORITY-CODE-MUTATION: bounded documentation write (MUTATION_CAPABILITY_LADDER level 1) shipped in .41; ladder extension to code requires a new Owner-authorized goal and production evidence. Pilot was non-production, isolated clone only.",
+      "capability_family": "MUTATION_CAPABILITY_LADDER",
+      "canonical_capability_ids": [
+        "C40",
+        "BW01",
+        "BW01A",
+        "BW01B"
+      ],
+      "status": "VERIFIED",
+      "evidence_pointers": [
+        "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (CONTROLLED_NON_PRODUCTION_DOCUMENTATION_MUTATION=VERIFIED, CANONICAL_MUTATION_AUTHORITY_CHAIN=VERIFIED_ON_GAME_TRUYEN_ISOLATED_CLONE, ROLLBACK_RECOVERY=VERIFIED)",
+        "artifact .41 da835f8a... embeds FW04/FW05/FW06 bounded write modules"
+      ],
+      "dependencies": [
+        "BOUNDED_DOCUMENTATION_WRITE verified ladder base (Pilot-02 + .41 promotion)"
+      ],
+      "reconciliation_note": "Appended by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner coverage gate detected SOURCE_RESEARCH_ID_MISSING_FROM_LEDGER; durable provenance record appended. Historical records untouched.",
+      "appended_at": "2026-08-21T05:28:56Z"
+    },
+    {
+      "research_id": "RA-EXT-028",
+      "source_name": "P2P-FRAMEWORK-00 C43 production install evidence pack",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "docs/p2p-development/research/c43/evidence/ (16 evidence JSONs, harness c43_gametruyen_activation.py)",
+      "source_version_or_commit": "recorded 2026-08-19 on branch p2p-framework-00-product-memory, commit a9764ab9",
+      "provenance_status": "INTERNAL_RESEARCH_EVIDENCE",
+      "research_summary": "Production-install evidence pack for Game Truyện and Gia Phả (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
+      "selected_ideas": [
+        "installation lifecycle evidence on authoritative projects",
+        "acceptance-bar-driven install/activation",
+        "rollback-relevant pre-install snapshots"
+      ],
+      "rejected_ideas": [
+        "unauthenticated role identity claims",
+        "handwritten ROLE_ID in receipts"
+      ],
+      "p2p_translation": "Supports RM-PRIORITY-RELEASE-LIFECYCLE evidence (C40/C43 evidence dependency). Install evidence exists but live-role identity reconciliation is unresolved (c43-reconciliation.json); status PARTIAL reflects evidence exist + reconciliation open. Any project pin change still requires separate Owner authorization.",
+      "capability_family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
+      "canonical_capability_ids": [
+        "C40",
+        "C43"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "docs/p2p-development/research/c43/evidence/c43-production-install-evidence-pack.json",
+        "docs/p2p-development/research/c43/evidence/c43-reconciliation.json (resolution: neither ROLE_ID mechanically bound)",
+        "docs/p2p-development/research/c43/evidence/c43-gametruyen-install.json",
+        "docs/p2p-development/research/c43/evidence/c43-gia-pha-install.json"
+      ],
+      "dependencies": [
+        "C40/C43 evidence",
+        "FW01 installer"
+      ],
+      "reconciliation_note": "Appended by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner coverage gate detected SOURCE_RESEARCH_ID_MISSING_FROM_LEDGER; durable provenance record appended. Historical records untouched.",
+      "appended_at": "2026-08-21T05:28:56Z"
     }
   ],
   "rejected_register_summary": {

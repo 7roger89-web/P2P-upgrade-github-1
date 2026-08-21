@@ -552,7 +552,7 @@
       "blockers": [],
       "source_research_ids": [
         "RA-EXT-026",
-        "Pilot-02"
+        "RA-EXT-027"
       ],
       "canonical_capability_ids": [],
       "current_evidence": "BOUNDED_DOCUMENTATION_WRITE verified isolated/non-production (Pilot-02); READ_ONLY strongly evidenced",
@@ -561,7 +561,8 @@
       "project_impact": "ISOLATED_REPOS",
       "promotion_required": "YES — new candidate + Owner approval",
       "next_safe_when": "Owner authorizes ladder-2 design goal",
-      "defer_reason": ""
+      "defer_reason": "",
+      "reconciliation_note_01a": "source_research_ids corrected to durable adoption record ids by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A ('Pilot-02' -> RA-EXT-027)"
     },
     {
       "roadmap_id": "RM-PRIORITY-ORCA-EXT",
@@ -660,7 +661,7 @@
       "blockers": [],
       "source_research_ids": [
         "RA-EXT-006",
-        "C43"
+        "RA-EXT-028"
       ],
       "canonical_capability_ids": [
         "C40",
@@ -672,7 +673,8 @@
       "project_impact": "AUTHORITATIVE_PROJECTS",
       "promotion_required": "YES for any runtime/pin change",
       "next_safe_when": "Owner authorizes install-lifecycle goal",
-      "defer_reason": ""
+      "defer_reason": "",
+      "reconciliation_note_01a": "source_research_ids corrected to durable adoption record ids by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A ('C43' -> RA-EXT-028)"
     }
   ],
   "coverage_gate": {

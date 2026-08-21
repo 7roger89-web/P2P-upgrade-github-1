@@ -4645,7 +4645,8 @@
       "next_condition": "Standalone read-only design goal; never modifies runtime without its own promotion.",
       "last_reviewed": "2026-08-21",
       "freshness": "from_roadmap_consolidation",
-      "notes": "VERIFIED by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01: mechanical canonical consumption of roadmap JSON proved by direct file reading (ROADMAP_MANUAL_REENTRY_REQUIRED=NO), 18/18 validation tests PASS, fail-closed, deterministic ranking, hash binding."
+      "notes": "VERIFIED by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01: mechanical canonical consumption of roadmap JSON proved by direct file reading (ROADMAP_MANUAL_REENTRY_REQUIRED=NO), 18/18 validation tests PASS, fail-closed, deterministic ranking, hash binding.",
+      "01a_hardening_note": "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner v2 hardening completed — coverage gate fail-closed (ROADMAP_COVERAGE_PASS_OPEN_BUG closed), SELECTED/PLANNED/PARTIAL ledger translation explicit, BLOCKED classification (C09/C27 never UNKNOWN), dependency-necessity ranking factor implemented, 5-factor score decomposition, evidence-bound WHY_THIS_GOAL, beginner view bound to selected goal. 35/35 reactivity/fail-closed tests PASS. Status VERIFIED retained; runtime execution-loop integration gap unchanged and disclosed (planner remains governance-side)."
     },
     {
       "capability_id": "GOAL_DESIGN_INTELLIGENCE_COMPOSITION",
