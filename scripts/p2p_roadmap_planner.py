@@ -40,8 +40,19 @@ import re
 import sys
 from datetime import datetime, timezone
 
-VERSION = "3"
-SPEC_GOAL = "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A"
+VERSION = "4"
+SPEC_GOAL = "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01"
+
+# v4 strict-binding vocabulary (INTAKE-CLOSURE-01 intake ledger vocabulary is
+# the canonical source of truth; anything missing/ambiguous fails closed):
+INTAKE_CLASSIFICATION_VOCABULARY = {
+    "INTAKE_REQUESTED", "ACCEPTED", "RESEARCH_ONLY", "ADAPTED",
+    "DEFERRED", "REJECTED", "VENDORED_BLOCKED", "COMPLETED",
+}
+# Adoption states that constitute durable material adoption for an ACCEPTED
+# intake (spec 01B §4); DISCOVERED/RESEARCHED alone do NOT satisfy.
+ADOPTION_SATISFYING_STATES = {"SELECTED", "PLANNED", "PARTIAL"}
+ADOPTION_EXCLUDED_STATES = {"DEFERRED", "REJECTED", "SUPERSEDED"}
 
 STATUS_VOCAB = {
     "READY_NOW", "BLOCKED_BY_DEPENDENCY", "BLOCKED_BY_EXTERNAL_EVIDENCE",
@@ -233,6 +244,12 @@ def coverage_gate(inp, dctl):
     for i in inp["ROADMAP_ITEMS"]:
         for c in i.get("canonical_capability_ids", []) or []:
             cap_ids_by_item.add(c)
+    cap_ids_by_composition = set()
+    for i in inp["ROADMAP_ITEMS"]:
+        for ce in i.get("composition_entries", []) or []:
+            c = ce.get("capability")
+            if c:
+                cap_ids_by_composition.add(c)
     for rec in inp["RESEARCH_ADOPTION_RECORDS"]:
         st = rec.get("status")
         rid = rec["research_id"]
@@ -240,8 +257,9 @@ def coverage_gate(inp, dctl):
             continue  # adopted/excluded/non-material records do not need future consideration
         composed = rid in roadmapped_research or rid in composed_research
         defer_ok = bool(rec.get("defer_reason") or rec.get("roadmap_relation", "").startswith("defer"))
+        explicit_relation = str(rec.get("roadmap_relation", "")).startswith(("composed", "enumerated"))
         excluded = st in LEDGER_EXCLUDED_STATUSES
-        if not composed and not defer_ok and not excluded:
+        if not composed and not defer_ok and not explicit_relation and not excluded:
             gaps.append({"reason": "MATERIAL_RESEARCH_WITHOUT_ROADMAP_CONSIDERATION",
                          "research_id": rid, "status": st})
     # ---------------- v3 G2: capability -> roadmap coverage ---------------
@@ -283,42 +301,79 @@ def coverage_gate(inp, dctl):
         if not materially_intended:
             registry_excluded.append(cid)
             continue
-        in_item = cid in cap_ids_by_item
-        same_family_umbrella = bool(effective_families(c.get("family") or "")
-                                    & planned_families_expanded)
-        deferral_note = any("defer" in str(v).lower() for v in (
-            c.get("roadmap_relation"), c.get("known_gap"), c.get("notes"), ""))
-        rejection_note = any(kw in str(v).lower() for kw in ("reject", "superseded") for v in (
-            c.get("roadmap_relation"), c.get("known_gap"), c.get("notes"), ""))
-        if not (in_item or same_family_umbrella or deferral_note or rejection_note):
-            gaps.append({"reason": "FUTURE_WORK_CAPABILITY_WITHOUT_ROADMAP_CONSIDERATION",
-                         "capability_id": cid, "status": st})
+        in_composition = cid in cap_ids_by_composition
     # ---------------- v3 G3: orphan accepted-decision detection -----------
     # An ACCEPTED intake record without a matching adoption record is an orphan.
     # An accepted adoption record without a capability record (or roadmapped
     # capability) and without explicit defer/reject is an orphan stage.
-    intake_accepted = {r["id"]: r for r in inp["INTAKE_RECORDS"]
-                       if r.get("classification", "").upper() == "ACCEPTED"}
+    # ---------------- v4 G0: intake vocabulary fail-closed --------------
+    # Every intake record classification must be a known canonical vocabulary
+    # value. UNKNOWN / missing / unrecognized / ambiguous classification makes
+    # planning incomplete — never silently ignored.
+    vocab = set((inp.get("INTAKE_VOCABULARY") or {}).get("classifications", []))
+    if not vocab:
+        vocab = INTAKE_CLASSIFICATION_VOCABULARY
+    intake_unknown_classifications = []
+    intake_accepted = {}
+    for r in inp["INTAKE_RECORDS"]:
+        cls = (r.get("classification") or "").strip()
+        cls_upper = cls.upper()
+        if not cls or cls_upper not in vocab:
+            intake_unknown_classifications.append({"intake_id": r["id"],
+                                                   "classification": cls or "MISSING"})
+            continue
+        if cls_upper == "ACCEPTED":
+            intake_accepted[r["id"]] = r
+    if intake_unknown_classifications:
+        gaps.append({"reason": "UNKNOWN_INTAKE_CLASSIFICATION",
+                     "records": intake_unknown_classifications})
+    # ---------------- v4 orphan accepted-decision detection ---------------
+    # Canonical proof of intake -> adoption linkage requires an explicit stable
+    # ID (adoption.intake_record == intake.id). Fuzzy name/token similarity is
+    # diagnostic only: it NEVER satisfies the authoritative gate.
     adoption_ids = {r["research_id"] for r in inp["RESEARCH_ADOPTION_RECORDS"]}
     capability_ids = {c.get("capability_id") or c.get("id") or "" for c in inp["CAPABILITY_RECORDS"]}
+    fuzzy_matches_used_for_authority = 0
+    explicit_intake_bindings = 0
     for iid, r in intake_accepted.items():
-        # matching adoption record: explicit intake_record id reference, or
-        # token overlap >= 2 between intake subject and adoption source_name
-        subj = (r.get("subject", "") or "").lower()
-        subj_tokens = set(t for t in re.split(r"[^a-z0-9]+", subj) if len(t) > 3)
-        matched = False
+        explicit_matches = [a for a in inp["RESEARCH_ADOPTION_RECORDS"]
+                            if a.get("intake_record") == iid]
+        if explicit_matches:
+            explicit_intake_bindings += 1
+            continue
+        # diagnostic fuzzy candidate (never authority)
+        subj_tokens = set(t for t in re.split(r"[^a-z0-9]+",
+                                              (r.get("subject", "") or "").lower()) if len(t) > 3)
         for a in inp["RESEARCH_ADOPTION_RECORDS"]:
-            if a.get("intake_record") == iid:
-                matched = True
-                break
-            aname = (a.get("source_name", "") or "").lower()
-            aname_tokens = set(t for t in re.split(r"[^a-z0-9]+", aname) if len(t) > 3)
+            aname_tokens = set(t for t in re.split(r"[^a-z0-9]+",
+                                                   (a.get("source_name", "") or "").lower()) if len(t) > 3)
             if len(subj_tokens & aname_tokens) >= 2:
-                matched = True
+                fuzzy_matches_used_for_authority += 1
                 break
-        if not matched:
-            gaps.append({"reason": "ACCEPTED_INTAKE_WITHOUT_ADOPTION_RECORD",
-                         "intake_id": iid, "subject": r.get("subject", "")})
+        gaps.append({"reason": "ACCEPTED_INTAKE_WITHOUT_ADOPTION_RECORD",
+                     "intake_id": iid, "subject": r.get("subject", "")})
+    # ---------------- v4 G3b: accepted intake requires material adoption --
+    # An ACCEPTED intake is not satisfied merely because an adoption object
+    # exists with an explicit ID: the linked adoption must be in a durable
+    # material state (SELECTED/PLANNED/PARTIAL). UNKNOWN/missing status does
+    # NOT satisfy; DISCOVERED/RESEARCHED alone do NOT satisfy.
+    unknown_adoption_records = []
+    for iid, r in intake_accepted.items():
+        for a in inp["RESEARCH_ADOPTION_RECORDS"]:
+            if a.get("intake_record") != iid:
+                continue
+            st = (a.get("status") or "").upper()
+            if st in ADOPTION_SATISFYING_STATES:
+                continue
+            if st in ADOPTION_EXCLUDED_STATES:
+                # explicit later Owner decision; lineage preserved, not a gap
+                continue
+            unknown_adoption_records.append({"intake_id": iid,
+                                             "adoption_id": a["research_id"],
+                                             "adoption_status": a.get("status", "MISSING")})
+    if unknown_adoption_records:
+        gaps.append({"reason": "ACCEPTED_INTAKE_ADOPTION_NOT_MATERIAL",
+                     "records": unknown_adoption_records})
     for a in inp["RESEARCH_ADOPTION_RECORDS"]:
         if a.get("status") not in LEDGER_MATERIAL_STATUSES:
             continue
@@ -330,6 +385,41 @@ def coverage_gate(inp, dctl):
         if not has_cap and not roadmapped and not deferred and not excluded:
             gaps.append({"reason": "MATERIAL_ADOPTION_WITHOUT_CAPABILITY_OR_ROADMAP",
                          "research_id": a["research_id"]})
+    # ---------------- v4 G2b: explicit capability -> roadmap enumeration ----
+    # Family aliasing is semantic normalization ONLY — not evidence of roadmap
+    # consideration. A material future-work capability requires one of:
+    #   A. capability ID explicitly in roadmap item canonical_capability_ids
+    #   B. capability ID represented in roadmap item composition_entries
+    #   C. explicit defer relation with reason
+    #   D. explicit rejected/superseded relation
+    cap_explicitly_roadmapped = set()
+    for c in inp["CAPABILITY_RECORDS"]:
+        cid = c.get("capability_id") or c.get("id") or ""
+        st = c.get("status", "")
+        if st not in CAP_FUTURE_WORK_STATES:
+            continue
+        materially_intended = (c.get("origin_type") == "OWNER_ACCEPTED_PROPOSAL") or (cid in adopted_cap_ids)
+        if not materially_intended:
+            continue
+        in_item = cid in cap_ids_by_item
+        in_composition = cid in cap_ids_by_composition
+        deferral_ok = (str(c.get("roadmap_relation", "")).startswith("defer")) or \
+            (c.get("defer_reason") or "")
+        rejected_ok = any(kw in str(v).lower() for kw in ("reject", "superseded") for v in (
+            c.get("roadmap_relation"), c.get("known_gap"), c.get("notes"), ""))
+        if in_item or in_composition:
+            cap_explicitly_roadmapped.add(cid)
+        if not (in_item or in_composition or deferral_ok or rejected_ok):
+            gaps.append({"reason": "FUTURE_WORK_CAPABILITY_WITHOUT_ROADMAP_CONSIDERATION",
+                         "capability_id": cid, "status": st})
+    # ---------------- v4 G2c: unknown capability status is never authority ---
+    for c in inp["CAPABILITY_RECORDS"]:
+        cid = c.get("capability_id") or c.get("id") or ""
+        st = (c.get("status") or "").upper()
+        materially_intended = (c.get("origin_type") == "OWNER_ACCEPTED_PROPOSAL") or (cid in adopted_cap_ids)
+        if materially_intended and not st:
+            gaps.append({"reason": "CAPABILITY_STATUS_UNKNOWN_MATERIAL",
+                         "capability_id": cid})
     owner_selected = []
     for item in inp["ROADMAP_ITEMS"]:
         if item.get("status") in ("PLANNED", "PARTIAL"):
@@ -380,6 +470,16 @@ def coverage_gate(inp, dctl):
                                    or "MATERIAL_ADOPTION_WITHOUT_CAPABILITY_OR_ROADMAP" == g["reason"]],
         "INTAKE_RECORDS_CONSUMED": len(inp["INTAKE_RECORDS"]),
         "INTAKE_CONTRACT_BOUND": bool(inp.get("INTAKE_CONTRACT")),
+        "INTAKE_UNKNOWN_RECORDS": intake_unknown_classifications,
+        "UNKNOWN_ADOPTION_RECORDS": unknown_adoption_records,
+        "EXPLICIT_INTAKE_BINDINGS": explicit_intake_bindings,
+        "FUZZY_MATCHES_USED_FOR_AUTHORITY": fuzzy_matches_used_for_authority,
+        "OWNER_ACCEPTED_CAPABILITIES": sorted(cap_explicitly_roadmapped | {
+            c.get("capability_id") or c.get("id") or "" for c in inp["CAPABILITY_RECORDS"]
+            if c.get("origin_type") == "OWNER_ACCEPTED_PROPOSAL"}),
+        "EXPLICITLY_ROADMAPPED_CAPABILITIES": sorted(cap_explicitly_roadmapped),
+        "FUZZY_AUTHORITY_MATCHING": "DISABLED",
+        "FAMILY_ALIAS_ALONE_DOES_NOT_SATISFY_COVERAGE": True,
     }
 
 

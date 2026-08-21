@@ -31,7 +31,7 @@
   "invariant": "OWNER_SELECTED_CAPABILITY -> DURABLE_ROADMAP_RECORD (mechanically testable)",
   "failure_semantics": "If any stage after acceptance has not succeeded, intake remains INCOMPLETE: INTAKE_INCOMPLETE = TRUE, ROADMAP_COVERAGE_GAP = TRUE, PLAN_COMPLETE = FALSE, RECOMMENDED_NEXT_GOAL = null.",
   "no_duplicate_truth": "research-intake-ledger.json remains the ONLY pending-accepted intake store; development-control.json research_decisions remains authoritative for its 8 pre-existing subjects (inherited_decisions). No second competing ledger is created. The intake ledger is an explicit bridge into the Research Adoption Ledger: ACCEPTED classification MUST be followed by an adoption record before the owning goal can claim closure.",
-  "provenance_rule": "Chat memory alone is non-authoritative. An accepted decision that exists only as prose must be recorded in this contract's pipeline; orphan decision artifacts must be indexed in the intake ledger (decision_ref) — an unindexed .md decision outside governance/docs/p2p-development conventions is detected as an orphan.",
+  "provenance_rule": "Chat memory alone is non-authoritative. An accepted decision that exists only as prose must be recorded in this contract's pipeline; orphan decision artifacts must be indexed in the intake ledger (decision_ref) \u2014 an unindexed .md decision outside governance/docs/p2p-development conventions is detected as an orphan.",
   "future_workflow": "Whenever Owner says 'adopt this' / 'add this capability' / 'put this into P2P' (or equivalent explicit acceptance) in an authorized P2P development flow, the handling goal MUST persist the full intake before claiming closure. Terminal check: OWNER_SELECTED_CAPABILITY_RECORDED = VERIFIED. If persistence fails, the goal cannot claim full closure.",
   "capability_family_alias_table": {
     "CONTEXT_AND_KNOWLEDGE": {
@@ -39,5 +39,31 @@
       "note": "bound by INTAKE-CLOSURE-01"
     }
   },
-  "capability_to_roadmap_enumeration_policy": "OWNER_ACCEPTED_PROPOSAL capabilities are enumerated into an existing roadmap item's canonical_capability_ids (option B, spec §8) rather than spawning a new roadmap item, except when the Owner explicitly directs a new item. Capabilities without material intent (PROJECT_LEARNING, RECOVERED_LEGACY registry entries) are documented inventory and are excluded from the coverage gate."
+  "capability_to_roadmap_enumeration_policy": "OWNER_ACCEPTED_PROPOSAL capabilities are enumerated into an existing roadmap item's canonical_capability_ids (option B, spec \u00a78) rather than spawning a new roadmap item, except when the Owner explicitly directs a new item. Capabilities without material intent (PROJECT_LEARNING, RECOVERED_LEGACY registry entries) are documented inventory and are excluded from the coverage gate.",
+  "amendments": [
+    {
+      "amendment_id": "AMEND-001",
+      "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
+      "date": "2026-08-21",
+      "change": "vocabulary extension (append-only): intake classifications PENDING_OWNER_APPROVAL and PLANNED_NEXT are documented canonical states in durable intake records RI-002/RI-004/RI-005/RI-006 (Owner-pending requests, not unknown decisions). They satisfy the strict-binding vocabulary gate; they never satisfy material materiality on their own.",
+      "affected_records": [
+        "RI-002",
+        "RI-004",
+        "RI-005",
+        "RI-006"
+      ]
+    },
+    {
+      "amendment_id": "AMEND-001",
+      "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
+      "date": "2026-08-21",
+      "change": "vocabulary extension (append-only): intake classifications PENDING_OWNER_APPROVAL and PLANNED_NEXT are documented canonical states in durable intake records RI-002/RI-004/RI-005/RI-006 (Owner-pending requests, not unknown decisions). They satisfy the strict-binding vocabulary gate; they never satisfy material materiality on their own.",
+      "affected_records": [
+        "RI-002",
+        "RI-004",
+        "RI-005",
+        "RI-006"
+      ]
+    }
+  ]
 }

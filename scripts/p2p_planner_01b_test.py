@@ -251,6 +251,20 @@ def main():
                                    "status": "PLANNED",
                                    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
                                    "notes": "defer pending roadmap enumeration"})
+        # enumerate CRI into the CONTEXT roadmap item via composition_entries
+        # (canonical option from INTAKE-CLOSURE-01), mirroring repo truth:
+        rd2 = json.load(open(f"{root}/governance/p2p-development-roadmap.json"))
+        ce = rd2["items"][0].setdefault("composition_entries", [])
+        ce.append({"research_id": "RA-EXT-099", "capability": "CRI",
+                   "note": "compose adopted CRI research into Context goal"})
+        json.dump(rd2, open(f"{root}/governance/p2p-development-roadmap.json", "w"),
+                  indent=2, ensure_ascii=False)
+        dc2 = json.load(open(f"{root}/governance/development-control.json"))
+        ce2 = dc2["roadmap"]["items"][0].setdefault("composition_entries", [])
+        ce2.append({"research_id": "RA-EXT-099", "capability": "CRI",
+                    "note": "compose adopted CRI research into Context goal"})
+        json.dump(dc2, open(f"{root}/governance/development-control.json", "w"),
+                  indent=2, ensure_ascii=False)
         json.dump(ci, open(f"{root}/docs/p2p-development/capability-ledger/capability-index.json", "w"),
                   indent=2, ensure_ascii=False)
         p, r = load_plan(root)
@@ -301,16 +315,25 @@ def main():
         ci["capabilities"].append({"capability_id": "SYM-RET",
                                    "family": "CONTEXT_AND_KNOWLEDGE",
                                    "status": "PLANNED",
-                                   "origin_type": "OWNER_ACCEPTED_PROPOSAL",
-                                   "notes": "adopted via alias umbrella"})
+                                   "origin_type": "OWNER_ACCEPTED_PROPOSAL"})
         json.dump(ci, open(f"{root}/docs/p2p-development/capability-ledger/capability-index.json", "w"),
+                  indent=2, ensure_ascii=False)
+        # G (v4 semantics): family alias ALONE no longer satisfies — the item's
+        # canonical_capability_ids must enumerate SYM-RET explicitly (option B).
+        rd = json.load(open(f"{root}/governance/p2p-development-roadmap.json"))
+        rd["items"][0]["canonical_capability_ids"].append("SYM-RET")
+        json.dump(rd, open(f"{root}/governance/p2p-development-roadmap.json", "w"),
+                  indent=2, ensure_ascii=False)
+        dc = json.load(open(f"{root}/governance/development-control.json"))
+        dc["roadmap"]["items"][0]["canonical_capability_ids"].append("SYM-RET")
+        json.dump(dc, open(f"{root}/governance/development-control.json", "w"),
                   indent=2, ensure_ascii=False)
         p, r = load_plan(root)
         cg = gate(p)
         flagged = [g["capability_id"] for g in p["ROADMAP_COVERAGE_GAPS"]
                    if g["reason"] == "FUTURE_WORK_CAPABILITY_WITHOUT_ROADMAP_CONSIDERATION"]
         check("G", "SYM-RET" not in flagged and not cg["ROADMAP_COVERAGE_GAP"],
-              f"alias umbrella did not cover SYM-RET: {flagged}")
+              f"explicit enumeration did not cover SYM-RET: {flagged}")
     finally:
         pass
 
@@ -322,7 +345,7 @@ def main():
         ci["capabilities"].append({"capability_id": "DEF-CAP", "family": "NEW_FAMILY_X",
                                    "status": "PLANNED",
                                    "origin_type": "OWNER_ACCEPTED_PROPOSAL",
-                                   "notes": "defer to a later Owner-directed goal"})
+                                   "roadmap_relation": "defer: Owner defers until lifecycle goal completes"})
         json.dump(ci, open(f"{root}/docs/p2p-development/capability-ledger/capability-index.json", "w"),
                   indent=2, ensure_ascii=False)
         p, r = load_plan(root)
