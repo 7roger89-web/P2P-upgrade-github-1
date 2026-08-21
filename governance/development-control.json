@@ -2605,6 +2605,20 @@
         "PERMISSION_BOUNDARY": "PASS",
         "PLANNER_LIFECYCLE_REGRESSION": "PASS"
       }
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.45",
+      "artifact_sha256": "2d1114607b71005cd10c95071712309dd1c46e1e5774e05bebf772934457a19b",
+      "promotion_status": "UNPROMOTED",
+      "minted_at": "2026-08-21T09:00:00Z",
+      "minted_by": "Manus-RM-CONTEXT-01C",
+      "notes": "Final Reconciled Candidate for Context Intelligence. Successor to .44. Includes §3-§8 CRI semantics, §9 Host-neutral Serialization, §17 Contract, §18 Permission Boundary, and §20 A-Z Matrix (26/26).",
+      "gates": {
+        "A_Z_NEGATIVE_MATRIX": "26/26 PASS",
+        "REAL_REPOSITORY_PROOF": "2/2 PASS",
+        "NUMERIC_BASELINE_COMPARISON": "VERIFIED",
+        "CANDIDATE_INTEGRITY": "PASS"
+      }
     }
   ]
 }

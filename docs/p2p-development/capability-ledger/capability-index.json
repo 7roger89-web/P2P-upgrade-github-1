@@ -4831,7 +4831,7 @@
         "RULE_OUTCOME_EVALUATION",
         "RULE_PACK_HOST_COMPILATION"
       ],
-      "known_gap": "NONE; verified via RM-CONTEXT-01B acceptance suite.",
+      "known_gap": "NONE; verified via RM-CONTEXT-01C acceptance suite (26/26 A-Z Matrix).",
       "dependencies": [
         "symbol-aware retrieval primitives",
         "RM-PRIORITY-CONTEXT approval"
