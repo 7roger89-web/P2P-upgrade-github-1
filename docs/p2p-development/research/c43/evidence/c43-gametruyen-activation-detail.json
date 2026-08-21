@@ -1,0 +1,20 @@
+{
+ "ok": true,
+ "request_id": "ec6efc0e1040ec48e4c4207fab1a34cb",
+ "task": {
+  "agent_profile": "manus-1.6-lite",
+  "created_at": "1787073589",
+  "created_by_api_key": {
+   "id": "L2CtVXFCqJ86KxqrwAj8L8",
+   "name": "p2p-c39-live-target-selection"
+  },
+  "credit_usage": 0,
+  "id": "XYiLYckpEgQPux4JCaT6BK",
+  "share_visibility": "private",
+  "status": "stopped",
+  "task_type": "standard",
+  "task_url": "https://manus.im/app/XYiLYckpEgQPux4JCaT6BK",
+  "title": "P2P-C43 activation Game Truy\u1ec7n",
+  "updated_at": "1787073619"
+ }
+}

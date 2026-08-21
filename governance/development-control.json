@@ -51,62 +51,65 @@
     }
   },
   "current_development": {
-    "development_goal": "C21",
-    "status": "PASS",
-    "source_version": "8.4.7-C-codex.21",
-    "source_version_status": "CANDIDATE_UNPROMOTED",
+    "development_goal": "P2P-CANONICAL-LINEAGE-REPAIR-01",
+    "goal_kind": "RECONCILIATION_NOT_PRODUCT_GOAL",
+    "status": "BLOCKED_PRE_MINT_REAL_MANUS_SENTINEL_UNAVAILABLE",
+    "source_version": "8.4.7-C-codex.72",
+    "source_version_status": "ACTIVE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
     "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
     "source_drift_classification": {
-      "primary": "RECONCILED_TO_PROMOTED_BASELINE",
+      "primary": "CANONICAL_LINEAGE_RECONCILIATION",
       "contributors": [
-        "C17_LINEAGE_RECONCILIATION",
-        "C18_ADAPTIVE_POLICY",
-        "C18_VALIDATED",
-        "C19_TASK_TARGETED_CONTEXT",
-        "C19_CROSS_PLATFORM_RECONCILIATION",
-        "C20_HOST_EXECUTOR_NEUTRALITY",
-        "C21_HOST_SELECTION_POLICY"
+        "ORIGIN_MAIN_OFFICIAL_BASELINE",
+        "P2P_PROMOTE_41_HISTORICAL_FEATURE_REF",
+        "P2P_FULL_SUCCESSOR_46_HISTORICAL_PROMOTION_ATTEMPT",
+        "P2P_RELEASE_LIFECYCLE_CORRECTIVE_01A",
+        "P2P_RELEASE_LIFECYCLE_CORRECTIVE_01B",
+        "P2P_RELEASE_LIFECYCLE_CORRECTIVE_01C",
+        "P2P_RELEASE_LIFECYCLE_CORRECTIVE_01D"
       ],
       "implementation_bug": false,
       "evidence_refs": [
-        "E0-P0A-BASE1",
-        "E0-P0A-SOURCE2",
-        "E0-P0A-CTRL1",
-        "E1-P1A-LINEAGE1",
-        "E1-P1-C21-SOURCE",
-        "E2-P2-C21-HS1-HS30",
-        "E3-P3-C21-PACKAGE"
+        "E0-P0A-GIT1",
+        "E0-P0A-GIT2",
+        "E0-P0A-MATRIX2",
+        "E0-P0A-HIST1",
+        "E1-P1B-AUTH1"
       ]
     },
     "historical_maintenance_mode": "DISABLED",
-    "owner_action_required": "C21 host selection policy foundation PASS; candidate remains UNPROMOTED; automatic host routing and live Manus adapter certification are not claimed.",
-    "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
+    "owner_action_required": "Successor remains UNPROMOTED; request an independent Promotion Readiness Review only after this branch proves all gates. Official baseline remains .19.",
     "lineage_reconciliation": {
-      "from_source_version": "8.4.7-C-codex.15",
-      "to_source_version": "8.4.7-C-codex.21",
+      "from_source_version": "8.4.7-C-codex.21",
+      "to_source_version": "8.4.7-C-codex.72",
       "based_on_official_version": "8.4.7-C-codex.19",
       "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "policy_derivation": "highest fetched historical codex revision 71 plus one unused revision",
       "evidence_refs": [
-        "E0-P0A-BASE1",
-        "E0-P0A-SOURCE2",
-        "E0-P0A-CTRL1",
-        "E1-P1A-LINEAGE1"
+        "E0-P0A-MATRIX1",
+        "E0-P0A-MATRIX2",
+        "E1-P1B-MATRIX1"
       ]
     },
-    "candidate_id": "C21",
-    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
-    "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
-    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
-    "promotion_status": "UNPROMOTED",
-    "foundation_status": "HOST_SELECTION_POLICY_FOUNDATION_READY",
-    "portable_execution_envelope_ready": true,
-    "portable_result_receipt_ready": true,
-    "cross_host_continuation_contract_ready": true,
-    "automatic_host_routing_ready": false,
-    "live_manus_adapter_certified": false,
-    "host_requirement_profile_ready": true,
-    "host_capability_discovery_foundation_ready": true
+    "candidate_identity_binding": {
+      "status": "NOT_MINTED_BLOCKED_BEFORE_MINT",
+      "candidate_version": "8.4.7-C-codex.72",
+      "artifact_sha256": null,
+      "source_commit": null,
+      "source_tree": null,
+      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01-candidate-identity.json"
+    },
+    "provider_neutrality": "PRESERVED",
+    "manus_native_council": {
+      "status": "SUPPORTED",
+      "member_execution_mode": "BACKEND_ATTESTED_INTERNAL_MEMBERS",
+      "raw_member_results": "SUPPORTED",
+      "per_member_failure": "SUPPORTED",
+      "per_member_external_id": "NOT_EXPOSED",
+      "p2p_direct_child_control": "NOT_SUPPORTED",
+      "p2p_council_adapter": "FEASIBLE"
+    }
   },
   "candidate_records": [
     {

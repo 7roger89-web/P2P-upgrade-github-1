@@ -104,8 +104,145 @@
       "classification": "C",
       "status": "HISTORICAL_EVIDENCE",
       "reason": "Dated research notes retained for reference; model references are not active P2P facts."
+    },
+    "docs/p2p-development/research/c38/evidence/c38-stage-c-01-usage.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes live usage record (2026-07-09); provider model name is archival evidence metadata."
+    },
+    "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-live-receipt.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes CLI live receipt; model identifier is archival evidence metadata."
+    },
+    "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-contract.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role contract snapshot; model identifier is archival evidence metadata."
+    },
+    "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated Hermes role receipt; model identifier is archival evidence metadata."
+    },
+    "docs/p2p-development/research/c39/P2P-C39-starting-truth-report.md": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Starting-truth report for C39 (2026-08-09); model identifiers are snapshot evidence metadata."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-auth-preflight.json:9": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-01-usage.json:12": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-drift-evidence.json:23": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json:7": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json:30": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json:42": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json:58": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json:72\"": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-auth-preflight.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-01-usage.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-drift-evidence.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-live-evidence.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-2-role-contract.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/c39/evidence/c39-proof-4-unsafe-postdispatch.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Machine-generated or archival goal-evidence artifact (C38/C39/C40 era); provider and model identifiers are evidence metadata, not live P2P runtime claims."
+    },
+    "docs/p2p-development/research/release-gates-20260818/drift-final-report.json": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Drift gate report artifact generated during the C40 release-gate flow; contains archival scoped references as evidence."
+    },
+    "docs/CURRENT_STATE.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project's own fact record; P2P-FACT references are host-project governance, not P2P runtime claims, and are outside the P2P claims ledger scope."
+    },
+    "docs/RUNBOOK.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project runbook; provider/model identifiers are operational metadata of the host project, not P2P runtime claims."
+    },
+    "docs/SESSION_BOOTSTRAP.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project session contract; provider identifiers are host-level configuration, not P2P runtime claims."
+    },
+    "docs/GUIDANCE_INDEX.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project guidance index; cited provider names are host documentation metadata, not P2P runtime claims."
+    },
+    "docs/HANDOFF.md": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project handoff document; provider references are host documentation metadata, not P2P runtime claims."
+    },
+    "package.json": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project manifest; dependency and engine metadata is host-level, not P2P runtime governance."
+    },
+    "docs/": {
+      "classification": "P",
+      "status": "HOST_PROJECT_EVIDENCE",
+      "reason": "Host project documentation tree (including docs/plans/ and fact records); provider references and P2P-FACT records are host-project governance, not P2P runtime claims — covered by prefix scope."
     }
   },
-  "generated_targets": ["governance/live-specs.json"],
+  "generated_targets": [
+    "governance/live-specs.json"
+  ],
   "approval_required_for_lock_promotion": true
 }

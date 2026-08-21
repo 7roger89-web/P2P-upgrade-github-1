@@ -1,0 +1,6092 @@
+[
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:29:51.166488+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:29:55.558699+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:30:12.171093+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:30:44.452979+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:30:49.614058+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:11.074110+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:15.340133+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:38.499333+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:31:43.060467+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:32:20.277275+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:32:57.084376+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:33:07.544057+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T07:33:52.183857+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T08:07:15.360081+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T08:07:20.292319+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T08:07:25.074010+00:00"
+  },
+  {
+    "adapter_id": "p2p-manus-orchestration",
+    "provider": "manus",
+    "model": "manus-models",
+    "harness": "manus-fw00-fw06-candidate",
+    "live_certified": true,
+    "current_auth_state": "READ",
+    "attestation_summary": "manus-fw00-fw06-candidate",
+    "registered_at": "2026-08-20T09:05:53.318214+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "unknown",
+    "model": "unknown",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:57:59.893219+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:57:59.907561+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:57:59.908893+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:57:59.910109+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:57:59.911368+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:57:59.912652+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:57:59.913822+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:57:59.914994+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.045523+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.046942+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.048149+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.049217+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.050422+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.051583+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.053319+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.081307+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.082496+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.083604+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.084805+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.086691+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.089032+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.090794+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.096769+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.097842+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.099019+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.100336+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.101464+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.103273+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.105376+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.109517+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.112359+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.113684+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.115003+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.116054+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.117370+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.118599+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.128705+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.130709+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.131930+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.133671+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.134795+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.135715+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.138869+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.143383+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.145267+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.146522+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.147810+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.148979+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.149970+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.150933+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.159160+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.160692+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.161782+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.162823+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.163819+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.164829+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.165908+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.178335+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.180200+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.181848+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.183624+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.185360+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.187411+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.188705+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.193447+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.195391+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.197165+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.199259+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.201040+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.206159+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.207370+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.210444+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.212000+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.213207+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.214687+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.216979+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.218926+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.221839+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.225810+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.227513+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.228722+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.229988+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.231212+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.232396+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.233563+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.238107+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.239895+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.241143+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.242420+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.243666+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.244934+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.246329+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.250475+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.254406+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.256082+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.257405+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.258751+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.260027+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.261874+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.265462+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.267219+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.268502+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.270661+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.272521+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.273949+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.275263+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.278616+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.280460+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.281943+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.283285+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.284693+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.286609+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.288810+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.384549+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.388257+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.391069+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.393475+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.394979+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.396457+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.397940+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.401213+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.405144+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.407193+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.408904+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.412066+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.414079+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.415556+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.432530+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.434251+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.436204+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.438414+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.439899+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.441408+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.442921+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.457119+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.459066+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.460597+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.462075+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.463823+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.465347+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.466862+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T14:58:00.471762+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T14:58:00.473821+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T14:58:00.475478+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T14:58:00.477441+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T14:58:00.479605+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T14:58:00.481451+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T14:58:00.483055+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "unknown",
+    "model": "unknown",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:32.704475+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:32.725306+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:32.729012+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:32.734147+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:32.736977+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:32.741767+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:32.746639+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:32.751144+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.034579+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.040007+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.042919+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.046424+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.050484+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.054711+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.057567+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.085228+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.089371+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.092803+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.096070+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.100230+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.105678+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.109233+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.123507+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.126413+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.130137+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.134212+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.139341+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.142106+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.146087+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.156346+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.159307+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.164466+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.168820+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.174108+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.177445+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.183782+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.191225+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.194632+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.199483+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.204064+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.206782+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.209113+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.212663+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.222094+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.224180+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.226635+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.230317+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.235369+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.241940+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.246144+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.260634+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.264929+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.269858+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.274890+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.278917+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.283303+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.288775+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.308369+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.313307+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.318356+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.324327+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.329783+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.334519+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.340371+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.351651+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.357853+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.360922+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.366972+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.372312+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.375860+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.380359+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.390869+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.395193+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.400218+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.405629+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.409078+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.414661+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.420048+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.425766+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.431002+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.434903+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.439998+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.442280+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.448678+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.455457+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.465945+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.471300+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.473793+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.476051+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.482635+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.488219+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.493904+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.506482+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.508744+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.514719+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.520236+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.525290+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.532723+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.539054+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.549504+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.555394+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.560102+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.565402+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.571089+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.573592+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.577852+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.589126+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.592549+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.597244+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.604796+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.608258+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.613462+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.619751+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.802897+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.807051+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.813536+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.832081+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:33.859601+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:33.925684+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:33.932653+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:33.951776+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:33.975951+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:33.984425+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:33.994577+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:34.000586+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:34.008060+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:34.014453+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:34.064119+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:34.070956+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:34.076807+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:34.081738+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:34.096219+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:34.104246+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:34.113248+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:34.157273+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:34.164295+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:34.169911+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:34.179543+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:34.183535+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:34.192446+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:34.197632+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:00:34.210023+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:00:34.216636+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:00:34.225817+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:00:34.233340+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:00:34.242153+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:00:34.249083+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:00:34.256227+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "unknown",
+    "model": "unknown",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.061222+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.070376+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.073064+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.075482+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.077756+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.080134+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.082566+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.085628+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.164996+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.168181+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.170802+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.173178+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.175797+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.178485+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.180963+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.196414+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.199058+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.201913+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.204315+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.206747+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.209333+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.211742+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.217696+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.220243+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.222753+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.227208+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.231367+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.235743+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.239663+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.245898+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.248687+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.252884+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.259779+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.264249+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.268384+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.272415+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.277249+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.279888+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.282557+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.285346+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.288458+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.291344+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.293847+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.298307+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.301138+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.303945+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.306465+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.309009+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.311556+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.314375+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.322139+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.324804+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.327801+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.330346+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.333357+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.336188+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.338738+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.347451+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.350447+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.353264+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.356251+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.358856+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.361484+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.364219+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.369150+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.371750+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.374432+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.377034+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.379677+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.382323+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.385735+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.390224+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.392877+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.396275+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.399858+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.403919+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.407160+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.410237+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.414819+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.417771+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.420492+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.423207+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.425993+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.429018+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.431783+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.436767+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.439452+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.442274+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.445766+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.449359+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.453489+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.456319+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.461017+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.463807+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.466821+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.469706+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.472653+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.475423+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.479007+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.485693+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.490013+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.494085+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.497972+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.502544+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.506693+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.510135+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.515417+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.518673+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.521683+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.524555+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.527461+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.530414+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.533708+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.594441+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.597475+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.601172+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.604143+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.607190+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.610668+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.613642+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.618646+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.621574+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.624486+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.627574+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.630555+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.633882+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.636858+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.652063+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.655506+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.658461+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.661469+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.664438+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.667924+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.671158+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.684583+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.687590+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.690711+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.693780+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.696815+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.701247+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.704831+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:08.710196+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:08.713707+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:08.717421+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:08.720528+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:08.723610+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:08.726676+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:08.729766+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "unknown",
+    "model": "unknown",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.308559+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.323683+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.331561+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.337231+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.343498+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.350244+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.353982+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.358593+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.469608+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.473897+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.478093+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.484933+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.490354+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.494211+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.498176+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.518336+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.521922+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.526272+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.530157+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.536835+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.541520+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.545357+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.554574+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.559069+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.562922+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.567505+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.571577+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.575731+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.579598+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.585608+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.591648+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.598193+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.602076+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.605814+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.609594+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.613213+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.621144+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.625255+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.629048+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.634374+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.641679+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.648602+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.654709+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.665396+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.672468+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.677983+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.683693+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.690830+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.697991+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.702352+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.712845+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.718770+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.723442+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.727547+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.732686+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.736542+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.740398+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.753496+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.757855+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.762385+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.767345+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.771905+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.776332+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.782100+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.792748+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.799575+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.806221+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.810786+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.815605+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.821537+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.829442+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.840299+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.847516+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.853263+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.859818+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.867214+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.874342+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.881340+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.891001+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.896685+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.901581+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.906578+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.911599+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.916593+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.920615+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.927920+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.933867+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.939003+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.943611+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.950265+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.954686+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.959049+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:26.965508+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:26.970545+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:26.974814+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:26.979216+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:26.986177+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:26.991263+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:26.997999+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.005314+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.010651+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.016506+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.023223+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.028225+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.035697+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.042535+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.050488+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.057451+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.062494+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.070085+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.075221+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.082106+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.087248+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.165562+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.170846+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.175705+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.180889+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.185452+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.190380+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.195200+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.201484+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.207865+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.214969+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.222246+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.231002+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.238635+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.246791+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.269983+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.275635+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.282066+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.287419+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.293917+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.300013+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.305251+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.322473+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.328159+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.332982+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.337547+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.342633+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.348280+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.353322+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-manus",
+    "provider": "manus",
+    "model": "manus-model-deterministic",
+    "harness": "manus",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "manus",
+    "registered_at": "2026-08-21T15:04:27.361422+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-codex",
+    "provider": "openai",
+    "model": "openai-model-deterministic",
+    "harness": "codex",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "codex",
+    "registered_at": "2026-08-21T15:04:27.367336+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-claude",
+    "provider": "anthropic",
+    "model": "anthropic-model-deterministic",
+    "harness": "claude-code",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "claude-code",
+    "registered_at": "2026-08-21T15:04:27.372190+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-grok",
+    "provider": "xai",
+    "model": "xai-model-deterministic",
+    "harness": "grok",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "grok",
+    "registered_at": "2026-08-21T15:04:27.377562+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-deepseek",
+    "provider": "deepseek",
+    "model": "deepseek-model-deterministic",
+    "harness": "deepseek",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "deepseek",
+    "registered_at": "2026-08-21T15:04:27.385388+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-gemini",
+    "provider": "google",
+    "model": "google-model-deterministic",
+    "harness": "gemini",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "gemini",
+    "registered_at": "2026-08-21T15:04:27.393871+00:00"
+  },
+  {
+    "adapter_id": "adapter-fake-hermes",
+    "provider": "hermes",
+    "model": "hermes-model-deterministic",
+    "harness": "hermes",
+    "live_certified": false,
+    "current_auth_state": "NO_CREDENTIALS",
+    "attestation_summary": "hermes",
+    "registered_at": "2026-08-21T15:04:27.401609+00:00"
+  }
+]

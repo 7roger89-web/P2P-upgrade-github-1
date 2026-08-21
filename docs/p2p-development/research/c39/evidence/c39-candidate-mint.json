@@ -1,0 +1,8 @@
+{
+  "schema": "c39-candidate-mint/1",
+  "label": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
+  "sha256": "a999552538adb98332c039af8bb117a13fad3991605c543668034a89da4eb387",
+  "status": "UNPROMOTED",
+  "promotion": "NONE",
+  "exactly_one": true
+}

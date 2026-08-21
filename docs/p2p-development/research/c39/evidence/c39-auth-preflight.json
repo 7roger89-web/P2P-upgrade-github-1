@@ -1,0 +1,23 @@
+{
+  "manus": {
+    "auth_state": "AUTH_VALID",
+    "probe": "task.list HTTP 200 ok=true",
+    "key_file": "/home/ubuntu/.secrets/manus_api_key_new"
+  },
+  "hermes_gemini": {
+    "auth_state": "AUTH_VALID",
+    "probe": "hermes -z capital-of-vietnam gemini-2.5-flash -> Hanoi exit 0",
+    "key_file": "/home/ubuntu/.secrets/gemini_api_key",
+    "binary": "hermes-agent 0.20.4 (npm global)"
+  },
+  "codex": {
+    "auth_state": "AUTH_ABSENT",
+    "probe": "no binary, no credential"
+  },
+  "eligible": {
+    "manus_api_v2": "CURRENTLY_ELIGIBLE",
+    "hermes_gemini": "CURRENTLY_ELIGIBLE",
+    "codex": "INELIGIBLE"
+  },
+  "note": "Manus key refreshed by Owner after C38 key expired (HTTP 401). Both C38-certified backends currently eligible."
+}

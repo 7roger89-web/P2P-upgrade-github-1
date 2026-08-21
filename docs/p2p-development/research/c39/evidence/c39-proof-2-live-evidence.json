@@ -1,0 +1,93 @@
+{
+  "schema": "c39-proof-2-live-evidence/1",
+  "timestamp": "2026-08-18T10:28:00Z",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "original_target": "manus-api-v2",
+  "reselected_target": "hermes-cli:gemini:gemini-2.5-flash",
+  "drift_evidence": {
+    "schema": "c39-proof-2-drift-evidence/1",
+    "timestamp": "2026-08-18T10:27:49Z",
+    "drift_method": "env-binding-unset-REVERSIBLE",
+    "drift_cause": "MANUS_API_KEY removed from env; key file untouched",
+    "probe_snapshot": {
+      "schema": "p2p-eligibility-snapshot/1",
+      "target": "manus-api-v2",
+      "eligible": false,
+      "failure_class": "AUTH_INVALID",
+      "evidence_pointers": [
+        "health-check-401"
+      ],
+      "detail": ""
+    },
+    "failover_decision": {
+      "schema": "p2p-failover-decision/1",
+      "decision": "RESELECT_TARGET",
+      "failure_class": "AUTH_INVALID",
+      "failure_class_observed": [],
+      "revision": "reselect-9dbd9f82ddb2f6f3828b2252",
+      "old_target": "manus-api-v2",
+      "new_target": "hermes-cli:gemini:gemini-2.5-flash",
+      "old_receipt_pointer": "",
+      "new_receipt_pointer": "",
+      "reason": "SAFE_RESELECTION_EVIDENCE",
+      "mutation_status": "NO_MUTATION_OBSERVED",
+      "evidence_pointers": [],
+      "details": {}
+    },
+    "credential_file_state": "INTACT_NOT_REVOKED"
+  },
+  "reselection_probe": {
+    "schema": "p2p-eligibility-snapshot/1",
+    "target": "hermes-cli:gemini:gemini-2.5-flash",
+    "eligible": true,
+    "failure_class": null,
+    "evidence_pointers": [
+      "hermes-probe-ok"
+    ],
+    "detail": ""
+  },
+  "pre_dispatch_decisions": [
+    {
+      "schema": "p2p-failover-decision/1",
+      "decision": "RESELECT_TARGET",
+      "failure_class": "AUTH_INVALID",
+      "failure_class_observed": [],
+      "revision": "reselect-9dbd9f82ddb2f6f3828b2252",
+      "old_target": "manus-api-v2",
+      "new_target": "hermes-cli:gemini:gemini-2.5-flash",
+      "old_receipt_pointer": "",
+      "new_receipt_pointer": "",
+      "reason": "SAFE_RESELECTION_EVIDENCE",
+      "mutation_status": "NO_MUTATION_OBSERVED",
+      "evidence_pointers": [],
+      "details": {}
+    },
+    {
+      "schema": "p2p-failover-decision/1",
+      "decision": "RETRY_SAME_TARGET",
+      "failure_class": null,
+      "failure_class_observed": [],
+      "revision": "",
+      "old_target": "hermes-cli:gemini:gemini-2.5-flash",
+      "new_target": "",
+      "old_receipt_pointer": "",
+      "new_receipt_pointer": "",
+      "reason": "NO_FAILURE_RECORDED_PRE_DISPATCH_ELIGIBILITY_SAFE",
+      "mutation_status": "NO_MUTATION_OBSERVED",
+      "evidence_pointers": [],
+      "details": {}
+    }
+  ],
+  "execution_status": "SUCCEEDED",
+  "error_class": null,
+  "latency_seconds": 3.89,
+  "backend_receipt_pointer": null,
+  "output_pointers": [],
+  "verification_status": "UNKNOWN",
+  "observed_answer": "Hanoi",
+  "observed_raw_output": "Hanoi",
+  "acceptance_is_true": true,
+  "contract_fingerprint": "ec19a7c6763f0f3f1f7ba71ece8786868ce33b2afea0daf727883823bf680a80",
+  "git_revision": "p2p-c39-governed-live-failover"
+}

@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://p2p.project/docs/p2p-development/capability-ledger/schema.json",
+  "title": "P2P Capability Ledger Schema",
+  "description": "Canonical machine-readable record of P2P capabilities: knowledge, status, and roadmap intent. This ledger is NOT a runtime truth store, NOT Task State, and NOT a second FACT store. It does not control runtime task completion.",
+  "type": "object",
+  "required": ["ledger_id", "schema_version", "canonical_source_statement", "authority_boundary", "generated_at", "families", "capabilities"],
+  "properties": {
+    "ledger_id": {
+      "type": "string",
+      "description": "Stable identifier of this ledger file, matching its filename.",
+      "examples": ["capability-index"]
+    },
+    "schema_version": {
+      "type": "integer",
+      "minimum": 2,
+      "description": "Bump when the record shape changes; older records are migrated or preserved in history."
+    },
+    "canonical_source_statement": {
+      "type": "string",
+      "description": "Declares the canonical sources this ledger is derived from. This is the drift-protection header: derived artifacts must declare their source.",
+      "examples": ["Derived from governance/development-control.json (roadmap, architectural_invariants, candidate_records), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, and per-goal evidence. Not a copy of FACT ledger or Task State."]
+    },
+    "authority_boundary": {
+      "type": "string",
+      "description": "Encodes the boundary: what this ledger does and does not control."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last reconciliation. Roadmap projection (current-roadmap.md) is deterministically derived from this file."
+    },
+    "families": {
+      "type": "object",
+      "description": "Family registry. Each family id maps to a human name and a one-line purpose. Family ids used in capabilities must be registered here.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "purpose"],
+        "properties": {
+          "name": { "type": "string" },
+          "purpose": { "type": "string" }
+        }
+      }
+    },
+    "status_vocabulary": {
+      "type": "array",
+      "description": "The only allowed capability statuses. Do not invent additional labels.",
+      "items": { "type": "string", "enum": ["VERIFIED_IMPLEMENTED", "FOUNDATION_READY", "PARTIAL", "PLANNED", "DEFERRED", "REJECTED", "OBSOLETE", "UNKNOWN"] },
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Capability records. capability_id must be unique.",
+      "items": { "$ref": "#/$defs/capability" }
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "required": ["capability_id", "name", "family", "status", "beginner_value", "principle", "origin_refs", "origin_type", "dependencies"],
+      "properties": {
+        "capability_id": {
+          "type": "string",
+          "description": "Unique machine identifier, SCREAMING_SNAKE_CASE.",
+          "pattern": "^[A-Z][A-Z0-9_]{2,60}$"
+        },
+        "name": { "type": "string" },
+        "family": { "type": "string", "description": "Must be a key registered in families." },
+        "beginner_value": {
+          "type": "string",
+          "description": "Answers 'What technical burden does this remove from a non-coder?' in owner-facing terms. Required for every material capability. Bad example: 'Adds host resolver.' Good example: 'Owner no longer needs to know which AI can safely perform the task.'"
+        },
+        "principle": {
+          "type": "string",
+          "description": "Charter invariant this capability serves, e.g. BEGINNER_FIRST, PROJECT_STATE_NOT_CHAT_HISTORY."
+        },
+        "origin_refs": {
+          "type": "array",
+          "description": "Recoverable origin: goal documents, plans, reports, research notes. If origin cannot be durably recovered, use exactly 'origin_unknown_or_not_durably_recovered'. Do not fabricate precise origins.",
+          "items": { "type": "string" }
+        },
+        "origin_type": {
+          "type": "string",
+          "enum": ["IMPLEMENTATION_GOAL", "RESEARCH_DECISION", "OWNER_ACCEPTED_PROPOSAL", "ARCHITECTURE_INVARIANT", "UPSTREAM_SPECIFICATION", "PROJECT_LEARNING", "REJECTED_DESIGN", "RECOVERED_LEGACY", "UNKNOWN"],
+          "description": "Categorical origin class. IMPLEMENTATION_GOAL = born from a durable implementation Goal. RESEARCH_DECISION = born from the research decision registry. OWNER_ACCEPTED_PROPOSAL = born from owner-accepted chat/context proposals; it MUST enter the roadmap as PLANNED and is NOT an implementation. ARCHITECTURE_INVARIANT = born from a charter invariant or structural requirement. UPSTREAM_SPECIFICATION = born from an upstream host/spec requirement. PROJECT_LEARNING = born from evaluation or learning history. REJECTED_DESIGN = a rejected pattern kept on the ledger to prevent reintroduction. RECOVERED_LEGACY = reconstructed from recovered legacy artifacts (evidence-only). UNKNOWN = origin cannot be durably recovered; origin_refs must then be exactly ['origin_unknown_or_not_durably_recovered']."
+        },
+        "status": { "type": "string", "enum": ["VERIFIED_IMPLEMENTED", "FOUNDATION_READY", "PARTIAL", "PLANNED", "DEFERRED", "REJECTED", "OBSOLETE", "UNKNOWN"] },
+        "implementation_refs": {
+          "type": "array",
+          "description": "Files/modules where implementation lives, e.g. ['.p2p/system/scripts/p2p_workflow.py'].",
+          "items": { "type": "string" }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "description": "Behavioral evidence: test files, QA/coder/supervisor reports, candidate zips, evals. REQUIRED when status is VERIFIED_IMPLEMENTED.",
+          "items": { "type": "string" }
+        },
+        "dependencies": {
+          "type": "array",
+          "description": "capability_ids this record depends on; each must reference a valid capability_id in this ledger. The field itself is REQUIRED: an empty list is a valid declaration meaning 'no dependencies'. Dependency intent must always be explicitly declared, never implied by absence.",
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,60}$" }
+        },
+        "known_gaps": {
+          "type": "array",
+          "description": "What is still missing or intentionally out of scope.",
+          "items": { "type": "string" }
+        },
+        "do_not_duplicate_with": {
+          "type": "array",
+          "description": "capability_ids or subsystems this must not be reimplemented as.",
+          "items": { "type": "string" }
+        },
+        "next_condition": {
+          "type": "string",
+          "description": "When this capability should be reconsidered or what must be true before work resumes."
+        },
+        "deferred_reason": {
+          "type": "string",
+          "description": "Why it was deferred, when known. Required when status is DEFERRED."
+        },
+        "rejected_reason": {
+          "type": "string",
+          "description": "Why it must not be reintroduced. Required when status is REJECTED."
+        },
+        "last_reviewed": { "type": "string", "format": "date" },
+        "freshness": {
+          "type": "string",
+          "description": "Confidence class of the record: 'verified_against_filesystem', 'from_governance_record', 'from_plan_or_report', 'origin_unknown_or_not_durably_recovered'."
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

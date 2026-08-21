@@ -1,0 +1,26 @@
+{
+  "expected_candidate_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+  "observed_artifact_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+  "sha_match": true,
+  "staged_preview_outside_package": false,
+  "canonical_install_rc": 0,
+  "canonical_install_pass": true,
+  "canonical_install_tail": [
+    "RESULT: PASS"
+  ],
+  "doctor_rc": 0,
+  "doctor_health": "HEALTHY",
+  "doctor_tail": [
+    "RESULT: PASS"
+  ],
+  "external_dev_path_dependency": 0,
+  "dev_path_refs_audit": [
+    ".p2p/system/governance/approvals/P2P-APR-20260818T155200Z-c40-release-gates-live-specs.json",
+    ".p2p/system/governance/approvals/P2P-APR-20260818T162500Z-c40-final-release.json",
+    ".p2p/system/governance/development-control.json",
+    ".p2p/system/governance/release-evidence/technical-preview.json"
+  ],
+  "no_p2p_repo_dependency": true,
+  "no_pythonpath": true,
+  "status": "PASS"
+}

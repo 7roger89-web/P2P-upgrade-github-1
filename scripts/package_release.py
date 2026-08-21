@@ -40,6 +40,26 @@ except ModuleNotFoundError:
 SCHEMA = "p2p-codex-release-manifest/1"
 CHECKSUM_NAME = "RELEASE-SHA256SUMS.txt"
 MANIFEST_NAME = "release-manifest.json"
+CANDIDATE_MANIFEST_NAME = "CANDIDATE-DISTRIBUTION-MANIFEST.json"
+SOURCE_BINDING_NAME = "SOURCE-BINDING.json"
+ARTIFACT_IDENTITY_NAME = "ARTIFACT-IDENTITY.json"
+INVENTORY_NAME = "INVENTORY.json"
+METADATA_NAMES = frozenset(
+    {
+        CANDIDATE_MANIFEST_NAME,
+        SOURCE_BINDING_NAME,
+        ARTIFACT_IDENTITY_NAME,
+        INVENTORY_NAME,
+        MANIFEST_NAME,
+        CHECKSUM_NAME,
+    }
+)
+SOURCE_DISTRIBUTION_EXCLUDES = frozenset(
+    {
+        "manifest/build-report.json",
+        "governance/development-control.json.fixture47",
+    }
+)
 FORBIDDEN_FRAGMENTS = (
     "/.tmp/",
     "/reports/",
@@ -189,6 +209,50 @@ def package_version(root: Path) -> str:
     return version
 
 
+def source_binding(root: Path) -> dict[str, str]:
+    """Capture and verify immutable Git provenance before any staging side effect."""
+
+    status = subprocess.run(
+        ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=all"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if status.returncode:
+        raise RuntimeError(f"cannot inspect source worktree status: {status.stderr.strip()}")
+    if status.stdout.strip():
+        raise ValueError("source worktree must be clean before mint/build")
+    commit = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    tree = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD^{tree}"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    if not re.fullmatch(r"[0-9a-f]{40}", commit) or not re.fullmatch(r"[0-9a-f]{40}", tree):
+        raise ValueError("source commit/tree must be full Git object IDs")
+    subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{commit}^{{commit}}"], check=True)
+    subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{tree}^{{tree}}"], check=True)
+    bound_tree = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", f"{commit}^{{tree}}"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    if bound_tree != tree:
+        raise ValueError("source tree is not bound to source commit")
+    return {"source_commit": commit, "source_tree": tree}
+
+
+def is_distribution_excluded(relative: str) -> bool:
+    return relative.replace("\\", "/") in SOURCE_DISTRIBUTION_EXCLUDES
+
+
 def selected_paths(root: Path) -> list[str]:
     paths: list[str] = list(ROOT_FILES) + list(DOC_FILES) + list(SCRIPT_FILES)
     paths.extend((f"{directory}/" for directory in DIRECTORIES))
@@ -251,7 +315,10 @@ def copy_foundation_runtime(root: Path, stage: Path) -> None:
     shutil.copytree(
         runtime_source / "p2p_capabilities",
         runtime / "p2p_capabilities",
-        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"),
+        # Test fixtures are validation inputs, not installed runtime
+        # surfaces.  Excluding them prevents stale host paths and historical
+        # external-project assumptions from entering the candidate payload.
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", "tests"),
     )
     for script_name in FOUNDATION_RUNTIME_SCRIPTS:
         source = runtime_source / "scripts" / script_name
@@ -284,7 +351,16 @@ def copy_selected(root: Path, stage: Path) -> list[str]:
                 shutil.copytree(skill_source, target / name, ignore=COPYTREE_IGNORE)
             continue
         if source.is_dir():
-            shutil.copytree(source, target, symlinks=True, ignore=COPYTREE_IGNORE)
+            def ignore(directory: str, names: list[str]) -> list[str]:
+                ignored = list(COPYTREE_IGNORE(directory, names) or [])
+                base = Path(directory)
+                for name in names:
+                    relative_name = (base / name).relative_to(root).as_posix()
+                    if is_distribution_excluded(relative_name):
+                        ignored.append(name)
+                return sorted(set(ignored))
+
+            shutil.copytree(source, target, symlinks=True, ignore=ignore)
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
@@ -322,7 +398,11 @@ def regenerate_source_checksums(root: Path) -> None:
             files.append(source)
         elif source.is_dir():
             files.extend(path for path in iter_files(source) if path != checksum_path)
-    lines = [f"{sha256(path)}  {path.relative_to(root).as_posix()}" for path in sorted(set(files))]
+    lines = [
+        f"{sha256(path)}  {path.relative_to(root).as_posix()}"
+        for path in sorted(set(files))
+        if not is_distribution_excluded(path.relative_to(root).as_posix())
+    ]
     checksum_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -345,11 +425,88 @@ def refresh_runtime_lock(root: Path) -> None:
         raise RuntimeError((result.stdout or result.stderr).strip() or "runtime lock failed")
 
 
-def write_release_metadata(stage: Path, version: str, selected: list[str]) -> None:
-    content_files = relative_files(stage)
-    if MANIFEST_NAME in content_files or CHECKSUM_NAME in content_files:
+def write_release_metadata(stage: Path, version: str, selected: list[str], binding: dict[str, str]) -> None:
+    payload_files = relative_files(stage)
+    if set(payload_files) & METADATA_NAMES:
         raise ValueError("Release metadata names collide with selected source files")
     package_manifest = load_json(stage / "manifest" / "package.json")
+    control = load_control(stage / "governance" / "development-control.json")
+    official = control.get("official_baseline")
+    if not isinstance(official, dict):
+        raise ValueError("official baseline is missing from the active control record")
+    if official.get("version") == version:
+        raise ValueError("candidate version must differ from the official baseline")
+
+    candidate_manifest = {
+        "schema_version": "p2p-codex-candidate-distribution/1",
+        "candidate_version": version,
+        "official_baseline_version": official.get("version"),
+        "official_baseline_sha256": official.get("artifact_sha256"),
+        "candidate_vs_official": "UNPROMOTED_SUCCESSOR_CANDIDATE",
+        "distribution_scope_canonical": "VERIFIED",
+        "accidental_repository_dump": False,
+        "include_rules": {
+            "root_files": list(ROOT_FILES),
+            "documentation_files": list(DOC_FILES),
+            "script_files": list(SCRIPT_FILES),
+            "directories": list(DIRECTORIES),
+            "release_skills": list(RELEASE_SKILLS),
+            "runtime_payload": ["runtime/p2p_capabilities", "runtime/p2p_uiux", "runtime/scripts"],
+        },
+        "exclude_rules": {
+            "forbidden_fragments": list(FORBIDDEN_FRAGMENTS),
+            "source_distribution_excludes": sorted(SOURCE_DISTRIBUTION_EXCLUDES),
+            "transient_extensions": [".pyc", ".pyo"],
+        },
+        "expected_root_surfaces": sorted(set(ROOT_FILES) | set(DOC_FILES) | set(SCRIPT_FILES) | {"runtime/"}),
+        "payload_file_count": len(payload_files),
+        "metadata_files": [CANDIDATE_MANIFEST_NAME, SOURCE_BINDING_NAME, ARTIFACT_IDENTITY_NAME, INVENTORY_NAME],
+    }
+    (stage / CANDIDATE_MANIFEST_NAME).write_text(json.dumps(candidate_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    source_record = {
+        "schema_version": "p2p-codex-source-binding/1",
+        "candidate_version": version,
+        "official_baseline_version": official.get("version"),
+        "official_baseline_sha256": official.get("artifact_sha256"),
+        "source_commit": binding["source_commit"],
+        "source_tree": binding["source_tree"],
+        "source_commit_object": "VERIFIED",
+        "source_tree_object": "VERIFIED",
+        "source_tree_bound_to_commit": "VERIFIED",
+        "worktree_clean_at_binding": True,
+    }
+    (stage / SOURCE_BINDING_NAME).write_text(json.dumps(source_record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    identity_record = {
+        "schema_version": "p2p-codex-artifact-identity/1",
+        "candidate_version": version,
+        "artifact_path_kind": "DISPOSABLE_CANDIDATE_OUTPUT",
+        "artifact_sha256": None,
+        "artifact_sha256_status": "BOUND_EXTERNALLY_AFTER_ARCHIVE_WRITE",
+        "artifact_hash_scope": "full ZIP bytes; exact value is recorded in the append-only candidate identity report",
+        "source_commit": binding["source_commit"],
+        "source_tree": binding["source_tree"],
+        "official_baseline_version": official.get("version"),
+        "official_baseline_sha256": official.get("artifact_sha256"),
+    }
+    (stage / ARTIFACT_IDENTITY_NAME).write_text(json.dumps(identity_record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    metadata_files = [CANDIDATE_MANIFEST_NAME, SOURCE_BINDING_NAME, ARTIFACT_IDENTITY_NAME, INVENTORY_NAME]
+    inventory = {
+        "schema_version": "p2p-codex-inventory/1",
+        "candidate_version": version,
+        "payload_files": payload_files,
+        "metadata_files": metadata_files,
+        "release_metadata_files": [MANIFEST_NAME, CHECKSUM_NAME],
+        "total_members": len(payload_files) + len(metadata_files) + 2,
+        "accounted_members": len(payload_files) + len(metadata_files) + 2,
+        "unaccounted_members": 0,
+        "duplicate_paths": 0,
+        "unsafe_archive_paths": 0,
+        "absolute_archive_paths": 0,
+        "missing_expected_members": 0,
+    }
+    (stage / INVENTORY_NAME).write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    content_files = relative_files(stage)
     manifest = {
         "schema_version": SCHEMA,
         "package_name": package_manifest.get("name", "P2P Codex Edition"),
@@ -357,6 +514,11 @@ def write_release_metadata(stage: Path, version: str, selected: list[str]) -> No
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "selected_roots": selected,
         "excluded_fragments": list(FORBIDDEN_FRAGMENTS),
+        "source_distribution_excludes": sorted(SOURCE_DISTRIBUTION_EXCLUDES),
+        "source_commit": binding["source_commit"],
+        "source_tree": binding["source_tree"],
+        "official_baseline_version": official.get("version"),
+        "official_baseline_sha256": official.get("artifact_sha256"),
         "file_count": len(content_files),
         "files": [
             {
@@ -406,6 +568,29 @@ def verify_stage(stage: Path) -> dict[str, object]:
     for relative, digest in checksum_map.items():
         if sha256(stage / relative) != digest:
             raise ValueError(f"release checksum mismatch: {relative}")
+    candidate_manifest = load_json(stage / CANDIDATE_MANIFEST_NAME)
+    source_record = load_json(stage / SOURCE_BINDING_NAME)
+    identity_record = load_json(stage / ARTIFACT_IDENTITY_NAME)
+    inventory = load_json(stage / INVENTORY_NAME)
+    metadata_files = {CANDIDATE_MANIFEST_NAME, SOURCE_BINDING_NAME, ARTIFACT_IDENTITY_NAME, INVENTORY_NAME}
+    if set(inventory.get("metadata_files", [])) != metadata_files:
+        raise ValueError("candidate inventory metadata set is incomplete")
+    if inventory.get("payload_files") != sorted(expected - metadata_files):
+        raise ValueError("candidate inventory payload set does not match release manifest")
+    if inventory.get("total_members") != len(actual) + 2 or inventory.get("accounted_members") != inventory.get("total_members"):
+        raise ValueError("candidate inventory member accounting is inconsistent")
+    if any(inventory.get(key) != 0 for key in ("unaccounted_members", "duplicate_paths", "unsafe_archive_paths", "absolute_archive_paths", "missing_expected_members")):
+        raise ValueError("candidate inventory contains an unsafe or unaccounted member")
+    if candidate_manifest.get("candidate_version") != manifest.get("package_version"):
+        raise ValueError("candidate distribution manifest version mismatch")
+    if candidate_manifest.get("candidate_vs_official") != "UNPROMOTED_SUCCESSOR_CANDIDATE":
+        raise ValueError("candidate distribution manifest changes promotion state")
+    if source_record.get("source_commit") != manifest.get("source_commit") or source_record.get("source_tree") != manifest.get("source_tree"):
+        raise ValueError("source binding does not match release manifest")
+    if source_record.get("source_commit_object") != "VERIFIED" or source_record.get("source_tree_bound_to_commit") != "VERIFIED":
+        raise ValueError("source binding is not verified")
+    if identity_record.get("artifact_sha256") is not None or identity_record.get("artifact_sha256_status") != "BOUND_EXTERNALLY_AFTER_ARCHIVE_WRITE":
+        raise ValueError("artifact identity record must use explicit external full-ZIP binding")
     package_manifest = load_json(stage / "manifest" / "package.json")
     if package_manifest.get("version") != manifest.get("package_version"):
         raise ValueError("release package manifest version mismatch")
@@ -428,6 +613,9 @@ def verify_stage(stage: Path) -> dict[str, object]:
         "package_version": manifest.get("package_version"),
         "file_count": len(expected),
         "checksum_count": len(checksum_map),
+        "source_commit": manifest.get("source_commit"),
+        "source_tree": manifest.get("source_tree"),
+        "inventory": inventory,
     }
     if development_control is not None:
         result["development_control"] = development_control
@@ -453,18 +641,19 @@ def build(root: Path, output: Path) -> dict[str, object]:
     output = output.resolve()
     if output.exists():
         raise ValueError(f"Output already exists; choose another path to preserve history: {output}")
+    binding = source_binding(root)
     version = package_version(root)
     lineage = validate_lineage_for_build(root, version)
     selected = selected_paths(root)
-    refresh_runtime_lock(root)
-    regenerate_source_checksums(root)
     stage_parent = root / ".tmp"
     stage_parent.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix="p2p-release-stage-", dir=str(stage_parent)))
     try:
         selected = copy_selected(root, stage)
         refresh_runtime_lock(stage)
-        write_release_metadata(stage, version, selected)
+        regenerate_source_checksums(stage)
+        refresh_runtime_lock(stage)
+        write_release_metadata(stage, version, selected, binding)
         verification = verify_stage(stage)
         run_gate(stage, "doctor.py", ["--package", str(stage)])
         run_gate(stage, "p2p_governance.py", ["drift", "--root", str(stage), "--governance", str(stage / "governance")])
@@ -472,7 +661,9 @@ def build(root: Path, output: Path) -> dict[str, object]:
         output.parent.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for path in iter_files(stage):
-                archive.write(path, path.relative_to(stage).as_posix())
+                info = zipfile.ZipInfo(path.relative_to(stage).as_posix(), date_time=(2010, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                archive.writestr(info, path.read_bytes())
     finally:
         shutil.rmtree(stage, ignore_errors=True)
     return {
@@ -481,6 +672,8 @@ def build(root: Path, output: Path) -> dict[str, object]:
         "artifact": str(output),
         "artifact_sha256": sha256(output),
         "artifact_size": output.stat().st_size,
+        "source_commit": binding["source_commit"],
+        "source_tree": binding["source_tree"],
         "lineage": lineage,
         "content": verification,
     }

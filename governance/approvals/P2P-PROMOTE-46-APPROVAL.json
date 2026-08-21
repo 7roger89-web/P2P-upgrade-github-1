@@ -1,0 +1,19 @@
+{
+  "decision_type": "OFFICIAL_BASELINE_PROMOTION",
+  "decision_id": "P2P-PROMOTE-46-01",
+  "previous_official_version": "8.4.7-C-codex.41",
+  "new_official_version": "8.4.7-C-codex.46",
+  "artifact_path": "reports/candidates/P2P-8.4.7-C-codex.46-full-distribution-candidate.zip",
+  "artifact_sha256": "2901adca106d3533b3df37e1d10d8a375162b64b001c32bec28b4b178c2f3bb7",
+  "source_commit": "8f31a282bbd03f58e35e1ba3ffcb75a8c20fe2b2",
+  "source_tree": "e91a4ae703457440b5216a6c79d2104d102a6d25",
+  "readiness_evidence_reference": "reports/P2P-PROMOTION-READINESS-46-01-REPORT.md",
+  "owner_authorization_provenance": "pasted_content_15.txt",
+  "timestamp_utc": "2026-08-21T10:35:00Z",
+  "scope_boundaries": {
+    "project_installation": "NOT_AUTHORIZED",
+    "deployment": "NOT_AUTHORIZED",
+    "public_release": "NOT_AUTHORIZED"
+  },
+  "verdict": "PROMOTED_VERIFIED"
+}

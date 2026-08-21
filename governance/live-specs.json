@@ -1,8 +1,8 @@
 {
   "schema_version": "p2p-codex-live-specs/2",
-  "ledger_revision": 2,
-  "generated_on": "2026-08-09",
-  "source_ledger_sha256": "18033bc4037191865a2ef47e951f5904b41926759a838a39af45db0597bc4510",
+  "ledger_revision": 3,
+  "generated_on": "2026-08-18",
+  "source_ledger_sha256": "dc33783d306c73e6897e1ce9ef28df2041a44f6c222a38b45a54a7034459297c",
   "rules": {
     "stale_claims_are_excluded": true,
     "block_requires_official_evidence_A": true,

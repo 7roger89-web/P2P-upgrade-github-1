@@ -1,0 +1,10 @@
+{
+  "leg": "NEG_G_OPTIONAL_SKILL_UNAVAILABLE",
+  "eligible_set": [],
+  "no_false_support_claim": "VERIFIED",
+  "rerun_context": {
+    "rerun_for": "FW01 closure normalization \u2014 case G evidence directory was absent from the proof tree; deterministic rerun re-derives the VERIFIED verdict on the current code.",
+    "deterministic": true,
+    "mechanism": "eligible_skills(Path('/nonexistent-registry')) -> empty set -> bounded fallback, no false support claim"
+  }
+}

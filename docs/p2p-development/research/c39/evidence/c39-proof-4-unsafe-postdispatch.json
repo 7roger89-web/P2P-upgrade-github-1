@@ -1,0 +1,74 @@
+{
+  "schema": "c39-proof-4-unsafe-postdispatch/1",
+  "timestamp": "2026-08-18T10:30:03Z",
+  "proof_type": "DETERMINISTIC_NO_LIVE_BACKEND",
+  "backend_b_executed": false,
+  "cases": [
+    {
+      "case": "MUTATION_UNKNOWN_AFTER_DISPATCH",
+      "decision": "STOP_FAIL_CLOSED",
+      "expected": "STOP_FAIL_CLOSED",
+      "allowed_alternatives": [
+        "REVERIFY_REQUIRED"
+      ],
+      "reason": "UNSAFE_AFTER_DISPATCH_NO_VERIFICATION_POSSIBLE",
+      "failure_class": "MUTATION_UNKNOWN",
+      "old_target": "manus-api-v2",
+      "passed": true,
+      "note": "Backend B MUST NOT execute with unknown mutation."
+    },
+    {
+      "case": "RESULT_UNKNOWN_AFTER_DISPATCH",
+      "decision": "STOP_FAIL_CLOSED",
+      "expected": "STOP_FAIL_CLOSED",
+      "allowed_alternatives": [
+        "REVERIFY_REQUIRED"
+      ],
+      "reason": "UNSAFE_AFTER_DISPATCH_NO_VERIFICATION_POSSIBLE",
+      "failure_class": "RESULT_UNKNOWN_AFTER_DISPATCH",
+      "old_target": "hermes-cli:gemini:gemini-2.5-flash",
+      "passed": true,
+      "note": "UNKNOWN result after dispatch fails closed."
+    },
+    {
+      "case": "UNRECOGNIZED_CLASS_AFTER_DISPATCH_NO_POINTERS",
+      "decision": "STOP_FAIL_CLOSED",
+      "expected": "STOP_FAIL_CLOSED",
+      "allowed_alternatives": [
+        "REVERIFY_REQUIRED"
+      ],
+      "reason": "FAILURE_CLASS_UNRECOGNIZED_AFTER_DISPATCH",
+      "failure_class": "FAILURE_CLASS_UNKNOWN",
+      "old_target": "manus-api-v2",
+      "passed": true,
+      "note": "Unknown class maps to FAILURE_CLASS_UNKNOWN holder -> fail closed."
+    },
+    {
+      "case": "TIMEOUT_AFTER_POSSIBLE_MUTATION",
+      "decision": "STOP_FAIL_CLOSED",
+      "expected": "STOP_FAIL_CLOSED",
+      "allowed_alternatives": [
+        "REVERIFY_REQUIRED"
+      ],
+      "reason": "UNSAFE_AFTER_DISPATCH_NO_VERIFICATION_POSSIBLE",
+      "failure_class": "TIMEOUT_AFTER_POSSIBLE_MUTATION",
+      "old_target": "manus-api-v2",
+      "passed": true,
+      "note": "Timeout after possible mutation -> unsafe set."
+    },
+    {
+      "case": "UNVERIFIED_WRITE_AFTER_DISPATCH",
+      "decision": "REVERIFY_REQUIRED",
+      "expected": "REVERIFY_REQUIRED",
+      "allowed_alternatives": [],
+      "reason": "UNSAFE_AFTER_DISPATCH_WITH_RESULT_POINTERS",
+      "failure_class": "UNVERIFIED_WRITE",
+      "old_target": "manus-api-v2",
+      "passed": true,
+      "note": "Verifiable pointer exists -> REVERIFY_REQUIRED (still blocked from blind retry)."
+    }
+  ],
+  "all_cases_passed": true,
+  "semantic_truth": "Backend B MUST NOT execute when mutation/result is UNKNOWN after dispatch; unsafe states fail closed.",
+  "git_revision": "p2p-c39-governed-live-failover"
+}

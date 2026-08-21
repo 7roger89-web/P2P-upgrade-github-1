@@ -1,0 +1,22 @@
+{
+  "schema_version": "p2p-codex-approval-record/2",
+  "request_id": "P2P-APR-20260818T152219+0000-c40-candidate-promote",
+  "state": "APPROVED",
+  "action": "promote_candidate",
+  "scope": "P2P-C40 candidate promotion to PROMOTED status; usage limited to Owner web projects similar to the two pilots (Game Truyện, Gia Phả) until full release gates pass",
+  "subject": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+  "subject_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+  "requested_at": "2026-08-18T15:22:19+00:00",
+  "request_expires_at": "2026-08-18T15:22:19+00:00",
+  "requested_by": "7roger89-web (Owner)",
+  "risk_summary": "Gói đã đủ bar pilot trên 2 dự án (task kiểm chứng độc lập, fresh-process recovery, rollback fingerprint khớp tuyệt đối); regression sạch; rủi ro còn lại: dự án ngoài phong cách đã pilot và các gate phát hành đầy đủ (drift, fact ledger, final hash-bound approval) chưa chạy — promotion bị giới hạn phạm vi và chưa là phát hành.",
+  "technical_report": "docs/p2p-development/research/c41/c41-pilot-extension-summary.md",
+  "technical_report_sha256": "ae6cdbe546be6c216a6c3e687989365c0109c56ec18ae0281806ddbabe8ad387",
+  "decision": "APPROVE",
+  "decided_at": "2026-08-18T15:22:19+00:00",
+  "decided_by": "7roger89-web (Owner)",
+  "decision_note": "PROMOTE — Owner chỉ thị trực tiếp trong cuộc hội thoại (18/08/2026). Phạm vi: các dự án web tương tự đã pilot; giữ owner-gate + rollback cho mọi cài đặt mới. Phát hành đầy đủ (release gates) chưa được yêu cầu.",
+  "approval_method": "conversation_explicit",
+  "identity_assurance": "active_user_message",
+  "recorded_by": "p2p-c41-pilot-extension-session"
+}

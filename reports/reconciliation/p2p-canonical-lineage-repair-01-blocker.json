@@ -1,0 +1,34 @@
+{
+  "schema_version": "p2p-canonical-lineage-repair-blocker/1",
+  "task_id": "P2P-CANONICAL-LINEAGE-REPAIR-01",
+  "canonical_authority_ref": "origin/main",
+  "current_official_baseline": "8.4.7-C-codex.19",
+  "current_official_artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+  "reconciliation_base": "origin/main",
+  "reconciliation_branch": "codex/p2p-canonical-lineage-repair-01",
+  "successor_version_reserved_for_source_lineage": "8.4.7-C-codex.72",
+  "candidate_minted": false,
+  "candidate_artifact_path": null,
+  "candidate_artifact_sha256": null,
+  "manus_sentinel": {
+    "status": "BLOCKED",
+    "transport": "UNAVAILABLE",
+    "credential_state": "NO_CREDENTIALS",
+    "p2p_request_id": "NOT_RUN",
+    "manus_backend_task_id": "NOT_RUN",
+    "raw_result": "NOT_RUN",
+    "reason": "No existing Manus credential was available on this host; no credential was requested and no synthetic or fixture result was accepted."
+  },
+  "local_evidence_before_block": {
+    "map_before_work_source_pilot": "VERIFIED",
+    "core_provider_neutral_suite": "145 tests, 5 skipped, OK",
+    "bounded_runtime_suite": "94 tests, OK",
+    "capability_runtime_suite": "335 tests, 6 skipped, OK",
+    "authoritative_game_truyen_mutation": 0,
+    "gia_pha_mutation": 0,
+    "logistics_mutation": 0,
+    "promotion_performed": "NO",
+    "official_baseline_changed": "NO"
+  },
+  "terminal_verdict": "BLOCKED / REAL_MANUS_SENTINEL_UNAVAILABLE"
+}

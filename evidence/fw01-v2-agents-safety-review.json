@@ -1,0 +1,21 @@
+{
+  "installer_semantics": "backup-then-merge within BEGIN/END P2P CODEX delimiters; UTF-8 re-encode is an unavoidable side effect of the merge flow on non-clean bytes",
+  "owner_gate_semantics": "installer performs the merge; project owner may refuse by skipping install.sh and applying the dry-run diff manually; this record captures the proposed diff WITHOUT applying it",
+  "results": [
+    {
+      "project": "GT",
+      "agents_bytes": "5a4e2c72900ccbcfa191411e30232c52b766239fa7fe65841e3ee7c9c29a56f9",
+      "before_utf8_clean": true,
+      "diff_class": "B",
+      "side_effect_C_mojibake_repair": false,
+      "would_change": true,
+      "diff_lines": 0,
+      "post_install_sha256": "c1c3d7eac1844d5ef26aebf49927b9a7122aeab090fae8b68db5a2414a9f6887"
+    },
+    {
+      "project": "GP",
+      "agents_missing": true,
+      "note": "installer would create AGENTS.md with only the P2P block"
+    }
+  ]
+}

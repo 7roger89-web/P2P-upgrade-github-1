@@ -1,0 +1,166 @@
+{
+  "purpose": "Isolated FW01 candidate pilot proofs (Game Truyện + Gia Phà clones). Production repos untouched; no remote pushes. Bounded, read-only where required.",
+  "candidate_zip_sha256": "2f34b659257cb8587f39a7424cdac4747c1e35c6220a59e01f6513b5a75cb978",
+  "stages": [
+    {
+      "stage": "0-baseline",
+      "pilot": "game-truyen",
+      "repo": "/home/ubuntu/fw01-pilot/fw01-pilot-game-truyen",
+      "HEAD": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+      "source_fingerprint": "a353ac3bb3d8a4c7f2c60836565f7a7715fcc37059945fe15c531485ba144db9",
+      "status": "SNAPSHOT_TAKEN"
+    },
+    {
+      "stage": "0-baseline",
+      "pilot": "gia-pha",
+      "repo": "/home/ubuntu/fw01-pilot/fw01-pilot-gia-pha",
+      "HEAD": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+      "source_fingerprint": "8a9b6b8cadb9b142af34c71bbc91287cea259e660f35f4a995f0cd5c7e34edc3",
+      "status": "SNAPSHOT_TAKEN"
+    },
+    {
+      "stage": "1-install",
+      "pilot": "game-truyen",
+      "package_dir": "/tmp/fw01-pilot-pkg-game-truyen",
+      "evidence": {
+        "schema": "c40-install-result/1",
+        "install_class": "FRESH_INSTALL",
+        "package_version": "8.4.7-C-codex.24",
+        "package_sha256": null,
+        "managed_file_count": 137,
+        "pre_fingerprint_files": 594,
+        "status": "INSTALLED"
+      },
+      "status": "INSTALL_PASS"
+    },
+    {
+      "stage": "1-install",
+      "pilot": "gia-pha",
+      "package_dir": "/tmp/fw01-pilot-pkg-gia-pha",
+      "evidence": {
+        "schema": "c40-install-result/1",
+        "install_class": "FRESH_INSTALL",
+        "package_version": "8.4.7-C-codex.24",
+        "package_sha256": null,
+        "managed_file_count": 137,
+        "pre_fingerprint_files": 115,
+        "status": "INSTALLED"
+      },
+      "status": "INSTALL_PASS"
+    },
+    {
+      "stage": "2-upgrade",
+      "pilot": "game-truyen",
+      "evidence": {
+        "raw": "Upgrade is a no-op: already on this version (idempotent). Use install for SAME_VERSION_REINSTALL semantics.\n"
+      },
+      "status": "UPGRADE_SAME_VERSION_NOOP",
+      "note": "bounded: re-bind of the same FW01 candidate is idempotent (machinery enforces SAME_VERSION_NOOP); a genuine version-different upgrade path exists but has no newer artifact in this pilot scope"
+    },
+    {
+      "stage": "2-upgrade",
+      "pilot": "gia-pha",
+      "evidence": {
+        "raw": "Upgrade is a no-op: already on this version (idempotent). Use install for SAME_VERSION_REINSTALL semantics.\n"
+      },
+      "status": "UPGRADE_SAME_VERSION_NOOP",
+      "note": "bounded: re-bind of the same FW01 candidate is idempotent (machinery enforces SAME_VERSION_NOOP); a genuine version-different upgrade path exists but has no newer artifact in this pilot scope"
+    },
+    {
+      "stage": "3-doctor",
+      "pilot": "game-truyen",
+      "evidence": "{\n  \"schema\": \"c40-doctor/1\",\n  \"project_root\": \"/home/ubuntu/fw01-pilot/fw01-pilot-game-truyen\",\n  \"p2p_version\": \"8.4.7-C-codex.24\",\n  \"project_binding\": {\n    \"project_root\": \"/home/ubuntu/fw01-pilot/fw01-pilot-game-truyen\",\n    \"post_install_fingerprint\": \"6d6e2afb9959fd2509a3b84ed6da2be8688942044661895be26476b157ace09d\"\n  },\n  \"installation_health\": \"HEALTHY\",\n  \"runtime_manifest_integrity\": \"INCOMPLETE\",\n  \"state_health\": \"NOT_INITIALIZED\",\n  \"snapshots\": 0,\n  \"rollback_available\": false,\n  \"context_health\": \"AVAILABLE\",\n  \"backend_availability\": {\n    \"manus_rest_api_v2\": \"REFERENCE_ABSENT\",\n    \"hermes_cli\": true,\n    \"gemini\": \"REFERENCE_ABSENT\",\n    \"codex\": false\n  },\n  \"current_eligible_targets\": [\n    \"p2p-uiux\",\n    \"p2p_aesthetica\",\n    \"p2p_anon\",\n    \"p2p_architecton\",\n    \"p2p_axiom\",\n    \"p2p_datos\",\n    \"p2p_helios\",\n    \"p2p_iris\",\n    \"p2p_tecton\",\n    \"p2p_vector\"\n  ],\n  \"permission_status\": \"UNBOUND\",\n  \"upgrade_status\": \"FRESH_INSTALL\",\n  \"warnings\": [],\n  \"recommended_next_action\": \"P2P sẵn sàng. Giao nhiệm vụ dạng 'Tiếp tục hoàn thiện dự án' để hệ thống tự chọn bước an toàn tiếp theo.\"\n}\n",
+      "status": "DOCTOR_PASS"
+    },
+    {
+      "stage": "3-doctor",
+      "pilot": "gia-pha",
+      "evidence": "{\n  \"schema\": \"c40-doctor/1\",\n  \"project_root\": \"/home/ubuntu/fw01-pilot/fw01-pilot-gia-pha\",\n  \"p2p_version\": \"8.4.7-C-codex.24\",\n  \"project_binding\": {\n    \"project_root\": \"/home/ubuntu/fw01-pilot/fw01-pilot-gia-pha\",\n    \"post_install_fingerprint\": \"35e082ea91ce91cd4d8fc61e9c3303c34ec4c384a784d6a610e38def6c39101f\"\n  },\n  \"installation_health\": \"HEALTHY\",\n  \"runtime_manifest_integrity\": \"INCOMPLETE\",\n  \"state_health\": \"NOT_INITIALIZED\",\n  \"snapshots\": 0,\n  \"rollback_available\": false,\n  \"context_health\": \"AVAILABLE\",\n  \"backend_availability\": {\n    \"manus_rest_api_v2\": \"REFERENCE_ABSENT\",\n    \"hermes_cli\": true,\n    \"gemini\": \"REFERENCE_ABSENT\",\n    \"codex\": false\n  },\n  \"current_eligible_targets\": [\n    \"p2p-uiux\",\n    \"p2p_aesthetica\",\n    \"p2p_anon\",\n    \"p2p_architecton\",\n    \"p2p_axiom\",\n    \"p2p_datos\",\n    \"p2p_helios\",\n    \"p2p_iris\",\n    \"p2p_tecton\",\n    \"p2p_vector\"\n  ],\n  \"permission_status\": \"UNBOUND\",\n  \"upgrade_status\": \"FRESH_INSTALL\",\n  \"warnings\": [],\n  \"recommended_next_action\": \"P2P sẵn sàng. Giao nhiệm vụ dạng 'Tiếp tục hoàn thiện dự án' để hệ thống tự chọn bước an toàn tiếp theo.\"\n}\n",
+      "status": "DOCTOR_PASS"
+    },
+    {
+      "stage": "4-rollback",
+      "pilot": "game-truyen",
+      "evidence": {
+        "raw": "No rollback snapshot available (fail-closed).\n"
+      },
+      "post_rollback_fingerprint": "a353ac3bb3d8a4c7f2c60836565f7a7715fcc37059945fe15c531485ba144db9",
+      "baseline_fingerprint": "a353ac3bb3d8a4c7f2c60836565f7a7715fcc37059945fe15c531485ba144db9",
+      "fingerprint_restored": true,
+      "status": "ROLLBACK_FAIL"
+    },
+    {
+      "stage": "4-rollback",
+      "pilot": "gia-pha",
+      "evidence": {
+        "raw": "No rollback snapshot available (fail-closed).\n"
+      },
+      "post_rollback_fingerprint": "8a9b6b8cadb9b142af34c71bbc91287cea259e660f35f4a995f0cd5c7e34edc3",
+      "baseline_fingerprint": "8a9b6b8cadb9b142af34c71bbc91287cea259e660f35f4a995f0cd5c7e34edc3",
+      "fingerprint_restored": true,
+      "status": "ROLLBACK_FAIL"
+    },
+    {
+      "stage": "5-bounded-loop",
+      "pilot": "game-truyen",
+      "evidence": {
+        "leg": "PRIMARY_E2E",
+        "timestamp": "2026-08-19T04:01:17.892047+00:00",
+        "AUTONOMOUS_MULTI_TASK_CONTINUATION": "VERIFIED",
+        "FRESH_PROCESS_RECOVERY": "VERIFIED",
+        "OWNER_GATE_STOP": "VERIFIED",
+        "NO_DUPLICATE_EXECUTION": "VERIFIED",
+        "status_sequence_leg1": [
+          "TASK_DONE_CONTINUE",
+          "TASK_DONE_CONTINUE",
+          "TASK_DONE_CONTINUE",
+          "PRE_DISPATCH_BLOCKED"
+        ],
+        "status_sequence_leg2": [
+          "PRE_DISPATCH_BLOCKED"
+        ],
+        "execution_counts_after_restart": {
+          "A": 0,
+          "B": 0,
+          "C": 0,
+          "D": 0
+        }
+      },
+      "source_fingerprint_after_proof": "a353ac3bb3d8a4c7f2c60836565f7a7715fcc37059945fe15c531485ba144db9",
+      "source_unchanged": true,
+      "status": "BOUNDED_LOOP_PASS"
+    },
+    {
+      "stage": "5-bounded-loop",
+      "pilot": "gia-pha",
+      "evidence": {
+        "leg": "PRIMARY_E2E",
+        "timestamp": "2026-08-19T04:01:18.089609+00:00",
+        "AUTONOMOUS_MULTI_TASK_CONTINUATION": "VERIFIED",
+        "FRESH_PROCESS_RECOVERY": "VERIFIED",
+        "OWNER_GATE_STOP": "VERIFIED",
+        "NO_DUPLICATE_EXECUTION": "VERIFIED",
+        "status_sequence_leg1": [
+          "TASK_DONE_CONTINUE",
+          "TASK_DONE_CONTINUE",
+          "TASK_DONE_CONTINUE",
+          "PRE_DISPATCH_BLOCKED"
+        ],
+        "status_sequence_leg2": [
+          "PRE_DISPATCH_BLOCKED"
+        ],
+        "execution_counts_after_restart": {
+          "A": 0,
+          "B": 0,
+          "C": 0,
+          "D": 0
+        }
+      },
+      "source_fingerprint_after_proof": "8a9b6b8cadb9b142af34c71bbc91287cea259e660f35f4a995f0cd5c7e34edc3",
+      "source_unchanged": true,
+      "status": "BOUNDED_LOOP_PASS"
+    }
+  ],
+  "run_at": "2026-08-19T04:01:18Z",
+  "git_ref": "f661dd583d5a793c318764755f31848cdce307da"
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "c40-install-result/1",
+  "install_class": "FRESH_INSTALL",
+  "package_version": "8.4.7-C-codex.24",
+  "package_sha256": null,
+  "managed_file_count": 1371,
+  "pre_fingerprint_files": 124,
+  "status": "INSTALLED"
+}

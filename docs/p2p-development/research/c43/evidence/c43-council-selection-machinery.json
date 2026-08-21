@@ -1,0 +1,40 @@
+{
+  "role_quorum_module_loaded": true,
+  "role_quorum_spec_present": true,
+  "canonical_denominator": 8,
+  "canonical_quorum_rule": "8/8",
+  "canonical_members": [
+    "p2p_iris",
+    "p2p_tecton",
+    "p2p_axiom",
+    "p2p_vector",
+    "p2p_datos",
+    "p2p_anon",
+    "p2p_architecton",
+    "p2p_helios"
+  ],
+  "canonical_role_spec_hashes": {
+    "p2p_iris": "b5f3cd9c104062ceba1745cbe08f3a93cdc0e947bc59f7142592f009d2c0aee3",
+    "p2p_tecton": "faa427d3fd906dbdbd5eb8dd93df6d8eefb7a9f3d982fe48173d47c9242c2617",
+    "p2p_axiom": "a3294c16139fa7d7664aaf7aba8409ced5d144326a7729e292e5c20e1d4b99ed",
+    "p2p_vector": "b731d084f4b9f7a5cbf0be93115234f880daba3c7b979cee35f9d23e01d48ab4",
+    "p2p_datos": "8301c6763292a323432fc863ad1286837f507435262c698e7abe4d69225d15bb",
+    "p2p_anon": "0de4b6918ad6328a034e1988728e9c8a1bcf3f6c920c97b943e1271555a02c5c",
+    "p2p_architecton": "228647705d58a034b13ada8f83d29835096810e5b469f5a175633bee75bb8810",
+    "p2p_helios": "bb62d0a4aaf228c599a574a1fc0f6bd4abb4125cb9703b41fe7c20ecf706044c"
+  },
+  "all_role_spec_hashes_valid": true,
+  "role_quorum_functions": [
+    "Any",
+    "Iterable",
+    "Mapping",
+    "RoleExecutionReceipt",
+    "RoleQuorumError",
+    "adaptive_participant_set",
+    "evaluate_role_quorum"
+  ],
+  "evaluate_role_quorum_signature": "(receipts: 'Iterable[RoleExecutionReceipt]', *, required_roles: 'Iterable[str]' = ('p2p_iris', 'p2p_tecton', 'p2p_axiom', 'p2p_vector', 'p2p_datos', 'p2p_anon', 'p2p_architecton', 'p2p_helios'), expected_role_spec_hashes: 'Mapping[str, str] | None' = None, expected_goal_id: 'str | None' = None, expected_task_id: 'str | None' = None, current_spec_hashes: 'Mapping[str, str] | None' = None) -> 'dict[str, Any]'",
+  "adaptive_participant_set_signature": "(task_risk_class: 'str', *, policy_roles: 'Mapping[str, tuple[str, ...]] | None' = None) -> 'dict[str, Any]'",
+  "verdict": "COUNCIL_SELECTION_MACHINERY = VERIFIED",
+  "note": "Read-only deterministic check of existing machinery. No second council created; canonical registry untouched. Per Owner instruction #13: council roles != backend providers; multiple roles may execute on the same backend."
+}

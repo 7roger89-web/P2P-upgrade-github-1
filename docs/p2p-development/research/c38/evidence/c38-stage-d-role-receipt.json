@@ -1,0 +1,69 @@
+{
+  "schema": "p2p-role-execution-receipt/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "task_id": "c38-stage-d-fresh-session-capsule-proof",
+  "goal_id": "C38",
+  "request_fingerprint": "055a19c8d9f72c51cb580e4104ad678ec9c184c0c83ec3c3c1e8d2602d5decc5",
+  "permission_profile_fingerprint": "d91982c163580fe6af1f8aa27defadbe71dd8b7d44ce99d1aa45e0e0953da5f2",
+  "task_fingerprint": "055a19c8d9f72c51cb580e4104ad678ec9c184c0c83ec3c3c1e8d2602d5decc5",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "context_digest": "cd935dff216b62598b4fa4e65fbfc1731dc2ccc6768e1a4235d92caf794b2ec3",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "approved_scope": [
+    "API_TRANSPORT",
+    "SYNTHETIC_TEXT_EXECUTION",
+    "NON_MUTATING_TASK"
+  ],
+  "explicit_execution_target": "manus-api-v2",
+  "target_fingerprint": "680fdf1ca355ae6dad7be3ffa3a60b847b9d4f620115af4be1fdaa8c86284f65",
+  "requested_target": "manus-rest-api-v2",
+  "observed_target": "manus-rest-api-v2",
+  "target_attestation_status": "ATTESTED_MATCH",
+  "execution_status": "SUCCEEDED",
+  "backend_result": {
+    "request_id": "c38-stage-d-fresh-session-capsule-proof-01",
+    "request_fingerprint_hex": "055a19c8d9f72c51cb580e4104ad678ec9c184c0c83ec3c3c1e8d2602d5decc5",
+    "task_id": "c38-stage-d-fresh-session-capsule-proof",
+    "goal_id": "C38",
+    "adapter_id": "manus-rest-api-v2",
+    "execution_status": "SUCCEEDED",
+    "verification_status": "VERIFIED",
+    "started_at": "2026-08-18T07:42:03+0000",
+    "finished_at": "2026-08-18T07:42:14+0000",
+    "exit_status": "stopped",
+    "target_fingerprint": "680fdf1ca355ae6dad7be3ffa3a60b847b9d4f620115af4be1fdaa8c86284f65",
+    "output_pointers": [],
+    "artifact_pointers": [],
+    "mutation_surface": "NONE",
+    "usage_evidence": {},
+    "error_class": null,
+    "auth_state_after": "VALID",
+    "raw_backend_receipt_pointer": "manus-task:JpWLAR4CcaG4qkXvN96etX",
+    "possible_mutation": false
+  },
+  "output_pointers": [],
+  "artifact_pointers": [
+    "docs/p2p-development/research/c38/harness/c38_stage_d_fresh_execution.py",
+    "docs/p2p-development/research/c38/evidence/c38-stage-d-observation.json",
+    "docs/p2p-development/research/c38/evidence/c38-stage-d-live-receipt.json"
+  ],
+  "evidence_pointers": [
+    "role_binding:contract-on-disk",
+    "target_attestation:manus-task:JpWLAR4CcaG4qkXvN96etX",
+    "terminal_result:listMessages:stopped:{\"project_id\": \"P2P-upgrade-github-1\", \""
+  ],
+  "verifier_result": "VERIFIED",
+  "mutation_state": "NO_MUTATION_OBSERVED",
+  "failure_class": "NONE",
+  "timestamps": {
+    "started_at": "2026-08-18T07:42:03+0000",
+    "finished_at": "2026-08-18T07:42:14+0000",
+    "executed_at": "UNKNOWN",
+    "verified_at": "UNKNOWN"
+  },
+  "raw_backend_receipt_pointer": "manus-task:JpWLAR4CcaG4qkXvN96etX"
+}

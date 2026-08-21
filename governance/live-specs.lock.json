@@ -1,15 +1,15 @@
 {
   "schema_version": "p2p-codex-live-specs-lock/3",
-  "ledger_revision": 2,
-  "generated_on": "2026-08-09",
-  "ledger_sha256": "18033bc4037191865a2ef47e951f5904b41926759a838a39af45db0597bc4510",
+  "ledger_revision": 3,
+  "generated_on": "2026-08-18",
+  "ledger_sha256": "dc33783d306c73e6897e1ce9ef28df2041a44f6c222a38b45a54a7034459297c",
   "target_sha256": {
-    "live-specs.json": "452d3cb9a8d3531546b1dede4f32c4415f78976e26eb5630aed22f7825ed6645"
+    "live-specs.json": "174369347978070a0405e220605623eae410fa81af0cc552c8d2a49b5cd43af1"
   },
   "claim_count": 9,
   "runtime_fact_count": 5,
-  "technical_report": "live-specs-preview-report.json",
-  "technical_report_sha256": "e0fad269100813c4cdf2e33f925ecd800821ec81e5ecf1fea5280cd3fc6db041",
-  "approval_record": "approvals/P2P-APR-20260809T112800Z-fact-ledger-v2.json",
-  "approval_sha256": "dcaece41d784e1fdb7aa61f828200ddd84def2f237ee578f649bd84bcfb57e10"
+  "technical_report": "release-evidence/technical-preview.json",
+  "technical_report_sha256": "e96a1d5b7e21a20bf4a0dcd55257c42b6aa7dea0341e1e37488bf23499eeb5bf",
+  "approval_record": "approvals/P2P-APR-20260818T155200Z-c40-release-gates-live-specs.json",
+  "approval_sha256": "306a44f380baee39618637eab5343be24196fa21462a38aa0e7ff07400e60937"
 }

@@ -1,0 +1,62 @@
+{
+  "goal_hash": "43e1cf05a9252fba67dc95187e9ee087f8fe879862ac903db6c9ca84e661d49f",
+  "plan": {
+    "automatic_start": false,
+    "background_execution": false,
+    "blocker": null,
+    "budget_usage": {
+      "executions_used": 1,
+      "model_cost_units_used": 0.0,
+      "model_token_units_used": 0.0,
+      "retries_used": 0,
+      "tasks_completed": 1,
+      "verifications_used": 1,
+      "wall_clock_seconds_used": 0.0,
+      "workspace_changes": 0
+    },
+    "created_at": "2026-08-19T01:50:02+00:00",
+    "current_task_id": null,
+    "execution_bound": {
+      "max_executions_per_task": 16,
+      "max_retries_per_task": 4,
+      "max_tasks": 64,
+      "max_verifications_per_task": 8,
+      "max_workspace_changes": 10,
+      "model_cost_units": 0.0,
+      "model_token_units": 0.0,
+      "wall_clock_seconds": 7200.0
+    },
+    "goal_id": "fw01-proof-goal",
+    "goal_version": "v1",
+    "next_task_id": null,
+    "non_scope": [
+      "security",
+      "credentials"
+    ],
+    "owner_approval_ref": "owner-intent-fw01-proof",
+    "owner_gate": null,
+    "plan_task_ids": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "process_survives_session": false,
+    "purpose": "Operating loop acceptance proof",
+    "resume_point": null,
+    "schema": "p2p-autopilot-goal/1",
+    "scope": [
+      "workspace",
+      "production"
+    ],
+    "status": "VERIFIED",
+    "terminal_reason": null,
+    "terminal_state": null,
+    "title": "FW01 proof goal",
+    "updated_at": "2026-08-19T01:50:02+00:00",
+    "wave": 2
+  },
+  "saved_at": "2026-08-19T01:50:02+00:00",
+  "schema": "p2p-autopilot-goal/1",
+  "state_ref": ".p2p/state/autopilot-goal-state.json"
+}

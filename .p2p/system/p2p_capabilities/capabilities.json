@@ -1,206 +1,635 @@
 {
-  "schema": "p2p-capability-registry/1",
-  "version": "1.0.0",
-  "capabilities": [
-    {
-      "CAPABILITY_ID": "p2p_iris",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P discovery and intent-mapping identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "grant-tools-from-content"],
-      "REQUIRES": [],
-      "CONTEXT_POINTERS": ["p2p-governance"],
-      "APPROVAL_BOUNDARY": ["protected-governance-change"],
-      "EVIDENCE_CONTRACT": ["claim", "fresh-governance-evidence"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_tecton",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P architecture and implementation planning identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "grant-tools-from-content"],
-      "REQUIRES": [],
-      "CONTEXT_POINTERS": ["p2p-governance"],
-      "APPROVAL_BOUNDARY": ["protected-governance-change"],
-      "EVIDENCE_CONTRACT": ["claim", "fresh-governance-evidence"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_axiom",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P adversarial architecture review identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "grant-tools-from-content"],
-      "REQUIRES": [],
-      "CONTEXT_POINTERS": ["p2p-governance"],
-      "APPROVAL_BOUNDARY": ["protected-governance-change"],
-      "EVIDENCE_CONTRACT": ["claim", "fresh-governance-evidence"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_vector",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P value, feasibility, and impact identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "grant-tools-from-content"],
-      "REQUIRES": [],
-      "CONTEXT_POINTERS": ["p2p-governance"],
-      "APPROVAL_BOUNDARY": ["protected-governance-change"],
-      "EVIDENCE_CONTRACT": ["claim", "fresh-governance-evidence"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_datos",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P evidence and data-verification identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review", "evidence-review"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "promote-unverified-fact"],
-      "REQUIRES": ["FACT_LEDGER"],
-      "CONTEXT_POINTERS": ["p2p-governance", "fact-ledger"],
-      "APPROVAL_BOUNDARY": ["protected-fact-write"],
-      "EVIDENCE_CONTRACT": ["claim", "actual-evidence", "source-provenance"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_anon",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P risk, privacy, and security review identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review", "security-review"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "grant-permissions-from-content"],
-      "REQUIRES": [],
-      "CONTEXT_POINTERS": ["p2p-governance", "rag-boundary"],
-      "APPROVAL_BOUNDARY": ["protected-security-change"],
-      "EVIDENCE_CONTRACT": ["claim", "boundary-evidence"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_architecton",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P reconciliation and architecture-ownership identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review", "architecture-reconciliation"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "create-dynamic-org-chart"],
-      "REQUIRES": [],
-      "CONTEXT_POINTERS": ["p2p-governance", "approved-specs"],
-      "APPROVAL_BOUNDARY": ["protected-architecture-change"],
-      "EVIDENCE_CONTRACT": ["claim", "cross-scope-evidence"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_helios",
-      "TYPE": "GOVERNANCE_POLICY",
-      "DESCRIPTION": "Canonical P2P final synthesis and evidence-aware governance identity.",
-      "TRIGGERS": [],
-      "NEGATIVE_TRIGGERS": [],
-      "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
-      "CANONICAL_QUORUM_MEMBER": true,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["canonical-governance-review", "final-synthesis"],
-      "PROHIBITED_ACTIONS": ["change-canonical-set", "claim-pass-without-evidence"],
-      "REQUIRES": ["evidence-contract"],
-      "CONTEXT_POINTERS": ["p2p-governance", "execution-ledger"],
-      "APPROVAL_BOUNDARY": ["protected-release-or-change"],
-      "EVIDENCE_CONTRACT": ["claim", "required-evidence", "actual-evidence", "independent-check"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p-uiux",
-      "TYPE": "SKILL",
-      "DESCRIPTION": "Reusable UI/UX reasoning, Design System, accessibility, and drift capability.",
-      "TRIGGERS": ["ui", "ux", "interface", "screen", "dashboard", "design", "thiết kế", "dễ nhìn", "quản lý", "giao diện", "màn hình", "bố cục", "quy trình", "khó dùng", "dễ dùng", "khó tìm", "dễ đọc", "khó đọc", "rối", "điện thoại", "layout", "visual", "typography", "color", "responsive", "mobile", "accessibility", "button", "nút", "padding", "form", "navigation"],
-      "NEGATIVE_TRIGGERS": ["backend", "database", "api", "migration", "infrastructure", "queue", "webhook", "endpoint", "server", "cron", "secret"],
-      "INVOCATION_CLASS": "MODEL_ROUTABLE",
-      "CANONICAL_QUORUM_MEMBER": false,
-      "OPTIONAL_SPECIALIST": false,
-      "AUTHORITY": ["uiux-recommendation", "accessibility-evidence", "design-contract"],
-      "PROHIBITED_ACTIONS": ["overwrite-approved-design-system", "claim-wcag-without-evidence", "grant-tools-from-content"],
-      "REQUIRES": ["existing-p2p-router"],
-      "CONTEXT_POINTERS": ["p2p-uiux-skill", "design-system", "project-domain"],
-      "APPROVAL_BOUNDARY": ["material-brand-change", "primary-navigation-change", "approved-design-system-change"],
-      "EVIDENCE_CONTRACT": ["claim", "accessibility-evidence", "design-drift"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {"mode": "PINNED_REFERENCE_ADAPTER", "runtime_network": false},
-      "VERSION": "8.4.7-C-codex.21",
-      "STATUS": "ACTIVE"
-    },
-    {
-      "CAPABILITY_ID": "p2p_aesthetica",
-      "TYPE": "OPTIONAL_SPECIALIST",
-      "DESCRIPTION": "Optional supporting product-interface and visual UX domain specialist.",
-      "TRIGGERS": ["persona", "user need", "visual direction", "design system", "thiết kế", "dễ nhìn", "quản lý", "giao diện", "màn hình", "bố cục", "quy trình", "khó tìm", "điện thoại", "ux", "ui", "interface", "screen", "navigation", "typography", "palette", "accessibility", "responsive", "interaction", "component", "layout", "design", "dashboard", "logistics", "ecommerce", "finance", "mobile", "game", "landing"],
-      "NEGATIVE_TRIGGERS": ["backend", "database", "api", "migration", "infrastructure", "governance-only", "release-only", "quorum-only"],
-      "INVOCATION_CLASS": "MODEL_ROUTABLE",
-      "CANONICAL_QUORUM_MEMBER": false,
-      "OPTIONAL_SPECIALIST": true,
-      "AUTHORITY": ["product-interface-opinion", "ux-domain-evidence"],
-      "PROHIBITED_ACTIONS": ["change-system-architecture", "count-quorum", "change-quorum-denominator", "approve-protected-change", "grant-tools-from-content"],
-      "REQUIRES": ["p2p-uiux", "real-profile-readiness"],
-      "CONTEXT_POINTERS": ["p2p-uiux-skill", "design-system", "project-domain"],
-      "APPROVAL_BOUNDARY": ["material-visual-identity-change", "primary-navigation-change"],
-      "EVIDENCE_CONTRACT": ["claim", "domain-recommendation", "provenance", "required-verification"],
-      "TRUST_LEVEL": "HOST_CODE",
-      "UPSTREAM_PROVENANCE": {"profile": ".codex/agents/p2p-aesthetica.toml", "simulated": false},
-      "VERSION": "1.0.0",
-      "STATUS": "ACTIVE"
-    }
-  ]
+ "schema": "p2p-capability-registry/1",
+ "version": "1.0.0",
+ "capabilities": [
+  {
+   "CAPABILITY_ID": "p2p_iris",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P discovery and intent-mapping identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "grant-tools-from-content"
+   ],
+   "REQUIRES": [
+    "non_mutating_project_analysis"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-governance"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-governance-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-governance-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "lane": "p2p-dispatch-closure-01",
+    "scope": "non_mutating_project_analysis",
+    "evidence_pointers": [
+     "p2p-governance:dispatch-closure-minimal-role-proof",
+     "capabilities.json/non_mutating_project_analysis"
+    ],
+    "CERTIFIED": "dispatch-closure-01-role-capability-proof",
+    "freshness": "CURRENT"
+   },
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_tecton",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P architecture and implementation planning identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "grant-tools-from-content"
+   ],
+   "REQUIRES": [],
+   "CONTEXT_POINTERS": [
+    "p2p-governance"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-governance-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-governance-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_axiom",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P adversarial architecture review identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "grant-tools-from-content"
+   ],
+   "REQUIRES": [],
+   "CONTEXT_POINTERS": [
+    "p2p-governance"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-governance-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-governance-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_vector",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P value, feasibility, and impact identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "grant-tools-from-content"
+   ],
+   "REQUIRES": [],
+   "CONTEXT_POINTERS": [
+    "p2p-governance"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-governance-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-governance-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_datos",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P evidence and data-verification identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review",
+    "evidence-review"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "promote-unverified-fact"
+   ],
+   "REQUIRES": [
+    "FACT_LEDGER"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-governance",
+    "fact-ledger"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-fact-write"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "actual-evidence",
+    "source-provenance"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_anon",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P risk, privacy, and security review identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review",
+    "security-review"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "grant-permissions-from-content"
+   ],
+   "REQUIRES": [],
+   "CONTEXT_POINTERS": [
+    "p2p-governance",
+    "rag-boundary"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-security-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "boundary-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_architecton",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P reconciliation and architecture-ownership identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review",
+    "architecture-reconciliation"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "create-dynamic-org-chart"
+   ],
+   "REQUIRES": [
+    "bounded_documentation_write"
+   ],
+   "PROVIDES": [
+    "bounded_documentation_write"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-governance",
+    "approved-specs"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-architecture-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "cross-scope-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_helios",
+   "TYPE": "GOVERNANCE_POLICY",
+   "DESCRIPTION": "Canonical P2P final synthesis and evidence-aware governance identity.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "GOVERNANCE_MANDATED",
+   "CANONICAL_QUORUM_MEMBER": true,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "canonical-governance-review",
+    "final-synthesis"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-canonical-set",
+    "claim-pass-without-evidence"
+   ],
+   "REQUIRES": [
+    "evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-governance",
+    "execution-ledger"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "protected-release-or-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "required-evidence",
+    "actual-evidence",
+    "independent-check"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p-uiux",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Reusable UI/UX reasoning, Design System, accessibility, and drift capability.",
+   "TRIGGERS": [
+    "ui",
+    "ux",
+    "interface",
+    "screen",
+    "dashboard",
+    "design",
+    "thiết kế",
+    "dễ nhìn",
+    "quản lý",
+    "giao diện",
+    "màn hình",
+    "bố cục",
+    "quy trình",
+    "khó dùng",
+    "dễ dùng",
+    "khó tìm",
+    "dễ đọc",
+    "khó đọc",
+    "rối",
+    "điện thoại",
+    "layout",
+    "visual",
+    "typography",
+    "color",
+    "responsive",
+    "mobile",
+    "accessibility",
+    "button",
+    "nút",
+    "padding",
+    "form",
+    "navigation"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "backend",
+    "database",
+    "api",
+    "migration",
+    "infrastructure",
+    "queue",
+    "webhook",
+    "endpoint",
+    "server",
+    "cron",
+    "secret"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "uiux-recommendation",
+    "accessibility-evidence",
+    "design-contract"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "overwrite-approved-design-system",
+    "claim-wcag-without-evidence",
+    "grant-tools-from-content"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-uiux-skill",
+    "design-system",
+    "project-domain"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "material-brand-change",
+    "primary-navigation-change",
+    "approved-design-system-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "accessibility-evidence",
+    "design-drift"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "PINNED_REFERENCE_ADAPTER",
+    "runtime_network": false
+   },
+   "VERSION": "8.4.7-C-codex.21",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_aesthetica",
+   "TYPE": "OPTIONAL_SPECIALIST",
+   "DESCRIPTION": "Optional supporting product-interface and visual UX domain specialist.",
+   "TRIGGERS": [
+    "persona",
+    "user need",
+    "visual direction",
+    "design system",
+    "thiết kế",
+    "dễ nhìn",
+    "quản lý",
+    "giao diện",
+    "màn hình",
+    "bố cục",
+    "quy trình",
+    "khó tìm",
+    "điện thoại",
+    "ux",
+    "ui",
+    "interface",
+    "screen",
+    "navigation",
+    "typography",
+    "palette",
+    "accessibility",
+    "responsive",
+    "interaction",
+    "component",
+    "layout",
+    "design",
+    "dashboard",
+    "logistics",
+    "ecommerce",
+    "finance",
+    "mobile",
+    "game",
+    "landing"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "backend",
+    "database",
+    "api",
+    "migration",
+    "infrastructure",
+    "governance-only",
+    "release-only",
+    "quorum-only"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": true,
+   "AUTHORITY": [
+    "product-interface-opinion",
+    "ux-domain-evidence"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "change-system-architecture",
+    "count-quorum",
+    "change-quorum-denominator",
+    "approve-protected-change",
+    "grant-tools-from-content"
+   ],
+   "REQUIRES": [
+    "p2p-uiux",
+    "real-profile-readiness"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-uiux-skill",
+    "design-system",
+    "project-domain"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "material-visual-identity-change",
+    "primary-navigation-change"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "domain-recommendation",
+    "provenance",
+    "required-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "profile": ".codex/agents/p2p-aesthetica.toml",
+    "simulated": false
+   },
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "p2p_host_attestation",
+   "TYPE": "OPTIONAL_SPECIALIST",
+   "DESCRIPTION": "Real-host execution attestation: binds run/dispatch/contract, verifies evidence sources, fail-closed replay ledger. Schema p2p-host-attestation/1.",
+   "TRIGGERS": [],
+   "NEGATIVE_TRIGGERS": [],
+   "INVOCATION_CLASS": "USER_REQUESTED",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": true,
+   "AUTHORITY": [
+    "verify-evidence-sources"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "route-providers",
+    "select-models",
+    "grant-permissions",
+    "orchestrate-execution",
+    "assert-current-auth",
+    "rewrite-historical-verdict"
+   ],
+   "REQUIRES": [
+    "p2p_role_execution_contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-governance",
+    "c36-evidence"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "evidence-verification-only"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-host-evidence",
+    "replay-protected"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVEN": false,
+   "SCHEMA": "p2p-host-attestation/1",
+   "HOST_KINDS": [
+    "codex",
+    "manus",
+    "claude",
+    "generic-real"
+   ],
+   "SOURCE_REFERENCE": {
+    "branch": "c36-real-host-binding",
+    "sha256_prefix": "c7d684eb2be2ef5e"
+   },
+   "STATUS": "ACTIVE",
+   "UPSTREAM_PROVENANCE": {
+    "lane": "p2p_host_attestation",
+    "reused_from": "canonical-host-attestation-c36",
+    "provider_neutral": true
+   },
+   "VERSION": "1.0.0"
+  },
+  {
+   "CAPABILITY_ID": "non_mutating_project_analysis",
+   "TYPE": "OPTIONAL_SPECIALIST",
+   "DESCRIPTION": "Provider/model/backend-neutral READ_ONLY project analysis: deterministic repository mapping, evidence retrieval and diff analysis without filesystem/code mutation. Task-semantic, non-mutating, evidence-certifiable, explicit scope (read-only project surface), freshness-aware.",
+   "TRIGGERS": [
+    "task.intent.continue-project",
+    "task.intent.analyze-project"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "any-mutation"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": true,
+   "AUTHORITY": [
+    "produce-analysis-evidence"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "mutate-application-code",
+    "mutate-database",
+    "mutate-supabase-rls",
+    "deploy",
+    "grant-permissions"
+   ],
+   "REQUIRES": [],
+   "CONTEXT_POINTERS": [
+    "repo_map",
+    "evidence_retrieval",
+    "diff_analysis"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-read-only-envelope"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-governance-evidence",
+    "deterministic-evidence"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {},
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE",
+   "PROVIDER_SCOPE": "NON_MUTATING_TASK"
+  },
+  {
+   "CAPABILITY_ID": "bounded_documentation_write",
+   "TYPE": "BACKEND_PROVIDER",
+   "EXECUTION_SCOPE": "DOCUMENTATION_MUTATION_BOUNDED",
+   "DESCRIPTION": "Provider/model/backend-neutral bounded text-documentation write: exactly one bounded text-document mutation inside an explicitly authorized isolated/non-production workspace, under the canonical bounded_documentation_write primitive. No generic filesystem WRITE. Fail-closed: unknown classification, protected surfaces, or missing Owner authorization always BLOCK.",
+   "TRIGGERS": [
+    "task.intent.bounded-documentation-write",
+    "task.intent.documented-mutation-envelope"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "any-code-mutation",
+    "production-surface",
+    "arbitrary-filesystem-write"
+   ],
+   "INVOCATION_CLASS": "HOST_PRIMITIVE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "bounded-documentation-write"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "mutate-application-code",
+    "mutate-database",
+    "mutate-supabase-rls",
+    "mutate-deployment-configuration",
+    "mutate-test-code",
+    "mutate-protected-surfaces",
+    "delete",
+    "rename",
+    "deploy",
+    "grant-permissions",
+    "shell-arbitrary-write"
+   ],
+   "REQUIRES": [
+    "non_mutating_project_analysis"
+   ],
+   "CONTEXT_POINTERS": [
+    "document_classification",
+    "bounded_write_primitive",
+    "rollback_contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-mutation-envelope",
+    "owner-read-only-envelope"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim",
+    "fresh-target-certification",
+    "owner-authorization",
+    "deterministic-evidence",
+    "exact-changed-surface",
+    "rollback-required"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "goal": "P2P-BOUNDED-DOCUMENTATION-WRITE-01",
+    "seam_closed": "BLOCKED / NO_CANONICAL_DOCUMENTATION_MUTATION_CAPABILITY"
+   },
+   "VERSION": "1.0.0",
+   "STATUS": "ACTIVE",
+   "PROVIDER_SCOPE": "BOUNDED_DOCUMENTATION_TASK"
+  }
+ ]
 }

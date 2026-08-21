@@ -1,0 +1,17 @@
+# Synthetic fixture: core module BEFORE the canonical change.
+# This file exists solely to enable per-symbol changed evidence:
+# calculate_total body differs from core.py; format_receipt is identical.
+
+def format_receipt(total: float) -> str:
+    """Untouched symbol for changed-symbol precision measurement."""
+    return f"TOTAL {total:.2f}"
+
+
+def calculate_total(items: list) -> float:
+    """Original body: no tax, different rounding semantics."""
+    return sum(item.get("price", 0.0) for item in items)
+
+
+def describe_product(name: str) -> str:
+    """Second untouched symbol."""
+    return f"product: {name}"

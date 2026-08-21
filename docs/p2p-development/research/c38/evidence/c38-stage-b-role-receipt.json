@@ -1,0 +1,43 @@
+{
+  "schema": "p2p-role-execution-receipt/1",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "goal_id": "C38",
+  "task_id": "c38-stage-b-first-live-role-proof",
+  "project_binding": "P2P-upgrade-github-1",
+  "environment_binding": "LOCAL_PROJECT",
+  "context_digest": "92da41a5f62c04fa1b04074b78f55ad9fd13ca89832d52af27e8e374c376844b",
+  "permission_profile": [
+    "NON_MUTATING_TASK"
+  ],
+  "permission_profile_fingerprint": "d91982c163580fe6af1f8aa27defadbe71dd8b7d44ce99d1aa45e0e0953da5f2",
+  "request_fingerprint": "dd58e94cd7ea885530cb1f15f223a9c62edb28e75f2b8643558973927b5e10b0",
+  "task_fingerprint": "dd58e94cd7ea885530cb1f15f223a9c62edb28e75f2b8643558973927b5e10b0",
+  "requested_target": "manus-api-v2",
+  "observed_target": "manus-api-v2",
+  "target_attestation_status": "ATTESTED_MATCH",
+  "target_fingerprint": "7335b2097cf4d14de9e210026c76380052f3420738fa265bbbb8386d19b39c00",
+  "execution_status": "SUCCEEDED",
+  "output_pointers": [],
+  "artifact_pointers": [
+    "docs/p2p-development/research/c38/harness",
+    "docs/p2p-development/research/c38/evidence/c38-stage-b-messages-observed.json",
+    "docs/p2p-development/research/c38/evidence/c38-stage-b-live-receipt.json"
+  ],
+  "evidence_pointers": [
+    "role_binding:contract-on-disk",
+    "target_attestation:manus-task:NWnoWkrrJeQiYWZMv8jCS5",
+    "terminal_result:listMessages:stopped:answer:H\u00e0 N\u1ed9i"
+  ],
+  "verifier_result": "VERIFIED",
+  "verifier_reasons": [],
+  "mutation_state": "NO_MUTATION_OBSERVED",
+  "failure_class": "NONE",
+  "timestamps": {
+    "started_at": "2026-08-18T07:26:08+0000",
+    "finished_at": "2026-08-18T07:26:10+0000",
+    "executed_at": "UNKNOWN",
+    "verified_at": "UNKNOWN"
+  },
+  "raw_backend_receipt_pointer": "manus-task:NWnoWkrrJeQiYWZMv8jCS5"
+}

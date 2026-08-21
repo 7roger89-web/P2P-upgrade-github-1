@@ -1,0 +1,11 @@
+{
+  "schema": "c40-regression-differential/1",
+  "baseline_head": "8b751f6",
+  "current_head": "working tree of p2p-c40-project-usable-release-pilot",
+  "current_failures": 44,
+  "baseline_failures": 46,
+  "new_unexplained_failures": 0,
+  "framework_validator": "73/73 passed, 0 failed",
+  "approved_set_growth": "expected_untracked extended with C40 paths (C34 precedent)",
+  "verdict": "PASS"
+}

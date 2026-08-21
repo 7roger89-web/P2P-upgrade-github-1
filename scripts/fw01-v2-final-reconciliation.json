@@ -1,0 +1,93 @@
+{
+  "schema": "fw01-v2-final-evidence-reconciliation/1",
+  "generated_on": "2026-08-19",
+  "git_truth": {
+    "current_branch": "p2p-fw01-bootstrap-reconciliation",
+    "current_local_head": "22ba171314f1c4bf8b05540df475657d3da9d2ea",
+    "owner_reported_head": "22ba171",
+    "owner_reported_head_confirmed": true,
+    "remote_head_fw01_branch": "ad5c39d927d3034261ea3ade5fcdb06cd7af6b79",
+    "remote_branch": "p2p-framework-01-autonomous-operating-loop",
+    "working_tree": "clean (0 uncommitted changes)",
+    "pr19": {
+      "state": "open",
+      "head": "ad5c39d927d3034261ea3ade5fcdb06cd7af6b79",
+      "head_branch": "p2p-framework-01-autonomous-operating-loop",
+      "base": "p2p-framework-00-product-memory",
+      "base_head": "33aa50b46166f2ec14906f1c5f142328a24bcd0d",
+      "merged": false
+    },
+    "candidate_blob_sha_git_hash_object": "130a58601254d1af4a671cee1e901d88dfc12a94",
+    "candidate_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+    "candidate_bytes_changed": false
+  },
+  "lineage": {
+    "AUTHORITATIVE_BASE_BRANCH": "p2p-framework-01-autonomous-operating-loop",
+    "PATCH_BRANCH": "p2p-fw01-bootstrap-reconciliation",
+    "SOURCE_COMMIT": "a5f2997d982c18fc9b6005e2408dc8527a7dd0f0",
+    "CURRENT_FINAL_HEAD": "22ba171314f1c4bf8b05540df475657d3da9d2ea",
+    "is_ancestor_firmware_base_tip_of_final_head": true,
+    "merge_base_final_head_vs_fw01_tip": "ad5c39d927d3034261ea3ade5fcdb06cd7af6b79",
+    "child_branch_is_bounded": true,
+    "rewrites": false,
+    "merges_of_other_branches": false,
+    "commit_chain": ["ad5c39d", "d16b1e5", "0fb7693", "5626339", "05f3a82", "38a3e59", "1161dc5", "a5f2997", "806abf4", "e0c3152", "22ba171"]
+  },
+  "source_binding_accounting": {
+    "UNIQUE_CANDIDATE_MEMBERS": 463,
+    "ACCOUNTED_UNIQUE_MEMBERS": 463,
+    "UNACCOUNTED_MEMBERS": 0,
+    "disjoint_classes": {
+      "exact_tree_match": 363,
+      "runtime_remap_byte_verified": 86,
+      "legacy_stable_absent_from_tree": 5,
+      "mint_generated_integrity_committed_to_tree": 7,
+      "self_referencing_mint_unbound": 2
+    },
+    "UNBOUND_COUNT": 2,
+    "UNBOUND_FILES": ["RELEASE-SHA256SUMS.txt", "release-manifest.json"],
+    "defect_classification": "C-then-D: old evidence overcounted 'unbound' (4 vs real 2) because its runtime_remap count used path-only remap; mechanical byte-verified accounting shows 86/86 runtime remaps DO byte-match .p2p/system/ in the tree, removing the double-counted 2",
+    "method": "accounting_check.py: every zip member classified into exactly one disjoint class with byte-level git cat verification"
+  },
+  "determinism_terminology": {
+    "CONTENT_LAYOUT_DETERMINISM": "PASS (463/463 member set identical, layout identical, archive format fully normalized: ZipInfo date_time=2010-01-01T00:00:00, sorted iteration)",
+    "EXECUTABLE_PAYLOAD_DETERMINISM": "PASS (459/463 content-bearing members byte-identical across mint runs)",
+    "BYTE_IDENTICAL_REBUILD": "NOT_REQUIRED_BY_CURRENT_POLICY (canonical mint deliberately embeds generated_at in release-manifest.json; no canonical policy requires identical artifact bytes across mint runs)",
+    "FROZEN_CANDIDATE_IMMUTABILITY": "VERIFIED (artifact hash 2a42... unchanged across all subsequent operations; binding achieved via exact-byte hash pinning, proven independently in fw01-v2-exact-fresh-machine-proof.json and fw01-v2-source-binding.json)",
+    "policy_basis": "scripts/package_release.py write_release_metadata() declares generated_at = datetime.now(UTC); C29 closure policy vocabulary is artifact immutability via hash-binding, not rebuild reproducibility"
+  },
+  "artifact_proof_preserved": {
+    "EXPECTED_SHA": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+    "OBSERVED_SHA": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
+    "INSTALL": "PASS",
+    "DOCTOR": "HEALTHY",
+    "EXTERNAL_DEV_PATH_DEPENDENCY": 0,
+    "proof_file_unchanged": true,
+    "proof_not_rerun": true
+  },
+  "agents_md_disclosure": {
+    "Game_Truyen": {
+      "classification": "B",
+      "precise_semantics": "DECLARED_TRACKED_INSTALLER_MUTATION = AGENTS.md only (P2P CODEX block merge, backup-then-merge); UNEXPECTED_TRACKED_MUTATION = 0",
+      "mojibake_note": "UTF-8 normalization inside the replaced block is an unavoidable side effect of the documented merge flow on non-clean bytes; it is NOT claimed as a P2P feature"
+    },
+    "Gia_Pha": {
+      "classification": "A",
+      "precise_semantics": "UNEXPECTED_TRACKED_MUTATION = 0, tracked_changes = 0, SUPABASE_MUTATION = 0 (no RLS SQL present in the project to weaken)"
+    }
+  },
+  "validation": {
+    "validator": "78/78 PASS",
+    "validate_control": "PASS",
+    "candidate_sha_verify": "PASS (bytes unchanged)",
+    "source_binding_accounting_checker": "PASS (accounting_check.py)",
+    "lineage_checker": "PASS (merge-base + is-ancestor mechanical checks)",
+    "secret_scan": "CLEAN for FW01 v2 scope (evidence/, reports/, terminal report, GP evidence: 0 findings; worktree-wide historical documentation placeholders flagged are pre-existing C40/creem/tier1 items, none are real credentials in FW01 v2 scope)",
+    "runtime_mutation": false,
+    "project_remote_mutation": false,
+    "NEW_UNEXPLAINED_FAILURES": 0
+  },
+  "terminal_verdict": "PASS/FW01_V2_RELEASE_EVIDENCE_RECONCILED",
+  "gate": "OWNER_PATCH_RELEASE_GATE",
+  "no_actions_taken": ["no publish", "no promote", "no push", "no FRAMEWORK-02", "no Council/Gate J", "no Supabase writes", "no re-mint", "no runtime modification", "no candidate byte change"]
+}

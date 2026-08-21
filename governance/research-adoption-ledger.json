@@ -1,0 +1,1155 @@
+{
+  "ledger_id": "research-adoption-ledger",
+  "schema_version": "p2p-framework/research-adoption-ledger/1",
+  "generated_at": "2026-08-21T04:25:23Z",
+  "generated_by": "P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01",
+  "authority": "This ledger is the durable record of what P2P researched, selected, rejected, and shipped, reconciled from repository evidence. It is append-and-reconcile only: historical records are never rewritten. External research is provenance, not authority. P2P adopts ideas selectively, not repositories wholesale.",
+  "status_vocabulary": [
+    "DISCOVERED",
+    "RESEARCHED",
+    "SELECTED",
+    "PLANNED",
+    "PARTIAL",
+    "IMPLEMENTED",
+    "SHIPPED",
+    "VERIFIED",
+    "DEFERRED",
+    "REJECTED",
+    "SUPERSEDED",
+    "UNKNOWN"
+  ],
+  "intake_rule": "OWNER_SELECTED_CAPABILITY -> DURABLE_ROADMAP_RECORD: whenever the Owner accepts a new P2P feature/capability/research direction, P2P must update this ledger (and the roadmap/charter/capability ledger as applicable) before or during the goal that acts on it. Chat memory is never a source of truth.",
+  "baseline_identity": {
+    "version": "8.4.7-C-codex.41",
+    "artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
+    "promotion_status": "PROMOTED_VERIFIED",
+    "promotion_goal": "P2P-PROMOTE-41-01",
+    "verified_at": "2026-08-21T04:25:23Z"
+  },
+  "records": [
+    {
+      "research_id": "RA-EXT-001",
+      "source_name": "Agent Skills ecosystem (OpenAI / agent-skill patterns)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/openai/agent-skills",
+      "source_version_or_commit": "public repository (accessed via research goals, not vendored)",
+      "provenance_status": "REPOSITORY_NOT_VENDORED",
+      "research_summary": "Patterns for modular, loadable skill packages: capability/skill separation, on-demand loading, skill provenance.",
+      "selected_ideas": [
+        "skill discovery",
+        "progressive skill loading",
+        "skill provenance & hashing",
+        "capability vs skill separation",
+        "bounded skill selection"
+      ],
+      "rejected_ideas": [
+        "turning skill catalogs into permanent agent populations",
+        "indiscriminate prompt preload"
+      ],
+      "p2p_translation": "Mapped into the SKILL_AND_LEARNING family: skills are loadable resources read by the capability intelligence layer (FW02), never agents. Selection is bounded and relevance-filtered.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "capability-index.json (family SKILL_AND_LEARNING, 5 entries, statuses FOUNDATION_READY/VERIFIED_IMPLEMENTED)",
+        "reports P2P-FRAMEWORK-02 (FW02 PROJECT & CAPABILITY INTELLIGENCE)",
+        "runtime artifact .41: .p2p/system/.../skills selection modules"
+      ],
+      "dependencies": [
+        "FW02 capability intelligence"
+      ],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Selected selectively: loading/provenance patterns adopted; no repository vendoring. 174-faculty-style agentization explicitly rejected."
+    },
+    {
+      "research_id": "RA-EXT-002",
+      "source_name": "Superlearn / Superpowers-style development & evaluation patterns",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "governance/development-control.json (research_decisions)",
+      "provenance_status": "DECISION_RECORD_PRESENT",
+      "research_summary": "Disciplined implementation loops, pressure testing, deterministic verification, workspace-per-skill iteration habits.",
+      "selected_ideas": [
+        "deterministic verification before AI judgment",
+        "disciplined build-retest loops",
+        "evaluation-first mindset"
+      ],
+      "rejected_ideas": [
+        "vendoring Superlearn source or packages"
+      ],
+      "p2p_translation": "Principles adapted as working method, not as code. DETERMINISTIC_FIRST is a charter invariant; verification suites and negative tests are the mechanism.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "development-control.json research_decisions: Superlearn ADAPTED, vendored false",
+        "charter invariant DETERMINISTIC_FIRST"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:quality",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "decision: principles adapted; no source/package vendoring."
+    },
+    {
+      "research_id": "RA-EXT-003",
+      "source_name": "Matt Skills / Agency Agents / related agent-skill repositories",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "public agent-skill repositories (documented during early design goals)",
+      "provenance_status": "REPOSITORY_NOT_VENDORED",
+      "research_summary": "Reusable specialist knowledge blocks; distinction between an agent role and a loadable skill.",
+      "selected_ideas": [
+        "role-vs-skill separation",
+        "reusable specialist knowledge units"
+      ],
+      "rejected_ideas": [
+        "skill catalog -> permanent agent population (TASK_AS_AGENT, 174_NUI_FACULTIES_AS_AGENTS)"
+      ],
+      "p2p_translation": "ROLE != SKILL preserved as a charter invariant (TASK_NOT_AGENT). Skills remain loadable knowledge sources; they never become canonical agent identities.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "TASK_NOT_AGENT (charter invariant)",
+        "AUTO_PROMOTION_AFTER_GOAL_PASS (rejected pattern)",
+        "174_NUI_FACULTIES_AS_AGENTS (rejected pattern)"
+      ],
+      "status": "VERIFIED",
+      "evidence_pointers": [
+        "charter invariants TASK_NOT_AGENT, HOST_NOT_AGENT",
+        "capability-index.json REJECTED entries",
+        "docs/p2p-development/framework/capability-skill-map.md"
+      ],
+      "dependencies": [
+        "RA-EXT-001"
+      ],
+      "roadmap_slot": "family:roles",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter \u00a77 never-reintroduce list."
+    },
+    {
+      "research_id": "RA-EXT-004",
+      "source_name": "Karpathy-style coding/reasoning workflow research",
+      "source_type": "ARTICLE",
+      "source_reference": "public writing/interviews on agent skills & evidence-driven engineering (documented in early C-series goals)",
+      "provenance_status": "CLAIMS_DOCUMENTED_NO_ARTIFACT",
+      "research_summary": "Evidence-driven engineering; minimal useful context; reasoning as a discipline rather than token volume.",
+      "selected_ideas": [
+        "evidence-driven engineering",
+        "minimal useful context",
+        "deterministic-first verification"
+      ],
+      "rejected_ideas": [
+        "no external repository adopted as such"
+      ],
+      "p2p_translation": "Absorbed as engineering discipline: DETERMINISTIC_FIRST, CORRECTNESS_OVER_TOKEN_SAVING, PROGRESSIVE_DISCLOSURE invariants; CONTEXT_AND_KNOWLEDGE family implementation.",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "charter invariants DETERMINISTIC_FIRST / PROGRESSIVE_DISCLOSURE / CORRECTNESS_OVER_TOKEN_SAVING",
+        "capability-index CONTEXT_AND_KNOWLEDGE family (35 entries)"
+      ],
+      "dependencies": [
+        "RA-EXT-023"
+      ],
+      "roadmap_slot": "family:context",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "No external artifact to vendor; the practice is preserved via invariants and implementation, not source copy."
+    },
+    {
+      "research_id": "RA-EXT-005",
+      "source_name": "Semantica (structured semantics / provenance ideas)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "governance/development-control.json (research_decisions)",
+      "provenance_status": "DECISION_RECORD_PRESENT",
+      "research_summary": "Structured semantics and provenance/decision-trace ideas from the Semantica project.",
+      "selected_ideas": [
+        "provenance and decision-trace concepts (absorbed natively)"
+      ],
+      "rejected_ideas": [
+        "competing source-of-truth system (NO_SECOND_TRUTH_STORE)",
+        "runtime dependency / vendoring"
+      ],
+      "p2p_translation": "Deferrred research. Semantics/provenance ideas are absorbed into native decision trace and FACT/Evidence machinery; no separate Semantica-derived module.",
+      "capability_family": "PROJECT_TRUTH_AND_DURABLE_STATE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "development-control.json research_decisions: Semantica DEFERRED"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "deferred",
+      "owner_decision_status": "OWNER_DECISION_RECORD",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Status DEFERRED from prior Owner decision; re-evaluate only if a native-native gap emerges."
+    },
+    {
+      "research_id": "RA-EXT-006",
+      "source_name": "Brigade / typed lifecycle ideas",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "internal design discussions during C11/FW06 goals",
+      "provenance_status": "INTERNAL_DISCUSSION",
+      "research_summary": "Typed state transitions, explicit execution lifecycle, fail-closed state semantics.",
+      "selected_ideas": [
+        "typed state transitions",
+        "explicit lifecycle states",
+        "fail-closed state semantics"
+      ],
+      "rejected_ideas": [
+        "none \u2014 concepts fully consistent with fail-closed architecture"
+      ],
+      "p2p_translation": "Implemented as C11 durable task state (fail-closed state machine) and FW06 lease/interruption lifecycle.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [
+        "FW06 lease/interruption state modules",
+        "C11 task state"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "reports P2P-C11, FW06 modules in artifact .41 runtime",
+        "capability-index RECOVERY_AND_CONTINUATION family"
+      ],
+      "dependencies": [
+        "C11",
+        "FW01",
+        "FW06"
+      ],
+      "roadmap_slot": "family:execution",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Typed lifecycle is the backbone of fail-closed semantics; shipped and verified through the FW06 harness."
+    },
+    {
+      "research_id": "RA-EXT-007",
+      "source_name": "Anvien (project/change intelligence)",
+      "source_type": "PROJECT",
+      "source_reference": "external project (license/provenance constraints documented)",
+      "provenance_status": "LICENSE_CONSTRAINED_NO_ADOPTION",
+      "research_summary": "Useful project/change intelligence ideas, but the upstream license and provenance make vendoring or copying the framework material incompatible.",
+      "selected_ideas": [
+        "lessons about project/change intelligence only"
+      ],
+      "rejected_ideas": [
+        "vendoring or copying framework material (license/provenance incompatible)"
+      ],
+      "p2p_translation": "Research-only register entry. No code, document, or capability in the P2P runtime derives from Anvien.",
+      "capability_family": "RESEARCH_ONLY_REGISTER",
+      "canonical_capability_ids": [],
+      "status": "REJECTED",
+      "evidence_pointers": [
+        "this ledger (rejected/non-adopted register)",
+        "charter invariant on provenance-only external research"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "rejected",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Rejection rationale preserved: incompatible license/provenance. Prevents accidental future reintroduction."
+    },
+    {
+      "research_id": "RA-EXT-008",
+      "source_name": "UI-UX Pro Max",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "UI/UX design intelligence repository (researched in C13/C14 lineage)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "UI/UX design intelligence: selective loading of design knowledge, upstream provenance.",
+      "selected_ideas": [
+        "selective loading of design intelligence",
+        "upstream provenance discipline"
+      ],
+      "rejected_ideas": [
+        "standalone UI-UX Pro Max agent / second router"
+      ],
+      "p2p_translation": "Feeds the DESIGN_AND_PRODUCT_INTELLIGENCE family and the C13 beginner design-intelligence lineage (C13 DONE, C14 DONE PROMOTED_VERIFIED).",
+      "capability_family": "UI_UX_VISUAL_INTELLIGENCE",
+      "canonical_capability_ids": [
+        "C13 design intelligence foundation",
+        "C14 design intelligence release readiness"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "reports P2P-C13, P2P-C14 (PROMOTED_VERIFIED)",
+        "docs/plans 2026-08-13-p2p-beginner-uiux-*",
+        "docs/p2p-development/framework/capability-skill-map.md (design rows)"
+      ],
+      "dependencies": [
+        "C13",
+        "C14"
+      ],
+      "roadmap_slot": "family:design",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Design intelligence is a capability of P2P, not a separate tool identity. C14 reached PROMOTED_VERIFIED."
+    },
+    {
+      "research_id": "RA-EXT-009",
+      "source_name": "Nolane UI Intelligence (NUI)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "docs/p2p-development/framework/capability-skill-map.md; governance/research-intake-ledger.json RI-003",
+      "provenance_status": "PRINCIPLES_ADAPTED_CLAIM_PROVENANCE_NOT_RECOVERED",
+      "research_summary": "Design cognition registry concepts. The specific external claim of '174 canonical faculties' could not be reproduced from a repository artifact.",
+      "selected_ideas": [
+        "targeted faculty loading",
+        "design cognition registry pattern",
+        "P2P-as-sole-router discipline"
+      ],
+      "rejected_ideas": [
+        "174 faculties as permanent agents (174_NUI_FACULTIES_AS_AGENTS)",
+        "competing visual router (NO_COMPETING_ROUTER)"
+      ],
+      "p2p_translation": "C13 beginner design-intelligence source (ADAPTED). The 174-faculty count is classified PROVENANCE_NOT_RECOVERED / NOT_PROVEN per machinery (RI-003); it remains NOT_PROVEN until recovered or disproven, never REJECTED by evidence of absence.",
+      "capability_family": "UI_UX_VISUAL_INTELLIGENCE",
+      "canonical_capability_ids": [
+        "C13",
+        "RI-003 (research-intake-ledger)"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "RI-003 (research-intake-ledger.json)",
+        "capability-skill-map.md NUI row",
+        "charter \u00a77 174_NUI_FACULTIES_AS_AGENTS REJECTED"
+      ],
+      "dependencies": [
+        "RA-EXT-008",
+        "RA-EXT-010"
+      ],
+      "roadmap_slot": "family:design",
+      "owner_decision_status": "OWNER_RECONCILED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "RI-003 reconciliation (2026-08-19): principles ADAPTED, faculty-count claim PROVENANCE_NOT_RECOVERED. Do not mark REJECTED."
+    },
+    {
+      "research_id": "RA-EXT-010",
+      "source_name": "Visual Commander 4",
+      "source_type": "PROJECT",
+      "source_reference": "visual intent interpretation project (researched alongside C13 design work)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "Natural-language visual intent interpretation, style vocabulary, visual recipes, dense visual specification.",
+      "selected_ideas": [
+        "design intelligence input for beginner-first visual guidance",
+        "style/recipe vocabulary as selectable knowledge"
+      ],
+      "rejected_ideas": [
+        "competing visual router / second orchestration brain (NO_COMPETING_ROUTER)"
+      ],
+      "p2p_translation": "Registered as a design-intelligence input source; visual knowledge flows into C13 lineage via the capability/skill map, never as a separate router.",
+      "capability_family": "UI_UX_VISUAL_INTELLIGENCE",
+      "canonical_capability_ids": [
+        "C13",
+        "capability-skill-map visual rows"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "docs/p2p-development/framework/capability-skill-map.md",
+        "docs/p2p-development/framework/_skill-inventory-raw.json"
+      ],
+      "dependencies": [
+        "RA-EXT-008",
+        "RA-EXT-009"
+      ],
+      "roadmap_slot": "family:design",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Composition principle: P2P sole orchestrator; design sources are cognition/skill providers only."
+    },
+    {
+      "research_id": "RA-EXT-011",
+      "source_name": "Orca AI Orchestrator",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "orchestration concepts researched in C17/FW06 goals",
+      "provenance_status": "CONCEPTS_ADOPTED_SELECTIVELY",
+      "research_summary": "Parallel task execution, isolated task workspaces/worktrees, comparing multiple independent candidate solutions, bounded fanout, orchestration UI ideas.",
+      "selected_ideas": [
+        "task-scoped isolated sessions",
+        "git worktrees/workspaces",
+        "bounded parallel candidate execution (C17)",
+        "output compare/evaluate",
+        "headless/replaceable backends",
+        "explicit lifecycle state"
+      ],
+      "rejected_ideas": [
+        "uncontrolled fanout",
+        "background autonomous explosion",
+        "automatic permission widening"
+      ],
+      "p2p_translation": "Selected bounded subset shipped in C17 (safe bounded parallel foreground execution, DONE) and FW06 (lease, max_parallelism=1 default). Rejected patterns are charter invariants.",
+      "capability_family": "WORKSPACE_SESSION_ISOLATION",
+      "canonical_capability_ids": [
+        "C17 safe bounded parallel foreground execution",
+        "FW06 lease/interruption"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "reports P2P-C17, FW06 terminal report",
+        "charter invariants NO_SWARM_FOR_ITS_OWN_SAKE / PERMISSION_ENVELOPE_NEVER_WIDENS",
+        "capability-index EXECUTION_AND_ORCHESTRATION family"
+      ],
+      "dependencies": [
+        "C17",
+        "FW06",
+        "RA-EXT-006"
+      ],
+      "roadmap_slot": "family:isolation",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' \u2014 fully embedded in C17/FW06."
+    },
+    {
+      "research_id": "RA-EXT-012",
+      "source_name": "Electron / desktop-control ideas",
+      "source_type": "ARTICLE",
+      "source_reference": "discussions alongside Orca research (no durable decision record in repo)",
+      "provenance_status": "PROVENANCE_NOT_RECOVERED",
+      "research_summary": "Desktop shell / local control-plane directions discussed during orchestration research.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "desktop shell / local control plane as P2P core direction"
+      ],
+      "p2p_translation": "No selection evidence exists in durable governance records. Classified NOT_ADOPTED / PROVENANCE_NOT_RECOVERED: no repository artifact reproduces the specific claims.",
+      "capability_family": "RESEARCH_ONLY_REGISTER",
+      "canonical_capability_ids": [],
+      "status": "UNKNOWN",
+      "evidence_pointers": [
+        "this ledger (no matching evidence found in docs/ governance/ \u2014 verified by full-text search 2026-08-21)"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "not_adopted",
+      "owner_decision_status": "UNKNOWN_NOT_PROVEN",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "If a desktop-shell direction is ever wanted it requires a new Owner decision and its own goal; it is NOT inherited from this research."
+    },
+    {
+      "research_id": "RA-EXT-013",
+      "source_name": "awesome-cursor-rules-mdc / rules-mdc",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "public rule-collection repositories (researched during skill/context goals)",
+      "provenance_status": "PATTERNS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "Reusable coding rules, scoped instruction loading, provenance, project/language/framework-aware rule selection.",
+      "selected_ideas": [
+        "scoped instruction loading",
+        "provenance per rule set",
+        "avoid indiscriminate prompt preload"
+      ],
+      "rejected_ideas": [
+        "FULL_CONTEXT_PRELOAD (rejected invariant)",
+        "vendoring whole rule collections"
+      ],
+      "p2p_translation": "Mapped to SKILL_AND_LEARNING selective-loading patterns: rules are loadable knowledge units selected per task, never preloaded wholesale.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "SKILL_AND_LEARNING capability-index entries"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "charter invariant FULL_CONTEXT_PRELOAD in never-reintroduce list",
+        "capability-index SKILL_AND_LEARNING family"
+      ],
+      "dependencies": [
+        "RA-EXT-001"
+      ],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "The selective-load lesson is now an invariant; the external collections are not vendored."
+    },
+    {
+      "research_id": "RA-EXT-014",
+      "source_name": "Godogen (game-dev toolchain)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "external game-dev toolchain repository (eval/iteration concepts referenced in skill documentation)",
+      "provenance_status": "CONCEPTS_ADOPTED_SELECTIVELY",
+      "research_summary": "Autonomous/self-evolving project development concepts for games; evaluation and iteration pipelines.",
+      "selected_ideas": [
+        "evaluation/iteration pipeline ideas",
+        "self-contained packaging/deployment lessons"
+      ],
+      "rejected_ideas": [
+        "unbounded background autonomy",
+        "automatic dependency-chain autonomy without safe gates"
+      ],
+      "p2p_translation": "Evaluation/iteration lessons absorbed into VERIFICATION_AND_EVALUATION and OUTCOME_LEARNING capability entries; autonomous-evolution directions rejected.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [
+        "VERIFICATION_AND_EVALUATION family entries",
+        "OUTCOME_LEARNING family entries"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "capability-index OUTCOME_LEARNING (4 entries)",
+        "skill documentation referencing godogen pipeline"
+      ],
+      "dependencies": [
+        "RA-EXT-002"
+      ],
+      "roadmap_slot": "family:quality",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Kept only the eval/iteration discipline; autonomy directions conflict with NO_UNBOUNDED_BACKGROUND_AUTONOMY."
+    },
+    {
+      "research_id": "RA-EXT-015",
+      "source_name": "Hermes Agent",
+      "source_type": "PROJECT",
+      "source_reference": "hermes_adapter.py in artifact .41 runtime; adapter discussions in C35/FRAMEWORK goals",
+      "source_version_or_commit": "evidence-bound current capability only",
+      "provenance_status": "LESSONS_ADOPTED_CURRENT_EVIDENCE_ONLY",
+      "research_summary": "Provider-neutral backend lessons: replaceable harness/backend, current capability evidence.",
+      "selected_ideas": [
+        "replaceable headless backend concept",
+        "adapter conformance pattern"
+      ],
+      "rejected_ideas": [
+        "Hermes as P2P core architecture",
+        "provider-specific design"
+      ],
+      "p2p_translation": "Hermes contributes adapter lessons (hermes_adapter.py ships in .41); it is a supported backend, not the identity of P2P.",
+      "capability_family": "MULTI_AI_INTEROPERABILITY",
+      "canonical_capability_ids": [
+        "C35 provider-neutral runtime",
+        "MULTI_AI_INTEROPERABILITY family (31 entries)"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        ".41 runtime: hermes_adapter.py, fake_hermes_*.py",
+        "reports P2P-C35 (PROMOTED_VERIFIED lineage)"
+      ],
+      "dependencies": [
+        "RA-EXT-023",
+        "RA-EXT-016"
+      ],
+      "roadmap_slot": "family:interoperability",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "C35 verified provider-neutral runtime; Hermes is one adapter among interchangeable backends."
+    },
+    {
+      "research_id": "RA-EXT-016",
+      "source_name": "Manus integration",
+      "source_type": "PROJECT",
+      "source_reference": "manus_adapter.py in artifact .41 runtime; FW01 loop host",
+      "source_version_or_commit": "current-host execution evidence only",
+      "provenance_status": "LESSONS_ADOPTED_CURRENT_EVIDENCE_ONLY",
+      "research_summary": "Provider-neutral adapter lessons and real execution receipts on the current host.",
+      "selected_ideas": [
+        "adapter lessons",
+        "real execution receipt patterns",
+        "cold-process recovery concepts"
+      ],
+      "rejected_ideas": [
+        "designing P2P around Manus",
+        "transport-as-permission confusion"
+      ],
+      "p2p_translation": "Manus is the current execution host and adapter source; TRANSPORT_NOT_PERMISSION invariant prevents channel-based permission inference.",
+      "capability_family": "MULTI_AI_INTEROPERABILITY",
+      "canonical_capability_ids": [
+        "C35",
+        "FW06",
+        "C11 durable state"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        ".41 runtime: manus_adapter.py, fake_manus_*.py",
+        "reports P2P-FW06, P2P-C11"
+      ],
+      "dependencies": [
+        "RA-EXT-015",
+        "RA-EXT-023"
+      ],
+      "roadmap_slot": "family:interoperability",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "HOST_NOT_AGENT / TRANSPORT_NOT_PERMISSION invariants keep the host a backend, not an identity."
+    },
+    {
+      "research_id": "RA-EXT-017",
+      "source_name": "Codex integration",
+      "source_type": "PROJECT",
+      "source_reference": "C36 real-host-binding lane; C38 live-role certification; current host @ 8a1ad30",
+      "source_version_or_commit": "host-identity evidence from C36/C38 live certification",
+      "provenance_status": "LESSONS_ADOPTED_HOST_IS_INFRASTRUCTURE",
+      "research_summary": "Execution host, not P2P identity: live role certification, real host binding.",
+      "selected_ideas": [
+        "host execution path lessons",
+        "live role certification evidence (LIVE_COUNCIL_8_OF_8 single host)"
+      ],
+      "rejected_ideas": [
+        "provider lock-in",
+        "HOSTS_AS_CANONICAL_AGENTS (rejected)"
+      ],
+      "p2p_translation": "Codex is the current evidence host; the canonical certification lane is host-neutral (c36-real-host-binding). Multi-host certification remains NOT_PROVEN.",
+      "capability_family": "MULTI_AI_INTEROPERABILITY",
+      "canonical_capability_ids": [
+        "C36 context/execution lane",
+        "C38 live role certification",
+        "LIVE_COUNCIL_8_OF_8"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-C38-terminal-report.md",
+        "c36-real-host-binding lane (8/8 VERIFIED)",
+        "master-roadmap.md"
+      ],
+      "dependencies": [
+        "RA-EXT-023"
+      ],
+      "roadmap_slot": "family:interoperability",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "CERTIFIED != CURRENTLY_ELIGIBLE: live re-certification is required per capability evidence rules (drift)."
+    },
+    {
+      "research_id": "RA-EXT-018",
+      "source_name": "Claude Code / session-management research",
+      "source_type": "ARTICLE",
+      "source_reference": "context/session research during C11/FW06 goals",
+      "provenance_status": "PATTERNS_ADOPTED_IMPLEMENTED",
+      "research_summary": "Context/session continuation, durable state, context offloading, fresh-process recovery.",
+      "selected_ideas": [
+        "durable state across sessions (C11)",
+        "context offloading to filesystem (PROGRESSIVE_DISCLOSURE)",
+        "fresh/cold-process recovery (FW06)"
+      ],
+      "rejected_ideas": [
+        "chat transcript as project state (FULL_CHAT_AS_PROJECT_STATE rejected)"
+      ],
+      "p2p_translation": "Implemented: C11 durable task state, FW06 cold-process recovery, filesystem evidence preservation.",
+      "capability_family": "WORKSPACE_SESSION_ISOLATION",
+      "canonical_capability_ids": [
+        "C11",
+        "FW06"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "reports P2P-C11, P2P-FW06*",
+        "charter invariants PROJECT_STATE_NOT_CHAT_HISTORY / RAW_OUTPUT_NOT_MODEL_CONTEXT"
+      ],
+      "dependencies": [
+        "RA-EXT-019",
+        "RA-EXT-023"
+      ],
+      "roadmap_slot": "family:session",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "The session-management lesson is implemented as durable state, not as transcript memory."
+    },
+    {
+      "research_id": "RA-EXT-019",
+      "source_name": "Context / token efficiency research",
+      "source_type": "ARTICLE",
+      "source_reference": "C19 task-targeted retrieval + context goals",
+      "provenance_status": "PATTERNS_ADOPTED_IMPLEMENTED",
+      "research_summary": "Filesystem/context offloading, deterministic-first checks, task-targeted retrieval, retrieval coverage/fallback, project/repository maps, symbol-aware retrieval, cache-aware context, adaptive context budget, token-bounded maps.",
+      "selected_ideas": [
+        "task-targeted retrieval (C19 DONE)",
+        "progressive disclosure",
+        "evidence pointers",
+        "deterministic-first verification",
+        "token-bounded maps",
+        "adaptive context budget",
+        "symbol-aware retrieval",
+        "current-state capsules"
+      ],
+      "rejected_ideas": [
+        "full context preload (FULL_CONTEXT_PRELOAD rejected)",
+        "correctness sacrifice for token saving (CORRECTNESS_OVER_TOKEN_SAVING)"
+      ],
+      "p2p_translation": "Implemented as the largest canonical family: CONTEXT_AND_KNOWLEDGE (35 capability entries).",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "C19 task-targeted context retrieval",
+        "CONTEXT_AND_KNOWLEDGE family (35 entries)"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "reports P2P-C19, capability-index CONTEXT_AND_KNOWLEDGE family",
+        "charter invariants PROGRESSIVE_DISCLOSURE / DETERMINISTIC_FIRST"
+      ],
+      "dependencies": [
+        "RA-EXT-004"
+      ],
+      "roadmap_slot": "family:context",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Continued completeness work planned (full audit in roadmap: context intelligence completeness gap)."
+    },
+    {
+      "research_id": "RA-EXT-020",
+      "source_name": "Adaptive execution intelligence research",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "C18 adaptive orchestration goal",
+      "provenance_status": "CONCEPTS_IMPLEMENTED",
+      "research_summary": "Adaptive agent/team count, adaptive quorum, adaptive model selection, adaptive reasoning effort, quality-first routing, evidence-backed capability intersection.",
+      "selected_ideas": [
+        "adaptive orchestration policy (C18 DONE)",
+        "evidence-backed capability intersection",
+        "quality-adjusted routing"
+      ],
+      "rejected_ideas": [
+        "none identified"
+      ],
+      "p2p_translation": "Implemented as C18 adaptive orchestration policy foundation (DONE), consumed by FW02 selection layer.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [
+        "C18 adaptive orchestration policy",
+        "FW02 selection layer"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "reports P2P-C18",
+        "FW02 report"
+      ],
+      "dependencies": [
+        "RA-EXT-021"
+      ],
+      "roadmap_slot": "family:execution",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Selection remains fail-closed: evidence-backed capability intersection, no speculative ranking."
+    },
+    {
+      "research_id": "RA-EXT-021",
+      "source_name": "Large Goal autonomous execution research",
+      "source_type": "OWNER_IDEA",
+      "source_reference": "Owner goal specifications (C12/C15 lineage; spec \u00a710 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
+      "source_version_or_commit": "Owner goal documents",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "One Owner goal -> internal task graph -> automatic safe continuation -> checkpoint/resume -> bounded foreground execution -> Owner Gate only when necessary -> no per-task nagging.",
+      "selected_ideas": [
+        "bounded foreground execution (C12 DONE)",
+        "bounded delegation (C15 DONE)",
+        "checkpoint/resume (C11+FW06)",
+        "Owner Gate only for material decisions"
+      ],
+      "rejected_ideas": [
+        "unbounded autonomy (NO_UNBOUNDED_BACKGROUND_AUTONOMY rejected)",
+        "per-task Owner nagging"
+      ],
+      "p2p_translation": "Large Goal = bounded autonomous progression. Core verified on C12/C15; completeness (full adaptive goal-graph automation without new Owner Gates) remains a PLANNED roadmap item.",
+      "capability_family": "LARGE_GOAL_AUTONOMOUS_EXECUTION",
+      "canonical_capability_ids": [
+        "C12 bounded foreground execution",
+        "C15 bounded delegation"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "reports P2P-C12, P2P-C15",
+        "charter invariants NO_UNBOUNDED_BACKGROUND_AUTONOMY / OWNER_ONLY_FOR_GENUINE_OWNER_DECISIONS"
+      ],
+      "dependencies": [
+        "RA-EXT-018",
+        "RA-EXT-020"
+      ],
+      "roadmap_slot": "family:large-goal",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Roadmap item LARGE_GOAL_COMPLETENESS planned; not unbounded autonomy."
+    },
+    {
+      "research_id": "RA-EXT-022",
+      "source_name": "Beginner-first experience research",
+      "source_type": "OWNER_IDEA",
+      "source_reference": "charter \u00a71 North Star; beginner lifecycle plans 2026-08-10/13*",
+      "source_version_or_commit": "charter",
+      "provenance_status": "IMPLEMENTED_AND_NORTH_STAR",
+      "research_summary": "Progressive disclosure, minimal technical questions, Owner asked only product/business/material decisions, technical choices made by P2P when safely inferable, accessibility where the project requires it.",
+      "selected_ideas": [
+        "North Star BEGINNER_FIRST",
+        "progressive disclosure",
+        "decision separation (product vs technical)",
+        "accessibility considerations"
+      ],
+      "rejected_ideas": [
+        "technical burden shifting to Owner (OWNER_ONLY_FOR_GENUINE_OWNER_DECISIONS prevents)"
+      ],
+      "p2p_translation": "The product North Star. Embedded in charter, goal contracts, beginner lifecycle certification plans, and FW05 owner-experience output.",
+      "capability_family": "OWNER_EXPERIENCE_DECISION_TRACE",
+      "canonical_capability_ids": [
+        "BEGINNER_FIRST (charter invariant)",
+        "BEGINNER_LIFECYCLE family (7 entries)"
+      ],
+      "status": "VERIFIED",
+      "evidence_pointers": [
+        "charter \u00a71/\u00a74/\u00a76",
+        "docs/plans 2026-08-10-p2p-beginner-*",
+        "FW05 owner summary modules"
+      ],
+      "dependencies": [
+        "RA-EXT-023"
+      ],
+      "roadmap_slot": "family:north-star",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Beginner-first is a standing invariant, not a one-off feature."
+    },
+    {
+      "research_id": "RA-EXT-023",
+      "source_name": "Decision Trace / Code-Impact Evidence / behavioral certification",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "FW05 owner experience; plans 2026-08-12-p2p-native-decision-trace*",
+      "source_version_or_commit": "FW05 reports",
+      "provenance_status": "IMPLEMENTED_CORE_CONTRACT_PARTIAL",
+      "research_summary": "Native decision trace, code-impact evidence contract, beginner lifecycle behavioral certification.",
+      "selected_ideas": [
+        "native decision trace per step (FW02/FW05)",
+        "code-impact evidence",
+        "beginner lifecycle behavioral certification plans"
+      ],
+      "rejected_ideas": [
+        "none rejected"
+      ],
+      "p2p_translation": "Core decision trace shipped in FW02/FW05; the full code-impact evidence contract remains PLANNED (beginner lifecycle certification plans exist but not fully executed).",
+      "capability_family": "OWNER_EXPERIENCE_DECISION_TRACE",
+      "canonical_capability_ids": [
+        "FW02 decision trace layer",
+        "FW05 owner experience"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "FW02/FW05 reports",
+        "docs/plans 2026-08-12-p2p-native-decision-trace*"
+      ],
+      "dependencies": [
+        "RA-EXT-022"
+      ],
+      "roadmap_slot": "family:decision-trace",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "Decision trace is the evidence spine of every goal; code-impact contract is the open gap."
+    },
+    {
+      "research_id": "RA-EXT-024",
+      "source_name": "Obsolescence / capability drift watch",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "governance/drift-policy.json; charter DRIFT_FAIL_CLOSED",
+      "source_version_or_commit": "drift-policy.json",
+      "provenance_status": "MECHANISM_SHIPPED_VALIDATION_PENDING",
+      "research_summary": "AI providers evolve quickly; stale host/model/capability claims expire; capability evidence must be revalidated; P2P must survive vendor displacement.",
+      "selected_ideas": [
+        "drift fail-closed policy",
+        "certification-not-currently-eligible semantics",
+        "evidence-bound capability claims",
+        "provider-neutral displacement survival"
+      ],
+      "rejected_ideas": [
+        "stale certification silently remaining current"
+      ],
+      "p2p_translation": "Mechanism shipped: drift-policy.json + DRIFT_FAIL_CLOSED invariant + LIVE_CERTIFICATION_RECORD semantics. Validation gap: full drift revalidation sweep across all capabilities is PLANNED.",
+      "capability_family": "OBSOLESCENCE_CAPABILITY_DRIFT",
+      "canonical_capability_ids": [
+        "DRIFT_FAIL_CLOSED (charter invariant)",
+        "drift-policy.json"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "governance/drift-policy.json",
+        "charter invariant DRIFT_FAIL_CLOSED",
+        "master-roadmap C36/C38 live-cert semantics"
+      ],
+      "dependencies": [
+        "RA-EXT-017"
+      ],
+      "roadmap_slot": "family:drift",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED after host transitions; drift watch is the standing reason not to claim CURRENTLY_ELIGIBLE."
+    },
+    {
+      "research_id": "RA-EXT-025",
+      "source_name": "Provider-neutral control plane research",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "C35 provider-neutral runtime + charter invariants",
+      "source_version_or_commit": "C35 reports",
+      "provenance_status": "IMPLEMENTED_VERIFIED",
+      "research_summary": "ROLE!=SKILL, ROLE!=BACKEND, BACKEND!=PROVIDER, PROVIDER!=MODEL, MODEL!=TOOLSET, HARNESS!=MODEL, REGISTRY!=ROUTER, SELECTION!=EXECUTION, FAILOVER!=RETRY.",
+      "selected_ideas": [
+        "full identity ladder separation",
+        "neutral adapter registry",
+        "interchangeable backends"
+      ],
+      "rejected_ideas": [
+        "single-vendor architectural lock-in (REJECTED)",
+        "PROVIDER_HARDCODE_IN_CORE (rejected)"
+      ],
+      "p2p_translation": "Verified: C35 PROMOTED_VERIFIED provider-neutral runtime; identity ladder is charter invariants; adapters only in adapter modules.",
+      "capability_family": "MULTI_AI_INTEROPERABILITY",
+      "canonical_capability_ids": [
+        "C35 provider-neutral runtime",
+        "P2P_CORE_PROVIDER_NEUTRAL invariant"
+      ],
+      "status": "VERIFIED",
+      "evidence_pointers": [
+        "reports P2P-C35",
+        "artifact .41 runtime adapters (manus/hermes/fake)",
+        "charter invariants"
+      ],
+      "dependencies": [
+        "RA-EXT-015",
+        "RA-EXT-016",
+        "RA-EXT-017"
+      ],
+      "roadmap_slot": "family:interoperability",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "The identity ladder is the defining architecture of P2P; verified at .41 promotion."
+    },
+    {
+      "research_id": "RA-EXT-026",
+      "source_name": "Safety boundaries deliberately rejected (Z register)",
+      "source_type": "OWNER_IDEA",
+      "source_reference": "charter \u00a77 never-reintroduce list; capability-index REJECTED entries",
+      "source_version_or_commit": "charter + capability-index",
+      "provenance_status": "REGISTER_MAINTAINED",
+      "research_summary": "Permission bypass, auto-approve-all, unbounded fanout, unbounded background autonomy, automatic dependency-chain autonomy, unofficial scraping as core, GitHub Actions as brain/control plane, single-vendor lock-in, AI self-report as evidence.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "permission bypass",
+        "auto-approve-all",
+        "unbounded fanout (UNBOUNDED_SWARM)",
+        "unbounded background autonomy",
+        "automatic dependency-chain autonomy",
+        "unofficial browser scraping as core",
+        "GitHub Actions as control plane",
+        "single-vendor lock-in",
+        "AI self-report as evidence (OUTPUT_NOT_EVIDENCE)",
+        "174 NUI faculties as agents",
+        "TASK_AS_AGENT",
+        "HOSTS_AS_CANONICAL_AGENTS",
+        "PROVIDER_HARDCODE_IN_CORE",
+        "BACKGROUND_DAEMON_WITHOUT_SEPARATE_GOAL",
+        "AUTO_PROMOTION_AFTER_GOAL_PASS",
+        "FULL_CONTEXT_PRELOAD",
+        "FULL_CHAT_AS_PROJECT_STATE",
+        "BLIND_RETRY",
+        "HOST_OUTPUT_AS_FINAL_EVIDENCE"
+      ],
+      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter \u00a77 and the capability ledger with status REJECTED and preserved reasons.",
+      "capability_family": "SAFETY_AUTHORITY_PERMISSIONS",
+      "canonical_capability_ids": [
+        "15 REJECTED entries in capability-index.json",
+        "charter \u00a77 never-reintroduce list"
+      ],
+      "status": "VERIFIED",
+      "evidence_pointers": [
+        "charter \u00a77",
+        "capability-index.json REJECTED entries (15)"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:safety",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-08-21T04:25:23Z",
+      "notes": "This register is a standing invariant; any future proposal touching these patterns must re-open them explicitly with Owner approval."
+    },
+    {
+      "research_id": "RA-EXT-027",
+      "source_name": "P2P-GT-MUTATION-PILOT-02 (bounded documentation write pilot)",
+      "source_type": "INTERNAL_P2P_PILOT",
+      "source_reference": "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (and Pilot-02 harness/commit history)",
+      "source_version_or_commit": "P2P-C40-PILOT approval 2026-08-18; integrated in artifact .40/.41",
+      "provenance_status": "INTERNAL_PILOT_EVIDENCE",
+      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truy\u1ec7n clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
+      "selected_ideas": [
+        "bounded documentation mutation with pre-write authorization binding",
+        "second-path pre-write block (B_BYTES_WRITTEN = 0)",
+        "mutation receipt canonical verification",
+        "byte-identical rollback recovery"
+      ],
+      "rejected_ideas": [
+        "production mutation without Owner authorization",
+        "mutation without evidence receipt"
+      ],
+      "p2p_translation": "Verified ladder base for RM-PRIORITY-CODE-MUTATION: bounded documentation write (MUTATION_CAPABILITY_LADDER level 1) shipped in .41; ladder extension to code requires a new Owner-authorized goal and production evidence. Pilot was non-production, isolated clone only.",
+      "capability_family": "MUTATION_CAPABILITY_LADDER",
+      "canonical_capability_ids": [
+        "C40",
+        "BW01",
+        "BW01A",
+        "BW01B"
+      ],
+      "status": "VERIFIED",
+      "evidence_pointers": [
+        "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (CONTROLLED_NON_PRODUCTION_DOCUMENTATION_MUTATION=VERIFIED, CANONICAL_MUTATION_AUTHORITY_CHAIN=VERIFIED_ON_GAME_TRUYEN_ISOLATED_CLONE, ROLLBACK_RECOVERY=VERIFIED)",
+        "artifact .41 da835f8a... embeds FW04/FW05/FW06 bounded write modules"
+      ],
+      "dependencies": [
+        "BOUNDED_DOCUMENTATION_WRITE verified ladder base (Pilot-02 + .41 promotion)"
+      ],
+      "reconciliation_note": "Appended by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner coverage gate detected SOURCE_RESEARCH_ID_MISSING_FROM_LEDGER; durable provenance record appended. Historical records untouched.",
+      "appended_at": "2026-08-21T05:28:56Z"
+    },
+    {
+      "research_id": "RA-EXT-028",
+      "source_name": "P2P-FRAMEWORK-00 C43 production install evidence pack",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "docs/p2p-development/research/c43/evidence/ (16 evidence JSONs, harness c43_gametruyen_activation.py)",
+      "source_version_or_commit": "recorded 2026-08-19 on branch p2p-framework-00-product-memory, commit a9764ab9",
+      "provenance_status": "INTERNAL_RESEARCH_EVIDENCE",
+      "research_summary": "Production-install evidence pack for Game Truy\u1ec7n and Gia Ph\u1ea3 (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
+      "selected_ideas": [
+        "installation lifecycle evidence on authoritative projects",
+        "acceptance-bar-driven install/activation",
+        "rollback-relevant pre-install snapshots"
+      ],
+      "rejected_ideas": [
+        "unauthenticated role identity claims",
+        "handwritten ROLE_ID in receipts"
+      ],
+      "p2p_translation": "Supports RM-PRIORITY-RELEASE-LIFECYCLE evidence (C40/C43 evidence dependency). Install evidence exists but live-role identity reconciliation is unresolved (c43-reconciliation.json); status PARTIAL reflects evidence exist + reconciliation open. Any project pin change still requires separate Owner authorization.",
+      "capability_family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
+      "canonical_capability_ids": [
+        "C40",
+        "C43"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/c43/evidence/c43-production-install-evidence-pack.json",
+        "docs/p2p-development/research/c43/evidence/c43-reconciliation.json (resolution: neither ROLE_ID mechanically bound)",
+        "docs/p2p-development/research/c43/evidence/c43-gametruyen-install.json",
+        "docs/p2p-development/research/c43/evidence/c43-gia-pha-install.json"
+      ],
+      "dependencies": [
+        "C40/C43 evidence",
+        "FW01 installer"
+      ],
+      "reconciliation_note": "Appended by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner coverage gate detected SOURCE_RESEARCH_ID_MISSING_FROM_LEDGER; durable provenance record appended. Historical records untouched.",
+      "appended_at": "2026-08-21T05:28:56Z"
+    },
+    {
+      "research_id": "RA-EXT-029",
+      "source_name": "Contextual Rule Intelligence / Domain Policy Packs (Owner architecture decision 2026-08-21)",
+      "source_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "source_reference": "P2P_Contextual_Rule_Intelligence_Update_2026-08-21 (as intaken via research-intake-ledger RI-008; decision document archived in docs/p2p-development/decisions/owner-accepted/)",
+      "source_version_or_commit": "owner decision 2026-08-21; intake 2026-08-21 (P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01)",
+      "provenance_status": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "research_summary": "Contextual Rule Intelligence: FW02 extension providing domain policy packs with rule pack discovery, applicability evaluation, dependency-aware / version-bound / task-scoped rule selection, conflict resolution, provenance binding, freshness and confidence classification, minimum sufficient rule injection, rule outcome evaluation, host compilation. Adopt the PATTERN, not the corpus: external .mdc corpus is UNVERIFIED_CANDIDATE_CORPUS.",
+      "selected_ideas": [
+        "DOMAIN_POLICY_PACK",
+        "RULE_PACK_DISCOVERY",
+        "RULE_APPLICABILITY_EVALUATION",
+        "DEPENDENCY_AWARE_RULE_SELECTION",
+        "VERSION_BOUND_RULE_SELECTION",
+        "TASK_SCOPED_RULE_SELECTION",
+        "RULE_CONFLICT_RESOLUTION",
+        "RULE_PROVENANCE_BINDING",
+        "RULE_FRESHNESS_CLASSIFICATION",
+        "RULE_CONFIDENCE_CLASSIFICATION",
+        "MINIMUM_SUFFICIENT_RULE_INJECTION",
+        "RULE_OUTCOME_EVALUATION",
+        "RULE_PACK_HOST_COMPILATION"
+      ],
+      "rejected_ideas": [
+        "adopting the external .mdc corpus as canonical P2P truth",
+        "host serialization becoming canonical authority",
+        "rules with unknown applicability being silently applied"
+      ],
+      "p2p_translation": "Composed as first-class part of RM-PRIORITY-CONTEXT (Context Intelligence completeness umbrella): symbol-aware retrieval, token-bounded maps, adaptive context budget, CRI/Domain Policy Packs, affected-surface targeting, provenance/freshness-aware context selection. Precedence preserved; UNKNOWN applicability -> fail closed; minimum sufficient context; provider-neutral host compilation (Cursor/Codex/Claude/Manus/Gemini forms non-authoritative).",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "CONTEXTUAL_RULE_INTELLIGENCE",
+        "C19"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "governance/intake-contract.json (atomic intake contract)",
+        "governance/research-intake-ledger.json intake_records id=RI-008",
+        "docs/p2p-development/decisions/owner-accepted/P2P_Contextual_Rule_Intelligence_Update_2026-08-21.md (archived decision)",
+        "RM-PRIORITY-CONTEXT composition entry (p2p-development-roadmap.json)"
+      ],
+      "dependencies": [
+        "RM-PRIORITY-CONTEXT goal approval",
+        "symbol-aware retrieval primitives (Context goal)"
+      ],
+      "roadmap_relation": "composition into RM-PRIORITY-CONTEXT (B)",
+      "appended_at": "2026-08-21T05:42:58Z",
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
+    },
+    {
+      "research_id": "RA-EXT-030",
+      "source_name": "Contextual Rule Intelligence / Domain Policy Packs (Owner architecture decision 2026-08-21)",
+      "source_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "source_reference": "P2P_Contextual_Rule_Intelligence_Update_2026-08-21 (decision document archived in docs/p2p-development/decisions/owner-accepted/)",
+      "canonical_capability_ids": [
+        "CONTEXTUAL_RULE_INTELLIGENCE"
+      ],
+      "status": "SHIPPED",
+      "intake_record": "RI-007",
+      "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
+      "lineage_note": "CRI adoption lineage: RA-EXT-029 (bound to RI-008 during INTAKE-CLOSURE-01) and this record (bound to RI-007) refer to the same Owner-accepted CRI direction. Roadmap consideration exists via RM-PRIORITY-CONTEXT composition entry (intake_record RI-008) and source_research_ids; this record adds the missing explicit RI-007 binding.",
+      "roadmap_relation": "composed-in-RM-PRIORITY-CONTEXT",
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
+    },
+    {
+      "research_id": "RA-EXT-031",
+      "source_name": "P2P Release Lifecycle & Project Pinning (Owner architecture decision 2026-08-21)",
+      "source_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "source_reference": "RM-PRIORITY-RELEASE-LIFECYCLE goal approval",
+      "source_version_or_commit": "baseline .46 verified",
+      "provenance_status": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "research_summary": "P2P Release Lifecycle: Formalization of the installation, adoption, and pinning lifecycle for P2P projects. Includes Safe Installer with atomic rollback, Project Pinning contract, Manus ExecutionTarget certification, and Sentinel Dispatch for bounded remote execution.",
+      "selected_ideas": [
+        "SAFE_INSTALLER_ATOMIC_ROLLBACK",
+        "PROJECT_PINNING_CONTRACT",
+        "MANUS_EXECUTION_TARGET_CERTIFICATION",
+        "SENTINEL_DISPATCH_BOUNDED_EXECUTION",
+        "DYNAMIC_PLANNER_DERIVATION"
+      ],
+      "rejected_ideas": [
+        "HARDCODED_BASELINE_IN_PLANNER",
+        "UNBOUNDED_BACKGROUND_EXECUTION",
+        "SILENT_PROJECT_MUTATION"
+      ],
+      "p2p_translation": "Implemented as RM-PRIORITY-RELEASE-LIFECYCLE. Dynamic baseline derivation in Planner; Safe Installer with rollback; Project Pin contract; Manus certified as ExecutionTarget; Sentinel dispatcher for Manus tasks.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [
+        "SAFE_INSTALLER",
+        "MANUS_EXECUTION_TARGET"
+      ],
+      "status": "SHIPPED",
+      "evidence_pointers": [
+        "scripts/p2p_safe_installer.py",
+        "governance/project-adoption-lifecycle.md",
+        "runtime/p2p_capabilities/manus_adapter.py",
+        "runtime/p2p_capabilities/sentinel_dispatch.py",
+        "reports/P2P-RM-RELEASE-01-REPORT.md"
+      ],
+      "dependencies": [
+        "RM-PRIORITY-CONTEXT completion",
+        "Baseline .46 promotion"
+      ],
+      "roadmap_relation": "composition into RM-PRIORITY-RELEASE-LIFECYCLE",
+      "appended_at": "2026-08-21T11:05:00Z",
+      "notes": "Verified via Pilot installation on Game Truyện (desktop) and Manus ExecutionTarget certification."
+    }
+  ],
+  "rejected_register_summary": {
+    "total_rejected_records": 1,
+    "never_reintroduce_patterns": [
+      "TASK_AS_AGENT",
+      "SECOND_TASK_TRUTH_STORE",
+      "SECOND_EXECUTOR",
+      "COMPETING_ROUTER",
+      "UNBOUNDED_SWARM",
+      "FULL_CONTEXT_PRELOAD",
+      "FULL_CHAT_AS_PROJECT_STATE",
+      "BLIND_RETRY",
+      "HOST_OUTPUT_AS_FINAL_EVIDENCE",
+      "AUTO_PROMOTION_AFTER_GOAL_PASS",
+      "174_NUI_FACULTIES_AS_AGENTS",
+      "HOSTS_AS_CANONICAL_AGENTS",
+      "PROVIDER_HARDCODE_IN_CORE",
+      "BACKGROUND_DAEMON_WITHOUT_SEPARATE_GOAL",
+      "permission_bypass",
+      "auto_approve_all",
+      "dependency_chain_autonomy",
+      "scraping_as_core_infrastructure",
+      "github_actions_control_plane",
+      "single_vendor_lockin",
+      "ai_self_report_as_evidence"
+    ]
+  },
+  "last_reviewed": "2026-08-21T04:25:23Z",
+  "notes": [
+    "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
+  ]
+}

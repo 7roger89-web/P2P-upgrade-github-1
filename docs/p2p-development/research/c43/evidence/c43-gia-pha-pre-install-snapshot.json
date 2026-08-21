@@ -1,0 +1,19 @@
+{
+  "remote_url_redacted": "https://***@github.com/7roger89-web/Du_An_Gia_Pha-github.git",
+  "local_branch": "main",
+  "local_head": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+  "remote_heads": {
+    "origin/HEAD": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+    "origin/main": "130da38fd5a7dd51723dc36709f9bdac0d99ea11",
+    "origin/master": null
+  },
+  "git_dirty": false,
+  "porcelain_line_count": 0,
+  "tracked_files": 115,
+  "untracked_files": 0,
+  "untracked_prefixes": [],
+  "snapshot_at": "2026-08-18T17:24:35+0000",
+  "snapshot_method": "git-ls-files-z + sha256(tree); idempotent deterministic recomputation",
+  "PRE_INSTALL_PROJECT_FINGERPRINT": "c21d18e9036c938acabd7528967fed36e538a123c938ef3e363c23057e9a93ae",
+  "PRE_INSTALL_REVISION": "130da38fd5a7dd51723dc36709f9bdac0d99ea11"
+}

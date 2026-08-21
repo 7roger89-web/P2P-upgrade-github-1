@@ -1,0 +1,68 @@
+{
+  "schema": "p2p-c43-reconciliation/1",
+  "goal_id": "P2P-FRAMEWORK-00",
+  "recorded_at": "2026-08-19",
+  "recorded_on_branch": "p2p-framework-00-product-memory",
+  "recorded_after_commit": "a9764ab983648db0ba248b1f3a88a36508e907c5 (p2p-framework-00-product-memory)",
+  "2a_live_role_identity": {
+    "issue": "C43 live council smoke evidence contains conflicting role identifiers: raw receipt ROLE_ID=p2p_axiom, adaptive participant set participant_roles=[p2p_datos], owner-facing report described participant as p2p_datos.",
+    "conflicting_claims": [
+      "receipt ROLE_ID = p2p_axiom (c43-live-council-smoke.json)",
+      "adaptive_participant_set.participant_roles = [p2p_datos] (c43-live-council-smoke.json)",
+      "owner report described live participant as p2p_datos"
+    ],
+    "authoritative_evidence": {
+      "harness": ".tmp/c43_live_council_smoke.py (committed with 88bd0b7)",
+      "dispatch_invocation": "adapter.execute(...) called with NO role_id parameter; the execution layer carries no role binding",
+      "receipt_assembly": "receipts[0] ROLE_ID is a hardcoded literal 'p2p_axiom' at assembly time, not read from any backend or role machinery",
+      "participant_set_source": "role_quorum.adaptive_participant_set('low') deterministically returned [p2p_datos]",
+      "report_source": "owner-facing description derived from participant-set decision, not from the live receipt"
+    },
+    "resolution": "Neither ROLE_ID is mechanically bound to the executed Manus task. The dispatch was role-agnostic; ROLE_ID='p2p_axiom' is an unsupported handwritten claim in receipt assembly; 'p2p_datos' is the deterministic LOW-risk participant-set classification, not proof of execution role. Canonical claim: C43_LIVE_EXECUTED_ROLE = UNBOUND.",
+    "execution_vs_verification": "EXECUTION_STATUS=SUCCEEDED is recorded; verification_status=UNKNOWN; ROLE_VERIFICATION != VERIFIED; UNKNOWN preserved as UNKNOWN.",
+    "files_normalized": "none — original live receipt left byte-identical by invariant CLAIM != EVIDENCE; reconciliation recorded in this file only.",
+    "live_evidence_bytes_changed": false
+  },
+  "2b_commit_lineage": {
+    "issue": "C43 artifacts mention commit values 88bd0b730c0f0f9e5c2fa68431933fb6def259d3 and 9389c11; evidence pack index also carries install_commit 88bd0b7 while the owner report described final evidence as 9389c11.",
+    "commit_role_map": {
+      "C43_START_HEAD": "74810098f45509a88f51b9c3312508d92a96e60e (C40 release gates complete — provenance base)",
+      "C43_INSTALL_PROOF_HEAD": "88bd0b7 (production install, activation proofs, acceptance bars, council audit, selection machinery, bounded live smoke)",
+      "C43_EVIDENCE_HEAD": "9389c11 (evidence pack index added)",
+      "C43_REPORT_HEAD": "9389c11 (PR #17 body C43 section)",
+      "C43_FINAL_HEAD": "9389c11359d050bab49819fecfee345d17701847"
+    },
+    "resolution": "Both SHAs are legitimate commits with different roles. No stale HEAD reference existed; no docs normalization required.",
+    "stale_head_existed": false
+  },
+  "2c_council_semantics": {
+    "definitions": {
+      "CANONICAL_MEMBER": "roster position in governance capability set; denominator = 8",
+      "ACTIVE": "present in runtime capability registry and loadable (proven 8/8 across installed sources)",
+      "CERTIFIED": "passed capability verification in goal lifecycle (C38: only p2p_axiom reached CERTIFIED)",
+      "LIVE_CERTIFIED": "CERTIFIED and backed by a live role execution receipt",
+      "semantics_note": "ACTIVE != CERTIFIED != LIVE_CERTIFIED != CANONICAL_MEMBER; not synonyms"
+    },
+    "c43_live_truth": {
+      "roster_intact": true,
+      "registry_byte_identical_across_sources": true,
+      "bounded_live_role_execution_via_manus": "one execution, role unbound in dispatch (2a)",
+      "full_automatic_live_role_fan_out": "NOT_PROVEN",
+      "LIVE_COUNCIL_8_OF_8": "NOT_PROVEN"
+    },
+    "no_new_8_role_live_test": true
+  },
+  "2d_evidence_count": {
+    "physical_files_in_c43_evidence_dir": 16,
+    "evidence_pack_index_count": 15,
+    "resolution": "The pack index intentionally does not index itself (checksum paradox). 15 evidence files + 1 index file = 16 physical files; the owner report's '16 evidence files' equals the physical count. Consistent."
+  },
+  "unknown_fields_preserved": {
+    "C43_LIVE_ROLE_IDENTITY": "UNBOUND (dispatch carried no role binding)",
+    "ROLE_VERIFICATION": "UNKNOWN (not upgraded to VERIFIED)",
+    "LIVE_COUNCIL_8_OF_8": "NOT_PROVEN"
+  },
+  "live_evidence_bytes_changed": false,
+  "runtime_changed": false,
+  "claim_vs_evidence_invariant": "preserved — original live receipts unaltered; reconciliation exists only in this record"
+}

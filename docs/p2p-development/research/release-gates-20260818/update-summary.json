@@ -1,0 +1,33 @@
+{
+  "created_at": "2026-08-18T15:29:22+00:00",
+  "new_zip": "/home/ubuntu/p2p-repo/reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
+  "new_zip_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+  "baseline_total": 152,
+  "new_total": 1383,
+  "counts": {
+    "added": 1383,
+    "removed": 152,
+    "unchanged": 0,
+    "modified": 0,
+    "renamed_or_moved": 0
+  },
+  "baseline_reconciled": 152,
+  "new_reconciled": 1383,
+  "inventory_gate": "PASS",
+  "port_status": "BLOCKED_PENDING_SEMANTIC_GATES",
+  "required_next_gates": [
+    "READ_ALL_MODIFIED_ADDED_AND_REMOVED_CAPABILITIES",
+    "FACT_LEDGER_REVIEW",
+    "FACT_LEDGER_TECHNICAL_PREVIEW",
+    "FACT_LEDGER_USER_APPROVAL_BOUND_TO_PREVIEW",
+    "LIVE_SPECS_REBUILD_AND_LOCK",
+    "AFFECTED_PROJECT_EVALS",
+    "RAG_RETRIEVAL_CHECKS_IF_AFFECTED",
+    "PROTECTED_RUNTIME_MANIFEST_LOCK",
+    "ACTIVE_RUNTIME_DRIFT_GATE",
+    "ROLLBACK_ARTIFACT",
+    "PACKAGE_DOCTOR",
+    "FINAL_USER_APPROVAL_BOUND_TO_CANDIDATE_AND_REPORT_HASH",
+    "FINAL_GATE_REPORT"
+  ]
+}

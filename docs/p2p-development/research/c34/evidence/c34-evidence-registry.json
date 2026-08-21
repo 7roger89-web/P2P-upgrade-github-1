@@ -1,0 +1,44 @@
+{
+  "schema": "c34-evidence-registry/1",
+  "registered_at": "2026-08-17T10:20:00Z",
+  "branch": "p2p-c34-real-backend-contract-validation",
+  "based_on": "p2p-c33-bounded-autopilot-core @ 2a000e0",
+  "terminal_verdict": "PARTIAL / REAL_BACKEND_CONTRACT_VALIDATED",
+  "verdicts": {
+    "manus_adapter": {
+      "classification": "LIVE_VALIDATED",
+      "auth_state": "VALID",
+      "protocol": "HTTPS REST /v2/task.*",
+      "live_task_id": "8Eqa4QGo4x35raVTPnnA7c",
+      "evidence": [
+        {"file": "manus-probe/c34-manus-probe-create.json", "sha256": "839f59a2a5c3bdf523d9c1cd0cc4e93dd3a938684a3317bb881dea8e38ff9b53"},
+        {"file": "manus-probe/c34-manus-probe-detail.json", "sha256": "41e5e6695cc7e2175b8463f38973ead6bf096df90002075de900d573fc6bd7cb"},
+        {"file": "manus-probe/c34-manus-probe-messages.json", "sha256": "a58f0bdf725cec4a29c8684f3e93fa05e5a6096aed89ab0d34e8d0f5cbc944b9"}
+      ],
+      "facts": "Answer 'Four' preserved; credit_usage 0; stopped in ~11s; possible_mutation false; foreground polling only; no daemon/cron/scheduler"
+    },
+    "hermes_adapter": {
+      "classification": "ADAPTER_VALIDATED_AUTH_BLOCKED",
+      "auth_state": "NO_CREDENTIALS",
+      "protocol": "CLI headless hermes -z",
+      "binary": "hermes v0.20.2 (2026.8.16), MIT, NousResearch/hermes-agent",
+      "probe_result": "HTTP 403 Access denied -> FAILED / AUTH_INVALID / NO_CREDENTIALS",
+      "usage_evidence_emitted": true,
+      "forbidden_flags_passed": false,
+      "facts": "Interface probe-verified (docs + live --version/--help/-z); no provider credentials in environment; success not fabricated"
+    }
+  },
+  "regression": {
+    "frozen_baseline": {"failed": 17, "passed": 681, "skipped": 5},
+    "final_freeze": {"failed": 17, "passed": 725, "skipped": 6},
+    "failure_set_identical": true,
+    "c34_regressions": 0,
+    "classifications": ["PRE_EXISTING_BASELINE_FAILURE", "ENVIRONMENT_DIFFERENCE", "EXTERNAL_AUTH_BLOCKER (none new)"]
+  },
+  "suite": {
+    "module": "tests/test_p2p_c34_real_backend_contract.py",
+    "result": "44 passed, 1 skipped (Hermes credential path skipped honestly)"
+  },
+  "line_count": {"backend_contract.py": 432, "backend_execution_bridge.py": 322, "hermes_adapter.py": 402, "manus_adapter.py": 375, "test_p2p_c34_real_backend_contract.py": 705},
+  "ledger": {"capability_index_entries_added": ["C34_REAL_BACKEND_CONTRACT", "C34_STATE_FAMILY_IDENTIFICATION"], "capabilities_count_after": 158}
+}

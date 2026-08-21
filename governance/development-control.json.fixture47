@@ -1,0 +1,14 @@
+{
+  "official_baseline": {
+    "version": "8.4.7-C-codex.47",
+    "artifact_sha256": "641b8910cf7b10a474ebd0f8181bc7c7d5ff62136a2f3e61c92adc23f9bab2c6",
+    "artifact_path": "reports/candidates/P2P-8.4.7-C-codex.47-full-distribution-candidate.zip",
+    "promotion_status": "PROMOTED_VERIFIED",
+    "promotion_report": "reports/P2P-OFFICIAL-PROMOTION-47-REPORT.md"
+  },
+  "roadmap": {
+    "items": []
+  },
+  "provenance_log": [],
+  "candidate_records": []
+}

@@ -71,7 +71,7 @@ class P2PDevelopmentControlTests(unittest.TestCase):
             destination = root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             content = (REPO_ROOT / relative).read_text(encoding="utf-8")
-            destination.write_text(content.replace("8.4.7-C-codex.21", "8.4.7-C-codex.15").replace("8.4.7-C-codex.20", "8.4.7-C-codex.15"), encoding="utf-8")
+            destination.write_text(content.replace("8.4.7-C-codex.21", "8.4.7-C-codex.15").replace("8.4.7-C-codex.20", "8.4.7-C-codex.15").replace("8.4.7-C-codex.22", "8.4.7-C-codex.15").replace("8.4.7-C-codex.23", "8.4.7-C-codex.15").replace("8.4.7-C-codex.24", "8.4.7-C-codex.15"), encoding="utf-8")
         record = copy.deepcopy(load_record())
         roadmap = record["roadmap"]  # type: ignore[index]
         items = roadmap["items"]
@@ -92,8 +92,8 @@ class P2PDevelopmentControlTests(unittest.TestCase):
         record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C17"]  # type: ignore[index]
         record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C19"]  # type: ignore[index]
         record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C20"]  # type: ignore[index]
-        record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") != "C21"]  # type: ignore[index]
-        roadmap["items"] = [item for item in items if item.get("id") not in {"C19", "C20", "C21"}]
+        record["candidate_records"] = [item for item in record["candidate_records"] if item.get("candidate_id") not in {"C21", "C28"}]  # type: ignore[index]
+        roadmap["items"] = [item for item in items if item.get("id") not in {"C19", "C20", "C21", "C25", "C26", "C27", "C28", "C29", "C30", "C31"}]
         record["current_development"]["source_version"] = "8.4.7-C-codex.15"  # type: ignore[index]
         record["current_development"]["source_version_status"] = "STALE_BLOCKED_BELOW_OFFICIAL"  # type: ignore[index]
         record["current_development"]["source_drift_classification"] = {  # type: ignore[index]
@@ -218,11 +218,31 @@ class P2PDevelopmentControlTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             projection = json.loads(result.stdout)
-            if any(item.get("id") == "C20" and item.get("status") == "DONE" for item in load_record()["capability_status"]):  # type: ignore[index]
-                expected_id = "C21" if any(item.get("id") == "C21" and item.get("status") == "DONE" for item in load_record()["capability_status"]) else "C20"  # type: ignore[index]
-                self.assertEqual(projection["current"]["id"], expected_id)
-                self.assertEqual(projection["likely_next"]["id"], expected_id)
-            elif any(item.get("id") == "C19" and item.get("status") == "DONE" for item in load_record()["capability_status"]):  # type: ignore[index]
+            c25_done = any(item.get("id") == "C25" and item.get("status") == "DONE" for item in load_record()["roadmap"]["items"])  # type: ignore[index]
+            c21_done = any(item.get("id") == "C21" and item.get("status") == "DONE" for item in load_record()["capability_status"])  # type: ignore[index]
+            c20_done = any(item.get("id") == "C20" and item.get("status") == "DONE" for item in load_record()["capability_status"])  # type: ignore[index]
+            c19_done = any(item.get("id") == "C19" and item.get("status") == "DONE" for item in load_record()["capability_status"])  # type: ignore[index]
+            c26_done = any(item.get("id") == "C26" and item.get("status") == "DONE" for item in load_record()["roadmap"]["items"])  # type: ignore[index]
+            if c26_done:
+                record = load_record()
+                live_current = record["roadmap"]["current"]  # type: ignore[index]
+                live_next = record["roadmap"]["likely_next"]  # type: ignore[index]
+                self.assertEqual(projection["current"]["id"], live_current["id"])
+                self.assertEqual(projection["current"]["status"], live_current["status"])
+                self.assertEqual(projection["likely_next"]["id"], live_next["id"])
+                self.assertEqual(projection["likely_next"]["status"], live_next["status"])
+            elif c25_done:
+                self.assertEqual(projection["current"]["id"], "C25")
+                self.assertEqual(projection["current"]["status"], "DONE")
+                self.assertEqual(projection["likely_next"]["id"], "C26")
+                self.assertEqual(projection["likely_next"]["status"], "PLANNED")
+            elif c21_done:
+                self.assertEqual(projection["current"]["id"], "C21")
+                self.assertEqual(projection["likely_next"]["id"], "C21")
+            elif c20_done:
+                self.assertEqual(projection["current"]["id"], "C20")
+                self.assertEqual(projection["likely_next"]["id"], "C20")
+            elif c19_done:
                 self.assertEqual(projection["current"]["id"], "C19")
                 self.assertEqual(projection["likely_next"]["id"], "C19")
             else:

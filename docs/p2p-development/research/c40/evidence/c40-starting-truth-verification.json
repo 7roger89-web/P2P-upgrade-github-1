@@ -1,0 +1,37 @@
+{
+  "schema": "c40-starting-truth-verification/1",
+  "timestamp": "2026-08-18T12:15:00Z",
+  "contract_expected": {
+    "repository": "7roger89-web/P2P-upgrade-github-1",
+    "c39_branch": "p2p-c39-governed-live-failover",
+    "c39_head": "e826327",
+    "c39_terminal": "PASS / GOVERNED_LIVE_FAILOVER_READY"
+  },
+  "observed": {
+    "c39_branch_remote_head": "e82632789004973c50aba207adf331aa640f8241",
+    "c39_branch_head_prefix": "e826327",
+    "head_matches_prefix": true,
+    "c39_candidate_filename": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
+    "c39_candidate_sha256": "a999552538adb98332c039af8bb117a13fad3991605c543668034a89da4eb387",
+    "governance_record_sha256_matches_file": true,
+    "roadmap_current": {"id": "C39", "status": "DONE"},
+    "current_development": "C31/BLOCKED_TERMINAL (historical snapshot, explained per C35R/C38 precedent)",
+    "c39_candidate_promotion_status": "UNPROMOTED",
+    "c39_terminal_verdict": "PASS / GOVERNED_LIVE_FAILOVER_READY",
+    "c39_truths": {
+      "governed_live_target_selection": "VERIFIED (evidence c39-proof-1-live-evidence.json)",
+      "live_failover_manus_hermes": "VERIFIED (evidence c39-proof-2-live-evidence.json)",
+      "unsafe_post_dispatch_unknown_state": "REJECTED / FAIL-CLOSED (evidence c39-proof-4-unsafe-postdispatch.json, 5/5)",
+      "context_capsule_continuity": "VERIFIED (evidence c39-proof-3-observation.json, 11/11)",
+      "deterministic_c39_suite": "PASS (104 unit checks)",
+      "regression_new_unexplained_failures": 0,
+      "framework_validator": "PASS (73/73)",
+      "c39_candidate_count": "exactly one",
+      "c39_candidate_status": "UNPROMOTED",
+      "pr_16": "draft, open, no merge",
+      "no_merge_promotion_release_deploy": true
+    }
+  },
+  "verdict": "C40_STARTING_TRUTH = MATCH — repository truth verified against contract expectations; proceed to branch creation",
+  "method": "git fetch origin; rev-parse of origin/p2p-c39-governed-live-failover; sha256sum + unzip manifest of C39 candidate; governance development-control.json read"
+}

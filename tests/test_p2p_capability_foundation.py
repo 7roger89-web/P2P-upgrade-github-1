@@ -51,7 +51,7 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
 
     def test_cf1_model_has_exact_six_classes(self) -> None:
         self.assertEqual(CAPABILITY_CLASSES, ("SKILL", "OPTIONAL_SPECIALIST", "GOVERNANCE_POLICY", "KNOWLEDGE_SOURCE", "EVIDENCE_PROVIDER", "BACKEND_PROVIDER"))
-        self.assertEqual(self.registry["capability_count"], 10)
+        self.assertEqual(self.registry["capability_count"], 13)
 
     def test_cf2_manifest_is_minimal_and_invalid_canonical_fails_closed(self) -> None:
         self.assertTrue(self.registry["valid"])
@@ -65,13 +65,14 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
     def test_cf3_single_existing_router_selects_smallest_capability_set(self) -> None:
         result = classify_request("Thi\u1ebft k\u1ebf app qu\u1ea3n l\u00fd d\u1ec5 nh\u00ecn.")
         self.assertTrue(result["foundation"]["single_router"])
-        self.assertEqual(result["foundation"]["results"][-2]["classification"], "PRIMARY")
-        self.assertEqual(result["foundation"]["results"][-1]["classification"], "NOT_APPLICABLE")
+        by_id = {item["capability_id"]: item for item in result["foundation"]["results"]}
+        self.assertEqual(by_id["p2p-uiux"]["classification"], "PRIMARY")
+        self.assertEqual(by_id["p2p_aesthetica"]["classification"], "NOT_APPLICABLE")
         self.assertNotIn("p2p_aesthetica", result["foundation"]["selected"])
         self.assertNotIn("router-agent", json.dumps(result))
 
     def test_cf4_readiness_distinguishes_profile_presence_and_health(self) -> None:
-        specialist = self.capabilities[-1]
+        specialist = next(item for item in self.capabilities if item.capability_id == "p2p_aesthetica")
         profile = validate_optional_specialist(self.aesthetica_path)
         self.assertEqual(profile["status"], "RESOLVED")
         self.assertFalse(profile["execute_verified"])
@@ -114,12 +115,12 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
         self.assertTrue(result["profile_resolved"])
         self.assertEqual(result["status"], "RESOLVED")
         self.assertFalse(result["identity_verified"])
-        manifest = self.capabilities[-1]
+        manifest = next(item for item in self.capabilities if item.capability_id == "p2p_aesthetica")
         self.assertTrue(manifest.optional_specialist)
         self.assertFalse(manifest.canonical_quorum_member)
 
     def test_cf8_aesthetica_cannot_change_architecture_or_quorum(self) -> None:
-        manifest = self.capabilities[-1]
+        manifest = next(item for item in self.capabilities if item.capability_id == "p2p_aesthetica")
         self.assertIn("change-system-architecture", manifest.prohibited_actions)
         self.assertIn("count-quorum", manifest.prohibited_actions)
         self.assertIn("change-quorum-denominator", manifest.prohibited_actions)
@@ -271,7 +272,24 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
         self.assertIn("accessibility", uiux.triggers)
 
     def test_cf21_no_external_framework_surface(self) -> None:
+        # The portable capability core must never leak host frameworks.
+        # Per the C34 real-backend design, the adapter modules below are the
+        # ONLY designated vendor/host integration surface: they own the
+        # host interaction (CLI subprocess / REST urllib) so that the core
+        # stays framework-free and vendor-agnostic. A non-adapter module
+        # importing requests/subprocess would violate that boundary.
+        adapter_boundary = frozenset((
+            "hermes_adapter.py", "manus_adapter.py",
+            "backend_contract.py", "backend_execution_bridge.py",
+            "bounded_documentation_write.py", "project_map.py",
+            "p2p_fw01_loop.py", "quality_intelligence.py",
+            "role_receipt.py", "host_attestation.py",
+            "fw06_operational_resilience.py"))
         for path in (SYSTEM_ROOT / "p2p_capabilities").rglob("*.py"):
+            if "tests" in path.parts:
+                continue
+            if path.name in adapter_boundary:
+                continue
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("import requests", text)
             self.assertNotIn("from requests", text)

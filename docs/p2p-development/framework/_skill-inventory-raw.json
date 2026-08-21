@@ -1,0 +1,1033 @@
+{
+ "skills": [
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/Architect-review/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/Architect-review",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/Data-Integrity/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/Data-Integrity",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/Edge-Case/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/Edge-Case",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/Spec-to-SVG-Flow-Map/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/Spec-to-SVG-Flow-Map",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/System-Architect/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/System-Architect",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-animation-design/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-animation-design",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-animation-design/animation-vocabulary/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-animation-design/animation-vocabulary",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-animation-design/apple-design/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-animation-design/apple-design",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-animation-design/emil-design-eng/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-animation-design/emil-design-eng",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-animation-design/improve-animations/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-animation-design/improve-animations",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-animation-design/review-animations/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-animation-design/review-animations",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/brandkit/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/brandkit",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/brutalist-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/brutalist-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/gpt-tasteskill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/gpt-tasteskill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/image-to-code-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/image-to-code-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/imagegen-frontend-mobile/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/imagegen-frontend-mobile",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/imagegen-frontend-web/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/imagegen-frontend-web",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/minimalist-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/minimalist-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/output-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/output-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/redesign-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/redesign-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/soft-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/soft-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/stitch-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/stitch-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/UI-taste-skill/skills/taste-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/UI-taste-skill/skills/taste-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/api-surface/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/api-surface",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/backend-development/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/backend-development",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/bb4pda/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/bb4pda",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/better-auth/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/better-auth",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/bunny/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/bunny",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/coder/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/coder",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/databases/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/databases",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/debugging/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/debugging",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/devops/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/devops",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/docs-seeker/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/docs-seeker",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/document-skills/docx/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/document-skills/docx",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/document-skills/pdf/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/document-skills/pdf",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/document-skills/pptx/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/document-skills/pptx",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/document-skills/xlsx/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/document-skills/xlsx",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/frontend-design/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/frontend-design",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/frontend-development/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/frontend-development",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/mcp-builder/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/mcp-builder",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/mcp-management/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/mcp-management",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/media-processing/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/media-processing",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/mermaidjs-v11/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/mermaidjs-v11",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/notebook-pack/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/notebook-pack",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-approval/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-approval",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-atlas/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-atlas",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-capsule/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-capsule",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-chain/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-chain",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-download/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-download",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-eval/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-eval",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-explore/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-explore",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-feedback/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-feedback",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-idea/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-idea",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-karpathy/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-karpathy",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-metrics/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-metrics",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-pxpipe/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-pxpipe",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-quorum/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-quorum",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-scope/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-scope",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-teacher/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-teacher",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/p2p-uiux/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/p2p-uiux",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/payment-integration/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/payment-integration",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/planner/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/planner",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/plugin-marketplace/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/plugin-marketplace",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/collision-zone-thinking/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/collision-zone-thinking",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/inversion-exercise/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/inversion-exercise",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/meta-pattern-recognition/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/meta-pattern-recognition",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/problem-solving-parent-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/problem-solving-parent-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/scale-game/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/scale-game",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/simplification-cascades/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/simplification-cascades",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/problem-solving/when-stuck/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/problem-solving/when-stuck",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/pxpipe/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/pxpipe",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/qa/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/qa",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/rag-grounding/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/rag-grounding",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/rag-prep/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/rag-prep",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/rag-router/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/rag-router",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/refactoring/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/refactoring",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/repo-bootstrap/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/repo-bootstrap",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/sequential-thinking/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/sequential-thinking",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/shopify/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/shopify",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/skill-creator/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/skill-creator",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/spec-architecture-discussion/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/spec-architecture-discussion",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/supervisor/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/supervisor",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/threejs/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/threejs",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/ui-be-binding-skill/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/ui-be-binding-skill",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/ui-driven-spec/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/ui-driven-spec",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/ui-styling/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/ui-styling",
+   "title": "---"
+  },
+  {
+   "source": "codex_skill",
+   "path": ".agents/skills/web-frameworks/SKILL.md",
+   "name": "/home/ubuntu/p2p-repo/.agents/skills/web-frameworks",
+   "title": "---"
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/agent_role.py",
+   "name": "p2p_capabilities.agent_role",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/autopilot_budget.py",
+   "name": "p2p_capabilities.autopilot_budget",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/autopilot_contract.py",
+   "name": "p2p_capabilities.autopilot_contract",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/autopilot_gate.py",
+   "name": "p2p_capabilities.autopilot_gate",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/autopilot_loop.py",
+   "name": "p2p_capabilities.autopilot_loop",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/autopilot_state.py",
+   "name": "p2p_capabilities.autopilot_state",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/autopilot_verifier.py",
+   "name": "p2p_capabilities.autopilot_verifier",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/backend_contract.py",
+   "name": "p2p_capabilities.backend_contract",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/backend_execution_bridge.py",
+   "name": "p2p_capabilities.backend_execution_bridge",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/beginner.py",
+   "name": "p2p_capabilities.beginner",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/bounded_delegation.py",
+   "name": "p2p_capabilities.bounded_delegation",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/context.py",
+   "name": "p2p_capabilities.context",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/context_cache.py",
+   "name": "p2p_capabilities.context_cache",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/context_efficiency.py",
+   "name": "p2p_capabilities.context_efficiency",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/context_envelope.py",
+   "name": "p2p_capabilities.context_envelope",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/context_loop_guard.py",
+   "name": "p2p_capabilities.context_loop_guard",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/context_manifest.py",
+   "name": "p2p_capabilities.context_manifest",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/decision_trace.py",
+   "name": "p2p_capabilities.decision_trace",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/domain.py",
+   "name": "p2p_capabilities.domain",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/evidence.py",
+   "name": "p2p_capabilities.evidence",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/failover_boundary.py",
+   "name": "p2p_capabilities.failover_boundary",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/fake_execution_backend.py",
+   "name": "p2p_capabilities.fake_execution_backend",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/fake_targets.py",
+   "name": "p2p_capabilities.fake_targets",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/foreground_execution.py",
+   "name": "p2p_capabilities.foreground_execution",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/hermes_adapter.py",
+   "name": "p2p_capabilities.hermes_adapter",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/host_executor.py",
+   "name": "p2p_capabilities.host_executor",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/host_selection.py",
+   "name": "p2p_capabilities.host_selection",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/isolation.py",
+   "name": "p2p_capabilities.isolation",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/live_execution.py",
+   "name": "p2p_capabilities.live_execution",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/manus_adapter.py",
+   "name": "p2p_capabilities.manus_adapter",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/model.py",
+   "name": "p2p_capabilities.model",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/orchestration_policy.py",
+   "name": "p2p_capabilities.orchestration_policy",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/parallel_execution.py",
+   "name": "p2p_capabilities.parallel_execution",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/providers.py",
+   "name": "p2p_capabilities.providers",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/read_evidence.py",
+   "name": "p2p_capabilities.read_evidence",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/role_bridge.py",
+   "name": "p2p_capabilities.role_bridge",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/role_contract.py",
+   "name": "p2p_capabilities.role_contract",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/role_eligibility.py",
+   "name": "p2p_capabilities.role_eligibility",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/role_quorum.py",
+   "name": "p2p_capabilities.role_quorum",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/role_receipt.py",
+   "name": "p2p_capabilities.role_receipt",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/role_verifier.py",
+   "name": "p2p_capabilities.role_verifier",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/routing.py",
+   "name": "p2p_capabilities.routing",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_filter.py",
+   "name": "p2p_capabilities.selection_filter",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_policy.py",
+   "name": "p2p_capabilities.selection_policy",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_quality.py",
+   "name": "p2p_capabilities.selection_quality",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_receipt.py",
+   "name": "p2p_capabilities.selection_receipt",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_request.py",
+   "name": "p2p_capabilities.selection_request",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_risk.py",
+   "name": "p2p_capabilities.selection_risk",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_target.py",
+   "name": "p2p_capabilities.selection_target",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/selection_trace.py",
+   "name": "p2p_capabilities.selection_trace",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/skill_standard.py",
+   "name": "p2p_capabilities.skill_standard",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/specialist.py",
+   "name": "p2p_capabilities.specialist",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/task_state.py",
+   "name": "p2p_capabilities.task_state",
+   "title": ""
+  },
+  {
+   "source": "p2p_capability_module",
+   "path": ".p2p/system/p2p_capabilities/trust.py",
+   "name": "p2p_capabilities.trust",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/doctor.py",
+   "name": "doctor",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_approval.py",
+   "name": "p2p_approval",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_beginner_certification.py",
+   "name": "p2p_beginner_certification",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_c15_field_test.py",
+   "name": "p2p_c15_field_test",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_decision_trace.py",
+   "name": "p2p_decision_trace",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_decision_trace_eval.py",
+   "name": "p2p_decision_trace_eval",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_delegation.py",
+   "name": "p2p_delegation",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_development_control.py",
+   "name": "p2p_development_control",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_eval.py",
+   "name": "p2p_eval",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_execution_target.py",
+   "name": "p2p_execution_target",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_foreground_execution.py",
+   "name": "p2p_foreground_execution",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_gate.py",
+   "name": "p2p_gate",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_goal_closure.py",
+   "name": "p2p_goal_closure",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_governance.py",
+   "name": "p2p_governance",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_install_release.py",
+   "name": "p2p_install_release",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_live_certification.py",
+   "name": "p2p_live_certification",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_parallel.py",
+   "name": "p2p_parallel",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_secure_onboarding.py",
+   "name": "p2p_secure_onboarding",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_task_state.py",
+   "name": "p2p_task_state",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/p2p_workflow.py",
+   "name": "p2p_workflow",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/package_release.py",
+   "name": "package_release",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/update_from_release.py",
+   "name": "update_from_release",
+   "title": ""
+  },
+  {
+   "source": "repo_script",
+   "path": "scripts/validate_p2p_development_framework.py",
+   "name": "validate_p2p_development_framework",
+   "title": ""
+  }
+ ],
+ "canonical_capability_set": [
+  {
+   "role": "denominator",
+   "entry": 8
+  },
+  {
+   "role": "quorum",
+   "entry": "8/8"
+  },
+  {
+   "role": "members",
+   "entry": [
+    "p2p_iris",
+    "p2p_tecton",
+    "p2p_axiom",
+    "p2p_vector",
+    "p2p_datos",
+    "p2p_anon",
+    "p2p_architecton",
+    "p2p_helios"
+   ]
+  },
+  {
+   "role": "aesthetica_policy",
+   "entry": "supporting optional only; never canonical and never counted"
+  }
+ ],
+ "counts": {
+  "codex_skills": 89,
+  "codex_agent_profiles": 0,
+  "p2p_capability_modules": 54,
+  "repo_scripts": 23
+ }
+}

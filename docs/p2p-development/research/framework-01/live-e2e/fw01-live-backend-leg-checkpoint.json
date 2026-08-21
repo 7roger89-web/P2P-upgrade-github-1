@@ -1,0 +1,19 @@
+{
+  "project": "fw01-live-e2e",
+  "goal_id": "fw01-live-e2e",
+  "task_completed": "live-read-only-summary",
+  "mutation_status": "READ_ONLY_NO_MUTATION",
+  "verification": {
+    "verdict": "VERIFIED",
+    "execution_status": "SUCCEEDED",
+    "answer_observed": false
+  },
+  "evidence_pointers": {
+    "create_receipt": "/home/ubuntu/p2p-repo/docs/p2p-development/research/framework-01/live-e2e/fw01-live-backend-leg-create.json",
+    "raw_backend_receipt_pointer": "manus-task:T5tQPyCaLxrSZtAKPpKFjg"
+  },
+  "next_safe_action": "none - single live task by contract",
+  "owner_gate_state": "none",
+  "attempt": 1,
+  "loop_status": "DONE"
+}

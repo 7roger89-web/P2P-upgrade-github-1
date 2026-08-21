@@ -1,0 +1,45 @@
+{
+ "has_more": false,
+ "messages": [
+  {
+   "id": "phovBPJTOJuAI211DrEVVS",
+   "timestamp": "1786961411846",
+   "type": "user_message",
+   "user_message": {
+    "content": "Answer in exactly one word: what is 2+2? Do not do any other work.",
+    "message_type": "text"
+   }
+  },
+  {
+   "id": "PCYTy7aCysJ6bfm9eWKpRJ-1",
+   "status_update": {
+    "agent_status": "running",
+    "brief": "Manus is running",
+    "description": "Manus is working on your request"
+   },
+   "timestamp": "1786961412487",
+   "type": "status_update"
+  },
+  {
+   "assistant_message": {
+    "content": "Four"
+   },
+   "id": "za0pBfLVlaVeZF3BqyFXXZ",
+   "timestamp": "1786961417912",
+   "type": "assistant_message"
+  },
+  {
+   "id": "ZUsTV9oXwWPwsNVqUz7ZBL",
+   "status_update": {
+    "agent_status": "stopped",
+    "brief": "Manus finished working",
+    "description": "Manus has completed the current task and is ready for new requests or revisions."
+   },
+   "timestamp": "1786961418216",
+   "type": "status_update"
+  }
+ ],
+ "ok": true,
+ "request_id": "ef0021100bf26573aeeeef4d07389dd2",
+ "task_id": "8Eqa4QGo4x35raVTPnnA7c"
+}

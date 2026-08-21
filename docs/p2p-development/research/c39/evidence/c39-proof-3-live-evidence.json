@@ -1,0 +1,16 @@
+{
+  "schema": "c39-proof-3-live-evidence/1",
+  "timestamp": "2026-08-18T10:29:12Z",
+  "role_id": "p2p_iris",
+  "role_spec_hash": "1c0ea4d2196d59493001dc43bec50c31845a6681f8171409322fe569b172b4b2",
+  "capsule_path": "docs/p2p-development/research/c39/evidence/c39-proof-3-continuation-capsule.json",
+  "execution_status": "SUCCEEDED",
+  "error_class": null,
+  "latency_seconds": 11.39,
+  "backend_receipt_pointer": "manus-task:2HX2kPL6PFiUphu6NybjNw",
+  "manus_task_id": "2HX2kPL6PFiUphu6NybjNw",
+  "output_pointers": [],
+  "verification_status": "UNKNOWN",
+  "contract_fingerprint": "9bae19239b101eb6afbee9e2d110872a429cd81fea9a9701049c434b53d49fc6",
+  "git_revision": "p2p-c39-governed-live-failover"
+}

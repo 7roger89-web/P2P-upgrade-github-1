@@ -1,0 +1,65 @@
+{
+  "schema": "p2p-canonical-lineage-reconciliation-record/1",
+  "task": "P2P-CANONICAL-LINEAGE-REPAIR-01",
+  "record_type": "APPEND_ONLY_HISTORICAL_RECONCILIATION",
+  "canonical_authority_ref": "origin/main",
+  "reconciliation_base": "origin/main",
+  "official_baseline": {
+    "version": "8.4.7-C-codex.19",
+    "artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "status": "CURRENT_CANONICAL_OFFICIAL",
+    "source": "origin/main at task start"
+  },
+  "historical_records": [
+    {
+      "version": "8.4.7-C-codex.41",
+      "classification": "HISTORICAL_FEATURE_REF_PROMOTION_RECORD",
+      "source_ref": "origin/p2p-promote-41-01",
+      "source_commit": "bf896b61d62acde6a669c8232ea165e310c82487",
+      "artifact_sha256": "da835f6b1e6a2d1cbcd50787d03070f46bfc822236480036acfca1e8f8233d2d",
+      "canonical_status": "NOT_CANONICAL_MAIN_PROMOTION",
+      "evidence_status": "Promotion record exists on a noncanonical feature ref; preserved, not adopted as current authority."
+    },
+    {
+      "version": "8.4.7-C-codex.46",
+      "classification": "HISTORICAL_OWNER_APPROVAL_PROMOTION_ATTEMPT",
+      "source_ref": "origin/p2p-full-successor-46",
+      "source_commit": "c9fa9925b9093e56ba73435937e9285ad3408ea4",
+      "artifact_sha256": "2901adca106d3533b3df37e1d10d8a375162b64b001c32bec28b4b178c2f3bb7",
+      "canonical_status": "NOT_CANONICAL_MAIN_PROMOTION",
+      "evidence_status": "Approval/promotion evidence exists, but canonical merge/binding is incomplete; artifact has stale internal .41 identity and a broken/mismatched promotion-report path."
+    },
+    {
+      "version": "8.4.7-C-codex.47",
+      "classification": "HISTORICAL_UNPROMOTED_CANDIDATE",
+      "source_ref": "origin/p2p-release-lifecycle-corrective-01c",
+      "source_commit": "9a76d2d82223774e3a48a980520d3310894ddac6",
+      "canonical_status": "UNPROMOTED",
+      "evidence_status": "Governance sealing record preserved; no canonical-main promotion."
+    },
+    {
+      "version": "8.4.7-C-codex.48",
+      "classification": "HISTORICAL_INCOMPLETE_CANDIDATE_GOVERNANCE_RECORD",
+      "source_ref": "origin/p2p-release-lifecycle-corrective-01d",
+      "source_commit": "bf5a5410b8531e6524c27f468670a78eefae1975",
+      "canonical_status": "INCOMPLETE_NOT_OFFICIAL",
+      "evidence_status": "Final sealing input is preserved, but it does not establish canonical merge, clean source binding, or official promotion."
+    },
+    {
+      "version": "8.4.7-C-codex.71",
+      "classification": "HISTORICAL_REPORT_ONLY_INCOMPLETE_CANDIDATE_IDENTITY",
+      "source_ref": "origin/p2p-release-lifecycle-corrective-01b",
+      "source_commit": "93733d3acf999c8fb0fa27b4d4b2469dce63597f",
+      "canonical_status": "REPORT_ONLY_NOT_OFFICIAL",
+      "evidence_status": "Report/record identity is incomplete or not mechanically bound to a canonical merged source; preserved without promotion."
+    }
+  ],
+  "current_repair_boundary": {
+    "candidate_version": "8.4.7-C-codex.72",
+    "candidate_status": "UNPROMOTED_SUCCESSOR_CANDIDATE_ONLY",
+    "official_baseline_changed": false,
+    "promotion_performed": false,
+    "historical_reports_rewritten": false,
+    "authoritative_projects_touched": false
+  }
+}

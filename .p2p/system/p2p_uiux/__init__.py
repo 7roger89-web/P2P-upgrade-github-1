@@ -1,6 +1,6 @@
 """Reusable, offline-safe P2P UI/UX capability."""
 
-__version__ = "8.4.7-C-codex.21"
+__version__ = "8.4.7-C-codex.41"
 
 from .accessibility import audit_design_system
 from .contracts import contract_requirements, generate_contract, validate_contract

@@ -1,0 +1,29 @@
+{
+  "schema": "c43-pre-install-snapshot/1",
+  "project": "game-truyen-github",
+  "repo_url": "https://github.com/7roger89-web/game-truyen-github",
+  "remote": "https://***@github.com/7roger89-web/game-truyen-github.git",
+  "branch": "main",
+  "remote_main": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+  "PRE_INSTALL_REVISION": "354203ee7c23a2b349e81a0254b537da4d9c622f",
+  "PRE_INSTALL_PROJECT_FINGERPRINT": "5b37132b6932fe96d4359775bc951e8ac8e1cf76503085041aa6df530a480ea0",
+  "tree_fingerprint_sha256": "ee1216b7d26a5108ad4f62887b6162b23590a0fe5c27f6ce26f4b804b3f1b8a1",
+  "clean_state_porcelain": true,
+  "working_tree_untracked_files": [],
+  "PRE_INSTALL_P2P_STATE": {
+    "p2p_marker": false,
+    "p2p_state_file": false,
+    "p2p_install_json": false
+  },
+  "ROLLBACK_AVAILABLE": true,
+  "rollback_method": "git restore --staged + git checkout -- . + git clean -fd to revision 354203ee7c23a2b349e81a0254b537da4d9c622f",
+  "PROJECT_DATA_BOUNDARY": {
+    "database_db": true,
+    "saves_dir": true,
+    "database_dir": true,
+    "tracked_files": 594,
+    "untracked_files": 0
+  },
+  "clone_timestamp": "2026-08-18T17:15:23Z",
+  "notes": "Fresh clone guarantees clean working tree; local HEAD == origin/main; no existing P2P installation detected; rollback path = git restore to revision above."
+}

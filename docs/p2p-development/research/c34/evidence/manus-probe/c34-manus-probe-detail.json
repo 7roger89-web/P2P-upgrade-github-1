@@ -1,0 +1,20 @@
+{
+ "ok": true,
+ "request_id": "bb5e77d8ca04c224fa587cdc5e19f5a7",
+ "task": {
+  "agent_profile": "manus-1.6-lite",
+  "created_at": "1786961412",
+  "created_by_api_key": {
+   "id": "jYvuZTtFLRAZtthF3Hrd7Y",
+   "name": "LOG"
+  },
+  "credit_usage": 0,
+  "id": "8Eqa4QGo4x35raVTPnnA7c",
+  "share_visibility": "private",
+  "status": "stopped",
+  "task_type": "standard",
+  "task_url": "https://manus.im/app/8Eqa4QGo4x35raVTPnnA7c",
+  "title": "p2p-c34-manus-probe",
+  "updated_at": "1786961418"
+ }
+}

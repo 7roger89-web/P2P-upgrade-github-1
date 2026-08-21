@@ -1,0 +1,95 @@
+{
+  "schema": "p2p-evidence-pack/1",
+  "goal": "C43",
+  "goal_title": "Production install Game Truyện + Gia Phả (Owner-directed)",
+  "candidate_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
+  "release_tag": "c40-promoted-pilot-release-draft",
+  "release_commit": "7481009",
+  "install_commit": "88bd0b730c0f0f9e5c2fa68431933fb6def259d3",
+  "evidence_count": 15,
+  "evidence": [
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-council-audit.json",
+      "sha256": "4c8957a2df814e9033b6e18e802c03cef1a8b1ee87d166be8dceba310cdde6cd",
+      "bytes": 4422
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-council-selection-machinery.json",
+      "sha256": "4e40a90099b43b80a6d0a1e2f6a91471fee7818af5c3b28fb50e94b85b9def21",
+      "bytes": 2152
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-game-truyen-acceptance-bar.json",
+      "sha256": "3369466e301179161c9716ddffc9a5038b0af3d951d443d04c5e0ae1c51e65de",
+      "bytes": 1573
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-game-truyen-install.json",
+      "sha256": "a022c7d1e5d2f93474dcd080f82b2be1c54d7234e0dde7f9385cecdbeaa3f4ec",
+      "bytes": 229
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-game-truyen-pre-install-snapshot.json",
+      "sha256": "c72c0951990832ab5f1cbebcea5c5ae3716c3779e49de9f89c9f0bb49f9b82d6",
+      "bytes": 1302
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-gametruyen-activation-create.json",
+      "sha256": "8208b85ccfbbbc5cddda831d1b9e39b690e0a3ae90410d8c0d18d4cbd664e023",
+      "bytes": 250
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-gametruyen-activation-detail.json",
+      "sha256": "998576ce80106e5a4b5e11d24d67aaece677ed157dc947ade86c57406851ee7d",
+      "bytes": 535
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-gametruyen-activation-messages.json",
+      "sha256": "291f0e18f0a13463af35ddff61fdb16b89f9d658fb0a40536d0b3699c02d7f35",
+      "bytes": 5208
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-gia-pha-acceptance-bar.json",
+      "sha256": "db4c13df1a3714020ccaf2d5628105141af3d021241e14f8622538bf6232c6ce",
+      "bytes": 1211
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-gia-pha-install.json",
+      "sha256": "e4278bdd29d3851bb282f55531e4b61edfaa0b89efecd14b2dba3b03bfeecf03",
+      "bytes": 229
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-gia-pha-pre-install-snapshot.json",
+      "sha256": "a1f4a5717e4443320269036e015c435e7ec10b7e8a8384e7d0df77b4eadb27bb",
+      "bytes": 796
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-giapha-activation-create.json",
+      "sha256": "8f62beca685b5e03c7d608bb284dbb4b11823b36c450d5691c39f4f102fab0ca",
+      "bytes": 246
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-giapha-activation-detail.json",
+      "sha256": "bc67489230e9a66b687309eb03398755252ca8a814c0a1a7a1745bfe7ce8d56f",
+      "bytes": 531
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-giapha-activation-messages.json",
+      "sha256": "cd7a56735dbe919495e2456a3a1de378538090b9adac44fbe5a9004d26adcf4b",
+      "bytes": 5078
+    },
+    {
+      "file": "docs/p2p-development/research/c43/evidence/c43-live-council-smoke.json",
+      "sha256": "c4ae59739a9e9b72b576dcdaa39b2863b8d860171eb2885500679fc7c0fd7f72",
+      "bytes": 2754
+    }
+  ],
+  "notes": {
+    "game_truyen_project_root": "/home/ubuntu/game-truyen-production",
+    "gia_pha_project_root": "/home/ubuntu/gia-pha-production",
+    "package_dir": "/home/ubuntu/c43-pkg",
+    "rollback_instruction": "git clean -fdx docs/p2p-development && git checkout -- .",
+    "logistics": "DO_NOT_INSTALL_YET"
+  },
+  "generated_at_branch": "p2p-c40-project-usable-release-pilot"
+}

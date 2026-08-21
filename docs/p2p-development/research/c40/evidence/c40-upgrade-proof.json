@@ -1,0 +1,47 @@
+{
+  "schema": "c40-upgrade-proof/1",
+  "stages": [
+    {
+      "stage": "LEGACY_OLD_INSTALL_PRESENT",
+      "old_version": "8.4.7-C-codex.19",
+      "doctor": {
+        "p2p_version": "8.4.7-C-codex.19",
+        "installation_health": "MARKER_MISSING",
+        "upgrade_status": "NONE",
+        "rollback_available": false
+      }
+    },
+    {
+      "stage": "UPGRADE_TO_C40",
+      "cli_output": "INSTALL LEGACY_SYSTEM_UPGRADE: 8.4.7-C-codex.24 (1371 managed files)",
+      "doctor": {
+        "p2p_version": "8.4.7-C-codex.24",
+        "installation_health": "HEALTHY",
+        "upgrade_status": "LEGACY_SYSTEM_UPGRADE",
+        "rollback_available": true
+      }
+    },
+    {
+      "stage": "UPGRADE_ROLLBACK",
+      "cli_output": "ROLLBACK restored from snapshot 20260818-113546 -> 8.4.7-C-codex.24",
+      "doctor": {
+        "p2p_version": "8.4.7-C-codex.19",
+        "installation_health": "MARKER_MISSING",
+        "upgrade_status": "LEGACY_SYSTEM_UPGRADE_ROLLBACK",
+        "rollback_available": false
+      }
+    },
+    {
+      "stage": "RE-UPGRADE_TO_C40_FOR_PILOT",
+      "cli_output": "INSTALL SAME_VERSION_REINSTALL: 8.4.7-C-codex.24 (1371 managed files)",
+      "doctor": {
+        "p2p_version": "8.4.7-C-codex.24",
+        "installation_health": "HEALTHY",
+        "upgrade_status": "SAME_VERSION_REINSTALL",
+        "rollback_available": true
+      }
+    }
+  ],
+  "pre_source_revision": "bb72f8c3ca3e60807e62ab36d3a7a05bee0d10e8",
+  "pre_upgrade_fingerprint": "bb72f8c3ca3e60807e62ab36d3a7a05bee0d10e8"
+}
