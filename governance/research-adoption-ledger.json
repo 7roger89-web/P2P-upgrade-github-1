@@ -1133,6 +1133,18 @@
       "decision": "ADAPT_SELECTIVELY",
       "boundary": "catalog/retrieve on demand; scripts unverified by default; intrusive execution permission-gated",
       "status": "PLANNED"
+    },
+    {
+      "research_id": "RA-EXT-033",
+      "status": "PLANNED",
+      "source_name": "Adaptive Verification Hardening v2 / Right-Evidence Testing",
+      "intake_record": "RI-009",
+      "canonical_capability_ids": [
+        "ADAPTIVE_VERIFICATION_POLICY_V2"
+      ],
+      "roadmap_relation": "composition",
+      "decision": "HARDEN_EXISTING_FW04_ADAPTIVE_VERIFICATION",
+      "notes": "NFR applicability, proportional verification, lifecycle gates, failure taxonomy, process cleanup."
     }
   ],
   "rejected_register_summary": {
