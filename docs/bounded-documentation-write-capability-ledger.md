@@ -204,3 +204,69 @@ and `overall`, independent of the mutation-evidence branch.
 3. Unchanged from §9: working-tree primitive, `NON_EXISTENT` sentinel rules,
    and the real Game Truyện documentation mutation pilot remain
    NOT executed, gated behind the second Owner decision.
+
+---
+
+# PHỤ LỤC B — P2P-BOUNDED-DOCUMENTATION-WRITE-01B (Hiệu chỉnh ngữ nghĩa vai/host)
+
+**Ledger version:** 1.2.0 · schema `p2p-bounded-documentation-write-ledger/1`
+**Goal closed:** `P2P-BOUNDED-DOCUMENTATION-WRITE-01B` (khép hai seam ngữ nghĩa còn lại sau BW01A).
+
+## B.1. PROVENANCE
+
+| Item | Value |
+|---|---|
+| Implementation commit | `a1e78bc378d8efe65840ec7c3d23ded121284759` |
+| Implementation tree | `3bb25bff45941045123ac9ab426cb24ad62149ff` |
+| Carrying candidate | `8.4.7-C-codex.40` — `f2edabf09de2657b63ad930636599295e96d94d0eea47fc91e14081c7e600519` (UNPROMOTED, fresh-tree verified) |
+| Predecessor candidate | `8.4.7-C-codex.39` — `a21d8122a29146970889499dd74ad1fe0eb7be51491f7481cce62132ce82ed69` (immutable, UNPROMOTED, untouched) |
+| Test evidence | `tests/test_bounded_role_host_semantics.py` — 22 tests (dương M0/M1/M2 + ma trận tiêu cực A–N) trên fixture Git dùng một lần; hồi quy 357 tests PASS; framework 78/78; dev-control PASS; gitleaks 0 leak mới |
+
+## B.2. SEMANTIC CORRECTION 1 — REQUIRES/PROVIDES CONFLATION (CLOSED)
+
+Seam đã được chứng minh: registry role không có trường `PROVIDES` nào; checker quyền
+đọc `REQUIRES` như "provides"; FW03 `role_capability_evidence` kết hợp `CAPABILITY_ID + REQUIRES`
+thành tập năng lực do vai cung cấp. Sửa fail-closed:
+
+1. **Trường `PROVIDES` tường minh** trên role record (`capabilities.json`). Vai
+   `p2p_architecton` ghi `PROVIDES: ["bounded_documentation_write"]` — đây là nguồn ngữ nghĩa
+   chính tắc duy nhất cho "vai cung cấp gì".
+2. `team_intelligence.role_capability_evidence` giờ chỉ phát ra evidence row cho các
+   năng lực nằm trong `PROVIDES`; row không tồn tại khi vai không tuyên bố cung cấp —
+   `REQUIRES` **không bao giờ** được thăng cấp vào bề mặt provided (role chỉ dùng năng lực
+   khi một vai khác cung cấp + chính sách cho phép).
+3. `build_team_decision` PROVIDE-set tính từ evidence rows (từng dòng PROVIDES), không còn
+   cộng gộp từ REQUIRES.
+4. Checker toàn-claim (`_g1_authority_chain_check`) thêm bước
+   `role_explicitly_provides_capability`: fail nếu vai được chọn không có `PROVIDES` chứa
+   năng lực đột biến — kể cả khi REQUIRES liệt kê.
+5. Fixture FW03 (test suite + production registry) được hòa hợp về ngữ nghĩa tường minh;
+   41/41 test FW03 PASS sau hòa hợp.
+
+**ROLE_PROVISION_SEMANTIC_CONFLATION = RESOLVED.** Chon vai tối thiểu được đánh giá lại
+thuần túy trên PROVIDES: `p2p_architecton` vẫn là vai tối thiểu phù hợp (cung cấp
+`bounded_documentation_write`; 7 vai còn lại không tuyên bố cung cấp).
+
+## B.3. SEMANTIC CORRECTION 2 — AUTHORITY MODE SEMANTICS (CLOSED)
+
+1. **Hằng số chính tắc** `MUTATION_AUTHORITY_MODES = ("MUTATION_READY", "TEST_ONLY")` trong
+   `bounded_documentation_write.py`; đầu vào không chính tắc → lỗi fail-closed.
+2. Cổng thực thi khóa theo **authority mode** (không theo nhãn môi trường):
+   - `MUTATION_READY` → HostAttestation **thật bắt buộc** + `rollback_required="REQUIRED"`;
+     derived ID chỉ chấp nhận trong nhánh `TEST_ONLY` (bằng chứng đánh dấu `test_only_evidence=true`).
+   - `TEST_ONLY` → **không bao giờ escalade**: thực thi chỉ khi evidence mang
+     `test_only_evidence=true` và không có HostAttestation thật; mọi receipt mang mode này bị
+     verifier đánh `mutation_authority_mode_is_mutation_ready=false`.
+3. Evidence mang `mutation_authority_mode`; role_bridge dispatch chuyền mode chính tắc;
+   receipt mang khối `authority` (mode + test_only_evidence + attestation fingerprint).
+4. Verifier thêm các bước: `mutation_authority_mode_is_canonical`,
+   `mutation_authority_mode_is_mutation_ready`, `test_only_evidence` — tất cả fail-closed.
+
+**TEST_ONLY_NEVER_ESCALATES = VERIFIED** (ma trận tiêu cực BW01B rows kiểm chứng từng liên kết).
+
+## B.4. KNOWN REMAINING LIMITS
+
+1. Chứng nhận target đột biến vẫn là lớp registry trong-runtime (chưa có nguồn chứng nhận
+   bên ngoài được xác thực); giữ nguyên trạng thái BW01A.
+2. Pilot đột biến Game Truyện thật thứ hai vẫn **chưa thực hiện** — vẫn là quyết định Owner
+   trên ứng viên .40.
