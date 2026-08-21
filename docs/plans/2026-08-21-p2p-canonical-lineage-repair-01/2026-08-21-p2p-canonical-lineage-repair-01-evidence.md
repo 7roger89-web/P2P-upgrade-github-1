@@ -55,7 +55,7 @@ Matching plan item(s): `P2-A`, `P2-B`
 - `E2-P2A-REG1`: full capability suite `335 tests, 6 skipped, OK`; core provider-neutral suite `145 tests, 5 skipped, OK`; bounded suite `94 tests, OK`.
 - `E2-P2B-MINT1`: NOT RUN; exactly zero successor artifacts minted.
 - `E2-P2B-INVENTORY1`: NOT RUN; no candidate ZIP exists to verify.
-- `E2-P2B-DELIVERY1`: pending final source commit/change detection before branch delivery.
+- `E2-P2B-DELIVERY1`: source reconciliation commit `66f84479d363b60dc5e00382b60ef4ec6a6cb33f` has verified tree `a6f6c6ca1fe38ede9113e55fa8e652c4d5f5adda`; Anvien `detect-changes --scope all` completed successfully with a critical blast-radius warning caused by the broad historical lineage merge, not an edit prohibition. The worktree is clean after the evidence-only update is committed.
 - `E2-P2B-DELIVERY2`: pending branch push; no promotion or main merge is authorized.
 
 ## Closure Evidence

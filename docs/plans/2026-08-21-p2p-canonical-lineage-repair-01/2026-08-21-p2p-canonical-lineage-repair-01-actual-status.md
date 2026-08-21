@@ -76,7 +76,7 @@ Out of scope:
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-21 | fresh `origin/main` worktree + fetched refs + refreshed Anvien graph | full lineage repair scope | initial classifications above | E0-P0A-GIT1..E0-P0A-SCOPE1 | P1-A must integrate only verified implementation; P1-B must reset active authority to `.19` |
-| R1 | 2026-08-21 | merged verified corrective lineage + refreshed graph + scoped runtime gates | implementation, authority, portability, and P2 gate | P1-A/P1-B correct; source Manus transport unavailable; no candidate minted | E1-P1A-SRC1..E1-P1B-PKG2, E2-P2A-REG1, E2-P2A-MANUS1 | stop with exact `BLOCKED / REAL_MANUS_SENTINEL_UNAVAILABLE`; no P2-B mint |
+| R1 | 2026-08-21 | merged verified corrective lineage + refreshed graph + scoped runtime gates | implementation, authority, portability, and P2 gate | P1-A/P1-B correct; source commit `66f84479d363b60dc5e00382b60ef4ec6a6cb33f` / tree `a6f6c6ca1fe38ede9113e55fa8e652c4d5f5adda`; source Manus transport unavailable; no candidate minted | E1-P1A-SRC1..E1-P1B-PKG2, E2-P2A-REG1, E2-P2A-MANUS1, E2-P2B-DELIVERY1 | stop with exact `BLOCKED / REAL_MANUS_SENTINEL_UNAVAILABLE`; no P2-B mint |
 
 ## Phase Touch Map
 
