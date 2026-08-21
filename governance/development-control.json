@@ -2409,6 +2409,12 @@
         "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/tag/p2p-8.4.7-C-codex.24-fw01-v1"
       ],
       "git_ref": null
+    },
+    {
+      "change_id": "PLANNER-01",
+      "goal": "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01",
+      "timestamp": "2026-08-21T05:10:00Z",
+      "description": "ROADMAP_AWARE_DEVELOPMENT-PLANNER implemented as governance-side script scripts/p2p_roadmap_planner.py; mechanical canonical consumption proven (18/18 tests); capability record set VERIFIED; no runtime mutation."
     }
   ],
   "research_intake_ledger": "governance/research-intake-ledger.json",

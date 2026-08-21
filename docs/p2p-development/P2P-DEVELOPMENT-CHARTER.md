@@ -55,7 +55,7 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `RESEARCH_PROVENANCE_NOT_AUTHORITY` | External research is provenance, not authority; P2P adopts ideas selectively, not repositories wholesale; unvendored and license-constrained sources stay research-only. |
 | `SELECTIVE_ADOPTION` | What P2P researched is not what P2P adopted; SELECTED ≠ IMPLEMENTED ≠ SHIPPED ≠ VERIFIED ≠ PROMOTED; UNKNOWN is never silently treated as SUPPORTED. |
 | `ROADMAP_COVERAGE_GAP_DETECTED` | Any proposed major roadmap or major next Goal must reconcile against the Research Adoption Ledger + Development Roadmap; a materially relevant SELECTED/PLANNED/PARTIAL record omitted without explicit reason surfaces ROADMAP_COVERAGE_GAP. |
-| `MACHINE_READABLE_ROADMAP_MACHINE_READABLE_NOT_AUTOMATIC` | The roadmap is canonical and machine-readable, but the current runtime does not automatically consume it when choosing the next Goal; stated status `ROADMAP_AWARE_DEVELOPMENT_PLANNER = PLANNED` is not VERIFIED. |
+| `MACHINE_READABLE_ROADMAP_VERIFIED` | The roadmap is canonical, machine-readable, and mechanically consumed by `scripts/p2p_roadmap_planner.py` (P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01): planner reads official baseline + ledger + roadmap + evidence + Owner priority, outputs ranked candidate goals with coverage-gap detection; never overrides Owner Gates. Verification: 18/18 tests PASS, fail-closed, deterministic ranking, hash binding. Runtime execution-loop integration remains planned (charter §6 heuristic unchanged). |
 
 
 ## 4. Owner Gate — what P2P asks the owner about

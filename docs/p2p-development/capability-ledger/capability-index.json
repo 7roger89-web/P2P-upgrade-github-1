@@ -4628,20 +4628,24 @@
         "governance/p2p-development-roadmap.json (RM-PRIORITY-PLANNER, coverage_gate)",
         "governance/research-adoption-ledger.json"
       ],
-      "status": "PLANNED",
-      "implementation_refs": [],
+      "status": "VERIFIED",
+      "implementation_refs": [
+        "scripts/p2p_roadmap_planner.py"
+      ],
       "evidence_refs": [
-        "governance/p2p-development-roadmap.json",
-        "governance/research-adoption-ledger.json",
-        "docs/p2p-development/capability-ledger/capability-index.json"
+        "scripts/p2p_roadmap_planner.py (sha256 b0a0b92c71001c96)",
+        "scripts/p2p_planner_test.py (sha256 3b3f1b5de052d6a7)",
+        "reports/planner/P2P-PLANNER-RUN-01.json"
       ],
       "dependencies": [],
-      "known_gaps": [],
+      "known_gaps": [
+        "Planner is a governance-side script; the runtime execution-loop goal-choice (charter §6) is not yet integrated with it."
+      ],
       "do_not_duplicate_with": [],
       "next_condition": "Standalone read-only design goal; never modifies runtime without its own promotion.",
-      "last_reviewed": "2026-08-21T04:27:11Z",
+      "last_reviewed": "2026-08-21",
       "freshness": "from_roadmap_consolidation",
-      "notes": "Read-only governance capability: consumes canonical roadmaps; outputs ranked candidate goals with gap detection. Runtime currently has no roadmap reader (documented honestly)."
+      "notes": "VERIFIED by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01: mechanical canonical consumption of roadmap JSON proved by direct file reading (ROADMAP_MANUAL_REENTRY_REQUIRED=NO), 18/18 validation tests PASS, fail-closed, deterministic ranking, hash binding."
     },
     {
       "capability_id": "GOAL_DESIGN_INTELLIGENCE_COMPOSITION",
