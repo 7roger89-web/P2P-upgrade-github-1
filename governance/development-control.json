@@ -98,7 +98,7 @@
       "artifact_sha256": null,
       "source_commit": null,
       "source_tree": null,
-      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01-candidate-identity.json"
+      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01-blocker.json"
     },
     "provider_neutrality": "PRESERVED",
     "manus_native_council": {
