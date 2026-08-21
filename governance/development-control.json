@@ -2659,16 +2659,17 @@
     },
     {
       "candidate_version": "8.4.7-C-codex.47",
-      "artifact_sha256": "4391a3834901adca0d6c827361993436d3330366666666666666666666666666",
+      "artifact_sha256": "641b8910cf7b10a474ebd0f8181bc7c7d5ff62136a2f3e61c92adc23f9bab2c6",
       "promotion_status": "UNPROMOTED",
       "minted_at": "2026-08-21T12:00:00Z",
-      "minted_by": "Manus-RM-RELEASE-LIFECYCLE-01A",
-      "notes": "Corrective Release Lifecycle Candidate. Fixes Anomaly 1-5. Integrates Project Context Bootstrap, Map-Before-Work, and Manus Causal Closure.",
+      "minted_by": "Manus-RM-RELEASE-LIFECYCLE-01C",
+      "source_commit": "091037179b326d6af0e292f16d49648e62e7e3e3",
+      "notes": "Final Corrective Release Lifecycle Candidate. Reconciled identity and member accounting. Verified with Project Context Bootstrap, Map-Before-Work, and Real Manus Causal Closure.",
       "gates": {
         "IDENTITY_HARDENING": "PASS",
-        "DOCTOR_FAIL_CLOSED": "VERIFIED",
-        "INVARIANT_INVERSION": "PASS",
-        "CAUSAL_CLOSURE": "PASS"
+        "DOCTOR_HEALTHY": "PASS",
+        "MAP_BEFORE_WORK": "PASS",
+        "CAUSAL_CLOSURE": "VERIFIED"
       }
     }
   ]
