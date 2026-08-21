@@ -1,0 +1,28 @@
+{
+  "schema": "p2p-canonical-lineage-repair-01a-pre-mint-disclosure/1",
+  "task": "P2P-CANONICAL-LINEAGE-REPAIR-01A",
+  "continuation_of": "reports/reconciliation/p2p-canonical-lineage-repair-01-blocker.json",
+  "canonical_authority_ref": "origin/main",
+  "reconciliation_base": "origin/main",
+  "current_official_baseline": "8.4.7-C-codex.19",
+  "current_official_artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+  "reconciliation_branch": "codex/p2p-canonical-lineage-repair-01",
+  "owner_decision": "01A permits candidate mint and readiness without live Manus credentials; the candidate remains unpromoted.",
+  "version_reservation": {
+    "candidate_version": "8.4.7-C-codex.72",
+    "reservation_status": "VALID_UNIQUE_SOURCE_LINEAGE_RESERVATION",
+    "collision_found": false,
+    "existing_artifact_found": false
+  },
+  "live_manus": {
+    "status": "NOT_RUN",
+    "reason": "NO_CREDENTIALS",
+    "credentials_requested": false,
+    "synthetic_or_historical_live_ids_reused": false,
+    "candidate_gate_effect": "DISCLOSURE_ONLY_NOT_BLOCKING"
+  },
+  "historical_blocker_preserved": true,
+  "candidate_minted": false,
+  "promotion_performed": false,
+  "official_baseline_changed": false
+}

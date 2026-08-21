@@ -53,7 +53,7 @@
   "current_development": {
     "development_goal": "P2P-CANONICAL-LINEAGE-REPAIR-01",
     "goal_kind": "RECONCILIATION_NOT_PRODUCT_GOAL",
-    "status": "BLOCKED_PRE_MINT_REAL_MANUS_SENTINEL_UNAVAILABLE",
+    "status": "ACTIVE_UNPROMOTED_CANDIDATE_MINT_AUTHORIZED_WITH_LIVE_MANUS_DISCLOSURE",
     "source_version": "8.4.7-C-codex.72",
     "source_version_status": "ACTIVE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
@@ -93,12 +93,12 @@
       ]
     },
     "candidate_identity_binding": {
-      "status": "NOT_MINTED_BLOCKED_BEFORE_MINT",
+      "status": "RESERVED_PRE_MINT_UNPROMOTED",
       "candidate_version": "8.4.7-C-codex.72",
       "artifact_sha256": null,
       "source_commit": null,
       "source_tree": null,
-      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01-blocker.json"
+      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01a-pre-mint-disclosure.json"
     },
     "provider_neutrality": "PRESERVED",
     "manus_native_council": {
