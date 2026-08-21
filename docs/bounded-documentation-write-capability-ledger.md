@@ -270,3 +270,71 @@ thuần túy trên PROVIDES: `p2p_architecton` vẫn là vai tối thiểu phù 
    bên ngoài được xác thực); giữ nguyên trạng thái BW01A.
 2. Pilot đột biến Game Truyện thật thứ hai vẫn **chưa thực hiện** — vẫn là quyết định Owner
    trên ứng viên .40.
+
+
+
+## ADDENDUM — P2P-MUTATION-SAFETY-INTEGRATION-01 (CORRECTIVE, APPENDED)
+
+This addendum is appended to the canonical bounded-documentation-write ledger. It does
+not modify, reinterpret, or overwrite any prior ledger entry. Pilot-02 entries and the
+Closure-01 evidence remain authoritative history.
+
+### Corrective statements
+
+1. Candidate `.40` (version `8.4.7-C-codex.40`, artifact SHA
+   `f2edabf09de2657b63ad930636599295e96d94d0eea47fc91e14081c7e600519`,
+   source `a1e78bc378d8efe65840ec7c3d23ded121284759`) shipped the original
+   protected-basename classifier. Its protected-surface patterns were anchored to the
+   beginning of the path string, so `TASKS.md`, `AGENTS.md`, and
+   `P2P-PROJECT-BOOTSTRAP.md` were protected **only at the repository root**. Nested
+   files such as `docs/TASKS.md` fell through to the allowed-documentation trees. The
+   seam was recorded as `PROTECTED_BASENAME_SCOPE_BUG = CONFIRMED` by
+   P2P-MUTATION-SAFETY-CLOSURE-01 and remains an accurate description of `.40`.
+
+2. The P2P-MUTATION-SAFETY-CLOSURE-01 goal proved the intended policy (A–E path
+   classification with fail-closed canonical normalization, and the team-state
+   `TEAM_SUCCESS XOR MATERIAL_FAILURE` invariant) through an **external** spec-layer
+   overlay and a 19-row negative matrix. The overlay was never part of the shipped
+   runtime; those semantics existed only in `/tmp/closure_layer` during Closure-01.
+
+3. P2P-MUTATION-SAFETY-INTEGRATION-01 moves those already-proven semantics into the
+   canonical shipped runtime (candidate `.41`, version `8.4.7-C-codex.41`, artifact SHA
+   `da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d`,
+   source `ec47147bf09bc5d482261838d586599643e637cd`). Changes are confined to
+   `bounded_documentation_write.py` (A–E classification, fail-closed normalization,
+   authorization binding, second-path guard), `team_intelligence.py` (platform/role
+   separation, invariant), and `role_receipt.py` (team block flow-through, six team
+   checks), plus mechanical version derivation to `.41`.
+
+4. Platform runtime requirements and role capabilities are distinct by explicit schema
+   (`FW02_BASE_PLATFORM_CAPABILITIES`). Platform requirement gaps (for example
+   `capability_registry`, `task_state_store`, `decision_trace`,
+   `permission_profile_verification`, `freshness_verification`) are infrastructure
+   states, **not** role capability gaps. The invariant
+   `PLATFORM_REQUIREMENT_GAP != ROLE_CAPABILITY_GAP` holds at the canonical decision
+   object.
+
+5. A mutation-ready canonical team object never carries a material `failure_class`.
+   `TEAM_SUCCESS XOR MATERIAL_FAILURE` is enforced on the raw canonical `TeamDecision`
+   object by `build_team_decision` and independently re-verified by the whole-claim
+   verifier through six team checks; any material failure sets verifier
+   `overall = false`.
+
+6. The second unauthorized path is blocked **before any write primitive invocation**:
+   the canonical Owner authorization binds `authorization_id, goal_id, task_id,
+   capability_id, role_id, mutation_class, allowed_relative_path, max_changed_files,
+   permission, rollback_requirement` into an authorization binding digest; a dispatch
+   whose contract does not match that digest is rejected with
+   `OWNER_AUTHORIZATION_BINDING_INVALID` at the execute gate, before bytes are written.
+   `SECOND_PATH_PREWRITE_BLOCK = VERIFIED`: zero bytes written to the unauthorized
+   path, zero changed files contributed, `UNAUTHORIZED_CHANGED_SURFACE = 0`.
+
+### Non-rewrite commitments
+
+- Pilot-02 history (`CONTROLLED_NON_PRODUCTION_DOCUMENTATION_MUTATION = VERIFIED`,
+  `CANONICAL_MUTATION_AUTHORITY_CHAIN = VERIFIED_ON_GAME_TRUYEN_ISOLATED_CLONE`,
+  `ROLLBACK_RECOVERY = VERIFIED`) is preserved unchanged.
+- Closure-01 findings are preserved unchanged; the closure overlay remains an
+  independent proof artifact and is no longer required, because the same semantics
+  now ship in the candidate runtime.
+- `.40` remains immutable and unchanged.
