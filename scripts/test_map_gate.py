@@ -9,7 +9,7 @@ import shutil
 capabilities_path = "/tmp/p2p-promo01/runtime/p2p_capabilities"
 sys.path.insert(0, capabilities_path)
 
-from project_context import enforce_map_before_work, ProjectContextError
+from project_context import enforce_map_before_work, ProjectContextError, ProjectContextBootstrap
 
 def setup_fixture(path: Path):
     if path.exists():
@@ -17,6 +17,7 @@ def setup_fixture(path: Path):
     path.mkdir(parents=True)
     p2p_dir = path / ".p2p"
     p2p_dir.mkdir()
+    (p2p_dir / "context").mkdir()
     
     # Healthy Pin
     pin = {
@@ -32,11 +33,10 @@ def setup_fixture(path: Path):
     with open(path / "file1.txt", "w") as f:
         f.write("hello")
     
-    # Create Map
-    from project_map import ProjectMapBuilder
-    builder = ProjectMapBuilder(str(path))
-    pmap = builder.build_full_map()
-    # Map is now fresh
+    # Bootstrap context which creates and saves the map
+    bootstrap = ProjectContextBootstrap(path)
+    pmap = bootstrap.get_project_map()
+    bootstrap.save_project_map()
     return pmap
 
 def run_test():
@@ -51,7 +51,7 @@ def run_test():
         print(f"Result: FAIL ({e})")
 
     print("\nScenario 2: Stale Map + Mutation Intent")
-    # Induce drift
+    # Induce drift by adding a file not in the saved map
     with open(fixture_path / "file2.txt", "w") as f:
         f.write("drift")
     
