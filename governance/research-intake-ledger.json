@@ -116,6 +116,15 @@
       "owner_accepted": true,
       "accepted_at": "2026-08-21T16:59:57Z",
       "summary": "Intake of mukul975/Anthropic-Cybersecurity-Skills registry (817 skills) as an external knowledge source. No auto-execution. Pinned to f76261573a539ec40c3d434ecbb9e657d26aa921."
+    },
+    {
+      "id": "RI-009",
+      "classification": "ACCEPTED",
+      "subject": "Adaptive Verification Hardening v2 / Right-Evidence Testing",
+      "status": "ACCEPTED",
+      "source": "owner-chat-2026-08-21",
+      "accepted_at": "2026-08-21T17:00:56Z",
+      "summary": "FW04 quality verification policy hardening. NFR applicability, proportional verification, lifecycle gates, failure taxonomy, process cleanup."
     }
   ],
   "inherited_decisions": {
