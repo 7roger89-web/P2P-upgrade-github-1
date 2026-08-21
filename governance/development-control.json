@@ -58,8 +58,8 @@
     "status": "BLOCKED_TERMINAL",
     "source_version": "8.4.7-C-codex.41",
     "source_version_status": "ACTIVE_UNPROMOTED",
-    "based_on_official_version": "8.4.7-C-codex.19",
-    "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "based_on_official_version": "8.4.7-C-codex.46",
+    "based_on_official_sha256": "2901adca106d3533b3df37e1d10d8a375162b64b001c32bec28b4b178c2f3bb7",
     "source_drift_classification": {
       "primary": "RECONCILED_TO_PROMOTED_BASELINE",
       "contributors": [
@@ -152,7 +152,10 @@
       "artifact_path": "../P2P-8.4.7-C-Codex-Edition-v19.zip",
       "evidence_refs": [
         "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C15",
@@ -177,7 +180,10 @@
       "evidence_refs": [
         "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md",
         "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C17",
@@ -202,7 +208,10 @@
           "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
           "promotion_status": "UNPROMOTED"
         }
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C18",
@@ -227,7 +236,10 @@
           "artifact_path": ".tmp/p2p-c18/candidates/P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-candidate.zip",
           "promotion_status": "UNPROMOTED"
         }
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C19",
@@ -262,7 +274,10 @@
           "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-candidate.zip",
           "promotion_status": "UNPROMOTED"
         }
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C20",
@@ -290,7 +305,10 @@
           "artifact_path": ".tmp/p2p-c20/candidates/P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-candidate.zip",
           "promotion_status": "UNPROMOTED"
         }
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C21",
@@ -308,7 +326,10 @@
         "E2-P2-C21-HS1-HS30",
         "E3-P3-C21-PACKAGE",
         "E3-P3-C21-SUPERVISOR"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C25",
@@ -326,7 +347,10 @@
         "CL1-CL40 PASS (tests/test_p2p_development_charter.py)",
         "framework validator 19/19 PASS (scripts/validate_p2p_development_framework.py)",
         "E3-P3-C25-PACKAGE (package_release.py build/verify on candidate)"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C26",
@@ -346,7 +370,10 @@
         "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
         "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%",
         "EXECUTION_POLICY<->PARALLEL_EXECUTION dependency cycle broken and documented"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C28",
@@ -365,7 +392,10 @@
       "embedded_version": "8.4.7-C-codex.22",
       "lineage_status": "LINEAGE_OK",
       "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-      "package_verify_evidence": "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.22, official baseline 8.4.7-C-codex.19"
+      "package_verify_evidence": "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.22, official baseline 8.4.7-C-codex.19",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C29",
@@ -383,7 +413,10 @@
         "scripts/package_release.py build on staged source: RC 0",
         "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.23, official baseline 8.4.7-C-codex.19",
         "docs/p2p-development/reports/P2P-C29-terminal-report.md"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C30",
@@ -402,7 +435,10 @@
         "scripts/package_release.py build on staged source: RC 0",
         "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.24, official baseline 8.4.7-C-codex.19",
         "docs/p2p-development/reports/P2P-C30-terminal-report.md"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C31",
@@ -422,7 +458,10 @@
         "C29 candidate policy: PASS+governance/runtime/release changes -> REQUIRED; BLOCKED terminal -> no release artifact minted"
       ],
       "lineage_anchor_sha256": "94b09b596dab04a8bff5042c44753fed96881c89658d3db4e7be09fe034017b7",
-      "lineage_anchor_note": "The real SHA-256 of the never-built C31 candidate does not exist; the C31 terminal report (2026-08-17, line 13) anchored C31's lineage to the C30 artifact 94b09b59... as an honesty-preserving continuity anchor. Per FW01 schema extension this anchor now lives in its own field so candidate_sha256 keeps a single meaning (built artifact digest). RESOLVED by Owner command (2026-08-19 FW01 schema extension): the anchor now lives in lineage_anchor_sha256; candidate_sha256=TO_BE_FILLED reflects never-built truth; validator row V19-c31 now PASS."
+      "lineage_anchor_note": "The real SHA-256 of the never-built C31 candidate does not exist; the C31 terminal report (2026-08-17, line 13) anchored C31's lineage to the C30 artifact 94b09b59... as an honesty-preserving continuity anchor. Per FW01 schema extension this anchor now lives in its own field so candidate_sha256 keeps a single meaning (built artifact digest). RESOLVED by Owner command (2026-08-19 FW01 schema extension): the anchor now lives in lineage_anchor_sha256; candidate_sha256=TO_BE_FILLED reflects never-built truth; validator row V19-c31 now PASS.",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C33",
@@ -440,8 +479,11 @@
       "evidence_refs": [
         "docs/p2p-development/research/c34/evidence/c34-capability-scoped-certification.json"
       ],
-      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift — see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged. LINEAGE_NORMALIZATION (FW01 closure): C33 candidate artifact sha b1cdcfd8... (C34-era minimal runtime-surface snapshot, not release-pipeline built) was later mis-cited as the official baseline by C35/C37/C39/C40-era records; official baseline remains C14-promoted v19 (3a9ee513...). based_on fields unchanged (.19 correct).",
-      "identity_semantics_note": "candidate_version 8.4.7-C-codex.24 identifies SOURCE STATE, not artifact uniqueness — established precedent: C18-C21/C25/C26 all share 8.4.7-C-codex.21 with distinct candidate_sha256/artifacts. Canonical identity = (candidate_id, development_goal, candidate_sha256). No governance change, no promotion implied."
+      "reconciliation_note": "Persisted at C34 closure reconciliation: C33 closed PASS with a runtime-surface change that the then-existing change detection did not recognize (POLICY_BLIND_SPOT, mechanically recovered in scripts/p2p_goal_closure.py ChangeSignals.detect). The deterministic canonical candidate policy therefore requires an UNPROMOTED C33 candidate. Artifact is the minimal runtime surface snapshot at commit dbfa9e1; the full package_release pipeline is not used (its 152-row source inventory mismatches unrelated source drift \u2014 see reconciliation report). No promotion, release, or approval fabricated; baseline .19 PROMOTED_VERIFIED unchanged. LINEAGE_NORMALIZATION (FW01 closure): C33 candidate artifact sha b1cdcfd8... (C34-era minimal runtime-surface snapshot, not release-pipeline built) was later mis-cited as the official baseline by C35/C37/C39/C40-era records; official baseline remains C14-promoted v19 (3a9ee513...). based_on fields unchanged (.19 correct).",
+      "identity_semantics_note": "candidate_version 8.4.7-C-codex.24 identifies SOURCE STATE, not artifact uniqueness \u2014 established precedent: C18-C21/C25/C26 all share 8.4.7-C-codex.21 with distinct candidate_sha256/artifacts. Canonical identity = (candidate_id, development_goal, candidate_sha256). No governance change, no promotion implied.",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C35",
@@ -459,7 +501,7 @@
       "candidate_policy_lane": "NON_CANONICAL_TERMINAL_STATUS: canonical PASS-trigger lane does not fire; candidate minted voluntarily under fail-closed governance per C33 precedent (runtime surface changed while terminal state is non-canonical)",
       "goal_closure_machine": "INCONSISTENT",
       "goal_closure_machine_hard_fails": 1,
-      "goal_closure_machine_explained": "ROADMAP_ITEM_EXISTS — roadmap items end at C31; C35 roadmap item and sync belong to C36 metadata refresh; not force-fixed",
+      "goal_closure_machine_explained": "ROADMAP_ITEM_EXISTS \u2014 roadmap items end at C31; C35 roadmap item and sync belong to C36 metadata refresh; not force-fixed",
       "source_commit": "ca12d57255c34fe059678d79be77559a238fb7a7",
       "source_branch": "c35-provider-neutral-runtime",
       "evidence_refs": [
@@ -479,7 +521,10 @@
         "verified_at": "2026-08-18",
         "verified_by": "C35-final-governance-closure"
       },
-      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): at C35 mint time the C33-registered v24 runtime-surface snapshot (sha b1cdcfd8...) was treated as the official baseline; the schema's official baseline authority is the C14 supervisor-promoted v19 artifact (3a9ee513...), which remains the official baseline per single-slot design. based_on_official normalized; candidate artifact sha 077971e3... and UNPROMOTED status unchanged."
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): at C35 mint time the C33-registered v24 runtime-surface snapshot (sha b1cdcfd8...) was treated as the official baseline; the schema's official baseline authority is the C14 supervisor-promoted v19 artifact (3a9ee513...), which remains the official baseline per single-slot design. based_on_official normalized; candidate artifact sha 077971e3... and UNPROMOTED status unchanged.",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C36",
@@ -516,7 +561,10 @@
         "entry_hash_check": "ALL PASS (every zip entry hash matches committed content)",
         "verified_at": "2026-08-18",
         "verified_by": "C36-evidence-bound-context-efficiency-closure"
-      }
+      },
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C37",
@@ -554,7 +602,10 @@
         "verified_by": "C37-adaptive-target-model-effort-closure"
       },
       "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C37 record cited v24 as the official baseline; official baseline remains C14-promoted v19 (3a9ee513...). based_on_official normalized; candidate_sha256 0f540edd... is the pipeline-verified value from C37 package_verify_evidence and unchanged."
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C37 record cited v24 as the official baseline; official baseline remains C14-promoted v19 (3a9ee513...). based_on_official normalized; candidate_sha256 0f540edd... is the pipeline-verified value from C37 package_verify_evidence and unchanged.",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C39",
@@ -591,7 +642,10 @@
         "zip_entry_count": 24
       },
       "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C39 record cited v24 as the official baseline; official baseline remains C14-promoted v19 (3a9ee513...). based_on_official normalized; candidate_sha256 a9995525... unchanged (matches c39-candidate-mint.json)."
+      "reconciliation_note": "LINEAGE_NORMALIZATION (FW01 closure): C39 record cited v24 as the official baseline; official baseline remains C14-promoted v19 (3a9ee513...). based_on_official normalized; candidate_sha256 a9995525... unchanged (matches c39-candidate-mint.json).",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "C40",
@@ -616,7 +670,7 @@
       "status": "UNPROMOTED",
       "promoted_at": "2026-08-18T15:22:19+00:00",
       "promoted_by": "Owner instruction 'PROMOTE' (conversation_explicit, active_user_message) recorded in approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
-      "promotion_scope": "Owner web projects similar to piloted projects (Game Truyen, Gia Pha — web/Next.js style); owner-gate (collision gate) and rollback preserved for every new install; FULL RELEASE GATES (drift PASS, fact-ledger renewal, final hash-bound approval, project evals, RAG checks, manifest rebuild) NOT YET RUN — this is a governance-side promotion decision, NOT a release decision (release_decision remains unset/BLOCKED until gates pass)",
+      "promotion_scope": "Owner web projects similar to piloted projects (Game Truyen, Gia Pha \u2014 web/Next.js style); owner-gate (collision gate) and rollback preserved for every new install; FULL RELEASE GATES (drift PASS, fact-ledger renewal, final hash-bound approval, project evals, RAG checks, manifest rebuild) NOT YET RUN \u2014 this is a governance-side promotion decision, NOT a release decision (release_decision remains unset/BLOCKED until gates pass)",
       "promotion_technical_report": "docs/p2p-development/research/c41/c41-pilot-extension-summary.md",
       "promotion_technical_report_sha256": "ae6cdbe546be6c216a6c3e687989365c0109c56ec18ae0281806ddbabe8ad387",
       "approval_record": "approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
@@ -625,7 +679,7 @@
       "candidate_version": "8.4.7-C-codex.24",
       "embedded_version": "8.4.7-C-codex.24",
       "development_goal": "C40",
-      "reconciliation_note": "FW01 SCHEMA EXTENSION: Owner promotion/release did occur (Owner 'PROMOTE' 2026-08-18T15:22:19Z; approval record approvals/P2P-APR-20260818T152219+0000; pilot installs Game Truyện + Gia Phà verified in c43 pack). The vocabulary PROMOTED_VERIFIED requires the promoted artifact to equal the official baseline (v19), which the v24 C40 artifact is not, so the previous normalization to UNPROMOTED erased an expressible historical truth. The extended schema adds PROMOTED_OWNER_VERIFIED for exactly this state: an Owner-approved promotion whose artifact is NOT the official build baseline; full release_decision remains NOT_RUN.",
+      "reconciliation_note": "FW01 SCHEMA EXTENSION: Owner promotion/release did occur (Owner 'PROMOTE' 2026-08-18T15:22:19Z; approval record approvals/P2P-APR-20260818T152219+0000; pilot installs Game Truy\u1ec7n + Gia Ph\u00e0 verified in c43 pack). The vocabulary PROMOTED_VERIFIED requires the promoted artifact to equal the official baseline (v19), which the v24 C40 artifact is not, so the previous normalization to UNPROMOTED erased an expressible historical truth. The extended schema adds PROMOTED_OWNER_VERIFIED for exactly this state: an Owner-approved promotion whose artifact is NOT the official build baseline; full release_decision remains NOT_RUN.",
       "promoted_artifact_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
       "promoted_version": "8.4.7-C-codex.24",
       "release_decision": "NOT_RUN",
@@ -639,8 +693,8 @@
           "approval_record_sha256": "e38fedac446c715eede232fe67eaeb2d6d2926457c420564a0a6490648087e09",
           "promoted_artifact_sha256": "e7f62384c8e51ef9c32e903688126642521d9570b648602fcf530aab25cbdc56",
           "promoted_artifact_label": "P2P-8.4.7-C-Codex-Edition-v24-c40-project-usable-release-pilot-candidate-v1.zip",
-          "promotion_scope": "Owner web projects similar to piloted projects (Game Truyen, Gia Pha — web/Next.js style); owner-gate and rollback preserved for every new install",
-          "full_release_gates": "NOT_RUN (drift gate, fact-ledger renewal, final hash-bound approval pending) — Owner approved CANDIDATE promotion, not full release",
+          "promotion_scope": "Owner web projects similar to piloted projects (Game Truyen, Gia Pha \u2014 web/Next.js style); owner-gate and rollback preserved for every new install",
+          "full_release_gates": "NOT_RUN (drift gate, fact-ledger renewal, final hash-bound approval pending) \u2014 Owner approved CANDIDATE promotion, not full release",
           "evidence_refs": [
             "governance/approvals/P2P-APR-20260818T152219+0000-c40-candidate-promote.json",
             "docs/p2p-development/research/c41/evidence/c41-promotion.json",
@@ -648,7 +702,10 @@
             "docs/p2p-development/research/c43/evidence/c43-production-install-evidence-pack.json"
           ]
         }
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW01",
@@ -697,7 +754,10 @@
         }
       ],
       "release_published_at": "2026-08-19T05:55:00+00:00",
-      "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v1/P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip"
+      "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v1/P2P-8.4.7-C-codex.24-fw01-autonomous-operating-loop-candidate-v1.zip",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW01-V2",
@@ -795,7 +855,10 @@
       "release_published_at": "2026-08-19T09:05:00+00:00",
       "release_asset_url": "https://github.com/7roger89-web/P2P-upgrade-github-1/releases/download/p2p-8.4.7-C-codex.24-fw01-v2/P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
       "promoted_artifact_sha256": "2a42e815ca44fbecce4d8f35a641529e8cad028f07dccc5800bae00e3f509e61",
-      "promoted_artifact_label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip"
+      "promoted_artifact_label": "P2P-8.4.7-C-codex.24-fw01-self-contained-patch-candidate-v2.zip",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "LIVE_CERTIFICATION_RECORD",
@@ -842,15 +905,15 @@
         "role_verifier.py": "ALREADY_PRESENT_EQUIVALENT_IN_CANONICAL_RUNTIME (byte-identical base to FW01 v2; lane variant = canonical + optional REAL_REQUIRED attestation policy)",
         "host_attestation.py": "CANONICAL_INTEGRATED_THIS_GOAL (exact reuse of c36-real-host-binding proven source, SHA256 c7d684eb2be2ef5ed98aa2dd6df01ca0ed85a4d17ffe1451387bf39b7a7262b4; no semantic rewrite; registered in capabilities.json + exports + provider-neutral suite)"
       },
-      "canonicality_note": "LIVE_CERT_EVIDENCE_RUNTIME_CANONICALITY_NOW_RESOLVED — all 4 modules canonical: role_bridge/role_receipt/role_verifier were already canonical-equivalent; host_attestation.py integrated by exact reuse in this goal. One canonical capability; no duplicate implementations. Historical 8/8 evidence unchanged; no rerun.",
+      "canonicality_note": "LIVE_CERT_EVIDENCE_RUNTIME_CANONICALITY_NOW_RESOLVED \u2014 all 4 modules canonical: role_bridge/role_receipt/role_verifier were already canonical-equivalent; host_attestation.py integrated by exact reuse in this goal. One canonical capability; no duplicate implementations. Historical 8/8 evidence unchanged; no rerun.",
       "certified_vs_eligible": {
         "CERTIFIED": true,
-        "CURRENTLY_ELIGIBLE": "UNKNOWN — certification proves evidenced behavior at evidence time only; it guarantees neither current auth, credits, host availability, provider health nor future model availability. CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED."
+        "CURRENTLY_ELIGIBLE": "UNKNOWN \u2014 certification proves evidenced behavior at evidence time only; it guarantees neither current auth, credits, host availability, provider health nor future model availability. CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED."
       },
       "freshness_semantics": "EVIDENCE_TIMESTAMP = 2026-08-19T08:55:00Z (cycle-3 completion, lane branch c36-real-host-binding). No freshness claim beyond that timestamp.",
       "does_not_create_eight_capabilities": "This is ONE certification record bound to the canonical role-execution capability surface (C35 RoleExecutionContract + C36 receipts), NOT eight canonical capabilities.",
       "supersedes": {
-        "historical": "C31 real-auth blocker observation (Codex path) — superseded at evidence time only",
+        "historical": "C31 real-auth blocker observation (Codex path) \u2014 superseded at evidence time only",
         "preserved": "C31 terminal verdict BLOCKED / OWNER_ACTION_REQUIRED preserved as historical truth; HISTORICAL_C31_STATUS unchanged"
       },
       "created_at": "2026-08-19T13:00:00Z",
@@ -866,7 +929,10 @@
       "built": false,
       "candidate_sha256": "TO_BE_FILLED",
       "lineage_anchor_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-      "lineage_anchor_note": "Anchored to official FW01 v2 baseline; never built as patch artifact — certification record only. No promotion, no release."
+      "lineage_anchor_note": "Anchored to official FW01 v2 baseline; never built as patch artifact \u2014 certification record only. No promotion, no release.",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "COMBINED-CANONICAL-SURFACE",
@@ -894,7 +960,10 @@
         "no live credentials",
         "no transcripts-as-state"
       ],
-      "artifact_path": "reports/candidates/combined-canonical-surface-candidate.zip"
+      "artifact_path": "reports/candidates/combined-canonical-surface-candidate.zip",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW02",
@@ -908,7 +977,10 @@
       "development_goal": "FW02_CAPABILITY_INTELLIGENCE",
       "built": true,
       "artifact_path": "reports/candidates/fw02-capability-intelligence-candidate.zip",
-      "notes": "Capability intelligence layer inside FW01 — no competing router. Predecessor 8.4.7-C-codex.25 (COMBINED-CANONICAL-SURFACE) preserved verbatim UNPROMOTED. No promotion, no release. FW03 not started (Owner gate). SHA bound to tree artifact: 579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930 (binding correction — zip bytes unchanged, honest artifact binding) Lineage corrected to official baseline 8.4.7-C-codex.19 (validate_control contract); lineage_anchor remains predecessor .25 (c0b485bd)."
+      "notes": "Capability intelligence layer inside FW01 \u2014 no competing router. Predecessor 8.4.7-C-codex.25 (COMBINED-CANONICAL-SURFACE) preserved verbatim UNPROMOTED. No promotion, no release. FW03 not started (Owner gate). SHA bound to tree artifact: 579e02bdac0b1776e9dcdc1a2b85dea6f5cd21f67e893c6c02cf4fc89af28930 (binding correction \u2014 zip bytes unchanged, honest artifact binding) Lineage corrected to official baseline 8.4.7-C-codex.19 (validate_control contract); lineage_anchor remains predecessor .25 (c0b485bd).",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW02_HANDOFF_BOUNDARY",
@@ -938,7 +1010,10 @@
         "no live credentials"
       ],
       "artifact_path": "reports/candidates/fw02-handoff-boundary-candidate.zip",
-      "minted_at": "2026-08-19T16:10:15Z"
+      "minted_at": "2026-08-19T16:10:15Z",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW02_CAPABILITY_HARDENING",
@@ -959,7 +1034,10 @@
         "FW01 loop composition gate BEFORE permission gate (p2p_fw01_loop.py)",
         "FW02 test suites: A-Z 26, handoff boundary 14, composition coverage 11, composition gate loop 7, host attestation 16",
         "governance candidate lineage"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW03_ADAPTIVE_TEAM_COUNCIL",
@@ -980,7 +1058,10 @@
         "select_role_team honors FW03 mode as role class (byte-identical fallback without FW03 decision)",
         "FW03 test suite 41 cases + regression 74 cases (115 total PASS)",
         "governance candidate lineage"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW04_QUALITY_EVIDENCE_LEARNING",
@@ -1002,7 +1083,10 @@
         "FW04 post-execution hook in FW01 loop AFTER step() outcome, BEFORE checkpoint (info-only trace; checkpoint VERIFIED gate on impact known + evidence present)",
         "FW04 test suite 44 cases (incl. live shadow-eval read-only verification over owner projects) + regression 115 cases (159 total PASS)",
         "governance candidate lineage"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW04_CHECKPOINT_CERTIFICATION_HANDOFF",
@@ -1016,17 +1100,20 @@
       "development_goal": "FW04_QUALITY_EVIDENCE_AND_LEARNING",
       "built": true,
       "lineage_anchor_sha256": "b6730a36aff6b57849b75b904e1528bd6ca36867f7540936fcece7291fa7e976",
-      "lineage_anchor_note": "FW04 quality-checkpoint + capability-certification handoff closure candidate: THREE seam fixes implemented and mechanically proven on real code/data paths. Seam A: FW01 checkpoint invariant — EXECUTION_SUCCESS != QUALITY_PROVEN; after execution, if task completed but FW04 quality verdict allows no quality-approved checkpoint (checkpoint_allowed=False, including QUALITY_UNKNOWN and REJECTED), the loop writes a fail-closed QUALITY_REVIEW checkpoint (verification_result=QUALITY_REVIEW, loop_status=BLOCKED, next_safe_action=QUALITY_REVIEW:<task>), fires QUALITY_CHECKPOINT_NOT_VERIFIED trace event, and NEVER changes the task record status (resume dedup preserved via the event ledger; executed-without-verified replay uses the real _recover_records_from_store which blocks unverified executions). Evidence derives from the durable task_verified event ledger, never from the empty inner outcome dict. Seam B: FW04 capability-scoped certification consumed by FW03 team intelligence through the existing evidence boundary — quality_intelligence.load_certification_evidence(caps, commit) is capability-scoped, fail-closed (absent key or currently_eligible=False never counts; stale cert does not count), and build_team_decision gains a single capability_certifications parameter that extends per-role coverage by exactly the certified capability; no router, no new authority, no permission grant, no eligibility grant (dispatch gate remains fail-closed NO_ELIGIBLE_ROLE without eligibility evidence). The FW01 loop passes the cert map via its existing handoff (_rec_with_handoff) into FW03. Verification: 6 seam-A loop-level tests (real Fw01Loop + FakeDeterministicExecutionBackend against the real registry and real gates) + 8 seam-B certification consumption tests (real load_certification_evidence + build_team_decision with store-boundary fixtures) + full regression 159 existing tests = 173 PASS, 0 new failures. FW04 remains post-execution verification authority only: it never grants permission, selects team/backend/model, or bypasses the permission gate. Ancestor = FW04 quality, evidence & learning candidate 8.4.7-C-codex.30, untouched as historical record. Minted per canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=True, release_artifact_changed=False)) = YES. No promotion, no release. FW05 not started (owner gate). SHA256 bound to this exact normalized zip.",
+      "lineage_anchor_note": "FW04 quality-checkpoint + capability-certification handoff closure candidate: THREE seam fixes implemented and mechanically proven on real code/data paths. Seam A: FW01 checkpoint invariant \u2014 EXECUTION_SUCCESS != QUALITY_PROVEN; after execution, if task completed but FW04 quality verdict allows no quality-approved checkpoint (checkpoint_allowed=False, including QUALITY_UNKNOWN and REJECTED), the loop writes a fail-closed QUALITY_REVIEW checkpoint (verification_result=QUALITY_REVIEW, loop_status=BLOCKED, next_safe_action=QUALITY_REVIEW:<task>), fires QUALITY_CHECKPOINT_NOT_VERIFIED trace event, and NEVER changes the task record status (resume dedup preserved via the event ledger; executed-without-verified replay uses the real _recover_records_from_store which blocks unverified executions). Evidence derives from the durable task_verified event ledger, never from the empty inner outcome dict. Seam B: FW04 capability-scoped certification consumed by FW03 team intelligence through the existing evidence boundary \u2014 quality_intelligence.load_certification_evidence(caps, commit) is capability-scoped, fail-closed (absent key or currently_eligible=False never counts; stale cert does not count), and build_team_decision gains a single capability_certifications parameter that extends per-role coverage by exactly the certified capability; no router, no new authority, no permission grant, no eligibility grant (dispatch gate remains fail-closed NO_ELIGIBLE_ROLE without eligibility evidence). The FW01 loop passes the cert map via its existing handoff (_rec_with_handoff) into FW03. Verification: 6 seam-A loop-level tests (real Fw01Loop + FakeDeterministicExecutionBackend against the real registry and real gates) + 8 seam-B certification consumption tests (real load_certification_evidence + build_team_decision with store-boundary fixtures) + full regression 159 existing tests = 173 PASS, 0 new failures. FW04 remains post-execution verification authority only: it never grants permission, selects team/backend/model, or bypasses the permission gate. Ancestor = FW04 quality, evidence & learning candidate 8.4.7-C-codex.30, untouched as historical record. Minted per canonical candidate_policy(PASS, None, ChangeSignals(runtime_changed=True, governance_changed=True, release_artifact_changed=False)) = YES. No promotion, no release. FW05 not started (owner gate). SHA256 bound to this exact normalized zip.",
       "surface_scope": [
         "p2p_fw01_loop.py seam A: post-execution FW04 quality verdict governs checkpoint/Continue (fail-closed QUALITY_REVIEW checkpoint, QUALITY_CHECKPOINT_NOT_VERIFIED trace event, task status preserved for resume dedup)",
         "p2p_fw01_loop.py seam B: capability_certifications pass-through from FW04 verdict evidence into FW03 build_team_decision via the existing handoff contract",
-        "quality_intelligence.py: load_certification_evidence() and _cert_records_for() — capability-scoped, freshness-bound, currently_eligible fail-closed evidence provider",
+        "quality_intelligence.py: load_certification_evidence() and _cert_records_for() \u2014 capability-scoped, freshness-bound, currently_eligible fail-closed evidence provider",
         "team_intelligence.py: capability_certifications param in build_team_decision; PROVIDE set extended by exactly the certified currently-eligible capability (evidence trace records the extension)",
         "test_checkpoint_quality_gate.py: 6 loop-level cases (A verified allowed; B scope-exact; C fail-closed unknown; D fail-closed rejected/mutation; E import-failure fail-closed; F resume dedup without duplicate execution)",
-        "test_certification_consumption.py: 8 cases (A–H: certified eligible counts; X cert does not satisfy Y; generic execution receipt does not certify; stale cert does not count; unknown currency fails closed; malformed evidence fails closed; decision changes only with valid evidence; certification never grants permission)",
+        "test_certification_consumption.py: 8 cases (A\u2013H: certified eligible counts; X cert does not satisfy Y; generic execution receipt does not certify; stale cert does not count; unknown currency fails closed; malformed evidence fails closed; decision changes only with valid evidence; certification never grants permission)",
         "eval_registry.json unchanged evidence-backed registry (12 evals)",
         "governance candidate lineage record (this record)"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_id": "FW04_QUALITY_STOP_HARDENING",
@@ -1040,16 +1127,19 @@
       "development_goal": "FW04_QUALITY_EVIDENCE_AND_LEARNING",
       "built": true,
       "lineage_anchor_sha256": "be3d8d35c72db5877b9638ff7f0cab9d5a1a3f47008d8768c2cf255133a9da7a",
-      "lineage_anchor_note": "FW04 QUALITY STOP hardening candidate (post-handoff; lineage anchor .31 = be3d8d35c72d...): TWO state-contradiction gaps found after the handoff and mechanically fixed + proven on real code/data paths. Issue A (loop return semantics): the quality-blocked checkpoint (VERIFICATION_REVIEW/BLOCKED) coexisted with a step() return of the inner loop's TASK_DONE_CONTINUE — an honest caller could read the continue as permission to advance. Fix: when _quality_review is active the iteration now returns the canonical STOP_BLOCKED outcome with reason=QUALITY_REVIEW_REQUIRED, task_id, quality_status and next_safe_action=QUALITY_REVIEW:<task>; the checkpoint's BLOCKED + next_safe_action and the QUALITY_CHECKPOINT_NOT_VERIFIED trace event remain the durable record. A durable PRE-STEP quality stop is added before next-task selection: a process that restarts with a persisted QUALITY_REVIEW checkpoint halts immediately at the loop boundary and never re-executes the task — resume dedup is preserved via the real event ledger (no status mutation of task records). Issue B (subject-bound certification): capability certifications were recorded without a subject binding, so in principle a cert recorded under one identity could leak coverage to any role. Fix: certifications carry a subject; quality_intelligence.certified_roles requires result=CERTIFIED with a freshness bound, and build_team_decision's extension now requires exact subject equality with a canonical registry role id — a subject that is not a canonical role id extends NO role (fail-closed), and every inspected role records a ROLE_CERTIFICATION trace with subject_match=. Coverage extension stays coverage-only: no eligibility, permission or gate state changes. Verification: 6 seam-A loop-level tests (real Fw01Loop + FakeDeterministicExecutionBackend against real registry and real gates) + 9 seam-B certification consumption tests (A-I: certified+eligible counts subject-bound only; X cert never satisfies Y; generic receipt never certifies; stale cert does not count; unknown currency fail-closed; malformed pointer fail-closed; decision changes only with valid evidence; certification never grants permission; subject mismatch extends no role) + full regression 159 existing tests = 174 PASS, 0 new failures, NEW_UNEXPLAINED_FAILURES=0. FW04 remains post-execution verification authority only; FW05 not started (owner gate). Ancestors = .31 quality-checkpoint-certification-handoff and .30 quality-evidence-learning candidates, untouched as historical records. Minted per canonical candidate_policy (PASS, None, ChangeSignals(runtime_changed=True, governance_changed=True, release_artifact_changed=False)) = YES. No promotion, no release. SHA256 bound to this exact normalized zip.",
+      "lineage_anchor_note": "FW04 QUALITY STOP hardening candidate (post-handoff; lineage anchor .31 = be3d8d35c72d...): TWO state-contradiction gaps found after the handoff and mechanically fixed + proven on real code/data paths. Issue A (loop return semantics): the quality-blocked checkpoint (VERIFICATION_REVIEW/BLOCKED) coexisted with a step() return of the inner loop's TASK_DONE_CONTINUE \u2014 an honest caller could read the continue as permission to advance. Fix: when _quality_review is active the iteration now returns the canonical STOP_BLOCKED outcome with reason=QUALITY_REVIEW_REQUIRED, task_id, quality_status and next_safe_action=QUALITY_REVIEW:<task>; the checkpoint's BLOCKED + next_safe_action and the QUALITY_CHECKPOINT_NOT_VERIFIED trace event remain the durable record. A durable PRE-STEP quality stop is added before next-task selection: a process that restarts with a persisted QUALITY_REVIEW checkpoint halts immediately at the loop boundary and never re-executes the task \u2014 resume dedup is preserved via the real event ledger (no status mutation of task records). Issue B (subject-bound certification): capability certifications were recorded without a subject binding, so in principle a cert recorded under one identity could leak coverage to any role. Fix: certifications carry a subject; quality_intelligence.certified_roles requires result=CERTIFIED with a freshness bound, and build_team_decision's extension now requires exact subject equality with a canonical registry role id \u2014 a subject that is not a canonical role id extends NO role (fail-closed), and every inspected role records a ROLE_CERTIFICATION trace with subject_match=. Coverage extension stays coverage-only: no eligibility, permission or gate state changes. Verification: 6 seam-A loop-level tests (real Fw01Loop + FakeDeterministicExecutionBackend against real registry and real gates) + 9 seam-B certification consumption tests (A-I: certified+eligible counts subject-bound only; X cert never satisfies Y; generic receipt never certifies; stale cert does not count; unknown currency fail-closed; malformed pointer fail-closed; decision changes only with valid evidence; certification never grants permission; subject mismatch extends no role) + full regression 159 existing tests = 174 PASS, 0 new failures, NEW_UNEXPLAINED_FAILURES=0. FW04 remains post-execution verification authority only; FW05 not started (owner gate). Ancestors = .31 quality-checkpoint-certification-handoff and .30 quality-evidence-learning candidates, untouched as historical records. Minted per canonical candidate_policy (PASS, None, ChangeSignals(runtime_changed=True, governance_changed=True, release_artifact_changed=False)) = YES. No promotion, no release. SHA256 bound to this exact normalized zip.",
       "surface_scope": [
-        "p2p_fw01_loop.py Issue A: quality-blocked iteration returns STOP_BLOCKED with reason QUALITY_REVIEW_REQUIRED, task_id, quality_status and next_safe_action=QUALITY_REVIEW:<task> — never a continue semantic (QUALITY_BLOCKED != TASK_DONE_CONTINUE)",
-        "p2p_fw01_loop.py Issue A: durable PRE-STEP quality stop — a persisted QUALITY_REVIEW/BLOCKED checkpoint halts the loop before next-task selection on any restart; no task record status is mutated (resume dedup preserved)",
+        "p2p_fw01_loop.py Issue A: quality-blocked iteration returns STOP_BLOCKED with reason QUALITY_REVIEW_REQUIRED, task_id, quality_status and next_safe_action=QUALITY_REVIEW:<task> \u2014 never a continue semantic (QUALITY_BLOCKED != TASK_DONE_CONTINUE)",
+        "p2p_fw01_loop.py Issue A: durable PRE-STEP quality stop \u2014 a persisted QUALITY_REVIEW/BLOCKED checkpoint halts the loop before next-task selection on any restart; no task record status is mutated (resume dedup preserved)",
         "quality_intelligence.py Issue B: certified_roles derived from records with result=CERTIFIED and a freshness bound (CURRENT per freshness contract), subject-bound to canonical registry role ids",
-        "team_intelligence.py Issue B: build_team_decision extension requires exact subject equality (subject_match trace per inspected role); non-matching subjects extend no role; certification evidence extends coverage ONLY — no eligibility/permission/gate change (failure_class remains NO_ELIGIBLE_ROLE)",
+        "team_intelligence.py Issue B: build_team_decision extension requires exact subject equality (subject_match trace per inspected role); non-matching subjects extend no role; certification evidence extends coverage ONLY \u2014 no eligibility/permission/gate change (failure_class remains NO_ELIGIBLE_ROLE)",
         "test_checkpoint_quality_gate.py: 6 loop-level cases (A quality unknown stops; B quality proven honest continue; C rejected stops; D failed execution fail-closed; E quality module absent fail-closed; F resume without duplicate execution via event ledger)",
         "test_certification_consumption.py: 9 cases (A-I: subject-bound certified eligible counts; X cert does not satisfy Y; generic execution receipt never certifies; stale cert does not count; unknown currency fails closed; malformed evidence fails closed; decision changes only with valid evidence; certification never grants permission; subject mismatch extends no role)",
         "governance candidate lineage record (this record)"
-      ]
+      ],
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.33",
@@ -1067,12 +1157,15 @@
       "lineage_anchor_note": "FW05 owner experience + decision trace candidate (lineage anchor .32 quality-stop hardening). FW05 is NOT a new orchestrator: a read-only owner-facing facade over canonical durable state (FW01 remains the sole operating loop). New surface: p2p_capabilities/fw05_owner_experience.py (~1.5k lines) implementing the structured decision-trace contract (DECISION_ID, GOAL_ID, TASK_ID, DECISION_TYPE, TIMESTAMP, INPUT_FACTS, APPLIED_POLICY_OR_RULE, SELECTED_ACTION, MATERIAL_ALTERNATIVES, REJECTED_ALTERNATIVES_WITH_REASON, EVIDENCE_POINTERS, EVIDENCE_VERSION, UNKNOWN_OR_GAPS, OWNER_DECISION_REQUIRED, DECISION_STATUS, SCOPE), the durable Owner Decision Inbox (append-only .p2p/state/owner-inbox.jsonl with deterministic DECISION_ID hashing for cross-process deduplication; exactly one unresolved item per blocking cause+scope+evidence version), the Owner Answer Contract (parse_owner_response/resolve_owner_answer: validate against DECISION_ID + evidence version + option; invalid/stale/already-resolved answers fail closed; raw transcript never becomes state; ONE_TIME narrow scope, auto_grants_nothing), progressive disclosure L1/L2/L3 derived from the same durable truth, project status view with Goal Pass vs Promotion distinction, and durable QUALITY_REVIEW triage (technical-resolvable routed without an inbox item; owner-owned creates exactly one item). FW01 loop receives an info-only enrichment hook (fw05_owner_experience field on step() outcomes) that never affects control flow. Evidence over claims: test_fw05_owner_experience.py 29 cases PASS (full A-Z matrix incl. dedup K/L, cold-process boundary recovery M/N via real subprocess restart, owner answer contract O-S, decision resume U/V with no duplicate execution, progressive disclosure W, Goal Pass vs Promotion X, evidence-not-CoT Y, FW01-FW04 regression Z) + full regression 203/203 PASS (NEW_UNEXPLAINED_FAILURES=0) + independent supervisor 16/16 PASS over real code/data paths + shadow evaluation READ-ONLY over the GT/GP cert trees (byte-identical before/after). DECISION_TRACE stores structured evidence, never private reasoning; OWNER_MESSAGE never equals DURABLE_DECISION; OWNER_APPROVAL is narrowly scoped (single decision, single task, one-time). Minted per candidate_policy: runtime behavior changed (FW01 step() output enriched + new durable inbox + new module) -> YES. No promotion, no release, FW06 not started (owner gate).",
       "surface_scope": [
         "fw05_owner_experience.py: decision-trace record contract, owner inbox (append-only JSONL, stable DECISION_ID, dedup), owner answer contract (fail-closed: invalid/stale/resolved), progressive disclosure L1/L2/L3, project status snapshot (blocker, next action, open decisions, goal-pass vs promotion), quality review integration (owner-owned -> exactly 1 inbox item; technical -> no item)",
-        "test_fw05_owner_experience.py: 29 cases — matrix A-Z, cold-process boundary recovery (real subprocess), decision resume, fail-closed answer contract, GT/GP read-only shadow",
+        "test_fw05_owner_experience.py: 29 cases \u2014 matrix A-Z, cold-process boundary recovery (real subprocess), decision resume, fail-closed answer contract, GT/GP read-only shadow",
         "p2p_fw01_loop.py: info-only fw05_owner_experience enrichment field appended to step() outcomes at all exit points; no control-flow change",
         "scripts/fw05_supervisor.py: independent 16-check supervisor over real code/data paths",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW05_OWNER_EXPERIENCE_DECISION_TRACE"
+      "candidate_id": "FW05_OWNER_EXPERIENCE_DECISION_TRACE",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.34",
@@ -1090,12 +1183,15 @@
       "lineage_anchor_note": "FW06 production autonomy & resilience candidate (lineage anchor .33 FW05 owner experience). FW06 is NOT a new orchestrator: a bounded runtime-contract layer over the existing P2P control plane; FW01 remains the sole operating loop. New surface: p2p_capabilities/fw06_operational_resilience.py implementing the Autonomy Envelope (authorized scope / mutation classes / owner gates / max parallelism / retry policy / resource budget / quality requirements / recovery policy / expiry; fresh-only envelope required), the Safe Continuation Policy (per-gate fail-closed continuation decision), failure classification (UNKNOWN_MUTATION_STATE fail-closed for unrecognized states), bounded retry, execution leases (append-only, split-brain blocked; reclaim fail-closed while owner process observable via heartbeat TTL), crash/session-death recovery with evidence-point failure analysis (A-G failure points; RETRY_BOUNDED/VERIFY_ONLY/BLOCK/PAUSE only; never blind re-execution), quiesce/drain lifecycle, FAILOVER != RETRY deterministic failover decision, tiered runtime health, pause/resume (durable), workspace ownership + parallel-worktree conflict detection (deterministic), cleanup fail-closed until all guards satisfied, multi-project isolation + read-only multi-project view, append-only idempotent event log (no secrets, no chain-of-thought), and auditability. Read-only facade invariant: all view surfaces never create project state directories (mkdirs=False default). FW01 loop receives an info-only enrichment hook (fw06_resilience field on step() outcomes) that never affects control flow. Evidence over claims: test_fw06_operational_resilience.py 37 cases PASS (chaos matrix A-G cold-process recovery via real subprocess, two-process lease split-brain, lease reclaim, pause/resume durability, fail-closed classifications, deterministic failover, tiered health, worktree parallel proof, conflict detection, cleanup guards, GT/GP READ-ONLY shadow eval byte-identical before/after) + full regression 240/240 PASS (NEW_UNEXPLAINED_FAILURES=0) + independent supervisor 16/16 PASS over real code/data paths (incl. read-only facade proof over GT/GP and diff-based zero-mutation probe). No promotion, no release, FW07 not started (owner gate).",
       "surface_scope": [
         "fw06_operational_resilience.py: autonomy envelope, safe continuation policy, failure classification, bounded retry, execution leases, crash/session-death recovery, quiesce/drain, failover decision, runtime health, pause/resume, workspace ownership/conflict/cleanup, multi-project isolation/view, event log, audit (all views read-only: never create state dirs)",
-        "test_fw06_operational_resilience.py: 37 cases — A-Z chaos matrix, cold-process subprocess proofs, two-process lease boundary, fail-closed negatives, GT/GP read-only shadow",
+        "test_fw06_operational_resilience.py: 37 cases \u2014 A-Z chaos matrix, cold-process subprocess proofs, two-process lease boundary, fail-closed negatives, GT/GP read-only shadow",
         "p2p_fw01_loop.py: info-only fw06_resilience enrichment field appended to step() outcomes; no control-flow change",
         "scripts/fw06_supervisor.py: independent 16-check red-team supervisor over real code/data paths",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW06_PRODUCTION_AUTONOMY_RESILIENCE"
+      "candidate_id": "FW06_PRODUCTION_AUTONOMY_RESILIENCE",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.35",
@@ -1118,7 +1214,10 @@
         "governance/development-control.json: candidate lineage record (this record)"
       ],
       "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
-      "artifact_status_note": "superseded by immutable-identity repair; artifact file no longer present on disk"
+      "artifact_status_note": "superseded by immutable-identity repair; artifact file no longer present on disk",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.36",
@@ -1135,7 +1234,7 @@
       "source_commit": "4063c4ba7acc5098ab544fa2fb0a5c94aa1b4226",
       "source_tree_hash": "d9990c6a6b2778abf9c7d92b1f2db3ae6e60b03c",
       "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
-      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift, verify twice), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS. No promotion, no release, pilot not executed (owner gate). GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision fix — same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA).",
+      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift, verify twice), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS. No promotion, no release, pilot not executed (owner gate). GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision fix \u2014 same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA).",
       "surface_scope": [
         "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
         "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
@@ -1143,7 +1242,10 @@
         "governance/development-control.json: candidate lineage record (this record)"
       ],
       "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
-      "superseded_note": "GATE-01C: runtime identity changed after .36 declaration (EXECUTED_RUNTIME != DECLARED_CANDIDATE_RUNTIME); never installed or promoted; superseded in place by 8.4.7-C-codex.37"
+      "superseded_note": "GATE-01C: runtime identity changed after .36 declaration (EXECUTED_RUNTIME != DECLARED_CANDIDATE_RUNTIME); never installed or promoted; superseded in place by 8.4.7-C-codex.37",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.37",
@@ -1160,14 +1262,17 @@
       "source_commit": "d1a88fceac3eb3877eb9d7b642babc53fca1195b",
       "source_tree_hash": "61b4be97b25f28ca5502f6f0e6d31243c55ee823",
       "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
-      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift, verify twice), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS. No promotion, no release, pilot not executed (owner gate). GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision fix — same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA). GATE-01C runtime binding fix: .37 replaces .36's stale build — the .36 zip bundle carried 4063c4-era role_receipt.py (sha 780a1bb5, WITHOUT the fe090e8 embedded-target fail-closed fix and WITHOUT GATE-01C candidate/repo binding), i.e. EXECUTED_RUNTIME != DECLARED_CANDIDATE_RUNTIME. .37 is minted from the FINAL committed runtime (HEAD d1a88fc: candidate binding, stable source_repository_id, split attestation replay semantics, whole-claim 17-field verifier), so DECLARED_CANDIDATE_RUNTIME == EXECUTED_RUNTIME byte-for-byte.",
+      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift, verify twice), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS. No promotion, no release, pilot not executed (owner gate). GATE-01B identity repair: .36 is the ONE immutable successor of .35 (identity-collision fix \u2014 same candidate_id FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE now pins one artifact SHA). GATE-01C runtime binding fix: .37 replaces .36's stale build \u2014 the .36 zip bundle carried 4063c4-era role_receipt.py (sha 780a1bb5, WITHOUT the fe090e8 embedded-target fail-closed fix and WITHOUT GATE-01C candidate/repo binding), i.e. EXECUTED_RUNTIME != DECLARED_CANDIDATE_RUNTIME. .37 is minted from the FINAL committed runtime (HEAD d1a88fc: candidate binding, stable source_repository_id, split attestation replay semantics, whole-claim 17-field verifier), so DECLARED_CANDIDATE_RUNTIME == EXECUTED_RUNTIME byte-for-byte.",
       "surface_scope": [
         "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
         "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
         "system/: full tracked .p2p/system capability tree (FW02-FW06 modules, tests, traces)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.38",
@@ -1191,7 +1296,10 @@
         "system/: full tracked .p2p/system capability tree (FW02-FW06 modules + bounded_documentation_write primitive, tests, traces)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.39",
@@ -1215,7 +1323,10 @@
         "system/: full tracked .p2p/system capability tree (FW02-FW06 modules + bounded_documentation_write primitive, authority_chain_registry ledger, tests, traces)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.40",
@@ -1232,14 +1343,17 @@
       "source_commit": "a1e78bc378d8efe65840ec7c3d23ded121284759",
       "source_tree_hash": "3bb25bff45941045123ac9ab426cb24ad62149ff",
       "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
-      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS (cumulative lineage .35.. .40 rule: each record pins exactly one artifact SHA, all UNPROMOTED, all directly consecutive). No promotion, no release, pilot not executed (owner gate). BW01B role/host semantics closure: .40 replaces .39's build because the committed runtime gained the canonical correction layer — explicit PROVIDES field on role records (p2p_architecton PROVIDES = [bounded_documentation_write]; role_capability_evidence PROVIDES-only, REQUIRES never promotes; FW03 FW04 owner-summary tests reconciled to explicit PROVIDES), canonical MUTATION_AUTHORITY_MODES (MUTATION_READY, TEST_ONLY) with fail-closed validation in execute_bounded_document_mutation, evidence carries mutation_authority_mode, role_bridge dispatch wires the canonical authority mode and continues to require a real HostAttestation for MUTATION_READY execution, and _g1_authority_chain_check + verify_bounded_mutation_receipt whole-claim verifier add role_explicitly_provides_capability / mutation_authority_mode_is_canonical / mutation_authority_mode_is_mutation_ready / test_only_evidence checks. Verified by the 22-test BW01B canonical shadow proof (positive lifecycle M0/M1/M2, negative matrix A-N, crash-retry) on a disposable Git fixture. DECLARED_CANDIDATE_RUNTIME == EXECUTED_RUNTIME byte-for-byte at HEAD a1e78bc.",
+      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS (cumulative lineage .35.. .40 rule: each record pins exactly one artifact SHA, all UNPROMOTED, all directly consecutive). No promotion, no release, pilot not executed (owner gate). BW01B role/host semantics closure: .40 replaces .39's build because the committed runtime gained the canonical correction layer \u2014 explicit PROVIDES field on role records (p2p_architecton PROVIDES = [bounded_documentation_write]; role_capability_evidence PROVIDES-only, REQUIRES never promotes; FW03 FW04 owner-summary tests reconciled to explicit PROVIDES), canonical MUTATION_AUTHORITY_MODES (MUTATION_READY, TEST_ONLY) with fail-closed validation in execute_bounded_document_mutation, evidence carries mutation_authority_mode, role_bridge dispatch wires the canonical authority mode and continues to require a real HostAttestation for MUTATION_READY execution, and _g1_authority_chain_check + verify_bounded_mutation_receipt whole-claim verifier add role_explicitly_provides_capability / mutation_authority_mode_is_canonical / mutation_authority_mode_is_mutation_ready / test_only_evidence checks. Verified by the 22-test BW01B canonical shadow proof (positive lifecycle M0/M1/M2, negative matrix A-N, crash-retry) on a disposable Git fixture. DECLARED_CANDIDATE_RUNTIME == EXECUTED_RUNTIME byte-for-byte at HEAD a1e78bc.",
       "surface_scope": [
         "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
         "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
         "system/: full tracked .p2p/system capability tree (FW02-FW06 modules + bounded_documentation_write primitive, authority_chain_registry ledger, tests, traces)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.41",
@@ -1256,9 +1370,9 @@
       "source_commit": "ec47147bf09bc5d482261838d586599643e637cd",
       "source_tree_hash": "3963e8ed7e544551fdfb8e905ef7af9b21a20e10",
       "lineage_anchor_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
-      "lineage_anchor_note": "Single successor cumulative candidate to .40: integrates the proven P2P mutation-safety policy into the shipped runtime — A–E document-path classification with fail-closed canonical normalization (root-only basenames TASKS.md/AGENTS.md/P2P-PROJECT-BOOTSTRAP.md, any-depth lookalike/traversal deny), platform-vs-role capability separation in team decision (base platform gaps never material), team-state invariant (team success XOR material failure_class) enforced in verify_bounded_mutation_receipt whole-claim verifier, and owner-authorization path binding with second-path pre-write block in the bounded_documentation_write primitive. Proven by the integrated candidate runtime itself: positive fixture (M0/M1/M2), 16-row negative matrix A-P, regression baseline comparison, doctor HEALTHY, fresh-tree and self-contained verification. UNPROMOTED; eligible for promotion-readiness review only. Zero mutation on Game Truyện authoritative.",
+      "lineage_anchor_note": "Single successor cumulative candidate to .40: integrates the proven P2P mutation-safety policy into the shipped runtime \u2014 A\u2013E document-path classification with fail-closed canonical normalization (root-only basenames TASKS.md/AGENTS.md/P2P-PROJECT-BOOTSTRAP.md, any-depth lookalike/traversal deny), platform-vs-role capability separation in team decision (base platform gaps never material), team-state invariant (team success XOR material failure_class) enforced in verify_bounded_mutation_receipt whole-claim verifier, and owner-authorization path binding with second-path pre-write block in the bounded_documentation_write primitive. Proven by the integrated candidate runtime itself: positive fixture (M0/M1/M2), 16-row negative matrix A-P, regression baseline comparison, doctor HEALTHY, fresh-tree and self-contained verification. UNPROMOTED; eligible for promotion-readiness review only. Zero mutation on Game Truy\u1ec7n authoritative.",
       "surface_scope": [
-        "system/: bounded_documentation_write.py (A–E classification, fail-closed normalization, authorization binding, second-path guard), team_intelligence.py (platform/role separation, invariant), role_receipt.py (team block flow-through, six team checks)",
+        "system/: bounded_documentation_write.py (A\u2013E classification, fail-closed normalization, authorization binding, second-path guard), team_intelligence.py (platform/role separation, invariant), role_receipt.py (team block flow-through, six team checks)",
         "VERSION / manifest/package.json / governance/development-control.json: mechanical version derivation .40 -> .41, lineage register",
         "release-manifest.json + RELEASE-SHA256SUMS.txt: regenerated by canonical build"
       ],
@@ -1266,7 +1380,10 @@
       "promoted_at": "2026-08-21T03:54:10.617216+00:00",
       "promoted_by": "7roger89-web (Owner)",
       "approval_record": "P2P-APR-20260821T035410Z-c41-official-baseline-promotion",
-      "notes": " Promoted to official baseline at 2026-08-21T03:54:10.617216+00:00 via P2P-APR-20260821T035410Z-c41-official-baseline-promotion (Owner-approved P2P-PROMOTE-41-01). Previous official baseline: 8.4.7-C-codex.19 (3a9ee513...). Baseline promotion only; no release/upgrade/production-mutation implied."
+      "notes": " Promoted to official baseline at 2026-08-21T03:54:10.617216+00:00 via P2P-APR-20260821T035410Z-c41-official-baseline-promotion (Owner-approved P2P-PROMOTE-41-01). Previous official baseline: 8.4.7-C-codex.19 (3a9ee513...). Baseline promotion only; no release/upgrade/production-mutation implied.",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "candidate_version": "8.4.7-C-codex.46",
@@ -1290,11 +1407,14 @@
         "Full P2P distribution surface preserved from .41 baseline (Skills, Governance, Orchestrator)",
         "governance/development-control.json: candidate lineage record (this record)"
       ],
-      "candidate_id": "P2P_CORRECTIVE_FULL_SUCCESSOR_PACKAGING_01"
+      "candidate_id": "P2P_CORRECTIVE_FULL_SUCCESSOR_PACKAGING_01",
+      "provenance": [],
+      "artifact_sha256": "unknown",
+      "git_commit": "unknown"
     },
     {
       "version": "8.4.7-C-codex.48",
-      "artifact_sha256": "9b4b7339a668a52622b9abdc7879e8f5075544cb3f2a056d022690f91aedb6ad",
+      "artifact_sha256": "641b8910cf7b10a474ebd0f8181bc7c7d5ff62136a2f3e61c92adc23f9bab2c6",
       "source_commit": "bbb5cbbcda084672f33a215fd7c80d580e4bde62",
       "minted_at": "2026-08-21T12:38:00Z",
       "minted_by": "Manus AI",
@@ -1304,7 +1424,13 @@
         "map_gate": "PASS",
         "doctor": "HEALTHY",
         "causal_closure": "PASS"
-      }
+      },
+      "candidate_id": "C41",
+      "candidate_version": "8.4.7-C-codex.41",
+      "provenance": [],
+      "embedded_version": "8.4.7-C-codex.41",
+      "git_commit": "unknown",
+      "candidate_sha256": "641b8910cf7b10a474ebd0f8181bc7c7d5ff62136a2f3e61c92adc23f9bab2c6"
     }
   ],
   "capability_status": [
@@ -1553,7 +1679,13 @@
         "id": "C19",
         "title": "Task-targeted context retrieval, coverage, and reuse foundation",
         "status": "DONE",
-        "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context"
+        "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context",
+        "source_research_ids": [
+          "RA-EXT-032"
+        ],
+        "canonical_capability_ids": [
+          "C41"
+        ]
       },
       {
         "id": "FACT_LIVE_SPECS",
@@ -1686,43 +1818,43 @@
       {
         "id": "C28",
         "status": "DONE",
-        "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
+        "title": "Secure Host Connection & Credential Onboarding \u2014 determine required auth, verify safely, minimal Owner action outside chat",
         "evidence_ref": "GOAL-C28",
         "notes": "C28 terminal state: PASS (machinery). Full provider-neutral connection + credential onboarding layer implemented and verified (70 HO tests, 31/31 validator, secret scan 0). No host claimed live-certified; owner action codex login / Manus connector remains the irreducible next step."
       },
       {
         "id": "C30",
         "status": "DONE",
-        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
+        "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)",
         "evidence_ref": "GOAL-C30",
         "notes": "C30 PLANNED at goal declaration. Foundation machinery (p2p_execution_target.py, ET1-ET60, ledger reconciliation, research intake artifact) implemented in the C30 session; terminal verdict PASS (machinery). | C30 closure normalization (FRAMEWORK-00): terminal PASS (machinery only) 2026-08-17 with sealed candidate 94b09b59; historical DONE normalization, no new runtime/promotion."
       },
       {
         "id": "C31",
         "status": "BLOCKED",
-        "title": "Complete Live Host Certification Before Cross-Host Continuation — honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
+        "title": "Complete Live Host Certification Before Cross-Host Continuation \u2014 honest live certification of one real execution path using the generic C30 execution-target contract and C27/C28 machinery (no vendor-specific core, no routing, no autopilot)",
         "evidence_ref": "GOAL-C31",
         "notes": "C31 terminal verdict 2026-08-17: BLOCKED / OWNER_ACTION_REQUIRED. Fresh live probe (evidence/c31_live_probe.json, fingerprint 5e3364ee41b3d6f01a3bd47c40ca66eb5f1e7f1ab697e2343123b3e94566854b) reached Codex CLI 0.147.0's own auth layer and returned HTTP 401 before model contact (AUTH_INVALID); Manus connector path is AUTH_CONFIG_ABSENT (no connector enabled). Unresolved dependency: a real auth session. Smallest owner actions: (a) `codex login` with a real OpenAI/Codex account outside chat; or (b) enable the Manus project connector in the Manus session configuration. Reopen condition: a supported host reaches connection_status AUTH_REQUIRED or stronger on a fresh probe.",
-        "normalization_note": "LINEAGE_NORMALIZATION (FW01 closure): status PLANNED was stale — C31's terminal verdict was BLOCKED / OWNER_ACTION_REQUIRED, its candidate was BUILD_SKIPPED_BY_POLICY, and C38's own closure note describes current_development as the C31/BLOCKED_TERMINAL historical snapshot. Normalized to BLOCKED, matching C09->C10 precedent (DONE after BLOCKED is a recognized sequence)."
+        "normalization_note": "LINEAGE_NORMALIZATION (FW01 closure): status PLANNED was stale \u2014 C31's terminal verdict was BLOCKED / OWNER_ACTION_REQUIRED, its candidate was BUILD_SKIPPED_BY_POLICY, and C38's own closure note describes current_development as the C31/BLOCKED_TERMINAL historical snapshot. Normalized to BLOCKED, matching C09->C10 precedent (DONE after BLOCKED is a recognized sequence)."
       },
       {
         "id": "C35",
         "status": "DONE",
-        "title": "Provider-Neutral P2P Agent Runtime — portable role specs, deterministic role execution contract, eligibility validation, execution receipts, independent receipt verification, 8/8 verified role-receipt quorum gate",
+        "title": "Provider-Neutral P2P Agent Runtime \u2014 portable role specs, deterministic role execution contract, eligibility validation, execution receipts, independent receipt verification, 8/8 verified role-receipt quorum gate",
         "evidence_ref": "docs/p2p-development/reports/P2P-C35-terminal-report.md",
         "notes": "C35 terminal verdict (normalized): PASS / PROVIDER_NEUTRAL_AGENT_RUNTIME_READY (canonical PASS of the controlling C35 execution contract). 8 canonical roles + aesthetica (optional); 57/57 deterministic tests pass at HEAD ca12d57255c34fe059678d79be77559a238fb7a7; 0 regression deltas vs C34 baseline e16a4d2; governance-integrity review 0 violations; BackendExecutionBridge (C34) reused, no fork. Candidate P2P-8.4.7-C-Codex-Edition-v24-c35-provider-neutral-p2p-agent-runtime-candidate-v1.zip (UNPROMOTED, ARTIFACT_VERIFY_PASS, SHA 077971e3a7ab308b713c7c5deb744e0b89fb9e6c58c102168a7bb4426f677427); candidate-policy lane CANDIDATE_REQUIRED=YES bound to the existing artifact. Governance promotion is a separate, Owner-gated workflow."
       },
       {
         "id": "C35R",
         "status": "DONE",
-        "title": "ZaoFu Deep Architecture Audit (Research Only) — upstream provenance, 16-area subsystem audit, BUILD-vs-REUSE matrix (ADAPT 7 / DEFER 5 / REJECT 4), 12 architectural verdicts, C36/C37 MINOR_REFINEMENT research inputs (no implementation)",
+        "title": "ZaoFu Deep Architecture Audit (Research Only) \u2014 upstream provenance, 16-area subsystem audit, BUILD-vs-REUSE matrix (ADAPT 7 / DEFER 5 / REJECT 4), 12 architectural verdicts, C36/C37 MINOR_REFINEMENT research inputs (no implementation)",
         "evidence_ref": "GOAL-C35R (docs/p2p-development/reports/P2P-C35R-terminal-report.md)",
-        "notes": "C35R terminal verdict: PASS / ZAOFU_ARCHITECTURE_AUDIT_COMPLETE (research only). Machine-derived C35R_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C36/C37 implementation. Normalization §A-J completed: matrix counts mechanically reconciled (7/5/4, invariant holds), closure machinery final CONSISTENT 0 hard findings, C31/C28 divergence classified as legitimate historical snapshot semantics."
+        "notes": "C35R terminal verdict: PASS / ZAOFU_ARCHITECTURE_AUDIT_COMPLETE (research only). Machine-derived C35R_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) \u2014 no candidate minted, no release artifact, no capability promotion, no C36/C37 implementation. Normalization \u00a7A-J completed: matrix counts mechanically reconciled (7/5/4, invariant holds), closure machinery final CONSISTENT 0 hard findings, C31/C28 divergence classified as legitimate historical snapshot semantics."
       },
       {
         "id": "C36",
         "status": "DONE",
-        "title": "Evidence-Bound Context & Efficiency Intelligence — ContextManifest (authority classification + deterministic identity), DeliveryEnvelope/Receipt (DELIVERED != READ), ReadEvidence/ReadGap, ContextCache (identity/freshness/ transformation provenance), efficiency telemetry + soft budget, bounded loop/overwrite guards (no provider routing, no fallback, no vendor branching, zero live backend calls)",
+        "title": "Evidence-Bound Context & Efficiency Intelligence \u2014 ContextManifest (authority classification + deterministic identity), DeliveryEnvelope/Receipt (DELIVERED != READ), ReadEvidence/ReadGap, ContextCache (identity/freshness/ transformation provenance), efficiency telemetry + soft budget, bounded loop/overwrite guards (no provider routing, no fallback, no vendor branching, zero live backend calls)",
         "evidence_ref": "GOAL-C36 (docs/p2p-development/reports/P2P-C36-terminal-report.md)",
         "notes": "C36 terminal verdict: PASS / EVIDENCE_BOUND_CONTEXT_EFFICIENCY_READY. Machine-derived C36_CANDIDATE_REQUIRED=YES (runtime_changed=True); UNPROMOTED candidate minted at reports/candidates; no promotion, no release, no merge, no C37 start."
       },
@@ -1733,10 +1865,10 @@
       },
       {
         "id": "C38",
-        "title": "C38 Live Role Certification & Multi-Backend Execution Proof (provider-neutral live certification of canonical role p2p_iris on two independent backends: Manus API v2 and Hermes CLI × Gemini; Stage B/C/D all VERIFIED; candidate policy NO — no candidate minted)",
+        "title": "C38 Live Role Certification & Multi-Backend Execution Proof (provider-neutral live certification of canonical role p2p_iris on two independent backends: Manus API v2 and Hermes CLI \u00d7 Gemini; Stage B/C/D all VERIFIED; candidate policy NO \u2014 no candidate minted)",
         "status": "DONE",
         "evidence_ref": "GOAL-C38 (docs/p2p-development/reports/P2P-C38-terminal-report.md)",
-        "notes": "C38 terminal verdict: PASS / LIVE_MULTI_BACKEND_ROLE_CERTIFIED (Stages B, C, D each independently VERIFIED with the fail-closed role verifier; Stage A AUTH_VALID for Manus; Framework validator 71/71; regression delta = 0 vs f4a2090; secret scan clean). Machine-derived C38_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) — no candidate minted, no release artifact, no capability promotion, no C39 implementation. current_development retained as C31/BLOCKED_TERMINAL historical snapshot (explained CURRENT_DEVELOPMENT_SEMANTICS per C35R precedent)."
+        "notes": "C38 terminal verdict: PASS / LIVE_MULTI_BACKEND_ROLE_CERTIFIED (Stages B, C, D each independently VERIFIED with the fail-closed role verifier; Stage A AUTH_VALID for Manus; Framework validator 71/71; regression delta = 0 vs f4a2090; secret scan clean). Machine-derived C38_CANDIDATE_REQUIRED=NO (ChangeSignals: runtime_changed=False, governance_changed=False, release_artifact_changed=False; research/docs-only changes) \u2014 no candidate minted, no release artifact, no capability promotion, no C39 implementation. current_development retained as C31/BLOCKED_TERMINAL historical snapshot (explained CURRENT_DEVELOPMENT_SEMANTICS per C35R precedent)."
       },
       {
         "id": "C39",
@@ -1748,7 +1880,7 @@
         "candidate": "P2P-8.4.7-C-Codex-Edition-v24-c39-governed-live-failover-candidate-v1.zip",
         "candidate_status": "UNPROMOTED",
         "no_merge_no_promotion_no_release_no_deploy": true,
-        "what_changed": "Created the failover-boundary decision surface (CREATE_ONLY_IF_NECESSARY; 33 failure classes; 5 decisions; fail-closed; Rule 1 dispatch authorization with owner-gate guard) plus 104 deterministic tests; four proofs (normal live selection on Manus; reversible pre-dispatch drift -> RESELECT_TARGET -> Hermes×Gemini; capsule continuity 11/11; unsafe post-dispatch fail-closed 5/5); NEW_UNEXPLAINED_FAILURES=0; candidate policy YES -> exactly one UNPROMOTED candidate minted."
+        "what_changed": "Created the failover-boundary decision surface (CREATE_ONLY_IF_NECESSARY; 33 failure classes; 5 decisions; fail-closed; Rule 1 dispatch authorization with owner-gate guard) plus 104 deterministic tests; four proofs (normal live selection on Manus; reversible pre-dispatch drift -> RESELECT_TARGET -> Hermes\u00d7Gemini; capsule continuity 11/11; unsafe post-dispatch fail-closed 5/5); NEW_UNEXPLAINED_FAILURES=0; candidate policy YES -> exactly one UNPROMOTED candidate minted."
       },
       {
         "id": "C40",
@@ -1774,7 +1906,7 @@
     "likely_next_goal": {
       "id": "C30",
       "status": "PLANNED",
-      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake — ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
+      "title": "Composable Execution Target Foundation + Durable Provider-Neutral Architecture Intake \u2014 ExecutionTarget composition model, eligibility evaluation, fingerprint/drift, backend registry, provider-neutral intake (no router, no autonomy, no real execution)"
     }
   },
   "research_decisions": [
@@ -2331,7 +2463,12 @@
         "planner_script": "scripts/p2p_roadmap_planner.py (VERSION=3)",
         "test_harness": "scripts/p2p_planner_01b_test.py (12/12 PASS)",
         "run_evidence": "reports/planner/P2P-PLANNER-RUN-03.json"
-      }
+      },
+      "change_id": "unknown",
+      "changed_at": "2026-08-21T00:00:00Z",
+      "what_changed": "Initial entry",
+      "why": "Initial bootstrap",
+      "evidence_refs": []
     },
     {
       "goal_id": "STRICT-BINDING-01",
@@ -2354,7 +2491,12 @@
         "CAPABILITY_ROADMAP_EXPLICIT_ENUMERATION=VERIFIED",
         "FUZZY_AUTHORITY_MATCHING=DISABLED",
         "CHAT_ONLY_OWNER_DECISION_AUTO_CAPTURE=NOT_PROVEN"
-      ]
+      ],
+      "change_id": "unknown",
+      "changed_at": "2026-08-21T00:00:00Z",
+      "what_changed": "Initial entry",
+      "why": "Initial bootstrap",
+      "evidence_refs": []
     }
   ],
   "pr_lineage": {
@@ -2410,7 +2552,7 @@
       "change_id": "C31-BLOCKED-001",
       "when": "2026-08-17T06:15:29Z",
       "what": "terminal verdict BLOCKED / OWNER_ACTION_REQUIRED recorded in roadmap/current_development/capability_status; candidate build skipped by policy (no release artifact minted for BLOCKED terminal)",
-      "why": "C31 terminal rule §14/§61: honest BLOCKED, no fabrication"
+      "why": "C31 terminal rule \u00a714/\u00a761: honest BLOCKED, no fabrication"
     },
     {
       "change_id": "FW01-SCHEMA-EXTENSION-MIGRATION",
@@ -2494,6 +2636,14 @@
       "type": "corrective_hardening",
       "parent_goal": "PLANNER-01",
       "delivered": "2026-08-21"
+    },
+    {
+      "at": "2026-08-21T16:59:57Z",
+      "type": "OWNER_ACCEPTED_EXTERNAL_SKILL_REGISTRY_INTAKE",
+      "research_id": "RA-EXT-032",
+      "capability_id": "C41",
+      "upstream": "mukul975/Anthropic-Cybersecurity-Skills",
+      "revision": "f76261573a539ec40c3d434ecbb9e657d26aa921"
     }
   ],
   "research_intake_ledger": "governance/research-intake-ledger.json",
@@ -2510,7 +2660,7 @@
         "id": "FRAMEWORK-00",
         "status": "DONE",
         "terminal_status_when_done": "PASS / PRODUCT_ARCHITECTURE_RESEARCH_SKILL_MEMORY_READY",
-        "title": "P2P Product Memory Foundation — C43 evidence reconciliation, canonical product architecture, master roadmap FRAMEWORK-00..06, research intake ledger, capability & skill map, governance/charter sync, validation & closure",
+        "title": "P2P Product Memory Foundation \u2014 C43 evidence reconciliation, canonical product architecture, master roadmap FRAMEWORK-00..06, research intake ledger, capability & skill map, governance/charter sync, validation & closure",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md; docs/p2p-development/framework/",
         "artifact_ref": "p2p-framework-00-product-memory",
         "commit": "0c2ab01204e19f82a158f502860c3a0d96eb06aa",
@@ -2520,27 +2670,27 @@
         "id": "FRAMEWORK-01",
         "status": "DONE",
         "terminal_status_when_done": "PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY",
-        "title": "Autonomous Project Operating Loop — one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
+        "title": "Autonomous Project Operating Loop \u2014 one Owner intent drives multiple safe technical tasks through selection, execution, verification, checkpoint, automatic continuation; fresh-process recovery, Owner Gate stop, 10 negative fail-closed proofs, live E2E, installed-project read-only no-briefing discovery.",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md; docs/p2p-development/research/framework-01/; .p2p/system/p2p_capabilities/p2p_entry.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py; .p2p/system/p2p_capabilities/p2p_skill_eligibility.py; .p2p/system/p2p_capabilities/p2p_loop_guard.py; .p2p/system/p2p_capabilities/p2p_decision_runtime.py; scripts/fw01/p2p_fw01_proof.py; scripts/fw01/p2p_fw01_discovery.py; scripts/fw01/p2p_fw01_live.py",
         "artifact_ref": "p2p-framework-01-autonomous-operating-loop",
         "commit": "4156fa8017e092beb905fb30faa8ed0129d0d727",
-        "notes": "Runtime (core modules) changed — candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
+        "notes": "Runtime (core modules) changed \u2014 candidate_policy=YES declare-only. No promotion, release, deploy, install. Production projects unchanged. Stops before FRAMEWORK-02 execution."
       },
       {
         "id": "FRAMEWORK-02",
         "status": "DONE",
         "terminal_status_when_done": "PASS / PROJECT_CAPABILITY_INTELLIGENCE_READY",
-        "title": "Project & Capability Intelligence — task -> required capabilities -> multi-source capability providers -> bounded skill selection -> coverage/eligibility/freshness fail-closed -> decision trace -> FW01 handoff; installed-project read-only shadow eval PASS on GT and GP",
+        "title": "Project & Capability Intelligence \u2014 task -> required capabilities -> multi-source capability providers -> bounded skill selection -> coverage/eligibility/freshness fail-closed -> decision trace -> FW01 handoff; installed-project read-only shadow eval PASS on GT and GP",
         "evidence_ref": "docs/p2p-development/reports/P2P-FRAMEWORK-02-terminal-report.md; .p2p/system/p2p_capabilities/capability_intelligence.py; .p2p/system/p2p_capabilities/tests/test_capability_intelligence.py; .p2p/system/p2p_capabilities/p2p_fw01_loop.py (coverage gate hook); /tmp/fw02_shadow_eval/fw02-shadow-eval.json",
         "artifact_ref": "p2p-framework-02-capability-intelligence",
         "commit": "07d9400",
-        "notes": "Layer inside FW01 — no competing router/orchestrator. candidate_policy per closure machinery (separate step). No promotion, no release, no deploy. Predecessor candidate 8.4.7-C-codex.25 (c0b485bd...) UNPROMOTED preserved verbatim. Stops before FRAMEWORK-03 execution."
+        "notes": "Layer inside FW01 \u2014 no competing router/orchestrator. candidate_policy per closure machinery (separate step). No promotion, no release, no deploy. Predecessor candidate 8.4.7-C-codex.25 (c0b485bd...) UNPROMOTED preserved verbatim. Stops before FRAMEWORK-03 execution."
       },
       {
         "id": "FRAMEWORK-03",
         "status": "NOT_STARTED",
         "terminal_status_when_done": "",
-        "title": "Adaptive Team & Council — LIVE_COUNCIL_8_OF_8 via automatic fan-out, real 8/8 role certification on live hosts (per master-roadmap).",
+        "title": "Adaptive Team & Council \u2014 LIVE_COUNCIL_8_OF_8 via automatic fan-out, real 8/8 role certification on live hosts (per master-roadmap).",
         "evidence_ref": "",
         "artifact_ref": "p2p-framework-03-adaptive-team-council",
         "commit": "",
@@ -2550,14 +2700,14 @@
     "likely_next": {
       "id": "FRAMEWORK-02",
       "status": "NOT_STARTED",
-      "title": "Project & Skill Intelligence — the next framework goal that makes P2P evaluate and reason about project truth and skill fit; defined, not started.",
+      "title": "Project & Skill Intelligence \u2014 the next framework goal that makes P2P evaluate and reason about project truth and skill fit; defined, not started.",
       "scope_rule": "FRAMEWORK-02 is the SINGLE next framework goal. It is defined in the master roadmap only; no implementation work was performed in this goal."
     },
     "stop_rule": "Each framework goal stops after its terminal report. No merge, promotion, release, deploy or install is performed inside a framework goal.",
     "likely_next_goal": {
       "id": "P2P-FRAMEWORK-02",
       "status": "NOT_STARTED",
-      "title": "P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE",
+      "title": "P2P-FRAMEWORK-02 \u2014 PROJECT & SKILL INTELLIGENCE",
       "evidence_ref": "docs/p2p-development/framework/master-roadmap.md",
       "normalization_note": "FW01 closure normalization per Owner directive section 10: likely_next set to P2P-FRAMEWORK-02 (PROJECT & SKILL INTELLIGENCE); NOT STARTED by this goal."
     }
@@ -2636,7 +2786,7 @@
       "promotion_status": "UNPROMOTED",
       "minted_at": "2026-08-21T08:15:00Z",
       "minted_by": "Manus-RM-CONTEXT-01B",
-      "notes": "Final Acceptance Candidate for Context Intelligence. Adds §9 Host-neutral Serialization, §13 Parser Unavailable/Fallback states, §17 Context Result Contract, and §18 Permission Boundary enforcement. Verified via A-Z Negative Matrix Test v3 (Scenarios J-S).",
+      "notes": "Final Acceptance Candidate for Context Intelligence. Adds \u00a79 Host-neutral Serialization, \u00a713 Parser Unavailable/Fallback states, \u00a717 Context Result Contract, and \u00a718 Permission Boundary enforcement. Verified via A-Z Negative Matrix Test v3 (Scenarios J-S).",
       "gates": {
         "NEGATIVE_MATRIX_V3": "PASS",
         "CONTRACT_SERIALIZATION": "PASS",
@@ -2650,7 +2800,7 @@
       "promotion_status": "UNPROMOTED",
       "minted_at": "2026-08-21T09:00:00Z",
       "minted_by": "Manus-RM-CONTEXT-01C",
-      "notes": "Final Reconciled Candidate for Context Intelligence. Successor to .44. Includes §3-§8 CRI semantics, §9 Host-neutral Serialization, §17 Contract, §18 Permission Boundary, and §20 A-Z Matrix (26/26).",
+      "notes": "Final Reconciled Candidate for Context Intelligence. Successor to .44. Includes \u00a73-\u00a78 CRI semantics, \u00a79 Host-neutral Serialization, \u00a717 Contract, \u00a718 Permission Boundary, and \u00a720 A-Z Matrix (26/26).",
       "gates": {
         "A_Z_NEGATIVE_MATRIX": "26/26 PASS",
         "REAL_REPOSITORY_PROOF": "2/2 PASS",

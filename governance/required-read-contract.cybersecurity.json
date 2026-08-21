@@ -1,0 +1,17 @@
+{
+  "schema": "p2p-required-read-contract/1",
+  "contract_id": "CYBERSECURITY_EXTERNAL_SKILL_REGISTRY_REQUIRED_READ",
+  "status": "PLANNED_INSTALLATION",
+  "path": "docs/p2p-development/required-read/P2P-CYBERSECURITY-EXTERNAL-SKILL-REGISTRY.md",
+  "required_for": [
+    "DEVELOPMENT_PLANNING",
+    "CAPABILITY_SELECTION",
+    "EXTERNAL_SKILL_REGISTRY_CHANGES",
+    "SECURITY_AUTOMATION",
+    "SECURITY_REVIEW",
+    "EXTERNAL_EXECUTABLE_USE"
+  ],
+  "fail_closed_if_missing_after_install": true,
+  "supersedable": true,
+  "owner_decision_date": "2026-08-21"
+}

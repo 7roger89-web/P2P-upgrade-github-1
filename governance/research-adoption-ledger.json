@@ -1062,7 +1062,7 @@
       ],
       "roadmap_relation": "composition into RM-PRIORITY-CONTEXT (B)",
       "appended_at": "2026-08-21T05:42:58Z",
-      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, \u00a79 Serialization, \u00a717 Contract, \u00a718 Permission Boundary. Verified via Candidate .45."
     },
     {
       "research_id": "RA-EXT-030",
@@ -1077,7 +1077,7 @@
       "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
       "lineage_note": "CRI adoption lineage: RA-EXT-029 (bound to RI-008 during INTAKE-CLOSURE-01) and this record (bound to RI-007) refer to the same Owner-accepted CRI direction. Roadmap consideration exists via RM-PRIORITY-CONTEXT composition entry (intake_record RI-008) and source_research_ids; this record adds the missing explicit RI-007 binding.",
       "roadmap_relation": "composed-in-RM-PRIORITY-CONTEXT",
-      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, \u00a79 Serialization, \u00a717 Contract, \u00a718 Permission Boundary. Verified via Candidate .45."
     },
     {
       "research_id": "RA-EXT-031",
@@ -1119,7 +1119,20 @@
       ],
       "roadmap_relation": "composition into RM-PRIORITY-RELEASE-LIFECYCLE",
       "appended_at": "2026-08-21T11:05:00Z",
-      "notes": "Verified via Pilot installation on Game Truyện (desktop) and Manus ExecutionTarget certification."
+      "notes": "Verified via Pilot installation on Game Truy\u1ec7n (desktop) and Manus ExecutionTarget certification."
+    },
+    {
+      "research_id": "RA-EXT-032",
+      "intake_record": "RI-008",
+      "source_repository": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+      "source_revision": "f76261573a539ec40c3d434ecbb9e657d26aa921",
+      "canonical_capability_ids": [
+        "C41"
+      ],
+      "roadmap_relation": "composition",
+      "decision": "ADAPT_SELECTIVELY",
+      "boundary": "catalog/retrieve on demand; scripts unverified by default; intrusive execution permission-gated",
+      "status": "PLANNED"
     }
   ],
   "rejected_register_summary": {
