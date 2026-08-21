@@ -284,6 +284,35 @@
       "origin_type": "PROJECT_LEARNING"
     },
     {
+      "capability_id": "SAFE_INSTALLER",
+      "name": "Safe Installer",
+      "family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
+      "beginner_value": "Cài đặt P2P lên dự án của bạn một cách an toàn. Nếu có lỗi xảy ra trong quá trình cài đặt, hệ thống sẽ tự động khôi phục (rollback) về trạng thái ban đầu, đảm bảo dự án của bạn không bao giờ bị hỏng.",
+      "principle": "ATOMIC_INSTALLATION_OR_ROLLBACK",
+      "origin_refs": [
+        "scripts/p2p_safe_installer.py"
+      ],
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        "scripts/p2p_safe_installer.py"
+      ],
+      "evidence_refs": [
+        "scripts/test_safe_installer_rollback.py",
+        "reports/PILOT_INSTALLATION_EVIDENCE.md"
+      ],
+      "dependencies": [
+        "DRIFT_GATE",
+        "DOCTOR_VALIDATION"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Hỗ trợ cập nhật từng phần (incremental updates).",
+      "last_reviewed": "2026-08-21",
+      "freshness": "verified_against_filesystem",
+      "notes": "Đã xác minh qua Pilot trên Game Truyện và Fixture Rollback.",
+      "origin_type": "PROJECT_LEARNING"
+    },
+    {
       "capability_id": "HASH_BOUND_APPROVAL",
       "name": "Hash-Bound Approval",
       "family": "TRUTH_AND_GOVERNANCE",
@@ -1821,6 +1850,36 @@
       "freshness": "verified_against_filesystem",
       "notes": "C17/C18 evidence.",
       "origin_type": "ARCHITECTURE_INVARIANT"
+    },
+    {
+      "capability_id": "MANUS_EXECUTION_TARGET",
+      "name": "Manus Execution Target",
+      "family": "EXECUTION_AND_ORCHESTRATION",
+      "beginner_value": "Manus được chứng nhận là môi trường thực thi an toàn cho P2P. Mọi tác vụ chạy trên Manus đều được giám sát bởi Sentinel để đảm bảo ranh giới quyền hạn và không gây đột biến ngoài ý muốn.",
+      "principle": "BOUNDED_REMOTE_EXECUTION",
+      "origin_refs": [
+        "runtime/p2p_capabilities/manus_adapter.py",
+        "runtime/p2p_capabilities/sentinel_dispatch.py"
+      ],
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        "runtime/p2p_capabilities/manus_adapter.py",
+        "runtime/p2p_capabilities/sentinel_dispatch.py"
+      ],
+      "evidence_refs": [
+        "scripts/certify_manus_target.py",
+        "scripts/run_pilot_readonly_task.py"
+      ],
+      "dependencies": [
+        "BACKEND_ADAPTER_REGISTRY"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Hỗ trợ nhiều luồng thực thi song song (parallel dispatch).",
+      "last_reviewed": "2026-08-21",
+      "freshness": "verified_against_filesystem",
+      "notes": "Đã chứng nhận Manus làm ExecutionTarget chính thức.",
+      "origin_type": "PROJECT_LEARNING"
     },
     {
       "capability_id": "DESIGN_ROUTING_VERIFICATION",

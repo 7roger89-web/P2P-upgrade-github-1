@@ -695,10 +695,10 @@
     },
     {
       "roadmap_id": "RM-PRIORITY-RELEASE-LIFECYCLE",
-      "title": "Release / project-installation lifecycle hardening",
+      "title": "P2P Release Lifecycle & Project Pinning",
       "family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
-      "owner_value": "C\u00e0i \u0111\u1eb7t/d\u1ee1 c\u00e0i/rollback nh\u1ea5t qu\u00e1n cho d\u1ef1 \u00e1n th\u1eadt (Game Truy\u1ec7n, Gia Ph\u1ea3, d\u1ef1 \u00e1n m\u1edbi t\u1eeb Zero-to-Project).",
-      "status": "PLANNED",
+      "owner_value": "Formalize the installation, adoption, and pinning lifecycle for P2P projects. Safe installer with atomic rollback; project pinning contract; Manus ExecutionTarget certification; sentinel dispatch for bounded remote execution.",
+      "status": "DONE",
       "priority": 10,
       "dependencies": [
         "C40/C43 evidence",
@@ -708,13 +708,16 @@
       "blockers": [],
       "source_research_ids": [
         "RA-EXT-006",
-        "RA-EXT-028"
+        "RA-EXT-028",
+        "RA-EXT-031"
       ],
       "canonical_capability_ids": [
         "C40",
-        "C43"
+        "C43",
+        "SAFE_INSTALLER",
+        "MANUS_EXECUTION_TARGET"
       ],
-      "current_evidence": "C40 production installs GT+GP (docs/p2p-development/research/c43/evidence/); baseline .41 PROMOTED_VERIFIED",
+      "current_evidence": "scripts/p2p_safe_installer.py; governance/project-adoption-lifecycle.md; Manus certified as ExecutionTarget; Pilot installation on Game Truyện (desktop) verified.",
       "target_evidence": "installation contract on authoritative projects with rollback verified; pin policy enforced",
       "mutation_risk_class": "BOUNDED_DOCUMENTATION_WRITE",
       "project_impact": "AUTHORITATIVE_PROJECTS",
@@ -748,10 +751,10 @@
     "planned_capability": "ROADMAP_AWARE_DEVELOPMENT_PLANNER (status PLANNED, item RM-PRIORITY-PLANNER) \u2014 never overrides Owner Gates."
   },
   "baseline_identity": {
-    "version": "8.4.7-C-codex.41",
-    "artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
+    "version": "8.4.7-C-codex.46",
+    "artifact_sha256": "2901adca106d3533b3df37e1d10d8a375162b64b001c32bec28b4b178c2f3bb7",
     "promotion_status": "PROMOTED_VERIFIED",
-    "verified_at": "2026-08-21T04:26:28Z"
+    "verified_at": "2026-08-21T11:05:00Z"
   },
   "mutation_ladder": {
     "current_evidence": {
