@@ -407,6 +407,26 @@ def regenerate_source_checksums(root: Path) -> None:
     checksum_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def normalize_text_snapshot_line_endings(root: Path) -> None:
+    """Make immutable text snapshots byte-stable in the portable package.
+
+    Git checkout settings on Windows can materialize the historical source
+    snapshot as CRLF even though its locked inventory hashes are LF bytes.
+    Normalize only known text snapshot suffixes in the disposable stage; the
+    source worktree and its historical evidence remain untouched, while the
+    package Doctor can verify the locked inventory deterministically.
+    """
+    text_suffixes = {".md", ".mjs", ".json", ".txt", ".ps1", ".sh"}
+    snapshot_root = root / "source"
+    for path in snapshot_root.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in text_suffixes:
+            continue
+        data = path.read_bytes()
+        normalized = data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        if normalized != data:
+            path.write_bytes(normalized)
+
+
 def refresh_runtime_lock(root: Path) -> None:
     command = [
         sys.executable,
@@ -427,7 +447,9 @@ def refresh_runtime_lock(root: Path) -> None:
 
 
 def write_release_metadata(stage: Path, version: str, selected: list[str], binding: dict[str, str]) -> None:
-    payload_files = relative_files(stage)
+    # Normalize to string-path ordering so Windows Path ordering cannot drift
+    # from the verifier's canonical ``sorted(set(...))`` ordering.
+    payload_files = sorted(relative_files(stage))
     if set(payload_files) & METADATA_NAMES:
         raise ValueError("Release metadata names collide with selected source files")
     package_manifest = load_json(stage / "manifest" / "package.json")
@@ -651,6 +673,7 @@ def build(root: Path, output: Path) -> dict[str, object]:
     stage = Path(tempfile.mkdtemp(prefix="p2p-release-stage-", dir=str(stage_parent)))
     try:
         selected = copy_selected(root, stage)
+        normalize_text_snapshot_line_endings(stage)
         refresh_runtime_lock(stage)
         regenerate_source_checksums(stage)
         refresh_runtime_lock(stage)
