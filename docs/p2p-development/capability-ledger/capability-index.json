@@ -4837,6 +4837,26 @@
         "RM-PRIORITY-CONTEXT approval"
       ],
       "roadmap_relation": "composition into RM-PRIORITY-CONTEXT"
+    },
+    {
+      "id": "SYMBOL_AWARE_RETRIEVAL",
+      "status": "SHIPPED",
+      "family": "CONTEXT_AND_RETRIEVAL"
+    },
+    {
+      "id": "TOKEN_BOUNDED_PROJECT_MAP",
+      "status": "SHIPPED",
+      "family": "CONTEXT_AND_RETRIEVAL"
+    },
+    {
+      "id": "ADAPTIVE_CONTEXT_BUDGET",
+      "status": "SHIPPED",
+      "family": "CONTEXT_AND_RETRIEVAL"
+    },
+    {
+      "id": "CONTEXTUAL_RULE_INTELLIGENCE",
+      "status": "SHIPPED",
+      "family": "CONTEXT_AND_RETRIEVAL"
     }
   ],
   "last_reviewed": "2026-08-21T04:27:11Z",

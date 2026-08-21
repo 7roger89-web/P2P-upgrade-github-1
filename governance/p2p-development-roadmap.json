@@ -16,7 +16,7 @@
   "ordering_principle": "Owner value + dependency necessity + safety maturity + evidence gap + architectural leverage. NOT novelty, NOT recency, NOT 'oldest idea first'.",
   "north_star": {
     "id": "BEGINNER_FIRST",
-    "statement": "P2P hiện làm được gì, đang thiếu gì để đạt mục tiêu 'nói một câu rồi tự xây dự án', tính năng nào đã chọn nhưng chưa làm, đã làm một phần, và cái gì bị chủ động loại bỏ — tất cả trả lời cho người Owner không lập trình."
+    "statement": "P2P hi\u1ec7n l\u00e0m \u0111\u01b0\u1ee3c g\u00ec, \u0111ang thi\u1ebfu g\u00ec \u0111\u1ec3 \u0111\u1ea1t m\u1ee5c ti\u00eau 'n\u00f3i m\u1ed9t c\u00e2u r\u1ed3i t\u1ef1 x\u00e2y d\u1ef1 \u00e1n', t\u00ednh n\u0103ng n\u00e0o \u0111\u00e3 ch\u1ecdn nh\u01b0ng ch\u01b0a l\u00e0m, \u0111\u00e3 l\u00e0m m\u1ed9t ph\u1ea7n, v\u00e0 c\u00e1i g\u00ec b\u1ecb ch\u1ee7 \u0111\u1ed9ng lo\u1ea1i b\u1ecf \u2014 t\u1ea5t c\u1ea3 tr\u1ea3 l\u1eddi cho ng\u01b0\u1eddi Owner kh\u00f4ng l\u1eadp tr\u00ecnh."
   },
   "families": [
     {
@@ -88,7 +88,7 @@
     {
       "family_id": "GOAL_DESIGN_INTELLIGENCE",
       "name": "Goal Design Intelligence",
-      "purpose": "Design cognition registry, targeted faculty loading, visual recipes as input, design verification — P2P sole router.",
+      "purpose": "Design cognition registry, targeted faculty loading, visual recipes as input, design verification \u2014 P2P sole router.",
       "status": "SHIPPED",
       "provenance": [
         "RA-EXT-008",
@@ -313,12 +313,12 @@
       "roadmap_id": "RM-C08",
       "title": "Controlled continuation",
       "family": "RESILIENCE_RECOVERY_FAILOVER",
-      "owner_value": "Resume interrupted work without full restart — beginner impact: less manual state rebuild.",
+      "owner_value": "Resume interrupted work without full restart \u2014 beginner impact: less manual state rebuild.",
       "status": "DEFERRED",
       "priority": null,
       "dependencies": [],
       "blockers": [
-        "Owner re-selection — was explicitly DEFERRED"
+        "Owner re-selection \u2014 was explicitly DEFERRED"
       ],
       "source_research_ids": [
         "RA-EXT-006",
@@ -360,13 +360,13 @@
       "project_impact": "NONE",
       "promotion_required": "YES",
       "next_safe_when": "evidence keys available on target host",
-      "defer_reason": "BLOCKED / EVENT_EVIDENCE_UNAVAILABLE — missing real-world evidence, not design"
+      "defer_reason": "BLOCKED / EVENT_EVIDENCE_UNAVAILABLE \u2014 missing real-world evidence, not design"
     },
     {
       "roadmap_id": "RM-C27",
       "title": "Live host evidence completion",
       "family": "EXECUTION_TARGET_PROVIDER_MODEL",
-      "owner_value": "Same family as C09 — production trustworthiness.",
+      "owner_value": "Same family as C09 \u2014 production trustworthiness.",
       "status": "BLOCKED",
       "priority": null,
       "dependencies": [
@@ -391,9 +391,9 @@
     },
     {
       "roadmap_id": "RM-Z2P",
-      "title": "ZERO_TO_PROJECT — Intent Compiler & project formation loop",
+      "title": "ZERO_TO_PROJECT \u2014 Intent Compiler & project formation loop",
       "family": "OWNER_INTENT_PROJECT_FORMATION",
-      "owner_value": "Owner nói một câu ('Tôi muốn tạo dự án A để làm X.') — P2P diễn giải ý định, chọn mặc định kỹ thuật an toàn, tạo Project Contract + Product Truth + acceptance criteria + kiến trúc khởi tạo + đồ thị mục tiêu thích ứng, bootstrap dự án, thực thi mục tiêu an toàn đầu tiên và tiếp tục tự động, dừng chỉ ở Owner Gate hoặc DONE.",
+      "owner_value": "Owner n\u00f3i m\u1ed9t c\u00e2u ('T\u00f4i mu\u1ed1n t\u1ea1o d\u1ef1 \u00e1n A \u0111\u1ec3 l\u00e0m X.') \u2014 P2P di\u1ec5n gi\u1ea3i \u00fd \u0111\u1ecbnh, ch\u1ecdn m\u1eb7c \u0111\u1ecbnh k\u1ef9 thu\u1eadt an to\u00e0n, t\u1ea1o Project Contract + Product Truth + acceptance criteria + ki\u1ebfn tr\u00fac kh\u1edfi t\u1ea1o + \u0111\u1ed3 th\u1ecb m\u1ee5c ti\u00eau th\u00edch \u1ee9ng, bootstrap d\u1ef1 \u00e1n, th\u1ef1c thi m\u1ee5c ti\u00eau an to\u00e0n \u0111\u1ea7u ti\u00ean v\u00e0 ti\u1ebfp t\u1ee5c t\u1ef1 \u0111\u1ed9ng, d\u1eebng ch\u1ec9 \u1edf Owner Gate ho\u1eb7c DONE.",
       "status": "PLANNED",
       "priority": 1,
       "dependencies": [
@@ -419,13 +419,13 @@
       "promotion_required": "YES for any runtime change",
       "next_safe_when": "Owner approves goal after prerequisite analysis",
       "defer_reason": "",
-      "note": "DO NOT implement now (Owner directive). Connects to existing FW00–FW06 primitives — NOT a competing orchestrator. Uses: durable state, capability intelligence, team intelligence, target/model selection, permission, quality/evidence, Owner Gate, Continue Gate, resilience."
+      "note": "DO NOT implement now (Owner directive). Connects to existing FW00\u2013FW06 primitives \u2014 NOT a competing orchestrator. Uses: durable state, capability intelligence, team intelligence, target/model selection, permission, quality/evidence, Owner Gate, Continue Gate, resilience."
     },
     {
       "roadmap_id": "RM-PRIORITY-LARGE-GOAL",
       "title": "Large-Goal execution completeness (adaptive goal-graph automation)",
       "family": "LARGE_GOAL_AUTONOMOUS_EXECUTION",
-      "owner_value": "Một mục tiêu lớn -> P2P tự phân rã, thực thi, xác minh, checkpoint, phục hồi, tiếp tục — không hỏi sau mỗi tác vụ kỹ thuật; dừng chỉ ở quyết định sản phẩm/dữ liệu thật mới/credentials/hành động phá hoại/production mutation/release/scope expansion/khoảng trống bằng chứng.",
+      "owner_value": "M\u1ed9t m\u1ee5c ti\u00eau l\u1edbn -> P2P t\u1ef1 ph\u00e2n r\u00e3, th\u1ef1c thi, x\u00e1c minh, checkpoint, ph\u1ee5c h\u1ed3i, ti\u1ebfp t\u1ee5c \u2014 kh\u00f4ng h\u1ecfi sau m\u1ed7i t\u00e1c v\u1ee5 k\u1ef9 thu\u1eadt; d\u1eebng ch\u1ec9 \u1edf quy\u1ebft \u0111\u1ecbnh s\u1ea3n ph\u1ea9m/d\u1eef li\u1ec7u th\u1eadt m\u1edbi/credentials/h\u00e0nh \u0111\u1ed9ng ph\u00e1 ho\u1ea1i/production mutation/release/scope expansion/kho\u1ea3ng tr\u1ed1ng b\u1eb1ng ch\u1ee9ng.",
       "status": "PLANNED",
       "priority": 2,
       "dependencies": [
@@ -460,7 +460,7 @@
       "roadmap_id": "RM-PRIORITY-CONTEXT",
       "title": "Context Intelligence completeness (symbol-aware retrieval, token-bounded maps, adaptive context budget, CRI/Domain Policy Packs)",
       "family": "CONTEXT_AND_RETRIEVAL",
-      "owner_value": "Chất lượng và chi phí thực thi tốt hơn cho mọi mục tiêu (bao gồm Zero-to-Project). (bao gồm Contextual Rule Intelligence / Domain Policy Packs: rule packs có provenance/freshness/confidence, minimum sufficient injection, fail-closed khi applicability UNKNOWN; pattern adoption, corpus bên ngoài KHÔNG phải truth)",
+      "owner_value": "Ch\u1ea5t l\u01b0\u1ee3ng v\u00e0 chi ph\u00ed th\u1ef1c thi t\u1ed1t h\u01a1n cho m\u1ecdi m\u1ee5c ti\u00eau (bao g\u1ed3m Zero-to-Project). (bao g\u1ed3m Contextual Rule Intelligence / Domain Policy Packs: rule packs c\u00f3 provenance/freshness/confidence, minimum sufficient injection, fail-closed khi applicability UNKNOWN; pattern adoption, corpus b\u00ean ngo\u00e0i KH\u00d4NG ph\u1ea3i truth)",
       "status": "PLANNED",
       "priority": 3,
       "dependencies": [
@@ -502,7 +502,7 @@
       "mutation_risk_class": "READ_ONLY",
       "project_impact": "NONE",
       "promotion_required": "NO (read-only capability enhancement)",
-      "next_safe_when": "now — no dependency on blocked items",
+      "next_safe_when": "now \u2014 no dependency on blocked items",
       "defer_reason": "",
       "composition_entries": [
         {
@@ -510,7 +510,7 @@
           "research_record": "RA-EXT-029",
           "intake_record": "RI-008",
           "mode": "B_explicit_composition",
-          "note": "ADOPT THE PATTERN — DO NOT ADOPT THE CORPUS AS TRUTH; UNVERIFIED_CANDIDATE_CORPUS remains non-canonical; precedence: Owner/Project Policy > Verified Project Truth > Version-bound Upstream > Verified P2P Domain Policy > Generic External Rule Corpus; UNKNOWN -> fail closed; minimum sufficient context; provider neutrality (host forms non-authoritative)."
+          "note": "ADOPT THE PATTERN \u2014 DO NOT ADOPT THE CORPUS AS TRUTH; UNVERIFIED_CANDIDATE_CORPUS remains non-canonical; precedence: Owner/Project Policy > Verified Project Truth > Version-bound Upstream > Verified P2P Domain Policy > Generic External Rule Corpus; UNKNOWN -> fail closed; minimum sufficient context; provider neutrality (host forms non-authoritative)."
         }
       ],
       "intake_closure_note_01b": "Composed by P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01; no second competing Context subsystem created.",
@@ -522,7 +522,7 @@
       "roadmap_id": "RM-PRIORITY-PLANNER",
       "title": "ROADMAP_AWARE_DEVELOPMENT_PLANNER",
       "family": "OWNER_INTENT_PROJECT_FORMATION",
-      "owner_value": "P2P chọn mục tiêu tiếp theo từ chân lý bền vững (baseline + ledger + roadmap + evidence + Owner priority) thay vì chat memory — bao phủ gap ROADMAP_COVERAGE_GAP được phát hiện tự động.",
+      "owner_value": "P2P ch\u1ecdn m\u1ee5c ti\u00eau ti\u1ebfp theo t\u1eeb ch\u00e2n l\u00fd b\u1ec1n v\u1eefng (baseline + ledger + roadmap + evidence + Owner priority) thay v\u00ec chat memory \u2014 bao ph\u1ee7 gap ROADMAP_COVERAGE_GAP \u0111\u01b0\u1ee3c ph\u00e1t hi\u1ec7n t\u1ef1 \u0111\u1ed9ng.",
       "status": "PLANNED",
       "priority": 4,
       "dependencies": [
@@ -536,7 +536,7 @@
         "RA-EXT-022"
       ],
       "canonical_capability_ids": [],
-      "current_evidence": "goal-choice narrative in charter §6 (heuristic, not machine-readable)",
+      "current_evidence": "goal-choice narrative in charter \u00a76 (heuristic, not machine-readable)",
       "target_evidence": "planner reads official baseline + ledger + roadmap + evidence gaps + Owner priority; outputs ranked candidate goals with coverage-gap detection; never overrides Owner Gates",
       "mutation_risk_class": "READ_ONLY",
       "project_impact": "NONE",
@@ -548,7 +548,7 @@
       "roadmap_id": "RM-PRIORITY-DESIGN",
       "title": "Goal Design / Visual Intelligence integration (aesthetica + NUI + VC composition)",
       "family": "GOAL_DESIGN_INTELLIGENCE",
-      "owner_value": "Hướng dẫn thiết kế cho người mới bắt đầu từ registry thiết kế (aesthetica + NUI + Visual Commander) — P2P vẫn là router duy nhất.",
+      "owner_value": "H\u01b0\u1edbng d\u1eabn thi\u1ebft k\u1ebf cho ng\u01b0\u1eddi m\u1edbi b\u1eaft \u0111\u1ea7u t\u1eeb registry thi\u1ebft k\u1ebf (aesthetica + NUI + Visual Commander) \u2014 P2P v\u1eabn l\u00e0 router duy nh\u1ea5t.",
       "status": "PLANNED",
       "priority": 5,
       "dependencies": [
@@ -580,7 +580,7 @@
       "roadmap_id": "RM-PRIORITY-CODE-MUTATION",
       "title": "Bounded code mutation (next ladder level)",
       "family": "MUTATION_CAPABILITY_LADDER",
-      "owner_value": "Bước kế tiếp của thang đột biến: thay đổi code có giới hạn, có evidence, có rollback.",
+      "owner_value": "B\u01b0\u1edbc k\u1ebf ti\u1ebfp c\u1ee7a thang \u0111\u1ed9t bi\u1ebfn: thay \u0111\u1ed5i code c\u00f3 gi\u1edbi h\u1ea1n, c\u00f3 evidence, c\u00f3 rollback.",
       "status": "PLANNED",
       "priority": 6,
       "dependencies": [
@@ -598,7 +598,7 @@
       "target_evidence": "new primitive fail-closed; bounded isolated repo mutation; rollback recovery verified; OWNED approval gate",
       "mutation_risk_class": "BOUNDED_CODE_CHANGE (proposed)",
       "project_impact": "ISOLATED_REPOS",
-      "promotion_required": "YES — new candidate + Owner approval",
+      "promotion_required": "YES \u2014 new candidate + Owner approval",
       "next_safe_when": "Owner authorizes ladder-2 design goal",
       "defer_reason": "",
       "reconciliation_note_01a": "source_research_ids corrected to durable adoption record ids by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A ('Pilot-02' -> RA-EXT-027)"
@@ -607,7 +607,7 @@
       "roadmap_id": "RM-PRIORITY-ORCA-EXT",
       "title": "Orca-style isolated/parallel execution extension",
       "family": "WORKSPACE_SESSION_ISOLATION",
-      "owner_value": "So sánh nhiều giải pháp ứng viên độc lập trên worktree cô lập — chất lượng quyết định tốt hơn.",
+      "owner_value": "So s\u00e1nh nhi\u1ec1u gi\u1ea3i ph\u00e1p \u1ee9ng vi\u00ean \u0111\u1ed9c l\u1eadp tr\u00ean worktree c\u00f4 l\u1eadp \u2014 ch\u1ea5t l\u01b0\u1ee3ng quy\u1ebft \u0111\u1ecbnh t\u1ed1t h\u01a1n.",
       "status": "PLANNED",
       "priority": 7,
       "dependencies": [
@@ -634,7 +634,7 @@
       "roadmap_id": "RM-PRIORITY-MULTIHOST-COUNCIL",
       "title": "Adaptive multi-host Council certification",
       "family": "ROLE_TEAM_COUNCIL",
-      "owner_value": "Hội đồng 8/8 vai trò thật trên nhiều host — độ tin cậy sản xuất đa host.",
+      "owner_value": "H\u1ed9i \u0111\u1ed3ng 8/8 vai tr\u00f2 th\u1eadt tr\u00ean nhi\u1ec1u host \u2014 \u0111\u1ed9 tin c\u1eady s\u1ea3n xu\u1ea5t \u0111a host.",
       "status": "PLANNED",
       "priority": 8,
       "dependencies": [
@@ -671,7 +671,7 @@
       "roadmap_id": "RM-PRIORITY-DRIFT-SWEEP",
       "title": "Capability drift revalidation sweep",
       "family": "OBSOLESCENCE_DRIFT",
-      "owner_value": "Không còn claim lỗi thời: mọi capability evidence được revalidate hoặc đánh dấu UNKNOWN.",
+      "owner_value": "Kh\u00f4ng c\u00f2n claim l\u1ed7i th\u1eddi: m\u1ecdi capability evidence \u0111\u01b0\u1ee3c revalidate ho\u1eb7c \u0111\u00e1nh d\u1ea5u UNKNOWN.",
       "status": "PLANNED",
       "priority": 9,
       "dependencies": [
@@ -696,7 +696,7 @@
       "roadmap_id": "RM-PRIORITY-RELEASE-LIFECYCLE",
       "title": "Release / project-installation lifecycle hardening",
       "family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
-      "owner_value": "Cài đặt/dỡ cài/rollback nhất quán cho dự án thật (Game Truyện, Gia Phả, dự án mới từ Zero-to-Project).",
+      "owner_value": "C\u00e0i \u0111\u1eb7t/d\u1ee1 c\u00e0i/rollback nh\u1ea5t qu\u00e1n cho d\u1ef1 \u00e1n th\u1eadt (Game Truy\u1ec7n, Gia Ph\u1ea3, d\u1ef1 \u00e1n m\u1edbi t\u1eeb Zero-to-Project).",
       "status": "PLANNED",
       "priority": 10,
       "dependencies": [
@@ -743,8 +743,8 @@
   },
   "roadmap_reader_status": {
     "mechanism": "NO_AUTOMATIC_CONSUMPTION",
-    "fact": "Current P2P runtime has no canonical mechanism that reads this roadmap when choosing the next development Goal. Goal choice is governed by charter §6 heuristics plus Owner instruction.",
-    "planned_capability": "ROADMAP_AWARE_DEVELOPMENT_PLANNER (status PLANNED, item RM-PRIORITY-PLANNER) — never overrides Owner Gates."
+    "fact": "Current P2P runtime has no canonical mechanism that reads this roadmap when choosing the next development Goal. Goal choice is governed by charter \u00a76 heuristics plus Owner instruction.",
+    "planned_capability": "ROADMAP_AWARE_DEVELOPMENT_PLANNER (status PLANNED, item RM-PRIORITY-PLANNER) \u2014 never overrides Owner Gates."
   },
   "baseline_identity": {
     "version": "8.4.7-C-codex.41",

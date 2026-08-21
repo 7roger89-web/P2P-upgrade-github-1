@@ -2569,5 +2569,15 @@
       "no_baseline_change": true,
       "no_candidate_mutation": true
     }
+  ],
+  "candidates": [
+    {
+      "candidate_version": "8.4.7-C-codex.42",
+      "artifact_sha256": "fc963b9e2e786e7b910b7a30f2ddf7cf0b6427a66e596397b50e200d12238397",
+      "source_commit": "ec47147bf09b_PLUS_CONTEXT_INTELLIGENCE",
+      "minted_at": "2026-08-21T07:02:51.719779+00:00",
+      "status": "UNPROMOTED",
+      "promotion_gate": "P2P-PROMOTION-READINESS-REVIEW-02 (PLANNED)"
+    }
   ]
 }

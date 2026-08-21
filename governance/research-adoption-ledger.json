@@ -1049,7 +1049,7 @@
         "CONTEXTUAL_RULE_INTELLIGENCE",
         "C19"
       ],
-      "status": "PLANNED",
+      "status": "SHIPPED",
       "evidence_pointers": [
         "governance/intake-contract.json (atomic intake contract)",
         "governance/research-intake-ledger.json intake_records id=RI-008",
@@ -1071,7 +1071,7 @@
       "canonical_capability_ids": [
         "CONTEXTUAL_RULE_INTELLIGENCE"
       ],
-      "status": "PARTIAL",
+      "status": "SHIPPED",
       "intake_record": "RI-007",
       "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
       "lineage_note": "CRI adoption lineage: RA-EXT-029 (bound to RI-008 during INTAKE-CLOSURE-01) and this record (bound to RI-007) refer to the same Owner-accepted CRI direction. Roadmap consideration exists via RM-PRIORITY-CONTEXT composition entry (intake_record RI-008) and source_research_ids; this record adds the missing explicit RI-007 binding.",
