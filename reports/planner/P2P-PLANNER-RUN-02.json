@@ -1,7 +1,7 @@
 {
   "planner": "p2p_roadmap_planner",
-  "version": "2",
-  "spec_goal": "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A",
+  "version": "4",
+  "spec_goal": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
   "OFFICIAL_BASELINE": {
     "version": "8.4.7-C-codex.41",
     "artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
@@ -9,15 +9,17 @@
     "approval_reference": "P2P-APR-20260821T035410Z-c41-official-baseline-promotion"
   },
   "HASHES": {
-    "p2p_development_roadmap_json_sha256": "e435c3b59d5827aa8145429f63926931949e89e7ab993edfade04ad2a04c1677",
+    "p2p_development_roadmap_json_sha256": "8d84d8c2d3827c0e41cf75d66e38c7282644e7f6a0923ad5b8a4c201c3e52581",
     "p2p_development_roadmap_schema_version": "p2p-framework/development-roadmap/1",
-    "research_adoption_ledger_json_sha256": "b62cec51fec22523617e922d43b12b9aa7c901742983089260ac9ef4283aa297",
+    "research_adoption_ledger_json_sha256": "996c6745dacc50e0d395cc8c173433510bbbec4f2ef2a358b655b152e4a52531",
     "research_adoption_ledger_schema_version": "p2p-framework/research-adoption-ledger/1",
-    "capability_index_json_sha256": "65b55dec12fa54d62c5d04366b3269d5f21777674ddbb1ad5734b7404f450e45",
-    "development_control_json_sha256": "bff4b8b135c8ead796560b7745141bba218813403e4a2daa808587dc659ba290",
+    "capability_index_json_sha256": "843c132e4c27fbc48410de36fc5bd1ac74f78f52be07812a33c4c0fe832b797c",
+    "development_control_json_sha256": "3bc199c8ed47a4ca55c41f288867eb18d7e9e8ed3b531923d2a0048e023a9025",
+    "intake_contract_json_sha256": "609e10fac3991703951c6b3b17520b2132d83aa57cdd2b6dbc58d51bc63b504a",
+    "research_intake_ledger_json_sha256": "5617e00ca41b221a7f17177166fed44a1ef6060e2fbf07a3a3158da092fe2885",
     "official_baseline_version": "8.4.7-C-codex.41",
     "official_baseline_artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
-    "planning_timestamp_utc": "2026-08-21T05:29:20Z"
+    "planning_timestamp_utc": "2026-08-21T09:15:02Z"
   },
   "AUTHORITY_ORDER": {
     "official_baseline": "development-control",
@@ -36,7 +38,6 @@
     "owner_selected_candidates": [
       "RM-Z2P",
       "RM-PRIORITY-LARGE-GOAL",
-      "RM-PRIORITY-CONTEXT",
       "RM-PRIORITY-PLANNER",
       "RM-PRIORITY-DESIGN",
       "RM-PRIORITY-CODE-MUTATION",
@@ -48,8 +49,7 @@
       "RA-EXT-010",
       "RA-EXT-021",
       "RA-EXT-023",
-      "RA-EXT-024",
-      "RA-EXT-028"
+      "RA-EXT-024"
     ],
     "status_translation": {
       "ledger_material": [
@@ -68,7 +68,93 @@
         "SUPERSEDED"
       ],
       "unknown_never_satisfies": true
-    }
+    },
+    "RESEARCH_TO_ROADMAP_REVERSE_COVERAGE": true,
+    "CAPABILITY_TO_ROADMAP_COVERAGE": true,
+    "CAPABILITY_REGISTRY_ENTRIES_EXCLUDED_FROM_GATE": [
+      "ATLAS_CAPSULE",
+      "CONTEXT_CAPSULES",
+      "KNOWLEDGE_DELTA",
+      "BOOK_TO_SKILL_CONVERSION",
+      "QUALITY_ADJUSTED_ROUTING",
+      "HOST_FALLBACK",
+      "BEGINNER_CONTROL_CENTER",
+      "BEGINNER_DECISION_INBOX",
+      "BEGINNER_HEALTH_GOAL_VIEWS",
+      "C31_LIVE_AUTH_PROBE_FRESH_EVIDENCE",
+      "C31_OWNER_AUTH_ACTION_DEPENDENCY",
+      "ZERO_TO_PROJECT_INTENT_COMPILER",
+      "LARGE_GOAL_COMPLETENESS",
+      "CONTEXT_INTELLIGENCE_COMPLETENESS",
+      "GOAL_DESIGN_INTELLIGENCE_COMPOSITION",
+      "BOUNDED_CODE_MUTATION_PRIMITIVE",
+      "ORCA_BOUNDED_CANDIDATE_FANOUT",
+      "MULTIHOST_COUNCIL_CERTIFICATION",
+      "CAPABILITY_DRIFT_REVALIDATION_SWEEP",
+      "RELEASE_INSTALL_LIFECYCLE_HARDENING"
+    ],
+    "ORPHAN_OWNER_DECISIONS": [],
+    "INTAKE_RECORDS_CONSUMED": 7,
+    "INTAKE_CONTRACT_BOUND": true,
+    "INTAKE_UNKNOWN_RECORDS": [],
+    "UNKNOWN_ADOPTION_RECORDS": [],
+    "EXPLICIT_INTAKE_BINDINGS": 1,
+    "FUZZY_MATCHES_USED_FOR_AUTHORITY": 0,
+    "OWNER_ACCEPTED_CAPABILITIES": [
+      "BOUNDED_TOOL_OUTPUT",
+      "C31_EXECUTION_TARGET_AS_CERTIFICATION_INTAKE",
+      "CACHE_AFFECTING_CONFIGURATION_FINGERPRINT",
+      "CACHE_AWARE_MODEL_EFFORT_STABILITY",
+      "CACHE_HIT_TELEMETRY",
+      "CODE_INTELLIGENCE_FIRST_NAVIGATION",
+      "CONTEXT_COST_TELEMETRY",
+      "CONTEXT_PRESSURE_MONITORING",
+      "DURABLE_PRE_COMPACTION_CHECKPOINT",
+      "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
+      "PLANNER_PROVIDER_NEUTRALITY",
+      "PROVIDER_NEUTRAL_AUTOPILOT",
+      "QUALITY_ADJUSTED_CONTEXT_OPTIMIZATION",
+      "RAW_OUTPUT_ARTIFACT_OFFLOADING",
+      "SAFE_CONTEXT_COMPACTION",
+      "SAFE_QUIESCE_AND_DRAIN",
+      "SESSION_CONFIGURATION_STABILITY",
+      "SESSION_REUSE_DECISION",
+      "SUBAGENT_CONTEXT_ISOLATION",
+      "SYMBOL_AWARE_RETRIEVAL",
+      "TASK_SESSION_BOUNDARY_MANAGEMENT",
+      "TASK_TARGETED_MCP_LOADING",
+      "TASK_TARGETED_SKILL_LOADING",
+      "TASK_TARGETED_TOOL_LOADING",
+      "VERBOSE_WORK_CONTEXT_ISOLATION"
+    ],
+    "EXPLICITLY_ROADMAPPED_CAPABILITIES": [
+      "BOUNDED_TOOL_OUTPUT",
+      "C31_EXECUTION_TARGET_AS_CERTIFICATION_INTAKE",
+      "CACHE_AFFECTING_CONFIGURATION_FINGERPRINT",
+      "CACHE_AWARE_MODEL_EFFORT_STABILITY",
+      "CACHE_HIT_TELEMETRY",
+      "CODE_INTELLIGENCE_FIRST_NAVIGATION",
+      "CONTEXT_COST_TELEMETRY",
+      "CONTEXT_PRESSURE_MONITORING",
+      "DURABLE_PRE_COMPACTION_CHECKPOINT",
+      "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
+      "PLANNER_PROVIDER_NEUTRALITY",
+      "PROVIDER_NEUTRAL_AUTOPILOT",
+      "QUALITY_ADJUSTED_CONTEXT_OPTIMIZATION",
+      "RAW_OUTPUT_ARTIFACT_OFFLOADING",
+      "SAFE_CONTEXT_COMPACTION",
+      "SAFE_QUIESCE_AND_DRAIN",
+      "SESSION_CONFIGURATION_STABILITY",
+      "SESSION_REUSE_DECISION",
+      "SUBAGENT_CONTEXT_ISOLATION",
+      "TASK_SESSION_BOUNDARY_MANAGEMENT",
+      "TASK_TARGETED_MCP_LOADING",
+      "TASK_TARGETED_SKILL_LOADING",
+      "TASK_TARGETED_TOOL_LOADING",
+      "VERBOSE_WORK_CONTEXT_ISOLATION"
+    ],
+    "FUZZY_AUTHORITY_MATCHING": "DISABLED",
+    "FAMILY_ALIAS_ALONE_DOES_NOT_SATISFY_COVERAGE": true
   },
   "DEPENDENCY_GRAPH": {
     "RM-C08": {
@@ -97,9 +183,9 @@
       "status": "PLANNED"
     },
     "RM-PRIORITY-CONTEXT": {
-      "class": "READY_NOW",
-      "reason": "NONE",
-      "status": "PLANNED"
+      "class": "DONE_SHIPPED_VERIFIED",
+      "reason": "terminal status DONE",
+      "status": "DONE"
     },
     "RM-PRIORITY-PLANNER": {
       "class": "READY_NOW",
@@ -141,7 +227,7 @@
     {
       "rank": 1,
       "roadmap_id": "RM-PRIORITY-CONTEXT",
-      "score": 16.4559
+      "score": 16.4468
     },
     {
       "rank": 2,
@@ -161,7 +247,7 @@
     {
       "rank": 5,
       "roadmap_id": "RM-C09",
-      "score": 9.5441
+      "score": 9.5479
     },
     {
       "rank": 6,
@@ -171,12 +257,12 @@
     {
       "rank": 7,
       "roadmap_id": "RM-PRIORITY-LARGE-GOAL",
-      "score": 8.9559
+      "score": 8.9521
     },
     {
       "rank": 8,
       "roadmap_id": "RM-C27",
-      "score": 8.5441
+      "score": 8.5479
     },
     {
       "rank": 9,
@@ -205,11 +291,6 @@
     }
   ],
   "NEXT_EXECUTABLE_GOALS": [
-    {
-      "roadmap_id": "RM-PRIORITY-CONTEXT",
-      "score": 16.4559,
-      "graph_class": "READY_NOW"
-    },
     {
       "roadmap_id": "RM-PRIORITY-RELEASE-LIFECYCLE",
       "score": 12.0,
@@ -293,7 +374,7 @@
     "RM-PRIORITY-DRIFT-SWEEP": [],
     "RM-PRIORITY-RELEASE-LIFECYCLE": []
   },
-  "RECOMMENDED_NEXT_GOAL": "RM-PRIORITY-CONTEXT",
+  "RECOMMENDED_NEXT_GOAL": "RM-PRIORITY-RELEASE-LIFECYCLE",
   "SCORE_BREAKDOWN": {
     "formula": "SCORE = 3.0*owner_value_bucket + 2.0*dependency_necessity + 1.5*safety_maturity + 1.0*evidence_gap + 1.5*architectural_leverage",
     "weights": {
@@ -305,23 +386,24 @@
     },
     "contributions": {
       "owner_value": 9.0,
-      "dependency_necessity": 1.7059,
-      "safety_maturity": 3.0,
-      "evidence_gap": 0.5,
-      "architectural_leverage": 2.25
+      "dependency_necessity": 0.0,
+      "safety_maturity": 1.5,
+      "evidence_gap": 0.0,
+      "architectural_leverage": 1.5
     },
-    "total": 16.4559
+    "total": 12.0
   },
   "WHY_THIS_GOAL": [
-    "score 16.4559 highest among READY_NOW items",
-    "owner_value contribution 9.0000 (bucket 3.0) from durable text: Chất lượng và chi phí thực thi tốt hơn cho mọi mục tiêu (bao gồm Zero-to-Project).",
-    "dependency_necessity contribution 1.7059 (normalized factor 0.8529)",
-    "safety_maturity contribution 3.0000 (mutation_risk_class=READ_ONLY)",
-    "evidence_gap contribution 0.5000",
-    "architectural_leverage contribution 2.2500 (family=CONTEXT_AND_RETRIEVAL)",
-    "graph_class=READY_NOW; project_impact=NONE; promotion_required=NO (read-only capability enhancement)"
+    "score 12.0000 highest among READY_NOW items",
+    "owner_value contribution 9.0000 (bucket 3.0) from durable text: Cài đặt/dỡ cài/rollback nhất quán cho dự án thật (Game Truyện, Gia Phả, dự án mới từ Zero-to-Project).",
+    "dependency_necessity contribution 0.0000 (normalized factor 0.0000)",
+    "safety_maturity contribution 1.5000 (mutation_risk_class=BOUNDED_DOCUMENTATION_WRITE)",
+    "evidence_gap contribution 0.0000",
+    "architectural_leverage contribution 1.5000 (family=RELEASE_INSTALL_PROJECT_LIFECYCLE)",
+    "graph_class=READY_NOW; project_impact=AUTHORITATIVE_PROJECTS; promotion_required=YES for any runtime/pin change"
   ],
   "WHY_NOT_HIGHER_PRIORITY_ITEMS": [
+    "RM-PRIORITY-CONTEXT: STRATEGIC_PRIORITY #1 but DONE_SHIPPED_VERIFIED (terminal status DONE)",
     "RM-PRIORITY-DESIGN: STRATEGIC_PRIORITY #2 but BLOCKED_BY_DEPENDENCY (NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED)"
   ],
   "REQUIRED_OWNER_DECISION": "Approve or reject the planner-recommended next P2P development Goal.",
@@ -340,11 +422,11 @@
   "PLANNER_SELECTION_DOES_NOT_AUTO_EXECUTE": true,
   "ROADMAP_MANUAL_REENTRY_REQUIRED": "NO — planner reads canonical JSON files directly; no transcription into prompt",
   "beginner_owner_view_vn": {
-    "P2P muốn làm gì tiếp?": "RM-PRIORITY-CONTEXT",
-    "Goal đó là gì?": "Context Intelligence completeness (symbol-aware retrieval, cache-aware budget, maps) (RM-PRIORITY-CONTEXT) — dependencies: RA-EXT-019 shipped core (C19); symbol table generation primitives; blockers: không có",
-    "Tại sao (điểm từng yếu tố)?": "score 16.4559 highest among READY_NOW items; owner_value contribution 9.0000 (bucket 3.0) from durable text: Chất lượng và chi phí thực thi tốt hơn cho mọi mục tiêu (bao gồm Zero-to-Project).; dependency_necessity contribution 1.7059 (normalized factor 0.8529)",
-    "Rủi ro đột biến / đụng project?": "KHÔNG mutate dự án — goal này là Context Intelligence completeness (symbol-aware retrieval, cache-aware budget, maps); project_impact=NONE, mutation_risk_class=READ_ONLY, không chạm Game Truyện / Gia Phả / Logistics ở giai đoạn lập kế hoạch.",
-    "Yêu cầu promotion cho goal này?": "promotion_required=NO (read-only capability enhancement)",
+    "P2P muốn làm gì tiếp?": "RM-PRIORITY-RELEASE-LIFECYCLE",
+    "Goal đó là gì?": "Release / project-installation lifecycle hardening (RM-PRIORITY-RELEASE-LIFECYCLE) — dependencies: C40/C43 evidence; FW01 installer; Owner policy on project pins (.41 NOT auto-upgraded); blockers: không có",
+    "Tại sao (điểm từng yếu tố)?": "score 12.0000 highest among READY_NOW items; owner_value contribution 9.0000 (bucket 3.0) from durable text: Cài đặt/dỡ cài/rollback nhất quán cho dự án thật (Game Truyện, Gia Phả, dự án mới từ Zero-to-Project).; dependency_necessity contribution 0.0000 (normalized factor 0.0000)",
+    "Rủi ro đột biến / đụng project?": "KHÔNG mutate dự án — goal này là Release / project-installation lifecycle hardening; project_impact=AUTHORITATIVE_PROJECTS, mutation_risk_class=BOUNDED_DOCUMENTATION_WRITE, không chạm Game Truyện / Gia Phả / Logistics ở giai đoạn lập kế hoạch.",
+    "Yêu cầu promotion cho goal này?": "promotion_required=YES for any runtime/pin change",
     "Việc quan trọng hơn nào chưa làm được ngay?": "RM-PRIORITY-DESIGN (BLOCKED_BY_DEPENDENCY); RM-Z2P (BLOCKED_BY_DEPENDENCY); RM-C09 (BLOCKED_BY_EXTERNAL_EVIDENCE); RM-C27 (BLOCKED_BY_EXTERNAL_EVIDENCE); RM-PRIORITY-MULTIHOST-COUNCIL (BLOCKED_BY_EXTERNAL_EVIDENCE)",
     "Cái gì đang bị block?": "RM-PRIORITY-DESIGN: NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED; RM-Z2P: depends on RM-PRIORITY-LARGE-GOAL (status PLANNED, not terminal); RM-C09: EVENT_EVIDENCE_UNAVAILABLE; RM-C27: LIVE_HOST_EVIDENCE_UNAVAILABLE; RM-PRIORITY-MULTIHOST-COUNCIL: C09/C27 LIVE_HOST_EVIDENCE_UNAVAILABLE; MULTIHOST_LIVE_COUNCIL = NOT_PROVEN",
     "Cái gì Owner đã hoãn?": "RM-C08; RM-PRIORITY-LARGE-GOAL",
