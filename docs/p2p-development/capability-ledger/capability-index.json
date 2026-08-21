@@ -3678,7 +3678,7 @@
       "capability_id": "SYMBOL_AWARE_RETRIEVAL",
       "name": "Symbol-aware retrieval",
       "family": "CONTEXT_AND_KNOWLEDGE",
-      "status": "PLANNED",
+      "status": "SHIPPED",
       "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
       "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
       "origin_refs": [
@@ -3690,7 +3690,7 @@
       "origin_type": "OWNER_ACCEPTED_PROPOSAL",
       "dependencies": [],
       "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
-      "last_reviewed": "2026-08-17",
+      "last_reviewed": "2026-08-21",
       "freshness": "from_governance_record",
       "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
     },
@@ -4811,7 +4811,7 @@
       "capability_id": "CONTEXTUAL_RULE_INTELLIGENCE",
       "name": "Contextual Rule Intelligence (Domain Policy Packs)",
       "family": "CONTEXT_AND_KNOWLEDGE",
-      "status": "PLANNED",
+      "status": "SHIPPED",
       "origin_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
       "owner_decision_ref": "RI-008",
       "adoption_record": "RA-EXT-029",
@@ -4836,7 +4836,8 @@
         "symbol-aware retrieval primitives",
         "RM-PRIORITY-CONTEXT approval"
       ],
-      "roadmap_relation": "composition into RM-PRIORITY-CONTEXT"
+      "roadmap_relation": "composition into RM-PRIORITY-CONTEXT",
+      "last_reviewed": "2026-08-21"
     },
     {
       "id": "SYMBOL_AWARE_RETRIEVAL",

@@ -461,7 +461,7 @@
       "title": "Context Intelligence completeness (symbol-aware retrieval, token-bounded maps, adaptive context budget, CRI/Domain Policy Packs)",
       "family": "CONTEXT_AND_RETRIEVAL",
       "owner_value": "Ch\u1ea5t l\u01b0\u1ee3ng v\u00e0 chi ph\u00ed th\u1ef1c thi t\u1ed1t h\u01a1n cho m\u1ecdi m\u1ee5c ti\u00eau (bao g\u1ed3m Zero-to-Project). (bao g\u1ed3m Contextual Rule Intelligence / Domain Policy Packs: rule packs c\u00f3 provenance/freshness/confidence, minimum sufficient injection, fail-closed khi applicability UNKNOWN; pattern adoption, corpus b\u00ean ngo\u00e0i KH\u00d4NG ph\u1ea3i truth)",
-      "status": "PLANNED",
+      "status": "SHIPPED",
       "priority": 3,
       "dependencies": [
         "RA-EXT-019 shipped core (C19)",
@@ -516,7 +516,8 @@
       "intake_closure_note_01b": "Composed by P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01; no second competing Context subsystem created.",
       "intake_closure_notes_01b": [
         "INTAKE-CLOSURE-01 option-B enumeration: 20 OWNER_ACCEPTED_PROPOSAL caps from 2026-08-17 context umbrella accepted into existing RM-PRIORITY-CONTEXT item; no new roadmap item created; family alias CONTEXT_AND_KNOWLEDGE<->CONTEXT_AND_RETRIEVAL bound in intake contract"
-      ]
+      ],
+      "notes": "Goal completed and verified with semantic closure (RM-CONTEXT-01A)."
     },
     {
       "roadmap_id": "RM-PRIORITY-PLANNER",

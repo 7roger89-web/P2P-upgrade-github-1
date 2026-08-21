@@ -1061,7 +1061,8 @@
         "symbol-aware retrieval primitives (Context goal)"
       ],
       "roadmap_relation": "composition into RM-PRIORITY-CONTEXT (B)",
-      "appended_at": "2026-08-21T05:42:58Z"
+      "appended_at": "2026-08-21T05:42:58Z",
+      "notes": "Semantic closure verified via RM-CONTEXT-01A. Includes fail-closed budget enforcement and CRI precedence."
     },
     {
       "research_id": "RA-EXT-030",
@@ -1075,7 +1076,8 @@
       "intake_record": "RI-007",
       "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
       "lineage_note": "CRI adoption lineage: RA-EXT-029 (bound to RI-008 during INTAKE-CLOSURE-01) and this record (bound to RI-007) refer to the same Owner-accepted CRI direction. Roadmap consideration exists via RM-PRIORITY-CONTEXT composition entry (intake_record RI-008) and source_research_ids; this record adds the missing explicit RI-007 binding.",
-      "roadmap_relation": "composed-in-RM-PRIORITY-CONTEXT"
+      "roadmap_relation": "composed-in-RM-PRIORITY-CONTEXT",
+      "notes": "Semantic closure verified via RM-CONTEXT-01A. Includes fail-closed budget enforcement and CRI precedence."
     }
   ],
   "rejected_register_summary": {

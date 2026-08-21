@@ -2578,6 +2578,19 @@
       "minted_at": "2026-08-21T07:02:51.719779+00:00",
       "status": "UNPROMOTED",
       "promotion_gate": "P2P-PROMOTION-READINESS-REVIEW-02 (PLANNED)"
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.43",
+      "artifact_sha256": "42d75a218cdc7f6dd81f448847925df3fbafdf288ece4f6cbb7d4198beca2c09",
+      "promotion_status": "UNPROMOTED",
+      "minted_at": "2026-08-21T07:26:51.799948",
+      "minted_by": "Manus-RM-CONTEXT-01A",
+      "notes": "Successor to .42. Includes semantic closure for Context Intelligence: Project Map L2, Symbol STALE detection, Adaptive Budget enforcement (Scenario K/L), and CRI Policy Packs (Scenario J/M).",
+      "gates": {
+        "PLANNER_MECHANICAL_CLOSURE": "PASS",
+        "NEGATIVE_MATRIX_V2": "PASS",
+        "LIFECYCLE_SEMANTICS_FIXED": "YES"
+      }
     }
   ]
 }
