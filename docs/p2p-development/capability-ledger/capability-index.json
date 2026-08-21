@@ -4930,6 +4930,16 @@
         "PERMISSION_GATES"
       ],
       "notes": "External registry only. 817 upstream skills are not trusted executable permissions. Required-read policy applies."
+    },
+    {
+      "capability_id": "ADAPTIVE_VERIFICATION_POLICY_V2",
+      "family": "ROUTING_AND_COGNITIVE_ECONOMY",
+      "status": "PLANNED",
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
+      "dependencies": [
+        "QUALITY_ADJUSTED_ROUTING"
+      ],
+      "notes": "FW04 hardening only. RIGHT_EVIDENCE_NOT_MAXIMUM_TEST_COUNT. reasoning_effort does not widen verification_scope."
     }
   ],
   "last_reviewed": "2026-08-21T04:27:11Z",

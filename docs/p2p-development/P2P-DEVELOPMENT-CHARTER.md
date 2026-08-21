@@ -81,3 +81,9 @@ The next goal is never chosen because the previous goal number was C24. It is ch
 ## 7. What must never be reintroduced
 
 `TASK_AS_AGENT`, `SECOND_TASK_TRUTH_STORE`, `SECOND_EXECUTOR`, `COMPETING_ROUTER`, `UNBOUNDED_SWARM`, `FULL_CONTEXT_PRELOAD`, `FULL_CHAT_AS_PROJECT_STATE`, `BLIND_RETRY`, `HOST_OUTPUT_AS_FINAL_EVIDENCE`, `AUTO_PROMOTION_AFTER_GOAL_PASS`, `174_NUI_FACULTIES_AS_AGENTS`, `HOSTS_AS_CANONICAL_AGENTS`, `PROVIDER_HARDCODE_IN_CORE`, `BACKGROUND_DAEMON_WITHOUT_SEPARATE_GOAL`. These appear in the Capability Ledger with status REJECTED and a preserved reason; future goals must recover and respect them. The full rejected-pattern register (21 patterns with rationales) lives in `governance/research-adoption-ledger.json` (rejected_register_summary / RA-EXT-026) and is carried by this section; a future goal that touches any of these patterns must reopen it explicitly with Owner approval.
+
+## Owner-accepted verification proportionality policy — 2026-08-21
+P2P quality verification follows **RIGHT EVIDENCE, NOT MAXIMUM TEST COUNT**.
+Verification depth is derived from acceptance requirements, affected surface, material risk, applicable NFRs, lifecycle stage, and evidence. Reasoning effort does not automatically widen test scope. High-cost E2E/race/load/stress/soak/performance verification requires explicit applicability or lifecycle evidence. Unknown applicability fails closed without defaulting to "run everything". Valid tests must never be weakened merely to obtain GREEN. P2P-owned test/runtime processes require explicit lifecycle cleanup; unrelated processes must not be killed.
+Canonical detail:
+`docs/p2p-development/required-read/P2P-ADAPTIVE-VERIFICATION-HARDENING-V2.md`
