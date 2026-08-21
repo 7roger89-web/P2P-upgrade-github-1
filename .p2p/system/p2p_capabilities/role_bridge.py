@@ -74,6 +74,26 @@ class RoleBridgeError(ValueError):
         super().__init__("ROLE_BRIDGE_ERROR:" + code)
 
 
+def _inspect_callable_kwargs(callable_: Any) -> set[str]:
+    """Recover the keyword parameters a bounded-write callable accepts.
+    Callables that cannot be inspected receive NO forwarded kwargs
+    (fail-closed: the execute path never guesses)."""
+    import inspect as _inspect
+    try:
+        signature = _inspect.signature(callable_)
+    except (TypeError, ValueError):
+        return set()
+    names: set[str] = set()
+    for name, param in signature.parameters.items():
+        if param.kind in (_inspect.Parameter.KEYWORD_ONLY,
+                          _inspect.Parameter.POSITIONAL_OR_KEYWORD):
+            names.add(name)
+    if any(p.kind == _inspect.Parameter.VAR_KEYWORD
+           for p in signature.parameters.values()):
+        return names  # **kwargs accepts everything we forward
+    return names
+
+
 class RoleExecutionBridge:
     """Bounded foreground dispatcher for role contracts.
 
@@ -111,12 +131,20 @@ class RoleExecutionBridge:
                  # (derived identities are never promoted to
                  # mutation-ready authority).
                  execute_bounded_write_host_attestation=None,
+                 execute_bounded_write_authority_mode=None,
                  ) -> dict[str, Any]:
         """Dispatch one bounded role contract through the reused backend
         bridge. The explicit adapter MUST already be registered in the
         bridge's registry by an eligibility-validated caller. The bridge
         never selects, ranks, or falls back to another adapter.
 
+        execute_bounded_write_authority_mode: optional canonical
+            authority mode (bounded_documentation_write.TEST_ONLY |
+            MUTATION_READY) passed to the callback. Default
+            MUTATION_READY. Unknown modes BLOCK (fail-closed). An
+            execute_bounded_write callable with keyword
+            mutation_authority_mode receives it; callables without the
+            kwarg receive only the project root and host attestation.
         execute_bounded_write: optional callable(project_root,
         host_attestation=...) -> evidence dict returned by
         bounded_documentation_write.execute_bounded_document_mutation.
@@ -183,6 +211,21 @@ class RoleExecutionBridge:
             and bool(contract.pre_mutation_surface_fingerprint))
         _write_bounded_granted = "WRITE_BOUNDED" in tuple(
             str(g) for g in contract.permission_profile or ())
+        # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: the dispatch authority
+        # mode is canonical and fail-closed. A real HostAttestation is
+        # required for every MUTATION_READY execution — including
+        # isolated, non-production pilots; the requirement is keyed to
+        # the mode, never to any environment label. TEST_ONLY evidence
+        # can never satisfy a mutation-ready pass.
+        _canonical_modes = (
+            _bdw.TEST_ONLY_AUTHORITY_MODE,
+            _bdw.MUTATION_READY_AUTHORITY_MODE)
+        _auth_mode = (str(execute_bounded_write_authority_mode or "")
+                      .strip().upper()) or _bdw.MUTATION_READY_AUTHORITY_MODE
+        if _auth_mode not in _canonical_modes:
+            raise RoleBridgeError("BOUND_MUTATION_AUTHORITY_MODE_INVALID", {
+                "mutation_authority_mode": execute_bounded_write_authority_mode,
+                "canonical_modes": list(_canonical_modes)})
         if _mutation_contract_live and execute_bounded_write is not None:
             if not _write_bounded_granted:
                 raise RoleBridgeError("BOUND_MUTATION_PERMISSION_NOT_GRANTED", {
@@ -191,9 +234,15 @@ class RoleExecutionBridge:
             if not _project_root:
                 raise RoleBridgeError("NO_PROJECT_BINDING_FOR_MUTATION", {})
             try:
+                _call_kwargs = {
+                    "host_attestation": execute_bounded_write_host_attestation,
+                    "mutation_authority_mode": _auth_mode,
+                }
+                _sig = _inspect_callable_kwargs(execute_bounded_write)
                 evidence = execute_bounded_write(
                     _project_root,
-                    host_attestation=execute_bounded_write_host_attestation)
+                    **{k: v for k, v in _call_kwargs.items()
+                       if k in _sig})
             except _bdw.BoundedDocWriteError as exc:
                 raise RoleBridgeError("BOUND_MUTATION_BLOCKED", {
                     "code": exc.code, "details": exc.details})
@@ -213,6 +262,12 @@ class RoleExecutionBridge:
                         "quality": _q})
                 mutation_evidence["quality_evaluation"] = dict(_q)
             mutation_evidence = dict(evidence)
+            # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: record the canonical
+            # authority mode inside the evidence surface so the receipt
+            # verifier can bind mode, attestation and execution in one
+            # claim (TEST_ONLY evidence is bound and verifiable, never
+            # silently promoted to mutation-ready).
+            mutation_evidence["mutation_authority_mode"] = _auth_mode
             possible_mutation = True
             mutation_state = "BOUNDED_MUTATION_OBSERVED"
             # P2P-BOUNDED-DOCUMENTATION-WRITE-01A: bind the receipt to a

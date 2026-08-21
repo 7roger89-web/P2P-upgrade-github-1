@@ -11,9 +11,13 @@ from p2p_capabilities import team_intelligence as ti
 from p2p_capabilities import capability_intelligence as ci
 
 
-def _role(cid, requires=(), ev="", prov=None):
+def _role(cid, requires=(), provides=(), ev="", prov=None):
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: role provision is carried
+    # by the explicit PROVIDES field only; REQUIRES is a dependency
+    # (provenance), never silently promoted into the provided surface.
     return {"CAPABILITY_ID": cid, "TYPE": "role",
             "REQUIRES": tuple(requires),
+            "PROVIDES": tuple(provides),
             "EVIDENCE_CONTRACT": ev,
             "UPSTREAM_PROVENANCE": dict(prov) if prov else {}}
 
@@ -27,14 +31,14 @@ CANON = ["p2p_iris", "p2p_tecton", "p2p_axiom", "p2p_vector",
 
 RECORDS = [
     _role("p2p_iris"),
-    _role("p2p_tecton", ["design_intelligence_nui"]),
-    _role("p2p_axiom", ["unit_test_execution", "security_audit"]),
+    _role("p2p_tecton", provides=["design_intelligence_nui"]),
+    _role("p2p_axiom", provides=["unit_test_execution", "security_audit"]),
     _role("p2p_vector"),
-    _role("p2p_datos", ["fact_ledger_writes"]),
-    _role("p2p_anon", ["security_audit"]),
-    _role("p2p_architecton", ["architecture_review"]),
-    _role("p2p_helios", ["evidence_audit"]),
-    _role("p2p_aesthetica", ["ux_design"]),
+    _role("p2p_datos", requires=["fact_ledger_writes"]),
+    _role("p2p_anon", requires=["security_audit"]),
+    _role("p2p_architecton", provides=["architecture_review"]),
+    _role("p2p_helios", provides=["evidence_audit"]),
+    _role("p2p_aesthetica", provides=["ux_design"]),
 ]
 
 ELIG = {r["CAPABILITY_ID"]: _elig() for r in RECORDS}
@@ -185,13 +189,25 @@ class TestFw03EvidenceTiers(unittest.TestCase):
         self.assertEqual(ev[0].evidence_tier, "UNKNOWN")
 
     def test_verified_uplift_requires_evidence_surface(self):
-        # No evidence contract surface -> tier stays DECLARED.
+        # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: provision lives in the
+        # explicit PROVIDES field. A role with NO explicit provision
+        # yields NO capability evidence rows (fail-closed): REQUIRES
+        # and a bare registry record never promote into a DECLARED row.
         recs = [_role("p2p_iris", ev="")]
         ev = ti.role_capability_evidence("p2p_iris", recs)
-        self.assertEqual(ev[0].evidence_tier, "DECLARED")
-        recs2 = [_role("p2p_iris", prov={"audit": "CERTIFIED"})]
-        ev2 = ti.role_capability_evidence("p2p_iris", recs2)
-        self.assertIn(ev2[0].evidence_tier,
+        self.assertEqual(ev, ())
+        # An explicit provision without an evidence contract surface
+        # stays at the DECLARED tier.
+        recs_d = [_role("p2p_tecton", provides=["design_intelligence_nui"],
+                        ev="")]
+        ev_d = ti.role_capability_evidence("p2p_tecton", recs_d)
+        self.assertEqual(ev_d[0].evidence_tier, "DECLARED")
+        # An explicit provision WITH a verified upstream surface uplifts.
+        recs_v = [_role("p2p_tecton",
+                        provides=["design_intelligence_nui"],
+                        prov={"audit": "CERTIFIED"})]
+        ev_v = ti.role_capability_evidence("p2p_tecton", recs_v)
+        self.assertIn(ev_v[0].evidence_tier,
                       ("CERTIFIED", "LIVE_CERTIFIED"))
 
     def test_target_incompatibility_does_not_count(self):

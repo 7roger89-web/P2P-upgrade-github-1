@@ -27,6 +27,18 @@ from typing import Any, Mapping
 BOUNDED_DOC_WRITE_SCHEMA = "p2p-bounded-documentation-write/1"
 MUTATION_CLASS = "DOCUMENTATION_WRITE_ONLY"
 NON_EXISTENT = "NON_EXISTENT"
+# P2P-BOUNDED-DOCUMENTATION-WRITE-01B: canonical mutation authority
+# modes. The requirement for a REAL canonical HostAttestation is keyed
+# to this authority mode — NOT to any environment label (PRODUCTION /
+# NON_PRODUCTION / ISOLATED). TEST_ONLY may carry a synthetic/derived
+# attestation ONLY because it is structurally incapable of producing a
+# mutation-ready PASS (execute without a real attestation raises here;
+# the receipt verifier further requires test_only_evidence == false for
+# any mutation-ready VERIFIED path). Unknown modes BLOCK (fail-closed).
+TEST_ONLY_AUTHORITY_MODE = "TEST_ONLY"
+MUTATION_READY_AUTHORITY_MODE = "MUTATION_READY"
+MUTATION_AUTHORITY_MODES: tuple[str, ...] = (
+    TEST_ONLY_AUTHORITY_MODE, MUTATION_READY_AUTHORITY_MODE)
 PERMISSION_WRITE_BOUNDED = "WRITE_BOUNDED"
 
 # Bounded budget defaults (contract may tighten, never widen via defaults).
@@ -255,6 +267,11 @@ class BoundedDocWriteEvidence:
     host_attestation_id: str = ""
     rollback_required: str = "REQUIRED"
     rollback_state: str = ""
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: the canonical authority mode
+    # under which this mutation executed. TEST_ONLY evidence must never
+    # satisfy a mutation-ready VERIFIED path (the receipt verifier
+    # requires test_only_evidence == false for mutation-ready receipts).
+    mutation_authority_mode: str = MUTATION_READY_AUTHORITY_MODE
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -275,6 +292,7 @@ class BoundedDocWriteEvidence:
             "host_attestation_id": self.host_attestation_id,
             "rollback_required": self.rollback_required,
             "rollback_state": self.rollback_state,
+            "mutation_authority_mode": self.mutation_authority_mode,
         }
 
 
@@ -636,7 +654,7 @@ def execute_bounded_document_mutation(
         # fixtures ("TEST_ONLY") so legacy BW01 fixture behavior is not
         # silently widened into authority paths.
         host_attestation: Any = None,
-        mutation_authority_mode: str = "MUTATION_READY",
+        mutation_authority_mode: str = MUTATION_READY_AUTHORITY_MODE,
 ) -> BoundedDocWriteEvidence:
     """Execute exactly one bounded text-documentation mutation.
 
@@ -649,12 +667,22 @@ def execute_bounded_document_mutation(
     if not project_root.is_dir():
         raise BoundedDocWriteError("PROJECT_ROOT_INVALID")
 
-    # 0. Real host attestation gate (01A Owner amendment 1/§6):
-    #    mutation-ready executions MUST carry a real canonical
-    #    HostAttestation; derived (synthetic) identities are accepted
-    #    ONLY when the caller explicitly types the fixture as
-    #    mutation_authority_mode=TEST_ONLY. Any other value — including
-    #    the default MUTATION_READY — requires the real object.
+    # 0. Real host attestation gate (01A Owner amendment 1/§6 +
+    #    01B Owner amendment 2/§6-§7): mutation-ready executions MUST
+    #    carry a real canonical HostAttestation regardless of whether
+    #    the mutation is PRODUCTION, NON_PRODUCTION or ISOLATED — the
+    #    requirement is keyed to MUTATION_AUTHORITY_MODE, never to the
+    #    environment. Only the canonical TEST_ONLY mode may omit a real
+    #    attestation (and TEST_ONLY can never satisfy a mutation-ready
+    #    pass: it is validated here as fail-closed, and the receipt
+    #    verifier further requires test_only_evidence == false for any
+    #    mutation-ready VERIFIED path). Unknown modes BLOCK.
+    if str(mutation_authority_mode or "").strip().upper() \
+            not in MUTATION_AUTHORITY_MODES:
+        raise BoundedDocWriteError(
+            "MUTATION_AUTHORITY_MODE_INVALID",
+            {"mutation_authority_mode": mutation_authority_mode,
+             "canonical_modes": list(MUTATION_AUTHORITY_MODES)})
     _mode = str(mutation_authority_mode or "").strip()
     _att_fp: str | None = None
     if host_attestation is not None:
@@ -771,6 +799,9 @@ def execute_bounded_document_mutation(
                                  _att_fp or _sha256_hex(
                                      (str(dispatch_id) + str(execution_id)).encode("utf-8"))),
             rollback_required="REQUIRED",
+            mutation_authority_mode=str(mutation_authority_mode or
+                                        MUTATION_READY_AUTHORITY_MODE
+                                        ).strip().upper(),
             rollback_state="PENDING",
         )
         return evidence

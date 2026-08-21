@@ -1081,12 +1081,21 @@ def _g1_authority_chain_check(
         out["role_spec_matches_registry"] = (
             bool(role_spec_hash) and role_spec_hash.lower()
             == _spec_hash.lower())
-    # 2. The selected role's registry record must provide the bounded
-    #    capability — REQUIRES must contain it (canonical provenance).
+    # 2. The selected role's registry record must carry an EXPLICIT
+    #    PROVIDES containing the bounded capability (P2P-BW01B:
+    #    REQUIRES is dependency provenance only; it never counts as
+    #    provision). A role without PROVIDES provides NOTHING
+    #    (fail-closed) — no fallback to REQUIRES, the role id, or any
+    #    name/authority implication.
+    _provides_explicit = False
     if _role_rec is not None:
+        _provides_list = list(_role_rec.get("PROVIDES", ()) or ())
+        _provides_explicit = capability_id in tuple(
+            str(_c) for _c in _provides_list)
         _requires = list(_role_rec.get("REQUIRES", ()) or ())
         out["role_provides_capability"] = capability_id in tuple(
             str(_c) for _c in _requires)
+    out["role_explicitly_provides_capability"] = bool(_provides_explicit)
     # 3. Capability record exists and carries an explicit certified
     #    execution scope (EXECUTION_SCOPE first, then the module-level
     #    map; an unmapped capability is BLOCK).
@@ -1210,15 +1219,34 @@ def _g1_authority_chain_check(
     out["owner_authorization_bound"] = (
         bool(_auth_id) and _auth_id.startswith("owner-mutation-")
         and _hex64ish(_req_fp))
+    # 8. Canonical authority mode (P2P-BW01B): a mutation-ready
+    #    execution must declare MUTATION_READY — never TEST_ONLY — and
+    #    the evidence's declared mode must equal the canonical
+    #    MUTATION_READY constant. TEST_ONLY evidence is legitimate for
+    #    fixtures but structurally incapable of satisfying this claim;
+    #    an unknown or missing mode BLOCKS (fail-closed).
+    from . import bounded_documentation_write as _bdw
+    _declared_mode = str(ev.get("mutation_authority_mode", "") or
+                         "").strip().upper()
+    out["mutation_authority_mode_is_canonical"] = (
+        _declared_mode in _bdw.MUTATION_AUTHORITY_MODES)
+    out["mutation_authority_mode_is_mutation_ready"] = (
+        _declared_mode == _bdw.MUTATION_READY_AUTHORITY_MODE)
+    out["test_only_evidence"] = (
+        _declared_mode == _bdw.TEST_ONLY_AUTHORITY_MODE)
     out["overall"] = bool(
         out["role_selected"]
+        and out["role_explicitly_provides_capability"]
         and out["role_provides_capability"]
         and out["capability_scope_mapping_valid"]
         and out["execution_scope_certified_for_target"]
         and out["target_certification_subject_bound_to_role"]
         and out["target_certification_current"]
         and out["attestation_real_and_matches_evidence"]
-        and out["owner_authorization_bound"])
+        and out["owner_authorization_bound"]
+        and out["mutation_authority_mode_is_canonical"]
+        and out["mutation_authority_mode_is_mutation_ready"]
+        and not out["test_only_evidence"])
     return out
 
 

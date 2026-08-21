@@ -195,11 +195,6 @@ def role_capability_evidence(
         return tuple(out)
     prov = record.get("UPSTREAM_PROVENANCE") or {}
     ev = record.get("EVIDENCE_CONTRACT") or ""
-    pointers = tuple(dict.fromkeys(
-        ["capabilities.json/" + str(role_id)]
-        + (["evidence-contract:" + str(ev)] if ev else [])
-        + (["provenance:" + str(k) + "=" + str(v)
-            for k, v in dict(prov).items()] if prov else [])))
     # Tier uplift: any explicit verified/certified evidence surface.
     tier = "DECLARED"
     if ev and str(ev).strip():
@@ -210,9 +205,32 @@ def role_capability_evidence(
                for v in (prov.values() if prov else ())):
             tier = "CERTIFIED" if key in ("VERIFIED", "CERTIFIED") \
                 else "LIVE_CERTIFIED"
-    caps: list[str] = [str(role_id)]
-    requires = record.get("REQUIRES") or ()
-    caps += [str(c) for c in requires]
+    # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: REQUIRES is a role
+    # DEPENDENCY (provenance of what the role consumes), not what it
+    # PROVIDES. The provided surface must come from the explicit
+    # PROVIDES field of the registry record only. A role without
+    # PROVIDES provides NOTHING (fail-closed): its own capability id
+    # and dependency list are never silently promoted into the
+    # provided surface. Dependency provenance stays observable in the
+    # UPSTREAM_PROVENANCE pointers (REQUIRES entries listed there).
+    caps: list[str] = [str(c) for c in
+                       (record.get("PROVIDES") or ())]
+    prov = record.get("UPSTREAM_PROVENANCE") or {}
+    prov_keys = list(dict.fromkeys(prov.keys()))
+    requires = tuple(str(c) for c in
+                     (record.get("REQUIRES") or ())
+                     if str(c) not in prov_keys)
+    _provided_pointers: tuple[str, ...] = ()
+    if caps:
+        _provided_pointers = tuple(
+            "provenance:provided-registry=" + str(c) for c in caps)
+    pointers = tuple(dict.fromkeys(
+        ["capabilities.json/" + str(role_id)]
+        + ["provenance:requires=" + str(r) for r in requires]
+        + (["evidence-contract:" + str(ev)] if ev else [])
+        + (["provenance:" + str(k) + "=" + str(v)
+            for k, v in dict(prov).items()] if prov else [])
+        + list(_provided_pointers)))
     compat = "compatible"
     if target_eligibility_result is not None:
         reasons = (target_eligibility_result.get("reasons") or ())
@@ -309,9 +327,11 @@ def build_team_decision(
     Algorithm (set cover, greedy, bounded):
       1. Required capability set R (only explicit task-contract caps;
          unknown caps are NOT invented here — FW02 carries them).
-      2. For every registry role compute its PROVIDE set: registry
-         CAPABILITY_ID (self capability) + REQUIRES surface, tiered by
-         evidence, with target compatibility enforced when a target
+      2. For every registry role compute its PROVIDE set from the
+         explicit PROVIDES field of its registry record ONLY
+         (P2P-BW01B: REQUIRES is dependency provenance, never
+         provision; a role without PROVIDES provides nothing), tiered
+         by evidence, with target compatibility enforced when a target
          record is supplied. A capability with externally-governed
          certification evidence (capability_certifications map produced
          by FW04) ALSO counts when its currently_eligible is True and
@@ -427,9 +447,12 @@ def build_team_decision(
         trace.append(TeamDecisionTraceItem(
             step="ROLE_PROVIDE",
             fact=f"{role} provides={sorted(covers)}",
-            rationale="Provision computed from registry REQUIRES surface "
-                      "plus eligibility and target compatibility; no "
-                      "self-declared claim is trusted without evidence.",
+            rationale="Provision computed from the explicit PROVIDES "
+                      "field of the role's registry record only (P2P "
+                      "BW01B: REQUIRES is dependency provenance, never "
+                      "provision), plus eligibility and target "
+                      "compatibility; no self-declared claim is trusted "
+                      "without evidence.",
             tie_breaker=""))
 
     # --- 3. eligibility filter -------------------------------------------

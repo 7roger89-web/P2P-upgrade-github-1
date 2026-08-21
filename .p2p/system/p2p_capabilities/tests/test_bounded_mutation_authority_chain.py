@@ -297,7 +297,7 @@ class LifecycleAuthorityTests(unittest.TestCase):
             dispatch_id="p2p-task-doc-01a",
             execution_id="exec-fw01a",
             host_attestation=att,
-            mutation_authority_mode="PRODUCTION")
+            mutation_authority_mode="MUTATION_READY")
         with open(artifact_path, "w", encoding="utf-8") as fh:
             json.dump({"schema": "p2p-bounded-documentation-write/1",
                        "evidence": evidence.to_dict()}, fh)
@@ -387,7 +387,7 @@ class LifecycleAuthorityTests(unittest.TestCase):
             dispatch_id="p2p-task-doc-01a",
             execution_id="exec-fw01a",
             host_attestation=att,
-            mutation_authority_mode="PRODUCTION")
+            mutation_authority_mode="MUTATION_READY")
         with open(artifact_path, "w", encoding="utf-8") as fh:
             json.dump(evidence.to_dict(), fh)
         decision = _bdw.bounded_write_retry_decision(
@@ -426,7 +426,7 @@ class NegativeMatrixTests(unittest.TestCase):
             dispatch_id="p2p-task-doc-01a",
             execution_id="exec-fw01a",
             host_attestation=self.att,
-            mutation_authority_mode="PRODUCTION")
+            mutation_authority_mode="MUTATION_READY")
         with open(self.artifact_path, "w", encoding="utf-8") as fh:
             json.dump(self.evidence.to_dict(), fh)
 

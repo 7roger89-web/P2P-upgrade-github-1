@@ -232,6 +232,9 @@
    "REQUIRES": [
     "bounded_documentation_write"
    ],
+   "PROVIDES": [
+    "bounded_documentation_write"
+   ],
    "CONTEXT_POINTERS": [
     "p2p-governance",
     "approved-specs"
