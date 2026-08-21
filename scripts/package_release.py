@@ -388,16 +388,17 @@ def assert_clean_paths(root: Path) -> None:
 
 
 def regenerate_source_checksums(root: Path) -> None:
-    """Refresh the existing canonical checksum list without self-hashing it."""
+    """Refresh the staged canonical checksum list without self-hashing it.
+
+    The release stage intentionally exposes the selected distribution at its
+    root and the installed runtime under ``runtime/``; it does not contain the
+    source checkout's ``.p2p/system`` tree.  Reusing ``selected_paths`` here
+    therefore validates the wrong layout and makes every clean package build
+    fail after staging.  At this point the stage contains only payload files,
+    so the staged file set is the authoritative checksum input.
+    """
     checksum_path = root / "manifest" / "sha256sums.txt"
-    paths = selected_paths(root)
-    files: list[Path] = []
-    for relative in paths:
-        source = root / relative.rstrip("/")
-        if source.is_file() and relative != "manifest/sha256sums.txt":
-            files.append(source)
-        elif source.is_dir():
-            files.extend(path for path in iter_files(source) if path != checksum_path)
+    files = [path for path in iter_files(root) if path != checksum_path]
     lines = [
         f"{sha256(path)}  {path.relative_to(root).as_posix()}"
         for path in sorted(set(files))
