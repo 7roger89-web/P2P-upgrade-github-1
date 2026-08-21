@@ -3,10 +3,10 @@
   "version": "4",
   "spec_goal": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
   "OFFICIAL_BASELINE": {
-    "version": "8.4.7-C-codex.41",
-    "artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
+    "version": "8.4.7-C-codex.46",
+    "artifact_sha256": "2901adca106d3533b3df37e1d10d8a375162b64b001c32bec28b4b178c2f3bb7",
     "promotion_status": "PROMOTED_VERIFIED",
-    "approval_reference": "P2P-APR-20260821T035410Z-c41-official-baseline-promotion"
+    "approval_reference": "governance/approvals/P2P-PROMOTE-46-APPROVAL.json"
   },
   "HASHES": {
     "p2p_development_roadmap_json_sha256": "8d84d8c2d3827c0e41cf75d66e38c7282644e7f6a0923ad5b8a4c201c3e52581",
@@ -14,12 +14,12 @@
     "research_adoption_ledger_json_sha256": "996c6745dacc50e0d395cc8c173433510bbbec4f2ef2a358b655b152e4a52531",
     "research_adoption_ledger_schema_version": "p2p-framework/research-adoption-ledger/1",
     "capability_index_json_sha256": "843c132e4c27fbc48410de36fc5bd1ac74f78f52be07812a33c4c0fe832b797c",
-    "development_control_json_sha256": "3bc199c8ed47a4ca55c41f288867eb18d7e9e8ed3b531923d2a0048e023a9025",
+    "development_control_json_sha256": "9d5b10d04eebf4c611f6c011b85ac05f0c3e797504011e0b6b073149e5f96c54",
     "intake_contract_json_sha256": "609e10fac3991703951c6b3b17520b2132d83aa57cdd2b6dbc58d51bc63b504a",
     "research_intake_ledger_json_sha256": "5617e00ca41b221a7f17177166fed44a1ef6060e2fbf07a3a3158da092fe2885",
-    "official_baseline_version": "8.4.7-C-codex.41",
-    "official_baseline_artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
-    "planning_timestamp_utc": "2026-08-21T09:15:02Z"
+    "official_baseline_version": "8.4.7-C-codex.46",
+    "official_baseline_artifact_sha256": "2901adca106d3533b3df37e1d10d8a375162b64b001c32bec28b4b178c2f3bb7",
+    "planning_timestamp_utc": "2026-08-21T10:38:36Z"
   },
   "AUTHORITY_ORDER": {
     "official_baseline": "development-control",

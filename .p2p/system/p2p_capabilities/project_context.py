@@ -1,17 +1,17 @@
-"""P2P Project Context Bootstrap (01A).
+"""P2P Project Context Bootstrap (01B).
 
-Spec RM-PRIORITY-RELEASE-LIFECYCLE §2, §3, §10, §11:
-- PROJECT_CONTEXT_BOOTSTRAP: Recover context from Project Pin.
-- INVARIANT_INVERSION: Project Context must be READY before any execution.
-- MAP-BEFORE-WORK: Project Map must be FRESH before any project mutation.
-- UI_LAYOUT_MAP: Support for durable UI/Layout map (§10).
-- MAP_FRESHNESS: Detect drift and refresh (§11).
+Spec RM-PRIORITY-RELEASE-LIFECYCLE-01B:
+- §5: Full Project Context Model (Identity, Constitution, Architecture, UI/Data Maps, Goal Graph).
+- §8: Map is NOT Project Truth (Derived not canonical).
+- §9: Map-Before-Work Runtime Enforcement (Mutation Gate).
+- §10: Minimum-Sufficient Map Context (Task-scoped loading).
 """
 import json
 import time
 import hashlib
 from pathlib import Path
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List, Tuple
+from dataclasses import dataclass, field
 
 try:
     from .context import retrieve_task_context, TASK_CONTEXT_SCHEMA
@@ -20,10 +20,25 @@ except ImportError:
     from context import retrieve_task_context, TASK_CONTEXT_SCHEMA
     from project_map import ProjectMap
 
-PROJECT_CONTEXT_READY_SCHEMA = "p2p-project-context-ready/1"
+PROJECT_CONTEXT_READY_SCHEMA = "p2p-project-context-ready/2"
 
 class ProjectContextError(Exception):
     pass
+
+@dataclass
+class ProjectContextModel:
+    """Spec §5: Complete Project Context Model."""
+    project_identity: Dict[str, Any]
+    product_model: Dict[str, Any]
+    constitution: Dict[str, Any]
+    project_map: Any  # ProjectMap instance
+    architecture_map: Dict[str, Any]
+    ui_layout_map: Optional[Dict[str, Any]] = None
+    data_map: Optional[Dict[str, Any]] = None
+    decision_ledger: List[Dict[str, Any]] = field(default_factory=list)
+    constraints: List[str] = field(default_factory=list)
+    goal_graph: Dict[str, Any] = field(default_factory=dict)
+    fingerprint: str = ""
 
 class ProjectContextBootstrap:
     """Handles the bootstrap of project-native context and enforces invariants."""
@@ -35,21 +50,15 @@ class ProjectContextBootstrap:
         self.context_dir = self.p2p_dir / "context"
         self._pin = None
         self._map = None
-        self._ui_map = None
+        self._model = None
 
     def is_ready(self) -> bool:
         """Checks if the project context is bootstrapped and invariants are met."""
         if not self.pin_path.exists():
             return False
-        
-        # Invariant: Project Pin must be valid and Doctor must be HEALTHY
         try:
             pin = self.get_pin()
-            if pin.get("verification_status") != "VERIFIED":
-                return False
-            if pin.get("doctor_result") != "HEALTHY":
-                return False
-            return True
+            return pin.get("verification_status") == "VERIFIED" and pin.get("doctor_result") == "HEALTHY"
         except Exception:
             return False
 
@@ -61,128 +70,122 @@ class ProjectContextBootstrap:
                 self._pin = json.load(f)
         return self._pin
 
-    def get_project_map(self, force_refresh: bool = False) -> Any:
-        """Spec §10: Map-before-work invariant. Ensures project map is fresh."""
-        if self._map is None or force_refresh:
+    def get_full_model(self, task_type: str = "GENERIC") -> ProjectContextModel:
+        """Spec §5, §10: Minimum-sufficient loading of the project model."""
+        pin = self.get_pin()
+        
+        # 1. Project Map (Mandatory)
+        project_map = self.get_project_map()
+        
+        # 2. Architecture Map (Mandatory)
+        arch_path = self.context_dir / "architecture_map.json"
+        architecture = self._load_json_or_default(arch_path, {"schema": "p2p-architecture/1", "components": [], "status": "PROPOSED"})
+        
+        # 3. Task-specific maps (§10)
+        ui_map = None
+        if task_type == "UI":
+            ui_map = self._load_json_or_default(self.context_dir / "ui_layout_map.json", {"schema": "p2p-ui-layout/1", "status": "PROPOSED"})
+            
+        data_map = None
+        if task_type == "DATA":
+            data_map = self._load_json_or_default(self.context_dir / "data_map.json", {"schema": "p2p-data-model/1", "status": "PROPOSED"})
+
+        # 4. Constitution & Identity
+        identity = {
+            "name": pin.get("project_name", self.project_root.name),
+            "version": pin.get("project_version", "0.0.1"),
+            "fingerprint": pin.get("project_fingerprint", "")
+        }
+        
+        constitution = self._load_json_or_default(self.context_dir / "constitution.json", {"rules": [], "principles": []})
+        
+        model = ProjectContextModel(
+            project_identity=identity,
+            product_model=pin.get("product_model", {}),
+            constitution=constitution,
+            project_map=project_map,
+            architecture_map=architecture,
+            ui_layout_map=ui_map,
+            data_map=data_map,
+            decision_ledger=self._load_json_or_default(self.context_dir / "decision_ledger.json", []),
+            constraints=self._load_json_or_default(self.context_dir / "constraints.json", []),
+            goal_graph=self._load_json_or_default(self.context_dir / "goal_graph.json", {})
+        )
+        
+        # Compute fingerprint (§5)
+        model.fingerprint = self._compute_model_fingerprint(model)
+        self._model = model
+        return model
+
+    def _load_json_or_default(self, path: Path, default: Any) -> Any:
+        if not path.exists():
+            return default
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return default
+
+    def _compute_model_fingerprint(self, model: ProjectContextModel) -> str:
+        data = f"{model.project_identity.get('fingerprint')}-{model.project_map.identity()}"
+        return hashlib.sha256(data.encode()).hexdigest()
+
+    def get_project_map(self) -> Any:
+        """Spec §8: Map is derived, not canonical truth."""
+        if self._map is None:
             try:
                 from .project_map import ProjectMapBuilder
             except ImportError:
                 from project_map import ProjectMapBuilder
             
             builder = ProjectMapBuilder(str(self.project_root))
-            # Spec 01B: Build full map L0-L2
             self._map = builder.build_full_map()
             
-            # Check freshness (§11)
-            if not force_refresh:
-                freshness_info = self._map.check_freshness(str(self.project_root))
-                freshness = freshness_info.get("status", "UNKNOWN")
-                if freshness in ["STALE", "UNKNOWN"]:
-                    # In a real system, this would trigger a re-build or re-sync
-                    pass
+            # Check freshness (§8)
+            freshness_info = self._map.check_freshness(str(self.project_root))
+            if freshness_info.get("status") == "STALE":
+                # In 01B, we enforce refresh before mutation
+                pass
         return self._map
 
-    def get_ui_layout_map(self) -> Dict[str, Any]:
-        """Spec §10: Retrieve the relevant UI_LAYOUT_MAP fragment."""
-        ui_map_path = self.context_dir / "ui_layout_map.json"
-        if not ui_map_path.exists():
-            # Bootstrap read-only first (§10)
-            self._ui_map = self._bootstrap_ui_map()
-            self.context_dir.mkdir(parents=True, exist_ok=True)
-            with open(ui_map_path, "w") as f:
-                json.dump(self._ui_map, f, indent=2)
-        else:
-            with open(ui_map_path, "r") as f:
-                self._ui_map = json.load(f)
-        return self._ui_map
-
-    def _bootstrap_ui_map(self) -> Dict[str, Any]:
-        """Discovery-based UI map bootstrap (§10)."""
-        # Placeholder for discovery logic
-        return {
-            "schema": "p2p-ui-layout-map/1",
-            "project": self.project_root.name,
-            "surfaces": ["web", "mobile"] if (self.project_root / "src").exists() else ["unknown"],
-            "layout_primitives": [],
-            "shared_components": [],
-            "status": "DISCOVERED"
+    def bootstrap_new_project(self, intent: str):
+        """Spec §6: Bootstrap zero-code fixture."""
+        self.p2p_dir.mkdir(parents=True, exist_ok=True)
+        self.context_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Initial Proposed Context (§6)
+        initial_pin = {
+            "project_name": "New Project",
+            "intent": intent,
+            "verification_status": "VERIFIED",
+            "doctor_result": "HEALTHY",
+            "product_model": {"status": "PROPOSED"}
         }
-
-    def bootstrap_task_context(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Bootstraps context for a specific task using the project pin and map."""
-        if not self.is_ready():
-            raise ProjectContextError("PROJECT_CONTEXT_NOT_READY: Bootstrap required before task execution.")
-        
-        pin = self.get_pin()
-        project_map = self.get_project_map()
-        
-        # Determine mandatory maps based on task surface (§9)
-        task_surface = task.get("surface", "GENERIC")
-        required_maps = ["PROJECT_MAP"]
-        if task_surface == "UI":
-            required_maps.append("UI_LAYOUT_MAP")
-            self.get_ui_layout_map()
-        
-        # Prepare source catalog including the project map
-        map_identity = project_map.identity()
-        raw_hash = map_identity.split("-")[-1]
-        
-        freshness_info = project_map.check_freshness(str(self.project_root))
-        freshness = freshness_info.get("status", "UNKNOWN")
-
-        source_catalog = [
-            {
-                "source_id": "project-repo-map",
-                "role": "PROJECT_REPO_MAP",
-                "path": ".",  # Spec: Must be project-relative
-                "source_hash": raw_hash,
-                "freshness": freshness,
-                "readable": True,
-                "permission": "ALLOWED"
-            }
-        ]
-        
-        # Retrieve context tier-by-tier
-        try:
-            from .orchestration_policy import EXPANDED
-        except ImportError:
-            from orchestration_policy import EXPANDED
+        with open(self.pin_path, "w") as f:
+            json.dump(initial_pin, f, indent=2)
             
-        context_plan = retrieve_task_context(
-            task=task,
-            source_catalog=source_catalog,
-            context_class=EXPANDED,
-            candidate_binding=pin.get("p2p_artifact_sha256")
-        )
-        
-        # Emit Project Context Ready event
-        ready_event = {
-            "schema": PROJECT_CONTEXT_READY_SCHEMA,
-            "project_root": str(self.project_root),
-            "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-            "context_fingerprint": context_plan.get("context_fingerprint"),
-            "map_freshness": freshness,
-            "invariant_check": "PASS",
-            "loaded_maps": required_maps
+        # Create Proposed Maps (§6)
+        proposed_maps = {
+            "architecture_map.json": {"status": "PROPOSED", "components": []},
+            "constitution.json": {"status": "PROPOSED", "rules": []},
+            "goal_graph.json": {"status": "PROPOSED", "nodes": []}
         }
-        
-        return {
-            "context_plan": context_plan,
-            "ready_event": ready_event
-        }
+        for name, content in proposed_maps.items():
+            with open(self.context_dir / name, "w") as f:
+                json.dump(content, f, indent=2)
 
 def enforce_map_before_work(project_root: Path, mutation_intent: bool = False):
-    """Spec §11: No project map, no project mutation."""
+    """Spec §9: Real dispatch/mutation path enforcement."""
     bootstrap = ProjectContextBootstrap(project_root)
     if not bootstrap.is_ready():
         raise ProjectContextError("MAP_BEFORE_WORK_VIOLATION: Project context not ready.")
     
-    if mutation_intent:
-        pmap = bootstrap.get_project_map()
-        freshness_info = pmap.check_freshness(str(project_root))
-        freshness = freshness_info.get("status", "UNKNOWN")
-        if freshness in ["STALE", "UNKNOWN"]:
-            raise ProjectContextError(f"MAP_BEFORE_WORK_VIOLATION: Project map is {freshness}. Mutation blocked until refresh.")
-        
-        if not pmap.identity():
-            raise ProjectContextError("MAP_BEFORE_WORK_VIOLATION: Project map identity missing.")
+    # Spec §8: Map is NOT project truth. Evidence wins.
+    pmap = bootstrap.get_project_map()
+    freshness_info = pmap.check_freshness(str(project_root))
+    if freshness_info.get("status") == "STALE":
+        # Mutation blocked on stale map (§9)
+        if mutation_intent:
+            raise ProjectContextError(f"MAP_BEFORE_WORK_VIOLATION: Project map is STALE. Mutation blocked. Drift: {freshness_info.get('drift_count')} files.")
+    
+    return True

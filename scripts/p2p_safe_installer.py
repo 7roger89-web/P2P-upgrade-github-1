@@ -174,8 +174,10 @@ def install(project_root: Path, artifact_path: Path, expected_sha: str, requeste
             # Set PYTHONPATH to include system_dir for capability discovery
             env = os.environ.copy()
             env["PYTHONPATH"] = str(system_dir) + os.pathsep + env.get("PYTHONPATH", "")
+            # Use 'installed' role if project-pin exists, otherwise 'portable'
+            role = "installed" if (project_root / ".p2p" / "project-pin.json").exists() else "portable"
             res = subprocess.run(
-                [sys.executable, str(doctor_path), "--root", str(project_root), "--role", "portable"], 
+                [sys.executable, str(doctor_path), "--root", str(project_root), "--role", role], 
                 capture_output=True, text=True, env=env
             )
             doctor_result = "HEALTHY" if res.returncode == 0 else "UNHEALTHY"
