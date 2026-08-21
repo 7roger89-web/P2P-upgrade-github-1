@@ -47,13 +47,22 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .backend_contract import (
-    AdapterHealthState,
-    BackendAdapterIdentity,
-    BackendContractError,
-    BackendExecutionResult,
-    normalize_adapter_error,
-)
+try:
+    from .backend_contract import (
+        AdapterHealthState,
+        BackendAdapterIdentity,
+        BackendContractError,
+        BackendExecutionResult,
+        normalize_adapter_error,
+    )
+except ImportError:
+    from backend_contract import (
+        AdapterHealthState,
+        BackendAdapterIdentity,
+        BackendContractError,
+        BackendExecutionResult,
+        normalize_adapter_error,
+    )
 
 MANUS_ADAPTER_ID = "manus-api"
 MANUS_ADAPTER_VERSION = "0.1.0"
@@ -67,11 +76,17 @@ MANUS_STATUS_VALID = {"running", "stopped", "waiting", "error"}
 
 def _manus_key() -> str | None:
     """Read-only load of the Manus API key. Caller decides policy."""
+    import os
+    from pathlib import Path as _P
     try:
-        from pathlib import Path as _P
-        return _P("/home/ubuntu/.secrets/manus_api_key").read_text(encoding="utf-8").strip() or None
+        # Portability correction: use home directory instead of hardcoded /home/ubuntu
+        key_path = _P(os.path.expanduser("~/.secrets/manus_api_key"))
+        if key_path.exists():
+            return key_path.read_text(encoding="utf-8").strip() or None
     except OSError:
-        return None
+        pass
+    # Fallback to environment variable
+    return os.environ.get("MANUS_API_KEY")
 
 
 @dataclass(frozen=True)
@@ -318,6 +333,7 @@ class ManusAdapter:
             usage_evidence["credit_usage"] = credit_usage
             usage_evidence["units"] = "manus-credits"
             usage_evidence["source"] = "task.detail.credit_usage"
+        output_pointers = (f"text://{answer_text}",) if answer_text else ()
         return BackendExecutionResult(
             request_id=request_id,
             request_fingerprint_hex=request_fingerprint,
@@ -329,13 +345,14 @@ class ManusAdapter:
             started_at=started_at,
             finished_at=finished_at,
             exit_status="EXPIRED" if expired else final_status,
+            output_pointers=output_pointers,
             artifact_pointers=artifact_pointers,
             mutation_surface=HONEST_UNKNOWN,
             usage_evidence=usage_evidence,
             error_class=error_class,
-            auth_state_after="VALID",
-            raw_backend_receipt_pointer=transcript_pointer,
-            possible_mutation=expired,
+            auth_state_after="VALID" if not error_class else "UNKNOWN",
+            raw_backend_receipt_pointer=task_url,
+            possible_mutation=False,
         )
 
     def _map_terminal(self, final_status: str, expired: bool,

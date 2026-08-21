@@ -44,13 +44,22 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping
 
-from .host_executor import (
-    ERROR_CLASSES,
-    PORTABLE_RECEIPT_SCHEMA,
-    _EXECUTION_STATUSES,
-    _VERIFICATION_STATUSES,
-    normalize_host_error,
-)
+try:
+    from .host_executor import (
+        ERROR_CLASSES,
+        PORTABLE_RECEIPT_SCHEMA,
+        _EXECUTION_STATUSES,
+        _VERIFICATION_STATUSES,
+        normalize_host_error,
+    )
+except ImportError:
+    from host_executor import (
+        ERROR_CLASSES,
+        PORTABLE_RECEIPT_SCHEMA,
+        _EXECUTION_STATUSES,
+        _VERIFICATION_STATUSES,
+        normalize_host_error,
+    )
 
 BACKEND_CONTRACT_SCHEMA = "p2p-backend-execution-contract/1"
 BACKEND_RESULT_SCHEMA = "p2p-backend-execution-result/1"

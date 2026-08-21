@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import PurePosixPath
 from typing import Any, Iterable, Mapping
 
-from .orchestration_policy import (
+from orchestration_policy import (
     CONTEXT_CLASSES,
     CONTEXT_INSUFFICIENT,
     EXPANDED,

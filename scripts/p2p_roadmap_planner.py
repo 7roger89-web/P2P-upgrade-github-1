@@ -84,8 +84,8 @@ WEIGHTS = {"owner_value": 3.0, "dependency_necessity": 2.0, "safety_maturity": 1
            "evidence_gap": 1.0, "architectural_leverage": 1.5}
 WEIGHT_SUM = sum(WEIGHTS.values())
 
-BASELINE_EXPECTED = "8.4.7-C-codex.41"
-BASELINE_SHA_EXPECTED = "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d"
+# BASELINE_EXPECTED and BASELINE_SHA_EXPECTED removed (spec 01D §3)
+# Canonical planner derives current official baseline dynamically from authoritative durable truth.
 
 
 class PlannerError(Exception):
@@ -139,8 +139,12 @@ def build_input_model(repo, override_owner_value):
                                f"while p2p-development-roadmap status is {it.get('status')}; canonical authorities materially conflict")
 
     ob = dctl.get("official_baseline")
-    if not ob or ob.get("version") != BASELINE_EXPECTED or ob.get("artifact_sha256") != BASELINE_SHA_EXPECTED:
-        raise PlannerError(f"BASELINE IDENTITY MISMATCH — expected {BASELINE_EXPECTED}@{BASELINE_SHA_EXPECTED[:16]}..., got {json.dumps(ob)}")
+    if not ob or not ob.get("version") or not ob.get("artifact_sha256"):
+        raise PlannerError(f"BASELINE IDENTITY MISSING — authoritative durable truth must contain official_baseline version and sha256, got {json.dumps(ob)}")
+    
+    # Verify baseline promotion status if record exists
+    if ob.get("promotion_status") != "PROMOTED_VERIFIED":
+        raise PlannerError(f"BASELINE PROMOTION INVALID — official_baseline status must be PROMOTED_VERIFIED, got {ob.get('promotion_status')}")
 
     authority = {
         "official_baseline": "development-control",
@@ -201,8 +205,8 @@ def bind_hashes(inp, repo):
     ilp = os.path.join(repo, "governance", "research-intake-ledger.json")
     if os.path.exists(ilp):
         h["research_intake_ledger_json_sha256"] = sha256_file(ilp)
-    h["official_baseline_version"] = BASELINE_EXPECTED
-    h["official_baseline_artifact_sha256"] = BASELINE_SHA_EXPECTED
+    h["official_baseline_version"] = inp["OFFICIAL_BASELINE"]["version"]
+    h["official_baseline_artifact_sha256"] = inp["OFFICIAL_BASELINE"]["artifact_sha256"]
     h["planning_timestamp_utc"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 

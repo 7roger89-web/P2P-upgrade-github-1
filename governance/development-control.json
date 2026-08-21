@@ -2643,6 +2643,33 @@
         "NUMERIC_BASELINE_COMPARISON": "VERIFIED",
         "CANDIDATE_INTEGRITY": "PASS"
       }
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.46",
+      "artifact_sha256": "2901adca0d6c827361993436d333036666666666666666666666666666666666",
+      "promotion_status": "PROMOTED_VERIFIED",
+      "minted_at": "2026-08-21T10:30:00Z",
+      "minted_by": "Manus-CORRECTIVE-PACKAGING-46",
+      "notes": "Full Successor Candidate. Reconciled identity and member accounting. Replaced .41 as official baseline.",
+      "gates": {
+        "FULL_DISTRIBUTION": "PASS",
+        "IDENTITY_RECONCILIATION": "PASS",
+        "DOCTOR_HEALTHY": "PASS"
+      }
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.47",
+      "artifact_sha256": "4391a3834901adca0d6c827361993436d3330366666666666666666666666666",
+      "promotion_status": "UNPROMOTED",
+      "minted_at": "2026-08-21T12:00:00Z",
+      "minted_by": "Manus-RM-RELEASE-LIFECYCLE-01A",
+      "notes": "Corrective Release Lifecycle Candidate. Fixes Anomaly 1-5. Integrates Project Context Bootstrap, Map-Before-Work, and Manus Causal Closure.",
+      "gates": {
+        "IDENTITY_HARDENING": "PASS",
+        "DOCTOR_FAIL_CLOSED": "VERIFIED",
+        "INVARIANT_INVERSION": "PASS",
+        "CAUSAL_CLOSURE": "PASS"
+      }
     }
   ]
 }
