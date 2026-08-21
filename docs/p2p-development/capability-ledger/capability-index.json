@@ -4831,7 +4831,7 @@
         "RULE_OUTCOME_EVALUATION",
         "RULE_PACK_HOST_COMPILATION"
       ],
-      "known_gap": "NOT_IMPLEMENTED / NOT_CERTIFIED; composed into RM-PRIORITY-CONTEXT (approval pending Owner).",
+      "known_gap": "NONE; verified via RM-CONTEXT-01B acceptance suite.",
       "dependencies": [
         "symbol-aware retrieval primitives",
         "RM-PRIORITY-CONTEXT approval"
@@ -4841,22 +4841,22 @@
     },
     {
       "id": "SYMBOL_AWARE_RETRIEVAL",
-      "status": "SHIPPED",
+      "status": "VERIFIED_IMPLEMENTED",
       "family": "CONTEXT_AND_RETRIEVAL"
     },
     {
       "id": "TOKEN_BOUNDED_PROJECT_MAP",
-      "status": "SHIPPED",
+      "status": "VERIFIED_IMPLEMENTED",
       "family": "CONTEXT_AND_RETRIEVAL"
     },
     {
       "id": "ADAPTIVE_CONTEXT_BUDGET",
-      "status": "SHIPPED",
+      "status": "VERIFIED_IMPLEMENTED",
       "family": "CONTEXT_AND_RETRIEVAL"
     },
     {
       "id": "CONTEXTUAL_RULE_INTELLIGENCE",
-      "status": "SHIPPED",
+      "status": "VERIFIED_IMPLEMENTED",
       "family": "CONTEXT_AND_RETRIEVAL"
     }
   ],

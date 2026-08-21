@@ -2591,6 +2591,20 @@
         "NEGATIVE_MATRIX_V2": "PASS",
         "LIFECYCLE_SEMANTICS_FIXED": "YES"
       }
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.44",
+      "artifact_sha256": "9f8d13e09861e43add4ea81d0780a228df77fef09adae8904eec099e0eade229",
+      "promotion_status": "UNPROMOTED",
+      "minted_at": "2026-08-21T08:15:00Z",
+      "minted_by": "Manus-RM-CONTEXT-01B",
+      "notes": "Final Acceptance Candidate for Context Intelligence. Adds §9 Host-neutral Serialization, §13 Parser Unavailable/Fallback states, §17 Context Result Contract, and §18 Permission Boundary enforcement. Verified via A-Z Negative Matrix Test v3 (Scenarios J-S).",
+      "gates": {
+        "NEGATIVE_MATRIX_V3": "PASS",
+        "CONTRACT_SERIALIZATION": "PASS",
+        "PERMISSION_BOUNDARY": "PASS",
+        "PLANNER_LIFECYCLE_REGRESSION": "PASS"
+      }
     }
   ]
 }

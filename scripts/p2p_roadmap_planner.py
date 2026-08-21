@@ -51,7 +51,8 @@ INTAKE_CLASSIFICATION_VOCABULARY = {
 }
 # Adoption states that constitute durable material adoption for an ACCEPTED
 # intake (spec 01B §4); DISCOVERED/RESEARCHED alone do NOT satisfy.
-ADOPTION_SATISFYING_STATES = {"SELECTED", "PLANNED", "PARTIAL"}
+ADOPTION_SATISFYING_STATES = {"SELECTED", "PLANNED", "PARTIAL", "IMPLEMENTED", "SHIPPED", "VERIFIED"}
+ADOPTION_BLOCKING_STATES = {"UNKNOWN", "DISCOVERED", "RESEARCHED", "MISSING"}
 ADOPTION_EXCLUDED_STATES = {"DEFERRED", "REJECTED", "SUPERSEDED"}
 
 STATUS_VOCAB = {
@@ -363,7 +364,7 @@ def coverage_gate(inp, dctl):
             if a.get("intake_record") != iid:
                 continue
             st = (a.get("status") or "").upper()
-            if st in ADOPTION_SATISFYING_STATES:
+            if st in ADOPTION_SATISFYING_STATES and st not in ADOPTION_BLOCKING_STATES:
                 continue
             if st in ADOPTION_EXCLUDED_STATES:
                 # explicit later Owner decision; lineage preserved, not a gap
