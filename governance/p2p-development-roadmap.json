@@ -1,0 +1,744 @@
+{
+  "roadmap_id": "p2p-development-roadmap",
+  "schema_version": "p2p-framework/development-roadmap/1",
+  "generated_at": "2026-08-21T04:26:28Z",
+  "generated_by": "P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01",
+  "authority": "This JSON is the canonical machine-readable roadmap for future P2P development planning. It extends governance/development-control.json (C-line roadmap) and docs/p2p-development/framework/master-roadmap.md (FW-line). On conflict with development-control.json, development-control.json wins for C-line status; this file is authoritative for future planned items and family organization.",
+  "status_vocabulary": [
+    "ACTIVE",
+    "BLOCKED",
+    "DEFERRED",
+    "DONE",
+    "PLANNED",
+    "REJECTED",
+    "PARTIAL"
+  ],
+  "ordering_principle": "Owner value + dependency necessity + safety maturity + evidence gap + architectural leverage. NOT novelty, NOT recency, NOT 'oldest idea first'.",
+  "north_star": {
+    "id": "BEGINNER_FIRST",
+    "statement": "P2P hiện làm được gì, đang thiếu gì để đạt mục tiêu 'nói một câu rồi tự xây dự án', tính năng nào đã chọn nhưng chưa làm, đã làm một phần, và cái gì bị chủ động loại bỏ — tất cả trả lời cho người Owner không lập trình."
+  },
+  "families": [
+    {
+      "family_id": "OWNER_INTENT_PROJECT_FORMATION",
+      "name": "Owner Intent & Project Formation",
+      "purpose": "Interpret Owner intent, build Project Constitution/Contract, Product Truth, acceptance criteria, initial architecture, project bootstrap.",
+      "status": "FOUNDATION_READY",
+      "provenance": [
+        "RA-EXT-022",
+        "RA-EXT-021",
+        "C16 roadmap-lineage foundation",
+        "FW01 bootstrap"
+      ],
+      "canonical_refs": [
+        "C16",
+        "FW01",
+        "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md"
+      ]
+    },
+    {
+      "family_id": "PROJECT_TRUTH_DURABLE_STATE",
+      "name": "Project Truth & Durable State",
+      "purpose": "State surviving sessions and hosts: task state, execution ledger, evidence-bound completion, recovery.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-006",
+        "RA-EXT-018",
+        "C11",
+        "FW01",
+        "FW06"
+      ],
+      "canonical_refs": [
+        "C11",
+        "FW06",
+        "FW01"
+      ]
+    },
+    {
+      "family_id": "RESEARCH_FACT_LIVE_SPEC",
+      "name": "Research / Fact / Live-Spec Intelligence",
+      "purpose": "Research intake, fact ledger, live specs, evidence-bound factual authority.",
+      "status": "SHIPPED",
+      "provenance": [
+        "research-intake-ledger",
+        "fact-ledger.json",
+        "live-specs.json",
+        "FW02"
+      ],
+      "canonical_refs": [
+        "FW02",
+        "governance/fact-ledger.json"
+      ]
+    },
+    {
+      "family_id": "CONTEXT_AND_RETRIEVAL",
+      "name": "Context & Retrieval Intelligence",
+      "purpose": "Task-targeted retrieval, progressive disclosure, evidence pointers, deterministic-first, project/repository maps, symbol-aware retrieval, cache-aware context, adaptive context budget, token-bounded maps, current-state capsules.",
+      "status": "PARTIAL",
+      "provenance": [
+        "RA-EXT-004",
+        "RA-EXT-019",
+        "C19"
+      ],
+      "canonical_refs": [
+        "C19",
+        "capability-index CONTEXT_AND_KNOWLEDGE family"
+      ]
+    },
+    {
+      "family_id": "GOAL_DESIGN_INTELLIGENCE",
+      "name": "Goal Design Intelligence",
+      "purpose": "Design cognition registry, targeted faculty loading, visual recipes as input, design verification — P2P sole router.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-008",
+        "RA-EXT-009",
+        "RA-EXT-010",
+        "C13",
+        "C14"
+      ],
+      "canonical_refs": [
+        "C13",
+        "C14"
+      ]
+    },
+    {
+      "family_id": "SKILLS_AND_KNOWLEDGE",
+      "name": "Skills & Knowledge",
+      "purpose": "Skill discovery, progressive loading, provenance, hashing, reverification, rollback, content boundaries; rule sets as loadable units.",
+      "status": "FOUNDATION_READY",
+      "provenance": [
+        "RA-EXT-001",
+        "RA-EXT-003",
+        "RA-EXT-013",
+        "FW02 skill intelligence"
+      ],
+      "canonical_refs": [
+        "capability-index SKILL_AND_LEARNING family",
+        "FW02"
+      ]
+    },
+    {
+      "family_id": "ROLE_TEAM_COUNCIL",
+      "name": "Role / Team / Council Intelligence",
+      "purpose": "Canonical 8-role set, team decision builder, quorum semantics, live council certification.",
+      "status": "PARTIAL",
+      "provenance": [
+        "RA-EXT-003",
+        "canonical_capability_set 8/8",
+        "C38"
+      ],
+      "canonical_refs": [
+        "C38",
+        "development-control canonical_capability_set"
+      ]
+    },
+    {
+      "family_id": "EXECUTION_TARGET_PROVIDER_MODEL",
+      "name": "Execution Target / Provider / Model Intelligence",
+      "purpose": "Provider-neutral adapter registry, model/provider resolution, quality-adjusted routing, minimum-sufficient host selection.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-015",
+        "RA-EXT-016",
+        "RA-EXT-017",
+        "RA-EXT-025",
+        "C35",
+        "C37"
+      ],
+      "canonical_refs": [
+        "C35",
+        "C37",
+        "artifact .41 adapters"
+      ]
+    },
+    {
+      "family_id": "WORKSPACE_SESSION_ISOLATION",
+      "name": "Workspace / Session / Worktree Isolation",
+      "purpose": "Task-scoped isolated sessions, git worktrees/workspaces, lease/interruption lifecycle, cold-process recovery.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-011",
+        "RA-EXT-018",
+        "FW06",
+        "C12 isolation semantics"
+      ],
+      "canonical_refs": [
+        "FW06",
+        "C12"
+      ]
+    },
+    {
+      "family_id": "LARGE_GOAL_AUTONOMOUS_EXECUTION",
+      "name": "Large-Goal Autonomous Execution",
+      "purpose": "One Owner goal -> internal task graph -> bounded autonomous progression -> checkpoint/resume -> Owner Gate only for material decisions; no per-task nagging.",
+      "status": "PARTIAL",
+      "provenance": [
+        "RA-EXT-021",
+        "C12",
+        "C15"
+      ],
+      "canonical_refs": [
+        "C12",
+        "C15"
+      ]
+    },
+    {
+      "family_id": "QUALITY_EVIDENCE_EVALUATION",
+      "name": "Quality / Evidence / Evaluation",
+      "purpose": "Evaluation suites, negative tests, regression contracts, outcome learning, evidence-based iteration.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-002",
+        "RA-EXT-014",
+        "FW05",
+        "C14 gates"
+      ],
+      "canonical_refs": [
+        "FW05",
+        "C14"
+      ]
+    },
+    {
+      "family_id": "OWNER_EXPERIENCE_DECISION_TRACE",
+      "name": "Owner Experience / Decision Trace",
+      "purpose": "Native decision trace per step, owner summaries, beginner output simplicity, code-impact evidence contract (pending).",
+      "status": "PARTIAL",
+      "provenance": [
+        "RA-EXT-022",
+        "RA-EXT-023",
+        "FW02",
+        "FW05"
+      ],
+      "canonical_refs": [
+        "FW02",
+        "FW05"
+      ]
+    },
+    {
+      "family_id": "SAFETY_AUTHORITY_PERMISSIONS",
+      "name": "Safety / Authority / Permissions",
+      "purpose": "Bounded documentation mutation, permission envelopes, A-E fail classification, second-path prewrite guard, rejected-pattern register.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-026",
+        "mutation-safety integration",
+        "FW02 coverage gate"
+      ],
+      "canonical_refs": [
+        "artifact .41 mutation modules",
+        "capability-index TRUTH_AND_GOVERNANCE REJECTED entries"
+      ]
+    },
+    {
+      "family_id": "MUTATION_CAPABILITY_LADDER",
+      "name": "Mutation Capability Ladder",
+      "purpose": "Ordered mutation levels, each with own authority, evidence, verification, rollback, and Owner policy.",
+      "status": "PROVEN_LEVELS_SHIPPED_HIGHER_LEVELS_PLANNED",
+      "provenance": [
+        "Pilot-02 bounded_documentation_write",
+        "P2P-PROMOTION-READINESS-REVIEW-01"
+      ],
+      "canonical_refs": [
+        "docs/bounded-documentation-write-capability-ledger.md",
+        "P2P-GT-MUTATION-PILOT-02-REPORT.md"
+      ]
+    },
+    {
+      "family_id": "RESILIENCE_RECOVERY_FAILOVER",
+      "name": "Resilience / Recovery / Failover",
+      "purpose": "Checkpoint/resume, lease interruption, fresh-tree recovery, drift fail-closed semantics.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-006",
+        "RA-EXT-024",
+        "C39",
+        "FW06"
+      ],
+      "canonical_refs": [
+        "C39",
+        "FW06"
+      ]
+    },
+    {
+      "family_id": "UI_UX_VISUAL_INTELLIGENCE",
+      "name": "UI / UX / Visual Intelligence",
+      "purpose": "Design cognition and visual-recipe input to C13 lineage; beginner-first visual guidance; never a second router.",
+      "status": "SHIPPED",
+      "provenance": [
+        "RA-EXT-008",
+        "RA-EXT-009",
+        "RA-EXT-010",
+        "C13",
+        "C14"
+      ],
+      "canonical_refs": [
+        "C13",
+        "C14",
+        "capability-skill-map design rows"
+      ]
+    },
+    {
+      "family_id": "OBSOLESCENCE_DRIFT",
+      "name": "Obsolescence / Capability Drift",
+      "purpose": "Drift fail-closed policy, stale-claim expiration, capability evidence revalidation, vendor-displacement survival.",
+      "status": "PARTIAL",
+      "provenance": [
+        "RA-EXT-024",
+        "drift-policy.json"
+      ],
+      "canonical_refs": [
+        "governance/drift-policy.json",
+        "charter DRIFT_FAIL_CLOSED"
+      ]
+    },
+    {
+      "family_id": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
+      "name": "Release / Install / Project Lifecycle",
+      "purpose": "Release gates, installation/doctor/activation/rollback on real projects, promotion machinery.",
+      "status": "SHIPPED",
+      "provenance": [
+        "C40",
+        "C43 production installs",
+        "P2P-PROMOTE-41-01"
+      ],
+      "canonical_refs": [
+        "C40",
+        "docs/p2p-development/research/c43/evidence/"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "roadmap_id": "RM-C08",
+      "title": "Controlled continuation",
+      "family": "RESILIENCE_RECOVERY_FAILOVER",
+      "owner_value": "Resume interrupted work without full restart — beginner impact: less manual state rebuild.",
+      "status": "DEFERRED",
+      "priority": null,
+      "dependencies": [],
+      "blockers": [
+        "Owner re-selection — was explicitly DEFERRED"
+      ],
+      "source_research_ids": [
+        "RA-EXT-006",
+        "RA-EXT-018"
+      ],
+      "canonical_capability_ids": [
+        "C08"
+      ],
+      "current_evidence": "docs/plans/2026-08-10-*; C08 roadmap record",
+      "target_evidence": "C08 contract with checkpoint/resume acceptance bar",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "YES for any runtime change",
+      "next_safe_when": "Owner re-selects",
+      "defer_reason": "Explicit Owner deferral; superseded in sequencing by lifecycle/foundation goals"
+    },
+    {
+      "roadmap_id": "RM-C09",
+      "title": "Live host identity and event boundary",
+      "family": "EXECUTION_TARGET_PROVIDER_MODEL",
+      "owner_value": "Trustable live host identity for production use.",
+      "status": "BLOCKED",
+      "priority": null,
+      "dependencies": [
+        "host availability with required evidence keys"
+      ],
+      "blockers": [
+        "EVENT_EVIDENCE_UNAVAILABLE"
+      ],
+      "source_research_ids": [
+        "RA-EXT-017"
+      ],
+      "canonical_capability_ids": [
+        "C09"
+      ],
+      "current_evidence": "C09 terminal report",
+      "target_evidence": "live host identity receipt + event boundary evidence",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "YES",
+      "next_safe_when": "evidence keys available on target host",
+      "defer_reason": "BLOCKED / EVENT_EVIDENCE_UNAVAILABLE — missing real-world evidence, not design"
+    },
+    {
+      "roadmap_id": "RM-C27",
+      "title": "Live host evidence completion",
+      "family": "EXECUTION_TARGET_PROVIDER_MODEL",
+      "owner_value": "Same family as C09 — production trustworthiness.",
+      "status": "BLOCKED",
+      "priority": null,
+      "dependencies": [
+        "RM-C09 resolution"
+      ],
+      "blockers": [
+        "LIVE_HOST_EVIDENCE_UNAVAILABLE"
+      ],
+      "source_research_ids": [
+        "RA-EXT-017"
+      ],
+      "canonical_capability_ids": [
+        "C27"
+      ],
+      "current_evidence": "P2P-C27-terminal-report.md",
+      "target_evidence": "live host capability evidence on real runtime",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "YES",
+      "next_safe_when": "blocker resolved",
+      "defer_reason": "BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "roadmap_id": "RM-Z2P",
+      "title": "ZERO_TO_PROJECT — Intent Compiler & project formation loop",
+      "family": "OWNER_INTENT_PROJECT_FORMATION",
+      "owner_value": "Owner nói một câu ('Tôi muốn tạo dự án A để làm X.') — P2P diễn giải ý định, chọn mặc định kỹ thuật an toàn, tạo Project Contract + Product Truth + acceptance criteria + kiến trúc khởi tạo + đồ thị mục tiêu thích ứng, bootstrap dự án, thực thi mục tiêu an toàn đầu tiên và tiếp tục tự động, dừng chỉ ở Owner Gate hoặc DONE.",
+      "status": "PLANNED",
+      "priority": 1,
+      "dependencies": [
+        "RM-PRIORITY-LARGE-GOAL (task-graph automation)",
+        "RM-PRIORITY-CONTEXT (symbol-aware completion)",
+        "capability intelligence (FW02)",
+        "permission envelope (SAFETY family)",
+        "Owner Gate + Continue Gate",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md contract grammar"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-021",
+        "RA-EXT-022",
+        "RA-EXT-019",
+        "RA-EXT-023"
+      ],
+      "canonical_capability_ids": [],
+      "current_evidence": "FW01 bootstrap (P2P-PROJECT-BOOTSTRAP.md); C16 roadmap-lineage; FW02 selection; Goal Contract template; Pilot lifecycle evidence (C40/C43)",
+      "target_evidence": "Intent Compiler deterministic parse of Owner one-liner; Project Contract + Product Truth + acceptance criteria generated; first safe Goal executed and verified; no runtime change during definition phase",
+      "mutation_risk_class": "READ_ONLY then BOUNDED_DOCUMENTATION_WRITE",
+      "project_impact": "NEW_PROJECTS_CREATED",
+      "promotion_required": "YES for any runtime change",
+      "next_safe_when": "Owner approves goal after prerequisite analysis",
+      "defer_reason": "",
+      "note": "DO NOT implement now (Owner directive). Connects to existing FW00–FW06 primitives — NOT a competing orchestrator. Uses: durable state, capability intelligence, team intelligence, target/model selection, permission, quality/evidence, Owner Gate, Continue Gate, resilience."
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-LARGE-GOAL",
+      "title": "Large-Goal execution completeness (adaptive goal-graph automation)",
+      "family": "LARGE_GOAL_AUTONOMOUS_EXECUTION",
+      "owner_value": "Một mục tiêu lớn -> P2P tự phân rã, thực thi, xác minh, checkpoint, phục hồi, tiếp tục — không hỏi sau mỗi tác vụ kỹ thuật; dừng chỉ ở quyết định sản phẩm/dữ liệu thật mới/credentials/hành động phá hoại/production mutation/release/scope expansion/khoảng trống bằng chứng.",
+      "status": "PLANNED",
+      "priority": 2,
+      "dependencies": [
+        "RM-C08 (controlled continuation)",
+        "FW06 lease/checkpoint",
+        "FW02 capability coverage gate",
+        "FW05 decision trace"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-021",
+        "RA-EXT-006",
+        "RA-EXT-020"
+      ],
+      "canonical_capability_ids": [
+        "C12",
+        "C15"
+      ],
+      "current_evidence": "C12 bounded foreground execution DONE; C15 bounded delegation DONE",
+      "target_evidence": "task-graph decomposition + checkpoint/resume + continuation without per-task Owner nagging, verified on a real bounded goal",
+      "mutation_risk_class": "BOUNDED_DOCUMENTATION_WRITE",
+      "project_impact": "NONE (execution-only, no new mutation level)",
+      "promotion_required": "YES",
+      "next_safe_when": "after RM-C08 re-selection",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-CONTEXT",
+      "title": "Context Intelligence completeness (symbol-aware retrieval, cache-aware budget, maps)",
+      "family": "CONTEXT_AND_RETRIEVAL",
+      "owner_value": "Chất lượng và chi phí thực thi tốt hơn cho mọi mục tiêu (bao gồm Zero-to-Project).",
+      "status": "PLANNED",
+      "priority": 3,
+      "dependencies": [
+        "RA-EXT-019 shipped core (C19)",
+        "symbol table generation primitives"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-019",
+        "RA-EXT-004"
+      ],
+      "canonical_capability_ids": [
+        "C19"
+      ],
+      "current_evidence": "C19 task-targeted retrieval DONE; 35 CONTEXT_AND_KNOWLEDGE entries",
+      "target_evidence": "symbol-aware retrieval + token-bounded repo/project maps + adaptive context budget verified on real repositories",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "NO (read-only capability enhancement)",
+      "next_safe_when": "now — no dependency on blocked items",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-PLANNER",
+      "title": "ROADMAP_AWARE_DEVELOPMENT_PLANNER",
+      "family": "OWNER_INTENT_PROJECT_FORMATION",
+      "owner_value": "P2P chọn mục tiêu tiếp theo từ chân lý bền vững (baseline + ledger + roadmap + evidence + Owner priority) thay vì chat memory — bao phủ gap ROADMAP_COVERAGE_GAP được phát hiện tự động.",
+      "status": "PLANNED",
+      "priority": 4,
+      "dependencies": [
+        "research-adoption-ledger.json (this goal)",
+        "capability-index.json",
+        "development-control.json",
+        "docs/P2P-DEVELOPMENT-ROADMAP.md"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-022"
+      ],
+      "canonical_capability_ids": [],
+      "current_evidence": "goal-choice narrative in charter §6 (heuristic, not machine-readable)",
+      "target_evidence": "planner reads official baseline + ledger + roadmap + evidence gaps + Owner priority; outputs ranked candidate goals with coverage-gap detection; never overrides Owner Gates",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "NO",
+      "next_safe_when": "now",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-DESIGN",
+      "title": "Goal Design / Visual Intelligence integration (aesthetica + NUI + VC composition)",
+      "family": "GOAL_DESIGN_INTELLIGENCE",
+      "owner_value": "Hướng dẫn thiết kế cho người mới bắt đầu từ registry thiết kế (aesthetica + NUI + Visual Commander) — P2P vẫn là router duy nhất.",
+      "status": "PLANNED",
+      "priority": 5,
+      "dependencies": [
+        "C13/C14 shipped",
+        "RA-EXT-009 provenance resolution",
+        "framework/capability-skill-map composition"
+      ],
+      "blockers": [
+        "NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED"
+      ],
+      "source_research_ids": [
+        "RA-EXT-008",
+        "RA-EXT-009",
+        "RA-EXT-010"
+      ],
+      "canonical_capability_ids": [
+        "C13",
+        "C14"
+      ],
+      "current_evidence": "C14 PROMOTED_VERIFIED; capability-skill-map composition table",
+      "target_evidence": "unified composition schema (aesthetica optional specialist + NUI cognition registry + VC recipes) verified fail-closed",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "NO",
+      "next_safe_when": "now (partial provenance acceptable)",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-CODE-MUTATION",
+      "title": "Bounded code mutation (next ladder level)",
+      "family": "MUTATION_CAPABILITY_LADDER",
+      "owner_value": "Bước kế tiếp của thang đột biến: thay đổi code có giới hạn, có evidence, có rollback.",
+      "status": "PLANNED",
+      "priority": 6,
+      "dependencies": [
+        "BOUNDED_DOCUMENTATION_WRITE verified ladder base (Pilot-02 + .41 promotion)",
+        "Owner policy for code mutation",
+        "new primitive + receipt + rollback design"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-026",
+        "Pilot-02"
+      ],
+      "canonical_capability_ids": [],
+      "current_evidence": "BOUNDED_DOCUMENTATION_WRITE verified isolated/non-production (Pilot-02); READ_ONLY strongly evidenced",
+      "target_evidence": "new primitive fail-closed; bounded isolated repo mutation; rollback recovery verified; OWNED approval gate",
+      "mutation_risk_class": "BOUNDED_CODE_CHANGE (proposed)",
+      "project_impact": "ISOLATED_REPOS",
+      "promotion_required": "YES — new candidate + Owner approval",
+      "next_safe_when": "Owner authorizes ladder-2 design goal",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-ORCA-EXT",
+      "title": "Orca-style isolated/parallel execution extension",
+      "family": "WORKSPACE_SESSION_ISOLATION",
+      "owner_value": "So sánh nhiều giải pháp ứng viên độc lập trên worktree cô lập — chất lượng quyết định tốt hơn.",
+      "status": "PLANNED",
+      "priority": 7,
+      "dependencies": [
+        "FW06 lease semantics",
+        "C17 bounded parallel",
+        "output compare/evaluate in VERIFICATION family"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-011"
+      ],
+      "canonical_capability_ids": [
+        "C17"
+      ],
+      "current_evidence": "C17 DONE (bounded parallel foreground); FW06 lease",
+      "target_evidence": "bounded candidate-fanout with compare/evaluate verdicts on isolated worktrees; permission envelope never widens",
+      "mutation_risk_class": "READ_ONLY then per-candidate BOUNDED_DOCUMENTATION_WRITE",
+      "project_impact": "NONE",
+      "promotion_required": "YES for runtime changes",
+      "next_safe_when": "after RM-C08 re-selection",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-MULTIHOST-COUNCIL",
+      "title": "Adaptive multi-host Council certification",
+      "family": "ROLE_TEAM_COUNCIL",
+      "owner_value": "Hội đồng 8/8 vai trò thật trên nhiều host — độ tin cậy sản xuất đa host.",
+      "status": "PLANNED",
+      "priority": 8,
+      "dependencies": [
+        "RM-C09/C27 (live host evidence unblocked)",
+        "FW01 loop on target hosts"
+      ],
+      "blockers": [
+        "C09/C27 LIVE_HOST_EVIDENCE_UNAVAILABLE",
+        "MULTIHOST_LIVE_COUNCIL = NOT_PROVEN"
+      ],
+      "source_research_ids": [
+        "RA-EXT-017"
+      ],
+      "canonical_capability_ids": [
+        "C38",
+        "LIVE_COUNCIL_8_OF_8"
+      ],
+      "current_evidence": "single-host LIVE_COUNCIL_8_OF_8 certified @ 8a1ad30; multi-host NOT_PROVEN",
+      "target_evidence": "multi-host 8/8 live certification with event evidence",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "YES",
+      "next_safe_when": "host evidence blockers resolved",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-DRIFT-SWEEP",
+      "title": "Capability drift revalidation sweep",
+      "family": "OBSOLESCENCE_DRIFT",
+      "owner_value": "Không còn claim lỗi thời: mọi capability evidence được revalidate hoặc đánh dấu UNKNOWN.",
+      "status": "PLANNED",
+      "priority": 9,
+      "dependencies": [
+        "drift-policy.json",
+        "capability-index.json",
+        "host access"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-024"
+      ],
+      "canonical_capability_ids": [],
+      "current_evidence": "drift-policy.json; DRIFT_FAIL_CLOSED invariant; per-capability LIVE_CERTIFICATION_RECORD semantics",
+      "target_evidence": "sweep report: every capability marked VERIFIED-AT-EVIDENCE-TIME or UNKNOWN_NOT_PROBED; stale claims expired",
+      "mutation_risk_class": "READ_ONLY",
+      "project_impact": "NONE",
+      "promotion_required": "NO",
+      "next_safe_when": "now",
+      "defer_reason": ""
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-RELEASE-LIFECYCLE",
+      "title": "Release / project-installation lifecycle hardening",
+      "family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
+      "owner_value": "Cài đặt/dỡ cài/rollback nhất quán cho dự án thật (Game Truyện, Gia Phả, dự án mới từ Zero-to-Project).",
+      "status": "PLANNED",
+      "priority": 10,
+      "dependencies": [
+        "C40/C43 evidence",
+        "FW01 installer",
+        "Owner policy on project pins (.41 NOT auto-upgraded)"
+      ],
+      "blockers": [],
+      "source_research_ids": [
+        "RA-EXT-006",
+        "C43"
+      ],
+      "canonical_capability_ids": [
+        "C40",
+        "C43"
+      ],
+      "current_evidence": "C40 production installs GT+GP (docs/p2p-development/research/c43/evidence/); baseline .41 PROMOTED_VERIFIED",
+      "target_evidence": "installation contract on authoritative projects with rollback verified; pin policy enforced",
+      "mutation_risk_class": "BOUNDED_DOCUMENTATION_WRITE",
+      "project_impact": "AUTHORITATIVE_PROJECTS",
+      "promotion_required": "YES for any runtime/pin change",
+      "next_safe_when": "Owner authorizes install-lifecycle goal",
+      "defer_reason": ""
+    }
+  ],
+  "coverage_gate": {
+    "invariant": "ROADMAP_COVERAGE_GAP",
+    "rule": "Whenever P2P proposes a major new development roadmap or selects the next major development Goal, it MUST reconcile against the canonical Research Adoption Ledger + Development Roadmap. If any record is SELECTED/PLANNED/PARTIAL and materially relevant to the proposed direction but omitted without explicit reason, surface ROADMAP_COVERAGE_GAP. The roadmap may defer a selected item but must record WHY."
+  },
+  "update_contract": {
+    "invariant": "OWNER_SELECTED_CAPABILITY -> DURABLE_ROADMAP_RECORD",
+    "required_updates": [
+      "research-adoption-ledger",
+      "capability-ledger (capability-index)",
+      "charter (as applicable)",
+      "development-roadmap (this file)",
+      "goal registry",
+      "evidence pointers",
+      "dependencies",
+      "status",
+      "explicit non-adopted aspects"
+    ]
+  },
+  "roadmap_reader_status": {
+    "mechanism": "NO_AUTOMATIC_CONSUMPTION",
+    "fact": "Current P2P runtime has no canonical mechanism that reads this roadmap when choosing the next development Goal. Goal choice is governed by charter §6 heuristics plus Owner instruction.",
+    "planned_capability": "ROADMAP_AWARE_DEVELOPMENT_PLANNER (status PLANNED, item RM-PRIORITY-PLANNER) — never overrides Owner Gates."
+  },
+  "baseline_identity": {
+    "version": "8.4.7-C-codex.41",
+    "artifact_sha256": "da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d",
+    "promotion_status": "PROMOTED_VERIFIED",
+    "verified_at": "2026-08-21T04:26:28Z"
+  },
+  "mutation_ladder": {
+    "current_evidence": {
+      "READ_ONLY": "STRONGLY_EVIDENCED (C-series, Pilot evidence, no-mutation proofs on GT/GP)",
+      "BOUNDED_DOCUMENTATION_WRITE": "VERIFIED_ISOLATED_NON_PRODUCTION (Pilot-02: CONTROLLED_NON_PRODUCTION_DOCUMENTATION_MUTATION=VERIFIED; canonical authority chain verified; rollback M2==M0 byte-identical)"
+    },
+    "future_levels": [
+      {
+        "level": "DOCUMENTATION_WRITE",
+        "requires": "authority + evidence + verification + rollback + Owner policy per level"
+      },
+      {
+        "level": "BOUNDED_CODE_CHANGE",
+        "requires": "authority + evidence + verification + rollback + Owner policy per level"
+      },
+      {
+        "level": "MULTI_FILE_CODE_CHANGE",
+        "requires": "authority + evidence + verification + rollback + Owner policy per level"
+      },
+      {
+        "level": "DEPENDENCY_CHANGE",
+        "requires": "authority + evidence + verification + rollback + Owner policy per level"
+      },
+      {
+        "level": "DATABASE_CHANGE",
+        "requires": "authority + evidence + verification + rollback + Owner policy per level"
+      },
+      {
+        "level": "DEPLOYMENT",
+        "requires": "authority + evidence + verification + rollback + Owner policy per level"
+      }
+    ],
+    "warning": "Future levels are NOT claimed as supported. Each requires its own goal, candidate, promotion, and Owner authorization."
+  },
+  "last_reviewed": "2026-08-21T04:26:28Z",
+  "notes": [
+    "Human projection: docs/P2P-DEVELOPMENT-ROADMAP.md + beginner-first view section. On conflict this JSON wins."
+  ]
+}

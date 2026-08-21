@@ -55,14 +55,14 @@
     }
   },
   "status_vocabulary": [
-    "VERIFIED_IMPLEMENTED",
+    "DEFERRED",
     "FOUNDATION_READY",
+    "OBSOLETE",
     "PARTIAL",
     "PLANNED",
-    "DEFERRED",
     "REJECTED",
-    "OBSOLETE",
-    "UNKNOWN"
+    "UNKNOWN",
+    "VERIFIED_IMPLEMENTED"
   ],
   "capabilities": [
     {
@@ -4537,11 +4537,278 @@
         "source_sha256": "c7d684eb2be2ef5ed98aa2dd6df01ca0ed85a4d17ffe1451387bf39b7a7262b4",
         "exact_reuse": true
       }
+    },
+    {
+      "capability_id": "ZERO_TO_PROJECT_INTENT_COMPILER",
+      "name": "Zero-to-Project Intent Compiler",
+      "family": "DURABLE_PROJECT_INTELLIGENCE",
+      "beginner_value": "Chủ sở hữu không lập trình nói một câu ('Tôi muốn tạo dự án A để làm X.') — P2P biên dịch thành Project Contract, Product Truth, acceptance criteria, kiến trúc khởi tạo, đồ thị mục tiêu thích ứng và mục tiêu an toàn đầu tiên; không hỏi Owner về scaffolding kỹ thuật.",
+      "principle": "INTENT_NOT_SCAFFOLDING — Owner không phải viết scaffolding; P2P tạo và bảo trì scaffolding. Compose FW00–FW06 primitives; never a competing orchestrator.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-Z2P)",
+        "RA-EXT-021/022/019/023 research-adoption-ledger"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md",
+        "FW02 capability intelligence",
+        "FW05 decision trace",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ],
+      "dependencies": [
+        "ROADMAP_AWARE_DEVELOPMENT_PLANNER_PLANNED",
+        "LARGE_GOAL_COMPLETENESS"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Owner approves the Zero-to-Project design goal after prerequisite analysis (RM-PRIORITY-LARGE-GOAL + RM-PRIORITY-CONTEXT).",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "PLANNED per P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01; DO NOT IMPLEMENT in that goal. Requires Large-Goal completion + context intelligence completeness as prerequisites. Definition-phase bar: no runtime change."
+    },
+    {
+      "capability_id": "LARGE_GOAL_COMPLETENESS",
+      "name": "Large-Goal Execution Completeness",
+      "family": "EXECUTION_AND_ORCHESTRATION",
+      "beginner_value": "Một mục tiêu lớn của Owner được phân rã, thực thi, xác minh, checkpoint, phục hồi và tiếp tục tự động — không hỏi Owner sau mỗi tác vụ kỹ thuật; dừng chỉ ở Owner Gate thật (quyết định sản phẩm, dữ liệu thật mới, credentials, hành động phá hoại, production mutation, release, mở rộng scope, khoảng trống bằng chứng).",
+      "principle": "BOUNDED_AUTONOMOUS_PROGRESSION — Large Goal is bounded autonomous progression, never unbounded autonomy (NO_UNBOUNDED_BACKGROUND_AUTONOMY).",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-LARGE-GOAL)",
+        "RA-EXT-021"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "reports P2P-C12, P2P-C15",
+        "FW06 lease/checkpoint"
+      ],
+      "dependencies": [
+        "C08"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "C08 controlled continuation re-selected by Owner; then design goal with checkpoint/resume continuation evidence.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "Core (C12 bounded foreground execution, C15 bounded delegation) VERIFIED_IMPLEMENTED; the full adaptive goal-graph automation is the open PLANNED piece. Depends on C08 re-selection."
+    },
+    {
+      "capability_id": "CONTEXT_INTELLIGENCE_COMPLETENESS",
+      "name": "Context Intelligence Completeness (symbol-aware retrieval, adaptive budget, maps)",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "beginner_value": "Truy vấn theo ký hiệu (symbol-aware), bản đồ dự án/kho token-bounded, ngân sách ngữ cảnh thích ứng — chất lượng và chi phí tốt hơn cho mọi mục tiêu, kể cả Zero-to-Project.",
+      "principle": "PROGRESSIVE_DISCLOSURE + CORRECTNESS_OVER_TOKEN_SAVING — completeness never sacrifices correctness for token saving.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-CONTEXT)",
+        "RA-EXT-019",
+        "RA-EXT-004"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "reports P2P-C19",
+        "capability-index CONTEXT_AND_KNOWLEDGE family"
+      ],
+      "dependencies": [],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "No dependency on blocked items — can start now.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "C19 task-targeted retrieval VERIFIED_IMPLEMENTED and the 35-entry CONTEXT_AND_KNOWLEDGE family cover the core; symbol-aware retrieval, token-bounded maps, and adaptive context budget are the remaining PARTIAL pieces."
+    },
+    {
+      "capability_id": "ROADMAP_AWARE_DEVELOPMENT_PLANNER_PLANNED",
+      "name": "Roadmap-Aware Development Planner",
+      "family": "DURABLE_PROJECT_INTELLIGENCE",
+      "beginner_value": "Trước khi chọn Goal phát triển lớn, P2P đọc baseline chính thức + Research Adoption Ledger + Capability Ledger + Roadmap + evidence gaps + Owner priority, rồi chọn Goal an toàn giá trị cao tiếp theo; phát hiện ROADMAP_COVERAGE_GAP tự động.",
+      "principle": "COVERAGE_NOT_FORGETTING — OWNER_SELECTED_CAPABILITY -> DURABLE_ROADMAP_RECORD; planner never overrides Owner Gates.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-PLANNER, coverage_gate)",
+        "governance/research-adoption-ledger.json"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "governance/p2p-development-roadmap.json",
+        "governance/research-adoption-ledger.json",
+        "docs/p2p-development/capability-ledger/capability-index.json"
+      ],
+      "dependencies": [],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Standalone read-only design goal; never modifies runtime without its own promotion.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "Read-only governance capability: consumes canonical roadmaps; outputs ranked candidate goals with gap detection. Runtime currently has no roadmap reader (documented honestly)."
+    },
+    {
+      "capability_id": "GOAL_DESIGN_INTELLIGENCE_COMPOSITION",
+      "name": "Goal Design / Visual Intelligence Composition",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Hướng dẫn thiết kế cho người mới bắt đầu từ một registry hợp nhất: aesthetics (aesthetica specialist) + design cognition registry (NUI principles) + visual recipes (Visual Commander) — P2P là router duy nhất.",
+      "principle": "SOLE_ORCHESTRATOR_DESIGN_INPUT — design sources are cognition/skills/recipes/evidence providers; never competing routers; NUI faculties are NOT agents.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-DESIGN)",
+        "RA-EXT-008/009/010",
+        "RI-003"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "reports P2P-C13, P2P-C14",
+        "docs/p2p-development/framework/capability-skill-map.md",
+        "RI-003"
+      ],
+      "dependencies": [],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Design goal with fail-closed composition schema verification.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "C13/C14 foundation SHIPPED (C14 PROMOTED_VERIFIED); the unified composition schema is the open piece. NUI 174-faculty claim stays PROVENANCE_NOT_RECOVERED / NOT_PROVEN (RI-003 machinery) — partial provenance acceptable for composition work."
+    },
+    {
+      "capability_id": "BOUNDED_CODE_MUTATION_PRIMITIVE",
+      "name": "Bounded Code Mutation Primitive (ladder level 2)",
+      "family": "SAFETY_AUTHORITY_PERMISSIONS",
+      "beginner_value": "Thay đổi code có giới hạn trong workspace cách ly phi sản xuất, kèm evidence, xác minh và rollback hoàn nguyên — bước kế tiếp của thang đột biến đã được Owner chấp thuận về nguyên tắc.",
+      "principle": "LADDER_EVIDENCE_PER_LEVEL — each mutation level requires its own authority, evidence, verification, rollback/recovery, and Owner policy. NOT_PROVEN must not become SUPPORTED.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-CODE-MUTATION)",
+        "mutation ladder future_levels"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "docs/bounded-documentation-write-capability-ledger.md",
+        "P2P-GT-MUTATION-PILOT-02-REPORT.md"
+      ],
+      "dependencies": [
+        "BOUNDED_DOCUMENTATION_WRITE_SHIPPED"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Owner authorizes a ladder-2 design goal; new candidate + promotion required before any runtime change.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "Ladder base BOUNDED_DOCUMENTATION_WRITE verified (Pilot-02); code level requires a new primitive with fail-closed classification (A–E), receipt, and rollback, plus Owner approval of the design goal. Runtime and .41 artifact untouched."
+    },
+    {
+      "capability_id": "ORCA_BOUNDED_CANDIDATE_FANOUT",
+      "name": "Bounded Parallel Candidate Execution (Orca-style extension)",
+      "family": "EXECUTION_AND_ORCHESTRATION",
+      "beginner_value": "So sánh nhiều giải pháp ứng viên độc lập trên worktree cô lập để quyết định chất lượng tốt hơn — fanout có giới hạn, permission không bao giờ mở rộng.",
+      "principle": "BOUNDED_FANOUT_JUSTIFIED_BY_EVIDENCE — parallelism never decorative (NO_SWARM_FOR_ITS_OWN_SAKE); permission envelopes never widen.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-ORCA-EXT)",
+        "RA-EXT-011"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "reports P2P-C17",
+        "FW06 lease modules"
+      ],
+      "dependencies": [
+        "C08"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "C08 re-selection; design goal with bounded-fanout evidence contract.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "C17 bounded parallel foreground SHIPPED and FW06 lease semantics SHIPPED; the candidate-compare extension builds on them. Rejected: uncontrolled fanout, background autonomous explosion."
+    },
+    {
+      "capability_id": "MULTIHOST_COUNCIL_CERTIFICATION",
+      "name": "Multi-Host Council Certification",
+      "family": "EXECUTION_AND_ORCHESTRATION",
+      "beginner_value": "Council 8/8 vai trò thật trên nhiều host — độ tin cậy sản xuất đa host; hiện chỉ chứng nhận single-host.",
+      "principle": "CERTIFIED_NOT_CURRENTLY_ELIGIBLE — historical certification never silently remains current (DRIFT_FAIL_CLOSED).",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-MULTIHOST-COUNCIL)",
+        "RA-EXT-017"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "P2P-C38-terminal-report.md",
+        "c36-real-host-binding lane"
+      ],
+      "dependencies": [
+        "C09",
+        "C27"
+      ],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "C09/C27 blockers resolved (host evidence keys available), then FRAMEWORK-03 scope.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "SINGLE_HOST_LIVE_COUNCIL VERIFIED (historical); MULTIHOST_LIVE_COUNCIL = NOT_PROVEN. Blocked upstream by C09/C27 live host evidence. Not ranked above blocked evidence per ordering principle."
+    },
+    {
+      "capability_id": "CAPABILITY_DRIFT_REVALIDATION_SWEEP",
+      "name": "Capability Drift Revalidation Sweep",
+      "family": "OBSOLESCENCE_CAPABILITY_DRIFT",
+      "beginner_value": "Mọi capability evidence được revalidate hoặc đánh dấu UNKNOWN_NOT_PROBED — không còn claim lỗi thời; AI providers thay đổi nhanh, P2P sống sót qua vendor displacement.",
+      "principle": "DRIFT_FAIL_CLOSED — stale claims expire; old certification never silently remains current.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-DRIFT-SWEEP)",
+        "RA-EXT-024",
+        "drift-policy.json"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "governance/drift-policy.json",
+        "charter DRIFT_FAIL_CLOSED"
+      ],
+      "dependencies": [],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Can start now — no blocked dependencies.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "Policy and invariant SHIPPED; the full sweep across all capabilities is the open PLANNED piece. Read-only."
+    },
+    {
+      "capability_id": "RELEASE_INSTALL_LIFECYCLE_HARDENING",
+      "name": "Release / Installation Lifecycle Hardening",
+      "family": "TRUTH_AND_GOVERNANCE",
+      "beginner_value": "Cài đặt/dỡ cài/rollback nhất quán cho dự án thật; pin policy được thi hành (baseline promotion ≠ project auto-upgrade, đã chứng minh ở P2P-PROMOTE-41-01: pin GT/GP không đổi).",
+      "principle": "PROMOTION_NOT_AUTO_UPGRADE — official baseline promotion never automatically upgrades any project.",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-RELEASE-LIFECYCLE)",
+        "C40",
+        "C43"
+      ],
+      "status": "PLANNED",
+      "implementation_refs": [],
+      "evidence_refs": [
+        "P2P-C40-terminal-report.md",
+        "docs/p2p-development/research/c43/evidence/",
+        "P2P-PROMOTE-41-01"
+      ],
+      "dependencies": [],
+      "known_gaps": [],
+      "do_not_duplicate_with": [],
+      "next_condition": "Owner authorizes install-lifecycle goal; no runtime pin change without explicit Owner decision.",
+      "last_reviewed": "2026-08-21T04:27:11Z",
+      "freshness": "from_roadmap_consolidation",
+      "notes": "C40 production installs + C43 evidence SHIPPED; hardening (installation contract with verified rollback + pin policy enforcement) is the open piece."
     }
   ],
-  "last_reviewed": "2026-08-19T13:15:00Z",
+  "last_reviewed": "2026-08-21T04:27:11Z",
   "review_notes": [
-    "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions."
+    "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions.",
+    {
+      "reviewed_after_goal": "P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01",
+      "at": "2026-08-21T04:27:11Z",
+      "change": "10 new PLANNED capability records added from canonical roadmap consolidation; no existing record modified or removed (append-and-reconcile). New records: ZERO_TO_PROJECT_INTENT_COMPILER, LARGE_GOAL_COMPLETENESS, CONTEXT_INTELLIGENCE_COMPLETENESS, ROADMAP_AWARE_DEVELOPMENT_PLANNER_PLANNED, GOAL_DESIGN_INTELLIGENCE_COMPOSITION, BOUNDED_CODE_MUTATION_PRIMITIVE, ORCA_BOUNDED_CANDIDATE_FANOUT, MULTIHOST_COUNCIL_CERTIFICATION, CAPABILITY_DRIFT_REVALIDATION_SWEEP, RELEASE_INSTALL_LIFECYCLE_HARDENING",
+      "dedup_check": "verified no duplicate capability_id or capability name against pre-existing 159 records"
+    }
   ],
   "reviewed_after_goal": "GOVERNANCE-TRUTH-SYNC",
   "notes": [
