@@ -95,6 +95,7 @@
     "candidate_identity_binding": {
       "status": "MINTED_UNPROMOTED_CANDIDATE",
       "candidate_version": "8.4.7-C-codex.72",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v72.zip",
       "artifact_sha256": "70613080d2ddbb92a52d2d79186e125439ec7f5ba8a6fa87bda9208d1b39d872",
       "source_commit": "6f88798cb3c7008167e5dd071247a4279cb31f3e",
       "source_tree": "a03b8d76fcd018ebd4e7064dc6c85aae058d392e",
