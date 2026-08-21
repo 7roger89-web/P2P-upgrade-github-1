@@ -1,0 +1,5465 @@
+{
+  "project_root": "/home/ubuntu/fw01_work/auth-f01",
+  "source_commit": "bbb5cbbcda084672f33a215fd7c80d580e4bde62",
+  "levels": {
+    "0": {
+      "level": 0,
+      "content": {
+        "file_tree": {
+          "AGENTS.md": {
+            "size": 29617,
+            "suffix": ".md",
+            "hash": "cb52c2c69a28539f"
+          },
+          "BAT-DAU.md": {
+            "size": 6179,
+            "suffix": ".md",
+            "hash": "ed559dd34f96109a"
+          },
+          "CLAUDE.md": {
+            "size": 19402,
+            "suffix": ".md",
+            "hash": "1f5a3b5974bdcdb4"
+          },
+          "NOTICE.md": {
+            "size": 1111,
+            "suffix": ".md",
+            "hash": "80881e21b7c8f5c5"
+          },
+          "RELEASE-NOTES.md": {
+            "size": 6962,
+            "suffix": ".md",
+            "hash": "127368a9bb0f742b"
+          },
+          "VERSION": {
+            "size": 17,
+            "suffix": "",
+            "hash": "3c17572d314543cd"
+          },
+          "add_c30_invariants.py": {
+            "size": 2769,
+            "suffix": ".py",
+            "hash": "b3031c17a84ecaf5"
+          },
+          "add_roadmap_c31.py": {
+            "size": 2121,
+            "suffix": ".py",
+            "hash": "36322c94b54c944f"
+          },
+          "build_c30_candidate.py": {
+            "size": 2404,
+            "suffix": ".py",
+            "hash": "4eb882e726af49a5"
+          },
+          "bump_version_24.py": {
+            "size": 874,
+            "suffix": ".py",
+            "hash": "4c10714395ff55c0"
+          },
+          "c30_recover_state.py": {
+            "size": 2180,
+            "suffix": ".py",
+            "hash": "fe2648c053be5c93"
+          },
+          "c31_live_probe.py": {
+            "size": 6282,
+            "suffix": ".py",
+            "hash": "3245e21861b7087e"
+          },
+          "check_cycles.py": {
+            "size": 927,
+            "suffix": ".py",
+            "hash": "788a1d1f1ba4930a"
+          },
+          "create_pr6.py": {
+            "size": 3321,
+            "suffix": ".py",
+            "hash": "c0c072c7705115a6"
+          },
+          "docs/AI-HANDOFF.md": {
+            "size": 3103,
+            "suffix": ".md",
+            "hash": "0a12811d98a30b71"
+          },
+          "docs/CAP-NHAT.md": {
+            "size": 2767,
+            "suffix": ".md",
+            "hash": "720450fa2b484fd4"
+          },
+          "docs/KIEN-TRUC.md": {
+            "size": 2971,
+            "suffix": ".md",
+            "hash": "2a7780ba7c693c9a"
+          },
+          "docs/P2P-DEVELOPMENT-ROADMAP.md": {
+            "size": 11221,
+            "suffix": ".md",
+            "hash": "b9c3078205e2f921"
+          },
+          "docs/PHAN-TICH-CHIEU-NGANG-DOC.md": {
+            "size": 4869,
+            "suffix": ".md",
+            "hash": "2cc1ec1623a9820f"
+          },
+          "docs/QUAN-TRI-FACT-EVAL-RAG.md": {
+            "size": 8652,
+            "suffix": ".md",
+            "hash": "64a718384a1a0789"
+          },
+          "docs/RESEARCH-ADOPTION-LEDGER.md": {
+            "size": 8660,
+            "suffix": ".md",
+            "hash": "a6c9cf8b51df3799"
+          },
+          "docs/SPEC/P2P-CAPABILITY-CONTEXT-POINTER-SPEC.md": {
+            "size": 2529,
+            "suffix": ".md",
+            "hash": "70ef30df1384362a"
+          },
+          "docs/SPEC/P2P-CAPABILITY-EXECUTION-EVIDENCE-SPEC.md": {
+            "size": 2679,
+            "suffix": ".md",
+            "hash": "c3cf6b7e385204ab"
+          },
+          "docs/SPEC/P2P-CAPABILITY-FOUNDATION-ARCHITECTURE-SPEC.md": {
+            "size": 4439,
+            "suffix": ".md",
+            "hash": "c238340299feef35"
+          },
+          "docs/SPEC/P2P-CAPABILITY-MANIFEST-SPEC.md": {
+            "size": 3677,
+            "suffix": ".md",
+            "hash": "f872fa4b8d5cd206"
+          },
+          "docs/SPEC/P2P-CAPABILITY-ROUTING-READINESS-SPEC.md": {
+            "size": 3708,
+            "suffix": ".md",
+            "hash": "e357edfa7a4790c7"
+          },
+          "docs/SPEC/P2P-CAPABILITY-TEST-EVAL-SPEC.md": {
+            "size": 2741,
+            "suffix": ".md",
+            "hash": "075214d5a5b49977"
+          },
+          "docs/SPEC/P2P-CAPABILITY-TRUST-DATA-INSTRUCTION-SPEC.md": {
+            "size": 2656,
+            "suffix": ".md",
+            "hash": "a728e882ad969810"
+          },
+          "docs/SPEC/P2P-DECISION-TRACE-SPEC.md": {
+            "size": 16297,
+            "suffix": ".md",
+            "hash": "84cc32fe77fe044a"
+          },
+          "docs/SPEC/P2P-OPTIONAL-SPECIALIST-CONTRACT-SPEC.md": {
+            "size": 2252,
+            "suffix": ".md",
+            "hash": "7271beaa844c871f"
+          },
+          "docs/SPEC/P2P-PROJECT-DOMAIN-MODEL-SPEC.md": {
+            "size": 1835,
+            "suffix": ".md",
+            "hash": "bb23210ca6a11bfe"
+          },
+          "docs/SPEC/P2P-PROVIDER-ABSTRACTION-SPEC.md": {
+            "size": 2020,
+            "suffix": ".md",
+            "hash": "97a1c6e034e1d00a"
+          },
+          "docs/SU-DUNG.md": {
+            "size": 4766,
+            "suffix": ".md",
+            "hash": "70cc243b6e1b69d6"
+          },
+          "docs/bounded-documentation-write-capability-ledger.md": {
+            "size": 21071,
+            "suffix": ".md",
+            "hash": "7a3625c37846c61e"
+          },
+          "docs/decisions/P2P-CAPABILITY-FOUNDATION-RESEARCH-DECISIONS.md": {
+            "size": 6704,
+            "suffix": ".md",
+            "hash": "2b995feb9afea7f2"
+          },
+          "docs/execution/2026-08-12-p2p-beginner-lifecycle-certification.md": {
+            "size": 1326,
+            "suffix": ".md",
+            "hash": "4d5c7e12145e7a14"
+          },
+          "docs/notes_decisions_log/notes_decisions_log_20260813.md": {
+            "size": 10853,
+            "suffix": ".md",
+            "hash": "8bd26f961a11a8c8"
+          },
+          "docs/notes_decisions_log/notes_decisions_log_20260814.md": {
+            "size": 2756,
+            "suffix": ".md",
+            "hash": "8d0f3fe03bec6d2c"
+          },
+          "docs/notes_decisions_log/notes_decisions_log_20260816.md": {
+            "size": 3357,
+            "suffix": ".md",
+            "hash": "aa20bc1995ef2d0b"
+          },
+          "docs/p2p-development/P2P-C25-final-report.md": {
+            "size": 27786,
+            "suffix": ".md",
+            "hash": "d4444515702a472f"
+          },
+          "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md": {
+            "size": 11527,
+            "suffix": ".md",
+            "hash": "9801be9d82209cd5"
+          },
+          "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md": {
+            "size": 5805,
+            "suffix": ".md",
+            "hash": "5cadca9c054c8abd"
+          },
+          "docs/p2p-development/capability-ledger/capability-index.json": {
+            "size": 222530,
+            "suffix": ".json",
+            "hash": "63bf9c43558e7236"
+          },
+          "docs/p2p-development/capability-ledger/capability-ledger.schema.json": {
+            "size": 7618,
+            "suffix": ".json",
+            "hash": "147f5a296952305c"
+          },
+          "docs/p2p-development/current-roadmap.md": {
+            "size": 20990,
+            "suffix": ".md",
+            "hash": "df8cea88fe6f3739"
+          },
+          "docs/p2p-development/decisions/owner-accepted/INDEX.md": {
+            "size": 2076,
+            "suffix": ".md",
+            "hash": "56f41da69d272565"
+          },
+          "docs/p2p-development/decisions/owner-accepted/P2P_Contextual_Rule_Intelligence_Update_2026-08-21.md": {
+            "size": 1482,
+            "suffix": ".md",
+            "hash": "7c1cc7597dd65b34"
+          },
+          "docs/p2p-development/framework/_skill-inventory-raw.json": {
+            "size": 28952,
+            "suffix": ".json",
+            "hash": "507b7c7710ad9c14"
+          },
+          "docs/p2p-development/framework/capability-skill-map.json": {
+            "size": 12465,
+            "suffix": ".json",
+            "hash": "577a1f332596333c"
+          },
+          "docs/p2p-development/framework/capability-skill-map.md": {
+            "size": 6126,
+            "suffix": ".md",
+            "hash": "2abd87e6fc19f5a1"
+          },
+          "docs/p2p-development/framework/master-roadmap.md": {
+            "size": 6732,
+            "suffix": ".md",
+            "hash": "b9057f8316a48512"
+          },
+          "docs/p2p-development/framework/product-architecture.md": {
+            "size": 4940,
+            "suffix": ".md",
+            "hash": "0a6e021ceb84ad02"
+          },
+          "docs/p2p-development/reports/P2P-C26-terminal-report.md": {
+            "size": 23644,
+            "suffix": ".md",
+            "hash": "b1e1042966c751b0"
+          },
+          "docs/p2p-development/reports/P2P-C27-terminal-report.md": {
+            "size": 18624,
+            "suffix": ".md",
+            "hash": "fe6ec346d66fbf0f"
+          },
+          "docs/p2p-development/reports/P2P-C28-terminal-report.md": {
+            "size": 22407,
+            "suffix": ".md",
+            "hash": "d775200c52ebf772"
+          },
+          "docs/p2p-development/reports/P2P-C29-terminal-report.md": {
+            "size": 25430,
+            "suffix": ".md",
+            "hash": "8a9942b92d2f8523"
+          },
+          "docs/p2p-development/reports/P2P-C30-terminal-report.md": {
+            "size": 24442,
+            "suffix": ".md",
+            "hash": "6180a8203206cb9f"
+          },
+          "docs/p2p-development/reports/P2P-C31-terminal-report.md": {
+            "size": 14668,
+            "suffix": ".md",
+            "hash": "b6f03b3adccc5de6"
+          },
+          "docs/p2p-development/reports/P2P-C35-terminal-report.md": {
+            "size": 3345,
+            "suffix": ".md",
+            "hash": "962f90a9bcb4bb6d"
+          },
+          "docs/p2p-development/reports/P2P-C35R-terminal-report.md": {
+            "size": 22853,
+            "suffix": ".md",
+            "hash": "f66cf44a52b71b49"
+          },
+          "docs/p2p-development/reports/P2P-C36-terminal-report.md": {
+            "size": 24124,
+            "suffix": ".md",
+            "hash": "4c57478361877323"
+          },
+          "docs/p2p-development/reports/P2P-C37-terminal-report.md": {
+            "size": 32888,
+            "suffix": ".md",
+            "hash": "d89992563f1c9466"
+          },
+          "docs/p2p-development/reports/P2P-C38-terminal-report.md": {
+            "size": 12908,
+            "suffix": ".md",
+            "hash": "c7521c5bef94a9de"
+          },
+          "docs/p2p-development/reports/P2P-C39-terminal-report.md": {
+            "size": 13614,
+            "suffix": ".md",
+            "hash": "2cd0af22de351121"
+          },
+          "docs/p2p-development/reports/P2P-C40-terminal-report.md": {
+            "size": 15802,
+            "suffix": ".md",
+            "hash": "64ac40502da8e970"
+          },
+          "docs/p2p-development/reports/P2P-FRAMEWORK-00-terminal-report.md": {
+            "size": 5722,
+            "suffix": ".md",
+            "hash": "76ef22d309da82d6"
+          },
+          "docs/p2p-development/reports/P2P-FRAMEWORK-01-terminal-report.md": {
+            "size": 14361,
+            "suffix": ".md",
+            "hash": "5bfdadaefed904fa"
+          },
+          "docs/p2p-development/reports/P2P-FRAMEWORK-02-terminal-report.md": {
+            "size": 1315,
+            "suffix": ".md",
+            "hash": "7d857424231b622c"
+          },
+          "docs/p2p-development/reports/P2P-FW01-bootstrap-reconciliation-terminal-report.md": {
+            "size": 10485,
+            "suffix": ".md",
+            "hash": "576ad0fab8026892"
+          },
+          "docs/p2p-development/reports/P2P-FW01-self-contained-patch-terminal-report.md": {
+            "size": 7410,
+            "suffix": ".md",
+            "hash": "eda4bbdc6c6c253d"
+          },
+          "docs/p2p-development/reports/P2P-FW01-v2-promote-release-terminal-report.md": {
+            "size": 9484,
+            "suffix": ".md",
+            "hash": "428f8b9918d7f2ee"
+          },
+          "docs/p2p-development/research/c32/00_p2p_state_recovery.md": {
+            "size": 3708,
+            "suffix": ".md",
+            "hash": "b6e49adb42f7572e"
+          },
+          "docs/p2p-development/research/c32/01_test_baseline_note.md": {
+            "size": 2581,
+            "suffix": ".md",
+            "hash": "0203dacf266a4310"
+          },
+          "docs/p2p-development/research/c32/02_hermes_provenance.md": {
+            "size": 1711,
+            "suffix": ".md",
+            "hash": "76baea2c91256220"
+          },
+          "docs/p2p-development/research/c32/03_hermes_audit.md": {
+            "size": 12874,
+            "suffix": ".md",
+            "hash": "bc747ccde8cc78ce"
+          },
+          "docs/p2p-development/research/c32/P2P-C32-terminal-report.md": {
+            "size": 21019,
+            "suffix": ".md",
+            "hash": "229818165e2c9b8b"
+          },
+          "docs/p2p-development/research/c32/deliverable_A_hermes_architecture_map.md": {
+            "size": 8438,
+            "suffix": ".md",
+            "hash": "773ba888c95b47f0"
+          },
+          "docs/p2p-development/research/c32/deliverable_B_C_matrix_and_feasibility.md": {
+            "size": 16660,
+            "suffix": ".md",
+            "hash": "ce72bd60c3189cba"
+          },
+          "docs/p2p-development/research/c32/deliverable_D_E_F_autopilot_contract_model.md": {
+            "size": 11143,
+            "suffix": ".md",
+            "hash": "0fbf01bae1bfdc3c"
+          },
+          "docs/p2p-development/research/c32/deliverable_G_H_policy_and_roadmap.md": {
+            "size": 11969,
+            "suffix": ".md",
+            "hash": "f482082a863113b0"
+          },
+          "docs/p2p-development/research/c32/validation/c32_persist_scan.md": {
+            "size": 2078,
+            "suffix": ".md",
+            "hash": "866ab429f3eba19d"
+          },
+          "docs/p2p-development/research/c33/01_c33_baseline_note.md": {
+            "size": 3099,
+            "suffix": ".md",
+            "hash": "fb76f701f24b6f7d"
+          },
+          "docs/p2p-development/research/c33/02_addendum_compatibility_audit.md": {
+            "size": 2893,
+            "suffix": ".md",
+            "hash": "72439dd873195413"
+          },
+          "docs/p2p-development/research/c33/03_capability_inventory_matrix.md": {
+            "size": 9631,
+            "suffix": ".md",
+            "hash": "c1cecc03b449e233"
+          },
+          "docs/p2p-development/research/c33/P2P-C33-terminal-report.md": {
+            "size": 27674,
+            "suffix": ".md",
+            "hash": "6464d0dee026585d"
+          },
+          "docs/p2p-development/research/c34/P2P-C34-terminal-report.md": {
+            "size": 30565,
+            "suffix": ".md",
+            "hash": "4654481fd4eaf0e1"
+          },
+          "docs/p2p-development/research/c34/evidence/c34-capability-scoped-certification.json": {
+            "size": 4223,
+            "suffix": ".json",
+            "hash": "271b425cb83a41ca"
+          },
+          "docs/p2p-development/research/c34/evidence/c34-evidence-registry.json": {
+            "size": 2451,
+            "suffix": ".json",
+            "hash": "b1dbd98b83db9ba4"
+          },
+          "docs/p2p-development/research/c34/evidence/c34-final-failure-set.txt": {
+            "size": 6113,
+            "suffix": ".txt",
+            "hash": "f5de59ea090b6f6c"
+          },
+          "docs/p2p-development/research/c34/evidence/c34-post-closure-failure-set.txt": {
+            "size": 6626,
+            "suffix": ".txt",
+            "hash": "2797a8585e1d1332"
+          },
+          "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-create.json": {
+            "size": 234,
+            "suffix": ".json",
+            "hash": "839f59a2a5c3bdf5"
+          },
+          "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-detail.json": {
+            "size": 493,
+            "suffix": ".json",
+            "hash": "41e5e6695cc7e217"
+          },
+          "docs/p2p-development/research/c34/evidence/manus-probe/c34-manus-probe-messages.json": {
+            "size": 1102,
+            "suffix": ".json",
+            "hash": "a58f0bdf725cec4a"
+          },
+          "docs/p2p-development/research/c34/phase0-baseline-tests.md": {
+            "size": 2523,
+            "suffix": ".md",
+            "hash": "ca1695a323836a4e"
+          },
+          "docs/p2p-development/research/c34/phase0-recovery.md": {
+            "size": 3545,
+            "suffix": ".md",
+            "hash": "10b6cc7e88f02ad8"
+          },
+          "docs/p2p-development/research/c34/phase2-hermes-interface-probe.md": {
+            "size": 4603,
+            "suffix": ".md",
+            "hash": "e21b12937faf0f55"
+          },
+          "docs/p2p-development/research/c34/phase3-manus-api-probe.md": {
+            "size": 3867,
+            "suffix": ".md",
+            "hash": "7c1bc753203abcc6"
+          },
+          "docs/p2p-development/research/c34/phase4-progress.md": {
+            "size": 4138,
+            "suffix": ".md",
+            "hash": "ec877e3910ede27e"
+          },
+          "docs/p2p-development/research/c34/regression-analysis.md": {
+            "size": 2888,
+            "suffix": ".md",
+            "hash": "7ae45297f0390b69"
+          },
+          "docs/p2p-development/research/c35/P2P-C35-terminal-report.md": {
+            "size": 14794,
+            "suffix": ".md",
+            "hash": "d4678ba8e3249378"
+          },
+          "docs/p2p-development/research/c35/evidence/c35-closure-machine-output.txt": {
+            "size": 1419,
+            "suffix": ".txt",
+            "hash": "36a0e249ac504d82"
+          },
+          "docs/p2p-development/research/c35/evidence/c35-normalization-machine-output.txt": {
+            "size": 1729,
+            "suffix": ".txt",
+            "hash": "651bcc2064bac0d3"
+          },
+          "docs/p2p-development/research/c35/evidence/c35-normalization-policy-run.txt": {
+            "size": 1290,
+            "suffix": ".txt",
+            "hash": "0bc0647bcf3a7417"
+          },
+          "docs/p2p-development/research/c35r/evidence/c35r-candidate-policy-derivation.txt": {
+            "size": 1889,
+            "suffix": ".txt",
+            "hash": "41437b438e1ec7aa"
+          },
+          "docs/p2p-development/research/c35r/evidence/c35r-change-signals-derivation.txt": {
+            "size": 1973,
+            "suffix": ".txt",
+            "hash": "89f24a2add2f06cf"
+          },
+          "docs/p2p-development/research/c35r/evidence/c35r-closure-machine-final.txt": {
+            "size": 1377,
+            "suffix": ".txt",
+            "hash": "e621db1104b63a4a"
+          },
+          "docs/p2p-development/research/c35r/evidence/c35r-closure-machine-output.txt": {
+            "size": 1854,
+            "suffix": ".txt",
+            "hash": "5b8f59d84ec849e1"
+          },
+          "docs/p2p-development/research/c35r/evidence/c35r-final-candidate-policy-recheck.txt": {
+            "size": 4309,
+            "suffix": ".txt",
+            "hash": "37bf11a4abef70f2"
+          },
+          "docs/p2p-development/research/c35r/evidence/c35r-final-test-failure-set.txt": {
+            "size": 3310,
+            "suffix": ".txt",
+            "hash": "664a9090698a2edc"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area01.md": {
+            "size": 4309,
+            "suffix": ".md",
+            "hash": "18fcbf122ee50a1c"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area02.md": {
+            "size": 4848,
+            "suffix": ".md",
+            "hash": "5aa5caa43591cab2"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area03.md": {
+            "size": 6591,
+            "suffix": ".md",
+            "hash": "cc310970dd90a927"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area04.md": {
+            "size": 5082,
+            "suffix": ".md",
+            "hash": "a4d8719f539505f5"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area05.md": {
+            "size": 8983,
+            "suffix": ".md",
+            "hash": "a3b8a7c03076b4c5"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area06.md": {
+            "size": 3803,
+            "suffix": ".md",
+            "hash": "3f95c506c94af54f"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area07.md": {
+            "size": 5240,
+            "suffix": ".md",
+            "hash": "9b1ef37aaf662760"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area08.md": {
+            "size": 6613,
+            "suffix": ".md",
+            "hash": "612542eba22b6043"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area09.md": {
+            "size": 5230,
+            "suffix": ".md",
+            "hash": "284b8137023c609e"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area10.md": {
+            "size": 6513,
+            "suffix": ".md",
+            "hash": "cf233210d9be413d"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area11.md": {
+            "size": 7642,
+            "suffix": ".md",
+            "hash": "98a665a799f7dc3b"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area12.md": {
+            "size": 8474,
+            "suffix": ".md",
+            "hash": "bac1173543843a5b"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area13.md": {
+            "size": 7513,
+            "suffix": ".md",
+            "hash": "13adc27926d04647"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area14.md": {
+            "size": 4942,
+            "suffix": ".md",
+            "hash": "dd73ab0325e25c76"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area15.md": {
+            "size": 6695,
+            "suffix": ".md",
+            "hash": "04489feabfcc1026"
+          },
+          "docs/p2p-development/research/c35r/evidence/zaofu-audit-area16.md": {
+            "size": 5722,
+            "suffix": ".md",
+            "hash": "21ce50512476c767"
+          },
+          "docs/p2p-development/research/c35r/zaofu-build-vs-reuse-matrix.json": {
+            "size": 15501,
+            "suffix": ".json",
+            "hash": "37cd4638daefdc20"
+          },
+          "docs/p2p-development/research/c35r/zaofu-normalization-record.md": {
+            "size": 11337,
+            "suffix": ".md",
+            "hash": "48cc31801eb1047f"
+          },
+          "docs/p2p-development/research/c35r/zaofu-p2p-architecture-map.md": {
+            "size": 13873,
+            "suffix": ".md",
+            "hash": "c5e6aa397fb996b4"
+          },
+          "docs/p2p-development/research/c35r/zaofu-roadmap-impact.md": {
+            "size": 4655,
+            "suffix": ".md",
+            "hash": "36de3ceb39cfaf1d"
+          },
+          "docs/p2p-development/research/c35r/zaofu-upstream-provenance.json": {
+            "size": 2217,
+            "suffix": ".json",
+            "hash": "1be9cb847d198e21"
+          },
+          "docs/p2p-development/research/c36/evidence/c36-closure-machine-output.txt": {
+            "size": 2067,
+            "suffix": ".txt",
+            "hash": "5ae12a1e5d1ffd8c"
+          },
+          "docs/p2p-development/research/c36/evidence/c36-cp0-evidence.md": {
+            "size": 4233,
+            "suffix": ".md",
+            "hash": "9418d2f9bafd2dc6"
+          },
+          "docs/p2p-development/research/c36/evidence/c36-final-regression-diff.txt": {
+            "size": 2014,
+            "suffix": ".txt",
+            "hash": "5321fe38158bdd23"
+          },
+          "docs/p2p-development/research/c36/evidence/c36-normalization-record.md": {
+            "size": 7777,
+            "suffix": ".md",
+            "hash": "1f0cc61f7d0a6b67"
+          },
+          "docs/p2p-development/research/c37/evidence/c37-candidate-mint.txt": {
+            "size": 1023,
+            "suffix": ".txt",
+            "hash": "caa182a8bdb4a117"
+          },
+          "docs/p2p-development/research/c37/evidence/c37-cp0-evidence.md": {
+            "size": 3107,
+            "suffix": ".md",
+            "hash": "2e16406c8ad0d925"
+          },
+          "docs/p2p-development/research/c38/P2P-C38-stageA-terminal-report.md": {
+            "size": 5401,
+            "suffix": ".md",
+            "hash": "338095efa0600b96"
+          },
+          "docs/p2p-development/research/c38/P2P-C38-stageB-terminal-report.md": {
+            "size": 5451,
+            "suffix": ".md",
+            "hash": "c758ce73a0dc6f0e"
+          },
+          "docs/p2p-development/research/c38/P2P-C38-stageD-terminal-report.md": {
+            "size": 5696,
+            "suffix": ".md",
+            "hash": "5fbc74049eb739eb"
+          },
+          "docs/p2p-development/research/c38/c38-operating-digest.md": {
+            "size": 3682,
+            "suffix": ".md",
+            "hash": "88ea2fba4b409db8"
+          },
+          "docs/p2p-development/research/c38/c38-task-graph-revision.md": {
+            "size": 1633,
+            "suffix": ".md",
+            "hash": "d51fa571ee99f96c"
+          },
+          "docs/p2p-development/research/c38/c38-task-graph.md": {
+            "size": 2909,
+            "suffix": ".md",
+            "hash": "d017bb787b8be7d7"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-auth-preflight-recheck.md": {
+            "size": 1413,
+            "suffix": ".md",
+            "hash": "5a6810d056946e0c"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-auth-preflight.md": {
+            "size": 3177,
+            "suffix": ".md",
+            "hash": "bfeee6ad7d9557da"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-b-live-receipt.json": {
+            "size": 1179,
+            "suffix": ".json",
+            "hash": "238590190b47c4a5"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-b-messages-observed.json": {
+            "size": 952,
+            "suffix": ".json",
+            "hash": "adf5cb46801ffb46"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-b-role-contract.json": {
+            "size": 1347,
+            "suffix": ".json",
+            "hash": "c2ed8b53d92ea69b"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-b-role-receipt.json": {
+            "size": 1834,
+            "suffix": ".json",
+            "hash": "fb504e99f9ddf6f7"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-c-01-usage.json": {
+            "size": 441,
+            "suffix": ".json",
+            "hash": "f44207a7a6b2f2c5"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-live-receipt.json": {
+            "size": 1839,
+            "suffix": ".json",
+            "hash": "73e4f273b565ded9"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-contract.json": {
+            "size": 1428,
+            "suffix": ".json",
+            "hash": "61da8ee2ed1eedc2"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-c-hermes-role-receipt.json": {
+            "size": 3434,
+            "suffix": ".json",
+            "hash": "3e0974e2dfd51b93"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-continuation-capsule.json": {
+            "size": 1729,
+            "suffix": ".json",
+            "hash": "c6afd357b33721c9"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-delivery-receipt.json": {
+            "size": 503,
+            "suffix": ".json",
+            "hash": "58cc0e2d66edd8ef"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-live-receipt.json": {
+            "size": 1375,
+            "suffix": ".json",
+            "hash": "c158805ec3702c47"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-messages-observed.json": {
+            "size": 3716,
+            "suffix": ".json",
+            "hash": "7b773b5289c2efb0"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-observation.json": {
+            "size": 2506,
+            "suffix": ".json",
+            "hash": "7f5face73c316df0"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-role-contract.json": {
+            "size": 1510,
+            "suffix": ".json",
+            "hash": "368648f1a5e9d5a4"
+          },
+          "docs/p2p-development/research/c38/evidence/c38-stage-d-role-receipt.json": {
+            "size": 2899,
+            "suffix": ".json",
+            "hash": "0b0c9898130aec31"
+          },
+          "docs/p2p-development/research/c38/harness/c38_stage_b_independent_verify.py": {
+            "size": 8689,
+            "suffix": ".py",
+            "hash": "75c7906d31bfdb4b"
+          },
+          "docs/p2p-development/research/c38/harness/c38_stage_b_role_proof.py": {
+            "size": 6337,
+            "suffix": ".py",
+            "hash": "a8cf9a1974407f8e"
+          },
+          "docs/p2p-development/research/c38/harness/c38_stage_c_hermes_proof.py": {
+            "size": 8290,
+            "suffix": ".py",
+            "hash": "3d30daa4aaf79fc1"
+          },
+          "docs/p2p-development/research/c38/harness/c38_stage_c_independent_verify.py": {
+            "size": 6430,
+            "suffix": ".py",
+            "hash": "cbcf6646c054e582"
+          },
+          "docs/p2p-development/research/c38/harness/c38_stage_d_capsule_build.py": {
+            "size": 7010,
+            "suffix": ".py",
+            "hash": "53570635967f3ec4"
+          }
+        }
+      },
+      "token_count": 4985,
+      "fingerprint": "0d8980aa2c5899dbd7f97fe38191c6cdd7c688e3ed47d1612bc00e73803bf8e4",
+      "is_truncated": true
+    },
+    "1": {
+      "level": 1,
+      "content": {
+        "signatures": {
+          "add_c30_invariants.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "add_roadmap_c31.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "build_c30_candidate.py": [
+            {
+              "name": "_refresh_buildroot",
+              "type": "FunctionDef",
+              "args": "",
+              "doc": "Re-copy the live repo into /tmp/buildroot (ignoring transien..."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "bump_version_24.py": [],
+          "c30_recover_state.py": [],
+          "c31_live_probe.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "data: bytes"
+            },
+            {
+              "name": "utcnow",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "run",
+              "type": "FunctionDef",
+              "args": "cmd: list[str], timeout: int"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "check_cycles.py": [
+            {
+              "name": "find_cycles",
+              "type": "FunctionDef",
+              "args": "cid, stack, path"
+            }
+          ],
+          "create_pr6.py": [],
+          "docs/p2p-development/research/c38/harness/c38_stage_b_independent_verify.py": [
+            {
+              "name": "_ms2iso",
+              "type": "FunctionDef",
+              "args": "ms: str",
+              "doc": "Convert millisecond epoch string to ISO-8601 basic form."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_b_role_proof.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "sha256hex",
+              "type": "FunctionDef",
+              "args": "text: str"
+            }
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_c_hermes_proof.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "sha256hex",
+              "type": "FunctionDef",
+              "args": "text: str"
+            }
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_c_independent_verify.py": [
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "name: str"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_capsule_build.py": [],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_fresh_execution.py": [
+            {
+              "name": "sha256hex",
+              "type": "FunctionDef",
+              "args": "s: str"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_independent_verify.py": [
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "name: str"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_observe_result.py": [
+            {
+              "name": "canonical_sha256",
+              "type": "FunctionDef",
+              "args": "s: str",
+              "doc": "Same canonical fingerprint the capsule builder used (C36 _ca..."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c39/evidence/c39-auth-preflight.py": [
+            {
+              "name": "classify",
+              "type": "FunctionDef",
+              "args": "name, status"
+            }
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof1_independent_verify.py": [
+            {
+              "name": "_ms2iso",
+              "type": "FunctionDef",
+              "args": "ms: str",
+              "doc": "Convert millisecond epoch string to ISO-8601 basic form."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof1_selection_execution.py": [
+            {
+              "name": "sha256hex",
+              "type": "FunctionDef",
+              "args": "payload: str"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof2_drift_reselection.py": [
+            {
+              "name": "sha256hex",
+              "type": "FunctionDef",
+              "args": "text: str"
+            },
+            {
+              "name": "hermes_probe",
+              "type": "FunctionDef",
+              "args": "target: str",
+              "doc": "Probe hermes-cli eligibility via a dry run of _run_hermes us..."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof3_capsule_continuity.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof3_observe_result.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof4_unsafe_postdispatch.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c40/harness/c40_fresh_process_recovery.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "data: bytes"
+            },
+            {
+              "name": "build_capsule",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "dispatch",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c40/harness/c40_pilot_task.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "now_utc",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c41/harness/c41_gia_pha_fresh_process_recovery.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "data: bytes"
+            },
+            {
+              "name": "build_capsule",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "dispatch",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c41/harness/c41_gia_pha_pilot_task.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "now_utc",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "docs/p2p-development/research/c43/harness/c43_gametruyen_activation.py": [
+            {
+              "name": "build_prompt",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "dump_c31_evidence.py": [],
+          "fill_c30_candidate.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "finalize_governance_c26.py": [
+            {
+              "name": "sha256_of",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "fix_ledger_deps.py": [],
+          "fix_ledger_provenance_c30.py": [],
+          "regen_roadmap_c30.py": [
+            {
+              "name": "rewrite_family_section",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "remove_ledger_c27_draft.py": [],
+          "reports/fw04-checkpoint-certification-handoff-supervisor.py": [
+            {
+              "name": "check",
+              "type": "FunctionDef",
+              "args": "name, cond, detail=''"
+            }
+          ],
+          "scripts/accounting_check.py": [
+            {
+              "name": "sha",
+              "type": "FunctionDef",
+              "args": "p"
+            },
+            {
+              "name": "git_cat",
+              "type": "FunctionDef",
+              "args": "rel"
+            },
+            {
+              "name": "tree_path_for_runtime",
+              "type": "FunctionDef",
+              "args": "member"
+            }
+          ],
+          "scripts/analyze_rebuild_diff.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/certify_manus_target.py": [
+            {
+              "name": "run_certification",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/debug_freshness.py": [],
+          "scripts/debug_rebuild_diff.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/doctor.py": [
+            {
+              "name": "Report",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "add",
+                  "type": "FunctionDef",
+                  "args": "self, level: str, check: str, message: str"
+                },
+                {
+                  "name": "pass_",
+                  "type": "FunctionDef",
+                  "args": "self, check: str, message: str"
+                },
+                {
+                  "name": "fail",
+                  "type": "FunctionDef",
+                  "args": "self, check: str, message: str"
+                },
+                {
+                  "name": "warn",
+                  "type": "FunctionDef",
+                  "args": "self, check: str, message: str"
+                },
+                {
+                  "name": "failed",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ]
+            },
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "parse_skill",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "find_layout",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "infer_role",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Identify the filesystem contract without treating roles as i..."
+            },
+            {
+              "name": "check_skills",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "check_agents",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "check_config",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "check_instructions",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "check_governance",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report, package_mode: bool"
+            },
+            {
+              "name": "check_uiux_payload",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "_foundation_required_paths",
+              "type": "FunctionDef",
+              "args": "base: Path"
+            },
+            {
+              "name": "_run_foundation_doctor",
+              "type": "FunctionDef",
+              "args": "source: Path, profile_root: Path"
+            },
+            {
+              "name": "_run_decision_trace_doctor",
+              "type": "FunctionDef",
+              "args": "source: Path, project_root: Path"
+            },
+            {
+              "name": "check_decision_trace_payload",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report, *, installed: bool"
+            },
+            {
+              "name": "check_foundation_payload",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "check_installed_foundation",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "_load_package_release_contract",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "check_development",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report",
+              "doc": "Validate the development checkout using its source-owned run..."
+            },
+            {
+              "name": "check_package",
+              "type": "FunctionDef",
+              "args": "root: Path, report: Report"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/fix_fw05_fw06_candidate_ids.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/fw01/p2p_fw01_discovery.py": [
+            {
+              "name": "_git_snapshot",
+              "type": "FunctionDef",
+              "args": "project_dir: Path"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/fw01/p2p_fw01_proof.py": [
+            {
+              "name": "_now_iso",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "ProofBackend",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "execute",
+                  "type": "FunctionDef",
+                  "args": "self, contract: dict"
+                }
+              ],
+              "doc": "Deterministic, fixture-driven execution backend for the proo..."
+            },
+            {
+              "name": "ProofVerifier",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "verify",
+                  "type": "FunctionDef",
+                  "args": "self, result: dict, verify_spec: tuple=()"
+                }
+              ],
+              "doc": "Deterministic verifier. 'CONTRADICTED' / 'INCOMPLETE' / 'UNK..."
+            },
+            {
+              "name": "_make_records",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Build 4 C11-style task records (A,B,C sequential + D owner g..."
+            },
+            {
+              "name": "build_goal",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Build the 4-task GoalPlan (A,B,C sequential + D owner gate)."
+            },
+            {
+              "name": "_fresh",
+              "type": "FunctionDef",
+              "args": "root: Path, backend, verifier",
+              "doc": "A genuinely new process surface: imports re-derived, Attempt..."
+            },
+            {
+              "name": "run_leg",
+              "type": "FunctionDef",
+              "args": "root: Path, backend, verifier, max_steps: int=20, *, expect_owner_gate: bool=False"
+            },
+            {
+              "name": "primary_e2e_proof",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "A -> verify -> checkpoint -> auto continue -> B -> verify ->..."
+            },
+            {
+              "name": "negative_proof_a_unknown_mutation",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "A. unknown mutation state -> no blind retry/failover."
+            },
+            {
+              "name": "negative_proof_b_stale_binding",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "B. stale project binding -> fail closed."
+            },
+            {
+              "name": "negative_proof_c_contradictory_evidence",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "C. contradictory evidence -> stop."
+            },
+            {
+              "name": "negative_proof_d_retry_exhausted",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "D. exhausted retry -> stop (bounded)."
+            },
+            {
+              "name": "negative_proof_e_scope_expansion",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "E. material scope expansion -> Owner Gate / stop."
+            },
+            {
+              "name": "negative_proof_f_no_eligible_target",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "F. no eligible execution target -> fail closed."
+            },
+            {
+              "name": "negative_proof_g_optional_skill_unavailable",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "G. optional skill unavailable -> bounded fallback, no false..."
+            },
+            {
+              "name": "negative_proof_h_unproven_council",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "H. unproven full-council requirement -> no fake 8/8."
+            },
+            {
+              "name": "negative_proof_i_no_duplicate",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "I. already verified task after restart -> not executed twice..."
+            },
+            {
+              "name": "negative_proof_j_corrupted_checkpoint",
+              "type": "FunctionDef",
+              "args": "base_dir: Path",
+              "doc": "J. corrupted checkpoint -> fail closed / no silent recovery."
+            },
+            {
+              "name": "run_all_negative",
+              "type": "FunctionDef",
+              "args": "base_dir: Path"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/fw01_patch_mint.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "stage_release_evidence",
+              "type": "FunctionDef",
+              "args": "root: Path, stage: Path",
+              "doc": "Copy the tracked Live Specs technical preview into the stage..."
+            },
+            {
+              "name": "rebuild_live_specs",
+              "type": "FunctionDef",
+              "args": "stage: Path, governance: Path",
+              "doc": "Re-run build-live against the staged evidence so the release..."
+            },
+            {
+              "name": "crc32_file",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "regenerate_source_inventory",
+              "type": "FunctionDef",
+              "args": "stage: Path",
+              "doc": "Regenerate manifest/source-inventory.json from the bytes act..."
+            },
+            {
+              "name": "regenerate_external_sources",
+              "type": "FunctionDef",
+              "args": "stage: Path",
+              "doc": "Rewrite manifest/external-sources.json hashes from the packa..."
+            },
+            {
+              "name": "write_supplemental_checksums",
+              "type": "FunctionDef",
+              "args": "stage: Path",
+              "doc": "Persist the supplemental catalog hash from packaged bytes so..."
+            },
+            {
+              "name": "patch_host_project_drift_scope",
+              "type": "FunctionDef",
+              "args": "drift_policy_path: Path",
+              "doc": "Scope host-project docs out of P2P volatile-claim ledgering...."
+            },
+            {
+              "name": "regenerate_checksums",
+              "type": "FunctionDef",
+              "args": "stage: Path",
+              "doc": "Re-run the canonical checksum regeneration so RELEASE-SHA256..."
+            },
+            {
+              "name": "patch_stage",
+              "type": "FunctionDef",
+              "args": "root: Path, stage: Path",
+              "doc": "Apply the full FW01 patch mint sequence to an already staged..."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/fw05_supervisor.py": [
+            {
+              "name": "check",
+              "type": "FunctionDef",
+              "args": "name: str, ok: bool, detail: str"
+            },
+            {
+              "name": "_run_code",
+              "type": "FunctionDef",
+              "args": "code: str"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/fw06_supervisor.py": [
+            {
+              "name": "check",
+              "type": "FunctionDef",
+              "args": "name, detail, passed, note=''"
+            },
+            {
+              "name": "run_code",
+              "type": "FunctionDef",
+              "args": "code: str, extra_env: dict | None=None"
+            },
+            {
+              "name": "_check_no_execution_capability",
+              "type": "FunctionDef",
+              "args": "",
+              "doc": "FW06 never executes code: no os.system/Popen/eval/exec/subpr..."
+            },
+            {
+              "name": "_tmp_root",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/mint_fw00_fw06_cumulative.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "run_build",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "iter_tracked_files",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "copy_system_bundle",
+              "type": "FunctionDef",
+              "args": "stage: Path",
+              "doc": "Stage B: copy the tracked .p2p/system tree into stage/system..."
+            },
+            {
+              "name": "extend_manifest",
+              "type": "FunctionDef",
+              "args": "stage: Path, members: list[str]"
+            },
+            {
+              "name": "verify_stage",
+              "type": "FunctionDef",
+              "args": "stage: Path, manifest: dict",
+              "doc": "Cross-check inventory vs actual files (same contract as veri..."
+            },
+            {
+              "name": "write_zip",
+              "type": "FunctionDef",
+              "args": "stage: Path, output: Path"
+            },
+            {
+              "name": "governance_sanity",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/mint_fw00_fw06_governance_record.py": [
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            }
+          ],
+          "scripts/mint_fw05_candidate.py": [
+            {
+              "name": "sha256_of",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/mint_fw06_candidate.py": [
+            {
+              "name": "sha256_of",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_approval.py": [
+            {
+              "name": "ApprovalError",
+              "type": "ClassDef",
+              "bases": [
+                "ValueError"
+              ],
+              "methods": []
+            },
+            {
+              "name": "utc_now",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "iso",
+              "type": "FunctionDef",
+              "args": "value: datetime"
+            },
+            {
+              "name": "parse_datetime",
+              "type": "FunctionDef",
+              "args": "value: object, field: str"
+            },
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "write_json_atomic",
+              "type": "FunctionDef",
+              "args": "path: Path, value: object"
+            },
+            {
+              "name": "sha256_file",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "excluded_relative",
+              "type": "FunctionDef",
+              "args": "relative: str"
+            },
+            {
+              "name": "fingerprint_subject",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "default_governance",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "validate_policy",
+              "type": "FunctionDef",
+              "args": "value: object"
+            },
+            {
+              "name": "validate_record",
+              "type": "FunctionDef",
+              "args": "value: object, policy: dict, *, expected_action: str | None=None, expected_subject_sha256: str | None=None, expected_technical_report_sha256: str | None=None, provenance_only: bool=False, as_of: datetime | None=None"
+            },
+            {
+              "name": "command_request",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "decide",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace, decision: str"
+            },
+            {
+              "name": "command_approve",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_reject",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_verify",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "parser",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_beginner_certification.py": [
+            {
+              "name": "utc_now",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "read_json",
+              "type": "FunctionDef",
+              "args": "path: Path, default: Any=None"
+            },
+            {
+              "name": "write_json",
+              "type": "FunctionDef",
+              "args": "path: Path, value: Any"
+            },
+            {
+              "name": "within",
+              "type": "FunctionDef",
+              "args": "path: Path, root: Path"
+            },
+            {
+              "name": "sha256_file",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "tree_fingerprint",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "output_fingerprint",
+              "type": "FunctionDef",
+              "args": "stdout: str, stderr: str"
+            },
+            {
+              "name": "parse_json_output",
+              "type": "FunctionDef",
+              "args": "stdout: str"
+            },
+            {
+              "name": "safe_command_record",
+              "type": "FunctionDef",
+              "args": "command_id: str, argv: list[str], process: subprocess.CompletedProcess[str], elapsed_ms: int"
+            },
+            {
+              "name": "command_env",
+              "type": "FunctionDef",
+              "args": "home_root: Path"
+            },
+            {
+              "name": "run_cli",
+              "type": "FunctionDef",
+              "args": "command_id: str, argv: list[str], *, cwd: Path, env: dict[str, str], timeout: int=45"
+            },
+            {
+              "name": "selected_workflow_fields",
+              "type": "FunctionDef",
+              "args": "result: Any"
+            },
+            {
+              "name": "workflow_contract_fields",
+              "type": "FunctionDef",
+              "args": "project: Path"
+            },
+            {
+              "name": "record",
+              "type": "FunctionDef",
+              "args": "records: list[dict[str, Any]], *, scenario_id: str, stage: str, dimension: str, expected: str, actual_status: str, evidence_ref: str, critical: bool, notes: str"
+            },
+            {
+              "name": "scenario_definitions",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "set_fixture_readiness",
+              "type": "FunctionDef",
+              "args": "project: Path, ready: bool"
+            },
+            {
+              "name": "apply_stage_fixture_change",
+              "type": "FunctionDef",
+              "args": "project: Path, stage: str"
+            },
+            {
+              "name": "workflow_cli",
+              "type": "FunctionDef",
+              "args": "package: Path, project: Path, request: str, env: dict[str, str], command_id: str"
+            },
+            {
+              "name": "router_cli",
+              "type": "FunctionDef",
+              "args": "package: Path, request: str, env: dict[str, str], command_id: str"
+            },
+            {
+              "name": "doctor_cli",
+              "type": "FunctionDef",
+              "args": "package: Path, env: dict[str, str], command_id: str"
+            },
+            {
+              "name": "uiux_recommend_cli",
+              "type": "FunctionDef",
+              "args": "package: Path, project_kind: str, request: str, env: dict[str, str], command_id: str"
+            },
+            {
+              "name": "public_contract_supplements",
+              "type": "FunctionDef",
+              "args": "package: Path, prompts: Iterable[str]"
+            },
+            {
+              "name": "route_status",
+              "type": "FunctionDef",
+              "args": "route_command: dict[str, Any]"
+            },
+            {
+              "name": "evaluate_stage",
+              "type": "FunctionDef",
+              "args": "records: list[dict[str, Any]], *, scenario: dict[str, Any], stage: str, request: str, workflow_command: dict[str, Any], route_command: dict[str, Any], uiux_command: dict[str, Any] | None, project: Path, supplements: dict[str, Any]"
+            },
+            {
+              "name": "summarize_dimensions",
+              "type": "FunctionDef",
+              "args": "records: list[dict[str, Any]]"
+            },
+            {
+              "name": "validate_machine_result",
+              "type": "FunctionDef",
+              "args": "result: dict[str, Any]"
+            },
+            {
+              "name": "initial_protected_snapshot",
+              "type": "FunctionDef",
+              "args": "package: Path"
+            },
+            {
+              "name": "compare_protected_snapshot",
+              "type": "FunctionDef",
+              "args": "package: Path, before: dict[str, Any]"
+            },
+            {
+              "name": "create_synthetic_project",
+              "type": "FunctionDef",
+              "args": "source_fixture: Path, project: Path, scenario: dict[str, Any]"
+            },
+            {
+              "name": "run_scenario",
+              "type": "FunctionDef",
+              "args": "package: Path, temp_root: Path, scenario: dict[str, Any], supplements: dict[str, Any], env: dict[str, str], records: list[dict[str, Any]]"
+            },
+            {
+              "name": "readiness_class",
+              "type": "FunctionDef",
+              "args": "records: list[dict[str, Any]], harness_status: str"
+            },
+            {
+              "name": "render_report",
+              "type": "FunctionDef",
+              "args": "result: dict[str, Any]"
+            },
+            {
+              "name": "run_certification",
+              "type": "FunctionDef",
+              "args": "package: str | Path, output_dir: str | Path | None=None"
+            },
+            {
+              "name": "parser",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_c15_field_test.py": [
+            {
+              "name": "_goal",
+              "type": "FunctionDef",
+              "args": "goal_id: str"
+            },
+            {
+              "name": "_task",
+              "type": "FunctionDef",
+              "args": "task_id: str"
+            },
+            {
+              "name": "_prepare",
+              "type": "FunctionDef",
+              "args": "root: Path, task_id: str"
+            },
+            {
+              "name": "_candidate",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_request",
+              "type": "FunctionDef",
+              "args": "controller: BoundedDelegationController, task_id: str, *, value_reasons: tuple[str, ...], task_size: str='MODERATE', host: bool=True"
+            },
+            {
+              "name": "_claim",
+              "type": "FunctionDef",
+              "args": "root: Path, task_id: str"
+            },
+            {
+              "name": "_summary",
+              "type": "FunctionDef",
+              "args": "result: Mapping[str, Any], *, expected_strategy: str"
+            },
+            {
+              "name": "_run_case",
+              "type": "FunctionDef",
+              "args": "case_id: str, fn: Callable[[Path], dict[str, Any]]"
+            },
+            {
+              "name": "_case_a_direct",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "_delegated_request",
+              "type": "FunctionDef",
+              "args": "controller: BoundedDelegationController, task_id: str"
+            },
+            {
+              "name": "_case_b_and_d_verified",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "_case_c_reject",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "_case_e_no_grandchild",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "_case_f_resume",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "run_field_test",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_decision_trace.py": [
+            {
+              "name": "_load_runtime",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_decision_trace_eval.py": [
+            {
+              "name": "_hash",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "_write_json",
+              "type": "FunctionDef",
+              "args": "path: Path, value: object"
+            },
+            {
+              "name": "_fixture",
+              "type": "FunctionDef",
+              "args": "root: Path, *, with_governance: bool=False"
+            },
+            {
+              "name": "_record",
+              "type": "FunctionDef",
+              "args": "root: Path, decision_id: str, decision_type: str='ARCHITECTURE', **kwargs: Any"
+            },
+            {
+              "name": "_case",
+              "type": "FunctionDef",
+              "args": "case_id: str, name: str, fn: Callable[[], tuple[bool, str]]"
+            },
+            {
+              "name": "run_evaluation",
+              "type": "FunctionDef",
+              "args": "repo_root: Path=REPO_ROOT"
+            },
+            {
+              "name": "render_report",
+              "type": "FunctionDef",
+              "args": "result: dict[str, object]"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_delegation.py": [
+            {
+              "name": "_read_json",
+              "type": "FunctionDef",
+              "args": "path: str | Path"
+            },
+            {
+              "name": "_mapping",
+              "type": "FunctionDef",
+              "args": "path: str | None, error: str"
+            },
+            {
+              "name": "_root",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "_parser",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_common_kwargs",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "_write",
+              "type": "FunctionDef",
+              "args": "value: Any"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_development_control.py": [
+            {
+              "name": "_goal_ids_in_order",
+              "type": "FunctionDef",
+              "args": "by_id: dict[str, dict[str, Any]]",
+              "doc": "Return roadmap goal IDs (C<number>) sorted by numeric goal n..."
+            },
+            {
+              "name": "_expected_current_goal",
+              "type": "FunctionDef",
+              "args": "goal_ids: list[str], by_id: dict[str, dict[str, Any]]",
+              "doc": "Deterministically derive the expected current roadmap item w..."
+            },
+            {
+              "name": "_likely_next_goal",
+              "type": "FunctionDef",
+              "args": "goal_ids: list[str], by_id: dict[str, dict[str, Any]]",
+              "doc": "Deterministically derive the likely next roadmap Goal: the l..."
+            },
+            {
+              "name": "ControlError",
+              "type": "ClassDef",
+              "bases": [
+                "ValueError"
+              ],
+              "methods": [
+                {
+                  "name": "__init__",
+                  "type": "FunctionDef",
+                  "args": "self, code: str, message: str"
+                }
+              ],
+              "doc": "A deterministic, user-actionable control-record validation e..."
+            },
+            {
+              "name": "_require",
+              "type": "FunctionDef",
+              "args": "condition: bool, code: str, message: str"
+            },
+            {
+              "name": "_object",
+              "type": "FunctionDef",
+              "args": "value: Any, label: str"
+            },
+            {
+              "name": "_list",
+              "type": "FunctionDef",
+              "args": "value: Any, label: str"
+            },
+            {
+              "name": "_nonempty_string",
+              "type": "FunctionDef",
+              "args": "value: Any, label: str"
+            },
+            {
+              "name": "_version_key",
+              "type": "FunctionDef",
+              "args": "version: Any, label: str='version'"
+            },
+            {
+              "name": "version_is_at_least",
+              "type": "FunctionDef",
+              "args": "version: str, minimum: str=OFFICIAL_BASELINE_VERSION",
+              "doc": "Compare release lineage by explicit version fields, never fi..."
+            },
+            {
+              "name": "load_control",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "_validate_authority",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]"
+            },
+            {
+              "name": "_validate_official_baseline",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]"
+            },
+            {
+              "name": "_validate_lineage_contract",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any], baseline: dict[str, Any]"
+            },
+            {
+              "name": "_validate_candidates",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any], baseline: dict[str, Any]"
+            },
+            {
+              "name": "_validate_capabilities",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]"
+            },
+            {
+              "name": "_validate_design_and_canonical",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]"
+            },
+            {
+              "name": "_validate_roadmap",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]"
+            },
+            {
+              "name": "_validate_research_and_invariants",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]"
+            },
+            {
+              "name": "validate_control",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any], *, expected_official_version: str=OFFICIAL_BASELINE_VERSION, expected_official_sha256: str=OFFICIAL_BASELINE_SHA256",
+              "doc": "Validate one control record and return a small deterministic..."
+            },
+            {
+              "name": "control_path",
+              "type": "FunctionDef",
+              "args": "root: Path, explicit: str | None=None"
+            },
+            {
+              "name": "validate_path",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "validate_lineage_for_build",
+              "type": "FunctionDef",
+              "args": "root: Path, version: str | None=None, *, control_file: Path | None=None",
+              "doc": "Validate build ancestry before package-release side effects..."
+            },
+            {
+              "name": "status_projection",
+              "type": "FunctionDef",
+              "args": "control: dict[str, Any]",
+              "doc": "Derive a fresh-session status projection without copying aut..."
+            },
+            {
+              "name": "render_status",
+              "type": "FunctionDef",
+              "args": "projection: dict[str, Any]"
+            },
+            {
+              "name": "_write_json_atomic",
+              "type": "FunctionDef",
+              "args": "path: Path, value: dict[str, Any]"
+            },
+            {
+              "name": "_replace_active_version",
+              "type": "FunctionDef",
+              "args": "path: Path, old_version: str, new_version: str",
+              "doc": "Return an active metadata payload after one exact version re..."
+            },
+            {
+              "name": "_write_bytes_atomic",
+              "type": "FunctionDef",
+              "args": "path: Path, payload: bytes, suffix: str"
+            },
+            {
+              "name": "reconcile_development_lineage",
+              "type": "FunctionDef",
+              "args": "root: Path, target_version: str=C17_DEVELOPMENT_VERSION, evidence_refs: list[str] | None=None, *, control_file: Path | None=None, changed_at: str | None=None, changed_by: str='p2p-c17-lineage-reconciliation'",
+              "doc": "Reconcile active source metadata to a post-official developm..."
+            },
+            {
+              "name": "record_c17_completion",
+              "type": "FunctionDef",
+              "args": "path: Path, *, candidate_sha256: str, candidate_label: str, candidate_artifact_path: str, evidence_refs: list[str], changed_at: str | None=None, changed_by: str='p2p-c17'",
+              "doc": "Record C17 PASS/foundation readiness without promoting its a..."
+            },
+            {
+              "name": "refresh_c17_candidate_artifact",
+              "type": "FunctionDef",
+              "args": "path: Path, *, candidate_sha256: str, candidate_label: str, candidate_artifact_path: str, evidence_refs: list[str], changed_at: str | None=None, changed_by: str='p2p-c17-candidate-refresh'",
+              "doc": "Bind a rebuilt unpromoted C17 artifact to the existing candi..."
+            },
+            {
+              "name": "record_c17_cognitive_economy_evaluation",
+              "type": "FunctionDef",
+              "args": "path: Path, *, evidence_refs: list[str], changed_at: str | None=None, changed_by: str='p2p-c17-cognitive-economy'",
+              "doc": "Record the bounded cognitive-economy evaluation without prom..."
+            },
+            {
+              "name": "record_roadmap_mutation",
+              "type": "FunctionDef",
+              "args": "path: Path, item_id: str, status: str, reason: str, evidence_refs: list[str], *, changed_at: str | None=None, changed_by: str='p2p'",
+              "doc": "Apply one explicit roadmap mutation and append its provenanc..."
+            },
+            {
+              "name": "parser",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            }
+          ],
+          "scripts/p2p_eval.py": [
+            {
+              "name": "load",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "write_json_new",
+              "type": "FunctionDef",
+              "args": "path: Path, value: object"
+            },
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "suite_path",
+              "type": "FunctionDef",
+              "args": "project: Path"
+            },
+            {
+              "name": "default_template",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_project_type",
+              "type": "FunctionDef",
+              "args": "project: Path, goal: str, profile: object | None"
+            },
+            {
+              "name": "_project_markers",
+              "type": "FunctionDef",
+              "args": "project: Path"
+            },
+            {
+              "name": "design_project_suite",
+              "type": "FunctionDef",
+              "args": "project: Path, *, name: str | None=None, goal: str='', profile: object | None=None, destination: Path | None=None",
+              "doc": "Create the smallest useful project-specific v2 suite, or reu..."
+            },
+            {
+              "name": "contains_placeholder",
+              "type": "FunctionDef",
+              "args": "value: object"
+            },
+            {
+              "name": "validate_policy",
+              "type": "FunctionDef",
+              "args": "policy: object, errors: list[str]"
+            },
+            {
+              "name": "validate_run",
+              "type": "FunctionDef",
+              "args": "run: object, prefix: str, errors: list[str]"
+            },
+            {
+              "name": "validate",
+              "type": "FunctionDef",
+              "args": "value: object"
+            },
+            {
+              "name": "mean",
+              "type": "FunctionDef",
+              "args": "values: list[float]"
+            },
+            {
+              "name": "summarize",
+              "type": "FunctionDef",
+              "args": "value: dict"
+            },
+            {
+              "name": "resolve_evidence",
+              "type": "FunctionDef",
+              "args": "project: Path, raw: str"
+            },
+            {
+              "name": "gate",
+              "type": "FunctionDef",
+              "args": "value: dict, suite: Path"
+            },
+            {
+              "name": "_runtime_root",
+              "type": "FunctionDef",
+              "args": "target_root: Path",
+              "doc": "Resolve an isolated package/source target to its installed r..."
+            },
+            {
+              "name": "_snapshot_tree",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Hash the isolated target while ignoring explicitly disposabl..."
+            },
+            {
+              "name": "_parse_command_json",
+              "type": "FunctionDef",
+              "args": "stdout: str",
+              "doc": "Parse a JSON command result without accepting an invented fa..."
+            },
+            {
+              "name": "_case_command",
+              "type": "FunctionDef",
+              "args": "case_id: str, target_root: Path, runtime_root: Path, suite: Path",
+              "doc": "Return one real executable oracle for a frozen project-eval..."
+            },
+            {
+              "name": "_assert_case",
+              "type": "FunctionDef",
+              "args": "case_id: str, parsed: object",
+              "doc": "Grade only observable command output for one case; no narrat..."
+            },
+            {
+              "name": "_execute_case",
+              "type": "FunctionDef",
+              "args": "case: dict, *, target_root: Path, suite: Path, variant: str, trial: int, evidence_dir: Path, model: str, surface: str, environment_id: str"
+            },
+            {
+              "name": "command_run_trial",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_record_trial",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "rag_gate",
+              "type": "FunctionDef",
+              "args": "value: object, check_path: Path | None=None"
+            },
+            {
+              "name": "command_init",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_design",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_validate",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_summary",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_gate",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_rag_gate",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_migrate",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "parser",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_execution_target.py": [
+            {
+              "name": "CapabilityState",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "validate",
+                  "type": "FunctionDef",
+                  "args": "cls, status: str"
+                }
+              ],
+              "doc": "Evidence state of a single component capability."
+            },
+            {
+              "name": "EvidenceFreshness",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": []
+            },
+            {
+              "name": "ProtocolClass",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Execution-host protocol classes. MCP is semantically distinc..."
+            },
+            {
+              "name": "WorkspaceClass",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Execution workspace classes. C30 records the classes; it doe..."
+            },
+            {
+              "name": "HealthState",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Runtime health/ownership ladder (\u00a729). A process existing or..."
+            },
+            {
+              "name": "QuiesceState",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Safe lifecycle states (\u00a730). UNKNOWN must fail closed for de..."
+            },
+            {
+              "name": "ContractDriftState",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Contract identity / drift states (\u00a726). An old certification..."
+            },
+            {
+              "name": "EligibilityState",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": []
+            },
+            {
+              "name": "ComponentCapabilities",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "state_of",
+                  "type": "FunctionDef",
+                  "args": "self, capability: str"
+                },
+                {
+                  "name": "intersection",
+                  "type": "FunctionDef",
+                  "args": "self, other: 'ComponentCapabilities'",
+                  "doc": "Evidence intersection (\u00a722): a capability is supported only..."
+                }
+              ],
+              "doc": "Deterministic, evidence-backed capability set of a component..."
+            },
+            {
+              "name": "Evidence",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Material evidence for a component capability. Secrets are ne..."
+            },
+            {
+              "name": "HarnessProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Execution harness: any runtime capable of agentic work (data..."
+            },
+            {
+              "name": "ProviderProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Model provider: the service/runtime through which inference..."
+            },
+            {
+              "name": "ModelProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Model identity, separate from provider (\u00a713). Volatile prope..."
+            },
+            {
+              "name": "ModelVariant",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Effort/reasoning variant \u2014 a dimension of a model identity,..."
+            },
+            {
+              "name": "ProtocolProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Execution protocol, represented independently (\u00a715). MCP_TOO..."
+            },
+            {
+              "name": "ToolSetProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Tool capability, separate from model/provider/harness identi..."
+            },
+            {
+              "name": "WorkspaceProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Execution workspace class with durable identity/binding (\u00a717..."
+            },
+            {
+              "name": "EnvironmentProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Execution environment \u2014 distinct from workspace (\u00a718). Same..."
+            },
+            {
+              "name": "AuthProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Authentication state. Preserves C28 invariants: SECRET_REFER..."
+            },
+            {
+              "name": "PermissionProfile",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "is_subset_of",
+                  "type": "FunctionDef",
+                  "args": "self, other: 'PermissionProfile'"
+                },
+                {
+                  "name": "union",
+                  "type": "FunctionDef",
+                  "args": "self, other: 'PermissionProfile'",
+                  "doc": "Union is the only sound monotone combination: it narrows aut..."
+                }
+              ],
+              "doc": "Permission envelope (\u00a720). Composition rule: execution-targe..."
+            },
+            {
+              "name": "ContractIdentity",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [],
+              "doc": "Verified adapter/protocol contract identity/version (\u00a726)."
+            },
+            {
+              "name": "HealthSnapshot",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Runtime health/ownership snapshot (\u00a729)."
+            },
+            {
+              "name": "ExecutionTarget",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "effective_capability",
+                  "type": "FunctionDef",
+                  "args": "self",
+                  "doc": "EffectiveCapability = evidence-aggregated capability state a..."
+                },
+                {
+                  "name": "provider_protocol_capability",
+                  "type": "FunctionDef",
+                  "args": "self",
+                  "doc": "The provider profile carries no capability set of its own (\u00a7..."
+                },
+                {
+                  "name": "fingerprint",
+                  "type": "FunctionDef",
+                  "args": "self",
+                  "doc": "Deterministic, non-secret fingerprint. Changes on any materi..."
+                },
+                {
+                  "name": "health_rank",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "is_at_least",
+                  "type": "FunctionDef",
+                  "args": "self, state: str"
+                }
+              ],
+              "doc": "A composable execution target: the full composition of compo..."
+            },
+            {
+              "name": "_material_identity",
+              "type": "FunctionDef",
+              "args": "target: ExecutionTarget",
+              "doc": "Material identity fields only \u2014 no secrets, no values."
+            },
+            {
+              "name": "_material_field_changed",
+              "type": "FunctionDef",
+              "args": "before: Dict, after: Dict, path: Tuple[str, ...]",
+              "doc": "Compare the material-identity projection of two fingerprints..."
+            },
+            {
+              "name": "material_identity_field",
+              "type": "FunctionDef",
+              "args": "target: ExecutionTarget, path: Tuple[str, ...]",
+              "doc": "Project a single material field from the fingerprint payload..."
+            },
+            {
+              "name": "TaskRequirements",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__post_init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Contract/data representation of required capabilities for a..."
+            },
+            {
+              "name": "EligibilityResult",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "eligible",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ],
+              "doc": "Deterministic eligibility outcome (strict precedence, no ran..."
+            },
+            {
+              "name": "_protocol_satisfies",
+              "type": "FunctionDef",
+              "args": "target: ExecutionTarget, requirements: TaskRequirements",
+              "doc": "Protocol protocol eligibility (\u00a721, ET21): an execution-host..."
+            },
+            {
+              "name": "evaluate_execution_target",
+              "type": "FunctionDef",
+              "args": "target: ExecutionTarget, requirements: TaskRequirements, p2p_allowed_permission: Optional[PermissionProfile]=None",
+              "doc": "Deterministic execution-target eligibility.\n\nReturns ELIGIBL..."
+            },
+            {
+              "name": "drift_state",
+              "type": "FunctionDef",
+              "args": "current_contract: ContractIdentity, observed_version: str, behavior_changed: bool",
+              "doc": "Contract identity / drift guard. An old certification can ne..."
+            },
+            {
+              "name": "quiesce_transition",
+              "type": "FunctionDef",
+              "args": "current: str, desired: str",
+              "doc": "Deterministic safe lifecycle transitions. UNKNOWN fails clos..."
+            },
+            {
+              "name": "quiesce_allows_destructive",
+              "type": "FunctionDef",
+              "args": "state: str",
+              "doc": "Only a certifiably known QUIESCENT or DRAINING state allows..."
+            },
+            {
+              "name": "BackendRegistry",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "__init__",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "register_harness",
+                  "type": "FunctionDef",
+                  "args": "self, profile: HarnessProfile"
+                },
+                {
+                  "name": "register_provider",
+                  "type": "FunctionDef",
+                  "args": "self, profile: ProviderProfile"
+                },
+                {
+                  "name": "register_model",
+                  "type": "FunctionDef",
+                  "args": "self, profile: ModelProfile"
+                },
+                {
+                  "name": "register_protocol",
+                  "type": "FunctionDef",
+                  "args": "self, profile: ProtocolProfile"
+                },
+                {
+                  "name": "harness",
+                  "type": "FunctionDef",
+                  "args": "self, harness_id: str"
+                },
+                {
+                  "name": "provider",
+                  "type": "FunctionDef",
+                  "args": "self, provider_id: str"
+                },
+                {
+                  "name": "model",
+                  "type": "FunctionDef",
+                  "args": "self, model_id: str"
+                },
+                {
+                  "name": "protocol",
+                  "type": "FunctionDef",
+                  "args": "self, protocol_class: str, version: Optional[str]=None"
+                },
+                {
+                  "name": "list_harnesses",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "list_providers",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "list_models",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "eligible_targets",
+                  "type": "FunctionDef",
+                  "args": "self, requirements: TaskRequirements, p2p_allowed_permission: Optional[PermissionProfile]=None",
+                  "doc": "Deterministic composition enumeration over registered profil..."
+                }
+              ],
+              "doc": "One neutral registry of execution-environment profiles and e..."
+            }
+          ],
+          "scripts/p2p_foreground_execution.py": [
+            {
+              "name": "_read_json",
+              "type": "FunctionDef",
+              "args": "path: str | Path"
+            },
+            {
+              "name": "_mapping",
+              "type": "FunctionDef",
+              "args": "value: Any, error: str"
+            },
+            {
+              "name": "_root",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "_parser",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_claim_for_path",
+              "type": "FunctionDef",
+              "args": "controller: ForegroundExecutionController, runtime: Any, path: str"
+            },
+            {
+              "name": "_write_result",
+              "type": "FunctionDef",
+              "args": "value: Any"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_gate.py": [
+            {
+              "name": "GateError",
+              "type": "ClassDef",
+              "bases": [
+                "ValueError"
+              ],
+              "methods": []
+            },
+            {
+              "name": "write_json_new",
+              "type": "FunctionDef",
+              "args": "path: Path, value: object"
+            },
+            {
+              "name": "default_governance",
+              "type": "FunctionDef",
+              "args": "project: Path"
+            },
+            {
+              "name": "default_helpers",
+              "type": "FunctionDef",
+              "args": "project: Path"
+            },
+            {
+              "name": "run_json",
+              "type": "FunctionDef",
+              "args": "command: list[str]"
+            },
+            {
+              "name": "validate_project_policy",
+              "type": "FunctionDef",
+              "args": "value: object"
+            },
+            {
+              "name": "compare_eval_policy",
+              "type": "FunctionDef",
+              "args": "suite: dict, project_policy: dict"
+            },
+            {
+              "name": "compare_rag_policy",
+              "type": "FunctionDef",
+              "args": "check: dict, project_policy: dict"
+            },
+            {
+              "name": "command_prepare",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "command_finalize",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "parser",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_goal_closure.py": [
+            {
+              "name": "load_governance",
+              "type": "FunctionDef",
+              "args": "root: pathlib.Path | None=None"
+            },
+            {
+              "name": "load_ledger",
+              "type": "FunctionDef",
+              "args": "root: pathlib.Path | None=None"
+            },
+            {
+              "name": "load_contract_template",
+              "type": "FunctionDef",
+              "args": "root: pathlib.Path | None=None"
+            },
+            {
+              "name": "load_supervisor_template",
+              "type": "FunctionDef",
+              "args": "root: pathlib.Path | None=None"
+            },
+            {
+              "name": "_run_git",
+              "type": "FunctionDef",
+              "args": "*args: str, cwd: pathlib.Path | None=None"
+            },
+            {
+              "name": "_git_rc",
+              "type": "FunctionDef",
+              "args": "*args: str, cwd: pathlib.Path | None=None",
+              "doc": "Return git exit code for flag-style commands (e.g. merge-bas..."
+            },
+            {
+              "name": "normalize_terminal_status",
+              "type": "FunctionDef",
+              "args": "value: str",
+              "doc": "Normalize any casing into canonical PASS / BLOCKED / FAIL /..."
+            },
+            {
+              "name": "terminal_lane_label",
+              "type": "FunctionDef",
+              "args": "value: str",
+              "doc": "Return the full lane label (e.g. 'PARTIAL/\u2026') if the value i..."
+            },
+            {
+              "name": "terminal_from_report",
+              "type": "FunctionDef",
+              "args": "report_path: pathlib.Path",
+              "doc": "Extract machine-checkable terminal fields from a terminal re..."
+            },
+            {
+              "name": "ChangeSignals",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "detect",
+                  "type": "FunctionDef",
+                  "args": "cls, changed_files: list[str]"
+                },
+                {
+                  "name": "router_or_controller_files",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "context_controller_files",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "auth_action_files",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "second_executor_files",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "background_autonomy_files",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ]
+            },
+            {
+              "name": "candidate_policy",
+              "type": "FunctionDef",
+              "args": "terminal_status: str, contract_declared: str | None, changes: ChangeSignals",
+              "doc": "Deterministic answer to 'Does this Goal require a candidate?..."
+            },
+            {
+              "name": "candidate_policy_from_report_fields",
+              "type": "FunctionDef",
+              "args": "report_fields: dict, changes: ChangeSignals"
+            },
+            {
+              "name": "ClosureFinding",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": []
+            },
+            {
+              "name": "check_roadmap_goal_consistency",
+              "type": "FunctionDef",
+              "args": "roadmap_items: list[dict], report_fields: dict, goal_id: str",
+              "doc": "Verify that a terminal verdict coheres with the roadmap life..."
+            },
+            {
+              "name": "check_development_control_consistency",
+              "type": "FunctionDef",
+              "args": "governance: dict, report_fields: dict, goal_id: str",
+              "doc": "Terminal verdict must cohere with development-control state...."
+            },
+            {
+              "name": "check_candidate_policy_compliance",
+              "type": "FunctionDef",
+              "args": "governance: dict, report_fields: dict, goal_id: str, changes: ChangeSignals, candidate_artifact_exists: bool, package_verify_evidence: str | None",
+              "doc": "Candidate-required Goals cannot close PASS without a verifie..."
+            },
+            {
+              "name": "check_goal_vs_capability_separation",
+              "type": "FunctionDef",
+              "args": "ledger: dict, capability_claims: dict, outcome_capability_ids: list[str]",
+              "doc": "Goal status and capability status must not be conflated.\n\nMa..."
+            },
+            {
+              "name": "check_claim_boundary",
+              "type": "FunctionDef",
+              "args": "changes: ChangeSignals",
+              "doc": "C29 claim boundary: a Goal session must not introduce host r..."
+            },
+            {
+              "name": "check_capability_status_evidence_type",
+              "type": "FunctionDef",
+              "args": "ledger: dict, capability_claims: dict",
+              "doc": "Capability status must match its proven evidence type (ledge..."
+            },
+            {
+              "name": "BranchAncestry",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": []
+            },
+            {
+              "name": "branch_ancestry",
+              "type": "FunctionDef",
+              "args": "branch: str, expected_parent: str"
+            },
+            {
+              "name": "pr_base_mismatch",
+              "type": "FunctionDef",
+              "args": "pr_branch: str, declared_base: str, intended_parent: str",
+              "doc": "True when a PR's declared base differs from the branch's act..."
+            },
+            {
+              "name": "official_baseline_unmodified",
+              "type": "FunctionDef",
+              "args": "governance: dict",
+              "doc": "Official .19 baseline must stay immutable: PROMOTED_VERIFIED..."
+            },
+            {
+              "name": "roadmap_terminal_next",
+              "type": "FunctionDef",
+              "args": "items: list[dict]",
+              "doc": "Derive the terminal likely_next after the last terminal goal..."
+            },
+            {
+              "name": "reopen_condition_is_metadata",
+              "type": "FunctionDef",
+              "args": "roadmap_items: list[dict]",
+              "doc": "reopen_condition is roadmap metadata only; nothing auto-exec..."
+            },
+            {
+              "name": "ClosureVerdict",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "failures",
+                  "type": "FunctionDef",
+                  "args": "self"
+                }
+              ]
+            },
+            {
+              "name": "goal_closure_verdict",
+              "type": "FunctionDef",
+              "args": "governance: dict, ledger: dict, report_fields: dict, goal_id: str, changes: ChangeSignals, candidate_artifact_exists: bool=False, package_verify_evidence: str | None=None, outcome_capability_ids: list[str] | None=None"
+            },
+            {
+              "name": "_roadmap_item_status",
+              "type": "FunctionDef",
+              "args": "governance: dict, goal_id: str",
+              "doc": "Recover a roadmap lifecycle status for a goal with no termin..."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_governance.py": [
+            {
+              "name": "GovernanceError",
+              "type": "ClassDef",
+              "bases": [
+                "ValueError"
+              ],
+              "methods": []
+            },
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "parse_date",
+              "type": "FunctionDef",
+              "args": "value: object, field: str"
+            },
+            {
+              "name": "lifecycle",
+              "type": "FunctionDef",
+              "args": "claim: dict, as_of: date, expiring_window: int"
+            },
+            {
+              "name": "validate_ledger",
+              "type": "FunctionDef",
+              "args": "ledger: object, governance_dir: Path"
+            },
+            {
+              "name": "build_live",
+              "type": "FunctionDef",
+              "args": "ledger: dict, ledger_digest: str, generated_on: date"
+            },
+            {
+              "name": "write_json_atomic",
+              "type": "FunctionDef",
+              "args": "path: Path, value: object"
+            },
+            {
+              "name": "canonical_json_bytes",
+              "type": "FunctionDef",
+              "args": "value: object"
+            },
+            {
+              "name": "live_preview_report",
+              "type": "FunctionDef",
+              "args": "ledger: dict, ledger_path: Path, governance: Path, generated_on: date"
+            },
+            {
+              "name": "command_prepare_live",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "sha256_text",
+              "type": "FunctionDef",
+              "args": "value: str"
+            },
+            {
+              "name": "runtime_manifest",
+              "type": "FunctionDef",
+              "args": "root: Path, governance: Path"
+            },
+            {
+              "name": "command_lock_runtime",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "verify_runtime_manifest",
+              "type": "FunctionDef",
+              "args": "root: Path, governance: Path"
+            },
+            {
+              "name": "command_build",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "scan_volatile",
+              "type": "FunctionDef",
+              "args": "root: Path, governance: Path, claims_by_id: dict[str, dict], as_of: date, expiring_window: int, scoped_references: list[dict[str, object]] | None=None"
+            },
+            {
+              "name": "command_drift",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "parser",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_install_release.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "sha256set",
+              "type": "FunctionDef",
+              "args": "root: Path, exclude: set[str] | None=None"
+            },
+            {
+              "name": "project_fingerprint",
+              "type": "FunctionDef",
+              "args": "root: Path"
+            },
+            {
+              "name": "sha256_of_string",
+              "type": "FunctionDef",
+              "args": "s: str"
+            },
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "dump_json",
+              "type": "FunctionDef",
+              "args": "p: Path, obj: Any"
+            },
+            {
+              "name": "stamp_now",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_validate_package",
+              "type": "FunctionDef",
+              "args": "package_dir: Path"
+            },
+            {
+              "name": "_detect_install_class",
+              "type": "FunctionDef",
+              "args": "root: Path, package_version: str"
+            },
+            {
+              "name": "_install_files",
+              "type": "FunctionDef",
+              "args": "project_root: Path, package_dir: Path, install_class: str, pre_fingerprint: dict, collision_policy: str='owner-gate'"
+            },
+            {
+              "name": "cmd_install",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "cmd_upgrade",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "cmd_rollback",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "_backend_availability",
+              "type": "FunctionDef",
+              "args": "",
+              "doc": "Presence-only backend availability. No credential values exa..."
+            },
+            {
+              "name": "_eligible_targets",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Current P2P-selected eligible targets via the capability reg..."
+            },
+            {
+              "name": "cmd_doctor",
+              "type": "FunctionDef",
+              "args": "args: argparse.Namespace"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_live_certification.py": [
+            {
+              "name": "CertificationError",
+              "type": "ClassDef",
+              "bases": [
+                "RuntimeError"
+              ],
+              "methods": []
+            },
+            {
+              "name": "LiveCertificationRecord",
+              "type": "ClassDef",
+              "bases": [],
+              "methods": [
+                {
+                  "name": "to_dict",
+                  "type": "FunctionDef",
+                  "args": "self"
+                },
+                {
+                  "name": "from_dict",
+                  "type": "FunctionDef",
+                  "args": "cls, data: dict"
+                }
+              ],
+              "doc": "Durable certification record scoped to version/environment/t..."
+            },
+            {
+              "name": "_sha256_bytes",
+              "type": "FunctionDef",
+              "args": "data: bytes"
+            },
+            {
+              "name": "_sha256_file",
+              "type": "FunctionDef",
+              "args": "path: Path"
+            },
+            {
+              "name": "_utcnow",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_env_hash",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_tree_snapshot",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Hash every regular file under root (relative paths)."
+            },
+            {
+              "name": "_tree_diff",
+              "type": "FunctionDef",
+              "args": "before: dict, after: dict"
+            },
+            {
+              "name": "_codex_available",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_codex_version",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_run_probe",
+              "type": "FunctionDef",
+              "args": "prompt: str, workspace: Path, timeout_s: int=DEFAULT_TIMEOUT_S, model: str='gpt-5-nano'",
+              "doc": "Run the bounded codex CLI probe foreground-only. Returns evi..."
+            },
+            {
+              "name": "_any_output",
+              "type": "FunctionDef",
+              "args": "stdout_b: bytes, stderr_b: bytes"
+            },
+            {
+              "name": "classify_timeout",
+              "type": "FunctionDef",
+              "args": "proc: subprocess.Popen, before: dict, workspace: Path",
+              "doc": "Classify a live timeout per C27 mutation-certainty rules."
+            },
+            {
+              "name": "is_fresh",
+              "type": "FunctionDef",
+              "args": "record: LiveCertificationRecord",
+              "doc": "Freshness/revalidation semantics: a certification is fresh o..."
+            },
+            {
+              "name": "verify_result",
+              "type": "FunctionDef",
+              "args": "workspace: Path, fingerprint: str",
+              "doc": "Independent (host-free) deterministic verification of the pr..."
+            },
+            {
+              "name": "reconcile",
+              "type": "FunctionDef",
+              "args": "workspace: Path, archive_dir: Path, record: LiveCertificationRecord, verification: dict",
+              "doc": "Safe reconciliation: archive raw evidence, remove isolated w..."
+            },
+            {
+              "name": "build_record",
+              "type": "FunctionDef",
+              "args": "prompt: str, workspace: Path, evidence: dict, verification: dict, project_id: str, candidate_ref: str=''"
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_parallel.py": [
+            {
+              "name": "_read_json",
+              "type": "FunctionDef",
+              "args": "path: str | Path"
+            },
+            {
+              "name": "_request",
+              "type": "FunctionDef",
+              "args": "root: Path, value: Mapping[str, Any]"
+            },
+            {
+              "name": "_parser",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": "argv: list[str] | None=None"
+            }
+          ],
+          "scripts/p2p_planner_01a_test.py": [
+            {
+              "name": "make_fixture",
+              "type": "FunctionDef",
+              "args": "patches=None, name='fix'"
+            },
+            {
+              "name": "run_planner",
+              "type": "FunctionDef",
+              "args": "d, extra_args=None, out=None, expect_fail=False"
+            },
+            {
+              "name": "check",
+              "type": "FunctionDef",
+              "args": "name, cond, detail=''"
+            },
+            {
+              "name": "test_a",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_b",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_c",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_d",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_e",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "necessity_of",
+              "type": "FunctionDef",
+              "args": "plan, rid"
+            },
+            {
+              "name": "tests_f_g",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_h",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_i",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_j",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_k",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "test_l",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "plan_get",
+              "type": "FunctionDef",
+              "args": "d"
+            }
+          ],
+          "scripts/p2p_planner_01b_test.py": [
+            {
+              "name": "new_root",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "dctl",
+              "type": "FunctionDef",
+              "args": "**kw"
+            },
+            {
+              "name": "rd_item",
+              "type": "FunctionDef",
+              "args": "rid, status='PLANNED', priority=5, family='CONTEXT_AND_RETRIEVAL', source_research_ids=None, canonical_capability_ids=None, deps=None, defer_reason=''"
+            },
+            {
+              "name": "ledger",
+              "type": "FunctionDef",
+              "args": "**kw"
+            },
+            {
+              "name": "intake",
+              "type": "FunctionDef",
+              "args": "**kw"
+            },
+            {
+              "name": "contract",
+              "type": "FunctionDef",
+              "args": "**kw"
+            },
+            {
+              "name": "capidx",
+              "type": "FunctionDef",
+              "args": "**kw"
+            },
+            {
+              "name": "write",
+              "type": "FunctionDef",
+              "args": "root, obj, *parts"
+            },
+            {
+              "name": "load_plan",
+              "type": "FunctionDef",
+              "args": "root"
+            },
+            {
+              "name": "gate",
+              "type": "FunctionDef",
+              "args": "plan"
+            },
+            {
+              "name": "check",
+              "type": "FunctionDef",
+              "args": "name, cond, why=''"
+            },
+            {
+              "name": "base_root",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_planner_strictbind_test.py": [
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "path"
+            },
+            {
+              "name": "build_root",
+              "type": "FunctionDef",
+              "args": "",
+              "doc": "Fixture root = canonical governance + capability index, copi..."
+            },
+            {
+              "name": "run_planner",
+              "type": "FunctionDef",
+              "args": "root"
+            },
+            {
+              "name": "gate",
+              "type": "FunctionDef",
+              "args": "plan"
+            },
+            {
+              "name": "check",
+              "type": "FunctionDef",
+              "args": "name, ok, detail=''"
+            }
+          ],
+          "scripts/p2p_planner_test.py": [
+            {
+              "name": "fixture",
+              "type": "FunctionDef",
+              "args": "name, patch_roadmap=None, patch_ledger=None, patch_dctl=None, remove_ledger=False, remove_cap=False, baseline_version=None",
+              "doc": "Create a disposable fixture copying only the files the plann..."
+            },
+            {
+              "name": "run_planner",
+              "type": "FunctionDef",
+              "args": "fixture_dir, out, overrides=None, patch_roadmap=None, patch_ledger=None, patch_dctl=None, expect_fail=False, expected_fail_sub=None",
+              "doc": "Convenience: optionally patch the fixture AFTER creation (di..."
+            },
+            {
+              "name": "record",
+              "type": "FunctionDef",
+              "args": "name, ok, detail=''"
+            },
+            {
+              "name": "patch_add_blocked",
+              "type": "FunctionDef",
+              "args": "rd"
+            },
+            {
+              "name": "patch_add_ready",
+              "type": "FunctionDef",
+              "args": "rd"
+            },
+            {
+              "name": "patch_block_dep",
+              "type": "FunctionDef",
+              "args": "rd"
+            },
+            {
+              "name": "patch_defer",
+              "type": "FunctionDef",
+              "args": "rd"
+            },
+            {
+              "name": "patch_conflict",
+              "type": "FunctionDef",
+              "args": "rd"
+            }
+          ],
+          "scripts/p2p_roadmap_planner.py": [
+            {
+              "name": "PlannerError",
+              "type": "ClassDef",
+              "bases": [
+                "Exception"
+              ],
+              "methods": [],
+              "doc": "Fail-closed explicit refusal \u2014 never raised silently, always..."
+            },
+            {
+              "name": "sha256_file",
+              "type": "FunctionDef",
+              "args": "path"
+            },
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "path, label"
+            },
+            {
+              "name": "build_input_model",
+              "type": "FunctionDef",
+              "args": "repo, override_owner_value",
+              "doc": "Spec \u00a73 input contract \u2014 all fields populated from canonical..."
+            },
+            {
+              "name": "bind_hashes",
+              "type": "FunctionDef",
+              "args": "inp, repo",
+              "doc": "Spec \u00a719: bind every canonical source + baseline; stale plan..."
+            },
+            {
+              "name": "coverage_gate",
+              "type": "FunctionDef",
+              "args": "inp, dctl",
+              "doc": "Spec \u00a74 (hardened 01A): ROADMAP_COVERAGE_GAP.\n\nCoverage sema..."
+            },
+            {
+              "name": "classify_dependencies",
+              "type": "FunctionDef",
+              "args": "inp",
+              "doc": "Spec \u00a76: per-item dependency graph class with justification..."
+            },
+            {
+              "name": "owner_value_bucket",
+              "type": "FunctionDef",
+              "args": "text, oid",
+              "doc": "Spec \u00a77: deterministic bucket from durable text. Explicit pr..."
+            },
+            {
+              "name": "dependency_necessity_factors",
+              "type": "FunctionDef",
+              "args": "inp, graph",
+              "doc": "Spec 01A \u00a77: real graph-leverage signals, deterministic, doc..."
+            },
+            {
+              "name": "rank_items",
+              "type": "FunctionDef",
+              "args": "inp, graph",
+              "doc": "Spec \u00a77 (hardened 01A): deterministic ranking on ALL five ca..."
+            },
+            {
+              "name": "build_plan",
+              "type": "FunctionDef",
+              "args": "inp, graph, scored, coverage, dctl"
+            },
+            {
+              "name": "beginner_view",
+              "type": "FunctionDef",
+              "args": "plan, inp",
+              "doc": "Spec 01A \u00a710: beginner view bound to the ACTUALLY selected r..."
+            },
+            {
+              "name": "main",
+              "type": "FunctionDef",
+              "args": ""
+            }
+          ],
+          "scripts/p2p_safe_installer.py": [
+            {
+              "name": "InstallerError",
+              "type": "ClassDef",
+              "bases": [
+                "Exception"
+              ],
+              "methods": []
+            },
+            {
+              "name": "sha256",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "get_project_fingerprint",
+              "type": "FunctionDef",
+              "args": "root: Path",
+              "doc": "Generate a stable fingerprint of the project root (excluding..."
+            },
+            {
+              "name": "load_json",
+              "type": "FunctionDef",
+              "args": "p: Path"
+            },
+            {
+              "name": "dump_json",
+              "type": "FunctionDef",
+              "args": "p: Path, obj: Any"
+            },
+            {
+              "name": "stamp_now",
+              "type": "FunctionDef",
+              "args": ""
+            },
+            {
+              "name": "_validate_artifact_identity",
+              "type": "FunctionDef",
+              "args": "temp_extract: Path, requested_version: str, artifact_sha: str",
+              "doc": "Performs fail-closed identity validation (\u00a72)."
+            },
+            {
+              "name": "install",
+              "type": "FunctionDef",
+              "args": "project_root: Path, artifact_path: Path, expected_sha: str, requested_version: str, mode: str='PORTABLE'"
+            },
+            {
+              "name": "rollback",
+              "type": "FunctionDef",
+              "args": "project_root: Path"
+            }
+          ]
+        }
+      },
+      "token_count": 14950,
+      "fingerprint": "1a1600b56de76a2a34d8dd307026643508b610b00bce05174b9f740fa159a0c4",
+      "is_truncated": true
+    },
+    "2": {
+      "level": 2,
+      "content": {
+        "import_graph": {
+          "add_c30_invariants.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path"
+          ],
+          "add_roadmap_c31.py": [
+            "pathlib.Path"
+          ],
+          "build_c30_candidate.py": [
+            "json",
+            "pathlib",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile"
+          ],
+          "bump_version_24.py": [
+            "json",
+            "pathlib"
+          ],
+          "c30_recover_state.py": [
+            "json",
+            "pathlib.Path"
+          ],
+          "c31_live_probe.py": [
+            "__future__.annotations",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "time"
+          ],
+          "check_cycles.py": [
+            "__future__.annotations",
+            "json"
+          ],
+          "create_pr6.py": [
+            "json",
+            "subprocess"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_b_independent_verify.py": [
+            "__future__.annotations",
+            "datetime",
+            "hashlib",
+            "json",
+            "p2p_capabilities.backend_contract.BackendExecutionResult",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "p2p_capabilities.role_receipt.new_role_receipt",
+            "p2p_capabilities.role_verifier.verify_role_execution_receipt",
+            "pathlib.Path",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_b_role_proof.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "p2p_capabilities.agent_role.CANONICAL_ROLES",
+            "p2p_capabilities.backend_contract.BackendContractError",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "pathlib.Path",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_c_hermes_proof.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role.CANONICAL_ROLES",
+            "p2p_capabilities.backend_contract.BackendContractError",
+            "p2p_capabilities.hermes_adapter.HermesAdapter",
+            "p2p_capabilities.hermes_adapter._run_hermes",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "time"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_c_independent_verify.py": [
+            "__future__.annotations",
+            "dataclasses",
+            "hashlib",
+            "json",
+            "p2p_capabilities.backend_contract.BackendExecutionResult",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "p2p_capabilities.role_receipt.RoleExecutionReceipt",
+            "p2p_capabilities.role_verifier.verify_role_execution_receipt",
+            "pathlib.Path",
+            "sys"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_capsule_build.py": [
+            "__future__.annotations",
+            "dataclasses",
+            "json",
+            "p2p_capabilities.context_envelope.DeliveryEnvelope",
+            "p2p_capabilities.context_manifest.ContextManifest",
+            "pathlib.Path",
+            "secrets",
+            "sys"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_fresh_execution.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.agent_role.CANONICAL_ROLES",
+            "p2p_capabilities.backend_contract.BackendContractError",
+            "p2p_capabilities.context_envelope._fingerprint",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "pathlib.Path",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_independent_verify.py": [
+            "__future__.annotations",
+            "dataclasses",
+            "hashlib",
+            "json",
+            "p2p_capabilities.backend_contract.BackendExecutionResult",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "p2p_capabilities.role_receipt.RoleExecutionReceipt",
+            "p2p_capabilities.role_verifier.verify_role_execution_receipt",
+            "pathlib.Path",
+            "sys"
+          ],
+          "docs/p2p-development/research/c38/harness/c38_stage_d_observe_result.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "p2p_capabilities.context._canonical_bytes",
+            "pathlib.Path",
+            "sys"
+          ],
+          "docs/p2p-development/research/c39/evidence/c39-auth-preflight.py": [
+            "json",
+            "os",
+            "shutil",
+            "subprocess",
+            "sys",
+            "urllib.request"
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof1_independent_verify.py": [
+            "__future__.annotations",
+            "datetime",
+            "hashlib",
+            "json",
+            "p2p_capabilities.backend_contract.BackendExecutionResult",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "p2p_capabilities.role_receipt.new_role_receipt",
+            "p2p_capabilities.role_verifier.verify_role_execution_receipt",
+            "pathlib.Path",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof1_selection_execution.py": [
+            "hashlib.sha256",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role.CANONICAL_ROLES",
+            "p2p_capabilities.backend_contract.BackendExecutionResult",
+            "p2p_capabilities.failover_boundary.decide_next_action",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "pathlib.Path",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof2_drift_reselection.py": [
+            "hashlib",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role.CANONICAL_ROLES",
+            "p2p_capabilities.failover_boundary.decide_next_action",
+            "p2p_capabilities.hermes_adapter.HermesAdapter",
+            "p2p_capabilities.hermes_adapter._run_hermes",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "time"
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof3_capsule_continuity.py": [
+            "__future__.annotations",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role.CANONICAL_ROLES",
+            "p2p_capabilities.context_envelope._fingerprint",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "pathlib.Path",
+            "secrets",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof3_observe_result.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.context_envelope._fingerprint",
+            "pathlib.Path",
+            "sys"
+          ],
+          "docs/p2p-development/research/c39/harness/c39_proof4_unsafe_postdispatch.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.failover_boundary.decide_next_action",
+            "pathlib.Path",
+            "sys",
+            "time"
+          ],
+          "docs/p2p-development/research/c40/harness/c40_fresh_process_recovery.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "uuid"
+          ],
+          "docs/p2p-development/research/c40/harness/c40_pilot_task.py": [
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role.load_capability_registry",
+            "p2p_capabilities.failover_boundary.decide_next_action",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "pathlib.Path",
+            "sys",
+            "time",
+            "uuid"
+          ],
+          "docs/p2p-development/research/c41/harness/c41_gia_pha_fresh_process_recovery.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "uuid"
+          ],
+          "docs/p2p-development/research/c41/harness/c41_gia_pha_pilot_task.py": [
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "p2p_capabilities.agent_role.load_capability_registry",
+            "p2p_capabilities.failover_boundary.decide_next_action",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "pathlib.Path",
+            "sys",
+            "time",
+            "uuid"
+          ],
+          "docs/p2p-development/research/c43/harness/c43_gametruyen_activation.py": [
+            "hashlib",
+            "os",
+            "p2p_capabilities.manus_adapter.ManusAdapter",
+            "sys"
+          ],
+          "dump_c31_evidence.py": [
+            "json"
+          ],
+          "fill_c30_candidate.py": [
+            "datetime",
+            "json",
+            "pathlib"
+          ],
+          "finalize_governance_c26.py": [
+            "hashlib",
+            "json",
+            "pathlib.Path"
+          ],
+          "fix_ledger_deps.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path"
+          ],
+          "fix_ledger_provenance_c30.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path"
+          ],
+          "regen_roadmap_c30.py": [
+            "__future__.annotations",
+            "collections.Counter",
+            "json",
+            "pathlib.Path"
+          ],
+          "remove_ledger_c27_draft.py": [
+            "json",
+            "pathlib.Path"
+          ],
+          "reports/fw04-checkpoint-certification-handoff-supervisor.py": [
+            "pathlib.Path",
+            "re",
+            "sys"
+          ],
+          "scripts/accounting_check.py": [
+            "hashlib",
+            "json",
+            "subprocess",
+            "zipfile"
+          ],
+          "scripts/analyze_rebuild_diff.py": [
+            "json",
+            "os",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "zipfile"
+          ],
+          "scripts/certify_manus_target.py": [
+            "json",
+            "os",
+            "pathlib.Path",
+            "sentinel_dispatch.certify_manus_target",
+            "sys"
+          ],
+          "scripts/debug_freshness.py": [
+            "hashlib",
+            "os",
+            "pathlib.Path",
+            "project_map.ProjectMapBuilder",
+            "shutil",
+            "sys"
+          ],
+          "scripts/debug_rebuild_diff.py": [
+            "difflib",
+            "json",
+            "os",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "zipfile"
+          ],
+          "scripts/doctor.py": [
+            "__future__.annotations",
+            "argparse",
+            "csv",
+            "hashlib",
+            "importlib.util",
+            "json",
+            "pathlib.Path",
+            "re",
+            "subprocess",
+            "sys",
+            "tomllib",
+            "zlib"
+          ],
+          "scripts/fix_fw05_fw06_candidate_ids.py": [
+            "hashlib",
+            "json",
+            "sys"
+          ],
+          "scripts/fw01/p2p_fw01_discovery.py": [
+            "json",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "time"
+          ],
+          "scripts/fw01/p2p_fw01_proof.py": [
+            "__future__.annotations",
+            "datetime.datetime",
+            "json",
+            "os",
+            "p2p_capabilities.autopilot_state.GoalPlan",
+            "p2p_capabilities.p2p_fw01_loop.Fw01Loop",
+            "p2p_capabilities.p2p_fw01_loop.Fw01State",
+            "p2p_capabilities.p2p_fw01_loop.build_fw01_loop",
+            "p2p_capabilities.p2p_loop_guard.IterationRecord",
+            "p2p_skill_eligibility.skill_eligibility_set",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "traceback",
+            "typing.Any"
+          ],
+          "scripts/fw01_patch_mint.py": [
+            "__future__.annotations",
+            "csv",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "zlib"
+          ],
+          "scripts/fw05_supervisor.py": [
+            "__future__.annotations",
+            "hashlib",
+            "inspect",
+            "io",
+            "json",
+            "p2p_capabilities.fw05_owner_experience",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "tokenize"
+          ],
+          "scripts/fw06_supervisor.py": [
+            "ast",
+            "datetime",
+            "datetime.timezone",
+            "hashlib",
+            "json",
+            "os",
+            "p2p_capabilities.fw06_operational_resilience",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile"
+          ],
+          "scripts/mint_fw00_fw06_cumulative.py": [
+            "collections.Counter",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "zipfile"
+          ],
+          "scripts/mint_fw00_fw06_governance_record.py": [
+            "collections.Counter",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "sys"
+          ],
+          "scripts/mint_fw05_candidate.py": [
+            "__future__.annotations",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "zipfile"
+          ],
+          "scripts/mint_fw06_candidate.py": [
+            "__future__.annotations",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "zipfile"
+          ],
+          "scripts/p2p_approval.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "re",
+            "sys"
+          ],
+          "scripts/p2p_beginner_certification.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "p2p_capabilities.CANONICAL_IDENTITIES",
+            "pathlib.Path",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "time",
+            "typing.Any"
+          ],
+          "scripts/p2p_c15_field_test.py": [
+            "__future__.annotations",
+            "argparse",
+            "hashlib",
+            "json",
+            "p2p_capabilities.bounded_delegation.BLOCKED",
+            "p2p_capabilities.evidence.EvidenceClaim",
+            "p2p_capabilities.task_state.TaskPlan",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "typing.Any"
+          ],
+          "scripts/p2p_decision_trace.py": [
+            "__future__.annotations",
+            "p2p_capabilities.decision_trace.cli_main",
+            "pathlib.Path",
+            "sys"
+          ],
+          "scripts/p2p_decision_trace_eval.py": [
+            "__future__.annotations",
+            "argparse",
+            "copy",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "p2p_capabilities.decision_trace",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "typing.Any"
+          ],
+          "scripts/p2p_delegation.py": [
+            "__future__.annotations",
+            "argparse",
+            "json",
+            "p2p_capabilities.bounded_delegation.BoundedDelegationController",
+            "p2p_capabilities.task_state.TaskStateError",
+            "pathlib.Path",
+            "sys",
+            "typing.Any"
+          ],
+          "scripts/p2p_development_control.py": [
+            "__future__.annotations",
+            "argparse",
+            "copy",
+            "datetime.datetime",
+            "json",
+            "pathlib.Path",
+            "re",
+            "sys",
+            "typing.Any"
+          ],
+          "scripts/p2p_eval.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys"
+          ],
+          "scripts/p2p_execution_target.py": [
+            "__future__.annotations",
+            "dataclasses.dataclass",
+            "hashlib",
+            "json",
+            "typing.Dict"
+          ],
+          "scripts/p2p_foreground_execution.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.datetime",
+            "json",
+            "p2p_capabilities.evidence.EvidenceClaim",
+            "p2p_capabilities.foreground_execution.ExecutionBudget",
+            "p2p_capabilities.task_state.TaskStateError",
+            "pathlib.Path",
+            "sys",
+            "typing.Any"
+          ],
+          "scripts/p2p_gate.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.datetime",
+            "json",
+            "p2p_approval.ApprovalError",
+            "pathlib.Path",
+            "subprocess",
+            "sys"
+          ],
+          "scripts/p2p_goal_closure.py": [
+            "dataclasses.dataclass",
+            "json",
+            "pathlib",
+            "re",
+            "subprocess",
+            "sys"
+          ],
+          "scripts/p2p_governance.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.date",
+            "hashlib",
+            "json",
+            "p2p_approval.validate_policy",
+            "p2p_approval.validate_record",
+            "pathlib.Path",
+            "re",
+            "sys"
+          ],
+          "scripts/p2p_install_release.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tarfile",
+            "typing.Any"
+          ],
+          "scripts/p2p_live_certification.py": [
+            "__future__.annotations",
+            "argparse",
+            "dataclasses.dataclass",
+            "datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "platform",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "time",
+            "uuid"
+          ],
+          "scripts/p2p_parallel.py": [
+            "__future__.annotations",
+            "argparse",
+            "json",
+            "p2p_capabilities.bounded_delegation.DelegationBudget",
+            "p2p_capabilities.parallel_execution.BoundedParallelForegroundController",
+            "p2p_capabilities.task_state.TaskStateError",
+            "pathlib.Path",
+            "sys",
+            "typing.Any"
+          ],
+          "scripts/p2p_planner_01a_test.py": [
+            "json",
+            "os",
+            "shutil",
+            "subprocess",
+            "sys"
+          ],
+          "scripts/p2p_planner_01b_test.py": [
+            "json",
+            "os",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile"
+          ],
+          "scripts/p2p_planner_strictbind_test.py": [
+            "hashlib",
+            "json",
+            "os",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile"
+          ],
+          "scripts/p2p_planner_test.py": [
+            "glob",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib",
+            "shutil",
+            "subprocess",
+            "sys",
+            "time"
+          ],
+          "scripts/p2p_roadmap_planner.py": [
+            "argparse",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "re",
+            "sys"
+          ],
+          "scripts/p2p_safe_installer.py": [
+            "argparse",
+            "datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tarfile",
+            "typing.Any"
+          ],
+          "scripts/p2p_secure_onboarding.py": [
+            "__future__.annotations",
+            "dataclasses",
+            "datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib",
+            "re",
+            "shlex",
+            "subprocess",
+            "sys",
+            "urllib.error",
+            "urllib.request"
+          ],
+          "scripts/p2p_task_state.py": [
+            "__future__.annotations",
+            "argparse",
+            "json",
+            "p2p_capabilities.task_state.TaskPlan",
+            "p2p_capabilities.task_state.dependency_handoff",
+            "pathlib.Path",
+            "sys",
+            "typing.Any"
+          ],
+          "scripts/p2p_workflow.py": [
+            "__future__.annotations",
+            "argparse",
+            "datetime.date",
+            "hashlib",
+            "importlib",
+            "json",
+            "pathlib.Path",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "typing.Any"
+          ],
+          "scripts/pilot_harness_hardened.py": [
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "re",
+            "subprocess",
+            "sys",
+            "uuid"
+          ],
+          "scripts/rail_consolidation_validator.py": [
+            "hashlib",
+            "json",
+            "os",
+            "re",
+            "sys"
+          ],
+          "scripts/run_pilot_readonly_task.py": [
+            "json",
+            "manus_adapter.ManusAdapter",
+            "os",
+            "pathlib.Path",
+            "sentinel_dispatch.SentinelDispatcher",
+            "sys"
+          ],
+          "scripts/supervisor_pre_pilot_fw00_fw06.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "zipfile"
+          ],
+          "scripts/test_agents_safety.py": [
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "re",
+            "zipfile"
+          ],
+          "scripts/test_bootstrap.py": [
+            "json",
+            "os",
+            "pathlib.Path",
+            "project_context.ProjectContextBootstrap",
+            "shutil",
+            "sys"
+          ],
+          "scripts/test_causal_closure.py": [
+            "agent_role.AgentRoleSpec",
+            "json",
+            "manus_adapter.ManusAdapter",
+            "pathlib.Path",
+            "sentinel_dispatch.SentinelDispatcher",
+            "sys",
+            "time"
+          ],
+          "scripts/test_causal_closure_real.py": [
+            "manus_adapter.ManusAdapter",
+            "os",
+            "pathlib.Path",
+            "sentinel_dispatch.SentinelDispatcher",
+            "sys",
+            "time"
+          ],
+          "scripts/test_exact_fresh_machine.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile"
+          ],
+          "scripts/test_invariant_inversion.py": [
+            "json",
+            "pathlib.Path",
+            "project_context.ProjectContextBootstrap",
+            "shutil",
+            "sys",
+            "traceback"
+          ],
+          "scripts/test_map_freshness.py": [
+            "json",
+            "os",
+            "pathlib.Path",
+            "project_context",
+            "project_context.ProjectContextBootstrap",
+            "project_map.ProjectMap",
+            "shutil",
+            "sys",
+            "time",
+            "traceback"
+          ],
+          "scripts/test_map_gate.py": [
+            "json",
+            "os",
+            "pathlib.Path",
+            "project_context.enforce_map_before_work",
+            "shutil",
+            "sys"
+          ],
+          "scripts/test_map_gate_debug.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "project_context.enforce_map_before_work",
+            "project_map.ProjectMapBuilder",
+            "shutil",
+            "sys"
+          ],
+          "scripts/test_planner_dynamic.py": [
+            "json",
+            "os",
+            "shutil",
+            "subprocess",
+            "traceback"
+          ],
+          "scripts/test_safe_installer_rollback.py": [
+            "json",
+            "os",
+            "shutil",
+            "subprocess",
+            "sys",
+            "traceback"
+          ],
+          "scripts/test_v2_fresh_clone.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile"
+          ],
+          "scripts/update_from_release.py": [
+            "__future__.annotations",
+            "argparse",
+            "collections.defaultdict",
+            "csv",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "sys",
+            "zipfile"
+          ],
+          "scripts/validate_p2p_development_framework.py": [
+            "glob",
+            "json",
+            "jsonschema.validate",
+            "pathlib.Path",
+            "re",
+            "subprocess",
+            "sys"
+          ],
+          "scripts/verify_determinism.py": [
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "re",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "zipfile"
+          ],
+          "scripts/verify_fw00_fw06_cumulative.py": [
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "zipfile"
+          ],
+          "scripts/verify_mutation_safety_integration_01.py": [
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "zipfile"
+          ],
+          "scripts/verify_regen_digests.py": [
+            "hashlib",
+            "zipfile"
+          ],
+          "scripts/verify_reinstall_and_compat.py": [
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "zipfile"
+          ],
+          "scripts/verify_source_binding.py": [
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "subprocess",
+            "zipfile"
+          ],
+          "show_et_errors.py": [
+            "re",
+            "subprocess"
+          ],
+          "sync_c30_capability_status.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path"
+          ],
+          "tests/fixtures/existing-project/app.py": [],
+          "tests/fixtures/new-project/app.py": [],
+          "tests/p2p_capabilities/test_failover_boundary.py": [
+            "hashlib",
+            "json",
+            "p2p_capabilities.backend_contract.BackendContractError",
+            "p2p_capabilities.failover_boundary",
+            "p2p_capabilities.failover_boundary.FailoverDecision",
+            "pytest"
+          ],
+          "tests/test_p2p_adaptive_orchestration.py": [
+            "json",
+            "p2p_capabilities.orchestration_policy.derive_requirement",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_aesthetica_selective_routing.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_uiux.router.classify_request",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_autopilot_families.py": [
+            "__future__.annotations",
+            "dataclasses.asdict",
+            "json",
+            "os",
+            "p2p_capabilities.autopilot_budget.BudgetController",
+            "p2p_capabilities.autopilot_contract.TaskContractBuilder",
+            "p2p_capabilities.autopilot_gate.ContinueGate",
+            "p2p_capabilities.autopilot_loop.AutoPilotLoop",
+            "p2p_capabilities.autopilot_state.GoalStateStore",
+            "p2p_capabilities.autopilot_verifier.TaskVerifier",
+            "p2p_capabilities.fake_execution_backend.FakeDeterministicExecutionBackend",
+            "p2p_capabilities.task_state.TaskPlan",
+            "sys",
+            "tempfile",
+            "threading",
+            "unittest"
+          ],
+          "tests/test_p2p_autopilot_scenarios.py": [
+            "__future__.annotations",
+            "json",
+            "os",
+            "p2p_capabilities.autopilot_budget.BudgetController",
+            "p2p_capabilities.autopilot_contract.TaskContractBuilder",
+            "p2p_capabilities.autopilot_gate.validate_owner_gate_reason",
+            "p2p_capabilities.autopilot_loop.AutoPilotLoop",
+            "p2p_capabilities.autopilot_state.ExecutionBound",
+            "p2p_capabilities.autopilot_state.GoalStateStore",
+            "p2p_capabilities.autopilot_verifier.TaskVerifier",
+            "p2p_capabilities.fake_execution_backend.FakeDeterministicExecutionBackend",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_beginner_certification.py": [
+            "__future__.annotations",
+            "p2p_beginner_certification",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_beginner_routing.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_uiux.router.classify_request",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_bounded_delegation.py": [
+            "__future__.annotations",
+            "importlib.util",
+            "json",
+            "p2p_capabilities.bounded_delegation.BLOCKED",
+            "p2p_capabilities.decision_trace.read_trace_records",
+            "p2p_capabilities.evidence.EvidenceClaim",
+            "p2p_capabilities.task_state.TaskPlan",
+            "pathlib.Path",
+            "scripts.p2p_host_identity_hook.append_receipt",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_c31_live_certification.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "pathlib.Path",
+            "pytest",
+            "re"
+          ],
+          "tests/test_p2p_c34_real_backend_contract.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "os",
+            "p2p_capabilities.backend_contract.ADAPTER_STATES",
+            "p2p_capabilities.backend_execution_bridge.ADAPTER_CURRENTLY_ELIGIBLE",
+            "p2p_capabilities.hermes_adapter.HERMES_ADAPTER_ID",
+            "p2p_capabilities.manus_adapter.MANUS_ADAPTER_ID",
+            "pathlib",
+            "pytest",
+            "re",
+            "subprocess",
+            "sys",
+            "time",
+            "unittest.mock"
+          ],
+          "tests/test_p2p_c35_provider_neutral_runtime.py": [
+            "__future__.annotations",
+            "importlib.util",
+            "inspect",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role",
+            "p2p_capabilities.agent_role.AgentRoleSpec",
+            "p2p_capabilities.backend_contract.AUTH_STATES",
+            "p2p_capabilities.backend_execution_bridge.BackendAdapterRegistry",
+            "p2p_capabilities.fake_targets.FAKE_TARGET_IDS",
+            "p2p_capabilities.role_bridge.RoleBridgeError",
+            "p2p_capabilities.role_contract",
+            "p2p_capabilities.role_contract.ROLE_CONTRACT_SCHEMA",
+            "p2p_capabilities.role_eligibility",
+            "p2p_capabilities.role_eligibility.TargetCertificationRecord",
+            "p2p_capabilities.role_quorum",
+            "p2p_capabilities.role_quorum.RoleQuorumError",
+            "p2p_capabilities.role_receipt",
+            "p2p_capabilities.role_receipt.RoleExecutionReceipt",
+            "p2p_capabilities.role_verifier",
+            "p2p_capabilities.role_verifier.DECISION_CODES",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_c36_evidence_bound_context.py": [
+            "__future__.annotations",
+            "collections.Counter",
+            "json",
+            "os",
+            "p2p_capabilities.agent_role.build_role_spec",
+            "p2p_capabilities.context.context_fingerprint",
+            "p2p_capabilities.context_cache",
+            "p2p_capabilities.context_cache.StaleCacheError",
+            "p2p_capabilities.context_efficiency",
+            "p2p_capabilities.context_efficiency.UNKNOWN_VALUE",
+            "p2p_capabilities.context_envelope",
+            "p2p_capabilities.context_envelope.DeliveryEnvelope",
+            "p2p_capabilities.context_loop_guard",
+            "p2p_capabilities.context_loop_guard.AttemptLog",
+            "p2p_capabilities.context_manifest",
+            "p2p_capabilities.context_manifest.AUTHORITY_CLASSES",
+            "p2p_capabilities.decision_trace.CANONICAL_IDENTITIES",
+            "p2p_capabilities.evidence.detect_no_progress",
+            "p2p_capabilities.fake_targets.fake_target_certification_record",
+            "p2p_capabilities.fake_targets.fake_target_fingerprint",
+            "p2p_capabilities.read_evidence",
+            "p2p_capabilities.read_evidence.READ_STATES",
+            "p2p_capabilities.role_contract.AgentRoleSpec",
+            "p2p_capabilities.role_contract.RoleExecutionContract",
+            "p2p_capabilities.role_eligibility.evaluate_role_target_eligibility",
+            "scripts.p2p_goal_closure.ChangeSignals",
+            "sys",
+            "tempfile",
+            "tests.test_p2p_c35_provider_neutral_runtime._cert_for",
+            "unittest"
+          ],
+          "tests/test_p2p_c37_adaptive_selection.py": [
+            "__future__.annotations",
+            "inspect",
+            "os",
+            "p2p_capabilities.agent_role.build_role_spec",
+            "p2p_capabilities.backend_execution_bridge.contract_request_fingerprint",
+            "p2p_capabilities.context_efficiency.CURRENCIES",
+            "p2p_capabilities.context_loop_guard.AttemptLog",
+            "p2p_capabilities.decision_trace.DECISION_TYPES",
+            "p2p_capabilities.decision_trace.append_trace",
+            "p2p_capabilities.fake_targets.fake_target_fingerprint",
+            "p2p_capabilities.host_selection.HostSelector",
+            "p2p_capabilities.role_contract.build_role_execution_contract",
+            "p2p_capabilities.role_eligibility.TargetCertificationRecord",
+            "p2p_capabilities.selection_filter.EligibilityRequirements",
+            "p2p_capabilities.selection_policy",
+            "p2p_capabilities.selection_policy.BLOCKED",
+            "p2p_capabilities.selection_quality.QUALITY_CLASSES",
+            "p2p_capabilities.selection_receipt.BLOCKED",
+            "p2p_capabilities.selection_request.OwnerConstraints",
+            "p2p_capabilities.selection_risk.classify_task_risk",
+            "p2p_capabilities.selection_target.SelectionCandidateEvidence",
+            "p2p_capabilities.selection_trace.TRACE_SCHEMA",
+            "p2p_capabilities.selection_trace.map_exclusion_reason_to_trace",
+            "p2p_capabilities.trust",
+            "p2p_capabilities.trust.FactClaim",
+            "scripts.p2p_goal_closure.ChangeSignals",
+            "sys",
+            "tempfile",
+            "tests.test_p2p_c35_provider_neutral_runtime._cert_for",
+            "unittest"
+          ],
+          "tests/test_p2p_capability_foundation.py": [
+            "__future__.annotations",
+            "copy",
+            "json",
+            "p2p_capabilities.CAPABILITY_CLASSES",
+            "p2p_uiux.router.classify_request",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "tomllib",
+            "unittest"
+          ],
+          "tests/test_p2p_cognitive_economy.py": [
+            "p2p_capabilities.bounded_delegation.DELEGATE",
+            "p2p_capabilities.context.BASELINE_COMPAT",
+            "p2p_capabilities.parallel_execution.MAX_PARALLEL_CHILDREN",
+            "p2p_capabilities.task_state.TaskPlan",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_context_delivery.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.context.BASELINE_COMPAT",
+            "p2p_workflow",
+            "pathlib.Path",
+            "shutil",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_decision_trace.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.decision_trace",
+            "p2p_decision_trace_eval",
+            "p2p_workflow",
+            "pathlib.Path",
+            "shutil",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_design_intelligence.py": [
+            "__future__.annotations",
+            "copy",
+            "json",
+            "p2p_uiux.design_intelligence.DISPOSITIONS",
+            "p2p_uiux.router.classify_request",
+            "pathlib.Path",
+            "shutil",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_development_charter.py": [
+            "json",
+            "jsonschema",
+            "pathlib.Path",
+            "pytest",
+            "re"
+          ],
+          "tests/test_p2p_development_control.py": [
+            "__future__.annotations",
+            "copy",
+            "hashlib",
+            "importlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "unittest",
+            "zipfile"
+          ],
+          "tests/test_p2p_doctor_roles.py": [
+            "__future__.annotations",
+            "doctor",
+            "json",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_execution_target.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "p2p_execution_target",
+            "p2p_execution_target.AuthProfile",
+            "p2p_execution_target.CapabilityState",
+            "p2p_execution_target._material_identity",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_foreground_execution.py": [
+            "__future__.annotations",
+            "ast",
+            "importlib.util",
+            "json",
+            "p2p_capabilities.evidence.EvidenceClaim",
+            "p2p_capabilities.foreground_execution.ExecutionBudget",
+            "p2p_capabilities.task_state.TaskPlan",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "time",
+            "unittest"
+          ],
+          "tests/test_p2p_fw01_closure_no_self_reference.py": [
+            "pathlib",
+            "subprocess",
+            "unittest"
+          ],
+          "tests/test_p2p_goal_closure.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "p2p_goal_closure",
+            "pathlib",
+            "re",
+            "subprocess",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_goal_subsystem.py": [
+            "__future__.annotations",
+            "copy",
+            "json",
+            "p2p_workflow",
+            "pathlib.Path",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_governance_drift.py": [
+            "__future__.annotations",
+            "datetime.date",
+            "json",
+            "p2p_governance",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_host_executor.py": [
+            "__future__.annotations",
+            "p2p_capabilities.bounded_delegation.PermissionEnvelope",
+            "p2p_capabilities.foreground_execution.ExecutionBudget",
+            "p2p_capabilities.host_executor.CAPABILITY_DIMENSIONS",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_host_identity_receipt.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_host_identity_hook",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "tomllib",
+            "unittest"
+          ],
+          "tests/test_p2p_host_selection.py": [
+            "__future__.annotations",
+            "p2p_capabilities.host_executor.HostCapabilityProfile",
+            "p2p_capabilities.host_selection.AVAILABLE",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_ledger_provenance.py": [
+            "json",
+            "pathlib.Path",
+            "pytest",
+            "re",
+            "subprocess"
+          ],
+          "tests/test_p2p_live_certification.py": [
+            "dataclasses",
+            "json",
+            "p2p_live_certification",
+            "pathlib.Path",
+            "pytest",
+            "subprocess",
+            "sys"
+          ],
+          "tests/test_p2p_live_execution.py": [
+            "__future__.annotations",
+            "datetime.datetime",
+            "hashlib",
+            "json",
+            "p2p_capabilities.context.BASELINE_COMPAT",
+            "p2p_capabilities.live_execution.CUSTOM_PROFILE_EXECUTOR_CLASS",
+            "pathlib.Path",
+            "shutil",
+            "sys",
+            "unittest",
+            "uuid"
+          ],
+          "tests/test_p2p_parallel_execution.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.bounded_delegation.DelegationRequest",
+            "p2p_capabilities.evidence.EvidenceClaim",
+            "p2p_capabilities.parallel_execution.MAX_PARALLEL_CHILDREN",
+            "p2p_capabilities.task_state.TaskPlan",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "threading",
+            "time",
+            "unittest"
+          ],
+          "tests/test_p2p_project_eval.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_eval",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_release_packaging.py": [
+            "__future__.annotations",
+            "hashlib",
+            "json",
+            "os",
+            "pathlib.Path",
+            "shutil",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "unittest",
+            "zipfile"
+          ],
+          "tests/test_p2p_secure_onboarding.py": [
+            "dataclasses",
+            "json",
+            "p2p_secure_onboarding.AUTH_METHODS",
+            "p2p_secure_onboarding.FAILURE_STATUSES",
+            "p2p_secure_onboarding.auth_requirement",
+            "p2p_secure_onboarding.connector_configured",
+            "p2p_secure_onboarding.host_binary_available",
+            "pathlib",
+            "pytest",
+            "sys",
+            "time"
+          ],
+          "tests/test_p2p_security_scan.py": [
+            "__future__.annotations",
+            "p2p_uiux.security.scan_text",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_task_state.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_capabilities.evidence.EvidenceClaim",
+            "p2p_capabilities.task_state.TaskContractError",
+            "pathlib.Path",
+            "subprocess",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "tests/test_p2p_task_targeted_context.py": [
+            "copy",
+            "json",
+            "p2p_capabilities.context.CONTEXT_INSUFFICIENT",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_task_targeted_context_comparison.py": [
+            "json",
+            "p2p_capabilities.context.EXPANDED",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_uiux_cli.py": [
+            "__future__.annotations",
+            "importlib.util",
+            "json",
+            "pathlib.Path",
+            "sys",
+            "unittest"
+          ],
+          "tests/test_p2p_workflow.py": [
+            "__future__.annotations",
+            "json",
+            "p2p_workflow",
+            "pathlib.Path",
+            "shutil",
+            "sys",
+            "tempfile",
+            "unittest"
+          ],
+          "update_governance_c27.py": [
+            "__future__.annotations",
+            "datetime",
+            "json",
+            "pathlib.Path",
+            "sys"
+          ],
+          "update_governance_c28.py": [
+            "__future__.annotations",
+            "datetime",
+            "json",
+            "pathlib",
+            "sys"
+          ],
+          "update_governance_c29.py": [
+            "json",
+            "pathlib",
+            "sys"
+          ],
+          "update_governance_c30.py": [
+            "json",
+            "pathlib",
+            "sys"
+          ],
+          "update_governance_c31.py": [
+            "__future__.annotations",
+            "datetime.datetime",
+            "json",
+            "pathlib.Path"
+          ],
+          "update_ledger_c27.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path",
+            "sys"
+          ],
+          "update_ledger_c30.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path"
+          ],
+          "update_ledger_c31.py": [
+            "__future__.annotations",
+            "json",
+            "pathlib.Path"
+          ],
+          "verify_package.py": [
+            "collections.Counter",
+            "pathlib.Path",
+            "zipfile"
+          ]
+        }
+      },
+      "token_count": 7435,
+      "fingerprint": "196bc288560337d8faeb29eb73fa2c63c1e6f61d61c8e5d865d951747aee5882",
+      "is_truncated": false
+    }
+  }
+}

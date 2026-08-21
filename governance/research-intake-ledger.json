@@ -26,7 +26,7 @@
   "intake_records": [
     {
       "id": "RI-001",
-      "subject": "P2P-FRAMEWORK-00 \u2014 Product Memory Foundation",
+      "subject": "P2P-FRAMEWORK-00 — Product Memory Foundation",
       "classification": "COMPLETED",
       "source": "owner_instruction",
       "instruction_ref": "Owner message 2026-08-18/19 (P2P-FRAMEWORK-00)",
@@ -60,22 +60,22 @@
       "subject": "DeepSeek Harness (DSH) / plugin architecture claims",
       "classification": "PENDING_OWNER_APPROVAL",
       "source": "owner_instruction",
-      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake \u2014 DeepSeek Harness / plugin architecture claims",
-      "scope": "DSH public claims (150k stars / four-day release / Cordis identity): classification NOT_VERIFIED \u2014 no repository or web provenance artifact for the specific claims exists in durable evidence (verified by full-text repository search; no DSH evidence files or decision records present in docs/, governance/, manifest/); the repo's pre-existing research_decisions entry 'DeepSeek Harness (DEFERRED, C11-scoped)' covers the general subject but not these claims. Everything-is-plugin: ADAPT_SELECTIVELY (Owner instruction; map selectively to existing P2P governance rather than wholesale adoption). Hot reload: candidate idea GOVERNED_HOT_SWAP / safe quiescent-boundary activation. Open plugin market: DEFER / SECURITY_GATED.",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — DeepSeek Harness / plugin architecture claims",
+      "scope": "DSH public claims (150k stars / four-day release / Cordis identity): classification NOT_VERIFIED — no repository or web provenance artifact for the specific claims exists in durable evidence (verified by full-text repository search; no DSH evidence files or decision records present in docs/, governance/, manifest/); the repo's pre-existing research_decisions entry 'DeepSeek Harness (DEFERRED, C11-scoped)' covers the general subject but not these claims. Everything-is-plugin: ADAPT_SELECTIVELY (Owner instruction; map selectively to existing P2P governance rather than wholesale adoption). Hot reload: candidate idea GOVERNED_HOT_SWAP / safe quiescent-boundary activation. Open plugin market: DEFER / SECURITY_GATED.",
       "status": "PENDING_OWNER_APPROVAL",
       "evidence_refs": [
         "/home/ubuntu/upload/pasted_content_3.txt (Owner directive section 10)",
         "governance/development-control.json research_decisions 'DeepSeek Harness' (DEFERRED)",
         "docs/p2p-development/reports/P2P-C35R-terminal-report.md (execution-harness audit precedent: P2P stays out of raw execution-harness layer; selective concept adaptation only)"
       ],
-      "machinery_rule": "Specific public claims without repository/web provenance are NOT_VERIFIED by machinery (no evidence-of-absence claim; they remain NOT_PROVEN until provenance is recovered or disproven) \u2014 same provenance discipline as the NUI '174 faculties' reconciliation (RI-003)."
+      "machinery_rule": "Specific public claims without repository/web provenance are NOT_VERIFIED by machinery (no evidence-of-absence claim; they remain NOT_PROVEN until provenance is recovered or disproven) — same provenance discipline as the NUI '174 faculties' reconciliation (RI-003)."
     },
     {
       "id": "RI-005",
       "subject": "Community 13-step Codex efficiency workflow",
       "classification": "PENDING_OWNER_APPROVAL",
       "source": "owner_instruction",
-      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake \u2014 community 13-step Codex efficiency workflow",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — community 13-step Codex efficiency workflow",
       "scope": "Community-derived 13-step Codex efficiency workflow. Per Owner instruction: do NOT copy the workflow literally; instead map its concepts to existing P2P capabilities and framework gaps (concept-to-capability mapping intake). No community source artifact is stored in durable evidence today; intake records the concept-mapping request, not the workflow text.",
       "status": "PENDING_OWNER_APPROVAL",
       "evidence_refs": [
@@ -88,7 +88,7 @@
       "subject": "Capability Intelligence concept (FRAMEWORK-02 product direction)",
       "classification": "PENDING_OWNER_APPROVAL",
       "source": "owner_instruction",
-      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake \u2014 Capability Intelligence concept; set FRAMEWORK-02 likely_next name 'P2P-FRAMEWORK-02 \u2014 PROJECT & SKILL INTELLIGENCE' without starting it",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — Capability Intelligence concept; set FRAMEWORK-02 likely_next name 'P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE' without starting it",
       "scope": "Accepted product direction for FRAMEWORK-02: TASK -> REQUIRED_CAPABILITIES -> eligible skill/tool/retriever/model/backend/etc. Skill is only ONE capability source. Intake records the direction only; FRAMEWORK-02 remains NOT_STARTED and this directive explicitly forbids starting it.",
       "status": "PENDING_OWNER_APPROVAL",
       "evidence_refs": [
@@ -105,8 +105,17 @@
       "decision_ref": "P2P_Contextual_Rule_Intelligence_Update_2026-08-21 (Owner decision document, intaken by P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01)",
       "instruction_ref": "Owner decision: ACCEPTED FOR DEVELOPMENT ARCHITECTURE; status PLANNED / NOT_IMPLEMENTED / NOT_CERTIFIED; target FW02 Project & Capability Intelligence extension.",
       "selected_ideas_summary": "DOMAIN_POLICY_PACK, RULE_PACK_DISCOVERY, RULE_APPLICABILITY_EVALUATION, DEPENDENCY_AWARE_RULE_SELECTION, VERSION_BOUND_RULE_SELECTION, TASK_SCOPED_RULE_SELECTION, RULE_CONFLICT_RESOLUTION, RULE_PROVENANCE_BINDING, RULE_FRESHNESS_CLASSIFICATION, RULE_CONFIDENCE_CLASSIFICATION, MINIMUM_SUFFICIENT_RULE_INJECTION, RULE_OUTCOME_EVALUATION, RULE_PACK_HOST_COMPILATION",
-      "notes": "ADOPT THE PATTERN \u2014 DO NOT ADOPT THE CORPUS AS TRUTH. External .mdc corpus remains UNVERIFIED_CANDIDATE_CORPUS. Precedence preserved: Owner/Project Policy > Verified Project Truth > Version-bound Official Upstream > Verified P2P Domain Policy > Generic External Rule Corpus. UNKNOWN applicability -> fail closed. Minimum sufficient context. Provider neutrality preserved (host serialization never canonical authority).",
+      "notes": "ADOPT THE PATTERN — DO NOT ADOPT THE CORPUS AS TRUTH. External .mdc corpus remains UNVERIFIED_CANDIDATE_CORPUS. Precedence preserved: Owner/Project Policy > Verified Project Truth > Version-bound Official Upstream > Verified P2P Domain Policy > Generic External Rule Corpus. UNKNOWN applicability -> fail closed. Minimum sufficient context. Provider neutrality preserved (host serialization never canonical authority).",
       "intaken_at": "2026-08-21T05:42:52Z"
+    },
+    {
+      "id": "RI-008",
+      "subject": "Cybersecurity External Skill Registry / Trust & Permission Gate",
+      "classification": "ACCEPTED",
+      "source": "github:mukul975/Anthropic-Cybersecurity-Skills@f76261573a539ec40c3d434ecbb9e657d26aa921",
+      "owner_accepted": true,
+      "accepted_at": "2026-08-21T16:13:09Z",
+      "summary": "Intake of mukul975/Anthropic-Cybersecurity-Skills registry (817 skills) as an external knowledge source. No auto-execution. Pinned to f76261573a539ec40c3d434ecbb9e657d26aa921."
     }
   ],
   "inherited_decisions": {
