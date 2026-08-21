@@ -1555,10 +1555,12 @@
         "status": "DONE",
         "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context",
         "source_research_ids": [
-          "RA-EXT-032"
+          "RA-EXT-032",
+          "RA-EXT-033"
         ],
         "canonical_capability_ids": [
-          "C41"
+          "C41",
+          "ADAPTIVE_VERIFICATION_POLICY_V2"
         ]
       },
       {

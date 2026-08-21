@@ -1076,3 +1076,136 @@ def latest_source_bound_record(capability_id: str,
                 and rec.get("subject") == subject):
             return dict(rec)
     return None
+
+
+import json
+import pathlib
+from typing import Any, Dict, List, Optional, Tuple, FrozenSet
+from dataclasses import dataclass
+
+# Path to the adaptive verification policy v2
+POLICY_PATH = pathlib.Path(__file__).resolve().parents[3] / "governance/adaptive-verification-policy-v2.json"
+
+@dataclass(frozen=True)
+class NFR:
+    nfr_id: str
+    requirement: str
+    applicability: str  # APPLICABLE | NOT_APPLICABLE | UNKNOWN | OWNER_REVIEW
+    hard_gate: bool = False
+    verification: Optional[str] = None
+
+@dataclass(frozen=True)
+class VerificationInput:
+    lifecycle_stage: str = "TASK"
+    change_class: str = "BUSINESS_LOGIC"
+    affected_surfaces: Tuple[str, ...] = ()
+    risk_class: str = "LOW"
+    mutation_class: str = "CODE"
+    reasoning_effort: str = "MEDIUM"
+    nfrs: Tuple[NFR, ...] = ()
+    requested_checks: FrozenSet[str] = frozenset()
+    release_policy_full_suite: bool = False
+    affected_surface_known: bool = True
+
+@dataclass(frozen=True)
+class VerificationPlan:
+    levels: Tuple[str, ...]
+    checks: Tuple[str, ...]
+    deferred: Tuple[str, ...]
+    escalation_reasons: Tuple[str, ...]
+    fail_closed_reasons: Tuple[str, ...]
+    full_suite: bool
+    process_cleanup_required: bool
+    stop_condition: str
+
+BROAD = {"E2E", "RACE", "LOAD", "STRESS", "SOAK", "CHAOS", "PERFORMANCE"}
+
+def _base_levels(change_class: str) -> List[str]:
+    c = change_class.upper()
+    if c in {"DOCS", "LABEL", "COPY", "CONFIG_COMMENT"}:
+        return ["L0_STATIC"]
+    if c in {"VALIDATION", "PURE_FUNCTION", "LOCAL_LOGIC"}:
+        return ["L0_STATIC", "L1_TARGETED"]
+    if c in {"DB_TRANSACTION", "SCHEMA", "PERSISTENCE"}:
+        return ["L0_STATIC", "L1_TARGETED", "L2_COMPONENT", "L3_INTEGRATION"]
+    if c in {"AUTH", "AUTH_MIDDLEWARE", "PERMISSION", "SESSION"}:
+        return ["L0_STATIC", "L1_TARGETED", "L3_INTEGRATION", "L4_E2E"]
+    return ["L0_STATIC", "L1_TARGETED"]
+
+def plan_verification(inp: VerificationInput) -> VerificationPlan:
+    """Hardened Adaptive Verification Planner (V2).
+    Implements: RIGHT EVIDENCE, NOT MAXIMUM TEST COUNT.
+    """
+    levels = _base_levels(inp.change_class)
+    checks, deferred, escalations, fail = [], [], [], []
+    
+    # reasoning_effort is intentionally NOT used as a verification scope multiplier.
+    
+    if not inp.affected_surface_known:
+        fail.append("IMPACT_UNKNOWN")
+        levels = ["L0_STATIC"]
+        
+    sensitive = {"database", "auth", "permission", "security", "financial", "data-integrity"}
+    surfaces = {x.lower() for x in inp.affected_surfaces}
+    if surfaces & sensitive and "L3_INTEGRATION" not in levels:
+        levels.append("L3_INTEGRATION")
+        escalations.append("MATERIAL_BOUNDARY_AFFECTED")
+        
+    applicable_nfr = False
+    for nfr in inp.nfrs:
+        a = nfr.applicability.upper()
+        if a == "APPLICABLE":
+            applicable_nfr = True
+            if nfr.verification:
+                checks.append(nfr.verification.upper())
+            if "L5_NFR_SYSTEM" not in levels:
+                levels.append("L5_NFR_SYSTEM")
+            escalations.append(f"NFR_APPLICABLE:{nfr.nfr_id}")
+        elif a == "NOT_APPLICABLE":
+            deferred.append(f"NFR_NOT_APPLICABLE:{nfr.nfr_id}")
+        elif a in {"UNKNOWN", "OWNER_REVIEW"}:
+            if nfr.hard_gate:
+                fail.append(f"NFR_APPLICABILITY_UNRESOLVED:{nfr.nfr_id}")
+            else:
+                deferred.append(f"NFR_REQUIRES_REVIEW:{nfr.nfr_id}")
+        else:
+            fail.append(f"NFR_APPLICABILITY_INVALID:{nfr.nfr_id}")
+            
+    for requested in sorted(inp.requested_checks):
+        r = requested.upper()
+        if r in BROAD:
+            if applicable_nfr or (inp.lifecycle_stage in {"RELEASE", "MAJOR_RELEASE"} and inp.release_policy_full_suite):
+                checks.append(r)
+            else:
+                deferred.append(f"BROAD_CHECK_NEEDS_APPLICABILITY:{r}")
+        else:
+            checks.append(r)
+            
+    full_suite = False
+    if inp.lifecycle_stage in {"RELEASE", "MAJOR_RELEASE"} and inp.release_policy_full_suite:
+        full_suite = True
+        if "L6_RELEASE" not in levels:
+            levels.append("L6_RELEASE")
+        escalations.append("RELEASE_POLICY_REQUIRES_BROAD_REGRESSION")
+        
+    if inp.lifecycle_stage not in {"RELEASE", "MAJOR_RELEASE"}:
+        full_suite = False
+        
+    def uniq(xs): return tuple(dict.fromkeys(xs))
+    
+    return VerificationPlan(
+        levels=uniq(levels),
+        checks=uniq(checks),
+        deferred=uniq(deferred),
+        escalation_reasons=uniq(escalations),
+        fail_closed_reasons=uniq(fail),
+        full_suite=full_suite,
+        process_cleanup_required=True,
+        stop_condition="ACCEPTANCE_PROVEN_AND_NO_UNRESOLVED_MATERIAL_REGRESSION",
+    )
+
+FAILURE_TAXONOMY = frozenset({
+    "IMPLEMENTATION_DEFECT", "TEST_DEFECT", "ENVIRONMENT_DEFECT", "FLAKY_TEST",
+    "DEPENDENCY_FAILURE", "DATA_FIXTURE_DEFECT", "RESOURCE_EXHAUSTION",
+    "TIMEOUT_POLICY_DEFECT", "SPECIFICATION_CONFLICT", "UNKNOWN_FAILURE",
+})

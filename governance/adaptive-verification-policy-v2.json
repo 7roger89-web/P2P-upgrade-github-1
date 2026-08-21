@@ -1,0 +1,26 @@
+{
+  "schema": "p2p-adaptive-verification-policy/2",
+  "policy_id": "ADAPTIVE_VERIFICATION_HARDENING_V2",
+  "owner_decision": "ACCEPTED",
+  "decision_date": "2026-08-21",
+  "extends": "P2P-FRAMEWORK-04_ADAPTIVE_VERIFICATION",
+  "principle": "RIGHT_EVIDENCE_NOT_MAXIMUM_TEST_COUNT",
+  "new_framework": false,
+  "new_router": false,
+  "new_orchestrator": false,
+  "reasoning_effort_scope_coupling": "PROHIBITED",
+  "unknown_nfr_applicability": "FAIL_CLOSED_WITHOUT_RUN_EVERYTHING",
+  "full_suite_default": false,
+  "broad_test_classes_require_intent": [
+    "E2E",
+    "RACE",
+    "LOAD",
+    "STRESS",
+    "SOAK",
+    "CHAOS",
+    "PERFORMANCE"
+  ],
+  "failure_classification_required_before_fix": true,
+  "owned_process_cleanup_required": true,
+  "promotion_effect": "NONE"
+}

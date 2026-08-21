@@ -594,9 +594,12 @@
       "blockers": [],
       "source_research_ids": [
         "RA-EXT-026",
-        "RA-EXT-027"
+        "RA-EXT-027",
+        "RA-EXT-033"
       ],
-      "canonical_capability_ids": [],
+      "canonical_capability_ids": [
+        "ADAPTIVE_VERIFICATION_POLICY_V2"
+      ],
       "current_evidence": "BOUNDED_DOCUMENTATION_WRITE verified isolated/non-production (Pilot-02); READ_ONLY strongly evidenced",
       "target_evidence": "new primitive fail-closed; bounded isolated repo mutation; rollback recovery verified; OWNED approval gate",
       "mutation_risk_class": "BOUNDED_CODE_CHANGE (proposed)",
