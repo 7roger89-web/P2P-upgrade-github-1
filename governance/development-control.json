@@ -93,12 +93,12 @@
       ]
     },
     "candidate_identity_binding": {
-      "status": "RESERVED_PRE_MINT_UNPROMOTED",
+      "status": "MINTED_UNPROMOTED_CANDIDATE",
       "candidate_version": "8.4.7-C-codex.72",
-      "artifact_sha256": null,
-      "source_commit": null,
-      "source_tree": null,
-      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01a-pre-mint-disclosure.json"
+      "artifact_sha256": "70613080d2ddbb92a52d2d79186e125439ec7f5ba8a6fa87bda9208d1b39d872",
+      "source_commit": "6f88798cb3c7008167e5dd071247a4279cb31f3e",
+      "source_tree": "a03b8d76fcd018ebd4e7064dc6c85aae058d392e",
+      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01a-candidate-identity.json"
     },
     "provider_neutrality": "PRESERVED",
     "manus_native_council": {

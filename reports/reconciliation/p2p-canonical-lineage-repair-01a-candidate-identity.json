@@ -1,0 +1,195 @@
+{
+  "schema": "p2p-canonical-lineage-repair-01a-candidate-identity/1",
+  "task": "P2P-CANONICAL-LINEAGE-REPAIR-01A",
+  "continuation_of": "reports/reconciliation/p2p-canonical-lineage-repair-01a-pre-mint-disclosure.json",
+  "terminal_candidate_status": "PASS_WITH_DISCLOSURES",
+  "canonical_authority_ref": "origin/main",
+  "reconciliation_base": "origin/main",
+  "reconciliation_branch": "codex/p2p-canonical-lineage-repair-01",
+  "current_official_baseline": "8.4.7-C-codex.19",
+  "current_official_artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+  "official_baseline_changed": false,
+  "promotion_performed": false,
+  "candidate": {
+    "version": "8.4.7-C-codex.72",
+    "artifact_path": ".tmp/candidates/P2P-8.4.7-C-Codex-Edition-v72.zip",
+    "artifact_path_absolute": "D:/AI/P2P_dev/P2P-upgrade-github/.tmp/p2p-canonical-lineage-repair-01/.tmp/candidates/P2P-8.4.7-C-Codex-Edition-v72.zip",
+    "artifact_size_bytes": 2899774,
+    "artifact_sha256": "70613080d2ddbb92a52d2d79186e125439ec7f5ba8a6fa87bda9208d1b39d872",
+    "hash_match": true,
+    "hash_mechanisms": [
+      "Python hashlib.sha256 over full ZIP bytes",
+      "PowerShell Get-FileHash -Algorithm SHA256"
+    ],
+    "mint_count": 1,
+    "reminted_or_overwritten": false,
+    "candidate_vs_official": "UNPROMOTED_SUCCESSOR_CANDIDATE"
+  },
+  "source_binding": {
+    "source_commit": "6f88798cb3c7008167e5dd071247a4279cb31f3e",
+    "source_tree": "a03b8d76fcd018ebd4e7064dc6c85aae058d392e",
+    "source_worktree_dir": "D:/AI/P2P_dev/P2P-upgrade-github/.tmp/p2p-canonical-lineage-repair-01",
+    "source_worktree_dirty_at_mint": false,
+    "source_commit_object": "VERIFIED",
+    "source_tree_object": "VERIFIED",
+    "source_tree_bound_to_commit": "VERIFIED",
+    "source_commit_is_recovered_material_head": true,
+    "post_mint_branch_changes_are_evidence_or_governance_only": true
+  },
+  "metadata": {
+    "manifest_path": "release-manifest.json",
+    "manifest_schema": "p2p-codex-release-manifest/1",
+    "manifest_sha256": "564848bccbf373b0570aff90a17c7177da1a2e1b9fe0ea68b17dff4abfd40530",
+    "inventory_path": "INVENTORY.json",
+    "inventory_digest": "1b1c702f80d004e10a1472c59a8d62652be1191bdacce186f7c74f563d7b14c0",
+    "checksum_path": "RELEASE-SHA256SUMS.txt",
+    "checksum_set_digest": "2d0fb1e13f7e9dff0413a3a317e2c26662122b72803590e1a1ff5db31dffac9b",
+    "candidate_embedded_version": "8.4.7-C-codex.72",
+    "official_baseline_metadata_remains_separate": true
+  },
+  "archive_integrity": {
+    "total_members": 491,
+    "accounted_members": 491,
+    "unaccounted_members": 0,
+    "duplicate_paths": 0,
+    "unsafe_archive_paths": 0,
+    "absolute_archive_paths": 0,
+    "missing_expected_members": 0,
+    "inventory_match": true,
+    "checksum_match": true,
+    "checksum_mismatch_count": 0,
+    "independent_zip_structure_check": "PASS",
+    "distribution_scope_canonical": "VERIFIED",
+    "accidental_repository_dump": false,
+    "forbidden_surfaces": [
+      "/.tmp/",
+      "/reports/",
+      "/docs/plans/",
+      "/experimental/",
+      "/.p2p/",
+      "/__pycache__/"
+    ],
+    "distribution_notes": {
+      "runtime_namespace": "runtime/",
+      "source_p2p_system_alias": ".p2p/system/* -> runtime/*",
+      "tests": "evidence-only and excluded from payload",
+      "safe_installer": "package/install.ps1 is the packaged installer surface; source-only helper scripts are not payload members"
+    }
+  },
+  "recovered_capabilities": {
+    "matrix_entries": 16,
+    "adopt_yes_entries": 15,
+    "material_recovered_capabilities_missing": 0,
+    "baseline_replacement_sufficiency": "VERIFIED",
+    "material_baseline_surfaces_missing": 0,
+    "provider_neutrality": "PRESERVED",
+    "authority_model": "governance/development-control.json != manifest/package.json != runtime/p2p_capabilities/capabilities.json",
+    "capability_registry_canonical_members": [
+      "p2p_iris",
+      "p2p_tecton",
+      "p2p_axiom",
+      "p2p_vector",
+      "p2p_datos",
+      "p2p_anon",
+      "p2p_architecton",
+      "p2p_helios"
+    ],
+    "canonical_denominator": 8,
+    "full_quorum": "8/8"
+  },
+  "project_context_status": {
+    "PROJECT_IDENTITY": "DERIVED",
+    "PRODUCT_MODEL": "PROPOSED_OR_DERIVED_FROM_PROJECT_PIN",
+    "PROJECT_CONSTITUTION": "PROPOSED_UNLESS_AUTHORITATIVE_PROJECT_SUPPLIES_ONE",
+    "PROJECT_MAP": "DERIVED_ONLY_AFTER_EXPLICIT_SAVE",
+    "ARCHITECTURE_MAP": "PROPOSED_UNLESS_PRESENT_IN_PROJECT_CONTEXT",
+    "UI_LAYOUT_MAP": "PROPOSED_OR_NOT_IMPLEMENTED",
+    "DATA_MAP": "PROPOSED_OR_NOT_IMPLEMENTED",
+    "DECISION_LEDGER": "DERIVED_READ_ONLY_PROJECTION",
+    "PROJECT_CONSTRAINTS": "DERIVED_OR_UNKNOWN",
+    "GOAL_GRAPH": "PROPOSED_OR_UNKNOWN",
+    "PROJECT_CONTEXT_FINGERPRINT": "DERIVED",
+    "PROJECT_CONTEXT_READY_IS_EXECUTION_AUTHORIZATION": false
+  },
+  "installation_pilot": {
+    "install_method": "candidate install.ps1 -Scope Project -ProjectPath <disposable project>",
+    "project_root": ".tmp/pilot-v72/project-ps1",
+    "installation_mode": "PROJECT_LOCAL_DISPOSABLE_PILOT",
+    "install_status": "VERIFIED",
+    "project_pin": "VERIFIED",
+    "project_pin_path": ".tmp/pilot-v72/project-ps1/.p2p/project-pin.json",
+    "project_pin_candidate_sha256_matches": true,
+    "project_local_doctor": "HEALTHY",
+    "doctor_surface": "candidate doctor.ps1 invoked by install.ps1",
+    "strict_python_installed_role_drift": "FAIL_DISCLOSED",
+    "strict_python_installed_role_disclosure": "pre-existing Live Specs/governance drift is reported separately; it was not used to label the package doctor WARN as HEALTHY"
+  },
+  "map_before_work": {
+    "map_before_work_gate_runtime_enforced": "VERIFIED",
+    "fresh_map_authorized_mutation": "ALLOWED",
+    "stale_map_mutation": "BLOCKED",
+    "missing_map_mutation": "BLOCKED",
+    "context_ready_permission_denied": "BLOCKED",
+    "no_project_map_no_project_mutation": true
+  },
+  "manus": {
+    "local_adapter_conformance": "VERIFIED",
+    "adapter_state": "ARCHITECTURALLY_COMPATIBLE",
+    "auth_state": "NO_CREDENTIALS",
+    "availability": "UNAVAILABLE",
+    "p2p_request_id_distinct_from_manus_backend_task_id": true,
+    "execute_without_credentials": "AUTH_REQUIRED",
+    "live_manus_current_host": "NOT_RUN",
+    "live_manus_reason": "NO_CREDENTIALS",
+    "credentials_requested": false,
+    "synthetic_or_historical_live_ids_reused": false,
+    "manus_backend_task_id": "NOT_RUN",
+    "live_manus_certification": "NOT_CERTIFIED_ON_THIS_HOST",
+    "native_council": {
+      "status": "SUPPORTED",
+      "member_execution_mode": "BACKEND_ATTESTED_INTERNAL_MEMBERS",
+      "raw_member_results": "SUPPORTED",
+      "per_member_failure": "SUPPORTED",
+      "per_member_external_id": "NOT_EXPOSED",
+      "p2p_direct_child_control": "NOT_SUPPORTED",
+      "p2p_council_adapter": "FEASIBLE",
+      "externally_observable_eight_member_manus_council": false
+    }
+  },
+  "negative_matrix": {
+    "negative_matrix": "26/26",
+    "fail_closed": "26/26",
+    "suite": ".p2p/system/p2p_capabilities/tests/test_fw05_owner_experience.py",
+    "suite_result": "29 tests OK, 1 unrelated shadow-project skip"
+  },
+  "regression": {
+    "full_capability_suite": "335/335 PASS, 6 skipped",
+    "full_capability_suite_command": "unittest discovery .p2p/system/p2p_capabilities/tests -p test_*.py with repo-local Windows worktree harness shim",
+    "provider_neutral_c35_suite": "57/57 PASS",
+    "bounded_fw_suites": "94/94 PASS",
+    "new_unexplained_failures": 0,
+    "initial_windows_worktree_helper_failure": "test harness created an existing empty directory before git worktree add; corrected only in the disposable test harness, no product/test source change"
+  },
+  "security_portability": {
+    "new_secret_findings": 0,
+    "known_synthetic_fixture_secret_marker": "scripts/fw06_supervisor.py contains a non-secret test token fixture; no credential was used",
+    "runtime_absolute_mint_path_dependencies": 0,
+    "historical_script_evidence_paths": "present only in quarantined/evidence-oriented scripts and not active runtime dependencies",
+    "mutation_authority_widening": "ABSENT"
+  },
+  "authoritative_project_safety": {
+    "authoritative_game_truyen_mutation": 0,
+    "gia_pha_mutation": 0,
+    "logistics_mutation": 0,
+    "logistics_install": "NO",
+    "project_auto_upgrade": "NO",
+    "authoritative_project_mutation": 0
+  },
+  "governance_drift_disclosure": {
+    "status": "FAIL_DISCLOSED",
+    "is_candidate_gate_blocker_under_01A": false,
+    "reason": "pre-existing FACT_LEDGER/Live Specs/approval technical-preview hash drift remains historical governance state; no stale authority was adopted and no protected Live Specs rebuild or approval was performed",
+    "promotion_or_official_baseline_effect": "NONE"
+  },
+  "owner_next_decision": "Approve or reject an independent Promotion Readiness Review of the new canonical-lineage successor candidate."
+}
