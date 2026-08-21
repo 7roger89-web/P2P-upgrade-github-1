@@ -190,6 +190,11 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
     # means the dispatch surface cannot prove consistency — fail closed.
     if fields.get("backend") is not None:
         receipt_dict["backend"] = dict(fields["backend"])
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §3: the team decision block
+    # (FW03 deterministic selection output) flows through the receipt
+    # so the whole-claim verifier can check the team-state invariant.
+    if fields.get("team_decision") is not None:
+        receipt_dict["team_decision"] = dict(fields["team_decision"])
     return receipt_dict
 
 
@@ -1559,6 +1564,15 @@ def verify_bounded_mutation_receipt(
     checks["authority_chain"] = auth
     th = dict(receipt.get("tree_hashes") or {})
     ev = dict(receipt.get("mutation_evidence") or {})
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §3: the team decision block
+    # (FW03 deterministic selection) — six whole-claim checks on the
+    # team-state invariant: presence, non-empty participation, exact
+    # role-provided coverage of the mutation scope, no material failure
+    # class, platform-requirement satisfaction, and explicit role
+    # provision of the capability under the same registry surface.
+    _team = dict(receipt.get("team_decision") or {})
+    _team_checks = _g1_team_state_invariant_check(receipt, registry_records)
+    checks["team_state"] = _team_checks
     # Identity digests must be real non-empty hex digests (fail closed).
     req_fp = str(receipt.get("request_fingerprint") or "").strip()
     checks["identity_fingerprints_real"] = bool(req_fp and re.fullmatch(
@@ -1589,15 +1603,118 @@ def verify_bounded_mutation_receipt(
         and mutation_evidence_ok
         and dispatch_consistent
         and mutation_exactly_one
-        and auth.get("overall", False))
+        and auth.get("overall", False)
+        and _team_checks.get("overall", True))
     return {
         "schema": ROLE_RECEIPT_SCHEMA,
         "mutation_state": mut,
         "host_attestation": att,
         "authority_chain": auth,
+        "team_state": _team_checks,
         "identity_fingerprints_real": checks["identity_fingerprints_real"],
         "baseline_tree_lock": checks["baseline_tree_lock"],
         "attestation_real_anchor": checks["attestation_real_anchor"],
         "attestation_matches_evidence": checks["attestation_matches_evidence"],
         "overall": overall,
     }
+
+
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-SAFETY-INTEGRATION-01 §3 — Team state invariant checks.
+#
+# A bounded-mutation receipt that claims MUTATION_READY authority must
+# also prove the team state that produced the dispatch: a non-empty
+# participant set that explicitly provides the mutation capability,
+# covering every role-scope requirement, with no material failure
+# class. Legacy .40 receipts without a team_decision block remain
+# valid for their OWN layer (the block is additive): an absent block
+# makes these six checks PASS-NO-OP so .40 receipts keep verifiable,
+# while any receipt that DOES carry a block must satisfy all six.
+# ---------------------------------------------------------------------------
+
+_FW02_BASE_PLATFORM_CAPABILITIES = {
+    "freshness_verification", "capability_registry", "task_state_store",
+    "decision_trace", "permission_profile_verification",
+}
+
+
+def _g1_team_state_invariant_check(
+        receipt: Mapping[str, Any],
+        registry_records: Iterable[Mapping[str, Any]] | None,
+) -> dict[str, Any]:
+    """Six whole-claim checks over the receipt's team_decision block.
+    Absent block -> all checks pass no-op (additive, backward
+    compatible). Present block -> every check must hold; any single
+    failure fails the whole receipt claim for that receipt."""
+    _td = dict(receipt.get("team_decision") or {})
+    present = bool(_td and _td.get("participant_roles") is not None
+                   and _td.get("team_mode"))
+    if not present:
+        return {
+            "schema": "team_state_invariant/1",
+            "team_decision_present": present,
+            "team_participants_nonempty": True,
+            "team_capability_coverage_complete": True,
+            "team_failure_class_clear": True,
+            "team_base_platform_requirements_satisfied": True,
+            "role_explicitly_provides_capability": True,
+            "overall": True,
+        }
+    participants = list(_td.get("participant_roles") or [])
+    required = tuple(str(c) for c in
+                     (_td.get("required_capabilities") or ()))
+    provided = tuple(str(c) for c in
+                     (_td.get("provided_capabilities") or ()))
+    failure_class = str(_td.get("failure_class") or "").strip()
+    # Materiality: base platform caps are infrastructure (FW02), never
+    # role provisions; only role-scope requirements count as gaps.
+    _base = {str(c) for c in _FW02_BASE_PLATFORM_CAPABILITIES}
+    role_required = tuple(c for c in required if c not in _base)
+    provided_role = set(provided) - _base
+    checks: dict[str, Any] = {
+        "schema": "team_state_invariant/1",
+        "team_decision_present": True,
+        "team_participants_nonempty": bool(participants),
+        "team_capability_coverage_complete": bool(
+            set(role_required) <= provided_role),
+        "team_failure_class_clear": failure_class == "",
+        "team_base_platform_requirements_satisfied": bool(
+            {c for c in required if c in _base}
+            <= set(provided)),
+    }
+    # Explicit provision: the bounded-mutation capability must appear
+    # in the selected role's own PROVIDES field on the SAME registry
+    # surface the receipt was built on (never on the provided_capabilities
+    # summary alone — that could be inflated by a broken decision).
+    # The canonical bounded-mutation capability id is the same one the
+    # authority chain check binds ("bounded_documentation_write"); an
+    # explicitly supplied override from the team_decision block is
+    # accepted only when it is a non-empty string — an empty or
+    # absent value falls back to the canonical id.
+    _role_id = str(receipt.get("role_id", "") or "").strip()
+    _mut_cap = str(_td.get("mutation_class_capability") or "").strip()
+    # Fail-closed override policy: an explicit mutation capability id
+    # on the team decision block is honored ONLY when it is the
+    # canonical bounded-mutation id; any OTHER explicit value (a
+    # lookalike, a superseded alias, or a fabricated one) is rejected
+    # out of hand rather than silently substituted — the check then
+    # fails closed because no role's PROVIDES matches it.
+    _canonical_bounded = "bounded_documentation_write"
+    if _mut_cap:
+        if _mut_cap != _canonical_bounded:
+            checks["role_explicitly_provides_capability"] = False
+            checks["overall"] = False
+            return checks
+    _mut_cap = _canonical_bounded
+    _explicit = False
+    if _role_id and registry_records is not None:
+        for _rr in registry_records:
+            if str(_rr.get("CAPABILITY_ID", "")) == _role_id:
+                _prov = tuple(str(c) for c in
+                              (_rr.get("PROVIDES") or ()))
+                _explicit = _mut_cap in set(_prov)
+                break
+    checks["role_explicitly_provides_capability"] = bool(_explicit)
+    checks["overall"] = all(bool(v) for k, v in checks.items()
+                            if k != "schema")
+    return checks

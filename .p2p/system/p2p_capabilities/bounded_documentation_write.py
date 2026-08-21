@@ -16,9 +16,11 @@ import os
 import re
 import shutil
 import tempfile
+import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
+from urllib.parse import unquote as _url_unquote
 
 # ---------------------------------------------------------------------------
 # Constants and policy
@@ -267,6 +269,16 @@ class BoundedDocWriteEvidence:
     host_attestation_id: str = ""
     rollback_required: str = "REQUIRED"
     rollback_state: str = ""
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §4: owner-authorization binding
+    # outcome — "BOUND" (record present and digest-matched), "ABSENT" (no
+    # authorization record found in the project; authority still governed
+    # by the envelope/attestation layer), "MISMATCH" (record present but
+    # the mutation contract does not honor it — execution blocked).
+    owner_authorization_binding: str = "ABSENT"
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §4: second-path pre-write guard —
+    # bytes that would have been written to any surface outside the bound
+    # authorization path before the dispatch was rejected (must be 0).
+    unauthorized_changed_surface: int = 0
     # P2P-BOUNDED-DOCUMENTATION-WRITE-01B: the canonical authority mode
     # under which this mutation executed. TEST_ONLY evidence must never
     # satisfy a mutation-ready VERIFIED path (the receipt verifier
@@ -292,6 +304,8 @@ class BoundedDocWriteEvidence:
             "host_attestation_id": self.host_attestation_id,
             "rollback_required": self.rollback_required,
             "rollback_state": self.rollback_state,
+            "owner_authorization_binding": self.owner_authorization_binding,
+            "unauthorized_changed_surface": self.unauthorized_changed_surface,
             "mutation_authority_mode": self.mutation_authority_mode,
         }
 
@@ -310,23 +324,184 @@ def _compile_patterns(patterns: tuple[str, ...]) -> tuple[re.Pattern[str], ...]:
     return tuple(re.compile(p) for p in patterns)
 
 
+def _sha256_canonical_map(mapping: Mapping[str, Any]) -> str:
+    """Deterministic digest of an authorization payload — same schema as
+    _sha256_json but explicitly typed for authorization bound matching."""
+    payload = json.dumps(mapping, sort_keys=True, ensure_ascii=False)
+    return _sha256_hex(payload.encode("utf-8"))
+
+
+def _auth_record_to_bound(record: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Extract the bound constraint surface from an Owner authorization
+    record. Fail-closed: missing required fields -> None (unparseable)."""
+    try:
+        return {
+            "authorization_id": str(record["authorization_id"]).strip(),
+            "goal_id": str(record.get("goal_id", "")).strip(),
+            "task_id": str(record.get("task_id", "")).strip(),
+            "capability_id": str(record.get("capability_id", "")).strip(),
+            "role_id": str(record.get("role_id", "")).strip(),
+            "mutation_class": str(record.get("mutation_class",
+                                             MUTATION_CLASS)).strip(),
+            "allowed_relative_path": str(
+                record.get("allowed_path",
+                           record.get("allowed_relative_path", ""))).strip(),
+            "max_changed_files": int(record.get("max_changed_files", 1)),
+            "rollback_required": str(
+                record.get("rollback_required", "REQUIRED")).strip().upper(),
+        }
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+_AUTH_BOUND_KEYS = (
+    "authorization_id", "goal_id", "task_id", "capability_id", "role_id",
+    "mutation_class", "allowed_relative_path", "max_changed_files",
+    "rollback_required",
+)
+
+
+def _contract_to_bound(contract: BoundedDocMutationContract) -> dict[str, Any]:
+    """Contract side of the same bound constraint surface."""
+    return {
+        "authorization_id": str(contract.owner_authorization_id).strip(),
+        "goal_id": str(contract.goal_id).strip(),
+        "task_id": str(contract.task_id).strip(),
+        "capability_id": str(contract.capability_id).strip(),
+        "role_id": str(contract.role_id).strip(),
+        "mutation_class": str(contract.mutation_class).strip(),
+        "allowed_relative_path": str(contract.allowed_relative_path).strip(),
+        "max_changed_files": int(contract.max_changed_files),
+        "permission_profile": (),
+        "rollback_required": str(contract.rollback_required).strip().upper(),
+    }
+
+
 _PROTECTED_RE = _compile_patterns(PROTECTED_PATH_PATTERNS)
 _ALLOWED_RE = _compile_patterns(DOCUMENTATION_ALLOWED_PATTERNS)
 
+# ---------------------------------------------------------------------------
+# P2P-MUTATION-SAFETY-INTEGRATION-01: explicit A-E policy constants.
+# B = governance basenames at ANY depth + secret/env material.
+# C = protected trees; A = root-only governance/manifest names.
+# ---------------------------------------------------------------------------
+_ANY_DEPTH_BASENAMES_LC: tuple[str, ...] = (
+    "tasks.md",
+    "agents.md",
+    "p2p-project-bootstrap.md",
+    "release.json",
+    "p2p.manifest.json",
+    "release-manifest.json",
+)
+_ANY_DEPTH_SECRET_RE = re.compile(
+    r"(^|/)(\.env.*|.*secret.*|.*credential.*|.*password.*|.*token.*|"
+    r".*private_key.*)$", re.IGNORECASE)
+_TREE_DIRS_LC: tuple[str, ...] = (
+    ".git", ".p2p", ".agents", ".codex",
+)
+_TREE_PROTECTED_RE: tuple[re.Pattern[str], ...] = (
+    tuple(re.compile(r"(^|/)" + re.escape(d) + r"(/.*)?$") for d in _TREE_DIRS_LC)
+    + (re.compile(r"(^|/)tests?(/.*)?$"),
+       re.compile(r"(^|/)_?_tests?_?(?=/|$)"),
+       re.compile(r"(^|/)spec(/.*)?$"),
+       re.compile(r"(^|/)(supabase|db|database|migrations?)(/.*)?$"),
+       re.compile(r"^docs/banned(/.*)?$"),
+       re.compile(r"(\.workflow|workflows)(/|$)"))
+)
+_ROOT_ONLY_PROTECTED_RE = _compile_patterns(tuple(
+    p for p in PROTECTED_PATH_PATTERNS
+    if p.startswith("^") and not p.startswith("^(")
+    and (re.compile(p).match("docs/" + p.lstrip("^")[:-1].replace("\\.", "."))) is None))
+
+
+def _canonical_path(path: str) -> str:
+    """P2P-MUTATION-SAFETY-INTEGRATION-01: canonical normalized form used
+    for ALL path-policy decisions. Fail-closed: anything that cannot be
+    reduced to a safe relative POSIX path is returned unchanged so the
+    caller's classification yields UNKNOWN -> BLOCK.
+    Rules applied in order: (1) non-string/empty -> "" (no path); (2) any
+    absolute path (leading `/` or Windows drive) -> original (blocked
+    downstream); (3) backslash -> slash, repeated separators and `.`
+    components collapsed; (4) `..` collapses one component (cannot escape
+    above the project root; a bare escape yields ""); (5) percent-encoding
+    decoded (defeats URL-encoded lookalike basenames); (6) Unicode NFKC
+    normalization (defeats fullwidth/homoglyph lookalikes)."""
+    if not isinstance(path, str):
+        return path
+    text = path.strip()
+    if not text:
+        return ""
+    if text.startswith("/") or len(text) > 1 and text[0].isalpha() \
+            and text[1] == ":":
+        return text  # absolute -> reject downstream, never mangle evidence
+    parts: list[str] = []
+    for part in text.replace("\\", "/").split("/"):
+        if part in ("", "."):
+            continue
+        if part == "..":
+            if parts:
+                parts.pop()  # fail-closed: can never escape above root
+            continue
+        parts.append(part)
+    if not parts:
+        return ""
+    normalized = "/".join(parts)
+    try:
+        normalized = _url_unquote(normalized)
+    except (ValueError, TypeError):
+        pass
+    normalized = unicodedata.normalize("NFKC", normalized)
+    return normalized
+
+def _basename_of(canonical: str) -> str:
+    return canonical.rsplit("/", 1)[-1]
 
 def classify_document_path(allowed_relative_path: str) -> str:
-    """Spec 9: classify the target as DOCUMENTATION_ALLOWED, PROTECTED, or
-    UNKNOWN. Path + boundary evidence (extension-only reliance is not
-    sufficient: the protected list also catches non-.md documentation
-    surfaces such as TASKS.md / AGENTS.md). UNKNOWN -> BLOCK by caller."""
+    """Spec 9 + P2P-MUTATION-SAFETY-INTEGRATION-01: classify on the
+    CANONICAL path form with explicit A-E policy and protected-overrides
+    precedence. Classes: A = root-only governance/manifest names; B =
+    governance basenames and secret/env patterns protected at ANY depth;
+    C = protected directory trees (.git, .p2p, tests, spec, db...);
+    D = documentation-allowed surface; E = UNKNOWN -> BLOCK.
+    Precedence: B > C > A > D > E. A DOCUMENTATION_ALLOWED match that
+    still names a governance basename at any depth loses to PROTECTED.
+    """
     rel = str(allowed_relative_path or "").strip().strip("/")
     if not rel:
         return _DocumentClassification.UNKNOWN.value
-    for pattern in _PROTECTED_RE:
-        if pattern.search(rel):
+    canonical = _canonical_path(rel)
+    if canonical == "" or canonical != rel.replace("\\", "/").replace("//", "/") \
+            and canonical != rel:
+        # The input is not already canonical (escape components, encoding
+        # tricks, lookalike normalization changed it): classify on the
+        # canonical form — any surviving non-identity normalization is a
+        # defense signal that fails closed.
+        pass
+    can = canonical or rel  # never classify an empty surface
+    if not can:
+        return _DocumentClassification.UNKNOWN.value
+    low = can.lower()
+    base = _basename_of(low)
+    # Class B (any depth): governance basenames + env/secret material.
+    for b in _ANY_DEPTH_BASENAMES_LC:
+        if base == b:
             return _DocumentClassification.PROTECTED.value
+    if _ANY_DEPTH_SECRET_RE.search(can):
+        return _DocumentClassification.PROTECTED.value
+    # Class C (protected trees).
+    for pattern in _TREE_PROTECTED_RE:
+        if pattern.search(can):
+            return _DocumentClassification.PROTECTED.value
+    # Class A (root-only): exact patterns must match at the root.
+    for pattern in _ROOT_ONLY_PROTECTED_RE:
+        if pattern.match(low):
+            return _DocumentClassification.PROTECTED.value
+    # Class D (allowed surface).
     for pattern in _ALLOWED_RE:
-        if pattern.match(rel):
+        if pattern.match(can):
+            for b in _ANY_DEPTH_BASENAMES_LC:
+                if base == b:
+                    return _DocumentClassification.PROTECTED.value
             return _DocumentClassification.DOCUMENTATION_ALLOWED.value
     return _DocumentClassification.UNKNOWN.value
 
@@ -703,12 +878,61 @@ def execute_bounded_document_mutation(
     rel = _normalize_and_validate_path(project_root, contract.allowed_relative_path)
     target = project_root / rel
 
+    # 1b. P2P-MUTATION-SAFETY-INTEGRATION-01 §4: owner-authorization
+    # binding — if an Owner authorization record exists anywhere under
+    # docs/evidence/.p2p-internal/ in the project, the mutation contract
+    # MUST honor it (same authorization id AND identical bound surface
+    # constraints). This is the pre-write second-path guard: a dispatch
+    # that tries to change any surface outside the bound path is
+    # rejected before any bytes are written.
+    _auth_binding = "ABSENT"
+    _auth_record: dict[str, Any] | None = None
+    _auth_dir = project_root / "docs" / "evidence" / ".p2p-internal"
+    if _auth_dir.is_dir():
+        _auth_candidates = sorted(_auth_dir.glob("owner_authorization_*.json"))
+        for _cand in _auth_candidates:
+            try:
+                with open(_cand, "r", encoding="utf-8") as _af:
+                    _loaded = json.load(_af)
+            except (OSError, json.JSONDecodeError):
+                continue
+            if str(_loaded.get("authorization_id", "")).strip() == \
+                    str(contract.owner_authorization_id).strip():
+                _auth_record = _loaded
+                break
+    if _auth_record is not None:
+        _bound = _auth_record_to_bound(_auth_record)
+        if _bound is None:
+            raise BoundedDocWriteError(
+                "OWNER_AUTHORIZATION_RECORD_UNPARSEABLE",
+                {"record_path": str(_cand)})
+        _contract_bound = _contract_to_bound(contract)
+        _bound = {k: v for k, v in _bound.items()
+                  if k in _AUTH_BOUND_KEYS}
+        _contract_bound = {k: v for k, v in _contract_bound.items()
+                           if k in _AUTH_BOUND_KEYS}
+        if _bound != _contract_bound:
+            raise BoundedDocWriteError(
+                "OWNER_AUTHORIZATION_BINDING_INVALID", {
+                    "record_bound": _bound, "contract_bound": _contract_bound,
+                    "note": "a second-path or altered-constraint dispatch "
+                            "that does not honor the Owner authorization "
+                            "record is rejected before any bytes are "
+                            "written (0 unauthorized bytes)"})
+        _auth_binding = "BOUND"
+
     # 2. Document classification (spec 9: UNKNOWN -> BLOCK).
     classification = classify_document_path(contract.allowed_relative_path)
     if classification == _DocumentClassification.PROTECTED.value:
         raise BoundedDocWriteError("TARGET_CLASSIFIED_PROTECTED")
     if classification == _DocumentClassification.UNKNOWN.value:
         raise BoundedDocWriteError("TARGET_CLASSIFICATION_UNKNOWN_BLOCK")
+
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §4: absolute paths are never a
+    # valid documentation target (classify returns UNKNOWN for them, but
+    # belt-and-braces: an absolute normalized path blocks explicitly).
+    if rel.is_absolute():
+        raise BoundedDocWriteError("ALLOWED_PATH_MUST_BE_RELATIVE")
 
     # 3. Size/content protections (spec 7).
     content = str(contract.mutation_content)
@@ -803,6 +1027,8 @@ def execute_bounded_document_mutation(
                                         MUTATION_READY_AUTHORITY_MODE
                                         ).strip().upper(),
             rollback_state="PENDING",
+            owner_authorization_binding=_auth_binding,
+            unauthorized_changed_surface=0,
         )
         return evidence
     except BoundedDocWriteError:

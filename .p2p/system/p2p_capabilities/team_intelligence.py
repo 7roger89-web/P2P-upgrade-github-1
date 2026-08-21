@@ -255,6 +255,62 @@ def role_capability_evidence(
 
 
 # ---------------------------------------------------------------------------
+# FW02 / role platform separation (P2P-CLOSURE-01 root cause fix +
+# P2P-MUTATION-SAFETY-INTEGRATION-01 §3)
+#
+# FW02 (infer_required_capabilities) ALWAYS adds the deterministic
+# base-platform requirement set (task_state_store, decision_trace,
+# permission_profile_verification plus runtime-signal caps such as
+# freshness_verification and capability_registry). By design these
+# platform capabilities are NOT role-registry provisions: no role's
+# PROVIDES field covers them, and they must never count as material
+# team-selection gaps. Mutating this into a role-capability would
+# silently widen every role's privilege surface.
+#
+# The separation semantics are:
+#   * platform caps are REMOVED from the team-selection requirement
+#     set (they remain in required_capabilities on the returned
+#     decision for FW02 auditability, but never enter the cover)
+#   * a gap that consists ONLY of platform caps is NOT a failure:
+#     failure_class is "" (with a TRACE-ONLY note)
+#   * a gap that mixes platform caps with any role capability is
+#     STILL INSUFFICIENT_TEAM_CAPABILITY, with the missing set
+#     carrying BOTH subsets (P2P-CLOSURE-01 exact-materiality rule)
+# ---------------------------------------------------------------------------
+FW02_BASE_PLATFORM_CAPABILITIES: tuple[str, ...] = (
+    "freshness_verification",
+    "capability_registry",
+    "task_state_store",
+    "decision_trace",
+    "permission_profile_verification",
+)
+
+
+def _is_fw02_base_platform_capability(capability_id: str) -> bool:
+    """Membership test against the canonical FW02 base platform set.
+    String-based and case-insensitive-safe (the canonical ids are
+    always lowercase); non-string input is fail-closed (never base)."""
+    try:
+        return str(capability_id).strip().lower() in {
+            str(c).strip().lower() for c in FW02_BASE_PLATFORM_CAPABILITIES}
+    except (TypeError, AttributeError):
+        return False
+
+
+def separate_fw02_base_platform_capabilities(
+        required_capabilities: Iterable[str]) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Split FW02's requirement set into (role_selection_requirements,
+    platform_requirements). Platform caps never participate in the
+    team cover and never contribute material gaps."""
+    selection: list[str] = []
+    platform: list[str] = []
+    for cap in dict.fromkeys(str(c) for c in required_capabilities):
+        (platform if _is_fw02_base_platform_capability(cap)
+         else selection).append(cap)
+    return tuple(selection), tuple(platform)
+
+
+# ---------------------------------------------------------------------------
 # Minimal sufficient team selection (deterministic, bounded, trace-backed)
 # ---------------------------------------------------------------------------
 @dataclass(frozen=True)
@@ -356,6 +412,11 @@ def build_team_decision(
     """
     records = [dict(r) for r in registry_records]
     reqs = tuple(dict.fromkeys(str(c) for c in required_capabilities))
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §3: FW02 base platform
+    # separation — platform caps are audited but never part of the
+    # team-selection cover (they have no role provider by design).
+    role_reqs, platform_reqs = (
+        separate_fw02_base_platform_capabilities(reqs))
     target_results = dict(target_eligibility_results or {})
     elig_results = dict(eligibility_results or {})
     certs = dict(capability_certifications or {})
@@ -472,7 +533,7 @@ def build_team_decision(
                     tie_breaker=""))
             continue
         eligible_roles.append(role)
-    if not eligible_roles and reqs:
+    if not eligible_roles and role_reqs:
         return TeamDecision(
             team_mode="SINGLE_ROLE",
             required_capabilities=reqs,
@@ -482,7 +543,7 @@ def build_team_decision(
             role_capability_evidence=tuple(role_evidence))
 
     # --- 4. greedy minimum cover -----------------------------------------
-    uncovered = set(reqs)
+    uncovered = set(role_reqs)
     selected: list[str] = []
     while uncovered and len(selected) < min(fan_out_bound, len(role_ids)):
         best, best_score = None, None
@@ -542,13 +603,36 @@ def build_team_decision(
         escalation.append("verification-needs-verifier")
 
     # Failure reporting
+    # P2P-MUTATION-SAFETY-INTEGRATION-01 §3: exact materiality —
+    # P2P-CLOSURE-01 root cause: INSUFFICIENT_TEAM_CAPABILITY was
+    # raised even when the only uncovered caps were FW02 base
+    # platform caps, which no role can provide by design. Now:
+    # platform-only gaps are trace-only (non-material), mixed gaps
+    # stay material with both subsets recorded, and role-cap gaps
+    # stay material as before.
+    material_missing = {cap for cap in uncovered
+                        if not _is_fw02_base_platform_capability(cap)}
+    platform_missing = tuple(sorted(
+        cap for cap in uncovered if cap not in material_missing))
     failure = ""
     if independence_unmet:
         failure = "INDEPENDENCE_REQUIREMENT_UNMET"
-    elif uncovered:
+    elif material_missing:
         failure = "INSUFFICIENT_TEAM_CAPABILITY"
-    elif not eligible_roles and reqs:
+    elif not eligible_roles and role_reqs:
         failure = "NO_ELIGIBLE_ROLE"
+    trace.append(TeamDecisionTraceItem(
+        step="FW02_PLATFORM_SEPARATION",
+        fact=(f"platform_capabilities={sorted(platform_reqs)} "
+              f"platform_missing_in_cover={platform_missing} "
+              f"material_missing={sorted(material_missing)} "
+              f"failure={failure or '(none)'}"),
+        rationale="FW02 base platform capabilities are infrastructure, "
+                  "never role provisions. A gap consisting solely of "
+                  "platform caps is non-material (trace-only); any "
+                  "role-capability gap remains a material failure "
+                  "(P2P-CLOSURE-01 exact-materiality rule).",
+        tie_breaker=""))
 
     provided = tuple(dict.fromkeys(
         cap for r in selected for cap in sorted(provide.get(r, set()))
@@ -567,7 +651,12 @@ def build_team_decision(
         required_capabilities=reqs,
         selected_capability_sources=tuple(dict.fromkeys(
             f"capabilities.json/{r}" for r in selected)),
-        provided_capabilities=provided,
+        # P2P-MUTATION-SAFETY-INTEGRATION-01 §3: provided_capabilities
+        # covers the selection plus the FW02 platform set, which is
+        # satisfied by infrastructure (not roles) by design — the
+        # receipt team checks must therefore validate mutation-scope
+        # coverage on the role-selected subset only.
+        provided_capabilities=tuple(provided) + tuple(sorted(platform_reqs)),
         decision_trace=tuple(trace),
         mode_reason=reason,
         escalation_factors=tuple(escalation),
