@@ -791,7 +791,7 @@
     "docs/SPEC/P2P-PROJECT-DOMAIN-MODEL-SPEC.md": "bb23210ca6a11bfecedd8838f3f00d26ae86e6e4a138d070e02a8dc8333218f7",
     "docs/SPEC/P2P-PROVIDER-ABSTRACTION-SPEC.md": "97a1c6e034e1d00aa9fc7248dfa454ad01494f93f227ecae1e1aa8396529521c",
     "docs/SU-DUNG.md": "70cc243b6e1b69d6aeea385ea1a137eac845cdb61bc47937dd0a32cddfb726bd",
-    "docs/bounded-documentation-write-capability-ledger.md": "2aebd7402477e64de0918daa72e595a01b6546b9a9a5014b6a0a411279236547",
+    "docs/bounded-documentation-write-capability-ledger.md": "68b1be9fa742035107a617ac77ae4e1efd4aa17b26079006fcf9492d8cf5deb3",
     "docs/decisions/P2P-CAPABILITY-FOUNDATION-RESEARCH-DECISIONS.md": "2b995feb9afea7f21aacb0204d36df8d8deb55a490383884d0485aa839991bff",
     "docs/notes_decisions_log/notes_decisions_log_20260813.md": "8bd26f961a11a8c85f09019ca77fb02280e2225106e9c9af332286b211df6cc1",
     "docs/notes_decisions_log/notes_decisions_log_20260814.md": "8d0f3fe03bec6d2cb74cf56182d4f90a7892c5b9629b0565146083296079f9ec",
@@ -1074,7 +1074,7 @@
     "governance/approvals/P2P-APR-20260818T155200Z-c40-release-gates-live-specs.json": "306a44f380baee39618637eab5343be24196fa21462a38aa0e7ff07400e60937",
     "governance/approvals/P2P-APR-20260818T162500Z-c40-final-release.json": "2c5e4fc5cfe8ff828f7b468e71fcac810c1351bd54536199c2ec731d077ea419",
     "governance/approvals/P2P-APR-20260819T090500+0000-fw01-v2-promote-release.json": "605ec71152e5dd11036fc92261ba6bdbecc9f315e60eb8dc7e48cd984a1f93b1",
-    "governance/development-control.json": "eec1cefd47eba47a7c0ec3533c971b66891b18baa160433652f8783113f3d6c0",
+    "governance/development-control.json": "07a6c81dcbe1dfdebf064437e4a4b3e5d6e07fad7852b42a9638b7c084ad26e3",
     "governance/drift-policy.json": "4e9131dcdbd2f2269b985ecdf586b65787fb2959dfb9dea7e6b900b33417574e",
     "governance/eval-suite.schema.json": "5eb2788a7b6fefedea5d01555a9c572809a693176d4187dd01b2c64201d6fe79",
     "governance/evidence/governance-truth-sync-20260819.json": "102365cd1b4c2a6e6bb561c709013a9bc2b452bbd465ed1943690442cf769d06",
@@ -1108,7 +1108,7 @@
     "scripts/fw05_supervisor.py": "facad5bdb389cfcf3a71c1c56263e5fda6cd1de1096ac7a26fd1aa09cc1101a6",
     "scripts/fw06_supervisor.py": "8a7e0aa5e04bd4ebc6438e54c0739c24140dd49a07a5f9394d93203cc42c7f09",
     "scripts/mint_fw00_fw06_cumulative.py": "d93edbe5d21e4158ad2f98f3991bcfd5c734cbef95a306ac0f7f3fc3981517fa",
-    "scripts/mint_fw00_fw06_governance_record.py": "7577ba86cc076b8f97df48530dfa02fb48183edc8ceccad438dde7bc0038d926",
+    "scripts/mint_fw00_fw06_governance_record.py": "b4965fdc4f1723e8dd4c18140f66e966eebfa54c411dadcf98d4c804517a3859",
     "scripts/mint_fw05_candidate.py": "aa8ffcbe91a8296fa23737486494907e8bf6db4aa8c6ba99a92510626e36b5dc",
     "scripts/mint_fw06_candidate.py": "0497b5560e5cc890069fea9e7da1774d513cb0e65d06c38dc876346e18473d40",
     "scripts/p2p-bootstrap.sh": "8339116118e7292b6f8385ddb7a6206e764dc73a2e42ebec0d8c392e20c92173",
@@ -1140,7 +1140,7 @@
     "scripts/update_from_release.py": "b34226f59cd520af9bb7690de296711b7bb723d669b356810a43e74d65f9ad1f",
     "scripts/validate_p2p_development_framework.py": "14b0c94e2b308c7c31d9fbb384b113e39e6f58278716e6623925007c1f44e5ba",
     "scripts/verify_determinism.py": "9035190c7e753d46c3c1cd9609cb52b66468d1d5522cf67b2040c1a7dceb780a",
-    "scripts/verify_fw00_fw06_cumulative.py": "44cf6b12fa7042952fcc3d5d630b91b528a14fb3b71d375602f5a2b64fe05cad",
+    "scripts/verify_fw00_fw06_cumulative.py": "84fb6e902b0c1a38bb7be32248ef5eebf00f95254037d51f1bc2b8643db50bb6",
     "scripts/verify_regen_digests.py": "9f12b641e9356e32cee4edf1b86d150f75e64396ab4a3378f46acbc28b647ab1",
     "scripts/verify_reinstall_and_compat.py": "81365ac48ca33cee1e16cc407424fcb8ddeccbb761624d7bac06ff62a2ff22aa",
     "scripts/verify_source_binding.py": "4ad6df5eb0dd2edd2c0b1449f340547c8fee5ed3f5ec0edc3ceac1180d1b463e"
@@ -1149,6 +1149,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-20T20:09:05+00:00",
+  "generated_at": "2026-08-21T00:28:27+00:00",
   "reason": "Release package build"
 }

@@ -1212,6 +1212,30 @@
         "governance/development-control.json: candidate lineage record (this record)"
       ],
       "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
+    },
+    {
+      "candidate_version": "8.4.7-C-codex.40",
+      "candidate_label": "fw00-fw06-cumulative-production-package",
+      "candidate_sha256": "f2edabf09de2657b63ad930636599295e96d94d0eea47fc91e14081c7e600519",
+      "candidate_artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-fw00-fw06-cumulative-candidate.zip",
+      "candidate_built_at_utc": "2026-08-21T00:00:00Z",
+      "embedded_version": "8.4.7-C-codex.40",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE",
+      "promotion_status": "UNPROMOTED",
+      "built": true,
+      "source_commit": "a1e78bc378d8efe65840ec7c3d23ded121284759",
+      "source_tree_hash": "3bb25bff45941045123ac9ab426cb24ad62149ff",
+      "lineage_anchor_sha256": "607e722d22db519aeee9f803814432fcd13e73157db7e6d6d4e5afcbebeca7fa",
+      "lineage_anchor_note": "Cumulative self-contained FW00-FW06 production package (lineage anchor .34 FW06 operational resilience). NOT a new orchestrator: a packaging milestone containing the canonical FW01-era release machinery (v24 artifact: install.sh/install.ps1/doctor.ps1/runtime/foundation/source/docs/governance/.agents) PLUS the full tracked .p2p/system capability tree (FW02-FW06 modules, tests, decision trace, owner inbox, resilience surfaces). Installable and self-contained; evidence: package_release.py canonical build gates PASS (doctor --package, drift), Stage-B verification PASS (manifest/checksum cross-check), governance sanity PASS (cumulative lineage .35.. .40 rule: each record pins exactly one artifact SHA, all UNPROMOTED, all directly consecutive). No promotion, no release, pilot not executed (owner gate). BW01B role/host semantics closure: .40 replaces .39's build because the committed runtime gained the canonical correction layer — explicit PROVIDES field on role records (p2p_architecton PROVIDES = [bounded_documentation_write]; role_capability_evidence PROVIDES-only, REQUIRES never promotes; FW03 FW04 owner-summary tests reconciled to explicit PROVIDES), canonical MUTATION_AUTHORITY_MODES (MUTATION_READY, TEST_ONLY) with fail-closed validation in execute_bounded_document_mutation, evidence carries mutation_authority_mode, role_bridge dispatch wires the canonical authority mode and continues to require a real HostAttestation for MUTATION_READY execution, and _g1_authority_chain_check + verify_bounded_mutation_receipt whole-claim verifier add role_explicitly_provides_capability / mutation_authority_mode_is_canonical / mutation_authority_mode_is_mutation_ready / test_only_evidence checks. Verified by the 22-test BW01B canonical shadow proof (positive lifecycle M0/M1/M2, negative matrix A-N, crash-retry) on a disposable Git fixture. DECLARED_CANDIDATE_RUNTIME == EXECUTED_RUNTIME byte-for-byte at HEAD a1e78bc.",
+      "surface_scope": [
+        "release-manifest.json: cumulative_scope + cumulative_system_file_count + system/ bundle entries",
+        "RELEASE-SHA256SUMS.txt: full checksum set incl. system/ bundle",
+        "system/: full tracked .p2p/system capability tree (FW02-FW06 modules + bounded_documentation_write primitive, authority_chain_registry ledger, tests, traces)",
+        "governance/development-control.json: candidate lineage record (this record)"
+      ],
+      "candidate_id": "FW00_FW06_CUMULATIVE_PRODUCTION_PACKAGE"
     }
   ],
   "capability_status": [
