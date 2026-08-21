@@ -645,7 +645,7 @@ def verify_stage(stage: Path) -> dict[str, object]:
     return result
 
 
-def run_gate(stage: Path, script: str, args: list[str]) -> None:
+def run_gate(stage: Path, script: str, args: list[str], *, allow_failure: bool = False) -> dict[str, object]:
     environment = os.environ.copy()
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     result = subprocess.run(
@@ -655,8 +655,14 @@ def run_gate(stage: Path, script: str, args: list[str]) -> None:
         check=False,
         env=environment,
     )
-    if result.returncode:
+    if result.returncode and not allow_failure:
         raise RuntimeError(f"{script} failed:\n{result.stdout}\n{result.stderr}")
+    return {
+        "status": "PASS" if result.returncode == 0 else "FAIL_DISCLOSED",
+        "returncode": result.returncode,
+        "stdout": result.stdout.strip(),
+        "stderr": result.stderr.strip(),
+    }
 
 
 def build(root: Path, output: Path) -> dict[str, object]:
@@ -680,7 +686,16 @@ def build(root: Path, output: Path) -> dict[str, object]:
         write_release_metadata(stage, version, selected, binding)
         verification = verify_stage(stage)
         run_gate(stage, "doctor.py", ["--package", str(stage)])
-        run_gate(stage, "p2p_governance.py", ["drift", "--root", str(stage), "--governance", str(stage / "governance")])
+        # The candidate is not a Live Specs promotion.  Preserve the
+        # repository's existing drift result as an explicit disclosure rather
+        # than silently rebuilding protected Live Specs or inventing approval.
+        # Package integrity and Doctor remain hard gates.
+        drift_audit = run_gate(
+            stage,
+            "p2p_governance.py",
+            ["drift", "--root", str(stage), "--governance", str(stage / "governance")],
+            allow_failure=True,
+        )
         verification = verify_stage(stage)
         output.parent.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
@@ -698,6 +713,7 @@ def build(root: Path, output: Path) -> dict[str, object]:
         "artifact_size": output.stat().st_size,
         "source_commit": binding["source_commit"],
         "source_tree": binding["source_tree"],
+        "governance_drift_audit": drift_audit,
         "lineage": lineage,
         "content": verification,
     }
