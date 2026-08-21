@@ -4645,7 +4645,7 @@
       "next_condition": "Standalone read-only design goal; never modifies runtime without its own promotion.",
       "last_reviewed": "2026-08-21",
       "freshness": "from_roadmap_consolidation",
-      "notes": "VERIFIED by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01: mechanical canonical consumption of roadmap JSON proved by direct file reading (ROADMAP_MANUAL_REENTRY_REQUIRED=NO), 18/18 validation tests PASS, fail-closed, deterministic ranking, hash binding.",
+      "notes": "VERIFIED by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01: mechanical canonical consumption of roadmap JSON proved by direct file reading (ROADMAP_MANUAL_REENTRY_REQUIRED=NO), 18/18 validation tests PASS, fail-closed, deterministic ranking, hash binding. INTAKE-CLOSURE-01: planner upgraded to v3 — coverage gate adds G1 RESEARCH_TO_ROADMAP_REVERSE_COVERAGE, G2 CAPABILITY_TO_ROADMAP_COVERAGE (family alias resolution via intake contract), G3 ORPHAN_OWNER_DECISION_DETECTION; intake contract loaded and hash-bound; 12/12 negative tests A-L PASS (exact missed-intake failure mode reproduced and closed). INTAKE-CLOSURE-01: planner upgraded to v3 — coverage gate adds G1 RESEARCH_TO_ROADMAP_REVERSE_COVERAGE, G2 CAPABILITY_TO_ROADMAP_COVERAGE (family alias resolution via intake contract), G3 ORPHAN_OWNER_DECISION_DETECTION; intake contract loaded and hash-bound; 12/12 negative tests A-L PASS (exact missed-intake failure mode reproduced and closed).",
       "01a_hardening_note": "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner v2 hardening completed — coverage gate fail-closed (ROADMAP_COVERAGE_PASS_OPEN_BUG closed), SELECTED/PLANNED/PARTIAL ledger translation explicit, BLOCKED classification (C09/C27 never UNKNOWN), dependency-necessity ranking factor implemented, 5-factor score decomposition, evidence-bound WHY_THIS_GOAL, beginner view bound to selected goal. 35/35 reactivity/fail-closed tests PASS. Status VERIFIED retained; runtime execution-loop integration gap unchanged and disclosed (planner remains governance-side)."
     },
     {
@@ -4803,6 +4803,37 @@
       "last_reviewed": "2026-08-21T04:27:11Z",
       "freshness": "from_roadmap_consolidation",
       "notes": "C40 production installs + C43 evidence SHIPPED; hardening (installation contract with verified rollback + pin policy enforcement) is the open piece."
+    },
+    {
+      "capability_id": "CONTEXTUAL_RULE_INTELLIGENCE",
+      "name": "Contextual Rule Intelligence (Domain Policy Packs)",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PLANNED",
+      "origin_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "owner_decision_ref": "RI-008",
+      "adoption_record": "RA-EXT-029",
+      "beginner_value": "P2P áp dụng quy tắc miền (domain policy packs) có kiểm soát: chỉ đưa đủ quy tắc cần thiết cho tác vụ, xác minh nguồn gốc/freshness/confidence, không áp quy tắc lạ; bộ quy tắc bên ngoài (.mdc) không mặc định là chân lý.",
+      "selected_semantics": [
+        "DOMAIN_POLICY_PACK",
+        "RULE_PACK_DISCOVERY",
+        "RULE_APPLICABILITY_EVALUATION",
+        "DEPENDENCY_AWARE_RULE_SELECTION",
+        "VERSION_BOUND_RULE_SELECTION",
+        "TASK_SCOPED_RULE_SELECTION",
+        "RULE_CONFLICT_RESOLUTION",
+        "RULE_PROVENANCE_BINDING",
+        "RULE_FRESHNESS_CLASSIFICATION",
+        "RULE_CONFIDENCE_CLASSIFICATION",
+        "MINIMUM_SUFFICIENT_RULE_INJECTION",
+        "RULE_OUTCOME_EVALUATION",
+        "RULE_PACK_HOST_COMPILATION"
+      ],
+      "known_gap": "NOT_IMPLEMENTED / NOT_CERTIFIED; composed into RM-PRIORITY-CONTEXT (approval pending Owner).",
+      "dependencies": [
+        "symbol-aware retrieval primitives",
+        "RM-PRIORITY-CONTEXT approval"
+      ],
+      "roadmap_relation": "composition into RM-PRIORITY-CONTEXT"
     }
   ],
   "last_reviewed": "2026-08-21T04:27:11Z",

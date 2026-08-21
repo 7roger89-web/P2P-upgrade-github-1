@@ -40,7 +40,7 @@ import re
 import sys
 from datetime import datetime, timezone
 
-VERSION = "2"
+VERSION = "3"
 SPEC_GOAL = "P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A"
 
 STATUS_VOCAB = {
@@ -108,6 +108,14 @@ def build_input_model(repo, override_owner_value):
     roadmap = load_json(os.path.join(repo, "governance", "p2p-development-roadmap.json"), "p2p-development-roadmap")
     ledger = load_json(os.path.join(repo, "governance", "research-adoption-ledger.json"), "research-adoption-ledger")
     cap = load_json(os.path.join(repo, "docs", "p2p-development", "capability-ledger", "capability-index.json"), "capability-index")
+    intake = {}
+    intake_path = os.path.join(repo, "governance", "research-intake-ledger.json")
+    if os.path.exists(intake_path):
+        intake = load_json(intake_path, "research-intake-ledger")
+    intake_contract = {}
+    ic_path = os.path.join(repo, "governance", "intake-contract.json")
+    if os.path.exists(ic_path):
+        intake_contract = load_json(ic_path, "intake-contract")
 
     # §13 fail-closed: two canonical authorities materially conflict detection
     dctl_items = {it.get("id"): it for it in dctl.get("roadmap", {}).get("items", [])}
@@ -142,6 +150,10 @@ def build_input_model(repo, override_owner_value):
         "RESEARCH_ADOPTION_RECORDS": ledger["records"],
         "ROADMAP_ITEMS": roadmap["items"],
         "CAPABILITY_RECORDS": [c for c in cap["capabilities"] if isinstance(c, dict)],
+        "INTAKE_RECORDS": intake.get("intake_records", []),
+        "INTAKE_CLASSIFICATIONS": {r["id"]: r.get("classification", "") for r in intake.get("intake_records", [])},
+        "INTAKE_VOCABULARY": intake.get("vocabulary", {}),
+        "INTAKE_CONTRACT": intake_contract,
         "CURRENT_EVIDENCE": {i["roadmap_id"]: i.get("current_evidence", "") for i in roadmap["items"]},
         "DEPENDENCIES": {i["roadmap_id"]: i.get("dependencies", []) for i in roadmap["items"]},
         "BLOCKERS": {i["roadmap_id"]: i.get("blockers", []) for i in roadmap["items"]},
@@ -171,6 +183,12 @@ def bind_hashes(inp, repo):
     h["research_adoption_ledger_schema_version"] = "p2p-framework/research-adoption-ledger/1"
     h["capability_index_json_sha256"] = sha256_file(os.path.join(repo, "docs", "p2p-development", "capability-ledger", "capability-index.json"))
     h["development_control_json_sha256"] = sha256_file(os.path.join(repo, "governance", "development-control.json"))
+    icp = os.path.join(repo, "governance", "intake-contract.json")
+    if os.path.exists(icp):
+        h["intake_contract_json_sha256"] = sha256_file(icp)
+    ilp = os.path.join(repo, "governance", "research-intake-ledger.json")
+    if os.path.exists(ilp):
+        h["research_intake_ledger_json_sha256"] = sha256_file(ilp)
     h["official_baseline_version"] = BASELINE_EXPECTED
     h["official_baseline_artifact_sha256"] = BASELINE_SHA_EXPECTED
     h["planning_timestamp_utc"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -187,8 +205,131 @@ def coverage_gate(inp, dctl):
       Ledger DISCOVERED/RESEARCHED        -> not yet selected; not a gap, not counted.
       Ledger UNKNOWN                      -> NEVER satisfies coverage.
       Roadmap PLANNED/PARTIAL items       -> materially relevant candidates.
+
+    v3 additions (INTAKE-CLOSURE-01 spec §§7-9):
+      G1 RESEARCH_TO_ROADMAP_REVERSE_COVERAGE
+      G2 CAPABILITY_TO_ROADMAP_COVERAGE
+      G3 ORPHAN_OWNER_DECISION_DETECTION
+      G4 forward check preserved (existing)
     """
     gaps = []
+    # ---------------- v3 G1: research -> roadmap reverse coverage ----------
+    # Material ledger records (SELECTED/PLANNED/PARTIAL) must have one of:
+    #   * explicit reference from a roadmap item (source_research_ids)
+    #   * explicit composition into an existing roadmap item (composition_entries)
+    #   * explicit DEFER reason attached to the record
+    #   * explicit REJECTED/SUPERSEDED state (excluded with documented reason)
+    roadmap_id_set = {i["roadmap_id"] for i in inp["ROADMAP_ITEMS"]}
+    roadmapped_research = set()
+    composed_research = set()
+    for i in inp["ROADMAP_ITEMS"]:
+        for s in i.get("source_research_ids", []):
+            roadmapped_research.add(s)
+        for ce in i.get("composition_entries", []) or []:
+            rr = ce.get("research_record")
+            if rr:
+                composed_research.add(rr)
+    cap_ids_by_item = set()
+    for i in inp["ROADMAP_ITEMS"]:
+        for c in i.get("canonical_capability_ids", []) or []:
+            cap_ids_by_item.add(c)
+    for rec in inp["RESEARCH_ADOPTION_RECORDS"]:
+        st = rec.get("status")
+        rid = rec["research_id"]
+        if st not in LEDGER_MATERIAL_STATUSES:
+            continue  # adopted/excluded/non-material records do not need future consideration
+        composed = rid in roadmapped_research or rid in composed_research
+        defer_ok = bool(rec.get("defer_reason") or rec.get("roadmap_relation", "").startswith("defer"))
+        excluded = st in LEDGER_EXCLUDED_STATUSES
+        if not composed and not defer_ok and not excluded:
+            gaps.append({"reason": "MATERIAL_RESEARCH_WITHOUT_ROADMAP_CONSIDERATION",
+                         "research_id": rid, "status": st})
+    # ---------------- v3 G2: capability -> roadmap coverage ---------------
+    # Spec §8: only capabilities whose state means future work is MATERIALLY
+    # INTENDED are gated (not every historical registry entry):
+    #   (a) origin_type == OWNER_ACCEPTED_PROPOSAL  (Owner accepted)
+    #   (b) cited by a MATERIAL adoption record (canonical_capability_ids)
+    # Other PLANNED/PARTIAL caps are documented registry inventory and are
+    # logged in registry_entries_excluded_from_gate (explicitly not a gap).
+    CAP_FUTURE_WORK_STATES = {"PLANNED", "PARTIAL", "FOUNDATION_READY_WITH_GAP", "OWNER_ACCEPTED_PROPOSAL"}
+    adopted_cap_ids = set()
+    for r in inp["RESEARCH_ADOPTION_RECORDS"]:
+        if r.get("status") in LEDGER_MATERIAL_STATUSES:
+            for c in r.get("canonical_capability_ids", []) or []:
+                adopted_cap_ids.add(c)
+    planned_item_families = {i.get("family") for i in inp["ROADMAP_ITEMS"]
+                             if i.get("status") in ("PLANNED", "PARTIAL")}
+    # Alias resolution (INTAKE-CLOSURE-01 intake contract): a capability family
+    # may be declared equivalent to a roadmap family via the alias table.
+    _alias_table = (inp.get("INTAKE_CONTRACT") or {}).get(
+        "capability_family_alias_table", {}) or {}
+    def effective_families(fam):
+        eff = {fam}
+        rf = (_alias_table.get(fam) or {}).get("roadmap_family")
+        if rf:
+            eff.add(rf)
+        return eff
+    planned_families_expanded = set(planned_item_families)
+    for k, v in _alias_table.items():
+        if (v or {}).get("roadmap_family") in planned_item_families:
+            planned_families_expanded.add(k)
+    registry_excluded = []
+    for c in inp["CAPABILITY_RECORDS"]:
+        cid = c.get("capability_id") or c.get("id") or ""
+        st = c.get("status", "")
+        if st not in CAP_FUTURE_WORK_STATES:
+            continue
+        materially_intended = (c.get("origin_type") == "OWNER_ACCEPTED_PROPOSAL") or (cid in adopted_cap_ids)
+        if not materially_intended:
+            registry_excluded.append(cid)
+            continue
+        in_item = cid in cap_ids_by_item
+        same_family_umbrella = bool(effective_families(c.get("family") or "")
+                                    & planned_families_expanded)
+        deferral_note = any("defer" in str(v).lower() for v in (
+            c.get("roadmap_relation"), c.get("known_gap"), c.get("notes"), ""))
+        rejection_note = any(kw in str(v).lower() for kw in ("reject", "superseded") for v in (
+            c.get("roadmap_relation"), c.get("known_gap"), c.get("notes"), ""))
+        if not (in_item or same_family_umbrella or deferral_note or rejection_note):
+            gaps.append({"reason": "FUTURE_WORK_CAPABILITY_WITHOUT_ROADMAP_CONSIDERATION",
+                         "capability_id": cid, "status": st})
+    # ---------------- v3 G3: orphan accepted-decision detection -----------
+    # An ACCEPTED intake record without a matching adoption record is an orphan.
+    # An accepted adoption record without a capability record (or roadmapped
+    # capability) and without explicit defer/reject is an orphan stage.
+    intake_accepted = {r["id"]: r for r in inp["INTAKE_RECORDS"]
+                       if r.get("classification", "").upper() == "ACCEPTED"}
+    adoption_ids = {r["research_id"] for r in inp["RESEARCH_ADOPTION_RECORDS"]}
+    capability_ids = {c.get("capability_id") or c.get("id") or "" for c in inp["CAPABILITY_RECORDS"]}
+    for iid, r in intake_accepted.items():
+        # matching adoption record: explicit intake_record id reference, or
+        # token overlap >= 2 between intake subject and adoption source_name
+        subj = (r.get("subject", "") or "").lower()
+        subj_tokens = set(t for t in re.split(r"[^a-z0-9]+", subj) if len(t) > 3)
+        matched = False
+        for a in inp["RESEARCH_ADOPTION_RECORDS"]:
+            if a.get("intake_record") == iid:
+                matched = True
+                break
+            aname = (a.get("source_name", "") or "").lower()
+            aname_tokens = set(t for t in re.split(r"[^a-z0-9]+", aname) if len(t) > 3)
+            if len(subj_tokens & aname_tokens) >= 2:
+                matched = True
+                break
+        if not matched:
+            gaps.append({"reason": "ACCEPTED_INTAKE_WITHOUT_ADOPTION_RECORD",
+                         "intake_id": iid, "subject": r.get("subject", "")})
+    for a in inp["RESEARCH_ADOPTION_RECORDS"]:
+        if a.get("status") not in LEDGER_MATERIAL_STATUSES:
+            continue
+        caps = a.get("canonical_capability_ids", []) or []
+        has_cap = any(c in capability_ids for c in caps)
+        roadmapped = a["research_id"] in roadmapped_research or a["research_id"] in composed_research
+        deferred = bool(a.get("defer_reason") or str(a.get("roadmap_relation", "")).startswith("defer"))
+        excluded = a.get("status") in LEDGER_EXCLUDED_STATUSES
+        if not has_cap and not roadmapped and not deferred and not excluded:
+            gaps.append({"reason": "MATERIAL_ADOPTION_WITHOUT_CAPABILITY_OR_ROADMAP",
+                         "research_id": a["research_id"]})
     owner_selected = []
     for item in inp["ROADMAP_ITEMS"]:
         if item.get("status") in ("PLANNED", "PARTIAL"):
@@ -230,6 +371,15 @@ def coverage_gate(inp, dctl):
             "ledger_excluded_with_reason": sorted(LEDGER_EXCLUDED_STATUSES),
             "unknown_never_satisfies": True,
         },
+        "RESEARCH_TO_ROADMAP_REVERSE_COVERAGE": all(
+            g["reason"] != "MATERIAL_RESEARCH_WITHOUT_ROADMAP_CONSIDERATION" for g in gaps),
+        "CAPABILITY_TO_ROADMAP_COVERAGE": all(
+            g["reason"] != "FUTURE_WORK_CAPABILITY_WITHOUT_ROADMAP_CONSIDERATION" for g in gaps),
+        "CAPABILITY_REGISTRY_ENTRIES_EXCLUDED_FROM_GATE": registry_excluded,
+        "ORPHAN_OWNER_DECISIONS": [g for g in gaps if "ACCEPTED_INTAKE_WITHOUT_ADOPTION_RECORD" == g["reason"]
+                                   or "MATERIAL_ADOPTION_WITHOUT_CAPABILITY_OR_ROADMAP" == g["reason"]],
+        "INTAKE_RECORDS_CONSUMED": len(inp["INTAKE_RECORDS"]),
+        "INTAKE_CONTRACT_BOUND": bool(inp.get("INTAKE_CONTRACT")),
     }
 
 

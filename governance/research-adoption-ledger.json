@@ -1014,6 +1014,54 @@
       ],
       "reconciliation_note": "Appended by P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01A: planner coverage gate detected SOURCE_RESEARCH_ID_MISSING_FROM_LEDGER; durable provenance record appended. Historical records untouched.",
       "appended_at": "2026-08-21T05:28:56Z"
+    },
+    {
+      "research_id": "RA-EXT-029",
+      "source_name": "Contextual Rule Intelligence / Domain Policy Packs (Owner architecture decision 2026-08-21)",
+      "source_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "source_reference": "P2P_Contextual_Rule_Intelligence_Update_2026-08-21 (as intaken via research-intake-ledger RI-008; decision document archived in docs/p2p-development/decisions/owner-accepted/)",
+      "source_version_or_commit": "owner decision 2026-08-21; intake 2026-08-21 (P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01)",
+      "provenance_status": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "research_summary": "Contextual Rule Intelligence: FW02 extension providing domain policy packs with rule pack discovery, applicability evaluation, dependency-aware / version-bound / task-scoped rule selection, conflict resolution, provenance binding, freshness and confidence classification, minimum sufficient rule injection, rule outcome evaluation, host compilation. Adopt the PATTERN, not the corpus: external .mdc corpus is UNVERIFIED_CANDIDATE_CORPUS.",
+      "selected_ideas": [
+        "DOMAIN_POLICY_PACK",
+        "RULE_PACK_DISCOVERY",
+        "RULE_APPLICABILITY_EVALUATION",
+        "DEPENDENCY_AWARE_RULE_SELECTION",
+        "VERSION_BOUND_RULE_SELECTION",
+        "TASK_SCOPED_RULE_SELECTION",
+        "RULE_CONFLICT_RESOLUTION",
+        "RULE_PROVENANCE_BINDING",
+        "RULE_FRESHNESS_CLASSIFICATION",
+        "RULE_CONFIDENCE_CLASSIFICATION",
+        "MINIMUM_SUFFICIENT_RULE_INJECTION",
+        "RULE_OUTCOME_EVALUATION",
+        "RULE_PACK_HOST_COMPILATION"
+      ],
+      "rejected_ideas": [
+        "adopting the external .mdc corpus as canonical P2P truth",
+        "host serialization becoming canonical authority",
+        "rules with unknown applicability being silently applied"
+      ],
+      "p2p_translation": "Composed as first-class part of RM-PRIORITY-CONTEXT (Context Intelligence completeness umbrella): symbol-aware retrieval, token-bounded maps, adaptive context budget, CRI/Domain Policy Packs, affected-surface targeting, provenance/freshness-aware context selection. Precedence preserved; UNKNOWN applicability -> fail closed; minimum sufficient context; provider-neutral host compilation (Cursor/Codex/Claude/Manus/Gemini forms non-authoritative).",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "CONTEXTUAL_RULE_INTELLIGENCE",
+        "C19"
+      ],
+      "status": "PLANNED",
+      "evidence_pointers": [
+        "governance/intake-contract.json (atomic intake contract)",
+        "governance/research-intake-ledger.json intake_records id=RI-008",
+        "docs/p2p-development/decisions/owner-accepted/P2P_Contextual_Rule_Intelligence_Update_2026-08-21.md (archived decision)",
+        "RM-PRIORITY-CONTEXT composition entry (p2p-development-roadmap.json)"
+      ],
+      "dependencies": [
+        "RM-PRIORITY-CONTEXT goal approval",
+        "symbol-aware retrieval primitives (Context goal)"
+      ],
+      "roadmap_relation": "composition into RM-PRIORITY-CONTEXT (B)",
+      "appended_at": "2026-08-21T05:42:58Z"
     }
   ],
   "rejected_register_summary": {

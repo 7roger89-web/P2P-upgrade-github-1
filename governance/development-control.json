@@ -2283,6 +2283,17 @@
         "docs/p2p-development/reports/P2P-C31-terminal-report.md",
         "docs/p2p-development/reports/P2P-C30-terminal-report.md"
       ]
+    },
+    {
+      "event": "P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01",
+      "kind": "INTAKE_CLOSURE_NOTE",
+      "date": "2026-08-21",
+      "summary": "Missed-intake case CONTEXTUAL_RULE_INTELLIGENCE reproduced (no ledger/roadmap/capability record pre-closure) and closed via atomic intake: RI-007 ACCEPTED -> RA-EXT-029 adoption -> capability CRI (OWNER_ACCEPTED_PROPOSAL) -> enumerated into RM-PRIORITY-CONTEXT family umbrella (CONTEXT_AND_KNOWLEDGE alias) + source_research_ids. Planner v3 adds reverse research->roadmap coverage, capability->roadmap coverage, orphan accepted-decision detection; intake contract governance/intake-contract.json hash-bound. Canonical rerun: GAP=false, RECOMMENDED=RM-PRIORITY-CONTEXT.",
+      "bindings": {
+        "planner_script": "scripts/p2p_roadmap_planner.py (VERSION=3)",
+        "test_harness": "scripts/p2p_planner_01b_test.py (12/12 PASS)",
+        "run_evidence": "reports/planner/P2P-PLANNER-RUN-03.json"
+      }
     }
   ],
   "pr_lineage": {

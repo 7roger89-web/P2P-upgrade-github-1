@@ -442,7 +442,8 @@
       ],
       "canonical_capability_ids": [
         "C12",
-        "C15"
+        "C15",
+        "SAFE_QUIESCE_AND_DRAIN"
       ],
       "current_evidence": "C12 bounded foreground execution DONE; C15 bounded delegation DONE",
       "target_evidence": "task-graph decomposition + checkpoint/resume + continuation without per-task Owner nagging, verified on a real bounded goal",
@@ -450,13 +451,16 @@
       "project_impact": "NONE (execution-only, no new mutation level)",
       "promotion_required": "YES",
       "next_safe_when": "after RM-C08 re-selection",
-      "defer_reason": ""
+      "defer_reason": "",
+      "intake_closure_notes_01b": [
+        "INTAKE-CLOSURE-01 option-B enumeration: SAFE_QUIESCE_AND_DRAIN (recorded intent, later goal required)"
+      ]
     },
     {
       "roadmap_id": "RM-PRIORITY-CONTEXT",
-      "title": "Context Intelligence completeness (symbol-aware retrieval, cache-aware budget, maps)",
+      "title": "Context Intelligence completeness (symbol-aware retrieval, token-bounded maps, adaptive context budget, CRI/Domain Policy Packs)",
       "family": "CONTEXT_AND_RETRIEVAL",
-      "owner_value": "Chất lượng và chi phí thực thi tốt hơn cho mọi mục tiêu (bao gồm Zero-to-Project).",
+      "owner_value": "Chất lượng và chi phí thực thi tốt hơn cho mọi mục tiêu (bao gồm Zero-to-Project). (bao gồm Contextual Rule Intelligence / Domain Policy Packs: rule packs có provenance/freshness/confidence, minimum sufficient injection, fail-closed khi applicability UNKNOWN; pattern adoption, corpus bên ngoài KHÔNG phải truth)",
       "status": "PLANNED",
       "priority": 3,
       "dependencies": [
@@ -465,11 +469,33 @@
       ],
       "blockers": [],
       "source_research_ids": [
+        "RA-EXT-004",
         "RA-EXT-019",
-        "RA-EXT-004"
+        "RA-EXT-029"
       ],
       "canonical_capability_ids": [
-        "C19"
+        "C19",
+        "CONTEXTUAL_RULE_INTELLIGENCE",
+        "BOUNDED_TOOL_OUTPUT",
+        "CACHE_AFFECTING_CONFIGURATION_FINGERPRINT",
+        "CACHE_AWARE_MODEL_EFFORT_STABILITY",
+        "CACHE_HIT_TELEMETRY",
+        "CODE_INTELLIGENCE_FIRST_NAVIGATION",
+        "CONTEXT_COST_TELEMETRY",
+        "CONTEXT_PRESSURE_MONITORING",
+        "DURABLE_PRE_COMPACTION_CHECKPOINT",
+        "QUALITY_ADJUSTED_CONTEXT_OPTIMIZATION",
+        "RAW_OUTPUT_ARTIFACT_OFFLOADING",
+        "SAFE_CONTEXT_COMPACTION",
+        "SESSION_CONFIGURATION_STABILITY",
+        "SESSION_REUSE_DECISION",
+        "SUBAGENT_CONTEXT_ISOLATION",
+        "SYMBOL_AWARE_RETRIEVAL",
+        "TASK_SESSION_BOUNDARY_MANAGEMENT",
+        "TASK_TARGETED_MCP_LOADING",
+        "TASK_TARGETED_SKILL_LOADING",
+        "TASK_TARGETED_TOOL_LOADING",
+        "VERBOSE_WORK_CONTEXT_ISOLATION"
       ],
       "current_evidence": "C19 task-targeted retrieval DONE; 35 CONTEXT_AND_KNOWLEDGE entries",
       "target_evidence": "symbol-aware retrieval + token-bounded repo/project maps + adaptive context budget verified on real repositories",
@@ -477,7 +503,20 @@
       "project_impact": "NONE",
       "promotion_required": "NO (read-only capability enhancement)",
       "next_safe_when": "now — no dependency on blocked items",
-      "defer_reason": ""
+      "defer_reason": "",
+      "composition_entries": [
+        {
+          "capability": "CONTEXTUAL_RULE_INTELLIGENCE",
+          "research_record": "RA-EXT-029",
+          "intake_record": "RI-008",
+          "mode": "B_explicit_composition",
+          "note": "ADOPT THE PATTERN — DO NOT ADOPT THE CORPUS AS TRUTH; UNVERIFIED_CANDIDATE_CORPUS remains non-canonical; precedence: Owner/Project Policy > Verified Project Truth > Version-bound Upstream > Verified P2P Domain Policy > Generic External Rule Corpus; UNKNOWN -> fail closed; minimum sufficient context; provider neutrality (host forms non-authoritative)."
+        }
+      ],
+      "intake_closure_note_01b": "Composed by P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01; no second competing Context subsystem created.",
+      "intake_closure_notes_01b": [
+        "INTAKE-CLOSURE-01 option-B enumeration: 20 OWNER_ACCEPTED_PROPOSAL caps from 2026-08-17 context umbrella accepted into existing RM-PRIORITY-CONTEXT item; no new roadmap item created; family alias CONTEXT_AND_KNOWLEDGE<->CONTEXT_AND_RETRIEVAL bound in intake contract"
+      ]
     },
     {
       "roadmap_id": "RM-PRIORITY-PLANNER",
@@ -611,7 +650,11 @@
       ],
       "canonical_capability_ids": [
         "C38",
-        "LIVE_COUNCIL_8_OF_8"
+        "LIVE_COUNCIL_8_OF_8",
+        "PROVIDER_NEUTRAL_AUTOPILOT",
+        "PLANNER_PROVIDER_NEUTRALITY",
+        "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
+        "C31_EXECUTION_TARGET_AS_CERTIFICATION_INTAKE"
       ],
       "current_evidence": "single-host LIVE_COUNCIL_8_OF_8 certified @ 8a1ad30; multi-host NOT_PROVEN",
       "target_evidence": "multi-host 8/8 live certification with event evidence",
@@ -619,7 +662,10 @@
       "project_impact": "NONE",
       "promotion_required": "YES",
       "next_safe_when": "host evidence blockers resolved",
-      "defer_reason": ""
+      "defer_reason": "",
+      "intake_closure_notes_01b": [
+        "INTAKE-CLOSURE-01 option-B enumeration: multi-ai certification/provider-neutrality caps under C30/C31 council umbrella"
+      ]
     },
     {
       "roadmap_id": "RM-PRIORITY-DRIFT-SWEEP",
