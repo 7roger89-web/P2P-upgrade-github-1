@@ -51,9 +51,9 @@
     }
   },
   "current_development": {
-    "development_goal": "C31",
+    "development_goal": "C32",
     "status": "BLOCKED_TERMINAL",
-    "source_version": "8.4.7-C-codex.24",
+    "source_version": "8.4.7-C-codex.41",
     "source_version_status": "ACTIVE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
     "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
@@ -80,7 +80,7 @@
       ]
     },
     "historical_maintenance_mode": false,
-    "owner_action_required": "C30 terminal PASS (provider-neutral execution foundation + durable research intake); candidates remain UNPROMOTED; C27 reopen needs one Owner action outside chat (codex login or Manus API connector); no goal auto-started.",
+    "owner_action_required": "Mutation safety integration into canonical runtime completed on dev branch; candidate .41 minted UNPROMOTED and immutable after packaging; promotion-readiness review is the next Owner action.",
     "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
     "lineage_reconciliation": {
       "from_source_version": "8.4.7-C-codex.15",
@@ -106,7 +106,7 @@
     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
     "candidate_sha256": null,
     "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v24-c30-composable-execution-target-foundation-candidate-v1.zip",
-    "terminal_verdict": "BLOCKED / OWNER_ACTION_REQUIRED",
+    "terminal_verdict": "PENDING",
     "terminal_at": "2026-08-17T06:27:20Z",
     "terminal_evidence": "evidence/c31_live_probe.json",
     "blocker": {
@@ -131,7 +131,8 @@
       "verdict": "VERIFIED_AT_EVIDENCE_TIME",
       "not_permanent": "AUTH_VALID_FOREVER is NOT claimed",
       "current_auth_state": "UNKNOWN_NOT_PROBED"
-    }
+    },
+    "maintenance_mode_note": "GOVERNANCE-TRUTH-SYNC (2026-08-21): previous C31 terminal block preserved historically; this block reflects the post-integration state. No rewrite of historical evidence."
   },
   "candidate_records": [
     {
