@@ -1,0 +1,31 @@
+{
+  "schema": "p2p-external-skill-source/1",
+  "source_id": "mukul975-anthropic-cybersecurity-skills",
+  "name": "Anthropic Cybersecurity Skills (community project)",
+  "repository": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+  "upstream_owner": "mukul975",
+  "affiliation": "COMMUNITY_PROJECT_NOT_ANTHROPIC_PBC",
+  "license": "Apache-2.0",
+  "pinned_commit": "f76261573a539ec40c3d434ecbb9e657d26aa921",
+  "pinned_at": "2026-08-21",
+  "index_path": "index.json",
+  "index_git_blob_sha": "720b64989aad879be39e9520559fbbdaca49f625",
+  "reported_index_generated_at": "2026-08-20T15:57:01Z",
+  "reported_total_skills": 817,
+  "reported_domains": 29,
+  "adoption": "CATALOG_AND_RETRIEVE_ON_DEMAND",
+  "bulk_vendor": false,
+  "bulk_auto_execute": false,
+  "script_execution_trust": "UNVERIFIED_BY_DEFAULT",
+  "skill_content_trust": "EXTERNAL_CANDIDATE_BY_DEFAULT",
+  "risk_model_required": true,
+  "permission_gate_required": true,
+  "target_binding_required_for_active_testing": true,
+  "owner_gate_required_for_intrusive_or_dual_use_execution": true,
+  "notes": [
+    "Ingest metadata/catalog; do not preload 817 SKILL.md files.",
+    "Retrieve SKILL.md/reference content only when task applicability is evidenced.",
+    "Bundled scripts are executable artifacts and require separate review/trust.",
+    "Offensive/dual-use skills never gain execution permission from semantic match alone."
+  ]
+}

@@ -1553,7 +1553,13 @@
         "id": "C19",
         "title": "Task-targeted context retrieval, coverage, and reuse foundation",
         "status": "DONE",
-        "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context"
+        "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context",
+        "source_research_ids": [
+          "RA-EXT-032"
+        ],
+        "canonical_capability_ids": [
+          "C41"
+        ]
       },
       {
         "id": "FACT_LIVE_SPECS",
@@ -2494,6 +2500,14 @@
       "type": "corrective_hardening",
       "parent_goal": "PLANNER-01",
       "delivered": "2026-08-21"
+    },
+    {
+      "at": "2026-08-21T16:59:57Z",
+      "type": "OWNER_ACCEPTED_EXTERNAL_SKILL_REGISTRY_INTAKE",
+      "research_id": "RA-EXT-032",
+      "capability_id": "C41",
+      "upstream": "mukul975/Anthropic-Cybersecurity-Skills",
+      "revision": "f76261573a539ec40c3d434ecbb9e657d26aa921"
     }
   ],
   "research_intake_ledger": "governance/research-intake-ledger.json",
