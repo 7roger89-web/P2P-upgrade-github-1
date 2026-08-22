@@ -51,7 +51,7 @@
     }
   },
   "current_development": {
-    "development_goal": "P2P-CANONICAL-LINEAGE-REPAIR-01",
+    "development_goal": "P2P-C72-SUCCESSOR-INSTALLATION-LIFECYCLE-01",
     "goal_kind": "RECONCILIATION_NOT_PRODUCT_GOAL",
     "status": "ACTIVE_UNPROMOTED_CANDIDATE_MINT_AUTHORIZED_WITH_LIVE_MANUS_DISCLOSURE",
     "source_version": "8.4.7-C-codex.73",
@@ -99,7 +99,7 @@
       "artifact_sha256": "TO_BE_FILLED_AFTER_MINT",
       "source_commit": "TO_BE_FILLED_AFTER_SOURCE_FREEZE",
       "source_tree": "TO_BE_FILLED_AFTER_SOURCE_FREEZE",
-      "record_path": "reports/reconciliation/p2p-canonical-lineage-repair-01a-candidate-identity.json"
+      "record_path": "reports/reconciliation/p2p-c72-successor-installation-lifecycle-01-candidate-identity.json"
     },
     "provider_neutrality": "PRESERVED",
     "manus_native_council": {
