@@ -185,7 +185,7 @@ RELEASE_SKILLS = (
     "rag-prep",
     "rag-router",
 )
-COPYTREE_IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo")
+COPYTREE_IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", ".coverage")
 
 
 def sha256(path: Path) -> str:
