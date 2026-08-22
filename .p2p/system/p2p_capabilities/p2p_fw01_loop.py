@@ -860,6 +860,23 @@ class Fw01Loop:
         }
         try:
             from p2p_capabilities import quality_intelligence as _qi
+            from p2p_capabilities.aerg_engine import AERGEngine
+            from p2p_capabilities.aerg_model import Evidence, EvidenceType
+            
+            _aerg = AERGEngine(task_id=str(task_id))
+            # AERG: Bind execution outcome to evidence
+            if isinstance(evidence, Mapping):
+                _aerg_claim = _aerg.create_claim(
+                    subject=f"task:{task_id}",
+                    statement=f"Execution outcome: {status}"
+                )
+                if evidence.get("verification_result"):
+                    _aerg.add_evidence(_aerg_claim.claim_id, Evidence(
+                        type=EvidenceType.SHELL_OUTPUT,
+                        content=str(evidence.get("verification_result")),
+                        source="autopilot_step"
+                    ))
+            
             _fw04_impact = _qi.affected_surface(
                 changed_paths=_fw04_changed_surface,
                 project_root=self.root,
@@ -874,7 +891,8 @@ class Fw01Loop:
                     if isinstance(evidence, Mapping) else False),
                 independent_verifier_result=(
                     evidence.get("independent_verdict") or "")
-                if isinstance(evidence, Mapping) else "")
+                if isinstance(evidence, Mapping) else "",
+                reliability_claims=_aerg.get_claims())
             self._trace(task_id, {"mutation_class": "READ_ONLY",
                           "permission": "",
                           "verification": "REQUIRED"},

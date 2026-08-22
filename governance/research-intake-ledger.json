@@ -107,6 +107,28 @@
       "selected_ideas_summary": "DOMAIN_POLICY_PACK, RULE_PACK_DISCOVERY, RULE_APPLICABILITY_EVALUATION, DEPENDENCY_AWARE_RULE_SELECTION, VERSION_BOUND_RULE_SELECTION, TASK_SCOPED_RULE_SELECTION, RULE_CONFLICT_RESOLUTION, RULE_PROVENANCE_BINDING, RULE_FRESHNESS_CLASSIFICATION, RULE_CONFIDENCE_CLASSIFICATION, MINIMUM_SUFFICIENT_RULE_INJECTION, RULE_OUTCOME_EVALUATION, RULE_PACK_HOST_COMPILATION",
       "notes": "ADOPT THE PATTERN \u2014 DO NOT ADOPT THE CORPUS AS TRUTH. External .mdc corpus remains UNVERIFIED_CANDIDATE_CORPUS. Precedence preserved: Owner/Project Policy > Verified Project Truth > Version-bound Official Upstream > Verified P2P Domain Policy > Generic External Rule Corpus. UNKNOWN applicability -> fail closed. Minimum sufficient context. Provider neutrality preserved (host serialization never canonical authority).",
       "intaken_at": "2026-08-21T05:42:52Z"
+    },
+    {
+      "id": "RI-010",
+      "subject": "Controlled Execution Hardening",
+      "classification": "ACCEPTED",
+      "source": "owner_instruction",
+      "instruction_ref": "P2P-CONTROLLED-EXECUTION-HARDENING-01",
+      "scope": "Hardening execution control plane; Write Lease; Authority Profile; Task-Scoped Handoff.",
+      "status": "IMPLEMENTED_CANDIDATE",
+      "evidence_ref": "p2p-controlled-execution-hardening-01 branch",
+      "intaken_at": "2026-08-22T00:00:00Z"
+    },
+    {
+      "id": "RI-011",
+      "subject": "AI Execution Reliability Guard (AERG)",
+      "classification": "ACCEPTED",
+      "source": "owner_instruction",
+      "instruction_ref": "P2P-AERG-PROVIDER-NEUTRAL-RELIABILITY-01",
+      "scope": "Provider-neutral reliability guard; prevent trust in self-attestation; separate claim from evidence; deterministic contradiction detection; assurance levels.",
+      "status": "IMPLEMENTED_CANDIDATE",
+      "evidence_ref": "p2p-aerg-provider-neutral-reliability-01 feature branch",
+      "intaken_at": "2026-08-22T00:00:00Z"
     }
   ],
   "inherited_decisions": {
@@ -127,16 +149,6 @@
   "last_reviewed": "2026-08-19",
   "intake_rule_note": "RI-004..RI-006 persisted at FW01 closure normalization per Owner directive section 10; full consolidation delegated to FRAMEWORK-02 opening. Entries are durable pending intake: nothing is executed until the Owner opens and approves the corresponding goal.",
   "provenance_notes": [
-    {
-      "provenance_id": "PN-001",
-      "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
-      "date": "2026-08-21",
-      "note": "CRI intake lineage: RI-007 (2026-08-21 Owner decision, classification ACCEPTED) and RI-008 (intaken during INTAKE-CLOSURE-01 from the same decision document). Both bind the same CRI adoption lineage (RA-EXT-029 binds RI-008; RA-EXT-030 binds RI-007). No duplicate adoption claims: each adoption record has exactly one intake_record.",
-      "affected_records": [
-        "RI-007",
-        "RI-008"
-      ]
-    },
     {
       "provenance_id": "PN-001",
       "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",

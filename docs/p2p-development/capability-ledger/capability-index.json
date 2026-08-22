@@ -287,7 +287,7 @@
       "capability_id": "SAFE_INSTALLER",
       "name": "Safe Installer",
       "family": "RELEASE_INSTALL_PROJECT_LIFECYCLE",
-      "beginner_value": "Cài đặt P2P lên dự án của bạn một cách an toàn. Nếu có lỗi xảy ra trong quá trình cài đặt, hệ thống sẽ tự động khôi phục (rollback) về trạng thái ban đầu, đảm bảo dự án của bạn không bao giờ bị hỏng.",
+      "beginner_value": "C\u00e0i \u0111\u1eb7t P2P l\u00ean d\u1ef1 \u00e1n c\u1ee7a b\u1ea1n m\u1ed9t c\u00e1ch an to\u00e0n. N\u1ebfu c\u00f3 l\u1ed7i x\u1ea3y ra trong qu\u00e1 tr\u00ecnh c\u00e0i \u0111\u1eb7t, h\u1ec7 th\u1ed1ng s\u1ebd t\u1ef1 \u0111\u1ed9ng kh\u00f4i ph\u1ee5c (rollback) v\u1ec1 tr\u1ea1ng th\u00e1i ban \u0111\u1ea7u, \u0111\u1ea3m b\u1ea3o d\u1ef1 \u00e1n c\u1ee7a b\u1ea1n kh\u00f4ng bao gi\u1edd b\u1ecb h\u1ecfng.",
       "principle": "ATOMIC_INSTALLATION_OR_ROLLBACK",
       "origin_refs": [
         "scripts/p2p_safe_installer.py"
@@ -306,10 +306,10 @@
       ],
       "known_gaps": [],
       "do_not_duplicate_with": [],
-      "next_condition": "Hỗ trợ cập nhật từng phần (incremental updates).",
+      "next_condition": "H\u1ed7 tr\u1ee3 c\u1eadp nh\u1eadt t\u1eebng ph\u1ea7n (incremental updates).",
       "last_reviewed": "2026-08-21",
       "freshness": "verified_against_filesystem",
-      "notes": "Đã xác minh qua Pilot trên Game Truyện và Fixture Rollback.",
+      "notes": "\u0110\u00e3 x\u00e1c minh qua Pilot tr\u00ean Game Truy\u1ec7n v\u00e0 Fixture Rollback.",
       "origin_type": "PROJECT_LEARNING"
     },
     {
@@ -1855,7 +1855,7 @@
       "capability_id": "MANUS_EXECUTION_TARGET",
       "name": "Manus Execution Target",
       "family": "EXECUTION_AND_ORCHESTRATION",
-      "beginner_value": "Manus được chứng nhận là môi trường thực thi an toàn cho P2P. Mọi tác vụ chạy trên Manus đều được giám sát bởi Sentinel để đảm bảo ranh giới quyền hạn và không gây đột biến ngoài ý muốn.",
+      "beginner_value": "Manus \u0111\u01b0\u1ee3c ch\u1ee9ng nh\u1eadn l\u00e0 m\u00f4i tr\u01b0\u1eddng th\u1ef1c thi an to\u00e0n cho P2P. M\u1ecdi t\u00e1c v\u1ee5 ch\u1ea1y tr\u00ean Manus \u0111\u1ec1u \u0111\u01b0\u1ee3c gi\u00e1m s\u00e1t b\u1edfi Sentinel \u0111\u1ec3 \u0111\u1ea3m b\u1ea3o ranh gi\u1edbi quy\u1ec1n h\u1ea1n v\u00e0 kh\u00f4ng g\u00e2y \u0111\u1ed9t bi\u1ebfn ngo\u00e0i \u00fd mu\u1ed1n.",
       "principle": "BOUNDED_REMOTE_EXECUTION",
       "origin_refs": [
         "runtime/p2p_capabilities/manus_adapter.py",
@@ -1875,10 +1875,10 @@
       ],
       "known_gaps": [],
       "do_not_duplicate_with": [],
-      "next_condition": "Hỗ trợ nhiều luồng thực thi song song (parallel dispatch).",
+      "next_condition": "H\u1ed7 tr\u1ee3 nhi\u1ec1u lu\u1ed3ng th\u1ef1c thi song song (parallel dispatch).",
       "last_reviewed": "2026-08-21",
       "freshness": "verified_against_filesystem",
-      "notes": "Đã chứng nhận Manus làm ExecutionTarget chính thức.",
+      "notes": "\u0110\u00e3 ch\u1ee9ng nh\u1eadn Manus l\u00e0m ExecutionTarget ch\u00ednh th\u1ee9c.",
       "origin_type": "PROJECT_LEARNING"
     },
     {
@@ -4917,6 +4917,24 @@
       "id": "CONTEXTUAL_RULE_INTELLIGENCE",
       "status": "VERIFIED_IMPLEMENTED",
       "family": "CONTEXT_AND_RETRIEVAL"
+    },
+    {
+      "capability_id": "AI_EXECUTION_RELIABILITY_GUARD",
+      "name": "AI Execution Reliability Guard",
+      "family": "QUALITY_EVIDENCE_EVALUATION",
+      "beginner_value": "Ng\u0103n ch\u1eb7n tin t\u01b0\u1edfng m\u00f9 qu\u00e1ng v\u00e0o AI, y\u00eau c\u1ea7u b\u1eb1ng ch\u1ee9ng th\u1ef1c thi.",
+      "principle": "PROVIDER_NEUTRAL_RELIABILITY",
+      "origin_refs": [
+        "RI-011",
+        "RA-EXT-035"
+      ],
+      "status": "PLANNED",
+      "evidence_refs": [
+        "p2p-aerg-provider-neutral-reliability-01 branch"
+      ],
+      "dependencies": [],
+      "next_condition": "Owner approval",
+      "last_reviewed": "2026-08-22"
     }
   ],
   "last_reviewed": "2026-08-21T04:27:11Z",

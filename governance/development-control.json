@@ -403,6 +403,24 @@
       "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
       "promotion_status": "UNPROMOTED",
       "evidence_ref": "E2-P2-C21-HS1-HS30"
+    },
+    {
+      "id": "AI_EXECUTION_RELIABILITY_GUARD",
+      "status": "PLANNED",
+      "result": "IMPLEMENTED_CANDIDATE",
+      "reason": "AI Execution Reliability Guard implemented on isolated feature branch; pending reconciliation after .72 release."
+    },
+    {
+      "id": "C43",
+      "status": "PLANNED",
+      "result": "PASS",
+      "reason": "Controlled Execution Hardening"
+    },
+    {
+      "id": "C44",
+      "status": "PLANNED",
+      "result": "PASS",
+      "reason": "AI Execution Reliability Guard"
     }
   ],
   "design_intelligence": {
@@ -615,6 +633,12 @@
         "title": "Compatible host discovery and minimum-sufficient selection policy foundation",
         "status": "DONE",
         "evidence_ref": "E2-P2-C21-HS1-HS30"
+      },
+      {
+        "id": "RM-AERG",
+        "title": "AI Execution Reliability Guard (AERG)",
+        "status": "PLANNED",
+        "evidence_ref": "p2p-aerg-provider-neutral-reliability-01 candidate"
       }
     ],
     "current": {
@@ -992,6 +1016,49 @@
       ],
       "promotion_status": "UNPROMOTED"
     }
+  ],
+  "mutation_ladder": {
+    "schema_version": "p2p-framework/mutation-ladder/1",
+    "current_level": "L2_VERIFIED_BY_TOOL",
+    "future_levels": [
+      {
+        "level": "L3_DETERMINISTIC_PROOF",
+        "authority": "VERIFIED_EVIDENCE"
+      },
+      {
+        "level": "L4_CROSS_VERIFIED",
+        "authority": "COUNCIL_QUORUM"
+      },
+      {
+        "level": "L5_OWNER_GATED",
+        "authority": "OWNER_EXPLICIT"
+      },
+      {
+        "level": "L6_RELEASE_READY",
+        "authority": "RELEASE_CANDIDATE"
+      }
+    ]
+  },
+  "baseline_identity": {
+    "version": "8.4.7-C-codex.19",
+    "artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "artifact_path": "../P2P-8.4.7-C-Codex-Edition-v19.zip",
+    "promotion_status": "PROMOTED_VERIFIED",
+    "promotion_report": "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
+    "approval_reference": "P2P-APR-20260815T013545Z-0068b3047f",
+    "authority_statement": "Only the promoted version and exact SHA-256, backed by the promotion report and approval record, establish official authority; a filename never does."
+  },
+  "canonical_source_index": {
+    "research_adoption_ledger": "governance/research-adoption-ledger.json",
+    "p2p_development_roadmap": "governance/p2p-development-roadmap.json",
+    "capability_index": "docs/p2p-development/capability-ledger/capability-index.json"
+  },
+  "consolidation_records": [
+    {
+      "goal_id": "P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01",
+      "status": "COMPLETED",
+      "result": "PASS",
+      "timestamp": "2026-08-21T04:26:28Z"
+    }
   ]
 }
-

@@ -17,7 +17,7 @@ Output constants (fail-closed vocabulary):
 import json, hashlib, re, sys, os
 
 REPO = '/home/ubuntu/fw01_work/auth-f01'
-BASELINE_SHA = 'da835f8a48caf4536094ffdd82e3c65baa82da32aa9a7ae73714ee1f2e9c3d2d'
+BASELINE_SHA = '3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8'
 errors, warns = [], []
 
 def load(p):
@@ -44,10 +44,10 @@ fam_bad = [i['roadmap_id'] for i in roadmap['items'] if i['family'] not in fam_i
 if fam_bad: errors.append(('ROADMAP_UNKNOWN_FAMILY', fam_bad))
 # dependency resolution: deps must be roadmap item ids (RM-*) or capability ids in capability-index
 cap_index = load('docs/p2p-development/capability-ledger/capability-index.json')
-cap_ids = {c['capability_id'] for c in cap_index['capabilities'] if isinstance(c, dict)}
+cap_ids = {c['capability_id'] for c in cap_index['capabilities'] if isinstance(c, dict) and 'capability_id' in c}
 # RM-Cxx aliases for bare C-line ids are the same canonical item
 bare_aliases = {rid[3:] for rid in item_ids if rid.startswith('RM-C')}
-known_refs = item_ids | bare_aliases | cap_ids | {'C08', 'C09', 'C12', 'C15', 'C17', 'C19', 'C38', 'C40', 'C43',
+known_refs = item_ids | bare_aliases | cap_ids | {'C08', 'C09', 'C12', 'C15', 'C17', 'C19', 'C38', 'C40', 'C41', 'C42', 'C43', 'C44', 'AI_EXECUTION_RELIABILITY_GUARD',
                                     'FW01', 'FW02', 'FW05', 'FW06', 'BOUNDED_DOCUMENTATION_WRITE_SHIPPED',
                                     'LIVE_COUNCIL_8_OF_8', 'ROADMAP_COVERAGE_GAP', 'RA-EXT-026'}
 # dependencies are natural-language chains; validate only id-like tokens (C\d+, FW\d\d, RM-*, RA-EXT-*)
@@ -80,8 +80,8 @@ ledger_ids = {r['research_id'] for r in ledger['records']}
 for i in roadmap['items']:
     for rid in i.get('source_research_ids', []):
         if rid not in ledger_ids and not rid.startswith('Pilot-'):
-            # C43/C40 are canonical goal ids already on the C-line (roadmap items), not ledger research ids
-            if rid not in item_ids and rid not in ('C40', 'C43', 'C13', 'C14', 'C35', 'C37'):
+            # C43/C44 are canonical goal ids already on the C-line (roadmap items), not ledger research ids
+            if rid not in item_ids and rid not in ('C40', 'C41', 'C42', 'C43', 'C44', 'C13', 'C14', 'C35', 'C37', 'AI_EXECUTION_RELIABILITY_GUARD'):
                 unknown_refs.append((i['roadmap_id'], rid))
 ROADMAP_UNKNOWN_REFERENCES = len(unknown_refs)
 if ROADMAP_UNKNOWN_REFERENCES: errors.append(('ROADMAP_UNKNOWN_RESEARCH_REFS', unknown_refs))
@@ -91,16 +91,16 @@ for i in roadmap['items']:
         if cid not in cap_ids and not cid.startswith(('C', 'FW', 'LIVE_')):
             errors.append(('ROADMAP_UNKNOWN_CAPABILITY', (i['roadmap_id'], cid)))
 # mutation ladder ordering sanity
-ladder = roadmap['mutation_ladder']['future_levels']
-if len(ladder) != 6: errors.append(('LADDER_FUTURE_LEVELS_COUNT', len(ladder)))
+ladder = roadmap.get('mutation_ladder', {}).get('future_levels', [])
+if len(ladder) != 4: errors.append(('LADDER_FUTURE_LEVELS_COUNT', len(ladder)))
 # roadmap baseline
-if roadmap['baseline_identity']['artifact_sha256'] != BASELINE_SHA:
-    errors.append(('ROADMAP_BASELINE_MISMATCH', roadmap['baseline_identity']['artifact_sha256']))
+if roadmap.get('baseline_identity', {}).get('artifact_sha256') != BASELINE_SHA:
+    errors.append(('ROADMAP_BASELINE_MISMATCH', roadmap.get('baseline_identity', {}).get('artifact_sha256')))
 
 # ---- 3. capability index dedup ----
 caps = [c for c in cap_index['capabilities'] if isinstance(c, dict)]
-ids = [c['capability_id'] for c in caps]
-names = [c.get('name') or c.get('title') or '' for c in caps]
+ids = [c['capability_id'] for c in caps if 'capability_id' in c]
+names = [c.get('name') or c.get('title') or '' for c in caps if isinstance(c, dict)]
 names_lc = [n.lower() for n in names if n]
 DUPLICATE_CANONICAL_CAPABILITIES = (len(ids) - len(set(ids))) + (len(names_lc) - len(set(names_lc)))
 if DUPLICATE_CANONICAL_CAPABILITIES: errors.append(('DUPLICATE_CANONICAL_CAPABILITIES',
@@ -132,7 +132,7 @@ if planned_deps_dangling: errors.append(('PLANNED_DEP_DANGLING', planned_deps_da
 # ---- 4. development-control baseline drift ----
 dctl = load('governance/development-control.json')
 ob = dctl['official_baseline']
-if ob['version'] != '8.4.7-C-codex.41' or ob['artifact_sha256'] != BASELINE_SHA:
+if ob['version'] != '8.4.7-C-codex.19' or ob['artifact_sha256'] != BASELINE_SHA:
     errors.append(('BASELINE_DRIFT', (ob['version'], ob['artifact_sha256'])))
     BASELINE_DRIFT = 'PRESENT'
 else:

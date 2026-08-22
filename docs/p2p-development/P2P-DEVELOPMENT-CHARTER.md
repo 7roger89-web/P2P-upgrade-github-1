@@ -56,6 +56,9 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `SELECTIVE_ADOPTION` | What P2P researched is not what P2P adopted; SELECTED ≠ IMPLEMENTED ≠ SHIPPED ≠ VERIFIED ≠ PROMOTED; UNKNOWN is never silently treated as SUPPORTED. |
 | `ROADMAP_COVERAGE_GAP_DETECTED` | Any proposed major roadmap or major next Goal must reconcile against the Research Adoption Ledger + Development Roadmap; a materially relevant SELECTED/PLANNED/PARTIAL record omitted without explicit reason surfaces ROADMAP_COVERAGE_GAP. |
 | `MACHINE_READABLE_ROADMAP_VERIFIED` | The roadmap is canonical, machine-readable, and mechanically consumed by `scripts/p2p_roadmap_planner.py` (P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01): planner reads official baseline + ledger + roadmap + evidence + Owner priority, outputs ranked candidate goals with coverage-gap detection; never overrides Owner Gates. Verification: 18/18 tests PASS, fail-closed, deterministic ranking, hash binding. Runtime execution-loop integration remains planned (charter §6 heuristic unchanged). |
+| `AI_EXECUTION_RELIABILITY_GUARD` | AI output is a CLAIM until evidence satisfies the required acceptance gate; AGENT_SELF_ATTESTATION_CANNOT_SATISFY_MATERIAL_ACCEPTANCE_GATE; EXECUTOR != INDEPENDENT_VERIFIER. |
+| `EVIDENCE_BOUND_VERDICT` | Material verdicts must be computed from required predicates, not agent prose; CLAIM != EVIDENCE; REPORT != STATE; UNKNOWN != VERIFIED. |
+| `PROVIDER_NEUTRAL_RELIABILITY` | Reliability semantics remain invariant across backends (Manus, Codex, Claude, Gemini, Hermes, etc.); no AI becomes trusted merely because of provider brand. |
 
 
 ## 4. Owner Gate — what P2P asks the owner about

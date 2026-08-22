@@ -20,7 +20,10 @@ import json
 import os
 import pathlib
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .aerg_model import ReliabilityClaim
 
 REGISTRY_DIR = pathlib.Path(__file__).parent
 _GOVERNANCE_DIR = pathlib.Path(__file__).resolve().parents[3] / "governance"
@@ -354,14 +357,14 @@ def build_quality_contract(task_ref: str,
                            project_root: Optional[Any] = None,
                            required_capabilities: Tuple[str, ...] = (),
                            mutation_class: str = "READ_ONLY",
-                           independent_review_required: bool = False
+                           independent_review_required: bool = False,
+                           reliability_guard_required: bool = True
                            ) -> Dict[str, Any]:
     """Compact per-task Quality Contract derived from evidence. No manual
     Owner selection of technical evals: eval choice follows from the risk
     class and project type evidence."""
     project_type = classify_project_type(project_root) if project_root else ProjectType.UNKNOWN
-    risk_class = _risk_class(mutation_class, acceptance_requirements)
-
+    risk_class = classify_risk(project_root, mutation_class) if project_root else "LOW"
     registry = load_eval_registry()
     required_evals = [r["eval_id"] for r in registry if _eval_required_for(
         r, risk_class, mutation_class, project_type, required_capabilities)]
@@ -370,7 +373,7 @@ def build_quality_contract(task_ref: str,
         and r.get("cost_class", "CHEAP") != "EXPENSIVE"]
 
     fail_closed = ["MISSING_REQUIRED_EVIDENCE", "EVAL_FAILED", "IMPACT_UNKNOWN",
-                   "STALE_EVIDENCE", "CERTIFICATION_SCOPE_MISMATCH"]
+                   "STALE_EVIDENCE", "CERTIFICATION_SCOPE_MISMATCH", "RELIABILITY_CONTRADICTION"]
 
     contract = {
         "task_ref": task_ref,
@@ -382,6 +385,7 @@ def build_quality_contract(task_ref: str,
         "project_evals_required": project_type is not ProjectType.UNKNOWN,
         "independent_review_required": bool(independent_review_required
             or risk_class == "SECURITY_DATABASE_PERMISSION"),
+        "reliability_guard_required": reliability_guard_required,
         "fail_closed_conditions": tuple(fail_closed),
         "project_type": project_type.value,
         "optional_evals": tuple(optional_evals),
@@ -701,7 +705,8 @@ def build_quality_verdict(execution_status: str,
                           required_evidence_present: bool = True,
                           declared_required_evals: Optional[Dict[str, Any]] = None,
                           independent_verifier_result: Optional[str] = None,
-                          independent_required: bool = False
+                          independent_required: bool = False,
+                          reliability_claims: Optional[List[ReliabilityClaim]] = None
                           ) -> Dict[str, Any]:
     """Structured outcome. Unknown quality must not become PASS: an execution
     SUCCESS with quality_status QUALITY_UNKNOWN must NOT checkpoint as fully
@@ -711,6 +716,14 @@ def build_quality_verdict(execution_status: str,
         failures.append("IMPACT_UNKNOWN")
     if not required_evidence_present:
         failures.append("MISSING_REQUIRED_EVIDENCE")
+    
+    # AERG: Contradiction Detection
+    if reliability_claims:
+        for claim in reliability_claims:
+            if claim.verdict == "CONTRADICTED":
+                failures.append("RELIABILITY_CONTRADICTION")
+                break
+
     declared = declared_required_evals if declared_required_evals is not None \
         else (required_eval_results or {})
     for eid in (declared or {}):
@@ -727,7 +740,7 @@ def build_quality_verdict(execution_status: str,
     if independent_required and not independent_verifier_result:
         failures.append("INDEPENDENT_VERIFIER_UNAVAILABLE")
 
-    if "EVAL_FAILED" in failures or "MISSING_REQUIRED_EVIDENCE" in failures:
+    if "EVAL_FAILED" in failures or "MISSING_REQUIRED_EVIDENCE" in failures or "RELIABILITY_CONTRADICTION" in failures:
         status = "QUALITY_REJECTED"
     elif failures:
         # Missing required independent verification and unanalyzed impact both
