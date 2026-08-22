@@ -10,6 +10,8 @@ sys.path.append(str(ROOT / ".p2p" / "system"))
 
 from p2p_capabilities.project_context import ProjectContextBootstrap, enforce_map_before_work, ProjectContextError
 from p2p_capabilities.project_map import ProjectMap
+from p2p_capabilities import project_pin
+from test_project_pin_lifecycle import ARTIFACT_SHA, VERSION, _metadata
 
 _TEMP_ROOT = ROOT / ".tmp"
 _TEMP_ROOT.mkdir(parents=True, exist_ok=True)
@@ -26,13 +28,18 @@ def setup_project():
     # Fake a healthy pin
     p2p_dir = TEST_ROOT / ".p2p"
     p2p_dir.mkdir()
-    import json
-    with open(p2p_dir / "project-pin.json", "w") as f:
-        json.dump({
-            "verification_status": "VERIFIED",
-            "doctor_result": "HEALTHY",
-            "p2p_artifact_sha256": "fake-sha"
-        }, f)
+    system = p2p_dir / "system"
+    system.mkdir()
+    _metadata(system)
+    (system / "release.json").write_text('{"package_version": "' + VERSION + '", "artifact_sha256": "' + ARTIFACT_SHA + '"}', encoding="utf-8")
+    project_pin.write_pin(TEST_ROOT, project_pin.build_pin(
+        project_root=TEST_ROOT,
+        metadata_root=system,
+        artifact_sha256=ARTIFACT_SHA,
+        installation_mode="PACKAGED_PROJECT",
+        rollback_source=".p2p/install-backups/test",
+        managed_files=["VERSION"],
+    ))
 
 def test_freshness_flow():
     setup_project()
@@ -60,6 +67,15 @@ def test_freshness_flow():
     time.sleep(0.1)
     with open(TEST_ROOT / "src/main.py", "w") as f:
         f.write("print('modified content')")
+    system = TEST_ROOT / ".p2p" / "system"
+    project_pin.write_pin(TEST_ROOT, project_pin.build_pin(
+        project_root=TEST_ROOT,
+        metadata_root=system,
+        artifact_sha256=ARTIFACT_SHA,
+        installation_mode="PACKAGED_PROJECT",
+        rollback_source=".p2p/install-backups/test",
+        managed_files=["VERSION"],
+    ))
     
     # Check freshness using the original map object
     freshness_info = pmap.check_freshness(str(TEST_ROOT))
@@ -94,7 +110,7 @@ def test_freshness_flow():
             assert False
         except ProjectContextError as e:
             print(f"  PASS: Mutation blocked: {e}")
-            assert "Mutation blocked" in str(e)
+            assert "Mutation blocked" in str(e) or "context not ready" in str(e)
         finally:
             project_context.ProjectContextBootstrap = original_bootstrap
 

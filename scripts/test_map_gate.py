@@ -1,8 +1,8 @@
 """Test for Map-Before-Work Gate Runtime Enforcement (§9)."""
 import os
+import json
 import sys
 from pathlib import Path
-import json
 import shutil
 import tempfile
 
@@ -12,6 +12,8 @@ system_path = capabilities_path.parent
 sys.path.insert(0, str(system_path))
 
 from p2p_capabilities.project_context import enforce_map_before_work, ProjectContextError, ProjectContextBootstrap
+from p2p_capabilities import project_pin
+from test_project_pin_lifecycle import ARTIFACT_SHA, VERSION, _metadata
 
 def setup_fixture(path: Path):
     if path.exists():
@@ -20,20 +22,22 @@ def setup_fixture(path: Path):
     p2p_dir = path / ".p2p"
     p2p_dir.mkdir()
     (p2p_dir / "context").mkdir()
-    
-    # Healthy Pin
-    pin = {
-        "project_name": "Test Project",
-        "verification_status": "VERIFIED",
-        "doctor_result": "HEALTHY",
-        "p2p_artifact_sha256": "dummy"
-    }
-    with open(p2p_dir / "project-pin.json", "w") as f:
-        json.dump(pin, f)
+    system = p2p_dir / "system"
+    system.mkdir()
+    _metadata(system)
+    (system / "release.json").write_text(json.dumps({"package_version": VERSION, "artifact_sha256": ARTIFACT_SHA}), encoding="utf-8")
     
     # Create a dummy file for mapping
     with open(path / "file1.txt", "w") as f:
         f.write("hello")
+    project_pin.write_pin(path, project_pin.build_pin(
+        project_root=path,
+        metadata_root=system,
+        artifact_sha256=ARTIFACT_SHA,
+        installation_mode="PACKAGED_PROJECT",
+        rollback_source=".p2p/install-backups/test",
+        managed_files=["VERSION"],
+    ))
     
     # Bootstrap context which creates and saves the map
     bootstrap = ProjectContextBootstrap(path)

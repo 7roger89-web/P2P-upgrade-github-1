@@ -20,15 +20,23 @@ cần thiết, chọn nhóm agent nhỏ phù hợp, kiểm tra kết quả và d
 
 1. Giải nén gói này ra một thư mục riêng.
 2. Mở PowerShell trong thư mục vừa giải nén.
-3. Chạy:
+3. Xác minh đúng file ZIP và SHA-256 đã công bố, rồi chạy (thay hai giá trị mẫu bằng giá trị của đúng ZIP):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Scope Project -ProjectPath "<PROJECT_PATH>"
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Scope Project -ProjectPath "<PROJECT_PATH>" -ArtifactPath "<PATH_TO_EXACT_ZIP>" -ArtifactSha256 "<64_HEX_SHA256>"
 ```
 
-4. Mở thư mục `<PROJECT_PATH>` bằng Codex và đánh dấu dự án là đáng tin cậy
+4. Installer sẽ tạo `.p2p/project-pin.json` từ metadata gói; không tự viết file pin.
+5. Tạo và chạy project eval theo hướng dẫn `$p2p-eval`; eval là dữ liệu do project owner sở hữu.
+6. Chạy Doctor strict sau khi eval đã PASS:
+
+```powershell
+py .p2p\system\scripts\doctor.py --root "<PROJECT_PATH>" --role installed --strict
+```
+
+7. Mở thư mục `<PROJECT_PATH>` bằng Codex và đánh dấu dự án là đáng tin cậy
    nếu Codex hỏi.
-5. Mở một chat mới trong dự án. Nếu bạn mới chỉ có ý tưởng, gõ:
+8. Mở một chat mới trong dự án. Nếu bạn mới chỉ có ý tưởng, gõ:
 
 ```text
 Dùng $p2p-idea cho ý tưởng này: [viết ý tưởng bằng lời bình thường].
@@ -135,7 +143,7 @@ tám thread riêng thì không được coi là full QUORUM thật.
 ## Cài cho mọi dự án của tài khoản Windows
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Scope User
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Scope User -ArtifactPath "<PATH_TO_EXACT_ZIP>" -ArtifactSha256 "<64_HEX_SHA256>"
 ```
 
 Cài theo dự án an toàn và dễ kiểm soát hơn cho người mới. Chỉ dùng `User` khi

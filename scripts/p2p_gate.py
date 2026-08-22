@@ -135,6 +135,16 @@ def command_prepare(args: argparse.Namespace) -> int:
     technical_failures: list[str] = []
     gates: dict[str, object] = {}
 
+    doctor_code, doctor_result = run_json(
+        [
+            sys.executable, str(helpers / "doctor.py"),
+            "--root", str(project), "--role", "installed", "--strict", "--json",
+        ]
+    )
+    gates["project_pin_and_strict_doctor"] = doctor_result
+    if doctor_code != 0 or doctor_result.get("ok") is not True:
+        technical_failures.append("project pin or strict Doctor gate failed")
+
     drift_code, drift = run_json(
         [
             sys.executable, str(helpers / "p2p_governance.py"), "drift",

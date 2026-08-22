@@ -24,10 +24,13 @@ Mọi dự án sử dụng P2P phải chứa một tệp `.p2p/project-pin.json`
 ```json
 {
   "project_fingerprint": "SHA-256 của gốc dự án",
-  "p2p_official_version": "8.4.7-C-codex.46",
-  "p2p_artifact_sha256": "2901adca...",
+  "schema": "p2p-project-pin/1",
+  "p2p_official_baseline_version": "<official baseline from candidate metadata>",
+  "p2p_official_baseline_sha256": "<64-hex official baseline SHA-256>",
+  "p2p_candidate_version": "<installed unpromoted candidate>",
+  "p2p_candidate_artifact_sha256": "<64-hex exact archive SHA-256>",
   "install_timestamp_utc": "ISO-8601",
-  "installation_mode": "PORTABLE_VIRTUAL_ENV",
+  "installation_mode": "PACKAGED_PROJECT",
   "permission_envelope": {
     "file_read": "PROJECT_ROOT",
     "file_write": "PROJECT_LOCAL_P2P_STATE",
@@ -39,6 +42,11 @@ Mọi dự án sử dụng P2P phải chứa một tệp `.p2p/project-pin.json`
   },
   "rollback_source": ".p2p/backups/pre-install-snapshot.tar.gz",
   "doctor_result": "HEALTHY",
+  "verification_status": "VERIFIED",
+  "candidate_vs_official": "UNPROMOTED_SUCCESSOR_CANDIDATE",
+  "source_binding_status": "VERIFIED",
+  "source_commit": "<40-hex source commit>",
+  "source_tree": "<40-hex source tree>",
   "compatibility_state": "VERIFIED_COMPATIBLE"
 }
 ```

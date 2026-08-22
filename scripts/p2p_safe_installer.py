@@ -18,6 +18,7 @@ Corrective 01A Upgrades:
 import argparse
 import datetime
 import hashlib
+import importlib
 import json
 import os
 import shutil
@@ -44,14 +45,22 @@ def sha256(p: Path) -> str:
     return h.hexdigest()
 
 def get_project_fingerprint(root: Path) -> str:
-    """Generate a stable fingerprint of the project root (excluding .p2p and .git)."""
-    files = []
-    for item in sorted(root.rglob("*")):
-        if item.is_file():
-            rel = item.relative_to(root).as_posix()
-            if not rel.startswith(".p2p") and not rel.startswith(".git"):
-                files.append(f"{rel}:{sha256(item)}")
-    return hashlib.sha256("\n".join(files).encode("utf-8")).hexdigest()
+    """Use the one canonical project-fingerprint implementation."""
+    return _project_pin_module(root).project_fingerprint(root)
+
+
+def _project_pin_module(metadata_root: Path | None = None):
+    candidates = []
+    if metadata_root is not None:
+        candidates.extend((metadata_root, metadata_root / "runtime", metadata_root / ".p2p" / "system"))
+    candidates.extend((Path(__file__).resolve().parents[1] / ".p2p" / "system", Path(__file__).resolve().parents[1]))
+    for candidate in candidates:
+        module_path = candidate / "p2p_capabilities" / "project_pin.py"
+        if module_path.is_file():
+            if str(candidate) not in sys.path:
+                sys.path.insert(0, str(candidate))
+            return importlib.import_module("p2p_capabilities.project_pin")
+    raise InstallerError("PROJECT_PIN_PRODUCER_MISSING")
 
 def load_json(p: Path) -> Dict:
     if not p.exists():
@@ -149,27 +158,8 @@ def install(project_root: Path, artifact_path: Path, expected_sha: str, requeste
             shutil.copy2(item, dest)
             managed_files.append(rel.as_posix())
             
-    # 5. Create Project Pin
-    pin = {
-        "schema": PROJECT_PIN_SCHEMA,
-        "project_fingerprint": fingerprint,
-        "p2p_official_baseline_version": candidate_metadata.get("official_baseline_version"),
-        "p2p_official_baseline_sha256": candidate_metadata.get("official_baseline_sha256"),
-        "p2p_candidate_version": embedded_version,
-        "p2p_candidate_artifact_sha256": expected_sha,
-        "install_timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "installation_mode": mode,
-        "permission_envelope": {
-            "file_read": "PROJECT_ROOT",
-            "file_write": "PROJECT_LOCAL_P2P_STATE",
-            "network": "EXECUTION_TARGET_ONLY"
-        },
-        "rollback_source": str(snapshot_dir.relative_to(project_root)),
-        "managed_files": sorted(managed_files),
-        "candidate_vs_official": "UNPROMOTED_SUCCESSOR_CANDIDATE",
-    }
-    
-    # 6. Doctor (Strict Verification)
+    # 5. Doctor before pin creation uses the portable contract because the
+    # project pin is the output of this operation.
     doctor_path = system_dir / "scripts" / "doctor.py"
     doctor_result = "UNKNOWN"
     if doctor_path.exists():
@@ -177,28 +167,53 @@ def install(project_root: Path, artifact_path: Path, expected_sha: str, requeste
             # Set PYTHONPATH to include system_dir for capability discovery
             env = os.environ.copy()
             env["PYTHONPATH"] = str(system_dir) + os.pathsep + env.get("PYTHONPATH", "")
-            # Use 'installed' role if project-pin exists, otherwise 'portable'
-            role = "installed" if (project_root / ".p2p" / "project-pin.json").exists() else "portable"
             res = subprocess.run(
-                [sys.executable, str(doctor_path), "--root", str(project_root), "--role", role], 
+                [sys.executable, str(doctor_path), "--root", str(project_root), "--role", "portable"],
                 capture_output=True, text=True, env=env
             )
             doctor_result = "HEALTHY" if res.returncode == 0 else "UNHEALTHY"
         except Exception:
             doctor_result = "EXECUTION_FAILED"
     
-    pin["doctor_result"] = doctor_result
-    
-    # Fail-closed: If doctor is unhealthy, we do not consider this a verified installation
-    if doctor_result != "HEALTHY":
-        pin["verification_status"] = "INSTALLED_UNVERIFIED"
-        dump_json(p2p_dir / "project-pin.json", pin)
+    pin_module = _project_pin_module(temp_extract)
+    pin = pin_module.build_pin(
+        project_root=project_root,
+        metadata_root=temp_extract,
+        artifact_sha256=expected_sha,
+        installation_mode=mode,
+        rollback_source=str(snapshot_dir.relative_to(project_root)),
+        managed_files=managed_files,
+        doctor_result=doctor_result,
+    )
+    pin_module.write_pin(project_root, pin)
+    if doctor_result == "HEALTHY":
+        installed_result = subprocess.run(
+            [sys.executable, str(doctor_path), "--root", str(project_root), "--role", "installed"],
+            capture_output=True, text=True, env=env
+        )
+        if installed_result.returncode != 0:
+            pin = pin_module.build_pin(
+                project_root=project_root,
+                metadata_root=temp_extract,
+                artifact_sha256=expected_sha,
+                installation_mode=mode,
+                rollback_source=str(snapshot_dir.relative_to(project_root)),
+                managed_files=managed_files,
+                doctor_result="UNHEALTHY",
+            )
+            pin_module.write_pin(project_root, pin)
+            shutil.rmtree(temp_extract)
+            raise InstallerError("INSTALLED_UNVERIFIED / DOCTOR_UNHEALTHY")
+        pin_module.validate_pin(
+            project_root,
+            metadata_root=system_dir,
+            expected_artifact_sha256=expected_sha,
+            expected_version=embedded_version,
+        )
+    else:
         shutil.rmtree(temp_extract)
         raise InstallerError(f"INSTALLED_UNVERIFIED / DOCTOR_UNHEALTHY (Result: {doctor_result})")
-    
-    pin["verification_status"] = "VERIFIED"
-    dump_json(p2p_dir / "project-pin.json", pin)
-    
+
     shutil.rmtree(temp_extract)
     return pin
 
@@ -238,6 +253,15 @@ if __name__ == "__main__":
     inst.add_argument("artifact")
     inst.add_argument("--sha", required=True)
     inst.add_argument("--version", required=True)
+
+    pin_cmd = subparsers.add_parser("pin")
+    pin_cmd.add_argument("project_root")
+    pin_cmd.add_argument("--package-root", required=True)
+    pin_cmd.add_argument("--artifact", required=True)
+    pin_cmd.add_argument("--sha", required=True)
+    pin_cmd.add_argument("--version", required=True)
+    pin_cmd.add_argument("--mode", default="PACKAGED_PROJECT")
+    pin_cmd.add_argument("--rollback-source", required=True)
     
     rb = subparsers.add_parser("rollback")
     rb.add_argument("project_root")
@@ -252,6 +276,31 @@ if __name__ == "__main__":
         elif args.command == "rollback":
             res = rollback(Path(args.project_root))
             print(f"SUCCESS: Rollback complete - {res}")
+        elif args.command == "pin":
+            package_root = Path(args.package_root).resolve()
+            artifact = Path(args.artifact).resolve()
+            if not artifact.is_file() or sha256(artifact) != args.sha.lower():
+                raise InstallerError("INSTALL_BLOCKED / ARTIFACT_SHA256_MISMATCH")
+            module = _project_pin_module(package_root)
+            system = Path(args.project_root).resolve() / ".p2p" / "system"
+            managed = [path.relative_to(system).as_posix() for path in system.rglob("*") if path.is_file()]
+            pin = module.build_pin(
+                project_root=Path(args.project_root),
+                metadata_root=package_root,
+                artifact_sha256=args.sha,
+                installation_mode=args.mode,
+                rollback_source=args.rollback_source,
+                managed_files=managed,
+                doctor_result="HEALTHY",
+            )
+            module.write_pin(Path(args.project_root), pin)
+            module.validate_pin(
+                Path(args.project_root),
+                metadata_root=system,
+                expected_artifact_sha256=args.sha,
+                expected_version=args.version,
+            )
+            print(json.dumps({"status": "PASS", "pin": str(Path(args.project_root).resolve() / ".p2p" / "project-pin.json"), "version": args.version}, ensure_ascii=False))
         else:
             parser.print_help()
     except Exception as e:

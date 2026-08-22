@@ -16,9 +16,11 @@ from dataclasses import dataclass, field
 try:
     from .context import retrieve_task_context, TASK_CONTEXT_SCHEMA
     from .project_map import ProjectMap
+    from .project_pin import ProjectPinError, validate_pin
 except ImportError:
     from context import retrieve_task_context, TASK_CONTEXT_SCHEMA
     from project_map import ProjectMap
+    from project_pin import ProjectPinError, validate_pin
 
 PROJECT_CONTEXT_READY_SCHEMA = "p2p-project-context-ready/2"
 
@@ -58,9 +60,9 @@ class ProjectContextBootstrap:
         if not self.pin_path.exists():
             return False
         try:
-            pin = self.get_pin()
-            return pin.get("verification_status") == "VERIFIED" and pin.get("doctor_result") == "HEALTHY"
-        except Exception:
+            validate_pin(self.project_root, metadata_root=self.p2p_dir / "system")
+            return True
+        except (OSError, ProjectPinError, ValueError, TypeError, json.JSONDecodeError):
             return False
 
     def get_pin(self) -> Dict[str, Any]:
@@ -176,16 +178,16 @@ class ProjectContextBootstrap:
         self.p2p_dir.mkdir(parents=True, exist_ok=True)
         self.context_dir.mkdir(parents=True, exist_ok=True)
         
-        # Initial Proposed Context (§6)
-        initial_pin = {
-            "project_name": "New Project",
+        # Bootstrap is proposal-only.  It must never mint a canonical project
+        # pin or claim readiness without a normal packaged installation.
+        proposal = {
+            "schema": "p2p-project-bootstrap-proposal/1",
             "intent": intent,
-            "verification_status": "VERIFIED",
-            "doctor_result": "HEALTHY",
-            "product_model": {"status": "PROPOSED"}
+            "status": "PROPOSED",
+            "product_model": {"status": "PROPOSED"},
         }
-        with open(self.pin_path, "w") as f:
-            json.dump(initial_pin, f, indent=2)
+        with open(self.context_dir / "project-bootstrap-proposal.json", "w", encoding="utf-8") as f:
+            json.dump(proposal, f, indent=2)
             
         # Create Proposed Maps (§6)
         proposed_maps = {

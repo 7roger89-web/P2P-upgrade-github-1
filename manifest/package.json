@@ -1,7 +1,7 @@
 {
   "schema_version": "p2p-codex-project-bundle/1",
   "name": "P2P 8.4.7-C Codex Edition",
-  "version": "8.4.7-C-codex.72",
+  "version": "8.4.7-C-codex.73",
   "language": "vi",
   "upstream": {
     "project": "sanic732/P2P-4PDA-edition",

@@ -274,7 +274,7 @@ def check_governance(root: Path, report: Report, package_mode: bool) -> None:
         report.fail("governance-drift", detail[:800])
 
     helper_root = root / "scripts" if package_mode else root / ".p2p" / "system" / "scripts"
-    for name in ("p2p_approval.py", "p2p_eval.py", "p2p_gate.py", "p2p_governance.py", "p2p_workflow.py"):
+    for name in ("p2p_approval.py", "p2p_eval.py", "p2p_gate.py", "p2p_governance.py", "p2p_safe_installer.py", "p2p_workflow.py"):
         if (helper_root / name).is_file():
             report.pass_(f"helper:{name}", f"Protection helper exists: {name}")
         else:
@@ -369,6 +369,9 @@ def _foundation_required_paths(base: Path) -> tuple[str, ...]:
         "p2p_capabilities/specialist.py",
         "p2p_capabilities/trust.py",
         "p2p_capabilities/decision_trace.py",
+        "p2p_capabilities/project_pin.py",
+        "p2p_capabilities/project_context.py",
+        "p2p_capabilities/project_map.py",
         "p2p_capabilities/capabilities.json",
         "scripts/p2p_capability_doctor.py",
         "scripts/p2p_decision_trace.py",
@@ -490,6 +493,28 @@ def check_installed_foundation(root: Path, report: Report) -> None:
     else:
         report.fail("installed-foundation", detail or "Installed Capability Foundation doctor failed")
     check_decision_trace_payload(root, report, installed=True)
+
+
+def check_project_pin(root: Path, report: Report) -> None:
+    """Validate the installed project binding through the canonical runtime."""
+
+    system = root / ".p2p" / "system"
+    module_path = system / "p2p_capabilities" / "project_pin.py"
+    if not module_path.is_file():
+        report.fail("project-pin", f"Missing canonical project-pin validator: {module_path}")
+        return
+    spec = importlib.util.spec_from_file_location("p2p_installed_project_pin", module_path)
+    if spec is None or spec.loader is None:
+        report.fail("project-pin", "Could not load canonical project-pin validator")
+        return
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+        result = module.validate_pin(root, metadata_root=system)
+    except Exception as exc:
+        report.fail("project-pin", str(exc))
+        return
+    report.pass_("project-pin", f"Project pin is verified for {result['candidate_version']} and the installed source binding")
 
 
 def _load_package_release_contract(root: Path):
@@ -719,6 +744,7 @@ def main() -> int:
     parser.add_argument("--root", help="Installed project root or user home")
     parser.add_argument("--role", choices=DOCTOR_ROLES, default="auto", help="Filesystem contract to validate")
     parser.add_argument("--json", action="store_true", help="Emit JSON")
+    parser.add_argument("--strict", action="store_true", help="Treat warnings as failures")
     args = parser.parse_args()
     if bool(args.package) == bool(args.root):
         parser.error("provide exactly one of --package or --root")
@@ -744,6 +770,9 @@ def main() -> int:
         elif role == "installed":
             check_governance(root, report, package_mode=False)
             check_installed_foundation(root, report)
+            check_project_pin(root, report)
+    if args.strict and any(item["level"] == "WARN" for item in report.items):
+        report.fail("strict-warnings", "Strict Doctor rejects WARN results; complete project-owned eval/context setup first")
     if args.json:
         print(json.dumps({"root": str(root), "role": role, "detected_role": detected_role, "ok": not report.failed, "checks": report.items}, ensure_ascii=False, indent=2))
     else:

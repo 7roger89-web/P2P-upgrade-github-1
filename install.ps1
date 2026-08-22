@@ -1,7 +1,9 @@
 param(
   [ValidateSet("Project", "User")]
   [string]$Scope = "Project",
-  [string]$ProjectPath = (Get-Location).Path
+  [string]$ProjectPath = (Get-Location).Path,
+  [string]$ArtifactPath,
+  [string]$ArtifactSha256
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,6 +16,14 @@ if (-not (Test-Path -LiteralPath $PackageVersionPath -PathType Leaf)) {
 $PackageVersion = (Get-Content -LiteralPath $PackageVersionPath -Raw).Trim()
 if (-not $PackageVersion) {
   throw "Package VERSION is empty."
+}
+if (-not $ArtifactPath -or -not $ArtifactSha256 -or $ArtifactSha256 -notmatch '^[0-9a-fA-F]{64}$') {
+  throw "ArtifactPath and a full 64-hex ArtifactSha256 are required for canonical project pinning."
+}
+$ArtifactPath = (Resolve-Path -LiteralPath $ArtifactPath -ErrorAction Stop).Path
+$ActualArtifactSha256 = (Get-FileHash -LiteralPath $ArtifactPath -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($ActualArtifactSha256 -ne $ArtifactSha256.ToLowerInvariant()) {
+  throw "Artifact SHA-256 mismatch; installation is blocked before project mutation."
 }
 
 if ($Scope -eq "User") {
@@ -81,7 +91,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $SystemDestination "scripts
 Get-ChildItem -LiteralPath (Join-Path $PackageRoot "governance") -Force | ForEach-Object {
   Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $SystemDestination "governance") -Recurse -Force
 }
-foreach ($ScriptName in @("p2p_governance.py", "p2p_eval.py", "p2p_approval.py", "p2p_gate.py", "p2p_workflow.py", "p2p_decision_trace.py", "p2p_task_state.py", "doctor.py")) {
+foreach ($ScriptName in @("p2p_governance.py", "p2p_eval.py", "p2p_approval.py", "p2p_gate.py", "p2p_workflow.py", "p2p_decision_trace.py", "p2p_task_state.py", "p2p_safe_installer.py", "doctor.py")) {
   Copy-Item -LiteralPath (Join-Path $PackageRoot ("scripts\" + $ScriptName)) -Destination (Join-Path $SystemDestination ("scripts\" + $ScriptName)) -Force
 }
 
@@ -138,6 +148,14 @@ if (Test-Path -LiteralPath $UiUxRuntime -PathType Container) {
   foreach ($ScriptName in @("p2p_capability_doctor.py", "p2p_decision_trace.py", "p2p_host_identity_hook.py", "p2p_uiux.py", "p2p_router.py", "p2p_uiux_governance.py", "p2p_uiux_eval.py", "p2p_uiux_eval_impl.py", "p2p_uiux_doctor.py", "p2p_uiux_drift_check.py", "p2p_uiux_secret_scan.py")) {
     Copy-Item -LiteralPath (Join-Path $UiUxRuntime ("scripts\" + $ScriptName)) -Destination (Join-Path $SystemDestination ("scripts\" + $ScriptName)) -Force
   }
+}
+
+foreach ($MetadataName in @("CANDIDATE-DISTRIBUTION-MANIFEST.json", "SOURCE-BINDING.json", "ARTIFACT-IDENTITY.json", "INVENTORY.json", "release-manifest.json", "RELEASE-SHA256SUMS.txt")) {
+  $MetadataPath = Join-Path $PackageRoot $MetadataName
+  if (-not (Test-Path -LiteralPath $MetadataPath -PathType Leaf)) {
+    throw "Canonical release metadata is missing: $MetadataName"
+  }
+  Copy-Item -LiteralPath $MetadataPath -Destination (Join-Path $SystemDestination $MetadataName) -Force
 }
 
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\approvals\requests") | Out-Null
@@ -251,6 +269,18 @@ if (-not $PythonCommand) {
 if ($LASTEXITCODE -ne 0) {
   throw "Could not build the mandatory P2P runtime drift lock."
 }
+New-Item -ItemType Directory -Force -Path $BackupRoot | Out-Null
+& $PythonCommand.Source (Join-Path $PackageRoot "scripts\p2p_safe_installer.py") pin `
+  $Root `
+  --package-root $PackageRoot `
+  --artifact $ArtifactPath `
+  --sha $ArtifactSha256 `
+  --version $PackageVersion `
+  --mode ("PACKAGED_" + $Scope.ToUpperInvariant()) `
+  --rollback-source (".p2p\install-backups\" + $Stamp)
+if ($LASTEXITCODE -ne 0) {
+  throw "Canonical project pin creation failed; installation is not verified."
+}
 Write-Host ""
 Write-Host "P2P Codex installed successfully." -ForegroundColor Green
 Write-Host "Scope: $Scope"
@@ -267,6 +297,8 @@ if ($LASTEXITCODE -ne 0) {
 $Marker = [ordered]@{
   schema_version = "p2p-install-release/1"
   package_version = $PackageVersion
+  candidate_version = $PackageVersion
+  artifact_sha256 = $ArtifactSha256.ToLowerInvariant()
   install_class = $InstallClass
   scope = $Scope
   managed_file_count = @(Get-ChildItem -LiteralPath $SystemDestination -File -Recurse).Count

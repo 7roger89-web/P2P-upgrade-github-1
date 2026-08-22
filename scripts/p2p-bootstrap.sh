@@ -148,7 +148,7 @@ PY
     fi
     rm -f "$preflight_check"
   fi
-  bash "$pkg_root/install.sh" project "$PROJECT_ROOT"
+  bash "$pkg_root/install.sh" project "$PROJECT_ROOT" "$tmp/asset.zip" "$got"
   rc=$?
   rm -rf "$tmp"
   if [[ $rc -ne 0 ]]; then

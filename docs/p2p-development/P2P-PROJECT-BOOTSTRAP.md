@@ -37,8 +37,8 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 | Entry contract expected? | Codex project agents surface (`AGENTS.md` `<-- BEGIN P2P CODEX -->` block) |
 | Where does project truth live? | In the project source itself; this manifest binds only |
 | Is the local runtime present? | Check `./.p2p/system/release.json` — absent means install needed |
-| How to install/verify? | `scripts/p2p-bootstrap.sh` (in the P2P package) or manual: download artifact, verify SHA-256, run `install.sh project` |
-| How to run doctor? | `python3 .p2p/system/scripts/doctor.py --root .` |
+| How to install/verify? | `scripts/p2p-bootstrap.sh` (in the P2P package) or manual: download artifact, verify SHA-256, run `install.sh project <PROJECT_ROOT> <ARTIFACT_PATH> <ARTIFACT_SHA256>` |
+| How to run doctor? | `python3 .p2p/system/scripts/doctor.py --root . --role installed --strict` |
 | Rollback? | Runtime removal leaves this file; full removal requires deleting it explicitly |
 
 ## Install / verify (manual, provider-neutral)
@@ -46,10 +46,10 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 1. Download `RELEASE_ARTIFACT` from `RELEASE_SOURCE` (or the published asset
    URL under the same tag).
 2. `sha256sum <artifact>` must equal `RELEASE_SHA256`. **Mismatch → STOP.**
-3. Unzip to a fresh directory; run `./install.sh project` from the artifact
-   root with this repository root as the project path.
-4. Run doctor: `python3 .p2p/system/scripts/doctor.py --root .` → all PASS,
-   release marker `RELEASE_MARKER_OK`.
+3. Unzip to a fresh directory; run `./install.sh project <PROJECT_ROOT> <ARTIFACT_PATH> <ARTIFACT_SHA256>` from the artifact root. The installer creates the canonical project pin from the packaged metadata.
+4. Create and execute the project-owned eval suite; do not hand-write a pin or suite fixture as release evidence.
+5. Run strict Doctor: `python3 .p2p/system/scripts/doctor.py --root . --role installed --strict` → HEALTHY,
+   with the release marker and verified project pin present.
 5. Enter project: open the repository root in a Codex-compatible host; the
    tracked entry contract (`AGENTS.md` P2P block) loads automatically; or
    invoke `$p2p` from any host that reads `.agents/skills`.

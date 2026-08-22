@@ -98,6 +98,7 @@ SCRIPT_FILES = (
     "scripts/p2p_parallel.py",
     "scripts/p2p_development_control.py",
     "scripts/p2p_task_state.py",
+    "scripts/p2p_safe_installer.py",
     "scripts/p2p_workflow.py",
     "scripts/package.ps1",
     "scripts/package.sh",
@@ -149,6 +150,9 @@ FOUNDATION_RUNTIME_MODULES = (
     "task_state.py",
     "trust.py",
     "decision_trace.py",
+    "project_pin.py",
+    "project_context.py",
+    "project_map.py",
 )
 FOUNDATION_RUNTIME_FILES = ("p2p_capabilities/capabilities.json",)
 FOUNDATION_RUNTIME_SCRIPTS = (

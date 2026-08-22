@@ -3,6 +3,8 @@ set -euo pipefail
 
 scope="${1:-project}"
 project_path="${2:-$PWD}"
+artifact_path="${3:-}"
+artifact_sha256="${4:-}"
 package_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ ! -f "$package_root/VERSION" ]]; then
@@ -12,6 +14,16 @@ fi
 package_version="$(tr -d '\r\n' < "$package_root/VERSION")"
 if [[ -z "$package_version" ]]; then
   echo "Package VERSION is empty" >&2
+  exit 2
+fi
+if [[ -z "$artifact_path" || ! -f "$artifact_path" || ! "$artifact_sha256" =~ ^[0-9a-fA-F]{64}$ ]]; then
+  echo "Artifact path and a full 64-hex artifact SHA-256 are required for canonical project pinning." >&2
+  exit 2
+fi
+artifact_path="$(cd "$(dirname "$artifact_path")" && pwd)/$(basename "$artifact_path")"
+actual_artifact_sha256="$(sha256sum "$artifact_path" | awk '{print tolower($1)}')"
+if [[ "$actual_artifact_sha256" != "${artifact_sha256,,}" ]]; then
+  echo "Artifact SHA-256 mismatch; installation is blocked before project mutation." >&2
   exit 2
 fi
 
@@ -81,8 +93,23 @@ cp \
   "$package_root/scripts/p2p_workflow.py" \
   "$package_root/scripts/p2p_decision_trace.py" \
   "$package_root/scripts/p2p_task_state.py" \
+  "$package_root/scripts/p2p_safe_installer.py" \
   "$package_root/scripts/doctor.py" \
   "$system_destination/scripts/"
+
+for metadata_name in \
+  CANDIDATE-DISTRIBUTION-MANIFEST.json \
+  SOURCE-BINDING.json \
+  ARTIFACT-IDENTITY.json \
+  INVENTORY.json \
+  release-manifest.json \
+  RELEASE-SHA256SUMS.txt; do
+  if [[ ! -f "$package_root/$metadata_name" ]]; then
+    echo "Canonical release metadata is missing: $metadata_name" >&2
+    exit 2
+  fi
+  cp "$package_root/$metadata_name" "$system_destination/$metadata_name"
+done
 
 uiux_runtime="$package_root/runtime"
 if [[ -d "$uiux_runtime" ]]; then
@@ -105,6 +132,9 @@ if [[ -d "$uiux_runtime" ]]; then
     p2p_capabilities/isolation.py \
     p2p_capabilities/domain.py \
     p2p_capabilities/decision_trace.py \
+    p2p_capabilities/project_pin.py \
+    p2p_capabilities/project_context.py \
+    p2p_capabilities/project_map.py \
     scripts/p2p_capability_doctor.py \
     scripts/p2p_decision_trace.py \
     scripts/p2p_host_identity_hook.py \
@@ -254,6 +284,16 @@ python3 "$system_destination/scripts/p2p_governance.py" lock-runtime \
   --governance "$system_destination/governance" \
   --reason "Explicit package installation by user"
 
+mkdir -p "$backup_root"
+python3 "$package_root/scripts/p2p_safe_installer.py" pin \
+  "$root" \
+  --package-root "$package_root" \
+  --artifact "$artifact_path" \
+  --sha "$artifact_sha256" \
+  --version "$package_version" \
+  --mode "PACKAGED_${scope^^}" \
+  --rollback-source ".p2p/install-backups/$stamp"
+
 echo "P2P Codex installed successfully."
 echo "Scope: $scope"
 echo "Root:  $root"
@@ -265,7 +305,7 @@ if ! python3 "$package_root/scripts/doctor.py" --root "$root"; then
 fi
 managed_file_count="$(find "$system_destination" -type f | wc -l | tr -d ' ')"
 project_policy_sha256="$(sha256sum "$project_policy_path" | awk '{print $1}')"
-python3 - "$release_marker_path" "$package_version" "$install_class" "$scope" "$managed_file_count" "$project_policy_sha256" <<'PY'
+python3 - "$release_marker_path" "$package_version" "$install_class" "$scope" "$managed_file_count" "$project_policy_sha256" "$artifact_sha256" <<'PY'
 import json
 import sys
 from datetime import datetime, timezone
@@ -277,9 +317,12 @@ install_class = sys.argv[3]
 scope = sys.argv[4]
 managed_file_count = int(sys.argv[5])
 project_policy_sha256 = sys.argv[6]
+artifact_sha256 = sys.argv[7]
 value = {
     "schema_version": "p2p-install-release/1",
     "package_version": version,
+    "candidate_version": version,
+    "artifact_sha256": artifact_sha256.lower(),
     "install_class": install_class,
     "scope": scope,
     "managed_file_count": managed_file_count,
