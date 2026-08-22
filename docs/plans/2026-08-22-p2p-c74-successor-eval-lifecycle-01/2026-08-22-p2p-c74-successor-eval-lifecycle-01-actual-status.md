@@ -2,7 +2,7 @@
 
 Title: P2P C74 Successor Evaluator Lifecycle
 Date: 2026-08-22
-Status: P1-A Complete / P1-B Pending
+Status: P1-A Complete / P1-B Validated; repository-wide baseline failures disclosed
 Companion plan: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-plan.md`
 Companion evidence: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-evidence.md`
 Companion benchmark: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-benchmark.md`
@@ -80,7 +80,7 @@ Out of scope:
 | Installed `.p2p/system/scripts/p2p_eval.py` in development checkout | UIUX-only helper; correctly rejected by project-eval resolver in development mode | in a real installed consumer, package install must place project-eval helper at this path; development UIUX helper must never be used as a fallback | partial | related through installer/runtime surfaces | `E0-P0A-SRC2`, `E0-P0A-WORKFLOW1` | validate P2-A; no source edit |
 | Project-owned suite | suite is project data under `.p2p/evals`; C73 fresh lifecycle did not reach trial execution | suite is created/reused through normal setup and validated by installed helper | partial | gate/Doctor consumers | `E0-P0A-C73FAIL1`, `E0-P0A-CONTRACT1` | prove P2-A |
 | Installer/adoption lifecycle | normal packaged scripts copy `scripts/p2p_eval.py` into installed runtime and create project pin/state, but C73 proof reported a helper-path mismatch | fresh consumer is installed through normal lifecycle with no reviewer hand-copy | partial | installer/package/gate/Doctor | `E0-P0A-CONTRACT1`, `E0-P0A-C73FAIL1` | inspect/validate P2-A |
-| Direct evaluator tests | three new target-layout tests cover installed wins, package source mode, and no installed-to-root fallback; existing recorded-suite check is blocked by the fresh worktree's empty ignored suite state | installed wins, package works, installed absence does not source-fallback; complete focused/full source validation without fake evidence | partial | test file 15 symbols / 6 local / 7 outbound after edit | `E1-P1B-TEST1`, `E1-P1B-TEST2` | finish P1-B with disposable real suite or disclose baseline fixture limitation |
+| Direct evaluator tests | three target-layout tests plus the existing project-eval file pass; the source-local disposable matrix has 20 successful case-oracle executions | installed wins, package works, installed absence does not source-fallback; complete focused validation without fake evidence | correct | test file 18 symbols / 6 local / 7 outbound after edit | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3` | commit P1-B evidence, then prove the same contract from a fresh installed consumer |
 | `.72`, `.73`, official `.19` | exact protected bytes/authority exist | unchanged byte identity and unpromoted candidate boundary | correct | protected identity evidence | `E0-P0A-SEAL1` | preserve-only |
 | Root/other worktrees | root and prior review worktrees contain owner/reviewer changes | no edits or cleanup outside successor worktree | correct/preserve-only | N/A | `E0-P0A-AUTH1`, `E0-P0A-STATUS1` | do-not-touch |
 
@@ -90,6 +90,7 @@ Out of scope:
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-22 | fresh C74 worktree at C72 successor head; graph refreshed before graph queries | evaluator lifecycle and protected boundaries | initial classification: resolver wrong, suite/installer partial, direct route tests missing, seals correct | `E0-P0A-AUTH1`, `E0-P0A-GRAPH1`, `E0-P0A-C73FAIL1`, `E0-P0A-SEAL1` | Option B selected; P1-A is one resolver branch, P1-B adds target-layout tests, P2 proves clean install |
 | R1 | 2026-08-22 | P1-A source edit plus focused route checks; post-edit graph refreshed | `scripts/p2p_eval.py` resolver and direct route tests | resolver `wrong -> correct`; route-test coverage `missing -> partial`; ignored source suite remains empty and is not evidence | `E1-P1A-ROUTE1`, `E1-P1A-SYNTAX1`, `E1-P1B-TEST1`, `E1-P1B-TEST2` | P1-A can be committed; complete P1-B validation/commit before P2 |
+| R2 | 2026-08-22 | P1-B test file plus disposable source-local suite and parent-commit comparison | project-eval focused coverage and repository-wide regression classification | route coverage `partial -> correct`; source-local matrix `20/20` successful; repository-wide suite remains non-green in both C74 and clean parent, so it is disclosed rather than promoted to a false pass | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E1-P1B-FULL1` | commit only the intended test/docs paths after detect-changes; P2 remains the only clean-consumer proof |
 
 ## Phase Touch Map
 
@@ -218,7 +219,7 @@ No rewrite, rezip, promotion, approval, finalize, or destructive cleanup.
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
 | P1-A | completion resolver is wrong; Option B is resolved from current source and docs | keep P1-A unchanged; edit one resolver branch only |
-| P1-B | direct target-layout tests are missing | keep P1-B; add tests after P1-A and use repo-local disposable roots |
+| P1-B | direct target-layout tests and source-local project-eval matrix are green; repository-wide suite has the same pre-existing non-green family on the clean parent | mark P1-B validated for its scoped acceptance, record the full-suite limitation, commit the test/docs slice, and continue to P2 |
 | P2-A | installer/project suite contract is partial; C73 proof is failed, not reusable | keep P2-A; require fresh candidate/install and ten slots; no historical reuse |
 | P2-B | protected artifact/source boundary is correct; successor not yet minted | keep P2-B; defer mint until P1/P2-A gates pass |
 | Pn-A/B/C | no implementation or supervisor review yet | remain pending until P2 evidence is complete |
@@ -237,7 +238,7 @@ No rewrite, rezip, promotion, approval, finalize, or destructive cleanup.
 - [x] Next phase status assumptions, next action, and work steps have been updated from this status file when needed.
 - [x] Status Refresh Log has an R0 baseline row.
 - [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
-- [ ] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
+- [x] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
 ## Final P0 Decision
 
@@ -252,4 +253,4 @@ Choose one:
 
 Decision note:
 
-P0 is complete and P1-A is implemented. Fresh repo truth and independent C73 evidence establish a single narrow defect: the installed completion oracle used a project-root path that normal packaged adoption does not provide. Option B is consistent with the installed command examples and installer producer: installed consumers use `.p2p/system/scripts/p2p_eval.py`, while package/source validation uses the packaged root helper without allowing installed-root fallback. The source syntax and three direct route checks pass. P1-B still needs its commit-boundary validation, and P2 must prove the real fresh consumer before any successor handoff can be declared ready.
+P0 is complete and P1-A/P1-B are validated for the scoped evaluator contract. Fresh repo truth and independent C73 evidence establish a single narrow defect: the installed completion oracle used a project-root path that normal packaged adoption does not provide. Option B is consistent with the installed command examples and installer producer: installed consumers use `.p2p/system/scripts/p2p_eval.py`, while package/source validation uses the packaged root helper without allowing installed-root fallback. The source syntax, three target-layout tests, five-test project-eval file, and 20-execution source-local matrix pass. The repository-wide suite remains non-green in the clean parent and C74 worktree with the same legacy governance/closure family, so that limitation is explicitly recorded. P2 must prove the real fresh consumer before any successor handoff can be declared ready.

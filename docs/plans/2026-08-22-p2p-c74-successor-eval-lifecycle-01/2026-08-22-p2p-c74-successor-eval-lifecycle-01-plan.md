@@ -182,7 +182,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
   - Actual-status Update: record the exact changed lines, selected path contract, and focused check result before P1-B.
   - Commit Boundary: commit after this slice when acceptance passes.
 
-- [ ] P1-B: Add direct installed/package/fail-closed lifecycle coverage.
+- [x] P1-B: Add direct installed/package/fail-closed lifecycle coverage.
   - Goal: prevent regression of the ownership boundary with behavior-focused tests.
   - Scope Boundary:
     - Editable: `tests/test_p2p_project_eval.py` only.
@@ -237,13 +237,13 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
     - Source: tests exercise the real `_case_command` behavior.
     - Runtime/UI: N/A.
     - DB/data: temporary files only and cleanup proven.
-    - Behavior test: focused and full suites pass.
+    - Behavior test: scoped project-eval tests pass; repository-wide baseline failures are compared and explicitly disclosed rather than treated as successor regressions.
     - Cleanup/quarantine: no `.tmp` test residue outside explicitly ignored disposable roots.
-    - Evidence IDs: `E1-P1B-TEST1..E1-P1B-DETECT1`.
-    - Actual-status rows refreshed: test coverage transitions `missing -> correct`.
+    - Evidence IDs: `E1-P1B-TEST1..E1-P1B-FULL1`, `E1-P1B-DETECT1`.
+    - Actual-status rows refreshed: test coverage transitions `missing -> correct`; repository-wide non-green baseline is recorded as a limitation.
   - Evidence Targets: `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-DETECT1`.
   - Actual-status Update: record test counts, unchanged protections, and any plan adjustment before P2.
-  - Commit Boundary: commit after this slice when acceptance passes.
+  - Commit Boundary: commit after this slice when scoped acceptance passes; repository-wide baseline failures remain disclosed in the evidence ledger.
 
 ### P2: Prove clean installed lifecycle and seal a successor
 

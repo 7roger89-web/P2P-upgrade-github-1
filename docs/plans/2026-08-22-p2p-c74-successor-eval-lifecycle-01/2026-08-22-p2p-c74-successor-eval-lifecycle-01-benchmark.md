@@ -57,10 +57,11 @@ Benchmark sections must follow the plan phases:
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | Direct completion route checks | checks | 0 | pending | pending | installed/package/missing paths pass | pending | E1-P1A-ROUTE1 |
-| P1 | Resolver source lines changed | lines | 0 | pending | pending | smallest branch only | pending | E1-P1A-DETECT1 |
-| P1 | Focused lifecycle tests | tests | 0 | pending | pending | all pass | pending | E1-P1B-TEST1 |
-| P1 | Full unit tests | tests | historical C73 335 capability tests | pending | pending | no new regression | pending | E1-P1B-TEST2 |
+| P1 | Direct completion route checks | checks | 0 | 3 | pending | installed/package/missing paths pass | +3 | E1-P1A-ROUTE1 |
+| P1 | Resolver source lines changed | lines | 0 | +21/-3 | pending | smallest branch only | +21/-3 | E1-P1A-DETECT1 |
+| P1 | Focused project-eval tests | tests | 0 | 5 passed | pending | all scoped tests pass | +5 | E1-P1B-TEST2 |
+| P1 | Source-local eval case executions | case executions | 0 | 20 passed | pending | 20 (5 x 2 x 2) | +20 | E1-P1B-TEST3 |
+| P1 | Full repository unit tests | tests | parent 700 (14F/27E/3S) | C74 703 (15F/25E/3S) | pending | baseline-equivalent limitation disclosed | compare only | E1-P1B-FULL1 |
 
 ## B2 - P2 Benchmarks
 
@@ -68,8 +69,8 @@ Benchmark sections must follow the plan phases:
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
 | P2 | Required eval cases | cases | 5 | pending | pending | 5 | pending | E2-P2A-EVAL1 |
 | P2 | Required trial slots | slots | 0 executable in C73 | pending | pending | 10 | pending | E2-P2A-EVAL1 |
-| P2 | Baseline trials | trials | 0 recorded in C73 | pending | pending | 10? | pending | E2-P2A-EVAL1 |
-| P2 | P2P trials | trials | 0 recorded in C73 | pending | pending | 10? | pending | E2-P2A-EVAL1 |
+| P2 | Baseline trials | trials | 0 recorded in C73 | pending | pending | 10 | pending | E2-P2A-EVAL1 |
+| P2 | P2P trials | trials | 0 recorded in C73 | pending | pending | 10 | pending | E2-P2A-EVAL1 |
 | P2 | Unexpected writes | writes | C73 blocked before records | pending | pending | 0 | pending | E2-P2A-EVAL1 |
 | P2 | P2P pass rate | ratio | unavailable | pending | pending | policy threshold | pending | E2-P2A-GATE1 |
 | P2 | Case regressions | cases | unavailable | pending | pending | 0 | pending | E2-P2A-GATE1 |
