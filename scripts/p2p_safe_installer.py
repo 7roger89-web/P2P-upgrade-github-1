@@ -167,8 +167,13 @@ def install(project_root: Path, artifact_path: Path, expected_sha: str, requeste
             # Set PYTHONPATH to include system_dir for capability discovery
             env = os.environ.copy()
             env["PYTHONPATH"] = str(system_dir) + os.pathsep + env.get("PYTHONPATH", "")
+            # Validate the extracted package before the project is classified as
+            # installed. Running portable Doctor against project_root after
+            # creating .p2p/system makes role inference report "installed" and
+            # falsely rejects the package. The extracted archive itself is the
+            # portable package root at this point.
             res = subprocess.run(
-                [sys.executable, str(doctor_path), "--root", str(project_root), "--role", "portable"],
+                [sys.executable, str(doctor_path), "--package", str(system_dir)],
                 capture_output=True, text=True, env=env
             )
             doctor_result = "HEALTHY" if res.returncode == 0 else "UNHEALTHY"

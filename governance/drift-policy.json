@@ -40,6 +40,7 @@
     "/.p2p/approvals/",
     "/.p2p/gates/",
     "/__pycache__/",
+    ".coverage",
     "/docs/plans/",
     "/reports/",
     "/docs/execution/2026-08-12-p2p-beginner-lifecycle-certification.md",
@@ -55,6 +56,11 @@
   "live_fact_marker": "FACT_REF:",
   "historical_marker": "HISTORICAL_ONLY:",
   "scoped_volatile_paths": {
+    "scripts/fw01-v2-final-reconciliation-terminal-report.md": {
+      "classification": "D",
+      "status": "HISTORICAL_EVIDENCE",
+      "reason": "Historical FW01 reconciliation terminal report; provider/model identifiers are archival evidence metadata, not active P2P runtime claims."
+    },
     ".agents/skills/mcp-builder/reference/evaluation.md": {
       "classification": "D",
       "status": "NONCANONICAL_REFERENCE",

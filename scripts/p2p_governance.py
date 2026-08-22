@@ -40,11 +40,16 @@ def load_json(path: Path) -> object:
 
 
 def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    """Hash governance content portably across LF/CRLF checkouts.
+
+    Governance JSON, reports, and runtime source are text surfaces. Their
+    semantic identity must not change merely because Git materializes them
+    with Windows line endings. Binary surfaces retain their exact bytes.
+    """
+    data = path.read_bytes()
+    if b"\x00" not in data:
+        data = data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def parse_date(value: object, field: str) -> date:
