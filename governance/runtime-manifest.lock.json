@@ -1080,7 +1080,7 @@
     "governance/approvals/P2P-APR-20260819T090500+0000-fw01-v2-promote-release.json": "605ec71152e5dd11036fc92261ba6bdbecc9f315e60eb8dc7e48cd984a1f93b1",
     "governance/approvals/P2P-APR-20260821T035410Z-c41-official-baseline-promotion.json": "bfaeb7143c93c797789bc507900c8de565ceca1e7b4c209f99d59b87fa272227",
     "governance/approvals/P2P-PROMOTE-46-APPROVAL.json": "1eda9ea62029c9dff131be606d32e8371e32078244920f1e5388508aeec363d3",
-    "governance/development-control.json": "6ec479c47287bcf61dd5329dd40fede05a41a3b3a1d5e671c3bac37294067b45",
+    "governance/development-control.json": "0c96cf508ba686b442357155a36d36a42fcdd8692be265ddafeac5941c44fbb4",
     "governance/development-control.json.fixture47": "a51cf40625288aac6157829a12a8ec29b5ccd65212da2bee503f69d7f7879a66",
     "governance/drift-policy.json": "f06aa6094191e480883166c9e7a2353e56945a15a160f13e7feec7b05662cd38",
     "governance/eval-suite.schema.json": "5eb2788a7b6fefedea5d01555a9c572809a693176d4187dd01b2c64201d6fe79",
@@ -1179,6 +1179,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-22T12:02:24+07:00",
-  "reason": "C74 successor source metadata freeze"
+  "generated_at": "2026-08-22T12:28:52+07:00",
+  "reason": "C74 sealed candidate identity and handoff evidence"
 }

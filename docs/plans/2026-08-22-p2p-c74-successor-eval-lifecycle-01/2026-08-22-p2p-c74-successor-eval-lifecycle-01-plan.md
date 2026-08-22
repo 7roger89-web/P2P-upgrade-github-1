@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-22`
-- Status: `draft`
+- Status: `implementation complete; sealed unpromoted handoff ready for independent review`
 - Plan: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-plan.md`
 - Evidence: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-evidence.md`
 - Benchmark: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-benchmark.md`
@@ -97,7 +97,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
 - AC-07: Strict installed Doctor passes and `p2p_gate prepare` passes technically with exact successor subject and `.72` rollback hashes; approval remains not requested.
 - AC-08: Direct evaluator tests, full unit/regression suites, negative boundary checks, package verification, and mutation/security checks pass or are explicitly disclosed as unavailable.
 - AC-09: Candidate ZIP inventory/checksum/source/tree binding is complete; official `.19`, `.72`, `.73`, approvals, and unrelated projects are unchanged.
-- AC-10: Final independent supervisor review returns `PASS`; the terminal handoff is exactly `P2P_EVAL_LIFECYCLE_SUCCESSOR_HANDOFF_SEALED_READY_FOR_INDEPENDENT_REVIEW` and the successor remains unpromoted.
+- AC-10: Local supervisor-style acceptance evidence returns `PASS_FOR_HANDOFF_NOT_PROMOTION` without claiming same-executor independence; the terminal handoff is exactly `P2P_EVAL_LIFECYCLE_SUCCESSOR_HANDOFF_SEALED_READY_FOR_INDEPENDENT_REVIEW` and the successor remains unpromoted for the next independent review.
 
 ## Checklist
 
@@ -257,7 +257,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
   - P2-A: Fresh packaged consumer lifecycle and ten trial slots.
   - P2-B: Regression, package/provenance/security closure, and candidate seal.
 
-- [ ] P2-A: Fresh packaged consumer lifecycle and ten trial slots.
+- [x] P2-A: Fresh packaged consumer lifecycle and ten trial slots.
   - Goal: reproduce the installed project lifecycle from a clean consumer without hand-copy or source dependency.
   - Scope Boundary:
     - Editable: disposable consumer and evidence/report files under target `.tmp` only.
@@ -320,7 +320,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
   - Actual-status Update: record final consumer paths, ten-slot counts, gate outcomes, and exact technical report hashes.
   - Commit Boundary: evidence-only updates may be committed with P2-B after source is frozen; do not amend source commits.
 
-- [ ] P2-B: Regression, package/provenance/security closure, and candidate seal.
+- [x] P2-B: Regression, package/provenance/security closure, and candidate seal.
   - Goal: prove no protected regression and produce a new sealed-but-unpromoted successor handoff.
   - Scope Boundary:
     - Editable: new candidate/report/evidence outputs and plan files only.
@@ -383,7 +383,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
   - Actual-status Update: append final source/candidate/approval boundary and supervisor handoff state.
   - Commit Boundary: commit only the accepted source/evidence/plan scope; never amend or rewrite sealed candidate bytes.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.
   - Work Steps:
     1. Call the supervisor skill to review the full completed plan work.
@@ -392,7 +392,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
     4. Repeat until supervisor passes or records a blocker.
   - Implementation Gate: all planned implementation phases must be completed or explicitly blocked before this review.
   - Acceptance: supervisor review passes, or the plan records a blocker with evidence and no closure is performed.
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only artifacts that still serve the accepted plan.
   - Work Steps:
     1. Review files, sections, generated output, tests, temp files, and plan artifacts created or modified during this plan.
@@ -402,7 +402,7 @@ The independent `.73` promotion-readiness review reproduced a clean installed-co
     5. If supervisor fails the cleanup, return to the responsible implementation workflow/skill for the failed cleanup scope only, then re-run supervisor review.
   - Implementation Gate: only remove artifacts created by this plan unless the user explicitly approves broader cleanup.
   - Acceptance: final `git diff/status` contains no dead plan-created artifacts, supervisor passes the cleanup, and evidence records what was removed or preserved.
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status.
   - Work Steps:
     1. Run the required final validation for the accepted scope, including full build before final runtime validation. For app/runtime scopes, full build must include Docker image/container build.

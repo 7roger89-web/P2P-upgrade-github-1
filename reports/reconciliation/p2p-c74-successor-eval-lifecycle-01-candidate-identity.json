@@ -1,0 +1,51 @@
+{
+  "schema": "p2p-c74-successor-eval-lifecycle-candidate-identity/1",
+  "task": "P2P-C74-SUCCESSOR-EVAL-LIFECYCLE-01",
+  "canonical_authority_ref": "origin/main",
+  "reconciliation_base": "origin/main",
+  "reconciliation_branch": "codex/p2p-c74-successor-eval-lifecycle-01",
+  "current_official_baseline": "8.4.7-C-codex.19",
+  "current_official_artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+  "official_baseline_changed": false,
+  "promotion_performed": false,
+  "candidate": {
+    "version": "8.4.7-C-codex.74",
+    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v74.zip",
+    "artifact_size_bytes": 2899886,
+    "artifact_sha256": "2b82dea10695abb1c99253be1205728335a114df42cececde2fcca5c1727fd12",
+    "hash_match": true,
+    "mint_count": 1,
+    "reminted_or_overwritten": false,
+    "candidate_vs_official": "UNPROMOTED_SUCCESSOR_CANDIDATE"
+  },
+  "source_binding": {
+    "source_commit": "4eafc3ccb6de52f2b5f9b9b75b754c9d9a2a9b53",
+    "source_tree": "064d52121cd6220602fbd455614bccc0c3b3dd2b",
+    "source_worktree_dirty_at_mint": false,
+    "source_commit_object": "VERIFIED",
+    "source_tree_object": "VERIFIED",
+    "source_tree_bound_to_commit": "VERIFIED",
+    "post_mint_branch_changes_are_evidence_or_governance_only": true
+  },
+  "sealed_ancestors": {
+    "v72_sha256": "70613080d2ddbb92a52d2d79186e125439ec7f5ba8a6fa87bda9208d1b39d872",
+    "v73_sha256": "72bfbef935a41b68ebe3c7fc5464d99d2a47e849cb77e85507ceb90cdf19ef1a"
+  },
+  "archive_integrity": {
+    "total_members": 493,
+    "accounted_members": 493,
+    "unaccounted_members": 0,
+    "duplicate_paths": 0,
+    "unsafe_archive_paths": 0,
+    "missing_expected_members": 0,
+    "inventory_match": true,
+    "checksum_match": true,
+    "distribution_scope_canonical": "VERIFIED"
+  },
+  "governance": {
+    "approval_state": "NOT_REQUESTED",
+    "promotion_performed": "NO",
+    "candidate_status": "MINTED_UNPROMOTED_CANDIDATE"
+  },
+  "notes": "Artifact was minted once. Subsequent changes are limited to evidence and governance-derived state; no artifact rebuild or overwrite occurred."
+}

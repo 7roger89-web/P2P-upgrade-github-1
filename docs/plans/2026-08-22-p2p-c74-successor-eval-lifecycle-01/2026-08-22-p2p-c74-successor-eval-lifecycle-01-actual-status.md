@@ -2,16 +2,16 @@
 
 Title: P2P C74 Successor Evaluator Lifecycle
 Date: 2026-08-22
-Status: P1-A Complete / P1-B Validated; repository-wide baseline failures disclosed
+Status: P2-A/P2-B Complete; sealed unpromoted handoff ready for independent review; repository-wide baseline limitations disclosed
 Companion plan: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-plan.md`
 Companion evidence: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-evidence.md`
 Companion benchmark: `docs/plans/2026-08-22-p2p-c74-successor-eval-lifecycle-01/2026-08-22-p2p-c74-successor-eval-lifecycle-01-benchmark.md`
 
 ## Purpose
 
-This file records the real current state before implementation.
+This file records the real current state after implementation and successor sealing.
 
-Implementation must not start until the target scope has a completed status row, evidence IDs, and a downstream plan decision.
+The P0/P1 history remains preserved below; current rows and refreshes are the authority for the handoff state.
 
 This file does not replace `evidence.md`. It classifies current state from evidence.
 
@@ -51,13 +51,13 @@ Out of scope:
 
 | Unit / File / Surface | File Detail Evidence | Related File Count | Relationship Summary | Impact Note |
 |-----------------------|----------------------|--------------------|----------------------|-------------|
-| `scripts/p2p_eval.py` / `_case_command` | `E0-P0A-FD1`, `E0-P0A-IMPACT1` | 1 inbound file; 51 local relationships; 24 linked flows | evaluator helper is consumed by project-eval tests and workflow/gate processes; completion path uses runtime/root paths | CRITICAL symbol scope warning; edit one resolver branch only |
-| `tests/test_p2p_project_eval.py` | file-detail inspected through `E0-P0A-FD1` inbound relationship and source read | 1 direct evaluator consumer | current tests cover parser and recorded suite gate but not target-layout completion selection | high scope warning; edit only after source behavior |
+| `scripts/p2p_eval.py` / `_case_command` | `E0-P0A-FD1`, `E1-P1A-IMPACT1` | 4 direct affected symbols; 52 local relationships; 24 linked flows | evaluator helper is consumed by project-eval tests and workflow/gate processes; completion path now uses the canonical installed/package resolver | CRITICAL symbol scope warning; source edit is frozen and verified |
+| `tests/test_p2p_project_eval.py` | post-edit file-detail and focused run `E1-P1B-TEST2` | direct evaluator behavior consumer | 5 focused tests cover installed, package, and fail-closed layouts plus parser/recorded suite behavior | high scope warning; test source is frozen |
 | `scripts/p2p_workflow.py` | source inspection `E0-P0A-WORKFLOW1` | resolver-related consumer | filters UIUX-only helper and enforces project-eval CLI flags | preserve; inspect-only |
 | `scripts/p2p_gate.py` / `scripts/doctor.py` | source inspection `E0-P0A-CONTRACT1` | installed gate consumers | both use installed runtime helper and project-local suite; no resolver edit required | preserve; validate-only |
-| `install.ps1`, `install.sh`, `scripts/p2p_install_release.py` | source inspection `E0-P0A-CONTRACT1` | installer producers | normal install copies package project-eval helper into `.p2p/system/scripts`; no root consumer script | preserve; validate-only |
+| `install.ps1`, `install.sh`, `scripts/p2p_install_release.py` | source inspection `E0-P0A-CONTRACT1`, `E2-P2A-INSTALL1` | installer producers | normal install copies package project-eval helper into `.p2p/system/scripts`; fresh consumer proof confirms no root consumer script | preserve; validated |
 | `scripts/package_release.py` | source inspection `E0-P0A-SRC2` | package producer | package contains root project-eval source and distinct UIUX implementation name | preserve unless package verification finds a new defect |
-| `.72` / `.73` / official `.19` | `E0-P0A-SEAL1` | protected artifacts | exact byte identities are fixed and not editable | do-not-touch |
+| `.72` / `.73` / official `.19` | `E0-P0A-SEAL1`, `E2-P2B-SEC1` | protected artifacts | exact byte identities remain fixed and unchanged before/after the C74 successor | do-not-touch |
 
 ## Status Rules
 
@@ -75,13 +75,14 @@ Out of scope:
 
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
-| Installed completion resolver | `_project_eval_path` now selects `runtime_root/scripts/p2p_eval.py` for an installed consumer and keeps root `scripts/p2p_eval.py` only for an unpacked package/development root; missing installed helper remains visible | installed runtime helper is selected when `.p2p/system` exists; missing helper fails closed; package mode remains executable | correct | 4 direct affected symbols / 2 modules / 6 processes; file 177 symbols / 52 local / 24 flows | `E0-P0A-C73FAIL1`, `E1-P1A-ROUTE1`, `E1-P1A-IMPACT1` | preserve source behavior; finish P1-B tests |
+| Installed completion resolver | `_project_eval_path` selects `runtime_root/scripts/p2p_eval.py` for an installed consumer and root `scripts/p2p_eval.py` only for an unpacked package/development root; missing installed helper remains visible | installed runtime helper is selected when `.p2p/system` exists; missing helper fails closed; package mode remains executable | correct | 4 direct affected symbols / 2 modules / 6 processes; file 177 symbols / 52 local / 24 flows | `E0-P0A-C73FAIL1`, `E1-P1A-ROUTE1`, `E1-P1A-IMPACT1`, `E2-P2A-EVAL1` | preserve; source frozen |
 | Project-eval source helper | `scripts/p2p_eval.py` is packaged and supports schema-v2 design/validate/run/record/gate | remain the package/source validation authority; no duplicate consumer copy | correct | file-detail `E0-P0A-FD1` | `E0-P0A-SRC2` | preserve; use only package mode |
-| Installed `.p2p/system/scripts/p2p_eval.py` in development checkout | UIUX-only helper; correctly rejected by project-eval resolver in development mode | in a real installed consumer, package install must place project-eval helper at this path; development UIUX helper must never be used as a fallback | partial | related through installer/runtime surfaces | `E0-P0A-SRC2`, `E0-P0A-WORKFLOW1` | validate P2-A; no source edit |
-| Project-owned suite | suite is project data under `.p2p/evals`; C73 fresh lifecycle did not reach trial execution | suite is created/reused through normal setup and validated by installed helper | partial | gate/Doctor consumers | `E0-P0A-C73FAIL1`, `E0-P0A-CONTRACT1` | prove P2-A |
-| Installer/adoption lifecycle | normal packaged scripts copy `scripts/p2p_eval.py` into installed runtime and create project pin/state, but C73 proof reported a helper-path mismatch | fresh consumer is installed through normal lifecycle with no reviewer hand-copy | partial | installer/package/gate/Doctor | `E0-P0A-CONTRACT1`, `E0-P0A-C73FAIL1` | inspect/validate P2-A |
-| Direct evaluator tests | three target-layout tests plus the existing project-eval file pass; the source-local disposable matrix has 20 successful case-oracle executions | installed wins, package works, installed absence does not source-fallback; complete focused validation without fake evidence | correct | test file 18 symbols / 6 local / 7 outbound after edit | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3` | commit P1-B evidence, then prove the same contract from a fresh installed consumer |
-| `.72`, `.73`, official `.19` | exact protected bytes/authority exist | unchanged byte identity and unpromoted candidate boundary | correct | protected identity evidence | `E0-P0A-SEAL1` | preserve-only |
+| Installed `.p2p/system/scripts/p2p_eval.py` in development checkout | UIUX-only helper remains correctly rejected in development mode; a normal `.74` install places the project-eval helper at this path in the consumer | development UIUX helper is never a fallback; installed consumer owns the canonical project-eval helper | correct/preserve-only | installer/runtime surfaces | `E0-P0A-SRC2`, `E0-P0A-WORKFLOW1`, `E2-P2A-INSTALL1` | no source edit |
+| Project-owned suite | normal installed bootstrap created `.p2p/evals/suite.json`; installed helper validated and executed the five-case suite | suite is project data created through normal lifecycle and validated by installed helper | correct | gate/Doctor consumers | `E0-P0A-CONTRACT1`, `E2-P2A-EVAL1` | preserve project ownership |
+| Installer/adoption lifecycle | normal packaged install created the installed helper, project pin/state, project suite, ten trial slots, gates, and strict Doctor PASS without hand-copy | fresh consumer is installed through normal lifecycle with no source checkout dependency | correct | installer/package/gate/Doctor | `E0-P0A-CONTRACT1`, `E2-P2A-INSTALL1`, `E2-P2A-GATE1` | preserve; no installer edit |
+| Direct evaluator tests | 5 focused tests pass; 20 source-local case-oracle executions pass; fresh installed consumer produced 20/20 successful case executions | installed wins, package works, installed absence does not source-fallback; no fake evidence | correct | test file post-edit; consumer-local evidence | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E2-P2A-EVAL1` | preserve |
+| Candidate `.74` and identity binding | candidate ZIP is bound to source commit/tree and exact artifact hash; governance identity is minted/unpromoted | candidate is sealed, unpromoted, and reviewable without promotion action | correct/bound-correct | candidate/identity/governance | `E2-P2A-PACKAGE1`, `E2-P2B-SEAL1` | preserve; no approval/promotion |
+| `.72`, `.73`, official `.19` | exact protected bytes/authority remain unchanged | unchanged byte identity and unpromoted candidate boundary | correct | protected identity evidence | `E0-P0A-SEAL1`, `E2-P2B-SEC1` | preserve-only |
 | Root/other worktrees | root and prior review worktrees contain owner/reviewer changes | no edits or cleanup outside successor worktree | correct/preserve-only | N/A | `E0-P0A-AUTH1`, `E0-P0A-STATUS1` | do-not-touch |
 
 ## Status Refresh Log
@@ -91,6 +92,8 @@ Out of scope:
 | R0 | 2026-08-22 | fresh C74 worktree at C72 successor head; graph refreshed before graph queries | evaluator lifecycle and protected boundaries | initial classification: resolver wrong, suite/installer partial, direct route tests missing, seals correct | `E0-P0A-AUTH1`, `E0-P0A-GRAPH1`, `E0-P0A-C73FAIL1`, `E0-P0A-SEAL1` | Option B selected; P1-A is one resolver branch, P1-B adds target-layout tests, P2 proves clean install |
 | R1 | 2026-08-22 | P1-A source edit plus focused route checks; post-edit graph refreshed | `scripts/p2p_eval.py` resolver and direct route tests | resolver `wrong -> correct`; route-test coverage `missing -> partial`; ignored source suite remains empty and is not evidence | `E1-P1A-ROUTE1`, `E1-P1A-SYNTAX1`, `E1-P1B-TEST1`, `E1-P1B-TEST2` | P1-A can be committed; complete P1-B validation/commit before P2 |
 | R2 | 2026-08-22 | P1-B test file plus disposable source-local suite and parent-commit comparison | project-eval focused coverage and repository-wide regression classification | route coverage `partial -> correct`; source-local matrix `20/20` successful; repository-wide suite remains non-green in both C74 and clean parent, so it is disclosed rather than promoted to a false pass | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E1-P1B-FULL1` | commit only the intended test/docs paths after detect-changes; P2 remains the only clean-consumer proof |
+| R3 | 2026-08-22 | exact `.74` artifact installed by normal installer into a fresh disposable consumer; installed helper used for all eval commands | installer/adoption, project-owned suite, ten trial slots, eval gate, strict Doctor, technical prepare | installer/suite lifecycle `partial -> correct`; 10/10 slots executable, 20/20 case executions recorded, 0 unexpected writes, gate PASS, Doctor PASS, prepare technical PASS | `E2-P2A-INSTALL1`, `E2-P2A-EVAL1`, `E2-P2A-GATE1` | freeze source and candidate; complete package/security/provenance closure |
+| R4 | 2026-08-22 | final source/package/governance identity and regression/security audit | candidate binding, protected artifacts, regressions, mutation and handoff | candidate `unbound -> bound-correct`; `.72/.73/.19` remain unchanged; relevant regression/security gates PASS; repository-wide and Windows historical portability limits remain disclosed | `E2-P2A-PACKAGE1`, `E2-P2B-REG1`, `E2-P2B-SEC1`, `E2-P2B-SEAL1` | local supervisor-style handoff PASS; stop at exact independent-review-ready token |
 
 ## Phase Touch Map
 
@@ -111,7 +114,7 @@ Out of scope:
 
 Current state:
 
-`_case_command` resolves the completion case to `target_root / "scripts" / "p2p_eval.py"`. The independent C73 consumer has `.p2p/system/scripts/p2p_eval.py` after normal installation and no root `scripts/p2p_eval.py`, so the completion oracle exits before creating a trial record.
+`_case_command` now delegates completion resolution to `_project_eval_path`. An installed consumer selects `runtime_root / "scripts" / "p2p_eval.py"`; an unpacked package/source target selects its own root `scripts/p2p_eval.py` only when package markers are present. Missing installed helper paths raise a visible error and do not source-fallback.
 
 Required state:
 
@@ -133,11 +136,11 @@ Relationship and impact:
 
 Classification:
 
-`wrong` — the consumer path is wrong even though the source helper and installed package producer are otherwise correct.
+`correct` — the C73 `EVAL_OWNERSHIP_CONTRACT_MISMATCH` / `WRONG_EVALUATOR_PATH_CONTRACT` is repaired with no schema, grading, or fallback change.
 
 Allowed next action:
 
-Edit P1-A only after P0 completion to select the installed canonical helper and preserve package-mode validation.
+Preserve the frozen resolver and use the fresh consumer evidence for independent review.
 
 Forbidden next action:
 
@@ -147,7 +150,7 @@ Do not copy a helper into the consumer, use an ancestor checkout, suppress missi
 
 Current state:
 
-The normal installer copies the project-eval source helper into `.p2p/system/scripts`; the project suite remains project-owned under `.p2p/evals`. C73 did not prove the complete consumer lifecycle because its completion case resolved the wrong path.
+The normal installer copied the project-eval source helper into `.p2p/system/scripts`; normal bootstrap created the project-owned `.p2p/evals/suite.json`; the installed helper executed every trial and produced consumer-local records.
 
 Required state:
 
@@ -168,11 +171,11 @@ Relationship and impact:
 
 Classification:
 
-`partial` — contract and producer exist, but fresh independent proof is missing.
+`correct` — fresh normal-install proof exists for the successor. The consumer root has no source-checkout evaluator copy.
 
 Allowed next action:
 
-Validate through the canonical package lifecycle in P2-A.
+Preserve the consumer evidence and leave promotion/approval to the next authority boundary.
 
 Forbidden next action:
 
@@ -182,7 +185,7 @@ Do not manufacture a project suite or trial evidence in the installer.
 
 Current state:
 
-The new worktree is separate from the root owner worktree and historical review worktrees. `.72` and `.73` exact hashes are known; official `.19` authority is preserved.
+The new worktree is separate from the root owner worktree and historical review worktrees. `.72`, `.73`, and official `.19` exact identities remain preserved; `.74` is bound to the frozen source commit/tree and remains unpromoted.
 
 Required state:
 
@@ -208,7 +211,7 @@ Classification:
 
 Allowed next action:
 
-Read-only comparison before/after candidate mint.
+Independent review of the sealed handoff; no approval, promotion, finalize, release, or deployment action in this task.
 
 Forbidden next action:
 
@@ -218,11 +221,11 @@ No rewrite, rezip, promotion, approval, finalize, or destructive cleanup.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | completion resolver is wrong; Option B is resolved from current source and docs | keep P1-A unchanged; edit one resolver branch only |
-| P1-B | direct target-layout tests and source-local project-eval matrix are green; repository-wide suite has the same pre-existing non-green family on the clean parent | mark P1-B validated for its scoped acceptance, record the full-suite limitation, commit the test/docs slice, and continue to P2 |
-| P2-A | installer/project suite contract is partial; C73 proof is failed, not reusable | keep P2-A; require fresh candidate/install and ten slots; no historical reuse |
-| P2-B | protected artifact/source boundary is correct; successor not yet minted | keep P2-B; defer mint until P1/P2-A gates pass |
-| Pn-A/B/C | no implementation or supervisor review yet | remain pending until P2 evidence is complete |
+| P1-A | completion resolver corrected and frozen; Option B is proven by source and consumer evidence | preserve implementation; no further source edit |
+| P1-B | focused target-layout tests and source-local project-eval matrix are green; repository-wide suite has the same pre-existing non-green family on the clean parent | retain scoped PASS with explicit baseline limitation |
+| P2-A | fresh normal install, project-owned suite, 10 trial slots, eval gate, strict Doctor, and technical prepare all pass | complete; preserve consumer evidence and pending technical approval boundary |
+| P2-B | candidate `.74` is verified, source/tree bound, security/regression checked, and unpromoted | complete; preserve exact artifact and identity record |
+| Pn-A/B/C | local supervisor-style evidence gate passes; external independent review remains unperformed; no dead intended-path artifact remains | complete local handoff and stop at independent-review-ready token |
 
 ## Implementation Gate
 
@@ -240,7 +243,7 @@ No rewrite, rezip, promotion, approval, finalize, or destructive cleanup.
 - [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
 - [x] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
-## Final P0 Decision
+## Historical Final P0 Decision
 
 Choose one:
 
@@ -253,4 +256,13 @@ Choose one:
 
 Decision note:
 
-P0 is complete and P1-A/P1-B are validated for the scoped evaluator contract. Fresh repo truth and independent C73 evidence establish a single narrow defect: the installed completion oracle used a project-root path that normal packaged adoption does not provide. Option B is consistent with the installed command examples and installer producer: installed consumers use `.p2p/system/scripts/p2p_eval.py`, while package/source validation uses the packaged root helper without allowing installed-root fallback. The source syntax, three target-layout tests, five-test project-eval file, and 20-execution source-local matrix pass. The repository-wide suite remains non-green in the clean parent and C74 worktree with the same legacy governance/closure family, so that limitation is explicitly recorded. P2 must prove the real fresh consumer before any successor handoff can be declared ready.
+P0 was complete and P1-A/P1-B were validated for the scoped evaluator contract. Fresh repo truth and independent C73 evidence established a single narrow defect: the installed completion oracle used a project-root path that normal packaged adoption does not provide. Option B was consistent with the installed command examples and installer producer: installed consumers use `.p2p/system/scripts/p2p_eval.py`, while package/source validation uses the packaged root helper without allowing installed-root fallback. The source syntax, target-layout tests, five-test project-eval file, and 20-execution source-local matrix passed. The repository-wide suite remains non-green in the clean parent and C74 worktree with the same legacy governance/closure family, so that limitation remains explicitly recorded.
+
+## Final Handoff Status
+
+- Source freeze: `4eafc3ccb6de52f2b5f9b9b75b754c9d9a2a9b53`; source tree: `064d52121cd6220602fbd455614bccc0c3b3dd2b`.
+- Candidate: `.74`, SHA-256 `2b82dea10695abb1c99253be1205728335a114df42cececde2fcca5c1727fd12`, minted once, unpromoted.
+- Consumer proof: normal install, canonical `.p2p/system/scripts/p2p_eval.py`, 20/20 case executions, 0 unexpected writes, eval gate PASS, strict Doctor PASS, technical prepare PASS.
+- Protected bytes: `.72` and `.73` exact hashes unchanged; official `.19` authority unchanged.
+- Local supervisor-style verdict: `PASS_FOR_HANDOFF_NOT_PROMOTION`. This is not an independent review; the successor is ready for an independent reviewer.
+- Terminal token: `P2P_EVAL_LIFECYCLE_SUCCESSOR_HANDOFF_SEALED_READY_FOR_INDEPENDENT_REVIEW`.
