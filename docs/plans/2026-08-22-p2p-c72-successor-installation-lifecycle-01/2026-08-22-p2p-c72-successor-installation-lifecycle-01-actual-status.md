@@ -2,7 +2,7 @@
 
 Title: P2P C72 Successor Installation Lifecycle 01  
 Date: 2026-08-22  
-Status: P0 Complete — implementation gate open
+Status: PASS_WITH_DISCLOSURES / P2P_INSTALLATION_LIFECYCLE_SUCCESSOR_CANDIDATE_VERIFIED
 
 Companion plan: `docs/plans/2026-08-22-p2p-c72-successor-installation-lifecycle-01/2026-08-22-p2p-c72-successor-installation-lifecycle-01-plan.md`  
 Companion evidence: `docs/plans/2026-08-22-p2p-c72-successor-installation-lifecycle-01/2026-08-22-p2p-c72-successor-installation-lifecycle-01-evidence.md`  
@@ -178,3 +178,51 @@ Forbidden next action: arbitrary synthetic eval suite or hidden source-repo depe
 Decision note:
 
 P0 is closed. Fresh reads establish one existing pin schema (`p2p-project-pin/1`), a source-only producer omitted from `.72`, project-owned eval initialization, and the exact package/runtime surfaces that must be added. The Anvien graph is fresh and the affected files have high-scope warnings recorded. The smallest unused immediate successor is `.73`; this is a candidate identity only and does not change official `.19`.
+
+## Final Status Refresh — R2
+
+Fresh remote-derived evidence supersedes the provisional pending labels above:
+
+| Area | Final state | Evidence |
+|---|---|---|
+| Canonical authority | `origin/main`; official `.19` and SHA unchanged | `E0-CLOSE-AUTHORITY1` |
+| Historical `.72` | exact bytes preserved; no remint | `E0-CLOSE-HISTORY1` |
+| Successor identity | `.73`, one candidate only, unpromoted | `E3-CLOSE-ARTIFACT1` |
+| Pin producer | one packaged canonical producer, schema `p2p-project-pin/1` | `E1-CLOSE-PIN1` |
+| Pin validation | version/SHA/project/source/Doctor binding verified; malformed and stale cases fail closed | `E1-CLOSE-TEST1`, `E3-CLOSE-PILOT1` |
+| MAP-BEFORE-WORK | fresh allowed; stale/missing/permission denied blocked | `E1-CLOSE-MAP1` |
+| Project eval | project-owned suite, 5/5 case pairs, baseline/p2p 1.0/1.0, zero regressions | `E2-CLOSE-EVAL1` |
+| Governance | derived drift `PASS`; historical approvals not rewritten | `E2-CLOSE-DRIFT1` |
+| Package | 493/493 accounted; inventory/checksum/safety all pass | `E3-CLOSE-PACKAGE1` |
+| Source provenance | clean at mint; commit/tree/object binding verified | `E3-CLOSE-PROVENANCE1` |
+| Installed Doctor | strict `ok=true`, project pin and runtime checks `PASS` | `E3-CLOSE-DOCTOR1` |
+| Technical prepare | `PASS`; approval request `PENDING`; no approve/finalize | `E3-CLOSE-GATE1` |
+| Manus sentinel | `NOT_RUN / NO_LIVE_TRANSPORT_OR_CREDENTIALS`; no result fabricated | `E3-CLOSE-MANUS1` |
+| C43/AERG | C43 not merged; AERG/Large Goal completeness planned/not implemented | `E0-CLOSE-SCOPE1` |
+| Authoritative projects | Game Truyện `0`, Gia Phả `0`, Logistics `0/NO`, auto-upgrade `NO` | `E3-CLOSE-SAFETY1` |
+
+### Final exact identity
+
+```text
+CANONICAL_AUTHORITY_REF = origin/main
+CURRENT_OFFICIAL_BASELINE = 8.4.7-C-codex.19
+CURRENT_OFFICIAL_ARTIFACT_SHA256 = 3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8
+NEW_SUCCESSOR_VERSION = 8.4.7-C-codex.73
+NEW_SUCCESSOR_ARTIFACT_PATH = reports/candidates/P2P-8.4.7-C-Codex-Edition-v73.zip
+NEW_SUCCESSOR_ARTIFACT_SHA256 = 72bfbef935a41b68ebe3c7fc5464d99d2a47e849cb77e85507ceb90cdf19ef1a
+NEW_SUCCESSOR_SOURCE_COMMIT = 4fba15e47f8c7290d71992dc0f44356321080c1b
+NEW_SUCCESSOR_SOURCE_TREE = dff1ccbbcab439f806c4f391e3a62ac857a1e1d3
+TOTAL_MEMBERS = 493
+INVENTORY_MATCH = TRUE
+CHECKSUM_MATCH = TRUE
+PROJECT_LOCAL_DOCTOR = HEALTHY
+MAP_BEFORE_WORK_GATE_RUNTIME_ENFORCED = VERIFIED
+MANUS_BACKEND_TASK_ID = NOT_RUN / no live transport or credentials available
+NEGATIVE_MATRIX = 26/26
+NEW_UNEXPLAINED_FAILURES = 0
+AUTHORITATIVE_PROJECT_MUTATION = 0
+OFFICIAL_BASELINE_CHANGED = NO
+PROMOTION_PERFORMED = NO
+```
+
+Disclosure: live Manus was unavailable; the whole-source secret scan reports two pre-existing token-shaped strings outside the candidate package; FW05 has one unrelated absent-shadow-project skip. Candidate-scope secret scans are clean. These are disclosed limitations, not new successor failures.

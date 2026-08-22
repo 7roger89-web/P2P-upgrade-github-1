@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-22`
-- Status: `draft`
+- Status: `PASS_WITH_DISCLOSURES / P2P_INSTALLATION_LIFECYCLE_SUCCESSOR_CANDIDATE_VERIFIED`
 - Plan: `docs/plans/2026-08-22-p2p-c72-successor-installation-lifecycle-01/2026-08-22-p2p-c72-successor-installation-lifecycle-01-plan.md`
 - Evidence: `docs/plans/2026-08-22-p2p-c72-successor-installation-lifecycle-01/2026-08-22-p2p-c72-successor-installation-lifecycle-01-evidence.md`
 - Benchmark: `docs/plans/2026-08-22-p2p-c72-successor-installation-lifecycle-01/2026-08-22-p2p-c72-successor-installation-lifecycle-01-benchmark.md`
@@ -67,7 +67,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
 
 ## Checklist
 
-- [ ] P0-A: Complete actual status before implementation work.
+- [x] P0-A: Complete actual status before implementation work.
   - Goal: establish clean-lineage, contract, version, pin, eval, and sibling-lane reality.
   - Work Steps: inspect current refs and `.72`; read adoption/Doctor/pin/eval/gate contracts; run Anvien refresh, file-detail, and impact for intended surfaces; classify all touch modes and update downstream slices.
   - Implementation Gate: actual-status has evidence IDs for every target and a final P0 decision.
@@ -85,7 +85,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - P1-A: Pin contract and producer wiring.
   - P1-B: Fail-closed pin/adoption regression matrix.
 
-- [ ] P1-A: Pin contract and producer wiring
+- [x] P1-A: Pin contract and producer wiring
   - Goal: make the canonical installed distribution create the existing project pin exactly once at the canonical lifecycle point.
   - Scope Boundary:
     - Editable: minimal installer/adoption helper and package inclusion lists, plus direct contract tests.
@@ -132,7 +132,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Actual-status Update: `missing/unbound -> correct` only after package-only fresh evidence.
   - Commit Boundary: one focused implementation/test commit after acceptance.
 
-- [ ] P1-B: Fail-closed pin/adoption regression matrix
+- [x] P1-B: Fail-closed pin/adoption regression matrix
   - Goal: prove wrong, missing, stale, malformed, and permission-denied pin states cannot authorize mutation.
   - Scope Boundary:
     - Editable: direct tests and minimal validation wiring required by existing readers.
@@ -185,7 +185,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Out of scope: historical approval rewrite, `.72` mutation, final approval.
   - Dependencies: P1 complete.
 
-- [ ] P2-A: Project-eval lifecycle closure
+- [x] P2-A: Project-eval lifecycle closure
   - Goal: classify and implement only the repository-defined project-eval initialization required by installed use.
   - Scope Boundary:
     - Editable: minimal adoption/eval initialization and direct eval tests if contract requires.
@@ -229,7 +229,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Actual-status Update: `missing -> correct` only with normal installed evidence.
   - Commit Boundary: separate eval lifecycle commit if code changes; otherwise evidence-only checkpoint.
 
-- [ ] P2-B: Source freeze and derived governance reconciliation
+- [x] P2-B: Source freeze and derived governance reconciliation
   - Goal: commit all material source, verify provenance, and rebuild current derived governance surfaces without historical mutation.
   - Scope Boundary:
     - Editable: current derived Live Specs/lock/technical preview/candidate binding per canonical commands.
@@ -282,7 +282,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Out of scope: approval, promotion, main merge, deployment.
   - Dependencies: P2 complete; source clean and drift PASS.
 
-- [ ] P3-A: Mint exactly one successor and durable seal
+- [x] P3-A: Mint exactly one successor and durable seal
   - Goal: produce one new version and preserve exact bytes in Git.
   - Scope Boundary:
     - Editable: candidate metadata, packaging evidence, durable artifact path.
@@ -327,7 +327,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Actual-status Update: candidate becomes `bound-correct` only after fresh remote verification.
   - Commit Boundary: mint/seal commit, followed by separate post-seal evidence commit if required.
 
-- [ ] P3-B: Fresh adoption, regression, technical prepare, and branch delivery
+- [x] P3-B: Fresh adoption, regression, technical prepare, and branch delivery
   - Goal: prove the successor is technically gate-ready while remaining unpromoted.
   - Scope Boundary:
     - Editable: disposable pilot state and evidence reports.
@@ -377,12 +377,12 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Actual-status Update: final PASS only if every required gate is verified.
   - Commit Boundary: final evidence commit; no merge or promotion.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: independently review the complete successor candidate and exact evidence.
   - Work Steps: create coder report, run supervisor review, fix only explicit rejection, rerun review.
   - Implementation Gate: all required phases complete or exact blocker recorded.
   - Acceptance: supervisor passes or records a precise allowed terminal blocker.
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: retain only required source, candidate, evidence, and plan artifacts.
   - Work Steps: inspect disposable outputs and plan-created files; remove only dead disposable work; preserve evidence.
   - Implementation Gate: no `.72`/main/authoritative mutation.
