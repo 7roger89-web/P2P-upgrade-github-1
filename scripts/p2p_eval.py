@@ -514,6 +514,24 @@ def _runtime_root(target_root: Path) -> Path:
     return target_root
 
 
+def _project_eval_path(target_root: Path, runtime_root: Path) -> Path:
+    """Resolve the project-eval helper owned by the active target layout.
+
+    An unpacked package/development root owns the source helper that will be
+    installed.  An installed consumer owns only its local runtime helper.  Do
+    not fall back from an installed consumer to a source checkout: that would
+    make a broken installation appear runnable.
+    """
+    package_root = (
+        (target_root / "governance").is_dir()
+        and (target_root / "manifest" / "package.json").is_file()
+        and (target_root / "scripts" / "package_release.py").is_file()
+    )
+    if package_root:
+        return target_root / "scripts" / "p2p_eval.py"
+    return runtime_root / "scripts" / "p2p_eval.py"
+
+
 def _snapshot_tree(root: Path) -> dict[str, tuple[int, int]]:
     """Hash the isolated target while ignoring explicitly disposable run data."""
     snapshot: dict[str, tuple[int, int]] = {}
@@ -550,10 +568,9 @@ def _parse_command_json(stdout: str) -> object:
 def _case_command(case_id: str, target_root: Path, runtime_root: Path, suite: Path) -> tuple[list[str], str]:
     """Return one real executable oracle for a frozen project-eval case."""
     runtime_scripts = runtime_root / "scripts"
-    root_scripts = target_root / "scripts"
     router = runtime_scripts / "p2p_router.py"
     uiux_eval = runtime_scripts / "p2p_uiux_eval.py"
-    project_eval = root_scripts / "p2p_eval.py"
+    project_eval = _project_eval_path(target_root, runtime_root)
     if case_id in {"positive-behavior", "regression-baseline"}:
         if not uiux_eval.is_file():
             raise ValueError(f"missing UI/UX evaluator in target: {uiux_eval}")
@@ -572,7 +589,8 @@ def _case_command(case_id: str, target_root: Path, runtime_root: Path, suite: Pa
         ], "backend_boundary"
     if case_id == "completion-contract":
         if not project_eval.is_file():
-            raise ValueError(f"missing project evaluator in target: {project_eval}")
+            ownership = "package source" if project_eval.parent == target_root / "scripts" else "installed runtime"
+            raise ValueError(f"missing canonical {ownership} project evaluator in target: {project_eval}")
         target_suite = target_root / ".p2p" / "evals" / "suite.json"
         if not target_suite.is_file():
             raise ValueError(f"missing frozen target suite: {target_suite}")
