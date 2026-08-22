@@ -1080,7 +1080,7 @@
     "governance/approvals/P2P-APR-20260819T090500+0000-fw01-v2-promote-release.json": "605ec71152e5dd11036fc92261ba6bdbecc9f315e60eb8dc7e48cd984a1f93b1",
     "governance/approvals/P2P-APR-20260821T035410Z-c41-official-baseline-promotion.json": "bfaeb7143c93c797789bc507900c8de565ceca1e7b4c209f99d59b87fa272227",
     "governance/approvals/P2P-PROMOTE-46-APPROVAL.json": "1eda9ea62029c9dff131be606d32e8371e32078244920f1e5388508aeec363d3",
-    "governance/development-control.json": "4054b60b9f90f7d3d421ae83ef9ea4c786ecfb199912cc1495b886172f1bc573",
+    "governance/development-control.json": "03e075a125716f7f01d149cc3baa3bb46db6cf4c2b380521d38572964df42e17",
     "governance/development-control.json.fixture47": "a51cf40625288aac6157829a12a8ec29b5ccd65212da2bee503f69d7f7879a66",
     "governance/drift-policy.json": "f06aa6094191e480883166c9e7a2353e56945a15a160f13e7feec7b05662cd38",
     "governance/eval-suite.schema.json": "5eb2788a7b6fefedea5d01555a9c572809a693176d4187dd01b2c64201d6fe79",
@@ -1149,7 +1149,7 @@
     "scripts/p2p_workflow.py": "c0809ee54208854ae6a885b9e7d4cdf1af6d0c9fc8b5722bb0fd5edd8f8d5f72",
     "scripts/package.ps1": "168bdfdb94ff72d96501f16810ce8679a908653384595e4bb9c987fe251877aa",
     "scripts/package.sh": "eb2d95fb825a3df673f4e82a2578fb105a3b21e7017179ddab59ee261430c92f",
-    "scripts/package_release.py": "23ea9cf3b42422b4921a728a907be958f78f0960badf1442ec77bd574ed068fe",
+    "scripts/package_release.py": "e6737116cb8f7c0eea70f9bf8be57497d41fad2c0c1c3af33f54e75adf4e0b82",
     "scripts/pilot_harness_hardened.py": "9bd50723fbe4c7c4442e8f88a1637b528c1636a733d928d1182a28f0dbdfd196",
     "scripts/rail_consolidation_validator.py": "669e59a3b04975b45bf59c26a7fd7382a4dc2be63ec7634b3dd72b5144a59fdd",
     "scripts/run_pilot_readonly_task.py": "1d291bb0b730e0e4475a6d670b81128576ec615e1ea3a21bd66f5eacb0ca6257",
@@ -1179,6 +1179,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-22T08:01:03+07:00",
+  "generated_at": "2026-08-22T08:03:17+07:00",
   "reason": "C72 successor installation lifecycle source freeze preparation"
 }

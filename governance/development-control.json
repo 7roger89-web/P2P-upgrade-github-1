@@ -51,7 +51,7 @@
     }
   },
   "current_development": {
-    "development_goal": "P2P-C72-SUCCESSOR-INSTALLATION-LIFECYCLE-01",
+    "development_goal": "P2P-CANONICAL-LINEAGE-REPAIR-01",
     "goal_kind": "RECONCILIATION_NOT_PRODUCT_GOAL",
     "status": "ACTIVE_UNPROMOTED_CANDIDATE_MINT_AUTHORIZED_WITH_LIVE_MANUS_DISCLOSURE",
     "source_version": "8.4.7-C-codex.73",
