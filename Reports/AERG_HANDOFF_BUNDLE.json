@@ -1,0 +1,68 @@
+{
+  "FEATURE_NAME": "AI Execution Reliability Guard (AERG)",
+  "FEATURE_BRANCH": "p2p-aerg-provider-neutral-reliability-01",
+  "BASE_REF": "4ce6a85f5991b6d6c464fb4b59e177114698947e",
+  "BASE_COMMIT": "4ce6a85f5991b6d6c464fb4b59e177114698947e",
+  "IMPLEMENTATION_COMMIT": "16d1534d42e05b76306df1fb3abf5afde404b697",
+  "IMPLEMENTATION_TREE": "cf95d1b25598dd7260a69a8c8cf95ecc1bdc4a4b",
+  "FINAL_BRANCH_HEAD": "16d1534d42e05b76306df1fb3abf5afde404b697",
+  "FINAL_TREE": "cf95d1b25598dd7260a69a8c8cf95ecc1bdc4a4b",
+  "CHANGED_FILES": [
+    ".p2p/system/p2p_capabilities/aerg_engine.py",
+    ".p2p/system/p2p_capabilities/aerg_model.py",
+    ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+    ".p2p/system/p2p_capabilities/quality_intelligence.py",
+    "Reports/AERG_PROVIDER_NEUTRAL_RELIABILITY_C44_CANDIDATE.md",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
+    "docs/p2p-development/capability-ledger/capability-index.json",
+    "docs/p2p-development/required-read/P2P-AERG-RELIABILITY-GUARD.md",
+    "governance/development-control.json",
+    "governance/p2p-development-roadmap.json",
+    "governance/research-adoption-ledger.json",
+    "governance/research-intake-ledger.json",
+    "scripts/rail_consolidation_validator.py",
+    "scripts/test_aerg_fail_closed.py",
+    "scripts/test_aerg_provider_neutrality.py"
+  ],
+  "ARCHITECTURAL_INVARIANTS": [
+    "AGENT_SELF_ATTESTATION_CANNOT_SATISFY_MATERIAL_ACCEPTANCE_GATE",
+    "REPORT_VERDICT_DERIVED_FROM_EVIDENCE",
+    "EXECUTOR_NOT_SOLE_INDEPENDENT_VERIFIER",
+    "CLAIM_NOT_EVIDENCE",
+    "REPORT_NOT_STATE",
+    "NOT_RUN_NOT_PASS",
+    "UNKNOWN_NOT_VERIFIED",
+    "WARN_NOT_HEALTHY",
+    "FIXTURE_NOT_LIVE",
+    "EVIDENCE_SUBJECT_MUST_MATCH_ACCEPTANCE_SUBJECT",
+    "STALE_EVIDENCE_CANNOT_SATISFY_CURRENT_GATE"
+  ],
+  "ACCEPTANCE_CRITERIA": {
+    "PROVIDER_NEUTRALITY": "VERIFIED",
+    "CONTRADICTION_DETECTION": "VERIFIED",
+    "FRESHNESS_ENFORCEMENT": "VERIFIED",
+    "ASSURANCE_LEVEL_UPGRADE": "VERIFIED_WITH_EVIDENCE"
+  },
+  "TEST_COMMANDS": [
+    "python3 scripts/test_aerg_fail_closed.py",
+    "python3 scripts/test_aerg_provider_neutrality.py",
+    "python3 scripts/test_aerg_contradiction_matrix.py",
+    "python3 scripts/test_aerg_az_matrix.py"
+  ],
+  "A_Z_MATRIX": "26/26",
+  "GOVERNANCE_VALIDATOR_RESULTS": {
+    "rail_consolidation_validator": "PASS",
+    "p2p_development_control": "PASS"
+  },
+  "PROVISIONAL_GOVERNANCE_IDS": {
+    "RI": "RI-011",
+    "RA": "RA-EXT-035",
+    "CAP": "C44"
+  },
+  "C43_MERGED": false,
+  "CANONICAL_RELEASE_LANE_MERGED": false,
+  "NO_MERGE": true,
+  "NO_PROMOTION": true,
+  "OFFICIAL_BASELINE_CHANGED": false,
+  "INDEPENDENT_CODEX_RECONCILIATION_REQUIRED": true
+}
