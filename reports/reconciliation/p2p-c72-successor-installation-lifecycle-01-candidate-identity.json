@@ -1,0 +1,77 @@
+{
+  "schema": "p2p-c72-successor-installation-lifecycle-candidate-identity/1",
+  "task": "P2P-C72-SUCCESSOR-INSTALLATION-LIFECYCLE-01",
+  "canonical_authority_ref": "origin/main",
+  "reconciliation_base": "origin/main",
+  "reconciliation_branch": "codex/p2p-c72-successor-installation-lifecycle-01",
+  "current_official_baseline": "8.4.7-C-codex.19",
+  "current_official_artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+  "official_baseline_changed": false,
+  "promotion_performed": false,
+  "candidate": {
+    "version": "8.4.7-C-codex.73",
+    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v73.zip",
+    "artifact_size_bytes": 2909357,
+    "artifact_sha256": "72bfbef935a41b68ebe3c7fc5464d99d2a47e849cb77e85507ceb90cdf19ef1a",
+    "hash_match": true,
+    "hash_mechanisms": [
+      "Python hashlib.sha256 over full ZIP bytes",
+      "PowerShell Get-FileHash -Algorithm SHA256"
+    ],
+    "mint_count": 1,
+    "reminted_or_overwritten": false,
+    "candidate_vs_official": "UNPROMOTED_SUCCESSOR_CANDIDATE"
+  },
+  "source_binding": {
+    "source_commit": "4fba15e47f8c7290d71992dc0f44356321080c1b",
+    "source_tree": "dff1ccbbcab439f806c4f391e3a62ac857a1e1d3",
+    "source_worktree_dir": "D:/AI/P2P_dev/P2P-upgrade-github/.tmp/p2p-c72-successor-installation-lifecycle-01",
+    "source_worktree_dirty_at_mint": false,
+    "source_commit_object": "VERIFIED",
+    "source_tree_object": "VERIFIED",
+    "source_tree_bound_to_commit": "VERIFIED",
+    "post_mint_branch_changes_are_evidence_or_governance_only": true
+  },
+  "metadata": {
+    "manifest_path": "release-manifest.json",
+    "manifest_schema": "p2p-codex-release-manifest/1",
+    "manifest_sha256": "c5c305e0561a29d77aee214e056fe7f237d6217d0a25255573dd737619b354d9",
+    "inventory_path": "INVENTORY.json",
+    "inventory_digest": "b4e657fb8e7acb5519acc933e89cda2b47bff4bc3ff66ceda5c8ed10739f0005",
+    "checksum_path": "RELEASE-SHA256SUMS.txt",
+    "checksum_set_digest": "02ef2f3f1c772f89a2e6714bd90a9f048d1155777c801ccff1e94e9ec68139ea",
+    "candidate_embedded_version": "8.4.7-C-codex.73",
+    "official_baseline_metadata_remains_separate": true
+  },
+  "archive_integrity": {
+    "total_members": 493,
+    "accounted_members": 493,
+    "unaccounted_members": 0,
+    "duplicate_paths": 0,
+    "unsafe_archive_paths": 0,
+    "absolute_archive_paths": 0,
+    "missing_expected_members": 0,
+    "inventory_match": true,
+    "checksum_match": true,
+    "checksum_mismatch_count": 0,
+    "independent_zip_structure_check": "PASS",
+    "distribution_scope_canonical": "VERIFIED",
+    "accidental_repository_dump": false,
+    "forbidden_surfaces": [
+      "/.tmp/",
+      "/reports/",
+      "/docs/plans/",
+      "/experimental/",
+      "/.p2p/",
+      "/__pycache__/",
+      ".coverage"
+    ]
+  },
+  "governance": {
+    "drift": "PASS",
+    "official_baseline_changed": "NO",
+    "candidate_is_official": "NO",
+    "approval_state": "PENDING_OWNER_REVIEW",
+    "promotion_performed": "NO"
+  }
+}
