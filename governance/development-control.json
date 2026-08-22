@@ -54,7 +54,7 @@
     "development_goal": "P2P-CANONICAL-LINEAGE-REPAIR-01",
     "goal_kind": "RECONCILIATION_NOT_PRODUCT_GOAL",
     "status": "ACTIVE_UNPROMOTED_CANDIDATE_MINT_AUTHORIZED_WITH_LIVE_MANUS_DISCLOSURE",
-    "source_version": "8.4.7-C-codex.73",
+    "source_version": "8.4.7-C-codex.74",
     "source_version_status": "ACTIVE_UNPROMOTED",
     "based_on_official_version": "8.4.7-C-codex.19",
     "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
@@ -82,10 +82,10 @@
     "owner_action_required": "Successor remains UNPROMOTED; request an independent Promotion Readiness Review only after this branch proves all gates. Official baseline remains .19.",
     "lineage_reconciliation": {
       "from_source_version": "8.4.7-C-codex.21",
-      "to_source_version": "8.4.7-C-codex.73",
+      "to_source_version": "8.4.7-C-codex.74",
       "based_on_official_version": "8.4.7-C-codex.19",
       "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-      "policy_derivation": "immediate unused successor of the clean .72 source lineage; .73 selected for the installation-lifecycle correction",
+      "policy_derivation": "immediate unused successor of the sealed .73 source lineage; .74 selected for the installed-evaluator lifecycle correction",
       "evidence_refs": [
         "E0-P0A-MATRIX1",
         "E0-P0A-MATRIX2",
@@ -93,13 +93,13 @@
       ]
     },
     "candidate_identity_binding": {
-      "status": "MINTED_UNPROMOTED_CANDIDATE",
-      "candidate_version": "8.4.7-C-codex.73",
-      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v73.zip",
-      "artifact_sha256": "72bfbef935a41b68ebe3c7fc5464d99d2a47e849cb77e85507ceb90cdf19ef1a",
-      "source_commit": "4fba15e47f8c7290d71992dc0f44356321080c1b",
-      "source_tree": "dff1ccbbcab439f806c4f391e3a62ac857a1e1d3",
-      "record_path": "reports/reconciliation/p2p-c72-successor-installation-lifecycle-01-candidate-identity.json"
+      "status": "SUCCESSOR_PENDING_MINT",
+      "candidate_version": "8.4.7-C-codex.74",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v74.zip",
+      "artifact_sha256": "TO_BE_FILLED_AFTER_MINT",
+      "source_commit": "TO_BE_FILLED_AFTER_SOURCE_FREEZE",
+      "source_tree": "TO_BE_FILLED_AFTER_SOURCE_FREEZE",
+      "record_path": "reports/reconciliation/p2p-c74-successor-eval-lifecycle-01-candidate-identity.json"
     },
     "provider_neutrality": "PRESERVED",
     "manus_native_council": {

@@ -1,7 +1,7 @@
 {
   "manifest_schema": "p2p-capability-manifest/1",
   "package_name": "p2p-uiux-capability",
-  "package_version": "8.4.7-C-codex.73",
+  "package_version": "8.4.7-C-codex.74",
   "baseline_compatibility": {
     "previous_package_version": "8.4.7-C-codex.14",
     "canonical_quorum_denominator": 8
