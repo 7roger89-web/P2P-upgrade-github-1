@@ -93,12 +93,12 @@
       ]
     },
     "candidate_identity_binding": {
-      "status": "SUCCESSOR_PENDING_MINT",
+      "status": "MINTED_UNPROMOTED_CANDIDATE",
       "candidate_version": "8.4.7-C-codex.73",
       "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v73.zip",
-      "artifact_sha256": "TO_BE_FILLED_AFTER_MINT",
-      "source_commit": "TO_BE_FILLED_AFTER_SOURCE_FREEZE",
-      "source_tree": "TO_BE_FILLED_AFTER_SOURCE_FREEZE",
+      "artifact_sha256": "72bfbef935a41b68ebe3c7fc5464d99d2a47e849cb77e85507ceb90cdf19ef1a",
+      "source_commit": "4fba15e47f8c7290d71992dc0f44356321080c1b",
+      "source_tree": "dff1ccbbcab439f806c4f391e3a62ac857a1e1d3",
       "record_path": "reports/reconciliation/p2p-c72-successor-installation-lifecycle-01-candidate-identity.json"
     },
     "provider_neutrality": "PRESERVED",

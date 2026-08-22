@@ -73,6 +73,7 @@ Matching plan items: `P3-A`, `P3-B`.
 
 - `E2-CLOSE-EVAL1`: project-owned eval suite was created through the installed eval helper and validated normally. Five case pairs completed with two baseline and two p2p trials each; baseline mean `1.0`, p2p mean `1.0`, delta `0.0`, case regressions `0`, p2p pass rate `1.0`.
 - `E2-CLOSE-DRIFT1`: derived governance was regenerated after source freeze; current governance drift is `PASS` with zero failures. Historical approval records remain semantically unchanged.
+- `E2-CLOSE-DRIFT2`: after the one-time seal, the current governance candidate binding was completed with the exact `.73` artifact SHA/source commit/source tree; `runtime-manifest.lock.json` was regenerated as derived state and drift remained `PASS`. This post-mint commit is governance/evidence-only and does not alter or remint the ZIP.
 - `E2-CLOSE-SECURITY1`: candidate package/pilot and candidate identity report secret scans returned no findings. A whole-source scan still reports two pre-existing token-shaped strings in historical documentation/tests; they are outside the candidate distribution and are disclosed, not reclassified as new findings.
 
 ### E3 closure — one sealed successor and remote proof
