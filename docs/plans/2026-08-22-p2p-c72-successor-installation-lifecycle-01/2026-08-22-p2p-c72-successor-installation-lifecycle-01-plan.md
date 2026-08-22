@@ -387,7 +387,7 @@ Manus C43, Controlled Execution Hardening, AERG, Large Goal, new framework/route
   - Work Steps: inspect disposable outputs and plan-created files; remove only dead disposable work; preserve evidence.
   - Implementation Gate: no `.72`/main/authoritative mutation.
   - Acceptance: final diff contains no rejected implementation artifact.
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: record final validation, detect-changes, commits, remote match, and exact verdict.
   - Work Steps: update ledgers, verify final hashes, run supervisor, push only successor branch, stop.
   - Implementation Gate: Pn-A and Pn-B pass or exact blocker recorded.

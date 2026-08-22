@@ -81,6 +81,7 @@ Matching plan items: `P3-A`, `P3-B`.
 - `E3-CLOSE-PACKAGE1`: fresh package verification reports `493` total members, `493` accounted, `0` unaccounted, `0` duplicates, `0` unsafe paths, `0` absolute paths, `0` missing expected members, inventory match `TRUE`, checksum match `TRUE`, checksum mismatch count `0`. Metadata hashes are recorded in `reports/reconciliation/p2p-c72-successor-installation-lifecycle-01-candidate-identity.json`.
 - `E3-CLOSE-PROVENANCE1`: source at mint was clean and bound to commit `4fba15e47f8c7290d71992dc0f44356321080c1b`, tree `dff1ccbbcab439f806c4f391e3a62ac857a1e1d3`; commit/tree objects and tree-to-commit binding were verified. Post-mint commits contain only seal/evidence/governance material.
 - `E3-CLOSE-REMOTE1`: fresh remote-derived checkout resolved local and remote branch head to `f43336c3439871968713c922ae28e0435c9d0b90`; artifact hash and package verification matched the durable seal.
+- `E3-CLOSE-PUSH2`: final evidence branch push resolved local and remote head to `03b582deeedecfdfc5a1ae44967a21ce071557c6`; a new remote-derived checkout at that head is clean and repeats candidate hash/package verification.
 
 ### E3 closure — installed adoption and technical prepare
 
