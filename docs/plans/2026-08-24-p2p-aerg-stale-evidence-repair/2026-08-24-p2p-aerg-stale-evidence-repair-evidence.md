@@ -56,23 +56,66 @@ Matching plan items: `P1-A`, `P1-B`, `P1-C`.
   happy path passed. Overall: `4` failures, all newly added discriminators;
   the prior cases passed. The edited test SHA-256 is
   `C3D462E985516387E8E57B91D69D52E83D253D4D5C8B3E83F5CD2BA055EE8187`.
-- `E1-P1B-SRC1`: pending minimal production diff.
-- `E1-P1B-GREEN1`: pending repaired five-case direct probe.
-- `E1-P1B-GREEN2`: pending focused repaired AERG/freshness tests.
-- `E1-P1B-GREEN3`: pending compile and source/hash boundary.
-- `E1-P1C-QI1`: pending actual repaired AERG result through QI.
-- `E1-P1C-FW1`: pending FW01 seam and closed-invariant regression.
+- `E1-P1B-SRC1`: production checkpoint `a10be51` changes only
+  `.p2p/system/p2p_capabilities/aerg_engine.py`: aggregate freshness from the
+  evaluated observation (`STALE` cannot be hidden by a stronger
+  `CONTRADICTED` decision), and append `STALE` whenever the observation
+  freshness derives as stale. No new state or subsystem was added.
+- `E1-P1B-GREEN1`: fresh five-case probe passed exactly:
+  `AGE_EXPIRED=STALE/INCOMPLETE/STALE`,
+  `EXPLICIT_STALE=STALE/INCOMPLETE/STALE`,
+  `STALE_CONTRADICTION=CONTRADICTED/CONTRADICTED/STALE`,
+  `FRESH_VALID=SUPPORTED/VERIFIED/CURRENT`, and
+  `QI_ACTUAL_STALE=QUALITY_UNKNOWN/checkpoint_false/STALE_EVIDENCE`.
+- `E1-P1B-GREEN2`: focused AERG reconciliation ran `17` tests with `0`
+  failures; the freshness-specific subset ran `5` with `0` failures.
+- `E1-P1B-GREEN3`: compileall exited `0`. Pre-repair AERG SHA-256 was
+  `B6B9E6750F3ABEA0975B3F888EBEC7C43D54337482262287322CB4C309A36C36`
+  as recorded by the prior checkpoint; repaired AERG SHA-256 is
+  `0B14D04B3326D88FC8DDB4EE5FD8F8C7C570F517A262749BEF5F25F196D1BE2F`.
+  The serialization assertions were added in test checkpoint `5273133`.
+- `E1-P1C-QI1`: actual repaired AERG output reaches existing QI as
+  `decision=STALE`; QI returns `QUALITY_UNKNOWN`, includes `STALE_EVIDENCE`,
+  and sets `checkpoint_allowed=False`. `quality_intelligence.py` is unchanged.
+- `E1-P1C-FW1`: FW01 retains the existing post-execution AERG/QI seam;
+  `test_checkpoint_quality_gate.py` ran `6` tests with exit `0` under the
+  package-path invocation. `p2p_fw01_loop.py` is unchanged.
 
 ## E2 - P2 Evidence
 
 Matching plan items: `P2-A`, `P2-B`.
 
-- `E2-P2A-RUN1..E2-P2A-RUN5`: pending focused behavior, reconstructed A-Z,
-  QI, FW01, and no-mutation outputs.
-- `E2-P2B-RUN1..E2-P2B-RUN5`: pending full capability, C43, RF01, compile,
-  validator classification, and protected-state checks.
+- `E2-P2A-RUN1`: focused AERG `17/17`, freshness subset `5/5`, and preserved
+  no-mutation assertion `1/1`, all exit `0`.
+- `E2-P2A-RUN2`: reconstructed baseline A-Z `26/26` plus age-only and
+  explicit-stale extensions `2/2`; total semantic coverage `28` cases.
+- `E2-P2A-RUN3`: QI `44` passed, `1` skipped, `0` failed; actual stale QI
+  boundary is `QUALITY_UNKNOWN`, `STALE_EVIDENCE`, checkpoint false.
+- `E2-P2A-RUN4`: FW01 checkpoint/integration `6/6`, exit `0`.
+- `E2-P2A-RUN5`: fresh five-case direct probe passed and compileall exited `0`.
+- `E2-P2B-RUN1`: full capability suite `352` passed, `6` skipped, `0` failed;
+  known ResourceWarnings remained non-failing.
+- `E2-P2B-RUN2`: C43 regression plus RF01 orientation/packaging `18/18`, exit
+  `0`.
+- `E2-P2B-RUN3`: framework validator `52/59`, exit `1`, with the same seven
+  inherited failures (`V01-schema-valid`, `V03-family-registered`,
+  `V05-dep-integrity`, `V09-freshness-vocab`,
+  `V06-charter-no-competitor-patterns`, `V12-origin-type-valid`, and
+  `V20-pr-lineage-declared`); `NEW_FAILURE=0`.
+- `E2-P2B-RUN4`: fresh Anvien scan exit `0`, `898` scanned, `164` parsed,
+  `0` parse failures; final detect-changes reports `0` affected files and
+  low risk, with only the known owner-dirty registry outside this lane.
+- `E2-P2B-RUN5`: `.19` remains `PROMOTED_VERIFIED`, `.74` remains
+  `SEALED_UNPROMOTED`, development status remains
+  `ACTIVE_NONCANONICAL_NO_PROMOTION`, promotion remains blocked by the
+  external private-GitHub host-protection limitation, and the independent
+  REJECT report is unchanged.
 
 ## Closure Evidence
 
-Pending until the repair checkpoint and coder handoff report exist. Supervisor
-and independent verification are explicitly not part of this plan.
+Repair checkpoints are `11c3e9e` (test-first red), `a10be51` (production
+repair), and `5273133` (serialization assertions). Coder handoff report
+`reports/coder/rp_coder_260824_174436_by_gpt-5-codex_p2p-aerg-stale-evidence-repair.md`
+and the 2026-08-24 notes-log entry are complete. The terminal state is
+`P2P_AERG_STALE_EVIDENCE_REPAIR_READY_FOR_SUPERVISOR_REVIEW`. Supervisor and
+independent verification are explicitly not part of this plan.

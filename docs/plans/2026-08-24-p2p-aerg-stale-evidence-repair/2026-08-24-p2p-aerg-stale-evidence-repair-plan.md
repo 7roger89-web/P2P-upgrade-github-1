@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-24`
-- Status: `P0 Complete / P1-A red checkpoint / P1-B pending`
+- Status: `P3 Complete / P2P_AERG_STALE_EVIDENCE_REPAIR_READY_FOR_SUPERVISOR_REVIEW`
 - Plan: `Docs/plans/2026-08-24-p2p-aerg-stale-evidence-repair/2026-08-24-p2p-aerg-stale-evidence-repair-plan.md`
 - Evidence: `Docs/plans/2026-08-24-p2p-aerg-stale-evidence-repair/2026-08-24-p2p-aerg-stale-evidence-repair-evidence.md`
 - Benchmark: `Docs/plans/2026-08-24-p2p-aerg-stale-evidence-repair/2026-08-24-p2p-aerg-stale-evidence-repair-benchmark.md`
@@ -164,7 +164,7 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
     expected pre-repair failures and left production source untouched. The
     test-only checkpoint is ready before P1-B editing.
 
-- [ ] P1-B: Add the minimal AERG stale decision derivation.
+- [x] P1-B: Add the minimal AERG stale decision derivation.
   - Goal: make stale freshness fail closed without changing the state model.
   - Scope Boundary:
     - Editable: `aerg_engine.py` decision aggregation only.
@@ -193,8 +193,10 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
   - Evidence Targets: source diff, direct before/after output, hashes.
   - Actual-status Update: record production fix and exact checkpoint.
   - Commit Boundary: commit production repair after fresh focused verification.
+  - Result: `a10be51` made the surgical correction. Fresh focused AERG was
+    `17/17`, the five-case probe passed, and compileall exited `0`.
 
-- [ ] P1-C: Prove QI/FW01 and sibling invariants unaffected.
+- [x] P1-C: Prove QI/FW01 and sibling invariants unaffected.
   - Goal: close the freshness invariant across the existing integration seam.
   - Scope Boundary:
     - Editable: none unless a fresh failing test proves required.
@@ -216,6 +218,9 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
   - Actual-status Update: sibling surfaces `bound-correct / preserve-only`.
   - Commit Boundary: include only if a needed P1-C change is proven; otherwise
     attach evidence to the P1-B repair checkpoint.
+  - Result: QI source and FW01 source remained unchanged. Actual stale AERG
+    output maps to `QUALITY_UNKNOWN/STALE_EVIDENCE` with checkpoint false, and
+    the FW01 checkpoint suite passed `6/6`.
 
 ### P2: Fresh regression and protected-state validation
 
@@ -223,7 +228,7 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
 - Phase Boundary:
   - In scope: fresh AERG/QI/FW01/full/C43/RF01/compile/validator checks.
   - Out of scope: inherited validator repair and any host/promotion action.
-- [ ] P2-A: Run focused and reconstructed behavioral validation.
+- [x] P2-A: Run focused and reconstructed behavioral validation.
   - Goal: prove direct five-case semantics, A-Z coverage, QI boundary, and
     no-mutation preservation.
   - Work Steps: run focused AERG, freshness-specific, reconstructed A-Z, QI,
@@ -232,8 +237,11 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
   - Acceptance: all required behavior passes and `NEW_FAILURE=0`.
   - Evidence Targets: `E2-P2A-RUN1..E2-P2A-RUN5`.
   - Commit Boundary: no source commit; evidence follows the repair commit.
+  - Result: focused AERG `17/17`, freshness-specific `5/5`, reconstructed
+    A-Z `26/26` plus `2` stale extensions (`28` semantic cases), QI `44/44`
+    plus `1` skip, FW01 `6/6`, and no-mutation `1/1` all pass.
 
-- [ ] P2-B: Run full regressions, compile, and protected-state checks.
+- [x] P2-B: Run full regressions, compile, and protected-state checks.
   - Goal: confirm no sibling or boundary regression.
   - Work Steps: run full capability, C43, RF01 orientation/packaging, compile,
     framework validator, Git diff/status, and governance readback.
@@ -241,11 +249,15 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
   - Acceptance: required suites pass; inherited debt remains honestly listed;
     protected state is unchanged.
   - Evidence Targets: `E2-P2B-RUN1..E2-P2B-RUN5`.
+  - Result: full capability `352/352` plus `6` skips, C43 + RF01 `18/18`,
+    compile exit `0`, and framework validator `52/59` with the same seven
+    inherited failures. Protected state and the prior independent REJECT
+    report are unchanged.
   - Commit Boundary: no source commit; evidence follows the repair commit.
 
 ### P3: Evidence and handoff
 
-- [ ] P3-A: Write coder evidence and stop at Supervisor-ready state.
+- [x] P3-A: Write coder evidence and stop at Supervisor-ready state.
   - Goal: create fresh repair evidence, hashes, report, and notes-log entry.
   - Work Steps: refresh plan evidence/benchmark/actual-status, write the coder
     report, update today's notes decision log, run detect-changes, commit the
@@ -254,6 +266,11 @@ not append a `STALE` decision. Decision aggregation therefore falls through to
   - Acceptance: exact terminal state is
     `P2P_AERG_STALE_EVIDENCE_REPAIR_READY_FOR_SUPERVISOR_REVIEW`.
   - Non-Goals: do not call Supervisor or independent verification.
+  - Result: coder report
+    `reports/coder/rp_coder_260824_174436_by_gpt-5-codex_p2p-aerg-stale-evidence-repair.md`
+    and the notes-log entry were created. The repair checkpoints are
+    `11c3e9e`, `a10be51`, and `5273133`; all requested fresh evidence is
+    recorded and the lane stops at the exact terminal state.
 
 ## Risk Notes
 

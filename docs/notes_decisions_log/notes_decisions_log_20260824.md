@@ -50,3 +50,38 @@
 - Post-review checkpoint: `c99145f3b67f33125598489030003db119facfa8`.
 - Terminal state: `P2P_AERG_POST_REVIEW_REPAIR_READY_FOR_SUPERVISOR_REREVIEW`.
 - No Supervisor review was performed in this repair lane; stop for rereview.
+
+## P2P AERG Expired-Evidence Fail-Closed Repair
+
+- Finding preserved: independent verification report
+  `430c47d868da084771afc9fbae039f4d4dda637a` rejected the stale-evidence
+  behavior because age-expired and explicit `freshness=STALE` observations
+  returned `SUPPORTED/VERIFIED/CURRENT` and could reach a QI checkpoint.
+- Test-first checkpoint: `11c3e9e` added exact age-only, explicit-stale,
+  stale-plus-contradiction, fresh, QI-boundary, and stale serialization
+  assertions. Before the production edit, `17` tests ran with `4` expected
+  new failures; production source was untouched.
+- Production repair: `a10be51` changed only AERG freshness aggregation and
+  stale decision derivation. `5273133` added direct `AERGResult.to_dict()`
+  assertions. No QI or FW01 source change was needed.
+- Repaired semantics: age-expired and explicit stale return exact
+  `STALE/INCOMPLETE/STALE`; stale plus contradiction returns
+  `CONTRADICTED/CONTRADICTED/STALE`; fresh valid remains
+  `SUPPORTED/VERIFIED/CURRENT`; actual stale reaches QI as
+  `QUALITY_UNKNOWN/STALE_EVIDENCE/checkpoint_allowed=False`.
+- Validation: focused AERG `17/17`; freshness subset `5/5`; reconstructed
+  A-Z `26/26` plus `2` explicit stale extensions (`28` total); QI `44/44` +
+  one skip; FW01 `6/6`; full capability `352/352` + six skips; C43 + RF01
+  `18/18`; compileall exit `0`; validator `52/59` with the same seven
+  inherited failures and `NEW_FAILURE=0`.
+- Protected boundary: `.19` remains `PROMOTED_VERIFIED`; `.74` remains
+  `SEALED_UNPROMOTED / NONCANONICAL`; development remains
+  `ACTIVE_NONCANONICAL_NO_PROMOTION`; `promotion.allowed=false`; CPT01-R2,
+  RF01, C43, host state, release, deployment, and Owner authority are
+  unchanged.
+- Coder report:
+  `reports/coder/rp_coder_260824_174436_by_gpt-5-codex_p2p-aerg-stale-evidence-repair.md`.
+- Terminal state:
+  `P2P_AERG_STALE_EVIDENCE_REPAIR_READY_FOR_SUPERVISOR_REVIEW`.
+- Stop boundary: no Supervisor review, independent verification, Owner
+  approval, promotion, release, deployment, or next Goal was started.
