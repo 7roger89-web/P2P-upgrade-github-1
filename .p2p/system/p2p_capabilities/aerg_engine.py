@@ -171,7 +171,7 @@ class AERGEngine:
         subject_binding = "SUBJECT_MISMATCH" if "SUBJECT_MISMATCH" in decisions else (
             "UNBOUND" if any(item["subject_binding"] == "UNBOUND" for item in observations) else "BOUND"
         )
-        freshness = "STALE" if "STALE" in decisions else (
+        freshness = "STALE" if any(item["freshness"] == "STALE" for item in observations) else (
             "UNKNOWN" if any(item["freshness"] == "UNKNOWN" for item in observations) else "CURRENT"
         )
         provenance = "INVALID" if any(item["provenance"] == "INVALID" for item in observations) else (
@@ -291,6 +291,8 @@ class AERGEngine:
         if observation.freshness not in ("CURRENT", "FRESH"):
             reasons.append("EVIDENCE_NOT_CURRENT")
             freshness = "STALE" if observation.freshness == "STALE" else "UNKNOWN"
+        if freshness == "STALE":
+            decisions.append("STALE")
 
         if not observation.subject_id:
             reasons.append("SUBJECT_BINDING_REQUIRED")
