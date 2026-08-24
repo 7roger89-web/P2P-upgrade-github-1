@@ -34,7 +34,8 @@ from . import p2p_entry as entry
 from .autopilot_budget import BudgetController, BudgetExhaustedError
 from .autopilot_contract import TaskContractBuilder
 from .autopilot_loop import (AutoPilotLoop, LoopHaltError, PreflightError,
-                             RecoveryObserver)
+                             RecoveryObserver, _assert_task_plan_compatible,
+                             _build_task_plan)
 from .autopilot_state import GoalPlan, GoalStateStore, GOAL_STATE_RELATIVE_PATH
 from .context_loop_guard import attempt_fingerprint, AttemptLog
 from .p2p_decision_runtime import (record_iteration_trace,
@@ -42,7 +43,7 @@ from .p2p_decision_runtime import (record_iteration_trace,
 from .p2p_entry import EntryContractError
 from .p2p_loop_guard import IterationRecord, LoopGuard
 from .p2p_skill_eligibility import ActivationReceiptStore, skill_eligibility_set
-from .task_state import TaskPlan, next_safe_task
+from .task_state import TaskPlan, TaskStateStore, next_safe_task
 
 FW01_STATE_RELATIVE_PATH = ".p2p/fw01.json"
 FW01_LEDGER_RELATIVE_PATH = ".p2p/fw01-state-ledger.jsonl"
@@ -185,74 +186,19 @@ def _recover_records_from_store(
     task_records: Mapping[str, Mapping[str, Any]],
     goal_id: str,
 ) -> dict[str, dict]:
-    """RECOVER: rebuild honest task statuses from the durable goal event
-    ledger after a process restart. A fresh process never trusts the
-    previous session's in-memory task records; the ledger is the only
-    durable truth. Done tasks keep their VERIFIED completion; tasks that
-    executed but never verified are marked PENDING_VERIFY (they must be
-    re-verified, never blindly re-executed)."""
-    store = GoalStateStore(root)
+    """Compatibility projection from the canonical C11 task store.
+
+    The goal ledger is not used to reconstruct the task graph. Dispatch-only
+    fields remain supplied by the caller, while status, completion, blockers,
+    and checkpoints come from ``TaskStateStore``.
+    """
+    candidate = _build_task_plan(goal_id, task_records)
+    store = TaskStateStore(root)
+    persisted = store.require()
+    _assert_task_plan_compatible(persisted, candidate, task_records)
     recs = {tid: dict(rec) for tid, rec in task_records.items()}
-    events = store.read_events().get("events", [])
-    executed_unverified: set[str] = set()
-    for ev in events:
-        if not isinstance(ev, Mapping):
-            continue
-        task_id = str(ev.get("task_id") or "").strip()
-        if task_id not in recs:
-            continue
-        name = str(ev.get("event") or "")
-        if name == "task_done":
-            details = ev.get("details") or {}
-            evidence_ref = str(details.get("evidence_ref", ""))
-            rec = recs[task_id]
-            rec["status"] = "DONE"
-            rec["blocker"] = None
-            rec["owner_decision"] = None
-            rec["completion"] = {
-                "status": "VERIFIED",
-                "evidence_refs": [evidence_ref] if evidence_ref else list(rec.get("required_evidence", ())),
-                "evidence_fingerprints": {},
-            }
-            executed_unverified.discard(task_id)
-        elif name == "task_verified":
-            # Honest verifier-anchored completion: the goal event ledger
-            # records task_verified (not task_done) as the persistence
-            # surface for a completed, verified task.
-            details = ev.get("details") or {}
-            if str(details.get("status", "")).upper() in ("VERIFIED",):
-                evidence_ref = str(details.get("evidence_ref", ""))
-                rec = recs[task_id]
-                required = tuple(rec.get("required_evidence", ())) or (
-                    (evidence_ref,) if evidence_ref else ())
-                rec["status"] = "DONE"
-                rec["blocker"] = None
-                rec["owner_decision"] = None
-                fps = {}
-                for ref in required:
-                    if ref == evidence_ref:
-                        fps[ref] = _sha256("verified-evidence:" + evidence_ref)
-                    else:
-                        fps[ref] = _sha256("derived-evidence:" + ref)
-                rec["completion"] = {
-                    "status": "VERIFIED",
-                    "evidence_refs": list(required),
-                    "candidate_state_fingerprint": _sha256(
-                        "completion:" + str(task_id) + ":" + evidence_ref),
-                    "evidence_fingerprints": fps,
-                }
-            executed_unverified.discard(task_id)
-        elif name == "task_executed":
-            executed_unverified.add(task_id)
-    for task_id in executed_unverified:
-        if recs[task_id].get("status", "") != "DONE":
-            recs[task_id]["status"] = "BLOCKED"
-            recs[task_id]["blocker"] = {
-                "reason": "EXECUTION_WITHOUT_VERIFICATION",
-                "note": "task executed in a previous session that did not "
-                        "persist verification; requires re-verification, "
-                        "never blind re-execution",
-            }
+    for task_id, task in persisted.tasks.items():
+        recs[task_id].update(task.to_dict())
     return recs
 
 
@@ -343,22 +289,38 @@ def build_fw01_loop(
 ) -> "Fw01Loop":
     """Compose the canonical loop from existing machinery.
     RECOVER/REUSE only: every component here is an existing P2P class."""
+    if set(str(item) for item in goal_plan.plan_task_ids) != set(task_records):
+        raise RuntimeError("GOAL_TASK_PLAN_ID_MISMATCH")
+
+    # C11 is the only durable task graph. First composition initializes it;
+    # every later composition must prove immutable intent and dispatch
+    # descriptor identity before the loop can be constructed. Goal identity
+    # is checked first so a rejected intent cannot leave a new task state
+    # beside an existing goal state.
     store = GoalStateStore(root)
     loaded = store.load()
+    if loaded is not None and loaded.goal_id != goal_plan.goal_id:
+        raise RuntimeError("GOAL_ID_MISMATCH: existing durable state belongs "
+                           f"to {loaded.goal_id}, intent is {goal_plan.goal_id}")
+
+    # Build and validate the candidate before any new durable state is
+    # created. Existing C11 state is also checked before a goal transition.
+    task_state_store = TaskStateStore(root)
+    candidate_task_plan = _build_task_plan(
+        goal_plan.goal_id, task_records, bind_execution_descriptors=True)
+    existing_task_plan = task_state_store.load()
+    if existing_task_plan is not None:
+        _assert_task_plan_compatible(existing_task_plan, candidate_task_plan,
+                                     task_records)
+
     if loaded is None:
         store.initialize(goal_plan)
         store.transition("APPROVED")
-    elif loaded.goal_id != goal_plan.goal_id:
-        raise RuntimeError("GOAL_ID_MISMATCH: existing durable state belongs "
-                           f"to {loaded.goal_id}, intent is {goal_plan.goal_id}")
     elif loaded.status == "PLANNED":
         # Owner intent was recorded after planning; approve now.
         store.transition("APPROVED")
-    if loaded is not None and loaded.status != "PLANNED":
-        # Fresh process restart: recover task statuses from the durable
-        # goal event ledger, never from the previous session's memory.
-        task_records = _recover_records_from_store(root, task_records,
-                                                   goal_plan.goal_id)
+    if existing_task_plan is None:
+        task_state_store.initialize(candidate_task_plan)
     budget = budget or BudgetController()
     builder = TaskContractBuilder(
         goal_id=goal_plan.goal_id,
@@ -374,6 +336,7 @@ def build_fw01_loop(
         verifier=verifier,
         builder=builder,
         task_records={str(k): dict(v) for k, v in task_records.items()},
+        task_state_store=task_state_store,
         owner_gate_resolver=owner_gate_resolver,
     )
     return Fw01Loop(root=root, loop=inner, builder=builder,
@@ -543,7 +506,7 @@ class Fw01Loop:
                 pass
             return _fw05_done
 
-        rec = self.loop._task_records.get(task_id, {})
+        rec = self.loop.task_record(task_id)
 
         # Skill eligibility (read-only; activation receipt only on use).
         eligible = self.eligible_skills()
@@ -907,7 +870,7 @@ class Fw01Loop:
 
         status = outcome.get("status")
         evidence = outcome.get("evidence") or {}
-        done_tasks = {t for t, r in self.loop._task_records.items()
+        done_tasks = {t for t, r in self.loop.task_records().items()
                       if r.get("status") == "DONE"}
 
         # P2P-FRAMEWORK-04 — durable execution-evidence derivation (seam A
@@ -924,8 +887,7 @@ class Fw01Loop:
             from p2p_capabilities.autopilot_state import GoalStateStore  # noqa: E402
             _fw04_store_events = (
                 GoalStateStore(self.root).read_events().get("events") or [])
-            _fw04_task_rec = dict(self.loop._task_records.get(
-                str(task_id), {}))
+            _fw04_task_rec = self.loop.task_record(str(task_id))
         except Exception:  # noqa: BLE001 - never blocks the loop
             pass
         # The goal-ledger events store the verifier status and evidence

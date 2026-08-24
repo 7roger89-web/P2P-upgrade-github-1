@@ -482,15 +482,15 @@ class SeamACheckpointTests(unittest.TestCase):
             # well; the pre-step quality checkpoint is the behavior under
             # test, while this explicit DONE state makes the no-selection
             # assertion independent of the generic builder's fixture mode.
-            fresh_loop.loop._task_records["task-a"].update({
-                "status": "DONE",
-                "completion": {
-                    "status": "VERIFIED",
-                    "evidence_refs": ["ev-a"],
-                    "done_when": ["ev-a"],
-                    "candidate_state_fingerprint": "a" * 64,
-                    "evidence_fingerprints": {"ev-a": "b" * 64},
-                },
+            task_store = fresh_loop.loop._task_state_store
+            task_store.transition("task-a", "ACTIVE",
+                                  preflight={"status": "PASS"})
+            task_store.transition("task-a", "DONE", completion={
+                "status": "VERIFIED",
+                "evidence_refs": ["ev-a"],
+                "done_when": ["ev-a"],
+                "candidate_state_fingerprint": "a" * 64,
+                "evidence_fingerprints": {"ev-a": "b" * 64},
             })
             comp2 = _make_composition_pass()
             try:
@@ -509,52 +509,38 @@ class SeamACheckpointTests(unittest.TestCase):
             self.assertIsNone(fresh_loop.loop.select_next_safe_task())
         finally:
             _remove_root(root2)
-        # Cross-session recovery: a fresh process rebuilds honest task
-        # statuses from the durable goal-event ledger only. With the
-        # verified ledger produced above, task-a recovers as DONE
-        # (never re-executed).
+        # Cross-session recovery: a fresh process reads honest task status
+        # from the canonical C11 store, not from the goal-event ledger.
+        recovery_record = dict(_task(
+            "t", skills=("skill_a",), team=("role_dev",),
+            required_capabilities=("task_state_store",
+                                    "decision_trace",
+                                    "permission_profile_verification")))
+        recovery_record.update({"task_id": "task-a",
+                                "goal_id": "p2p-goals-v003"})
         from p2p_capabilities.p2p_fw01_loop import (  # noqa: E402
             _recover_records_from_store)
         recovered = _recover_records_from_store(
             self.root,
-            {"task-a": {"task_id": "task-a", "status": "READY",
-                        "skills": ("skill_a",), "team": (),
-                        "required_capabilities": (),
-                        "permission_needs": ("write",),
-                        "risk_class": "LOW",
-                        "mutation_class": "READ_ONLY",
-                        "required_evidence": ("ev-a",),
-                        "scope": ("test-scope",),
-                        "goal_id": "p2p-goals-v003",
-                        "acceptance_requirements": ()}},
+            {"task-a": recovery_record},
             "p2p-goals-v003")
         self.assertEqual(recovered["task-a"]["status"], "DONE")
-        # Honest fail-closed recovery: when the ledger records an
-        # execution that never persisted verification, the recovered
+        # Honest fail-closed recovery: when the canonical task state records
+        # an execution that never persisted verification, the recovered
         # record is BLOCKED and must never be blind re-executed.
         root2 = _make_root()
         try:
-            _write_ledger(root2, [{"event": "goal_plan_initialized",
-                                   "goal_id": "p2p-goals-v003",
-                                   "at": _now(),
-                                   "details": {"title": "t",
-                                               "purpose": "d"}},
-                                  {"event": "task_executed",
-                                   "task_id": "task-a",
-                                   "at": _now(),
-                                   "details": {}}])
+            uncertain_loop = _build_loop(root2)
+            uncertain_store = uncertain_loop.loop._task_state_store
+            uncertain_store.transition("task-a", "ACTIVE",
+                                        preflight={"status": "PASS"})
+            uncertain_store.transition("task-a", "BLOCKED", blocker={
+                "reason": "EXECUTION_WITHOUT_VERIFICATION",
+                "note": "never blind re-execution",
+            })
             recovered_unverified = _recover_records_from_store(
                 root2,
-                {"task-a": {"task_id": "task-a", "status": "READY",
-                            "skills": ("skill_a",), "team": (),
-                            "required_capabilities": (),
-                            "permission_needs": ("write",),
-                            "risk_class": "LOW",
-                            "mutation_class": "READ_ONLY",
-                            "required_evidence": ("ev-a",),
-                            "scope": ("test-scope",),
-                            "goal_id": "p2p-goals-v003",
-                            "acceptance_requirements": ()}},
+                {"task-a": recovery_record},
                 "p2p-goals-v003")
             self.assertEqual(
                 recovered_unverified["task-a"]["status"], "BLOCKED")
