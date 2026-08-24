@@ -106,6 +106,9 @@ class AERGMatrixTests(unittest.TestCase):
         claim_text = "original claim: no files changed"
         result = self.evaluate(claim_text, evidence=observation(mutation_state="MUTATED", changed_paths=("src/a.py",)))
         self.assertEqual(result.original_claim, claim_text)
+        self.assertEqual(result.decision, "CONTRADICTED")
+        self.assertEqual(result.contradiction, "CONTRADICTED")
+        self.assertIn("MUTATION_CONTRADICTS_NO_MUTATION", result.reasons)
         contract = result.to_dict()
         self.assertEqual(contract["original_claim"], claim_text)
         self.assertEqual(contract["evidence_refs"], ["evidence/aerg-proof.json"])
