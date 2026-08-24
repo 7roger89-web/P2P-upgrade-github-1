@@ -9,6 +9,7 @@ optional ``aerg_result`` parameter.
 """
 
 from datetime import datetime, timedelta, timezone
+from functools import wraps
 import shutil
 import subprocess
 import sys
@@ -186,6 +187,65 @@ class RequiredEvaluationFailClosedTests(unittest.TestCase):
                                  verdict)
                 self.assertIn(failure, verdict["quality_failures"], verdict)
                 self.assertFalse(verdict["checkpoint_allowed"], verdict)
+
+
+class Fw01ProductionQualityCheckpointTests(unittest.TestCase):
+    def test_real_production_qi_fresh_execution_reaches_checkpoint(self):
+        """Bind the real FW01 -> AERG -> QI -> checkpoint path.
+
+        The wrapper calls the production QI implementation and records its
+        actual verdict only to make the RED state observable.  The expected
+        tuple intentionally includes the canonical execution projection so
+        the pre-repair failure reports both the status mismatch and the
+        resulting durable QUALITY_REVIEW/BLOCKED checkpoint.
+        """
+        root = _make_repo_local_root()
+        composition_original = _make_composition_pass()
+        qi_original = qi.build_quality_verdict
+        captured = {}
+
+        @wraps(qi_original)
+        def observe_qi(*args, **kwargs):
+            verdict = qi_original(*args, **kwargs)
+            captured["kwargs"] = dict(kwargs)
+            captured["verdict"] = dict(verdict)
+            return verdict
+
+        qi.build_quality_verdict = observe_qi
+        try:
+            output = _build_loop(root).step()
+            checkpoint = _last_checkpoint(root)
+        finally:
+            qi.build_quality_verdict = qi_original
+            _restore_composition(composition_original)
+            _remove_repo_local_root(root)
+
+        aerg_result = captured["kwargs"].get("aerg_result") or {}
+        observed = (
+            captured["kwargs"].get("execution_status"),
+            captured["verdict"].get("quality_status"),
+            captured["verdict"].get("checkpoint_allowed"),
+            aerg_result.get("decision"),
+            aerg_result.get("status"),
+            aerg_result.get("freshness"),
+            output.get("status"),
+            checkpoint.get("verification_state") if checkpoint else None,
+            checkpoint.get("loop_status") if checkpoint else None,
+        )
+        self.assertEqual(
+            observed,
+            (
+                "SUCCESS",
+                "QUALITY_VERIFIED",
+                True,
+                "SUPPORTED",
+                "VERIFIED",
+                "CURRENT",
+                "TASK_DONE_CONTINUE",
+                "VERIFIED",
+                "CHECKPOINTED",
+            ),
+        )
 
 
 class Fw01CompatibilityFailClosedTests(unittest.TestCase):
