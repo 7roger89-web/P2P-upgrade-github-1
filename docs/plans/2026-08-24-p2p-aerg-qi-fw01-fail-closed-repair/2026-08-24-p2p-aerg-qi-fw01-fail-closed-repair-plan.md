@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-24`
-- Status: `in_progress`
+- Status: `ready_for_supervisor_review`
 - Plan: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-plan.md`
 - Evidence: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-evidence.md`
 - Benchmark: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-benchmark.md`
@@ -82,7 +82,7 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - P1-A: Add and run RED QI non-proof-status matrix.
   - P1-B: Add narrow fail-closed required-status classification.
 
-- [ ] P1-A: Add and run RED QI non-proof-status matrix
+- [x] P1-A: Add and run RED QI non-proof-status matrix
   - Goal: prove that required non-proof and unknown statuses currently reach the unsafe verified branch.
   - Scope Boundary:
     - Editable: `.p2p/system/p2p_capabilities/tests/test_aerg_qi_fw01_fail_closed.py`.
@@ -128,7 +128,7 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - Actual-status Update: classify test coverage as bound and the production QI surface as still wrong until P1-B.
   - Commit Boundary: separate RED checkpoint commit before any production edit.
 
-- [ ] P1-B: Add narrow fail-closed required-status classification
+- [x] P1-B: Add narrow fail-closed required-status classification
   - Goal: classify required evaluation results as proof, known failure, known non-proof, unavailable, or unknown without changing optional semantics.
   - Scope Boundary:
     - Editable: `.p2p/system/p2p_capabilities/quality_intelligence.py`.
@@ -186,7 +186,7 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - P2-A: Add and run RED FW01 compatibility matrix.
   - P2-B: Add narrow actual-AERG safety clamp.
 
-- [ ] P2-A: Add and run RED FW01 compatibility matrix
+- [x] P2-A: Add and run RED FW01 compatibility matrix
   - Goal: execute the real FW01 step path with a QI callable lacking `aerg_result` and prove stale AERG can currently be checkpointed unsafely.
   - Scope Boundary:
     - Editable: the new repair test file only.
@@ -232,7 +232,7 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - Actual-status Update: preserve current QI path and mark FW01 compatibility seam as wrong until clamp repair.
   - Commit Boundary: separate FW01 RED checkpoint commit if not included in P1-A; otherwise retain one clearly scoped RED checkpoint.
 
-- [ ] P2-B: Add narrow actual-AERG safety clamp
+- [x] P2-B: Add narrow actual-AERG safety clamp
   - Goal: require the actual AERG result to prove current supported evidence before accepting any compatibility QI checkpoint.
   - Scope Boundary:
     - Editable: `.p2p/system/p2p_capabilities/p2p_fw01_loop.py`.
@@ -290,7 +290,7 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - P3-A: Run final regressions and preservation checks.
   - P3-B: Write coder/problem reports and handoff terminal.
 
-- [ ] P3-A: Run final regressions and preservation checks
+- [x] P3-A: Run final regressions and preservation checks
   - Goal: establish fresh test, compile, validator, protected-state, and audit-history evidence.
   - Scope Boundary:
     - Editable: evidence/benchmark/actual-status report artifacts only.
@@ -336,10 +336,10 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - Actual-status Update: final classifications and handoff readiness.
   - Commit Boundary: report/evidence commit only after all required validation passes.
 
-- [ ] P3-B: Write coder/problem reports and handoff terminal
+- [x] P3-B: Write coder/problem reports and handoff terminal
   - Goal: provide a precise repair handoff without performing the forbidden review/approval actions.
   - Scope Boundary:
-    - Editable: `reports/coder/`, `reports/problem/`, today’s notes log, and this plan’s evidence/benchmark/actual-status files.
+    - Editable: `reports/coder/`, `reports/problem/`, `docs/notes_decisions_log/`, and this plan’s evidence/benchmark/actual-status files.
     - Inspect-only: production source and protected state.
     - Preserve-only: all prior reports and audit history.
     - Out of scope: Supervisor report or independent-verification report.
@@ -389,3 +389,12 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
 - Compatibility callables may return incomplete or malformed verdict mappings; the FW01 clamp must fail closed without inventing a second state machine.
 - The full capability suite is long-running; communicate bounded progress and preserve exact exit codes.
 - The seven validator failures are inherited framework debt and must not be reclassified as new or repaired in this scope.
+
+## Final Handoff State
+
+- Current HEAD: `0910b18a215a4b8bae0c8b0d90da0f692067d5cb` on `codex/p2p-post74-development-01`.
+- Production repair commits: `ce641d6` (QI required-status classifier), `cbf7af9` (FW01 AERG safety clamp and fresh-observation ordering).
+- Test/evidence commits: `7e6b29f` (plan), `0ba5f39` (RED), `0910b18` (actual-AERG QI mapping regression).
+- Final measured capability result: `360 tests`, `OK`, `6 skipped`, exit `0`.
+- Final terminal: `P2P_AERG_QI_FW01_FAIL_CLOSED_REPAIR_READY_FOR_SUPERVISOR_REVIEW`.
+- Supervisor review, independent verification, Owner approval, promotion, release, deployment, and host mutation remain unperformed and out of scope.

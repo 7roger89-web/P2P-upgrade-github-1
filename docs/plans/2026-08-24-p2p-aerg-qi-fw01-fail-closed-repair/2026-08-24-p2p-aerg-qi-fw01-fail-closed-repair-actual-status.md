@@ -2,7 +2,7 @@
 
 Title: P2P AERG QI/FW01 Fail-Closed Repair
 Date: 2026-08-24
-Status: P0 Complete
+Status: P3 Complete — Ready for Supervisor Review
 Companion plan: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-plan.md`
 Companion evidence: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-evidence.md`
 Companion benchmark: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-benchmark.md`
@@ -56,18 +56,29 @@ Anvien refreshed the current Git worktree successfully. The index contains dupli
 | AERG engine freshness/aggregation | Current source preserves stale/contradiction semantics and fresh path | stale/contradiction closed with observable freshness | correct | preserve-only | E0-P0A-SRC1 | preserve through P1/P2 |
 | AERG model serialization | Current result serialization preserves decision/status/freshness | serialized stale truth remains stale | correct | preserve-only | E0-P0A-SRC1 | preserve through P1/P2 |
 | QI actual AERG-result mapping | Current stale/contradicted/scope-mismatch/insufficient mapping exists | actual AERG results remain fail-closed | correct | unavailable in graph | E0-P0A-SRC1 | preserve and regress |
-| QI generic required-evaluation classification | STALE/EXPIRED/WARN/UNKNOWN and unknown strings fall through as proof | only explicit proof statuses may verify; all non-proof/unknown block | wrong | unavailable in graph | E0-P0A-SRC1 | edit P1-A/P1-B |
+| QI generic required-evaluation classification | explicit proof allowlist; non-proof and unknown required statuses block | only explicit proof statuses may verify; all non-proof/unknown block | correct | unavailable in graph | E1-P1B-SRC1, E1-P1B-TEST1 | preserve optional semantics |
 | FW01 current QI seam | Current callable with `aerg_result` blocks stale AERG | current path remains fail-closed | correct | unavailable in graph | E0-P0A-SRC1 | preserve and regress |
-| FW01 compatibility seam | Signature omission drops actual AERG result and trusts affirmative compatibility verdict | compatibility shape cannot weaken AERG safety | wrong | unavailable in graph | E0-P0A-SRC1 | edit P2-A/P2-B |
+| FW01 compatibility seam | Post-QI clamp independently requires actual safe/current/bound/contract-supporting AERG result | compatibility shape cannot weaken AERG safety | correct | unavailable in graph | E2-P2B-SRC1, E2-P2B-TEST1 | preserve fresh compatibility behavior |
 | Protected governance/candidate/release state | `.19` promoted, `.74` sealed/unpromoted, promotion false, CPT01-R2 host blocked | unchanged | correct | preserve-only | E0-P0A-STATE1 | do not touch |
 | Prior independent REJECT reports | current and prior REJECT artifacts exist and are unchanged | immutable audit history | correct | preserve-only | E0-P0A-REPORT1 | do not touch |
 | Framework validator | 52/59 with seven named inherited failures | same seven inherited failures; no whole-framework PASS | correct as inherited debt | preserve-only | E0-P0A-STATE1 | do not repair; recheck P3 |
+
+Final status at handoff (appended after the R0/R1 classifications above):
+
+| Unit | Final State | Required State | Status | Evidence | Handoff Constraint |
+|------|-------------|----------------|--------|----------|-------------------|
+| QI generic required-evaluation classification | Explicit proof allowlist; non-proof and unknown required statuses block | only explicit proof statuses may verify; all non-proof/unknown block | correct | E1-P1B-SRC1, E1-P1B-TEST1 | preserve optional distinction |
+| FW01 compatibility seam | Post-QI clamp requires actual safe/current/bound/contract-supporting AERG result | compatibility shape cannot weaken AERG safety | correct | E2-P2B-SRC1, E2-P2B-TEST1 | preserve fresh compatibility behavior |
+| AERG engine/model and serialization | unchanged source; stale/contradiction truth remains observable | preserve existing semantics | correct/preserve-only | E3-P3A-PROOF1 | no sibling edits |
+| Protected governance and audit history | unchanged protected state and prior REJECT reports | immutable in this task | correct/preserve-only | E3-P3A-PROOF1 | no Supervisor/Owner/host action |
 
 ## Status Refresh Log
 
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-24 | current HEAD `6e531896` before repair | QI/FW01/AERG sibling boundary | QI generic path `wrong`; FW01 compatibility path `wrong`; AERG engine/model/current QI/protected state `correct` or preserve-only | E0-P0A-GIT1..E0-P0A-STATE1 | proceed to RED tests; keep production scope to two files |
+| R1 | 2026-08-24 | `ce641d6` after QI repair | QI required-status classifier | generic QI path `wrong -> correct`; current AERG mapping preserved; optional semantics preserved | E1-P1B-SRC1, E1-P1B-TEST1 | proceed to FW01 repair; no sibling edits |
+| R2 | 2026-08-24 | `0910b18` after FW01/test repair and final regressions | QI/FW01 boundary and protected/audit scope | FW01 compatibility path `wrong -> correct`; all repaired surfaces correct; seven validator classes remain inherited | E2-P2B-SRC1, E2-P2B-TEST1, E3-P3A-TEST1, E3-P3A-PROOF1 | hand off for separate Supervisor review; no approval/promotion |
 
 ## Phase Touch Map
 
@@ -81,6 +92,10 @@ Anvien refreshed the current Git worktree successfully. The index contains dupli
 | prior REJECT reports | coder/problem handoff | audit history | P3 | preserve-only | E0-P0A-REPORT1 | no overwrite or deletion |
 
 ## Detailed Findings
+
+The two subsections below preserve the R0 pre-repair defect descriptions for
+audit continuity. The current status is recorded in the final-status table and
+R1/R2 refresh rows above.
 
 ### QI generic required-evaluation classification
 
@@ -175,7 +190,7 @@ Do not redesign compatibility API, add a second verifier, or make the clamp a hi
 - [x] Blockers are recorded: Anvien hidden-path projection limitation only; direct source/runtime evidence remains available.
 - [x] Next phase status assumptions and actions are updated from P0.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] Affected rows refreshed after implementation slices.
+- [x] Affected rows refreshed after implementation slices.
 
 ## Final P0 Decision
 
