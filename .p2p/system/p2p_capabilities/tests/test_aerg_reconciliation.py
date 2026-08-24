@@ -116,6 +116,46 @@ class AERGMatrixTests(unittest.TestCase):
         self.assertEqual(contract["can_release"], False)
         self.assertEqual(contract["can_deploy"], False)
 
+    def test_age_expired_evidence_is_stale_and_not_verified(self):
+        result = self.evaluate(
+            "tests PASS",
+            evidence=observation(observed_at="2026-08-24T11:50:00+00:00"),
+        )
+        self.assertEqual(result.decision, "STALE")
+        self.assertEqual(result.status, "INCOMPLETE")
+        self.assertEqual(result.freshness, "STALE")
+        self.assertIn("EVIDENCE_EXPIRED", result.reasons)
+        self.assertNotEqual(result.status, "VERIFIED")
+
+    def test_explicit_stale_metadata_is_stale_and_not_verified(self):
+        result = self.evaluate(
+            "tests PASS",
+            evidence=observation(freshness="STALE"),
+        )
+        self.assertEqual(result.decision, "STALE")
+        self.assertEqual(result.status, "INCOMPLETE")
+        self.assertEqual(result.freshness, "STALE")
+        self.assertIn("EVIDENCE_NOT_CURRENT", result.reasons)
+        self.assertNotEqual(result.status, "VERIFIED")
+
+    def test_stale_contradiction_keeps_contradiction_precedence(self):
+        result = self.evaluate(
+            "tests PASS",
+            evidence=observation(
+                observed_at="2026-08-24T11:50:00+00:00",
+                exit_code=1,
+            ),
+        )
+        self.assertEqual(result.decision, "CONTRADICTED")
+        self.assertEqual(result.contradiction, "CONTRADICTED")
+        self.assertEqual(result.freshness, "STALE")
+
+    def test_fresh_valid_evidence_remains_supported(self):
+        result = self.evaluate("tests PASS", evidence=observation())
+        self.assertEqual(result.decision, "SUPPORTED")
+        self.assertEqual(result.status, "VERIFIED")
+        self.assertEqual(result.freshness, "CURRENT")
+
     def test_contradiction_precedes_stale_and_insufficient(self):
         result = self.evaluate(
             "tests PASS",
@@ -177,6 +217,24 @@ class AERGQualityIntegrationTests(unittest.TestCase):
             aerg_result=result.evaluate_claim(claim.claim_id).as_quality_input(),
         )
         self.assertEqual(verdict["quality_status"], "QUALITY_REJECTED")
+        self.assertFalse(verdict["checkpoint_allowed"])
+
+    def test_quality_intelligence_rejects_actual_stale_aerg_result(self):
+        result = AERGEngine(subject(), now=NOW)
+        claim = result.create_claim("tests PASS")
+        result.add_evidence(
+            claim.claim_id,
+            observation(observed_at="2026-08-24T11:50:00+00:00"),
+        )
+        aerg_result = result.evaluate_claim(claim.claim_id)
+        self.assertEqual(aerg_result.decision, "STALE")
+        verdict = qi.build_quality_verdict(
+            "SUCCESS",
+            required_eval_results={},
+            aerg_result=aerg_result.as_quality_input(),
+        )
+        self.assertEqual(verdict["quality_status"], "QUALITY_UNKNOWN")
+        self.assertIn("STALE_EVIDENCE", verdict["quality_failures"])
         self.assertFalse(verdict["checkpoint_allowed"])
 
     def test_quality_intelligence_does_not_upgrade_unknown(self):
