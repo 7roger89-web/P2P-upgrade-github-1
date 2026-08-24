@@ -65,11 +65,21 @@ Matching plan item(s): `P2-A`, `P2-B`, `P2-C`
 
 Closure evidence will be appended with exact IDs after verification:
 
-- `E2-P2A-TEST1..E2-P2A-IMMUTABLE3`: focused tests, framework validation, syntax/diff checks, and sealed subject rechecks.
-- `E2-P2A-ANV1..E2-P2A-DETECT1`: final Anvien graph and detect-changes evidence.
-- `E2-P2B-SUP1`: supervisor review report and verdict.
-- `E2-P2C-CLOSE1..E2-P2C-CLOSE3`: final worktree, commit, report, and terminal boundary evidence.
+- `E2-P2A-TEST1`: `python -m unittest discover -s tests -p "test_p2p_orientation*.py" -v` passes 9/9; JSON/framework assertions, control-record validator, Python compile, PowerShell AST parse, LF-normalized Bash parse, `git diff --check`, and README deep-link checks pass.
+- `E2-P2A-BASELINE1`: full `scripts/validate_p2p_development_framework.py` remains blocked at the pre-existing `capabilities[175]` schema defect and then its legacy duplicate-ID error; full charter tests are 32 passed / 8 failed on the same inherited `capability_id`/`SHIPPED`/159-vs-176 conditions. No RF01 source caused these failures.
+- `E2-P2A-IMMUTABLE1`: sealed `.74` artifact remains SHA-256 `2b82dea10695abb1c99253be1205728335a114df42cececde2fcca5c1727fd12`; source commit `4eafc3ccb6de52f2b5f9b9b75b754c9d9a2a9b53` is the direct parent of closure `54d15cb02b04a0fea35fb7d2fd0af1fd564bb264`; `merge-base --is-ancestor` exits 0.
+- `E2-P2A-IMMUTABLE2`: historical `source/8.4.6-C/README.md` and `README.en.md` hashes equal their HEAD blobs; closure-to-subject diff contains no sealed path; target `.tmp` contains zero ZIP/release metadata artifacts. The legacy root sealed worktree has a pre-existing missing-object condition, while its branch ref remains textually bound to closure `54d15cb...`; RF01 did not write there.
+- `E2-P2A-ANV1`: post-implementation target-only `anvien analyze --force` reports 872 scanned files, 163 parsed code files, 0 failures, 37,029 graph nodes, and 42,804 relationships.
+- `E2-P2A-DETECT1`: pre-P1-C `anvien detect-changes --repo <RF01 worktree> --scope all` reports eight staged changed files, five affected files, zero affected processes, and overall LOW risk; package builder impact remains separately recorded as HIGH and list-only.
+- `E2-P2B-SUP1`: [`reports/supervisor/rp_supervisor_260824_rf01-readme-first-development-framework.md`](../../../reports/supervisor/rp_supervisor_260824_rf01-readme-first-development-framework.md) records zero-trust scoped verdict `P2P_RF01_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF` with inherited baseline and host blockers preserved.
+- `E2-P2C-CLOSE1`: coder report is [`reports/coder/rp_coder_260824__rf01-readme-first-development-framework.md`](../../../reports/coder/rp_coder_260824__rf01-readme-first-development-framework.md); implementation commits are `579a711`, `be7ff40`, and `e00bdc7`.
+- `E2-P2C-CLOSE2`: intended RF01 paths are clean after `e00bdc7`; unrelated Windows `core.autocrlf` stat-noise under `.agents/.claude/AGENTS.md/.gitignore` is preserved and was never staged.
+- `E2-P2C-CLOSE3`: no release build, install, promotion, deployment, merge, publish, GitHub host mutation, external communication, or C43 execution occurred.
+- `E2-P2C-CLOSE4`: final target-only graph refresh after adding the two review reports reports 874 scanned files, 163 parsed code files, 0 failures, 37,045 graph nodes, and 42,822 relationships; final staged `anvien detect-changes` reports six documentation/report changed files, six affected documentation files, no affected processes, LOW risk, and no resolution-gap delta.
 
 ## Closure Evidence
 
-Pending until P1/P2 implementation and supervisor review. No release artifact, promotion mutation, host configuration mutation, or external communication is authorized by this plan.
+RF01 closure is complete at the scoped development-plane level with
+`P2P_RF01_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF`. No release artifact, promotion
+mutation, host configuration mutation, external communication, or C43 start is
+authorized by this plan.

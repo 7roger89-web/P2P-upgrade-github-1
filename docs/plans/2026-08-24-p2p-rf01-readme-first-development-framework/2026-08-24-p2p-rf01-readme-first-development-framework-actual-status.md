@@ -2,14 +2,14 @@
 
 Title: RF01 README-First Project Orientation + Development Framework Revision
 Date: 2026-08-24
-Status: P1-C Complete / P2 Pending
+Status: RF01 Complete / Hard Stop at Independent Review Handoff
 Companion plan: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-plan.md`
 Companion evidence: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-evidence.md`
 Companion benchmark: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-benchmark.md`
 
 ## Purpose
 
-This file records the real current state before RF01 implementation. P0 is complete only for the new worktree and only for the scoped orientation/framework slice. It does not authorize release, promotion, host mutation, or edits to sealed `.74` material.
+This file records the real current state through RF01 closure. P0/P1/P2 are complete only for the new worktree and only for the scoped orientation/framework slice. It does not authorize release, promotion, host mutation, or edits to sealed `.74` material.
 
 ## Freshness / Refresh Rules
 
@@ -72,6 +72,7 @@ Out of scope:
 | `.19` canonical baseline | official `.19` with existing SHA and promotion state | unchanged and still canonical | correct/preserve-only | `E0-P0A-AUTH1` | preserve |
 | Sealed `.74` source/closure/artifact | exact subject recovered and linked | unchanged; no RF01 mutation | correct/preserve-only | `E0-P0A-SRC1..SRC3` | preserve |
 | CPT01-R2 | implemented but host capability blocked | preserved; no R3/bypass | correct/preserve-only | `E0-P0A-AUTH1` | preserve |
+| RF01 scoped implementation | README/framework/package/install changes reviewed and locally verified | independent review handoff; no release/promotion | correct at development-plane scope | `E2-P2A-TEST1..E2-P2B-SUP1` | stop here |
 
 ## Status Refresh Log
 
@@ -80,6 +81,7 @@ Out of scope:
 | R0 | 2026-08-24 | closure `54d15cb02b04a0fea35fb7d2fd0af1fd564bb264` in new worktree before RF01 implementation | full RF01 target scope | initial classifications recorded | `E0-P0A-SRC1..E0-P0A-WF1` | P1-A/P1-B/P1-C proceed in order; preserve high-risk surfaces |
 | R1 | 2026-08-24 | commits `579a711` plus staged P1-B scope in RF01 worktree | README/updater/tests and framework/governance projection | missing/partial -> correct for P1-A/P1-B; package/install remain partial | `E1-P1A-ORIENT1..E1-P1B-BASELINE1` | P1-C remains list-only; inherited ledger gate remains explicit blocker |
 | R2 | 2026-08-24 | P1-C source edits in RF01 worktree after fresh Anvien refresh | package/install availability and README mutation boundary | partial -> correct; no release/install execution | `E1-P1C-PKG1..E1-P1C-GR1` | P2 verification and supervisor review; inherited ledger and host blockers remain |
+| R3 | 2026-08-24 | subject `e00bdc7571483bc0daf0a9794bbd2db249e1e8ee` plus final reports | final verification, immutability, and supervisor review | RF01 scoped implementation -> independent review handoff | `E2-P2A-TEST1..E2-P2C-CLOSE3` | hard stop; next safe goal is C43 reconciliation only after a new authorized task |
 
 ## Phase Touch Map
 
@@ -213,7 +215,7 @@ Do not run release builder, installer, deployment, or workflow integration in RF
 | P1-A | root README/updater/tests are correct at scoped level | preserve and validate |
 | P1-B | framework/governance projection is correct at scoped level; inherited ledger gate remains blocked | preserve additive projection; do not repair ledger in RF01 |
 | P1-C | package/install bindings are correct at source level; package builder remains HIGH | preserve list-only change; no release build/install |
-| P2 | P1-A/P1-B/P1-C scoped implementation is complete | run final verification and supervisor review; stop before C43 |
+| P2 | final verification and supervisor review are complete; inherited framework/host blockers remain | stop at independent review handoff; do not start C43 |
 
 ## Implementation Gate
 
@@ -238,4 +240,11 @@ Do not run release builder, installer, deployment, or workflow integration in RF
 
 Decision note:
 
-P0 is complete and P1-A/P1-B/P1-C are complete at scoped implementation level. Exact `.74` subject recovery, branch/worktree isolation, relevant SPEC review, fresh Anvien evidence, file-detail/impact evidence, and current authority preservation are recorded. The full legacy framework gate remains blocked by pre-existing capability-ledger defects proven in the parent commit; RF01 does not broaden scope to repair them. P1-C changed only existing package/install list entries, proved no automatic README mutation, and did not build a release or execute an install. The `.74` development base remains noncanonical and unpromoted; the exact external blocker is `EXTERNAL_HOST_CAPABILITY_LIMITATION`.
+P0/P1/P2 are complete at scoped RF01 implementation level. Exact `.74` subject recovery, branch/worktree isolation, relevant SPEC review, fresh Anvien evidence, file-detail/impact evidence, immutable-source checks, and current authority preservation are recorded. The full legacy framework gate remains blocked by pre-existing capability-ledger defects proven in the parent commit; RF01 does not broaden scope to repair them. RF01 changed only the planned README/framework/package/install surfaces, proved no automatic README mutation, and did not build a release or execute an install. Supervisor review passed the scoped implementation for independent review handoff. The `.74` development base remains noncanonical and unpromoted; the exact external blocker is `EXTERNAL_HOST_CAPABILITY_LIMITATION`.
+
+## Final RF01 Decision
+
+`P2P_RF01_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF`
+
+Next safe development Goal: `C43 reconciliation`, only in a new authorized
+task after this hard stop. No automatic continuation is permitted.

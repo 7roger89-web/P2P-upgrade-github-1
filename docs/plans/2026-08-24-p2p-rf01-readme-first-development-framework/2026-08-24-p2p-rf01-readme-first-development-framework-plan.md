@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-24`
-- Status: `active`
+- Status: `complete`
 - Plan: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-plan.md`
 - Evidence: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-evidence.md`
 - Benchmark: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-benchmark.md`
@@ -233,13 +233,21 @@ The development source has existing charter, roadmap, capability, governance, in
 
 ### P2: Verification, supervisor review, and hard stop
 
-- [ ] P2-A: Run focused tests, framework validation, syntax/build-equivalent checks, final Anvien analysis, immutability checks, and detect-changes.
-- [ ] P2-B: Use the supervisor skill for zero-trust review of the plan, actual status, evidence, diff, and exact noncanonical boundary; repair only if the review identifies an in-scope defect.
-- [ ] P2-C: Write coder/supervisor reports, refresh all ledgers, verify clean intended worktree state, commit closure metadata if needed, and stop. Do not start C43.
+- [x] P2-A: Run focused tests, framework validation, syntax/build-equivalent checks, final Anvien analysis, immutability checks, and detect-changes.
+- [x] P2-B: Use the supervisor skill for zero-trust review of the plan, actual status, evidence, diff, and exact noncanonical boundary; repair only if the review identifies an in-scope defect.
+- [x] P2-C: Write coder/supervisor reports, refresh all ledgers, verify clean intended worktree state, commit closure metadata if needed, and stop. Do not start C43.
 
 ## Risk Notes
 
 - The correct result may remain development-ready while release/promotion stays blocked; do not collapse these states.
+
+## RF01 Closure Decision
+
+`P2P_RF01_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF`
+
+The scoped implementation is ready for an independent review handoff. The
+full legacy framework gate remains inherited-blocked, host-enforced promotion
+remains blocked, and RF01 stops without release, promotion, deployment, or C43.
 - `scripts/p2p_workflow.py`, `scripts/p2p_development_control.py`, the release builder, and sealed candidate surfaces are high-risk or protected and are preserve-only unless a fresh scope decision is made.
 - README claims are projections. If a fact is not verified from current local authority, write `UNKNOWN` or `OWNER_CONFIRMATION_REQUIRED`; never infer it from a profile, cached ref, fixture, or log.
 - The exact required report disclaimer is repeated in the README and framework surfaces; it does not itself grant authority.
