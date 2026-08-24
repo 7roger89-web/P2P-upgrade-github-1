@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""RED regressions for the AERG -> QI -> FW01 checkpoint boundary.
+"""Regressions for the AERG -> QI -> FW01 checkpoint boundary.
 
 These tests deliberately exercise the current production surfaces before the
 repair.  The QI matrix proves that a required non-proof status must not be
@@ -146,6 +146,46 @@ class RequiredEvaluationFailClosedTests(unittest.TestCase):
         self.assertEqual(verdict["quality_status"], "QUALITY_VERIFIED",
                          verdict)
         self.assertTrue(verdict["checkpoint_allowed"], verdict)
+
+    def test_actual_aerg_result_uses_existing_qi_failure_vocabulary(self):
+        now = datetime.now(timezone.utc)
+        cases = {
+            "STALE": (
+                _actual_aerg_result(
+                    observed_at=(now - timedelta(seconds=360)).isoformat()),
+                "QUALITY_UNKNOWN",
+                "STALE_EVIDENCE",
+            ),
+            "CONTRADICTED": (
+                _actual_aerg_result(exit_code=1),
+                "QUALITY_REJECTED",
+                "QUALITY_CONFLICT",
+            ),
+            "SUBJECT_MISMATCH": (
+                _actual_aerg_result(subject_id="task:other-subject"),
+                "QUALITY_UNKNOWN",
+                "CERTIFICATION_SCOPE_MISMATCH",
+            ),
+            "INSUFFICIENT": (
+                _actual_aerg_result(add_evidence=False),
+                "QUALITY_REJECTED",
+                "MISSING_REQUIRED_EVIDENCE",
+            ),
+        }
+        for expected_decision, (aerg_result, quality_status, failure) in cases.items():
+            with self.subTest(expected_decision=expected_decision):
+                verdict = qi.build_quality_verdict(
+                    "SUCCESS",
+                    required_eval_results={},
+                    declared_required_evals={},
+                    aerg_result=aerg_result,
+                )
+                self.assertEqual(aerg_result["decision"], expected_decision,
+                                 aerg_result)
+                self.assertEqual(verdict["quality_status"], quality_status,
+                                 verdict)
+                self.assertIn(failure, verdict["quality_failures"], verdict)
+                self.assertFalse(verdict["checkpoint_allowed"], verdict)
 
 
 class Fw01CompatibilityFailClosedTests(unittest.TestCase):
