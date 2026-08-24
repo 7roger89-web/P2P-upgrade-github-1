@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-24`
-- Status: `P2 complete; supervisor review pending`
+- Status: `C43 complete; supervisor handoff recorded`
 - Plan: `docs/plans/2026-08-24-p2p-c43-framework-reconciliation/2026-08-24-p2p-c43-framework-reconciliation-plan.md`
 - Evidence: `docs/plans/2026-08-24-p2p-c43-framework-reconciliation/2026-08-24-p2p-c43-framework-reconciliation-evidence.md`
 - Benchmark: `docs/plans/2026-08-24-p2p-c43-framework-reconciliation/2026-08-24-p2p-c43-framework-reconciliation-benchmark.md`
@@ -297,7 +297,7 @@ The inherited capability ledger is not a safe source for downstream validation. 
   - Actual-status Update: append an R4/final refresh and set status to `P2 Complete` or precise blocker.
   - Commit Boundary: no new implementation commit after validation unless a scoped fix is required; then return to P2-A.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: verify the completed C43 work against the plan, actual status, evidence, benchmark, changed files, and validation results.
   - Work Steps:
     1. Call the supervisor skill to review the full completed plan work.
@@ -305,12 +305,12 @@ The inherited capability ledger is not a safe source for downstream validation. 
     3. Re-run supervisor review after any fix.
   - Implementation Gate: all C43 slices are complete or explicitly blocked.
   - Acceptance: supervisor passes or records a precise blocker; no closure is claimed without review.
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only accepted C43 artifacts.
   - Work Steps: inspect plan-created files, temporary fixtures, reports, and generated outputs; remove only dead artifacts created by this plan; re-run supervisor if cleanup changes acceptance scope.
   - Implementation Gate: do not touch unrelated owner changes.
   - Acceptance: final status/diff has no dead C43 artifacts.
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: record final evidence, detect-changes, commits, and the single allowed C43 verdict, then hard-stop.
   - Work Steps: finish reports, verify hashes, classify residual failures, and stop without beginning the next Goal.
   - Implementation Gate: supervisor result and boundary proof are present.

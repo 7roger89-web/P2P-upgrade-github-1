@@ -75,4 +75,12 @@ Matching plan item(s): `P2-A`, `P2-B`
 
 ## Closure Evidence
 
-- Pending until the targeted C43 commit, coder report, and separate supervisor review are recorded. The terminal handoff must include Anvien `detect-changes`, exact subject hashes, the final classification above, and one allowed C43 verdict; it must hard-stop without promotion, release, deployment, or host mutation.
+- `E3-P2B-COMMIT1`: Targeted implementation commit `2b2c104` contains exactly the nine intended C43 paths; `git diff --check 583ed32..2b2c104` exited `0`, and the intended paths are clean after commit. Unrelated owner changes remain outside the commit.
+- `E3-P2B-REVIEW1`: Supervisor report `reports/supervisor/rp_supervisor_260824_115808_by_gpt-5-codex_p2p-c43-framework-reconciliation.md` independently reviewed the commit, fresh graph, tests, residuals, and protected boundaries and recorded `P2P_C43_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF`.
+- `E3-P2B-REVIEW-HASH1`: Supervisor report SHA-256 is `20b22754f540bde4d40acfae1725d8bc54eb4c6b4c70d9154ebaf7d0527faee2` (7,873 bytes) before closure-document commit.
+- `E3-P2B-BOUNDARY1`: Fresh governance and direct artifact hashes confirm `.19` remains official/promoted with SHA `3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8`, `.74` remains sealed/unpromoted with SHA `2b82dea10695abb1c99253be1205728335a114df42cececde2fcca5c1727fd12`, RF01 remains `ACTIVE_NONCANONICAL_NO_PROMOTION`, CPT01-R2 remains `EXTERNAL_HOST_CAPABILITY_LIMITATION`, and `promotion.allowed=false`.
+- `E3-P2B-CLOSE1`: C43 terminal classification is `NEW_FAILURE=0`, `RESOLVED_INHERITED_FAILURE=37`, with residual inherited schema/validator/charter failures explicitly retained. No promotion, release, deployment, host mutation, AERG start, or authority mutation occurred.
+
+The C43 hard stop is now active after supervisor review. Any future work must be
+a separately authorized Goal; it must not be started as an automatic C43
+continuation.

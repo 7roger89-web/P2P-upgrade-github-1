@@ -2,7 +2,7 @@
 
 Title: P2P C43 Framework Reconciliation
 Date: 2026-08-24
-Status: P2 Complete / Supervisor Review Pending
+Status: C43 Complete / Supervisor Handoff Recorded / Hard Stop
 Companion plan: `docs/plans/2026-08-24-p2p-c43-framework-reconciliation/2026-08-24-p2p-c43-framework-reconciliation-plan.md`
 Companion evidence: `docs/plans/2026-08-24-p2p-c43-framework-reconciliation/2026-08-24-p2p-c43-framework-reconciliation-evidence.md`
 Companion benchmark: `docs/plans/2026-08-24-p2p-c43-framework-reconciliation/2026-08-24-p2p-c43-framework-reconciliation-benchmark.md`
@@ -75,6 +75,7 @@ Out of scope:
 | R2 | 2026-08-24 | validator/test edits after refreshed Anvien graph | P2-A | malformed records now produce bounded explicit failures; focused C43 matrix 9/9 PASS; validator current-tree run remains 52/59 with 7 inherited failures | `E2-P2A-CODE1`, `E2-P2A-TEST1`, `E2-P2A-NEG1..E2-P2A-NEG9` | run regression and boundary validation |
 | R3 | 2026-08-24 | refreshed graph `880/164/0`, `37294` nodes, `43109` relationships | P2-B | C36 69/69, targeted 19/19, comparison 1/1, C35 57/57; charter harness 38/40 with 2 inherited failures; RF01/.19/.74 preserved | `E2-P2B-REG1`, `E2-P2B-CHARTER1`, `E2-P2B-ANVIEN1`, `E2-P2B-BOUNDARY1` | prepare coder report and detect-changes |
 | R4 | 2026-08-24 | C43 implementation slice ready for exact-path commit | P2 complete | `NEW_FAILURE=0`; `RESOLVED_INHERITED_FAILURE=37`; residual 17 schema errors and 7 validator failures remain inherited; supervisor review pending | `E2-P2B-CLASSIFY1` | coder report, targeted commit, then supervisor review |
+| R5 | 2026-08-24 | implementation commit `2b2c104`; fresh post-commit graph `881/164/0`, `37305` nodes, `43120` relationships | supervisor review and closure | supervisor recorded `P2P_C43_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF`; exact paths clean; protected boundaries unchanged | `E3-P2B-COMMIT1`, `E3-P2B-REVIEW1`, `E3-P2B-BOUNDARY1`, `E3-P2B-CLOSE1` | hard-stop; any next Goal requires separate authorization |
 
 ## Phase Touch Map
 
@@ -220,14 +221,14 @@ Do not update the count to 176 merely because 176 is the current pre-reconciliat
 - [x] Status Refresh Log has an R0 baseline row.
 - [x] Affected rows refreshed after implementation slices.
 
-## P2 Closure Assessment Before Supervisor
+## Final C43 Closure Assessment
 
 - The accepted C43 implementation scope is limited to the capability ledger, derived roadmap projection, validator record-normalization/reporting path, focused C43 tests, and the four plan ledgers.
 - The ledger now has 174 unique records and the roadmap declares 174. The targeted compact/status/duplicate drift was resolved without deleting historical membership; the remaining 17 schema errors are outside the targeted C43 record set and remain visible.
 - The validator now fails closed for missing IDs, duplicate IDs, unsupported lifecycle values, malformed records/dependencies, and stale roadmap counts. Its current real-tree result is still nonzero (`52/59`, seven inherited failures); this is evidence of residual framework drift, not a whole-framework C43 PASS.
 - The nine focused C43 tests pass. Relevant regression suites pass as recorded in `E2-P2B-REG1`; the charter harness executes all 40 functions and reports 38 pass / 2 inherited fail.
 - RF01 remains `ACTIVE_NONCANONICAL_NO_PROMOTION`; `.74` remains `SEALED_UNPROMOTED`; canonical `.19`, release, promotion, deployment, host, network, hooks, and connectors were not touched.
-- Terminal state is not yet claimed until the targeted commit and separate supervisor review report exist. The intended handoff verdict is `P2P_C43_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF` only if supervisor accepts this bounded scope with the named inherited residuals; otherwise record a precise `P2P_C43_BLOCKED_<REASON>`.
+- Targeted implementation commit `2b2c104` and separate supervisor report are present. Supervisor verdict is `P2P_C43_PASS_FOR_INDEPENDENT_REVIEW_HANDOFF` for this bounded scope with the named inherited residuals. C43 is hard-stopped; no next Goal, promotion, release, deployment, host repair, or AERG start is authorized by this closure.
 
 ## Final P0 Decision
 
