@@ -8,6 +8,44 @@ File chuẩn tắc của kiến trúc sản phẩm P2P. Máy đọc; người đ
 
 > Người dùng không kỹ thuật nói một câu — "Tiếp tục hoàn thiện dự án" — và P2P làm phần còn lại một cách an toàn, có thể kiểm chứng, có thể quay lại.
 
+## RF01 — Development framework boundary
+
+RF01 is a noncanonical development-plane projection on sealed `.74`; it is
+not a runtime architecture change and does not replace the governance JSON,
+FACT_LEDGER/Live Specs, task state, execution ledger, approval policy, or
+release gates. Official canonical baseline remains `.19`; `.74` is sealed and
+UNPROMOTED. CPT01-R2 is preserved as `HOST_CAPABILITY_BLOCKED` with
+`EXTERNAL_HOST_CAPABILITY_LIMITATION`.
+
+The product fast loop is:
+
+`Business/Owner Outcome → Minimum Product Truth → Product/UX Synthesis →
+Interactive Prototype → Owner Review → Visual/Product Reference Lock → Real
+Implementation → Targeted Tests → Human Outcome Test`.
+
+The assurance/release loop is separate:
+
+`Risk-Proportional Hardening → Independent Verification → Release`.
+
+The product state model is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
+SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. OXP is a read-only projection
+over canonical/system truth and answers doing, finished, next, blocked, need
+to decide, safe to do nothing, and safe-to-execute questions. It never writes
+state or grants authority. Human acceptance is an observable outcome where
+possible; “Owner can determine the item needing attention within 30 seconds”
+is an example, not a fabricated result.
+
+Assurance is proportional to risk: preview/focused check for low risk,
+targeted functional checks for normal risk, stronger persistence/data checks
+for durable state, and independent verification plus Owner approval for auth,
+migration, destructive, canonical, or release claims. One capable agent is
+the default execution unit; a second verifier is added only when risk or
+independence requires it. No new memory graph, vector DB, daemon,
+orchestration platform, autonomous promotion, or unbounded subagent system is
+introduced by this projection.
+
+Required report disclaimer: `Implemented against sealed .74 NONCANONICAL DEVELOPMENT BASE. Official canonical baseline remains .19. Release/promotion authority remains deferred due to external GitHub private repository host-protection limitation.`
+
 ## Các bất biến kiến trúc (19 điều, đã chốt từ C25)
 
 Được giữ nguyên trong `governance/development-control.json → architectural_invariants`. Tóm tắt: đường dẫn dọc bắt buộc (nguồn → FACT_LEDGER → phê duyệt promotion → Live Specs → runtime → eval/RAG bị ảnh hưởng → drift → rollback → phê duyệt cuối gắn hash → kiểm tra lại hash → release/deploy); phê duyệt không thể biến gate FAIL thành PASS; runtime không giữ bản sao riêng của model ID/giá/bug; evidence có authority (FRESH_EXECUTION_CAPSULE_RECOVERY, ROLE_QUORUM); session death phải phục hồi được; mọi cài đặt giữ owner-gate và rollback.

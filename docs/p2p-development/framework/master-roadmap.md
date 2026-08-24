@@ -29,6 +29,37 @@ File chuẩn tắc tổng hợp hai dòng thời gian: dòng goal C01–C43 đã
 | FRAMEWORK-05 | Quality & Evidence learning layer (học từ bằng chứng các pilot để cải thiện validation) | NOT_STARTED |
 | FRAMEWORK-06 | Review tổng thể sản phẩm + beginner experience audit trước giai đoạn phát hành rộng | NOT_STARTED |
 
+## RF01 — README-first development plane (noncanonical)
+
+RF01 is the active development-plane continuation on sealed `.74`, not a new
+C-line and not a promotion/release goal. Its outcome is a compact README
+orientation projection plus a deterministic managed-block updater and a
+coherent product-development framework in the existing charter, architecture,
+roadmap, and development-control surfaces.
+
+The product fast loop is Owner Outcome → Minimum Product Truth → Product/UX
+Synthesis → Interactive Prototype → Owner Review → Visual/Product Reference
+Lock → Implementation → Targeted Tests → Human Outcome Test. The separate
+assurance/release loop is Risk-Proportional Hardening → Independent Verification
+→ Release. The state sequence is IDEA → PROTOTYPE → OWNER TRUTH →
+IMPLEMENTATION → SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH.
+
+After RF01, the next safe reconciliation work is **C43 reconciliation** and
+**AERG reconciliation**. Later candidates are read-only OXP v1, Owner Decision
+Inbox, Human Outcome Acceptance, Product Fast Loop tooling, Visual/Product
+Reference Lock, design-reference retrieval, skill-hygiene benchmarking, Work
+Queue/Lane Registry, Handoff/Integration queue, verifier expansion, time loops,
+and adaptive scheduling. These are roadmap candidates only; RF01 does not build
+unbounded orchestration, generic memory/vector infrastructure, auto-approval,
+background dependencies, or hardcoded vendor routing.
+
+The host limitation remains explicit: `.19` is the official canonical baseline,
+`.74` is sealed and UNPROMOTED, and CPT01-R2 is blocked by
+`EXTERNAL_HOST_CAPABILITY_LIMITATION`. Stop after RF01; do not begin C43 in the
+same goal.
+
+Required report disclaimer: `Implemented against sealed .74 NONCANONICAL DEVELOPMENT BASE. Official canonical baseline remains .19. Release/promotion authority remains deferred due to external GitHub private repository host-protection limitation.`
+
 ## FRAMEWORK-01 — Định nghĩa mục tiêu tiếp theo (dừng trước thực thi)
 
 Chuẩn hóa closure FRAMEWORK-00 theo chỉ thị Owner (2026-08-19): FRAMEWORK-01 có **duy nhất một mục tiêu** — **AUTONOMOUS PROJECT OPERATING LOOP**: vòng vận hành cho phép P2P khôi phục project truth bền vững và tiếp tục mục tiêu đang dở mà không cần briefing lại từ đầu. C30 là historical DONE (không phải lựa chọn FRAMEWORK-01); chứng nhận đầy đủ LIVE_COUNCIL_8_OF_8 thuộc scope FRAMEWORK-03, không phải FRAMEWORK-01.

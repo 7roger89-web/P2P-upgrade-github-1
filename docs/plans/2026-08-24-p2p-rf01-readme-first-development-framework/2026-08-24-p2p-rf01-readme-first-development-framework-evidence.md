@@ -38,11 +38,20 @@ Matching plan item(s): `P0-A`
 
 Matching plan item(s): `P1-A`, `P1-B`, `P1-C`
 
-Implementation evidence will be appended with exact IDs after each slice:
-
-- `E1-P1A-ORIENT1..E1-P1A-TEST4`: helper behavior, README projection, marker safety, and focused tests.
-- `E1-P1B-DOC1..E1-P1B-TEST3`: charter/framework/governance projection, JSON preservation, and framework/charter checks.
-- `E1-P1C-PKG1..E1-P1C-INSTALL3`: package allowlist and installer-preservation checks without a release build or install.
+- `E1-P1A-ORIENT1`: `scripts/p2p_orientation.py` implements explicit-content marker rendering, exact slice replacement, append-on-absent, idempotence, UTF-8 handling, and fail-closed ambiguity checks.
+- `E1-P1A-ORIENT2`: `README.md` has exactly one begin/end marker pair, 132 lines, required `.19`/`.74`/host-blocked state, task-to-files routing, deep links, and the exact report disclaimer.
+- `E1-P1A-TEST1`: focused unittest command `python -m unittest discover -s tests -p "test_p2p_orientation.py" -v` passed 7/7 tests.
+- `E1-P1A-TEST2`: tests prove CRLF/LF owner-prefix/suffix byte preservation, no-write on malformed markers, and second-update idempotence using quarantine fixtures under the worktree `.tmp`.
+- `E1-P1A-COMMIT1`: slice commit `579a711643415fee87647be278cc40fe098e35f0` contains exactly `README.md`, `scripts/p2p_orientation.py`, and `tests/test_p2p_orientation.py`.
+- `E1-P1B-DOC1`: charter §5A, product architecture RF01 boundary, and master roadmap RF01 section now distinguish PRODUCT FAST LOOP from ASSURANCE / RELEASE LOOP, record lifecycle states, OXP, measurable human outcome, risk-proportional assurance, one-capable-agent-first execution, and anti-overengineering limits.
+- `E1-P1B-GOV1`: `governance/development-control.json` parses and contains an additive `development_plane` for RF01; existing `current_development`, `.19`, `.74`, and C-line fields remain untouched.
+- `E1-P1B-GOV2`: scoped assertions pass for RF01 goal/status, exact `.19` baseline, exact `.74` artifact SHA, CPT01-R2 blocker, and exact report disclaimer.
+- `E1-P1B-ANV1`: after target-only generated-index recovery (`anvien clean --force` on this worktree only), fresh `anvien analyze --force` reports 871 files, 162 parsed code files, 0 failures, 36,994 nodes, and 42,767 relationships.
+- `E1-P1B-GR1`: fresh `anvien file-detail governance/development-control.json` reports 2 inbound references, low risk, parsed, no unresolved references; impact reports no affected upstream files/processes.
+- `E1-P1B-DETECT1`: fresh `anvien detect-changes --repo <RF01 worktree> --scope all` reports 4 changed files, 3 affected doc files, low risk, no affected processes, and no resolution-gap delta.
+- `E1-P1B-SCOPE1`: `git diff --cached --name-only` before the P1-B commit is exactly the three intended framework/charter documents plus `governance/development-control.json`.
+- `E1-P1B-BASELINE1`: full framework validator and full `tests/test_p2p_development_charter.py` remain blocked by the pre-existing capability ledger: parent commit `f92264b` already has `capabilities[175]` with legacy `id`/missing `capability_id`; current baseline also contains `SHIPPED` outside the allowed status vocabulary and roadmap count drift. RF01 does not edit that ledger.
+- `E1-P1C-PKG1..E1-P1C-INSTALL3`: pending until P1-C.
 
 ## E2 - P2 Evidence
 

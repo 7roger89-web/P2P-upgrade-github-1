@@ -86,7 +86,7 @@ The development source has existing charter, roadmap, capability, governance, in
   - P1-B: framework and development-plane documentation/governance projection.
   - P1-C: package/installer availability with README mutation prohibition.
 
-- [ ] P1-A: Deterministic README managed-block contract
+- [x] P1-A: Deterministic README managed-block contract
   - Goal: create the helper, root README projection, and behavior tests.
   - Scope Boundary:
     - Editable: `scripts/p2p_orientation.py`, `README.md`, `tests/test_p2p_orientation.py`.
@@ -133,7 +133,7 @@ The development source has existing charter, roadmap, capability, governance, in
   - Actual-status Update: record exact status transitions and the first implementation commit.
   - Commit Boundary: commit only the P1-A helper/README/tests slice after focused validation.
 
-- [ ] P1-B: Framework and development-plane projection
+- [x] P1-B: Framework and development-plane projection
   - Goal: revise existing charter/framework/governance surfaces to state the two loops, lifecycle states, OXP direction, human outcomes, risk-proportional assurance, and RF01 roadmap.
   - Scope Boundary:
     - Editable: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`, `docs/p2p-development/framework/product-architecture.md`, `docs/p2p-development/framework/master-roadmap.md`, `governance/development-control.json`.
@@ -171,13 +171,13 @@ The development source has existing charter, roadmap, capability, governance, in
     - Source: existing framework docs remain internally coherent and links resolve.
     - Runtime/UI: N/A.
     - DB/data: development-control JSON parses and canonical reconciliation remains valid.
-    - Behavior test: framework/charter tests pass.
+    - Behavior test: scoped RF01/framework checks pass; the full legacy framework/charter gate remains blocked by a pre-existing capability-ledger schema/status defect at `capabilities[175]` and is not repaired in RF01.
     - Cleanup/quarantine: no generated release output.
     - Evidence IDs: `E1-P1B-DOC1..E1-P1B-TEST3`.
     - Actual-status rows refreshed: framework and development-plane metadata transition to correct.
   - Evidence Targets: diff, validator output, JSON-preservation comparison, link inventory.
   - Actual-status Update: record status transitions and second implementation commit.
-  - Commit Boundary: commit P1-B only after all documentation/governance checks pass.
+  - Commit Boundary: commit P1-B after scoped documentation/governance checks pass; carry the inherited ledger gate as an explicit blocker.
 
 - [ ] P1-C: Package and installer availability
   - Goal: expose the README and helper in the existing package/install allowlists while proving installers do not auto-edit project README content.

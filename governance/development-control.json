@@ -112,6 +112,38 @@
       "p2p_council_adapter": "FEASIBLE"
     }
   },
+  "development_plane": {
+    "goal_id": "RF01",
+    "goal_title": "README-FIRST PROJECT ORIENTATION + DEVELOPMENT FRAMEWORK REVISION",
+    "mode": "DEVELOPMENT-PLANE CONTINUATION",
+    "status": "ACTIVE_NONCANONICAL_NO_PROMOTION",
+    "official_canonical_baseline": {
+      "version": "8.4.7-C-codex.19",
+      "artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "status": "PROMOTED_VERIFIED"
+    },
+    "development_base": {
+      "version": "8.4.7-C-codex.74",
+      "status": "SEALED_UNPROMOTED",
+      "artifact_sha256": "2b82dea10695abb1c99253be1205728335a114df42cececde2fcca5c1727fd12",
+      "source_commit": "4eafc3ccb6de52f2b5f9b9b75b754c9d9a2a9b53",
+      "closure_commit": "54d15cb02b04a0fea35fb7d2fd0af1fd564bb264"
+    },
+    "cpt01_r2": {
+      "status": "HOST_CAPABILITY_BLOCKED",
+      "blocker": "EXTERNAL_HOST_CAPABILITY_LIMITATION",
+      "preserved": true
+    },
+    "promotion": {
+      "allowed": false,
+      "reason": "external GitHub private repository host-protection limitation"
+    },
+    "next_safe_goals": [
+      "C43 reconciliation",
+      "AERG reconciliation"
+    ],
+    "required_report_disclaimer": "Implemented against sealed .74 NONCANONICAL DEVELOPMENT BASE. Official canonical baseline remains .19. Release/promotion authority remains deferred due to external GitHub private repository host-protection limitation."
+  },
   "candidate_records": [
     {
       "candidate_id": "C14",

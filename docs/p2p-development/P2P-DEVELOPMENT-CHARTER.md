@@ -74,6 +74,49 @@ P2P asks the owner only for: product/business intent, real-world business data, 
 
 The ledger references governance and evidence files; it never copies their full contents. Derived artifacts (templates, roadmap projection) declare their source in a header. If the charter, schema, ledger, and projection ever silently contradict, that is a defect to be fixed by reconciliation against the canonical sources — never by editing a derived copy to match another derived copy.
 
+## 5A. RF01 Development Plane — product fast loop and assurance loop
+
+RF01 is a **noncanonical development-plane projection** on the sealed `.74`
+base. It does not replace `current_development`, the C-line validator, the
+FACT_LEDGER/Live Specs, approval policy, execution ledger, or release gates.
+The official canonical baseline remains `.19`; `.74` remains sealed and
+UNPROMOTED. CPT01-R2 remains implemented but host-capability-blocked under
+`EXTERNAL_HOST_CAPABILITY_LIMITATION`.
+
+The product-development framework keeps two loops distinct:
+
+1. **PRODUCT FAST LOOP:** Business/Owner Outcome → Minimum Product Truth →
+   Product/UX Synthesis → Interactive Prototype → Owner Review →
+   Visual/Product Reference Lock → Real Implementation → Targeted Tests →
+   Human Outcome Test.
+2. **ASSURANCE / RELEASE LOOP:** Risk-Proportional Hardening → Independent
+   Verification → Release. Local technical success, Goal PASS, candidate
+   verification, release readiness, and promotion remain separate states.
+
+The state progression is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
+SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. Human acceptance should state an
+observable outcome where possible, such as an Owner determining the item
+needing attention within 30 seconds. Assurance scales with risk: a preview or
+focused check for low risk; targeted functional checks for normal risk;
+stronger persistence/data checks for durable state; and independent
+verification plus Owner approval for auth, migration, destructive, canonical,
+or release claims.
+
+OXP is a read-only orientation projection. It answers what P2P is doing,
+finished, next, blocked by, needs decided, safe to do nothing about, or safe to
+execute by reading canonical/system truth. OXP cannot grant authority, write
+facts, approve, promote, or create a competing router.
+
+Execution follows one capable agent end-to-end first, with a second verifier
+when risk justifies it. Parallel work is used only when coordination benefit
+exceeds coordination cost. The anti-overengineering order is: answer/no code,
+configuration, workflow correction, narrow edit, existing helper/component,
+replaceable skill/tool, then a new abstraction only when mechanically
+required. No vector database, generic memory graph, daemon, orchestration
+framework, autonomous promotion, or unbounded subagent system belongs in RF01.
+
+Required report disclaimer: `Implemented against sealed .74 NONCANONICAL DEVELOPMENT BASE. Official canonical baseline remains .19. Release/promotion authority remains deferred due to external GitHub private repository host-protection limitation.`
+
 ## 6. How the next Goal is chosen
 
 The next goal is never chosen because the previous goal number was C24. It is chosen by weighing beginner value, the current capability gap, dependency readiness, evidence readiness, risk reduction, and implementation minimality — all of which the Capability Ledger makes inspectable. The Goal Contract template (`docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md`) requires one primary objective stated as **what becomes TRUE after this goal that was not TRUE before**, explicit non-goals, existing-architecture-first recovery, behavioral acceptance over inventory, an evidence contract, a regression contract, beginner-impact and cognitive-economy reviews, and a terminal stop. If the beginner value cannot be answered convincingly, DEFER is a valid and encouraged outcome. Since P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01, goal selection also must satisfy the coverage gate: reconcile the proposal against `governance/research-adoption-ledger.json` and `governance/p2p-development-roadmap.json` (invariants `ROADMAP_IS_LIVING_TRUTH`, `ROADMAP_COVERAGE_GAP_DETECTED`).

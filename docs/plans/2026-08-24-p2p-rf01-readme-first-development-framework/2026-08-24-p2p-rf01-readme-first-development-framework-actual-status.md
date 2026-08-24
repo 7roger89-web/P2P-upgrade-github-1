@@ -2,7 +2,7 @@
 
 Title: RF01 README-First Project Orientation + Development Framework Revision
 Date: 2026-08-24
-Status: P0 Complete
+Status: P1-B Complete / P1-C Pending
 Companion plan: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-plan.md`
 Companion evidence: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-evidence.md`
 Companion benchmark: `docs/plans/2026-08-24-p2p-rf01-readme-first-development-framework/2026-08-24-p2p-rf01-readme-first-development-framework-benchmark.md`
@@ -60,11 +60,11 @@ Out of scope:
 
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
-| Root `README.md` | absent at package root; historical source README exists elsewhere | compact managed orientation block plus preserved owner text | missing | new | `E0-P0A-DOC1` | edit P1-A |
-| Orientation updater | no dedicated deterministic managed-block updater | explicit input, exact replacement, append-on-absent, fail-closed malformed markers | missing | new | `E0-P0A-DOC1`, `E0-P0A-SPEC1` | edit P1-A |
-| Orientation tests | no focused behavior test file | trigger/process/observable preservation and marker safety cases | missing | new | `E0-P0A-DOC1` | edit P1-A |
-| Charter/framework docs | existing authority/projection surfaces; RF01 loop/OXP/state not yet recorded as one plane | one RF01 projection with no duplicate governance | partial | document links | `E0-P0A-DOC1` | edit P1-B |
-| Development-control JSON | `.19` and `.74` reconciliation fields valid; no RF01 plane object | additive noncanonical RF01 development-plane record, current validator semantics unchanged | partial | validator/consumer path | `E0-P0A-AUTH1`, `E0-P0A-GR3` | edit P1-B |
+| Root `README.md` | managed block present, 132 lines, one marker pair, exact disclaimer and deep links | compact managed orientation block plus preserved owner text | correct | new | `E0-P0A-DOC1`, `E1-P1A-ORIENT2` | preserve |
+| Orientation updater | explicit-content replacement/append/idempotence/fail-closed behavior implemented | deterministic updater with no authority invention | correct | `E1-P1A-ORIENT1` | preserve and validate |
+| Orientation tests | 7 focused behavior tests pass | trigger/process/observable preservation and marker safety cases | correct | `E1-P1A-TEST1..E1-P1A-TEST2` | preserve and reuse |
+| Charter/framework docs | RF01 loop/OXP/state/risk/execution projection recorded in existing surfaces | one RF01 projection with no duplicate governance | correct | document links | `E1-P1B-DOC1`, `E1-P1B-DETECT1` | preserve |
+| Development-control JSON | additive `development_plane` parses; current `.19`/`.74` reconciliation unchanged | additive noncanonical RF01 development-plane record, current validator semantics unchanged | correct | 2 inbound refs | `E1-P1B-GOV1..E1-P1B-GR1` | preserve |
 | Package allowlists | root README/helper not selected | selected without release build | partial | `E0-P0A-GR4` | edit P1-C |
 | Installers | existing installer does not write project README; helper not copied | helper available; no README auto-write | partial | `E0-P0A-GR5` | edit P1-C |
 | `scripts/p2p_workflow.py` | current inspected workflow surface is high blast radius | unchanged for RF01 | correct/preserve-only | `E0-P0A-GR2` | preserve |
@@ -78,6 +78,7 @@ Out of scope:
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-24 | closure `54d15cb02b04a0fea35fb7d2fd0af1fd564bb264` in new worktree before RF01 implementation | full RF01 target scope | initial classifications recorded | `E0-P0A-SRC1..E0-P0A-WF1` | P1-A/P1-B/P1-C proceed in order; preserve high-risk surfaces |
+| R1 | 2026-08-24 | commits `579a711` plus staged P1-B scope in RF01 worktree | README/updater/tests and framework/governance projection | missing/partial -> correct for P1-A/P1-B; package/install remain partial | `E1-P1A-ORIENT1..E1-P1B-BASELINE1` | P1-C remains list-only; inherited ledger gate remains explicit blocker |
 
 ## Phase Touch Map
 
@@ -225,7 +226,7 @@ Do not run release builder, installer, deployment, or workflow integration in RF
 - [x] Blockers are recorded: host authority remains externally blocked and out of scope.
 - [x] Next phase status assumptions, actions, and work steps are updated from this file.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] If implementation has started, affected rows will be refreshed after each slice.
+- [x] If implementation has started, affected rows have been refreshed from latest evidence.
 
 ## Final P0 Decision
 
@@ -236,4 +237,4 @@ Do not run release builder, installer, deployment, or workflow integration in RF
 
 Decision note:
 
-P0 is complete. Exact `.74` subject recovery, branch/worktree isolation, graph refresh, relevant SPEC review, file-detail/impact evidence, and current authority preservation are all recorded. RF01 may proceed only through the narrow P1 slices in this plan. The `.74` development base remains noncanonical and unpromoted; the exact external blocker is `EXTERNAL_HOST_CAPABILITY_LIMITATION`.
+P0 is complete and P1-A/P1-B are complete at scoped implementation level. Exact `.74` subject recovery, branch/worktree isolation, relevant SPEC review, fresh Anvien evidence after generated-index recovery, file-detail/impact evidence, and current authority preservation are recorded. The full legacy framework gate remains blocked by pre-existing capability-ledger defects proven in the parent commit; RF01 does not broaden scope to repair them. P1-C may proceed only as a list-only package/installer binding with no release build. The `.74` development base remains noncanonical and unpromoted; the exact external blocker is `EXTERNAL_HOST_CAPABILITY_LIMITATION`.

@@ -29,10 +29,10 @@
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | Managed README block line count | lines | 0 | pending | pending | <= 300 | pending | pending |
-| P1 | Orientation behavior cases passing | cases | 0 | pending | pending | all planned cases | pending | pending |
-| P1 | README bytes preserved outside managed block | bytes | N/A | pending | pending | exact equality | pending | pending |
-| P1 | Installer README write paths | paths | 0 | pending | pending | 0 | pending | pending |
+| P1 | Managed README block line count | lines | 0 | 132 | pending | <= 300 | +132 | E1-P1A-ORIENT2 |
+| P1 | Orientation behavior cases passing | cases | 0 | 7 | pending | all planned cases | +7 | E1-P1A-TEST1 |
+| P1 | README bytes preserved outside managed block | fixtures | N/A | 2 | pending | exact equality | PASS | E1-P1A-TEST2 |
+| P1 | Installer README write paths | paths | 0 | 0 | pending | 0 | 0 | E0-P0A-GR5 |
 | P1 | New release/promotion artifacts | artifacts | 0 | 0 | 0 | 0 | 0 | plan boundary |
 
 ## B2 - P2 Benchmarks
