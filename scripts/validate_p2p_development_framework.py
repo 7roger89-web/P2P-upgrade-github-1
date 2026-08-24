@@ -56,8 +56,83 @@ def check(name: str, ok: bool, detail: str = "") -> None:
     print(f"[{'PASS' if ok else 'FAIL'}] {name}" + (f" — {detail}" if detail else ""))
 
 
+def _record_label(index: int, record: object) -> str:
+    """Return a stable diagnostic label without assuming record shape.
+
+    A malformed legacy record may expose ``id`` instead of the canonical
+    ``capability_id``. That hint is useful for provenance, but it must never
+    be treated as a canonical identifier or allow validation to crash.
+    """
+    if not isinstance(record, dict):
+        return f"capabilities[{index}]:record-not-object"
+    capability_id = record.get("capability_id")
+    if isinstance(capability_id, str) and capability_id:
+        return capability_id
+    legacy_id = record.get("id")
+    suffix = f" legacy_id={legacy_id}" if legacy_id is not None else ""
+    return f"capabilities[{index}]:missing-capability_id{suffix}"
+
+
+def _record_entries(caps: object) -> list[tuple[int, dict]]:
+    """Keep only object-shaped records for field checks, never silently.
+
+    The caller separately reports non-object entries and missing IDs. This
+    helper only prevents a malformed record from causing an uncontrolled
+    Python exception while the validator emits its complete failure set.
+    """
+    if not isinstance(caps, list):
+        return []
+    return [(index, record) for index, record in enumerate(caps)
+            if isinstance(record, dict)]
+
+
+def _record_diagnostics(caps: object, families: dict, vocab: set[str]) -> dict[str, object]:
+    """Collect fail-closed record diagnostics for tests and the CLI path."""
+    entries = _record_entries(caps)
+    non_object = [_record_label(index, record) for index, record in enumerate(caps or [])
+                  if not isinstance(record, dict)] if isinstance(caps, list) else [
+                      "capabilities:not-an-array"]
+    missing_id = [_record_label(index, record) for index, record in entries
+                  if not isinstance(record.get("capability_id"), str)
+                  or not record.get("capability_id")]
+    valid_ids = [record.get("capability_id") for _, record in entries
+                 if isinstance(record.get("capability_id"), str)
+                 and record.get("capability_id")]
+    duplicates = {capability_id for capability_id in valid_ids
+                  if valid_ids.count(capability_id) > 1}
+    bad_pattern = [_record_label(index, record) for index, record in entries
+                   if not isinstance(record.get("capability_id"), str)
+                   or not ID_PATTERN.match(str(record.get("capability_id")))]
+    bad_family = [_record_label(index, record) for index, record in entries
+                  if record.get("family") not in families]
+    unknown_status = [_record_label(index, record) for index, record in entries
+                      if record.get("status") not in vocab]
+    invalid_dep_shape = [_record_label(index, record) for index, record in entries
+                         if "dependencies" not in record
+                         or not isinstance(record.get("dependencies"), list)]
+    return {
+        "entries": entries,
+        "non_object": non_object,
+        "missing_id": missing_id,
+        "valid_ids": valid_ids,
+        "duplicates": duplicates,
+        "bad_pattern": bad_pattern,
+        "bad_family": bad_family,
+        "unknown_status": unknown_status,
+        "invalid_dep_shape": invalid_dep_shape,
+    }
+
+
+def _roadmap_count_matches(roadmap_text: str, ledger_count: int) -> bool:
+    """Check the derived snapshot count without accepting a missing count."""
+    match = re.search(r"\((\d+) records", roadmap_text)
+    return bool(match and int(match.group(1)) == ledger_count)
+
+
 def main() -> int:
     # ---------- V01: schema validation ----------
+    ledger = {}
+    schema = {}
     ok = True
     if not LEDGER.exists():
         check("V01-ledger-exists", False, "ledger missing")
@@ -69,6 +144,12 @@ def main() -> int:
             check("V01-ledger-parses", False, str(e))
             ok = False
         else:
+            if not isinstance(ledger, dict):
+                check("V01-ledger-object", False, "ledger root must be an object")
+                ledger = {}
+                ok = False
+            else:
+                check("V01-ledger-object", True)
             check("V01-ledger-parses", True)
             try:
                 schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
@@ -88,41 +169,87 @@ def main() -> int:
                     ok = False
 
     # ---------- V02/V03/V04/V05/V09/V10: record-level rules ----------
-    caps = ledger.get("capabilities", [])
+    raw_caps = ledger.get("capabilities", [])
+    caps = raw_caps if isinstance(raw_caps, list) else []
+    check("V01-capabilities-list", isinstance(raw_caps, list),
+          "capabilities must be an array" if not isinstance(raw_caps, list) else "")
     families = ledger.get("families", {})
-    vocab = set(ledger.get("status_vocabulary", []))
+    if not isinstance(families, dict):
+        families = {}
+    vocab_value = ledger.get("status_vocabulary", [])
+    vocab = {item for item in vocab_value if isinstance(item, str)} \
+        if isinstance(vocab_value, list) else set()
+    diagnostics = _record_diagnostics(caps, families, vocab)
+    entries = diagnostics["entries"]
+    non_object = diagnostics["non_object"]
+    missing_id = diagnostics["missing_id"]
+    check("V02-record-shape", len(non_object) == 0,
+          ", ".join(non_object)[:160] if non_object else "")
+    check("V02-id-present", len(missing_id) == 0,
+          ", ".join(missing_id)[:160] if missing_id else "")
 
-    ids = [c.get("capability_id") for c in caps]
-    dup = {i for i in ids if ids.count(i) > 1}
-    check("V02-id-unique", len(dup) == 0, ", ".join(sorted(dup))[:100] if dup else "")
-    bad_pattern = [c["capability_id"] for c in caps if not ID_PATTERN.match(str(c.get("capability_id")))]
-    check("V02-id-pattern", len(bad_pattern) == 0, ", ".join(bad_pattern)[:100] if bad_pattern else "")
+    valid_ids = diagnostics["valid_ids"]
+    dup = diagnostics["duplicates"]
+    check("V02-id-unique", len(dup) == 0,
+          ", ".join(sorted(dup))[:100] if dup else "")
+    bad_pattern = diagnostics["bad_pattern"]
+    check("V02-id-pattern", len(bad_pattern) == 0,
+          ", ".join(bad_pattern)[:160] if bad_pattern else "")
 
-    bad_family = [c["capability_id"] for c in caps if c["family"] not in families]
-    check("V03-family-registered", len(bad_family) == 0, ", ".join(bad_family)[:100] if bad_family else "")
+    bad_family = diagnostics["bad_family"]
+    check("V03-family-registered", len(bad_family) == 0,
+          ", ".join(bad_family)[:160] if bad_family else "")
 
-    unknown_status = [c["capability_id"] for c in caps if c.get("status") not in vocab]
-    check("V04-status-vocab", len(unknown_status) == 0, ", ".join(unknown_status)[:100] if unknown_status else "")
-    deferred_missing = [c["capability_id"] for c in caps if c.get("status") == "DEFERRED" and not c.get("deferred_reason")]
-    rejected_missing = [c["capability_id"] for c in caps if c.get("status") == "REJECTED" and not c.get("rejected_reason")]
-    verified_no_evidence = [c["capability_id"] for c in caps if c.get("status") == "VERIFIED_IMPLEMENTED" and not c.get("evidence_refs")]
-    check("V04-deferred-reason", len(deferred_missing) == 0, ", ".join(deferred_missing)[:100] if deferred_missing else "")
-    check("V04-rejected-reason", len(rejected_missing) == 0, ", ".join(rejected_missing)[:100] if rejected_missing else "")
-    check("V04-verified-evidence", len(verified_no_evidence) == 0, ", ".join(verified_no_evidence)[:100] if verified_no_evidence else "")
+    unknown_status = diagnostics["unknown_status"]
+    check("V04-status-vocab", len(unknown_status) == 0,
+          ", ".join(unknown_status)[:160] if unknown_status else "")
+    deferred_missing = [_record_label(index, record) for index, record in entries
+                        if record.get("status") == "DEFERRED"
+                        and not record.get("deferred_reason")]
+    rejected_missing = [_record_label(index, record) for index, record in entries
+                        if record.get("status") == "REJECTED"
+                        and not record.get("rejected_reason")]
+    verified_no_evidence = [_record_label(index, record) for index, record in entries
+                            if record.get("status") == "VERIFIED_IMPLEMENTED"
+                            and not record.get("evidence_refs")]
+    check("V04-deferred-reason", len(deferred_missing) == 0,
+          ", ".join(deferred_missing)[:160] if deferred_missing else "")
+    check("V04-rejected-reason", len(rejected_missing) == 0,
+          ", ".join(rejected_missing)[:160] if rejected_missing else "")
+    check("V04-verified-evidence", len(verified_no_evidence) == 0,
+          ", ".join(verified_no_evidence)[:160] if verified_no_evidence else "")
 
-    id_set = set(ids)
+    id_set = set(valid_ids)
+    invalid_dep_shape = diagnostics["invalid_dep_shape"]
+    check("V05-dep-shape", len(invalid_dep_shape) == 0,
+          ", ".join(invalid_dep_shape)[:160] if invalid_dep_shape else "")
     broken_deps = [
-        f"{c['capability_id']}->{d}" for c in caps
-        for d in c.get("dependencies", []) if d not in id_set
+        f"{_record_label(index, record)}->{dependency}"
+        for index, record in entries
+        for dependency in (record.get("dependencies")
+                          if isinstance(record.get("dependencies"), list) else [])
+        if not isinstance(dependency, str) or dependency not in id_set
     ]
-    check("V05-dep-integrity", len(broken_deps) == 0, ", ".join(broken_deps)[:100] if broken_deps else "")
+    check("V05-dep-integrity", len(broken_deps) == 0,
+          ", ".join(broken_deps)[:160] if broken_deps else "")
 
-    bad_fresh = [c["capability_id"] for c in caps if c.get("freshness") and c["freshness"] not in FRESHNESS_ALLOWED]
-    check("V09-freshness-vocab", len(bad_fresh) == 0, ", ".join(bad_fresh)[:100] if bad_fresh else "")
+    bad_fresh = [_record_label(index, record) for index, record in entries
+                 if record.get("freshness")
+                 and record.get("freshness") not in FRESHNESS_ALLOWED]
+    check("V09-freshness-vocab", len(bad_fresh) == 0,
+          ", ".join(bad_fresh)[:160] if bad_fresh else "")
 
-    gov = json.loads(GOVERNANCE.read_text(encoding="utf-8"))
-    colliding = [c["capability_id"] for c in caps if c["capability_id"] in GOV_CONTROL_KEYS]
-    check("V10-no-gov-collision", len(colliding) == 0, ", ".join(colliding)[:100] if colliding else "")
+    try:
+        gov = json.loads(GOVERNANCE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        gov = {}
+        check("V10-governance-parses", False, "governance source unavailable or malformed")
+    else:
+        check("V10-governance-parses", True)
+    colliding = [_record_label(index, record) for index, record in entries
+                 if record.get("capability_id") in GOV_CONTROL_KEYS]
+    check("V10-no-gov-collision", len(colliding) == 0,
+          ", ".join(colliding)[:160] if colliding else "")
 
     # ---------- V06: charter ----------
     if CHARTER.exists():
@@ -159,18 +286,27 @@ def main() -> int:
             check(f"V08-{tmpl}-exists", False)
 
     # ---------- C26 checks V11-V17 ----------
-    by_id = {c["capability_id"]: c for c in caps}
+    by_id = {}
+    for _, record in entries:
+        capability_id = record.get("capability_id")
+        if isinstance(capability_id, str) and capability_id and capability_id not in by_id:
+            by_id[capability_id] = record
 
     # V11: origin coverage — every record has origin_refs with at least one entry;
     # origin unknown must be explicit, never silent.
     ORIGIN_UNKNOWN_MARKER = "origin_unknown_or_not_durably_recovered"
-    no_origin = [c["capability_id"] for c in caps if not c.get("origin_refs")]
-    check("V11-origin-present-100", len(no_origin) == 0, ", ".join(no_origin)[:100] if no_origin else "")
+    no_origin = [_record_label(index, record) for index, record in entries
+                 if not record.get("origin_refs")]
+    check("V11-origin-present-100", len(no_origin) == 0,
+          ", ".join(no_origin)[:160] if no_origin else "")
     unknown_refs_wrong = [
-        c["capability_id"] for c in caps
-        if ORIGIN_UNKNOWN_MARKER in c.get("origin_refs", []) and set(c["origin_refs"]) != {ORIGIN_UNKNOWN_MARKER}
+        _record_label(index, record) for index, record in entries
+        if isinstance(record.get("origin_refs"), list)
+        and ORIGIN_UNKNOWN_MARKER in record.get("origin_refs", [])
+        and record.get("origin_refs", []) != [ORIGIN_UNKNOWN_MARKER]
     ]
-    check("V11-origin-unknown-exact", len(unknown_refs_wrong) == 0, ", ".join(unknown_refs_wrong)[:100] if unknown_refs_wrong else "")
+    check("V11-origin-unknown-exact", len(unknown_refs_wrong) == 0,
+          ", ".join(unknown_refs_wrong)[:160] if unknown_refs_wrong else "")
 
     # V12: origin_type — required enum value; UNKNOWN origin_type iff explicit unknown refs.
     ORIGIN_TYPES = {
@@ -178,33 +314,52 @@ def main() -> int:
         "ARCHITECTURE_INVARIANT", "UPSTREAM_SPECIFICATION", "PROJECT_LEARNING",
         "REJECTED_DESIGN", "RECOVERED_LEGACY", "UNKNOWN",
     }
-    bad_origin_type = [c["capability_id"] for c in caps if c.get("origin_type") not in ORIGIN_TYPES]
-    check("V12-origin-type-valid", len(bad_origin_type) == 0, ", ".join(bad_origin_type)[:100] if bad_origin_type else "")
+    bad_origin_type = [_record_label(index, record) for index, record in entries
+                       if record.get("origin_type") not in ORIGIN_TYPES]
+    check("V12-origin-type-valid", len(bad_origin_type) == 0,
+          ", ".join(bad_origin_type)[:160] if bad_origin_type else "")
     origin_unknown_mismatch = [
-        c["capability_id"] for c in caps
-        if c.get("origin_type") == "UNKNOWN" and c.get("origin_refs") != [ORIGIN_UNKNOWN_MARKER]
+        _record_label(index, record) for index, record in entries
+        if record.get("origin_type") == "UNKNOWN"
+        and record.get("origin_refs") != [ORIGIN_UNKNOWN_MARKER]
     ]
-    check("V12-origin-type-unknown-consistent", len(origin_unknown_mismatch) == 0, ", ".join(origin_unknown_mismatch)[:100] if origin_unknown_mismatch else "")
+    check("V12-origin-type-unknown-consistent", len(origin_unknown_mismatch) == 0,
+          ", ".join(origin_unknown_mismatch)[:160] if origin_unknown_mismatch else "")
     owner_proposal_not_planned = [
-        c["capability_id"] for c in caps
-        if c.get("origin_type") == "OWNER_ACCEPTED_PROPOSAL" and c.get("status") != "PLANNED"
+        _record_label(index, record) for index, record in entries
+        if record.get("origin_type") == "OWNER_ACCEPTED_PROPOSAL"
+        and record.get("status") != "PLANNED"
     ]
-    check("V12-owner-accepted-is-planned", len(owner_proposal_not_planned) == 0, ", ".join(owner_proposal_not_planned)[:100] if owner_proposal_not_planned else "")
+    check("V12-owner-accepted-is-planned", len(owner_proposal_not_planned) == 0,
+          ", ".join(owner_proposal_not_planned)[:160] if owner_proposal_not_planned else "")
 
     # V13: dependency field coverage + structural rules (presence 100%, no self-dep,
     # no duplicate deps).
-    no_deps_field = [c["capability_id"] for c in caps if "dependencies" not in c]
-    check("V13-deps-field-present-100", len(no_deps_field) == 0, ", ".join(no_deps_field)[:100] if no_deps_field else "")
-    self_deps = [c["capability_id"] for c in caps if c["capability_id"] in c.get("dependencies", [])]
-    check("V13-deps-no-self", len(self_deps) == 0, ", ".join(self_deps)[:100] if self_deps else "")
-    dup_deps = [c["capability_id"] for c in caps if len(c.get("dependencies", [])) != len(set(c.get("dependencies", [])))]
-    check("V13-deps-no-duplicates", len(dup_deps) == 0, ", ".join(dup_deps)[:100] if dup_deps else "")
+    no_deps_field = [_record_label(index, record) for index, record in entries
+                     if "dependencies" not in record]
+    check("V13-deps-field-present-100", len(no_deps_field) == 0,
+          ", ".join(no_deps_field)[:160] if no_deps_field else "")
+    self_deps = [_record_label(index, record) for index, record in entries
+                 if isinstance(record.get("dependencies"), list)
+                 and record.get("capability_id") in record.get("dependencies", [])]
+    check("V13-deps-no-self", len(self_deps) == 0,
+          ", ".join(self_deps)[:160] if self_deps else "")
+    dup_deps = [_record_label(index, record) for index, record in entries
+                if isinstance(record.get("dependencies"), list)
+                and len(record.get("dependencies", [])) != len({repr(item) for item in record.get("dependencies", [])})]
+    check("V13-deps-no-duplicates", len(dup_deps) == 0,
+          ", ".join(dup_deps)[:160] if dup_deps else "")
     REJECTED_STATUSES = {"REJECTED", "OBSOLETE"}
     rejected_prereq = [
-        f"{c['capability_id']}->{d}" for c in caps for d in c.get("dependencies", [])
-        if by_id.get(d, {}).get("status") in REJECTED_STATUSES
+        f"{_record_label(index, record)}->{dependency}"
+        for index, record in entries
+        for dependency in (record.get("dependencies")
+                           if isinstance(record.get("dependencies"), list) else [])
+        if isinstance(dependency, str)
+        and by_id.get(dependency, {}).get("status") in REJECTED_STATUSES
     ]
-    check("V13-deps-no-rejected-prereq", len(rejected_prereq) == 0, ", ".join(rejected_prereq)[:100] if rejected_prereq else "")
+    check("V13-deps-no-rejected-prereq", len(rejected_prereq) == 0,
+          ", ".join(rejected_prereq)[:160] if rejected_prereq else "")
 
     # V14: dependency cycle detection (depth-limited DFS; cycles are semantically
     # forbidden because completion order must be a DAG).
@@ -214,8 +369,12 @@ def main() -> int:
         color = {cid: WHITE for cid in by_id}
         def dfs(node: str, path: list[str]) -> None:
             color[node] = GRAY
-            for dep in by_id[node].get("dependencies", []):
-                if dep not in by_id:
+            dependencies = by_id[node].get("dependencies", [])
+            if not isinstance(dependencies, list):
+                color[node] = BLACK
+                return
+            for dep in dependencies:
+                if not isinstance(dep, str) or dep not in by_id:
                     continue
                 if color.get(dep) == GRAY:
                     found.append((path[path.index(dep)], dep))
@@ -238,7 +397,7 @@ def main() -> int:
         road = ROADMAP.read_text(encoding="utf-8")
         ledger_count = len(caps)
         match = re.search(r"\((\d+) records", road)
-        road_count_ok = bool(match and int(match.group(1)) == ledger_count)
+        road_count_ok = _roadmap_count_matches(road, ledger_count)
         check("V15-roadmap-count-sync", road_count_ok, f"roadmap says {match.group(1) if match else '?'} records, ledger has {ledger_count}")
         base = gov.get("official_baseline", {})
         base_match = base.get("version", "") in road or (base.get("artifact_sha256") or "")[:12] in road

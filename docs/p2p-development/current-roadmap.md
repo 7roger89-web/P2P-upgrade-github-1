@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-19 (FW01 self-contained-patch track appended; terminal reports P2P-FW01-bootstrap-reconciliation-terminal-report.md and P2P-FW01-self-contained-patch-terminal-report.md authored on the framework-01 lineage) (derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-24 (C43 framework reconciliation projection refresh; derived, not authored-by-hand as a decision document).
 
 ## 6. Framework goals (FW series)
 
@@ -67,15 +67,15 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at regeneration time (159 records, 12 families):
+Counts per family in `capability-index.json` at regeneration time (174 records, 12 registered families; 3 residual records use unregistered legacy family labels):
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
-| Truth & Governance | 20 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-| Durable Project Intelligence | 10 | VERIFIED_IMPLEMENTED + REJECTED |
-| Context & Knowledge | 35 | PLANNED + VERIFIED_IMPLEMENTED |
+| Truth & Governance | 22 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
+| Durable Project Intelligence | 12 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
+| Context & Knowledge | 39 | PLANNED + VERIFIED_IMPLEMENTED |
 | Skill & Learning | 5 | VERIFIED_IMPLEMENTED + PARTIAL |
-| Execution & Orchestration | 22 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-| Design & Product Intelligence | 6 | VERIFIED_IMPLEMENTED + REJECTED |
+| Execution & Orchestration | 28 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
+| Design & Product Intelligence | 7 | VERIFIED_IMPLEMENTED + REJECTED |
 | Multi-AI Interoperability | 31 | FOUNDATION_READY + REJECTED |
 | Routing & Cognitive Economy | 4 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
 | Verification & Evaluation | 6 | VERIFIED_IMPLEMENTED |
@@ -83,6 +83,8 @@ Counts per family in `capability-index.json` at regeneration time (159 records, 
 | Beginner Lifecycle | 7 | VERIFIED_IMPLEMENTED + PARTIAL |
 | Outcome Learning | 4 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
 Status vocabulary used by the ledger: `VERIFIED_IMPLEMENTED`, `FOUNDATION_READY`, `PARTIAL`, `PLANNED`, `DEFERRED`, `REJECTED`, `OBSOLETE`, `UNKNOWN`.
+
+Registered-family subtotal is 171 records. Three inherited records remain visible under the unregistered legacy family labels `RELEASE_INSTALL_PROJECT_LIFECYCLE`, `SAFETY_AUTHORITY_PERMISSIONS`, and `OBSOLESCENCE_CAPABILITY_DRIFT`; C43 reports them as residual schema drift rather than silently moving or deleting them.
 
 
 ### 3a. Owner-accepted context/session capability intake (C26, 20 records, all `PLANNED`)

@@ -3737,7 +3737,7 @@
       "capability_id": "SYMBOL_AWARE_RETRIEVAL",
       "name": "Symbol-aware retrieval",
       "family": "CONTEXT_AND_KNOWLEDGE",
-      "status": "SHIPPED",
+      "status": "PLANNED",
       "beginner_value": "Owner does not need to manage context, session, or cache behavior manually; accepted proposals keep the product honest about what is still intent, not fact.",
       "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
       "origin_refs": [
@@ -3749,9 +3749,9 @@
       "origin_type": "OWNER_ACCEPTED_PROPOSAL",
       "dependencies": [],
       "next_condition": "A future Goal may implement runtime behavior; until then this record represents owner-accepted intent only.",
-      "last_reviewed": "2026-08-21",
+      "last_reviewed": "2026-08-24",
       "freshness": "from_governance_record",
-      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy."
+      "notes": "Owner accepted for the P2P roadmap on 2026-08-17 after review of context/session/cache efficiency patterns. Acceptance makes this PLANNED intent only; runtime implementation is NOT part of C26 and is not claimed. Per CORRECTNESS_OVER_TOKEN_SAVING, correctness outranks token or credit economy. C43 reconciled a later RM-CONTEXT compact record for the same capability into this canonical record. Its historical VERIFIED_IMPLEMENTED assertion is preserved as provenance only; it is not promoted to capability truth without fresh independent implementation evidence."
     },
     {
       "capability_id": "CACHE_AWARE_MODEL_EFFORT_STABILITY",
@@ -4687,7 +4687,8 @@
         "governance/p2p-development-roadmap.json (RM-PRIORITY-PLANNER, coverage_gate)",
         "governance/research-adoption-ledger.json"
       ],
-      "status": "VERIFIED",
+      "origin_type": "IMPLEMENTATION_GOAL",
+      "status": "VERIFIED_IMPLEMENTED",
       "implementation_refs": [
         "scripts/p2p_roadmap_planner.py"
       ],
@@ -4870,11 +4871,19 @@
       "capability_id": "CONTEXTUAL_RULE_INTELLIGENCE",
       "name": "Contextual Rule Intelligence (Domain Policy Packs)",
       "family": "CONTEXT_AND_KNOWLEDGE",
-      "status": "SHIPPED",
-      "origin_type": "OWNER_ACCEPTED_ARCHITECTURE_DECISION",
+      "status": "PLANNED",
+      "origin_type": "OWNER_ACCEPTED_PROPOSAL",
       "owner_decision_ref": "RI-008",
       "adoption_record": "RA-EXT-029",
       "beginner_value": "P2P \u00e1p d\u1ee5ng quy t\u1eafc mi\u1ec1n (domain policy packs) c\u00f3 ki\u1ec3m so\u00e1t: ch\u1ec9 \u0111\u01b0a \u0111\u1ee7 quy t\u1eafc c\u1ea7n thi\u1ebft cho t\u00e1c v\u1ee5, x\u00e1c minh ngu\u1ed3n g\u1ed1c/freshness/confidence, kh\u00f4ng \u00e1p quy t\u1eafc l\u1ea1; b\u1ed9 quy t\u1eafc b\u00ean ngo\u00e0i (.mdc) kh\u00f4ng m\u1eb7c \u0111\u1ecbnh l\u00e0 ch\u00e2n l\u00fd.",
+      "principle": "UNKNOWN_APPLICABILITY_FAILS_CLOSED",
+      "origin_refs": [
+        "docs/p2p-development/decisions/owner-accepted/P2P_Contextual_Rule_Intelligence_Update_2026-08-21.md",
+        "governance/research-intake-ledger.json (RI-007)",
+        "governance/research-adoption-ledger.json (RA-EXT-029, RA-EXT-030)",
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-CONTEXT)",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01C-REPORT.md"
+      ],
       "selected_semantics": [
         "DOMAIN_POLICY_PACK",
         "RULE_PACK_DISCOVERY",
@@ -4890,33 +4899,84 @@
         "RULE_OUTCOME_EVALUATION",
         "RULE_PACK_HOST_COMPILATION"
       ],
-      "known_gap": "NONE; verified via RM-CONTEXT-01C acceptance suite (26/26 A-Z Matrix).",
+      "known_gap": "Owner decision remains PLANNED / NOT_IMPLEMENTED / NOT_CERTIFIED; adoption closure is not capability-runtime certification.",
       "dependencies": [
-        "symbol-aware retrieval primitives",
-        "RM-PRIORITY-CONTEXT approval"
+        "SYMBOL_AWARE_RETRIEVAL"
       ],
       "roadmap_relation": "composition into RM-PRIORITY-CONTEXT",
-      "last_reviewed": "2026-08-21"
+      "known_gaps": [
+        "The owner decision explicitly keeps this capability PLANNED / NOT_IMPLEMENTED / NOT_CERTIFIED.",
+        "The later SHIPPED adoption labels and compact VERIFIED_IMPLEMENTED record are retained as historical evidence pointers, not capability status authority.",
+        "Fresh independent runtime proof is not closed in this development worktree."
+      ],
+      "next_condition": "Owner-approved implementation goal and fresh independent evidence before the status may leave PLANNED.",
+      "last_reviewed": "2026-08-24",
+      "freshness": "from_plan_or_report",
+      "notes": "C43 merged the later compact record for the same capability into this owner-accepted canonical record. No capability membership was discarded; the compact VERIFIED_IMPLEMENTED assertion remains visible in the reconciliation evidence and is not treated as an implementation promotion."
     },
     {
-      "id": "SYMBOL_AWARE_RETRIEVAL",
-      "status": "VERIFIED_IMPLEMENTED",
-      "family": "CONTEXT_AND_RETRIEVAL"
+      "capability_id": "TOKEN_BOUNDED_PROJECT_MAP",
+      "name": "Token-bounded project map",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PARTIAL",
+      "beginner_value": "P2P builds a bounded project map in layers so the owner gets the relevant repository structure without silently preloading the whole project.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-CONTEXT)",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01-REPORT.md",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01C-REPORT.md",
+        ".p2p/system/p2p_capabilities/project_map.py",
+        "Git RM-CONTEXT-01 compact migration record (historical provenance)"
+      ],
+      "origin_type": "RECOVERED_LEGACY",
+      "dependencies": [],
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/project_map.py"
+      ],
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01-REPORT.md",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01C-REPORT.md"
+      ],
+      "known_gaps": [
+        "The historical compact record asserted VERIFIED_IMPLEMENTED without the required full record/evidence binding.",
+        "Fresh independent real-repository proof is not closed in this development worktree; the source primitive is retained as PARTIAL rather than promoted."
+      ],
+      "next_condition": "Fresh independent repository proof and a future ledger reconciliation may promote the status; reports alone do not promote it.",
+      "last_reviewed": "2026-08-24",
+      "freshness": "from_plan_or_report",
+      "notes": "C43 reconstructed the historical compact id record as a schema-valid canonical record. The legacy CONTEXT_AND_RETRIEVAL family label and VERIFIED_IMPLEMENTED claim were not silently accepted as current authority; family membership is normalized to the registered CONTEXT_AND_KNOWLEDGE family."
     },
     {
-      "id": "TOKEN_BOUNDED_PROJECT_MAP",
-      "status": "VERIFIED_IMPLEMENTED",
-      "family": "CONTEXT_AND_RETRIEVAL"
-    },
-    {
-      "id": "ADAPTIVE_CONTEXT_BUDGET",
-      "status": "VERIFIED_IMPLEMENTED",
-      "family": "CONTEXT_AND_RETRIEVAL"
-    },
-    {
-      "id": "CONTEXTUAL_RULE_INTELLIGENCE",
-      "status": "VERIFIED_IMPLEMENTED",
-      "family": "CONTEXT_AND_RETRIEVAL"
+      "capability_id": "ADAPTIVE_CONTEXT_BUDGET",
+      "name": "Adaptive context budget",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "status": "PARTIAL",
+      "beginner_value": "P2P scales context budgets from task risk and complexity, protects required context, and fails closed when a hard limit is exceeded.",
+      "principle": "CORRECTNESS_OVER_TOKEN_SAVING",
+      "origin_refs": [
+        "governance/p2p-development-roadmap.json (RM-PRIORITY-CONTEXT)",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01-REPORT.md",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01C-REPORT.md",
+        ".p2p/system/p2p_capabilities/adaptive_budget.py",
+        "Git RM-CONTEXT-01 compact migration record (historical provenance)"
+      ],
+      "origin_type": "RECOVERED_LEGACY",
+      "dependencies": [],
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/adaptive_budget.py"
+      ],
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01-REPORT.md",
+        "docs/p2p-development/reports/P2P-RM-CONTEXT-01C-REPORT.md"
+      ],
+      "known_gaps": [
+        "The historical compact record asserted VERIFIED_IMPLEMENTED without the required full record/evidence binding.",
+        "Fresh independent real-repository proof is not closed in this development worktree; the source primitive is retained as PARTIAL rather than promoted."
+      ],
+      "next_condition": "Fresh independent repository proof and a future ledger reconciliation may promote the status; reports alone do not promote it.",
+      "last_reviewed": "2026-08-24",
+      "freshness": "from_plan_or_report",
+      "notes": "C43 reconstructed the historical compact id record as a schema-valid canonical record. Its legacy CONTEXT_AND_RETRIEVAL family label and VERIFIED_IMPLEMENTED claim remain visible as migration provenance, not current capability authority."
     }
   ],
   "last_reviewed": "2026-08-21T04:27:11Z",
