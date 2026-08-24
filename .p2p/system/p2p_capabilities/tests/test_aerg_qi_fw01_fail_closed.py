@@ -422,6 +422,14 @@ class Fw01CompatibilityVerdictShapeFailClosedTests(unittest.TestCase):
             "unknown_quality_status": {
                 "quality_status": "QUALITY_NOT_A_REAL_STATUS",
                 "checkpoint_allowed": True, "quality_failures": ()},
+            "canonical_unknown_with_true": {
+                "quality_status": "QUALITY_UNKNOWN",
+                "checkpoint_allowed": True,
+                "quality_failures": ("MISSING_REQUIRED_EVIDENCE",)},
+            "canonical_rejected_with_true": {
+                "quality_status": "QUALITY_REJECTED",
+                "checkpoint_allowed": True,
+                "quality_failures": ("EVAL_FAILED",)},
             "checkpoint_allowed_yes": {
                 "quality_status": "QUALITY_VERIFIED",
                 "checkpoint_allowed": "yes", "quality_failures": ()},
@@ -434,6 +442,9 @@ class Fw01CompatibilityVerdictShapeFailClosedTests(unittest.TestCase):
             "checkpoint_allowed_none": {
                 "quality_status": "QUALITY_VERIFIED",
                 "checkpoint_allowed": None, "quality_failures": ()},
+            "checkpoint_allowed_object": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": object(), "quality_failures": ()},
             "quality_failures_string": {
                 "quality_status": "QUALITY_VERIFIED",
                 "checkpoint_allowed": True,
@@ -442,6 +453,9 @@ class Fw01CompatibilityVerdictShapeFailClosedTests(unittest.TestCase):
                 "quality_status": "QUALITY_VERIFIED",
                 "checkpoint_allowed": True,
                 "quality_failures": {"unexpected": "mapping"}},
+            "quality_failures_object": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": True, "quality_failures": object()},
         }
         for name, verdict in malformed.items():
             with self.subTest(name=name):

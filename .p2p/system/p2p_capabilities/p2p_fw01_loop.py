@@ -106,14 +106,47 @@ def _aerg_failure_for_checkpoint(
     return "MISSING_REQUIRED_EVIDENCE"
 
 
+_QI_QUALITY_STATUSES = frozenset({
+    "QUALITY_VERIFIED", "QUALITY_PARTIAL", "QUALITY_UNKNOWN",
+    "QUALITY_REJECTED",
+})
+
+
+def _quality_verdict_shape_is_valid(
+        quality_verdict: Any) -> bool:
+    """Validate the current QI result shape before checkpoint use."""
+    if not isinstance(quality_verdict, Mapping):
+        return False
+    return (
+        isinstance(quality_verdict.get("quality_status"), str)
+        and quality_verdict.get("quality_status") in _QI_QUALITY_STATUSES
+        and type(quality_verdict.get("checkpoint_allowed")) is bool
+        and isinstance(quality_verdict.get("quality_failures"), tuple)
+    )
+
+
+def _quality_verdict_allows_checkpoint(
+        quality_verdict: Any) -> bool:
+    """Require the canonical QI success state and literal boolean permission."""
+    return (
+        _quality_verdict_shape_is_valid(quality_verdict)
+        and quality_verdict.get("quality_status") == "QUALITY_VERIFIED"
+        and quality_verdict.get("checkpoint_allowed") is True
+    )
+
+
 def _clamp_quality_verdict_to_aerg(
-        quality_verdict: Mapping[str, Any],
+        quality_verdict: Any,
         aerg_result: Mapping[str, Any] | None) -> dict[str, Any]:
     """Prevent a compatibility QI callable from weakening AERG evidence."""
-    verdict = dict(quality_verdict)
-    if _aerg_result_allows_checkpoint(aerg_result):
+    verdict = (dict(quality_verdict)
+               if isinstance(quality_verdict, Mapping) else {})
+    verdict_shape_valid = _quality_verdict_shape_is_valid(verdict)
+    aerg_safe = _aerg_result_allows_checkpoint(aerg_result)
+    if aerg_safe and verdict_shape_valid:
         return verdict
-    failure = _aerg_failure_for_checkpoint(aerg_result)
+    failure = (_aerg_failure_for_checkpoint(aerg_result)
+               if not aerg_safe else "MISSING_REQUIRED_EVIDENCE")
     prior_failures = verdict.get("quality_failures", ())
     if isinstance(prior_failures, str):
         prior_failures = (prior_failures,)
@@ -124,7 +157,9 @@ def _clamp_quality_verdict_to_aerg(
     verdict["checkpoint_allowed"] = False
     verdict["aerg_result"] = (dict(aerg_result)
                                if isinstance(aerg_result, Mapping) else None)
-    if str(verdict.get("quality_status") or "") in ("", "QUALITY_VERIFIED"):
+    if (not verdict_shape_valid
+            or str(verdict.get("quality_status") or "")
+            in ("", "QUALITY_VERIFIED")):
         verdict["quality_status"] = (
             "QUALITY_REJECTED" if failure in (
                 "QUALITY_CONFLICT", "MISSING_REQUIRED_EVIDENCE")
@@ -1050,7 +1085,7 @@ class Fw01Loop:
                                    if isinstance(evidence, Mapping)
                                    else None) or "NOT_VERIFIED")
         if task_id in done_tasks and task_id:
-            if not _fw04_verdict.get("checkpoint_allowed", False):
+            if not _quality_verdict_allows_checkpoint(_fw04_verdict):
                 _quality_review = True
                 _quality_verification = _fw04_verdict.get(
                     "quality_status", "QUALITY_UNKNOWN")
