@@ -352,5 +352,146 @@ class Fw01CompatibilityFailClosedTests(unittest.TestCase):
                 self.assertEqual(clamped["aerg_result"], aerg_result)
 
 
+class Fw01CompatibilityVerdictShapeFailClosedTests(unittest.TestCase):
+    """Real-loop regressions for malformed legacy QI verdicts."""
+
+    class _CompatibilityOutput:
+        def __init__(self, output):
+            self.output = output
+
+        def affected_surface(self, changed_paths, project_root,
+                             analysis_complete=True):
+            return {"impact_unknown": False, "analysis_complete": True,
+                    "direct_dependents": {}, "affected_modules": (),
+                    "tests_affected": (), "total_affected": 0}
+
+        # Deliberately omits aerg_result: this is the legacy compatibility API.
+        def build_quality_verdict(self, *, execution_status,
+                                  required_eval_results,
+                                  declared_required_evals, impact_known,
+                                  required_evidence_present,
+                                  independent_verifier_result):
+            return self.output
+
+    def _step_with_compatibility_output(self, verdict, *, stale=False):
+        root = _make_repo_local_root()
+        composition_original = _make_composition_pass()
+        qa_original = _patch_qa(self._CompatibilityOutput(verdict))
+        now_original = fw01._now_iso
+        try:
+            if stale:
+                old_stamp = (
+                    datetime.now(timezone.utc) - timedelta(seconds=360)
+                ).isoformat()
+                fw01._now_iso = lambda: old_stamp
+            output = _build_loop(root).step()
+            checkpoint = _last_checkpoint(root)
+            return output, checkpoint
+        finally:
+            fw01._now_iso = now_original
+            _restore_qa(qa_original)
+            _restore_composition(composition_original)
+            _remove_repo_local_root(root)
+
+    def test_exact_malformed_compatibility_verdict_fails_closed(self):
+        output, checkpoint = self._step_with_compatibility_output({
+            "quality_status": "QUALITY_VERIFIED",
+            "checkpoint_allowed": "yes",
+            "quality_failures": "not-a-sequence",
+        })
+        self.assertEqual(output.get("status"), "STOP_BLOCKED", output)
+        self.assertEqual(output.get("reason"),
+                         "QUALITY_REVIEW_REQUIRED", output)
+        self.assertEqual(checkpoint["verification_state"],
+                         "QUALITY_REVIEW", checkpoint)
+        self.assertEqual(checkpoint["loop_status"], "BLOCKED", checkpoint)
+
+    def test_malformed_compatibility_verdict_matrix_fails_closed(self):
+        malformed = {
+            "none": None,
+            "empty_mapping": {},
+            "empty_list": [],
+            "non_mapping_string": "QUALITY_VERIFIED",
+            "missing_quality_status": {
+                "checkpoint_allowed": False, "quality_failures": ()},
+            "missing_checkpoint_allowed": {
+                "quality_status": "QUALITY_VERIFIED", "quality_failures": ()},
+            "quality_status_none": {
+                "quality_status": None, "checkpoint_allowed": True,
+                "quality_failures": ()},
+            "unknown_quality_status": {
+                "quality_status": "QUALITY_NOT_A_REAL_STATUS",
+                "checkpoint_allowed": True, "quality_failures": ()},
+            "checkpoint_allowed_yes": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": "yes", "quality_failures": ()},
+            "checkpoint_allowed_true_string": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": "true", "quality_failures": ()},
+            "checkpoint_allowed_one": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": 1, "quality_failures": ()},
+            "checkpoint_allowed_none": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": None, "quality_failures": ()},
+            "quality_failures_string": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": True,
+                "quality_failures": "not-a-sequence"},
+            "quality_failures_mapping": {
+                "quality_status": "QUALITY_VERIFIED",
+                "checkpoint_allowed": True,
+                "quality_failures": {"unexpected": "mapping"}},
+        }
+        for name, verdict in malformed.items():
+            with self.subTest(name=name):
+                output, checkpoint = self._step_with_compatibility_output(
+                    verdict)
+                self.assertEqual(output.get("status"), "STOP_BLOCKED",
+                                 output)
+                self.assertEqual(output.get("reason"),
+                                 "QUALITY_REVIEW_REQUIRED", output)
+                self.assertEqual(checkpoint["verification_state"],
+                                 "QUALITY_REVIEW", checkpoint)
+                self.assertEqual(checkpoint["loop_status"], "BLOCKED",
+                                 checkpoint)
+
+    def test_valid_fresh_compatibility_verdict_still_checkpoints(self):
+        output, checkpoint = self._step_with_compatibility_output({
+            "quality_status": "QUALITY_VERIFIED",
+            "checkpoint_allowed": True,
+            "quality_failures": (),
+        })
+        self.assertEqual(output.get("status"), "TASK_DONE_CONTINUE", output)
+        self.assertEqual(checkpoint["verification_state"], "VERIFIED",
+                         checkpoint)
+        self.assertEqual(checkpoint["loop_status"], "CHECKPOINTED",
+                         checkpoint)
+
+    def test_valid_blocked_compatibility_verdict_remains_blocked(self):
+        output, checkpoint = self._step_with_compatibility_output({
+            "quality_status": "QUALITY_UNKNOWN",
+            "checkpoint_allowed": False,
+            "quality_failures": ("MISSING_REQUIRED_EVIDENCE",),
+        })
+        self.assertEqual(output.get("status"), "STOP_BLOCKED", output)
+        self.assertEqual(checkpoint["verification_state"],
+                         "QUALITY_REVIEW", checkpoint)
+        self.assertEqual(checkpoint["loop_status"], "BLOCKED", checkpoint)
+
+    def test_affirmative_compatibility_verdict_cannot_override_stale_aerg(self):
+        verdict = {
+            "quality_status": "QUALITY_VERIFIED",
+            "checkpoint_allowed": True,
+            "quality_failures": (),
+        }
+        output, checkpoint = self._step_with_compatibility_output(
+            verdict, stale=True)
+        self.assertEqual(output.get("status"), "STOP_BLOCKED", output)
+        self.assertEqual(checkpoint["verification_state"],
+                         "QUALITY_REVIEW", checkpoint)
+        self.assertEqual(checkpoint["loop_status"], "BLOCKED", checkpoint)
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())
