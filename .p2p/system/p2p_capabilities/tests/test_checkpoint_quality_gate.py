@@ -239,10 +239,15 @@ def _restore_pre_dispatch(orig):
 def _break_qi():
     """Break the quality-module import path itself (scenario E)."""
     import sys as _s
-    _s.modules.pop("p2p_capabilities.quality_intelligence", None)
+    _module_name = "p2p_capabilities.quality_intelligence"
+    _module_present = _module_name in _s.modules
+    _prior_module = _s.modules.get(_module_name)
+    _s.modules.pop(_module_name, None)
     _s.modules.pop("p2p_capabilities.qi_helpers", None)
     try:
         import p2p_capabilities as _pkg
+        _pkg_attr_present = hasattr(_pkg, "quality_intelligence")
+        _prior_pkg_attr = getattr(_pkg, "quality_intelligence", None)
         for _name in ("quality_intelligence", "qi_helpers"):
             if hasattr(_pkg, _name):
                 delattr(_pkg, _name)
@@ -258,11 +263,38 @@ def _break_qi():
                     "p2p_capabilities.qi_helpers"):
             raise ImportError("quality module intentionally absent")
         return _orig(name, *a, **kw)
+    # The production import is ``from p2p_capabilities import ...``.  A
+    # missing child-module cache alone lets Python reload the real module,
+    # which would make this absence test depend on a status mismatch.
+    _s.modules[_module_name] = None
+    _pkg.quality_intelligence = None
     if isinstance(__builtins__, dict):
         __builtins__["__import__"] = _failing
     else:
         __builtins__.__import__ = _failing  # type: ignore[attr-defined]
-    return _orig
+    return {
+        "import": _orig,
+        "module_name": _module_name,
+        "module_present": _module_present,
+        "prior_module": _prior_module,
+        "package": _pkg,
+        "package_attr_present": _pkg_attr_present,
+        "prior_package_attr": _prior_pkg_attr,
+    }
+
+
+def _restore_broken_qi(state):
+    import sys as _s
+    _module_name = state["module_name"]
+    if state["module_present"]:
+        _s.modules[_module_name] = state["prior_module"]
+    else:
+        _s.modules.pop(_module_name, None)
+    _pkg = state["package"]
+    if state["package_attr_present"]:
+        _pkg.quality_intelligence = state["prior_package_attr"]
+    elif hasattr(_pkg, "quality_intelligence"):
+        delattr(_pkg, "quality_intelligence")
 
 
 class SeamACheckpointTests(unittest.TestCase):
@@ -356,14 +388,15 @@ class SeamACheckpointTests(unittest.TestCase):
         orig = _patch_qa(qa)
         restored = []
         comp_orig = _make_composition_pass()
-        orig_import = _break_qi()
+        qi_break = _break_qi()
         try:
             out = _build_loop(self.root).step()
         finally:
             if isinstance(__builtins__, dict):
-                __builtins__["__import__"] = orig_import
+                __builtins__["__import__"] = qi_break["import"]
             else:
-                __builtins__.__import__ = orig_import  # type: ignore
+                __builtins__.__import__ = qi_break["import"]  # type: ignore
+            _restore_broken_qi(qi_break)
             _restore_qa(orig)
             _restore_composition(comp_orig)
         # P2P-FW04 QUALITY STOP — quality-intelligence absent/unusable
@@ -392,9 +425,11 @@ class SeamACheckpointTests(unittest.TestCase):
         # boundary (same override as every scenario above) so the REAL
         # FW04 checkpoint path is exercised.
         comp_orig = _make_composition_pass()
+        qa_orig = _patch_qa(qa)
         try:
             out = loop.step()
         finally:
+            _restore_qa(qa_orig)
             _restore_composition(comp_orig)
         # P2P-FW04 QUALITY STOP — the iteration result for a
         # quality-blocked execution is an honest stop, not continue.
@@ -431,10 +466,32 @@ class SeamACheckpointTests(unittest.TestCase):
                                    "details": {"status": "VERIFIED",
                                                "evidence_ref": "ev-a"}},
                                   {"event": "task_done",
-                                   "task_id": "task-a",
-                                   "at": _now(),
-                                   "details": {"evidence_ref": "ev-a"}}])
+                                  "task_id": "task-a",
+                                  "at": _now(),
+                                  "details": {"evidence_ref": "ev-a"}}])
+            (root2 / ".p2p" / "fw01.json").write_text(
+                json.dumps({
+                    "schema": "p2p-fw01-checkpoint/1",
+                    "verification_state": "QUALITY_UNKNOWN",
+                    "next_safe_action": "QUALITY_REVIEW:task-a",
+                    "loop_status": "BLOCKED",
+                }),
+                encoding="utf-8")
             fresh_loop = _build_loop(root2)
+            # Bind the durable task_done event to the in-memory fixture as
+            # well; the pre-step quality checkpoint is the behavior under
+            # test, while this explicit DONE state makes the no-selection
+            # assertion independent of the generic builder's fixture mode.
+            fresh_loop.loop._task_records["task-a"].update({
+                "status": "DONE",
+                "completion": {
+                    "status": "VERIFIED",
+                    "evidence_refs": ["ev-a"],
+                    "done_when": ["ev-a"],
+                    "candidate_state_fingerprint": "a" * 64,
+                    "evidence_fingerprints": {"ev-a": "b" * 64},
+                },
+            })
             comp2 = _make_composition_pass()
             try:
                 fresh_out = fresh_loop.step()
