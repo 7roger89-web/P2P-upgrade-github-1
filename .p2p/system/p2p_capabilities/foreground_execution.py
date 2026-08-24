@@ -25,6 +25,7 @@ import time
 from typing import Any, Callable, Iterable, Mapping, Sequence
 import uuid
 
+from . import fw06_operational_resilience as fw06
 from .evidence import EvidenceClaim
 from .task_state import (
     TaskControlPlaneError,
@@ -47,6 +48,10 @@ FOREGROUND_RESULT_SCHEMA = "p2p-foreground-execution-result/1"
 FOREGROUND_STATE_RELATIVE_ROOT = ".p2p/state/foreground-executions"
 FOREGROUND_EXECUTION_STRATEGY = "DIRECT"
 DELEGATION_STATUS = "DEFERRED_NOT_CERTIFIED"
+WORKSPACE_SNAPSHOT_SCHEMA = "p2p-foreground-workspace-snapshot/1"
+WORKSPACE_BINDING_SCHEMA = "p2p-foreground-workspace-binding/1"
+PERMISSION_BINDING_SCHEMA = "p2p-foreground-permission-binding/1"
+SCOPE_EXPANSION_REQUIRES_REPLAN = "SCOPE_EXPANSION_REQUIRES_REPLAN"
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _EXECUTION_ID_RE = re.compile(r"^fg-[a-z0-9][a-z0-9-]{7,127}$")
@@ -133,6 +138,84 @@ def _sha256(value: Any) -> str:
     except (TypeError, ValueError) as exc:
         raise ForegroundContractError("JSON_VALUE_NOT_SERIALIZABLE") from exc
     return hashlib.sha256(payload).hexdigest()
+
+
+def _workspace_binding(root: Path) -> str:
+    """Bind the executor to one resolved workspace path, not a role/name."""
+
+    return _sha256({
+        "schema": WORKSPACE_BINDING_SCHEMA,
+        "root": str(root.resolve()),
+    })
+
+
+def _workspace_snapshot(root: Path) -> str:
+    """Return a deterministic material snapshot outside P2P control state."""
+
+    root = root.resolve()
+    if not root.exists() or not root.is_dir() or root.is_symlink():
+        raise ForegroundControlPlaneError("WORKSPACE_ROOT_INVALID")
+    files: list[dict[str, Any]] = []
+    for directory, directories, names in os.walk(root, followlinks=False):
+        directories[:] = [
+            name for name in directories if name not in {".git", ".p2p"}
+        ]
+        directory_path = Path(directory)
+        for name in sorted(names):
+            path = directory_path / name
+            relative = path.relative_to(root).as_posix()
+            if path.is_symlink():
+                files.append({"path": relative, "kind": "SYMLINK"})
+                continue
+            if not path.is_file():
+                continue
+            digest = hashlib.sha256()
+            try:
+                with path.open("rb") as handle:
+                    while chunk := handle.read(64 * 1024):
+                        digest.update(chunk)
+                size = path.stat().st_size
+            except OSError as exc:
+                raise ForegroundControlPlaneError(
+                    f"WORKSPACE_SNAPSHOT_READ_FAILED:{relative}") from exc
+            files.append({
+                "path": relative,
+                "kind": "FILE",
+                "size": size,
+                "sha256": digest.hexdigest(),
+            })
+    files.sort(key=lambda item: str(item["path"]))
+    return _sha256({
+        "schema": WORKSPACE_SNAPSHOT_SCHEMA,
+        "files": files,
+    })
+
+
+def _permission_binding(
+        task: TaskRecord,
+        permission_state: Mapping[str, Mapping[str, Any]] | None,
+    ) -> str:
+    """Hash only the exact requested permission keys.
+
+    Role names, handoff fields, and unrelated annotations cannot satisfy a
+    task permission because they are deliberately absent from this binding.
+    The actual grant decision remains C11 preflight's responsibility.
+    """
+
+    permissions = permission_state or {}
+    view: dict[str, Any] = {}
+    for permission in task.permission_needs:
+        record = permissions.get(permission)
+        view[permission] = (
+            _safe_value(record, path=f"permission_state.{permission}")
+            if isinstance(record, Mapping)
+            else {"status": "MISSING"}
+        )
+    return _sha256({
+        "schema": PERMISSION_BINDING_SCHEMA,
+        "permission_needs": list(task.permission_needs),
+        "permission_state": view,
+    })
 
 
 def _assert_sha256(value: Any, field_name: str) -> str:
@@ -328,6 +411,12 @@ class ExecutionIntent:
     owner_gate: Mapping[str, Any] | None = None
     created_at: str = field(default_factory=utc_now)
     strategy: str = FOREGROUND_EXECUTION_STRATEGY
+    objective: str = ""
+    baseline_binding: str = ""
+    candidate_binding: str = ""
+    workspace_binding: str = ""
+    permission_binding: str = ""
+    lease_id: str = ""
 
     def __post_init__(self) -> None:
         _execution_id(self.execution_id)
@@ -342,6 +431,10 @@ class ExecutionIntent:
             raise ForegroundContractError("PROJECT_BINDING_INVALID")
         if not isinstance(self.action_name, str) or not self.action_name.strip() or len(self.action_name) > 256:
             raise ForegroundContractError("ACTION_NAME_INVALID")
+        if not isinstance(self.objective, str) or len(self.objective) > 2048:
+            raise ForegroundContractError("OBJECTIVE_INVALID")
+        if not self.objective.strip():
+            object.__setattr__(self, "objective", self.action_name)
         if self.strategy != FOREGROUND_EXECUTION_STRATEGY:
             raise ForegroundContractError("FOREGROUND_STRATEGY_INVALID")
         if not self.scope:
@@ -362,6 +455,25 @@ class ExecutionIntent:
         _safe_value(self.verification_plan, path="verification_plan")
         if not isinstance(self.budget, ExecutionBudget):
             raise ForegroundContractError("BUDGET_REQUIRED")
+        for field_name, value in (
+            ("baseline_binding", self.baseline_binding),
+            ("candidate_binding", self.candidate_binding),
+            ("workspace_binding", self.workspace_binding),
+            ("permission_binding", self.permission_binding),
+        ):
+            if value:
+                _assert_sha256(value, field_name)
+        if self.budget.allow_mutation:
+            for field_name, value in (
+                ("baseline_binding", self.baseline_binding),
+                ("candidate_binding", self.candidate_binding),
+                ("workspace_binding", self.workspace_binding),
+                ("permission_binding", self.permission_binding),
+            ):
+                if not value:
+                    raise ForegroundContractError(f"{field_name}_REQUIRED_FOR_MUTATION")
+        if self.lease_id and (len(self.lease_id) > 256 or _SECRET_VALUE_RE.search(self.lease_id)):
+            raise ForegroundContractError("LEASE_ID_INVALID")
         if self.owner_gate is not None:
             if not isinstance(self.owner_gate, Mapping):
                 raise ForegroundContractError("OWNER_GATE_MUST_BE_OBJECT")
@@ -390,6 +502,12 @@ class ExecutionIntent:
             "budget": self.budget.to_dict(),
             "owner_gate": _safe_value(self.owner_gate, path="owner_gate") if self.owner_gate is not None else None,
             "created_at": self.created_at,
+            "objective": self.objective,
+            "baseline_binding": self.baseline_binding,
+            "candidate_binding": self.candidate_binding,
+            "workspace_binding": self.workspace_binding,
+            "permission_binding": self.permission_binding,
+            "lease_id": self.lease_id,
             "automatic_start": False,
             "background_execution": False,
             "process_survives_session": False,
@@ -434,6 +552,12 @@ class ExecutionIntent:
             "budget",
             "owner_gate",
             "created_at",
+            "objective",
+            "baseline_binding",
+            "candidate_binding",
+            "workspace_binding",
+            "permission_binding",
+            "lease_id",
             *forbidden_runtime_fields,
         }
         unknown = sorted(str(key) for key in value if str(key) not in allowed)
@@ -459,6 +583,12 @@ class ExecutionIntent:
             owner_gate=dict(value["owner_gate"]) if isinstance(value.get("owner_gate"), Mapping) else None,
             created_at=str(value.get("created_at", "")),
             strategy=str(value.get("strategy", FOREGROUND_EXECUTION_STRATEGY)),
+            objective=str(value.get("objective", "")),
+            baseline_binding=str(value.get("baseline_binding", "")),
+            candidate_binding=str(value.get("candidate_binding", "")),
+            workspace_binding=str(value.get("workspace_binding", "")),
+            permission_binding=str(value.get("permission_binding", "")),
+            lease_id=str(value.get("lease_id", "")),
         )
 
 
@@ -520,6 +650,7 @@ class ExecutionRuntime:
         self._artifact_paths: set[str] = set()
         self._mutation_performed = False
         self._max_bytes = intent.budget.max_output_bytes
+        self._expected_snapshot = intent.baseline_binding or _workspace_snapshot(self.root)
 
     @property
     def action_count(self) -> int:
@@ -597,7 +728,7 @@ class ExecutionRuntime:
             or relative.startswith(pattern.rstrip("/") + "/")
             for pattern in patterns
         ):
-            raise ForegroundScopeError("PATH_OUTSIDE_DECLARED_SCOPE")
+            raise ForegroundScopeError(SCOPE_EXPANSION_REQUIRES_REPLAN)
         candidate = (self.root / relative).resolve(strict=False)
         try:
             candidate.relative_to(self.root)
@@ -619,6 +750,46 @@ class ExecutionRuntime:
     def _path(self, value: str | Path) -> tuple[str, Path]:
         relative = self._relative_path(value)
         return relative, self.root / relative
+
+    def _assert_live_write_lease(self) -> None:
+        if not self.intent.lease_id:
+            raise ForegroundPermissionError("WRITE_LEASE_REQUIRED")
+        effective: dict[str, Any] | None = None
+        for record in fw06.read_leases(self.root):
+            if str(record.get("lease_id", "")) == self.intent.lease_id:
+                effective = dict(record)
+        if effective is None or effective.get("status") != "ACTIVE":
+            raise ForegroundPermissionError("WRITE_LEASE_NOT_ACTIVE")
+        if (
+            effective.get("project_id") != self.intent.workspace_binding
+            or effective.get("goal_id") != self.intent.goal_id
+            or effective.get("task_id") != self.intent.task_id
+        ):
+            raise ForegroundPermissionError("WRITE_LEASE_BINDING_MISMATCH")
+        try:
+            expires_at = datetime.fromisoformat(
+                str(effective.get("expires_at", "")).replace("Z", "+00:00")
+            )
+        except ValueError as exc:
+            raise ForegroundPermissionError("WRITE_LEASE_EXPIRY_INVALID") from exc
+        if expires_at.tzinfo is None or datetime.now(timezone.utc) >= expires_at:
+            raise ForegroundPermissionError("WRITE_LEASE_NOT_ACTIVE")
+
+    def _assert_write_binding(self) -> None:
+        if not self.intent.permission_needs:
+            raise ForegroundPermissionError("EXPLICIT_MUTATION_PERMISSION_REQUIRED")
+        if not self.intent.permission_binding:
+            raise ForegroundPermissionError("PERMISSION_BINDING_REQUIRED")
+        if not self.intent.workspace_binding:
+            raise ForegroundPermissionError("WORKSPACE_BINDING_REQUIRED")
+        if _workspace_binding(self.root) != self.intent.workspace_binding:
+            raise ForegroundPermissionError("WORKSPACE_BINDING_MISMATCH")
+        self._assert_live_write_lease()
+        current_snapshot = _workspace_snapshot(self.root)
+        if not self._mutation_performed and current_snapshot != self.intent.baseline_binding:
+            raise ForegroundPermissionError("BASELINE_BINDING_MISMATCH")
+        if current_snapshot != self._expected_snapshot:
+            raise ForegroundPermissionError("BASELINE_BINDING_STALE")
 
     def read_text(self, path: str | Path, *, encoding: str = "utf-8") -> str:
         self._consume("read_text")
@@ -664,6 +835,7 @@ class ExecutionRuntime:
             raise ForegroundPermissionError("EXPLICIT_MUTATION_BUDGET_REQUIRED")
         if not _is_approved_gate(self.intent.owner_gate):
             raise ForegroundPermissionError("OWNER_GATE_REQUIRED_FOR_MUTATION")
+        self._assert_write_binding()
         if not isinstance(content, str):
             raise ForegroundExecutionError("WRITE_CONTENT_MUST_BE_TEXT")
         if len(content.encode(encoding)) > self._max_bytes:
@@ -690,6 +862,7 @@ class ExecutionRuntime:
             raise ForegroundExecutionError(f"WRITE_FAILED:{relative}") from exc
         self._artifact_paths.add(relative)
         self._mutation_performed = True
+        self._expected_snapshot = _workspace_snapshot(self.root)
         return relative
 
     def artifact_bindings(self) -> list[dict[str, Any]]:
@@ -714,8 +887,15 @@ class ExecutionRuntime:
             "schema": "p2p-foreground-state-binding/1",
             "task_id": self.intent.task_id,
             "plan_hash": self.intent.plan_hash,
+            "workspace_binding": self.intent.workspace_binding,
+            "candidate_binding": _workspace_snapshot(self.root),
             "artifacts": self.artifact_bindings(),
         })
+
+    def candidate_binding(self) -> str:
+        """Return the exact deterministic candidate snapshot currently audited."""
+
+        return _workspace_snapshot(self.root)
 
 
 def _coerce_action_result(value: Any, runtime: ExecutionRuntime) -> ActionResult:
@@ -933,14 +1113,20 @@ class ForegroundExecutionController:
         budget: ExecutionBudget,
         verification_plan: Mapping[str, Any] | None,
         owner_gate: Mapping[str, Any] | None,
+        baseline_binding: str,
+        candidate_binding: str,
+        workspace_binding: str,
+        permission_binding: str,
+        lease_id: str = "",
+        execution_id: str | None = None,
     ) -> ExecutionIntent:
         return ExecutionIntent(
-            execution_id=_new_execution_id(),
+            execution_id=execution_id or _new_execution_id(),
             task_id=task.task_id,
             goal_id=plan.goal_id,
             plan_hash=plan.canonical_hash(),
             plan_revision=plan.plan_revision,
-            project_binding="PROJECT_ROOT_BOUND",
+            project_binding=workspace_binding,
             action_name=action_name,
             scope=tuple(task.scope),
             non_scope=tuple(task.non_scope),
@@ -952,6 +1138,12 @@ class ForegroundExecutionController:
             verification_plan=dict(verification_plan or {"mode": "CALLER_SUPPLIED_INDEPENDENT_CHECK"}),
             budget=budget,
             owner_gate=dict(owner_gate) if isinstance(owner_gate, Mapping) else None,
+            objective=f"{task.title}: {task.purpose}",
+            baseline_binding=baseline_binding,
+            candidate_binding=candidate_binding,
+            workspace_binding=workspace_binding,
+            permission_binding=permission_binding,
+            lease_id=lease_id,
         )
 
     def _execution_dir(self, execution_id: str) -> Path:
@@ -1005,12 +1197,19 @@ class ForegroundExecutionController:
         sequence = len(existing) + 1
         artifact_refs = runtime.artifact_refs if runtime is not None else ()
         state_fingerprint = runtime.state_fingerprint() if runtime is not None else _sha256({"task_id": intent.task_id, "plan_hash": intent.plan_hash})
+        candidate_binding = runtime.candidate_binding() if runtime is not None else intent.candidate_binding
         payload = {
             "schema": FOREGROUND_RECEIPT_SCHEMA,
             "execution_id": intent.execution_id,
             "task_id": intent.task_id,
             "goal_id": intent.goal_id,
             "plan_hash": intent.plan_hash,
+            "objective": intent.objective,
+            "baseline_binding": intent.baseline_binding,
+            "candidate_binding": candidate_binding,
+            "workspace_binding": intent.workspace_binding,
+            "permission_binding": intent.permission_binding,
+            "lease_id": intent.lease_id,
             "phase": phase,
             "status": status,
             "attempt": attempt,
@@ -1068,6 +1267,12 @@ class ForegroundExecutionController:
                 "execution_id": intent.execution_id,
                 "task_id": intent.task_id,
                 "plan_hash": intent.plan_hash,
+                "objective": intent.objective,
+                "baseline_binding": intent.baseline_binding,
+                "candidate_binding": runtime.candidate_binding(),
+                "workspace_binding": intent.workspace_binding,
+                "permission_binding": intent.permission_binding,
+                "lease_id": intent.lease_id,
                 **checkpoint,
             },
             immutable=True,
@@ -1088,6 +1293,73 @@ class ForegroundExecutionController:
         except TaskStateError as exc:
             raise ForegroundControlPlaneError(str(exc)) from exc
 
+    def _acquire_write_lease(self, intent: ExecutionIntent) -> str:
+        if not intent.budget.allow_mutation:
+            return ""
+        try:
+            result = fw06.acquire_lease(
+                self.root,
+                owner_process=f"foreground:{intent.execution_id}",
+                project_id=intent.workspace_binding,
+                goal_id=intent.goal_id,
+                task_id=intent.task_id,
+                ttl_seconds=max(1, math.ceil(intent.budget.max_wall_clock_seconds)),
+            )
+        except Exception as exc:
+            raise ForegroundPermissionError("WRITE_LEASE_ACQUIRE_FAILED") from exc
+        if not result.get("acquired") or not isinstance(result.get("lease"), Mapping):
+            reason = str(result.get("failure_class") or "UNKNOWN")
+            raise ForegroundPermissionError(f"WRITE_LEASE_ACQUIRE_FAILED:{reason}")
+        lease_id = str(result["lease"].get("lease_id", ""))
+        if not lease_id:
+            raise ForegroundPermissionError("WRITE_LEASE_ID_MISSING")
+        return lease_id
+
+    def _release_intent_lease(self, intent: ExecutionIntent) -> None:
+        if intent.lease_id:
+            try:
+                fw06.release_lease(self.root, intent.lease_id)
+            except Exception:
+                # Release failure is recorded by the durable FW06 ledger; the
+                # foreground path must not turn it into an unbounded retry.
+                pass
+
+    def _run_action_attempts(
+        self,
+        intent: ExecutionIntent,
+        runtime: ExecutionRuntime,
+        action: Callable[..., Any],
+        budget: ExecutionBudget,
+        receipt_refs: list[str],
+    ) -> tuple[ActionResult, int]:
+        """Run the existing bounded attempt loop and release its lease once."""
+
+        last_action = ActionResult(status="FAILED", summary="NO_ACTION_ATTEMPTED")
+        attempt = 0
+        try:
+            while attempt < budget.max_attempts:
+                attempt += 1
+                try:
+                    runtime.begin_attempt(attempt)
+                    value = _invoke(action, runtime)
+                    runtime.check_budget()
+                    last_action = _coerce_action_result(value, runtime)
+                except ForegroundInterrupted as exc:
+                    last_action = ActionResult(status="INTERRUPTED", summary=str(exc), artifact_refs=runtime.artifact_refs, mutation_performed=runtime.mutation_performed)
+                except ForegroundExecutionError as exc:
+                    last_action = ActionResult(status="FAILED", summary=str(exc), artifact_refs=runtime.artifact_refs, mutation_performed=runtime.mutation_performed)
+                except Exception as exc:  # direct callback failures are bounded and surfaced, never retried by default
+                    last_action = ActionResult(status="FAILED", summary=f"DIRECT_ACTION_FAILED:{type(exc).__name__}", artifact_refs=runtime.artifact_refs, mutation_performed=runtime.mutation_performed)
+                receipt_refs.append(self._persist_receipt(intent, phase="ACTION_ATTEMPT", status=last_action.status, attempt=attempt, runtime=runtime, summary=last_action.summary))
+                if last_action.status == "SUCCEEDED":
+                    break
+                retry_allowed = bool(last_action.retryable and not runtime.mutation_performed and attempt < budget.max_attempts and attempt <= budget.max_retries + 1)
+                if not retry_allowed or last_action.status in {"INTERRUPTED", "BLOCKED"}:
+                    break
+        finally:
+            self._release_intent_lease(intent)
+        return last_action, attempt
+
     def _mutation_gate(self, intent: ExecutionIntent) -> bool:
         if not intent.budget.allow_mutation:
             return True
@@ -1096,14 +1368,31 @@ class ForegroundExecutionController:
         return True
 
     def _candidate_state(self, runtime: ExecutionRuntime, supplied: Any) -> Any:
+        current_binding = runtime.candidate_binding()
         if supplied is not None:
-            _safe_value(supplied, path="candidate_state")
-            return supplied
-        return {
-            "verification_mode": "INDEPENDENT_READ_ONLY",
-            "artifact_bindings": runtime.artifact_bindings(),
-            "state_fingerprint": runtime.state_fingerprint(),
-        }
+            safe_supplied = _safe_value(supplied, path="candidate_state")
+            if isinstance(safe_supplied, Mapping):
+                supplied_binding = safe_supplied.get("candidate_binding")
+                if supplied_binding is not None and str(supplied_binding) != current_binding:
+                    raise ForegroundVerificationError("CANDIDATE_BINDING_MISMATCH")
+                candidate = dict(safe_supplied)
+            else:
+                candidate = {"supplied_candidate": safe_supplied}
+        else:
+            candidate = {}
+        candidate.update({
+            "candidate_binding": current_binding,
+            "baseline_binding": runtime.intent.baseline_binding,
+            "workspace_binding": runtime.intent.workspace_binding,
+            "audit_target": "EXACT_CURRENT_CANDIDATE",
+        })
+        if supplied is None:
+            candidate.update({
+                "verification_mode": "INDEPENDENT_READ_ONLY",
+                "artifact_bindings": runtime.artifact_bindings(),
+                "state_fingerprint": runtime.state_fingerprint(),
+            })
+        return candidate
 
     def _execute_inner(
         self,
@@ -1126,6 +1415,9 @@ class ForegroundExecutionController:
         candidate = self._candidate(plan, task_id)
         if candidate is None:
             return self._result("BLOCKED", task_id=task_id, reason="NO_SAFE_READY_TASK")
+        workspace_binding = _workspace_binding(self.root)
+        baseline_binding = _workspace_snapshot(self.root)
+        permission_binding = _permission_binding(candidate, permission_state)
         intent = self._build_intent(
             plan,
             candidate,
@@ -1133,9 +1425,14 @@ class ForegroundExecutionController:
             budget=budget,
             verification_plan=verification_plan,
             owner_gate=owner_gate,
+            baseline_binding=baseline_binding,
+            candidate_binding=baseline_binding,
+            workspace_binding=workspace_binding,
+            permission_binding=permission_binding,
         )
-        intent_ref = self._persist_intent(intent)
+        intent_ref: str | None = None
         if not self._mutation_gate(intent):
+            intent_ref = self._persist_intent(intent)
             owner_question = {
                 "question": "May this direct task change only the files in its recorded scope?",
                 "options": ["Allow only for this task", "Keep the task read-only"],
@@ -1202,42 +1499,70 @@ class ForegroundExecutionController:
         current_task = plan_after_preflight.tasks[candidate.task_id]
         if current_task.status != "READY":
             return self._result("BLOCKED", task_id=current_task.task_id, execution_id=intent.execution_id, reason=f"TASK_NOT_READY_AFTER_PREFLIGHT:{current_task.status}", intent_ref=intent_ref)
+        if budget.allow_mutation and not current_task.permission_needs:
+            return self._result(
+                "BLOCKED",
+                task_id=current_task.task_id,
+                execution_id=intent.execution_id,
+                reason="EXPLICIT_MUTATION_PERMISSION_REQUIRED",
+                preflight=preflight_result,
+                task_status=current_task.status,
+            )
+        intent = self._build_intent(
+            plan_after_preflight,
+            current_task,
+            action_name=action_name,
+            budget=budget,
+            verification_plan=verification_plan,
+            owner_gate=owner_gate,
+            baseline_binding=baseline_binding,
+            candidate_binding=baseline_binding,
+            workspace_binding=workspace_binding,
+            permission_binding=_permission_binding(current_task, permission_state),
+            execution_id=intent.execution_id,
+        )
+        if budget.allow_mutation:
+            try:
+                intent = replace(
+                    intent,
+                    lease_id=self._acquire_write_lease(intent),
+                )
+            except ForegroundPermissionError as exc:
+                return self._result(
+                    "BLOCKED",
+                    task_id=current_task.task_id,
+                    execution_id=intent.execution_id,
+                    reason=str(exc),
+                    preflight=preflight_result,
+                    task_status=current_task.status,
+                )
+        try:
+            intent_ref = self._persist_intent(intent)
+        except Exception:
+            self._release_intent_lease(intent)
+            raise
         try:
             active_plan = self.store.transition(candidate.task_id, "ACTIVE", preflight=preflight_result)
         except TaskStateError as exc:
+            self._release_intent_lease(intent)
             raise ForegroundControlPlaneError(str(exc)) from exc
         active_task = active_plan.tasks[candidate.task_id]
         runtime = ExecutionRuntime(self.root, intent)
-        initial_checkpoint_ref = self._persist_checkpoint(
-            intent,
-            runtime,
-            classification="UNKNOWN",
-            next_safe_step="Perform the explicit direct action once within the recorded finite budget.",
-            pending_refs=("DIRECT_ACTION",),
-            notes="Intent persisted before any material action; process survival is not assumed.",
-        )
-        receipt_refs = [self._persist_receipt(intent, phase="INTENT_AND_CHECKPOINT", status="ACTIVE", attempt=0, runtime=runtime, checkpoint_ref=initial_checkpoint_ref)]
-        last_action = ActionResult(status="FAILED", summary="NO_ACTION_ATTEMPTED")
-        attempt = 0
-        while attempt < budget.max_attempts:
-            attempt += 1
-            try:
-                runtime.begin_attempt(attempt)
-                value = _invoke(action, runtime)
-                runtime.check_budget()
-                last_action = _coerce_action_result(value, runtime)
-            except ForegroundInterrupted as exc:
-                last_action = ActionResult(status="INTERRUPTED", summary=str(exc), artifact_refs=runtime.artifact_refs, mutation_performed=runtime.mutation_performed)
-            except ForegroundExecutionError as exc:
-                last_action = ActionResult(status="FAILED", summary=str(exc), artifact_refs=runtime.artifact_refs, mutation_performed=runtime.mutation_performed)
-            except Exception as exc:  # direct callback failures are bounded and surfaced, never retried by default
-                last_action = ActionResult(status="FAILED", summary=f"DIRECT_ACTION_FAILED:{type(exc).__name__}", artifact_refs=runtime.artifact_refs, mutation_performed=runtime.mutation_performed)
-            receipt_refs.append(self._persist_receipt(intent, phase="ACTION_ATTEMPT", status=last_action.status, attempt=attempt, runtime=runtime, summary=last_action.summary))
-            if last_action.status == "SUCCEEDED":
-                break
-            retry_allowed = bool(last_action.retryable and not runtime.mutation_performed and attempt < budget.max_attempts and attempt <= budget.max_retries + 1)
-            if not retry_allowed or last_action.status in {"INTERRUPTED", "BLOCKED"}:
-                break
+        try:
+            initial_checkpoint_ref = self._persist_checkpoint(
+                intent,
+                runtime,
+                classification="UNKNOWN",
+                next_safe_step="Perform the explicit direct action once within the recorded finite budget.",
+                pending_refs=("DIRECT_ACTION",),
+                notes="Intent persisted before any material action; process survival is not assumed.",
+            )
+            receipt_refs = [self._persist_receipt(intent, phase="INTENT_AND_CHECKPOINT", status="ACTIVE", attempt=0, runtime=runtime, checkpoint_ref=initial_checkpoint_ref)]
+        except Exception:
+            self._release_intent_lease(intent)
+            raise
+        last_action, attempt = self._run_action_attempts(
+            intent, runtime, action, budget, receipt_refs)
         if last_action.status != "SUCCEEDED":
             if last_action.status == "INTERRUPTED" or runtime.mutation_performed:
                 checkpoint_ref = self._persist_checkpoint(
@@ -1397,6 +1722,20 @@ class ForegroundExecutionController:
             bindings.append({"path": normalized, "sha256": digest})
         return tuple(bindings)
 
+    def _current_state_fingerprint(
+        self,
+        intent: ExecutionIntent,
+        latest: Mapping[str, Any] | None,
+    ) -> str:
+        return _sha256({
+            "schema": "p2p-foreground-state-binding/1",
+            "task_id": intent.task_id,
+            "plan_hash": intent.plan_hash,
+            "workspace_binding": intent.workspace_binding,
+            "candidate_binding": _workspace_snapshot(self.root),
+            "artifacts": list(self._resume_artifact_bindings(intent, latest)),
+        })
+
     def resume(
         self,
         verify: Callable[..., Any] | None = None,
@@ -1411,6 +1750,27 @@ class ForegroundExecutionController:
             plan = self._control_plane()
             active = self._active_tasks(plan)
             if not active:
+                for completed_task in plan.tasks.values():
+                    if completed_task.status != "DONE":
+                        continue
+                    found_completed = self._find_execution(completed_task)
+                    if found_completed is None:
+                        continue
+                    completed_intent, _, completed_receipt = found_completed
+                    recorded = (
+                        completed_receipt.get("state_fingerprint")
+                        if isinstance(completed_receipt, Mapping)
+                        else None
+                    )
+                    if recorded and recorded != self._current_state_fingerprint(
+                            completed_intent, completed_receipt):
+                        return self._result(
+                            "STALE",
+                            task_id=completed_task.task_id,
+                            execution_id=completed_intent.execution_id,
+                            reason="AUDITED_CANDIDATE_STALE",
+                            task_status=completed_task.status,
+                        )
                 return self._result("NO_ACTIVE_TASK", reason="NO_ACTIVE_FOREGROUND_EXECUTION")
             if len(active) != 1:
                 raise ForegroundControlPlaneError("MULTIPLE_ACTIVE_TASKS")
@@ -1434,12 +1794,8 @@ class ForegroundExecutionController:
             if preflight_result.get("status") != "PASS":
                 return self._result(str(preflight_result.get("status", "UNKNOWN")), task_id=task.task_id, execution_id=intent.execution_id, reason="CURRENT_PREFLIGHT_NOT_PASS", preflight=preflight_result, task_status=task.status)
             bindings = self._resume_artifact_bindings(intent, latest)
-            current_state_fingerprint = _sha256({
-                "schema": "p2p-foreground-state-binding/1",
-                "task_id": intent.task_id,
-                "plan_hash": intent.plan_hash,
-                "artifacts": list(bindings),
-            })
+            current_state_fingerprint = self._current_state_fingerprint(
+                intent, latest)
             current_evidence = task.checkpoint.get("evidence_fingerprints", {}) if isinstance(task.checkpoint, Mapping) else {}
             classification = classify_resume(
                 task,
@@ -1492,6 +1848,10 @@ __all__ = [
     "FOREGROUND_STATE_RELATIVE_ROOT",
     "FOREGROUND_EXECUTION_STRATEGY",
     "DELEGATION_STATUS",
+    "WORKSPACE_SNAPSHOT_SCHEMA",
+    "WORKSPACE_BINDING_SCHEMA",
+    "PERMISSION_BINDING_SCHEMA",
+    "SCOPE_EXPANSION_REQUIRES_REPLAN",
     "ForegroundExecutionError",
     "ForegroundContractError",
     "ForegroundScopeError",

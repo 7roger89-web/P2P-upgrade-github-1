@@ -82,6 +82,7 @@ def _parser() -> argparse.ArgumentParser:
     run.add_argument("--text", help="text for write-text; content is never sent outside the project")
     run.add_argument("--allow-mutation", action="store_true", help="allow the explicit scoped write action")
     run.add_argument("--owner-source", help="owner decision reference; required with --allow-mutation")
+    run.add_argument("--permissions", help="JSON permission state; required with --allow-mutation")
     run.add_argument("--max-attempts", type=int, default=1)
     run.add_argument("--max-retries", type=int, default=0)
     run.add_argument("--max-actions", type=int, default=8)
@@ -138,10 +139,14 @@ def main(argv: list[str] | None = None) -> int:
             if args.action == "write-text" and args.text is None:
                 raise TaskStateError("WRITE_TEXT_REQUIRES_TEXT")
             owner_gate = None
+            permissions = None
             if args.allow_mutation:
                 if not args.owner_source:
                     raise TaskStateError("WRITE_TEXT_REQUIRES_OWNER_SOURCE")
+                if not args.permissions:
+                    raise TaskStateError("WRITE_TEXT_REQUIRES_PERMISSION_STATE")
                 owner_gate = {"status": "APPROVED", "source_ref": args.owner_source}
+                permissions = _mapping(_read_json(args.permissions), "PERMISSIONS_OBJECT_REQUIRED")
 
             def action(runtime: Any) -> dict[str, Any]:
                 if args.action == "write-text":
@@ -165,6 +170,7 @@ def main(argv: list[str] | None = None) -> int:
                     allow_mutation=args.allow_mutation,
                 ),
                 owner_gate=owner_gate,
+                permission_state=permissions,
             )
             _write_result(result)
             return 0

@@ -57,6 +57,27 @@ class AdaptiveOrchestrationPolicyTests(unittest.TestCase):
         self.assertEqual(result["worker_strategy"], "DIRECT")
         self.assertEqual(result["worker_count"], 0)
 
+    def test_complexity_and_assurance_axes_are_independent(self) -> None:
+        easy_critical = derive_requirement({
+            "task_size": "SMALL",
+            "dependency_complexity": "NONE",
+            "ambiguity": "LOW",
+            "mutation_risk": "DESTRUCTIVE",
+            "deterministic_verifier": True,
+        })
+        hard_low = derive_requirement({
+            "task_size": "LARGE",
+            "dependency_complexity": "HIGH",
+            "ambiguity": "HIGH",
+            "mutation_risk": "LOW",
+            "evidence_availability": "COMPLETE",
+        })
+        self.assertEqual(easy_critical["verification_class"], "HIGH_RISK")
+        self.assertEqual(hard_low["reasoning_class"], "HIGH")
+        self.assertNotEqual(hard_low["verification_class"], "HIGH_RISK")
+        self.assertEqual(easy_critical["provider_model_resolution"], "DEFERRED")
+        self.assertEqual(hard_low["provider_model_resolution"], "DEFERRED")
+
     def test_local_serialization_proxy_is_explicit_and_provider_neutral(self) -> None:
         result = derive_requirement({"task_size": "SMALL", "context_proxy_bytes": 1024, "context_refs": ["task:contract"]})
         self.assertEqual(result["context_measurement"]["label"], "LOCAL_SERIALIZATION_PROXY")

@@ -141,6 +141,8 @@ class TaskTargetedContextTests(unittest.TestCase):
         self.assertEqual(plan["available_context"]["count"], 100)
         self.assertEqual(materialized["materialized_context"]["count"], 1)
         self.assertEqual(materialized["permission_expansion"], False)
+        self.assertEqual(materialized["parent_history_included"], False)
+        self.assertNotIn("transcript", json.dumps(materialized).lower())
 
     def test_cr15_overlapping_workers_can_reuse_same_bounded_materialization(self):
         catalog = [source("shared.py", "DIRECT_AUTHORITATIVE_REFS")]
