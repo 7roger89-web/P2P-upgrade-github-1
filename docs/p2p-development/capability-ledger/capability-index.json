@@ -4977,9 +4977,53 @@
       "last_reviewed": "2026-08-24",
       "freshness": "from_plan_or_report",
       "notes": "C43 reconstructed the historical compact id record as a schema-valid canonical record. Its legacy CONTEXT_AND_RETRIEVAL family label and VERIFIED_IMPLEMENTED claim remain visible as migration provenance, not current capability authority."
+    },
+    {
+      "capability_id": "AI_EXECUTION_RELIABILITY_GUARD",
+      "name": "AI Execution Reliability Guard",
+      "family": "VERIFICATION_AND_EVALUATION",
+      "status": "FOUNDATION_READY",
+      "beginner_value": "The owner can see when an AI report is unsupported, contradicted, stale, or bound to the wrong subject instead of accepting confident prose as proof.",
+      "principle": "EVIDENCE_AUTHORITY_IS_NOT_MODEL_CONFIDENCE",
+      "origin_refs": [
+        "Git ref origin/p2p-aerg-provider-neutral-reliability-01 @ 955bcc0c123b007c5886d15cf97eed824a51a559 (recovered legacy subject)",
+        "docs/plans/2026-08-24-p2p-aerg-reconciliation/2026-08-24-p2p-aerg-reconciliation-plan.md",
+        "reports/reconciliation/p2p-aerg-reconciliation-20260824.md"
+      ],
+      "origin_type": "IMPLEMENTATION_GOAL",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/aerg_model.py",
+        ".p2p/system/p2p_capabilities/aerg_engine.py",
+        ".p2p/system/p2p_capabilities/quality_intelligence.py",
+        ".p2p/system/p2p_capabilities/p2p_fw01_loop.py"
+      ],
+      "evidence_refs": [
+        ".p2p/system/p2p_capabilities/tests/test_aerg_reconciliation.py",
+        ".p2p/system/p2p_capabilities/tests/test_quality_intelligence.py",
+        ".p2p/system/p2p_capabilities/tests/test_checkpoint_quality_gate.py"
+      ],
+      "dependencies": [
+        "INDEPENDENT_RESULT_VERIFICATION",
+        "STALE_REJECTION",
+        "SUPERVISOR_REVIEW"
+      ],
+      "known_gaps": [
+        "This is development-plane foundation evidence, not official capability promotion or release evidence.",
+        "AERG classifies evidence and feeds the existing QI contract; it does not create independent host verification, release authority, or owner approval.",
+        "The hidden .p2p/system sources are outside the current Anvien graph projection and require direct source/test verification."
+      ],
+      "do_not_duplicate_with": [
+        "INDEPENDENT_RESULT_VERIFICATION",
+        "RELEASE_ACCEPTANCE",
+        "SUPERVISOR_REVIEW"
+      ],
+      "next_condition": "Fresh supervisor review and any separately required independent evidence must pass before considering a future status change; no report alone may promote this record.",
+      "last_reviewed": "2026-08-24",
+      "freshness": "verified_against_filesystem",
+      "notes": "Current post-C43 reconciliation of the recoverable AERG intent. Historical C44, RI-011, RA-EXT-035, and RM-AERG labels are not current authority. .19 remains PROMOTED_VERIFIED, .74 remains SEALED_UNPROMOTED/NONCANONICAL, and promotion.allowed remains false."
     }
   ],
-  "last_reviewed": "2026-08-21T04:27:11Z",
+  "last_reviewed": "2026-08-24T12:00:00Z",
   "review_notes": [
     "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions.",
     {
@@ -4987,6 +5031,12 @@
       "at": "2026-08-21T04:27:11Z",
       "change": "10 new PLANNED capability records added from canonical roadmap consolidation; no existing record modified or removed (append-and-reconcile). New records: ZERO_TO_PROJECT_INTENT_COMPILER, LARGE_GOAL_COMPLETENESS, CONTEXT_INTELLIGENCE_COMPLETENESS, ROADMAP_AWARE_DEVELOPMENT_PLANNER_PLANNED, GOAL_DESIGN_INTELLIGENCE_COMPOSITION, BOUNDED_CODE_MUTATION_PRIMITIVE, ORCA_BOUNDED_CANDIDATE_FANOUT, MULTIHOST_COUNCIL_CERTIFICATION, CAPABILITY_DRIFT_REVALIDATION_SWEEP, RELEASE_INSTALL_LIFECYCLE_HARDENING",
       "dedup_check": "verified no duplicate capability_id or capability name against pre-existing 159 records"
+    },
+    {
+      "reviewed_after_goal": "AERG-RECONCILIATION-2026-08-24",
+      "at": "2026-08-24T12:00:00Z",
+      "change": "Added one foundation-only AI_EXECUTION_RELIABILITY_GUARD record under the registered VERIFICATION_AND_EVALUATION family from recovered historical subject plus fresh current implementation evidence; no official baseline, candidate promotion, release, or host authority changed.",
+      "dedup_check": "verified unique capability_id and registered family before validation"
     }
   ],
   "reviewed_after_goal": "GOVERNANCE-TRUTH-SYNC",
