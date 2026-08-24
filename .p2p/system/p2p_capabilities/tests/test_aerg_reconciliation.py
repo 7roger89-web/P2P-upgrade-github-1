@@ -126,6 +126,10 @@ class AERGMatrixTests(unittest.TestCase):
         self.assertEqual(result.freshness, "STALE")
         self.assertIn("EVIDENCE_EXPIRED", result.reasons)
         self.assertNotEqual(result.status, "VERIFIED")
+        serialized = result.to_dict()
+        self.assertEqual(serialized["decision"], "STALE")
+        self.assertEqual(serialized["status"], "INCOMPLETE")
+        self.assertEqual(serialized["freshness"], "STALE")
 
     def test_explicit_stale_metadata_is_stale_and_not_verified(self):
         result = self.evaluate(
@@ -137,6 +141,10 @@ class AERGMatrixTests(unittest.TestCase):
         self.assertEqual(result.freshness, "STALE")
         self.assertIn("EVIDENCE_NOT_CURRENT", result.reasons)
         self.assertNotEqual(result.status, "VERIFIED")
+        serialized = result.to_dict()
+        self.assertEqual(serialized["decision"], "STALE")
+        self.assertEqual(serialized["status"], "INCOMPLETE")
+        self.assertEqual(serialized["freshness"], "STALE")
 
     def test_stale_contradiction_keeps_contradiction_precedence(self):
         result = self.evaluate(
@@ -149,6 +157,10 @@ class AERGMatrixTests(unittest.TestCase):
         self.assertEqual(result.decision, "CONTRADICTED")
         self.assertEqual(result.contradiction, "CONTRADICTED")
         self.assertEqual(result.freshness, "STALE")
+        serialized = result.to_dict()
+        self.assertEqual(serialized["decision"], "CONTRADICTED")
+        self.assertEqual(serialized["status"], "CONTRADICTED")
+        self.assertEqual(serialized["freshness"], "STALE")
 
     def test_fresh_valid_evidence_remains_supported(self):
         result = self.evaluate("tests PASS", evidence=observation())
@@ -228,6 +240,10 @@ class AERGQualityIntegrationTests(unittest.TestCase):
         )
         aerg_result = result.evaluate_claim(claim.claim_id)
         self.assertEqual(aerg_result.decision, "STALE")
+        serialized = aerg_result.to_dict()
+        self.assertEqual(serialized["decision"], "STALE")
+        self.assertEqual(serialized["status"], "INCOMPLETE")
+        self.assertEqual(serialized["freshness"], "STALE")
         verdict = qi.build_quality_verdict(
             "SUCCESS",
             required_eval_results={},
