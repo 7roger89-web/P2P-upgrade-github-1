@@ -694,6 +694,29 @@ QUALITY_VERDICT = {
 }
 
 
+_REQUIRED_EVAL_PROOF_STATUSES = frozenset({
+    "PASS", "PASSED", "SUCCESS", "SUCCEEDED", "HEALTHY",
+    "VERIFIED", "CERTIFIED", "IMPLEMENTED", "VERIFIED_IMPLEMENTED",
+})
+
+
+def _required_eval_failure(status: Any) -> Optional[str]:
+    """Classify one required evaluation without assuming unknown is proof."""
+    normalized = str(status or "").strip().upper()
+    if normalized in _REQUIRED_EVAL_PROOF_STATUSES:
+        return None
+    if normalized.startswith("FAIL") or normalized in (
+            "REJECTED", "EVAL_FAILED"):
+        return "EVAL_FAILED"
+    if normalized in ("NOT_AVAILABLE", "EVAL_NOT_AVAILABLE", "UNAVAILABLE"):
+        return "EVAL_NOT_AVAILABLE"
+    if normalized in ("STALE", "EXPIRED"):
+        return "STALE_EVIDENCE"
+    if normalized in ("CONTRADICTED", "CONFLICT", "QUALITY_CONFLICT"):
+        return "QUALITY_CONFLICT"
+    return "MISSING_REQUIRED_EVIDENCE"
+
+
 def build_quality_verdict(execution_status: str,
                           required_eval_results: Dict[str, str],
                           optional_eval_results: Optional[Dict[str, str]] = None,
@@ -719,12 +742,9 @@ def build_quality_verdict(execution_status: str,
         if result is None:
             failures.append("MISSING_REQUIRED_EVIDENCE")
             break
-        status = (result or "").upper()
-        if status.startswith("FAIL") or status in ("REJECTED", "EVAL_FAILED"):
-            failures.append("EVAL_FAILED")
-            break
-        if status in ("NOT_AVAILABLE", "EVAL_NOT_AVAILABLE"):
-            failures.append("EVAL_NOT_AVAILABLE")
+        failure = _required_eval_failure(result)
+        if failure:
+            failures.append(failure)
     if independent_required and not independent_verifier_result:
         failures.append("INDEPENDENT_VERIFIER_UNAVAILABLE")
 
