@@ -55,6 +55,22 @@ LOOP_STATUS_VALUES = ("PLANNED", "IN_PROGRESS", "CHECKPOINTED",
                       "OWNER_GATE", "BLOCKED", "DONE", "STOPPED")
 
 
+def _qi_execution_status_from_fw01(status: Any) -> str:
+    """Project FW01 loop completion into QI's execution-status vocabulary.
+
+    FW01 receives the AutoPilot loop/control result, while QI's checkpoint
+    predicate consumes the canonical execution outcome ``SUCCESS``.  Only
+    explicit successful outcomes and the one AutoPilot state that is emitted
+    after independent verification are projected to that token.  Unknown,
+    failed, blocked, review, and arbitrary loop states remain non-success so
+    QI continues to fail closed.
+    """
+    normalized = str(status or "UNKNOWN").strip().upper()
+    if normalized in ("SUCCESS", "SUCCEEDED", "TASK_DONE_CONTINUE"):
+        return "SUCCESS"
+    return normalized
+
+
 def _aerg_result_allows_checkpoint(
         aerg_result: Mapping[str, Any] | None) -> bool:
     """Require the actual AERG result before accepting any QI seam output."""
@@ -974,7 +990,7 @@ class Fw01Loop:
                     "reasons": ["AERG_EVALUATION_UNAVAILABLE"],
                 }
             _fw04_quality_kwargs = {
-                "execution_status": status or "UNKNOWN",
+                "execution_status": _qi_execution_status_from_fw01(status),
                 "required_eval_results": {},
                 "declared_required_evals": None,
                 "impact_known": not _fw04_impact["impact_unknown"],
