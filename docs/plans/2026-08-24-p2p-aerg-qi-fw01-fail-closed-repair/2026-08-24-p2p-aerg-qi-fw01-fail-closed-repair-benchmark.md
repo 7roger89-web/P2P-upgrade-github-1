@@ -50,6 +50,37 @@
 | P3 | Framework validator | passed / total / exit | 52 / 59 / 1 prior | 52 / 59 / 1 | 52 / 59 / 1 | exactly 7 inherited failures | 0 new classes | E3-P3A-TEST1 |
 | P3 | Production repair files | files | 0 | 2 | 2 | exactly 2 | complete | E3-P3A-PROOF1 |
 
+## B4 - P4 FW01/QI Execution-Status Contract Repair Benchmarks
+
+| Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
+|-------|--------|------|----------|--------|-------|--------|-------|----------|
+| P4 | Real fresh checkpoint RED | failing assertions / exit | 1 / 1 expected | 1 / 1 | 1 / 1 | reproduce mismatch before production edit | expected RED | E4-P4A-RED1 |
+| P4 | Fresh checkpoint regression | tests / exit | 0 stored | 1 / 0 | 1 / 0 | fresh path VERIFIED/CHECKPOINTED | complete | E4-P4C-TEST1 |
+| P4 | Unsafe FW01 status mapping falsification | tests / exit | 0 stored | 1 / 0 | 1 / 0 | unsafe values never normalize to SUCCESS | complete | E4-P4B-TEST1 |
+| P4 | AERG/QI/FW01 boundary | tests / exit | 8 / 0 prior | 10 / 0 | 10 / 0 | no new fail-closed regression | 0 failures | E4-P4C-TEST1 |
+| P4 | AERG focused | tests / exit | 17 / 0 prior | 17 / 0 | 17 / 0 | no new failures | 0 | E4-P4C-TEST1 |
+| P4 | Freshness subset | tests / exit | 5 / 0 prior | 5 / 0 | 5 / 0 | stale/expired fail closed | 0 | E4-P4C-TEST1 |
+| P4 | QI focused | tests / skipped / exit | 44 / 1 / 0 prior | 44 / 1 / 0 | 44 / 1 / 0 | no new failures | 0 | E4-P4C-TEST1 |
+| P4 | FW01 focused | tests / exit | 6 / 0 prior | 6 / 0 | 6 / 0 | no new failures | 0 | E4-P4C-TEST1 |
+| P4 | Independent A-Z reconstruction | cases / exit | 26/26 + 2/2 prior | 26/26 + 2/2 | 26/26 + 2/2 | semantic coverage preserved | complete | E4-P4C-TEST1 |
+| P4 | Full capability suite | tests / skipped / exit | 360 / 6 / 0 | 362 / 6 / 0 | 362 / 6 / 0 | NEW_TEST_FAILURES=0 | +2 tests, 0 failures | E4-P4C-TEST1 |
+| P4 | C43/RF01 suites | tests / exit | 18 / 0 prior | 18 / 0 | 18 / 0 | no new failures | 0 | E4-P4C-TEST1 |
+| P4 | Compile boundary | exit | 0 prior | 0 | 0 | PASS | 0 | E4-P4C-TEST1 |
+| P4 | Framework validator | passed / total / exit | 52 / 59 / 1 prior | 52 / 59 / 1 | 52 / 59 / 1 | exactly 7 inherited failures | 0 new classes | E4-P4C-TEST1 |
+| P4 | Continuation production repair files | files | 0 | 1 | 1 | FW01 only | complete | E4-P4B-SRC1 |
+
+Benchmark interpretation:
+
+- The full capability suite increased from 360 to 362 tests because two
+  continuation regressions were added; all 362 passed with 6 skips.
+- A first unqualified Windows full-suite invocation produced 9 identical
+  UnicodeDecodeError runner failures. The authoritative UTF-8 invocation
+  passed 362/362 and is the result used for NEW_TEST_FAILURES.
+- Validator status is preserved at 52/59 with exactly seven inherited classes:
+  V01-schema-valid, V03-family-registered, V05-dep-integrity,
+  V09-freshness-vocab, V06-charter-no-competitor-patterns,
+  V12-origin-type-valid, and V20-pr-lineage-declared.
+
 ## Non-Benchmarkable Notes
 
 - No UI, browser, Docker, network, database, release, promotion, or deployment benchmark applies to this narrow Python capability-boundary repair.

@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-24`
-- Status: `ready_for_supervisor_review`
+- Status: `ready_for_supervisor_review_handoff` (same Goal; post-review contract-mismatch repair complete)
 - Plan: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-plan.md`
 - Evidence: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-evidence.md`
 - Benchmark: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-benchmark.md`
@@ -60,7 +60,7 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
 - AERG focused/freshness/A-Z plus freshness extensions, QI, FW01, full capability, C43/RF01, compile, and validator checks have fresh results recorded.
 - `NEW_TEST_FAILURES=0`, `NEW_RUNTIME_FINDINGS=0` within this invariant, and `NEW_VALIDATOR_FAILURE_CLASSES=0`; validator remains an explicit 52/59 with exactly seven inherited classes.
 - Protected state and prior REJECT history are unchanged.
-- Coder report, problem report, notes-log links, evidence, benchmark, and actual-status refreshes are committed; final terminal is `P2P_AERG_QI_FW01_FAIL_CLOSED_REPAIR_READY_FOR_SUPERVISOR_REVIEW` only if all required gates pass.
+- Coder report, problem report, notes-log links, evidence, benchmark, and actual-status refreshes are committed; final terminal for this continuation is `P2P_AERG_FW01_QI_STATUS_CONTRACT_REPAIR_READY_FOR_SUPERVISOR_REVIEW` only if all required gates pass.
 
 ## Checklist
 
@@ -382,6 +382,48 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
   - Actual-status Update: mark plan ready for the explicitly separate Supervisor lane.
   - Commit Boundary: final artifact commit; do not run Supervisor review.
 
+### P4: FW01/QI execution-status contract mismatch continuation
+
+- Phase Goal: restore the legitimate fresh FW01 checkpoint without widening QI's canonical execution vocabulary or weakening any fail-closed boundary.
+- Phase Boundary:
+  - In scope: source/spec/caller re-derivation, one real FW01-to-production-QI RED test, one narrow FW01 status projection if proven necessary, conservative mapping tests, and bounded regression/handoff artifacts.
+  - Out of scope: AERG engine/model changes, QI allowlist expansion, compatibility safety-clamp redesign, Supervisor review, independent verification, Owner approval, promotion, release, deployment, and a new Goal.
+  - Dependency: prior P1/P2 repair commits and the current independent REJECT are preserved audit inputs, not authority.
+- Phase Implementation Rule: test-first RED commit, then the minimum contract-owner production commit, then fresh regression and handoff artifacts.
+- Ordered Slice List:
+  - P4-A: bind canonical execution/loop vocabulary and commit the real production-path RED test.
+  - P4-B: project only proven successful FW01 loop state to QI's canonical execution status; prove negative mappings remain non-success.
+  - P4-C: rerun bounded regressions, preserve protected/audit state, and hand off for a separate Supervisor review.
+
+- [x] P4-A: Bind vocabulary and add RED fresh-checkpoint regression
+  - Goal: prove the current real production FW01 -> AERG -> QI path produces `QUALITY_VERIFIED` with `checkpoint_allowed=False` and durable `QUALITY_REVIEW/BLOCKED` solely because raw `TASK_DONE_CONTINUE` enters QI.
+  - Scope Boundary:
+    - Editable: bounded regression test only.
+    - Inspect-only: QI, FW01, backend/host execution contracts, AutoPilot loop vocabulary, callers, and relevant SPECs.
+    - Preserve-only: AERG engine/model, prior REJECT reports, protected state, and the existing fail-closed compatibility seam.
+  - Acceptance: source evidence proves `SUCCESS` is QI's checkpoint execution token and `TASK_DONE_CONTINUE` is a loop/control-flow result; the RED test fails before production edit and is committed separately.
+  - Evidence Targets: `E4-P4A-SRC1`, `E4-P4A-RED1`.
+  - Commit Boundary: test-only RED commit.
+
+- [x] P4-B: Apply the narrow FW01 projection and falsify unsafe mappings
+  - Goal: normalize only the proven successful completed-execution path to QI's canonical `SUCCESS`; failed, blocked, not-run, unknown, and unrecognized states must not normalize to `SUCCESS`.
+  - Scope Boundary:
+    - Editable: `.p2p/system/p2p_capabilities/p2p_fw01_loop.py` and bounded regression assertions only if mechanically required.
+    - Preserve-only: `quality_intelligence.py`, `aerg_engine.py`, `aerg_model.py`, and the existing `_clamp_quality_verdict_to_aerg` safety boundary.
+  - Acceptance: fresh real FW01 path persists `VERIFIED/CHECKPOINTED`; all unsafe AERG/required-status/compatibility cases remain blocked; no blanket `TASK_* -> SUCCESS` mapping exists.
+  - Evidence Targets: `E4-P4B-SRC1`, `E4-P4B-TEST1`.
+  - Commit Boundary: narrow production repair commit, followed by a separate coverage commit if needed.
+
+- [x] P4-C: Regress, preserve, and hand off
+  - Goal: establish no new test/runtime/validator failure class, preserve protected/audit state, and stop at the exact requested handoff terminal.
+  - Scope Boundary:
+    - Editable: plan/evidence/benchmark/actual-status, coder/problem report, and notes-log artifacts only.
+    - Inspect-only: all protected and external-host state.
+    - Out of scope: Supervisor/independent verification, Owner approval, promotion, release, deployment, and host mutation.
+  - Acceptance: required suites are freshly rerun and interpreted; `NEW_TEST_FAILURES=0`, `NEW_RUNTIME_FINDINGS=0`, `NEW_VALIDATOR_FAILURE_CLASSES=0`; prior REJECT history and owner-dirty files are preserved.
+  - Evidence Targets: `E4-P4C-TEST1`, `E4-P4C-PROOF1`, `E4-P4C-HANDOFF1`.
+  - Commit Boundary: final report/evidence commit only after all required checks pass.
+
 ## Risk Notes
 
 - The repository has extensive pre-existing owner-dirty changes; all changes must be staged by exact path and checked against the pre-repair status.
@@ -392,9 +434,10 @@ Close the two confirmed fail-open paths in the development-source AERG quality b
 
 ## Final Handoff State
 
-- Current HEAD: `0910b18a215a4b8bae0c8b0d90da0f692067d5cb` on `codex/p2p-post74-development-01`.
-- Production repair commits: `ce641d6` (QI required-status classifier), `cbf7af9` (FW01 AERG safety clamp and fresh-observation ordering).
-- Test/evidence commits: `7e6b29f` (plan), `0ba5f39` (RED), `0910b18` (actual-AERG QI mapping regression).
-- Final measured capability result: `360 tests`, `OK`, `6 skipped`, exit `0`.
-- Final terminal: `P2P_AERG_QI_FW01_FAIL_CLOSED_REPAIR_READY_FOR_SUPERVISOR_REVIEW`.
-- Supervisor review, independent verification, Owner approval, promotion, release, deployment, and host mutation remain unperformed and out of scope.
+- Source/test subject before documentation artifacts: `a716a5066db4b213af8ef44a392afbf0e4329ce6` on `codex/p2p-post74-development-01`.
+- Production repair commits for this continuation: `66657b3` (FW01 projection to canonical QI execution status); `quality_intelligence.py`, `aerg_engine.py`, and `aerg_model.py` are unchanged for this continuation.
+- Test commits for this continuation: `36f6877` (real-path RED), `c4c5fc9` (unsafe mapping falsification), `a716a50` (test-fixture contract corrections).
+- Prior production repair commits remain preserved: `ce641d6` (QI required-status classifier), `cbf7af9` (FW01 AERG safety clamp and fresh-observation ordering).
+- Full capability result: `362 tests`, `OK`, `6 skipped`, exit `0`; the unqualified Windows runner's nine decoding errors were classified as invocation-only and were not counted as product failures after the authoritative UTF-8 rerun.
+- Current terminal: `P2P_AERG_FW01_QI_STATUS_CONTRACT_REPAIR_READY_FOR_SUPERVISOR_REVIEW`.
+- The final documentation/report commit is a descendant of the source/test subject and contains no production source. Supervisor review, independent verification, Owner approval, promotion, release, deployment, and host mutation remain unperformed and out of scope.

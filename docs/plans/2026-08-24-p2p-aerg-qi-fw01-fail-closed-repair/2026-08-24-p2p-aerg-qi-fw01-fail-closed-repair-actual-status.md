@@ -2,7 +2,7 @@
 
 Title: P2P AERG QI/FW01 Fail-Closed Repair
 Date: 2026-08-24
-Status: P3 Complete — Ready for Supervisor Review
+Status: P4 Complete — Ready for Supervisor Review Handoff
 Companion plan: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-plan.md`
 Companion evidence: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-evidence.md`
 Companion benchmark: `docs/plans/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair/2026-08-24-p2p-aerg-qi-fw01-fail-closed-repair-benchmark.md`
@@ -62,6 +62,7 @@ Anvien refreshed the current Git worktree successfully. The index contains dupli
 | Protected governance/candidate/release state | `.19` promoted, `.74` sealed/unpromoted, promotion false, CPT01-R2 host blocked | unchanged | correct | preserve-only | E0-P0A-STATE1 | do not touch |
 | Prior independent REJECT reports | current and prior REJECT artifacts exist and are unchanged | immutable audit history | correct | preserve-only | E0-P0A-REPORT1 | do not touch |
 | Framework validator | 52/59 with seven named inherited failures | same seven inherited failures; no whole-framework PASS | correct as inherited debt | preserve-only | E0-P0A-STATE1 | do not repair; recheck P3 |
+| FW01 production QI execution-status projection | successful completed execution is projected from loop state `TASK_DONE_CONTINUE` to QI status `SUCCESS`; unsafe states remain non-success | successful completed execution enters QI as canonical `SUCCESS`; unsafe states must not normalize to success | correct | unavailable in graph | E4-P4A-SRC1, E4-P4A-RED1, E4-P4B-SRC1, E4-P4B-TEST1 | preserve projection and negative mappings for Supervisor review |
 
 Final status at handoff (appended after the R0/R1 classifications above):
 
@@ -69,7 +70,9 @@ Final status at handoff (appended after the R0/R1 classifications above):
 |------|-------------|----------------|--------|----------|-------------------|
 | QI generic required-evaluation classification | Explicit proof allowlist; non-proof and unknown required statuses block | only explicit proof statuses may verify; all non-proof/unknown block | correct | E1-P1B-SRC1, E1-P1B-TEST1 | preserve optional distinction |
 | FW01 compatibility seam | Post-QI clamp requires actual safe/current/bound/contract-supporting AERG result | compatibility shape cannot weaken AERG safety | correct | E2-P2B-SRC1, E2-P2B-TEST1 | preserve fresh compatibility behavior |
+| FW01 production fresh checkpoint | real execution now yields QI `QUALITY_VERIFIED` with `checkpoint_allowed=True`; durable state is `VERIFIED/CHECKPOINTED` | legitimate fresh path remains checkpointable | correct | E4-P4C-PROBE1, E4-P4C-TEST1 | preserve; no QI vocabulary expansion |
 | AERG engine/model and serialization | unchanged source; stale/contradiction truth remains observable | preserve existing semantics | correct/preserve-only | E3-P3A-PROOF1 | no sibling edits |
+| Test-only FW01 quality seam fixtures | previously mismatch-dependent fixture is now contract-valid and still asserts review/block behavior | tests must exercise the intended invariant, not rely on accidental status mismatch | correct/test-only | E4-P4B-TEST1 | no production impact |
 | Protected governance and audit history | unchanged protected state and prior REJECT reports | immutable in this task | correct/preserve-only | E3-P3A-PROOF1 | no Supervisor/Owner/host action |
 
 ## Status Refresh Log
@@ -79,6 +82,8 @@ Final status at handoff (appended after the R0/R1 classifications above):
 | R0 | 2026-08-24 | current HEAD `6e531896` before repair | QI/FW01/AERG sibling boundary | QI generic path `wrong`; FW01 compatibility path `wrong`; AERG engine/model/current QI/protected state `correct` or preserve-only | E0-P0A-GIT1..E0-P0A-STATE1 | proceed to RED tests; keep production scope to two files |
 | R1 | 2026-08-24 | `ce641d6` after QI repair | QI required-status classifier | generic QI path `wrong -> correct`; current AERG mapping preserved; optional semantics preserved | E1-P1B-SRC1, E1-P1B-TEST1 | proceed to FW01 repair; no sibling edits |
 | R2 | 2026-08-24 | `0910b18` after FW01/test repair and final regressions | QI/FW01 boundary and protected/audit scope | FW01 compatibility path `wrong -> correct`; all repaired surfaces correct; seven validator classes remain inherited | E2-P2B-SRC1, E2-P2B-TEST1, E3-P3A-TEST1, E3-P3A-PROOF1 | hand off for separate Supervisor review; no approval/promotion |
+| R3 | 2026-08-24 | current HEAD `25cf498` after independent REJECT of fresh production-QI path | compatibility safety remains correct; fresh production-QI projection is `wrong` because `TASK_DONE_CONTINUE` is passed as QI execution status | E4-P4A-SRC1, current independent REJECT preserved | proceed with P4-A RED only; keep QI/AERG/model unchanged unless contract evidence disproves ownership |
+| R4 | 2026-08-24 | source/test HEAD `a716a50` after P4 repair and fresh regressions | canonical contract proven; FW01 projection `wrong -> correct`; fresh durable checkpoint restored; AERG/QI/compatibility fail-closed cases preserved; validator debt unchanged | E4-P4A-SRC1, E4-P4A-RED1, E4-P4B-SRC1, E4-P4B-TEST1, E4-P4C-PROBE1, E4-P4C-PROOF1 | hand off exact terminal for separate Supervisor review; do not perform that review here |
 
 ## Phase Touch Map
 
@@ -202,3 +207,12 @@ Do not redesign compatibility API, add a second verifier, or make the clamp a hi
 Decision note:
 
 P0 is complete. The current branch/subject is unambiguous, the defect is bounded to two existing production seams, and the required evidence path is available through direct source and isolated runtime tests. Anvien graph resolution is incomplete for hidden target files, so no low-blast-radius claim is made; the repair remains narrow by plan and source inspection.
+
+## Final P4 Decision
+
+- [ ] P4 blocked by a new test, runtime, validator, authority, or protected-state failure.
+- [x] P4 complete; the fresh checkpoint contract is repaired and ready for a separate Supervisor review.
+
+Decision note:
+
+Git/source/runtime evidence proves that QI owns the canonical execution token SUCCESS, while TASK_DONE_CONTINUE is an FW01 loop/control-flow state emitted after verified completion. The only production change in this continuation is the narrow FW01 projection of the proven successful completion path to SUCCESS; failed, blocked, not-run, unknown, and arbitrary states remain non-success. The real fresh path now reaches VERIFIED/CHECKPOINTED, while stale, contradicted, subject-mismatch, insufficient, malformed, and compatibility safety cases remain blocked. No Supervisor review, independent verification, Owner approval, promotion, release, deployment, or host action was performed.

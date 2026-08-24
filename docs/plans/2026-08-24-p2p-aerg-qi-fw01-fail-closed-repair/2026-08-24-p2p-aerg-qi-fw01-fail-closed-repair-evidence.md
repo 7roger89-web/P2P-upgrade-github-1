@@ -56,4 +56,100 @@ Matching plan item(s): `P3-A`, `P3-B`
 
 ## Closure Evidence
 
+## E4 - P4 FW01/QI Execution-Status Contract Repair Evidence
+
+Matching plan items: P4-A, P4-B, P4-C
+
+- E4-P4A-SRC1: independent source/spec re-derivation proves that QI owns
+  the canonical execution token SUCCESS. The live checkpoint predicate in
+  quality_intelligence.py:786-787 requires execution_status == "SUCCESS" and
+  quality_status == "QUALITY_VERIFIED". AutoPilot emits
+  TASK_DONE_CONTINUE only after evidence.status == "VERIFIED" at
+  autopilot_loop.py:484-491; this is a loop/control-flow state, not a backend
+  execution outcome. The canonical host/backend execution vocabulary in
+  host_executor.py:65-66 contains SUCCEEDED, FAILED, INTERRUPTED, UNKNOWN,
+  BLOCKED, CANCELLED, and PARTIAL_MUTATION_UNKNOWN, but not
+  TASK_DONE_CONTINUE. The role bridge also preserves the distinction between
+  execution success and quality proof. Relevant execution/evidence SPECs
+  require missing, stale, or conflicting evidence to fail closed.
+- E4-P4A-RED1: RED commit
+  36f6877c36292af3a6e5c40b03451289f14a1efe added an executable regression
+  over the real FW01 -> AERG -> QI -> durable-checkpoint path. Before any
+  production edit, the observed tuple was
+  (TASK_DONE_CONTINUE, QUALITY_VERIFIED, False, SUPPORTED, VERIFIED, CURRENT,
+  STOP_BLOCKED, QUALITY_REVIEW, BLOCKED). The test required
+  (SUCCESS, QUALITY_VERIFIED, True, SUPPORTED, VERIFIED, CURRENT,
+  TASK_DONE_CONTINUE, VERIFIED, CHECKPOINTED), so the pre-fix run was a
+  genuine RED reproduction of the cross-subsystem status mismatch.
+- E4-P4B-SRC1: production commit
+  66657b31d76bddbd35998dd7a4f81c473e847115 changes only
+  p2p_fw01_loop.py in the production surface. The helper
+  _qi_execution_status_from_fw01() projects only SUCCESS, SUCCEEDED, and
+  TASK_DONE_CONTINUE to canonical QI SUCCESS; all other values are normalized
+  but preserved, so failed, blocked, review-required, not-run, unknown, and
+  arbitrary values cannot become SUCCESS. No QI allowlist expansion was made.
+  The source hashes for quality_intelligence.py, aerg_engine.py, and
+  aerg_model.py remain unchanged for this continuation.
+- E4-P4B-TEST1: mapping falsification commit
+  c4c5fc96a1e5a5206ca5ef118e2cfede714a9a2a covers successful aliases and
+  negative statuses including FAILED, BLOCKED, STOP_BLOCKED,
+  QUALITY_REVIEW_REQUIRED, NOT_RUN, UNKNOWN, TASK_DONE, TASK_UNRECOGNIZED,
+  an arbitrary value, and None. Test-fixture corrections in test-only commit
+  a716a5066db4b213af8ef44a392afbf0e4329ce6 make the FW01 quality seam tests
+  explicitly bind their intended mock/fixture behavior rather than relying on
+  the old mismatch. No production file is changed by that commit.
+- E4-P4C-TEST1: fresh authoritative results are: production fresh checkpoint
+  regression 1/1; conservative mapping regression 1/1; AERG/QI/FW01
+  boundary 10/10; QI 44 pass with 1 skip; AERG focused 17/17; freshness
+  subset 5/5; independent A-Z reconstruction 26/26 plus the two primary
+  freshness extensions; FW01 focused 6/6; full capability 362 tests, OK,
+  6 skips, exit 0; C43/RF01 18/18; compile boundary exit 0. The full
+  suite's first unqualified Windows invocation reported nine identical UTF-8
+  decoding errors; the authoritative python -X utf8 rerun passed 362/362,
+  so those were classified as runner encoding, not product failures.
+- E4-P4C-PROBE1: an evidence-only isolated runtime probe exercised the real
+  path. Fresh actual AERG SUPPORTED/VERIFIED/CURRENT produced QI
+  QUALITY_VERIFIED, checkpoint_allowed=True, captured QI execution status
+  SUCCESS, FW01 TASK_DONE_CONTINUE, and durable VERIFIED/CHECKPOINTED.
+  Age-expired actual AERG produced STALE/INCOMPLETE/STALE, QI
+  QUALITY_REJECTED with STALE_EVIDENCE, FW01 STOP_BLOCKED, and durable
+  QUALITY_REVIEW/BLOCKED. Missing/insufficient evidence also remained
+  QUALITY_REVIEW/BLOCKED. The temporary probe was removed and no runtime
+  artifact remains.
+- E4-P4C-PROOF1: Git independently binds the source/test subject to branch
+  codex/p2p-post74-development-01, HEAD
+  a716a5066db4b213af8ef44a392afbf0e4329ce6, with repair ancestry
+  430c47d -> 11c3e9e -> a10be51 -> 5273133 -> 45ef5a2 ->
+  ad39230 -> 6e53189 -> 7e6b29f -> 0ba5f39 -> ce641d6 -> cbf7af9 ->
+  0910b18 -> 36f6877 -> 66657b3 -> c4c5fc9 -> a716a50. The production
+  diff from b1fded1cc3bcfdf6e50923a457655af51b96e34d contains only
+  p2p_fw01_loop.py; the remaining two scoped changes are tests. AERG
+  engine/model/QI are unchanged. The broad owner-dirty worktree is preserved
+  and exact-path staging is required for the final documentation commit.
+  Anvien was refreshed, but its indexed projection still cannot resolve the
+  hidden .p2p/system targets; file-detail/impact risk therefore remains
+  UNKNOWN rather than being claimed low.
+- E4-P4C-STATE1: protected governance remains .19=PROMOTED_VERIFIED,
+  .74=SEALED_UNPROMOTED, promotion.allowed=false, CPT01-R2 remains
+  host-capability blocked, and the current governance file SHA-256 is
+  5820a855d52ae5d44c3fe30ce9d4b0a112f8ad75a44cfbd6c73126314e332029.
+  RF01, C43, release/deployment state, Owner authority, and prior REJECT
+  reports were not mutated. The prior REJECT report at 430c47d remains
+  immutable audit evidence.
+- E4-P4C-HANDOFF1: the continuation is ready only for the separately
+  requested Supervisor review at terminal
+  P2P_AERG_FW01_QI_STATUS_CONTRACT_REPAIR_READY_FOR_SUPERVISOR_REVIEW.
+  This run performed no Supervisor review, independent verification, Owner
+  approval, promotion, release, deployment, or host mutation.
+
+### E4 Closure
+
+The narrow contract mismatch is closed in source/test subject
+a716a5066db4b213af8ef44a392afbf0e4329ce6: QI receives canonical SUCCESS for
+the proven successful FW01 completion path, while the loop state
+TASK_DONE_CONTINUE remains observable at FW01. Fresh legitimate checkpointing
+is restored and all tested unsafe paths remain fail-closed. The final
+artifact/report commit is a descendant containing no production source. This
+is a coder handoff, not a Supervisor or independent verdict.
+
 Bounded repair and handoff evidence are complete at HEAD `0910b18a215a4b8bae0c8b0d90da0f692067d5cb`. `NEW_TEST_FAILURES=0`, `NEW_RUNTIME_FINDINGS=0` within the repaired invariant, and `NEW_VALIDATOR_FAILURE_CLASSES=0`; validator debt remains exactly seven inherited classes. Supervisor review is explicitly out of scope for this plan execution.
