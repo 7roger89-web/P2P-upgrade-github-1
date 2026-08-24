@@ -55,6 +55,67 @@ LOOP_STATUS_VALUES = ("PLANNED", "IN_PROGRESS", "CHECKPOINTED",
                       "OWNER_GATE", "BLOCKED", "DONE", "STOPPED")
 
 
+def _aerg_result_allows_checkpoint(
+        aerg_result: Mapping[str, Any] | None) -> bool:
+    """Require the actual AERG result before accepting any QI seam output."""
+    if not isinstance(aerg_result, Mapping):
+        return False
+    return (
+        str(aerg_result.get("decision") or "").upper() == "SUPPORTED"
+        and str(aerg_result.get("status") or "").upper() == "VERIFIED"
+        and str(aerg_result.get("freshness") or "").upper() == "CURRENT"
+        and str(aerg_result.get("subject_binding") or "").upper() == "BOUND"
+        and str(aerg_result.get("provenance") or "").upper() == "BOUND"
+        and str(aerg_result.get("authority") or "").upper()
+        in ("MECHANICAL", "INDEPENDENT")
+        and aerg_result.get("supports_existing_contract") is True
+    )
+
+
+def _aerg_failure_for_checkpoint(
+        aerg_result: Mapping[str, Any] | None) -> str:
+    """Map unsafe AERG state into the existing QI failure vocabulary."""
+    if not isinstance(aerg_result, Mapping):
+        return "MISSING_REQUIRED_EVIDENCE"
+    decision = str(aerg_result.get("decision") or "INSUFFICIENT").upper()
+    if decision == "CONTRADICTED" or str(
+            aerg_result.get("contradiction") or "").upper() == "CONTRADICTED":
+        return "QUALITY_CONFLICT"
+    if decision == "STALE" or str(
+            aerg_result.get("freshness") or "").upper() == "STALE":
+        return "STALE_EVIDENCE"
+    if decision == "SUBJECT_MISMATCH" or str(
+            aerg_result.get("subject_binding") or "").upper() == "SUBJECT_MISMATCH":
+        return "CERTIFICATION_SCOPE_MISMATCH"
+    return "MISSING_REQUIRED_EVIDENCE"
+
+
+def _clamp_quality_verdict_to_aerg(
+        quality_verdict: Mapping[str, Any],
+        aerg_result: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Prevent a compatibility QI callable from weakening AERG evidence."""
+    verdict = dict(quality_verdict)
+    if _aerg_result_allows_checkpoint(aerg_result):
+        return verdict
+    failure = _aerg_failure_for_checkpoint(aerg_result)
+    prior_failures = verdict.get("quality_failures", ())
+    if isinstance(prior_failures, str):
+        prior_failures = (prior_failures,)
+    elif not isinstance(prior_failures, (list, tuple, set)):
+        prior_failures = ()
+    verdict["quality_failures"] = tuple(dict.fromkeys(
+        [str(item) for item in prior_failures if item] + [failure]))
+    verdict["checkpoint_allowed"] = False
+    verdict["aerg_result"] = (dict(aerg_result)
+                               if isinstance(aerg_result, Mapping) else None)
+    if str(verdict.get("quality_status") or "") in ("", "QUALITY_VERIFIED"):
+        verdict["quality_status"] = (
+            "QUALITY_REJECTED" if failure in (
+                "QUALITY_CONFLICT", "MISSING_REQUIRED_EVIDENCE")
+            else "QUALITY_UNKNOWN")
+    return verdict
+
+
 def _sha256(value: Any) -> str:
     def _coerce(obj: Any) -> Any:
         if isinstance(obj, set):
@@ -879,6 +940,7 @@ class Fw01Loop:
                     _fw04_subject = SubjectBinding(
                         subject_id="task:" + str(task_id),
                         source_commit=_fw04_source_commit)
+                    _fw04_observed_at = _now_iso()
                     _fw04_aerg = AERGEngine(_fw04_subject)
                     _fw04_claim = _fw04_aerg.create_claim(
                         "Execution outcome is " + str(_fw04_verification),
@@ -891,7 +953,7 @@ class Fw01Loop:
                         evidence_ref=str(_fw04_evidence_refs[0]),
                         source="fw01.goal-state",
                         origin="RUNTIME_EVIDENCE",
-                        observed_at=_now_iso(),
+                        observed_at=_fw04_observed_at,
                         fingerprint=_sha256({
                             "task_id": str(task_id),
                             "status": str(_fw04_verification),
@@ -935,6 +997,11 @@ class Fw01Loop:
                 _fw04_quality_kwargs["aerg_result"] = _fw04_aerg_result
             _fw04_verdict = _qi.build_quality_verdict(
                 **_fw04_quality_kwargs)
+            # Compatibility QI callables may omit ``aerg_result`` for API
+            # shape compatibility, but they may not erase the actual AERG
+            # safety boundary before checkpoint persistence.
+            _fw04_verdict = _clamp_quality_verdict_to_aerg(
+                _fw04_verdict, _fw04_aerg_result)
             self._trace(task_id, {"mutation_class": "READ_ONLY",
                           "permission": "",
                           "verification": "REQUIRED"},
