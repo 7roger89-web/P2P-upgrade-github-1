@@ -121,7 +121,8 @@ Matching plan items: P4-A, P4-B, P4-C
   a716a5066db4b213af8ef44a392afbf0e4329ce6, with repair ancestry
   430c47d -> 11c3e9e -> a10be51 -> 5273133 -> 45ef5a2 ->
   ad39230 -> 6e53189 -> 7e6b29f -> 0ba5f39 -> ce641d6 -> cbf7af9 ->
-  0910b18 -> 36f6877 -> 66657b3 -> c4c5fc9 -> a716a50. The production
+  0910b18 -> b1fded1 -> 25cf498 -> 36f6877 -> 66657b3 -> c4c5fc9 ->
+  a716a50. The production
   diff from b1fded1cc3bcfdf6e50923a457655af51b96e34d contains only
   p2p_fw01_loop.py; the remaining two scoped changes are tests. AERG
   engine/model/QI are unchanged. The broad owner-dirty worktree is preserved
