@@ -247,6 +247,30 @@ class Fw01ProductionQualityCheckpointTests(unittest.TestCase):
             ),
         )
 
+    def test_fw01_qi_execution_projection_is_conservative(self):
+        cases = {
+            "SUCCESS": "SUCCESS",
+            "SUCCEEDED": "SUCCESS",
+            "TASK_DONE_CONTINUE": "SUCCESS",
+            "FAILED": "FAILED",
+            "BLOCKED": "BLOCKED",
+            "STOP_BLOCKED": "STOP_BLOCKED",
+            "QUALITY_REVIEW_REQUIRED": "QUALITY_REVIEW_REQUIRED",
+            "NOT_RUN": "NOT_RUN",
+            "UNKNOWN": "UNKNOWN",
+            "TASK_DONE": "TASK_DONE",
+            "TASK_UNRECOGNIZED": "TASK_UNRECOGNIZED",
+            "ARBITRARY_STATUS": "ARBITRARY_STATUS",
+            None: "UNKNOWN",
+        }
+        for raw_status, expected in cases.items():
+            with self.subTest(raw_status=raw_status):
+                projected = fw01._qi_execution_status_from_fw01(raw_status)
+                self.assertEqual(projected, expected)
+                if raw_status not in ("SUCCESS", "SUCCEEDED",
+                                      "TASK_DONE_CONTINUE"):
+                    self.assertNotEqual(projected, "SUCCESS")
+
 
 class Fw01CompatibilityFailClosedTests(unittest.TestCase):
     def _step_with_compatibility_qi(self, *, stale=False,
