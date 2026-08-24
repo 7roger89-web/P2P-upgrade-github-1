@@ -32,6 +32,8 @@
 | P1 | Managed README block line count | lines | 0 | 132 | pending | <= 300 | +132 | E1-P1A-ORIENT2 |
 | P1 | Orientation behavior cases passing | cases | 0 | 7 | pending | all planned cases | +7 | E1-P1A-TEST1 |
 | P1 | README bytes preserved outside managed block | fixtures | N/A | 2 | pending | exact equality | PASS | E1-P1A-TEST2 |
+| P1 | Package allowlist RF01 entries | entries | 0 | 2 | pending | README + helper selected | +2 | E1-P1C-PKG1..E1-P1C-PKG2 |
+| P1 | Installer helper copy bindings | installers | 0 | 2 | pending | both existing installers | +2 | E1-P1C-INSTALL1..E1-P1C-INSTALL3 |
 | P1 | Installer README write paths | paths | 0 | 0 | pending | 0 | 0 | E0-P0A-GR5 |
 | P1 | New release/promotion artifacts | artifacts | 0 | 0 | 0 | 0 | 0 | plan boundary |
 

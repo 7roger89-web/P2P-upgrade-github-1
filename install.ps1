@@ -91,7 +91,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $SystemDestination "scripts
 Get-ChildItem -LiteralPath (Join-Path $PackageRoot "governance") -Force | ForEach-Object {
   Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $SystemDestination "governance") -Recurse -Force
 }
-foreach ($ScriptName in @("p2p_governance.py", "p2p_eval.py", "p2p_approval.py", "p2p_gate.py", "p2p_workflow.py", "p2p_decision_trace.py", "p2p_task_state.py", "p2p_safe_installer.py", "doctor.py")) {
+foreach ($ScriptName in @("p2p_governance.py", "p2p_eval.py", "p2p_approval.py", "p2p_gate.py", "p2p_workflow.py", "p2p_orientation.py", "p2p_decision_trace.py", "p2p_task_state.py", "p2p_safe_installer.py", "doctor.py")) {
   Copy-Item -LiteralPath (Join-Path $PackageRoot ("scripts\" + $ScriptName)) -Destination (Join-Path $SystemDestination ("scripts\" + $ScriptName)) -Force
 }
 

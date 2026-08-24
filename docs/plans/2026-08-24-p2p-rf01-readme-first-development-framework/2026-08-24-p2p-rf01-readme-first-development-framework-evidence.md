@@ -51,7 +51,13 @@ Matching plan item(s): `P1-A`, `P1-B`, `P1-C`
 - `E1-P1B-DETECT1`: fresh `anvien detect-changes --repo <RF01 worktree> --scope all` reports 4 changed files, 3 affected doc files, low risk, no affected processes, and no resolution-gap delta.
 - `E1-P1B-SCOPE1`: `git diff --cached --name-only` before the P1-B commit is exactly the three intended framework/charter documents plus `governance/development-control.json`.
 - `E1-P1B-BASELINE1`: full framework validator and full `tests/test_p2p_development_charter.py` remain blocked by the pre-existing capability ledger: parent commit `f92264b` already has `capabilities[175]` with legacy `id`/missing `capability_id`; current baseline also contains `SHIPPED` outside the allowed status vocabulary and roadmap count drift. RF01 does not edit that ledger.
-- `E1-P1C-PKG1..E1-P1C-INSTALL3`: pending until P1-C.
+- `E1-P1C-PKG1`: `scripts/package_release.py` now includes `README.md` in `ROOT_FILES` and `scripts/p2p_orientation.py` in `SCRIPT_FILES`; the edits are list-only.
+- `E1-P1C-PKG2`: `tests/test_p2p_orientation_packaging.py::test_package_allowlists_include_readme_and_helper` passes; the package builder was not executed and no release artifact was generated.
+- `E1-P1C-INSTALL1`: `install.ps1` and `install.sh` now copy `p2p_orientation.py` through their existing system-script lists.
+- `E1-P1C-INSTALL2`: `tests/test_p2p_orientation_packaging.py::test_installers_copy_helper_but_do_not_write_project_readme` passes; static scan finds no installer README write path.
+- `E1-P1C-INSTALL3`: focused orientation/packaging tests pass 9/9; Python compile, PowerShell AST parse, LF-normalized `bash -n`, and `git diff --check` pass. Raw `bash -n` on the Windows `core.autocrlf=true` working copy is not treated as source failure because the normalized content and HEAD blob parse successfully.
+- `E1-P1C-ANV1`: fresh target-only `anvien analyze --force` reports 872 scanned files, 163 parsed code files, 0 failures, 37,029 graph nodes, and 42,804 relationships.
+- `E1-P1C-GR1`: refreshed `anvien file-detail` for `scripts/package_release.py` reports 92 symbols, 1 inbound reference, 36 local relationships, 7 linked flows, 430 unresolved references, HIGH risk; impact reports 13 impacted symbols and two affected process records. The change remains list-only.
 
 ## E2 - P2 Evidence
 

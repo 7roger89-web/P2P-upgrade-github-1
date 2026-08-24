@@ -91,6 +91,7 @@ cp \
   "$package_root/scripts/p2p_approval.py" \
   "$package_root/scripts/p2p_gate.py" \
   "$package_root/scripts/p2p_workflow.py" \
+  "$package_root/scripts/p2p_orientation.py" \
   "$package_root/scripts/p2p_decision_trace.py" \
   "$package_root/scripts/p2p_task_state.py" \
   "$package_root/scripts/p2p_safe_installer.py" \

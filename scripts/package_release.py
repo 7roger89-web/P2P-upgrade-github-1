@@ -70,6 +70,7 @@ FORBIDDEN_FRAGMENTS = (
 )
 ROOT_FILES = (
     "VERSION",
+    "README.md",
     "AGENTS.md",
     "BAT-DAU.md",
     "NOTICE.md",
@@ -100,6 +101,7 @@ SCRIPT_FILES = (
     "scripts/p2p_task_state.py",
     "scripts/p2p_safe_installer.py",
     "scripts/p2p_workflow.py",
+    "scripts/p2p_orientation.py",
     "scripts/package.ps1",
     "scripts/package.sh",
     "scripts/package_release.py",

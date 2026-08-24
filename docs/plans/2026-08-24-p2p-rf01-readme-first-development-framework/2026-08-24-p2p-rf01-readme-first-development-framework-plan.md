@@ -179,7 +179,7 @@ The development source has existing charter, roadmap, capability, governance, in
   - Actual-status Update: record status transitions and second implementation commit.
   - Commit Boundary: commit P1-B after scoped documentation/governance checks pass; carry the inherited ledger gate as an explicit blocker.
 
-- [ ] P1-C: Package and installer availability
+- [x] P1-C: Package and installer availability
   - Goal: expose the README and helper in the existing package/install allowlists while proving installers do not auto-edit project README content.
   - Scope Boundary:
     - Editable: `scripts/package_release.py`, `install.ps1`, `install.sh` only where the existing lists require the new helper/README.
@@ -224,6 +224,12 @@ The development source has existing charter, roadmap, capability, governance, in
   - Evidence Targets: changed list entries, static preservation scan, diff check.
   - Actual-status Update: record package/install status and forbidden release-build boundary.
   - Commit Boundary: commit P1-C after source-level checks pass.
+
+  - Completion Evidence:
+    - `tests/test_p2p_orientation*.py` passes 9/9 cases, including package-list and installer-preservation checks.
+    - Python compile, PowerShell AST parsing, LF-normalized `bash -n`, and `git diff --check` pass; no release builder or installer was executed.
+    - Fresh target Anvien analysis reports 872 scanned files, 163 parsed code files, 0 failures, 37,029 nodes, and 42,804 relationships.
+    - The inherited framework capability-ledger blocker remains unchanged and out of scope.
 
 ### P2: Verification, supervisor review, and hard stop
 
