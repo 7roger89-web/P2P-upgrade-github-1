@@ -22,15 +22,16 @@ This is the living evidence ledger for the bounded AERG reconciliation. It recor
 
 | Evidence ID | Required observation | Status |
 | --- | --- | --- |
-| `E1-AERG-AZ` | A–Z deterministic matrix output; all cases executed; seeded contradictions never support. | PASS: 26/26 cases, 12 tests, exit 0 |
+| `E1-AERG-AZ` | A–Z deterministic matrix output; all cases executed; seeded contradictions never support. | PASS: 26/26 cases, 12 tests, exit 0; `test_claim_and_provenance_are_preserved` now explicitly asserts decision/contradiction/reason for no-mutation |
 | `E1-AERG-PROVIDER` | Provider-neutral source/test guard with no provider-specific core branching. | PASS: no provider/control-plane matches |
 | `E1-AERG-SCOPE` | Core has no persistence, scheduler, queue, router, release, promotion, or deploy surface. | PASS: no forbidden core surface |
-| `E2-QI-FW01` | QI/FW01 focused integration and ordering regressions. | PASS: QI 44/44 + 1 skip; checkpoint 6/6; composition 7/7 |
+| `E2-QI-FW01` | QI/FW01 focused integration and ordering regressions. | PASS fresh: QI 44/44 + 1 skip; checkpoint 6/6; full hidden suite 347/347 + 6 skips; composition remains covered |
 | `E2-C43-RF01` | Relevant C43 and RF01 orientation regressions. | PASS: C43 9/9; RF01 7/7 + packaging 2/2 |
 | `E3-LEDGER` | Schema validation, registered family, dependency integrity, and current derived projection. | PASS scoped record/JSON/count; full validator remains 52/59 with 7 inherited failures |
 | `E3-IMMUTABILITY` | `.19` baseline hash, `.74` source/candidate hashes, and protected governance status unchanged. | PASS for available `.74` artifact and governance status; `.19` ZIP absent, expected authority hash preserved |
 | `E4-BUILD` | Full requested build/compile boundary and test discovery evidence. | PASS: full hidden suite 347/347 + 6 skips; compileall exit 0 |
-| `E4-CHANGE` | Anvien/git change detection, exact intended path inventory, and no unrelated owner changes. | PASS/OBSERVED: final `anvien analyze --force` exit 0; final `anvien detect-changes --scope all` exit 0; graph reports 5 tracked changed files including pre-existing `adapter_registry.json`; hidden AERG/docs paths are outside the graph and were reconciled by direct Git/source/test evidence. |
-| `E4-REPORT` | Final A–N reconciliation report and coder report hash-bound to the final subject. | PASS: reconciliation report and coder report written with source checkpoint/fingerprint/hash; supervisor review pending |
+| `E4-CHANGE` | Anvien/git change detection, exact intended path inventory, and no unrelated owner changes. | PASS/OBSERVED: fresh `anvien analyze --force` exit 0; fresh `anvien detect-changes --scope all` exit 0; graph reports two changed files (`adapter_registry.json` pre-existing and the AERG test), zero affected files; hidden AERG/docs paths are outside the graph and were reconciled by direct Git/source/test evidence. |
+| `E4-REPAIR` | Supervisor blocker repair, exact test assertion, production-source immutability, fresh affected regressions, and new checkpoint. | PASS: test-only checkpoint `c99145f`; production AERG/QI/FW01 hashes unchanged; focused 12/12, QI 44/44 + 1 skip, checkpoint 6/6, C43+RF01 18/18, full 347/347 + 6 skips, compileall exit 0 |
+| `E4-REPORT` | Final A–N reconciliation report and coder/post-review report hash-bound to the repaired subject. | PASS: prior Supervisor `REJECT` preserved; repair report and new coder handoff written; Supervisor re-review pending |
 
 `NOT_RUN` remains `NOT_RUN`; it is never converted to PASS by report wording.

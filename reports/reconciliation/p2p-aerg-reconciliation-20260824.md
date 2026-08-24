@@ -1,12 +1,28 @@
 # P2P AERG Reconciliation — Development-Plane Evidence Report
 
 **Date:** 2026-08-24
-**Terminal verdict:** `P2P_AERG_IMPLEMENTATION_READY_FOR_SUPERVISOR_REVIEW`
+**Terminal verdict:** `P2P_AERG_POST_REVIEW_REPAIR_READY_FOR_SUPERVISOR_REREVIEW`
 **Mode:** development-plane, evidence-first, noncanonical
-**Current source HEAD:** `fc1b9dc` (AERG implementation checkpoint)
-**AERG scoped subject fingerprint:** `677c1f52c7aaeec2987f91161fa2c894e017e574a764ef3ad6e7b498f54e10a3`
+**Current source HEAD:** `c99145f` (post-review test-only repair checkpoint)
+**Original implementation checkpoint:** `fc1b9dc`
+**AERG scoped subject fingerprint:** `bd14ca273d5c35fe02d177e329d24b73915f09ab89d079d0daf99124780f0d9c`
 
 This report is derived from fresh local source, Git, and test observations. Historical AERG reports are treated as claims, not authority. No promotion, release, deployment, GitHub host mutation, `.19` mutation, or `.74` mutation occurred.
+
+## Post-review repair update
+
+The prior Supervisor review remains preserved at
+`reports/supervisor/rp_supervisor_260824_141738_by_gpt-5-codex_p2p-aerg-reconciliation.md`
+with verdict `REJECT`. Its sole blocker was a missing executable assertion for
+the no-mutation contradiction. The owner-authorized repair was test-only:
+
+- `.p2p/system/p2p_capabilities/tests/test_aerg_reconciliation.py:109-111`
+  now asserts `decision == CONTRADICTED`,
+  `contradiction == CONTRADICTED`, and
+  `MUTATION_CONTRADICTS_NO_MUTATION`.
+- Production `aerg_model.py`, `aerg_engine.py`, `quality_intelligence.py`,
+  and `p2p_fw01_loop.py` were not changed.
+- Post-review repair checkpoint: `c99145f`.
 
 ## A. Historical AERG subject/base recovery
 
@@ -97,6 +113,11 @@ Important boundaries:
 Fresh matrix command: `py -X utf8 -m unittest discover -s .p2p/system/p2p_capabilities/tests -p 'test_aerg_reconciliation.py'`
 Result: **12 tests passed; 26/26 matrix cases passed; exit 0**.
 
+The previously unasserted required contradiction is now executable: claim
+`"no files changed"` with `mutation_state=MUTATED` and a changed path returns
+`CONTRADICTED`, preserves the original claim, preserves evidence references,
+and includes `MUTATION_CONTRADICTS_NO_MUTATION`.
+
 | Case | Result | Case | Result | Case | Result |
 | --- | --- | --- | --- | --- | --- |
 | A self-claim | INSUFFICIENT | J fixture != live | INSUFFICIENT | S unsupported PASS | INSUFFICIENT |
@@ -130,15 +151,14 @@ The AERG core contains no `Manus`, `Codex`, `Claude`, or `Gemini` branch/name. T
 
 | Boundary | Result |
 | --- | --- |
-| AERG matrix/integration | 12 passed; 26/26 cases; exit 0 |
+| AERG matrix/integration | 12 passed; 26/26 cases; exit 0; no-mutation assertion explicit |
 | Existing QualityIntelligence | 44 passed, 1 skipped; exit 0 |
 | Full hidden capability suite | 347 passed, 6 skipped; exit 0 |
 | FW01 checkpoint quality gate | 6 passed; exit 0 |
 | FW01 composition gate | 7 passed; exit 0 |
 | Capability foundation | 28 passed; exit 0 |
 | C43 reconciliation | 9 passed; exit 0 |
-| RF01 orientation | 7 passed; exit 0 |
-| RF01 packaging | 2 passed; exit 0 |
+| RF01 orientation + packaging | 9 passed; exit 0 |
 | Full compile boundary | exit 0; one unrelated pre-existing SyntaxWarning in `tests/test_p2p_live_certification.py` |
 | Framework validator | 52/59; exactly 7 inherited failures, unchanged in class and outside AERG scope |
 | Rail consolidation validator | exit 1 on inherited `/home/ubuntu/fw01_work/auth-f01` path assumption before ledger validation |
@@ -151,6 +171,7 @@ No AERG-specific NEW_FAILURE was observed in the focused or full hidden suites.
 | Classification | Finding | Action |
 | --- | --- | --- |
 | NEW_FAILURE | None in AERG scoped tests, QI, FW01 checkpoint/composition, C43, or RF01 tests. | None. |
+| RESOLVED_VERIFICATION_EVIDENCE_GAP | No-mutation contradiction was previously constructed but not asserted. | Explicit decision, contradiction, and stable-reason assertions added; prior Supervisor REJECT retained as historical evidence. |
 | RESOLVED_INHERITED_FAILURE | Historical AERG’s missing `get_claims()`/unverified-claim path and obsolete QI argument. | Replaced by current `aerg_result` contract and explicit evaluation. |
 | RESOLVED_INHERITED_FAILURE | Historical raw-content/timestamp-ID/no-subject-binding behavior. | Replaced by structured exact binding, deterministic IDs, and current EvidenceClaim projection. |
 | INHERITED_FAILURE | Seven framework-validator failures listed in section C. | Preserved; no cleanup-by-proximity. |
@@ -172,6 +193,6 @@ The reconciled slice adds exactly two runtime modules, one focused test module, 
 
 ## N. Next safe Goal
 
-`P2P_AERG_SUPERVISOR_REVIEW_01`: independently review the exact AERG subject at source checkpoint `fc1b9dc`, scoped fingerprint `677c1f52c7aaeec2987f91161fa2c894e017e574a764ef3ad6e7b498f54e10a3`, and this report’s final bytes. Supervisor review must inspect source before accepting tests, preserve the seven inherited framework failures, and stop at review handoff. Any later independent verification or promotion-readiness work is a separate owner-authorized goal; this reconciliation does not authorize it.
+`P2P_AERG_SUPERVISOR_REREVIEW_02`: independently re-review the repaired subject at source checkpoint `c99145f`, scoped fingerprint `bd14ca273d5c35fe02d177e329d24b73915f09ab89d079d0daf99124780f0d9c`, and this report’s final bytes. Re-review must confirm the exact no-mutation assertion, production-source immutability, preserved prior REJECT, and seven inherited framework failures. Any later independent verification or promotion-readiness work is a separate owner-authorized goal; this repair does not authorize it.
 
 **Hard stop:** do not start Work Queue, Lane Registry, Integration Queue, promotion, release, deployment, or host mutation from this result.

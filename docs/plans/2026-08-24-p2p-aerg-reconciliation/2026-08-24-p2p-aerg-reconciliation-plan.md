@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-24
 **Working tree:** `codex/p2p-post74-development-01`
-**Current HEAD:** `fc1b9dc` (AERG implementation checkpoint; source-bound subject commit)
-**Terminal target:** `P2P_AERG_IMPLEMENTATION_READY_FOR_SUPERVISOR_REVIEW` or a precise `P2P_AERG_BLOCKED_*` result.
+**Current HEAD:** `c99145f` (post-review no-mutation assertion checkpoint; source-bound subject commit)
+**Terminal target:** `P2P_AERG_POST_REVIEW_REPAIR_READY_FOR_SUPERVISOR_REREVIEW` or a precise `P2P_AERG_BLOCKED_*` result.
 
 ## Goal
 
