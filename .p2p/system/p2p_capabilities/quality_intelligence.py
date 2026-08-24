@@ -20,7 +20,7 @@ import json
 import os
 import pathlib
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 REGISTRY_DIR = pathlib.Path(__file__).parent
 _GOVERNANCE_DIR = pathlib.Path(__file__).resolve().parents[3] / "governance"
@@ -701,7 +701,8 @@ def build_quality_verdict(execution_status: str,
                           required_evidence_present: bool = True,
                           declared_required_evals: Optional[Dict[str, Any]] = None,
                           independent_verifier_result: Optional[str] = None,
-                          independent_required: bool = False
+                          independent_required: bool = False,
+                          aerg_result: Optional[Mapping[str, Any]] = None
                           ) -> Dict[str, Any]:
     """Structured outcome. Unknown quality must not become PASS: an execution
     SUCCESS with quality_status QUALITY_UNKNOWN must NOT checkpoint as fully
@@ -727,14 +728,32 @@ def build_quality_verdict(execution_status: str,
     if independent_required and not independent_verifier_result:
         failures.append("INDEPENDENT_VERIFIER_UNAVAILABLE")
 
-    if "EVAL_FAILED" in failures or "MISSING_REQUIRED_EVIDENCE" in failures:
+    # AERG is an evidence/assurance input only.  It cannot certify, promote,
+    # release, or deploy; it maps into the existing QI failure vocabulary.
+    if aerg_result is not None:
+        if not isinstance(aerg_result, Mapping):
+            failures.append("MISSING_REQUIRED_EVIDENCE")
+        else:
+            aerg_decision = str(aerg_result.get("decision") or "INSUFFICIENT").upper()
+            if aerg_decision == "CONTRADICTED":
+                failures.append("QUALITY_CONFLICT")
+            elif aerg_decision == "STALE":
+                failures.append("STALE_EVIDENCE")
+            elif aerg_decision == "SUBJECT_MISMATCH":
+                failures.append("CERTIFICATION_SCOPE_MISMATCH")
+            elif aerg_decision != "SUPPORTED":
+                failures.append("MISSING_REQUIRED_EVIDENCE")
+
+    if any(failure in failures for failure in
+           ("EVAL_FAILED", "MISSING_REQUIRED_EVIDENCE", "QUALITY_CONFLICT")):
         status = "QUALITY_REJECTED"
     elif failures:
         # Missing required independent verification and unanalyzed impact both
         # remain UNKNOWN: partial verification is never granted on missing
         # required evidence, only on honest unavailability of optional evals.
         unknown_causes = ("IMPACT_UNKNOWN", "INDEPENDENT_VERIFIER_UNAVAILABLE",
-                          "EVAL_NOT_AVAILABLE")
+                          "EVAL_NOT_AVAILABLE", "STALE_EVIDENCE",
+                          "CERTIFICATION_SCOPE_MISMATCH")
         status = "QUALITY_UNKNOWN" if any(c in failures for c in unknown_causes) \
             else "QUALITY_PARTIAL"
     else:
@@ -743,6 +762,7 @@ def build_quality_verdict(execution_status: str,
         "execution_status": execution_status,
         "quality_status": status,
         "quality_failures": tuple(failures),
+        "aerg_result": dict(aerg_result) if isinstance(aerg_result, Mapping) else None,
         "checkpoint_allowed": (execution_status == "SUCCESS"
                                and status == "QUALITY_VERIFIED"),
         "note": "EXECUTION_SUCCESS != QUALITY_PROVEN",

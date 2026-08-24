@@ -22,6 +22,7 @@ Transcript and cache can never override canonical source truth.
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import os
 import subprocess
@@ -864,17 +865,76 @@ class Fw01Loop:
                 changed_paths=_fw04_changed_surface,
                 project_root=self.root,
                 analysis_complete=True)
-            _fw04_verdict = _qi.build_quality_verdict(
-                execution_status=status or "UNKNOWN",
-                required_eval_results={},
-                declared_required_evals=None,
-                impact_known=not _fw04_impact["impact_unknown"],
-                required_evidence_present=bool(
-                    (evidence.get("verification_result") or "")
-                    if isinstance(evidence, Mapping) else False),
-                independent_verifier_result=(
+            _fw04_aerg_result = None
+            # AERG consumes only the durable FW01 event/evidence pointer.  It
+            # is intentionally lazy here so RF01 orientation does not load
+            # execution/release internals before a post-execution decision.
+            try:
+                from .aerg_engine import AERGEngine
+                from .aerg_model import (ClaimExpectation, EvidenceObservation,
+                                         SubjectBinding)
+                _fw04_source_commit = _qi.git_source_commit(self.root)
+                if (task_id and _fw04_source_commit and _fw04_evidence_refs
+                        and _fw04_verification):
+                    _fw04_subject = SubjectBinding(
+                        subject_id="task:" + str(task_id),
+                        source_commit=_fw04_source_commit)
+                    _fw04_aerg = AERGEngine(_fw04_subject)
+                    _fw04_claim = _fw04_aerg.create_claim(
+                        "Execution outcome is " + str(_fw04_verification),
+                        expectation=ClaimExpectation(
+                            expected_status="VERIFIED",
+                            required_assurance="MECHANICAL"))
+                    _fw04_mutation_state = (
+                        "MUTATED" if _fw04_changed_surface else "UNCHANGED")
+                    _fw04_observation = EvidenceObservation(
+                        evidence_ref=str(_fw04_evidence_refs[0]),
+                        source="fw01.goal-state",
+                        origin="RUNTIME_EVIDENCE",
+                        observed_at=_now_iso(),
+                        fingerprint=_sha256({
+                            "task_id": str(task_id),
+                            "status": str(_fw04_verification),
+                            "evidence_refs": list(_fw04_evidence_refs),
+                        }),
+                        subject_id=_fw04_subject.subject_id,
+                        source_commit=_fw04_source_commit,
+                        observed_status=str(_fw04_verification),
+                        mutation_state=_fw04_mutation_state,
+                        changed_paths=_fw04_changed_surface)
+                    _fw04_aerg.add_evidence(
+                        _fw04_claim.claim_id, _fw04_observation)
+                    _fw04_aerg_result = _fw04_aerg.evaluate_claim(
+                        _fw04_claim.claim_id).as_quality_input()
+            except Exception:  # noqa: BLE001 - quality remains fail-closed
+                _fw04_aerg_result = {
+                    "decision": "INSUFFICIENT",
+                    "reasons": ["AERG_EVALUATION_UNAVAILABLE"],
+                }
+            _fw04_quality_kwargs = {
+                "execution_status": status or "UNKNOWN",
+                "required_eval_results": {},
+                "declared_required_evals": None,
+                "impact_known": not _fw04_impact["impact_unknown"],
+                "required_evidence_present": bool(
+                    _fw04_aerg_result
+                    and _fw04_aerg_result.get("decision") == "SUPPORTED"),
+                "independent_verifier_result": (
                     evidence.get("independent_verdict") or "")
-                if isinstance(evidence, Mapping) else "")
+                if isinstance(evidence, Mapping) else "",
+            }
+            # Existing seam tests and downstream integrations may provide the
+            # pre-AERG QI callable.  The real current QI accepts the optional
+            # input; a compatible mock is deliberately kept info-only here.
+            try:
+                _fw04_qi_parameters = inspect.signature(
+                    _qi.build_quality_verdict).parameters
+            except (TypeError, ValueError):
+                _fw04_qi_parameters = {}
+            if "aerg_result" in _fw04_qi_parameters:
+                _fw04_quality_kwargs["aerg_result"] = _fw04_aerg_result
+            _fw04_verdict = _qi.build_quality_verdict(
+                **_fw04_quality_kwargs)
             self._trace(task_id, {"mutation_class": "READ_ONLY",
                           "permission": "",
                           "verification": "REQUIRED"},
