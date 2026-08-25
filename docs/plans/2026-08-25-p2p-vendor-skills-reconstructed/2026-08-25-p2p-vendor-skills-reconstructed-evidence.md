@@ -121,16 +121,34 @@ Matching plan item(s): `P3-A`, `P3-B`
   for the complete candidate scope.
 - `E3-P3B-REPORT1` — coder report:
   `reports/coder/rp_coder_260825_134605_by_gpt-5-codex_p2p-vendor-skills-reconstructed.md`.
-- `E3-P3B-COMMIT1` — checkpoint is authorized technically and remains pending
-  the single local commit; no remote write is allowed.
+- `E3-P3B-COMMIT1` — checkpoint is recorded exactly as commit
+  `d29801bd37a53207f81e89eaa295cbef0802b951`, tree
+  `27bac22f1f2cba670425a28d050a566916d23265`, parent `557b502…`; closure
+  worktree is clean. The pre-review to checkpoint implementation-subject
+  result is `EXACT_MATCH`; no post-review source mutation exists. Ancestry is
+  `ORIGIN_MAIN_ANCESTOR_OF_557B`.
 - `E3-P3B-SUP1` — fresh independent supervisor report
   `reports/supervisor/rp_supervisor_260825_134605_by_gpt-5-codex_p2p-vendor-skills-reconstructed.md`
-  records exactly `PASS` for this candidate. It separates technical readiness
-  from Owner approval and promotion.
+  records exactly `PASS` for this candidate and is preserved unchanged during
+  this closure. Its PASS applies to the exact checkpoint because the
+  implementation subject identity was proven.
+
+- `E4-OWNER-APPROVAL1` — the current explicit Owner instruction approves the
+  exact subject commit `d29801bd37a53207f81e89eaa295cbef0802b951` and tree
+  `27bac22f1f2cba670425a28d050a566916d23265`. The approval is bound to both
+  hashes; no approval CLI was executed and no approval was inferred from
+  silence. This records Owner approval only, not promotion.
+- `E4-HASH-CLOSURE1` — closure recheck preserved the implementation/vendor/test
+  hashes: registry `36d74ff8…b5cb97e`, adapter `d469a15d…f4490`, router
+  `9074d8b4…7f641`, foundation test `473936b8…a7eb`, vendor test
+  `2b5f0986…88b7`, whiteboard tree `55dbed47…8742c`, and copywriter tree
+  `5a02c082…2830d`. Existing Supervisor report blob remains
+  `8cdd091b1763f3ab86c708ac79cff61064d3a47c1dadf2d29d32f95f32626e85`.
 
 ## Closure Evidence
 
-The final closure section will record the exact final hashes, command exits,
-Anvien result, checkpoint subject/tree if created, supervisor report path, and
-the separation between technical readiness and Owner gate. No approval,
-promotion, merge, push, release, or deployment is performed by this plan.
+The final closure records the exact checkpoint, clean worktree, subject identity,
+ancestry, preserved Supervisor PASS, unchanged source/vendor/test hashes, and
+explicit Owner approval. Technical PASS, Supervisor PASS, Owner approval, and
+promotion remain separate states. No merge, push, release, deployment, or
+promotion is performed by this plan.

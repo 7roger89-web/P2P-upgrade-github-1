@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-25`
-- Status: `P3-A Complete; supervisor PASS; checkpoint pending`
+- Status: `Owner approval recorded; exact checkpoint unpromoted`
 - Plan: `docs/plans/2026-08-25-p2p-vendor-skills-reconstructed/2026-08-25-p2p-vendor-skills-reconstructed-plan.md`
 - Evidence: `docs/plans/2026-08-25-p2p-vendor-skills-reconstructed/2026-08-25-p2p-vendor-skills-reconstructed-evidence.md`
 - Benchmark: `docs/plans/2026-08-25-p2p-vendor-skills-reconstructed/2026-08-25-p2p-vendor-skills-reconstructed-benchmark.md`
@@ -383,7 +383,7 @@ errors. The safe unit is therefore the vendor integration seam only.
     Package role mismatch and development governance drift match the clean-base
     inherited/expected state; no candidate-attributable doctor blocker found.
 
-- [ ] P3-B: Close evidence, detect changes, checkpoint, and supervisor-review the new candidate.
+- [x] P3-B: Close evidence, detect changes, checkpoint, and supervisor-review the new candidate.
   - Goal: establish valid Git/Anvien authority and obtain an independent verdict.
   - Scope Boundary:
     - Editable: plan/evidence/benchmark/status/coder/supervisor reports and one checkpoint commit if gates pass.
@@ -429,8 +429,12 @@ errors. The safe unit is therefore the vendor integration seam only.
   - Actual-status Update: close as ready-for-owner-gate, regression, or blocked.
   - Commit Boundary: exactly one checkpoint commit; never merge/promote/push.
   - Current result: Git is valid, the final Anvien alias is unambiguous, and
-    `detect-changes --scope all` exits `0`. Coder evidence is complete and the
-    fresh supervisor verdict is `PASS`; one local checkpoint remains to record.
+    `detect-changes --scope all` exited `0`. The exact checkpoint is
+    `d29801bd37a53207f81e89eaa295cbef0802b951` / tree
+    `27bac22f1f2cba670425a28d050a566916d23265`; the pre-review to checkpoint
+    implementation subject is `EXACT_MATCH`. The fresh Supervisor verdict is
+    `PASS`, applies to this exact checkpoint, and the current Owner instruction
+    records approval. State remains unpromoted.
 
 - [ ] Pn-A: Call the supervisor for the implemented-plan acceptance loop.
   - Goal: independently verify the completed reconstruction against current source and evidence.

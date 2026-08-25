@@ -2,7 +2,7 @@
 
 Title: P2P Vendor Skills — Reconstruct Candidate on Valid Git Authority
 Date: 2026-08-25
-Status: P3-A Complete; supervisor PASS; checkpoint pending
+Status: Owner approval recorded; exact checkpoint unpromoted
 Companion plan: `docs/plans/2026-08-25-p2p-vendor-skills-reconstructed/2026-08-25-p2p-vendor-skills-reconstructed-plan.md`
 Companion evidence: `docs/plans/2026-08-25-p2p-vendor-skills-reconstructed/2026-08-25-p2p-vendor-skills-reconstructed-evidence.md`
 Companion benchmark: `docs/plans/2026-08-25-p2p-vendor-skills-reconstructed/2026-08-25-p2p-vendor-skills-reconstructed-benchmark.md`
@@ -42,7 +42,7 @@ validation surfaces without treating reports or profiles as authority.
 | Foundation test expectations | `correct` for vendor registry/adapter boundary | `E2-P2B-TEST1` | vendor-specific assertions only | Keep C35 and role surfaces untouched. |
 | Vendor focused tests | `correct` (`17/17`) | `E2-P2B-TEST1`, `E3-P3A-TEST1` | validation-only after addition | Supervisor recheck and final closure. |
 | Anvien graph | `correct` for indexed source, `.p2p` file-detail `UNKNOWN`; detect exit `0` | `E0-P0A-ANV1`, `E0-P0A-ANV2`, `E3-P3B-ANV1` | validation-only | Use direct source diff for hidden/untracked paths; semantic coverage is partial but Git authority is valid. |
-| Owner approval/promotion | `missing` by design | plan rules | preserve-only | Stop at technical/supervisor gate; do not promote. |
+| Owner approval/promotion | `Owner approval recorded` for exact checkpoint; promotion `missing` by design | `E3-P3B-COMMIT1`, `E4-OWNER-APPROVAL1` | preserve-only | Stop at approved-unpromoted state; do not promote. |
 
 ## P0 Decision
 
@@ -61,4 +61,5 @@ only in the new valid branch/worktree.
 | `2026-08-25 P2-B` | router/tests `partial -> correct` | `E2-P2B-SRC1`, `E2-P2B-TEST1` | P3 differential gate. |
 | `2026-08-25 P3-A` | technical candidate `partial -> technically ready pending supervisor` | `E3-P3A-TEST1`, `E3-P3A-DOCTOR1`, `E3-P3A-DIFF1` | P3-B source-scope, report, and supervisor gate. |
 | `2026-08-25 P3-B-precheck` | Git/Anvien authority `unknown -> usable`; candidate remains unpromoted | `E3-P3B-GIT1`, `E3-P3B-ANV1` | Supervisor review completed; create one local checkpoint only. |
-| `2026-08-25 P3-B-supervisor` | technical candidate `ready pending checkpoint -> supervisor PASS` | `E3-P3B-SUP1` | Record checkpoint SHA/tree; retain Owner gate separate. |
+| `2026-08-25 P3-B-supervisor` | technical candidate `ready pending checkpoint -> supervisor PASS` | `E3-P3B-SUP1` | Checkpoint identity confirmed; retain Owner gate separate. |
+| `2026-08-25 Owner closure` | exact checkpoint `unclosed -> Owner approved/unpromoted` | `E3-P3B-COMMIT1`, `E4-OWNER-APPROVAL1`, `E4-HASH-CLOSURE1` | Stop; no merge, push, promotion, or source mutation. |
