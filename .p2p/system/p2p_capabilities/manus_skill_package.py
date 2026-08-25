@@ -14,7 +14,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping
 
-from .vendor_skill import VendorSkillError, is_vendor_skill, load_vendor_skill, vendor_skill_metadata
+from .vendor_skill import VendorSkillError, canonical_source_sha256, is_vendor_skill, load_vendor_skill, vendor_skill_metadata
 
 
 MANUS_HOST_KIND = "manus"
@@ -283,7 +283,7 @@ def _entrypoint_content(context: Mapping[str, Any], expected_hash: str) -> tuple
         raw = value.encode("utf-8")
     else:
         raise ManusPackageError("SERIALIZATION_INVALID")
-    if _sha256(raw) != expected_hash:
+    if canonical_source_sha256(raw) != expected_hash:
         raise ManusPackageError("ENTRYPOINT_HASH_MISMATCH")
     declared = context.get("entrypoint_hash", context.get("current_entrypoint_hash"))
     if declared is not None and _text(declared).lower() != expected_hash:

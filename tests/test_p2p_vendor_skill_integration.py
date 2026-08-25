@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import hashlib
 import inspect
+import json
 import shutil
 import sys
 import tempfile
@@ -33,6 +33,7 @@ from p2p_uiux.router import foundation_route  # noqa: E402
 class P2PVendorSkillIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        (REPO_ROOT / ".tmp").mkdir(parents=True, exist_ok=True)
         cls.registry = load_registry(REGISTRY_PATH)
         cls.manifests = {
             item.capability_id: item
@@ -164,7 +165,7 @@ class P2PVendorSkillIntegrationTests(unittest.TestCase):
                 entrypoint = root / "SKILL.md"
                 self.assertEqual(snapshot_tree_sha256(root), provenance["snapshot_sha256"])
                 self.assertEqual(
-                    hashlib.sha256(entrypoint.read_bytes()).hexdigest(),
+                    vendor_skill._sha256_file(entrypoint),
                     provenance["integration"]["entrypoint_sha256"],
                 )
 
@@ -177,6 +178,61 @@ class P2PVendorSkillIntegrationTests(unittest.TestCase):
             readme = clone / "README.md"
             readme.write_text(readme.read_text(encoding="utf-8") + "\nlocal test mutation\n", encoding="utf-8")
             self.assertNotEqual(original_hash, snapshot_tree_sha256(clone))
+
+    @staticmethod
+    def _write_snapshot_fixture(root: Path, *, line_ending: bytes = b"\n") -> None:
+        (root / "nested").mkdir(parents=True)
+        (root / "text.txt").write_bytes(b"alpha" + line_ending + b"beta" + line_ending)
+        (root / "nested" / "binary.bin").write_bytes(b"\x89PNG\r\n\x00\xff")
+
+    def test_18_vendor_tree_hash_detects_missing_file(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="p2p-vendor-missing-", dir=REPO_ROOT / ".tmp") as raw:
+            root = Path(raw) / "snapshot"
+            self._write_snapshot_fixture(root)
+            original_hash = snapshot_tree_sha256(root)
+            (root / "text.txt").unlink()
+            self.assertNotEqual(original_hash, snapshot_tree_sha256(root))
+
+    def test_19_vendor_tree_hash_detects_unexpected_included_file(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="p2p-vendor-extra-", dir=REPO_ROOT / ".tmp") as raw:
+            root = Path(raw) / "snapshot"
+            self._write_snapshot_fixture(root)
+            original_hash = snapshot_tree_sha256(root)
+            (root / "unexpected.txt").write_bytes(b"unexpected\n")
+            self.assertNotEqual(original_hash, snapshot_tree_sha256(root))
+
+    def test_20_vendor_tree_hash_detects_path_set_drift(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="p2p-vendor-paths-", dir=REPO_ROOT / ".tmp") as raw:
+            root = Path(raw) / "snapshot"
+            self._write_snapshot_fixture(root)
+            original_hash = snapshot_tree_sha256(root)
+            (root / "text.txt").rename(root / "renamed.txt")
+            self.assertNotEqual(original_hash, snapshot_tree_sha256(root))
+
+    def test_21_stale_registry_identity_fails_closed(self) -> None:
+        payload = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+        for item in payload["capabilities"]:
+            if item.get("CAPABILITY_ID") == "creative.copywriting":
+                item["UPSTREAM_PROVENANCE"]["snapshot_sha256"] = "0" * 64
+                break
+        with tempfile.TemporaryDirectory(prefix="p2p-vendor-registry-", dir=REPO_ROOT / ".tmp") as raw:
+            registry = Path(raw) / "capabilities.json"
+            registry.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            with self.assertRaisesRegex(vendor_skill.VendorSkillError, "VENDOR_SNAPSHOT_HASH_MISMATCH"):
+                load_vendor_skill(
+                    "creative.copywriting",
+                    registry_path=registry,
+                    repository_root=REPO_ROOT,
+                )
+
+    def test_22_lf_and_crlf_materialize_same_canonical_snapshot_identity(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="p2p-vendor-eol-", dir=REPO_ROOT / ".tmp") as raw:
+            root = Path(raw)
+            lf_root = root / "lf"
+            crlf_root = root / "crlf"
+            self._write_snapshot_fixture(lf_root, line_ending=b"\n")
+            self._write_snapshot_fixture(crlf_root, line_ending=b"\r\n")
+            self.assertEqual(snapshot_tree_sha256(lf_root), snapshot_tree_sha256(crlf_root))
 
     def test_17_provider_neutral_single_router_boundary(self) -> None:
         source = inspect.getsource(vendor_skill).lower()

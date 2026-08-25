@@ -10,6 +10,7 @@ from pathlib import PurePosixPath
 from typing import Any, Mapping
 
 from .model import CapabilityManifest
+from .vendor_skill import canonical_source_sha256
 
 
 INPUT_SCHEMA = "p2p-host-skill-projection-input/1"
@@ -241,7 +242,7 @@ def _entrypoint(context: Mapping[str, Any], item: HostSkillProjectionInput) -> t
     else:
         raise ValueError("SERIALIZATION_INVALID")
     current = context.get("entrypoint_hash") or context.get("current_entrypoint_hash")
-    if _hash(raw) != item.entrypoint_hash or (current is not None and _text(current).lower() != item.entrypoint_hash):
+    if canonical_source_sha256(raw) != item.entrypoint_hash or (current is not None and _text(current).lower() != item.entrypoint_hash):
         raise ValueError("ENTRYPOINT_HASH_MISMATCH")
     return raw, text
 

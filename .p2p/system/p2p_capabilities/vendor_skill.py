@@ -114,15 +114,35 @@ def _declared_path(relative: str, declarations: Iterable[Any], *, field: str) ->
 
 
 def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    return _sha256_bytes(path.read_bytes())
+
+
+def _canonical_source_bytes(data: bytes) -> bytes:
+    """Match the repository's portable text hashing policy.
+
+    Git stores text surfaces with LF under the repository's ``text=auto``
+    attribute. A Windows checkout may materialize those same bytes as CRLF.
+    Canonicalize text line endings for identity checks while preserving binary
+    files exactly, as the existing governance hash contract does.
+    """
+
+    if b"\x00" in data:
+        return data
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def _sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(_canonical_source_bytes(data)).hexdigest()
+
+
+def canonical_source_sha256(data: bytes) -> str:
+    """Return the canonical identity hash for a repository source payload."""
+
+    return _sha256_bytes(data)
 
 
 def snapshot_tree_sha256(root: str | Path) -> str:
-    """Hash source bytes and relative names while excluding local build output."""
+    """Hash canonical source bytes and relative names, excluding local output."""
 
     root_path = Path(root).expanduser().resolve()
     if not root_path.is_dir():
@@ -328,7 +348,7 @@ def load_vendor_skill(
     if expected_tree and expected_tree != "UNKNOWN" and snapshot_tree_sha256(vendor_root) != expected_tree:
         raise VendorSkillError("VENDOR_SNAPSHOT_HASH_MISMATCH")
     entrypoint_bytes = entrypoint.read_bytes()
-    entrypoint_hash = hashlib.sha256(entrypoint_bytes).hexdigest()
+    entrypoint_hash = _sha256_bytes(entrypoint_bytes)
     expected_entrypoint = integration.get("entrypoint_sha256")
     if expected_entrypoint and expected_entrypoint != "UNKNOWN" and entrypoint_hash != expected_entrypoint:
         raise VendorSkillError("VENDOR_ENTRYPOINT_HASH_MISMATCH")
