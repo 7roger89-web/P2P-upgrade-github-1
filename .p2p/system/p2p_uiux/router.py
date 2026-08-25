@@ -96,6 +96,11 @@ def foundation_route(request, profile_root=None):
     try:
         from p2p_capabilities.model import load_registry
         from p2p_capabilities.routing import classify_capabilities, readiness_snapshot
+        from p2p_capabilities.vendor_skill import (
+            is_vendor_skill,
+            project_vendor_route,
+            vendor_readiness_snapshot,
+        )
         registry, profile_dir, specialist = _foundation_paths(profile_root)
     except ModuleNotFoundError as exc:
         return {
@@ -109,6 +114,7 @@ def foundation_route(request, profile_root=None):
         return {"schema": "p2p-capability-route/1", "status": "NOT_APPLICABLE", "reason": "FOUNDATION_REGISTRY_MISSING", "single_router": True}
     loaded = load_registry(registry)
     manifests = loaded["parsed"]
+    repository_root = registry.resolve().parents[3]
     readiness = {}
     for manifest in manifests:
         if manifest.capability_id == "p2p_aesthetica":
@@ -122,11 +128,24 @@ def foundation_route(request, profile_root=None):
                 healthy=specialist.get("health_verified", False),
                 reasons=[specialist.get("status", "PROFILE_UNAVAILABLE")],
             )
+        elif is_vendor_skill(manifest):
+            readiness[manifest.capability_id] = vendor_readiness_snapshot(
+                manifest,
+                repository_root=repository_root,
+                registry_path=registry,
+            )
         else:
             readiness[manifest.capability_id] = readiness_snapshot(manifest)
     result = classify_capabilities(request, manifests, readiness=readiness)
     result["registry_hash"] = loaded["registry_hash"]
     result["aesthetica_profile"] = specialist
+    result["vendor_skills"] = project_vendor_route(
+        request,
+        manifests,
+        result,
+        registry_path=registry,
+        repository_root=repository_root,
+    )
     return result
 
 

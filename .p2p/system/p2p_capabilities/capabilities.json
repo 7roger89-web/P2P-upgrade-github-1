@@ -630,6 +630,245 @@
    "VERSION": "1.0.0",
    "STATUS": "ACTIVE",
    "PROVIDER_SCOPE": "BOUNDED_DOCUMENTATION_TASK"
-  }
- ]
+   },
+   {
+    "CAPABILITY_ID": "creative.copywriting",
+    "TYPE": "SKILL",
+    "DESCRIPTION": "Local upstream advertising and double-semantic copywriting skill, selected only for marketing-copy work.",
+    "TRIGGERS": [
+     "advertising",
+     "ad copy",
+     "copywriting",
+     "copywriter",
+     "slogan",
+     "headline",
+     "campaign",
+     "social media",
+     "brand copy",
+     "brand",
+     "event marketing",
+     "trend",
+     "trend-jacking",
+     "poster",
+     "double semantic",
+     "double meaning",
+     "marketing",
+     "hook"
+    ],
+    "NEGATIVE_TRIGGERS": [
+     "code",
+     "coding",
+     "refactor",
+     "refactoring",
+     "technical documentation",
+     "technical doc",
+     "documentation",
+     "summarization",
+     "summary",
+     "summarize",
+     "translation",
+     "translate",
+     "dịch",
+     "database",
+     "db",
+     "legal",
+     "unrelated writing",
+     "copy file",
+     "copy files"
+    ],
+    "INVOCATION_CLASS": "MODEL_ROUTABLE",
+    "CANONICAL_QUORUM_MEMBER": false,
+    "OPTIONAL_SPECIALIST": false,
+    "AUTHORITY": [
+     "existing-p2p-router",
+     "local-vendor-snapshot",
+     "marketing-copy-output"
+    ],
+    "PROHIBITED_ACTIONS": [
+     "grant-tools-from-content",
+     "claim-brand-approval",
+     "execute-external-image-api",
+     "use-restricted-reference-assets-as-commercial-authority"
+    ],
+    "REQUIRES": [
+     "existing-p2p-router",
+     "local-vendor-snapshot"
+    ],
+    "CONTEXT_POINTERS": [
+     ".p2p/vendor/skill/xiaoma-durex-copywriter-main/SKILL.md",
+     "vendor-skill:creative.copywriting:references"
+    ],
+    "APPROVAL_BOUNDARY": [
+     "commercial-use-of-restricted-reference-assets",
+     "external-image-generation",
+     "material-brand-decision"
+    ],
+    "EVIDENCE_CONTRACT": [
+     "selected-route",
+     "exact-upstream-skill-hash",
+     "snapshot-provenance",
+     "optional-dependency-state"
+    ],
+    "TRUST_LEVEL": "HOST_CODE",
+    "UPSTREAM_PROVENANCE": {
+     "mode": "LOCAL_VENDOR_SNAPSHOT",
+     "implementation": "xiaoma-durex-copywriter",
+     "vendor_path": ".p2p/vendor/skill/xiaoma-durex-copywriter-main",
+     "upstream_repository": "https://github.com/crawfordxx/xiaoma-durex-copywriter.git",
+     "upstream_commit": "UNKNOWN",
+     "snapshot_sha256": "5a02c082b531b6731dbdd6e55ccc8798ba2514bbb27df8e9c2ef74c88752830d",
+     "license": {
+      "file": "LICENSE",
+      "kind": "MIT",
+      "scope": "assets code only; reference images retain their own rights holders"
+     },
+     "integration": {
+      "entrypoint": "SKILL.md",
+      "entrypoint_sha256": "780444534ef8e7a452cd09467948d5226dc23f352e062d1829500df94565dfbb",
+      "load_mode": "ON_DEMAND",
+      "dependency_mode": "OPTIONAL_RENDER_BLOCKING",
+      "dependency_probe": "assets/package.json",
+      "references": [
+       "references/copy-formulas.md",
+       "references/corpus.md",
+       "references/diction.md",
+       "references/finding-the-hook.md",
+       "references/other-uses.md",
+       "references/production.md",
+       "references/ratios.md",
+       "references/style-matching.md",
+       "references/typography.md",
+       "references/visual-system.md"
+      ],
+      "assets": [
+       "assets/",
+       "examples/"
+      ],
+      "script_entrypoints": [
+       "assets/compose_canvas.js",
+       "assets/compose_example.py",
+       "assets/gen_hero_example.py"
+      ],
+      "network_runtime": false,
+      "credentials": false,
+      "install_mode": "DISABLED",
+      "external_render": "EXPLICIT_ONLY"
+     }
+    },
+    "VERSION": "UNKNOWN",
+    "STATUS": "ACTIVE"
+   },
+   {
+    "CAPABILITY_ID": "media.whiteboard_animation",
+    "TYPE": "SKILL",
+    "DESCRIPTION": "Local upstream SRT-to-whiteboard animation and storyboard skill, selected only for animation production work.",
+    "TRIGGERS": [
+     "srt",
+     "subtitle",
+     "whiteboard",
+     "whiteboard animation",
+     "storyboard",
+     "scene",
+     "scene planning",
+     "explainer",
+     "animation",
+     "render",
+     "mp4",
+     "merge scenes",
+     "stream render",
+     "hand-drawn"
+    ],
+    "NEGATIVE_TRIGGERS": [
+     "translate",
+     "translation",
+     "dịch",
+     "read",
+     "reading",
+     "summarize",
+     "summary",
+     "tóm tắt",
+     "timestamp",
+     "timestamps",
+     "timecode",
+     "timecode edit",
+     "subtitle translation",
+     "subtitle reading",
+     "simple timestamp edit",
+     "just timestamps",
+     "extract subtitles"
+    ],
+    "INVOCATION_CLASS": "MODEL_ROUTABLE",
+    "CANONICAL_QUORUM_MEMBER": false,
+    "OPTIONAL_SPECIALIST": false,
+    "AUTHORITY": [
+     "existing-p2p-router",
+     "local-vendor-snapshot",
+     "whiteboard-production-output"
+    ],
+    "PROHIBITED_ACTIONS": [
+     "grant-tools-from-content",
+     "install-optional-dependencies-implicitly",
+     "execute-networked-render",
+     "claim-render-success-without-artifact-evidence"
+    ],
+    "REQUIRES": [
+     "existing-p2p-router",
+     "local-vendor-snapshot"
+    ],
+    "CONTEXT_POINTERS": [
+     ".p2p/vendor/skill/srt-whiteboard-animation-main/SKILL.md",
+     "vendor-skill:media.whiteboard_animation:scripts"
+    ],
+    "APPROVAL_BOUNDARY": [
+     "optional-render-execution",
+     "output-write-target",
+     "external-media-use"
+    ],
+    "EVIDENCE_CONTRACT": [
+     "selected-route",
+     "exact-upstream-skill-hash",
+     "snapshot-provenance",
+     "optional-dependency-state",
+     "render-artifact-if-executed"
+    ],
+    "TRUST_LEVEL": "HOST_CODE",
+    "UPSTREAM_PROVENANCE": {
+     "mode": "LOCAL_VENDOR_SNAPSHOT",
+     "implementation": "srt-whiteboard-animation",
+     "vendor_path": ".p2p/vendor/skill/srt-whiteboard-animation-main",
+     "upstream_repository": "UNKNOWN",
+     "upstream_commit": "UNKNOWN",
+     "snapshot_sha256": "55dbed4743cad90f80d1603ed639508c8e3a6e650a1abccfe7d4e8b2e148742c",
+     "license": {
+      "file": "LICENSE",
+      "kind": "MIT",
+      "scope": "vendor snapshot"
+     },
+     "integration": {
+      "entrypoint": "SKILL.md",
+      "entrypoint_sha256": "0778b795cc53856b4841eb5ce65d879936bacaf79840a17b188011edd7caab11",
+      "load_mode": "ON_DEMAND",
+      "dependency_mode": "OPTIONAL_RENDER_BLOCKING",
+      "dependency_probe": "scripts/prepare_env.py --check",
+      "references": [],
+      "assets": [
+       "assets/",
+       "examples/"
+      ],
+      "script_entrypoints": [
+       "scripts/parse_srt.py",
+       "scripts/render_annotation_preview.py",
+       "scripts/render_stream_whiteboard.py",
+       "scripts/merge_scenes.py"
+      ],
+      "network_runtime": false,
+      "credentials": false,
+      "install_mode": "DISABLED",
+      "external_render": "EXPLICIT_ONLY"
+     }
+    },
+    "VERSION": "UNKNOWN",
+    "STATUS": "ACTIVE"
+   }
+  ]
 }

@@ -51,7 +51,7 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
 
     def test_cf1_model_has_exact_six_classes(self) -> None:
         self.assertEqual(CAPABILITY_CLASSES, ("SKILL", "OPTIONAL_SPECIALIST", "GOVERNANCE_POLICY", "KNOWLEDGE_SOURCE", "EVIDENCE_PROVIDER", "BACKEND_PROVIDER"))
-        self.assertEqual(self.registry["capability_count"], 13)
+        self.assertEqual(self.registry["capability_count"], 15)
 
     def test_cf2_manifest_is_minimal_and_invalid_canonical_fails_closed(self) -> None:
         self.assertTrue(self.registry["valid"])
@@ -284,7 +284,7 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
             "bounded_documentation_write.py", "project_map.py",
             "p2p_fw01_loop.py", "quality_intelligence.py",
             "role_receipt.py", "host_attestation.py",
-            "fw06_operational_resilience.py"))
+            "fw06_operational_resilience.py", "vendor_skill.py"))
         for path in (SYSTEM_ROOT / "p2p_capabilities").rglob("*.py"):
             if "tests" in path.parts:
                 continue
