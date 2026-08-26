@@ -4587,7 +4587,10 @@
       "next_condition": "Owner decision: integrate host_attestation.py into canonical runtime or keep lane-only",
       "last_reviewed": "2026-08-19T13:15:00Z",
       "freshness": "from_governance_record",
-      "notes": "Certification record NOT a development candidate; DO NOT PROMOTE. | HOST_ATTESTATION_CANONICALIZED: all 4 live-cert modules canonical; certification bound to canonical runtime surface; no rerun; verified 2026-08-19 evidence time only.",
+      "notes": "Certification record NOT a development candidate; DO NOT PROMOTE. | HOST_ATTESTATION_CANONICALIZED: all 4 live-cert modules canonical; certification bound to canonical runtime surface; no rerun; verified 2026-08-19 evidence time only. HISTORICAL_SINGLE_HOST_LIVE_COUNCIL_8_OF_8=TRUE; CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE.",
+      "historical_single_host_live_council_8_of_8": true,
+      "current_lineage_full_council_live_proven": false,
+      "current_lineage_full_council_status": "NOT_PROVEN",
       "rejected_reason": "",
       "origin_type": "RESEARCH_DECISION",
       "integration_reference": {
@@ -4814,7 +4817,10 @@
       "next_condition": "C09/C27 blockers resolved (host evidence keys available), then FRAMEWORK-03 scope.",
       "last_reviewed": "2026-08-21T04:27:11Z",
       "freshness": "from_roadmap_consolidation",
-      "notes": "SINGLE_HOST_LIVE_COUNCIL VERIFIED (historical); MULTIHOST_LIVE_COUNCIL = NOT_PROVEN. Blocked upstream by C09/C27 live host evidence. Not ranked above blocked evidence per ordering principle."
+      "notes": "HISTORICAL_ONLY: SINGLE_HOST_LIVE_COUNCIL VERIFIED; MULTIHOST_LIVE_COUNCIL = NOT_PROVEN. CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE. Blocked upstream by C09/C27 live host evidence. Not ranked above blocked evidence per ordering principle.",
+      "historical_single_host_live_council_8_of_8": true,
+      "current_lineage_full_council_live_proven": false,
+      "current_lineage_full_council_status": "NOT_PROVEN"
     },
     {
       "capability_id": "CAPABILITY_DRIFT_REVALIDATION_SWEEP",

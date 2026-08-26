@@ -572,13 +572,13 @@
       "research_summary": "Execution host, not P2P identity: live role certification, real host binding.",
       "selected_ideas": [
         "host execution path lessons",
-        "live role certification evidence (LIVE_COUNCIL_8_OF_8 single host)"
+        "HISTORICAL_ONLY: live role certification evidence (LIVE_COUNCIL_8_OF_8 single host)"
       ],
       "rejected_ideas": [
         "provider lock-in",
         "HOSTS_AS_CANONICAL_AGENTS (rejected)"
       ],
-      "p2p_translation": "Codex is the current evidence host; the canonical certification lane is host-neutral (c36-real-host-binding). Multi-host certification remains NOT_PROVEN.",
+      "p2p_translation": "Codex is the historical evidence host; the canonical certification lane is host-neutral (c36-real-host-binding). Current-lineage full Council remains NOT_PROVEN and multi-host certification remains NOT_PROVEN.",
       "capability_family": "MULTI_AI_INTEROPERABILITY",
       "canonical_capability_ids": [
         "C36 context/execution lane",
@@ -597,7 +597,10 @@
       "roadmap_slot": "family:interoperability",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "CERTIFIED != CURRENTLY_ELIGIBLE: live re-certification is required per capability evidence rules (drift)."
+      "notes": "CERTIFIED != CURRENTLY_ELIGIBLE: live re-certification is required per capability evidence rules (drift). HISTORICAL_SINGLE_HOST_LIVE_COUNCIL_8_OF_8=TRUE; CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE until fresh exact-current-head eight-role evidence exists.",
+      "historical_single_host_live_council_8_of_8": true,
+      "current_lineage_full_council_live_proven": false,
+      "current_lineage_full_council_status": "NOT_PROVEN"
     },
     {
       "research_id": "RA-EXT-018",

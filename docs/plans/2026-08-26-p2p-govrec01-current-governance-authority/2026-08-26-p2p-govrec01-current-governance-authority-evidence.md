@@ -52,8 +52,19 @@ Matching plan item(s): `P1-A`, `P1-B`
 
 Matching plan item(s): `P2-A`, `P2-B`
 
-- `E2-P2A-COUNCIL1..E2-P2A-COUNCIL8`: To be filled with canonical historical/current Council wording and C36/C43 negative evidence.
-- `E2-P2B-EDGE1..E2-P2B-EDGE5`: To be filled with edge-case index path, family completeness, and UNKNOWN live slots.
+- `E2-P2A-COUNCIL1`: `governance/p2p-development-roadmap.json` now labels the single-host `LIVE_COUNCIL_8_OF_8` fact `HISTORICAL_ONLY` and records `historical_single_host_live_council_8_of_8=true`, `current_lineage_full_council_live_proven=false`, and `current_lineage_full_council_status=NOT_PROVEN`.
+- `E2-P2A-COUNCIL2`: `governance/research-adoption-ledger.json` RA-EXT-017 preserves the historical adoption record while explicitly refusing to treat it as current-lineage full-Council evidence.
+- `E2-P2A-COUNCIL3`: `docs/p2p-development/capability-ledger/capability-index.json` preserves the historical single-host certification and marks current-lineage full Council false/not proven in both live-certification and multi-host records.
+- `E2-P2A-COUNCIL4`: `docs/p2p-development/framework/capability-skill-map.json` keeps canonical denominator `8`, records the historical/current split, and does not add a ninth role or current live claim.
+- `E2-P2A-COUNCIL5`: `docs/p2p-development/framework/master-roadmap.md` distinguishes `HISTORICAL_CERTIFIED (single host)` from the future/current `NOT_PROVEN` multi-host/full-Council target.
+- `E2-P2A-COUNCIL6`: `docs/p2p-development/framework/capability-skill-map.md` states that configured 8/8 machinery and historical evidence are not current proof; current-lineage full Council remains false/not proven.
+- `E2-P2A-COUNCIL7`: `docs/p2p-development/framework/product-architecture.md` records the same boundary and states that bounded C43 smoke cannot upgrade current full-Council proof.
+- `E2-P2A-COUNCIL8`: JSON parse and semantic assertions passed for the roadmap and research records; no provider, Manus, Council execution, profile simulation, or remote write was run.
+- `E2-P2B-EDGE1`: Created canonical `reports/Edge-Case/QA+EDGE_CASE_TEST_PLAN.md` as an index-only artifact; no second framework or runner was added.
+- `E2-P2B-EDGE2`: The index contains all eight required families: retry, duplicate/replay, stale, partial, quorum, host failure, resume/recovery, and process interruption.
+- `E2-P2B-EDGE3`: Each family names an existing SPEC/test seam, expected fail-closed behavior, a unique `LIVE-*` evidence slot, and an explicit `UNKNOWN`/`NOT_PROVEN` status.
+- `E2-P2B-EDGE4`: Compound timing, ordering, stale-state, isolation/auth, and crash/recovery perturbations are mapped without claiming execution evidence.
+- `E2-P2B-EDGE5`: Fresh catalog report `reports/Edge-Case/rp_edge_260826_094810_by_gpt-5-codex_p2p_govrec01_catalog.md` records the stop boundary; no confirmed runtime failure or current Council proof is asserted.
 
 ## E3 - P3 Evidence
 

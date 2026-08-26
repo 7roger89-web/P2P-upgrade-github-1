@@ -82,7 +82,7 @@ Required report disclaimer: `Implemented against sealed .74 NONCANONICAL DEVELOP
 
 - **Không chạm dự án nào ngoài chỉ thị Owner** (Logistics = DO_NOT_INSTALL_YET).
 - **Không tự promotion/release/deploy** — mọi promotion yêu cầu Owner chỉ thị ràng buộc hash.
-- **Hội đồng**: 8/8 full council NOT_PROVEN; smoke bounded 1 vai trò đã thành công (C43).
+- **Hội đồng**: `HISTORICAL_SINGLE_HOST_LIVE_COUNCIL_8_OF_8=TRUE`; `CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE` / `NOT_PROVEN`; C43 chỉ là bounded one-role smoke và không nâng cấp current Council proof.
 - **RAG**: không tồn tại theo thiết kế hiện tại (NOT_APPLICABLE).
 - **Evals**: chưa có kết quả thử nghiệm ghi nhận (disclosed).
 

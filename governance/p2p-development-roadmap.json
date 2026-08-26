@@ -657,7 +657,11 @@
         "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
         "C31_EXECUTION_TARGET_AS_CERTIFICATION_INTAKE"
       ],
-      "current_evidence": "single-host LIVE_COUNCIL_8_OF_8 certified @ 8a1ad30; multi-host NOT_PROVEN",
+      "current_evidence": "HISTORICAL_ONLY: single-host LIVE_COUNCIL_8_OF_8 certified @ 8a1ad30; current-lineage full Council is not proven; multi-host NOT_PROVEN",
+      "historical_single_host_live_council_8_of_8": true,
+      "current_lineage_full_council_live_proven": false,
+      "current_lineage_full_council_status": "NOT_PROVEN",
+      "current_lineage_evidence_requirement": "Fresh exact-current-head live receipts for all eight canonical roles plus aggregate/quorum evidence",
       "target_evidence": "multi-host 8/8 live certification with event evidence",
       "mutation_risk_class": "READ_ONLY",
       "project_impact": "NONE",

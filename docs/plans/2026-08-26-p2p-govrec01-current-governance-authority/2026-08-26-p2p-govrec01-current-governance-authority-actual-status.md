@@ -2,7 +2,7 @@
 
 Title: P2P-GOVREC01 Current Governance Authority Reconciliation
 Date: 2026-08-26
-Status: P0 Complete / implementation in progress
+Status: P0/P1/P2 Complete / P3 implementation in progress
 Companion plan: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-plan.md`
 Companion evidence: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-evidence.md`
 Companion benchmark: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-benchmark.md`
@@ -59,9 +59,9 @@ Out of scope:
 | Protected runtime lock | deterministic generator now records 1,178 protected files and 2 virtual hashes; direct drift returns PASS with no failures | exact current promoted/candidate manifest after path classification | correct | generated | `E0-P0A-DRIFT1..2`, `E1-P1B-DRIFT1..17`, `E1-P1B-LOCK1..4` | proceed P2 |
 | Drift policy | current schema/patterns/exclusions are intact; no need for wildcard expansion | unchanged fail-closed policy | correct | generated | `E0-P0A-DRIFT2` | preserve-only |
 | Historical C36 Council evidence | genuine historical single-host 8/8 evidence exists in retained reports | remain historical, exact and immutable | correct | derived | `E0-P0A-SCOPE1` | preserve-only |
-| Current-lineage Council proof | current source has configured 8/8 structure and bounded C43 smoke, not a full current round-trip | `FALSE` / `NOT_PROVEN` until fresh exact evidence | partial | derived | prepilot council audit, `E0-P0A-AUTH1` | edit P2-A |
-| Active Council projections | historical `LIVE_COUNCIL_8_OF_8` wording appears beside current not-proven wording | explicit historical/current distinction | wrong | derived | `E0-P0A-SCOPE1` | edit P2-A |
-| Edge-case index | no canonical `reports/Edge-Case/QA+EDGE_CASE_TEST_PLAN.md` | required family map and live evidence slots | missing | n/a | `E0-P0A-SCOPE1` | edit P2-B |
+| Current-lineage Council proof | current source has configured 8/8 structure and bounded C43 smoke, not a full current round-trip | `FALSE` / `NOT_PROVEN` until fresh exact evidence | correct boundary; live evidence still open | derived | `E0-P0A-AUTH1`, `E2-P2A-COUNCIL1..8` | preserve until fresh exact evidence |
+| Active Council projections | projections now state historical single-host truth separately from current-lineage proof | explicit historical/current distinction | correct | derived | `E2-P2A-COUNCIL1..8` | preserve-only |
+| Edge-case index | canonical index now maps eight required failure families and names unfilled live slots | required family map and live evidence slots | correct as index; live runs pending | n/a | `E2-P2B-EDGE1..5` | execute only in a later fresh evidence run |
 | `doctor.py` governance subprocess | default text reader emits Windows UTF-8 decoder traceback before JSON; underlying drift remains fail | explicit UTF-8 strict boundary, malformed output fail closed | wrong | 3 inbound / 78 local / 14 flows | `E0-P0A-DOCTOR1`, `E0-P0A-GRAPH2`, `E0-P0A-IMPACT1` | edit P3-A |
 | Drift test fixture | asserts 10 scoped paths/35 refs against current 38-entry policy and current measured references | current policy truth plus negative governance tests | wrong | 2 outbound | `E0-P0A-TEST1`, `E0-P0A-IMPACT2` | edit P3-B |
 | Provider/Manus/Council execution | not run | remain not run | correct | n/a | `E0-P0A-SCOPE1` | preserve-only |
@@ -74,7 +74,7 @@ Out of scope:
 | R0 | 2026-08-26 | exact promoted `2a71410…` candidate before implementation | full GOVREC01 scope | initial classifications recorded | `E0-P0A-AUTH1..E0-P0A-SCOPE1` | P1-A/P1-B are executable; P2/P3 remain dependent |
 | R1 | 2026-08-26 | after P1-A authority projection edit | authority projection | `partial -> correct`; existing control fixture errors remain assigned to P3-B | `E1-P1A-AUTH1..7` | proceed P1-B; do not treat fixture errors as authority PASS |
 | R1b | 2026-08-26 | after P1-B lock regeneration | runtime lock/drift | `wrong -> correct`; all 17 pre-existing deltas classified; no unexplained drift | `E1-P1B-DRIFT1..17`, `E1-P1B-LOCK1..4` | proceed P2; future protected edits require final lock regeneration |
-| R2 | 2026-08-26 | after P2-A/P2-B implementation commit | Council semantics and edge index | pending | pending | update P3/P4 |
+| R2 | 2026-08-26 | after P2-A/P2-B implementation slice on exact candidate | Council semantics and edge index | active projections `wrong -> correct`; current proof boundary `partial -> correct boundary`; edge index `missing -> correct as index` | `E2-P2A-COUNCIL1..8`, `E2-P2B-EDGE1..5` | proceed P3; live slots remain open |
 | R3 | 2026-08-26 | after P3-A/P3-B implementation commit | doctor and tests | pending | pending | update P4 final gates |
 
 ## Phase Touch Map
@@ -167,7 +167,7 @@ Delete files, add wildcard exclusions, suppress output, or accept unexplained dr
 
 Current state:
 
-Historical C36 single-host 8/8 evidence exists, while current C43/current-head evidence does not establish a full current Council round-trip. Active projections use ambiguous `LIVE_COUNCIL_8_OF_8` wording.
+Historical C36 single-host 8/8 evidence exists, while current C43/current-head evidence does not establish a full current Council round-trip. Active projections now state the historical and current facts separately.
 
 Required state:
 
@@ -189,11 +189,11 @@ Relationship and impact:
 
 Classification:
 
-`wrong` wording / `partial` evidence projection.
+`correct boundary`; current live proof remains `NOT_PROVEN`.
 
 Allowed next action:
 
-Clarify active projections and add negative assertions.
+Preserve the distinction and add negative assertions; only fresh exact-head live evidence may change the current value.
 
 Forbidden next action:
 
@@ -205,8 +205,8 @@ Upgrade current Council from C36, C43 smoke, profiles, configured quorum, or log
 |---|---|---|
 | P1-A | current promoted source is now separately projected; `.19` and `.74` remain separated | complete; proceed P1-B |
 | P1-B | all 17 runtime deltas are classified and deterministic lock/drift now PASS | complete; proceed P2; regenerate final lock after later protected edits |
-| P2-A | active wording blurs historical/current Council | keep P2-A; preserve all historical reports |
-| P2-B | dedicated edge-case index is absent | keep P2-B add-only |
+| P2-A | active projections now distinguish historical single-host Council from current-lineage full Council; current remains `FALSE/NOT_PROVEN` | complete; preserve all historical reports and keep current proof closed |
+| P2-B | canonical index maps retry, duplicate, stale, partial, quorum, host failure, resume/recovery, and process interruption; all live slots remain open | complete as index-only slice; later live execution must create fresh Edge-Case evidence |
 | P3-A | doctor reader-thread decode failure is reproduced | keep P3-A bounded strict decoder fix |
 | P3-B | drift test expectation is stale; no gate weakening allowed | update current measured assertions and add negative tests |
 | P4 | no final gates run yet | remain pending until P1-P3 pass |

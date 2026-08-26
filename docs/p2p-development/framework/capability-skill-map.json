@@ -187,7 +187,10 @@
       ],
       "quorum": "8/8",
       "denominator": 8,
-      "live_certified": "p2p_iris only (C38, Stage B/C/D VERIFIED). p2p_datos executed the live council smoke test on 2026-08-18 through the Manus backend (C43). Other six: IN_TRAINING / NOT_CERTIFIED — council audit (C43) recorded LIVE_COUNCIL_8_OF_8 = NOT_PROVEN."
+      "live_certified": "p2p_iris only (C38, Stage B/C/D VERIFIED). p2p_datos executed the bounded live council smoke test on 2026-08-18 through the Manus backend (C43). Other six: IN_TRAINING / NOT_CERTIFIED — council audit (C43) recorded LIVE_COUNCIL_8_OF_8 = NOT_PROVEN.",
+      "historical_single_host_live_council_8_of_8": true,
+      "current_lineage_full_council_live_proven": false,
+      "current_lineage_full_council_status": "NOT_PROVEN"
     }
   },
   "ledger_cross_reference": {
@@ -275,6 +278,9 @@
     "certified_count": 1,
     "live_certified_count": 1,
     "live_council_8_of_8": "NOT_PROVEN",
+    "historical_single_host_live_council_8_of_8": true,
+    "current_lineage_full_council_live_proven": false,
+    "current_lineage_full_council_status": "NOT_PROVEN",
     "nui_classification": "Design Intelligence principles ADAPTED (repo-evidence-backed, C13 lineage); external '174 faculties' claim = PROVENANCE_NOT_RECOVERED / NOT_PROVEN (machinery classification, not REJECTED)",
     "rows": {
       "p2p_iris": {

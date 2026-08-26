@@ -15,7 +15,7 @@ File chuẩn tắc tổng hợp hai dòng thời gian: dòng goal C01–C43 đã
 | DEFERRED | C08 | Controlled continuation — defer |
 | DONE (historical) | C30 | C30 Composable Execution Target Foundation + provider-neutral intake — PASS (machinery only) 2026-08-17, candidate sealed 94b09b59; chuẩn hóa historical DONE trong FRAMEWORK-00 closure normalization. |
 | BLOCKED (historical) | C31 | Verdict BLOCKED / OWNER_ACTION_REQUIRED bảo tồn; blocker Codex bị supercede tại evidence time 2026-08-19T08:55:00Z (lane c36-real-host-binding 8/8 VERIFIED); CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED |
-| CERTIFIED (single host) | LIVE_COUNCIL_8_OF_8 | Chứng minh thật 8/8 vai trò trên 1 host Codex @ 8a1ad30; MULTIHOST = NOT_PROVEN; CERTIFIED != CURRENTLY_ELIGIBLE (UNKNOWN_NOT_PROBED) |
+| HISTORICAL_CERTIFIED (single host) | LIVE_COUNCIL_8_OF_8 | HISTORICAL_ONLY: chứng minh thật 8/8 vai trò trên 1 host Codex @ 8a1ad30; `HISTORICAL_SINGLE_HOST_LIVE_COUNCIL_8_OF_8=TRUE`; `CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE`; current status `NOT_PROVEN`; MULTIHOST = NOT_PROVEN |
 
 ## Dòng framework (FRAMEWORK-00..06)
 
@@ -24,7 +24,7 @@ File chuẩn tắc tổng hợp hai dòng thời gian: dòng goal C01–C43 đã
 | FRAMEWORK-00 | **Product Memory Foundation** — reconciliation C43, product architecture, master roadmap, research intake ledger, capability & skill map, governance sync, validation, closure, terminal report | IN_PROGRESS (goal này) |
 | FRAMEWORK-01 | **Autonomous Project Operating Loop** (DONE — PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY; FW01_V2_DEFAULT_BRANCH_DURABILITY_COMPLETE; v1 eb396dc1 + v2 2a42e815 released) | DONE |
 | FRAMEWORK-02 | **Project & Capability Intelligence** — DONE, PASS / PROJECT_CAPABILITY_INTELLIGENCE_READY; lớp trí tuệ năng lực trong FW01 (task → năng lực bắt buộc → nguồn đa dạng → coverage fail-closed → decision trace), shadow eval GT+GP PASS, không orchestrator cạnh tranh | DONE |
-| FRAMEWORK-03 | Pilot mở rộng (dự án thứ 3 hoặc ngôn ngữ/framework khác) + **Council Full Certification** — LIVE_COUNCIL_8_OF_8 qua fan-out tự động, chứng nhận thật 8/8 vai trò | NOT_STARTED |
+| FRAMEWORK-03 | Pilot mở rộng (dự án thứ 3 hoặc ngôn ngữ/framework khác) + **Council Full Certification** — future live proof target; current-lineage `LIVE_COUNCIL_8_OF_8` remains `NOT_PROVEN` | NOT_STARTED |
 | FRAMEWORK-04 | Release gates tái kiểm tra + re-promotion sau thay đổi runtime | NOT_STARTED |
 | FRAMEWORK-05 | Quality & Evidence learning layer (học từ bằng chứng các pilot để cải thiện validation) | NOT_STARTED |
 | FRAMEWORK-06 | Review tổng thể sản phẩm + beginner experience audit trước giai đoạn phát hành rộng | NOT_STARTED |

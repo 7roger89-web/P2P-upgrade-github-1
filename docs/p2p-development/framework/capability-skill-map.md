@@ -9,7 +9,7 @@ Chuẩn tắc (canonical) của P2P. Máy đọc file JSON kèm theo (`capabilit
 | Codex Edition skills | `.agents/skills/` | 63 thư mục (89 file `SKILL.md`) | Đơn vị kỹ năng nạp theo nhu cầu, gồm 17 skill P2P nền tảng và ~46 skill công nghệ/kỹ thuật/thiết kế |
 | P2P system modules | `.p2p/system/p2p_capabilities/` | 54 module | Runtime di động (provider-neutral): vai trò & hội đồng, chọn lựa thích nghi, thực thi giới hạn, failover, bối cảnh, trạng thái |
 | Repo scripts | `scripts/` | 23 script | Máy quản trị: validator, goal closure, release gates, install/doctor, certification |
-| Canonical council roles | `governance/development-control.json` | 8 vai trò (p2p_iris, p2p_tecton, p2p_axiom, p2p_vector, p2p_datos, p2p_anon, p2p_architecton, p2p_helios) | Hội đồng 8/8; quorum chuẩn tắc 8/8, mẫu số 8 |
+| Canonical council roles | `governance/development-control.json` | 8 vai trò (p2p_iris, p2p_tecton, p2p_axiom, p2p_vector, p2p_datos, p2p_anon, p2p_architecton, p2p_helios) | Machinery quorum 8/8; `HISTORICAL_SINGLE_HOST_LIVE_COUNCIL_8_OF_8=TRUE`; current-lineage full Council `FALSE` / `NOT_PROVEN` |
 
 ## Trạng thái trưởng thành theo nhóm kỹ năng (maturity audit)
 
@@ -31,7 +31,7 @@ Bảng dưới suy ra từ Capability Ledger (158 khả năng, 12 nhóm, trạng
 
 ## Khoảng trống mở
 
-1. **LIVE_COUNCIL_8_OF_8 = NOT_PROVEN** — hội đồng đầy đủ 8/8 qua fan-out tự động chưa chứng minh (chỉ 1 vai trò × 1 vòng).
+1. **HISTORICAL_ONLY: LIVE_COUNCIL_8_OF_8** — single-host C36 fact is retained; **CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE / NOT_PROVEN** (current evidence is only bounded one-role × one-round smoke).
 2. Không có hệ thống RAG (theo thiết kế hiện tại).
 3. Project evals chưa có kết quả thử nghiệm đã ghi nhận.
 
@@ -54,7 +54,7 @@ Ma trận này loại bỏ mâu thuẫn chữ (1/8 vs 6/8) bằng ba cột nghĩ
 **Đọc đúng mẫu số:**
 - **CERTIFIED: 1/8** (p2p_iris, qua C38). Dòng "6/8 chưa chứng nhận" trước đây tính cùng một sự thật nhưng theo mẫu số ngược (7/8 NOT_CERTIFIED ≈ "6/8 chưa chứng nhận" khi loại biên lai smoke); ma trận trên dùng mẫu số thống nhất 8 và bỏ cả hai cách viết mập mờ.
 - **LIVE_CERTIFIED: 1/8** (p2p_iris). Live smoke C43 KHÔNG tính live certification vì dispatch không ràng buộc vai trò (2A: LIVE_EXECUTED_ROLE = UNBOUND, verification UNKNOWN).
-- **LIVE_COUNCIL_8_OF_8 (8 vai trò × fan-out tự động): NOT_PROVEN.** Đây là mục tiêu tiếp theo cần chứng minh thật, thuộc scope FRAMEWORK-03.
+- **CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE.** `LIVE_COUNCIL_8_OF_8` full fan-out is a future proof target under FRAMEWORK-03; historical C36 evidence cannot upgrade current lineage.
 
 **Nolane UI Intelligence (NUI):** nguyên tắc Design Intelligence của NUI vẫn ADAPTED theo bằng chứng kho hiện có (C13 beginner design intelligence lineage + pilot beginner). Tuyên bố bên ngoài "174 NUI faculties" được machinery phân loại **PROVENANCE_NOT_RECOVERED / NOT_PROVEN** (không có artifact kho nào tái hiện con số này) — không phải REJECTED, không phải accepted-as-fact.
 
