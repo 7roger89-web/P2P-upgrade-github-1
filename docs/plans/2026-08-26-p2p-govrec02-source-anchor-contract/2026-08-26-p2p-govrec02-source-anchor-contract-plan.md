@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-26`
-- Status: `P1-B Complete / P2-A Complete / P2-B Ready`
+- Status: `P2-B Complete / P3 Ready`
 - Plan: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-plan.md`
 - Evidence: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-evidence.md`
 - Benchmark: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-benchmark.md`
@@ -65,7 +65,7 @@ The Owner has now selected anchor semantics. The current anchor is commit `2a714
 ## Acceptance Criteria
 
 - `authority.promoted_source_anchor` is the single active source-anchor truth and has unambiguous anchor semantics.
-- The old `current_promoted_source` key is absent from active authority JSON and active tests/consumers; historical reports are explicitly preserved as historical evidence.
+- The old `current_promoted_source` key is absent from active authority JSON and active positive consumers; the validator's legacy rejection guard and negative tests intentionally retain the literal, while historical reports are preserved as historical evidence.
 - A real candidate whose `HEAD` equals or descends from the anchor validates PASS.
 - A hypothetical post-promotion `origin/main` at the corrected candidate while the anchor stays `2a71410...` validates PASS without self-reference.
 - A valid commit before the anchor or from a divergent lineage fails closed with an explicit reason code.
@@ -246,7 +246,7 @@ The Owner has now selected anchor semantics. The current anchor is commit `2a714
   - Actual-status Update: append R3 and update P2-B/P3 assumptions.
   - Commit Boundary: commit after test matrix acceptance passes.
 
-- [ ] P2-B: Align active contract documentation and record external receipt boundary
+- [x] P2-B: Align active contract documentation and record external receipt boundary
   - Goal: document that the committed anchor is reconciliation input while final promoted subject identity remains externally bound by existing approval/receipt machinery.
   - Scope Boundary:
     - Editable: new GOVREC02 plan/evidence/benchmark/actual-status artifacts and active docs only if exact consumers remain after source search.
@@ -279,7 +279,7 @@ The Owner has now selected anchor semantics. The current anchor is commit `2a714
        - Render location check: only `promoted_source_anchor` is active.
        - Evidence target: `E2-P2B-DOC2`.
   - Implementation Gate:
-    - No active `current_promoted_source` consumer remains; any retained historical text is labeled by provenance, not used as authority.
+    - No active positive `current_promoted_source` consumer remains; retained legacy literals are rejection guards/negative tests or provenance-labeled history, not authority.
   - Acceptance:
     - Source: active docs and tests align with anchor semantics; historical evidence remains unmodified.
     - Runtime/UI: N/A.

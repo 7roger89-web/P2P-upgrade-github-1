@@ -1085,7 +1085,7 @@
     "governance/approvals/P2P-APR-20260819T090500+0000-fw01-v2-promote-release.json": "605ec71152e5dd11036fc92261ba6bdbecc9f315e60eb8dc7e48cd984a1f93b1",
     "governance/approvals/P2P-APR-20260821T035410Z-c41-official-baseline-promotion.json": "bfaeb7143c93c797789bc507900c8de565ceca1e7b4c209f99d59b87fa272227",
     "governance/approvals/P2P-PROMOTE-46-APPROVAL.json": "1eda9ea62029c9dff131be606d32e8371e32078244920f1e5388508aeec363d3",
-    "governance/development-control.json": "d9504052428e6ad2de37c55a0544030ef5b2fd1d77866fecf3e741bc40156a99",
+    "governance/development-control.json": "24aafdb82f36e272ce7f54dfd8108f8c87873bc8b3b19e3e7e0b1b780ebaa266",
     "governance/development-control.json.fixture47": "a51cf40625288aac6157829a12a8ec29b5ccd65212da2bee503f69d7f7879a66",
     "governance/drift-policy.json": "f06aa6094191e480883166c9e7a2353e56945a15a160f13e7feec7b05662cd38",
     "governance/eval-suite.schema.json": "5eb2788a7b6fefedea5d01555a9c572809a693176d4187dd01b2c64201d6fe79",
@@ -1133,7 +1133,7 @@
     "scripts/p2p_c15_field_test.py": "fe363b5444024f8057bbbbc6caccb0adf59d989258f6ae1a817a96d042ae4e4e",
     "scripts/p2p_decision_trace.py": "f2af53a861bb49ae71c83d5e99d4eb3a08c1cb198bacf15ce7375f160ca8c762",
     "scripts/p2p_delegation.py": "65297dd251217b5fcbe79e964687a74cae3f21412ba353d17aa926e4a8fd3416",
-    "scripts/p2p_development_control.py": "1783c135049b68ef53ee24a0e81cc316d8f9605e5821d699e0973fa0290a2bff",
+    "scripts/p2p_development_control.py": "7cbd9da5629e042dcbf3027313b9c8f0920ca21887f2f1aa44119768fcdb3a9a",
     "scripts/p2p_eval.py": "f9443efdcef3f75decf02d58a724f0cff39dff067c975dddb48ef43f7905af3b",
     "scripts/p2p_execution_target.py": "8909c086dab36fcc5056fbf58de071769408e4934a77dfc47815a26f17993c25",
     "scripts/p2p_foreground_execution.py": "3fda5411814919b773e129c4d1fecbd572f0321ac090956939f98b3b094bdda7",
@@ -1185,6 +1185,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-26T09:59:38+07:00",
-  "reason": "P2P-GOVREC01 final current promoted authority reconciliation after Council semantics and strict helper boundary"
+  "generated_at": "2026-08-26T11:22:43+07:00",
+  "reason": "P2P-GOVREC02 source-anchor contract correction"
 }

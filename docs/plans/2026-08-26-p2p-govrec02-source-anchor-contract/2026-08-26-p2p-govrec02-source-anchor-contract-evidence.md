@@ -49,12 +49,12 @@ Matching plan item(s): `P2-A`, `P2-B`
 
 - `E2-P2A-TEST1`: `tests.test_p2p_govrec02_source_anchor` passed `11/11`; active key/semantic fields, duplicate/legacy, artifact-shaped, self-reference, missing-anchor, wrong-tree, and status-projection behavior are covered.
 - `E2-P2A-TEST2`: The focused suite passed BEFORE equality, current descendant, hypothetical post-promotion descendant (`6c860ee...`), and diverged-head simulations using existing Git objects and injected observations; no refs or remote state changed.
-- `E2-P2B-DOC1`: Pending implementation: active evidence states that committed anchor data and external final promotion subject identity are separate.
-- `E2-P2B-DOC2`: Pending implementation: active consumer search finds no duplicate authority truth; historical GOVREC01 references remain provenance-preserved.
+- `E2-P2B-DOC1`: The committed `authority.promoted_source_anchor` is reconciliation input only. Existing approval machinery binds the external subject and technical report through `subject_sha256` and `technical_report_sha256`; the historical C41 receipt additionally records `source_commit` and `source_tree_hash`. Existing `scripts/package_release.py::source_binding` independently captures a clean source commit/tree and verifies that the tree is bound to that commit. These external identities avoid a candidate self-SHA loop; no second receipt system was added.
+- `E2-P2B-DOC2`: Active search finds one positive authority object in `governance/development-control.json`, one validator consumer, and the GOVREC01 regression consumer. The legacy literal remains only in the validator's rejection constant, GOVREC02 negative tests, and provenance-preserved GOVREC01/history/plan text; no active positive duplicate authority exists. Current-lineage Council remains `FALSE / NOT_PROVEN`.
 
 ## Closure Evidence
 
-P1-A/P1-B/P2-A closure:
+P1-A/P1-B/P2-A/P2-B closure:
 
 - `py -3 -X utf8 -m unittest tests.test_p2p_govrec01_reconciliation`: `9/9 PASS`.
 - `py -3 -X utf8 -m unittest tests.test_p2p_govrec02_source_anchor`: `11/11 PASS`.
@@ -63,7 +63,8 @@ P1-A/P1-B/P2-A closure:
 - `py -3 -X utf8 scripts/p2p_development_control.py status --root . --json`: `PASS`; same dynamic relations are exposed in `validation.source_anchor`.
 - Active legacy field check: `current_promoted_source` absent from active authority JSON.
 - P1-A checkpoint commit: `9e8bced18387bf786fbd6ed306acce83ad911e9d`; it contains the explicit anchor contract, static validator, focused plan ledger, and GOVREC01 snapshot update.
-- Post-P1-B/P2-A implementation checkpoint/detect-changes: pending until the dynamic validator and focused GOVREC02 test slice is committed.
+- P1-B/P2-A checkpoint commit: `8d3160e8fced3eb8b76a2f1adfa4ec3df1aa0536`; it contains the dynamic validator, GOVREC02 behavior suite, and refreshed plan evidence.
+- P2-B source/receipt boundary: active positive consumer search and existing receipt/source-binding inspection PASS; no duplicate authority or self-referential receipt was introduced.
 
 To be filled as remaining implementation slices complete:
 

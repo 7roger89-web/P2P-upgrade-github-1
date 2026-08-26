@@ -2,7 +2,7 @@
 
 Title: P2P-GOVREC02 Governance Source Anchor Contract Correction
 Date: 2026-08-26
-Status: P1-B Complete / P2-A Complete / P2-B Ready
+Status: P2-B Complete / P3 Ready
 Companion plan: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-plan.md`
 Companion evidence: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-evidence.md`
 Companion benchmark: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-benchmark.md`
@@ -58,6 +58,7 @@ Out of scope:
 | Dynamic Git boundary | resolves anchor commit/tree and observes HEAD/origin-main at real checkout boundary | explicit equal/descendant/diverged evaluation against anchor; Git-less package boundary remains static | bound-correct | 9 affected processes | `E1-P1B-GIT1..E1-P1B-GIT2`, refreshed Anvien impact | preserve in P2/P3 |
 | GOVREC02 focused tests | 11 tests cover active contract, topology simulation, and fail-closed reason codes | positive and fail-closed anchor behavior tests | correct | new focused suite | `E2-P2A-TEST1..E2-P2A-TEST2` | preserve |
 | GOVREC01 focused tests | legacy snapshot regression remains green after contract correction | no regression to GOVREC01 reconciliation facts | correct | 9 tests | closure evidence | preserve |
+| Source-anchor / external-receipt boundary | committed anchor is reconciliation input; approval subject/report hashes and existing source-binding remain separate external identity surfaces | no second authority/receipt system and no self-referential candidate identity | correct | 2 existing machinery paths | `E2-P2B-DOC1..E2-P2B-DOC2` | preserve in P3 |
 | Historical `.19` artifact and receipts | exact historical authority preserved | unchanged historical evidence | correct | preserve-only | `E0-P0A-AUTH3` | preserve-only |
 | Current Council status | historical/current boundary already explicit | remain `FALSE / NOT_PROVEN` | correct | preserve-only | `E0-P0A-SCOPE1` | preserve-only |
 | Root `.git` and unrelated owner dirty state | root admin metadata invalid; 1,127 target-worktree dirty entries are unrelated owner/line-ending state | untouched | preserve-only | out of scope | `E0-P0A-CHK1` | do not touch |
@@ -70,6 +71,7 @@ Out of scope:
 | R1 | 2026-08-26 | after P1-A static anchor contract implementation | authority JSON and static validator | active field `wrong -> correct`; static validator `partial -> correct`; dynamic Git boundary remains `missing` | `E1-P1A-CONTRACT1..E1-P1A-CONTRACT2` | proceed P1-B; dynamic checks must remain separate |
 | R2 | 2026-08-26 | after P1-B dynamic validator implementation | real linked worktree CLI and Git-less package boundary | dynamic boundary `missing -> bound-correct`; current checkout `HEAD_DESCENDS_FROM_ANCHOR`, origin/main `ORIGIN_MAIN_EQUALS_ANCHOR`; anchor commit/tree verified | `E1-P1B-GIT1..E1-P1B-GIT2` | proceed P2-A; no remote mutation |
 | R3 | 2026-08-26 | after P2-A focused behavior tests | GOVREC02/GOVREC01/development-control tests | focused behavior status `partial -> correct`; 11/11 GOVREC02, 9/9 GOVREC01, 21 development-control with 2 expected skips | `E2-P2A-TEST1..E2-P2A-TEST2` | proceed P2-B receipt/documentation boundary |
+| R4 | 2026-08-26 | after P2-B source/receipt boundary inspection | active search, approval schema/receipt, package source binding | receipt boundary `unbound -> correct`; anchor remains committed reconciliation input, external subject/source identity remains existing machinery, no duplicate system | `E2-P2B-DOC1..E2-P2B-DOC2` | proceed P3 final gates |
 
 ## Phase Touch Map
 
@@ -131,7 +133,7 @@ Do not preserve two active fields, equate anchor to latest HEAD, or encode the c
 | P1-A | active authority key was wrong/ambiguous; static validation was partial | complete: explicit anchor object and static contract |
 | P1-B | dynamic Git relationship was missing | complete: bind real Git checkout observations; no latest-head equality requirement |
 | P2-A | tests lacked positive/negative lineage behavior | complete: add behavior matrix after production behavior |
-| P2-B | receipt boundary exists historically but is not documented for this contract | document without creating a second receipt system |
+| P2-B | receipt boundary exists historically but was not documented for this contract | complete: document without creating a second receipt system |
 | P3 | current baseline gates were green in GOVREC01 but exact final GOVREC02 review is not run | rerun all required gates and fresh Supervisor on final HEAD |
 
 ## Implementation Gate
@@ -168,3 +170,7 @@ The active projection and static contract are explicit and tested; checkpoint `9
 P1-B/P2-A refresh note:
 
 The real linked-worktree validator now proves anchor commit/tree identity and separate HEAD/origin-main lineage. Focused simulations prove BEFORE equality, descendant candidate/post-promotion validity, and divergent-head rejection without changing refs. P2-B must now record the external receipt boundary and active-consumer search before final gates.
+
+P2-B refresh note:
+
+Existing approval/source-binding machinery remains the external identity boundary: the committed anchor is not an approval receipt, and no candidate's own future SHA is inserted into its governance file. Active positive consumer search is clean; remaining legacy literals are explicit rejection tests/guards or historical provenance.
