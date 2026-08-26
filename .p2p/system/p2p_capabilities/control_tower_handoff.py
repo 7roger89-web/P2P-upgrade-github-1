@@ -2,8 +2,10 @@
 
 This module is a small composition boundary over the existing P2P task,
 evidence, execution-ledger, and host-executor surfaces. It does not launch a
-host, select a provider, inherit chat state, write canonical truth, or approve
-protected actions.
+host, select a provider, inherit chat state, write canonical truth, approve
+protected actions, or transfer state between Control Tower instances. A
+successor packet is compact bootstrap data that must be reconciled with
+durable P2P evidence.
 """
 
 from __future__ import annotations
@@ -17,6 +19,8 @@ CONTROL_TOWER_PACKET_SCHEMA = "p2p-control-tower-return-packet/1"
 CONTROL_TOWER_PROMPT_SCHEMA = "p2p-control-tower-execution-prompt/1"
 CONTROL_TOWER_EVENT_SCHEMA = "p2p-control-tower-return-event/1"
 ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
+CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
+CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
 
 TERMINAL_STATES = (
     "COMPLETED",
@@ -60,6 +64,8 @@ UPLOAD_MANIFEST_INSTRUCTION = (
 )
 
 _HOST_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]{1,63}$")
+_CONTROL_TOWER_INSTANCE_PATTERN = re.compile(r"^CT[A-Z0-9_-]{1,63}$")
+_CONFIDENCE_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]{0,31}$")
 _HASH_PATTERN = re.compile(r"^[0-9a-fA-F]{64}$")
 _SECRET_KEY_PATTERN = re.compile(
     r"(?:secret|password|api[_-]?key|credential|token_value|"
@@ -207,6 +213,81 @@ def _attachment_classification(value: Any) -> str:
     if normalized not in ATTACHMENT_CLASSIFICATIONS:
         raise ControlTowerHandoffError("ATTACHMENT_CLASSIFICATION_INVALID")
     return normalized
+
+
+def _control_tower_instance_id(value: Any, field_name: str) -> str:
+    normalized = _text(value, field_name, max_length=64).upper()
+    if not _CONTROL_TOWER_INSTANCE_PATTERN.fullmatch(normalized):
+        raise ControlTowerHandoffError(f"{field_name.upper()}_INVALID")
+    return normalized
+
+
+def _canonical_confidence(value: Any) -> str:
+    if value is None:
+        return "UNKNOWN"
+    normalized = _text(value, "canonical_confidence", max_length=32).upper().replace("-", "_")
+    if not _CONFIDENCE_PATTERN.fullmatch(normalized):
+        raise ControlTowerHandoffError("CANONICAL_CONFIDENCE_INVALID")
+    return normalized
+
+
+def _positive_int(value: Any, field_name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise ControlTowerHandoffError(f"{field_name}_INVALID")
+    return value
+
+
+def _safe_items(values: Sequence[Any] | None, field_name: str) -> tuple[Any, ...]:
+    if values is None:
+        return ()
+    if isinstance(values, (str, bytes, Mapping)):
+        raise ControlTowerHandoffError(f"{field_name}_MUST_BE_SEQUENCE")
+    try:
+        iterator = iter(values)
+    except TypeError as exc:
+        raise ControlTowerHandoffError(f"{field_name}_MUST_BE_SEQUENCE") from exc
+    items: list[Any] = []
+    for index, item in enumerate(iterator):
+        if index >= 256:
+            raise ControlTowerHandoffError(f"{field_name}_TOO_LARGE")
+        items.append(_safe_json(item, path=f"{field_name}[{index}]"))
+    return tuple(items)
+
+
+def _canonical_claim(value: Any) -> Any:
+    if value is None:
+        return None
+    return _safe_json(value, path="current_canonical_claim")
+
+
+def _host_lanes(value: Mapping[str, Any] | None) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise ControlTowerHandoffError("HOST_LANES_MUST_BE_OBJECT")
+    lanes: dict[str, Any] = {}
+    for raw_host, raw_lane in value.items():
+        host = normalize_host(raw_host)
+        if host in lanes:
+            raise ControlTowerHandoffError(f"HOST_LANE_DUPLICATE:{host}")
+        lanes[host] = _safe_json(raw_lane, path=f"host_lanes.{host}")
+    return lanes
+
+
+def _active_execution(value: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if not isinstance(value, Mapping):
+        raise ControlTowerHandoffError("CONFIRMED_ACTIVE_EXECUTION_MUST_BE_OBJECT")
+    result = _safe_json(value, path="confirmed_active_execution")
+    if not isinstance(result, dict):
+        raise ControlTowerHandoffError("CONFIRMED_ACTIVE_EXECUTION_MUST_BE_OBJECT")
+    for field_name in ("SESSION_ID", "HOST", "GOAL_ID"):
+        if field_name not in result:
+            raise ControlTowerHandoffError(f"CONFIRMED_ACTIVE_EXECUTION_{field_name}_REQUIRED")
+        _text(result[field_name], f"confirmed_active_execution_{field_name.lower()}", max_length=256)
+    result["HOST"] = normalize_host(result["HOST"])
+    return result
 
 
 def _reject_inheritance(value: Any) -> None:
@@ -388,6 +469,329 @@ class ControlTowerAttachmentManifest:
         )
 
 
+@dataclass(frozen=True)
+class ControlTowerSuccessorPacket:
+    """Compact CT001 -> CT002 bootstrap data, never canonical truth."""
+
+    current_control_tower_instance_id: str
+    proposed_successor_control_tower_instance_id: str
+    latest_control_tower_snapshot_sequence: int
+    current_canonical_claim: Any = None
+    current_canonical_confidence: str = "UNKNOWN"
+    host_lanes: Mapping[str, Any] = field(default_factory=dict)
+    confirmed_active_execution: Mapping[str, Any] | None = None
+    owner_gates: Sequence[Any] = field(default_factory=tuple)
+    pending_work: Sequence[Any] = field(default_factory=tuple)
+    recently_closed_material_work: Sequence[Any] = field(default_factory=tuple)
+    blockers_and_risks: Sequence[Any] = field(default_factory=tuple)
+    critical_invariants: Sequence[Any] = field(default_factory=tuple)
+    next_safe_action: str = (
+        "Reconcile this successor packet against durable P2P evidence before continuing."
+    )
+    durable_evidence_checkpoint_refs: Sequence[Any] = field(default_factory=tuple)
+    unresolved_chat_only_not_canonical: Sequence[Any] = field(default_factory=tuple)
+    attachment_manifest: ControlTowerAttachmentManifest = field(
+        default_factory=ControlTowerAttachmentManifest
+    )
+
+    def __post_init__(self) -> None:
+        current_id = _control_tower_instance_id(
+            self.current_control_tower_instance_id,
+            "current_control_tower_instance_id",
+        )
+        successor_id = _control_tower_instance_id(
+            self.proposed_successor_control_tower_instance_id,
+            "proposed_successor_control_tower_instance_id",
+        )
+        if current_id == successor_id:
+            raise ControlTowerHandoffError("SUCCESSOR_CONTROL_TOWER_INSTANCE_MUST_DIFFER")
+        object.__setattr__(self, "current_control_tower_instance_id", current_id)
+        object.__setattr__(self, "proposed_successor_control_tower_instance_id", successor_id)
+        object.__setattr__(
+            self,
+            "latest_control_tower_snapshot_sequence",
+            _positive_int(
+                self.latest_control_tower_snapshot_sequence,
+                "latest_control_tower_snapshot_sequence",
+            ),
+        )
+        claim = _canonical_claim(self.current_canonical_claim)
+        object.__setattr__(self, "current_canonical_claim", claim)
+        confidence = _canonical_confidence(self.current_canonical_confidence)
+        if claim is None:
+            confidence = "UNKNOWN"
+        object.__setattr__(self, "current_canonical_confidence", confidence)
+        object.__setattr__(self, "host_lanes", _host_lanes(self.host_lanes))
+        object.__setattr__(
+            self,
+            "confirmed_active_execution",
+            _active_execution(self.confirmed_active_execution),
+        )
+        for field_name in (
+            "owner_gates",
+            "pending_work",
+            "recently_closed_material_work",
+            "blockers_and_risks",
+            "critical_invariants",
+        ):
+            object.__setattr__(self, field_name, _safe_items(getattr(self, field_name), field_name))
+        object.__setattr__(
+            self,
+            "next_safe_action",
+            _text(self.next_safe_action, "next_safe_action", max_length=4096),
+        )
+        object.__setattr__(
+            self,
+            "durable_evidence_checkpoint_refs",
+            _refs(self.durable_evidence_checkpoint_refs, "durable_evidence_checkpoint_refs"),
+        )
+        object.__setattr__(
+            self,
+            "unresolved_chat_only_not_canonical",
+            _refs(
+                self.unresolved_chat_only_not_canonical,
+                "unresolved_chat_only_not_canonical",
+            ),
+        )
+        manifest = self.attachment_manifest
+        if manifest is None:
+            manifest = ControlTowerAttachmentManifest()
+        elif isinstance(manifest, Mapping):
+            manifest = ControlTowerAttachmentManifest.from_mapping(manifest)
+        elif not isinstance(manifest, ControlTowerAttachmentManifest):
+            raise ControlTowerHandoffError("ATTACHMENT_MANIFEST_REQUIRED")
+        object.__setattr__(self, "attachment_manifest", manifest)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema": CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA,
+            "P2P_CONTROL_TOWER_SUCCESSOR_PACKET": True,
+            "CONTROL_TOWER_SUCCESSOR_PACKET": True,
+            "CURRENT_CONTROL_TOWER_INSTANCE_ID": self.current_control_tower_instance_id,
+            "PROPOSED_SUCCESSOR_CONTROL_TOWER_INSTANCE_ID": self.proposed_successor_control_tower_instance_id,
+            "LATEST_CONTROL_TOWER_SNAPSHOT_SEQUENCE": self.latest_control_tower_snapshot_sequence,
+            "CURRENT_CANONICAL_CLAIM": _safe_json(
+                self.current_canonical_claim,
+                path="current_canonical_claim",
+            ),
+            "CURRENT_CANONICAL_CONFIDENCE": self.current_canonical_confidence,
+            "HOST_LANES": _safe_json(self.host_lanes, path="host_lanes"),
+            "CONFIRMED_ACTIVE_EXECUTION": _safe_json(
+                self.confirmed_active_execution,
+                path="confirmed_active_execution",
+            ),
+            "OWNER_GATES": _safe_json(self.owner_gates, path="owner_gates"),
+            "PENDING_WORK": _safe_json(self.pending_work, path="pending_work"),
+            "RECENTLY_CLOSED_MATERIAL_WORK": _safe_json(
+                self.recently_closed_material_work,
+                path="recently_closed_material_work",
+            ),
+            "BLOCKERS_AND_RISKS": _safe_json(self.blockers_and_risks, path="blockers_and_risks"),
+            "CRITICAL_INVARIANTS": _safe_json(self.critical_invariants, path="critical_invariants"),
+            "NEXT_SAFE_ACTION": self.next_safe_action,
+            "DURABLE_EVIDENCE_CHECKPOINT_REFS": list(self.durable_evidence_checkpoint_refs),
+            "UNRESOLVED_CHAT_ONLY_NOT_CANONICAL": list(self.unresolved_chat_only_not_canonical),
+            "CHAT_ONLY_NOT_CANONICAL": list(self.unresolved_chat_only_not_canonical),
+            "CONTROL_TOWER_LIFECYCLE_LAYERS": {
+                "EXECUTION_SESSION": "SHORT_LIVED_BOUNDED",
+                "CONTROL_TOWER_INSTANCE": "ROTATABLE",
+                "P2P_REPOSITORY_EVIDENCE_GOVERNANCE": "LONG_LIVED_SOURCE_OF_TRUTH",
+            },
+            "FULL_CHAT_HISTORY_INCLUDED": "NO",
+            "UPLOAD_REQUIRED": self.attachment_manifest.upload_required,
+            "CONTROL_TOWER_ATTACHMENT_MANIFEST": self.attachment_manifest.to_dict(),
+            "SUCCESSOR_PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PROMOTION_EXECUTED": "NO",
+            "DEPLOYMENT_EXECUTED": "NO",
+            "LIVE_ACTION_EXECUTED": "NO",
+            "OWNER_APPROVAL_INHERITED": "NO",
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "ControlTowerSuccessorPacket":
+        if not isinstance(value, Mapping) or value.get("schema") != CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA:
+            raise ControlTowerHandoffError("CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA_INVALID")
+        if value.get("P2P_CONTROL_TOWER_SUCCESSOR_PACKET") is not True:
+            raise ControlTowerHandoffError("CONTROL_TOWER_SUCCESSOR_PACKET_MARKER_INVALID")
+        raw_manifest = value.get("CONTROL_TOWER_ATTACHMENT_MANIFEST")
+        if raw_manifest is None:
+            manifest = ControlTowerAttachmentManifest(
+                upload_required=value.get("UPLOAD_REQUIRED", "NO")
+            )
+        else:
+            manifest = ControlTowerAttachmentManifest.from_mapping(raw_manifest)
+            if "UPLOAD_REQUIRED" in value and value.get("UPLOAD_REQUIRED") != manifest.upload_required:
+                raise ControlTowerHandoffError("UPLOAD_REQUIRED_MANIFEST_MISMATCH")
+        return cls(
+            current_control_tower_instance_id=value.get("CURRENT_CONTROL_TOWER_INSTANCE_ID"),
+            proposed_successor_control_tower_instance_id=value.get(
+                "PROPOSED_SUCCESSOR_CONTROL_TOWER_INSTANCE_ID"
+            ),
+            latest_control_tower_snapshot_sequence=value.get(
+                "LATEST_CONTROL_TOWER_SNAPSHOT_SEQUENCE"
+            ),
+            current_canonical_claim=value.get("CURRENT_CANONICAL_CLAIM"),
+            current_canonical_confidence=value.get("CURRENT_CANONICAL_CONFIDENCE", "UNKNOWN"),
+            host_lanes=value.get("HOST_LANES") or {},
+            confirmed_active_execution=value.get("CONFIRMED_ACTIVE_EXECUTION"),
+            owner_gates=tuple(value.get("OWNER_GATES") or ()),
+            pending_work=tuple(value.get("PENDING_WORK") or ()),
+            recently_closed_material_work=tuple(value.get("RECENTLY_CLOSED_MATERIAL_WORK") or ()),
+            blockers_and_risks=tuple(value.get("BLOCKERS_AND_RISKS") or ()),
+            critical_invariants=tuple(value.get("CRITICAL_INVARIANTS") or ()),
+            next_safe_action=value.get(
+                "NEXT_SAFE_ACTION",
+                "Reconcile this successor packet against durable P2P evidence before continuing.",
+            ),
+            durable_evidence_checkpoint_refs=tuple(
+                value.get("DURABLE_EVIDENCE_CHECKPOINT_REFS") or ()
+            ),
+            unresolved_chat_only_not_canonical=tuple(
+                value.get("UNRESOLVED_CHAT_ONLY_NOT_CANONICAL")
+                or value.get("CHAT_ONLY_NOT_CANONICAL")
+                or ()
+            ),
+            attachment_manifest=manifest,
+        )
+
+
+@dataclass(frozen=True)
+class ControlTowerRotationHandoff:
+    """Beginner-facing rotation wrapper around one successor packet."""
+
+    successor_packet: ControlTowerSuccessorPacket
+    old_chat_archive_name: str
+    new_chat_name: str
+    user_action: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.successor_packet, ControlTowerSuccessorPacket):
+            raise ControlTowerHandoffError("SUCCESSOR_PACKET_REQUIRED")
+        object.__setattr__(
+            self,
+            "old_chat_archive_name",
+            _text(self.old_chat_archive_name, "old_chat_archive_name", max_length=256),
+        )
+        object.__setattr__(
+            self,
+            "new_chat_name",
+            _text(self.new_chat_name, "new_chat_name", max_length=256),
+        )
+        object.__setattr__(
+            self,
+            "user_action",
+            _text(self.user_action, "rotation_user_action", max_length=8192),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        packet = self.successor_packet.to_dict()
+        return {
+            "schema": CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA,
+            "CONTROL_TOWER_ROTATION_HANDOFF": True,
+            "P2P_CONTROL_TOWER_SUCCESSOR_PACKET": packet,
+            "CURRENT_CONTROL_TOWER_ARCHIVE_NAME": self.old_chat_archive_name,
+            "OLD_CHAT_ARCHIVE_NAME": self.old_chat_archive_name,
+            "SUCCESSOR_CONTROL_TOWER_CHAT_NAME": self.new_chat_name,
+            "NEW_CHAT_NAME": self.new_chat_name,
+            "ROTATION_USER_ACTION": self.user_action,
+            "UPLOAD_REQUIRED": self.successor_packet.attachment_manifest.upload_required,
+            "CONTROL_TOWER_ATTACHMENT_MANIFEST": self.successor_packet.attachment_manifest.to_dict(),
+            "SUCCESSOR_PACKET_IS_CANONICAL_TRUTH": "NO",
+            "FULL_CHAT_HISTORY_INCLUDED": "NO",
+            "OWNER_APPROVAL_INHERITED": "NO",
+            "PROMOTION_EXECUTED": "NO",
+            "DEPLOYMENT_EXECUTED": "NO",
+            "LIVE_ACTION_EXECUTED": "NO",
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "ControlTowerRotationHandoff":
+        if not isinstance(value, Mapping) or value.get("schema") != CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA:
+            raise ControlTowerHandoffError("CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA_INVALID")
+        if value.get("CONTROL_TOWER_ROTATION_HANDOFF") is not True:
+            raise ControlTowerHandoffError("CONTROL_TOWER_ROTATION_HANDOFF_MARKER_INVALID")
+        raw_packet = value.get("P2P_CONTROL_TOWER_SUCCESSOR_PACKET")
+        packet = ControlTowerSuccessorPacket.from_mapping(raw_packet)
+        if "UPLOAD_REQUIRED" in value and value.get("UPLOAD_REQUIRED") != packet.attachment_manifest.upload_required:
+            raise ControlTowerHandoffError("UPLOAD_REQUIRED_MANIFEST_MISMATCH")
+        return cls(
+            successor_packet=packet,
+            old_chat_archive_name=value.get(
+                "CURRENT_CONTROL_TOWER_ARCHIVE_NAME",
+                value.get("OLD_CHAT_ARCHIVE_NAME"),
+            ),
+            new_chat_name=value.get(
+                "SUCCESSOR_CONTROL_TOWER_CHAT_NAME",
+                value.get("NEW_CHAT_NAME"),
+            ),
+            user_action=value.get("ROTATION_USER_ACTION"),
+        )
+
+
+@dataclass(frozen=True)
+class ControlTowerSuccessorReconciliation:
+    """Read-only reconciliation result for a proposed successor packet."""
+
+    current_control_tower_instance_id: str
+    successor_control_tower_instance_id: str
+    canonical_claim_relation: str
+    snapshot_sequence_relation: str
+    control_tower_status: str
+    host_lanes: Mapping[str, Any]
+    confirmed_active_execution: Mapping[str, Any] | None
+    owner_gates: tuple[Any, ...]
+    pending_work: tuple[Any, ...]
+    recently_closed_material_work: tuple[Any, ...]
+    blockers_and_risks: tuple[Any, ...]
+    critical_invariants: tuple[Any, ...]
+    unresolved_chat_only_not_canonical: tuple[str, ...]
+    blockers: tuple[str, ...]
+    next_safe_action: str
+    promoted: bool = False
+    owner_gate_executed: bool = False
+    active_execution_closed: bool = False
+    active_execution_invented: bool = False
+    host_lane_reassigned: bool = False
+    owner_approval_inherited: bool = False
+    packet_is_canonical_truth: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema": "p2p-control-tower-successor-reconciliation/1",
+            "P2P_CONTROL_TOWER_SUCCESSOR_RECONCILIATION": True,
+            "CURRENT_CONTROL_TOWER_INSTANCE_ID": self.current_control_tower_instance_id,
+            "SUCCESSOR_CONTROL_TOWER_INSTANCE_ID": self.successor_control_tower_instance_id,
+            "CANONICAL_CLAIM_RELATION": self.canonical_claim_relation,
+            "SNAPSHOT_SEQUENCE_RELATION": self.snapshot_sequence_relation,
+            "CONTROL_TOWER_STATUS": self.control_tower_status,
+            "HOST_LANES": _safe_json(self.host_lanes, path="host_lanes"),
+            "CONFIRMED_ACTIVE_EXECUTION": _safe_json(
+                self.confirmed_active_execution,
+                path="confirmed_active_execution",
+            ),
+            "OWNER_GATES": _safe_json(self.owner_gates, path="owner_gates"),
+            "PENDING_WORK": _safe_json(self.pending_work, path="pending_work"),
+            "RECENTLY_CLOSED_MATERIAL_WORK": _safe_json(
+                self.recently_closed_material_work,
+                path="recently_closed_material_work",
+            ),
+            "BLOCKERS_AND_RISKS": _safe_json(self.blockers_and_risks, path="blockers_and_risks"),
+            "CRITICAL_INVARIANTS": _safe_json(self.critical_invariants, path="critical_invariants"),
+            "UNRESOLVED_CHAT_ONLY_NOT_CANONICAL": list(self.unresolved_chat_only_not_canonical),
+            "BLOCKERS": list(self.blockers),
+            "NEXT_SAFE_ACTION": self.next_safe_action,
+            "PROMOTED": self.promoted,
+            "OWNER_GATE_EXECUTED": "YES" if self.owner_gate_executed else "NO",
+            "ACTIVE_EXECUTION_CLOSED": "YES" if self.active_execution_closed else "NO",
+            "ACTIVE_EXECUTION_INVENTED": "YES" if self.active_execution_invented else "NO",
+            "HOST_LANE_REASSIGNED": "YES" if self.host_lane_reassigned else "NO",
+            "OWNER_APPROVAL_INHERITED": "YES" if self.owner_approval_inherited else "NO",
+            "SUCCESSOR_PACKET_IS_CANONICAL_TRUTH": "YES" if self.packet_is_canonical_truth else "NO",
+            "PACKET_IS_CANONICAL_TRUTH": "YES" if self.packet_is_canonical_truth else "NO",
+        }
+
+
 def bind_session(
     *,
     session_id: str,
@@ -548,6 +952,162 @@ def create_return_packet(binding: SessionBinding, **values: Any) -> ControlTower
     """Construct a packet while keeping the binding explicit at the call site."""
 
     return ControlTowerReturnPacket(binding=binding, **values)
+
+
+def prepare_control_tower_rotation(
+    *,
+    current_control_tower_instance_id: str,
+    proposed_successor_control_tower_instance_id: str,
+    latest_control_tower_snapshot_sequence: int,
+    current_canonical_claim: Any = None,
+    current_canonical_confidence: str = "UNKNOWN",
+    host_lanes: Mapping[str, Any] | None = None,
+    confirmed_active_execution: Mapping[str, Any] | None = None,
+    owner_gates: Sequence[Any] = (),
+    pending_work: Sequence[Any] = (),
+    recently_closed_material_work: Sequence[Any] = (),
+    blockers_and_risks: Sequence[Any] = (),
+    critical_invariants: Sequence[Any] = (),
+    next_safe_action: str = (
+        "Reconcile this successor packet against durable P2P evidence before continuing."
+    ),
+    durable_evidence_checkpoint_refs: Sequence[Any] = (),
+    unresolved_chat_only_not_canonical: Sequence[Any] = (),
+    attachment_manifest: ControlTowerAttachmentManifest | Mapping[str, Any] | None = None,
+) -> ControlTowerRotationHandoff:
+    """Emit the compact beginner-facing packet for one Control Tower rotation."""
+
+    packet = ControlTowerSuccessorPacket(
+        current_control_tower_instance_id=current_control_tower_instance_id,
+        proposed_successor_control_tower_instance_id=proposed_successor_control_tower_instance_id,
+        latest_control_tower_snapshot_sequence=latest_control_tower_snapshot_sequence,
+        current_canonical_claim=current_canonical_claim,
+        current_canonical_confidence=current_canonical_confidence,
+        host_lanes=host_lanes or {},
+        confirmed_active_execution=confirmed_active_execution,
+        owner_gates=owner_gates,
+        pending_work=pending_work,
+        recently_closed_material_work=recently_closed_material_work,
+        blockers_and_risks=blockers_and_risks,
+        critical_invariants=critical_invariants,
+        next_safe_action=next_safe_action,
+        durable_evidence_checkpoint_refs=durable_evidence_checkpoint_refs,
+        unresolved_chat_only_not_canonical=unresolved_chat_only_not_canonical,
+        attachment_manifest=attachment_manifest,
+    )
+    old_name = f"90 — P2P CONTROL TOWER — {packet.current_control_tower_instance_id} — ARCHIVE"
+    new_name = f"00 — P2P CONTROL TOWER — {packet.proposed_successor_control_tower_instance_id}"
+    user_action = "\n".join(
+        (
+            "ROTATION_USER_ACTION:",
+            f"1. Rename the current Control Tower chat to: {old_name}",
+            f"2. Create a new chat named: {new_name}",
+            "3. Paste the complete P2P_CONTROL_TOWER_SUCCESSOR_PACKET below.",
+            "4. Upload only explicitly listed REQUIRED attachments when UPLOAD_REQUIRED=YES.",
+            "5. Ask the successor to reconcile material claims with durable P2P evidence before continuing.",
+            "Do not manually summarize the old chat. The successor packet is bootstrap data, not canonical truth.",
+        )
+    )
+    return ControlTowerRotationHandoff(
+        successor_packet=packet,
+        old_chat_archive_name=old_name,
+        new_chat_name=new_name,
+        user_action=user_action,
+    )
+
+
+def _compare_successor_claims(
+    packet: ControlTowerSuccessorPacket,
+    current_canonical_claim: Any,
+    current_canonical_confidence: Any,
+) -> str:
+    current_claim = _canonical_claim(current_canonical_claim)
+    current_confidence = _canonical_confidence(current_canonical_confidence)
+    if (
+        packet.current_canonical_claim is None
+        or current_claim is None
+        or packet.current_canonical_confidence == "UNKNOWN"
+        or current_confidence == "UNKNOWN"
+    ):
+        return "UNKNOWN"
+    if (
+        packet.current_canonical_claim == current_claim
+        and packet.current_canonical_confidence == current_confidence
+    ):
+        return "CURRENT"
+    return "STALE"
+
+
+def _compare_snapshot_sequence(packet_sequence: int, current_sequence: Any) -> str:
+    if isinstance(current_sequence, bool) or not isinstance(current_sequence, int) or current_sequence < 1:
+        return "UNKNOWN"
+    if packet_sequence == current_sequence:
+        return "CURRENT"
+    return "STALE"
+
+
+def reconcile_control_tower_successor(
+    packet: ControlTowerSuccessorPacket,
+    *,
+    current_canonical_claim: Any,
+    current_canonical_confidence: str,
+    current_snapshot_sequence: int | None,
+    expected_successor_control_tower_instance_id: str | None = None,
+) -> ControlTowerSuccessorReconciliation:
+    """Reconcile successor bootstrap data without applying authority or state."""
+
+    if not isinstance(packet, ControlTowerSuccessorPacket):
+        raise ControlTowerHandoffError("SUCCESSOR_PACKET_REQUIRED")
+    claim_relation = _compare_successor_claims(
+        packet,
+        current_canonical_claim,
+        current_canonical_confidence,
+    )
+    snapshot_relation = _compare_snapshot_sequence(
+        packet.latest_control_tower_snapshot_sequence,
+        current_snapshot_sequence,
+    )
+    blockers: list[str] = []
+    if claim_relation != "CURRENT":
+        blockers.append(f"CANONICAL_CLAIM_{claim_relation}")
+    if snapshot_relation != "CURRENT":
+        blockers.append(f"CONTROL_TOWER_SNAPSHOT_{snapshot_relation}")
+    successor_id = packet.proposed_successor_control_tower_instance_id
+    if expected_successor_control_tower_instance_id is not None:
+        expected_id = _control_tower_instance_id(
+            expected_successor_control_tower_instance_id,
+            "expected_successor_control_tower_instance_id",
+        )
+        if expected_id != successor_id:
+            blockers.append("SUCCESSOR_CONTROL_TOWER_INSTANCE_MISMATCH")
+    status = "READY" if not blockers else "RECONCILIATION_REQUIRED"
+    next_action = (
+        packet.next_safe_action
+        if status == "READY"
+        else "Reconcile the successor packet against durable P2P evidence and the current snapshot before accepting material claims."
+    )
+    return ControlTowerSuccessorReconciliation(
+        current_control_tower_instance_id=packet.current_control_tower_instance_id,
+        successor_control_tower_instance_id=successor_id,
+        canonical_claim_relation=claim_relation,
+        snapshot_sequence_relation=snapshot_relation,
+        control_tower_status=status,
+        host_lanes=_safe_json(packet.host_lanes, path="host_lanes"),
+        confirmed_active_execution=_safe_json(
+            packet.confirmed_active_execution,
+            path="confirmed_active_execution",
+        ),
+        owner_gates=tuple(_safe_json(packet.owner_gates, path="owner_gates")),
+        pending_work=tuple(_safe_json(packet.pending_work, path="pending_work")),
+        recently_closed_material_work=tuple(
+            _safe_json(packet.recently_closed_material_work, path="recently_closed_material_work")
+        ),
+        blockers_and_risks=tuple(_safe_json(packet.blockers_and_risks, path="blockers_and_risks")),
+        critical_invariants=tuple(_safe_json(packet.critical_invariants, path="critical_invariants")),
+        unresolved_chat_only_not_canonical=packet.unresolved_chat_only_not_canonical,
+        blockers=tuple(dict.fromkeys(blockers)),
+        next_safe_action=next_action,
+    )
 
 
 @dataclass(frozen=True)
@@ -782,6 +1342,12 @@ def build_execution_prompt(
             "Prefer one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact when appropriate.",
             "PACKET_IS_CANONICAL_TRUTH: NO",
             "Return the packet to the Control Tower for reconciliation; the packet is not canonical truth.",
+            "Control Tower chats are rotatable instances; durable P2P repository/evidence/governance remains the long-lived source of truth.",
+            "When asked to prepare rotation, emit P2P_CONTROL_TOWER_SUCCESSOR_PACKET with the current instance, proposed successor,",
+            "snapshot sequence, canonical claim/confidence, host lanes, active execution, Owner Gates, pending/closed work,",
+            "blockers/risks, critical invariants, next safe action, durable refs, and CHAT_ONLY_NOT_CANONICAL.",
+            "The successor packet is compact bootstrap data: do not copy full chat history, execute Owner Gates, inherit approval,",
+            "close active execution, move host lanes, invent execution, or treat the packet as canonical truth.",
             "",
             USER_ACTION_BLOCK,
         )
@@ -795,13 +1361,18 @@ __all__ = [
     "CONTROL_TOWER_EVENT_SCHEMA",
     "CONTROL_TOWER_PACKET_SCHEMA",
     "CONTROL_TOWER_PROMPT_SCHEMA",
+    "CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA",
+    "CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA",
     "CONTROL_TOWER_STATUSES",
     "ControlTowerAttachment",
     "ControlTowerAttachmentManifest",
     "ControlTowerHandoffError",
     "ControlTowerIngestResult",
     "ControlTowerReturnPacket",
+    "ControlTowerRotationHandoff",
     "ControlTowerState",
+    "ControlTowerSuccessorPacket",
+    "ControlTowerSuccessorReconciliation",
     "EXISTING_LIFECYCLE_STATE",
     "SessionBinding",
     "TERMINAL_STATES",
@@ -812,5 +1383,7 @@ __all__ = [
     "build_execution_prompt",
     "create_return_packet",
     "normalize_host",
+    "prepare_control_tower_rotation",
+    "reconcile_control_tower_successor",
     "to_execution_ledger_event",
 ]

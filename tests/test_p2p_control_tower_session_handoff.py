@@ -23,11 +23,15 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     ControlTowerAttachmentManifest,
     ControlTowerHandoffError,
     ControlTowerReturnPacket,
+    ControlTowerRotationHandoff,
     ControlTowerState,
+    ControlTowerSuccessorPacket,
     bind_session,
     build_execution_prompt,
     create_return_packet,
     normalize_host,
+    prepare_control_tower_rotation,
+    reconcile_control_tower_successor,
     to_execution_ledger_event,
 )
 
@@ -71,6 +75,50 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
             current_canonical_base_tree=BASE_TREE,
             **kwargs,
         )
+
+    def successor_handoff(self, **overrides):
+        values = {
+            "current_control_tower_instance_id": "CT001",
+            "proposed_successor_control_tower_instance_id": "CT002",
+            "latest_control_tower_snapshot_sequence": 7,
+            "current_canonical_claim": {
+                "status": "INTEGRATED",
+                "candidate": "UNPROMOTED",
+            },
+            "current_canonical_confidence": "CONFIRMED",
+            "host_lanes": {
+                "MANUS": {
+                    "SESSION_ID": "manus-active-session",
+                    "CONTROL_TOWER_STATUS": "RUNNING",
+                },
+                "CODEX": {
+                    "CONTROL_TOWER_STATUS": "IDLE",
+                },
+            },
+            "confirmed_active_execution": {
+                "SESSION_ID": "manus-active-session",
+                "HOST": "MANUS",
+                "GOAL_ID": "P2P-CT01",
+                "STATE": "RUNNING",
+            },
+            "owner_gates": (
+                {"GATE_ID": "OWNER_REVIEW_CT01", "STATUS": "PENDING"},
+            ),
+            "pending_work": ("Reconcile durable evidence",),
+            "recently_closed_material_work": ("Attachment-aware handoff",),
+            "blockers_and_risks": (
+                {"RISK_ID": "CHAT_CONTEXT_NOT_CANONICAL", "STATUS": "OPEN"},
+            ),
+            "critical_invariants": (
+                "Successor packet is bootstrap data, not canonical truth",
+                "Do not transfer host lanes",
+            ),
+            "next_safe_action": "Reconcile the packet with durable P2P evidence.",
+            "durable_evidence_checkpoint_refs": ("checkpoint:ct01/7",),
+            "unresolved_chat_only_not_canonical": ("CT001 narrative remains chat-only",),
+        }
+        values.update(overrides)
+        return prepare_control_tower_rotation(**values)
 
     def test_a_ready_return_is_not_promotion(self):
         state = ControlTowerState.empty(["MANUS"])
@@ -443,6 +491,9 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
         self.assertIn("local path alone does not make file contents available", prompt.lower())
         self.assertIn("attachments are evidence input only", prompt.lower())
         self.assertIn("SESSION_ID-CONTROL-TOWER-HANDOFF.md", prompt)
+        self.assertIn("P2P_CONTROL_TOWER_SUCCESSOR_PACKET", prompt)
+        self.assertIn("CHAT_ONLY_NOT_CANONICAL", prompt)
+        self.assertIn("Control Tower chats are rotatable", prompt)
 
     def test_attachment_manifest_rejects_ambiguous_upload_requirements(self):
         entry = ControlTowerAttachment(
@@ -461,6 +512,113 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
 
         with self.assertRaises(ControlTowerHandoffError):
             ControlTowerAttachmentManifest("YES", (entry,))
+
+    def test_rotation_a_ct001_to_ct002_preserves_material_state(self):
+        handoff = self.successor_handoff()
+        serialized = handoff.to_dict()
+        restored = ControlTowerSuccessorPacket.from_mapping(
+            serialized["P2P_CONTROL_TOWER_SUCCESSOR_PACKET"]
+        )
+
+        result = reconcile_control_tower_successor(
+            restored,
+            current_canonical_claim={"status": "INTEGRATED", "candidate": "UNPROMOTED"},
+            current_canonical_confidence="CONFIRMED",
+            current_snapshot_sequence=7,
+            expected_successor_control_tower_instance_id="CT002",
+        )
+
+        self.assertEqual(handoff.old_chat_archive_name, "90 — P2P CONTROL TOWER — CT001 — ARCHIVE")
+        self.assertEqual(handoff.new_chat_name, "00 — P2P CONTROL TOWER — CT002")
+        self.assertEqual(result.control_tower_status, "READY")
+        self.assertEqual(result.canonical_claim_relation, "CURRENT")
+        self.assertEqual(result.snapshot_sequence_relation, "CURRENT")
+        self.assertEqual(result.pending_work, ("Reconcile durable evidence",))
+        self.assertEqual(result.host_lanes["MANUS"]["SESSION_ID"], "manus-active-session")
+        self.assertEqual(result.unresolved_chat_only_not_canonical, ("CT001 narrative remains chat-only",))
+        self.assertFalse(result.packet_is_canonical_truth)
+
+    def test_rotation_b_owner_gates_persist_without_execution(self):
+        packet = self.successor_handoff().successor_packet
+
+        result = reconcile_control_tower_successor(
+            packet,
+            current_canonical_claim=packet.current_canonical_claim,
+            current_canonical_confidence=packet.current_canonical_confidence,
+            current_snapshot_sequence=packet.latest_control_tower_snapshot_sequence,
+        )
+
+        self.assertEqual(result.owner_gates, packet.owner_gates)
+        self.assertFalse(result.owner_gate_executed)
+        self.assertFalse(result.owner_approval_inherited)
+        self.assertFalse(result.promoted)
+        self.assertEqual(result.to_dict()["OWNER_GATE_EXECUTED"], "NO")
+
+    def test_rotation_c_confirmed_manus_execution_remains_manus(self):
+        packet = self.successor_handoff().successor_packet
+
+        result = reconcile_control_tower_successor(
+            packet,
+            current_canonical_claim=packet.current_canonical_claim,
+            current_canonical_confidence=packet.current_canonical_confidence,
+            current_snapshot_sequence=packet.latest_control_tower_snapshot_sequence,
+        )
+
+        self.assertIsNotNone(result.confirmed_active_execution)
+        self.assertEqual(result.confirmed_active_execution["HOST"], "MANUS")
+        self.assertEqual(result.confirmed_active_execution["SESSION_ID"], "manus-active-session")
+        self.assertFalse(result.active_execution_closed)
+        self.assertFalse(result.host_lane_reassigned)
+
+    def test_rotation_d_stale_canonical_claim_requires_reconciliation(self):
+        packet = self.successor_handoff().successor_packet
+
+        result = reconcile_control_tower_successor(
+            packet,
+            current_canonical_claim={"status": "PROMOTED", "candidate": "DIFFERENT"},
+            current_canonical_confidence="CONFIRMED",
+            current_snapshot_sequence=packet.latest_control_tower_snapshot_sequence,
+        )
+
+        self.assertEqual(result.canonical_claim_relation, "STALE")
+        self.assertEqual(result.control_tower_status, "RECONCILIATION_REQUIRED")
+        self.assertIn("CANONICAL_CLAIM_STALE", result.blockers)
+        self.assertFalse(result.packet_is_canonical_truth)
+        self.assertIn("durable P2P evidence", result.next_safe_action)
+
+    def test_rotation_e_missing_active_execution_is_not_invented(self):
+        handoff = self.successor_handoff(
+            confirmed_active_execution=None,
+            host_lanes={"MANUS": {"CONTROL_TOWER_STATUS": "IDLE"}},
+        )
+
+        result = reconcile_control_tower_successor(
+            handoff.successor_packet,
+            current_canonical_claim=handoff.successor_packet.current_canonical_claim,
+            current_canonical_confidence=handoff.successor_packet.current_canonical_confidence,
+            current_snapshot_sequence=handoff.successor_packet.latest_control_tower_snapshot_sequence,
+        )
+
+        self.assertIsNone(result.confirmed_active_execution)
+        self.assertFalse(result.active_execution_invented)
+        self.assertFalse(result.active_execution_closed)
+        self.assertEqual(result.host_lanes["MANUS"]["CONTROL_TOWER_STATUS"], "IDLE")
+
+    def test_rotation_f_beginner_bootstraps_without_full_history(self):
+        handoff = self.successor_handoff()
+        serialized = handoff.to_dict()
+        json.dumps(serialized, ensure_ascii=False)
+        restored = ControlTowerRotationHandoff.from_mapping(serialized)
+
+        self.assertTrue(serialized["CONTROL_TOWER_ROTATION_HANDOFF"])
+        self.assertTrue(serialized["P2P_CONTROL_TOWER_SUCCESSOR_PACKET"]["P2P_CONTROL_TOWER_SUCCESSOR_PACKET"])
+        self.assertEqual(serialized["FULL_CHAT_HISTORY_INCLUDED"], "NO")
+        self.assertIn("Rename the current Control Tower chat to", serialized["ROTATION_USER_ACTION"])
+        self.assertIn("Create a new chat named", serialized["ROTATION_USER_ACTION"])
+        self.assertIn("Do not manually summarize", serialized["ROTATION_USER_ACTION"])
+        self.assertEqual(restored.successor_packet.current_control_tower_instance_id, "CT001")
+        self.assertEqual(restored.successor_packet.proposed_successor_control_tower_instance_id, "CT002")
+        self.assertEqual(restored.successor_packet.to_dict()["FULL_CHAT_HISTORY_INCLUDED"], "NO")
 
 
 if __name__ == "__main__":
