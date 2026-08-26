@@ -18,8 +18,8 @@ class P2PGovernanceDriftTests(unittest.TestCase):
         governance = REPO_ROOT / "governance"
         policy = json.loads((governance / "drift-policy.json").read_text(encoding="utf-8"))
         scoped = policy["scoped_volatile_paths"]
-        self.assertEqual(len(scoped), 10)
-        self.assertTrue(all(not key.endswith("/") for key in scoped))
+        self.assertEqual(len(scoped), 38)
+        self.assertEqual({key for key in scoped if key.endswith("/")}, {"docs/"})
         claims = json.loads((governance / "fact-ledger.json").read_text(encoding="utf-8"))["claims"]
         claims_by_id = {claim["claim_id"]: claim for claim in claims}
         references: list[dict[str, object]] = []
@@ -32,10 +32,10 @@ class P2PGovernanceDriftTests(unittest.TestCase):
             references,
         )
         self.assertEqual(findings, [])
-        self.assertEqual(len(references), 35)
+        self.assertEqual(len(references), 366)
         self.assertEqual(
             {item["classification"] for item in references},
-            {"C", "D"},
+            {"C", "D", "P"},
         )
         self.assertEqual(
             sum(item["classification"] == "C" for item in references),
@@ -43,7 +43,11 @@ class P2PGovernanceDriftTests(unittest.TestCase):
         )
         self.assertEqual(
             sum(item["classification"] == "D" for item in references),
-            31,
+            360,
+        )
+        self.assertEqual(
+            sum(item["classification"] == "P" for item in references),
+            2,
         )
 
 

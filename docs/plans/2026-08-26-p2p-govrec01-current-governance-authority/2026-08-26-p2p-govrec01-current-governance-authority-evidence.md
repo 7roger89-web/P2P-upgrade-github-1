@@ -70,8 +70,21 @@ Matching plan item(s): `P2-A`, `P2-B`
 
 Matching plan item(s): `P3-A`, `P3-B`
 
-- `E3-P3A-DECODER1..E3-P3A-DECODER7`: To be filled with explicit UTF-8 child environment, strict byte decode implementation, valid-output behavior, malformed-output failure, and doctor reproduction.
-- `E3-P3B-TEST1..E3-P3B-TEST8`: To be filled with governance negative tests, refreshed current-policy counts, focused suites, and regression comparison.
+- `E3-P3A-DECODER1`: `scripts/doctor.py` now launches the governance helper with `PYTHONIOENCODING=utf-8`, `PYTHONUTF8=1`, and `text=False`, so the parent receives raw bytes at the process boundary.
+- `E3-P3A-DECODER2`: `_decode_helper_stream` decodes only strict UTF-8 and converts `UnicodeDecodeError` into a bounded `governance-drift` failure; no replacement decoding or swallowed exception was added.
+- `E3-P3A-DECODER3`: A valid helper JSON object with schema `p2p-codex-drift-report/1` and status `PASS` remains a doctor PASS path.
+- `E3-P3A-DECODER4`: A return-code-zero helper with invalid UTF-8 is rejected as `governance helper stdout is not valid UTF-8`.
+- `E3-P3A-DECODER5`: A return-code-zero helper with valid UTF-8 but malformed JSON is rejected as malformed helper output.
+- `E3-P3A-DECODER6`: A valid UTF-8 helper with nonzero return code remains a bounded governance failure and its output is preserved for diagnosis.
+- `E3-P3A-DECODER7`: Direct `py -3 -X utf8 scripts/doctor.py --root . --role development --json` now returns structured JSON with no reader-thread `UnicodeDecodeError`; before final lock it reports only the expected protected-file drift from this candidate's edits.
+- `E3-P3B-TEST1`: `make_reconcilable_root()` now normalizes current `.74` and UIUX `.41` metadata to its test source version; no production runtime path was changed.
+- `E3-P3B-TEST2`: Current drift regression asserts 38 scoped entries, intentional `docs/` prefix scope, 366 classified references, and class counts `C=4`, `D=360`, `P=2`, with zero unledgered findings.
+- `E3-P3B-TEST3`: Dedicated `tests.test_p2p_govrec01_reconciliation` covers authority separation, historical/current Council negative boundary, edge index completeness, exact drift exclusions, unlocked-file rejection, changed-lock rejection, and malformed helper output.
+- `E3-P3B-TEST4`: Focused combined unittest command ran 40 tests with `OK` and 2 intentional skips.
+- `E3-P3B-TEST5`: Required Vendor suite ran 22/22 PASS.
+- `E3-P3B-TEST6`: Required Host Projection suite ran 30/30 PASS; Manus package ran 8/8 PASS; Foundation ran 28/28 PASS.
+- `E3-P3B-TEST7`: Required C35 suite ran 57/57 PASS; C43 suite ran 9/9 PASS.
+- `E3-P3B-TEST8`: Python 3.12 has `pytest 9.1.1`; the optional live-certification/ledger-provenance pytest run exposed 17 pre-existing baseline failures outside the requested GOVREC01 gate (missing provenance fields, stale dependency references, and a Python 3-specific `python3` test command). No unrelated framework mutation was made.
 
 ## E4 - P4 Evidence
 

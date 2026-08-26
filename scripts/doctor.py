@@ -8,6 +8,7 @@ import csv
 import hashlib
 import importlib.util
 import json
+import os
 import re
 import subprocess
 import sys
@@ -222,6 +223,18 @@ def check_instructions(root: Path, report: Report) -> None:
         report.warn("instructions", f"{instructions} exists but does not contain the P2P guidance block")
 
 
+def _decode_helper_stream(value: bytes | str | None, stream_name: str) -> tuple[str, str | None]:
+    """Decode a governance helper stream strictly at the process boundary."""
+    if value is None:
+        return "", None
+    if isinstance(value, str):
+        return value, None
+    try:
+        return value.decode("utf-8"), None
+    except UnicodeDecodeError as exc:
+        return "", f"{stream_name} is not valid UTF-8 at byte {exc.start}: {exc.reason}"
+
+
 def check_governance(root: Path, report: Report, package_mode: bool) -> None:
     if package_mode:
         governance = root / "governance"
@@ -253,6 +266,8 @@ def check_governance(root: Path, report: Report, package_mode: bool) -> None:
     if not helper.is_file():
         report.fail("governance-helper", f"Missing drift helper: {helper}")
         return
+    helper_env = os.environ.copy()
+    helper_env.update({"PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"})
     result = subprocess.run(
         [
             sys.executable,
@@ -264,13 +279,28 @@ def check_governance(root: Path, report: Report, package_mode: bool) -> None:
             str(governance),
         ],
         capture_output=True,
-        text=True,
+        text=False,
+        env=helper_env,
         check=False,
     )
+    stdout, stdout_error = _decode_helper_stream(result.stdout, "governance helper stdout")
+    stderr, stderr_error = _decode_helper_stream(result.stderr, "governance helper stderr")
+    decode_errors = [error for error in (stdout_error, stderr_error) if error]
+    if decode_errors:
+        report.fail("governance-drift", "; ".join(decode_errors))
+        return
     if result.returncode == 0:
+        try:
+            payload = json.loads(stdout)
+        except json.JSONDecodeError as exc:
+            report.fail("governance-drift", f"governance helper returned malformed JSON: {exc.msg}")
+            return
+        if not isinstance(payload, dict) or payload.get("schema_version") != "p2p-codex-drift-report/1" or payload.get("status") != "PASS":
+            report.fail("governance-drift", "governance helper returned malformed success output")
+            return
         report.pass_("governance-drift", "FACT_LEDGER approval, generated Live Specs, expiry, protected-runtime lock, and active-runtime drift gates pass")
     else:
-        detail = (result.stdout or result.stderr).strip().replace("\n", " ")
+        detail = (stdout or stderr or "governance helper returned nonzero without UTF-8 output").strip().replace("\n", " ")
         report.fail("governance-drift", detail[:800])
 
     helper_root = root / "scripts" if package_mode else root / ".p2p" / "system" / "scripts"

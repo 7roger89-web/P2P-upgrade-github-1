@@ -2,7 +2,7 @@
 
 Title: P2P-GOVREC01 Current Governance Authority Reconciliation
 Date: 2026-08-26
-Status: P0/P1/P2 Complete / P3 implementation in progress
+Status: P0/P1/P2/P3 implementation complete / P4 validation in progress
 Companion plan: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-plan.md`
 Companion evidence: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-evidence.md`
 Companion benchmark: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-benchmark.md`
@@ -62,8 +62,8 @@ Out of scope:
 | Current-lineage Council proof | current source has configured 8/8 structure and bounded C43 smoke, not a full current round-trip | `FALSE` / `NOT_PROVEN` until fresh exact evidence | correct boundary; live evidence still open | derived | `E0-P0A-AUTH1`, `E2-P2A-COUNCIL1..8` | preserve until fresh exact evidence |
 | Active Council projections | projections now state historical single-host truth separately from current-lineage proof | explicit historical/current distinction | correct | derived | `E2-P2A-COUNCIL1..8` | preserve-only |
 | Edge-case index | canonical index now maps eight required failure families and names unfilled live slots | required family map and live evidence slots | correct as index; live runs pending | n/a | `E2-P2B-EDGE1..5` | execute only in a later fresh evidence run |
-| `doctor.py` governance subprocess | default text reader emits Windows UTF-8 decoder traceback before JSON; underlying drift remains fail | explicit UTF-8 strict boundary, malformed output fail closed | wrong | 3 inbound / 78 local / 14 flows | `E0-P0A-DOCTOR1`, `E0-P0A-GRAPH2`, `E0-P0A-IMPACT1` | edit P3-A |
-| Drift test fixture | asserts 10 scoped paths/35 refs against current 38-entry policy and current measured references | current policy truth plus negative governance tests | wrong | 2 outbound | `E0-P0A-TEST1`, `E0-P0A-IMPACT2` | edit P3-B |
+| `doctor.py` governance subprocess | explicit UTF-8 byte boundary now produces a bounded JSON report; pre-lock direct doctor failure is only the expected protected-file drift | strict UTF-8 boundary, malformed output fail closed, underlying failures preserved | correct | CRITICAL Anvien impact: 6 inbound / 79 local / 15 linked flows after edit | `E0-P0A-DOCTOR1`, `E0-P0A-GRAPH2`, `E0-P0A-IMPACT1`, `E3-P3A-DECODER1..7` | regenerate lock, rerun doctor |
+| Drift test fixture | current policy has 38 scoped entries, one intentional `docs/` prefix scope, and 366 classified references; fixture now asserts current truth | current policy truth plus negative governance tests | correct | 2 outbound | `E0-P0A-TEST1`, `E0-P0A-IMPACT2`, `E3-P3B-TEST1..8` | preserve-only |
 | Provider/Manus/Council execution | not run | remain not run | correct | n/a | `E0-P0A-SCOPE1` | preserve-only |
 | Root Git admin / dirty owner worktrees | root `.git` invalid; owner worktrees dirty and out of scope | untouched | correct | n/a | root recovery report and `E0-P0A-AUTH2` | preserve-only |
 
@@ -75,7 +75,7 @@ Out of scope:
 | R1 | 2026-08-26 | after P1-A authority projection edit | authority projection | `partial -> correct`; existing control fixture errors remain assigned to P3-B | `E1-P1A-AUTH1..7` | proceed P1-B; do not treat fixture errors as authority PASS |
 | R1b | 2026-08-26 | after P1-B lock regeneration | runtime lock/drift | `wrong -> correct`; all 17 pre-existing deltas classified; no unexplained drift | `E1-P1B-DRIFT1..17`, `E1-P1B-LOCK1..4` | proceed P2; future protected edits require final lock regeneration |
 | R2 | 2026-08-26 | after P2-A/P2-B implementation slice on exact candidate | Council semantics and edge index | active projections `wrong -> correct`; current proof boundary `partial -> correct boundary`; edge index `missing -> correct as index` | `E2-P2A-COUNCIL1..8`, `E2-P2B-EDGE1..5` | proceed P3; live slots remain open |
-| R3 | 2026-08-26 | after P3-A/P3-B implementation commit | doctor and tests | pending | pending | update P4 final gates |
+| R3 | 2026-08-26 | after P3-A/P3-B implementation slice on exact candidate | doctor and tests | doctor decoder `wrong -> correct`; drift fixture `wrong -> correct`; focused target suites pass | `E3-P3A-DECODER1..7`, `E3-P3B-TEST1..8` | proceed P4; final lock and gates remain |
 
 ## Phase Touch Map
 
@@ -207,9 +207,9 @@ Upgrade current Council from C36, C43 smoke, profiles, configured quorum, or log
 | P1-B | all 17 runtime deltas are classified and deterministic lock/drift now PASS | complete; proceed P2; regenerate final lock after later protected edits |
 | P2-A | active projections now distinguish historical single-host Council from current-lineage full Council; current remains `FALSE/NOT_PROVEN` | complete; preserve all historical reports and keep current proof closed |
 | P2-B | canonical index maps retry, duplicate, stale, partial, quorum, host failure, resume/recovery, and process interruption; all live slots remain open | complete as index-only slice; later live execution must create fresh Edge-Case evidence |
-| P3-A | doctor reader-thread decode failure is reproduced | keep P3-A bounded strict decoder fix |
-| P3-B | drift test expectation is stale; no gate weakening allowed | update current measured assertions and add negative tests |
-| P4 | no final gates run yet | remain pending until P1-P3 pass |
+| P3-A | explicit UTF-8 environment, strict byte decode, valid JSON PASS, malformed bytes/JSON rejection, and nonzero preservation are implemented and focused-tested | complete; regenerate lock and rerun doctor |
+| P3-B | current policy counts and prefix semantics are asserted; authority/lock/edge/decoder rejection regressions pass | complete; preserve fail-closed gates |
+| P4 | implementation slices pass; final lock, compileall, doctor PASS, exact identity, and fresh Supervisor review remain | in progress; stop at owner-gate handoff |
 
 ## Implementation Gate
 
