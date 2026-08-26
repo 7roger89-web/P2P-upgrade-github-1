@@ -79,6 +79,7 @@ Out of scope:
 | R5 | 2026-08-26 | final scoped detect-changes, supervisor report, and closure review | candidate closure and terminal classification | technical implementation PASS; full session BLOCKED; no protected action | E2-P2B-DETECT1..E2-P2B-SUP1 | closed; separate goal required for inherited gates or live certification |
 | R6 | 2026-08-26 | Owner attachment addendum, 22-case focused suite, guide/ledger/roadmap/artifact updates, and fresh framework validation | attachment-aware handoff contract and upload boundary | addendum technical PASS; `INCLUDED_AND_TESTED`; full session remains BLOCKED | E3-P2A-SCOPE1..E3-P2A-BASELINE1 | fresh Supervisor review and final scoped commit; no promotion/live action |
 | R7 | 2026-08-26 | fresh addendum Supervisor review, installed-project doctor role check, and staged Anvien change detection | final acceptance classification and report closure | addendum PASS; full session REJECT/BLOCKED; no protected action | E3-P2B-SUP1, E3-P2B-DETECT1 | close current bounded slice; preserve candidate and selected artifact |
+| R8 | 2026-08-26 | final candidate checkpoint fa5e3d0d4e915bb6839b1775f6d203a127a1c383/tree 10ba008610cfb657878865ce27d2e46f7552d89c and final artifact/evidence refresh | terminal packet identity and attachment manifest closure | `INCLUDED_AND_TESTED`; full session remains BLOCKED; no promotion/deploy/live action | E3-P2B-CLOSURE1 | close with docs-only bookkeeping; terminal response carries final HEAD/tree |
 
 ## Phase Touch Map
 

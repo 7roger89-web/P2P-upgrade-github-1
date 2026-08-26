@@ -98,6 +98,8 @@ Matching plan item(s): A1-P1 through A1-P4
 - E3-P2B-SUP1: `reports/supervisor/rp_supervisor_260826_153823_by_gpt-5-codex_p2p-ct01-attachment-aware-handoff.md` is the fresh zero-trust review. It accepts the addendum technical slice, records `INCLUDED_AND_TESTED`, and rejects full-session closure because inherited validator/doctor/live-host gates remain unresolved.
 - E3-P2B-COMMIT1: documentation/artifact checkpoint `4d7beb797bd6b359191f08d3497540f2e3785f45` with tree `81ea11fbdbf97870f71a4fec1ca4aae81060d83d` contains the guide, ledger/roadmap projection, planner updates, one REQUIRED handoff artifact, and coder report. The subsequent Supervisor report is reviewed against this checkpoint; no remote write occurred.
 - E3-P2B-DETECT1: fresh staged Anvien detect-changes after the Supervisor slice returned `affected_count=0`, `affected_files=5`, `changed_count=20`, `changed_files=5`, `affected_processes=0`, and `risk_level=low`; the five files are planner actual-status/evidence/plan, the handoff artifact, and the Supervisor report.
+- E3-P2B-CLOSURE1: final addendum candidate checkpoint `fa5e3d0d4e915bb6839b1775f6d203a127a1c383` with tree `10ba008610cfb657878865ce27d2e46f7552d89c` contains the fresh Supervisor report and plan closure metadata. The handoff artifact records this checkpoint for Control Tower reconciliation; a later docs-only closure commit may change the tree, so the terminal packet remains the final subject identity.
+- E3-P2B-CLOSURE2: final staged Anvien detect-changes before the docs-only closure returned `affected_count=0`, `affected_files=3`, `changed_count=6`, `changed_files=3`, `affected_processes=0`, and `risk_level=low`; only the final planner/evidence/artifact closure bookkeeping was staged.
 
 ## Closure Evidence
 
