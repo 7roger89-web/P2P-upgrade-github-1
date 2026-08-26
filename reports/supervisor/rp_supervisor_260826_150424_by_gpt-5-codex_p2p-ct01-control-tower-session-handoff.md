@@ -12,7 +12,7 @@ This is a rejection of the complete acceptance claim, not a finding that the CT0
 - Host: CODEX
 - Isolated branch: codex/p2p-ct01-control-tower
 - Review base: fresh canonical HEAD 28a3ecd9c04d36511269e44c384bff6e11677b93
-- Candidate implementation lineage reviewed: 27a92ce, 289f93a, b5f0f5e, plus the final closure changes staged from this worktree
+- Candidate implementation lineage reviewed: 27a92ce, 289f93a, b5f0f5e, plus closure commit 76a9a9449927838eb3965448aefe732ed39e55ee (tree 9b876b4dba86bc1bb21358acb881843fb926f0a6)
 - Protected root: D:/AI/P2P_dev/P2P-upgrade-github — not touched
 - Remote write: none
 

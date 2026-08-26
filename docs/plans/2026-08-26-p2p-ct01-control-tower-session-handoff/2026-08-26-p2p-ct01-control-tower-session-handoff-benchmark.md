@@ -36,7 +36,7 @@ This is a Python protocol/documentation change. Record inventory and directly me
 | P2 | durable CT01 guides | files | 0 | 1 | 1 | 1 | +1 | E2-P2A-DOC1 |
 | P2 | capability ledger records | records | 175 | 176 | 176 | 176 | +1 | E2-P2A-LEDGER1 |
 | P2 | projected MULTI-AI records | records | 31 | 32 | 32 | 32 | +1 | E2-P2A-ROADMAP1 |
-| P2 | candidate commits | commits | 0 | 3 | pending | 1 or more | pending | E2-P2B-COMMIT1 |
+| P2 | candidate commits | commits | 0 | 4 | 4 | 1 or more | +4 | E2-P2B-COMMIT1 |
 
 ## Non-Benchmarkable Notes
 

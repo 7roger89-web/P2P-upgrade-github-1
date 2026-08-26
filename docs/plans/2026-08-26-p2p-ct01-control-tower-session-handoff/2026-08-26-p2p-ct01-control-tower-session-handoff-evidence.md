@@ -85,6 +85,6 @@ P2-B validation:
 - CT01 technical implementation is PASS; the full session is BLOCKED because the clean canonical baseline and candidate retain inherited framework/doctor gates and no live-host certification exists.
 - E2-P2B-DETECT1 records the final scoped change graph: nine intended changed files, zero affected processes, and low aggregate Anvien risk.
 - E2-P2B-SUP1 records the Supervisor REJECT and preserves the no-repair boundary.
-- E2-P2B-COMMIT1 is the closure commit for this isolated candidate; its exact SHA/tree is recorded immediately after commit verification.
+- E2-P2B-COMMIT1: closure commit 76a9a9449927838eb3965448aefe732ed39e55ee with tree 9b876b4dba86bc1bb21358acb881843fb926f0a6; it is four commits ahead of the bound base, retains the promoted anchor as an ancestor, and has no remote write.
 - Protected root, canonical main, remote, runtime lock, release surfaces, promotion, deployment, approval, and live host were not touched.
 - CANONICAL_PROMOTED: NO; no remote write occurred.
