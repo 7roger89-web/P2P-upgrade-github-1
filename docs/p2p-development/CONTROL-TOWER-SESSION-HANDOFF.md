@@ -1,8 +1,9 @@
 # P2P-CT01 — Durable Control Tower Session Handoff
 
 Status: FOUNDATION_READY candidate, UNPROMOTED
+ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED
 
-This document is the durable operator guide and return-contract index for P2P-CT01. It describes a short-lived AI execution session returning structured state to the durable P2P Control Tower. It does not grant permissions, certify a live provider, approve a release, or replace Task State, the execution ledger, evidence authority, or the sole P2P router.
+This document is the durable operator guide and return-contract index for P2P-CT01. It describes a short-lived AI execution session returning structured state to a rotatable Control Tower while the durable P2P repository, evidence, checkpoints, and governance remain the long-lived source of truth. It does not grant permissions, certify a live provider, approve a release, or replace Task State, the execution ledger, evidence authority, or the sole P2P router.
 
 ## Beginner workflow
 
@@ -39,6 +40,30 @@ HOST comes from the structured binding. It is never selected by parsing a senten
 
 No implicit inheritance is allowed. Chat history, previous session state, hidden conversation identifiers, and unstated context are not part of the contract. Required context must be represented by durable project/evidence references and validated by the existing P2P boundaries.
 
+## Three-layer lifecycle and Control Tower rotation
+
+P2P-CT01 keeps three layers distinct:
+
+1. The bounded execution session is short-lived and remains bound to one explicit host lane.
+2. The Control Tower chat is a replaceable coordination instance (`CT001`, `CT002`, ...), not canonical truth.
+3. The durable P2P repository, evidence/checkpoints, and governance records are the long-lived authority.
+
+When the Owner says `Prepare Control Tower rotation`, the current instance emits one compact `P2P_CONTROL_TOWER_SUCCESSOR_PACKET`. It contains the current instance ID, proposed successor ID, latest snapshot sequence, canonical claim/confidence, host lanes, confirmed active execution, Owner Gates, pending work, recently closed material work, blockers/risks, critical invariants, next safe action, durable evidence/checkpoint refs, unresolved `CHAT_ONLY_NOT_CANONICAL`, and the existing attachment manifest.
+
+The packet is bootstrap/coordination data, not canonical truth. CT002 must reconcile material claims with durable P2P evidence and the current snapshot before accepting them. A stale or unknown canonical claim/snapshot yields `RECONCILIATION_REQUIRED`. CT002 must preserve an active Manus execution as Manus, leave Owner Gates unexecuted, avoid inheriting approval, avoid inventing execution, and never transfer a host lane because the chat rotated.
+
+### Beginner rotation workflow
+
+1. Say: `Prepare Control Tower rotation.`
+2. Copy the complete successor response, including `ROTATION_USER_ACTION` and the nested `P2P_CONTROL_TOWER_SUCCESSOR_PACKET`.
+3. Rename the old chat to the exact emitted name, normally `90 — P2P CONTROL TOWER — CT001 — ARCHIVE`.
+4. Create the exact emitted successor chat, normally `00 — P2P CONTROL TOWER — CT002`.
+5. Paste the complete successor packet into CT002.
+6. Upload only the explicitly listed `REQUIRED` attachment when `UPLOAD_REQUIRED=YES`; with `NO`, copy the final response and upload nothing.
+7. Let CT002 reconcile against durable evidence and continue from `NEXT_SAFE_ACTION`.
+
+The user does not summarize CT001 or reproduce the full chat history. Rotation is qualitative: use it when the current Control Tower becomes unwieldy, loses continuity, or the Owner wants a clean coordination surface. A soft recommendation after roughly 10–20 material handoffs may be useful, but it is not a rigid trigger and never closes active execution.
+
 ## Return contract
 
 The implementation path is .p2p/system/p2p_capabilities/control_tower_handoff.py. The reusable regression proof is tests/test_p2p_control_tower_session_handoff.py. The structured packet marker is CONTROL_TOWER_RETURN_PACKET with schema p2p-control-tower-return-packet/1.
@@ -62,6 +87,8 @@ Every terminal response carries these fields:
 | NEXT_RECOMMENDED_ACTION | one safe next action |
 
 The packet contains PACKET_IS_CANONICAL_TRUTH: NO. It is not canonical repository truth, not approval, not a promotion record, and not a host-certification receipt. The packet can be serialized as an event for the existing execution-ledger writer through the module's to_execution_ledger_event function; the Control Tower module itself does not open a ledger file or create a second store.
+
+The rotation wrapper is `CONTROL_TOWER_ROTATION_HANDOFF` with schema `p2p-control-tower-rotation-handoff/1`; the nested successor packet uses `p2p-control-tower-successor-packet/1`. Both are compact, JSON-safe, and explicitly mark `SUCCESSOR_PACKET_IS_CANONICAL_TRUTH: NO` and `FULL_CHAT_HISTORY_INCLUDED: NO`.
 
 ## Attachment-aware terminal handoff
 
@@ -113,6 +140,8 @@ The build_execution_prompt function emits a self-contained prompt with:
 - the local-path/content-availability, evidence-only, and noncanonical attachment invariants;
 - the preferred single `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` artifact;
 - the explicit packet-is-not-canonical-truth marker;
+- the rotatable three-layer lifecycle and `P2P_CONTROL_TOWER_SUCCESSOR_PACKET` contract;
+- the exact CT001 archive / CT002 successor-chat workflow and reconciliation boundary;
 - the exact USER_ACTION text.
 
 The final response from the new host is copied in full to 00 — P2P CONTROL TOWER. The next session is created from the durable packet and fresh project evidence, not from the prior chat.
@@ -135,7 +164,8 @@ No second router, second truth store, nested certification system, simulated quo
 | Surface | Path |
 |---|---|
 | Return contract and implementation | .p2p/system/p2p_capabilities/control_tower_handoff.py |
-| A-H behavior proof | tests/test_p2p_control_tower_session_handoff.py |
+| A-H and ROTATION A-F behavior proof | tests/test_p2p_control_tower_session_handoff.py |
+| Successor packet/reconciliation API | `ControlTowerSuccessorPacket`, `ControlTowerRotationHandoff`, `reconcile_control_tower_successor` in the implementation module |
 | Attachment-aware handoff artifact | `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` in the executor's scoped evidence directory |
 | This operator guide | docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md |
 | Planner/evidence trail | docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/ |
@@ -146,6 +176,6 @@ No second router, second truth store, nested certification system, simulated quo
 
 ## Validation boundary and known gaps
 
-The local development-source proof is the 22-case focused suite, including seven attachment-aware cases, plus relevant existing P2P tests and doctor/compile checks. It proves the protocol behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
+The local development-source proof is the 28-case focused suite: the original CT01 cases, seven attachment-aware cases, and six `ROTATION A-F` cases. It proves the protocol and compact successor reconciliation behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
 
-P2P-CT01 terminal state for this candidate is FOUNDATION_READY / UNPROMOTED. CANONICAL_PROMOTED: NO. No remote write was performed.
+P2P-CT01 terminal state for this candidate is FOUNDATION_READY / UNPROMOTED. `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED`. `CANONICAL_PROMOTED: NO`. No remote write was performed.

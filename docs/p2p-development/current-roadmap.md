@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-26 (P2P-CT01 ledger projection refresh; derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-26 (P2P-CT01 rotatable Control Tower ledger projection refresh; derived, not authored-by-hand as a decision document).
 
 ## 6. Framework goals (FW series)
 
@@ -123,7 +123,7 @@ The ledger now makes prerequisite reasoning explicit: every record declares `dep
 
 ### P2P-CT01 durable Control Tower session handoff foundation
 
-P2P-CT01 adds a provider-neutral, explicit session binding and structured return packet over the existing host executor, task state, evidence, and execution-ledger boundaries. The packet supports terminal returns, stale/unknown-base reconciliation, owner-gate recording, failure return, host-lane isolation, attachment-aware `UPLOAD_REQUIRED` manifests, and recursive copy/paste continuation. It does not launch hosts, infer authority from prose, inherit chat history, treat a local path as readable contents, treat an attachment as canonical truth, overwrite canonical state, promote, release, or certify a live provider. Local proof is 22 focused tests, including 7 attachment-aware cases; the capability remains FOUNDATION_READY and UNPROMOTED.
+P2P-CT01 adds a provider-neutral, explicit session binding and structured return packet over the existing host executor, task state, evidence, and execution-ledger boundaries. The packet supports terminal returns, stale/unknown-base reconciliation, owner-gate recording, failure return, host-lane isolation, attachment-aware `UPLOAD_REQUIRED` manifests, recursive copy/paste continuation, and compact rotatable `P2P_CONTROL_TOWER_SUCCESSOR_PACKET` bootstrap/reconciliation for CT001 -> CT002. It does not launch hosts, infer authority from prose, inherit chat history, require a full transcript, transfer active execution or host lanes, treat a local path as readable contents, treat an attachment or successor packet as canonical truth, overwrite canonical state, promote, release, or certify a live provider. Local proof is 28 focused tests: 7 attachment-aware cases plus ROTATION A-F; the capability remains FOUNDATION_READY and UNPROMOTED.
 
 ### 3e. C30 composable execution target foundation (2026-08-17)
 C30 delivered the **provider-neutral, deterministic composable execution target foundation** — `scripts/p2p_execution_target.py` — with 60 passing tests (`tests/test_p2p_execution_target.py` ET1..ET60) and a durable research intake artifact (`docs/p2p-development/research/execution-target-pattern-research.md`, nine source repositories, patterns A–O, no code copied). The module models execution as an honest composition of a harness, a provider, a model, a protocol, a toolset, a workspace, an environment, auth (harness and provider kept separate), and a permission envelope; `UNKNOWN` and stale evidence fail closed, protocol compatibility is never certification, permission composition never widens, and the registry enumerates but never routes. Honest gaps are durably recorded: no router, no autopilot, no background autonomy, no real execution, no second executor, and no secrets stored. Terminal state: **PASS (foundation)**, candidate UNPROMOTED per the C29 deterministic policy.

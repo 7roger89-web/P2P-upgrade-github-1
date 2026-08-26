@@ -101,12 +101,39 @@ Matching plan item(s): A1-P1 through A1-P4
 - E3-P2B-CLOSURE1: final addendum candidate checkpoint `fa5e3d0d4e915bb6839b1775f6d203a127a1c383` with tree `10ba008610cfb657878865ce27d2e46f7552d89c` contains the fresh Supervisor report and plan closure metadata. The handoff artifact records this checkpoint for Control Tower reconciliation; a later docs-only closure commit may change the tree, so the terminal packet remains the final subject identity.
 - E3-P2B-CLOSURE2: final staged Anvien detect-changes before the docs-only closure returned `affected_count=0`, `affected_files=3`, `changed_count=6`, `changed_files=3`, `affected_processes=0`, and `risk_level=low`; only the final planner/evidence/artifact closure bookkeeping was staged.
 
+## E4 - Owner Scope Addendum Evidence — Rotatable Control Tower
+
+Matching plan item(s): A2-P1 through A2-P4
+
+- E4-A2-SCOPE1: the Owner-approved rotatable-Control-Tower clarification remains inside P2P-CT01. It adds no Large Goal, store, router, quorum, worker, connector, host transfer, promotion, deployment, release, remote write, or live action.
+- E4-A2-ANVIEN1: `anvien analyze --force` completed before the code slice with `stale=false`, `scanned=962`, `parsed_code=171`, `failed=0`, `nodes=40059`, and `relationships=46325`. File-detail for the indexed test consumer reported 48 symbols, 54 local relationships, 240 unresolved analyzer gaps, `risk=high`, and `stale=false`; impact reported no upstream affected files/processes for the test file. The hidden `.p2p/system/p2p_capabilities/control_tower_handoff.py` file-detail request failed because hidden `.p2p` sources are not in the graph; direct source inspection remains the authority for that module.
+- E4-A2-IMPL1: the existing CT01 module now exports `ControlTowerSuccessorPacket`, `ControlTowerRotationHandoff`, `ControlTowerSuccessorReconciliation`, `prepare_control_tower_rotation`, and `reconcile_control_tower_successor`, with JSON-safe fields for instance IDs, snapshot sequence, canonical claim/confidence, host lanes, active execution, Owner Gates, pending/closed work, blockers/risks, invariants, next safe action, durable refs, and `CHAT_ONLY_NOT_CANONICAL`. The implementation checkpoint is `b8861c3a68a948634b5d490c6a52a10125fe31a6`, tree `6a555464245cf1f8116ce7fb9668dbcd6df6678e`.
+- E4-A2-TEST1: `python -m pytest -q tests/test_p2p_control_tower_session_handoff.py` returned `28 passed in 0.31s`, exit 0. The six new tests are ROTATION A CT001 -> CT002 material-state preservation, ROTATION B Owner Gates not executed, ROTATION C Manus active execution preserved, ROTATION D stale canonical claim reconciliation, ROTATION E no invented active execution, and ROTATION F beginner bootstrap without full history.
+- E4-A2-PROMPT1: the existing recursive prompt test now also asserts `P2P_CONTROL_TOWER_SUCCESSOR_PACKET`, `CHAT_ONLY_NOT_CANONICAL`, and the rotatable Control Tower lifecycle text; attachment-aware upload semantics remain asserted in the same focused suite.
+- E4-A2-COMPILE1: `python -m py_compile .p2p/system/p2p_capabilities/control_tower_handoff.py` and direct import smoke for the new successor APIs exited 0.
+- E4-A2-DETECT1: staged Anvien change detection before the implementation commit reported `affected_count=0`, `affected_files=3`, `changed_count=60`, `changed_files=4`, `affected_processes=0`, and aggregate `risk_level=low`; the hidden module was represented as changed hunks without fabricated graph symbols. The broad LF/CRLF-only owner worktree noise remains unstaged.
+- E4-A2-LEDGER1: JSON parse, capability schema/count/dependency check passed with one `CONTROL_TOWER_SESSION_HANDOFF` record, 176 total records, 32 `MULTI_AI_INTEROPERABILITY` records, and CT01 coverage `28+7+6`; the record remains `FOUNDATION_READY` and unpromoted.
+- E4-A2-DOC1: the operator guide, charter cross-reference, capability record, and derived roadmap now document the three-layer lifecycle, exact CT001 archive/CT002 chat workflow, compact successor packet, no-full-history boundary, reconciliation requirement, and no state/approval/host-lane transfer.
+- E4-A2-ARTIFACT1: the single REQUIRED `p2p-ct01-codex-20260826-isolated-CONTROL-TOWER-HANDOFF.md` artifact now carries `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED`, the three-layer contract, exact example names, nested packet fields, and the same noncanonical/attachment boundary.
+- E4-A2-VALIDATION1: `python -m compileall -q .p2p/system/p2p_capabilities scripts tests/test_p2p_control_tower_session_handoff.py` exited 0; `python scripts/p2p_eval.py validate --suite .p2p/evals/suite.json` returned `status=PASS`, exit 0; framework validator remains `52/59` with the same seven inherited failures.
+- E4-A2-DOCTOR1: `python scripts/doctor.py --root . --role development --json` detected role `development` but returned `ok=false` only for expected governance drift from the unpromoted CT01 docs/ledger/roadmap changes; no runtime-lock mutation was performed.
+- E4-A2-CODER1: `reports/coder/rp_coder_260826_160810_by_gpt-5-codex_p2p-ct01-rotatable-control-tower.md` records technical PASS, `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED`, full-session BLOCKED, and the no-promotion/live boundary.
+- E4-A2-SUP1: `reports/supervisor/rp_supervisor_260826_161127_by_gpt-5-codex_p2p-ct01-rotatable-control-tower.md` is the fresh zero-trust review. It accepts the technical rotatable addendum, records `INCLUDED_AND_TESTED`, and rejects full-session closure because inherited validator/doctor/live-host gates remain unresolved.
+- E4-A2-CLOSURE1: final addendum documentation/artifact/report set is complete against implementation checkpoint `b8861c3a68a948634b5d490c6a52a10125fe31a6`/tree `6a555464245cf1f8116ce7fb9668dbcd6df6678e`; the final docs closure commit and terminal HEAD/tree remain the subject identity supplied in the final response.
+
+## E4 Closure Classification
+
+- The technical rotatable-Control-Tower slice is PASS and the durable documentation, artifact, evidence, coder report, and fresh Supervisor review are consistent.
+- `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED` is the final addendum classification.
+- The full CT01 session remains BLOCKED until the inherited framework/doctor/live-host authority boundaries are independently resolved; this addendum does not widen that scope.
+
 ## Closure Evidence
 
 - CT01 technical implementation is PASS; the full session is BLOCKED because the clean canonical baseline and candidate retain inherited framework/doctor gates and no live-host certification exists.
 - E2-P2B-DETECT1 records the final scoped change graph: nine intended changed files, zero affected processes, and low aggregate Anvien risk.
 - E2-P2B-SUP1 records the Supervisor REJECT and preserves the no-repair boundary.
 - `ATTACHMENT_AWARE_HANDOFF_STATUS: INCLUDED_AND_TESTED`: the addendum is integrated across packet, ledger event, recursive prompt, guide, ledger/roadmap projections, artifact, and seven regression cases.
+- `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED`: the same CT01 boundary now includes compact CT001 -> CT002 successor emission, exact beginner rotation instructions, read-only reconciliation, and six ROTATION A-F regression cases.
 - `UPLOAD_REQUIRED: YES`: the terminal response selects exactly one REQUIRED artifact; no OPTIONAL or DO_NOT_UPLOAD file is needed for Control Tower content access.
 - The artifact is evidence input only. A local path alone does not make its contents available to the Control Tower, and an uploaded artifact is not canonical truth or proof of promotion, deployment, live certification, or Owner approval.
 - E2-P2B-COMMIT1: closure commit 76a9a9449927838eb3965448aefe732ed39e55ee with tree 9b876b4dba86bc1bb21358acb881843fb926f0a6; it is four commits ahead of the bound base, retains the promoted anchor as an ancestor, and has no remote write.

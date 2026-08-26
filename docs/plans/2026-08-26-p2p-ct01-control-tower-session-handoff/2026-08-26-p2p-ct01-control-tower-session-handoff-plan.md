@@ -11,7 +11,7 @@
 
 ## Goal
 
-Implement a durable, provider-neutral Control Tower handoff contract for P2P-CT01. A short-lived execution session binds explicitly to SESSION_ID, HOST, GOAL_ID, and GOAL; returns a structured terminal packet; records current/stale/unknown-base reconciliation without treating the packet as canonical truth; and provides a self-contained copy/paste prompt for continuation in another compatible AI.
+Implement a durable, provider-neutral Control Tower handoff contract for P2P-CT01. A short-lived execution session binds explicitly to SESSION_ID, HOST, GOAL_ID, and GOAL; returns a structured terminal packet; records current/stale/unknown-base reconciliation without treating the packet as canonical truth; and provides a self-contained copy/paste prompt for continuation in another compatible AI. The same bounded contract must support rotation between compact Control Tower instances while preserving durable P2P state as the long-lived authority.
 
 This is a development-source candidate only. It must be discoverable and testable in an isolated worktree, and must remain unpromoted. It must not launch agents, create a second router or certification system, inherit hidden chat state, mutate canonical branches, promote facts, release, deploy, or contact a live host.
 
@@ -52,6 +52,9 @@ Required behavior:
 - owner-gate and failure recording;
 - one packet updates only its authoritative host lane;
 - recursive prompt containing the return contract and the exact beginner USER_ACTION.
+- rotatable Control Tower successor packet with explicit instance IDs, snapshot sequence, host lanes, active execution, Owner Gates, pending/closed work, blockers, invariants, next safe action, durable refs, and CHAT_ONLY_NOT_CANONICAL disclosures;
+- beginner-safe CT001 -> CT002 rotation instructions with exact archive/new-chat names and no requirement to reproduce full chat history;
+- successor reconciliation that preserves active host identity, does not execute Owner Gates, does not inherit approval, does not invent execution, and treats the successor packet as bootstrap data rather than canonical truth.
 
 ## Non-Goals
 
@@ -96,6 +99,7 @@ Required behavior:
 | Evidence/reconciliation | read_evidence.py, p2p_evidence_chain.py, execution ledger | return proposal plus base relation | packet never becomes canonical truth |
 | Governance/lifecycle | capability specs, charter, capability ledger | register foundation-ready capability | no second router/quorum/approval system |
 | Beginner handoff | existing generic handoff boundary plus CT01 guide | make copy/paste protocol explicit | no hidden chat history or inheritance |
+| Control Tower lifecycle | CT01 packet/prompt/state surfaces | add rotatable CT001 -> CT002 successor capsule and reconciliation boundary | no chat-history migration, state transfer, promotion, or approval inheritance |
 
 ## Fresh Baseline and P0 Decision
 
@@ -163,7 +167,7 @@ P0 is complete for implementation. Existing host executor, task state, live exec
     1. Add A-H tests: READY, BLOCKED, authoritative host, stale base, owner gate, FAILED, generated prompt, and lane isolation. Evidence E1-P1B-TEST1 through E1-P1B-TEST8.
     2. Add invalid binding, no implicit inheritance, and JSON round-trip checks; run focused pytest. Evidence E1-P1B-TEST9 through E1-P1B-TEST11.
   - Implementation Gate: tests prove observable behavior after P1-A code exists, not private implementation details.
-  - Acceptance: all required cases pass and no persistent test data escapes .tmp.
+- Acceptance: all required cases pass, including ROTATION A-F, and no persistent test data escapes .tmp.
   - Evidence Targets: E1-P1B-TEST1..E1-P1B-TEST11.
   - Actual-status Update: CT01 behavior coverage partial -> correct.
   - Commit Boundary: commit after focused tests and detect-changes.
@@ -277,6 +281,47 @@ ATTACHMENT_AWARE_HANDOFF_STATUS: INCLUDED_AND_TESTED
 - Do not treat an uploaded attachment as canonical truth, promotion, deployment, live certification, or Owner approval.
 - Do not require the user to select evidence files without a deterministic manifest.
 - Do not create a second persistence store, router, quorum, worker, connector, or live host action.
+
+## Owner Scope Addendum — Rotatable Control Tower
+
+This is a second Owner-approved clarification inside the existing P2P-CT01 bounded scope. It does not create a Large Goal and does not authorize promotion, deployment, release, live action, remote writes, or a new persistence/router/certification system.
+
+### Three-layer lifecycle contract
+
+1. A short-lived bounded execution session runs on one explicit host lane: Codex, Manus, Claude, Gemini, or a future provider-neutral host label.
+2. A Control Tower chat is a rotatable coordination instance (`CT001`, `CT002`, ...), not the durable source of truth.
+3. The durable P2P repository, evidence, checkpoints, and governance records remain the long-lived source of truth.
+
+The protocol must support `CT001 -> CT002` without copying the full CT001 conversation. The successor receives a compact bootstrap packet and reconciles material claims against durable evidence before relying on them.
+
+### Successor packet invariant map
+
+| Invariant | Required behavior | Forbidden interpretation |
+|---|---|---|
+| Successor bootstrap | packet carries current instance, proposed successor, snapshot sequence, canonical claim/confidence, lanes, active execution, Owner Gates, pending/closed material work, blockers/risks, invariants, next safe action, durable refs, and `CHAT_ONLY_NOT_CANONICAL` | packet is not canonical truth |
+| Instance rotation | exact old archive name and exact new chat name are emitted | user manually summarizes or renames ambiguously |
+| Active execution | current host/session identity is preserved | CT002 closes it, moves it to another lane, or invents one |
+| Owner authority | Owner Gates remain pending and visible | CT002 executes or inherits approval |
+| Reconciliation | stale or unknown canonical/snapshot inputs fail closed to reconciliation-required | stale packet is accepted as current |
+| History boundary | compact packet excludes full transcript | CT002 requires CT001 chat history |
+
+### Required regression coverage
+
+- ROTATION A: CT001 -> CT002 preserves material state in the compact packet.
+- ROTATION B: Owner Gates persist and are not executed.
+- ROTATION C: active Manus execution remains Manus.
+- ROTATION D: stale canonical claim requires reconciliation.
+- ROTATION E: no active execution is invented.
+- ROTATION F: a beginner can bootstrap CT002 from the packet without full history.
+
+### Rotation checklist
+
+- [x] A2-P1: Add the provider-neutral successor packet, rotation wrapper, and reconciliation boundary to the existing CT01 module.
+- [x] A2-P2: Add ROTATION A-F regression coverage without adding a router/store or live host behavior.
+- [x] A2-P3: Extend the operator guide, planner evidence, and durable discovery projections with the three-layer lifecycle and beginner rotation workflow.
+- [x] A2-P4: Re-run focused/full relevant validation, update reports/artifact, and close with `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED` or `DEFERRED_REQUIRES_CT01_FOLLOWUP`.
+
+ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED
 
 ## Risk Notes
 

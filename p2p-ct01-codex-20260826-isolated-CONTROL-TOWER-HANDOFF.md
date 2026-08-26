@@ -39,6 +39,7 @@ The user must copy the entire terminal final response to `00 — P2P CONTROL TOW
 SESSION_STATE: BLOCKED
 TECHNICAL_CT01_RESULT: PASS
 ATTACHMENT_AWARE_HANDOFF_STATUS: INCLUDED_AND_TESTED
+ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED
 TERMINAL_VERDICT: BLOCKED
 CANONICAL_PROMOTED: NO
 OWNER_APPROVAL: NOT_REQUESTED
@@ -71,17 +72,35 @@ The addendum extends the existing CT01 packet, execution-ledger event projection
 - recursive next-session prompt preservation;
 - preference for this one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact.
 
+## Rotatable Control Tower addendum
+
+The same CT01 boundary now preserves three layers:
+
+1. short-lived bounded execution session on one explicit host lane;
+2. replaceable Control Tower instances such as CT001 and CT002;
+3. durable P2P repository/evidence/checkpoints/governance as long-lived source of truth.
+
+The implementation emits a compact `P2P_CONTROL_TOWER_SUCCESSOR_PACKET` for rotation and a read-only reconciliation result. The packet carries the current/proposed instance IDs, snapshot sequence, canonical claim/confidence, host lanes, confirmed active execution, Owner Gates, pending work, recently closed material work, blockers/risks, critical invariants, next safe action, durable refs, and unresolved `CHAT_ONLY_NOT_CANONICAL`.
+
+The beginner contract emits exact names from the supplied instance IDs, for example:
+
+- old archive: `90 — P2P CONTROL TOWER — CT001 — ARCHIVE`;
+- new chat: `00 — P2P CONTROL TOWER — CT002`.
+
+The successor packet is bootstrap data, not canonical truth. Reconciliation fails closed for stale/unknown canonical claim or snapshot; it does not execute Owner Gates, inherit approval, close or move active execution, reassign host lanes, invent execution, or promote/deploy/live.
+
 ## Evidence available in the executor worktree
 
-- Focused protocol tests: `tests/test_p2p_control_tower_session_handoff.py` — 22 passed, including 7 attachment-aware cases.
+- Focused protocol tests: `tests/test_p2p_control_tower_session_handoff.py` — 28 passed, including 7 attachment-aware cases and ROTATION A-F.
 - Source compile: `python -m py_compile .p2p/system/p2p_capabilities/control_tower_handoff.py` — PASS.
+- Rotatable API import smoke: successor packet, rotation wrapper, and reconciliation APIs — PASS.
 - Existing project eval validation: `python scripts/p2p_eval.py validate --suite .p2p/evals/suite.json` — PASS.
 - Anvien refresh after implementation: stale=false, scanned=960, parsed_code=171, failed=0, nodes=40033, relationships=46299.
-- Staged documentation/artifact change analysis at the handoff checkpoint: changed_files=9, affected_files=7, affected_processes=0, risk_level=low; hidden `.p2p/system` graph file-detail remains unavailable and is recorded as a tooling limitation.
-- The durable technical evidence and remaining full-session blockers are recorded under `docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/` and `reports/` in the executor worktree. The Control Tower cannot read those files from their local paths unless separately attached; this artifact is the selected minimum attachment.
+- Implementation checkpoint: `b8861c3a68a948634b5d490c6a52a10125fe31a6`, tree `6a555464245cf1f8116ce7fb9668dbcd6df6678e`; hidden `.p2p/system` graph file-detail remains unavailable and is recorded as a tooling limitation.
+- The durable technical evidence, fresh coder/Supervisor reports, and remaining full-session blockers are recorded under `docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/` and `reports/` in the executor worktree. The Control Tower cannot read those files from their local paths unless separately attached; this artifact is the selected minimum attachment.
 
-SUPERVISOR_REVIEW_PATH: reports/supervisor/rp_supervisor_260826_153823_by_gpt-5-codex_p2p-ct01-attachment-aware-handoff.md
-SUPERVISOR_VERDICT: REJECT_FOR_FULL_SESSION; TECHNICAL_ADDENDUM_PASS
+SUPERVISOR_REVIEW_PATH: reports/supervisor/rp_supervisor_260826_161127_by_gpt-5-codex_p2p-ct01-rotatable-control-tower.md
+SUPERVISOR_VERDICT: REJECT_FOR_FULL_SESSION; TECHNICAL_ROTATABLE_ADDENDUM_PASS
 
 ## Blockers and authority boundary
 
@@ -91,4 +110,4 @@ The Control Tower must treat this artifact as proposed evidence input, verify it
 
 ## Safe next action
 
-Reconcile this attached artifact with the fresh canonical CT01 candidate and existing governance evidence. Preserve the BLOCKED terminal state unless independent authority and all required gates are freshly satisfied in a separately authorized action.
+Reconcile this attached artifact with the fresh canonical CT01 candidate and existing governance evidence. For a future rotation, CT002 must reconcile the successor packet against durable P2P evidence before accepting material claims. Preserve the BLOCKED terminal state unless independent authority and all required gates are freshly satisfied in a separately authorized action.

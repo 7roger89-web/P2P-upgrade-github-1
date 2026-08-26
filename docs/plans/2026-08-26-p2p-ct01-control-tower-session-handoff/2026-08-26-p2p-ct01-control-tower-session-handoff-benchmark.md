@@ -54,3 +54,15 @@ This is a Python protocol/documentation change. Record inventory and directly me
 | A1 | attachment manifest schema | schema versions | 0 | 1 | 1 | 1 | +1 | E3-P2A-IMPL1 |
 
 The addendum changes protocol/documentation inventory only. It does not create a live, network, host-performance, promotion, release, or deployment benchmark.
+
+## B4 - Owner Scope Addendum Benchmarks — Rotatable Control Tower
+
+| Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
+|---|---|---|---:|---:|---:|---:|---:|---|
+| A2 | successor/rotation protocol classes | classes | 0 | 3 | 3 | 3 | +3 | E4-A2-IMPL1 |
+| A2 | successor/rotation schema versions | schemas | 0 | 2 | 2 | 2 | +2 | E4-A2-IMPL1 |
+| A2 | total focused protocol regression cases | cases | 22 | 28 | 28 | 28 | +6 | E4-A2-TEST1 |
+| A2 | ROTATION A-F regression cases | cases | 0 | 6 | 6 | 6 | +6 | E4-A2-TEST1 |
+| A2 | exact beginner rotation chat names emitted | names | 0 | 2 | 2 | 2 | +2 | E4-A2-TEST1 |
+
+The rotatable addendum changes protocol/documentation inventory only. No benchmark result is a live-host, provider, quorum, promotion, release, deployment, or performance claim.
