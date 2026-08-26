@@ -17,7 +17,20 @@
       "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
       "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
     ],
-    "projection_rule": "derive status at read time; do not copy execution-ledger or evidence contents"
+    "projection_rule": "derive status at read time; do not copy execution-ledger or evidence contents",
+    "current_promoted_source": {
+      "ref": "origin/main",
+      "status": "PROMOTED_CANONICAL_SOURCE",
+      "commit": "2a71410afd1b29651016ef57a5d2da38938c3f68",
+      "tree": "3e6ab12ff78a72c4a3ea2a418e11167a8649aaad",
+      "parent": "af02170ac7ba180900ca78beb26a2972d80c73b6",
+      "baseline_ancestor": "af02170ac7ba180900ca78beb26a2972d80c73b6",
+      "verified_on": "2026-08-26",
+      "authority_scope": "current promoted source tree for governance reconciliation and protected-runtime identity",
+      "release_authority": "NOT_ESTABLISHED; official artifact baseline and Owner promotion gate remain authoritative for release",
+      "historical_official_artifact_preserved": true,
+      "unpromoted_successor_separate": true
+    }
   },
   "official_baseline": {
     "version": "8.4.7-C-codex.19",
