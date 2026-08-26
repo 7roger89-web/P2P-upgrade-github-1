@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-26
-- Status: BLOCKED / CLOSED
+- Status: BLOCKED / ADDENDUM IN PROGRESS
 - Plan: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-plan.md
 - Evidence: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-evidence.md
 - Benchmark: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-benchmark.md
@@ -239,6 +239,42 @@ P0 is complete for implementation. Existing host executor, task state, live exec
   - Work Steps: record exact hashes, protected no-change checks, and terminal report.
   - Implementation Gate: Pn-A/Pn-B pass or blocker recorded.
   - Acceptance: candidate terminal state BLOCKED, never promoted; reopening requires a separate bounded goal.
+
+## Owner Scope Addendum — Attachment-Aware Handoff
+
+This is an Owner-approved clarification within P2P-CT01, not a Large Goal. It extends the existing terminal packet and recursive prompt so the Control Tower can distinguish local evidence paths from evidence content that the user must upload. No runtime authority, live host, promotion, deployment, release, remote write, or new store/router is in scope.
+
+### Addendum Invariant Family Map
+
+| Family | Existing CT01 surface | Addendum change | Preserve-only boundary |
+|---|---|---|---|
+| Terminal return contract | ControlTowerReturnPacket and JSON event | add CONTROL_TOWER_ATTACHMENT_MANIFEST and UPLOAD_REQUIRED | packet remains proposed evidence, never canonical truth |
+| Recursive continuation | build_execution_prompt and USER_ACTION_BLOCK | require attachment-aware terminal response instructions | no hidden filesystem access or chat inheritance |
+| Beginner handoff | operator guide and final response | explain NO versus YES and exact 1–3 file manifest | user does not choose important files manually |
+| Durable evidence | planner/reports and one handoff artifact | prefer one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact | local path alone never proves content availability |
+
+### Required behavior
+
+- Every terminal response declares UPLOAD_REQUIRED as YES or NO.
+- NO states that the user only copies the entire final response to 00 — P2P CONTROL TOWER and does not upload a file.
+- YES lists 1–3 minimal attachment entries with filename, local path, purpose, why the Control Tower needs the contents, and REQUIRED/OPTIONAL/DO_NOT_UPLOAD classification.
+- The manifest explicitly records that local paths do not make contents available and that attachments are evidence input, not canonical truth or promotion/live/Owner approval proof.
+- The generated prompt preserves this contract for the next session.
+- When appropriate, one repo-local artifact named SESSION_ID-CONTROL-TOWER-HANDOFF.md is the only REQUIRED upload.
+
+### Addendum checklist
+
+- [x] A1-P1: Extend the packet/manifest dataclasses and existing ledger event projection.
+- [ ] A1-P2: Extend the recursive prompt and durable operator guide.
+- [ ] A1-P3: Add the one-artifact handoff and attachment-aware regression coverage.
+- [ ] A1-P4: Re-run validation, update evidence/reports, and close with INCLUDED_AND_TESTED or DEFERRED_REQUIRES_FOLLOWUP.
+
+### Addendum forbidden actions
+
+- Do not infer that a local path was read by the Control Tower.
+- Do not treat an uploaded attachment as canonical truth, promotion, deployment, live certification, or Owner approval.
+- Do not require the user to select evidence files without a deterministic manifest.
+- Do not create a second persistence store, router, quorum, worker, connector, or live host action.
 
 ## Risk Notes
 

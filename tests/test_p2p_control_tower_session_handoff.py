@@ -17,7 +17,10 @@ if str(SCRIPTS_ROOT) not in sys.path:
 
 from p2p_workflow import append_event  # noqa: E402
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
+    NO_UPLOAD_INSTRUCTION,
     USER_ACTION_BLOCK,
+    ControlTowerAttachment,
+    ControlTowerAttachmentManifest,
     ControlTowerHandoffError,
     ControlTowerReturnPacket,
     ControlTowerState,
@@ -312,6 +315,152 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
             stored["CONTROL_TOWER_RETURN_PACKET"]["PACKET_IS_CANONICAL_TRUTH"],
             "NO",
         )
+
+    def test_attachment_manifest_no_upload_requires_only_copy_back(self):
+        packet = self.packet(attachment_manifest=ControlTowerAttachmentManifest())
+
+        serialized = packet.to_dict()
+        manifest = serialized["CONTROL_TOWER_ATTACHMENT_MANIFEST"]
+
+        self.assertEqual(serialized["UPLOAD_REQUIRED"], "NO")
+        self.assertEqual(manifest["UPLOAD_REQUIRED"], "NO")
+        self.assertEqual(manifest["ATTACHMENTS"], [])
+        self.assertEqual(manifest["USER_INSTRUCTION"], NO_UPLOAD_INSTRUCTION)
+        self.assertEqual(manifest["LOCAL_PATH_ALONE_PROVES_CONTENTS_AVAILABLE"], "NO")
+        self.assertEqual(manifest["ATTACHMENTS_ARE_CANONICAL_TRUTH"], "NO")
+
+    def test_attachment_manifest_yes_lists_one_minimal_required_file(self):
+        entry = ControlTowerAttachment(
+            filename="ct01-handoff.md",
+            local_path=str(REPO_ROOT / ".tmp" / "ct01-handoff.md"),
+            purpose="Consolidated terminal handoff",
+            why_control_tower_needs_contents="The Control Tower cannot read executor-local reports by path alone.",
+        )
+        packet = self.packet(
+            attachment_manifest=ControlTowerAttachmentManifest(
+                upload_required="YES",
+                attachments=(entry,),
+            )
+        )
+
+        manifest = packet.to_dict()["CONTROL_TOWER_ATTACHMENT_MANIFEST"]
+        self.assertEqual(packet.to_dict()["UPLOAD_REQUIRED"], "YES")
+        self.assertEqual(len(manifest["ATTACHMENTS"]), 1)
+        self.assertEqual(manifest["ATTACHMENTS"][0]["FILENAME"], "ct01-handoff.md")
+        self.assertEqual(manifest["ATTACHMENTS"][0]["CLASSIFICATION"], "REQUIRED")
+        self.assertEqual(manifest["ATTACHMENTS"][0]["CONTENTS_AVAILABLE_TO_CONTROL_TOWER"], "UNKNOWN")
+
+    def test_attachment_manifest_preserves_required_optional_and_do_not_upload(self):
+        entries = (
+            ControlTowerAttachment(
+                filename="required.md",
+                local_path=".tmp/required.md",
+                purpose="Required evidence",
+                why_control_tower_needs_contents="It contains the exact terminal result.",
+                classification="REQUIRED",
+            ),
+            ControlTowerAttachment(
+                filename="optional.md",
+                local_path=".tmp/optional.md",
+                purpose="Optional context",
+                why_control_tower_needs_contents="It provides extra context only.",
+                classification="OPTIONAL",
+            ),
+            ControlTowerAttachment(
+                filename="secrets.txt",
+                local_path=".tmp/secrets.txt",
+                purpose="Protected local material",
+                why_control_tower_needs_contents="It is not needed and must remain local.",
+                classification="DO_NOT_UPLOAD",
+            ),
+        )
+
+        manifest = ControlTowerAttachmentManifest("YES", entries)
+
+        self.assertEqual(
+            [item["CLASSIFICATION"] for item in manifest.to_dict()["ATTACHMENTS"]],
+            ["REQUIRED", "OPTIONAL", "DO_NOT_UPLOAD"],
+        )
+
+    def test_attachment_local_path_alone_is_not_contents_access(self):
+        entry = ControlTowerAttachment(
+            filename="evidence.md",
+            local_path=".tmp/evidence.md",
+            purpose="Evidence input",
+            why_control_tower_needs_contents="The Control Tower must inspect the uploaded content.",
+        )
+
+        serialized = entry.to_dict()
+
+        self.assertEqual(serialized["LOCAL_PATH"], ".tmp/evidence.md")
+        self.assertEqual(serialized["LOCAL_PATH_ALONE_PROVES_CONTENTS_AVAILABLE"], "NO")
+        self.assertEqual(serialized["CONTENTS_AVAILABLE_TO_CONTROL_TOWER"], "UNKNOWN")
+
+    def test_attachment_is_evidence_input_not_canonical_truth(self):
+        entry = ControlTowerAttachment(
+            filename="handoff.md",
+            local_path=".tmp/handoff.md",
+            purpose="Return evidence",
+            why_control_tower_needs_contents="The Control Tower cannot infer the report contents from a path.",
+        )
+        packet = self.packet(
+            attachment_manifest=ControlTowerAttachmentManifest("YES", (entry,))
+        )
+        state = ControlTowerState.empty()
+
+        result = self.ingest(state, packet)
+        lane = state.lanes["CODEX"]
+        event_packet = state.return_events[-1]["CONTROL_TOWER_RETURN_PACKET"]
+
+        self.assertEqual(result.control_tower_status, "READY")
+        self.assertEqual(lane["UPLOAD_REQUIRED"], "YES")
+        self.assertEqual(lane["CONTROL_TOWER_ATTACHMENT_MANIFEST"]["ATTACHMENTS_ARE_CANONICAL_TRUTH"], "NO")
+        self.assertEqual(event_packet["PACKET_IS_CANONICAL_TRUTH"], "NO")
+        self.assertEqual(event_packet["CONTROL_TOWER_ATTACHMENT_MANIFEST"]["ATTACHMENTS_ARE_EVIDENCE_INPUT_ONLY"], "YES")
+
+    def test_recursive_prompt_preserves_attachment_aware_contract(self):
+        prompt = build_execution_prompt(
+            self.binding("MANUS"),
+            "Continue the bounded CT01 handoff.",
+            worktree=str(REPO_ROOT / ".tmp" / "ct01-prompt"),
+            branch="manus/ct01",
+            canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE,
+        )
+
+        for field_name in (
+            "UPLOAD_REQUIRED",
+            "CONTROL_TOWER_ATTACHMENT_MANIFEST",
+            "FILENAME",
+            "LOCAL_PATH",
+            "PURPOSE",
+            "WHY_CONTROL_TOWER_NEEDS_CONTENTS",
+            "REQUIRED",
+            "OPTIONAL",
+            "DO_NOT_UPLOAD",
+        ):
+            self.assertIn(field_name, prompt)
+        self.assertIn("local path alone does not make file contents available", prompt.lower())
+        self.assertIn("attachments are evidence input only", prompt.lower())
+        self.assertIn("SESSION_ID-CONTROL-TOWER-HANDOFF.md", prompt)
+
+    def test_attachment_manifest_rejects_ambiguous_upload_requirements(self):
+        entry = ControlTowerAttachment(
+            filename="optional.md",
+            local_path=".tmp/optional.md",
+            purpose="Optional context",
+            why_control_tower_needs_contents="It is not required for reconciliation.",
+            classification="OPTIONAL",
+        )
+
+        with self.assertRaises(ControlTowerHandoffError):
+            ControlTowerAttachmentManifest("NO", (entry,))
+
+        with self.assertRaises(ControlTowerHandoffError):
+            ControlTowerAttachmentManifest("YES", ())
+
+        with self.assertRaises(ControlTowerHandoffError):
+            ControlTowerAttachmentManifest("YES", (entry,))
 
 
 if __name__ == "__main__":

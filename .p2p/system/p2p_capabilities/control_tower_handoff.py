@@ -16,6 +16,7 @@ from typing import Any, Mapping, Sequence
 CONTROL_TOWER_PACKET_SCHEMA = "p2p-control-tower-return-packet/1"
 CONTROL_TOWER_PROMPT_SCHEMA = "p2p-control-tower-execution-prompt/1"
 CONTROL_TOWER_EVENT_SCHEMA = "p2p-control-tower-return-event/1"
+ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 
 TERMINAL_STATES = (
     "COMPLETED",
@@ -47,6 +48,15 @@ USER_ACTION_BLOCK = (
     "00 — P2P CONTROL TOWER\n"
     "\n"
     "Không cần viết thêm nội dung bàn giao."
+)
+UPLOAD_REQUIRED_VALUES = ("YES", "NO")
+ATTACHMENT_CLASSIFICATIONS = ("REQUIRED", "OPTIONAL", "DO_NOT_UPLOAD")
+NO_UPLOAD_INSTRUCTION = (
+    "Chỉ cần copy toàn bộ final response về 00 — P2P CONTROL TOWER; không cần upload file."
+)
+UPLOAD_MANIFEST_INSTRUCTION = (
+    "Upload only the listed REQUIRED attachments; OPTIONAL entries are not required, and "
+    "DO_NOT_UPLOAD entries must not be uploaded."
 )
 
 _HOST_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]{1,63}$")
@@ -185,6 +195,20 @@ def _location(value: Any, field_name: str) -> str:
     return normalized.replace("\\", "/")
 
 
+def _upload_required(value: Any) -> str:
+    normalized = _text(value, "upload_required", max_length=8).upper()
+    if normalized not in UPLOAD_REQUIRED_VALUES:
+        raise ControlTowerHandoffError("UPLOAD_REQUIRED_INVALID")
+    return normalized
+
+
+def _attachment_classification(value: Any) -> str:
+    normalized = _text(value, "attachment_classification", max_length=32).upper().replace("-", "_")
+    if normalized not in ATTACHMENT_CLASSIFICATIONS:
+        raise ControlTowerHandoffError("ATTACHMENT_CLASSIFICATION_INVALID")
+    return normalized
+
+
 def _reject_inheritance(value: Any) -> None:
     if value is None:
         return
@@ -232,6 +256,138 @@ class SessionBinding:
         )
 
 
+@dataclass(frozen=True)
+class ControlTowerAttachment:
+    """One explicit file entry; a path is not proof that its contents are readable."""
+
+    filename: str
+    local_path: str
+    purpose: str
+    why_control_tower_needs_contents: str
+    classification: str = "REQUIRED"
+
+    def __post_init__(self) -> None:
+        filename = _text(self.filename, "attachment_filename", max_length=256)
+        if "/" in filename or "\\" in filename:
+            raise ControlTowerHandoffError("ATTACHMENT_FILENAME_MUST_BE_BASENAME")
+        object.__setattr__(self, "filename", filename)
+        object.__setattr__(self, "local_path", _location(self.local_path, "attachment_local_path"))
+        object.__setattr__(
+            self,
+            "purpose",
+            _text(self.purpose, "attachment_purpose", max_length=4096),
+        )
+        object.__setattr__(
+            self,
+            "why_control_tower_needs_contents",
+            _text(
+                self.why_control_tower_needs_contents,
+                "attachment_why_contents",
+                max_length=4096,
+            ),
+        )
+        object.__setattr__(
+            self,
+            "classification",
+            _attachment_classification(self.classification),
+        )
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "FILENAME": self.filename,
+            "LOCAL_PATH": self.local_path,
+            "PURPOSE": self.purpose,
+            "WHY_CONTROL_TOWER_NEEDS_CONTENTS": self.why_control_tower_needs_contents,
+            "CLASSIFICATION": self.classification,
+            "LOCAL_PATH_ALONE_PROVES_CONTENTS_AVAILABLE": "NO",
+            "CONTENTS_AVAILABLE_TO_CONTROL_TOWER": "UNKNOWN",
+            "ATTACHMENT_IS_CANONICAL_TRUTH": "NO",
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "ControlTowerAttachment":
+        if not isinstance(value, Mapping):
+            raise ControlTowerHandoffError("ATTACHMENT_ENTRY_MUST_BE_OBJECT")
+        return cls(
+            filename=value.get("FILENAME"),
+            local_path=value.get("LOCAL_PATH"),
+            purpose=value.get("PURPOSE"),
+            why_control_tower_needs_contents=value.get("WHY_CONTROL_TOWER_NEEDS_CONTENTS"),
+            classification=value.get("CLASSIFICATION", "REQUIRED"),
+        )
+
+
+@dataclass(frozen=True)
+class ControlTowerAttachmentManifest:
+    """Explicit upload instructions and evidence-only attachment semantics."""
+
+    upload_required: str = "NO"
+    attachments: tuple[ControlTowerAttachment, ...] = ()
+
+    def __post_init__(self) -> None:
+        upload_required = _upload_required(self.upload_required)
+        raw_entries = self.attachments
+        if raw_entries is None or isinstance(raw_entries, (str, bytes)):
+            raise ControlTowerHandoffError("ATTACHMENTS_MUST_BE_SEQUENCE")
+        try:
+            iterator = iter(raw_entries)
+        except TypeError as exc:
+            raise ControlTowerHandoffError("ATTACHMENTS_MUST_BE_SEQUENCE") from exc
+        entries: list[ControlTowerAttachment] = []
+        seen_names: set[str] = set()
+        seen_paths: set[str] = set()
+        for raw_entry in iterator:
+            entry = (
+                raw_entry
+                if isinstance(raw_entry, ControlTowerAttachment)
+                else ControlTowerAttachment.from_mapping(raw_entry)
+            )
+            if entry.filename in seen_names:
+                raise ControlTowerHandoffError(f"ATTACHMENT_FILENAME_DUPLICATE:{entry.filename}")
+            if entry.local_path in seen_paths:
+                raise ControlTowerHandoffError(f"ATTACHMENT_PATH_DUPLICATE:{entry.local_path}")
+            seen_names.add(entry.filename)
+            seen_paths.add(entry.local_path)
+            entries.append(entry)
+        if upload_required == "NO" and entries:
+            raise ControlTowerHandoffError("ATTACHMENTS_FORBIDDEN_WHEN_UPLOAD_NOT_REQUIRED")
+        if upload_required == "YES":
+            if not 1 <= len(entries) <= 3:
+                raise ControlTowerHandoffError("UPLOAD_REQUIRED_NEEDS_ONE_TO_THREE_ATTACHMENTS")
+            if not any(entry.classification == "REQUIRED" for entry in entries):
+                raise ControlTowerHandoffError("UPLOAD_REQUIRED_NEEDS_REQUIRED_ATTACHMENT")
+        object.__setattr__(self, "upload_required", upload_required)
+        object.__setattr__(self, "attachments", tuple(entries))
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema": ATTACHMENT_MANIFEST_SCHEMA,
+            "UPLOAD_REQUIRED": self.upload_required,
+            "ATTACHMENTS": [entry.to_dict() for entry in self.attachments],
+            "LOCAL_PATH_ALONE_PROVES_CONTENTS_AVAILABLE": "NO",
+            "ATTACHMENTS_ARE_EVIDENCE_INPUT_ONLY": "YES",
+            "ATTACHMENTS_ARE_CANONICAL_TRUTH": "NO",
+            "ATTACHMENTS_PROVE_PROMOTION_DEPLOYMENT_LIVE_OR_OWNER_APPROVAL": "NO",
+            "USER_INSTRUCTION": (
+                NO_UPLOAD_INSTRUCTION
+                if self.upload_required == "NO"
+                else UPLOAD_MANIFEST_INSTRUCTION
+            ),
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "ControlTowerAttachmentManifest":
+        if not isinstance(value, Mapping) or value.get("schema") != ATTACHMENT_MANIFEST_SCHEMA:
+            raise ControlTowerHandoffError("ATTACHMENT_MANIFEST_SCHEMA_INVALID")
+        raw_entries = value.get("ATTACHMENTS") or ()
+        if isinstance(raw_entries, (str, bytes)):
+            raise ControlTowerHandoffError("ATTACHMENTS_MUST_BE_SEQUENCE")
+        return cls(
+            upload_required=value.get("UPLOAD_REQUIRED"),
+            attachments=tuple(ControlTowerAttachment.from_mapping(item) for item in raw_entries),
+        )
+
+
 def bind_session(
     *,
     session_id: str,
@@ -266,6 +422,9 @@ class ControlTowerReturnPacket:
     owner_gate: Mapping[str, Any] | None = None
     blockers: tuple[str, ...] = ()
     next_recommended_action: str = "Return this packet to the Control Tower for reconciliation."
+    attachment_manifest: ControlTowerAttachmentManifest = field(
+        default_factory=ControlTowerAttachmentManifest
+    )
 
     def __post_init__(self) -> None:
         if not isinstance(self.binding, SessionBinding):
@@ -303,6 +462,14 @@ class ControlTowerReturnPacket:
             "next_recommended_action",
             _text(self.next_recommended_action, "next_recommended_action", max_length=4096),
         )
+        manifest = self.attachment_manifest
+        if manifest is None:
+            manifest = ControlTowerAttachmentManifest()
+        elif isinstance(manifest, Mapping):
+            manifest = ControlTowerAttachmentManifest.from_mapping(manifest)
+        elif not isinstance(manifest, ControlTowerAttachmentManifest):
+            raise ControlTowerHandoffError("ATTACHMENT_MANIFEST_REQUIRED")
+        object.__setattr__(self, "attachment_manifest", manifest)
 
     @property
     def mapped_lifecycle_state(self) -> str:
@@ -329,6 +496,8 @@ class ControlTowerReturnPacket:
             "OWNER_GATE": _safe_json(self.owner_gate, path="owner_gate") if self.owner_gate is not None else None,
             "BLOCKERS": list(self.blockers),
             "NEXT_RECOMMENDED_ACTION": self.next_recommended_action,
+            "UPLOAD_REQUIRED": self.attachment_manifest.upload_required,
+            "CONTROL_TOWER_ATTACHMENT_MANIFEST": self.attachment_manifest.to_dict(),
             "PACKET_IS_CANONICAL_TRUTH": "NO",
             "CANONICAL_TRUTH": "NO",
         }
@@ -340,6 +509,15 @@ class ControlTowerReturnPacket:
             raise ControlTowerHandoffError("CONTROL_TOWER_PACKET_SCHEMA_INVALID")
         if value.get("CONTROL_TOWER_RETURN_PACKET") is not True:
             raise ControlTowerHandoffError("CONTROL_TOWER_PACKET_MARKER_INVALID")
+        raw_manifest = value.get("CONTROL_TOWER_ATTACHMENT_MANIFEST")
+        if raw_manifest is None:
+            manifest = ControlTowerAttachmentManifest(
+                upload_required=value.get("UPLOAD_REQUIRED", "NO")
+            )
+        else:
+            manifest = ControlTowerAttachmentManifest.from_mapping(raw_manifest)
+            if "UPLOAD_REQUIRED" in value and value.get("UPLOAD_REQUIRED") != manifest.upload_required:
+                raise ControlTowerHandoffError("UPLOAD_REQUIRED_MANIFEST_MISMATCH")
         return cls(
             binding=SessionBinding.from_mapping(value),
             session_state=value.get("SESSION_STATE"),
@@ -362,6 +540,7 @@ class ControlTowerReturnPacket:
                 "NEXT_RECOMMENDED_ACTION",
                 "Return this packet to the Control Tower for reconciliation.",
             ),
+            attachment_manifest=manifest,
         )
 
 
@@ -482,6 +661,8 @@ class ControlTowerState:
                 current_canonical_base_tree, "current_canonical_base_tree"
             ),
             "OWNER_GATE": _safe_json(packet.owner_gate, path="owner_gate") if packet.owner_gate is not None else None,
+            "UPLOAD_REQUIRED": packet.attachment_manifest.upload_required,
+            "CONTROL_TOWER_ATTACHMENT_MANIFEST": packet.attachment_manifest.to_dict(),
             "BLOCKERS": list(deduped_blockers),
             "NEXT_RECOMMENDED_ACTION": next_action,
             "PROMOTED": False,
@@ -589,6 +770,16 @@ def build_execution_prompt(
             "Include SESSION_ID, HOST, GOAL_ID, GOAL, SESSION_STATE, CANONICAL_BASE_SHA, CANONICAL_BASE_TREE,",
             "CANONICAL_RELATION, WORKTREE, BRANCH, CHANGES, TEST_RESULTS, EVIDENCE,",
             "CANDIDATE_OR_CHECKPOINT_SHA, TERMINAL_VERDICT, OWNER_GATE, BLOCKERS, and NEXT_RECOMMENDED_ACTION.",
+            "Every terminal response must declare UPLOAD_REQUIRED as YES or NO.",
+            "Include CONTROL_TOWER_ATTACHMENT_MANIFEST in the terminal packet.",
+            "When UPLOAD_REQUIRED is NO, state that the user only needs to copy the entire final response",
+            "to 00 — P2P CONTROL TOWER and does not need to upload a file.",
+            "When UPLOAD_REQUIRED is YES, list exactly 1-3 minimal files with FILENAME, LOCAL_PATH, PURPOSE,",
+            "WHY_CONTROL_TOWER_NEEDS_CONTENTS, and CLASSIFICATION as REQUIRED, OPTIONAL, or DO_NOT_UPLOAD.",
+            "A local path alone does not make file contents available to the Control Tower.",
+            "Attachments are evidence input only and never canonical truth or proof of promotion, deployment,",
+            "live certification, or Owner approval.",
+            "Prefer one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact when appropriate.",
             "PACKET_IS_CANONICAL_TRUTH: NO",
             "Return the packet to the Control Tower for reconciliation; the packet is not canonical truth.",
             "",
@@ -598,11 +789,15 @@ def build_execution_prompt(
 
 
 __all__ = [
+    "ATTACHMENT_CLASSIFICATIONS",
+    "ATTACHMENT_MANIFEST_SCHEMA",
     "CANONICAL_RELATIONS",
     "CONTROL_TOWER_EVENT_SCHEMA",
     "CONTROL_TOWER_PACKET_SCHEMA",
     "CONTROL_TOWER_PROMPT_SCHEMA",
     "CONTROL_TOWER_STATUSES",
+    "ControlTowerAttachment",
+    "ControlTowerAttachmentManifest",
     "ControlTowerHandoffError",
     "ControlTowerIngestResult",
     "ControlTowerReturnPacket",
@@ -610,6 +805,8 @@ __all__ = [
     "EXISTING_LIFECYCLE_STATE",
     "SessionBinding",
     "TERMINAL_STATES",
+    "UPLOAD_MANIFEST_INSTRUCTION",
+    "UPLOAD_REQUIRED_VALUES",
     "USER_ACTION_BLOCK",
     "bind_session",
     "build_execution_prompt",
