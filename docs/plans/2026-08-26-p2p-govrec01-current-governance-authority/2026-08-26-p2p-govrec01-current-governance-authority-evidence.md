@@ -90,9 +90,24 @@ Matching plan item(s): `P3-A`, `P3-B`
 
 Matching plan item(s): `P4-A`, `P4-B`
 
-- `E4-P4A-GATE1..E4-P4A-GATE12`: To be filled with compileall, drift, doctor, Vendor, Host Projection, Manus package, Foundation, C35, C43, capability, and regression receipts.
-- `E4-P4A-CLOSE1..E4-P4A-CLOSE5`: To be filled with Anvien detect-changes, diff check, final status, exact commit/tree/base, and no-provider/Council boundary.
-- `E4-P4B-SUP1..E4-P4B-SUP6`: To be filled with the fresh exact-head Supervisor review; the report must name the exact reviewed commit and tree and contain one PASS or REJECT verdict.
+- `E4-P4A-GATE1`: `py -3 -X utf8 -m unittest tests.test_p2p_vendor_skill_integration` returns `Ran 22 tests ... OK` (22/22).
+- `E4-P4A-GATE2`: `py -3 -X utf8 -m unittest tests.test_p2p_host_skill_projection` returns `Ran 30 tests ... OK` (30/30); final runtime lock has 1,178 protected files and 2 virtual hashes.
+- `E4-P4A-GATE3`: `py -3 -X utf8 -m unittest tests.test_p2p_manus_skill_package` returns `Ran 8 tests ... OK` (8/8).
+- `E4-P4A-GATE4`: `py -3 -X utf8 -m unittest tests.test_p2p_capability_foundation` returns `Ran 28 tests ... OK` (28/28).
+- `E4-P4A-GATE5`: `py -3 -X utf8 -m unittest tests.test_p2p_c35_provider_neutral_runtime` returns `Ran 57 tests ... OK` (57/57); no live provider or Manus call was made.
+- `E4-P4A-GATE6`: `py -3 -X utf8 -m unittest tests.test_p2p_c43_framework_reconciliation` returns `Ran 9 tests ... OK` (9/9).
+- `E4-P4A-GATE7`: `scripts/p2p_development_control.py validate` and `status` both return PASS; canonical denominator remains 8 and configured quorum remains 8/8; current Council live proof remains false/not proven.
+- `E4-P4A-GATE8`: `py -3 -X utf8 -m compileall -q .` returns exit code 0.
+- `E4-P4A-GATE9`: final `py -3 -X utf8 scripts/p2p_governance.py drift --root . --governance governance --as-of 2026-08-26` returns exit code 0, `status=PASS`, `failures=[]`, `warnings=[]`, and `volatile_findings=[]`.
+- `E4-P4A-GATE10`: final `py -3 -X utf8 scripts/doctor.py --root . --role development --json` returns exit code 0 and `ok=true`; governance-drift, installed foundation, and decision-trace checks PASS. Extra-skill WARN is inventory noise, not a failed gate.
+- `E4-P4A-GATE11`: combined final unittest command across the six required gates plus GOVREC01 regressions and doctor roles returns `Ran 187 tests ... OK (skipped=2)`.
+- `E4-P4A-GATE12`: GOVREC01 negative suite covers unauthorized runtime files, changed lock identity, stale/historical authority, Council upgrade from C36, whitelist expansion, malformed UTF-8/JSON helper output, and nonzero helper preservation; all focused cases pass.
+- `E4-P4A-CLOSE1`: Final lock was generated only through the existing `lock-runtime` command; no wildcard, exclusion, or suppression was added. The subsequent exact drift gate passes.
+- `E4-P4A-CLOSE2`: Anvien was refreshed with `anvien analyze --force`; final `anvien detect-changes --repo <candidate> --scope all --json` reports only the intended `governance/runtime-manifest.lock.json` change before its commit, with low risk and no affected symbols.
+- `E4-P4A-CLOSE3`: Functional commits currently are `23f0de3` (Council/edge reconciliation), `1a851d0` (doctor/tests), and `8c9363f` (generated runtime lock); exact final subject identity is recorded after the evidence/report closure commit.
+- `E4-P4A-CLOSE4`: The nested `.p2p/system/.p2p/state/adapter_registry.json` test pollution was verified as append-only fake-adapter output and restored to the exact candidate baseline; it was not staged or committed. Other dirty owner/line-ending paths remain preserved and out of subject scope.
+- `E4-P4A-CLOSE5`: No provider, Manus, Council, remote write, promotion, release, deployment, root Git repair, or mutation of `.19`, v5, immutable baseline, or user projects occurred.
+- `E4-P4B-SUP1..E4-P4B-SUP6`: Pending fresh independent exact-head Supervisor review. The report must state reviewed commit/tree/parent/base, subject-path diff, preserved dirty owner paths, and one PASS or REJECT verdict.
 
 ## Closure Evidence
 

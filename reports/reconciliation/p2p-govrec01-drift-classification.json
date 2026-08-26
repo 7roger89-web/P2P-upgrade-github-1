@@ -158,6 +158,56 @@
       "reason": "Read-only candidate evidence under an existing reports exclusion; it does not widen runtime policy."
     }
   ],
+  "candidate_overlay_changes": [
+    {
+      "path": "docs/p2p-development/capability-ledger/capability-index.json",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 current-lineage Council projection preserves historical C36 truth while keeping current full Council FALSE/NOT_PROVEN; this is an unpromoted candidate overlay, not promoted-source authority."
+    },
+    {
+      "path": "docs/p2p-development/framework/capability-skill-map.json",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 canonical projection explicitly separates historical single-host certification from current-lineage proof without changing the denominator."
+    },
+    {
+      "path": "docs/p2p-development/framework/capability-skill-map.md",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 human-readable projection preserves UNKNOWN/NOT_PROVEN current Council semantics."
+    },
+    {
+      "path": "docs/p2p-development/framework/master-roadmap.md",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 roadmap wording distinguishes historical certification from future/current full-Council evidence."
+    },
+    {
+      "path": "docs/p2p-development/framework/product-architecture.md",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 architecture projection prevents bounded C43 smoke from upgrading current full-Council proof."
+    },
+    {
+      "path": "governance/p2p-development-roadmap.json",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 governance projection records historical true/current false Council fields and a fresh-evidence requirement."
+    },
+    {
+      "path": "governance/research-adoption-ledger.json",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "23f0de3",
+      "reason": "P2 research adoption record retains historical provenance and refuses current-lineage upgrade."
+    },
+    {
+      "path": "scripts/doctor.py",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_commit": "1a851d0",
+      "reason": "P3 smallest strict UTF-8 and malformed-helper-output boundary repair; failures remain fail-closed and the candidate remains unpromoted."
+    }
+  ],
   "preserved_reference_state": [
     {
       "subject": "8.4.7-C-codex.19 artifact and promotion evidence",
@@ -174,12 +224,14 @@
     {
       "subject": "tests/test_p2p_governance_drift.py expected policy/reference counts",
       "classification": "GOVERNANCE_DEFECT",
-      "status": "REQUIRES_TEST_FIX_WITHOUT_GATE_WEAKENING"
+      "status": "RESOLVED_WITH_CURRENT_POLICY_ASSERTIONS",
+      "resolution_commit": "1a851d0"
     },
     {
       "subject": "scripts/doctor.py helper subprocess decode boundary",
       "classification": "GOVERNANCE_DEFECT",
-      "status": "REQUIRES_EXPLICIT_UTF8_STRICT_FAIL_CLOSED_REPAIR"
+      "status": "RESOLVED_WITH_EXPLICIT_UTF8_STRICT_FAIL_CLOSED_REPAIR",
+      "resolution_commit": "1a851d0"
     }
   ],
   "terminal_assertion_before_final_validation": {
@@ -188,5 +240,17 @@
     "stale_official_authority_used": false,
     "historical_as_current": false,
     "current_council_upgraded_from_c36": false
+  },
+  "terminal_assertion_after_final_validation": {
+    "unexplained_drift": 0,
+    "drift_gate_status": "PASS",
+    "doctor_status": "PASS",
+    "gate_weakening": false,
+    "stale_official_authority_used": false,
+    "historical_as_current": false,
+    "current_council_upgraded_from_c36": false,
+    "current_lineage_full_council_live_proven": false,
+    "current_lineage_full_council_status": "NOT_PROVEN",
+    "provider_manus_council_execution": "NOT_RUN"
   }
 }

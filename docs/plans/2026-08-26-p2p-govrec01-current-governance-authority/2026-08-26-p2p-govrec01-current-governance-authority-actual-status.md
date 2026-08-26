@@ -2,7 +2,7 @@
 
 Title: P2P-GOVREC01 Current Governance Authority Reconciliation
 Date: 2026-08-26
-Status: P0/P1/P2/P3 implementation complete / P4 validation in progress
+Status: P0/P1/P2/P3 implementation complete / P4-A technical validation complete / P4-B Supervisor pending
 Companion plan: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-plan.md`
 Companion evidence: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-evidence.md`
 Companion benchmark: `docs/plans/2026-08-26-p2p-govrec01-current-governance-authority/2026-08-26-p2p-govrec01-current-governance-authority-benchmark.md`
@@ -76,6 +76,7 @@ Out of scope:
 | R1b | 2026-08-26 | after P1-B lock regeneration | runtime lock/drift | `wrong -> correct`; all 17 pre-existing deltas classified; no unexplained drift | `E1-P1B-DRIFT1..17`, `E1-P1B-LOCK1..4` | proceed P2; future protected edits require final lock regeneration |
 | R2 | 2026-08-26 | after P2-A/P2-B implementation slice on exact candidate | Council semantics and edge index | active projections `wrong -> correct`; current proof boundary `partial -> correct boundary`; edge index `missing -> correct as index` | `E2-P2A-COUNCIL1..8`, `E2-P2B-EDGE1..5` | proceed P3; live slots remain open |
 | R3 | 2026-08-26 | after P3-A/P3-B implementation slice on exact candidate | doctor and tests | doctor decoder `wrong -> correct`; drift fixture `wrong -> correct`; focused target suites pass | `E3-P3A-DECODER1..7`, `E3-P3B-TEST1..8` | proceed P4; final lock and gates remain |
+| R4 | 2026-08-26 | after final lock and P4-A validation on exact candidate | lock, gates, doctor, drift, test artifact hygiene | technical gates complete; no unexplained drift; owner-gate review remains | `E4-P4A-GATE1..E4-P4A-CLOSE5` | perform fresh exact-head Supervisor review only |
 
 ## Phase Touch Map
 
@@ -231,6 +232,17 @@ Upgrade current Council from C36, C43 smoke, profiles, configured quorum, or log
 - [x] P0 complete. Next phase status, next action, or work steps must be updated before implementation.
 - [ ] P0 complete. Target scope is preserve-only.
 - [ ] P0 complete. Implementation is blocked by missing authority or evidence.
+
+## P4-A Technical Closure
+
+- [x] Required Vendor, Host Projection, Manus package, Foundation, C35, and C43 gates passed at 22/22, 30/30, 8/8, 28/28, 57/57, and 9/9.
+- [x] Combined final unittest sweep passed 187 tests with 2 intentional skips; compileall exited 0.
+- [x] Runtime lock regenerated through the existing deterministic command; final drift is PASS with zero failures, warnings, or volatile findings.
+- [x] Development doctor exited 0 with `ok=true`; malformed helper output and stale-authority/Council-upgrade negative regressions pass.
+- [x] Test-only adapter registry pollution was restored to the exact candidate baseline; dirty owner paths remain untouched.
+- [ ] Fresh exact-head Supervisor report has not yet been issued.
+
+Current handoff decision: `P4-A PASS / P4-B PENDING`. The current-lineage full Council remains `FALSE / NOT_PROVEN`; this is an intentional evidence boundary, not a failed technical gate.
 
 Decision note:
 

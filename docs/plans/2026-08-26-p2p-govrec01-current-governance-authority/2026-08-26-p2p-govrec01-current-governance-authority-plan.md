@@ -421,7 +421,7 @@ The promoted current source has moved past the `.74` runtime-manifest lock, whil
   - P4-A: Full validation and evidence closure.
   - P4-B: Fresh exact-head Supervisor review and final local handoff.
 
-- [ ] P4-A: Full validation and evidence closure
+- [x] P4-A: Full validation and evidence closure
   - Goal: run every required gate and record exact counts/statuses.
   - Scope Boundary:
     - Editable: evidence/report/plan status files only.
