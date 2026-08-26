@@ -24,19 +24,19 @@ This is a Python protocol/documentation change. Record inventory and directly me
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---|---:|---:|---:|---:|---:|---|
-| P1 | protocol modules | files | 0 | 1 | pending | 1 | pending | E1-P1A-SRC1 |
-| P1 | protocol regression tests | cases | 0 | 14 | pending | 14 | pending | E1-P1B-TEST1..E1-P1B-TEST14 |
-| P1 | required A-H scenarios | cases | 0 | 8 | pending | 8 | pending | E1-P1B-TEST1..E1-P1B-TEST8 |
-| P1 | negative/round-trip scenarios | cases | 0 | 6 | pending | 3 | pending | E1-P1B-TEST9..E1-P1B-TEST14 |
+| P1 | protocol modules | files | 0 | 1 | 1 | 1 | +1 | E1-P1A-SRC1 |
+| P1 | protocol regression tests | cases | 0 | 15 | 15 | 15 | +15 | E1-P1B-TEST1..E1-P1B-TEST15 |
+| P1 | required A-H scenarios | cases | 0 | 8 | 8 | 8 | +8 | E1-P1B-TEST1..E1-P1B-TEST8 |
+| P1 | negative/round-trip scenarios | cases | 0 | 6 | 6 | 3 | +6 | E1-P1B-TEST9..E1-P1B-TEST14 |
 
 ## B2 - P2 Benchmarks
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---|---:|---:|---:|---:|---:|---|
-| P2 | durable CT01 guides | files | 0 | 1 | pending | 1 | pending | E2-P2A-DOC1 |
-| P2 | capability ledger records | records | 175 | 176 | pending | 176 | pending | E2-P2A-LEDGER1 |
-| P2 | projected MULTI-AI records | records | 31 | 32 | pending | 32 | pending | E2-P2A-ROADMAP1 |
-| P2 | candidate commits | commits | 0 | pending | pending | 1 or more | pending | E2-P2B-COMMIT1 |
+| P2 | durable CT01 guides | files | 0 | 1 | 1 | 1 | +1 | E2-P2A-DOC1 |
+| P2 | capability ledger records | records | 175 | 176 | 176 | 176 | +1 | E2-P2A-LEDGER1 |
+| P2 | projected MULTI-AI records | records | 31 | 32 | 32 | 32 | +1 | E2-P2A-ROADMAP1 |
+| P2 | candidate commits | commits | 0 | 3 | pending | 1 or more | pending | E2-P2B-COMMIT1 |
 
 ## Non-Benchmarkable Notes
 

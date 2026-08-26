@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-26
-- Status: P0 Complete / In Progress
+- Status: BLOCKED / CLOSED
 - Plan: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-plan.md
 - Evidence: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-evidence.md
 - Benchmark: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-benchmark.md
@@ -202,7 +202,7 @@ P0 is complete for implementation. Existing host executor, task state, live exec
   - Actual-status Update: durable discovery missing -> correct.
   - Commit Boundary: commit after validation and detect-changes.
 
-- [ ] P2-B: Full validation and closure evidence
+- [x] P2-B: Full validation and closure evidence
   - Goal: produce a reproducible candidate report and supervisor verdict.
   - Scope Boundary:
     - Editable: planner artifacts and coder/supervisor reports.
@@ -219,26 +219,26 @@ P0 is complete for implementation. Existing host executor, task state, live exec
     1. Run focused/full relevant tests, doctor/validation, compile/import, and diff checks. Evidence E2-P2B-TEST1..E2-P2B-TEST4.
     2. Run Anvien detect-changes, write reports, commit, and verify exact HEAD/tree with no remote write. Evidence E2-P2B-DETECT1, E2-P2B-COMMIT1, E2-P2B-SUP1.
   - Implementation Gate: P1 and P2-A pass or a blocker is recorded.
-  - Acceptance: final candidate identity/evidence is known; CANONICAL_PROMOTED remains NO.
+  - Acceptance: final candidate identity/evidence is known; CANONICAL_PROMOTED remains NO; terminal outcome is BLOCKED because inherited repository gates remain unresolved.
   - Evidence Targets: E2-P2B-TEST1..E2-P2B-SUP1.
-  - Actual-status Update: all in-scope rows final.
+  - Actual-status Update: all in-scope rows final; supervisor verdict is REJECT for full-plan acceptance and BLOCKED for the session.
   - Commit Boundary: final candidate commit only; no push.
 
-- [ ] Pn-A: Supervisor acceptance review.
+- [x] Pn-A: Supervisor acceptance review.
   - Goal: verify plan, evidence, benchmark, diff, reports, and validation.
   - Work Steps: review, fix only failed in-scope scope, and rerun until PASS or blocker.
   - Implementation Gate: implementation phases complete or blocked.
-  - Acceptance: supervisor PASS or explicit blocker.
-- [ ] Pn-B: Remove dead work created by this plan.
+  - Acceptance: explicit Supervisor REJECT records the inherited validator/doctor/live-host blockers; no false PASS is claimed.
+- [x] Pn-B: Remove dead work created by this plan.
   - Goal: final diff contains only accepted CT01 artifacts.
   - Work Steps: review plan-created files, remove only dead CT01 artifacts, rerun supervisor.
   - Implementation Gate: no unrelated owner cleanup.
-  - Acceptance: no dead plan-created artifact remains.
-- [ ] Pn-C: Close the plan.
+  - Acceptance: no dead plan-created artifact remains; all retained files are CT01 implementation or durable evidence.
+- [x] Pn-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status.
   - Work Steps: record exact hashes, protected no-change checks, and terminal report.
   - Implementation Gate: Pn-A/Pn-B pass or blocker recorded.
-  - Acceptance: candidate terminal state READY or BLOCKED, never promoted.
+  - Acceptance: candidate terminal state BLOCKED, never promoted; reopening requires a separate bounded goal.
 
 ## Risk Notes
 

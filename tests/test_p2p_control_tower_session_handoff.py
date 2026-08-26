@@ -11,7 +11,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 if str(SYSTEM_ROOT) not in sys.path:
     sys.path.insert(0, str(SYSTEM_ROOT))
+SCRIPTS_ROOT = REPO_ROOT / "scripts"
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
 
+from p2p_workflow import append_event  # noqa: E402
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     USER_ACTION_BLOCK,
     ControlTowerHandoffError,
@@ -290,6 +294,24 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
             self.assertTrue(temp_root.is_relative_to(test_tmp_root.resolve()))
             packet = self.packet(worktree=str(temp_root))
             self.assertTrue(Path(packet.worktree).is_relative_to(test_tmp_root.resolve()))
+
+    def test_return_event_uses_existing_execution_ledger_writer(self):
+        test_tmp_root = REPO_ROOT / ".tmp"
+        test_tmp_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=test_tmp_root, prefix="ct01-ledger-") as temp_path:
+            ledger = Path(temp_path) / ".p2p" / "state" / "execution-ledger.jsonl"
+            packet = self.packet()
+            state = ControlTowerState.empty()
+            result = self.ingest(state, packet)
+            append_event(ledger, to_execution_ledger_event(packet, result))
+            stored = json.loads(ledger.read_text(encoding="utf-8").splitlines()[0])
+
+        self.assertEqual(stored["schema_version"], "p2p-execution-event/1")
+        self.assertEqual(stored["event_type"], "CONTROL_TOWER_RETURN_PACKET")
+        self.assertEqual(
+            stored["CONTROL_TOWER_RETURN_PACKET"]["PACKET_IS_CANONICAL_TRUTH"],
+            "NO",
+        )
 
 
 if __name__ == "__main__":

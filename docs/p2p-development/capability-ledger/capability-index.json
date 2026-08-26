@@ -5046,7 +5046,7 @@
         "docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md"
       ],
       "evidence_refs": [
-        "tests/test_p2p_control_tower_session_handoff.py (14 focused cases)",
+      "tests/test_p2p_control_tower_session_handoff.py (15 focused cases)",
         "docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-evidence.md"
       ],
       "dependencies": [
@@ -5070,7 +5070,7 @@
       "next_condition": "Reconsider only after fresh independent evidence and supervisor review; a packet or local test must never promote this capability.",
       "last_reviewed": "2026-08-26",
       "freshness": "verified_against_filesystem",
-      "notes": "P2P-CT01 local foundation proof is 14 focused tests on an isolated canonical worktree. Candidate remains FOUNDATION_READY and UNPROMOTED; CANONICAL_PROMOTED is NO."
+      "notes": "P2P-CT01 local foundation proof is 15 focused tests on an isolated canonical worktree. Candidate remains FOUNDATION_READY and UNPROMOTED; CANONICAL_PROMOTED is NO."
     }
   ],
   "last_reviewed": "2026-08-26T07:47:22Z",

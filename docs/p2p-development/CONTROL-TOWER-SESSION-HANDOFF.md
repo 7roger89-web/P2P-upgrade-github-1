@@ -129,6 +129,6 @@ No second router, second truth store, nested certification system, simulated quo
 
 ## Validation boundary and known gaps
 
-The local development-source proof is the 14-case focused suite plus relevant existing P2P tests and doctor/compile checks. It proves the protocol behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
+The local development-source proof is the 15-case focused suite plus relevant existing P2P tests and doctor/compile checks. It proves the protocol behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
 
 P2P-CT01 terminal state for this candidate is FOUNDATION_READY / UNPROMOTED. CANONICAL_PROMOTED: NO. No remote write was performed.

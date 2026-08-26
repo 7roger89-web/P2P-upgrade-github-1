@@ -54,7 +54,8 @@ P1-B completed:
 - E1-P1B-TEST12: packet round-trip, ledger event, and state projection are JSON safe.
 - E1-P1B-TEST13: future provider-neutral labels normalize without provider-specific routing logic.
 - E1-P1B-TEST14: temporary test worktree paths stay under the repository .tmp boundary.
-- E1-P1B-FIX1: first test run exposed only a missing repo-local .tmp fixture directory (13 passed, 1 fixture failure); the fixture was corrected and the final focused run passed.
+- E1-P1B-TEST15: the structured return event is accepted by the existing scripts/p2p_workflow.py append_event writer and is durable JSONL with the canonical-truth marker NO.
+- E1-P1B-FIX1: first test run exposed only a missing repo-local .tmp fixture directory (13 passed, 1 fixture failure); the fixture was corrected and the final focused run passed 15 cases.
 - E1-P1B-TEST1 through E1-P1B-TEST8: required A-H cases.
 - E1-P1B-TEST9 through E1-P1B-TEST11: invalid binding, no-inheritance, and round-trip/discovery cases.
 
@@ -69,19 +70,21 @@ P2-A completed:
 - E2-P2A-ROADMAP1: current-roadmap.md projection records 176 total capabilities and 32 Multi-AI records and names CONTROL_TOWER_SESSION_HANDOFF_FOUNDATION_READY as local technical proof only.
 - E2-P2A-BASELINE1: scripts/validate_p2p_development_framework.py on the CT01 worktree remains 52/59 with the same seven failures observed on the fresh canonical clone: nine historical records missing origin_type, legacy family/dependency/freshness entries, charter competitor-pattern scan, and governance pr_lineage. No new CT01-specific failure was added; those existing failures remain out of scope and are a P2-B validation blocker.
 
-P2-B pending:
+P2-B validation:
 
-- E2-P2A-DOC1: operator guide, charter cross-reference, exact beginner workflow, and discovery paths.
-- E2-P2A-LEDGER1: capability ledger schema/dependency/uniqueness validation.
-- E2-P2A-ROADMAP1: derived roadmap count/family projection validation.
-- E2-P2B-TEST1: focused CT01 test command and exit code.
-- E2-P2B-TEST2: relevant existing P2P test command and exit code.
-- E2-P2B-TEST3: development-source doctor/validation and exit code.
-- E2-P2B-TEST4: compile/import/diff-check command and exit code.
-- E2-P2B-DETECT1: Anvien detect-changes before final implementation commit.
-- E2-P2B-COMMIT1: final candidate commit and exact HEAD/tree.
-- E2-P2B-SUP1: supervisor report and verdict.
+- E2-P2B-TEST1: python -m pytest -q tests/test_p2p_control_tower_session_handoff.py returned 15 passed in 0.51s, exit 0.
+- E2-P2B-TEST2: fresh canonical related suite returned 68 passed and 1 inherited fixture failure; CT01 did not modify any of those existing sources.
+- E2-P2B-TEST3: compileall exit 0; project eval validate exit 0; development doctor passed on the clean canonical clone and failed on CT01 only for expected candidate governance drift.
+- E2-P2B-TEST4: framework validator returned 52/59 on both clean canonical and CT01; the same seven inherited failures were observed. Portable doctor role mismatch is expected for a development-source tree.
+- E2-P2B-CODER1: coder report written at reports/coder/rp_coder_260826_150226_by_gpt-5-codex_p2p-ct01-control-tower-session-handoff.md; technical implementation PASS, full session BLOCKED.
+- E2-P2B-DETECT1: final staged anvien detect-changes --repo isolated-worktree --scope all --json returned affected_count=0, affected_files=8, changed_count=53, changed_files=9, affected_processes=0, and risk_level=low. The nine changed paths are the CT01 module/test, operator guide, capability ledger, three planner artifacts, coder report, and supervisor report; no process was affected.
+- E2-P2B-SUP1: reports/supervisor/rp_supervisor_260826_150424_by_gpt-5-codex_p2p-ct01-control-tower-session-handoff.md is the fresh exact-scope review. Verdict is REJECT for full-plan closure, with CT01 technical implementation PASS and the full session terminal state BLOCKED.
 
 ## Closure Evidence
 
-Pending. Closure must state final candidate SHA/tree, report paths, supervisor verdict, protected surfaces not changed, and explicit no-promotion/no-remote-write result.
+- CT01 technical implementation is PASS; the full session is BLOCKED because the clean canonical baseline and candidate retain inherited framework/doctor gates and no live-host certification exists.
+- E2-P2B-DETECT1 records the final scoped change graph: nine intended changed files, zero affected processes, and low aggregate Anvien risk.
+- E2-P2B-SUP1 records the Supervisor REJECT and preserves the no-repair boundary.
+- E2-P2B-COMMIT1 is the closure commit for this isolated candidate; its exact SHA/tree is recorded immediately after commit verification.
+- Protected root, canonical main, remote, runtime lock, release surfaces, promotion, deployment, approval, and live host were not touched.
+- CANONICAL_PROMOTED: NO; no remote write occurred.
