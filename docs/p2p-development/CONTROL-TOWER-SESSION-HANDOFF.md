@@ -23,6 +23,19 @@ Không cần viết thêm nội dung bàn giao.
 
 If the host returns a failure, blocked state, owner gate, stale base, or unknown base, copy that result unchanged. A failure is useful return state; it must not be rewritten as success.
 
+### Foreground CLI
+
+The optional CLI is a thin operator surface over the same contract:
+
+```text
+python scripts/p2p_control_tower.py start --host CODEX --goal-id P2P-CT01 --goal "Durable Control Tower Session Handoff Integration"
+python scripts/p2p_control_tower.py snapshot
+python scripts/p2p_control_tower.py ingest --response-file <utf8-final-response.txt> --current-canonical-base-sha <sha> --current-canonical-base-tree <tree>
+python scripts/p2p_control_tower.py next --host CODEX
+```
+
+`start` and `next` register only an explicit foreground session. `ingest` requires both fresh canonical base values when it is used for reconciliation; absent values remain `UNKNOWN` and fail closed. `next` reads the existing task-state surface and returns `UNKNOWN` when it is not initialized. No command launches a host, changes task state, promotes, deploys, releases, or writes remotely.
+
 ## Durable Control Tower versus short-lived session
 
 The Control Tower is the durable project-facing coordinator. It records the packet as proposed return/evidence data and routes it through existing goal, task, evidence, execution-ledger, approval, and drift controls.
@@ -86,7 +99,9 @@ Every terminal response carries these fields:
 | BLOCKERS | truthful blockers, including failures |
 | NEXT_RECOMMENDED_ACTION | one safe next action |
 
-The packet contains PACKET_IS_CANONICAL_TRUTH: NO. It is not canonical repository truth, not approval, not a promotion record, and not a host-certification receipt. The packet can be serialized as an event for the existing execution-ledger writer through the module's to_execution_ledger_event function; the Control Tower module itself does not open a ledger file or create a second store.
+The packet contains PACKET_IS_CANONICAL_TRUTH: NO. It is not canonical repository truth, not approval, not a promotion record, and not a host-certification receipt. The packet can be serialized as an event for the existing execution-ledger writer through the module's to_execution_ledger_event function; the module never creates a second store.
+
+The foreground coordinator in the same module adds `ControlTower.start_session`, `ControlTower.snapshot`, `ControlTower.ingest_response`, and `ControlTower.ingest_packet`. These methods persist only structured session-start and return events through the existing `.p2p/state/execution-ledger.jsonl` writer; they never persist the raw executor response and never create `control-tower.json` or another task/event store. `PACKET_FINGERPRINT` makes an identical replay idempotent and a different second terminal packet fail closed. The optional CLI is `scripts/p2p_control_tower.py`; it exposes `start`, `snapshot`, `ingest`, and task-state-backed `next` in the foreground only.
 
 The rotation wrapper is `CONTROL_TOWER_ROTATION_HANDOFF` with schema `p2p-control-tower-rotation-handoff/1`; the nested successor packet uses `p2p-control-tower-successor-packet/1`. Both are compact, JSON-safe, and explicitly mark `SUCCESSOR_PACKET_IS_CANONICAL_TRUTH: NO` and `FULL_CHAT_HISTORY_INCLUDED: NO`.
 
@@ -124,7 +139,7 @@ The existing lifecycle vocabulary remains the authority boundary:
 7. FAILED, BLOCKED, and ABORTED return to the Control Tower as terminal outcomes; they are not hidden, retried blindly, or converted to success.
 8. Ingest updates only the lane named by the packet's explicit HOST. Narrative claims about another provider are ignored.
 
-The ControlTowerState object is a serializable projection over these results. Persistence belongs to the existing execution-ledger and evidence callers. The module does not launch a worker, select a provider, or persist hidden chat state.
+The ControlTowerState object is a serializable projection over these results. The coordinator replays only structured CT01 events from the existing execution ledger; it does not launch a worker, select a provider, or persist hidden chat state. If task-state is absent or invalid, `next` returns `UNKNOWN` or a bounded blocker and does not invent a session.
 
 ## Recursive continuation
 
@@ -165,6 +180,8 @@ No second router, second truth store, nested certification system, simulated quo
 |---|---|
 | Return contract and implementation | .p2p/system/p2p_capabilities/control_tower_handoff.py |
 | A-H and ROTATION A-F behavior proof | tests/test_p2p_control_tower_session_handoff.py |
+| Durable coordinator/CLI behavior proof | tests/test_p2p_control_tower_durable.py |
+| Foreground coordinator CLI | scripts/p2p_control_tower.py |
 | Successor packet/reconciliation API | `ControlTowerSuccessorPacket`, `ControlTowerRotationHandoff`, `reconcile_control_tower_successor` in the implementation module |
 | Attachment-aware handoff artifact | `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` in the executor's scoped evidence directory |
 | This operator guide | docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md |
@@ -176,6 +193,6 @@ No second router, second truth store, nested certification system, simulated quo
 
 ## Validation boundary and known gaps
 
-The local development-source proof is the 28-case focused suite: the original CT01 cases, seven attachment-aware cases, and six `ROTATION A-F` cases. It proves the protocol and compact successor reconciliation behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
+The local development-source proof is the 37-case focused suite: the original 28 CT01 cases, including seven attachment-aware and six `ROTATION A-F` cases, plus nine durable coordinator/CLI/discovery cases. It proves the protocol, compact successor reconciliation, existing-ledger replay, fail-closed binding, and foreground CLI behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
 
 P2P-CT01 terminal state for this candidate is FOUNDATION_READY / UNPROMOTED. `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED`. `CANONICAL_PROMOTED: NO`. No remote write was performed.

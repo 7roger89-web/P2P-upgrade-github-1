@@ -11,6 +11,10 @@ durable P2P evidence.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
 import re
 from typing import Any, Mapping, Sequence
 
@@ -18,9 +22,12 @@ from typing import Any, Mapping, Sequence
 CONTROL_TOWER_PACKET_SCHEMA = "p2p-control-tower-return-packet/1"
 CONTROL_TOWER_PROMPT_SCHEMA = "p2p-control-tower-execution-prompt/1"
 CONTROL_TOWER_EVENT_SCHEMA = "p2p-control-tower-return-event/1"
+CONTROL_TOWER_SESSION_START_EVENT_SCHEMA = "p2p-control-tower-session-start/1"
+CONTROL_TOWER_PROJECTION_SCHEMA = "p2p-control-tower-state-projection/2"
 ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
 CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
+UNKNOWN = "UNKNOWN"
 
 TERMINAL_STATES = (
     "COMPLETED",
@@ -53,6 +60,8 @@ USER_ACTION_BLOCK = (
     "\n"
     "Không cần viết thêm nội dung bàn giao."
 )
+PACKET_BEGIN = "CONTROL_TOWER_RETURN_PACKET_BEGIN"
+PACKET_END = "CONTROL_TOWER_RETURN_PACKET_END"
 UPLOAD_REQUIRED_VALUES = ("YES", "NO")
 ATTACHMENT_CLASSIFICATIONS = ("REQUIRED", "OPTIONAL", "DO_NOT_UPLOAD")
 NO_UPLOAD_INSTRUCTION = (
@@ -66,7 +75,11 @@ UPLOAD_MANIFEST_INSTRUCTION = (
 _HOST_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]{1,63}$")
 _CONTROL_TOWER_INSTANCE_PATTERN = re.compile(r"^CT[A-Z0-9_-]{1,63}$")
 _CONFIDENCE_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]{0,31}$")
-_HASH_PATTERN = re.compile(r"^[0-9a-fA-F]{64}$")
+_HASH_PATTERN = re.compile(r"^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$")
+_PROMOTION_TERM_PATTERN = re.compile(
+    r"(?:promot|release|deploy|publish|push|merge|live|production)",
+    re.IGNORECASE,
+)
 _SECRET_KEY_PATTERN = re.compile(
     r"(?:secret|password|api[_-]?key|credential|token_value|"
     r"chain[_-]?of[_-]?thought|chat[_-]?history|conversation)",
@@ -92,6 +105,18 @@ _INHERITANCE_KEYS = frozenset(
 
 class ControlTowerHandoffError(ValueError):
     """Raised when a Control Tower handoff violates a fail-closed boundary."""
+
+
+class PacketParseError(ControlTowerHandoffError):
+    """Raised when a marked executor response has no valid return packet."""
+
+
+class BindingError(ControlTowerHandoffError):
+    """Raised when a packet does not match its registered session binding."""
+
+
+class ProjectionError(ControlTowerHandoffError):
+    """Raised when the existing durable ledger cannot be projected safely."""
 
 
 def _text(value: Any, field_name: str, *, max_length: int = 1024) -> str:
@@ -131,6 +156,39 @@ def _safe_json(value: Any, *, path: str = "value", depth: int = 0) -> Any:
     if value is None or isinstance(value, (bool, int, float)):
         return value
     raise ControlTowerHandoffError(f"{path}_TYPE_INVALID")
+
+
+def _reject_secret_keys(value: Any, *, path: str = "value", depth: int = 0) -> None:
+    """Reject secret-bearing fields even when they are outside known fields."""
+
+    if depth > 8:
+        raise ControlTowerHandoffError(f"{path}_TOO_DEEP")
+    if isinstance(value, Mapping):
+        for raw_key, child in value.items():
+            key = str(raw_key)
+            if _SECRET_KEY_PATTERN.search(key):
+                raise ControlTowerHandoffError(f"{path}.{key}_SECRET_FIELD")
+            _reject_secret_keys(child, path=f"{path}.{key}", depth=depth + 1)
+    elif isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            _reject_secret_keys(child, path=f"{path}[{index}]", depth=depth + 1)
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def new_session_id(host: str, goal_id: str, task_id: str = "UNKNOWN") -> str:
+    """Derive a deterministic session ID without choosing a provider or host."""
+
+    normalized_host = normalize_host(host)
+    normalized_goal = _text(goal_id, "goal_id", max_length=256)
+    normalized_task = _text(task_id, "task_id", max_length=256)
+    slug = re.sub(r"[^a-z0-9]+", "-", normalized_goal.lower()).strip("-")[:48] or "goal"
+    digest = hashlib.sha256(
+        f"{normalized_host}\0{normalized_goal}\0{normalized_task}".encode("utf-8")
+    ).hexdigest()[:12]
+    return f"session-{normalized_host.lower()}-{slug}-{digest}"
 
 
 def _refs(values: Sequence[Any] | None, field_name: str, *, max_length: int = 2048) -> tuple[str, ...]:
@@ -911,6 +969,7 @@ class ControlTowerReturnPacket:
     def from_mapping(cls, value: Mapping[str, Any]) -> "ControlTowerReturnPacket":
         if not isinstance(value, Mapping) or value.get("schema") != CONTROL_TOWER_PACKET_SCHEMA:
             raise ControlTowerHandoffError("CONTROL_TOWER_PACKET_SCHEMA_INVALID")
+        _reject_secret_keys(value)
         if value.get("CONTROL_TOWER_RETURN_PACKET") is not True:
             raise ControlTowerHandoffError("CONTROL_TOWER_PACKET_MARKER_INVALID")
         raw_manifest = value.get("CONTROL_TOWER_ATTACHMENT_MANIFEST")
@@ -946,6 +1005,52 @@ class ControlTowerReturnPacket:
             ),
             attachment_manifest=manifest,
         )
+
+    def fingerprint(self) -> str:
+        """Return a deterministic content fingerprint for replay protection."""
+
+        encoded = json.dumps(
+            self.to_dict(),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    def to_marked_text(self) -> str:
+        payload = json.dumps(self.to_dict(), ensure_ascii=False, sort_keys=True, indent=2)
+        return f"{PACKET_BEGIN}\n{payload}\n{PACKET_END}"
+
+
+def parse_return_packet(final_response: str) -> ControlTowerReturnPacket:
+    """Extract exactly one structured packet from a complete final response."""
+
+    if not isinstance(final_response, str):
+        raise ControlTowerHandoffError("FINAL_RESPONSE_MUST_BE_TEXT")
+    if len(final_response) > 500_000:
+        raise ControlTowerHandoffError("FINAL_RESPONSE_TOO_LARGE")
+    if final_response.count(PACKET_BEGIN) != 1 or final_response.count(PACKET_END) != 1:
+        raise ControlTowerHandoffError("RETURN_PACKET_MARKERS_MUST_BE_UNIQUE")
+    start = final_response.index(PACKET_BEGIN) + len(PACKET_BEGIN)
+    end = final_response.index(PACKET_END)
+    if end <= start:
+        raise ControlTowerHandoffError("RETURN_PACKET_MARKERS_OUT_OF_ORDER")
+    try:
+        payload = json.loads(final_response[start:end].strip())
+    except json.JSONDecodeError as exc:
+        raise ControlTowerHandoffError(f"RETURN_PACKET_JSON_INVALID:{exc.msg}") from exc
+    if not isinstance(payload, Mapping):
+        raise ControlTowerHandoffError("RETURN_PACKET_MUST_BE_OBJECT")
+    try:
+        packet = ControlTowerReturnPacket.from_mapping(payload)
+    except ControlTowerHandoffError:
+        raise
+    supplied_fingerprint = payload.get("PACKET_FINGERPRINT")
+    if supplied_fingerprint not in (None, "UNKNOWN"):
+        supplied = _hash_or_unknown(supplied_fingerprint, "packet_fingerprint")
+        if supplied != packet.fingerprint():
+            raise ControlTowerHandoffError("PACKET_FINGERPRINT_MISMATCH")
+    return packet
 
 
 def create_return_packet(binding: SessionBinding, **values: Any) -> ControlTowerReturnPacket:
@@ -1127,6 +1232,9 @@ class ControlTowerIngestResult:
     canonical_state_overwritten: bool = False
     failure_recorded: bool = False
     narrative_host_ignored: bool = False
+    idempotent: bool = False
+    packet_fingerprint: str = "UNKNOWN"
+    promotion_claim_detected: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1145,6 +1253,9 @@ class ControlTowerIngestResult:
             "CANONICAL_STATE_OVERWRITTEN": self.canonical_state_overwritten,
             "FAILURE_RECORDED": self.failure_recorded,
             "NARRATIVE_HOST_IGNORED": self.narrative_host_ignored,
+            "IDEMPOTENT": self.idempotent,
+            "PACKET_FINGERPRINT": self.packet_fingerprint,
+            "PROMOTION_CLAIM_DETECTED": self.promotion_claim_detected,
         }
 
 
@@ -1160,6 +1271,16 @@ def _compare_bases(packet: ControlTowerReturnPacket, current_sha: Any, current_t
     return "STALE"
 
 
+def _contains_promotion_claim(value: Any) -> bool:
+    if isinstance(value, str):
+        return _PROMOTION_TERM_PATTERN.search(value) is not None
+    if isinstance(value, Mapping):
+        return any(_contains_promotion_claim(child) for child in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_contains_promotion_claim(child) for child in value)
+    return False
+
+
 @dataclass
 class ControlTowerState:
     """Durable-semantic projection over existing task/evidence/ledger state.
@@ -1171,6 +1292,7 @@ class ControlTowerState:
 
     lanes: dict[str, dict[str, Any]] = field(default_factory=dict)
     return_events: list[dict[str, Any]] = field(default_factory=list)
+    session_records: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     @classmethod
     def empty(cls, hosts: Sequence[str] = ()) -> "ControlTowerState":
@@ -1193,6 +1315,7 @@ class ControlTowerState:
         current_canonical_base_sha: str,
         current_canonical_base_tree: str,
         narrative_host: Any = None,
+        record_event: bool = True,
     ) -> ControlTowerIngestResult:
         if not isinstance(packet, ControlTowerReturnPacket):
             raise ControlTowerHandoffError("CONTROL_TOWER_PACKET_REQUIRED")
@@ -1206,6 +1329,16 @@ class ControlTowerState:
             status = packet.session_state
             next_action = packet.next_recommended_action
         deduped_blockers = tuple(dict.fromkeys(blockers))
+        promotion_claim_detected = _contains_promotion_claim(
+            (
+                packet.changes,
+                packet.test_results,
+                packet.evidence,
+                packet.owner_gate,
+                packet.blockers,
+                packet.next_recommended_action,
+            )
+        )
         lane = {
             "HOST": packet.binding.host,
             "SESSION_ID": packet.binding.session_id,
@@ -1227,6 +1360,7 @@ class ControlTowerState:
             "NEXT_RECOMMENDED_ACTION": next_action,
             "PROMOTED": False,
             "PROTECTED_ACTION_EXECUTED": False,
+            "PROMOTION_CLAIM_DETECTED": promotion_claim_detected,
             "PACKET_IS_CANONICAL_TRUTH": "NO",
             "CANONICAL_STATE_OVERWRITTEN": False,
         }
@@ -1243,15 +1377,19 @@ class ControlTowerState:
             next_action=next_action,
             failure_recorded=packet.session_state == "FAILED",
             narrative_host_ignored=narrative_host is not None,
+            packet_fingerprint=packet.fingerprint(),
+            promotion_claim_detected=promotion_claim_detected,
         )
-        self.return_events.append(to_execution_ledger_event(packet, result))
+        if record_event:
+            self.return_events.append(to_execution_ledger_event(packet, result))
         return result
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "schema": "p2p-control-tower-state-projection/1",
+            "schema": CONTROL_TOWER_PROJECTION_SCHEMA,
             "LANES": _safe_json(self.lanes, path="lanes"),
             "RETURN_EVENTS": _safe_json(self.return_events, path="return_events"),
+            "SESSION_RECORDS": _safe_json(self.session_records, path="session_records"),
             "CANONICAL_TRUTH_UPDATED": "NO",
             "PROMOTION_EXECUTED": "NO",
         }
@@ -1272,11 +1410,686 @@ def to_execution_ledger_event(
     return {
         "schema": CONTROL_TOWER_EVENT_SCHEMA,
         "event_type": "CONTROL_TOWER_RETURN_PACKET",
+        "PACKET_FINGERPRINT": packet.fingerprint(),
         "CONTROL_TOWER_RETURN_PACKET": packet.to_dict(),
         "CONTROL_TOWER_RECONCILIATION": reconciliation.to_dict() if reconciliation is not None else None,
         "CANONICAL_TRUTH_UPDATED": "NO",
         "PROTECTED_ACTION_EXECUTED": "NO",
     }
+
+
+CONTROL_TOWER_LEDGER_RELATIVE_PATH = Path(".p2p") / "state" / "execution-ledger.jsonl"
+
+
+def _control_tower_ledger_path(root: str | Path) -> Path:
+    root_path = Path(root).expanduser().resolve()
+    if not root_path.is_dir():
+        raise ProjectionError(f"CONTROL_TOWER_ROOT_NOT_FOUND:{root_path}")
+    ledger = root_path / CONTROL_TOWER_LEDGER_RELATIVE_PATH
+    if ledger.is_symlink() or (ledger.exists() and not ledger.is_file()):
+        raise ProjectionError("CONTROL_TOWER_LEDGER_PATH_INVALID")
+    return ledger
+
+
+def _read_control_tower_events(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError) as exc:
+        raise ProjectionError(f"CONTROL_TOWER_LEDGER_UNREADABLE:{exc}") from exc
+    events: list[dict[str, Any]] = []
+    for line_number, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        try:
+            raw = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ProjectionError(f"CONTROL_TOWER_LEDGER_INVALID_JSON:{line_number}") from exc
+        if not isinstance(raw, Mapping):
+            continue
+        if raw.get("event_type") not in {
+            "CONTROL_TOWER_SESSION_STARTED",
+            "CONTROL_TOWER_RETURN_PACKET",
+        }:
+            continue
+        try:
+            _reject_secret_keys(raw)
+            safe = _safe_json(raw, path=f"ledger[{line_number}]")
+        except ControlTowerHandoffError as exc:
+            raise ProjectionError(f"CONTROL_TOWER_LEDGER_EVENT_UNSAFE:{line_number}:{exc}") from exc
+        if not isinstance(safe, dict):
+            raise ProjectionError(f"CONTROL_TOWER_LEDGER_EVENT_INVALID:{line_number}")
+        safe["_LINE_NUMBER"] = line_number
+        events.append(safe)
+    return events
+
+
+def _append_existing_execution_event(path: Path, event: Mapping[str, Any]) -> None:
+    """Use the repository's existing execution-ledger writer; never create a second store."""
+
+    try:
+        from p2p_workflow import append_event
+    except ImportError:
+        try:
+            from scripts.p2p_workflow import append_event
+        except ImportError as exc:
+            raise ProjectionError("EXISTING_EXECUTION_LEDGER_WRITER_UNAVAILABLE") from exc
+    try:
+        append_event(path, dict(event))
+    except (OSError, TypeError, ValueError) as exc:
+        raise ProjectionError(f"CONTROL_TOWER_LEDGER_APPEND_FAILED:{exc}") from exc
+
+
+def _same_binding(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
+    return all(left.get(field_name) == right.get(field_name) for field_name in ("SESSION_ID", "HOST", "GOAL_ID", "GOAL"))
+
+
+def _session_recommendation(
+    binding: SessionBinding,
+    *,
+    task_prompt: str | None = None,
+    worktree: str = UNKNOWN,
+    branch: str = UNKNOWN,
+    canonical_base_sha: str = UNKNOWN,
+    canonical_base_tree: str = UNKNOWN,
+    acceptance_criteria: Sequence[str] = (),
+    task_id: str = UNKNOWN,
+) -> dict[str, Any]:
+    prompt = build_execution_prompt(
+        binding,
+        task_prompt or binding.goal,
+        worktree=worktree,
+        branch=branch,
+        canonical_base_sha=canonical_base_sha,
+        canonical_base_tree=canonical_base_tree,
+        acceptance_criteria=acceptance_criteria,
+    )
+    return {
+        "CHAT_NAME": f"{binding.host} — {binding.goal_id} — {binding.goal}",
+        "HOST": binding.host,
+        "SESSION_ID": binding.session_id,
+        "GOAL_ID": binding.goal_id,
+        "TASK_ID": task_id,
+        "PROMPT": prompt,
+        "PACKET_IS_CANONICAL_TRUTH": "NO",
+    }
+
+
+class ControlTower:
+    """Durable coordinator over the existing execution ledger.
+
+    The coordinator persists only structured session-start and return events
+    through the repository's existing ledger writer.  It never creates a
+    second state store, launches a host, or promotes a candidate.
+    """
+
+    def __init__(
+        self,
+        root: str | Path,
+        *,
+        current_canonical_base_sha: str = UNKNOWN,
+        current_canonical_base_tree: str = UNKNOWN,
+    ) -> None:
+        self.root = Path(root).expanduser().resolve()
+        self.ledger_path = _control_tower_ledger_path(self.root)
+        self.current_canonical_base_sha = _hash_or_unknown(
+            current_canonical_base_sha,
+            "current_canonical_base_sha",
+        )
+        self.current_canonical_base_tree = _hash_or_unknown(
+            current_canonical_base_tree,
+            "current_canonical_base_tree",
+        )
+
+    def _observed_bases(
+        self,
+        current_canonical_base_sha: str | None,
+        current_canonical_base_tree: str | None,
+    ) -> tuple[str, str]:
+        sha = self.current_canonical_base_sha if current_canonical_base_sha is None else current_canonical_base_sha
+        tree = self.current_canonical_base_tree if current_canonical_base_tree is None else current_canonical_base_tree
+        return (
+            _hash_or_unknown(sha, "current_canonical_base_sha"),
+            _hash_or_unknown(tree, "current_canonical_base_tree"),
+        )
+
+    def _replay(
+        self,
+        *,
+        current_canonical_base_sha: str | None = None,
+        current_canonical_base_tree: str | None = None,
+    ) -> tuple[ControlTowerState, list[dict[str, Any]]]:
+        current_sha, current_tree = self._observed_bases(
+            current_canonical_base_sha,
+            current_canonical_base_tree,
+        )
+        state = ControlTowerState.empty()
+        records: dict[str, dict[str, Any]] = {}
+        orphan_returns: list[dict[str, Any]] = []
+        for event in _read_control_tower_events(self.ledger_path):
+            event_type = event.get("event_type")
+            if event_type == "CONTROL_TOWER_SESSION_STARTED":
+                raw_binding = event.get("SESSION_BINDING")
+                if not isinstance(raw_binding, Mapping):
+                    raise ProjectionError("CONTROL_TOWER_SESSION_BINDING_INVALID")
+                binding = SessionBinding.from_mapping(raw_binding)
+                session_id = binding.session_id
+                existing = records.get(session_id)
+                if existing is not None and not _same_binding(
+                    existing.get("BINDING", {}),
+                    binding.to_dict(),
+                ):
+                    raise ProjectionError("CONTROL_TOWER_SESSION_BINDING_CONFLICT")
+                record = dict(existing or {})
+                record.update(
+                    {
+                        "SESSION_ID": session_id,
+                        "HOST": binding.host,
+                        "GOAL_ID": binding.goal_id,
+                        "GOAL": binding.goal,
+                        "BINDING": binding.to_dict(),
+                        "TASK_ID": event.get("TASK_ID", UNKNOWN),
+                        "WORKTREE": event.get("WORKTREE", UNKNOWN),
+                        "BRANCH": event.get("BRANCH", UNKNOWN),
+                        "CANONICAL_BASE_SHA": event.get("CANONICAL_BASE_SHA", UNKNOWN),
+                        "CANONICAL_BASE_TREE": event.get("CANONICAL_BASE_TREE", UNKNOWN),
+                        "SESSION_STATE": record.get("SESSION_STATE", "ACTIVE"),
+                        "PACKET_FINGERPRINT": record.get("PACKET_FINGERPRINT", UNKNOWN),
+                        "RECOMMENDED_NEW_CHAT": event.get("RECOMMENDED_NEW_CHAT"),
+                    }
+                )
+                records[session_id] = record
+                state.lanes.setdefault(
+                    binding.host,
+                    {
+                        "HOST": binding.host,
+                        "SESSION_ID": session_id,
+                        "CONTROL_TOWER_STATUS": "ACTIVE",
+                        "PROMOTED": False,
+                        "PROTECTED_ACTION_EXECUTED": False,
+                        "PACKET_IS_CANONICAL_TRUTH": "NO",
+                    },
+                )
+                continue
+
+            raw_packet = event.get("CONTROL_TOWER_RETURN_PACKET")
+            if not isinstance(raw_packet, Mapping):
+                raise ProjectionError("CONTROL_TOWER_RETURN_PACKET_INVALID")
+            try:
+                packet = ControlTowerReturnPacket.from_mapping(raw_packet)
+            except ControlTowerHandoffError as exc:
+                raise ProjectionError(f"CONTROL_TOWER_RETURN_PACKET_INVALID:{exc}") from exc
+            record = records.get(packet.binding.session_id)
+            if record is None:
+                orphan_returns.append(
+                    {
+                        "LINE": event.get("_LINE_NUMBER"),
+                        "SESSION_ID": packet.binding.session_id,
+                        "HOST": packet.binding.host,
+                    }
+                )
+                continue
+            packet_fingerprint = event.get("PACKET_FINGERPRINT") or packet.fingerprint()
+            if packet_fingerprint != packet.fingerprint():
+                raise ProjectionError("CONTROL_TOWER_PACKET_FINGERPRINT_MISMATCH")
+            previous_fingerprint = record.get("PACKET_FINGERPRINT", UNKNOWN)
+            if previous_fingerprint not in (UNKNOWN, packet_fingerprint):
+                raise ProjectionError("CONTROL_TOWER_MULTIPLE_DIFFERENT_RETURN_PACKETS")
+            result = state.ingest(
+                packet,
+                current_canonical_base_sha=current_sha,
+                current_canonical_base_tree=current_tree,
+                record_event=False,
+            )
+            state.return_events.append({key: value for key, value in event.items() if key != "_LINE_NUMBER"})
+            updated = dict(record)
+            updated.update(
+                {
+                    "SESSION_STATE": packet.session_state,
+                    "WORKTREE": packet.worktree,
+                    "BRANCH": packet.branch,
+                    "CANONICAL_BASE_SHA": packet.canonical_base_sha,
+                    "CANONICAL_BASE_TREE": packet.canonical_base_tree,
+                    "CANDIDATE_OR_CHECKPOINT_SHA": packet.candidate_or_checkpoint_sha,
+                    "OWNER_GATE": packet.owner_gate,
+                    "BLOCKERS": list(packet.blockers),
+                    "NEXT_RECOMMENDED_ACTION": packet.next_recommended_action,
+                    "PACKET": packet.to_dict(),
+                    "PACKET_FINGERPRINT": packet_fingerprint,
+                    "RECONCILIATION": result.to_dict(),
+                }
+            )
+            records[packet.binding.session_id] = updated
+        state.session_records = records
+        return state, orphan_returns
+
+    @staticmethod
+    def _next_action(record: Mapping[str, Any] | None) -> dict[str, Any]:
+        if not isinstance(record, Mapping):
+            return {
+                "ACTION": "NO_ACTIVE_EXECUTION",
+                "REASON": "No Control Tower session is registered.",
+            }
+        session_state = record.get("SESSION_STATE", UNKNOWN)
+        reconciliation = record.get("RECONCILIATION")
+        relation = reconciliation.get("CANONICAL_RELATION", UNKNOWN) if isinstance(reconciliation, Mapping) else UNKNOWN
+        if session_state == "WAITING_OWNER_GATE":
+            return {"ACTION": "WAIT_FOR_OWNER_DECISION", "REASON": "The packet records a pending Owner Gate."}
+        if session_state in {"FAILED", "BLOCKED", "ABORTED"}:
+            return {"ACTION": "REVIEW_FAILURE_AND_RECONCILE_BEFORE_RETRY", "REASON": "A terminal non-success state must remain visible."}
+        if relation != "CURRENT":
+            return {"ACTION": "RECONCILE_STALE_OR_UNKNOWN_BASE", "REASON": "The packet base is not freshly confirmed against both SHA and tree."}
+        next_action = record.get("NEXT_RECOMMENDED_ACTION", UNKNOWN)
+        if not isinstance(next_action, str) or next_action in {"", UNKNOWN} or _PROMOTION_TERM_PATTERN.search(next_action):
+            return {"ACTION": "NO_AUTOMATIC_CONTINUATION", "REASON": "The next action is unknown or crosses a protected boundary."}
+        return {"ACTION": next_action, "REASON": "Use only the registered session scope."}
+
+    def _projection(
+        self,
+        state: ControlTowerState,
+        orphan_returns: Sequence[Mapping[str, Any]],
+        *,
+        current_canonical_base_sha: str | None = None,
+        current_canonical_base_tree: str | None = None,
+    ) -> dict[str, Any]:
+        current_sha, current_tree = self._observed_bases(
+            current_canonical_base_sha,
+            current_canonical_base_tree,
+        )
+        active: list[dict[str, Any]] = []
+        closed: list[dict[str, Any]] = []
+        owner_gates: list[dict[str, Any]] = []
+        risks: list[dict[str, Any]] = []
+        latest: Mapping[str, Any] | None = None
+        for record in state.session_records.values():
+            if record.get("SESSION_STATE") == "ACTIVE":
+                active.append(
+                    {
+                        "SESSION_ID": record.get("SESSION_ID", UNKNOWN),
+                        "HOST": record.get("HOST", UNKNOWN),
+                        "GOAL_ID": record.get("GOAL_ID", UNKNOWN),
+                        "TASK_ID": record.get("TASK_ID", UNKNOWN),
+                    }
+                )
+            else:
+                closed.append(dict(record))
+            owner_gate = record.get("OWNER_GATE")
+            if owner_gate not in (None, UNKNOWN, "") and isinstance(owner_gate, Mapping):
+                owner_gates.append(dict(owner_gate))
+            reconciliation = record.get("RECONCILIATION")
+            relation = reconciliation.get("CANONICAL_RELATION", UNKNOWN) if isinstance(reconciliation, Mapping) else UNKNOWN
+            if record.get("SESSION_STATE") in {"BLOCKED", "FAILED", "ABORTED"} or relation != "CURRENT":
+                risks.append(
+                    {
+                        "SESSION_ID": record.get("SESSION_ID", UNKNOWN),
+                        "HOST": record.get("HOST", UNKNOWN),
+                        "SESSION_STATE": record.get("SESSION_STATE", UNKNOWN),
+                        "CANONICAL_RELATION": relation,
+                        "BLOCKERS": record.get("BLOCKERS", []),
+                    }
+                )
+            latest = record
+        projection = state.to_dict()
+        projection.update(
+            {
+                "schema": CONTROL_TOWER_PROJECTION_SCHEMA,
+                "CANONICAL": {
+                    "CURRENT_BASE_SHA": current_sha,
+                    "CURRENT_BASE_TREE": current_tree,
+                    "CANONICAL_TRUTH_UPDATED": "NO",
+                },
+                "HOST_LANES": state.lanes,
+                "ACTIVE_EXECUTION": active,
+                "OWNER_GATES": owner_gates,
+                "RECENTLY_CLOSED": closed,
+                "BLOCKED_RISKS": risks,
+                "ORPHAN_RETURN_EVENTS": list(orphan_returns),
+                "NEXT_SAFE_ACTION": self._next_action(latest) if not active else {
+                    "ACTION": "EXECUTE_ONLY_REGISTERED_SESSION_SCOPE",
+                    "REASON": "An explicitly bound execution session is active.",
+                },
+                "PROMOTION": {
+                    "STATUS": "NOT_INFERRED",
+                    "PROMOTED": False,
+                    "REASON": "A packet or session state cannot establish promotion.",
+                },
+                "PERSISTENCE": {
+                    "PATH": CONTROL_TOWER_LEDGER_RELATIVE_PATH.as_posix(),
+                    "EXISTING_EXECUTION_LEDGER_ONLY": "YES",
+                    "SECOND_STORE_CREATED": "NO",
+                },
+                "PACKET_IS_CANONICAL_TRUTH": "NO",
+                "CONTROL_TOWER_STATUS": "ACTIVE" if active else (latest.get("SESSION_STATE", "IDLE") if latest else "IDLE"),
+            }
+        )
+        return projection
+
+    def snapshot(
+        self,
+        *,
+        current_canonical_base_sha: str | None = None,
+        current_canonical_base_tree: str | None = None,
+    ) -> dict[str, Any]:
+        state, orphan_returns = self._replay(
+            current_canonical_base_sha=current_canonical_base_sha,
+            current_canonical_base_tree=current_canonical_base_tree,
+        )
+        return self._projection(
+            state,
+            orphan_returns,
+            current_canonical_base_sha=current_canonical_base_sha,
+            current_canonical_base_tree=current_canonical_base_tree,
+        )
+
+    def start_session(
+        self,
+        binding: SessionBinding,
+        *,
+        task_id: str = UNKNOWN,
+        task_prompt: str | None = None,
+        worktree: str = UNKNOWN,
+        branch: str = UNKNOWN,
+        canonical_base_sha: str = UNKNOWN,
+        canonical_base_tree: str = UNKNOWN,
+        acceptance_criteria: Sequence[str] = (),
+    ) -> dict[str, Any]:
+        if not isinstance(binding, SessionBinding):
+            raise BindingError("SESSION_BINDING_REQUIRED")
+        task_id = _optional_text(task_id, "task_id", max_length=256)
+        worktree = _location(worktree, "worktree")
+        branch = _location(branch, "branch")
+        canonical_base_sha = _hash_or_unknown(canonical_base_sha, "canonical_base_sha")
+        canonical_base_tree = _hash_or_unknown(canonical_base_tree, "canonical_base_tree")
+        criteria = _refs(acceptance_criteria, "acceptance_criteria", max_length=4096)
+        state, orphan_returns = self._replay()
+        existing = state.session_records.get(binding.session_id)
+        if existing is not None:
+            existing_binding = existing.get("BINDING")
+            if not isinstance(existing_binding, Mapping) or not _same_binding(existing_binding, binding.to_dict()):
+                raise BindingError("SESSION_ID_ALREADY_BOUND_TO_DIFFERENT_SESSION")
+            if existing.get("SESSION_STATE") != "ACTIVE":
+                raise BindingError("SESSION_ID_ALREADY_HAS_TERMINAL_RESULT")
+            recommendation = existing.get("RECOMMENDED_NEW_CHAT")
+            if not isinstance(recommendation, Mapping):
+                recommendation = _session_recommendation(
+                    binding,
+                    task_prompt=task_prompt,
+                    worktree=worktree,
+                    branch=branch,
+                    canonical_base_sha=canonical_base_sha,
+                    canonical_base_tree=canonical_base_tree,
+                    acceptance_criteria=criteria,
+                    task_id=task_id,
+                )
+            return {
+                "status": "PASS",
+                "idempotent": True,
+                "binding": binding.to_dict(),
+                "task_id": existing.get("TASK_ID", task_id),
+                "recommendation": dict(recommendation),
+                "snapshot": self._projection(state, orphan_returns),
+            }
+        recommendation = _session_recommendation(
+            binding,
+            task_prompt=task_prompt,
+            worktree=worktree,
+            branch=branch,
+            canonical_base_sha=canonical_base_sha,
+            canonical_base_tree=canonical_base_tree,
+            acceptance_criteria=criteria,
+            task_id=task_id,
+        )
+        event = {
+            "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
+            "event_type": "CONTROL_TOWER_SESSION_STARTED",
+            "CONTROL_TOWER_SESSION_STARTED": True,
+            "SESSION_BINDING": binding.to_dict(),
+            "TASK_ID": task_id,
+            "WORKTREE": worktree,
+            "BRANCH": branch,
+            "CANONICAL_BASE_SHA": canonical_base_sha,
+            "CANONICAL_BASE_TREE": canonical_base_tree,
+            "RECOMMENDED_NEW_CHAT": recommendation,
+            "PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PROMOTED": False,
+            "PROTECTED_ACTION_EXECUTED": False,
+        }
+        _append_existing_execution_event(self.ledger_path, event)
+        return {
+            "status": "PASS",
+            "idempotent": False,
+            "binding": binding.to_dict(),
+            "task_id": task_id,
+            "recommendation": recommendation,
+            "snapshot": self.snapshot(),
+        }
+
+    def ingest_response(
+        self,
+        final_response: str,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        try:
+            packet = parse_return_packet(final_response)
+        except ControlTowerHandoffError as exc:
+            raise PacketParseError(str(exc)) from exc
+        return self.ingest_packet(packet, **kwargs)
+
+    def ingest_packet(
+        self,
+        packet: ControlTowerReturnPacket,
+        *,
+        current_canonical_base_sha: str | None = None,
+        current_canonical_base_tree: str | None = None,
+        narrative_host: Any = None,
+    ) -> dict[str, Any]:
+        if not isinstance(packet, ControlTowerReturnPacket):
+            raise BindingError("CONTROL_TOWER_PACKET_REQUIRED")
+        current_sha, current_tree = self._observed_bases(
+            current_canonical_base_sha,
+            current_canonical_base_tree,
+        )
+        state, orphan_returns = self._replay(
+            current_canonical_base_sha=current_sha,
+            current_canonical_base_tree=current_tree,
+        )
+        record = state.session_records.get(packet.binding.session_id)
+        if not isinstance(record, Mapping):
+            raise BindingError("SESSION_ID_NOT_REGISTERED_IN_CONTROL_TOWER_LEDGER")
+        binding = record.get("BINDING")
+        if not isinstance(binding, Mapping) or not _same_binding(binding, packet.binding.to_dict()):
+            raise BindingError("PACKET_BINDING_REJECTED")
+        packet_fingerprint = packet.fingerprint()
+        previous_fingerprint = record.get("PACKET_FINGERPRINT", UNKNOWN)
+        if previous_fingerprint != UNKNOWN:
+            if previous_fingerprint == packet_fingerprint:
+                return {
+                    "status": "PASS",
+                    "idempotent": True,
+                    "reconciliation": record.get("RECONCILIATION"),
+                    "snapshot": self._projection(
+                        state,
+                        orphan_returns,
+                        current_canonical_base_sha=current_sha,
+                        current_canonical_base_tree=current_tree,
+                    ),
+                }
+            raise BindingError("SESSION_ALREADY_HAS_A_DIFFERENT_RETURN_PACKET")
+        result = state.ingest(
+            packet,
+            current_canonical_base_sha=current_sha,
+            current_canonical_base_tree=current_tree,
+            narrative_host=narrative_host,
+            record_event=False,
+        )
+        _append_existing_execution_event(self.ledger_path, to_execution_ledger_event(packet, result))
+        snapshot = self.snapshot(
+            current_canonical_base_sha=current_sha,
+            current_canonical_base_tree=current_tree,
+        )
+        return {
+            "status": "PASS",
+            "idempotent": False,
+            "reconciliation": result.to_dict(),
+            "snapshot": snapshot,
+        }
+
+    def recommend_next_session(
+        self,
+        host: str,
+        *,
+        session_id: str | None = None,
+        worktree: str = UNKNOWN,
+        branch: str = UNKNOWN,
+    ) -> dict[str, Any]:
+        """Derive one safe task-state session without starting a host."""
+
+        try:
+            from .task_state import TaskStateStore, next_safe_task
+        except ImportError as exc:
+            raise ProjectionError("TASK_STATE_SURFACE_UNAVAILABLE") from exc
+        try:
+            plan = TaskStateStore(self.root).load()
+        except Exception as exc:  # task-state errors must remain fail-closed
+            raise ProjectionError(f"TASK_STATE_UNREADABLE:{exc}") from exc
+        if plan is None:
+            return {
+                "status": "UNKNOWN",
+                "reason": "TASK_STATE_NOT_INITIALIZED",
+                "source": (Path(".p2p") / "state" / "task-state.json").as_posix(),
+                "automatic_start": False,
+                "recommendation": None,
+            }
+        task = next_safe_task(plan)
+        if task is None:
+            waiting = next(
+                (
+                    item
+                    for item in plan.tasks.values()
+                    if item.status == "WAITING_OWNER"
+                    or (
+                        isinstance(item.owner_decision, Mapping)
+                        and str(item.owner_decision.get("status", "")).upper() in {"PENDING", "WAITING"}
+                    )
+                ),
+                None,
+            )
+            if waiting is not None:
+                return {
+                    "status": "WAITING_OWNER_GATE",
+                    "reason": "OWNER_DECISION_PENDING",
+                    "task_id": waiting.task_id,
+                    "owner_gate": waiting.owner_decision,
+                    "automatic_start": False,
+                    "recommendation": None,
+                }
+            return {
+                "status": "UNKNOWN",
+                "reason": "NO_SAFE_READY_TASK",
+                "automatic_start": False,
+                "recommendation": None,
+            }
+        normalized_host = normalize_host(host)
+        state, orphan_returns = self._replay()
+        for record in state.session_records.values():
+            if record.get("SESSION_STATE") != "ACTIVE" or record.get("TASK_ID") != task.task_id:
+                continue
+            existing_binding = record.get("BINDING")
+            recommendation = record.get("RECOMMENDED_NEW_CHAT")
+            if isinstance(existing_binding, Mapping) and isinstance(recommendation, Mapping):
+                return {
+                    "status": "PASS",
+                    "idempotent": True,
+                    "task_id": task.task_id,
+                    "plan_hash": plan.canonical_hash(),
+                    "acceptance_criteria": list(task.acceptance_requirements),
+                    "binding": dict(existing_binding),
+                    "recommendation": dict(recommendation),
+                    "snapshot": self._projection(state, orphan_returns),
+                }
+            return {
+                "status": "BLOCKED",
+                "reason": "TASK_ALREADY_HAS_AN_ACTIVE_CONTROL_TOWER_SESSION",
+                "task_id": task.task_id,
+                "automatic_start": False,
+                "recommendation": None,
+            }
+        binding = SessionBinding(
+            session_id=session_id or new_session_id(normalized_host, plan.goal_id, task.task_id),
+            host=normalized_host,
+            goal_id=plan.goal_id,
+            goal=task.purpose,
+        )
+        recommendation = _session_recommendation(
+            binding,
+            task_prompt=task.purpose,
+            worktree=worktree,
+            branch=branch,
+            acceptance_criteria=task.acceptance_requirements,
+            task_id=task.task_id,
+        )
+        return {
+            "status": "PASS",
+            "idempotent": False,
+            "task_id": task.task_id,
+            "plan_hash": plan.canonical_hash(),
+            "acceptance_criteria": list(task.acceptance_requirements),
+            "binding": binding.to_dict(),
+            "recommendation": recommendation,
+            "automatic_start": False,
+        }
+
+    def start_next_session(
+        self,
+        host: str,
+        *,
+        session_id: str | None = None,
+        worktree: str = UNKNOWN,
+        branch: str = UNKNOWN,
+    ) -> dict[str, Any]:
+        result = self.recommend_next_session(
+            host,
+            session_id=session_id,
+            worktree=worktree,
+            branch=branch,
+        )
+        if result.get("status") != "PASS":
+            return result
+        binding_mapping = result.get("binding")
+        if not isinstance(binding_mapping, Mapping):
+            raise ProjectionError("NEXT_SESSION_BINDING_INVALID")
+        started = self.start_session(
+            SessionBinding.from_mapping(binding_mapping),
+            task_id=str(result.get("task_id", UNKNOWN)),
+            worktree=worktree,
+            branch=branch,
+            acceptance_criteria=tuple(result.get("acceptance_criteria") or ()),
+        )
+        started.update(
+            {
+                "source": (Path(".p2p") / "state" / "task-state.json").as_posix(),
+                "task_id": result.get("task_id", UNKNOWN),
+                "plan_hash": result.get("plan_hash", UNKNOWN),
+            }
+        )
+        return started
+
+
+def next_safe_session(
+    root: str | Path,
+    host: str,
+    *,
+    session_id: str | None = None,
+    worktree: str = UNKNOWN,
+    branch: str = UNKNOWN,
+) -> dict[str, Any]:
+    return ControlTower(root).recommend_next_session(
+        host,
+        session_id=session_id,
+        worktree=worktree,
+        branch=branch,
+    )
 
 
 def build_execution_prompt(
@@ -1326,6 +2139,8 @@ def build_execution_prompt(
             "- Finish with one structured CONTROL_TOWER_RETURN_PACKET.",
             "",
             "CONTROL_TOWER_RETURN_PACKET:",
+            PACKET_BEGIN,
+            "Return one JSON object matching the packet schema between these markers.",
             "SESSION_STATE must be one of COMPLETED, READY, WAITING_OWNER_GATE, BLOCKED, FAILED, or ABORTED.",
             "Include SESSION_ID, HOST, GOAL_ID, GOAL, SESSION_STATE, CANONICAL_BASE_SHA, CANONICAL_BASE_TREE,",
             "CANONICAL_RELATION, WORKTREE, BRANCH, CHANGES, TEST_RESULTS, EVIDENCE,",
@@ -1348,20 +2163,89 @@ def build_execution_prompt(
             "blockers/risks, critical invariants, next safe action, durable refs, and CHAT_ONLY_NOT_CANONICAL.",
             "The successor packet is compact bootstrap data: do not copy full chat history, execute Owner Gates, inherit approval,",
             "close active execution, move host lanes, invent execution, or treat the packet as canonical truth.",
+            PACKET_END,
             "",
             USER_ACTION_BLOCK,
         )
     )
 
 
+def load_snapshot(
+    root: str | Path,
+    *,
+    current_canonical_base_sha: str = UNKNOWN,
+    current_canonical_base_tree: str = UNKNOWN,
+) -> dict[str, Any]:
+    return ControlTower(
+        root,
+        current_canonical_base_sha=current_canonical_base_sha,
+        current_canonical_base_tree=current_canonical_base_tree,
+    ).snapshot()
+
+
+def render_snapshot(snapshot: Mapping[str, Any]) -> str:
+    if not isinstance(snapshot, Mapping):
+        raise ProjectionError("CONTROL_TOWER_SNAPSHOT_REQUIRED")
+    canonical = snapshot.get("CANONICAL", {})
+    lines = [
+        "P2P CONTROL TOWER SNAPSHOT",
+        "",
+        "CANONICAL",
+        f"  Current base SHA: {canonical.get('CURRENT_BASE_SHA', UNKNOWN) if isinstance(canonical, Mapping) else UNKNOWN}",
+        f"  Current base tree: {canonical.get('CURRENT_BASE_TREE', UNKNOWN) if isinstance(canonical, Mapping) else UNKNOWN}",
+        "  Promotion: NOT_INFERRED",
+        "",
+        "HOST LANES",
+    ]
+    lanes = snapshot.get("HOST_LANES", {})
+    if isinstance(lanes, Mapping) and lanes:
+        for host in sorted(lanes):
+            lane = lanes[host]
+            if isinstance(lane, Mapping):
+                lines.append(
+                    f"  {host}: {lane.get('CONTROL_TOWER_STATUS', UNKNOWN)} / {lane.get('SESSION_STATE', UNKNOWN)}"
+                )
+    else:
+        lines.append("  (none)")
+    lines.extend(
+        [
+            "",
+            "ACTIVE EXECUTION",
+            f"  {len(snapshot.get('ACTIVE_EXECUTION', [])) if isinstance(snapshot.get('ACTIVE_EXECUTION', []), Sequence) else 0} active session(s)",
+            "",
+            "OWNER GATES",
+        ]
+    )
+    gates = snapshot.get("OWNER_GATES", [])
+    if isinstance(gates, Sequence) and not isinstance(gates, (str, bytes)) and gates:
+        lines.extend(f"  {json.dumps(gate, ensure_ascii=False, sort_keys=True)}" for gate in gates)
+    else:
+        lines.append("  (none)")
+    lines.extend(
+        [
+            "",
+            "NEXT SAFE ACTION",
+            f"  {snapshot.get('NEXT_SAFE_ACTION', {}).get('ACTION', UNKNOWN) if isinstance(snapshot.get('NEXT_SAFE_ACTION'), Mapping) else UNKNOWN}",
+            "",
+            "PERSISTENCE",
+            "  EXISTING_EXECUTION_LEDGER_ONLY",
+        ]
+    )
+    return "\n".join(lines)
+
+
 __all__ = [
     "ATTACHMENT_CLASSIFICATIONS",
     "ATTACHMENT_MANIFEST_SCHEMA",
+    "BindingError",
     "CANONICAL_RELATIONS",
     "CONTROL_TOWER_EVENT_SCHEMA",
+    "CONTROL_TOWER_LEDGER_RELATIVE_PATH",
     "CONTROL_TOWER_PACKET_SCHEMA",
     "CONTROL_TOWER_PROMPT_SCHEMA",
+    "CONTROL_TOWER_PROJECTION_SCHEMA",
     "CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA",
+    "CONTROL_TOWER_SESSION_START_EVENT_SCHEMA",
     "CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA",
     "CONTROL_TOWER_STATUSES",
     "ControlTowerAttachment",
@@ -1370,10 +2254,13 @@ __all__ = [
     "ControlTowerIngestResult",
     "ControlTowerReturnPacket",
     "ControlTowerRotationHandoff",
+    "ControlTower",
     "ControlTowerState",
     "ControlTowerSuccessorPacket",
     "ControlTowerSuccessorReconciliation",
     "EXISTING_LIFECYCLE_STATE",
+    "PacketParseError",
+    "ProjectionError",
     "SessionBinding",
     "TERMINAL_STATES",
     "UPLOAD_MANIFEST_INSTRUCTION",
@@ -1382,8 +2269,13 @@ __all__ = [
     "bind_session",
     "build_execution_prompt",
     "create_return_packet",
+    "load_snapshot",
+    "new_session_id",
     "normalize_host",
+    "next_safe_session",
+    "parse_return_packet",
     "prepare_control_tower_rotation",
     "reconcile_control_tower_successor",
+    "render_snapshot",
     "to_execution_ledger_event",
 ]
