@@ -265,8 +265,8 @@ This is an Owner-approved clarification within P2P-CT01, not a Large Goal. It ex
 ### Addendum checklist
 
 - [x] A1-P1: Extend the packet/manifest dataclasses and existing ledger event projection.
-- [ ] A1-P2: Extend the recursive prompt and durable operator guide.
-- [ ] A1-P3: Add the one-artifact handoff and attachment-aware regression coverage.
+- [x] A1-P2: Extend the recursive prompt and durable operator guide.
+- [x] A1-P3: Add the one-artifact handoff and attachment-aware regression coverage.
 - [ ] A1-P4: Re-run validation, update evidence/reports, and close with INCLUDED_AND_TESTED or DEFERRED_REQUIRES_FOLLOWUP.
 
 ### Addendum forbidden actions

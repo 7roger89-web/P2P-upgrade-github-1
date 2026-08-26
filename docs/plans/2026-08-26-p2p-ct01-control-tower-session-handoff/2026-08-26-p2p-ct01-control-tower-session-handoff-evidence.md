@@ -80,11 +80,30 @@ P2-B validation:
 - E2-P2B-DETECT1: final staged anvien detect-changes --repo isolated-worktree --scope all --json returned affected_count=0, affected_files=8, changed_count=53, changed_files=9, affected_processes=0, and risk_level=low. The nine changed paths are the CT01 module/test, operator guide, capability ledger, three planner artifacts, coder report, and supervisor report; no process was affected.
 - E2-P2B-SUP1: reports/supervisor/rp_supervisor_260826_150424_by_gpt-5-codex_p2p-ct01-control-tower-session-handoff.md is the fresh exact-scope review. Verdict is REJECT for full-plan closure, with CT01 technical implementation PASS and the full session terminal state BLOCKED.
 
+## E3 - Owner Scope Addendum Evidence — Attachment-Aware Handoff
+
+Matching plan item(s): A1-P1 through A1-P4
+
+- E3-P2A-SCOPE1: the Owner-approved CT01 clarification was kept inside the existing bounded scope. No Large Goal, promotion, deployment, live action, remote write, second store, router, worker, quorum, or certification system was opened.
+- E3-P2A-IMPL1: `.p2p/system/p2p_capabilities/control_tower_handoff.py` adds `CONTROL_TOWER_ATTACHMENT_MANIFEST`, `UPLOAD_REQUIRED`, validated attachment entries, packet round-trip, execution-ledger event projection, and recursive prompt instructions. Implementation/test checkpoint is `13ccb8910cf2c845acc450b9e354f9d32c5f90a1`, tree `d1182567f44b05346361eeb9eeb97ad1cbbc2a00`.
+- E3-P2A-TEST1: `python -m pytest -q tests/test_p2p_control_tower_session_handoff.py` returned `22 passed in 0.29s`, exit 0. The seven added cases cover `UPLOAD_REQUIRED=NO`, `UPLOAD_REQUIRED=YES`, required/optional/do-not-upload classification, local path versus contents availability, attachment versus canonical truth, recursive prompt preservation, and ambiguous manifest rejection.
+- E3-P2A-COMPILE1: `python -m py_compile .p2p/system/p2p_capabilities/control_tower_handoff.py` and `python -m compileall -q .p2p/system/p2p_capabilities scripts tests/test_p2p_control_tower_session_handoff.py` both exited 0.
+- E3-P2A-EVAL1: `python scripts/p2p_eval.py validate --suite .p2p/evals/suite.json` returned `status=PASS`, exit 0.
+- E3-P2A-LEDGER1: custom capability-ledger check returned `CAPABILITY_LEDGER_CHECK=PASS records=176 multi_ai=32 ct01_evidence=22+7`; the CT01 record points to the single REQUIRED handoff artifact and does not promote the capability.
+- E3-P2A-DOC1: the durable operator guide and derived roadmap explicitly document the `YES/NO` contract, exact manifest fields, local-path/content distinction, evidence-only attachment semantics, and the preferred one-file artifact. The roadmap projection records 22 focused cases including seven attachment-aware cases.
+- E3-P2A-ARTIFACT1: `.tmp/p2p-ct01-control-tower/p2p-ct01-codex-20260826-isolated-CONTROL-TOWER-HANDOFF.md` exists as the one minimum REQUIRED upload. It states `LOCAL_PATH_ALONE_PROVES_CONTENTS_AVAILABLE: NO`, `ATTACHMENT_IS_CANONICAL_TRUTH: NO`, and that attachment contents do not prove promotion, deployment, live certification, or Owner approval.
+- E3-P2A-CODER1: `reports/coder/rp_coder_260826_153339_by_gpt-5-codex_p2p-ct01-attachment-aware-handoff.md` records technical addendum PASS, full-session BLOCKED, and the exact residual authority boundary.
+- E3-P2A-GRAPH1: final Anvien refresh before change detection returned stale=false, scanned=960, parsed_code=171, failed=0, nodes=40033, relationships=46299. Hidden `.p2p/system` graph file-detail remains unavailable; direct source inspection is retained as the authority for that hidden path.
+- E3-P2A-BASELINE1: the framework validator returned 52/59 with the same seven inherited failures previously observed on the clean canonical baseline; no addendum-specific validator failure was introduced.
+
 ## Closure Evidence
 
 - CT01 technical implementation is PASS; the full session is BLOCKED because the clean canonical baseline and candidate retain inherited framework/doctor gates and no live-host certification exists.
 - E2-P2B-DETECT1 records the final scoped change graph: nine intended changed files, zero affected processes, and low aggregate Anvien risk.
 - E2-P2B-SUP1 records the Supervisor REJECT and preserves the no-repair boundary.
+- `ATTACHMENT_AWARE_HANDOFF_STATUS: INCLUDED_AND_TESTED`: the addendum is integrated across packet, ledger event, recursive prompt, guide, ledger/roadmap projections, artifact, and seven regression cases.
+- `UPLOAD_REQUIRED: YES`: the terminal response selects exactly one REQUIRED artifact; no OPTIONAL or DO_NOT_UPLOAD file is needed for Control Tower content access.
+- The artifact is evidence input only. A local path alone does not make its contents available to the Control Tower, and an uploaded artifact is not canonical truth or proof of promotion, deployment, live certification, or Owner approval.
 - E2-P2B-COMMIT1: closure commit 76a9a9449927838eb3965448aefe732ed39e55ee with tree 9b876b4dba86bc1bb21358acb881843fb926f0a6; it is four commits ahead of the bound base, retains the promoted anchor as an ancestor, and has no remote write.
 - Protected root, canonical main, remote, runtime lock, release surfaces, promotion, deployment, approval, and live host were not touched.
 - CANONICAL_PROMOTED: NO; no remote write occurred.

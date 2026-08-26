@@ -9,7 +9,7 @@ Companion benchmark: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handof
 
 ## Purpose
 
-This records the real current state before implementation. It is not release approval and does not replace evidence.md.
+This records the real current state, including the Owner-approved attachment-aware addendum. It is not release approval and does not replace evidence.md.
 
 ## Freshness / Refresh Rules
 
@@ -20,6 +20,7 @@ Refresh after every implementation slice, before the next phase, and before clos
 Target scope:
 
 - Provider-neutral session binding, terminal return packet, lane reconciliation, recursive prompt, durable guide, ledger projection, and isolated tests.
+- Attachment-aware terminal response manifest, one scoped Control Tower handoff artifact, and recursive next-session preservation.
 
 Out of scope:
 
@@ -55,13 +56,14 @@ Out of scope:
 | requested root | malformed git metadata | untouched preserve-only root | blocked for use | unknown | E0-P0A-SRC1 | do not touch |
 | host executor | provider-neutral request/receipt/handoff exists; instruction generic | reused as boundary | partial | 11 related adapter links | E0-P0A-ARCH1 | inspect-only |
 | task/live/evidence state | durable task and session/evidence checks exist | explicit CT01 composition without hidden inheritance | partial | hidden graph unavailable | E0-P0A-ARCH1 | inspect-only |
-| CT01 packet/lane protocol | module and 15 focused tests pass | explicit terminal packet and reconciliation with regression proof | correct | new module + test file | E1-P1B-TEST1..E1-P1B-TEST15 | proceed P2-A |
-| recursive beginner prompt | builder and exact action assertions pass | self-contained prompt with regression proof | correct | new module + test file | E1-P1B-TEST7 | proceed P2-A |
-| CT01 behavior tests | 15 focused tests pass after fixture-only correction | isolated A-H plus negatives and ledger writer integration | correct | 15 tests | E1-P1B-TEST1..E1-P1B-TEST15 | proceed P2-A |
-| durable operator guide | guide and charter cross-reference are present and mechanically discoverable | discoverable guide with exact beginner flow and boundaries | correct | guide + charter | E2-P2A-DOC1 | proceed P2-B |
-| capability ledger projection | 176 records with a schema-valid CT01 record; seven baseline validator failures remain outside CT01 | one valid foundation-ready record plus unchanged governance boundary | correct for CT01 / partial for pre-existing ledger surface | schema + record | E2-P2A-LEDGER1, E2-P2A-BASELINE1 | proceed P2-B with baseline blocker |
+| CT01 packet/lane protocol | module and 22 focused tests pass, including 7 attachment-aware cases | explicit terminal packet, attachment manifest, and reconciliation with regression proof | correct | new module + test file | E1-P1B-TEST1..E1-P1B-TEST15, E3-P2A-TEST1 | proceed P2-A |
+| recursive beginner prompt | builder and exact action plus attachment-aware assertions pass | self-contained prompt with recursive upload contract | correct | new module + test file | E1-P1B-TEST7, E3-P2A-TEST1 | proceed P2-A |
+| CT01 behavior tests | 22 focused tests pass after fixture-only correction | isolated A-H, negatives, ledger integration, and attachment-aware cases | correct | 22 tests | E1-P1B-TEST1..E1-P1B-TEST15, E3-P2A-TEST1 | proceed P2-A |
+| durable operator guide | guide and charter cross-reference plus attachment contract are present and mechanically discoverable | discoverable guide with exact beginner flow, manifest fields, and boundaries | correct | guide + charter | E2-P2A-DOC1, E3-P2A-DOC1 | proceed P2-B |
+| capability ledger projection | 176 records with a schema-valid CT01 record and artifact evidence; seven baseline validator failures remain outside CT01 | one valid foundation-ready record plus unchanged governance boundary | correct for CT01 / partial for pre-existing ledger surface | schema + record | E2-P2A-LEDGER1, E3-P2A-LEDGER1, E3-P2A-BASELINE1 | proceed P2-B with baseline blocker |
 | roadmap projection | count and Multi-AI family projection updated to 176/32 | derived projection synchronized with CT01 record | correct | roadmap + ledger | E2-P2A-ROADMAP1 | proceed P2-B |
 | CT01 closure evidence | coder and supervisor reports exist; final detect result and closure checkpoint 76a9a9449927838eb3965448aefe732ed39e55ee are recorded | exact candidate identity, supervisor verdict, and terminal status | correct / terminal BLOCKED | reports + planner artifacts | E2-P2B-CODER1, E2-P2B-DETECT1, E2-P2B-COMMIT1, E2-P2B-SUP1 | preserve candidate; reopen only under a new goal |
+| attachment-aware handoff | packet, event, prompt, guide, ledger/roadmap projection, one REQUIRED artifact, and 7 regression cases pass | terminal response must make upload necessity and evidence authority explicit | correct / INCLUDED_AND_TESTED | module + tests + docs + artifact | E3-P2A-IMPL1..E3-P2A-ARTIFACT1 | preserve; upload only selected artifact |
 | project-wide acceptance | CT01-specific checks pass; inherited validator/doctor gates fail | truthful PASS or BLOCKED with no false promotion | blocked | protected governance/runtime surfaces | E2-P2B-TEST3..E2-P2B-TEST4 | report BLOCKED; do not repair unrelated baseline |
 | runtime authority/promotion | governed existing surfaces | unchanged and unpromoted | correct/preserve-only | protected | E0-P0A-ARCH1 | do not touch |
 
@@ -75,6 +77,7 @@ Out of scope:
 | R3 | 2026-08-26 | P2-A guide/charter/ledger/roadmap edits plus custom schema/count check and canonical baseline comparison | durable CT01 discovery and projection | missing/partial -> correct for CT01; global framework remains blocked by pre-existing 7 failures | E2-P2A-DOC1..E2-P2A-BASELINE1 | proceed P2-B; preserve blocker and do not repair unrelated baseline |
 | R4 | 2026-08-26 | P2-B focused/full relevant checks and coder report | closure evidence and project-wide acceptance | correct CT01 technical slice; closure partial; global acceptance blocked | E2-P2B-TEST1..E2-P2B-CODER1 | supervisor review, detect-changes, final commit, terminal BLOCKED |
 | R5 | 2026-08-26 | final scoped detect-changes, supervisor report, and closure review | candidate closure and terminal classification | technical implementation PASS; full session BLOCKED; no protected action | E2-P2B-DETECT1..E2-P2B-SUP1 | closed; separate goal required for inherited gates or live certification |
+| R6 | 2026-08-26 | Owner attachment addendum, 22-case focused suite, guide/ledger/roadmap/artifact updates, and fresh framework validation | attachment-aware handoff contract and upload boundary | addendum technical PASS; `INCLUDED_AND_TESTED`; full session remains BLOCKED | E3-P2A-SCOPE1..E3-P2A-BASELINE1 | fresh Supervisor review and final scoped commit; no promotion/live action |
 
 ## Phase Touch Map
 
@@ -129,6 +132,10 @@ Forbidden next action: call the candidate live-certified or promoted.
 | P1-B | 15 focused cases pass | complete; proceed P2-A |
 | P2-A | guide, charter cross-reference, CT01 ledger record, and roadmap projection pass focused checks | complete; proceed P2-B |
 | P2-B | CT01 tests/compile/eval pass; Supervisor REJECT confirms inherited validator/doctor/live-host blockers | closed with terminal BLOCKED for full session; no in-scope repair remains |
+| A1-P1 | packet and existing ledger event projection extended with validated attachment manifest | complete; preserve packet as noncanonical evidence |
+| A1-P2 | recursive prompt and durable guide carry `UPLOAD_REQUIRED` and attachment invariants | complete; preserve exact copy-back and manifest instructions |
+| A1-P3 | one REQUIRED handoff artifact and seven attachment-aware regression cases exist | complete; user is not asked to choose other files |
+| A1-P4 | focused tests, compile/eval, ledger check, Anvien refresh, and coder evidence pass; full framework remains 52/59 | complete for addendum with `ATTACHMENT_AWARE_HANDOFF_STATUS: INCLUDED_AND_TESTED`; full session remains BLOCKED |
 
 ## Implementation Gate
 
@@ -141,6 +148,10 @@ Forbidden next action: call the candidate live-certified or promoted.
 - [x] Blockers recorded.
 - [x] R0 baseline row recorded.
 - [x] Affected rows refreshed after implementation begins.
+- [x] Attachment-aware `UPLOAD_REQUIRED` manifest and packet/event projection recorded.
+- [x] Recursive prompt and durable guide preserve attachment-aware handoff semantics.
+- [x] One REQUIRED `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` artifact and seven regression cases recorded.
+- [x] Addendum technical validation and evidence boundary recorded; no promotion/deploy/live action performed.
 
 ## Final P0 Decision
 
@@ -152,4 +163,4 @@ Forbidden next action: call the candidate live-certified or promoted.
 
 Decision note:
 
-P1-A, P1-B, P2-A, and P2-B closure are complete in the isolated canonical worktree. The CT01-specific module/test/doc/ledger projection is present and focused checks pass, including event persistence through the existing execution-ledger writer. The clean canonical baseline and CT01 worktree both retain the same seven pre-existing framework-validator failures; the development doctor also rejects the unpromoted protected-surface drift. Supervisor verdict is REJECT for full-plan acceptance, so the honest terminal state is BLOCKED. No unrelated governance repair, promotion, remote write, or protected-root mutation occurred.
+P1-A, P1-B, P2-A, P2-B, and the Owner-approved A1 attachment-aware addendum are complete in the isolated canonical worktree. The CT01-specific module/test/doc/ledger/roadmap/artifact projection is present and focused checks pass, including event persistence through the existing execution-ledger writer. Every terminal response now declares upload necessity; this candidate selects one REQUIRED handoff artifact, while explicitly preserving that local paths do not grant contents access and attachments are not canonical truth or approval proof. The clean canonical baseline and CT01 worktree both retain the same seven pre-existing framework-validator failures; the development doctor also rejects the unpromoted protected-surface drift. Supervisor verdict remains REJECT for full-plan acceptance, so the honest terminal state is BLOCKED despite `ATTACHMENT_AWARE_HANDOFF_STATUS: INCLUDED_AND_TESTED`. No unrelated governance repair, promotion, remote write, or protected-root mutation occurred.

@@ -63,6 +63,18 @@ Every terminal response carries these fields:
 
 The packet contains PACKET_IS_CANONICAL_TRUTH: NO. It is not canonical repository truth, not approval, not a promotion record, and not a host-certification receipt. The packet can be serialized as an event for the existing execution-ledger writer through the module's to_execution_ledger_event function; the Control Tower module itself does not open a ledger file or create a second store.
 
+## Attachment-aware terminal handoff
+
+Every terminal response must declare `UPLOAD_REQUIRED: YES` or `UPLOAD_REQUIRED: NO` and include `CONTROL_TOWER_ATTACHMENT_MANIFEST`.
+
+When `UPLOAD_REQUIRED: NO`, the response must state that the user only needs to copy the entire final response to `00 — P2P CONTROL TOWER`; no file upload is needed.
+
+When `UPLOAD_REQUIRED: YES`, the manifest must identify the minimum one to three files using the exact filename, local path, purpose, why the Control Tower needs the file contents, and one of `REQUIRED`, `OPTIONAL`, or `DO_NOT_UPLOAD`. The user is not asked to decide which evidence matters. `REQUIRED` entries are the only files that must be uploaded; `OPTIONAL` entries are not required; `DO_NOT_UPLOAD` entries must not be uploaded.
+
+The local path is only a locator. `LOCAL_PATH_ALONE_PROVES_CONTENTS_AVAILABLE: NO` and `CONTENTS_AVAILABLE_TO_CONTROL_TOWER: UNKNOWN` remain explicit until the user attaches the file. An attachment is evidence input only: `ATTACHMENT_IS_CANONICAL_TRUTH: NO`. An attachment cannot by itself prove promotion, deployment, live certification, or Owner approval. The Control Tower must reconcile attached evidence with fresh canonical repository and governance truth.
+
+When a file is needed, prefer one artifact named `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` so the user can upload one clearly scoped handoff instead of searching through reports. The artifact remains noncanonical evidence and does not replace the packet, execution ledger, evidence chain, approval record, or fresh canonical checks.
+
 The existing lifecycle vocabulary remains the authority boundary:
 
 | CT01 state | Existing lifecycle mapping |
@@ -96,6 +108,10 @@ The build_execution_prompt function emits a self-contained prompt with:
 - the bounded task and acceptance criteria;
 - the terminal state vocabulary;
 - every CONTROL_TOWER_RETURN_PACKET field;
+- the `UPLOAD_REQUIRED` declaration and `CONTROL_TOWER_ATTACHMENT_MANIFEST` contract;
+- the exact no-upload instruction or the minimum one-to-three-file attachment fields;
+- the local-path/content-availability, evidence-only, and noncanonical attachment invariants;
+- the preferred single `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` artifact;
 - the explicit packet-is-not-canonical-truth marker;
 - the exact USER_ACTION text.
 
@@ -120,6 +136,7 @@ No second router, second truth store, nested certification system, simulated quo
 |---|---|
 | Return contract and implementation | .p2p/system/p2p_capabilities/control_tower_handoff.py |
 | A-H behavior proof | tests/test_p2p_control_tower_session_handoff.py |
+| Attachment-aware handoff artifact | `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` in the executor's scoped evidence directory |
 | This operator guide | docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md |
 | Planner/evidence trail | docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/ |
 | Capability projection | docs/p2p-development/capability-ledger/capability-index.json |
@@ -129,6 +146,6 @@ No second router, second truth store, nested certification system, simulated quo
 
 ## Validation boundary and known gaps
 
-The local development-source proof is the 15-case focused suite plus relevant existing P2P tests and doctor/compile checks. It proves the protocol behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
+The local development-source proof is the 22-case focused suite, including seven attachment-aware cases, plus relevant existing P2P tests and doctor/compile checks. It proves the protocol behavior in an isolated worktree. It does not prove a live Codex, Manus, Claude, Gemini, or future-host connection, live adapter certification, quorum, release readiness, owner approval, promotion, or deployment. Those remain UNKNOWN or unperformed until their existing independent evidence paths are satisfied.
 
 P2P-CT01 terminal state for this candidate is FOUNDATION_READY / UNPROMOTED. CANONICAL_PROMOTED: NO. No remote write was performed.

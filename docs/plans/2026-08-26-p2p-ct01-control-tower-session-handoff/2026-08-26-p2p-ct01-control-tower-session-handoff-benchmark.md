@@ -42,3 +42,15 @@ This is a Python protocol/documentation change. Record inventory and directly me
 
 - No browser, Docker, live-provider, quorum, network, or host-performance benchmark applies.
 - Broad line-ending-only worktree status is not a CT01 metric and must not enter the candidate diff.
+
+## B3 - Owner Scope Addendum Benchmarks
+
+| Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
+|---|---|---|---:|---:|---:|---:|---:|---|
+| A1 | attachment-aware regression cases | cases | 0 | 7 | 7 | 7 | +7 | E3-P2A-TEST1 |
+| A1 | total focused protocol regression cases | cases | 15 | 22 | 22 | 22 | +7 | E3-P2A-TEST1 |
+| A1 | handoff artifacts selected as REQUIRED | files | 0 | 1 | 1 | 1 | +1 | E3-P2A-ARTIFACT1 |
+| A1 | attachment classifications covered | classes | 0 | 3 | 3 | 3 | +3 | E3-P2A-TEST1 |
+| A1 | attachment manifest schema | schema versions | 0 | 1 | 1 | 1 | +1 | E3-P2A-IMPL1 |
+
+The addendum changes protocol/documentation inventory only. It does not create a live, network, host-performance, promotion, release, or deployment benchmark.
