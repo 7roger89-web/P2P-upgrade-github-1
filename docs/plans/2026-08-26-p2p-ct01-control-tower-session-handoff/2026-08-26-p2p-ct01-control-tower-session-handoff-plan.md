@@ -344,7 +344,7 @@ existing protected-runtime lock. The broken upgrade root remains read-only.
 - [x] P3-B: Re-discover the package lock allowlist and classify every CT01-related path as runtime/governance, test-only, documentation, plan/evidence, or out of lock scope.
 - [x] P3-C: Invoke the existing `lock-runtime` generator once with a reconciliation reason; accept only the expected CT01 lock additions/hash refreshes.
 - [x] P3-D: Prove the lock is not a bypass by causing one temporary protected-file mutation to fail drift/doctor, restore exact bytes, and confirm the scoped worktree is clean again.
-- [ ] P3-E: Run focused tests, compile, applicable eval, candidate doctor/drift, 52/59 baseline comparison, `git diff --check`, exact changed-path inspection, Anvien change detection, and a fresh Supervisor review against the resulting candidate SHA/tree.
+- [x] P3-E: Run focused tests, compile, applicable eval, candidate doctor/drift, 52/59 baseline comparison, `git diff --check`, exact changed-path inspection, Anvien change detection, and a fresh Supervisor review against the resulting candidate SHA/tree.
 
 ### P3 path classification
 
@@ -364,6 +364,11 @@ existing protected-runtime lock. The broken upgrade root remains read-only.
 The only package-lock additions are the intended protected documentation projections and
 the required dated execution log. The implementation module, test, plan, reports, and
 evidence remain outside this package lock for the reasons above.
+
+P3 closure is subject-bound: the fresh Supervisor reviewed checkpoint
+`b58c2954287bffc6a35a41b267206d1654579695` / tree
+`24dfec00dbe2a1e5eb9adfb333f4ff977d4b07e5`. Any later evidence-only bookkeeping
+commit is not a replacement for that reviewed subject.
 
 ### Acceptance boundary
 

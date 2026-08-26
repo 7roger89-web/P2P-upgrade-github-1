@@ -203,3 +203,16 @@ P1-A, P1-B, P2-A, P2-B, and the Owner-approved A1 attachment-aware addendum were
 | validation | focused 28-case suite, compile, eval, candidate doctor, and drift pass; framework validator remains the same inherited `52/59` on base and candidate | E5-P3E-TEST1..E5-P3E-BASELINE1 | fresh Supervisor review is the final local handoff gate |
 
 R03 technical classification: `P2P_CT01_GOVERNANCE_RECONCILED_CANDIDATE_READY_FOR_OWNER_GATE` after the exact checkpoint and fresh Supervisor review. This is not promotion, canonicalization, deployment, live execution, host certification, or inherited Owner approval.
+
+## R13 — P2P-CT01-R03 Supervisor Closure
+
+| Surface | Actual status | Evidence | Boundary |
+|---|---|---|---|
+| exact reviewed subject | `b58c2954287bffc6a35a41b267206d1654579695` / tree `24dfec00dbe2a1e5eb9adfb333f4ff977d4b07e5`; fresh Supervisor scoped verdict `PASS` | E5-P3E-SUP1 | subject identity is immutable for this execution |
+| clean-subject gates | archived checkpoint doctor/drift PASS; focused 28-case suite PASS; compileall PASS; baseline remains 52/59 on canonical and subject | E5-P3E-CODER1, E5-P3E-SUP1 | no live-host or promotion inference |
+| live worktree state | two owner untracked CT01 files appeared after the checkpoint and remain unbound; current worktree drift fails closed on `scripts/p2p_control_tower.py` | E5-P3E-SUP1 | preserve; owner must reconcile separately |
+| full-session status | technically reconciled candidate is ready for Owner Gate; full session remains `BLOCKED` by preserved owner worktree additions, inherited seven baseline failures, and absent live-host certification | E5-P3E-SUP1, E5-P3E-CLOSURE1 | no further action in this execution |
+
+The Supervisor report and coder report are evidence-only artifacts. They do not
+change the reviewed checkpoint's SHA/tree or grant approval, promotion, release,
+deployment, canonical, or live authority.
