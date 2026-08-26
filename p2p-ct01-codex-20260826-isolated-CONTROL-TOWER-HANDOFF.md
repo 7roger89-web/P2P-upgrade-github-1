@@ -53,6 +53,8 @@ BOUND_BASE_SHA: 28a3ecd9c04d36511269e44c384bff6e11677b93
 BOUND_BASE_TREE: cae63e055edd164fbd969f6dbae0d992a4d0efed
 IMPLEMENTATION_CHECKPOINT_SHA: 13ccb8910cf2c845acc450b9e354f9d32c5f90a1
 IMPLEMENTATION_CHECKPOINT_TREE: d1182567f44b05346361eeb9eeb97ad1cbbc2a00
+DOCUMENTATION_HANDOFF_CHECKPOINT_SHA: 4d7beb797bd6b359191f08d3497540f2e3785f45
+DOCUMENTATION_HANDOFF_CHECKPOINT_TREE: 81ea11fbdbf97870f71a4fec1ca4aae81060d83d
 
 ## Included scope
 
@@ -72,9 +74,12 @@ The addendum extends the existing CT01 packet, execution-ledger event projection
 - Focused protocol tests: `tests/test_p2p_control_tower_session_handoff.py` — 22 passed, including 7 attachment-aware cases.
 - Source compile: `python -m py_compile .p2p/system/p2p_capabilities/control_tower_handoff.py` — PASS.
 - Existing project eval validation: `python scripts/p2p_eval.py validate --suite .p2p/evals/suite.json` — PASS.
-- Anvien refresh after implementation: stale=false, scanned=959, parsed_code=171, failed=0, nodes=40024, relationships=46291.
-- Staged change analysis at the implementation checkpoint: affected_count=0, affected_files=2, affected_processes=0, risk_level=low for the source/test slice; hidden `.p2p/system` graph file-detail remains unavailable and is recorded as a tooling limitation.
+- Anvien refresh after implementation: stale=false, scanned=960, parsed_code=171, failed=0, nodes=40033, relationships=46299.
+- Staged documentation/artifact change analysis at the handoff checkpoint: changed_files=9, affected_files=7, affected_processes=0, risk_level=low; hidden `.p2p/system` graph file-detail remains unavailable and is recorded as a tooling limitation.
 - The durable technical evidence and remaining full-session blockers are recorded under `docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/` and `reports/` in the executor worktree. The Control Tower cannot read those files from their local paths unless separately attached; this artifact is the selected minimum attachment.
+
+SUPERVISOR_REVIEW_PATH: reports/supervisor/rp_supervisor_260826_153823_by_gpt-5-codex_p2p-ct01-attachment-aware-handoff.md
+SUPERVISOR_VERDICT: REJECT_FOR_FULL_SESSION; TECHNICAL_ADDENDUM_PASS
 
 ## Blockers and authority boundary
 

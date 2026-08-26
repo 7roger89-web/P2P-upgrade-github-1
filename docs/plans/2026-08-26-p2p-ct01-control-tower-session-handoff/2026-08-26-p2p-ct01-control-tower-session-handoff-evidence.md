@@ -95,6 +95,9 @@ Matching plan item(s): A1-P1 through A1-P4
 - E3-P2A-CODER1: `reports/coder/rp_coder_260826_153339_by_gpt-5-codex_p2p-ct01-attachment-aware-handoff.md` records technical addendum PASS, full-session BLOCKED, and the exact residual authority boundary.
 - E3-P2A-GRAPH1: final Anvien refresh before change detection returned stale=false, scanned=960, parsed_code=171, failed=0, nodes=40033, relationships=46299. Hidden `.p2p/system` graph file-detail remains unavailable; direct source inspection is retained as the authority for that hidden path.
 - E3-P2A-BASELINE1: the framework validator returned 52/59 with the same seven inherited failures previously observed on the clean canonical baseline; no addendum-specific validator failure was introduced.
+- E3-P2B-SUP1: `reports/supervisor/rp_supervisor_260826_153823_by_gpt-5-codex_p2p-ct01-attachment-aware-handoff.md` is the fresh zero-trust review. It accepts the addendum technical slice, records `INCLUDED_AND_TESTED`, and rejects full-session closure because inherited validator/doctor/live-host gates remain unresolved.
+- E3-P2B-COMMIT1: documentation/artifact checkpoint `4d7beb797bd6b359191f08d3497540f2e3785f45` with tree `81ea11fbdbf97870f71a4fec1ca4aae81060d83d` contains the guide, ledger/roadmap projection, planner updates, one REQUIRED handoff artifact, and coder report. The subsequent Supervisor report is reviewed against this checkpoint; no remote write occurred.
+- E3-P2B-DETECT1: fresh staged Anvien detect-changes after the Supervisor slice returned `affected_count=0`, `affected_files=5`, `changed_count=20`, `changed_files=5`, `affected_processes=0`, and `risk_level=low`; the five files are planner actual-status/evidence/plan, the handoff artifact, and the Supervisor report.
 
 ## Closure Evidence
 
