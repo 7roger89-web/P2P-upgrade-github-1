@@ -38,10 +38,23 @@ P1-A completed before test implementation:
 - E1-P1A-BOUNDARY1: smoke result showed host=CODEX and promoted=False; source has no file opening, subprocess, network, router, approval, or canonical-write path. Packet serialization includes PACKET_IS_CANONICAL_TRUTH=NO.
 - E1-P1A-GRAPH1: fresh anvien analyze --force after the source addition completed with stale=false, scanned=955, parsed_code=170, failed=0, nodes=39,702, relationships=45,895. detect-changes reported no tracked changes because the new source was still untracked at that point; this is recorded as a limitation, not as a claim that the source was absent.
 
-P1-B pending:
+P1-B completed:
 
-- E1-P1B-TEST1 through E1-P1B-TEST8: required A-H cases.
-- E1-P1B-TEST9 through E1-P1B-TEST11: invalid binding, no-inheritance, and round-trip/discovery cases.
+- E1-P1B-TEST1: A READY packet is accepted as READY and remains non-promoted.
+- E1-P1B-TEST2: a BLOCKED MANUS packet updates only the MANUS lane and cannot become success.
+- E1-P1B-TEST3: explicit CODEX binding wins over a narrative MANUS claim.
+- E1-P1B-TEST4: stale base SHA/tree produces RECONCILIATION_REQUIRED without canonical overwrite.
+- E1-P1B-TEST5: WAITING_OWNER_GATE records the owner gate without protected action.
+- E1-P1B-TEST6: FAILED is returned and recorded with mapped BLOCKED lifecycle and no false success.
+- E1-P1B-TEST7: recursive prompt contains the full return packet field list, NO canonical-truth marker, and exact user action.
+- E1-P1B-TEST8: only the authoritative GEMINI lane changes when narrative prose names CLAUDE.
+- E1-P1B-TEST9: missing/invalid binding and implicit inherited state fail closed.
+- E1-P1B-TEST10: WAITING_OWNER_GATE without an owner gate is rejected.
+- E1-P1B-TEST11: UNKNOWN canonical base is not treated as CURRENT.
+- E1-P1B-TEST12: packet round-trip, ledger event, and state projection are JSON safe.
+- E1-P1B-TEST13: future provider-neutral labels normalize without provider-specific routing logic.
+- E1-P1B-TEST14: temporary test worktree paths stay under the repository .tmp boundary.
+- E1-P1B-FIX1: first test run exposed only a missing repo-local .tmp fixture directory (13 passed, 1 fixture failure); the fixture was corrected and the final focused run passed.
 - E1-P1B-TEST1 through E1-P1B-TEST8: required A-H cases.
 - E1-P1B-TEST9 through E1-P1B-TEST11: invalid binding, no-inheritance, and round-trip/discovery cases.
 

@@ -145,7 +145,7 @@ P0 is complete for implementation. Existing host executor, task state, live exec
   - Actual-status Update: missing CT01 protocol -> implemented after focused smoke.
   - Commit Boundary: commit after focused smoke and detect-changes.
 
-- [ ] P1-B: Add the A-H regression suite
+- [x] P1-B: Add the A-H regression suite
   - Goal: prove terminal state, reconciliation, lane, authority, and prompt behavior mechanically.
   - Scope Boundary:
     - Editable: tests/test_p2p_control_tower_session_handoff.py.

@@ -25,8 +25,9 @@ This is a Python protocol/documentation change. Record inventory and directly me
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---|---:|---:|---:|---:|---:|---|
 | P1 | protocol modules | files | 0 | 1 | pending | 1 | pending | E1-P1A-SRC1 |
-| P1 | required A-H scenarios | cases | 0 | pending | pending | 8 | pending | E1-P1B-TEST1..E1-P1B-TEST8 |
-| P1 | negative/round-trip scenarios | cases | 0 | pending | pending | 3 | pending | E1-P1B-TEST9..E1-P1B-TEST11 |
+| P1 | protocol regression tests | cases | 0 | 14 | pending | 14 | pending | E1-P1B-TEST1..E1-P1B-TEST14 |
+| P1 | required A-H scenarios | cases | 0 | 8 | pending | 8 | pending | E1-P1B-TEST1..E1-P1B-TEST8 |
+| P1 | negative/round-trip scenarios | cases | 0 | 6 | pending | 3 | pending | E1-P1B-TEST9..E1-P1B-TEST14 |
 
 ## B2 - P2 Benchmarks
 
