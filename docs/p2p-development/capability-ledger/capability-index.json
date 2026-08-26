@@ -5091,7 +5091,7 @@
     {
       "reviewed_after_goal": "P2P-CT01",
       "at": "2026-08-26T07:47:22Z",
-      "change": "Added one foundation-ready durable Control Tower session handoff record under the registered MULTI_AI_INTEROPERABILITY family from the isolated P2P-CT01 implementation and 14 focused behavior tests; no runtime authority, promotion, release, or host certification changed.",
+        "change": "Added one foundation-ready durable Control Tower session handoff record under the registered MULTI_AI_INTEROPERABILITY family from the isolated P2P-CT01 implementation and 15 focused behavior tests; no runtime authority, promotion, release, or host certification changed.",
       "dedup_check": "verified unique capability_id, registered family, and existing dependency IDs before projection"
     }
   ],
