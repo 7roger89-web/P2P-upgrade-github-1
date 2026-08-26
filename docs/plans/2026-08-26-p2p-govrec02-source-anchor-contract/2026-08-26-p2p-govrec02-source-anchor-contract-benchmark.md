@@ -28,15 +28,15 @@ This task is a governance contract and validator correction. Record measured gra
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
 | P1 | Anchor semantic fields present | fields | 0 | 8 | pending | 8 | +8 | E1-P1A-CONTRACT1 |
 | P1 | Static fail-closed authority reason-code classes | classes | 0 | 5 | pending | 5 | +5 | E1-P1A-CONTRACT2 |
-| P1 | Anchor relationship classes covered | classes | 0 | pending | pending | 3 | pending | E1-P1B-GIT1 |
-| P1 | Fail-closed authority reason-code classes | classes | 0 | pending | pending | 7 | pending | E1-P1A-CONTRACT2 / E1-P1B-GIT2 |
+| P1 | Anchor relationship classes covered | classes | 0 | 3 | pending | 3 | +3 | E1-P1B-GIT1 |
+| P1 | Fail-closed authority reason-code classes | classes | 0 | 7 | pending | 7 | +7 | E1-P1A-CONTRACT2 / E1-P1B-GIT1 / E2-P2A-TEST1 |
 
 ## B2 - P2 Benchmarks
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | Positive/negative anchor simulation cases | cases | 0 | pending | pending | 4 | pending | E2-P2A-TEST2 |
-| P2 | Regression suite count | tests | 0 | pending | pending | required matrix | pending | E2-P2A-TEST1 |
+| P2 | Positive/negative anchor simulation cases | cases | 0 | 4 | pending | 4 | +4 | E2-P2A-TEST2 |
+| P2 | Focused regression suite count | tests | 0 | 41 | pending | 41 | +41 | E2-P2A-TEST1 |
 
 ## Non-Benchmarkable Notes
 

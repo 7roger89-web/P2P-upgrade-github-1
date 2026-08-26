@@ -12,6 +12,7 @@ import argparse
 import copy
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -148,7 +149,71 @@ def load_control(path: Path) -> dict[str, Any]:
     return _object(value, str(path))
 
 
-def _validate_source_anchor(authority: dict[str, Any]) -> dict[str, Any]:
+def _git_checkout_root(root: Path | None) -> Path | None:
+    """Return a real Git checkout root, including linked-worktree .git files."""
+
+    if root is None:
+        return None
+    candidate = Path(root).expanduser().resolve()
+    git_metadata = candidate / ".git"
+    return candidate if git_metadata.is_dir() or git_metadata.is_file() else None
+
+
+def _git_revision(repo_root: Path, revision: str, missing_code: str, label: str) -> str:
+    """Resolve one commit object without trusting caller-provided identity text."""
+
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), "rev-parse", "--verify", revision],
+            capture_output=True,
+            text=True,
+            encoding="ascii",
+            errors="replace",
+            check=False,
+        )
+    except OSError as exc:
+        raise ControlError("AUTHORITY_GIT_UNAVAILABLE", f"cannot invoke Git for {label}: {exc}") from exc
+    resolved = result.stdout.strip()
+    if result.returncode != 0 or not _GIT_SHA_RE.fullmatch(resolved):
+        detail = result.stderr.strip() or "revision is not a commit object"
+        raise ControlError(missing_code, f"{label} is unavailable: {detail}")
+    return resolved
+
+
+def _git_lineage_relationship(repo_root: Path, anchor_commit: str, observed_commit: str, prefix: str) -> str:
+    """Classify equality, descendant lineage, or divergence against the anchor."""
+
+    if observed_commit == anchor_commit:
+        return f"{prefix}_EQUALS_ANCHOR"
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo_root), "merge-base", "--is-ancestor", anchor_commit, observed_commit],
+            capture_output=True,
+            text=True,
+            encoding="ascii",
+            errors="replace",
+            check=False,
+        )
+    except OSError as exc:
+        raise ControlError("AUTHORITY_GIT_UNAVAILABLE", f"cannot invoke Git for {prefix.lower()} lineage: {exc}") from exc
+    if result.returncode == 0:
+        return f"{prefix}_DESCENDS_FROM_ANCHOR"
+    if result.returncode == 1:
+        raise ControlError(
+            "AUTHORITY_LINEAGE_DIVERGED",
+            f"{prefix.lower()} {observed_commit} does not equal or descend from source anchor {anchor_commit}",
+        )
+    detail = result.stderr.strip() or "Git could not determine ancestry"
+    raise ControlError("AUTHORITY_LINEAGE_UNAVAILABLE", f"cannot classify {prefix.lower()} lineage: {detail}")
+
+
+def _validate_source_anchor(
+    authority: dict[str, Any],
+    *,
+    repo_root: Path | None = None,
+    observed_head: str | None = None,
+    observed_origin_main: str | None = None,
+) -> dict[str, Any]:
     has_anchor = SOURCE_ANCHOR_KEY in authority
     has_legacy = LEGACY_SOURCE_ANCHOR_KEY in authority
     if has_anchor and has_legacy:
@@ -205,7 +270,7 @@ def _validate_source_anchor(authority: dict[str, Any]) -> dict[str, Any]:
     _nonempty_string(anchor.get("release_authority"), f"authority.{SOURCE_ANCHOR_KEY}.release_authority")
     _require(isinstance(anchor.get("historical_official_artifact_preserved"), bool), "AUTHORITY_SEMANTICS", "historical_official_artifact_preserved must be boolean")
     _require(isinstance(anchor.get("unpromoted_successor_separate"), bool), "AUTHORITY_SEMANTICS", "unpromoted_successor_separate must be boolean")
-    return {
+    source_anchor = {
         "semantic_type": semantic_type,
         "source_kind": source_kind,
         "observed_ref": anchor["observed_ref"],
@@ -217,9 +282,44 @@ def _validate_source_anchor(authority: dict[str, Any]) -> dict[str, Any]:
         "head_relationship": "NOT_OBSERVED",
         "origin_main_relationship": "NOT_OBSERVED",
     }
+    dynamic_root = _git_checkout_root(repo_root)
+    dynamic_requested = repo_root is not None or observed_head is not None or observed_origin_main is not None
+    if not dynamic_requested:
+        return source_anchor
+    _require(dynamic_root is not None, "AUTHORITY_GIT_UNAVAILABLE", "dynamic source-anchor validation requires a Git checkout root")
+
+    resolved_anchor = _git_revision(dynamic_root, f"{anchor_commit}^{{commit}}", "AUTHORITY_ANCHOR_COMMIT_MISSING", "source anchor commit")
+    resolved_tree = _git_revision(dynamic_root, f"{resolved_anchor}^{{tree}}", "AUTHORITY_ANCHOR_COMMIT_MISSING", "source anchor tree")
+    if resolved_tree != anchor_tree:
+        raise ControlError(
+            "AUTHORITY_ANCHOR_TREE_MISMATCH",
+            f"source anchor commit {resolved_anchor} resolves to tree {resolved_tree}, not recorded tree {anchor_tree}",
+        )
+    resolved_head = _git_revision(dynamic_root, observed_head or "HEAD^{commit}", "AUTHORITY_HEAD_MISSING", "observed Git HEAD")
+    resolved_origin_main = _git_revision(
+        dynamic_root,
+        observed_origin_main or "refs/remotes/origin/main^{commit}",
+        "AUTHORITY_ORIGIN_MAIN_MISSING",
+        "observed origin/main",
+    )
+    source_anchor.update(
+        {
+            "observed_head": resolved_head,
+            "observed_origin_main": resolved_origin_main,
+            "head_relationship": _git_lineage_relationship(dynamic_root, resolved_anchor, resolved_head, "HEAD"),
+            "origin_main_relationship": _git_lineage_relationship(dynamic_root, resolved_anchor, resolved_origin_main, "ORIGIN_MAIN"),
+        }
+    )
+    return source_anchor
 
 
-def _validate_authority(control: dict[str, Any]) -> dict[str, Any]:
+def _validate_authority(
+    control: dict[str, Any],
+    *,
+    repo_root: Path | None = None,
+    observed_head: str | None = None,
+    observed_origin_main: str | None = None,
+) -> dict[str, Any]:
     authority = _object(control.get("authority"), "authority")
     _require(
         authority.get("canonical_source") == "governance/development-control.json",
@@ -237,7 +337,12 @@ def _validate_authority(control: dict[str, Any]) -> dict[str, Any]:
     _require(required_refs.issubset(set(refs)), "AUTHORITY_REFS", "existing P2P authority references are incomplete")
     _require(authority.get("is_replacement_for_existing_state") is False, "SECOND_TRUTH_STORE", "control record cannot replace existing state")
     _require(authority.get("retrieved_content_is_data") is True, "TRUST_BOUNDARY", "retrieved content must remain data")
-    return _validate_source_anchor(authority)
+    return _validate_source_anchor(
+        authority,
+        repo_root=repo_root,
+        observed_head=observed_head,
+        observed_origin_main=observed_origin_main,
+    )
 
 
 def _validate_official_baseline(control: dict[str, Any]) -> dict[str, Any]:
@@ -525,12 +630,25 @@ def _validate_research_and_invariants(control: dict[str, Any]) -> None:
     _require(required_invariants.issubset(invariant_ids), "INVARIANTS", "required architectural invariants are incomplete")
 
 
-def validate_control(control: dict[str, Any], *, expected_official_version: str = OFFICIAL_BASELINE_VERSION, expected_official_sha256: str = OFFICIAL_BASELINE_SHA256) -> dict[str, Any]:
+def validate_control(
+    control: dict[str, Any],
+    *,
+    expected_official_version: str = OFFICIAL_BASELINE_VERSION,
+    expected_official_sha256: str = OFFICIAL_BASELINE_SHA256,
+    repo_root: Path | None = None,
+    observed_head: str | None = None,
+    observed_origin_main: str | None = None,
+) -> dict[str, Any]:
     """Validate one control record and return a small deterministic summary."""
 
     _require(control.get("schema_version") == SCHEMA, "CONTROL_SCHEMA", f"schema_version must be {SCHEMA}")
     _require(expected_official_version == OFFICIAL_BASELINE_VERSION and expected_official_sha256 == OFFICIAL_BASELINE_SHA256, "VALIDATOR_POLICY", "official validator constants cannot be overridden")
-    source_anchor = _validate_authority(control)
+    source_anchor = _validate_authority(
+        control,
+        repo_root=repo_root,
+        observed_head=observed_head,
+        observed_origin_main=observed_origin_main,
+    )
     baseline = _validate_official_baseline(control)
     _validate_lineage_contract(control, baseline)
     _validate_candidates(control, baseline)
@@ -590,9 +708,9 @@ def control_path(root: Path, explicit: str | None = None) -> Path:
     return (Path(explicit).expanduser() if explicit else root / DEFAULT_CONTROL_RELATIVE).resolve()
 
 
-def validate_path(path: Path) -> dict[str, Any]:
+def validate_path(path: Path, *, repo_root: Path | None = None) -> dict[str, Any]:
     control = load_control(path)
-    result = validate_control(control)
+    result = validate_control(control, repo_root=repo_root)
     result["control_path"] = str(path)
     return result
 
@@ -603,7 +721,7 @@ def validate_lineage_for_build(root: Path, version: str | None = None, *, contro
     root = root.resolve()
     path = (control_file or root / DEFAULT_CONTROL_RELATIVE).resolve()
     control = load_control(path)
-    validation = validate_control(control)
+    validation = validate_control(control, repo_root=_git_checkout_root(root))
     root_version = (root / "VERSION").read_text(encoding="utf-8").strip()
     requested_version = version or root_version
     _require(requested_version == root_version, "LINEAGE_VERSION_MISMATCH", "requested package version differs from root VERSION")
@@ -632,10 +750,10 @@ def validate_lineage_for_build(root: Path, version: str | None = None, *, contro
     }
 
 
-def status_projection(control: dict[str, Any]) -> dict[str, Any]:
+def status_projection(control: dict[str, Any], *, repo_root: Path | None = None) -> dict[str, Any]:
     """Derive a fresh-session status projection without copying authority."""
 
-    validation = validate_control(control)
+    validation = validate_control(control, repo_root=repo_root)
     capabilities = {item["id"]: item for item in _list(control["capability_status"], "capability_status")}
     roadmap = {item["id"]: item for item in _list(control["roadmap"]["items"], "roadmap.items")}
     current = _object(control["roadmap"].get("current"), "roadmap.current")
@@ -674,7 +792,11 @@ def status_projection(control: dict[str, Any]) -> dict[str, Any]:
             "aesthetica": control["design_intelligence"]["aesthetica"],
         },
         "canonical_capability_count": control["canonical_capability_set"]["denominator"],
-        "validation": {"official_baseline": validation["official_baseline"], "provenance_entries": validation["provenance_entries"]},
+        "validation": {
+            "official_baseline": validation["official_baseline"],
+            "provenance_entries": validation["provenance_entries"],
+            "source_anchor": validation["source_anchor"],
+        },
     }
 
 
@@ -691,6 +813,7 @@ def render_status(projection: dict[str, Any]) -> str:
         f"C17 parallel execution: {projection['parallel_execution']['status']} (certified={projection['parallel_execution']['certified']})",
         f"C17 cognitive economy: {projection['cognitive_economy']['status']} (evaluated={projection['cognitive_economy']['evaluated']})",
         f"Canonical capability set: {projection['canonical_capability_count']}/8",
+        "Source anchor: " + projection["validation"]["source_anchor"]["head_relationship"] + " / " + projection["validation"]["source_anchor"]["origin_main_relationship"],
     ]
     return "\n".join(lines)
 
@@ -1131,12 +1254,13 @@ def parser() -> argparse.ArgumentParser:
 def main(args: argparse.Namespace) -> int:
     root = Path(args.root).expanduser().resolve()
     path = control_path(root, args.control)
+    git_root = _git_checkout_root(root)
     if args.command == "validate":
-        result = validate_path(path)
+        result = validate_path(path, repo_root=git_root)
         print(json.dumps(result, ensure_ascii=False, indent=2) if args.json else f"PASS: {path}")
         return 0
     if args.command == "status":
-        projection = status_projection(load_control(path))
+        projection = status_projection(load_control(path), repo_root=git_root)
         print(json.dumps(projection, ensure_ascii=False, indent=2) if args.json else render_status(projection))
         return 0
     if args.command == "reconcile-lineage":

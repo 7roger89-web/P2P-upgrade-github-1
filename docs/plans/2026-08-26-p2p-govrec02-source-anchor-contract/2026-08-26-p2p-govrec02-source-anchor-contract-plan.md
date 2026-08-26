@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-26`
-- Status: `P1-A Complete / P1-B Ready`
+- Status: `P1-B Complete / P2-A Complete / P2-B Ready`
 - Plan: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-plan.md`
 - Evidence: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-evidence.md`
 - Benchmark: `docs/plans/2026-08-26-p2p-govrec02-source-anchor-contract/2026-08-26-p2p-govrec02-source-anchor-contract-benchmark.md`
@@ -141,7 +141,7 @@ The Owner has now selected anchor semantics. The current anchor is commit `2a714
   - Actual-status Update: append R1 with the exact field/validator transition and update P1-B assumptions.
   - Commit Boundary: commit after this slice when static contract acceptance passes.
 
-- [ ] P1-B: Add dynamic Git relationship evaluation and fail-closed reason codes
+- [x] P1-B: Add dynamic Git relationship evaluation and fail-closed reason codes
   - Goal: distinguish recorded anchor, observed `HEAD`, and observed `origin/main` at the real repository boundary.
   - Scope Boundary:
     - Editable: `scripts/p2p_development_control.py`, its direct tests if required.
@@ -185,7 +185,7 @@ The Owner has now selected anchor semantics. The current anchor is commit `2a714
     - Evidence IDs: `E1-P1B-GIT1..E1-P1B-GIT2`.
     - Actual-status rows refreshed: dynamic validator transitions to bound-correct.
   - Evidence Targets: source diff, relation results, static-package compatibility, current-worktree validation.
-  - Actual-status Update: append R2 and update P2 simulation assumptions.
+  - Actual-status Update: append R2 with dynamic relationship and static-package results; update P2 simulation assumptions.
   - Commit Boundary: commit after this slice when dynamic checks pass.
 
 ### P2: Prove simulations, regression, and receipt boundary
@@ -200,10 +200,10 @@ The Owner has now selected anchor semantics. The current anchor is commit `2a714
   - P2-A: Add behavior tests for anchor and post-promotion/divergence semantics.
   - P2-B: Align active contract documentation and record external receipt boundary.
 
-- [ ] P2-A: Add behavior tests for anchor and post-promotion/divergence semantics
+- [x] P2-A: Add behavior tests for anchor and post-promotion/divergence semantics
   - Goal: mechanically prove that a promoted candidate may descend from a prior anchor without self-reference, while unrelated lineage fails closed.
   - Scope Boundary:
-    - Editable: `tests/test_p2p_govrec01_reconciliation.py`, `tests/test_p2p_development_control.py` only where direct validator coverage belongs.
+    - Editable: `tests/test_p2p_govrec02_source_anchor.py` and existing direct validator suites where regression coverage belongs.
     - Inspect-only: production code after P1.
     - Preserve-only: historical reports and official artifact.
     - Out of scope: full repository tests until P3.

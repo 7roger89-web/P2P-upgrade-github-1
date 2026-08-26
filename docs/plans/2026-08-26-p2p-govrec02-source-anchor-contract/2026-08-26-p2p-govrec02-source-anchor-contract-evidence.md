@@ -40,25 +40,30 @@ Matching plan item(s): `P1-A`, `P1-B`
 
 - `E1-P1A-CONTRACT1`: `governance/development-control.json` now contains one `authority.promoted_source_anchor` object with `semantic_type=PROMOTED_IMPLEMENTATION_SOURCE_ANCHOR`, `source_kind=GIT_COMMIT_TREE`, explicit purpose, observed ref, anchor commit/tree, verification date, and descendant lineage policy. The active legacy key is absent.
 - `E1-P1A-CONTRACT2`: Static `p2p_development_control` validation now rejects duplicate/legacy authority keys, historical-artifact-shaped anchors, malformed semantic/source-kind/purpose/date/SHA fields, and self-reference lineage policies with explicit `ControlError` reason codes. `py -3 -X utf8 -m py_compile scripts/p2p_development_control.py` passed and `scripts/p2p_development_control.py validate --json` returned `PASS` with `NOT_OBSERVED` dynamic fields.
-- `E1-P1B-GIT1`: Pending implementation: dynamic validator binds anchor commit/tree, observes `HEAD` and `origin/main`, and returns explicit equality/descendant/divergence relations.
-- `E1-P1B-GIT2`: Pending implementation: real linked-worktree CLI validation uses dynamic Git checks while Git-less package verification remains static-only.
+- `E1-P1B-GIT1`: Dynamic validator now resolves the recorded anchor commit and tree, observes `HEAD` and `refs/remotes/origin/main`, and returns separate `HEAD_EQUALS_ANCHOR`/`HEAD_DESCENDS_FROM_ANCHOR` and `ORIGIN_MAIN_EQUALS_ANCHOR`/`ORIGIN_MAIN_DESCENDS_FROM_ANCHOR` relations. Divergence raises `AUTHORITY_LINEAGE_DIVERGED`; missing commit/tree and Git-object failures have stable reason codes.
+- `E1-P1B-GIT2`: Real linked-worktree CLI validation passes with `HEAD_DESCENDS_FROM_ANCHOR` and `ORIGIN_MAIN_EQUALS_ANCHOR`; Git-less static `validate_control` remains `NOT_OBSERVED`, preserving package-stage compatibility. `validate --json`, `status --json`, and human `status` all passed without remote mutation.
 
 ## E2 - P2 Evidence
 
 Matching plan item(s): `P2-A`, `P2-B`
 
-- `E2-P2A-TEST1`: Pending implementation: focused tests cover active key/semantic fields and all required malformed authority categories.
-- `E2-P2A-TEST2`: Pending implementation: disposable simulation proves anchor equality, descendant candidate, hypothetical post-promotion, and divergent-head fail-closed behavior.
+- `E2-P2A-TEST1`: `tests.test_p2p_govrec02_source_anchor` passed `11/11`; active key/semantic fields, duplicate/legacy, artifact-shaped, self-reference, missing-anchor, wrong-tree, and status-projection behavior are covered.
+- `E2-P2A-TEST2`: The focused suite passed BEFORE equality, current descendant, hypothetical post-promotion descendant (`6c860ee...`), and diverged-head simulations using existing Git objects and injected observations; no refs or remote state changed.
 - `E2-P2B-DOC1`: Pending implementation: active evidence states that committed anchor data and external final promotion subject identity are separate.
 - `E2-P2B-DOC2`: Pending implementation: active consumer search finds no duplicate authority truth; historical GOVREC01 references remain provenance-preserved.
 
 ## Closure Evidence
 
-P1-A closure:
+P1-A/P1-B/P2-A closure:
 
 - `py -3 -X utf8 -m unittest tests.test_p2p_govrec01_reconciliation`: `9/9 PASS`.
+- `py -3 -X utf8 -m unittest tests.test_p2p_govrec02_source_anchor`: `11/11 PASS`.
+- `py -3 -X utf8 -m unittest tests.test_p2p_development_control`: `21 tests, 19 PASS and 2 expected skips`.
+- `py -3 -X utf8 scripts/p2p_development_control.py validate --root . --json`: `PASS`; `HEAD_DESCENDS_FROM_ANCHOR` / `ORIGIN_MAIN_EQUALS_ANCHOR`.
+- `py -3 -X utf8 scripts/p2p_development_control.py status --root . --json`: `PASS`; same dynamic relations are exposed in `validation.source_anchor`.
 - Active legacy field check: `current_promoted_source` absent from active authority JSON.
-- P1-A commit/detect-changes: pending until checkpoint is created.
+- P1-A checkpoint commit: `9e8bced18387bf786fbd6ed306acce83ad911e9d`; it contains the explicit anchor contract, static validator, focused plan ledger, and GOVREC01 snapshot update.
+- Post-P1-B/P2-A implementation checkpoint/detect-changes: pending until the dynamic validator and focused GOVREC02 test slice is committed.
 
 To be filled as remaining implementation slices complete:
 
