@@ -85,6 +85,13 @@ def _likely_next_goal(goal_ids: list[str], by_id: dict[str, dict[str, Any]]) -> 
     return (goal_ids[-1], tail.get("status", "DONE"))
 RESEARCH_STATUSES = frozenset({"ADAPTED", "DEFERRED", "RESEARCH_ONLY", "EXCLUDED"})
 _VERSION_RE = re.compile(r"^(?P<base>.+-codex)\.(?P<revision>[0-9]+)$")
+_GIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+SOURCE_ANCHOR_KEY = "promoted_source_anchor"
+LEGACY_SOURCE_ANCHOR_KEY = "current_promoted_source"
+SOURCE_ANCHOR_SEMANTIC_TYPE = "PROMOTED_IMPLEMENTATION_SOURCE_ANCHOR"
+SOURCE_ANCHOR_SOURCE_KIND = "GIT_COMMIT_TREE"
+SOURCE_ANCHOR_LINEAGE_POLICY = "CURRENT_OR_CANDIDATE_HEAD_MUST_EQUAL_OR_DESCEND_FROM_ANCHOR"
+SOURCE_ANCHOR_PURPOSE = "The exact promoted implementation source against which this governance reconciliation was evaluated."
 
 
 class ControlError(ValueError):
@@ -141,7 +148,78 @@ def load_control(path: Path) -> dict[str, Any]:
     return _object(value, str(path))
 
 
-def _validate_authority(control: dict[str, Any]) -> None:
+def _validate_source_anchor(authority: dict[str, Any]) -> dict[str, Any]:
+    has_anchor = SOURCE_ANCHOR_KEY in authority
+    has_legacy = LEGACY_SOURCE_ANCHOR_KEY in authority
+    if has_anchor and has_legacy:
+        raise ControlError(
+            "AUTHORITY_DUPLICATE",
+            f"authority must not contain both {SOURCE_ANCHOR_KEY} and {LEGACY_SOURCE_ANCHOR_KEY}",
+        )
+    if has_legacy:
+        raise ControlError(
+            "AUTHORITY_LEGACY_FIELD",
+            f"{LEGACY_SOURCE_ANCHOR_KEY} is ambiguous; use {SOURCE_ANCHOR_KEY}",
+        )
+    anchor = _object(authority.get(SOURCE_ANCHOR_KEY), f"authority.{SOURCE_ANCHOR_KEY}")
+    semantic_type = _nonempty_string(anchor.get("semantic_type"), f"authority.{SOURCE_ANCHOR_KEY}.semantic_type")
+    if semantic_type == "OFFICIAL_ARTIFACT_AUTHORITY":
+        raise ControlError(
+            "AUTHORITY_HISTORICAL_ARTIFACT",
+            "the historical official artifact cannot be used as the implementation source anchor",
+        )
+    _require(semantic_type == SOURCE_ANCHOR_SEMANTIC_TYPE, "AUTHORITY_SEMANTICS", f"authority.{SOURCE_ANCHOR_KEY}.semantic_type is not an implementation source anchor")
+    source_kind = _nonempty_string(anchor.get("source_kind"), f"authority.{SOURCE_ANCHOR_KEY}.source_kind")
+    if source_kind == "OFFICIAL_ARTIFACT":
+        raise ControlError(
+            "AUTHORITY_HISTORICAL_ARTIFACT",
+            "the historical official artifact cannot be used as the implementation source anchor",
+        )
+    _require(source_kind == SOURCE_ANCHOR_SOURCE_KIND, "AUTHORITY_SEMANTICS", f"authority.{SOURCE_ANCHOR_KEY}.source_kind must be {SOURCE_ANCHOR_SOURCE_KIND}")
+    _require(
+        not any(key in anchor for key in ("artifact_sha256", "artifact_path", "promotion_report", "approval_reference")),
+        "AUTHORITY_ARTIFACT_SHAPE",
+        f"authority.{SOURCE_ANCHOR_KEY} must contain Git source identity, not artifact promotion identity",
+    )
+    purpose = _nonempty_string(anchor.get("purpose"), f"authority.{SOURCE_ANCHOR_KEY}.purpose")
+    _require(purpose == SOURCE_ANCHOR_PURPOSE, "AUTHORITY_SEMANTICS", f"authority.{SOURCE_ANCHOR_KEY}.purpose must define reconciliation anchor semantics")
+    _nonempty_string(anchor.get("observed_ref"), f"authority.{SOURCE_ANCHOR_KEY}.observed_ref")
+    anchor_commit = _nonempty_string(anchor.get("anchor_commit"), f"authority.{SOURCE_ANCHOR_KEY}.anchor_commit")
+    anchor_tree = _nonempty_string(anchor.get("anchor_tree"), f"authority.{SOURCE_ANCHOR_KEY}.anchor_tree")
+    _require(bool(_GIT_SHA_RE.fullmatch(anchor_commit)), "AUTHORITY_ANCHOR_COMMIT_FORMAT", "source anchor commit must be a 40-character lowercase Git SHA")
+    _require(bool(_GIT_SHA_RE.fullmatch(anchor_tree)), "AUTHORITY_ANCHOR_TREE_FORMAT", "source anchor tree must be a 40-character lowercase Git SHA")
+    verified_on = _nonempty_string(anchor.get("verified_on"), f"authority.{SOURCE_ANCHOR_KEY}.verified_on")
+    try:
+        datetime.strptime(verified_on, "%Y-%m-%d")
+    except ValueError as exc:
+        raise ControlError("AUTHORITY_VERIFIED_ON", "source anchor verified_on must be an ISO date") from exc
+    lineage_policy = _nonempty_string(anchor.get("lineage_policy"), f"authority.{SOURCE_ANCHOR_KEY}.lineage_policy")
+    policy_upper = lineage_policy.upper()
+    if any(token in policy_upper for token in ("SELF", "OWN_HEAD", "OWN_COMMIT", "CANDIDATE_SHA")):
+        raise ControlError(
+            "AUTHORITY_SELF_REFERENCE",
+            "source anchor lineage policy must not require the candidate to contain its own Git SHA",
+        )
+    _require(lineage_policy == SOURCE_ANCHOR_LINEAGE_POLICY, "AUTHORITY_LINEAGE_POLICY", f"source anchor lineage_policy must be {SOURCE_ANCHOR_LINEAGE_POLICY}")
+    _nonempty_string(anchor.get("authority_scope"), f"authority.{SOURCE_ANCHOR_KEY}.authority_scope")
+    _nonempty_string(anchor.get("release_authority"), f"authority.{SOURCE_ANCHOR_KEY}.release_authority")
+    _require(isinstance(anchor.get("historical_official_artifact_preserved"), bool), "AUTHORITY_SEMANTICS", "historical_official_artifact_preserved must be boolean")
+    _require(isinstance(anchor.get("unpromoted_successor_separate"), bool), "AUTHORITY_SEMANTICS", "unpromoted_successor_separate must be boolean")
+    return {
+        "semantic_type": semantic_type,
+        "source_kind": source_kind,
+        "observed_ref": anchor["observed_ref"],
+        "anchor_commit": anchor_commit,
+        "anchor_tree": anchor_tree,
+        "lineage_policy": lineage_policy,
+        "observed_head": None,
+        "observed_origin_main": None,
+        "head_relationship": "NOT_OBSERVED",
+        "origin_main_relationship": "NOT_OBSERVED",
+    }
+
+
+def _validate_authority(control: dict[str, Any]) -> dict[str, Any]:
     authority = _object(control.get("authority"), "authority")
     _require(
         authority.get("canonical_source") == "governance/development-control.json",
@@ -159,6 +237,7 @@ def _validate_authority(control: dict[str, Any]) -> None:
     _require(required_refs.issubset(set(refs)), "AUTHORITY_REFS", "existing P2P authority references are incomplete")
     _require(authority.get("is_replacement_for_existing_state") is False, "SECOND_TRUTH_STORE", "control record cannot replace existing state")
     _require(authority.get("retrieved_content_is_data") is True, "TRUST_BOUNDARY", "retrieved content must remain data")
+    return _validate_source_anchor(authority)
 
 
 def _validate_official_baseline(control: dict[str, Any]) -> dict[str, Any]:
@@ -451,7 +530,7 @@ def validate_control(control: dict[str, Any], *, expected_official_version: str 
 
     _require(control.get("schema_version") == SCHEMA, "CONTROL_SCHEMA", f"schema_version must be {SCHEMA}")
     _require(expected_official_version == OFFICIAL_BASELINE_VERSION and expected_official_sha256 == OFFICIAL_BASELINE_SHA256, "VALIDATOR_POLICY", "official validator constants cannot be overridden")
-    _validate_authority(control)
+    source_anchor = _validate_authority(control)
     baseline = _validate_official_baseline(control)
     _validate_lineage_contract(control, baseline)
     _validate_candidates(control, baseline)
@@ -500,6 +579,7 @@ def validate_control(control: dict[str, Any], *, expected_official_version: str 
         "schema_version": SCHEMA,
         "official_baseline": baseline["version"],
         "official_baseline_sha256": baseline["artifact_sha256"],
+        "source_anchor": source_anchor,
         "capabilities": {identifier: capabilities[identifier].get("status") for identifier in sorted(capabilities)},
         "roadmap": {identifier: roadmap[identifier].get("status") for identifier in sorted(roadmap)},
         "provenance_entries": len(provenance),

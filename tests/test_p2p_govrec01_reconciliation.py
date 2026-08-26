@@ -25,15 +25,19 @@ class P2PGovrec01ReconciliationTests(unittest.TestCase):
         control = json.loads((REPO_ROOT / "governance" / "development-control.json").read_text(encoding="utf-8"))
         official = control["official_baseline"]
         current = control["current_development"]
-        promoted = control["authority"]["current_promoted_source"]
+        promoted = control["authority"]["promoted_source_anchor"]
         self.assertEqual(official["version"], "8.4.7-C-codex.19")
         self.assertEqual(official["promotion_status"], "PROMOTED_VERIFIED")
         self.assertEqual(current["source_version"], "8.4.7-C-codex.74")
         self.assertEqual(current["source_version_status"], "ACTIVE_UNPROMOTED")
-        self.assertEqual(promoted["ref"], "origin/main")
-        self.assertEqual(promoted["status"], "PROMOTED_CANONICAL_SOURCE")
-        self.assertEqual(promoted["commit"], PROMOTED_COMMIT)
-        self.assertEqual(promoted["tree"], "3e6ab12ff78a72c4a3ea2a418e11167a8649aaad")
+        self.assertEqual(promoted["semantic_type"], "PROMOTED_IMPLEMENTATION_SOURCE_ANCHOR")
+        self.assertEqual(promoted["source_kind"], "GIT_COMMIT_TREE")
+        self.assertEqual(promoted["purpose"], "The exact promoted implementation source against which this governance reconciliation was evaluated.")
+        self.assertEqual(promoted["observed_ref"], "origin/main")
+        self.assertEqual(promoted["status"], "PROMOTED_IMPLEMENTATION_SOURCE_ANCHOR")
+        self.assertEqual(promoted["anchor_commit"], PROMOTED_COMMIT)
+        self.assertEqual(promoted["anchor_tree"], "3e6ab12ff78a72c4a3ea2a418e11167a8649aaad")
+        self.assertEqual(promoted["lineage_policy"], "CURRENT_OR_CANDIDATE_HEAD_MUST_EQUAL_OR_DESCEND_FROM_ANCHOR")
         self.assertEqual(promoted["baseline_ancestor"], "af02170ac7ba180900ca78beb26a2972d80c73b6")
         self.assertTrue(promoted["historical_official_artifact_preserved"])
         self.assertTrue(promoted["unpromoted_successor_separate"])
