@@ -323,10 +323,60 @@ The protocol must support `CT001 -> CT002` without copying the full CT001 conver
 
 ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED
 
+## Execution Addendum — Governance Lock Reconciliation (P2P-CT01-R03)
+
+This is a bounded continuation of P2P-CT01, not a new Large Goal. It reconciles
+the existing candidate's intended durable governance projections with the
+existing protected-runtime lock. The broken upgrade root remains read-only.
+
+### Scope and invariant map
+
+| Family | Authority / mechanism | In-scope action | Preserve-only boundary |
+|---|---|---|---|
+| Protected runtime integrity | `scripts/p2p_governance.py`, `governance/drift-policy.json`, and `governance/runtime-manifest.lock.json` | regenerate the existing package lock from the exact candidate tree | no second lock, policy bypass, or indiscriminate whitelist |
+| CT01 durable governance projection | Charter, capability ledger, roadmap, and operator guide | bind only the four files actually reported by the drift validator | tests, plans, reports, and evidence remain non-runtime surfaces |
+| CT01 implementation boundary | `.p2p/system/p2p_capabilities/control_tower_handoff.py` and its focused test | classify against the existing package lock scope; do not alter implementation | no router, quorum, provider, host, approval, promotion, or deployment change |
+| Baseline separation | fresh canonical clone and candidate commit/tree relation | compare doctor, drift, framework validator, and exact diffs | inherited 52/59 failures remain separately attributed |
+
+### Checklist
+
+- [x] P3-A: Re-verify origin, canonical SHA/tree, candidate ancestry/tree/branch, and scoped worktree state before mutation; stop on any mismatch.
+- [x] P3-B: Re-discover the package lock allowlist and classify every CT01-related path as runtime/governance, test-only, documentation, plan/evidence, or out of lock scope.
+- [x] P3-C: Invoke the existing `lock-runtime` generator once with a reconciliation reason; accept only the expected CT01 lock additions/hash refreshes.
+- [x] P3-D: Prove the lock is not a bypass by causing one temporary protected-file mutation to fail drift/doctor, restore exact bytes, and confirm the scoped worktree is clean again.
+- [ ] P3-E: Run focused tests, compile, applicable eval, candidate doctor/drift, 52/59 baseline comparison, `git diff --check`, exact changed-path inspection, Anvien change detection, and a fresh Supervisor review against the resulting candidate SHA/tree.
+
+### P3 path classification
+
+| Path / surface | Classification | Existing governance result | Reconciliation decision |
+|---|---|---|---|
+| `.p2p/system/p2p_capabilities/control_tower_handoff.py` | `INTENDED_DURABLE_CT01_ARTIFACT` | package-mode lock intentionally does not cover installed `.p2p/system` | preserve; do not add a package-lock exception or second registry |
+| `tests/test_p2p_control_tower_session_handoff.py` | `TEST_ONLY` | not in the package protected-path set | preserve focused proof; do not lock |
+| `docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md` | `INTENDED_DURABLE_CT01_ARTIFACT` | existing `docs` protection binds it | add through generated lock only |
+| `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md` | `INTENDED_DURABLE_CT01_ARTIFACT` | existing `docs` protection binds its CT01 cross-reference | refresh generated hash only |
+| `docs/p2p-development/capability-ledger/capability-index.json` | `INTENDED_DURABLE_CT01_ARTIFACT` | existing `docs` protection binds the ledger projection | refresh generated hash only |
+| `docs/p2p-development/current-roadmap.md` | `INTENDED_DURABLE_CT01_ARTIFACT` | existing `docs` protection binds the derived roadmap projection | refresh generated hash only; LF/CRLF noise remains unnormalized |
+| `docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/` | `NON_RUNTIME_DOCUMENTATION` | `/docs/plans/` is an existing lock exclusion | preserve as plan/evidence; do not lock |
+| `reports/coder/`, `reports/supervisor/`, and `.tmp/` evidence | `GENERATED_EVIDENCE_ONLY` | `/reports/`, lock output, and `.tmp` are existing non-runtime boundaries | preserve as evidence; do not lock |
+| `docs/notes_decisions_log/notes_decisions_log_20260826.md` | `NON_RUNTIME_DOCUMENTATION` | existing `docs` protection applies to this durable execution log | bind through the same generated lock; no special exemption |
+| `governance/runtime-manifest.lock.json` | `SHOULD_NOT_BE_GOVERNANCE_LOCKED` | lock output is excluded by the existing runtime-lock fragment | generate only through `lock-runtime`; never self-lock or hand-edit |
+
+The only package-lock additions are the intended protected documentation projections and
+the required dated execution log. The implementation module, test, plan, reports, and
+evidence remain outside this package lock for the reasons above.
+
+### Acceptance boundary
+
+The technical outcome may be `P2P_CT01_GOVERNANCE_RECONCILED_CANDIDATE_READY_FOR_OWNER_GATE`
+only when candidate-specific drift is gone and inherited failures remain explicit.
+It must not be called promoted, canonical, deployed, live, or host-runtime
+certified. Owner approval is not inherited and no approval or promotion command
+is authorized in this execution.
+
 ## Risk Notes
 
 - The worktree reports broad line-ending-only modifications under core.autocrlf=true; they remain unstaged and are not CT01 changes.
 - Hidden .p2p files are not represented in Anvien graph output; direct source inspection and repository validation remain authoritative.
-- Capability ledger/roadmap edits are derived candidate projections; runtime locks and promotion surfaces stay untouched.
+- Capability ledger/roadmap edits are derived candidate projections; this execution may regenerate only the existing runtime lock through its canonical generator, with promotion surfaces preserved.
 - Workflow bootstrap state may be ignored by Git and is not a replacement for durable tracked documentation.
 - Any base SHA/tree mismatch, invalid ledger schema, unbound host, or false-success test changes the terminal result to BLOCKED.

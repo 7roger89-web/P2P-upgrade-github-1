@@ -66,3 +66,17 @@ The addendum changes protocol/documentation inventory only. It does not create a
 | A2 | exact beginner rotation chat names emitted | names | 0 | 2 | 2 | 2 | +2 | E4-A2-TEST1 |
 
 The rotatable addendum changes protocol/documentation inventory only. No benchmark result is a live-host, provider, quorum, promotion, release, deployment, or performance claim.
+
+## B5 - P2P-CT01-R03 Governance Lock Reconciliation Benchmarks
+
+| Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
+|---|---|---|---:|---:|---:|---:|---:|---|
+| R03 | package protected runtime files | files | 1178 | 1180 | 1180 | existing manifest + intended protected docs | +2 | E5-P3C-LOCK1 |
+| R03 | candidate-specific governance drift failures | failure groups | 2 | 0 | 0 | 0 | -2 | E5-P3D-NEGATIVE1, E5-P3E-DOCTOR1 |
+| R03 | negative unexpected protected mutations proven | cases | 0 | 1 | 1 | 1 | +1 | E5-P3D-NEGATIVE1 |
+| R03 | focused CT01 protocol regression cases | cases | 28 | 28 | 28 | 28 | 0 | E5-P3E-TEST1 |
+
+The lock count delta is an inventory result: one intended durable guide and one dated
+execution log are now represented by the existing package `docs` protection; charter,
+ledger, and roadmap entries are hash refreshes. This is not a performance, live-host,
+provider, quorum, promotion, release, deployment, or canonical-authority benchmark.

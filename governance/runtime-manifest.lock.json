@@ -802,13 +802,15 @@
     "docs/notes_decisions_log/notes_decisions_log_20260816.md": "aa20bc1995ef2d0b1f313c2841d879bfda04a3e34a2817ff4503bd80b0ee84da",
     "docs/notes_decisions_log/notes_decisions_log_20260824.md": "129c8bf5d1a7d263e2a650cc6bdde879ef12f51d7ead2ba065a0b37443e2367b",
     "docs/notes_decisions_log/notes_decisions_log_20260825.md": "da1aa691cf98148f921d436c2d2b3236edcf0e03285185d1b7af0bac8382b386",
+    "docs/notes_decisions_log/notes_decisions_log_20260826.md": "5bd9f27df199789fb5168ca70758aadc963cc5a605ee8df3b07922f6ab823a9a",
+    "docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md": "24bb0ab77c362077d545fc9a43f152caf28297c6d85f432700df4bd3ab4a9cc7",
     "docs/p2p-development/P2P-C25-final-report.md": "d4444515702a472fb2ebed5504b5f19f8ea6a57544d03665a206deaff35e5d39",
-    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md": "07eae287f2f86a39d41c80cf613bf0143929b88299f6db93613d0e0a54462ffe",
+    "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md": "f4232478018aab174263272ecd666affbbf298d2b1b6731c6117cfb8ff4564b8",
     "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md": "8d0bd4b0e1700b4baf90a4222192851bc633046ceadcdb7f8d7368344ed2f09f",
     "docs/p2p-development/candidates/controlled-execution-hardening-canonical-coverage-matrix.md": "9adf0eda5688f21d1630f9ec82594779a528200237704e752cc68272c47e7bc9",
-    "docs/p2p-development/capability-ledger/capability-index.json": "5e37b220dcf7948ffff841b51317c58e52a7a94b3dad862ce340bfaca143a200",
+    "docs/p2p-development/capability-ledger/capability-index.json": "ddfe244cf5abf2b1d672090fbba678089503fce32f4de57cb8133ddb44a27c13",
     "docs/p2p-development/capability-ledger/capability-ledger.schema.json": "147f5a296952305ca90147ddee47559047eb8d92ebc803de7b0fc910562b51ef",
-    "docs/p2p-development/current-roadmap.md": "90c959b3695e6a3c30c0dd1d603c83972106c093f11a33fba560566a3f2f3d26",
+    "docs/p2p-development/current-roadmap.md": "4e5f74026a1b33a1372e235acda0b71d49687ba1d0343d9509b5b648d67196d9",
     "docs/p2p-development/decisions/owner-accepted/INDEX.md": "56f41da69d27256513db482ae8c22b39364bcd618c204c1e372b6a9ea3f7a047",
     "docs/p2p-development/decisions/owner-accepted/P2P_Contextual_Rule_Intelligence_Update_2026-08-21.md": "7c1cc7597dd65b343a35f007b4c30f4acb08515bee5a4dd6e2155158ac37b96d",
     "docs/p2p-development/framework/_skill-inventory-raw.json": "507b7c7710ad9c145b896773a385df4aa5ad62d7f4126821f84ca4a5b01345af",
@@ -1185,6 +1187,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-26T11:22:43+07:00",
-  "reason": "P2P-GOVREC02 source-anchor contract correction"
+  "generated_at": "2026-08-26T17:49:13+07:00",
+  "reason": "P2P-CT01-R03 governance lock reconciliation for intended durable CT01 projections"
 }

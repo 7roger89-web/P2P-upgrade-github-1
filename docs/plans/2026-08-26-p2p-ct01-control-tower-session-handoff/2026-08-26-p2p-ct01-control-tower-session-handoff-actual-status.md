@@ -189,3 +189,17 @@ The latest Owner addendum is materially compatible with the existing CT01 module
 Decision note:
 
 P1-A, P1-B, P2-A, P2-B, and the Owner-approved A1 attachment-aware addendum were complete before the latest addendum. The same bounded CT01 plan now includes the rotatable successor packet, exact archive/new-chat workflow, read-only reconciliation, durable projections, and ROTATION A-F coverage. Technical addendum validation and fresh Supervisor review pass; the clean canonical baseline and candidate retain the same seven pre-existing framework-validator failures, the development doctor remains blocked by unpromoted governance drift, and no live-host certification exists. The honest terminal state is `BLOCKED` for the full session while `ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED` is recorded for the addendum. No unrelated governance repair, promotion, remote write, or protected-root mutation occurred.
+
+## R12 — P2P-CT01-R03 Governance Lock Reconciliation
+
+| Surface | Actual status | Evidence | Next action / boundary |
+|---|---|---|---|
+| canonical and candidate identity | fresh origin/main `28a3ecd9c04d36511269e44c384bff6e11677b93`, canonical tree `cae63e055edd164fbd969f6dbae0d992a4d0efed`; candidate branch `codex/p2p-ct01-control-tower`, prior tip `57c4cfc2fd3bbad2c52e40b66be730aeb7ff7f47`, `12 ahead / 0 behind` | E5-P3A-IDENTITY1 | preserve exact lineage; no remote write |
+| protected-runtime mechanism | existing `scripts/p2p_governance.py lock-runtime` with `governance/drift-policy.json` and `governance/runtime-manifest.lock.json`; no second lock/registry/exemption | E5-P3B-MECHANISM1, E5-P3C-LOCK1 | preserve canonical generator |
+| CT01 durable projections | guide, charter, capability ledger, and roadmap are legitimate protected `docs/` projections; generated lock binds the intended paths and refreshed hashes | E5-P3B-CLASS1, E5-P3C-LOCK1 | preserve one router, lifecycle, ledger, Owner Gates, provider neutrality |
+| implementation/test boundary | module remains an existing `.p2p/system` capability seam; focused test remains test-only and neither is added to the package lock | E5-P3B-CLASS1 | no installed-runtime lock redesign |
+| plan/evidence boundary | plan/evidence remain documentation/evidence surfaces; reports and `.tmp` remain generated evidence only; dated notes log is bound by the existing `docs` protection | E5-P3B-CLASS1, E5-P3E-EVIDENCE1 | no packet canonicalization or approval authority |
+| negative proof | temporary unexpected roadmap mutation produced drift FAIL (exit 2) and doctor `ok=false` (exit 1); marker was removed and post-restore doctor/drift are PASS | E5-P3D-NEGATIVE1, E5-P3E-DOCTOR1 | preserve fail-closed detection |
+| validation | focused 28-case suite, compile, eval, candidate doctor, and drift pass; framework validator remains the same inherited `52/59` on base and candidate | E5-P3E-TEST1..E5-P3E-BASELINE1 | fresh Supervisor review is the final local handoff gate |
+
+R03 technical classification: `P2P_CT01_GOVERNANCE_RECONCILED_CANDIDATE_READY_FOR_OWNER_GATE` after the exact checkpoint and fresh Supervisor review. This is not promotion, canonicalization, deployment, live execution, host certification, or inherited Owner approval.
