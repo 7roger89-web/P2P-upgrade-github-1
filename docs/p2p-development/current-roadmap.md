@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-24 (C43 + AERG reconciliation projection refresh; derived, not authored-by-hand as a decision document).
+**Generated:** 2026-08-26 (P2P-CT01 ledger projection refresh; derived, not authored-by-hand as a decision document).
 
 ## 6. Framework goals (FW series)
 
@@ -67,7 +67,7 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at regeneration time (175 records, 12 registered families; 3 residual records use unregistered legacy family labels):
+Counts per family in `capability-index.json` at regeneration time (176 records, 12 registered families; 3 residual records use unregistered legacy family labels):
 | Family | Count | Dominant statuses |
 | --- | --- | --- |
 | Truth & Governance | 22 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
@@ -76,7 +76,7 @@ Counts per family in `capability-index.json` at regeneration time (175 records, 
 | Skill & Learning | 5 | VERIFIED_IMPLEMENTED + PARTIAL |
 | Execution & Orchestration | 28 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
 | Design & Product Intelligence | 7 | VERIFIED_IMPLEMENTED + REJECTED |
-| Multi-AI Interoperability | 31 | FOUNDATION_READY + REJECTED |
+| Multi-AI Interoperability | 32 | FOUNDATION_READY + REJECTED |
 | Routing & Cognitive Economy | 4 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
 | Verification & Evaluation | 7 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
 | Recovery & Continuation | 6 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
@@ -118,6 +118,12 @@ The ledger now makes prerequisite reasoning explicit: every record declares `dep
 - `TASK_TARGETED_STATE_ARCHITECTURE_FOUNDATION_READY`, `RECOVERY_TESTABILITY_FOUNDATION_READY`, `TASK_STATE_RECOVERY_IMPLEMENTED` (C13/C19 lineage)
 - `DURABLE_PROJECT_TRUTH_PACKAGING_FOUNDATION_READY` (C25)
 - `AI_EXECUTION_RELIABILITY_GUARD` (AERG reconciliation foundation; evidence/assurance only, not release authority)
+
+- CONTROL_TOWER_SESSION_HANDOFF_FOUNDATION_READY (P2P-CT01 local technical proof; UNPROMOTED)
+
+### P2P-CT01 durable Control Tower session handoff foundation
+
+P2P-CT01 adds a provider-neutral, explicit session binding and structured return packet over the existing host executor, task state, evidence, and execution-ledger boundaries. The packet supports terminal returns, stale/unknown-base reconciliation, owner-gate recording, failure return, host-lane isolation, and recursive copy/paste continuation. It does not launch hosts, infer authority from prose, inherit chat history, overwrite canonical state, promote, release, or certify a live provider. Local proof is 14 focused tests; the capability remains FOUNDATION_READY and UNPROMOTED.
 
 ### 3e. C30 composable execution target foundation (2026-08-17)
 C30 delivered the **provider-neutral, deterministic composable execution target foundation** — `scripts/p2p_execution_target.py` — with 60 passing tests (`tests/test_p2p_execution_target.py` ET1..ET60) and a durable research intake artifact (`docs/p2p-development/research/execution-target-pattern-research.md`, nine source repositories, patterns A–O, no code copied). The module models execution as an honest composition of a harness, a provider, a model, a protocol, a toolset, a workspace, an environment, auth (harness and provider kept separate), and a permission envelope; `UNKNOWN` and stale evidence fail closed, protocol compatibility is never certification, permission composition never widens, and the registry enumerates but never routes. Honest gaps are durably recorded: no router, no autopilot, no background autonomy, no real execution, no second executor, and no secrets stored. Terminal state: **PASS (foundation)**, candidate UNPROMOTED per the C29 deterministic policy.

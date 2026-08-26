@@ -33,9 +33,9 @@ This is a Python protocol/documentation change. Record inventory and directly me
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---|---:|---:|---:|---:|---:|---|
-| P2 | durable CT01 guides | files | 0 | pending | pending | 1 | pending | E2-P2A-DOC1 |
-| P2 | capability ledger records | records | 175 | pending | pending | 176 | pending | E2-P2A-LEDGER1 |
-| P2 | projected MULTI-AI records | records | 31 | pending | pending | 32 | pending | E2-P2A-ROADMAP1 |
+| P2 | durable CT01 guides | files | 0 | 1 | pending | 1 | pending | E2-P2A-DOC1 |
+| P2 | capability ledger records | records | 175 | 176 | pending | 176 | pending | E2-P2A-LEDGER1 |
+| P2 | projected MULTI-AI records | records | 31 | 32 | pending | 32 | pending | E2-P2A-ROADMAP1 |
 | P2 | candidate commits | commits | 0 | pending | pending | 1 or more | pending | E2-P2B-COMMIT1 |
 
 ## Non-Benchmarkable Notes

@@ -2,7 +2,7 @@
 
 Title: P2P-CT01 Durable Control Tower Session Handoff
 Date: 2026-08-26
-Status: P1-B Complete / P2-A Pending
+Status: P2-A Complete / P2-B Pending
 Companion plan: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-plan.md
 Companion evidence: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-evidence.md
 Companion benchmark: docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-benchmark.md
@@ -58,8 +58,9 @@ Out of scope:
 | CT01 packet/lane protocol | module and 14 focused tests pass | explicit terminal packet and reconciliation with regression proof | correct | new module + test file | E1-P1B-TEST1..E1-P1B-TEST14 | proceed P2-A |
 | recursive beginner prompt | builder and exact action assertions pass | self-contained prompt with regression proof | correct | new module + test file | E1-P1B-TEST7 | proceed P2-A |
 | CT01 behavior tests | 14 focused tests pass after fixture-only correction | isolated A-H plus negatives | correct | 14 tests | E1-P1B-TEST1..E1-P1B-TEST14 | proceed P2-A |
-| durable operator guide | no CT01 guide found | discoverable guide | missing | 0 | E0-P0A-ARCH2 | edit P2-A |
-| capability ledger projection | 175 records, no CT01 record | one valid foundation-ready record | partial | schema exists | E0-P0A-ARCH1 | edit P2-A |
+| durable operator guide | guide and charter cross-reference are present and mechanically discoverable | discoverable guide with exact beginner flow and boundaries | correct | guide + charter | E2-P2A-DOC1 | proceed P2-B |
+| capability ledger projection | 176 records with a schema-valid CT01 record; seven baseline validator failures remain outside CT01 | one valid foundation-ready record plus unchanged governance boundary | correct for CT01 / partial for pre-existing ledger surface | schema + record | E2-P2A-LEDGER1, E2-P2A-BASELINE1 | proceed P2-B with baseline blocker |
+| roadmap projection | count and Multi-AI family projection updated to 176/32 | derived projection synchronized with CT01 record | correct | roadmap + ledger | E2-P2A-ROADMAP1 | proceed P2-B |
 | runtime authority/promotion | governed existing surfaces | unchanged and unpromoted | correct/preserve-only | protected | E0-P0A-ARCH1 | do not touch |
 
 ## Status Refresh Log
@@ -69,6 +70,7 @@ Out of scope:
 | R0 | 2026-08-26 | fresh canonical clone, fetched remote, isolated worktree, current graph | all CT01 surfaces | baseline classifications above | E0-P0A-SRC1..E0-P0A-ENV1 | proceed P1-A with new-module-only edit |
 | R1 | 2026-08-26 | P1-A source addition, py_compile/import smoke, refreshed graph | CT01 module and prompt | missing -> partial; code exists, regression proof pending | E1-P1A-SRC1..E1-P1A-GRAPH1 | proceed P1-B tests; no existing executor edit |
 | R2 | 2026-08-26 | P1-B focused pytest after fixture correction | CT01 packet/prompt/tests | partial/missing -> correct | E1-P1B-TEST1..E1-P1B-TEST14, E1-P1B-FIX1 | proceed P2-A durable docs/ledger |
+| R3 | 2026-08-26 | P2-A guide/charter/ledger/roadmap edits plus custom schema/count check and canonical baseline comparison | durable CT01 discovery and projection | missing/partial -> correct for CT01; global framework remains blocked by pre-existing 7 failures | E2-P2A-DOC1..E2-P2A-BASELINE1 | proceed P2-B; preserve blocker and do not repair unrelated baseline |
 
 ## Phase Touch Map
 
@@ -121,8 +123,8 @@ Forbidden next action: call the candidate live-certified or promoted.
 |---|---|---|
 | P1-A | foundations partial; CT01 seam missing | proceed with new module only |
 | P1-B | 14 focused cases pass | complete; proceed P2-A |
-| P2-A | durable discovery missing | add guide and one foundation-ready ledger record |
-| P2-B | no candidate evidence/report | validate, report, commit; do not promote |
+| P2-A | guide, charter cross-reference, CT01 ledger record, and roadmap projection pass focused checks | complete; proceed P2-B |
+| P2-B | global framework validator remains 52/59 on clean canonical baseline; CT01 behavior is green | proceed with full relevant checks and supervisor, terminal may be BLOCKED by inherited baseline |
 
 ## Implementation Gate
 
@@ -146,4 +148,4 @@ Forbidden next action: call the candidate live-certified or promoted.
 
 Decision note:
 
-P1-A and P1-B are complete in the isolated canonical worktree. The first pytest run found and corrected only a missing repo-local .tmp fixture directory; the final run is 14 passed. P2-A may now add durable documentation and a foundation-ready ledger projection. The broken requested root remains untouched.
+P1-A, P1-B, and P2-A are complete in the isolated canonical worktree. The CT01-specific module/test/doc/ledger projection is present and focused checks pass. The clean canonical baseline and CT01 worktree both retain the same seven pre-existing framework-validator failures; P2-B must report this honestly and must not repair unrelated governance debt. The broken requested root remains untouched.

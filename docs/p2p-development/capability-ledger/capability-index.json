@@ -3,7 +3,7 @@
   "schema_version": 2,
   "canonical_source_statement": "Derived from governance/development-control.json (architectural_invariants, roadmap, capability_status, candidate_records, research_decisions), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, docs/plans/, and per-goal evidence reports in reports/. This ledger is capability knowledge, status, and roadmap intent only; it is NOT runtime truth, NOT Task State, and NOT a second FACT store. Where this ledger contradicts development-control.json, development-control.json wins.",
   "authority_boundary": "This ledger records capability knowledge, capability status, and development intent. It does not control runtime task completion. Runtime task authority lives in Task State; goal/development governance authority lives in governance/development-control.json; factual and evidence authority lives in governance/fact-ledger.json and governance/live-specs.json with their evidence files.",
-  "generated_at": "2026-08-19T13:15:00Z",
+  "generated_at": "2026-08-26T07:47:22Z",
   "families": {
     "TRUTH_AND_GOVERNANCE": {
       "name": "Truth & Governance",
@@ -5027,9 +5027,53 @@
       "last_reviewed": "2026-08-24",
       "freshness": "verified_against_filesystem",
       "notes": "Current post-C43 reconciliation of the recoverable AERG intent. Historical C44, RI-011, RA-EXT-035, and RM-AERG labels are not current authority. .19 remains PROMOTED_VERIFIED, .74 remains SEALED_UNPROMOTED/NONCANONICAL, and promotion.allowed remains false."
+    },
+    {
+      "capability_id": "CONTROL_TOWER_SESSION_HANDOFF",
+      "name": "Durable Control Tower Session Handoff",
+      "family": "MULTI_AI_INTEROPERABILITY",
+      "status": "FOUNDATION_READY",
+      "beginner_value": "A beginner can copy one complete final response back to the Control Tower and continue in another AI without manually reconstructing hidden session context.",
+      "principle": "PROJECT_STATE_NOT_CHAT_HISTORY",
+      "origin_refs": [
+        "docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-plan.md",
+        "docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md"
+      ],
+      "origin_type": "IMPLEMENTATION_GOAL",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/control_tower_handoff.py",
+        "tests/test_p2p_control_tower_session_handoff.py",
+        "docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_control_tower_session_handoff.py (14 focused cases)",
+        "docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/2026-08-26-p2p-ct01-control-tower-session-handoff-evidence.md"
+      ],
+      "dependencies": [
+        "HOST_EXECUTOR_NEUTRALITY",
+        "ROUND_TRIP_BINDING",
+        "CROSS_HOST_RESUME",
+        "DURABLE_RESUME",
+        "EXECUTION_LEDGER",
+        "HOST_IDENTITY_VERIFICATION"
+      ],
+      "known_gaps": [
+        "Live Codex, Manus, Claude, Gemini, and future-host continuation is not certified.",
+        "The packet is an evidence/return proposal; existing callers must persist it through the existing execution-ledger and evidence path.",
+        "Owner approval, promotion, release, deployment, and protected remote writes were not performed."
+      ],
+      "do_not_duplicate_with": [
+        "CROSS_HOST_CONTINUATION_CONTRACT",
+        "ROUND_TRIP_BINDING",
+        "CROSS_HOST_RESUME"
+      ],
+      "next_condition": "Reconsider only after fresh independent evidence and supervisor review; a packet or local test must never promote this capability.",
+      "last_reviewed": "2026-08-26",
+      "freshness": "verified_against_filesystem",
+      "notes": "P2P-CT01 local foundation proof is 14 focused tests on an isolated canonical worktree. Candidate remains FOUNDATION_READY and UNPROMOTED; CANONICAL_PROMOTED is NO."
     }
   ],
-  "last_reviewed": "2026-08-24T12:00:00Z",
+  "last_reviewed": "2026-08-26T07:47:22Z",
   "review_notes": [
     "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions.",
     {
@@ -5043,6 +5087,12 @@
       "at": "2026-08-24T12:00:00Z",
       "change": "Added one foundation-only AI_EXECUTION_RELIABILITY_GUARD record under the registered VERIFICATION_AND_EVALUATION family from recovered historical subject plus fresh current implementation evidence; no official baseline, candidate promotion, release, or host authority changed.",
       "dedup_check": "verified unique capability_id and registered family before validation"
+    },
+    {
+      "reviewed_after_goal": "P2P-CT01",
+      "at": "2026-08-26T07:47:22Z",
+      "change": "Added one foundation-ready durable Control Tower session handoff record under the registered MULTI_AI_INTEROPERABILITY family from the isolated P2P-CT01 implementation and 14 focused behavior tests; no runtime authority, promotion, release, or host certification changed.",
+      "dedup_check": "verified unique capability_id, registered family, and existing dependency IDs before projection"
     }
   ],
   "reviewed_after_goal": "GOVERNANCE-TRUTH-SYNC",

@@ -62,7 +62,14 @@ P1-B completed:
 
 Matching plan item(s): P2-A and P2-B
 
-Append:
+P2-A completed:
+
+- E2-P2A-DOC1: added docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md with the exact beginner workflow, exact USER_ACTION, packet field contract, reconciliation rules, architecture binding, discovery paths, and explicit UNPROMOTED boundary; added the charter 3A cross-reference.
+- E2-P2A-LEDGER1: custom JSON/schema/dependency check passed for CONTROL_TOWER_SESSION_HANDOFF; ledger count is 176, MULTI_AI_INTEROPERABILITY count is 32, the new record is schema-valid, unique, registered-family, and all six dependencies resolve.
+- E2-P2A-ROADMAP1: current-roadmap.md projection records 176 total capabilities and 32 Multi-AI records and names CONTROL_TOWER_SESSION_HANDOFF_FOUNDATION_READY as local technical proof only.
+- E2-P2A-BASELINE1: scripts/validate_p2p_development_framework.py on the CT01 worktree remains 52/59 with the same seven failures observed on the fresh canonical clone: nine historical records missing origin_type, legacy family/dependency/freshness entries, charter competitor-pattern scan, and governance pr_lineage. No new CT01-specific failure was added; those existing failures remain out of scope and are a P2-B validation blocker.
+
+P2-B pending:
 
 - E2-P2A-DOC1: operator guide, charter cross-reference, exact beginner workflow, and discovery paths.
 - E2-P2A-LEDGER1: capability ledger schema/dependency/uniqueness validation.

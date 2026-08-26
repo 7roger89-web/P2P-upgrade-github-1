@@ -179,7 +179,7 @@ P0 is complete for implementation. Existing host executor, task state, live exec
   - P2-A: document CT01 and register the foundation-ready projection.
   - P2-B: validate, report, supervise, commit, and close.
 
-- [ ] P2-A: Add durable documentation and ledger projection
+- [x] P2-A: Add durable documentation and ledger projection
   - Goal: expose exact discovery paths, beginner workflow, return contract, and governance boundary.
   - Scope Boundary:
     - Editable: CONTROL-TOWER-SESSION-HANDOFF.md, charter cross-reference, capability-index.json, current-roadmap.md.

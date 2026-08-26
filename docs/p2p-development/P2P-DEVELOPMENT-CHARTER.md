@@ -58,6 +58,12 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `MACHINE_READABLE_ROADMAP_VERIFIED` | The roadmap is canonical, machine-readable, and mechanically consumed by `scripts/p2p_roadmap_planner.py` (P2P-ROADMAP-AWARE-DEVELOPMENT-PLANNER-01): planner reads official baseline + ledger + roadmap + evidence + Owner priority, outputs ranked candidate goals with coverage-gap detection; never overrides Owner Gates. Verification: 18/18 tests PASS, fail-closed, deterministic ranking, hash binding. Runtime execution-loop integration remains planned (charter §6 heuristic unchanged). |
 
 
+## 3A. P2P-CT01 candidate boundary — durable session handoff
+
+P2P-CT01 applies existing charter invariants to a cross-host session return: PROJECT_STATE_NOT_CHAT_HISTORY, P2P_CORE_PROVIDER_NEUTRAL, HOST_NOT_AGENT, OUTPUT_NOT_EVIDENCE, NO_SECOND_TRUTH_STORE, NO_COMPETING_ROUTER, UNKNOWN_IS_NOT_SUPPORTED, and GOAL_PASS_NOT_PROMOTION. The durable operator and return contract is documented in docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md; the implementation and focused behavior proof are named there.
+
+The Control Tower packet is a proposed return/evidence projection. It does not become Task State, FACT_LEDGER, canonical repository truth, owner approval, host certification, release truth, or promotion. A short-lived session must bind SESSION_ID, HOST, GOAL_ID, and GOAL explicitly; stale or unknown canonical bases fail closed into reconciliation; owner gates and failures return without protected action; and a packet updates only its structured host lane. This is a foundation-ready development candidate, not a new router or certification authority.
+
 ## 4. Owner Gate — what P2P asks the owner about
 
 P2P asks the owner only for: product/business intent, real-world business data, destructive actions, secrets/credentials authorization, material expenditure, production deployment, release/promotion where approval is required, and irreducible ambiguity with material consequences. P2P must **not** ask the owner to choose implementation mechanics that P2P can determine from evidence.
