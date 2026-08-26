@@ -468,7 +468,7 @@ The promoted current source has moved past the `.74` runtime-manifest lock, whil
   - Actual-status Update: closure readiness or exact blocker.
   - Commit Boundary: commit evidence/status only when necessary; no source changes after final validation without rerun.
 
-- [ ] P4-B: Fresh exact-head Supervisor review and final local handoff
+- [x] P4-B: Fresh exact-head Supervisor review and final local handoff
   - Goal: obtain one fresh independent-style review of the exact final candidate head.
   - Scope Boundary:
     - Editable: Supervisor report only during review; no repair in review phase.
@@ -509,19 +509,19 @@ The promoted current source has moved past the `.74` runtime-manifest lock, whil
   - Actual-status Update: `PASS` -> Owner Gate; `REJECT` -> exact repair slice only.
   - Commit Boundary: final local commit before review; no commit during review.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.
   - Work Steps:
     1. Run the fresh exact-head Supervisor review described in P4-B.
     2. If it rejects, return only to the responsible implementation slice and rerun affected gates.
   - Implementation Gate: all planned implementation phases are completed or explicitly blocked.
   - Acceptance: Supervisor PASS, or a precise blocker with no false closure.
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only accepted plan artifacts.
   - Work Steps: inspect diff/status, remove only plan-created dead artifacts, rerun diff check, and record preserved owner data.
   - Implementation Gate: no unrelated cleanup.
   - Acceptance: no stale placeholder or dead generated artifact remains.
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status.
   - Work Steps: run final validation, record exact identity, record Supervisor report, commit locally, and stop at Owner Gate.
   - Implementation Gate: Pn-A and Pn-B pass or record blockers.

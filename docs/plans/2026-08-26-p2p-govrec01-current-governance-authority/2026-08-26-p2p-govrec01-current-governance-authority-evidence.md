@@ -109,8 +109,16 @@ Matching plan item(s): `P4-A`, `P4-B`
 - `E4-P4A-CLOSE5`: No provider, Manus, Council, remote write, promotion, release, deployment, root Git repair, or mutation of `.19`, v5, immutable baseline, or user projects occurred.
 - `E4-P4A-CLOSE6`: After the evidence closure commit, fresh Anvien analysis reports 945 files scanned, 169 code files parsed, and 0 parse failures; fresh `detect-changes --scope all` reports zero changed files, symbols, and affected processes.
 - `E4-P4A-CLOSE7`: Exact pre-Supervisor candidate identity is commit `b0b04dbadcce23459687cc158e03e65a6eb71217`, tree `3ad8ad2f8d0e7351c5cbd60ee3c7a15fed982dd7`, parent `89ce6de09a802967cf97f399d88b7a879d8c831e`, with baseline ancestor `af02170ac7ba180900ca78beb26a2972d80c73b6`.
-- `E4-P4B-SUP1..E4-P4B-SUP6`: Pending fresh independent exact-head Supervisor review. The report must state reviewed commit/tree/parent/base, subject-path diff, preserved dirty owner paths, and one PASS or REJECT verdict.
+- `E4-P4B-SUP1`: Fresh source-first Supervisor review inspected exact authority projection, `.19`/`.74` separation, runtime lock shape, Council boundary, Edge-Case index, decoder boundary, and drift classification before execution checks.
+- `E4-P4B-SUP2`: Supervisor reviewed commit `6c860eea9332b3641d2b7806daf37043b4bf123d`, tree `8d0e0201593f6a849a57e8811fae9ebc2646daa1`, parent `b0b04dbadcce23459687cc158e03e65a6eb71217`, baseline ancestor `af02170ac7ba180900ca78beb26a2972d80c73b6`, and promoted authority `2a71410afd1b29651016ef57a5d2da38938c3f68` / tree `3e6ab12ff78a72c4a3ea2a418e11167a8649aaad`.
+- `E4-P4B-SUP3`: Fresh exact-head checks passed: GOVREC01/drift/development-control `31 tests OK (skipped=2)`, direct drift PASS with empty failures/warnings/volatile findings, doctor exit 0 with `ok=true`, control validate/status PASS, corrected invariant assertions PASS, and unchanged adapter registry hash.
+- `E4-P4B-SUP4`: Subject paths were clean before report creation; 1,127 pre-existing owner/line-ending dirty entries remain preserved. No root Git repair, release artifact mutation, v5 mutation, baseline mutation, or user-project mutation occurred.
+- `E4-P4B-SUP5`: Supervisor recorded no provider, Manus, Council, remote, promotion, deployment, or approval execution; current full Council remains `FALSE/NOT_PROVEN`.
+- `E4-P4B-SUP6`: Fresh Supervisor verdict is `PASS`; the exact candidate is ready for the Owner Gate and the report is `reports/supervisor/rp_supervisor_260826_1017_by_gpt-5-codex_p2p-govrec01-current-authority.md`.
 
 ## Closure Evidence
 
-Pending implementation and validation. No release/promotion/remote mutation evidence is permitted in this plan.
+P0 through P4-B are technically complete. The terminal local handoff is
+`P2P_GOVREC01_CURRENT_GOVERNANCE_AUTHORITY_RECONCILED_READY_FOR_OWNER_GATE`.
+No release, promotion, remote mutation, provider, Manus, or Council execution
+evidence is asserted by this plan.
