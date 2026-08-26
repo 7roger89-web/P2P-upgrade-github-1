@@ -1,0 +1,192 @@
+{
+  "schema_version": "p2p-govrec01-drift-classification/1",
+  "goal_id": "P2P-GOVREC01",
+  "checked_on": "2026-08-26",
+  "authority": {
+    "ref": "origin/main",
+    "commit": "2a71410afd1b29651016ef57a5d2da38938c3f68",
+    "tree": "3e6ab12ff78a72c4a3ea2a418e11167a8649aaad",
+    "baseline_ancestor": "af02170ac7ba180900ca78beb26a2972d80c73b6"
+  },
+  "classification_vocabulary": [
+    "AUTHORIZED_PROMOTED_EVOLUTION",
+    "HISTORICAL_REFERENCE",
+    "EXPECTED_GENERATED_STATE",
+    "UNLOCKED_BUT_LEGITIMATE",
+    "UNEXPLAINED_DRIFT",
+    "GOVERNANCE_DEFECT"
+  ],
+  "runtime_manifest_before_reconciliation": {
+    "locked_protected_file_count": 1172,
+    "current_promoted_file_count": 1178,
+    "added_count": 6,
+    "changed_count": 11,
+    "virtual_hashes_equal": true
+  },
+  "findings": [
+    {
+      "path": "docs/SPEC/P2P-HOST-SKILL-PROJECTION-SPEC.md",
+      "delta": "added",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "7a294fae297ad60fe4b987d220d234840479b61d",
+      "reason": "Present in the exact promoted source history as the host projection reconciliation specification."
+    },
+    {
+      "path": "docs/SPEC/P2P-MANUS-NATIVE-SKILL-PACKAGE-ADDENDUM.md",
+      "delta": "added",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "af02170ac7ba180900ca78beb26a2972d80c73b6",
+      "reason": "Present in the exact promoted source history as the Manus package boundary addendum; it does not authorize a provider call."
+    },
+    {
+      "path": "docs/notes_decisions_log/notes_decisions_log_20260824.md",
+      "delta": "added",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "b26189daf33afadbf6fe3eeef4f773f1373ea751",
+      "reason": "Dated decision-log source present in promoted main history."
+    },
+    {
+      "path": "docs/notes_decisions_log/notes_decisions_log_20260825.md",
+      "delta": "added",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "d29801bd37a53207f81e89eaa295cbef0802b951",
+      "reason": "Dated decision-log source present in promoted main history."
+    },
+    {
+      "path": "docs/p2p-development/candidates/controlled-execution-hardening-canonical-coverage-matrix.md",
+      "delta": "added",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "557b502758581812a8845355ed6b426ba75372ec",
+      "reason": "Candidate coverage matrix is an explicitly named promoted-main development artifact, not an untracked runtime surprise."
+    },
+    {
+      "path": "scripts/p2p_orientation.py",
+      "delta": "added",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "579a711643415fee87647be278cc40fe098e35f0",
+      "reason": "README-first orientation contract is present in promoted main history."
+    },
+    {
+      "path": "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "be7ff403903d9668e0a370b5b07adc74ffe1713f",
+      "reason": "RF01 development framework update is present in promoted main history."
+    },
+    {
+      "path": "docs/p2p-development/capability-ledger/capability-index.json",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "92f76b5cb7c80472a963e970a90c7177eae86833",
+      "reason": "AERG handoff/capability-ledger update is present in promoted main history."
+    },
+    {
+      "path": "docs/p2p-development/current-roadmap.md",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "92f76b5cb7c80472a963e970a90c7177eae86833",
+      "reason": "Derived roadmap projection refresh is present in promoted main history."
+    },
+    {
+      "path": "docs/p2p-development/framework/master-roadmap.md",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "be7ff403903d9668e0a370b5b07adc74ffe1713f",
+      "reason": "RF01 framework roadmap update is present in promoted main history."
+    },
+    {
+      "path": "docs/p2p-development/framework/product-architecture.md",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "be7ff403903d9668e0a370b5b07adc74ffe1713f",
+      "reason": "RF01 product-architecture update is present in promoted main history."
+    },
+    {
+      "path": "governance/development-control.json",
+      "delta": "changed in promoted source, then current candidate projection",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "be7ff403903d9668e0a370b5b07adc74ffe1713f",
+      "candidate_overlay_classification": "UNLOCKED_BUT_LEGITIMATE",
+      "candidate_overlay_commit": "4d4cf0a66b15a6c11e373915da9d45e8f8ebe92",
+      "reason": "The pre-existing RF01 governance change is promoted-main evolution; the GOVREC01 current-promoted-source projection is a bounded local candidate overlay and remains unpromoted."
+    },
+    {
+      "path": "install.ps1",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "e00bdc7571483bc0daf0a9794bbd2db249e1e8ee",
+      "reason": "RF01 orientation installer exposure is present in promoted main history."
+    },
+    {
+      "path": "install.sh",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "e00bdc7571483bc0daf0a9794bbd2db249e1e8ee",
+      "reason": "RF01 orientation installer exposure is present in promoted main history."
+    },
+    {
+      "path": "scripts/p2p_foreground_execution.py",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "3f3ad28f7acb65f782c751bea78d039ebd59b5f2",
+      "reason": "Controlled execution authority seam is present in promoted main history."
+    },
+    {
+      "path": "scripts/package_release.py",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "e00bdc7571483bc0daf0a9794bbd2db249e1e8ee",
+      "reason": "Package release surface update is present in promoted main history; this task does not run release."
+    },
+    {
+      "path": "scripts/validate_p2p_development_framework.py",
+      "delta": "changed",
+      "classification": "AUTHORIZED_PROMOTED_EVOLUTION",
+      "evidence_commit": "2b2c10407fa64a1d0b5b11ce3752b6103c1ee72d",
+      "reason": "C43 framework reconciliation validator update is present in promoted main history."
+    }
+  ],
+  "candidate_and_generated_state": [
+    {
+      "path": "governance/runtime-manifest.lock.json",
+      "classification": "EXPECTED_GENERATED_STATE",
+      "reason": "Recreated only by scripts/p2p_governance.py lock-runtime after the path matrix is accepted."
+    },
+    {
+      "path": "reports/reconciliation/p2p-govrec01-drift-classification.json",
+      "classification": "UNLOCKED_BUT_LEGITIMATE",
+      "reason": "Read-only candidate evidence under an existing reports exclusion; it does not widen runtime policy."
+    }
+  ],
+  "preserved_reference_state": [
+    {
+      "subject": "8.4.7-C-codex.19 artifact and promotion evidence",
+      "classification": "HISTORICAL_REFERENCE",
+      "status": "PRESERVED_IMMUTABLE"
+    },
+    {
+      "subject": "C36 single-host live Council 8/8 evidence",
+      "classification": "HISTORICAL_REFERENCE",
+      "status": "PRESERVED_NOT_CURRENT_LINEAGE_PROOF"
+    }
+  ],
+  "governance_defects": [
+    {
+      "subject": "tests/test_p2p_governance_drift.py expected policy/reference counts",
+      "classification": "GOVERNANCE_DEFECT",
+      "status": "REQUIRES_TEST_FIX_WITHOUT_GATE_WEAKENING"
+    },
+    {
+      "subject": "scripts/doctor.py helper subprocess decode boundary",
+      "classification": "GOVERNANCE_DEFECT",
+      "status": "REQUIRES_EXPLICIT_UTF8_STRICT_FAIL_CLOSED_REPAIR"
+    }
+  ],
+  "terminal_assertion_before_final_validation": {
+    "unexplained_drift": 0,
+    "gate_weakening": false,
+    "stale_official_authority_used": false,
+    "historical_as_current": false,
+    "current_council_upgraded_from_c36": false
+  }
+}

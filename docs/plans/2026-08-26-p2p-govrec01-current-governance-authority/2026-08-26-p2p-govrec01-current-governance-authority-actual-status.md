@@ -56,7 +56,7 @@ Out of scope:
 | Historical `.19` official artifact | `PROMOTED_VERIFIED`, exact artifact SHA and approval preserved | immutable historical official evidence | correct | n/a | `E0-P0A-AUTH3` | preserve-only |
 | Current promoted `origin/main` | exact commit `2a71410…`, tree `3e6ab12…`, parent/base `af02170…` is now separately projected under `authority.current_promoted_source`; release authority remains deferred | separate current promoted source authority, not release authority | correct | 2 inbound in authority file | `E0-P0A-AUTH1`, `E0-P0A-GRAPH3`, `E1-P1A-AUTH1..7` | proceed P1-B |
 | `.74` successor | `ACTIVE_UNPROMOTED` / `SEALED_UNPROMOTED` record exists | remain unpromoted and separate | correct | n/a | `E0-P0A-AUTH3` | preserve-only |
-| Protected runtime lock | lock has 1,172 files; current manifest has 1,178; six additions and eleven changed hashes | exact current promoted manifest after classification | wrong | generated | `E0-P0A-DRIFT1..2` | edit P1-B |
+| Protected runtime lock | deterministic generator now records 1,178 protected files and 2 virtual hashes; direct drift returns PASS with no failures | exact current promoted/candidate manifest after path classification | correct | generated | `E0-P0A-DRIFT1..2`, `E1-P1B-DRIFT1..17`, `E1-P1B-LOCK1..4` | proceed P2 |
 | Drift policy | current schema/patterns/exclusions are intact; no need for wildcard expansion | unchanged fail-closed policy | correct | generated | `E0-P0A-DRIFT2` | preserve-only |
 | Historical C36 Council evidence | genuine historical single-host 8/8 evidence exists in retained reports | remain historical, exact and immutable | correct | derived | `E0-P0A-SCOPE1` | preserve-only |
 | Current-lineage Council proof | current source has configured 8/8 structure and bounded C43 smoke, not a full current round-trip | `FALSE` / `NOT_PROVEN` until fresh exact evidence | partial | derived | prepilot council audit, `E0-P0A-AUTH1` | edit P2-A |
@@ -73,7 +73,7 @@ Out of scope:
 |---|---|---|---|---|---|---|
 | R0 | 2026-08-26 | exact promoted `2a71410…` candidate before implementation | full GOVREC01 scope | initial classifications recorded | `E0-P0A-AUTH1..E0-P0A-SCOPE1` | P1-A/P1-B are executable; P2/P3 remain dependent |
 | R1 | 2026-08-26 | after P1-A authority projection edit | authority projection | `partial -> correct`; existing control fixture errors remain assigned to P3-B | `E1-P1A-AUTH1..7` | proceed P1-B; do not treat fixture errors as authority PASS |
-| R1b | 2026-08-26 | after P1-B implementation commit | runtime lock/drift | pending | pending | update P2 from fresh drift output |
+| R1b | 2026-08-26 | after P1-B lock regeneration | runtime lock/drift | `wrong -> correct`; all 17 pre-existing deltas classified; no unexplained drift | `E1-P1B-DRIFT1..17`, `E1-P1B-LOCK1..4` | proceed P2; future protected edits require final lock regeneration |
 | R2 | 2026-08-26 | after P2-A/P2-B implementation commit | Council semantics and edge index | pending | pending | update P3/P4 |
 | R3 | 2026-08-26 | after P3-A/P3-B implementation commit | doctor and tests | pending | pending | update P4 final gates |
 
@@ -204,7 +204,7 @@ Upgrade current Council from C36, C43 smoke, profiles, configured quorum, or log
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |---|---|---|
 | P1-A | current promoted source is now separately projected; `.19` and `.74` remain separated | complete; proceed P1-B |
-| P1-B | all 17 runtime deltas are explainable candidates but lock is stale | keep P1-B; block on any unexplained path |
+| P1-B | all 17 runtime deltas are classified and deterministic lock/drift now PASS | complete; proceed P2; regenerate final lock after later protected edits |
 | P2-A | active wording blurs historical/current Council | keep P2-A; preserve all historical reports |
 | P2-B | dedicated edge-case index is absent | keep P2-B add-only |
 | P3-A | doctor reader-thread decode failure is reproduced | keep P3-A bounded strict decoder fix |

@@ -42,8 +42,11 @@ Matching plan item(s): `P1-A`, `P1-B`
 - `E1-P1A-AUTH5`: No `VERSION`, artifact, approval, promotion, release, or remote authority file was changed by P1-A.
 - `E1-P1A-AUTH6`: Existing `tests.test_p2p_development_control` ran 21 tests with 15 passing, 2 skipped, and 2 fixture errors because `make_reconcilable_root()` does not normalize the current `.74` source version; this inherited test-fixture defect is assigned to P3-B and is not evidence against the authority projection.
 - `E1-P1A-AUTH7`: `git diff` is limited to the new authority projection plus planner artifacts; no provider, Manus, Council, or remote process was invoked.
-- `E1-P1B-DRIFT1..E1-P1B-DRIFT17`: Pending P1-B path-by-path classification.
-- `E1-P1B-LOCK1..E1-P1B-LOCK4`: To be filled after deterministic lock regeneration, direct drift, lock identity negative test, and diff check.
+- `E1-P1B-DRIFT1..E1-P1B-DRIFT17`: `reports/reconciliation/p2p-govrec01-drift-classification.json` records all six additions and eleven changed protected paths as `AUTHORIZED_PROMOTED_EVOLUTION`, with the current-authority overlay explicitly `UNLOCKED_BUT_LEGITIMATE`; no path is `UNEXPLAINED_DRIFT`.
+- `E1-P1B-LOCK1`: Existing `py -3 -X utf8 scripts/p2p_governance.py lock-runtime --root . --governance governance --reason "P2P-GOVREC01 current promoted authority reconciliation after path-specific drift classification"` returns `PASS`, `protected_files=1178`, `virtual_hashes=2`.
+- `E1-P1B-LOCK2`: Direct `py -3 -X utf8 scripts/p2p_governance.py drift --root . --governance governance --as-of 2026-08-26` returns `status=PASS`, `failures=[]`, `warnings=[]`, and `volatile_findings=[]`; scoped references remain classified data.
+- `E1-P1B-LOCK3`: Lock/runtime comparison after regeneration has equal protected-file sets and equal virtual hashes; no `drift-policy.json` wildcard or exclusion changed.
+- `E1-P1B-LOCK4`: Lock update is the existing generated-state path; no file deletion, mass whitelist, suppression, or remote write was performed.
 
 ## E2 - P2 Evidence
 
