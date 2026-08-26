@@ -244,6 +244,16 @@ Upgrade current Council from C36, C43 smoke, profiles, configured quorum, or log
 
 Current handoff decision: `P4-A PASS / P4-B PENDING`. The current-lineage full Council remains `FALSE / NOT_PROVEN`; this is an intentional evidence boundary, not a failed technical gate.
 
+## Candidate Identity Before Supervisor Review
+
+- Commit: `89ce6de09a802967cf97f399d88b7a879d8c831e`
+- Tree: `d3cd2afbc8aca8e194b60b8db31775371c07abf6`
+- Parent: `8c9363f0032ee782eb1f5e71ae70868d62499b0d`
+- Promoted authority: `origin/main` at `2a71410afd1b29651016ef57a5d2da38938c3f68`, tree `3e6ab12ff78a72c4a3ea2a418e11167a8649aaad`
+- Baseline ancestor: `af02170ac7ba180900ca78beb26a2972d80c73b6`
+- Fresh Anvien: 945 scanned / 169 parsed / 0 failed; detect-changes reports no changes.
+- Review state: exact-head Supervisor review is required and must not repair the candidate during review.
+
 Decision note:
 
 P0 is complete because the exact supplied promoted source, historical `.19`, unpromoted `.74`, current lock delta, Council evidence boundary, missing edge index, Anvien graph state, and doctor decoder failure are all identified. Implementation may proceed in the ordered slices, but any newly discovered protected drift without a path-specific authority explanation must terminally block the task.

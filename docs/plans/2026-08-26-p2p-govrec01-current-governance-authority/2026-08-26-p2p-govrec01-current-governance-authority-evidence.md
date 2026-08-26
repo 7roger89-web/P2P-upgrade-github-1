@@ -107,6 +107,8 @@ Matching plan item(s): `P4-A`, `P4-B`
 - `E4-P4A-CLOSE3`: Functional commits currently are `23f0de3` (Council/edge reconciliation), `1a851d0` (doctor/tests), and `8c9363f` (generated runtime lock); exact final subject identity is recorded after the evidence/report closure commit.
 - `E4-P4A-CLOSE4`: The nested `.p2p/system/.p2p/state/adapter_registry.json` test pollution was verified as append-only fake-adapter output and restored to the exact candidate baseline; it was not staged or committed. Other dirty owner/line-ending paths remain preserved and out of subject scope.
 - `E4-P4A-CLOSE5`: No provider, Manus, Council, remote write, promotion, release, deployment, root Git repair, or mutation of `.19`, v5, immutable baseline, or user projects occurred.
+- `E4-P4A-CLOSE6`: After the evidence closure commit, fresh Anvien analysis reports 945 files scanned, 169 code files parsed, and 0 parse failures; fresh `detect-changes --scope all` reports zero changed files, symbols, and affected processes.
+- `E4-P4A-CLOSE7`: Exact candidate identity is commit `89ce6de09a802967cf97f399d88b7a879d8c831e`, tree `d3cd2afbc8aca8e194b60b8db31775371c07abf6`, parent `8c9363f0032ee782eb1f5e71ae70868d62499b0d`, with baseline ancestor `af02170ac7ba180900ca78beb26a2972d80c73b6`.
 - `E4-P4B-SUP1..E4-P4B-SUP6`: Pending fresh independent exact-head Supervisor review. The report must state reviewed commit/tree/parent/base, subject-path diff, preserved dirty owner paths, and one PASS or REJECT verdict.
 
 ## Closure Evidence

@@ -16,7 +16,7 @@ This file records measured counts, sizes, hashes, inventories, and timings only.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| P0 | Anvien files scanned | files | 936 | 944 | 944 | 936+ | +8 | `E0-P0A-GRAPH1`, `E3-P3B-TEST8` |
+| P0 | Anvien files scanned | files | 936 | 945 | 945 | 936+ | +9 | `E0-P0A-GRAPH1`, `E3-P3B-TEST8`, `E4-P4A-CLOSE6` |
 | P0 | Anvien parsed code / failures | files / failures | 168 / 0 | 169 / 0 | 169 / 0 | 168 / 0 | +1 / 0 | `E0-P0A-GRAPH1`, `E3-P3B-TEST8` |
 | P0 | Runtime lock protected files | files | 1,172 | 1,178 | 1,178 | exact current manifest | +6 | `E1-P1B-LOCK1`, `E4-P4A-GATE2` |
 | P0 | Runtime virtual hashes | entries equal | equal | equal | equal | equal | unchanged | `E1-P1B-LOCK2`, `E4-P4A-GATE2` |
@@ -60,7 +60,7 @@ This file records measured counts, sizes, hashes, inventories, and timings only.
 | P4 | C43 gate | cases | 9/9 historical receipt | 9/9 | 9/9 | 9/9 | pass | `E4-P4A-GATE6` |
 | P4 | Capability denominator/quorum | denominator / quorum | 8 / 8 | 8 / 8 | 8 / 8 | 8 / 8 configured; no live proof claim | unchanged | `E4-P4A-GATE7` |
 | P4 | compileall | exit code | 0 historical receipt | 0 | 0 | 0 | pass | `E4-P4A-GATE8` |
-| P4 | Final candidate tree | SHA-1 | `3e6ab12…` before changes | pending | pending | exact final tree recorded | pending | `E4-P4A-CLOSE3` |
+| P4 | Final candidate tree | SHA-1 | `3e6ab12…` before changes | `d3cd2afbc8aca8e194b60b8db31775371c07abf6` | `d3cd2afbc8aca8e194b60b8db31775371c07abf6` | exact final tree recorded | bound | `E4-P4A-CLOSE3` |
 
 ## Non-Benchmarkable Notes
 
