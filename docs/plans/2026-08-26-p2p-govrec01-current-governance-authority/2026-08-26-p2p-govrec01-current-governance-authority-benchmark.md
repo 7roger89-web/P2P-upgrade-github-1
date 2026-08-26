@@ -60,7 +60,7 @@ This file records measured counts, sizes, hashes, inventories, and timings only.
 | P4 | C43 gate | cases | 9/9 historical receipt | 9/9 | 9/9 | 9/9 | pass | `E4-P4A-GATE6` |
 | P4 | Capability denominator/quorum | denominator / quorum | 8 / 8 | 8 / 8 | 8 / 8 | 8 / 8 configured; no live proof claim | unchanged | `E4-P4A-GATE7` |
 | P4 | compileall | exit code | 0 historical receipt | 0 | 0 | 0 | pass | `E4-P4A-GATE8` |
-| P4 | Final candidate tree | SHA-1 | `3e6ab12…` before changes | `d3cd2afbc8aca8e194b60b8db31775371c07abf6` | `d3cd2afbc8aca8e194b60b8db31775371c07abf6` | exact final tree recorded | bound | `E4-P4A-CLOSE3` |
+| P4 | Final candidate tree | SHA-1 | `3e6ab12…` before changes | `3ad8ad2f8d0e7351c5cbd60ee3c7a15fed982dd7` | `3ad8ad2f8d0e7351c5cbd60ee3c7a15fed982dd7` | exact pre-Supervisor candidate tree recorded | bound | `E4-P4A-CLOSE3`, `E4-P4A-CLOSE7` |
 
 ## Non-Benchmarkable Notes
 

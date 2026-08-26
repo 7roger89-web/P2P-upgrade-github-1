@@ -246,9 +246,9 @@ Current handoff decision: `P4-A PASS / P4-B PENDING`. The current-lineage full C
 
 ## Candidate Identity Before Supervisor Review
 
-- Commit: `89ce6de09a802967cf97f399d88b7a879d8c831e`
-- Tree: `d3cd2afbc8aca8e194b60b8db31775371c07abf6`
-- Parent: `8c9363f0032ee782eb1f5e71ae70868d62499b0d`
+- Commit: `b0b04dbadcce23459687cc158e03e65a6eb71217`
+- Tree: `3ad8ad2f8d0e7351c5cbd60ee3c7a15fed982dd7`
+- Parent: `89ce6de09a802967cf97f399d88b7a879d8c831e`
 - Promoted authority: `origin/main` at `2a71410afd1b29651016ef57a5d2da38938c3f68`, tree `3e6ab12ff78a72c4a3ea2a418e11167a8649aaad`
 - Baseline ancestor: `af02170ac7ba180900ca78beb26a2972d80c73b6`
 - Fresh Anvien: 945 scanned / 169 parsed / 0 failed; detect-changes reports no changes.
