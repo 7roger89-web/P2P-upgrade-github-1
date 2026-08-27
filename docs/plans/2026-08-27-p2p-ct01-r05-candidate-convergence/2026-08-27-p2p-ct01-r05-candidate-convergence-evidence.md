@@ -141,9 +141,15 @@ P1-A completed before P1-B:
   relationships. detect_changes with the exact candidate path reported one
   changed file, governance/drift-policy.json, low risk, zero affected files,
   and no changed symbols.
-- E1-P1B-TEST1: pending candidate governance test add.
-- E1-P1B-TEST2: pending candidate test compile.
-- E1-P1B-TEST3: pending isolated fixture review.
+- E1-P1B-TEST1: candidate test blob
+  e2fa50cc6b2b3914d1591824c6d3e15a8311047b exactly matches the Subject B
+  test blob, proving a narrow byte-for-byte port.
+- E1-P1B-TEST2: python -m py_compile
+  tests/test_p2p_ct01_governance_lock_reconciliation.py returned
+  candidate-test-compile=PASS.
+- E1-P1B-TEST3: source review confirms fixtures are rooted at
+  REPO_ROOT/.tmp, use the existing p2p_governance module, and clean up in
+  finally blocks; the candidate test does not import or execute Subject B.
 - E1-P1C-LOCK1: pending existing lock-runtime command.
 - E1-P1C-LOCK2: pending generated lock inventory and hidden-module hash.
 - E1-P1C-LOCK3: pending verifier output.

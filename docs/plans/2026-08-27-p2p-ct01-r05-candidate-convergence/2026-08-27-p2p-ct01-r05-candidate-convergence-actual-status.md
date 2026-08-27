@@ -2,7 +2,7 @@
 
 Title: P2P-CT01 R05 Durable Control Tower Candidate Convergence
 Date: 2026-08-27
-Status: P1-A Complete
+Status: P1-B Complete; P1-C pending lock generation
 Companion plan: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-plan.md
 Companion evidence: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-evidence.md
 Companion benchmark: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-benchmark.md
@@ -67,7 +67,7 @@ Out of scope:
 | Candidate isolation | new worktree at the valid repo .tmp path, branch codex/p2p-ct01-r05-candidate-convergence-7c3d1a92, clean before edits | isolated A-derived worktree | correct | N/A | E0-P0A-ISO1..E0-P0A-ISO2 | preserve |
 | Subject A durable functionality | A has the functional source, CLI, durable test, existing-ledger reuse, TaskState, replay, attachment, rotation, and boundary tests | all justified A functionality | correct | see relationship table | E0-P0A-A1..E0-P0A-A6 | preserve |
 | Subject B governance binding | candidate policy now contains the exact hidden-module entry once in each required array; no broad whitelist was added | exact package and installed entries, no broad whitelist | correct | configuration | E0-P0A-B1..E0-P0A-B3, E1-P1A-GOV1..E1-P1A-GOV3 | preserve; continue P1-B |
-| Subject B governance test | test exists in B only and has not been run in B | candidate-local test proves exact binding and fail-closed lock | missing | B-only surface | E0-P0A-B4 | edit P1-B |
+| Subject B governance test | candidate-local exact port is present and compiles; execution awaits the generated final lock | candidate-local test proves exact binding and fail-closed lock | partial | B-only surface | E0-P0A-B4, E1-P1B-TEST1..E1-P1B-TEST3 | execute after P1-C |
 | Runtime lock | A lock is stale for A's added protected source/CLI/test-related state; B lock covers the hidden module but not A functionality | one generated lock covering the final candidate | partial | generated output | E0-P0A-L1..E0-P0A-L3 | regenerate P1-C |
 | A/B Git relation | merge base 57c4cfc2fd3bbad2c52e40b66be730aeb7ff7f47; left/right counts 3/3; neither ancestor | exact relation recorded | correct | N/A | E0-P0A-REL1..E0-P0A-REL3 | Case B minimal convergence |
 | Functional conflict | B removes A CLI/source/durable test and adds only governance plan/test/policy/lock | preserve A and add exact B governance | correct | 19 A/B changed paths | E0-P0A-MAT1..E0-P0A-MAT4 | no conflict decision |
@@ -84,6 +84,7 @@ Out of scope:
 |---|---|---|---|---|---|---|
 | R0 | 2026-08-27 | fresh A-derived R05 worktree before implementation | all P2P-CT01 R05 surfaces | initial classifications above | E0-P0A-AUTH1..E0-P0A-NOISE2 | P0 complete; proceed with P1-A, P1-B, P1-C |
 | R1 | 2026-08-27 | after P1-A exact policy patch and Anvien refresh | governance/drift-policy.json | Subject B governance binding partial -> correct | E1-P1A-GOV1..E1-P1A-STATUS1 | P1-A complete; continue P1-B, then P1-C |
+| R2 | 2026-08-27 | after candidate test port and compile | tests/test_p2p_ct01_governance_lock_reconciliation.py | governance test missing -> partial (source/compile present; execution pending) | E1-P1B-TEST1..E1-P1B-TEST3 | P1-B implementation complete; execute after P1-C lock generation |
 
 ## Phase Touch Map
 
@@ -231,7 +232,7 @@ files as canonical truth.
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |---|---|---|
 | P1-A | Exact package and installed entries are present; JSON/no-broad checks pass | completed; preserve and move to P1-B |
-| P1-B | B proof is absent in A | keep; port narrowly and execute only in candidate |
+| P1-B | Candidate test is ported byte-for-byte and compiles; runtime execution awaits P1-C | implementation complete; execute only in candidate after lock generation |
 | P1-C | A lock is stale for the A-derived final tree | keep; regenerate with existing command |
 | P2-A | A functionality is present but fresh candidate proof is pending | keep; run focused suite after P1-C |
 | P2-B | baseline attribution is pending | keep; compare without repairing |

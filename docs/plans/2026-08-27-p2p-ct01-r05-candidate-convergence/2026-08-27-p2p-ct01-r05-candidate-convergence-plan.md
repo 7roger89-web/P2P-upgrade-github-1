@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-27
-- Status: P1-A Complete
+- Status: P1-B Complete; P1-C pending lock generation
 - Plan: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-plan.md
 - Evidence: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-evidence.md
 - Benchmark: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-benchmark.md
@@ -208,7 +208,7 @@ In scope:
   - Commit Boundary: checkpoint commit after acceptance if no unrelated files
     are staged.
 
-- [ ] P1-B: Add the governance-lock reconciliation test
+- [x] P1-B: Add the governance-lock reconciliation test
   - Goal: preserve Subject B's legitimate fail-closed governance proof in the
     A-derived candidate without executing the Subject B worktree test.
   - Scope Boundary:
