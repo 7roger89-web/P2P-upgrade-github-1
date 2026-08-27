@@ -2,7 +2,7 @@
 
 Title: P2P-CT01 R05 Durable Control Tower Candidate Convergence
 Date: 2026-08-27
-Status: P0 Complete
+Status: P1-A Complete
 Companion plan: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-plan.md
 Companion evidence: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-evidence.md
 Companion benchmark: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-benchmark.md
@@ -66,7 +66,7 @@ Out of scope:
 | Canonical authority | origin main resolves to 28a3ecd9c04d36511269e44c384bff6e11677b93 with tree cae63e055edd164fbd969f6dbae0d992a4d0efed | exact fresh SHA/tree and origin | correct | N/A | E0-P0A-AUTH1..E0-P0A-AUTH3 | preserve |
 | Candidate isolation | new worktree at the valid repo .tmp path, branch codex/p2p-ct01-r05-candidate-convergence-7c3d1a92, clean before edits | isolated A-derived worktree | correct | N/A | E0-P0A-ISO1..E0-P0A-ISO2 | preserve |
 | Subject A durable functionality | A has the functional source, CLI, durable test, existing-ledger reuse, TaskState, replay, attachment, rotation, and boundary tests | all justified A functionality | correct | see relationship table | E0-P0A-A1..E0-P0A-A6 | preserve |
-| Subject B governance binding | A policy lacks the two exact hidden-module protected entries that B adds | exact package and installed entries, no broad whitelist | partial | configuration | E0-P0A-B1..E0-P0A-B3 | edit P1-A |
+| Subject B governance binding | candidate policy now contains the exact hidden-module entry once in each required array; no broad whitelist was added | exact package and installed entries, no broad whitelist | correct | configuration | E0-P0A-B1..E0-P0A-B3, E1-P1A-GOV1..E1-P1A-GOV3 | preserve; continue P1-B |
 | Subject B governance test | test exists in B only and has not been run in B | candidate-local test proves exact binding and fail-closed lock | missing | B-only surface | E0-P0A-B4 | edit P1-B |
 | Runtime lock | A lock is stale for A's added protected source/CLI/test-related state; B lock covers the hidden module but not A functionality | one generated lock covering the final candidate | partial | generated output | E0-P0A-L1..E0-P0A-L3 | regenerate P1-C |
 | A/B Git relation | merge base 57c4cfc2fd3bbad2c52e40b66be730aeb7ff7f47; left/right counts 3/3; neither ancestor | exact relation recorded | correct | N/A | E0-P0A-REL1..E0-P0A-REL3 | Case B minimal convergence |
@@ -83,6 +83,7 @@ Out of scope:
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---|---|---|---|---|---|---|
 | R0 | 2026-08-27 | fresh A-derived R05 worktree before implementation | all P2P-CT01 R05 surfaces | initial classifications above | E0-P0A-AUTH1..E0-P0A-NOISE2 | P0 complete; proceed with P1-A, P1-B, P1-C |
+| R1 | 2026-08-27 | after P1-A exact policy patch and Anvien refresh | governance/drift-policy.json | Subject B governance binding partial -> correct | E1-P1A-GOV1..E1-P1A-STATUS1 | P1-A complete; continue P1-B, then P1-C |
 
 ## Phase Touch Map
 
@@ -149,11 +150,12 @@ Current state:
 Subject B at SHA 9086ca4be9874fb256195d26655022907665208f, tree
 91d1b467483fdb65b87d9459d3792a5253cdae68, adds exactly the hidden-module
 protected path to package and installed policy arrays and carries a focused
-governance test. B does not contain A's durable source, CLI, or durable test.
+governance test. The A-derived R05 candidate now contains the two exact policy
+entries. B does not contain A's durable source, CLI, or durable test.
 
 Required state:
 
-Port only the exact policy entries and the focused governance proof into the
+Preserve the exact policy entries, port the focused governance proof into the
 A-derived candidate, then regenerate the existing lock.
 
 Evidence:
@@ -162,6 +164,11 @@ Evidence:
 - E0-P0A-B2: B test source inventory and five proof cases.
 - E0-P0A-B3: B lock includes the hidden module hash and exact guide hash.
 - E0-P0A-B4: A/B path diff proves A functionality is absent in B.
+- E1-P1A-GOV1: candidate policy JSON parses successfully and contains the
+  hidden-module path exactly once in both package and installed arrays.
+- E1-P1A-GOV2: candidate policy has no broad .p2p/system or
+  .p2p/system/p2p_capabilities entry.
+- E1-P1A-GOV3: direct diff has exactly two intended additions in the policy.
 
 Relationship and impact:
 
@@ -173,11 +180,11 @@ Relationship and impact:
 
 Classification:
 
-partial
+correct
 
 Allowed next action:
 
-Add exact policy entries, port test, regenerate lock.
+Preserve exact policy entries; port test, regenerate lock.
 
 Forbidden next action:
 
@@ -223,7 +230,7 @@ files as canonical truth.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |---|---|---|
-| P1-A | A is missing the exact two B protected-path entries | keep; edit only those entries |
+| P1-A | Exact package and installed entries are present; JSON/no-broad checks pass | completed; preserve and move to P1-B |
 | P1-B | B proof is absent in A | keep; port narrowly and execute only in candidate |
 | P1-C | A lock is stale for the A-derived final tree | keep; regenerate with existing command |
 | P2-A | A functionality is present but fresh candidate proof is pending | keep; run focused suite after P1-C |
@@ -253,7 +260,7 @@ files as canonical truth.
 
 Decision note:
 
-P0 is complete for Case B minimal convergence. The user-supplied contract,
-existing handoff/governance specs, exact Git evidence, and the A/B source diffs
-are sufficient authority to make the narrow candidate change. Fresh proof still
-remains required before any Owner Gate recommendation.
+P0 was complete for Case B minimal convergence. P1-A is now complete: the
+candidate has the exact two governance entries and no broad whitelist. Fresh
+governance-test and lock proof remain required before any Owner Gate
+recommendation.

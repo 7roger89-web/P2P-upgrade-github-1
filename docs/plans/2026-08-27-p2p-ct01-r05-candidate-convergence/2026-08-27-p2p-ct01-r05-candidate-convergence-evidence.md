@@ -126,12 +126,21 @@ Matching plan item(s): P0-A
 
 Matching plan item(s): P1-A, P1-B, P1-C
 
-Pending until the three implementation slices execute.
+P1-A completed before P1-B:
 
-- E1-P1A-GOV1: pending exact policy patch and JSON parse.
-- E1-P1A-GOV2: pending no-broad-whitelist diff check.
-- E1-P1A-GOV3: pending package/installed path equality check.
-- E1-P1A-STATUS1: pending post-policy status refresh.
+- E1-P1A-GOV1: Python JSON parse and assertions returned
+  policy-json=PASS exact-package-installed=PASS no-broad-whitelist=PASS.
+- E1-P1A-GOV2: direct diff shows exactly two additions, one in
+  package_protected_paths and one in installed_protected_paths; no broad
+  .p2p/system or capability-directory entry was added.
+- E1-P1A-GOV3: the path
+  .p2p/system/p2p_capabilities/control_tower_handoff.py occurs exactly once
+  in each required array.
+- E1-P1A-STATUS1: after the policy patch, Anvien analyze --force refreshed
+  975 files, 174 parsed code files, 40724 graph nodes, and 47088
+  relationships. detect_changes with the exact candidate path reported one
+  changed file, governance/drift-policy.json, low risk, zero affected files,
+  and no changed symbols.
 - E1-P1B-TEST1: pending candidate governance test add.
 - E1-P1B-TEST2: pending candidate test compile.
 - E1-P1B-TEST3: pending isolated fixture review.

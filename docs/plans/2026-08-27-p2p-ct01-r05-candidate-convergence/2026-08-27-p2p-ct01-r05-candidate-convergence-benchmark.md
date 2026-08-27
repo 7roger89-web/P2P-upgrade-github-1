@@ -29,8 +29,8 @@ candidate measurements.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| P1 | Exact protected path additions | paths | 0 | pending | pending | 2 | pending | E1-P1A-GOV1 |
-| P1 | Broad whitelist additions | paths | 0 | pending | pending | 0 | pending | E1-P1A-GOV2 |
+| P1 | Exact protected path additions | paths | 0 | 2 | pending | 2 | +2 | E1-P1A-GOV1 |
+| P1 | Broad whitelist additions | paths | 0 | 0 | pending | 0 | 0 | E1-P1A-GOV2 |
 | P1 | Candidate protected files after lock generation | files | 1180 | pending | pending | generated current count | pending | E1-P1C-LOCK2 |
 | P1 | Candidate virtual hashes after lock generation | hashes | 2 | pending | pending | generated current count | pending | E1-P1C-LOCK2 |
 

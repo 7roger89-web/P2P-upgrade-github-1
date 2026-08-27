@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-27
-- Status: P0 Complete
+- Status: P1-A Complete
 - Plan: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-plan.md
 - Evidence: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-evidence.md
 - Benchmark: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-benchmark.md
@@ -156,7 +156,7 @@ In scope:
   - P1-B: Add the governance-lock reconciliation test.
   - P1-C: Regenerate and verify the existing runtime lock.
 
-- [ ] P1-A: Add exact protected-path governance entries
+- [x] P1-A: Add exact protected-path governance entries
   - Goal: bind the hidden Control Tower module in package and installed
     governance without broadening the whitelist.
   - Scope Boundary:
