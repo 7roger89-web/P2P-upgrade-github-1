@@ -34,8 +34,9 @@ class P2PCT01GovernanceLockReconciliationTests(unittest.TestCase):
         self.assertNotIn(".p2p/system/p2p_capabilities", policy["installed_protected_paths"])
 
         lock = json.loads((REPO_ROOT / "governance" / "runtime-manifest.lock.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(lock["protected_files"]), 1180)
-        self.assertEqual(len(lock["virtual_hashes"]), 2)
+        manifest = p2p_governance.runtime_manifest(REPO_ROOT, REPO_ROOT / "governance")
+        self.assertEqual(len(lock["protected_files"]), len(manifest["protected_files"]))
+        self.assertEqual(len(lock["virtual_hashes"]), len(manifest["virtual_hashes"]))
         for relative in (CONTROL_TOWER_MODULE, CONTROL_TOWER_GUIDE):
             path = REPO_ROOT / Path(relative)
             self.assertEqual(lock["protected_files"][relative], p2p_governance.sha256(path), relative)

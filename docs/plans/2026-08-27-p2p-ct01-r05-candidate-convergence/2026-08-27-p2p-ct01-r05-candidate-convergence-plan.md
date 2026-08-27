@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-27
-- Status: P1-B Complete; P1-C pending lock generation
+- Status: P1-C Complete; P2 pending fresh validation
 - Plan: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-plan.md
 - Evidence: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-evidence.md
 - Benchmark: docs/plans/2026-08-27-p2p-ct01-r05-candidate-convergence/2026-08-27-p2p-ct01-r05-candidate-convergence-benchmark.md
@@ -263,7 +263,7 @@ In scope:
   - Commit Boundary: include in the convergence implementation commit after
     P1-C and final pre-commit gates.
 
-- [ ] P1-C: Regenerate and verify the existing runtime lock
+- [x] P1-C: Regenerate and verify the existing runtime lock
   - Goal: make the generated lock cover the converged source and exact
     governance policy through the existing generator.
   - Scope Boundary:
