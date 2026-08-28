@@ -32,6 +32,16 @@ HIGH_RISK = "HIGH_RISK"
 VERIFICATION_CLASSES = (DETERMINISTIC, STANDARD, HIGH_RISK)
 LOCAL_SERIALIZATION_PROXY = "LOCAL_SERIALIZATION_PROXY"
 
+# These principles and lanes are part of the existing C18 policy output. They
+# do not create a second router or execution engine; they make the policy's
+# lowest-safe execution choice explicit before any host/runtime binding.
+MINIMUM_SUFFICIENT_WORK = "MINIMUM_SUFFICIENT_WORK"
+RISK_PROPORTIONAL_EXECUTION = "RISK_PROPORTIONAL_EXECUTION"
+FAST = "FAST"
+STRICT = "STRICT"
+CRITICAL = "CRITICAL"
+EXECUTION_LANES = (FAST, STANDARD, STRICT, CRITICAL)
+
 _ENUMS = {
     "task_size": {"TINY", "SMALL", "MODERATE", "LARGE"},
     "dependency_complexity": {"NONE", "LOW", "HIGH", "UNKNOWN"},
@@ -42,6 +52,9 @@ _ENUMS = {
     "evidence_availability": {"COMPLETE", "PARTIAL", "MISSING", "UNKNOWN"},
     "context_breadth": {"LOCAL", "PROJECT", "CROSS_SURFACE", "BROAD"},
     "owner_gate": {"NOT_REQUIRED", "REQUIRED", "PENDING", "UNKNOWN"},
+    "blast_radius": {"EXPECTED", "MATERIAL", "UNKNOWN"},
+    "dependency_path": {"CLEAR", "UNCLEAR", "UNKNOWN"},
+    "targeted_evidence": {"SUFFICIENT", "INSUFFICIENT", "UNKNOWN"},
 }
 
 
@@ -103,6 +116,23 @@ class TaskProfile:
     task_kind: str = "IMPLEMENTATION"
     context_proxy_bytes: int = 0
     context_refs: tuple[str, ...] = ()
+    source_mutation: bool = False
+    runtime_change: bool = False
+    registry_change: bool = False
+    governance_change: bool = False
+    security_risk: bool = False
+    promotion: bool = False
+    destructive: bool = False
+    blast_radius: str = "EXPECTED"
+    dependency_path: str = "CLEAR"
+    targeted_evidence: str = "SUFFICIENT"
+    acceptance_requires_testing: bool = False
+    unexplained_material_failure: bool = False
+    acceptance_proven: bool = False
+    baseline_failure: bool = False
+    baseline_invalidates_acceptance: bool = False
+    baseline_on_dependency_path: bool = False
+    baseline_safety_risk: bool = False
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any] | "TaskProfile") -> "TaskProfile":
@@ -123,6 +153,16 @@ class TaskProfile:
         task_kind = str(value.get("task_kind", "IMPLEMENTATION")).upper().strip()
         if not task_kind or len(task_kind) > 64:
             raise OrchestrationPolicyError("TASK_KIND_INVALID")
+        if "dependency_path_clear" in value:
+            dependency_path = "CLEAR" if _bool(value["dependency_path_clear"], "dependency_path_clear") else "UNCLEAR"
+        else:
+            dependency_path = enum("dependency_path", "CLEAR")
+        if "targeted_evidence_sufficient" in value:
+            targeted_evidence = "SUFFICIENT" if _bool(
+                value["targeted_evidence_sufficient"], "targeted_evidence_sufficient"
+            ) else "INSUFFICIENT"
+        else:
+            targeted_evidence = enum("targeted_evidence", "SUFFICIENT")
         return cls(
             task_size=enum("task_size", "SMALL"),
             dependency_complexity=enum("dependency_complexity", "NONE"),
@@ -150,6 +190,23 @@ class TaskProfile:
             task_kind=task_kind,
             context_proxy_bytes=raw_bytes,
             context_refs=_refs(value.get("context_refs", ()), "context_refs"),
+            source_mutation=boolean("source_mutation", False),
+            runtime_change=boolean("runtime_change", False),
+            registry_change=boolean("registry_change", False),
+            governance_change=boolean("governance_change", False),
+            security_risk=boolean("security_risk", False),
+            promotion=boolean("promotion", False),
+            destructive=boolean("destructive", False),
+            blast_radius=enum("blast_radius", "EXPECTED"),
+            dependency_path=dependency_path,
+            targeted_evidence=targeted_evidence,
+            acceptance_requires_testing=boolean("acceptance_requires_testing", False),
+            unexplained_material_failure=boolean("unexplained_material_failure", False),
+            acceptance_proven=boolean("acceptance_proven", False),
+            baseline_failure=boolean("baseline_failure", False),
+            baseline_invalidates_acceptance=boolean("baseline_invalidates_acceptance", False),
+            baseline_on_dependency_path=boolean("baseline_on_dependency_path", False),
+            baseline_safety_risk=boolean("baseline_safety_risk", False),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -263,6 +320,200 @@ def _worker_strategy(profile: TaskProfile, context_class: str) -> tuple[str, lis
     return DIRECT, ["DIRECT_PATH_HAS_SUFFICIENT_QUALITY_ADJUSTED_VALUE"], 0
 
 
+def _execution_lane(profile: TaskProfile) -> tuple[str, list[str]]:
+    """Select the lowest safe execution lane from material evidence only."""
+
+    critical: list[str] = []
+    if profile.security_risk:
+        critical.append("SECURITY_RISK")
+    if profile.production:
+        critical.append("PRODUCTION_RISK")
+    if profile.financial:
+        critical.append("FINANCIAL_RISK")
+    if profile.network_or_secret:
+        critical.append("SECRET_OR_NETWORK_RISK")
+    if profile.promotion or profile.task_kind in {"PROMOTION", "RELEASE", "DEPLOYMENT"}:
+        critical.append("PROMOTION_OR_RELEASE_BOUNDARY")
+    if profile.destructive or profile.mutation_risk == "DESTRUCTIVE":
+        critical.append("DESTRUCTIVE_RISK")
+    if profile.owner_gate != "NOT_REQUIRED":
+        critical.append("OWNER_AUTHORITY_GATE")
+    if profile.reversibility in {"IRREVERSIBLE", "UNKNOWN"}:
+        critical.append("IRREVERSIBILITY_NOT_SAFE")
+    if profile.mutation_risk == "UNKNOWN":
+        critical.append("MUTATION_RISK_UNKNOWN")
+    if profile.task_kind in {"SECURITY", "SECURITY_ANALYSIS"}:
+        critical.append("SECURITY_TASK")
+    if profile.baseline_failure and profile.baseline_safety_risk:
+        critical.append("BASELINE_SAFETY_RISK")
+    if critical:
+        return CRITICAL, sorted(set(critical))
+
+    strict: list[str] = []
+    if profile.registry_change or profile.task_kind in {"REGISTRY", "REGISTRY_CHANGE"}:
+        strict.append("REGISTRY_CHANGE")
+    if profile.runtime_change or profile.task_kind in {"RUNTIME", "RUNTIME_CHANGE"}:
+        strict.append("RUNTIME_CHANGE")
+    if profile.governance_change:
+        strict.append("GOVERNANCE_CHANGE")
+    if profile.blast_radius in {"MATERIAL", "UNKNOWN"}:
+        strict.append("BLAST_RADIUS_MATERIAL_OR_UNKNOWN")
+    if profile.dependency_path in {"UNCLEAR", "UNKNOWN"}:
+        strict.append("DEPENDENCY_PATH_UNCLEAR")
+    if profile.targeted_evidence in {"INSUFFICIENT", "UNKNOWN"}:
+        strict.append("TARGETED_EVIDENCE_INSUFFICIENT")
+    if profile.acceptance_clarity in {"MISSING", "UNKNOWN"}:
+        strict.append("ACCEPTANCE_NOT_ESTABLISHED")
+    if profile.evidence_availability in {"MISSING", "UNKNOWN"}:
+        strict.append("EVIDENCE_NOT_ESTABLISHED")
+    if profile.mutation_risk == "HIGH":
+        strict.append("HIGH_MUTATION_RISK")
+    if profile.migration:
+        strict.append("MIGRATION_CHANGE")
+    if profile.shared_resource_risk:
+        strict.append("SHARED_RESOURCE_RISK")
+    if profile.baseline_failure and (
+        profile.baseline_invalidates_acceptance or profile.baseline_on_dependency_path
+    ):
+        strict.append("BASELINE_AFFECTS_ACCEPTANCE_OR_DEPENDENCY")
+    if strict:
+        return STRICT, sorted(set(strict))
+
+    standard: list[str] = []
+    if profile.source_mutation:
+        standard.append("SOURCE_MUTATION_REQUIRED")
+    if profile.mutation_risk == "LOW":
+        standard.append("MATERIAL_MUTATION_SIGNAL")
+    if profile.acceptance_requires_testing:
+        standard.append("ACCEPTANCE_TESTING_REQUIRED")
+    if standard:
+        return STANDARD, sorted(set(standard))
+
+    return FAST, ["NO_MATERIAL_ESCALATION_SIGNAL"]
+
+
+def _jit_skills(profile: TaskProfile, lane: str) -> list[str]:
+    """Return only skills justified by the current policy evidence."""
+
+    skills: list[str] = []
+    if profile.source_mutation or profile.runtime_change:
+        skills.append("coder")
+    if profile.unexplained_material_failure:
+        skills.append("debugging")
+    testing_required = (
+        profile.acceptance_requires_testing
+        or profile.source_mutation
+        or profile.runtime_change
+        or profile.registry_change
+        or profile.governance_change
+        or lane in {STRICT, CRITICAL}
+    )
+    if testing_required:
+        skills.append("qa")
+    if lane == CRITICAL:
+        skills.append("supervisor")
+    return skills
+
+
+def _test_ceiling(profile: TaskProfile, lane: str) -> dict[str, Any]:
+    """Select the smallest validation level that the lane can require."""
+
+    if profile.acceptance_proven:
+        return {
+            "ordered_levels": [],
+            "selected_level": "ACCEPTANCE_PROVEN",
+            "broad_full_regression": False,
+            "broad_full_justification": None,
+            "optional_checks_executed": False,
+        }
+    if lane == FAST:
+        levels = ["ACCEPTANCE_SPECIFIC"] if profile.acceptance_requires_testing else []
+        return {
+            "ordered_levels": levels,
+            "selected_level": levels[-1] if levels else "TARGETED_EVIDENCE",
+            "broad_full_regression": False,
+            "broad_full_justification": None,
+            "optional_checks_executed": False,
+        }
+    if lane == STANDARD:
+        return {
+            "ordered_levels": ["ACCEPTANCE_SPECIFIC", "DIRECTLY_AFFECTED_MODULE"],
+            "selected_level": "DIRECTLY_AFFECTED_MODULE",
+            "broad_full_regression": False,
+            "broad_full_justification": None,
+            "optional_checks_executed": False,
+        }
+    if lane == STRICT:
+        return {
+            "ordered_levels": [
+                "ACCEPTANCE_SPECIFIC",
+                "DIRECTLY_AFFECTED_MODULE",
+                "DEPENDENCY_NEIGHBOR",
+            ],
+            "selected_level": "DEPENDENCY_NEIGHBOR",
+            "broad_full_regression": False,
+            "broad_full_justification": None,
+            "optional_checks_executed": False,
+        }
+    return {
+        "ordered_levels": [
+            "ACCEPTANCE_SPECIFIC",
+            "DIRECTLY_AFFECTED_MODULE",
+            "DEPENDENCY_NEIGHBOR",
+            "BROAD_FULL_REGRESSION",
+        ],
+        "selected_level": "BROAD_FULL_REGRESSION",
+        "broad_full_regression": True,
+        "broad_full_justification": "CRITICAL_SECURITY_PRODUCTION_AUTHORITY_OR_DESTRUCTIVE_PREDICATE",
+        "optional_checks_executed": False,
+    }
+
+
+def _baseline_failure_policy(profile: TaskProfile) -> dict[str, Any]:
+    if not profile.baseline_failure:
+        return {
+            "status": "NOT_APPLICABLE",
+            "action": "NONE",
+            "investigation_required": False,
+            "lane_escalation": False,
+        }
+    material = (
+        profile.baseline_invalidates_acceptance
+        or profile.baseline_on_dependency_path
+        or profile.baseline_safety_risk
+    )
+    if not material:
+        return {
+            "status": "PRE_EXISTING_UNRELATED",
+            "action": "RECORD_CLASSIFY_CONTINUE",
+            "investigation_required": False,
+            "lane_escalation": False,
+        }
+    return {
+        "status": "PRE_EXISTING_MATERIAL",
+        "action": "RECORD_AND_ESCALATE_WITH_EVIDENCE",
+        "investigation_required": True,
+        "lane_escalation": True,
+    }
+
+
+def _safety_invariants(profile: TaskProfile, lane: str) -> dict[str, Any]:
+    mutation = profile.source_mutation or profile.runtime_change or profile.registry_change or profile.governance_change
+    return {
+        "canonical_integrity": "PRESERVED",
+        "permission_expansion": False,
+        "production_protection": "FAIL_CLOSED",
+        "destructive_operations": "FAIL_CLOSED",
+        "provenance": "REQUIRED",
+        "owner_approval": "REQUIRED" if lane == CRITICAL else "UNCHANGED",
+        "rollback": "REQUIRED_FOR_MUTATION" if mutation else "NOT_APPLICABLE",
+        "promotion": "OWNER_GATE_REQUIRED" if profile.promotion else "NOT_AUTHORIZED_BY_POLICY",
+        "deployment": "NOT_AUTHORIZED_BY_POLICY",
+        "live_activation": "NOT_AUTHORIZED_BY_POLICY",
+        "force_push": "NOT_AUTHORIZED_BY_POLICY",
+    }
+
+
 def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]:
     """Derive an inspectable abstract requirement without executing anything."""
 
@@ -271,11 +522,27 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
     verification_class, verification_reasons = _verification(profile)
     reasoning_class, reasoning_reasons = _reasoning(profile, verification_class)
     worker_strategy, worker_reasons, worker_count = _worker_strategy(profile, context_class)
+    execution_lane, execution_lane_reasons = _execution_lane(profile)
+    jit_skills = _jit_skills(profile, execution_lane)
+    test_ceiling = _test_ceiling(profile, execution_lane)
+    baseline_failure = _baseline_failure_policy(profile)
+    safety_invariants = _safety_invariants(profile, execution_lane)
     reason_codes = sorted(set(context_reasons + verification_reasons + reasoning_reasons + worker_reasons))
     blocked = worker_strategy == BLOCKED
     return {
         "schema": POLICY_SCHEMA,
         "status": "BLOCKED" if blocked else "READY",
+        "policy_principles": [MINIMUM_SUFFICIENT_WORK, RISK_PROPORTIONAL_EXECUTION],
+        "execution_lane": execution_lane,
+        "execution_lane_reasons": execution_lane_reasons,
+        "execution_policy": {
+            "minimum_sufficient_work": "ENFORCED",
+            "risk_proportional_execution": "ENFORCED",
+            "default_lane": FAST,
+            "selected_lane": execution_lane,
+            "escalation_requires_material_evidence": True,
+            "template_or_skill_recommendation_is_not_escalation_evidence": True,
+        },
         "worker_strategy": worker_strategy,
         "worker_count": worker_count,
         "context_class": context_class,
@@ -290,6 +557,23 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
             "permission_expansion": False,
             "quality_overhead_tradeoff": "QUALITY_ADJUSTED_MINIMUM_SUFFICIENT",
         },
+        "jit_skills": {
+            "required": jit_skills,
+            "coder": "coder" in jit_skills,
+            "debugging": "debugging" in jit_skills,
+            "qa": "qa" in jit_skills,
+            "supervisor": "supervisor" in jit_skills,
+            "selection_rule": "JUST_IN_TIME_ONLY",
+        },
+        "test_ceiling": test_ceiling,
+        "baseline_failure": baseline_failure,
+        "stop_rule": {
+            "do_not_prove_more_than_task_requires": True,
+            "acceptance_proven": profile.acceptance_proven,
+            "stop_after": test_ceiling["selected_level"],
+            "optional_checks_executed": test_ceiling["optional_checks_executed"],
+        },
+        "safety_invariants": safety_invariants,
         "provenance": {
             "profile_fingerprint": _fingerprint(profile),
             "reason_codes": reason_codes,
@@ -297,6 +581,8 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
             "reasoning_reasons": reasoning_reasons,
             "verification_reasons": verification_reasons,
             "worker_reasons": worker_reasons,
+            "execution_lane": execution_lane,
+            "execution_lane_reasons": execution_lane_reasons,
             "ordered_inputs": [
                 "PROJECT_TASK_STATE",
                 "TASK_CHARACTERISTICS",
@@ -313,7 +599,12 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
             "bytes": profile.context_proxy_bytes,
             "refs": list(profile.context_refs),
         },
-        "canonical_governance": {"denominator": 8, "full_quorum": "8/8", "adaptive_worker_count_changes_quorum": False},
+        "canonical_governance": {
+            "denominator": 8,
+            "full_quorum": "8/8",
+            "adaptive_worker_count_changes_quorum": False,
+            "execution_lane_changes_quorum": False,
+        },
         "future_seams": [
             "CACHE_AWARE_CONTEXT",
             "TASK_TARGETED_RETRIEVAL",
@@ -327,23 +618,29 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
 
 __all__ = [
     "BLOCKED",
+    "CRITICAL",
     "CONTEXT_INSUFFICIENT",
     "CONTEXT_CLASSES",
     "DETERMINISTIC",
     "DIRECT",
     "EXPANDED",
+    "EXECUTION_LANES",
+    "FAST",
     "HIGH",
     "HIGH_RISK",
     "LOW",
     "MINIMAL",
+    "MINIMUM_SUFFICIENT_WORK",
     "ONE_WORKER",
     "OrchestrationPolicyError",
     "POLICY_SCHEMA",
     "REASONING_CLASSES",
     "STANDARD",
+    "STRICT",
     "TaskProfile",
     "TWO_WORKERS",
     "VERIFICATION_CLASSES",
     "WORKER_STRATEGIES",
+    "RISK_PROPORTIONAL_EXECUTION",
     "derive_requirement",
 ]
