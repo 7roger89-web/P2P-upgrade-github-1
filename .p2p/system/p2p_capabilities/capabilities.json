@@ -967,6 +967,9 @@
      "upstream_commit": "9a7b2e9c39f816d6c699c2a133e11b6d8bfdc464",
      "upstream_tree": "56b103dad637a95b9ec366eb7215459f28feb73e",
      "upstream_version": "gpt-image-2-style-library-v1.0.4",
+     "upstream_tag": "gpt-image-2-style-library-v1.0.4",
+     "upstream_tag_commit": "e1d07c98fe8c01aa1f6567b5f6d7987e517688fa",
+     "upstream_tag_binding": "OBSERVED_TAG_DOES_NOT_EQUAL_PIN",
      "snapshot_sha256": "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482",
      "source_files": [
       {

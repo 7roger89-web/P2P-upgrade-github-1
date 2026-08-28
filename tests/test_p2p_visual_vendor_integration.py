@@ -41,6 +41,15 @@ sys.path.insert(0, str(SYSTEM_ROOT))
 
 from p2p_capabilities import CANONICAL_IDENTITIES, load_registry  # noqa: E402
 from p2p_capabilities import vendor_skill  # noqa: E402
+from p2p_capabilities.host_projection import READY as HOST_READY  # noqa: E402
+from p2p_capabilities.host_projection import project_host_skill  # noqa: E402
+from p2p_capabilities.manus_skill_package import (  # noqa: E402
+    MANUS_MAPPING_STATUS,
+    MANUS_RUNTIME_STATUS,
+    READY as MANUS_READY,
+    export_manus_skill_package,
+    plan_manus_skill_package,
+)
 from p2p_capabilities.vendor_skill import (  # noqa: E402
     VendorSkillError,
     discover_vendor_skills,
@@ -82,6 +91,8 @@ class P2PVisualVendorIntegrationTests(unittest.TestCase):
         self.assertEqual(record["UPSTREAM_PROVENANCE"]["mode"], "LOCAL_VENDOR_SNAPSHOT")
         self.assertEqual(record["UPSTREAM_PROVENANCE"]["upstream_commit"], "9a7b2e9c39f816d6c699c2a133e11b6d8bfdc464")
         self.assertEqual(record["UPSTREAM_PROVENANCE"]["upstream_tree"], "56b103dad637a95b9ec366eb7215459f28feb73e")
+        self.assertEqual(record["UPSTREAM_PROVENANCE"]["upstream_tag"], "gpt-image-2-style-library-v1.0.4")
+        self.assertEqual(record["UPSTREAM_PROVENANCE"]["upstream_tag_binding"], "OBSERVED_TAG_DOES_NOT_EQUAL_PIN")
         self.assertEqual(record["UPSTREAM_PROVENANCE"]["integration"]["load_mode"], "ON_DEMAND")
         self.assertFalse(record["UPSTREAM_PROVENANCE"]["integration"]["network_runtime"])
         self.assertFalse(record["UPSTREAM_PROVENANCE"]["integration"]["credentials"])
@@ -299,6 +310,120 @@ class P2PVisualVendorIntegrationTests(unittest.TestCase):
         self.assertEqual(result["route"]["adaptive_quorum"]["full_quorum"], "8/8")
         self.assertTrue(all(not item["permission_grant"] for item in result["skills"]))
         self.assertTrue(all(not item["network_runtime"] for item in result["skills"]))
+
+    def test_09_existing_host_projection_preserves_stages_and_mapping_truth(self) -> None:
+        loaded = load_vendor_skill(
+            CAPABILITY_ID,
+            registry_path=REGISTRY_PATH,
+            repository_root=REPO_ROOT,
+            references=("references/style-library.md",),
+        )
+
+        def project(host_kind: str, stage: str, *, target_extra: dict[str, object] | None = None, **extra: object):
+            context: dict[str, object] = {
+                "load_stage": stage,
+                "selected": True,
+                "source_hash": EXPECTED_SNAPSHOT_HASH,
+            }
+            if stage in {"LOAD", "DEEP_LOAD"}:
+                context["entrypoint_content"] = loaded["skill"]["content"]
+                context["entrypoint_hash"] = loaded["skill"]["sha256"]
+            context.update(extra)
+            return project_host_skill(
+                self.manifest,
+                context,
+                {"host_kind": host_kind, "scope": "project", **(target_extra or {})},
+            )
+
+        discovery = project("codex", "DISCOVERY")
+        self.assertEqual(discovery.status, HOST_READY)
+        self.assertFalse(discovery.content_loaded)
+        self.assertIn("MAPPING_SUPPORTED", discovery.warnings)
+        self.assertIn("DISCOVERY_METADATA_ONLY", discovery.warnings)
+        match = project("codex", "MATCH")
+        self.assertEqual(match.status, HOST_READY)
+        self.assertFalse(match.content_loaded)
+        self.assertIn("MATCH_ENTRYPOINT_POINTER:SKILL.md", match.warnings)
+        loaded_plan = project("codex", "LOAD")
+        self.assertEqual(loaded_plan.status, HOST_READY)
+        self.assertTrue(loaded_plan.content_loaded)
+        self.assertEqual(loaded_plan.source_hash, EXPECTED_SNAPSHOT_HASH)
+        self.assertEqual(loaded_plan.entrypoint_hash, "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9")
+        self.assertTrue(all(not getattr(loaded_plan, field) for field in (
+            "writes_performed",
+            "provider_mutated",
+            "model_mutated",
+            "auth_mutated",
+            "permission_mutated",
+            "task_state_mutated",
+        )))
+        reference = loaded["references"]["references/style-library.md"]
+        deep = project(
+            "codex",
+            "DEEP_LOAD",
+            deep_load=[{
+                "requested": True,
+                "kind": "reference",
+                "relative_path": "references/style-library.md",
+                "source_hash": reference["sha256"],
+                "content": reference["content"],
+            }],
+        )
+        self.assertEqual(deep.status, HOST_READY)
+        self.assertIn("DEEP_LOAD_EXPLICIT_DECLARED_ONLY", deep.warnings)
+        self.assertEqual(deep.files[-1].relative_target, ".agents/skills/visual.gpt_image_2_style_library/references/style-library.md")
+        self.assertNotIn("data/style-library.json", [item.relative_target for item in deep.files])
+        for host_kind in ("claude", "gemini", "cursor", "copilot"):
+            extra = {"apply_to": "docs/**/*.md"} if host_kind == "copilot" else {}
+            planned = project(host_kind, "LOAD", target_extra=extra)
+            self.assertEqual(planned.status, HOST_READY)
+            self.assertIn("MAPPING_PLANNED", planned.warnings)
+            self.assertIn("MAPPING_PLANNED_NOT_RUNTIME_CERTIFIED", planned.warnings)
+
+    def test_10_existing_manus_projection_stays_not_certified_at_runtime(self) -> None:
+        loaded = load_vendor_skill(
+            CAPABILITY_ID,
+            registry_path=REGISTRY_PATH,
+            repository_root=REPO_ROOT,
+        )
+        context = {
+            "load_stage": "LOAD",
+            "selected": True,
+            "source_hash": EXPECTED_SNAPSHOT_HASH,
+            "entrypoint_content": loaded["skill"]["content"],
+            "entrypoint_hash": loaded["skill"]["sha256"],
+        }
+        target = {"host_kind": "manus", "scope": "project"}
+        plan = plan_manus_skill_package(
+            self.manifest,
+            context,
+            target,
+            registry_path=REGISTRY_PATH,
+            repository_root=REPO_ROOT,
+        )
+        self.assertEqual(plan.status, MANUS_READY)
+        self.assertEqual(plan.mapping_status, MANUS_MAPPING_STATUS)
+        self.assertEqual(plan.runtime_status, MANUS_RUNTIME_STATUS)
+        self.assertEqual(plan.lifecycle_stage, "MAPPING_SUPPORTED")
+        self.assertEqual(
+            [item.relative_path for item in plan.files],
+            ["P2P-PROVENANCE.json", "SKILL.md"],
+        )
+        provenance = plan.files[0].content_or_descriptor
+        self.assertEqual(provenance["source_hash"], EXPECTED_SNAPSHOT_HASH)
+        self.assertEqual(provenance["entrypoint_hash"], loaded["skill"]["sha256"])
+        self.assertNotIn("provider", json.dumps(provenance).lower())
+        self.assertNotIn("model", json.dumps(provenance).lower())
+        self.assertFalse(provenance["integration"]["credentials"])
+        with tempfile.TemporaryDirectory(prefix="p2p-visual-manus-", dir=REPO_ROOT / ".tmp") as raw:
+            exported = export_manus_skill_package(
+                self.manifest,
+                Path(raw) / "package",
+                repository_root=REPO_ROOT,
+                registry_path=REGISTRY_PATH,
+            )
+            self.assertEqual(exported.plan.runtime_status, "NOT_CERTIFIED")
+            self.assertTrue(Path(exported.archive_path).is_file())
 
 
 if __name__ == "__main__":
