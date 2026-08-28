@@ -30,10 +30,12 @@ from p2p_capabilities.vendor_skill import load_vendor_skill, snapshot_tree_sha25
 VENDOR_ROOTS = {
     "creative.copywriting": REPO_ROOT / ".p2p" / "vendor" / "skill" / "xiaoma-durex-copywriter-main",
     "media.whiteboard_animation": REPO_ROOT / ".p2p" / "vendor" / "skill" / "srt-whiteboard-animation-main",
+    "visual.gpt_image_2_style_library": REPO_ROOT / ".p2p" / "vendor" / "skill" / "gpt-image-2-style-library-9a7b2e9",
 }
 EXPECTED_VENDOR_HASHES = {
     "creative.copywriting": "5a02c082b531b6731dbdd6e55ccc8798ba2514bbb27df8e9c2ef74c88752830d",
     "media.whiteboard_animation": "55dbed4743cad90f80d1603ed639508c8e3a6e650a1abccfe7d4e8b2e148742c",
+    "visual.gpt_image_2_style_library": "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482",
 }
 
 

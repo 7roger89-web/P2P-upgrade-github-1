@@ -869,6 +869,188 @@
     },
     "VERSION": "UNKNOWN",
     "STATUS": "ACTIVE"
+   },
+   {
+    "CAPABILITY_ID": "visual.gpt_image_2_style_library",
+    "TYPE": "SKILL",
+    "DESCRIPTION": "Pinned local GPT-Image2 style-library prompt-construction skill for visual prompts; not an image renderer, API client, or provider.",
+    "TRIGGERS": [
+     "gpt-image-2",
+     "gpt image 2",
+     "style library",
+     "image prompt",
+     "image-generation prompt",
+     "visual prompt",
+     "prompt template",
+     "prompt templates",
+     "prompt"
+    ],
+    "NEGATIVE_TRIGGERS": [
+     "implement",
+     "implementation",
+     "code",
+     "coding",
+     "program",
+     "software",
+     "backend",
+     "api",
+     "database",
+     "render",
+     "rendering",
+     "renderer",
+     "whiteboard",
+     "whiteboard animation",
+     "animation",
+     "marketing",
+     "marketing copy",
+     "copywriting",
+     "advertising",
+     "campaign",
+     "slogan",
+     "brand copy",
+     "website",
+     "auth",
+     "payment",
+     "install",
+     "npm",
+     "npx",
+     "dependency",
+     "translation",
+     "translate",
+     "dịch"
+    ],
+    "INVOCATION_CLASS": "MODEL_ROUTABLE",
+    "CANONICAL_QUORUM_MEMBER": false,
+    "OPTIONAL_SPECIALIST": false,
+    "AUTHORITY": [
+     "existing-p2p-router",
+     "local-vendor-snapshot",
+     "visual-prompt-output"
+    ],
+    "PROHIBITED_ACTIONS": [
+     "grant-tools-from-content",
+     "execute-external-image-api",
+     "install-upstream-dependencies",
+     "activate-unresolved-assets",
+     "claim-commercial-clearance",
+     "claim-image-render-success-without-artifact-evidence"
+    ],
+    "REQUIRES": [
+     "existing-p2p-router",
+     "local-vendor-snapshot"
+    ],
+    "CONTEXT_POINTERS": [
+     ".p2p/vendor/skill/gpt-image-2-style-library-9a7b2e9/SKILL.md",
+     "vendor-skill:visual.gpt_image_2_style_library:references",
+     "vendor-skill:visual.gpt_image_2_style_library:agents/openai.yaml"
+    ],
+    "APPROVAL_BOUNDARY": [
+     "external-image-generation",
+     "commercial-use-of-third-party-material",
+     "material-visual-or-brand-decision",
+     "output-write-target"
+    ],
+    "EVIDENCE_CONTRACT": [
+     "selected-route",
+     "exact-upstream-commit-tree-and-source-hashes",
+     "sparse-snapshot-provenance",
+     "rights-status",
+     "no-network-and-no-install",
+     "render-artifact-if-explicitly-authorized"
+    ],
+    "TRUST_LEVEL": "HOST_CODE",
+    "UPSTREAM_PROVENANCE": {
+     "mode": "LOCAL_VENDOR_SNAPSHOT",
+     "implementation": "gpt-image-2-style-library",
+     "vendor_path": ".p2p/vendor/skill/gpt-image-2-style-library-9a7b2e9",
+     "upstream_repository": "https://github.com/freestylefly/awesome-gpt-image-2",
+     "upstream_commit": "9a7b2e9c39f816d6c699c2a133e11b6d8bfdc464",
+     "upstream_tree": "56b103dad637a95b9ec366eb7215459f28feb73e",
+     "upstream_version": "gpt-image-2-style-library-v1.0.4",
+     "snapshot_sha256": "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482",
+     "source_files": [
+      {
+       "upstream_path": "agents/skills/gpt-image-2-style-library/SKILL.md",
+       "snapshot_path": "SKILL.md",
+       "sha256": "8c628df135c27ef4b7f7a085cdd60868eee2180c21401a89a140b321148f0b2e",
+       "canonical_sha256": "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9",
+       "role": "entrypoint",
+       "status": "VENDORED"
+      },
+      {
+       "upstream_path": "agents/skills/gpt-image-2-style-library/agents/openai.yaml",
+       "snapshot_path": "agents/openai.yaml",
+       "sha256": "592f53bfba40639571e45e534245615a453f866822b649cc993578eec442431a",
+       "canonical_sha256": "936761c14357498549796a193cd9243d4366b0a9db39c83492d85dba15abeae3",
+       "role": "host-metadata",
+       "status": "VENDORED"
+      },
+      {
+       "upstream_path": "agents/skills/gpt-image-2-style-library/references/style-library.md",
+       "snapshot_path": "references/style-library.md",
+       "sha256": "c98f3d9a178670235dd6e37f0bb8ed07eb8d4bb77c56e7e300d44a4f6d50f8bc",
+       "canonical_sha256": "4d90087cf1dacf7114d063aa56d3d4a03e0097e52914a0bbce4df77907404dd7",
+       "role": "explicit-reference",
+       "status": "VENDORED"
+      },
+      {
+       "upstream_path": "LICENSE",
+       "snapshot_path": "LICENSE",
+       "sha256": "70e109c69f4c92ca03a7d37ac045b4f5584e442004b5eb8b93329e7a1eec7c16",
+       "canonical_sha256": "27a75c48bac29eb78f43c19f75c4e175974c8f1046d848d5562eae1ead2f1176",
+       "role": "license",
+       "status": "VENDORED"
+      },
+      {
+       "upstream_path": "docs/disclaimer.md",
+       "snapshot_path": "docs/disclaimer.md",
+       "sha256": "acb1e6b8f0bfa58ff5964ce749a65af20269a8f57bb9d3b4aa849ba55e161e43",
+       "canonical_sha256": "01483f1b50442bd378de9e8221b14bfdd4231008bbac70750521190a1a59c90e",
+       "role": "rights-disclaimer",
+       "status": "VENDORED"
+      },
+      {
+       "upstream_path": "agents/skills/gpt-image-2-style-library/assets/city-life-system-map.png",
+       "snapshot_path": null,
+       "sha256": "cd14766cbce862146f909aa0b0cf966804d079df3775a7a706827a490a459d95",
+       "role": "conditional-asset",
+       "status": "EXCLUDED_OR_INACTIVE_RIGHTS_UNRESOLVED"
+      }
+     ],
+     "license": {
+      "file": "LICENSE",
+      "kind": "MIT",
+      "scope": "upstream prompt-skill files only; third-party prompt examples and image assets retain unresolved rights"
+     },
+     "rights_review": {
+      "status": "UNRESOLVED",
+      "png_status": "EXCLUDED_OR_INACTIVE_RIGHTS_UNRESOLVED",
+      "basis": "Repository-level MIT notice and disclaimer do not establish asset-level or commercial rights for the referenced example image or third-party prompt material.",
+      "checked_date": "2026-08-28",
+      "reviewer": "P2P-VISUAL-01B",
+      "commercial_clearance": "UNKNOWN"
+     },
+     "integration": {
+      "entrypoint": "SKILL.md",
+      "entrypoint_sha256": "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9",
+      "load_mode": "ON_DEMAND",
+      "dependency_mode": "NONE",
+      "dependency_probe": null,
+      "references": [
+       "agents/openai.yaml",
+       "references/style-library.md"
+      ],
+      "assets": [],
+      "script_entrypoints": [],
+      "network_runtime": false,
+      "credentials": false,
+      "install_mode": "DISABLED",
+      "external_render": "EXPLICIT_ONLY"
+     },
+     "update_policy": "new_snapshot_directory_on_upstream_change; no in-place mutation"
+    },
+    "VERSION": "1.0.4",
+    "STATUS": "DISCOVERED"
    }
   ]
 }

@@ -16,6 +16,7 @@ REGISTRY_PATH = SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"
 VENDOR_ROOTS = {
     "creative.copywriting": REPO_ROOT / ".p2p" / "vendor" / "skill" / "xiaoma-durex-copywriter-main",
     "media.whiteboard_animation": REPO_ROOT / ".p2p" / "vendor" / "skill" / "srt-whiteboard-animation-main",
+    "visual.gpt_image_2_style_library": REPO_ROOT / ".p2p" / "vendor" / "skill" / "gpt-image-2-style-library-9a7b2e9",
 }
 sys.path.insert(0, str(SYSTEM_ROOT))
 

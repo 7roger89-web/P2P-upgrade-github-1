@@ -51,7 +51,7 @@ class P2PCapabilityFoundationTests(unittest.TestCase):
 
     def test_cf1_model_has_exact_six_classes(self) -> None:
         self.assertEqual(CAPABILITY_CLASSES, ("SKILL", "OPTIONAL_SPECIALIST", "GOVERNANCE_POLICY", "KNOWLEDGE_SOURCE", "EVIDENCE_PROVIDER", "BACKEND_PROVIDER"))
-        self.assertEqual(self.registry["capability_count"], 15)
+        self.assertEqual(self.registry["capability_count"], 16)
 
     def test_cf2_manifest_is_minimal_and_invalid_canonical_fails_closed(self) -> None:
         self.assertTrue(self.registry["valid"])

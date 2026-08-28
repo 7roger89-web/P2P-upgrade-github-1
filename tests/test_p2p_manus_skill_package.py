@@ -26,7 +26,11 @@ from p2p_capabilities.manus_skill_package import (  # noqa: E402
 from p2p_capabilities.vendor_skill import load_vendor_skill  # noqa: E402
 
 
-CAPABILITIES = ("creative.copywriting", "media.whiteboard_animation")
+CAPABILITIES = (
+    "creative.copywriting",
+    "media.whiteboard_animation",
+    "visual.gpt_image_2_style_library",
+)
 
 
 class P2PManusSkillPackageTests(unittest.TestCase):
