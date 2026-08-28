@@ -1190,6 +1190,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-27T14:43:41+07:00",
-  "reason": "P2P-CT01-R05 exact dual-source convergence: Subject A functionality plus Subject B protected runtime binding"
+  "generated_at": "2026-08-28T12:57:43+07:00",
+  "reason": "P2P-VISUAL-01B sparse vendor candidate technical lock"
 }

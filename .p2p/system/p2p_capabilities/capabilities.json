@@ -941,8 +941,8 @@
     ],
     "CONTEXT_POINTERS": [
      ".p2p/vendor/skill/gpt-image-2-style-library-9a7b2e9/SKILL.md",
-     "vendor-skill:visual.gpt_image_2_style_library:references",
-     "vendor-skill:visual.gpt_image_2_style_library:agents/openai.yaml"
+     "vendor-skill:gpt-image-2-style-library:references",
+     "vendor-skill:gpt-image-2-style-library:agents/openai.yaml"
     ],
     "APPROVAL_BOUNDARY": [
      "external-image-generation",
