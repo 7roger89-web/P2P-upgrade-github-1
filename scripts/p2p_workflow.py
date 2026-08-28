@@ -177,6 +177,27 @@ def orchestration_api(root: Path, package_hint: str | None = None) -> Any:
             continue
     raise ValueError("ORCHESTRATION_PRIMITIVE_UNAVAILABLE: p2p_capabilities.orchestration_policy")
 
+def capability_api(root: Path, package_hint: str | None, module_name: str) -> Any:
+    """Load one existing local capability module without widening authority."""
+
+    runtimes = [root / ".p2p" / "system"]
+    if package_hint:
+        runtimes.append(Path(package_hint).expanduser().resolve() / ".p2p" / "system")
+    runtimes.append(Path(__file__).resolve().parents[1] / ".p2p" / "system")
+    seen: set[str] = set()
+    for runtime in runtimes:
+        runtime = runtime.resolve()
+        runtime_text = str(runtime)
+        if runtime_text in seen or not (runtime / "p2p_capabilities" / f"{module_name}.py").is_file():
+            continue
+        seen.add(runtime_text)
+        if runtime_text not in sys.path:
+            sys.path.insert(0, runtime_text)
+        try:
+            return importlib.import_module(f"p2p_capabilities.{module_name}")
+        except (ImportError, OSError):
+            continue
+    raise ValueError(f"CAPABILITY_PRIMITIVE_UNAVAILABLE: p2p_capabilities.{module_name}")
 
 def package_roots() -> list[Path]:
     roots: list[Path] = []
@@ -1341,6 +1362,259 @@ def write_goal(root: Path, contract: dict[str, object]) -> Path:
     write_json_atomic(root / ".p2p" / "state" / "goal-contract.json", contract)
     return path
 
+def _beginner_decision_charter(
+    charter: dict[str, object],
+    gateway: Any,
+    question: str,
+    options: list[str] | None = None,
+    reason: str = "MATERIAL_PRODUCT_DECISION_REQUIRED",
+) -> dict[str, object]:
+    """Return a safe decision projection without changing existing state."""
+
+    updated = dict(charter)
+    updated["status"] = gateway.STATUS_NEEDS_DECISION
+    updated["question"] = question
+    updated["question_options"] = list(options or [])
+    updated["safe_next_action"] = "Chờ bạn trả lời câu hỏi trên; chưa bắt đầu thay đổi nào."
+    internal = dict(updated.get("internal") or {})
+    signals = dict(internal.get("signals") or {})
+    signals["question_reason"] = reason
+    internal["signals"] = signals
+    updated["internal"] = internal
+    return updated
+
+
+def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = None) -> dict[str, object]:
+    """Accept one Beginner request and bind it to existing P2P state surfaces.
+
+    The function does not start a host or execute project work.  A clear
+    request creates one Goal-scoped READY task; a material ambiguity creates
+    one WAITING_OWNER task.  Existing task state is never overwritten.
+    """
+
+    root = root.resolve()
+    gateway = capability_api(root, package_hint, "beginner_gateway")
+    task_state = capability_api(root, package_hint, "task_state")
+    control_tower = capability_api(root, package_hint, "control_tower_handoff")
+    inspection = inspect_project(root, request, package_hint)
+    charter = gateway.derive_charter(request, inspection)
+    normalized_request = str(charter.get("request") or "").strip()
+    public_projection = gateway.beginner_projection(charter)
+    advanced_projection = gateway.advanced_projection(charter)
+    persistence: dict[str, object] = {
+        "status": "NOT_PERSISTED",
+        "goal_id": None,
+        "goal_contract_path": None,
+        "task_state_path": ".p2p/state/task-state.json",
+        "execution_ledger_path": ".p2p/state/execution-ledger.jsonl",
+    }
+    recovery: dict[str, object] = {
+        "status": "NOT_READY",
+        "automatic_start": False,
+        "recommendation": None,
+    }
+    safety = dict((charter.get("internal") or {}).get("safety") or {})
+    safety["execution_started"] = False
+
+    try:
+        store = task_state.TaskStateStore(root)
+        existing_plan = store.load()
+        existing_contract = load_current_contract(root)
+    except Exception:
+        decision = _beginner_decision_charter(
+            charter,
+            gateway,
+            "Trạng thái dự án chưa rõ. Bạn muốn giữ nguyên để kiểm tra lại trước khi tiếp tục không?",
+            ["Giữ nguyên và kiểm tra lại", "Dừng yêu cầu này"],
+            "EXISTING_STATE_UNREADABLE",
+        )
+        return {
+            "schema_version": "p2p-beginner-gateway-run/1",
+            "charter": decision,
+            "beginner_projection": gateway.beginner_projection(decision),
+            "advanced_projection": gateway.advanced_projection(decision),
+            "persistence": {**persistence, "status": "BLOCKED", "reason": "EXISTING_STATE_UNREADABLE"},
+            "recovery": recovery,
+            "safety": safety,
+        }
+
+    existing_gateway = existing_contract.get("beginner_gateway") if isinstance(existing_contract, dict) else None
+    existing_gateway_valid = bool(
+        isinstance(existing_gateway, dict)
+        and existing_gateway.get("schema_version") == gateway.BEGINNER_GATEWAY_SCHEMA
+        and existing_gateway.get("mode") == gateway.BEGINNER_MODE
+    )
+    same_request = bool(
+        normalized_request
+        and existing_gateway_valid
+        and str(existing_gateway.get("request") or "").strip() == normalized_request
+    )
+    if existing_plan is not None and not same_request:
+        decision = _beginner_decision_charter(
+            charter,
+            gateway,
+            "Dự án đang có một việc chưa xong. Bạn muốn tiếp tục việc đó hay bắt đầu yêu cầu mới?",
+            ["Tiếp tục việc đang có", "Bắt đầu yêu cầu mới"],
+            "EXISTING_TASK_STATE_REQUIRES_RECONCILIATION",
+        )
+        persistence.update(
+            {
+                "status": "BLOCKED",
+                "reason": "EXISTING_TASK_STATE_REQUIRES_RECONCILIATION",
+                "existing_goal_id": existing_plan.goal_id,
+            }
+        )
+        recovery.update({"status": "EXISTING_TASK_STATE", "automatic_start": False})
+        return {
+            "schema_version": "p2p-beginner-gateway-run/1",
+            "charter": decision,
+            "beginner_projection": gateway.beginner_projection(decision),
+            "advanced_projection": gateway.advanced_projection(decision),
+            "persistence": persistence,
+            "recovery": recovery,
+            "safety": safety,
+        }
+
+    if not normalized_request:
+        return {
+            "schema_version": "p2p-beginner-gateway-run/1",
+            "charter": charter,
+            "beginner_projection": public_projection,
+            "advanced_projection": advanced_projection,
+            "persistence": persistence,
+            "recovery": recovery,
+            "safety": safety,
+        }
+
+    contract_path: Path | None = None
+    if same_request and isinstance(existing_contract, dict) and existing_gateway_valid:
+        contract = dict(existing_contract)
+        charter = dict(existing_gateway)
+        public_projection = gateway.beginner_projection(charter)
+        advanced_projection = gateway.advanced_projection(charter)
+    else:
+        governance_options = governance_candidates(root, package_hint)
+        policy = policy_for(root, governance_options[0][0] if governance_options else None)
+        inspection = inspect_project(root, normalized_request, package_hint)
+        contract = build_goal_contract(
+            root,
+            normalized_request,
+            inspection,
+            policy,
+            package_hint=package_hint,
+        )
+        contract["beginner_gateway"] = charter
+        contract["beginner_project_type"] = charter.get("project_type")
+        contract["beginner_project_state"] = charter.get("project_state")
+        contract["beginner_safe_next_action"] = charter.get("safe_next_action")
+        contract["beginner_status"] = charter.get("status")
+        contract_path = write_goal(root, contract)
+
+    goal_id = str(contract.get("goal_id") or "")
+    if not goal_id:
+        raise ValueError("BEGINNER_GOAL_ID_MISSING")
+    try:
+        if existing_plan is not None:
+            if existing_plan.goal_id != goal_id:
+                raise ValueError("BEGINNER_EXISTING_GOAL_MISMATCH")
+            plan = existing_plan
+            state_status = "REUSED"
+        else:
+            task_plan = task_state.TaskPlan.from_goal(
+                contract,
+                [gateway.task_spec_for_charter(charter, goal_id)],
+            )
+            plan = store.initialize(task_plan)
+            state_status = "CREATED"
+            store.record_event(
+                "beginner_gateway_ingested",
+                details={
+                    "entrypoint": "BEGINNER",
+                    "mode": gateway.BEGINNER_MODE,
+                    "charter_ref": ".p2p/state/goal-contract.json",
+                },
+            )
+    except Exception:
+        return {
+            "schema_version": "p2p-beginner-gateway-run/1",
+            "charter": charter,
+            "beginner_projection": gateway.beginner_projection(charter),
+            "advanced_projection": gateway.advanced_projection(charter),
+            "persistence": {
+                **persistence,
+                "status": "BLOCKED",
+                "reason": "TASK_STATE_BINDING_FAILED",
+                "goal_id": goal_id,
+            },
+            "recovery": recovery,
+            "safety": safety,
+        }
+
+    try:
+        recovery = control_tower.next_safe_session(root, "FOREGROUND")
+    except Exception:
+        recovery = {
+            "status": "BLOCKED",
+            "automatic_start": False,
+            "recommendation": None,
+            "reason": "CONTROL_TOWER_RECOMMENDATION_UNAVAILABLE",
+        }
+    contract["beginner_recovery_binding"] = {
+        "schema_version": "p2p-beginner-recovery/1",
+        "state_ref": ".p2p/state/task-state.json",
+        "ledger_ref": ".p2p/state/execution-ledger.jsonl",
+        "resume_without_chat_history": True,
+        "automatic_start": False,
+        "recommendation_status": recovery.get("status"),
+    }
+    if contract_path is not None or "beginner_recovery_binding" not in existing_contract:
+        write_goal(root, contract)
+        contract_path = contract_path or (root / ".p2p" / "state" / "goal-contract.json")
+    persistence.update(
+        {
+            "status": state_status,
+            "goal_id": goal_id,
+            "goal_contract_path": relative_path(contract_path, root) if contract_path else ".p2p/state/goal-contract.json",
+            "task_state_path": ".p2p/state/task-state.json",
+            "execution_ledger_path": ".p2p/state/execution-ledger.jsonl",
+            "plan_hash": plan.canonical_hash(),
+        }
+    )
+    return {
+        "schema_version": "p2p-beginner-gateway-run/1",
+        "charter": charter,
+        "beginner_projection": gateway.beginner_projection(charter),
+        "advanced_projection": gateway.advanced_projection(charter),
+        "persistence": persistence,
+        "recovery": recovery,
+        "safety": safety,
+    }
+
+
+def beginner_public_result(result: dict[str, object], *, advanced: bool = False) -> dict[str, object]:
+    """Project an internal gateway run for the requested display mode."""
+
+    public = dict(result.get("beginner_projection") or {})
+    persisted = result.get("persistence") if isinstance(result.get("persistence"), dict) else {}
+    persisted_status = str(persisted.get("status", "NOT_PERSISTED"))
+    saved = persisted_status in {"CREATED", "REUSED"}
+    public["saved_for_resume"] = saved
+    public["resume_note"] = (
+        "Yêu cầu và bước tiếp theo đã được giữ lại để có thể tiếp tục nếu phiên bị gián đoạn."
+        if saved
+        else "Yêu cầu chưa được giữ lại để thực hiện; chưa có thay đổi nào được bắt đầu."
+    )
+    if advanced:
+        advanced_payload = dict((result.get("advanced_projection") or {}).get("advanced") or {})
+        advanced_payload.update(
+            {
+                "persistence": persisted,
+                "recovery": result.get("recovery", {}),
+                "safety": result.get("safety", {}),
+            }
+        )
+        public["advanced"] = advanced_payload
+    return public
 
 def policy_for(root: Path, governance: Path | None) -> dict[str, object]:
     path = root / ".p2p" / "project-policy.json"
@@ -2768,6 +3042,9 @@ def parser() -> argparse.ArgumentParser:
     add_common(run)
     run.add_argument("--acceptance", action="store_true", help=argparse.SUPPRESS)
     run.add_argument("--context-mode", default=argparse.SUPPRESS, help="Context delivery mode: BASELINE_COMPAT or CONTEXT_EFFICIENT_V1")
+    beginner = sub.add_parser("beginner", help="Start P2P from a plain-language Beginner Mode request")
+    add_common(beginner)
+    beginner.add_argument("--advanced", action="store_true", default=argparse.SUPPRESS, help="Show preserved technical detail")
     report = sub.add_parser("report", help="Show the compact beginner-facing report")
     add_common(report, request=False)
     report.add_argument("--run-id")
@@ -2838,6 +3115,11 @@ def main(args: argparse.Namespace) -> int:
         if not request:
             raise ValueError("--request is required for run")
         output = run_workflow(root, request, package_hint=package, acceptance=bool(args.acceptance), context_mode=getattr(args, "context_mode", None))
+    elif args.command == "beginner":
+        output = beginner_public_result(
+            beginner_entrypoint(root, request, package_hint=package),
+            advanced=bool(getattr(args, "advanced", False)),
+        )
     elif args.command == "report":
         output = report_for(root, args.run_id)
     elif args.command == "update":
@@ -2849,6 +3131,9 @@ def main(args: argparse.Namespace) -> int:
         raise ValueError(f"Unknown command: {args.command}")
     if args.command == "run" and not args.json and isinstance(output, dict):
         print(beginner_report(output))
+    elif args.command == "beginner" and not args.json and isinstance(output, dict):
+        gateway = capability_api(root, package, "beginner_gateway")
+        print(gateway.render_beginner(output))
     elif args.command == "report" and not args.json:
         print(output)
     elif args.json or isinstance(output, (dict, list)):
