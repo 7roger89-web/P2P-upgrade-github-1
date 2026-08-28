@@ -53,7 +53,7 @@ Implemented the minimum workflow adapter against the current canonical lineage. 
 - `python -m py_compile scripts/p2p_workflow.py`: pass.
 - `python -B -m compileall -q scripts tests`: pass with one pre-existing `SyntaxWarning` in `tests/test_p2p_live_certification.py`; unrelated and unchanged.
 - `git diff --check -- scripts/p2p_workflow.py`: pass.
-- Fresh Anvien analysis: `993` files scanned, `177` code files parsed, `0` parse failures.
+- Fresh Anvien analysis: post-implementation refresh `994` files scanned, `177` code files parsed, `0` parse failures.
 - Anvien change detection: one affected source file (`scripts/p2p_workflow.py`), high-risk/high-fan-in warning retained as scope evidence.
 
 ## Legacy fallback status
@@ -64,7 +64,13 @@ The FASTPATH-02 candidate is not used as a base. Its pre-EFF01 policy assumption
 
 - No live worker executor is claimed or tested; selected workers are route metadata only.
 - Provider/model resolution, host identity, real eight-thread runtime quorum, external integration, Owner approval, promotion, and deployment remain outside this task.
-- The candidate contains a stat/line-ending metadata noise inherited from Windows checkout attributes; content diff is limited to the intentional workflow/test/plan artifacts and is not resolved by reset, clean, or normalization.
+- The old candidate's stat/line-ending metadata noise was not carried forward. The implementation checkpoint has `0` porcelain status lines; no reset, clean, stash, delete, or normalization was used.
 - One existing `SyntaxWarning` remains in `tests/test_p2p_live_certification.py`; it is outside the changed surface.
 
-Coder result: PASS for the assigned isolated implementation slice; ready for independent Supervisor review and Owner gate, not promoted.
+## Independent review
+
+- Supervisor report: `reports/supervisor/rp_supervisor_260828_194313_by_gpt-5-codex_p2p-lightweight-fastpath-03.md`
+- Supervisor result: `Verdict: PASS`
+- Review cleared current-lineage reuse, no EFF01 duplication, lightweight routing, high-risk protection, bounded context, proportional verification, and candidate cleanliness.
+
+Coder result: PASS for the assigned isolated implementation slice; Supervisor-cleared and ready for the Owner gate, not promoted.

@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-28`
-- Status: `P2-A complete; Supervisor/final Owner-gate closure pending`
+- Status: `P2-A/P2-B/P2-C complete; candidate stopped at Owner gate`
 - Plan: `docs/plans/2026-08-28-p2p-lightweight-fastpath-03-current-canonical/2026-08-28-p2p-lightweight-fastpath-03-current-canonical-plan.md`
 - Evidence: `docs/plans/2026-08-28-p2p-lightweight-fastpath-03-current-canonical/2026-08-28-p2p-lightweight-fastpath-03-current-canonical-evidence.md`
 - Benchmark: `docs/plans/2026-08-28-p2p-lightweight-fastpath-03-current-canonical/2026-08-28-p2p-lightweight-fastpath-03-current-canonical-benchmark.md`
@@ -196,17 +196,24 @@ FASTPATH-02 was implemented against the pre-EFF01 base and left a dirty `.tmp` c
   - Implementation Gate: P1-A and P1-B committed; candidate path is neutral and status is intentional-only.
   - Acceptance: required validation commands and path-sensitive checks pass, or a concrete unrelated limitation is recorded without broad expansion.
 
-- [ ] P2-B: Independent Supervisor review when required by current governance
+- [x] P2-B: Independent Supervisor review when required by current governance
   - Goal: independently review current lineage, no EFF01 duplication, seven-scenario behavior, high-risk protection, bounded context, and candidate cleanliness.
   - Work Steps: inspect final source/diff first; check reports and fresh validation; verify no Owner mutation or promotion; write exactly `PASS` or `REJECT` in the Supervisor report.
   - Implementation Gate: P2-A evidence and detect-changes are current.
   - Acceptance: Supervisor report exists if required and returns `PASS`, or the plan records a truthful governance reason it was not required.
 
-- [ ] P2-C: Close the candidate at the Owner gate
+- [x] P2-C: Close the candidate at the Owner gate
   - Goal: bind final SHA/tree, files, cleanliness, limitations, and terminal verdict.
   - Work Steps: refresh actual-status/evidence/benchmark; run final status/diff identity checks; commit only intended artifacts; confirm canonical remains untouched; stop without promotion.
   - Implementation Gate: P2-A and P2-B pass or record an explicit limitation.
   - Acceptance: final report has all 18 requested items, exact candidate identity, clean status, and one approved FASTPATH-03 terminal verdict.
+
+### Final closure
+
+- P2-A proportional validation passed: focused FASTPATH `18/18`, current EFF01/C18/C19/foundation `61/61`, workflow/path-sensitive `8/8`, compile/static checks, diff check, and fresh Anvien analysis.
+- P2-B Supervisor review passed in `reports/supervisor/rp_supervisor_260828_194313_by_gpt-5-codex_p2p-lightweight-fastpath-03.md`.
+- P2-C closes the isolated candidate at the Owner gate. The implementation checkpoint is `82d6bffc9c6e596d2b8270679db1a7ee2fc80ee6` with tree `1011ccf931445e5f645de2ec56cc7509c871a87a`; the final closure checkpoint is the commit containing this evidence update.
+- No promotion, merge, push, deploy, Owner approval, or canonical checkout mutation occurred.
 
 ## Risk Notes
 

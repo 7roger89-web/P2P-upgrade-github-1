@@ -19,8 +19,8 @@ This ledger records measured counts, timings, graph inventory, and exact hashes 
 | P0 | Current remote main | SHA | `230769...` known prior | `28a85bc6f69ab992c44f96770ab2f513bbc34f94` | `28a85bc6f69ab992c44f96770ab2f513bbc34f94` | fresh remote truth | 0 | `E0-P0A-REMOTE1`, `E2-P2C-ID1` |
 | P0 | Current main tree | SHA | `af290ed1...` known prior | `42734b3c55e8db7ce3936428fd0841f7e6106ea2` | `42734b3c55e8db7ce3936428fd0841f7e6106ea2` | exact current tree | 0 | `E0-P0A-CANON1`, `E2-P2C-ID1` |
 | P0 | Commits between old base and current main | commits | 0 | 4 | 4 | all relevant commits classified | +4 | `E0-P0A-ANCESTRY1` |
-| P0 | Candidate files scanned by Anvien | files | n/a | 988 | 993 | current candidate graph | +5 | `E0-P0A-GRAPH1`, `E2-P2A-ANVIEN1` |
-| P0 | Parsed code files | files | n/a | 176 | 177 | 0 parse failures | +1 | `E0-P0A-GRAPH1`, `E2-P2A-ANVIEN1` |
+| P0 | Candidate files scanned by Anvien | files | n/a | 988 | 994 | current candidate graph | +6 | `E0-P0A-GRAPH1`, `E2-P2A-ANVIEN1`, `E2-P2B-ANVIEN1` |
+| P0 | Parsed code files | files | n/a | 176 | 177 | 0 parse failures | +1 | `E0-P0A-GRAPH1`, `E2-P2A-ANVIEN1`, `E2-P2B-ANVIEN1` |
 | P0 | Initial candidate status | lines | 1127 old candidate noise | 0 content changes | 0 content changes | 0 unrelated content changes | 0 | `E0-P0A-CLEAN1`, `E2-P2C-CLEAN1` |
 
 ## B1 - P1 Benchmarks
@@ -38,8 +38,8 @@ This ledger records measured counts, timings, graph inventory, and exact hashes 
 | P2 | Focused FASTPATH tests | tests | 0 | 18 | 18 | all required scenarios | +18 | `E1-P1B-TEST1` |
 | P2 | Current EFF01/C18/C19 tests | tests | 61 | 61 | 61 | no regression | 0 | `E2-P2A-TEST1` |
 | P2 | Workflow/path-sensitive tests | tests | 8 | 8 | 8 | both path-sensitive pass outside `.tmp` | 0 | `E2-P2A-TEST1` |
-| P2 | Candidate commits after implementation | commits | 0 | pending | pending | isolated checkpoint(s) | pending | pending |
-| P2 | Candidate tree identity | SHA | pending | pending | pending | exact reviewed subject | pending | pending |
+| P2 | Candidate commits after implementation | commits | 0 | 1 | 2 | isolated implementation plus closure checkpoints | +2 | `E2-P2C-ID1`, `E2-P2C-CLOSE1` |
+| P2 | Candidate implementation tree identity | SHA | current-main tree | `1011ccf931445e5f645de2ec56cc7509c871a87a` | `1011ccf931445e5f645de2ec56cc7509c871a87a` | exact reviewed source checkpoint | 0 | `E2-P2C-ID1` |
 
 ## Non-Benchmarkable Notes
 

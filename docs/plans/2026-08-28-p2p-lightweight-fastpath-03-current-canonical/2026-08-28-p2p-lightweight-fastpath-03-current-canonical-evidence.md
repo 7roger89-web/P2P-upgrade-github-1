@@ -58,10 +58,16 @@ Matching plan item(s): `P2-A`, `P2-B`, `P2-C`
 - `E2-P2A-TEST1`: neighboring C18/C19/foundation suite passed `61/61`; workflow plus the formerly path-sensitive decision-trace test passed `8/8` from `D:\AI\P2P_dev\worktrees\p2p-lightweight-fastpath-03-final`, outside `.tmp`.
 - `E2-P2A-COMPILE1`: `python -B -m compileall -q scripts tests` passed. The only output was a pre-existing `SyntaxWarning` in `tests/test_p2p_live_certification.py`; no unrelated file was changed.
 - `E2-P2A-DIFF1`: `git diff --check -- scripts/p2p_workflow.py` passed.
-- `E2-P2A-ANVIEN1`: fresh `anvien analyze --force` completed with `993` scanned files, `177` parsed code files, `0` parse failures, `41853` graph nodes, and `48361` relationships. `scripts/p2p_workflow.py` remained high-risk/high-fan-in; scope stayed limited to the requested bridge.
+- `E2-P2A-ANVIEN1`: fresh pre-commit `anvien analyze --force` completed with `993` scanned files, `177` parsed code files, `0` parse failures, `41853` graph nodes, and `48361` relationships. `scripts/p2p_workflow.py` remained high-risk/high-fan-in; scope stayed limited to the requested bridge.
 - `E2-P2A-CHANGE1`: `anvien detect-changes --repo D:\AI\P2P_dev\worktrees\p2p-lightweight-fastpath-03-final --scope all --json` reported one affected source file, `scripts/p2p_workflow.py`, with high file risk and `335` changed symbols before staging.
-- `E2-P2C-ID1`: candidate remains based on current `origin/main` commit `28a85bc6f69ab992c44f96770ab2f513bbc34f94`, tree `42734b3c55e8db7ce3936428fd0841f7e6106ea2`; C18 policy/context source files remain unchanged.
+- `E2-P2B-ANVIEN1`: fresh post-implementation `anvien analyze --force` completed with `994` scanned files, `177` parsed code files, `0` parse failures, `41863` graph nodes, and `48371` relationships; `anvien status` is up-to-date.
+- `E2-P2B-SUPERVISOR1`: independent Supervisor report at `reports/supervisor/rp_supervisor_260828_194313_by_gpt-5-codex_p2p-lightweight-fastpath-03.md` contains exactly `Verdict: PASS`.
+- `E2-P2C-ID1`: implementation checkpoint `82d6bffc9c6e596d2b8270679db1a7ee2fc80ee6` is based on current `origin/main` commit `28a85bc6f69ab992c44f96770ab2f513bbc34f94`, tree `42734b3c55e8db7ce3936428fd0841f7e6106ea2`; C18 policy/context source files remain unchanged.
+- `E2-P2C-CLEAN1`: implementation checkpoint status is clean with `0` porcelain lines; the old FASTPATH-02 status noise and Owner dirty state were not carried into the candidate.
+- `E2-P2C-REMOTE1`: fresh `git ls-remote` still returns `28a85bc6f69ab992c44f96770ab2f513bbc34f94` for `refs/heads/main`; the candidate base is an ancestor of the implementation checkpoint.
+- `E2-P2C-CANON1`: read-only Owner canonical checkout remains on `main` at `28a85bc6f69ab992c44f96770ab2f513bbc34f94`, with `1133` dirty status lines; no mutation was performed.
+- `E2-P2C-CLOSE1`: final closure artifacts are candidate-only and the final commit/tree/status are verified in the terminal report; no promotion or merge occurred.
 
 ## Closure Evidence
 
-Final candidate SHA/tree, intentional-only status, Supervisor result, and terminal verdict are recorded after the isolated implementation checkpoint.
+Final candidate SHA/tree, intentional-only status, Supervisor result, and terminal verdict are recorded after the isolated closure checkpoint.

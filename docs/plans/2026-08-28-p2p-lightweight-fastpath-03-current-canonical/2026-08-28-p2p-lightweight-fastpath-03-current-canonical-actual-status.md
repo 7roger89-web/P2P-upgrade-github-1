@@ -2,14 +2,14 @@
 
 Title: P2P-LIGHTWEIGHT-FASTPATH-03 Current-Canonical Reconciliation and Clean Verification
 Date: 2026-08-28
-Status: P2-A/P2-B Complete; final closure pending
+Status: P2-A/P2-B/P2-C Complete; candidate stopped at Owner gate
 Companion plan: `docs/plans/2026-08-28-p2p-lightweight-fastpath-03-current-canonical/2026-08-28-p2p-lightweight-fastpath-03-current-canonical-plan.md`
 Companion evidence: `docs/plans/2026-08-28-p2p-lightweight-fastpath-03-current-canonical/2026-08-28-p2p-lightweight-fastpath-03-current-canonical-evidence.md`
 Companion benchmark: `docs/plans/2026-08-28-p2p-lightweight-fastpath-03-current-canonical/2026-08-28-p2p-lightweight-fastpath-03-current-canonical-benchmark.md`
 
 ## Purpose
 
-This file records the real current state before FASTPATH-03 implementation. It distinguishes current canonical authority, EFF01 behavior already present, the missing workflow adapter, the old dirty candidate, and the new clean candidate.
+This file records the real current state across FASTPATH-03 reconciliation and final technical verification. It distinguishes current canonical authority, EFF01 behavior already present, the former missing workflow adapter, the old dirty candidate, and the new clean candidate.
 
 ## Freshness / Refresh Rules
 
@@ -67,7 +67,7 @@ Out of scope:
 | Workflow result/ledger/manifest | C18/C19 requirement, source, escalation, and verification metadata are projected through existing surfaces | no new store/router/executor | bound-correct | `E1-P1A-IMPL1`, `E1-P1B-TEST2` | preserve |
 | FASTPATH focused tests | one current-main FASTPATH-03 test file covers all required scenarios and C19 edges | direct seven-scenario and C19 edge coverage | bound-correct | `E1-P1B-TEST1`, `E1-P1B-TEST2` | preserve |
 | Old FASTPATH-02 candidate | exact old candidate exists but is based on pre-EFF01 and dirty with 1127 status lines | evidence source only; not carried forward | stale/preserve-only | N/A | `E0-P0A-OLD` | do not replay mechanically |
-| New candidate | exact current-main commit/tree, neutral path; implementation changes are limited to workflow, focused test, and plan evidence | clean isolated candidate after intentional commit | correct pending final commit | `E0-P0A-CLEAN1`, `E2-P2C-CLEAN1` | final status check |
+| New candidate | exact current-main base, neutral path; implementation changes are limited to workflow, focused test, and candidate evidence | clean isolated candidate after implementation and closure commits | correct; stopped at Owner gate | `E0-P0A-CLEAN1`, `E2-P2C-CLEAN1`, `E2-P2C-CLOSE1` | no promotion |
 | Owner canonical checkout | heavily dirty and owner-owned | untouched | blocked/preserve-only | N/A | `E0-P0A-CANON1` | never modify |
 
 ## Status Refresh Log
@@ -77,6 +77,7 @@ Out of scope:
 | R0 | 2026-08-28 | current remote/main and new neutral candidate before implementation | lineage, EFF01/C18, C19, workflow, candidate cleanliness | initial classifications above | `E0-P0A-REMOTE1..E0-P0A-PLAN1` | P1-A only on workflow; P1-B focused tests; C18/C19 preserve-only |
 | R1 | 2026-08-28 | isolated candidate after C18/C19 adapter slice | workflow classification/selection and C19 adapter changed from partial/unbound to bound-correct; C18/C19 primitives remain preserve-only | `E1-P1A-SRC1`, `E1-P1A-IMPL1`, `E1-P1A-TEST1` | focused tests |
 | R2 | 2026-08-28 | after focused tests and neighboring validation | focused coverage changed missing -> bound-correct; 18/18 focused, 61/61 C18/C19/foundation, 8/8 workflow/path-sensitive | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E2-P2A-TEST1` | Supervisor/final closure |
+| R3 | 2026-08-28 | after implementation checkpoint and Supervisor review | candidate status 0; fresh graph current; source-level review passed; no C18/C19 policy/context changes | `E2-P2B-ANVIEN1`, `E2-P2B-SUPERVISOR1`, `E2-P2C-CLEAN1` | close at Owner gate |
 
 ## Phase Touch Map
 
@@ -225,3 +226,7 @@ Current remote/main is authoritative and EFF01 is already canonical. FASTPATH-02
 - `E2-P2A-TEST1`: neighboring suites passed `61/61` and workflow/path-sensitive tests passed `8/8` from the neutral non-`.tmp` candidate.
 - `E2-P2A-COMPILE1`: `python -B -m compileall -q scripts tests` passed; one pre-existing `SyntaxWarning` in `tests/test_p2p_live_certification.py` was observed and not changed.
 - `E2-P2A-ANVIEN1`: fresh Anvien graph refresh scanned `993` files, parsed `177` code files, had `0` parse failures; `scripts/p2p_workflow.py` remains a high-risk/high-fan-in file and was kept narrowly scoped.
+- `E2-P2B-ANVIEN1`: fresh post-implementation Anvien refresh scanned `994` files, parsed `177` code files, had `0` parse failures, and reported `41,863` nodes/`48,371` relationships; the graph status is current.
+- `E2-P2B-SUPERVISOR1`: independent Supervisor report returns exactly `Verdict: PASS`; current C18/C19 authority, lightweight routing, high-risk protection, bounded escalation, proportional verification, and candidate cleanliness are cleared.
+- `E2-P2C-CLEAN1`: candidate implementation checkpoint `82d6bffc9c6e596d2b8270679db1a7ee2fc80ee6` has tree `1011ccf931445e5f645de2ec56cc7509c871a87a` and `git status --porcelain --untracked-files=all` count `0`.
+- `E2-P2C-CLOSE1`: closure evidence is committed only in the isolated candidate; the final closure commit/tree is verified in the terminal report and remains based on current `origin/main`.
