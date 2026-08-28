@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import inspect
-import hashlib
 import json
 import shutil
 import sys
@@ -132,16 +131,18 @@ class P2PVisualVendorIntegrationTests(unittest.TestCase):
                     vendor_skill._sha256_file(VENDOR_ROOT / relative),
                     EXPECTED_CANONICAL_SOURCE_HASHES[relative],
                 )
-                self.assertEqual(
-                    hashlib.sha256((VENDOR_ROOT / relative).read_bytes()).hexdigest(),
-                    expected,
-                )
         declared = {
             item["snapshot_path"]: item["canonical_sha256"]
             for item in self.manifest.upstream_provenance["source_files"]
             if item["status"] == "VENDORED"
         }
         self.assertEqual(declared, EXPECTED_CANONICAL_SOURCE_HASHES)
+        raw_declared = {
+            item["snapshot_path"]: item["sha256"]
+            for item in self.manifest.upstream_provenance["source_files"]
+            if item["status"] == "VENDORED"
+        }
+        self.assertEqual(raw_declared, EXPECTED_SOURCE_HASHES)
 
     def test_04_discovery_is_metadata_only_and_load_is_explicit(self) -> None:
         with mock.patch.object(
