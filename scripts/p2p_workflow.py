@@ -155,6 +155,29 @@ def context_api(root: Path, package_hint: str | None = None) -> Any:
     raise ValueError("CONTEXT_PRIMITIVE_UNAVAILABLE: p2p_capabilities.context")
 
 
+def orchestration_api(root: Path, package_hint: str | None = None) -> Any:
+    """Load the current C18 orchestration policy or fail closed."""
+
+    runtimes = [root / ".p2p" / "system"]
+    if package_hint:
+        runtimes.append(Path(package_hint).expanduser().resolve() / ".p2p" / "system")
+    script_runtime = Path(__file__).resolve().parents[1] / ".p2p" / "system"
+    if script_runtime not in runtimes:
+        runtimes.append(script_runtime)
+    for runtime in runtimes:
+        module_path = runtime / "p2p_capabilities" / "orchestration_policy.py"
+        if not module_path.is_file():
+            continue
+        runtime_text = str(runtime.resolve())
+        if runtime_text not in sys.path:
+            sys.path.insert(0, runtime_text)
+        try:
+            return importlib.import_module("p2p_capabilities.orchestration_policy")
+        except (ImportError, OSError):
+            continue
+    raise ValueError("ORCHESTRATION_PRIMITIVE_UNAVAILABLE: p2p_capabilities.orchestration_policy")
+
+
 def package_roots() -> list[Path]:
     roots: list[Path] = []
     for parent in Path(__file__).resolve().parents:
@@ -441,7 +464,269 @@ def explicit_quorum_request(request: str) -> bool:
     return bool(re.search(r"(?:full\s+quorum|quorum\s+full|8\s*(?:agent|agents|threads)|eight[- ]agent)", request, re.I))
 
 
-def select_agents(request: str, inspection: dict[str, object], policy: dict[str, object] | None = None) -> dict[str, object]:
+def _lightweight_output_kind(request: str) -> str | None:
+    """Recognize only explicit, bounded output transformations.
+
+    This is a workflow-to-policy bridge, not a second orchestration policy.
+    Requests with material, external, or authority signals deliberately fall
+    through to the richer C18 profile mapping.
+    """
+
+    lower = request.lower()
+    risky = bool(
+        re.search(
+            r"(?:architecture|architectural|production|deploy|release|publish|"
+            r"external|upstream|integration|network|secret|permission|auth|"
+            r"security|migration|destructive|delete|payment|owner|approval|"
+            r"canonical|push|merge)",
+            lower,
+        )
+    )
+    if not risky and re.search(r"\bprompt\b", lower) and re.search(r"\b(?:write|draft|compose|create|rewrite)\b", lower):
+        return "PROMPT_COMPOSITION"
+    if not risky and re.search(r"\b(?:summarize|summarise|extract|translate|format|convert)\b", lower):
+        return "READ_ONLY_TRANSFORMATION"
+    return None
+
+
+def _request_risk_signals(request: str) -> dict[str, bool]:
+    lower = request.lower()
+    return {
+        "architecture": bool(
+            re.search(
+                r"(?:architecture|architectural|system design|kiến trúc|"
+                r"design\b.*\b(?:system|subsystem|architecture|component|infrastructure|workflow)|"
+                r"(?:system|subsystem)\b.*\bdesign\b)",
+                lower,
+            )
+        ),
+        "high_impact": bool(
+            re.search(
+                r"(?:production|deploy|release|publish|owner|approval|promot|canonical|"
+                r"high[- ]impact|critical|irreversible|destructive|data loss|payment|"
+                r"migration|permission|auth|security|bảo mật|"
+                r"authoritative\s+(?:architecture|system|world[- ]simulation)|"
+                r"(?:replace|retire|redesign)\b.*\b(?:authoritative|architecture|world[- ]simulation))",
+                lower,
+            )
+        ),
+        "external": bool(re.search(r"(?:external|upstream|github|vendor|network|secret|integration)", lower)),
+        "implementation": bool(re.search(r"(?:fix|implement|code|create|add|remove|update|rewrite|refactor)", lower)),
+        "research": bool(re.search(r"(?:research|investigate|study|analyze|analyse|điều tra)", lower)),
+        "testing": bool(re.search(r"(?:test|verify|check|focused|verification)", lower)),
+        "production": bool(re.search(r"(?:production|deploy|release|publish)", lower)),
+        "security": bool(re.search(r"(?:security|bảo mật|auth|permission)", lower)),
+        "destructive": bool(re.search(r"(?:destructive|delete|remove|irreversible|data loss)", lower)),
+        "promotion": bool(re.search(r"(?:promot|canonical|merge|push)", lower)),
+    }
+
+
+def _task_profile_mapping(request: str, inspection: dict[str, object]) -> dict[str, object]:
+    """Map existing workflow signals to fields consumed by current C18."""
+
+    lower = request.lower()
+    kind = _lightweight_output_kind(request)
+    signals = _request_risk_signals(request)
+    goal_eligibility = inspection.get("goal_eligibility")
+    if not isinstance(goal_eligibility, dict):
+        goal_eligibility = classify_goal_eligibility(request, inspection)
+    acceptance = "CLEAR" if request.strip() else "MISSING"
+    profile: dict[str, object] = {
+        "task_size": "SMALL",
+        "dependency_complexity": "NONE",
+        "mutation_risk": "NONE",
+        "reversibility": "REVERSIBLE",
+        "ambiguity": "LOW",
+        "acceptance_clarity": acceptance,
+        "evidence_availability": "COMPLETE",
+        "context_breadth": "LOCAL",
+        "specialist_need": False,
+        "isolation_value": False,
+        "independent_review_value": False,
+        "shared_resource_risk": False,
+        "owner_gate": "NOT_REQUIRED",
+        "deterministic_verifier": False,
+        "result_context_dependency": False,
+        "context_escalation_available": True,
+        "independent_ready_pair": False,
+        "material_worker_value": False,
+        "parallel_economy_passes": False,
+        "production": False,
+        "financial": False,
+        "network_or_secret": False,
+        "migration": False,
+        "task_kind": "IMPLEMENTATION",
+        "context_refs": ["request", "goal_eligibility"],
+        # Current EFF01 fields.  The workflow only supplies evidence; C18
+        # remains the sole owner of lane, JIT, and test-ceiling decisions.
+        "source_mutation": False,
+        "runtime_change": False,
+        "registry_change": False,
+        "governance_change": False,
+        "security_risk": False,
+        "promotion": False,
+        "destructive": False,
+        "blast_radius": "EXPECTED",
+        "dependency_path": "CLEAR",
+        "targeted_evidence": "SUFFICIENT",
+        "acceptance_requires_testing": False,
+        "unexplained_material_failure": False,
+        "acceptance_proven": False,
+        "baseline_failure": False,
+        "baseline_invalidates_acceptance": False,
+        "baseline_on_dependency_path": False,
+        "baseline_safety_risk": False,
+    }
+
+    if kind:
+        profile.update(
+            {
+                "task_size": "TINY",
+                "deterministic_verifier": True,
+                "task_kind": kind,
+            }
+        )
+    elif signals["architecture"]:
+        profile.update(
+            {
+                "task_size": "MODERATE",
+                "dependency_complexity": "HIGH",
+                "ambiguity": "HIGH",
+                "context_breadth": "CROSS_SURFACE",
+                "specialist_need": True,
+                "isolation_value": True,
+                "task_kind": "ARCHITECTURE",
+            }
+        )
+    elif signals["research"]:
+        profile.update(
+            {
+                "task_size": "MODERATE",
+                "dependency_complexity": "LOW",
+                "ambiguity": "MEDIUM",
+                "context_breadth": "PROJECT",
+                "specialist_need": True,
+                "isolation_value": True,
+                "task_kind": "RESEARCH",
+            }
+        )
+    elif signals["implementation"]:
+        profile.update(
+            {
+                "task_size": "SMALL",
+                "dependency_complexity": "LOW",
+                "isolation_value": True,
+                "deterministic_verifier": signals["testing"],
+                "source_mutation": True,
+                "mutation_risk": "LOW",
+                "acceptance_requires_testing": signals["testing"],
+                "task_kind": "IMPLEMENTATION",
+            }
+        )
+    else:
+        profile.update(
+            {
+                "task_size": "SMALL",
+                "context_breadth": "PROJECT",
+                "specialist_need": True,
+                "task_kind": "ANALYSIS",
+            }
+        )
+
+    if signals["external"]:
+        profile.update(
+            {
+                "network_or_secret": True,
+                "owner_gate": "REQUIRED",
+                "context_breadth": "BROAD",
+                "specialist_need": True,
+                "task_kind": "EXTERNAL_INTEGRATION",
+            }
+        )
+    if signals["high_impact"]:
+        profile.update(
+            {
+                "owner_gate": "REQUIRED",
+                "mutation_risk": "HIGH",
+                "reversibility": "PARTIAL",
+                "context_breadth": "BROAD",
+                "blast_radius": "MATERIAL",
+            }
+        )
+    if signals["production"]:
+        profile["production"] = True
+    if signals["security"]:
+        profile["security_risk"] = True
+    if signals["destructive"]:
+        profile["destructive"] = True
+    if signals["promotion"]:
+        profile["promotion"] = True
+    if signals["architecture"] and signals["high_impact"]:
+        profile["task_kind"] = "ARCHITECTURE"
+    if signals["implementation"] and kind is None:
+        profile["material_worker_value"] = True
+    return {
+        "profile": profile,
+        "task_kind": str(profile["task_kind"]),
+        "lightweight": kind is not None,
+        "goal_eligibility": goal_eligibility,
+        "work_type": classify_work_type(request),
+        "classification_signals": signals,
+    }
+
+
+def derive_orchestration_requirement(
+    request: str,
+    inspection: dict[str, object],
+    *,
+    package_hint: str | None = None,
+) -> dict[str, object]:
+    """Use existing workflow classification as the sole C18 profile bridge."""
+
+    bridge = _task_profile_mapping(request, inspection)
+    try:
+        module = orchestration_api(Path(str(inspection.get("project_root") or Path.cwd())), package_hint)
+        requirement = module.derive_requirement(bridge["profile"])
+    except (AttributeError, TypeError, ValueError) as exc:
+        return {
+            "schema": "p2p-adaptive-orchestration-policy/1",
+            "status": "BLOCKED",
+            "worker_strategy": "BLOCKED",
+            "worker_count": 0,
+            "context_class": "CONTEXT_INSUFFICIENT",
+            "reasoning_class": "HIGH",
+            "verification_class": "HIGH_RISK",
+            "provider_model_resolution": "DEFERRED",
+            "live_execution_certification": "NOT_CERTIFIED",
+            "quality_gate": {"permission_expansion": False},
+            "provenance": {"reason_codes": ["ORCHESTRATION_PRIMITIVE_UNAVAILABLE"]},
+            "profile": bridge["profile"],
+            "workflow_bridge": {key: value for key, value in bridge.items() if key != "profile"},
+            "failure_reasons": [f"ORCHESTRATION_PRIMITIVE_UNAVAILABLE:{type(exc).__name__}"],
+        }
+    requirement = dict(requirement)
+    requirement["workflow_bridge"] = {key: value for key, value in bridge.items() if key != "profile"}
+    return requirement
+
+
+def _existing_worker_roles(requirement: dict[str, object]) -> list[str]:
+    profile = requirement.get("profile") if isinstance(requirement.get("profile"), dict) else {}
+    kind = str(profile.get("task_kind", "")).upper()
+    if kind == "ARCHITECTURE":
+        return ["p2p_architecton"]
+    if kind in {"SECURITY", "SECURITY_ANALYSIS", "EXTERNAL_INTEGRATION"}:
+        return ["p2p_anon"]
+    if kind in {"RESEARCH", "ANALYSIS"}:
+        return ["p2p_datos"]
+    return ["p2p_tecton"]
+
+
+def select_agents(
+    request: str,
+    inspection: dict[str, object],
+    policy: dict[str, object] | None = None,
+    requirement: dict[str, object] | None = None,
+) -> dict[str, object]:
     lower = request.lower()
     explicit = explicit_quorum_request(request)
     release_policy = isinstance(policy, dict) and bool(policy.get("final_release_requires_full_quorum"))
@@ -451,25 +736,45 @@ def select_agents(request: str, inspection: dict[str, object], policy: dict[str,
         selected = list(AGENTS)
         reason = "Explicit or policy-required full certification; the requested quorum is preserved."
         tier = "full"
-    elif high:
-        selected = ["p2p_axiom", "p2p_anon", "p2p_architecton", "p2p_tecton", "p2p_datos"]
-        reason = "High-risk change needs critical, security, architecture, implementation, and evidence coverage."
-        tier = "high-risk"
-    elif medium:
-        selected = ["p2p_iris", "p2p_tecton", "p2p_axiom", "p2p_vector"]
-        reason = "Cross-component work needs a compact map, implementation plan, critique, and measurable checks."
-        tier = "medium"
-    else:
-        if re.search(r"security|privacy|permission|bảo mật|quyền", lower):
-            selected = ["p2p_anon"]
-        elif re.search(r"data|eval|evidence|dataset|dữ liệu|đánh giá", lower):
-            selected = ["p2p_datos"]
-        elif re.search(r"unclear|vague|idea|rough|ý tưởng|mơ hồ", lower):
-            selected = ["p2p_iris"]
+    elif requirement is not None:
+        strategy = str(requirement.get("worker_strategy", "BLOCKED"))
+        roles = _existing_worker_roles(requirement)
+        if strategy == "DIRECT":
+            selected = []
+            tier = "direct"
+            reason = "C18 selected DIRECT; no delegated worker is required for this bounded task."
+        elif strategy == "ONE_WORKER":
+            selected = roles[:1]
+            tier = "one-worker"
+            reason = f"C18 selected ONE_WORKER; use the existing named role {selected[0]}."
+        elif strategy == "TWO_WORKERS":
+            selected = (roles + ["p2p_axiom"])[:2]
+            tier = "two-workers"
+            reason = "C18 selected TWO_WORKERS; use two existing named roles without creating a new quorum."
         else:
-            selected = ["p2p_tecton"]
-        reason = f"Small/local work uses the smallest relevant named role: {AGENT_FOCUS[selected[0]]}."
-        tier = "small"
+            selected = []
+            tier = "blocked"
+            reason = "C18 selected BLOCKED; do not execute or substitute a broader route."
+    else:
+        if high:
+            selected = ["p2p_axiom", "p2p_anon", "p2p_architecton", "p2p_tecton", "p2p_datos"]
+            reason = "High-risk change needs critical, security, architecture, implementation, and evidence coverage."
+            tier = "high-risk"
+        elif medium:
+            selected = ["p2p_iris", "p2p_tecton", "p2p_axiom", "p2p_vector"]
+            reason = "Cross-component work needs a compact map, implementation plan, critique, and measurable checks."
+            tier = "medium"
+        else:
+            if re.search(r"security|privacy|permission|bảo mật|quyền", lower):
+                selected = ["p2p_anon"]
+            elif re.search(r"data|eval|evidence|dataset|dữ liệu|đánh giá", lower):
+                selected = ["p2p_datos"]
+            elif re.search(r"unclear|vague|idea|rough|ý tưởng|mơ hồ", lower):
+                selected = ["p2p_iris"]
+            else:
+                selected = ["p2p_tecton"]
+            reason = f"Small/local work uses the smallest relevant named role: {AGENT_FOCUS[selected[0]]}."
+            tier = "small"
     return {
         "tier": tier,
         "selected_agents": selected,
@@ -517,6 +822,8 @@ def _request_has_separate_objectives(request: str) -> bool:
         return False
     if re.search(r"\b(?:also|plus|as well as|separately|and then)\b|;", lower):
         return True
+    if re.search(r"\band\s+(?:run|execute)\s+(?:the\s+)?(?:focused\s+)?(?:test|tests|verification|check)", lower):
+        return False
     if re.search(r"\b(?:while preserving|until|stop when|stop only when|and finish|and complete)\b", lower):
         return False
     actions = _request_actions(request)
@@ -544,7 +851,12 @@ def classify_goal_eligibility(request: str, inspection: dict[str, object] | None
             "goal_required": False,
             "next_action": "Inspect available project evidence and produce one measurable interpretation.",
         }
-    if _request_has_separate_objectives(request):
+    lightweight_kind = _lightweight_output_kind(request)
+    if lightweight_kind:
+        classification = "DIRECT TASK"
+        reason = f"{lightweight_kind} is a bounded non-mutating output task; do not open a long-running Goal."
+        next_action = "Use the minimum-sufficient direct route and verify the resulting output."
+    elif _request_has_separate_objectives(request):
         classification = "SEPARATE GOALS"
         reason = "The request contains independent objectives; do not combine them into one open-ended Goal."
         next_action = "Split the objectives, order them, and compile one bounded Goal Contract per objective."
@@ -577,6 +889,7 @@ def classify_goal_eligibility(request: str, inspection: dict[str, object] | None
             "separate_objectives": _request_has_separate_objectives(request),
             "long_running": _request_is_long_running(request),
             "action_count": len(_request_actions(request)),
+            "lightweight_kind": lightweight_kind,
         },
     }
 
@@ -825,13 +1138,23 @@ def goal_acceptance_cases() -> dict[str, object]:
     return {"schema_version": "p2p-goal-acceptance/1", "status": "PASS" if all(bool(item.get("pass")) for item in cases.values()) else "BLOCKED", "cases": cases}
 
 
-def build_goal_contract(root: Path, request: str, inspection: dict[str, object], policy: dict[str, object] | None = None) -> dict[str, object]:
+def build_goal_contract(
+    root: Path,
+    request: str,
+    inspection: dict[str, object],
+    policy: dict[str, object] | None = None,
+    package_hint: str | None = None,
+) -> dict[str, object]:
     if not request.strip():
         raise ValueError("A natural-language request is required")
     objective, bounded_interpretation = objective_for(request, inspection)
-    selection = select_agents(request, inspection, policy)
-    risk = "high" if selection["tier"] in {"high-risk", "full"} else "medium" if selection["tier"] == "medium" else "low"
     eligibility = inspection.get("goal_eligibility") if isinstance(inspection.get("goal_eligibility"), dict) else classify_goal_eligibility(request, inspection)
+    inspection_for_profile = dict(inspection)
+    inspection_for_profile["project_root"] = str(root)
+    requirement = derive_orchestration_requirement(request, inspection_for_profile, package_hint=package_hint)
+    selection = select_agents(request, inspection, policy, requirement)
+    high_risk_requirement = requirement.get("verification_class") == "HIGH_RISK" or requirement.get("status") == "BLOCKED"
+    risk = "high" if high_risk_requirement or selection["tier"] in {"high-risk", "full", "blocked"} else "medium" if selection["tier"] in {"medium", "two-workers"} else "low"
     work_type = classify_work_type(request)
     goal_id = f"goal-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}-{slugify(request)[:24]}"
     contract = {
@@ -861,6 +1184,16 @@ def build_goal_contract(root: Path, request: str, inspection: dict[str, object],
         },
         "risk": risk,
         "work_type": work_type,
+        "orchestration_requirement": requirement,
+        "task_profile": requirement.get("profile", {}),
+        "context_class": requirement.get("context_class", "CONTEXT_INSUFFICIENT"),
+        "context_retrieval": {
+            "context_class": requirement.get("context_class", "CONTEXT_INSUFFICIENT"),
+            "escalation_allowed": bool((requirement.get("profile") or {}).get("context_escalation_available", False))
+            if isinstance(requirement.get("profile"), dict)
+            else False,
+            "max_class": "EXPANDED",
+        },
         "current_state_assumptions": [
             {
                 "assumption_id": "A1",
@@ -962,7 +1295,7 @@ def build_goal_contract(root: Path, request: str, inspection: dict[str, object],
         ],
         "guards": {
             "max_work_items": 5,
-            "max_agent_calls": max(1, int(selection["quorum_size"])),
+            "max_agent_calls": int(selection["quorum_size"]),
             "max_full_quorum_calls": 1 if selection["full_quorum_required"] else 0,
             "max_time_minutes": 30 if risk == "low" else 90 if risk == "medium" else 180,
             "reuse_pass_evidence_when_inputs_unchanged": True,
@@ -1263,6 +1596,8 @@ def task_targeted_context_metadata(
             "status": "BLOCKED",
             "context_class": "CONTEXT_INSUFFICIENT",
             "failure_reasons": ["CAPABILITY_UNAVAILABLE"],
+            "escalation_count": 0,
+            "workflow_escalation": {"allowed": False, "attempted": False, "count": 0, "max_attempts": 1},
         }
     role_by_source = {
         "goal-contract": "DIRECT_AUTHORITATIVE_REFS",
@@ -1278,18 +1613,36 @@ def task_targeted_context_metadata(
     dependency_refs: list[str] = []
     evidence_refs: list[str] = []
     acceptance: list[dict[str, object]] = []
+    profile = contract.get("task_profile") if isinstance(contract.get("task_profile"), dict) else {}
+    if not profile and isinstance(contract.get("orchestration_requirement"), dict):
+        profile = contract["orchestration_requirement"].get("profile", {})
+    task_kind = str(profile.get("task_kind", "")).upper() if isinstance(profile, dict) else ""
+    if task_kind in {"PROMPT_COMPOSITION", "READ_ONLY_TRANSFORMATION"}:
+        required_source_ids = {"goal-contract"}
+    elif task_kind == "IMPLEMENTATION":
+        required_source_ids = {"goal-contract", "project-status", "project-eval"}
+    elif task_kind in {"ARCHITECTURE", "RESEARCH", "ANALYSIS", "EXTERNAL_INTEGRATION"}:
+        required_source_ids = {"goal-contract", "project-status", "project-profile", "project-policy", "project-eval"}
+    else:
+        required_source_ids = {
+            str(binding.get("source_id"))
+            for binding in sources
+            if bool(binding.get("required"))
+        }
     for binding in sources:
         source_id = str(binding.get("source_id"))
         role = role_by_source.get(source_id, "TARGETED_SOURCE")
         catalog.append({**binding, "retrieval_role": role, "coverage_ids": [source_id], "scope": ["current-task"]})
+        if source_id not in required_source_ids:
+            continue
         if role == "DIRECT_AUTHORITATIVE_REFS":
             direct_refs.append(source_id)
         elif role == "DEPENDENCY_OUTPUTS":
             dependency_refs.append(source_id)
         else:
             evidence_refs.append(source_id)
-        if bool(binding.get("required")):
-            acceptance.append({"coverage_id": source_id, "source_refs": [source_id], "required": True})
+    for source_id in sorted(required_source_ids):
+        acceptance.append({"coverage_id": source_id, "source_refs": [source_id], "required": True})
     task = {
         "task_purpose": contract.get("objective") or contract.get("request") or "current bounded workflow task",
         "scope": ["current-task", "current-project"],
@@ -1303,7 +1656,98 @@ def task_targeted_context_metadata(
         requested_class = contract["context_retrieval"].get("context_class") or requested_class
     if not isinstance(requested_class, str) or not requested_class:
         requested_class = "MINIMAL"
-    return retrieve(task, catalog, context_class=requested_class, candidate_binding=candidate_binding)
+    escalation_allowed = bool(profile.get("context_escalation_available", False)) if isinstance(profile, dict) else False
+    try:
+        initial = retrieve(
+            task,
+            catalog,
+            context_class=requested_class,
+            candidate_binding=candidate_binding,
+            allow_external=False,
+        )
+    except (AttributeError, TypeError, ValueError) as exc:
+        return {
+            "schema": "p2p-task-targeted-context/1",
+            "status": "BLOCKED",
+            "context_class": "CONTEXT_INSUFFICIENT",
+            "failure_reasons": [f"RETRIEVAL_FAILED:{type(exc).__name__}"],
+            "escalation_count": 0,
+            "workflow_escalation": {"allowed": escalation_allowed, "attempted": False, "count": 0, "max_attempts": 1},
+        }
+    if not isinstance(initial, dict):
+        return {
+            "schema": "p2p-task-targeted-context/1",
+            "status": "BLOCKED",
+            "context_class": "CONTEXT_INSUFFICIENT",
+            "failure_reasons": ["RETRIEVAL_RESULT_INVALID"],
+            "escalation_count": 0,
+            "workflow_escalation": {"allowed": escalation_allowed, "attempted": False, "count": 0, "max_attempts": 1},
+        }
+    result = dict(initial)
+    initial_status = str(initial.get("status", "BLOCKED"))
+    escalation_count = 0
+    if (
+        initial_status == "INSUFFICIENT"
+        and escalation_allowed
+        and initial.get("next_context_class")
+        and callable(getattr(context_module, "escalate_task_context", None))
+    ):
+        try:
+            result = dict(
+                context_module.escalate_task_context(
+                    task,
+                    catalog,
+                    initial,
+                    candidate_binding=candidate_binding,
+                    allow_external=False,
+                )
+            )
+            escalation_count = 1
+        except (AttributeError, TypeError, ValueError) as exc:
+            result = {
+                **initial,
+                "status": "BLOCKED",
+                "sufficiency_status": "BLOCKED",
+                "context_class": "CONTEXT_INSUFFICIENT",
+                "failure_reasons": sorted(
+                    set(
+                        [str(item) for item in initial.get("failure_reasons", [])]
+                        + [f"ESCALATION_FAILED:{type(exc).__name__}"]
+                    )
+                ),
+            }
+    selected_ids = result.get("selected_source_ids")
+    if not isinstance(selected_ids, list):
+        materialized = result.get("materialized_context")
+        selected_ids = materialized.get("source_ids", []) if isinstance(materialized, dict) else []
+    catalog_by_id = {str(item.get("source_id")): item for item in catalog}
+    selected_types = sorted(
+        {
+            str(catalog_by_id[source_id].get("source_class", "UNKNOWN"))
+            for source_id in selected_ids
+            if source_id in catalog_by_id
+        }
+    )
+    result["requested_context_class"] = requested_class
+    result["initial_context_class"] = initial.get("context_class", requested_class)
+    result["escalation_count"] = escalation_count
+    result["escalation_allowed"] = escalation_allowed
+    result["workflow_escalation"] = {
+        "allowed": escalation_allowed,
+        "attempted": escalation_count == 1,
+        "count": escalation_count,
+        "max_attempts": 1,
+        "initial_status": initial_status,
+        "final_status": str(result.get("status", "BLOCKED")),
+        "ceiling": "EXPANDED",
+    }
+    result["source_selection"] = {
+        "required_source_ids": sorted(required_source_ids),
+        "available_source_count": len(catalog),
+        "selected_source_count": len(selected_ids),
+        "selected_source_types": selected_types,
+    }
+    return result
 
 
 def build_workflow_context_input(
@@ -1518,6 +1962,7 @@ def write_context_manifest(root: Path, run_id: str, context_view: dict[str, obje
         "context_manifest_pointer": relative_path(path, root),
         "context_manifest_schema": manifest.get("schema"),
         "context_serialized_size": serialized_size,
+        "task_targeted_context": manifest.get("task_targeted_context", {}),
     }
 
 
@@ -1564,6 +2009,64 @@ def safe_update_flow(changes: list[str], affected: list[str], policy: dict[str, 
     }
 
 
+def verification_surface_for(requirement: dict[str, object], affected: list[str]) -> dict[str, object]:
+    """Describe the C18-selected check without replacing existing gates."""
+
+    verification_class = str(requirement.get("verification_class", "HIGH_RISK"))
+    if verification_class == "DETERMINISTIC":
+        selected = ["goal_completion"]
+    elif verification_class == "HIGH_RISK":
+        selected = sorted(set(["goal_completion", *affected]))
+    else:
+        selected = sorted(set(["goal_completion", *[control for control in affected if control != "project_wide_audit"]]))
+    broad_controls = {
+        "project_wide_audit",
+        "package_doctor",
+        "drift_gate",
+        "eight_agent_runtime_proof",
+        "vendor_drift",
+        "full_regression",
+        "supervisor",
+        "promotion",
+    }
+    return {
+        "class": verification_class,
+        "selected": selected,
+        "workflow_controls_observed": sorted(set(affected)),
+        "broad_controls_entered": bool(set(selected) & broad_controls),
+        "proportional_route": verification_class == "DETERMINISTIC",
+    }
+
+
+def orchestration_result_fields(
+    requirement: dict[str, object],
+    task_context: dict[str, object] | None,
+    affected: list[str],
+) -> dict[str, object]:
+    """Expose C18/C19 decisions as existing workflow result metadata."""
+
+    task_context = task_context if isinstance(task_context, dict) else {}
+    profile = requirement.get("profile") if isinstance(requirement.get("profile"), dict) else {}
+    source_selection = task_context.get("source_selection") if isinstance(task_context.get("source_selection"), dict) else {}
+    return {
+        "orchestration_status": requirement.get("status", "BLOCKED"),
+        "worker_strategy": requirement.get("worker_strategy", "BLOCKED"),
+        "worker_count": requirement.get("worker_count", 0),
+        "requested_context_class": task_context.get("requested_context_class", requirement.get("context_class")),
+        "final_context_class": task_context.get("context_class", "CONTEXT_INSUFFICIENT"),
+        "context_sufficiency_status": task_context.get("status", "BLOCKED"),
+        "reasoning_class": requirement.get("reasoning_class", "HIGH"),
+        "verification_class": requirement.get("verification_class", "HIGH_RISK"),
+        "task_kind": profile.get("task_kind"),
+        "council_entered": False,
+        "quorum_entered": False,
+        "context_source_count": source_selection.get("selected_source_count", 0),
+        "context_source_types": source_selection.get("selected_source_types", []),
+        "context_escalation_count": task_context.get("escalation_count", 0),
+        "verification_surface": verification_surface_for(requirement, affected),
+    }
+
+
 def fixture_ready(root: Path) -> bool:
     marker = root / ".p2p" / "acceptance" / "ready.json"
     if marker.is_file():
@@ -1594,7 +2097,18 @@ def validate_suite(root: Path, suite_path: Path, helper: Path | None) -> dict[st
         return {"status": "BLOCKED", "errors": [(process.stderr or process.stdout).strip()[:500] or "p2p_eval validation failed"]}
 
 
-def criteria_result(contract: dict[str, object], bootstrap: dict[str, object], evidence: dict[str, object], inspection: dict[str, object], root: Path, acceptance: bool, suite_validation: dict[str, object]) -> list[dict[str, object]]:
+def criteria_result(
+    contract: dict[str, object],
+    bootstrap: dict[str, object],
+    evidence: dict[str, object],
+    inspection: dict[str, object],
+    root: Path,
+    acceptance: bool,
+    suite_validation: dict[str, object],
+    *,
+    orchestration_requirement: dict[str, object] | None = None,
+    task_context: dict[str, object] | None = None,
+) -> list[dict[str, object]]:
     eval_status = str(bootstrap.get("eval", {}).get("status", "BLOCKED")) if isinstance(bootstrap.get("eval"), dict) else "BLOCKED"
     eval_valid = eval_status in {"CREATED", "REUSED"} and str(suite_validation.get("status", "FAIL")) == "PASS"
     governance_root = bootstrap.get("governance_root")
@@ -1602,14 +2116,44 @@ def criteria_result(contract: dict[str, object], bootstrap: dict[str, object], e
     linter = contract.get("goal_linter") if isinstance(contract.get("goal_linter"), dict) else lint_goal_contract(contract)
     bounded = bool(contract.get("objective")) and len(contract.get("completion_criteria", [])) >= 4 and bool(contract.get("stop_conditions")) and bool(contract.get("out_of_scope")) and str(linter.get("status")) == "PASS"
     state_ok = all(Path(str(bootstrap.get(name))).is_file() for name in ("profile", "policy", "status", "trusted_evidence"))
-    results = [
+    results: list[dict[str, object]] = []
+    if isinstance(orchestration_requirement, dict):
+        requirement_status = str(orchestration_requirement.get("status", "BLOCKED"))
+        context_status = str((task_context or {}).get("status", "BLOCKED")) if isinstance(task_context, dict) else "BLOCKED"
+        results.extend(
+            [
+                {
+                    "criterion_id": "O1",
+                    "name": "minimum_sufficient_orchestration",
+                    "mandatory": True,
+                    "status": "PASS" if requirement_status == "READY" else "BLOCKED",
+                    "evidence": {
+                        "status": requirement_status,
+                        "worker_strategy": orchestration_requirement.get("worker_strategy"),
+                        "context_class": orchestration_requirement.get("context_class"),
+                        "reasoning_class": orchestration_requirement.get("reasoning_class"),
+                        "verification_class": orchestration_requirement.get("verification_class"),
+                    },
+                },
+                {
+                    "criterion_id": "O2",
+                    "name": "task_targeted_context",
+                    "mandatory": True,
+                    "status": "PASS" if context_status in {"SUFFICIENT", "PASS"} else "BLOCKED",
+                    "evidence": task_context or {"status": "BLOCKED"},
+                },
+            ]
+        )
+    results.extend(
+        [
         {"criterion_id": "L0", "name": "goal_linter", "mandatory": True, "status": "PASS" if str(linter.get("status")) == "PASS" else "BLOCKED", "evidence": linter.get("errors") or "every mandatory criterion has a verification oracle"},
         {"criterion_id": "C1", "name": "bounded_goal", "mandatory": True, "status": "PASS" if bounded else "BLOCKED", "evidence": "goal contract contains measurable criteria, verification oracles, and terminal rules"},
         {"criterion_id": "C2", "name": "project_state_initialized", "mandatory": True, "status": "PASS" if state_ok else "BLOCKED", "evidence": "profile, policy, status, and trusted-evidence paths exist"},
         {"criterion_id": "C3", "name": "project_specific_eval", "mandatory": True, "status": "PASS" if eval_valid else "BLOCKED", "evidence": "suite design/reuse plus v2 validation"},
         {"criterion_id": "C4", "name": "bounded_execution_and_verification", "mandatory": True, "status": "PASS" if acceptance and fixture_ready(root) else "BLOCKED", "evidence": "deterministic fixture readiness and selective verification" if acceptance else "goal-specific execution/eval evidence is not supplied"},
         {"criterion_id": "C5", "name": "governance_continuity", "mandatory": True, "status": "PASS" if governance_ok else "BLOCKED", "evidence": "authoritative FACT/Live/Approval/Drift references"},
-    ]
+        ]
+    )
     return results
 
 
@@ -1729,10 +2273,17 @@ def run_workflow(
 ) -> dict[str, object]:
     root = root.resolve()
     context_module = context_api(root, package_hint)
-    selected_context_mode = context_module.select_context_mode(context_mode)
     inspection = inspect_project(root, request, package_hint)
+    profile_inspection = dict(inspection)
+    profile_inspection["project_root"] = str(root)
+    preliminary_requirement = derive_orchestration_requirement(request, profile_inspection, package_hint=package_hint)
+    if context_mode is None and preliminary_requirement.get("context_class") == "MINIMAL":
+        selected_context_mode = context_module.select_context_mode("CONTEXT_EFFICIENT_V1")
+    else:
+        selected_context_mode = context_module.select_context_mode(context_mode)
     goal_eligibility = inspection.get("goal_eligibility") if isinstance(inspection.get("goal_eligibility"), dict) else classify_goal_eligibility(request, inspection)
     status_before = load_status(root)
+    current_contract = load_current_contract(root)
     current_snapshot = project_snapshot(root)
     previous_snapshot = status_before.get("trusted_baseline", {}).get("project_snapshot") if isinstance(status_before.get("trusted_baseline"), dict) else None
     changes = changed_files(previous_snapshot, current_snapshot)
@@ -1761,9 +2312,11 @@ def run_workflow(
             "summary": "Mục tiêu này đã PASS và các đầu vào liên quan chưa thay đổi; P2P đã dừng.",
             "checked_summary": "Đã dùng lại trạng thái PASS đã tin cậy; không chạy lại kiểm tra không bị ảnh hưởng.",
         }
-        context_contract = load_current_contract(root)
+        context_contract = current_contract
+        requirement = context_contract.get("orchestration_requirement") if isinstance(context_contract.get("orchestration_requirement"), dict) else preliminary_requirement
         context_input = build_workflow_context_input(root, request, context_contract, inspection, status_before, changes=[], context_module=context_module)
         result.update(create_context_receipt(root, run_id, context_module, selected_context_mode, context_input))
+        result.update(orchestration_result_fields(requirement, context_input.get("task_targeted_context"), []))
         ledger = root / ".p2p" / "state" / "execution-ledger.jsonl"
         append_event(ledger, {"event": "stopped_after_pass", "run_id": run_id, "goal_id": status_before.get("current_goal", {}).get("goal_id") if isinstance(status_before.get("current_goal"), dict) else None, "selected_agents": [], "quorum_size": 0, "full_quorum_used": False, "evidence_reused": result["reused_controls"], "context_mode": result["context_mode"], "context_fingerprint": result["context_fingerprint"], "context_manifest_pointer": result["context_manifest_pointer"]})
         report_json = root / ".p2p" / "state" / "reports" / f"{run_id}.json"
@@ -1777,16 +2330,17 @@ def run_workflow(
 
     governance_options = governance_candidates(root, package_hint)
     policy = policy_for(root, governance_options[0][0] if governance_options else None)
-    existing_contract = load_current_contract(root)
+    existing_contract = current_contract
     if (
         existing_contract.get("request") == request.strip()
         and load_status(root).get("terminal_state") not in TERMINAL_STATES
         and isinstance(existing_contract.get("goal_linter"), dict)
         and isinstance(existing_contract.get("goal_eligibility"), dict)
+        and isinstance(existing_contract.get("orchestration_requirement"), dict)
     ):
         contract = existing_contract
     else:
-        contract = build_goal_contract(root, request, inspection, policy)
+        contract = build_goal_contract(root, request, inspection, policy, package_hint=package_hint)
     if goal_update:
         updates = contract.setdefault("goal_updates", [])
         if isinstance(updates, list):
@@ -1820,12 +2374,39 @@ def run_workflow(
     update_flow = safe_update_flow(changes, previous_evidence.get("affected_controls", []), policy)
     eval_control_reused = "project_eval" in previous_evidence.get("reused_controls", []) and not previous_snapshot is None
     suite_validation = {"status": "PASS", "reused": True} if eval_control_reused else validate_suite(root, suite, helper)
-    criteria = criteria_result(contract, bootstrap, previous_evidence, inspection, root, acceptance, suite_validation)
+    requirement = contract.get("orchestration_requirement") if isinstance(contract.get("orchestration_requirement"), dict) else preliminary_requirement
+    context_input = build_workflow_context_input(
+        root,
+        request,
+        contract,
+        inspection,
+        status_before,
+        changes=changes,
+        previous_evidence=previous_evidence,
+        policy=policy,
+        context_module=context_module,
+    )
+    task_context = context_input.get("task_targeted_context") if isinstance(context_input.get("task_targeted_context"), dict) else {}
+    criteria = criteria_result(
+        contract,
+        bootstrap,
+        previous_evidence,
+        inspection,
+        root,
+        acceptance,
+        suite_validation,
+        orchestration_requirement=requirement,
+        task_context=task_context,
+    )
     blocking = [item for item in criteria if item.get("mandatory") and item.get("status") != "PASS"]
     decision_required = None
     if blocking:
         first = blocking[0]
-        if first.get("name") == "goal_linter":
+        if first.get("name") == "minimum_sufficient_orchestration":
+            decision_required = "C18 đã chặn route hiện tại; cần Owner gate hoặc evidence/authority tương ứng, không tự hạ xuống route khác."
+        elif first.get("name") == "task_targeted_context":
+            decision_required = "C19 chưa chứng minh đủ context trong ceiling cho task này; dừng và không mở rộng ngoài bound."
+        elif first.get("name") == "goal_linter":
             errors = contract.get("goal_linter", {}).get("errors", []) if isinstance(contract.get("goal_linter"), dict) else []
             decision_required = one_blocked_decision([f"Bổ sung verification oracle cho Goal Contract: {errors[0]}" if errors else "Bổ sung verification oracle cho các tiêu chí bắt buộc."])
         elif first.get("name") == "bounded_execution_and_verification" and not acceptance:
@@ -1841,18 +2422,12 @@ def run_workflow(
         status = "REJECT"
         decision_required = "Kết quả hiện tại không an toàn hoặc không hợp lệ dưới các ràng buộc hiện có; không tiếp tục thay đổi."
     run_id = f"run-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}-{slugify(request)[:20]}"
-    context_input = build_workflow_context_input(
-        root,
-        request,
-        contract,
-        inspection,
-        status_before,
-        changes=changes,
-        previous_evidence=previous_evidence,
-        policy=policy,
-        context_module=context_module,
-    )
     context_receipt = create_context_receipt(root, run_id, context_module, selected_context_mode, context_input)
+    orchestration_fields = orchestration_result_fields(
+        requirement,
+        task_context,
+        previous_evidence.get("affected_controls", []),
+    )
     ledger = root / ".p2p" / "state" / "execution-ledger.jsonl"
     append_event(ledger, {
         "event": "run_started",
@@ -1871,10 +2446,14 @@ def run_workflow(
         "context_fingerprint": context_receipt["context_fingerprint"],
         "context_manifest_pointer": context_receipt["context_manifest_pointer"],
         "context_serialized_size": context_receipt["context_serialized_size"],
+        "orchestration": orchestration_fields,
+        "task_targeted_context": task_context,
     })
     append_event(ledger, {"event": "bootstrap_completed", "run_id": run_id, "created": bootstrap.get("created", []), "reused": bootstrap.get("reused", []), "eval": bootstrap.get("eval", {})})
-    passed_controls = ["goal_completion"]
-    if str(suite_validation.get("status")) == "PASS":
+    passed_controls: list[str] = []
+    if status == "PASS":
+        passed_controls.append("goal_completion")
+    if status == "PASS" and str(suite_validation.get("status")) == "PASS":
         passed_controls.append("project_eval")
     if status == "PASS":
         passed_controls.extend(["project_wide_audit"] if changes else [])
@@ -1893,6 +2472,8 @@ def run_workflow(
         "context_mode": context_receipt["context_mode"],
         "context_fingerprint": context_receipt["context_fingerprint"],
         "context_manifest_pointer": context_receipt["context_manifest_pointer"],
+        "orchestration": orchestration_fields,
+        "task_targeted_context": task_context,
     })
     result: dict[str, object] = {
         "schema_version": SCHEMA,
@@ -1904,6 +2485,9 @@ def run_workflow(
         "context_manifest_pointer": context_receipt["context_manifest_pointer"],
         "context_manifest_schema": context_receipt["context_manifest_schema"],
         "context_serialized_size": context_receipt["context_serialized_size"],
+        "task_targeted_context": context_receipt.get("task_targeted_context", task_context),
+        "orchestration_requirement": requirement,
+        **orchestration_fields,
         "goal_eligibility": contract.get("goal_eligibility", goal_eligibility),
         "goal_created": contract.get("goal_eligibility", goal_eligibility).get("classification") in {"GOAL", "PLAN FIRST"} if isinstance(contract.get("goal_eligibility", goal_eligibility), dict) else True,
         "goal_linter": contract.get("goal_linter", lint_goal_contract(contract)),
@@ -1942,7 +2526,24 @@ def run_workflow(
     report_json = root / ".p2p" / "state" / "reports" / f"{run_id}.json"
     result["report_json"] = relative_path(report_json, root)
     result["report_markdown"] = relative_path(report_json.with_suffix(".md"), root)
-    append_event(ledger, {"event": "terminal", "run_id": run_id, "goal_id": contract.get("goal_id"), "status": status, "stop_reason": result["stop_reason"], "goal_eligibility": result.get("goal_eligibility"), "evidence_reused": reused_controls, "full_quorum_used": False, "context_mode": result["context_mode"], "context_fingerprint": result["context_fingerprint"], "context_manifest_pointer": result["context_manifest_pointer"]})
+    append_event(
+        ledger,
+        {
+            "event": "terminal",
+            "run_id": run_id,
+            "goal_id": contract.get("goal_id"),
+            "status": status,
+            "stop_reason": result["stop_reason"],
+            "goal_eligibility": result.get("goal_eligibility"),
+            "evidence_reused": reused_controls,
+            "full_quorum_used": False,
+            "context_mode": result["context_mode"],
+            "context_fingerprint": result["context_fingerprint"],
+            "context_manifest_pointer": result["context_manifest_pointer"],
+            "orchestration": orchestration_fields,
+            "task_targeted_context": task_context,
+        },
+    )
     trace_summary: dict[str, object] = {"captured": False, "status": "UNAVAILABLE", "reason": "native trace runtime not present"}
     trace_api = decision_trace_api(root, package_hint)
     if trace_api is not None:
@@ -1991,6 +2592,18 @@ def run_workflow(
         "context_manifest_pointer": result["context_manifest_pointer"],
         "context_manifest_schema": result["context_manifest_schema"],
         "context_serialized_size": result["context_serialized_size"],
+        "orchestration_requirement": result.get("orchestration_requirement"),
+        "worker_strategy": result.get("worker_strategy"),
+        "worker_count": result.get("worker_count"),
+        "requested_context_class": result.get("requested_context_class"),
+        "final_context_class": result.get("final_context_class"),
+        "context_sufficiency_status": result.get("context_sufficiency_status"),
+        "reasoning_class": result.get("reasoning_class"),
+        "verification_class": result.get("verification_class"),
+        "context_source_count": result.get("context_source_count"),
+        "context_source_types": result.get("context_source_types", []),
+        "context_escalation_count": result.get("context_escalation_count", 0),
+        "verification_surface": result.get("verification_surface", {}),
         "goal_linter": result.get("goal_linter"),
         "work_type": result.get("work_type"),
         "work_item_classes": result.get("work_item_classes", []),
@@ -2022,7 +2635,7 @@ def plan_workflow(root: Path, request: str, package_hint: str | None = None) -> 
     previous = status.get("trusted_baseline", {}).get("project_snapshot") if isinstance(status.get("trusted_baseline"), dict) else None
     changes = changed_files(previous, snapshot)
     policy = policy_for(root, governance_candidates(root, package_hint)[0][0] if governance_candidates(root, package_hint) else None)
-    contract = build_goal_contract(root, request, inspection, policy)
+    contract = build_goal_contract(root, request, inspection, policy, package_hint=package_hint)
     evidence = evidence_plan(root, snapshot, controls_affected_by(changes, previous is None))
     return {
         "schema_version": SCHEMA,
@@ -2191,7 +2804,13 @@ def main(args: argparse.Namespace) -> int:
             raise ValueError("--request is required for goal")
         inspection = inspect_project(root, request, package)
         governance = governance_candidates(root, package)
-        output = build_goal_contract(root, request, inspection, policy_for(root, governance[0][0] if governance else None))
+        output = build_goal_contract(
+            root,
+            request,
+            inspection,
+            policy_for(root, governance[0][0] if governance else None),
+            package_hint=package,
+        )
         write_goal(root, output)
     elif args.command == "bootstrap":
         if not request:
@@ -2202,7 +2821,13 @@ def main(args: argparse.Namespace) -> int:
         if existing_contract.get("request") == request.strip():
             contract = existing_contract
         else:
-            contract = build_goal_contract(root, request, inspection, policy_for(root, governance[0][0] if governance else None))
+            contract = build_goal_contract(
+                root,
+                request,
+                inspection,
+                policy_for(root, governance[0][0] if governance else None),
+                package_hint=package,
+            )
             write_goal(root, contract)
         output = bootstrap_project(root, inspection, contract, package)
     elif args.command == "plan":
