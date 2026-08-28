@@ -185,4 +185,3 @@ class P2PBG01BeginnerGatewayTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
