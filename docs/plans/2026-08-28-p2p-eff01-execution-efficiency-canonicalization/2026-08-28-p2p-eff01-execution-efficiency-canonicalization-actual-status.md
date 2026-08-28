@@ -2,7 +2,7 @@
 
 Title: P2P-EFF01 Execution Efficiency Canonicalization
 Date: 2026-08-28
-Status: P2-B In Progress
+Status: P2-C Complete
 Companion plan: `docs/plans/2026-08-28-p2p-eff01-execution-efficiency-canonicalization/2026-08-28-p2p-eff01-execution-efficiency-canonicalization-plan.md`
 Companion evidence: `docs/plans/2026-08-28-p2p-eff01-execution-efficiency-canonicalization/2026-08-28-p2p-eff01-execution-efficiency-canonicalization-evidence.md`
 Companion benchmark: `docs/plans/2026-08-28-p2p-eff01-execution-efficiency-canonicalization/2026-08-28-p2p-eff01-execution-efficiency-canonicalization-benchmark.md`
@@ -58,7 +58,7 @@ Anvien cannot file-detail the hidden `.p2p` path in the duplicate registry; this
 | Existing C18 consumers | `context.py` imports existing constants; `selection_risk.py` consumes `TaskProfile`; package inventory includes the module | remain compatible and preserve authority | correct | direct source consumers identified | E0-P0A-CONS1 | preserve-only |
 | C18 AO1-AO20 tests | Frozen behavior matrix covers current four abstract axes | remain passing; new cases added in separate direct test file | correct | direct test consumer | E0-P0A-CONS1 | preserve, then run affected regression |
 | Execution lanes/JIT/test ceiling | additive output projection is implemented and A-F behavior is proven through canonical `derive_requirement()` | remain deterministic and additive | correct | direct policy test file | E1-P1A-SRC1, E1-P1B-TEST1, E1-P1B-TEST2 | preserve |
-| Candidate authority | live origin/main base is `23076954e89dec58dbcf0f14bdce15843226acbc`; implementation is on isolated branch `codex/p2p-eff01-execution-efficiency` with checkpoint commits `3f085be`, `61a94a9` | exact final candidate lineage with no promotion | correct | Git subject bound; final SHA/tree pending closure artifacts | E0-P0A-AUTH1, E1-P1A-IMPL1 | preserve candidate boundary |
+| Candidate authority | live origin/main base is `23076954e89dec58dbcf0f14bdce15843226acbc`; technical subject is `eb4320c` with tree `6cdd0a3`; final HEAD adds only closure documentation | exact final candidate lineage with no promotion | correct | Git subject bound; final HEAD recorded in terminal packet | E0-P0A-AUTH1, E1-P1A-IMPL1, E2-CLOSE-SHA1 | preserve candidate boundary |
 | Broken requested root | `.git` metadata is incomplete and Git rejects it | remain untouched | blocked/preserve-only | N/A | E0-P0A-AUTH2 | do not repair or mutate |
 
 ## Status Refresh Log
@@ -67,6 +67,7 @@ Anvien cannot file-detail the hidden `.p2p` path in the duplicate registry; this
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-28 | verified isolated candidate from live origin/main | P2P-EFF01 policy root and acceptance boundary | initial classifications above | E0-P0A-AUTH1..E0-P0A-PLAN1 | P1-A may implement one policy-root slice; P1-B remains separate test slice |
 | R1 | 2026-08-28 | isolated candidate after implementation commits | policy root, direct EFF01 tests, and affected C18/context/risk validation | policy root `partial -> correct`; execution projection `missing -> correct`; AO/consumer rows remain correct; one compile-only baseline warning classified | E1-P1A-SRC1..E1-P1B-TEST2, E2-P2A-VALID1..E2-P2A-DETECT1 | P1/P2-A complete; run independent Supervisor review, then close |
+| R2 | 2026-08-28 | technical subject `eb4320c` plus independent review | final policy/test subject and closure artifacts | Supervisor `PASS`; P2-B/P2-C complete; Owner gate remains required | E2-CLOSE-SHA1..E2-CLOSE-TERM1 | stop at Owner gate; no promotion/deployment/live activation |
 
 ## Phase Touch Map
 
@@ -123,7 +124,8 @@ Do not add another router, orchestrator, skill registry, truth store, provider r
 | P1-A | Additive policy projection is implemented and import/compile checked | complete; preserve one policy-root slice |
 | P1-B | Direct A-F matrix calls canonical `derive_requirement()` and passes | complete; preserve AO fixture |
 | P2-A | Hidden Anvien path remains unavailable, but direct source/runtime evidence, affected regressions, and detect-changes pass | complete; do not expand graph work |
-| P2-B | Candidate requires independent acceptance review before closure | in progress; inspect final diff, invariants, evidence, and candidate identity |
+| P2-B | Independent Supervisor review returns `PASS` on `eb4320c` technical subject | complete; preserve the reviewed subject and its safety boundary |
+| P2-C | Final packet and Owner boundary are explicit | complete; stop and await Owner gate |
 
 ## Implementation Gate
 

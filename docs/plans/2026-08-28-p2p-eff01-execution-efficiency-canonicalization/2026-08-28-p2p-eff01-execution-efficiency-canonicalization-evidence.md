@@ -53,6 +53,6 @@ Matching plan item(s): `P2-A`
 
 ## Closure Evidence
 
-- `E2-CLOSE-SHA1`: pending exact final candidate commit SHA and tree after closure artifacts are committed.
-- `E2-CLOSE-SUP1`: pending independent Supervisor PASS/REJECT report.
-- `E2-CLOSE-TERM1`: pending final terminal packet with Owner gate required and no promotion/deployment/live activation.
+- `E2-CLOSE-SHA1`: technical candidate subject is commit `eb4320c1077b9b4b926ad76c0e14df5246f84bb6` with tree `6cdd0a330cd0c06fcc102e879ca5a5ed599dc57e`; the final HEAD adds only the Supervisor report and closure-ledger status updates, with its exact SHA/tree emitted in the terminal packet.
+- `E2-CLOSE-SUP1`: independent Supervisor report `reports/supervisor/rp_supervisor_20260828_162811_by_gpt-5-codex_p2p-eff01-execution-efficiency-canonicalization.md` returns `PASS` against the exact technical subject above.
+- `E2-CLOSE-TERM1`: terminal packet is `P2P_EFF01_EXECUTION_EFFICIENCY_CANDIDATE_READY_FOR_OWNER_GATE`; Owner approval is required, and no promotion/deployment/live activation/force push is authorized or performed.

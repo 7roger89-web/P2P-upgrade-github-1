@@ -32,8 +32,8 @@ This ledger records measured counts and hashes only. Test pass/fail narrative be
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | Candidate commit count after implementation | commits | 0 | 2 | pending | exact isolated checkpoint(s) | +2 | E1-P1A-IMPL1 |
-| P2 | Candidate tree identity | SHA | pending | pending | pending | exact final subject | pending | E2-CLOSE-SHA1 |
+| P2 | Candidate commit count after implementation | commits | 0 | 3 | 4 | exact isolated checkpoint(s) | +4 | E1-P1A-IMPL1, E2-CLOSE-SHA1 |
+| P2 | Candidate tree identity | SHA | pending | 6cdd0a330cd0c06fcc102e879ca5a5ed599dc57e | emitted in terminal packet | exact reviewed subject plus closure artifacts | n/a | E2-CLOSE-SHA1 |
 
 ## Non-Benchmarkable Notes
 

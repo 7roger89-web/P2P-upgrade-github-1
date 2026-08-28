@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-28`
-- Status: `P2-B In Progress`
+- Status: `P2-C Complete`
 - Plan: `docs/plans/2026-08-28-p2p-eff01-execution-efficiency-canonicalization/2026-08-28-p2p-eff01-execution-efficiency-canonicalization-plan.md`
 - Evidence: `docs/plans/2026-08-28-p2p-eff01-execution-efficiency-canonicalization/2026-08-28-p2p-eff01-execution-efficiency-canonicalization-evidence.md`
 - Benchmark: `docs/plans/2026-08-28-p2p-eff01-execution-efficiency-canonicalization/2026-08-28-p2p-eff01-execution-efficiency-canonicalization-benchmark.md`
@@ -188,23 +188,23 @@ The existing C18 policy derives bounded worker, context, reasoning, and verifica
   - Implementation Gate: P1-A and P1-B are complete.
   - Acceptance: focused and directly affected validation proves the contract; no broad/full regression is run without a material justification. PASS for EFF01, with one compile-only baseline warning recorded.
 
-- [ ] P2-B: Supervisor acceptance review
+- [x] P2-B: Supervisor acceptance review
   - Goal: independently verify source, exact diff, tests, safety boundaries, candidate identity, and the requested terminal packet.
   - Work Steps:
     1. Review the final source and reports against the user request and current candidate SHA/tree.
     2. Verify no promotion, deployment, live activation, force push, or hidden skill mutation occurred.
     3. Record exactly `PASS` or a truthful blocker in the supervisor report.
   - Implementation Gate: P2-A evidence and detect-changes are current.
-  - Acceptance: supervisor returns `PASS`, with no residual same-invariant unverified surface, or records `REJECT` with exact remediation.
+  - Acceptance: supervisor returns `PASS`, with no residual same-invariant unverified surface, or records `REJECT` with exact remediation. PASS recorded in the Supervisor report.
 
-- [ ] P2-C: Close and stop
+- [x] P2-C: Close and stop
   - Goal: write the final evidence/report packet and stop at the owner gate.
   - Work Steps:
     1. Refresh actual-status, evidence, and benchmark ledgers with final hashes and validation results.
     2. Verify candidate SHA/tree and clean subject scope; do not push or promote.
     3. Emit the required terminal verdict and stop all optional checks.
   - Implementation Gate: P2-A and P2-B pass or record a blocker.
-  - Acceptance: final packet contains all requested fields and `OWNER_GATE_REQUIRED: YES`.
+  - Acceptance: final packet contains all requested fields and `OWNER_GATE_REQUIRED: YES`; no promotion, deployment, live activation, or force push occurred.
 
 ## Risk Notes
 
