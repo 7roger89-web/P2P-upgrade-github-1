@@ -73,6 +73,10 @@ class ExecutionEfficiencyPolicyTests(unittest.TestCase):
         self.assertEqual(runtime_code["execution_lane"], STRICT)
         self.assertEqual(runtime_code["jit_skills"]["required"], ["coder", "qa"])
 
+        runtime_only = derive_requirement({"runtime_change": True})
+        self.assertEqual(runtime_only["execution_lane"], STRICT)
+        self.assertEqual(runtime_only["jit_skills"]["required"], ["qa"])
+
     def test_case_d_critical_promotion_keeps_owner_and_fail_closed_controls(self) -> None:
         profile = {
             "promotion": True,

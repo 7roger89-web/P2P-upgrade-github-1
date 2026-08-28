@@ -396,7 +396,7 @@ def _jit_skills(profile: TaskProfile, lane: str) -> list[str]:
     """Return only skills justified by the current policy evidence."""
 
     skills: list[str] = []
-    if profile.source_mutation or profile.runtime_change:
+    if profile.source_mutation:
         skills.append("coder")
     if profile.unexplained_material_failure:
         skills.append("debugging")
