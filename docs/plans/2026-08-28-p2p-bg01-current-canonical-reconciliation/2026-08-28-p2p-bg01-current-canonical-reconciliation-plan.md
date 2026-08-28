@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: 2026-08-28
-- Status: draft
+- Status: complete - ready for Owner gate
 - Plan: docs/plans/2026-08-28-p2p-bg01-current-canonical-reconciliation/2026-08-28-p2p-bg01-current-canonical-reconciliation-plan.md
 - Evidence: docs/plans/2026-08-28-p2p-bg01-current-canonical-reconciliation/2026-08-28-p2p-bg01-current-canonical-reconciliation-evidence.md
 - Benchmark: docs/plans/2026-08-28-p2p-bg01-current-canonical-reconciliation/2026-08-28-p2p-bg01-current-canonical-reconciliation-benchmark.md
@@ -233,23 +233,26 @@ Out of scope:
   - Actual-status Update: mark P1 complete only if all required focused evidence passes.
   - Commit Boundary: no extra implementation commit; retain P1-B checkpoint as final source checkpoint.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: independently review the completed candidate and evidence.
   - Work Steps: call the supervisor skill once after P1; if it rejects, stop at the responsible correction boundary.
   - Implementation Gate: P1 is complete or explicitly blocked.
   - Acceptance: supervisor result is recorded without promoting or deploying.
+  - Actual Result: independent review recorded `PASS` in `reports/supervisor/rp_supervisor_260828_215128_by_gpt-5-codex_p2p-bg01-current-canonical-reconciliation.md`.
 
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure only accepted candidate artifacts remain.
   - Work Steps: inspect status/diff and remove only plan-created dead artifacts; do not touch old candidate or canonical.
   - Implementation Gate: no unrelated files are in scope.
   - Acceptance: final candidate diff has no dead work.
+  - Actual Result: only the bounded BG01 source/test, surgical workflow seam, and candidate-only evidence artifacts remain; no duplicate candidate or transient test artifact remains.
 
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: record final identity, focused validation, candidate commit/tree, and Owner gate boundary.
   - Work Steps: update evidence/benchmark/actual-status, perform final read-only identity checks, and commit the candidate evidence if needed.
   - Implementation Gate: Pn-A and Pn-B pass or have explicit blockers.
   - Acceptance: exact new candidate SHA/tree and no promotion are reported.
+  - Actual Result: source checkpoint is `1012428798ed43027d24ba57b7551321ee5e15fe` / `84a612c17f413df5e967f4a3dad7a8d01f286ea2`; final closure commit identity is verified and returned after the evidence-only close.
 
 ## Risk Notes
 

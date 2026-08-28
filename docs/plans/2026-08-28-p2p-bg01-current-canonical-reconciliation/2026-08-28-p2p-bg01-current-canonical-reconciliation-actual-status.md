@@ -2,7 +2,7 @@
 
 Title: P2P-BG01 Current-Canonical Reconciliation
 Date: 2026-08-28
-Status: P1 Complete
+Status: Owner Gate Ready
 Companion plan: docs/plans/2026-08-28-p2p-bg01-current-canonical-reconciliation/2026-08-28-p2p-bg01-current-canonical-reconciliation-plan.md
 Companion evidence: docs/plans/2026-08-28-p2p-bg01-current-canonical-reconciliation/2026-08-28-p2p-bg01-current-canonical-reconciliation-evidence.md
 Companion benchmark: docs/plans/2026-08-28-p2p-bg01-current-canonical-reconciliation/2026-08-28-p2p-bg01-current-canonical-reconciliation-benchmark.md
@@ -172,3 +172,19 @@ Treat old commit or approval as the new promotion subject.
 Decision note:
 
 Proceed from the clean 34ece1d worktree only. The current canonical lightweight-fastpath is authoritative and preserve-only. The old BG01 implementation is source material, not a subject or approval.
+
+## Closure Status
+
+- [x] P1 implementation and focused validation complete.
+- [x] Pn-A independent Supervisor review complete with `PASS`.
+- [x] Pn-B dead-work review complete; no duplicate candidate, transient test artifact, or unrelated source remains.
+- [x] Pn-C evidence-only closure complete; candidate remains isolated and unpromoted.
+
+Closure evidence:
+
+- Implementation checkpoint: `1012428798ed43027d24ba57b7551321ee5e15fe` / `84a612c17f413df5e967f4a3dad7a8d01f286ea2`.
+- Current canonical base: `34ece1d1b804d0b794c56d51acba649b2d4a88c5` / `b3f541df0ba2215a4d752e67aa3672a22e242acb`.
+- Focused validation: BG01 `8/8`, workflow `7/7`, lightweight-fastpath `18/18`, EFF01 `7/7`, targeted compile PASS.
+- Independent review: Supervisor `PASS`; report is candidate-only.
+- Owner approval: old `86def933...` approval is not reusable; a fresh Owner gate is required.
+- Promotion/deployment/live action: none.

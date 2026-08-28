@@ -35,7 +35,8 @@ Record only measured identity, file, test, and scope counts. Pass/fail narrative
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| P2 | Candidate identity | SHA/tree | current base | current base plus focused source | pending | exact new candidate | pending | closure evidence |
+| P2 | Source checkpoint identity | SHA/tree | current base | `1012428798ed43027d24ba57b7551321ee5e15fe` / `84a612c17f413df5e967f4a3dad7a8d01f286ea2` | `1012428798ed43027d24ba57b7551321ee5e15fe` / `84a612c17f413df5e967f4a3dad7a8d01f286ea2` | exact source checkpoint | 0 | E2-PnC-ID1 |
+| P2 | Candidate closure identity | SHA/tree | source checkpoint | closure commit | final closure commit | exact new candidate | docs-only close | final read-only identity check |
 
 ## Non-Benchmarkable Notes
 

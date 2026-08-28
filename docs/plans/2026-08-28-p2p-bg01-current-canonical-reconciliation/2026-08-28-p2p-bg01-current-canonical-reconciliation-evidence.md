@@ -39,4 +39,8 @@ Matching plan item(s): P1-A, P1-B, P1-C
 
 ## Closure Evidence
 
-Final identity, focused validation, candidate commit/tree, status, and Owner-gate boundary will be appended after the candidate checkpoint. No canonical or remote write is permitted by this plan.
+- E2-PnA-SUP1: Independent read-only Supervisor review passed. The report confirms the current-canonical base, empty preserve-only path matches for the fastpath/policy/state surfaces, BG01 acceptance coverage, and no duplicate authority. Anvien was not run because the user explicitly prohibited it.
+- E2-PnB-DIFF1: Candidate status and changed-path review found only the bounded BG01 gateway/test, one surgical `scripts/p2p_workflow.py` seam, and candidate-only plan/evidence/report artifacts. No dead implementation, replacement candidate, or transient test artifact remains.
+- E2-PnC-ID1: Implementation checkpoint is `1012428798ed43027d24ba57b7551321ee5e15fe` with tree `84a612c17f413df5e967f4a3dad7a8d01f286ea2`, parent `f735d437473ecb158d472928dc2454a0c7a56967`, and current canonical base `34ece1d1b804d0b794c56d51acba649b2d4a88c5` as an ancestor. The final evidence-only closure commit is the new candidate subject reported after commit verification.
+- E2-PnC-TEST1: Reused focused results remain BG01 `8/8`, direct workflow `7/7`, lightweight-fastpath `18/18`, EFF01 `7/7`, and targeted compile PASS; no test was rerun during report closure.
+- E2-PnC-BOUNDARY1: `OWNER_APPROVAL_REUSABLE=NO`, `OWNER_GATE_REQUIRED=YES`, and `CANONICAL_PROMOTED=NO`. No canonical checkout, remote main, deployment, or live runtime was changed.
