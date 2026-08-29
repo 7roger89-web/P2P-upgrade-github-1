@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import json
-import shutil
-import sys
 import tempfile
+import sys
 import unittest
 from pathlib import Path
 
@@ -15,122 +13,208 @@ from p2p_capabilities import knowledge_lifecycle as knowledge  # noqa: E402
 from p2p_capabilities.isolation import IsolationViolation  # noqa: E402
 
 
-SCOPE = {"ORG": "ORG1", "PROJECT": "PROJ1", "WORKSTREAM": "WS1"}
+ORG_SCOPE = {"ORG": "ORG1"}
+PROJECT_SCOPE = {"ORG": "ORG1", "PROJECT": "PROJ1"}
+WORKSTREAM_SCOPE = {"ORG": "ORG1", "PROJECT": "PROJ1", "WORKSTREAM": "WS1"}
 
 
-def candidate(record_id: str, *, subject: str = "routing-boundary", statement: str = "Use the bounded current canonical primitive.", **overrides: object) -> dict[str, object]:
-    values: dict[str, object] = {
-        "record_id": record_id,
-        "knowledge_type": "ARCHITECTURE_DECISION",
-        "subject": subject,
-        "statement": statement,
-        "scope": SCOPE,
-        "lifecycle": "CANDIDATE",
-        "authority": {"origin": "MODEL_INFERENCE", "source": "focused-test", "evidence_bound": False},
-        "evidence_refs": [f"evidence:{record_id}"],
-        "provenance_refs": [f"provenance:{record_id}"],
-        "created_at": "2026-08-29T00:00:00Z",
-        "valid_from": "2026-08-29T00:00:00Z",
+def make_proposal(
+    record_id: str,
+    *,
+    statement: str = "Use the bounded current canonical primitive.",
+    scope: dict[str, str] = WORKSTREAM_SCOPE,
+    lifecycle: str = "CANDIDATE",
+    authority: dict[str, object] | None = None,
+    knowledge_type: str = "ARCHITECTURE_DECISION",
+    valid_from: str = "2026-08-01T00:00:00Z",
+) -> dict[str, object]:
+    return knowledge.make_record(
+        record_id=record_id,
+        knowledge_type=knowledge_type,
+        subject="routing-boundary",
+        statement=statement,
+        scope=scope,
+        lifecycle=lifecycle,
+        authority=authority or {"origin": "MODEL_INFERENCE", "source": "focused-test", "evidence_bound": False},
+        evidence_refs=[f"evidence:{record_id}"],
+        provenance_refs=[f"provenance:{record_id}"],
+        created_at=valid_from,
+        valid_from=valid_from,
+    )
+
+
+def make_verified(record_id: str, *, statement: str = "Use the bounded current canonical primitive.", scope: dict[str, str] = WORKSTREAM_SCOPE, knowledge_type: str = "ARCHITECTURE_DECISION", origin: str = "RUNTIME_EVIDENCE") -> dict[str, object]:
+    return make_proposal(
+        record_id,
+        statement=statement,
+        scope=scope,
+        lifecycle="VERIFIED",
+        knowledge_type=knowledge_type,
+        authority={"origin": origin, "source": f"verified-source:{record_id}", "evidence_bound": True},
+    )
+
+
+def promote(root: Path, record_id: str, *, approval_origin: str = "OWNER", knowledge_type: str = "ARCHITECTURE_DECISION", statement: str = "Use the bounded current canonical primitive.", scope: dict[str, str] = WORKSTREAM_SCOPE) -> dict[str, object]:
+    verified = make_verified(record_id, statement=statement, scope=scope, knowledge_type=knowledge_type)
+    knowledge.write_record(root, verified)
+    kwargs: dict[str, object] = {
+        "candidate_id": record_id,
+        "evidence_ref": f"promotion-evidence:{record_id}",
+        "approved_by": approval_origin,
     }
-    values.update(overrides)
-    return knowledge.make_record(**values)
+    if approval_origin == "GOVERNANCE":
+        kwargs["governance_decision_ref"] = f"governance-decision:{record_id}"
+    else:
+        kwargs["owner_decision_ref"] = f"owner-decision:{record_id}"
+    return knowledge.promote_record(root, **kwargs)
 
 
-class KP01KnowledgeLifecycleTests(unittest.TestCase):
-    def test_kp01_lifecycle_and_knowledge_types(self) -> None:
+class KP01ContractDriftRepairTests(unittest.TestCase):
+    def test_a_official_source_cannot_authorize_canonical_promotion(self) -> None:
+        with self.assertRaises(knowledge.KnowledgeError):
+            make_proposal("R-OFFICIAL", lifecycle="CANONICAL", authority={"origin": "OFFICIAL_SOURCE", "source": "official", "evidence_bound": True})
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
-            for kind in knowledge.KNOWLEDGE_TYPES:
-                record = candidate(f"R-{kind}", knowledge_type=kind)
-                self.assertEqual(knowledge.write_record(root, record)["status"], "APPENDED")
-            loaded = knowledge.read_records(root)
-            self.assertEqual(loaded["status"], "PASS")
-            self.assertEqual({item["knowledge_type"] for item in loaded["records"]}, set(knowledge.KNOWLEDGE_TYPES))
-            self.assertEqual({item["lifecycle"] for item in loaded["records"]}, {"CANDIDATE"})
-
-    def test_current_query_is_not_verified_truth_and_as_of_respects_validity(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            root = Path(raw)
-            old = candidate("R-OLD", statement="old bounded rule", valid_from="2026-08-01T00:00:00Z", created_at="2026-08-01T00:00:00Z")
-            new = candidate("R-NEW", statement="new bounded rule", valid_from="2026-08-20T00:00:00Z", created_at="2026-08-20T00:00:00Z")
-            knowledge.write_record(root, old)
-            knowledge.write_record(root, new)
-            as_of = knowledge.query_as_of(root, subject="routing-boundary", as_of="2026-08-10T00:00:00Z", scope=SCOPE)
-            current = knowledge.query_current(root, subject="routing-boundary", scope=SCOPE)
-            self.assertEqual(as_of["results"][0]["record_id"], "R-OLD")
-            self.assertEqual(current["results"][0]["record_id"], "R-NEW")
-            self.assertFalse(current["verified_truth"])
-            self.assertTrue(current["retrieved_knowledge"])
-
-    def test_supersession_keeps_old_record_and_changes_current_projection(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            root = Path(raw)
-            old = candidate("R-SUPERSEDED", statement="old rule")
-            new = candidate("R-SUCCESSOR", statement="successor rule", supersedes=["R-SUPERSEDED"], valid_from="2026-08-29T00:00:00Z", created_at="2026-08-29T00:00:00Z")
-            knowledge.write_record(root, old)
-            knowledge.write_record(root, new)
-            current = knowledge.query_current(root, subject="routing-boundary", scope=SCOPE)
-            self.assertEqual(current["results"][0]["record_id"], "R-SUCCESSOR")
-            self.assertEqual(len(knowledge.read_records(root)["records"]), 2)
-            self.assertEqual(knowledge.provenance_lookup(root, "R-SUPERSEDED")["status"], "PASS")
-
-    def test_authority_conflict_fails_closed(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            root = Path(raw)
-            first = candidate("R-CANON-1", statement="canonical A", lifecycle="CANONICAL", authority={"origin": "OWNER", "source": "owner-decision-A", "evidence_bound": True})
-            second = candidate("R-CANON-2", statement="canonical B", lifecycle="CANONICAL", authority={"origin": "OFFICIAL_SOURCE", "source": "official-source-B", "evidence_bound": True})
-            knowledge.write_record(root, first)
-            knowledge.write_record(root, second)
-            result = knowledge.query_current(root, subject="routing-boundary", scope=SCOPE)
-            self.assertEqual(result["status"], "AUTHORITY_CONFLICT")
-            self.assertTrue(result["authority_conflict"])
-            self.assertFalse(result["verified_truth"])
-
-    def test_scope_isolation_and_secret_private_reasoning_rejection(self) -> None:
-        with tempfile.TemporaryDirectory() as raw:
-            root = Path(raw)
-            protected = root / "protected"
-            record = candidate("R-ISOLATION")
-            protected_record = knowledge._record_path(root, record)  # bounded contract target for the test
-            with self.assertRaises(IsolationViolation):
-                knowledge.write_record(root, record, protected_roots=[protected_record.parent])
+            verified = make_verified("R-OFFICIAL-PROMOTION", origin="OFFICIAL_SOURCE")
+            knowledge.write_record(root, verified)
             with self.assertRaises(knowledge.KnowledgeError):
-                knowledge.make_record(
-                    record_id="R-SECRET", knowledge_type="OWNER_DECISION", subject="secret", statement="password=topsecret",
-                    scope=SCOPE, lifecycle="OBSERVATION", authority={"origin": "OWNER", "source": "owner"}, evidence_refs=[],
-                )
+                knowledge.promote_record(root, candidate_id="R-OFFICIAL-PROMOTION", evidence_ref="evidence", approved_by="OFFICIAL_SOURCE", owner_decision_ref="owner")
 
-    def test_control_tower_reads_canonical_only_and_never_grants_execution(self) -> None:
+    def test_b_runtime_evidence_cannot_authorize_canonical_promotion(self) -> None:
+        with self.assertRaises(knowledge.KnowledgeError):
+            make_proposal("R-RUNTIME", lifecycle="CANONICAL", authority={"origin": "RUNTIME_EVIDENCE", "source": "runtime", "evidence_bound": True})
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
-            proposed = candidate("R-PROPOSED")
-            knowledge.write_record(root, proposed)
-            before = knowledge.reconstruct_control_tower(root, scope=SCOPE)
-            self.assertEqual(before["status"], "NO_CANONICAL_KNOWLEDGE")
-            canonical = knowledge.make_record(
-                record_id="R-CANONICAL", knowledge_type="PROMOTION_RESULT", subject="routing-boundary",
-                statement="Use the bounded current canonical primitive.", scope=SCOPE, lifecycle="CANONICAL",
-                authority={"origin": "OWNER", "source": "owner-decision", "evidence_bound": True}, evidence_refs=["owner-evidence"],
-            )
-            knowledge.write_record(root, canonical)
-            after = knowledge.reconstruct_control_tower(root, scope=SCOPE)
-            self.assertEqual(after["status"], "PASS")
-            self.assertEqual(after["source"], "CANONICAL_KNOWLEDGE_ONLY")
-            self.assertEqual(after["execution_authorization"], "NOT_GRANTED")
-            self.assertEqual(after["records"][0]["record_id"], "R-CANONICAL")
+            verified = make_verified("R-RUNTIME-PROMOTION", origin="RUNTIME_EVIDENCE")
+            knowledge.write_record(root, verified)
+            with self.assertRaises(knowledge.KnowledgeError):
+                knowledge.promote_record(root, candidate_id="R-RUNTIME-PROMOTION", evidence_ref="evidence", approved_by="RUNTIME_EVIDENCE", owner_decision_ref="owner")
 
-    def test_explicit_promotion_requires_authority_and_keeps_candidate_separate(self) -> None:
+    def test_c_generic_direct_canonical_construction_is_rejected(self) -> None:
+        with self.assertRaisesRegex(knowledge.KnowledgeError, "DIRECT_CANONICAL_CONSTRUCTION_REJECTED"):
+            make_proposal("R-DIRECT", lifecycle="CANONICAL", authority={"origin": "OWNER", "source": "owner", "evidence_bound": True})
+
+    def test_d_candidate_direct_promotion_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
-            proposed = candidate("R-PROMOTE")
-            knowledge.write_record(root, proposed)
-            result = knowledge.promote_record(root, candidate_id="R-PROMOTE", owner_decision_ref="owner-decision", evidence_ref="promotion-evidence")
+            knowledge.write_record(root, make_proposal("R-CANDIDATE"))
+            with self.assertRaisesRegex(knowledge.KnowledgeError, "VERIFIED_ONLY_PROMOTION_REQUIRED"):
+                knowledge.promote_record(root, candidate_id="R-CANDIDATE", owner_decision_ref="owner", evidence_ref="evidence")
+
+    def test_e_verified_owner_approval_succeeds_and_preserves_type(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            result = promote(root, "R-OWNER", knowledge_type="OWNER_DECISION")
             self.assertEqual(result["status"], "PASS")
+            canonical = next(item for item in knowledge.read_records(root)["records"] if item["lifecycle"] == "CANONICAL")
+            self.assertEqual(canonical["knowledge_type"], "OWNER_DECISION")
+            self.assertEqual(canonical["authority"]["origin"], "OWNER")
+
+    def test_f_verified_governance_approval_succeeds(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            result = promote(root, "R-GOVERNANCE", approval_origin="GOVERNANCE")
+            self.assertEqual(result["status"], "PASS")
+            canonical = next(item for item in knowledge.read_records(root)["records"] if item["lifecycle"] == "CANONICAL")
+            self.assertEqual(canonical["authority"]["origin"], "GOVERNANCE")
+
+    def test_g_org_scope_works_without_project_or_workstream(self) -> None:
+        record = make_proposal("R-ORG", scope=ORG_SCOPE)
+        self.assertEqual(record["scope_level"], "ORG")
+        self.assertEqual(record["scope"], ORG_SCOPE)
+
+    def test_h_project_scope_works_without_workstream(self) -> None:
+        record = make_proposal("R-PROJECT", scope=PROJECT_SCOPE)
+        self.assertEqual(record["scope_level"], "PROJECT")
+        self.assertEqual(record["scope"], PROJECT_SCOPE)
+
+    def test_i_workstream_scope_remains_isolated(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            ws1 = make_proposal("R-WS1", scope={"ORG": "ORG1", "PROJECT": "PROJ1", "WORKSTREAM": "WS1"})
+            ws2 = make_proposal("R-WS2", scope={"ORG": "ORG1", "PROJECT": "PROJ1", "WORKSTREAM": "WS2"}, statement="isolated workstream rule")
+            knowledge.write_record(root, ws1)
+            knowledge.write_record(root, ws2)
+            result = knowledge.query_as_of(root, subject="routing-boundary", as_of="2026-08-29T00:00:00Z", scope=ws1["scope"])
+            self.assertEqual([item["record_id"] for item in result["results"]], ["R-WS1"])
+
+    def test_j_promoted_architecture_decision_preserves_knowledge_type(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            promote(root, "R-ARCH", knowledge_type="ARCHITECTURE_DECISION")
+            canonical = next(item for item in knowledge.read_records(root)["records"] if item["lifecycle"] == "CANONICAL")
+            self.assertEqual(canonical["knowledge_type"], "ARCHITECTURE_DECISION")
+            self.assertNotEqual(canonical["knowledge_type"], "PROMOTION_RESULT")
+
+    def test_k_supersession_transitions_old_canonical_and_retains_it(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            promote(root, "R-OLD", statement="old canonical rule")
+            promote(root, "R-NEW", statement="new canonical rule")
+            result = knowledge.supersede_records(root, old_record_id="R-OLD-canonical", new_record_id="R-NEW-canonical", supersession_at="2026-09-01T00:00:00Z")
+            self.assertEqual(result["status"], "PASS")
+            records = {item["record_id"]: item for item in knowledge.read_records(root)["records"]}
+            self.assertEqual(records["R-OLD-canonical"]["lifecycle"], "SUPERSEDED")
+            self.assertEqual(records["R-OLD-canonical"]["valid_until"], "2026-09-01T00:00:00Z")
+            self.assertEqual(records["R-OLD-canonical"]["superseded_by"], ["R-NEW-canonical"])
+            self.assertEqual(records["R-NEW-canonical"]["supersedes"], ["R-OLD-canonical"])
+            self.assertEqual(len(records), 4)
+
+    def test_l_exact_supersession_timestamp_is_half_open(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            promote(root, "R-OLD", statement="old canonical rule")
+            promote(root, "R-NEW", statement="new canonical rule")
+            knowledge.supersede_records(root, old_record_id="R-OLD-canonical", new_record_id="R-NEW-canonical", supersession_at="2026-09-01T00:00:00Z")
+            before = knowledge.query_as_of(root, subject="routing-boundary", as_of="2026-08-31T23:59:59Z", scope=WORKSTREAM_SCOPE)
+            exact = knowledge.query_as_of(root, subject="routing-boundary", as_of="2026-09-01T00:00:00Z", scope=WORKSTREAM_SCOPE)
+            self.assertEqual(before["results"][0]["record_id"], "R-OLD-canonical")
+            self.assertEqual(exact["results"][0]["record_id"], "R-NEW-canonical")
+
+    def test_m_control_tower_reads_canonical_only(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            knowledge.write_record(root, make_proposal("R-PROPOSED"))
+            self.assertEqual(knowledge.reconstruct_control_tower(root, scope=WORKSTREAM_SCOPE)["status"], "NO_CANONICAL_KNOWLEDGE")
+            promote(root, "R-CANONICAL")
+            tower = knowledge.reconstruct_control_tower(root, scope=WORKSTREAM_SCOPE)
+            self.assertEqual(tower["status"], "PASS")
+            self.assertTrue(all(item["lifecycle"] == "CANONICAL" for item in tower["records"]))
+            self.assertNotIn("R-PROPOSED", {item["record_id"] for item in tower["records"]})
+
+    def test_n_execution_authorization_stays_not_granted(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            result = promote(root, "R-AUTH")
             self.assertEqual(result["execution_authorization"], "NOT_GRANTED")
-            records = knowledge.read_records(root)["records"]
-            self.assertEqual({item["record_id"] for item in records}, {"R-PROMOTE", "R-PROMOTE-canonical"})
-            self.assertEqual(next(item for item in records if item["record_id"] == "R-PROMOTE")["lifecycle"], "CANDIDATE")
-            self.assertEqual(knowledge.reconstruct_control_tower(root, scope=SCOPE)["records"][0]["record_id"], "R-PROMOTE-canonical")
+            self.assertEqual(knowledge.reconstruct_control_tower(root, scope=WORKSTREAM_SCOPE)["execution_authorization"], "NOT_GRANTED")
+
+    def test_o_candidate_or_newer_observation_never_overrides_canonical_truth(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            promote(root, "R-CANON", statement="canonical truth")
+            newer = make_proposal("R-NEWER", statement="newer but noncanonical", lifecycle="OBSERVATION", valid_from="2026-12-01T00:00:00Z")
+            knowledge.write_record(root, newer)
+            result = knowledge.query_as_of(root, subject="routing-boundary", as_of="2026-12-15T00:00:00Z", scope=WORKSTREAM_SCOPE)
+            self.assertEqual(result["results"][0]["record_id"], "R-CANON-canonical")
+            self.assertTrue(result["verified_truth"])
+            self.assertEqual(result["results"][0]["statement"], "canonical truth")
+
+    def test_preserved_immutable_collision_isolation_and_secret_rejection(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            record = make_proposal("R-SAFE")
+            knowledge.write_record(root, record)
+            self.assertEqual(knowledge.write_record(root, record)["status"], "ALREADY_PRESENT")
+            altered = dict(record)
+            altered["statement"] = "different statement"
+            with self.assertRaises(knowledge.KnowledgeError):
+                knowledge.write_record(root, altered)
+            target = knowledge._record_path(root, record)
+            with self.assertRaises(IsolationViolation):
+                knowledge.write_record(root, make_proposal("R-ISOLATED"), protected_roots=[target.parent])
+            with self.assertRaises(knowledge.KnowledgeError):
+                make_proposal("R-SECRET", statement="password=topsecret")
 
 
 if __name__ == "__main__":
