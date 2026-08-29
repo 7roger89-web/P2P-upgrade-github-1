@@ -795,7 +795,13 @@
      "subtitle reading",
      "simple timestamp edit",
      "just timestamps",
-     "extract subtitles"
+     "extract subtitles",
+     "three.js",
+     "performance",
+     "browser performance",
+     "frame time",
+     "fps",
+     "webgl performance"
     ],
     "INVOCATION_CLASS": "MODEL_ROUTABLE",
     "CANONICAL_QUORUM_MEMBER": false,
@@ -917,7 +923,8 @@
      "dependency",
      "translation",
      "translate",
-     "dịch"
+     "dịch",
+     "camera"
     ],
     "INVOCATION_CLASS": "MODEL_ROUTABLE",
     "CANONICAL_QUORUM_MEMBER": false,
@@ -1054,6 +1061,1168 @@
     },
     "VERSION": "1.0.4",
     "STATUS": "DISCOVERED"
-   }
+   },
+  {
+   "CAPABILITY_ID": "game.mengto.build_isometric_arpg",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo gameplay-spine guidance for a bounded Three.js vertical slice; no world expansion.",
+   "TRIGGERS": [
+    "gameplay spine",
+    "game loop",
+    "vertical slice",
+    "isometric arpg",
+    "game architecture",
+    "playable arpg",
+    "encounter loop"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "full game",
+    "open-world"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "gameplay-vertical-slice"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/build-isometric-arpg/SKILL.md",
+     "entrypoint_sha256": "ddcb64e5b9fb5b3ae7df2f3cc157c45768e359903840440d97ed69c22881d189",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.camera_controls",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo guidance for readable, bounded Three.js game-camera controls.",
+   "TRIGGERS": [
+    "camera",
+    "camera controls",
+    "camera framing",
+    "follow camera",
+    "orbit camera",
+    "lock-on camera",
+    "camera shake",
+    "touch camera"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "combat",
+    "enemy",
+    "asset",
+    "character",
+    "img2threejs",
+    "full game"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "game-camera"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/build-game-camera-controls/SKILL.md",
+     "entrypoint_sha256": "9a9f5765d410bde6280a4fd35b0210e593b9c5729689dd1f0abd0edc84604fdf",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.mobile_controls",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo mobile Three.js control and responsive-gameplay guidance.",
+   "TRIGGERS": [
+    "mobile",
+    "mobile game",
+    "mobile web",
+    "touch input",
+    "touch controls",
+    "virtual joystick",
+    "portrait viewport",
+    "landscape viewport",
+    "safe area"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "image generation",
+    "marketing"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "mobile-game-controls"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/build-mobile-threejs-games/SKILL.md",
+     "entrypoint_sha256": "7c38939b8b919f8cac1ca2f7040b35a5c05ae43adcd9c4c143184180bc7b007a",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.action_combat",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo explicit action-combat contract guidance for timing, contact, cooldowns, and deterministic outcomes.",
+   "TRIGGERS": [
+    "combat",
+    "attack timing",
+    "cooldown",
+    "damage",
+    "hitbox",
+    "guard",
+    "dodge",
+    "parry",
+    "melee"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "image",
+    "reference",
+    "camera-only",
+    "prompt-only"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "combat-contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/design-action-combat/SKILL.md",
+     "entrypoint_sha256": "0b6289f0c651987554e2c82dda45e18582eb2a21412672778ed76cd1a214df17",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.enemy_systems",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo data-driven enemy archetype and runtime-contract guidance.",
+   "TRIGGERS": [
+    "enemy systems",
+    "enemy archetype",
+    "enemy spawn",
+    "enemy moveset",
+    "enemy contract",
+    "enemy runtime"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "prompt-only"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "enemy-runtime-contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/build-threejs-enemy-systems/SKILL.md",
+     "entrypoint_sha256": "b33c08b3296ea1a39d37705be29d773db428ef8a337a92f3640eb2cb6792bbb8",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.enemy_ai",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo bounded enemy-AI guidance for legible, reproducible combat decisions.",
+   "TRIGGERS": [
+    "enemy ai",
+    "enemy behavior",
+    "aggro",
+    "pathfinding",
+    "steering",
+    "boss behavior",
+    "target selection"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "prompt-only"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "enemy-ai-contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/tune-enemy-ai/SKILL.md",
+     "entrypoint_sha256": "13bcd0294240d0520bb1e132871ffe6f1ab36ff7c00868483f2f3490dab4e360",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.encounters",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo encounter and level-design guidance for bounded composition, pacing, fairness, and fixtures.",
+   "TRIGGERS": [
+    "encounter",
+    "encounters",
+    "level design",
+    "spawn pacing",
+    "boss phase",
+    "arena layout",
+    "wave composition"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "terrain",
+    "open-world"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "encounter-design"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/design-game-encounters/SKILL.md",
+     "entrypoint_sha256": "0cb2da5d4fbc25815fbd57b4627b9fafb1b3cc050712e7103476b214f7514a61",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.hybrid_assets",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo hybrid asset guidance for choosing procedural, imported, authored, and reference-grounded representations.",
+   "TRIGGERS": [
+    "hybrid asset",
+    "hybrid assets",
+    "asset pipeline",
+    "procedural asset",
+    "weapon",
+    "sword",
+    "relic",
+    "approved reference",
+    "reference-grounded"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "image generator",
+    "neural mesh"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "visual.gpt_image_2_style_library",
+    "P2P-EXT-CANDIDATE-IMG2THREEJS-01",
+    "img2threejs:provenance-only-pending",
+    "hybrid-asset-contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/build-hybrid-game-assets/SKILL.md",
+     "entrypoint_sha256": "bb64cbecfd06fdc3376323d4f5b4ef2c6e987442f8adcc3b9ddd7015a79cabf6",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.rigged_assets",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo rigged-actor integration guidance with only the directly required manifests, references, and validator script.",
+   "TRIGGERS": [
+    "rigged asset",
+    "rigged assets",
+    "skinned mesh",
+    "character runtime",
+    "monster runtime",
+    "skeleton",
+    "animation library",
+    "asset manifest"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "rigged-asset-contract"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/build-rigged-game-assets/SKILL.md",
+     "entrypoint_sha256": "093ab5940d129a9cd661a60098a8becec1cc9365ea12786375ea375e82fc7cc9",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "STATIC_DIRECT_CLOSURE",
+     "dependency_probe": "agent-skills/game-development/build-rigged-game-assets/scripts/validate_asset_manifest.py",
+     "references": [
+      "agent-skills/game-development/build-rigged-game-assets/references/requirements.md",
+      "agent-skills/game-development/build-rigged-game-assets/references/catalog-and-testing.md"
+     ],
+     "assets": [
+      "agent-skills/game-development/build-rigged-game-assets/assets/character-asset-manifest.template.json",
+      "agent-skills/game-development/build-rigged-game-assets/assets/monster-asset-manifest.template.json"
+     ],
+     "script_entrypoints": [
+      "agent-skills/game-development/build-rigged-game-assets/scripts/validate_asset_manifest.py"
+     ],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY",
+     "dependency_notes": "Static closure only; validator was not executed against a game project."
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.mengto.performance",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Selective MengTo Three.js/WebGL performance measurement and optimization guidance.",
+   "TRIGGERS": [
+    "performance",
+    "frame time",
+    "fps",
+    "draw calls",
+    "gpu pressure",
+    "cpu pressure",
+    "webgl performance",
+    "optimize three.js",
+    "browser performance"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "combat readability"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "performance-measurement"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/MengTo/skills.git",
+    "upstream_commit": "4c716b516b6b0143f3037631306b3730d2832344",
+    "upstream_tree": "faadfe0963132fdecee0ed55e79c4ed43ebae7e1",
+    "snapshot_sha256": "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb",
+    "vendor_path": ".p2p/vendor/skill/mengto-gameplay-spine-4c716b5",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "agent-skills/game-development/optimize-threejs-games/SKILL.md",
+     "entrypoint_sha256": "d50e8c26ae8130b5cb37da32835024ab281090f107bd52caa476b80a60f2e2b5",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "NONE",
+     "dependency_probe": null,
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-4c716b5",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "game.majid.threejs_qa_release",
+   "TYPE": "SKILL",
+   "DESCRIPTION": "Majid's unique Three.js browser QA/release checklist and bundled canvas inspector, statically vendored with runtime dependencies disabled.",
+   "TRIGGERS": [
+    "qa",
+    "three.js qa",
+    "playtest",
+    "visual verification",
+    "release checks",
+    "canvas inspection",
+    "approved reference",
+    "asset runtime qa"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "tripo",
+    "character card",
+    "character-card",
+    "open world",
+    "terrain expansion",
+    "implement",
+    "code",
+    "coding",
+    "generate",
+    "generation"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "threejs-qa-release"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "vendor-snapshot-hash",
+    "focused-route-probe",
+    "proportional-verification"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "STATIC_SKILL_SNAPSHOT",
+    "upstream_repository": "https://github.com/majidmanzarpour/threejs-game-skills.git",
+    "upstream_commit": "7221c1f4a6d2ae189a4d85d058d24f3228499d46",
+    "upstream_tree": "9add48693c42ab51915576e3b03ede9ad2f61480",
+    "snapshot_sha256": "94b65aa700ec7a1ad4f8734891902312a6112f0a7878bfa303c2478079d13db4",
+    "vendor_path": ".p2p/vendor/skill/majid-threejs-qa-release-7221c1f",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "LICENSE",
+     "kind": "MIT",
+     "scope": "selected upstream skill/reference/script files only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Pinned upstream repository license retained in the vendor snapshot; selected files are unmodified.",
+     "checked_date": "2026-08-29",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "skills/threejs-qa-release/SKILL.md",
+     "entrypoint_sha256": "63fe0e965c7f2b2f441270ef411f2f88d42d1d4e1f103c6c3ee98251712e2d37",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+     "dependency_probe": "skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs",
+     "references": [
+      "skills/threejs-qa-release/references/qa-release-checklists.md",
+      "skills/threejs-qa-release/references/checklists/visual-verification.md",
+      "skills/threejs-qa-release/references/checklists/playtest-qa.md",
+      "skills/threejs-qa-release/references/checklists/release.md",
+      "skills/threejs-qa-release/references/visual-test-harness.md",
+      "skills/threejs-qa-release/references/checklists/visual-test-harness.md",
+      "skills/threejs-qa-release/references/playtest-bot.md",
+      "skills/threejs-qa-release/references/checklists/bot-playtest.md",
+      "skills/threejs-qa-release/references/prompt-templates.md"
+     ],
+     "assets": [],
+     "script_entrypoints": [
+      "skills/threejs-qa-release/scripts/inspect-threejs-canvas.mjs"
+     ],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY",
+     "dependency_notes": "Bundled inspector imports @playwright/test and pngjs; no package install or browser launch is part of this candidate.",
+     "script_runtime_status": "NOT_EXECUTED_EXTERNAL_DEPENDENCIES_UNINSTALLED"
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-7221c1f",
+   "STATUS": "DISCOVERED"
+  }
   ]
 }

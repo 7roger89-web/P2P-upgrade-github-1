@@ -72,5 +72,39 @@
       "audited_in_full": true,
       "integration_status": "EXACT_SNAPSHOT_PRESERVED"
     }
+  ],
+  "candidate_sources": [
+    {
+      "source_id": "P2P-EXT-CANDIDATE-IMG2THREEJS-01",
+      "type": "external_repository_capability_candidate",
+      "title": "img2threejs pinned provenance-only candidate for 02A",
+      "url": "https://github.com/img2threejs/img2threejs.git",
+      "audited_at": "2026-08-29",
+      "upstream_commit": "441af85a96523569511154b6321859b79f3592f5",
+      "upstream_tree": "02e909630089bc21162f4ed3340b321b955291d8",
+      "license": "Apache-2.0",
+      "stored_path": null,
+      "sha256": null,
+      "provenance_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+      "selected_upstream_paths": [
+        "SKILL.md",
+        "README.md",
+        "LICENSE",
+        "docs/ARCHITECTURE.md",
+        "ROADMAP.md"
+      ],
+      "integration_status": "EXECUTABLE_REGISTRATION_PENDING_OWNER_GATE",
+      "executable_available_in_upstream": true,
+      "executable_registered_in_p2p": false,
+      "execution_status": "NOT_EXECUTED",
+      "boundary": [
+        "procedural/reference-grounded reconstruction",
+        "not neural image-to-mesh",
+        "not a production-ready environment/world pipeline",
+        "character v1.5 partial",
+        "Tripo separate and not activated"
+      ],
+      "rights_note": "Apache-2.0 at pinned commit; no source code or assets vendored; executable binding remains pending Owner gate."
+    }
   ]
 }
