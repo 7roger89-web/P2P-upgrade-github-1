@@ -106,6 +106,7 @@ class P2PAUTO01GoalDecompositionTests(unittest.TestCase):
         complex_auto = complex_charter["auto_decomposition"]
         self.assertEqual(complex_auto["workstream_count"], 5)
         self.assertEqual(complex_auto["dependency_model"]["topological_order"], ["scope", "data", "safety", "core", "verify"])
+        self.assertTrue(any("quyền truy cập" in item.casefold() for item in complex_auto["material_constraints"]))
         self.assertEqual(
             complex_auto["dependency_model"]["edges"],
             [

@@ -230,8 +230,24 @@ def _audience_and_constraints(request: str, state: str) -> tuple[list[str], list
     if any(term in lower for term in ("người lớn tuổi", "người cao tuổi", "older adults", "elderly", "seniors")):
         audiences.append("người lớn tuổi")
         constraints.append("Chữ rõ, thao tác ít bước, và không cần thuật ngữ kỹ thuật.")
-    if any(term in lower for term in ("private", "privacy", "sensitive", "riêng tư", "bảo mật", "nhạy cảm")):
-        constraints.append("Dữ liệu riêng tư chỉ được xử lý trong phạm vi đã đồng ý.")
+    if any(
+        term in lower
+        for term in (
+            "private",
+            "privacy",
+            "sensitive",
+            "secure",
+            "security",
+            "share",
+            "permission",
+            "riêng tư",
+            "bảo mật",
+            "nhạy cảm",
+            "chia sẻ",
+            "quyền truy cập",
+        )
+    ):
+        constraints.append("Dữ liệu riêng tư và quyền truy cập chỉ được xử lý trong phạm vi đã đồng ý.")
     if state == "EXISTING_PROJECT":
         constraints.append("Giữ nguyên phần đang hoạt động; chỉ thay đổi phần đã xác định.")
     return audiences, list(dict.fromkeys(constraints))

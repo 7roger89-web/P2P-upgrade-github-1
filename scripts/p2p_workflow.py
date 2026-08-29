@@ -1551,8 +1551,9 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
     """Accept one Beginner request and bind it to existing P2P state surfaces.
 
     The function does not start a host or execute project work.  A clear
-    request creates one Goal-scoped READY task; a material ambiguity creates
-    one WAITING_OWNER task.  Existing task state is never overwritten.
+    request creates one Goal-scoped READY task per derived workstream; a
+    material ambiguity creates one WAITING_OWNER task.  Existing task state is
+    never overwritten.
     """
 
     root = root.resolve()
