@@ -93,9 +93,30 @@ contained by adapter denial; no upstream patch or network sandbox was introduced
 - `E1-P1B-TEST1`: focused compatibility/projection suites passed `84/84`, including
   existing vendor, projection, registry, routing, and unrelated-project behavior.
 
-P1-B decision: complete pending final diff/doctor/supervisor closure checks.
+P1-B decision: complete. Final closure evidence is recorded below; the remaining
+workflow action is independent exact-subject supervisor review.
 
 ## Closure Evidence
 
-Pending final Anvien change detection, validation, independent supervisor review,
-and exact candidate freeze.
+- `E1-CLOSE1`: final focused compatibility/projection suites remain `84/84` PASS;
+  the dedicated adapter suite remains `6/6` PASS. Exact upstream verification,
+  JSON/hash consistency, Python compilation, and `git diff --check` are PASS.
+- `E1-CLOSE2`: Anvien was refreshed after implementation (`1047` files scanned,
+  `188` parsed, `0` parse failures) and `detect-changes --scope all` was run
+  before implementation commits. The report identified only the scoped registry,
+  provenance, protocol, bootstrap, and focused-test surfaces; test files carry a
+  HIGH blast-radius warning, treated as a scope warning.
+- `E1-CLOSE3`: development doctor was run with the correct detected role. It
+  exits `FAIL` only on existing governance drift in the fresh development
+  checkout: six unlocked runtime additions and five protected runtime changes,
+  including the intentionally scoped bootstrap documentation change. The package
+  doctor portable-role mismatch is not applicable. No unrelated drift was repaired.
+- `E1-CLOSE4`: candidate before supervisor report is
+  `abc7a6b8a09f77dd25aa1f350e20a31e9510dfac`, tree
+  `124c71141c5a54c2250fad8d162c2641b3196909`; worktree is clean and no push or
+  promotion occurred. The exact source prerequisite is the separate clean
+  v1.5.1 checkout at `dede5909be4e494b228c801a55dda47439143932` /
+  `25bcd4e1f1a487b9a61d69ade257342a3da767e3`.
+- `E1-CLOSE5`: coder handoff is recorded at
+  `reports/coder/rp_coder_260830_0019_by_gpt-5-codex_p2p-img2threejs-exec-01.md`.
+  Supervisor review and final report remain required before the Owner Gate.

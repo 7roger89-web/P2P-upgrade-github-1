@@ -26,10 +26,10 @@ belongs in `evidence.md`.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | capability registry entries | entries | 39 | 40 | pending | 40 after one noncanonical addition | +1 | E1-P1B-REG1 |
-| P1 | allowed upstream entrypoints | entrypoints | 0 | 5 | pending | 5 exact paths | +5 | E1-P1A-SEC2 |
-| P1 | full upstream tree copied into P2P | files | 0 | 0 | pending | 0 | 0 | E1-P1B-PROJ1 |
-| P1 | network-enabled adapter routes | routes | 0 | 0 | pending | 0 | 0 | E1-P1A-SEC3 |
+| P1 | capability registry entries | entries | 39 | 40 | 40 | 40 after one noncanonical addition | +1 | E1-P1B-REG1 |
+| P1 | allowed upstream entrypoints | entrypoints | 0 | 5 | 5 | 5 exact paths | +5 | E1-P1A-SEC2 |
+| P1 | full upstream tree copied into P2P | files | 0 | 0 | 0 | 0 | 0 | E1-P1B-PROJ1 |
+| P1 | network-enabled adapter routes | routes | 0 | 0 | 0 | 0 | 0 | E1-P1A-SEC3 |
 
 ## B2 - P2 Benchmarks
 

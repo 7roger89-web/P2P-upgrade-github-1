@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-29`
-- Status: `in_progress`
+- Status: `ready_for_exact_subject_supervisor`
 - Plan: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/plan.md`
 - Evidence: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/evidence.md`
 - Benchmark: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/benchmark.md`
@@ -263,14 +263,17 @@ execution adapter and an on-demand protocol projection are missing.
   - Implementation Gate: P1-A and P1-B are complete and candidate is frozen.
   - Acceptance: supervisor PASS or explicit blocker; no Owner approval inferred.
 
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: leave only accepted plan artifacts; remove temp clones/output and stale
     attempts made by this plan, preserving historical source records.
   - Work Steps: review status, remove only plan-created dead temp artifacts where
     permitted, rerun diff check, and record what remains.
   - Implementation Gate: never clean unrelated user temp data or mutate canonical
     runtime.
-  - Acceptance: candidate diff has no dead implementation artifacts.
+  - Acceptance: candidate diff has no dead implementation artifacts. The exact
+    upstream audit checkout remains outside the candidate as the declared source
+    prerequisite for verification; no plan-created dead implementation artifact
+    is tracked.
 
 - [ ] Pn-C: Close the plan.
   - Goal: record final validation, detect-changes, exact candidate SHA/tree, clean
@@ -279,7 +282,9 @@ execution adapter and an on-demand protocol projection are missing.
     changed surfaces; Docker/browser are N/A because no app runtime changed; run
     detect-changes, diff check, commit and final identity checks.
   - Implementation Gate: supervisor review is PASS or a blocker is recorded.
-  - Acceptance: `P2P_IMG2THREEJS_EXEC_01_READY_FOR_EXACT_SUBJECT_SUPERVISOR`.
+  - Acceptance: `P2P_IMG2THREEJS_EXEC_01_READY_FOR_EXACT_SUBJECT_SUPERVISOR` after
+    the independent supervisor report is written and the final candidate identity
+    is recorded.
 
 ## Risk Notes
 
