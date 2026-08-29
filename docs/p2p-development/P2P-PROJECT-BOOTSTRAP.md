@@ -54,6 +54,27 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
    tracked entry contract (`AGENTS.md` P2P block) loads automatically; or
    invoke `$p2p` from any host that reads `.agents/skills`.
 
+## Arena Agent Mode binding
+
+GitHub-connected Arena work uses the canonical
+[`docs/ARENA_AGENT_MODE_PROTOCOL.md`](../ARENA_AGENT_MODE_PROTOCOL.md). A fresh
+Arena session reconstructs from GitHub project state, not from an earlier
+Arena chat. When the project has the standard paths, read them in this order:
+
+1. `AGENTS.md`;
+2. the project master specification;
+3. `docs/CURRENT_STATE.md`;
+4. `production/SESSION_INDEX.md`;
+5. the latest accepted session report;
+6. task-specific projected P2P capabilities; and
+7. the Arena Agent Mode protocol.
+
+If a project uses different canonical names, bind the order to those actual
+files. Do not create duplicate state documents just to satisfy this list. The
+projection remains selective and plan-declared through the existing P2P host
+projection and project-pin contracts; this bootstrap file does not add a new
+materializer or runtime path.
+
 ## Why this design
 
 | Concern | Resolution |

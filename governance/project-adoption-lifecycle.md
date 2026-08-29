@@ -17,9 +17,45 @@ Tài liệu này định nghĩa các trạng thái rời rạc và hữu hạn c
 | **VERIFY** | Kết quả được xác minh độc lập. | Bằng chứng nghiệm thu. |
 | **CHECKPOINT** | Trạng thái dự án được lưu lại bền vững. | Cập nhật ledger dự án. |
 
-# Hợp đồng Project Pin (§5)
+## Nhánh Projection-only và Arena Agent Mode
 
-Mọi dự án sử dụng P2P phải chứa một tệp `.p2p/project-pin.json` với cấu trúc sau:
+Adoption projection-only là một nhánh riêng, không thay thế đường cài đặt
+`PACKAGED_PROJECT`/`p2p-project-pin/1` ở trên:
+
+```text
+PROJECTION_PLAN
+  -> CONTROLLED_MATERIALIZATION
+  -> PROJECTION_ONLY_PIN
+  -> PROJECTION_VERIFY
+```
+
+Luồng canonical cho dự án áp dụng Arena là:
+
+```text
+P2P CANONICAL SOURCE
+  -> SELECTIVE PROJECT PROJECTION
+  -> APPLICABLE GITHUB PROJECT
+```
+
+Nguồn đầy đủ là `docs/ARENA_AGENT_MODE_PROTOCOL.md`. Dự án chỉ nhận phần
+Arena ngắn, vận hành được và đã được khai báo trong plan hiện có; plan, hash
+nội dung, ownership và `p2p-project-projection-binding/1` pin là bằng chứng
+projection. Không duy trì bản sao thủ công khác nghĩa. Các target phải là
+project-scoped `.agents`, `.claude`, `.gemini`, `.cursor` hoặc `.github`; path
+user/global, registry thứ hai, router thứ hai và generic protocol materializer
+đều nằm ngoài hợp đồng này.
+
+Với Codex, target family hiện có là
+`.agents/skills/<capability_id>/SKILL.md` cùng metadata do plan khai báo.
+Việc mapping/projection không tự chứng nhận host runtime, không cài runtime
+P2P, và không tạo quyền GitHub. Nếu dự án chưa có một selected plan phù hợp,
+không được tuyên bố Arena protocol đã được projected.
+
+# Hợp đồng Project Pin — packaged runtime (§5)
+
+Đường cài đặt `PACKAGED_PROJECT` phải chứa một tệp `.p2p/project-pin.json`
+theo hợp đồng `p2p-project-pin/1` với cấu trúc sau. Nhánh projection-only dùng
+`p2p-project-pin/2` và các binding đã nêu ở trên; không được lẫn hai lifecycle.
 
 ```json
 {

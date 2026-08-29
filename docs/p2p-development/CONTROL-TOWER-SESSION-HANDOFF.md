@@ -77,6 +77,33 @@ The packet is bootstrap/coordination data, not canonical truth. CT002 must recon
 
 The user does not summarize CT001 or reproduce the full chat history. Rotation is qualitative: use it when the current Control Tower becomes unwieldy, loses continuity, or the Owner wants a clean coordination surface. A soft recommendation after roughly 10–20 material handoffs may be useful, but it is not a rigid trigger and never closes active execution.
 
+### GitHub-connected Arena Agent Mode boundary
+
+The Arena-specific session contract is canonical in
+`docs/ARENA_AGENT_MODE_PROTOCOL.md`. For one Arena development pass, the
+bounded unit is:
+
+```text
+ONE ARENA CHAT SESSION
+    -> ONE BOUNDED DEVELOPMENT GOAL
+    -> ONE WORKING BRANCH
+    -> ONE PR
+```
+
+Arena conversation state is ephemeral; GitHub project state is canonical. The
+Owner-facing prompt must state `DESTINATION=ARENA AI`, an explicit
+`SESSION_ACTION`, `SESSION_GOAL`, and `PR_EXPECTATION`. Continue the current
+session only for the same open PR and healthy context; start a new one for a
+new PR or goal, merged/closed PR, context exhaustion, or persistent tool
+confusion. Prompt count is not a rotation trigger.
+
+Before merge or promotion, applicable implementation, tests/QA evidence,
+screenshots, reports, handoff material, current-state/session-index files, and
+candidate-SHA-pinned visual evidence must already be on the candidate branch.
+After `PR MERGED OR CLOSED`,
+`OLD_SESSION_GITHUB_WRITE_CAPABILITY=TERMINATED`; the old Arena session is
+never reused for GitHub writes.
+
 ## Return contract
 
 The implementation path is .p2p/system/p2p_capabilities/control_tower_handoff.py. The reusable regression proof is tests/test_p2p_control_tower_session_handoff.py. The structured packet marker is CONTROL_TOWER_RETURN_PACKET with schema p2p-control-tower-return-packet/1.
@@ -185,6 +212,7 @@ No second router, second truth store, nested certification system, simulated quo
 | Successor packet/reconciliation API | `ControlTowerSuccessorPacket`, `ControlTowerRotationHandoff`, `reconcile_control_tower_successor` in the implementation module |
 | Attachment-aware handoff artifact | `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` in the executor's scoped evidence directory |
 | This operator guide | docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md |
+| Arena Agent Mode protocol | docs/ARENA_AGENT_MODE_PROTOCOL.md |
 | Planner/evidence trail | docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/ |
 | Capability projection | docs/p2p-development/capability-ledger/capability-index.json |
 | Derived roadmap projection | docs/p2p-development/current-roadmap.md |
