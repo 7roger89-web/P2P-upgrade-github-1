@@ -1384,6 +1384,169 @@ def _beginner_decision_charter(
     return updated
 
 
+def _beginner_continuity(task_state: Any, plan: Any) -> dict[str, object]:
+    """Read existing Task State into a safe AUTO01 continuity projection."""
+
+    if plan is None:
+        return {
+            "schema_version": "p2p-auto-project-continuity/1",
+            "status": "NOT_INITIALIZED",
+            "tasks": [],
+            "completed": [],
+            "active": [],
+            "blocked": [],
+            "waiting_owner": [],
+            "now_startable": [],
+            "next_task_id": None,
+            "next_task_title": None,
+            "safe_next_action": None,
+            "dependency_model": {"topological_order": [], "edges": [], "real_dependencies_only": True},
+        }
+    tasks: list[dict[str, object]] = []
+    order = list(plan.topological_order())
+    for task_id in order:
+        task = plan.tasks[task_id]
+        workstream_id = task.task_id
+        for scope_ref in task.scope:
+            text = str(scope_ref)
+            if text.startswith("WORKSTREAM:"):
+                workstream_id = text.split(":", 1)[1] or workstream_id
+                break
+        can_start_now = False
+        try:
+            can_start_now = task.status == "READY" and plan.dependencies_are_done(task.task_id)
+        except Exception:
+            can_start_now = False
+        owner_input = None
+        if isinstance(task.owner_decision, dict) and task.owner_decision.get("status") == "PENDING":
+            owner_input = str(task.owner_decision.get("question") or "").strip() or None
+        tasks.append(
+            {
+                "workstream_id": workstream_id,
+                "task_id": task.task_id,
+                "title": task.title,
+                "purpose": task.purpose,
+                "status": task.status,
+                "dependencies": list(task.dependencies),
+                "acceptance": list(task.acceptance_requirements),
+                "can_start_now": can_start_now,
+                "owner_input": owner_input,
+            }
+        )
+    by_status = lambda status: [item["task_id"] for item in tasks if item.get("status") == status]
+    completed = by_status("DONE")
+    active = by_status("ACTIVE")
+    blocked = by_status("BLOCKED")
+    waiting_owner = by_status("WAITING_OWNER")
+    startable = [item["task_id"] for item in tasks if item.get("can_start_now")]
+    next_task = None
+    if active:
+        next_task = next(item for item in tasks if item.get("task_id") == active[0])
+    else:
+        try:
+            candidate = task_state.next_safe_task(plan)
+        except Exception:
+            candidate = None
+        if candidate is not None:
+            next_task = next((item for item in tasks if item.get("task_id") == candidate.task_id), None)
+    if next_task is not None:
+        if next_task.get("status") == "ACTIVE":
+            safe_next_action = f"Tiếp tục phần đang làm: {next_task['title']}"
+        else:
+            safe_next_action = f"Bắt đầu phần nhỏ nhất có thể kiểm tra: {next_task['title']}"
+    elif waiting_owner:
+        safe_next_action = "Chờ bạn trả lời quyết định còn thiếu trước khi tiếp tục."
+    elif blocked:
+        safe_next_action = "Giải quyết phần đang bị chặn trước khi bắt đầu phần tiếp theo."
+    else:
+        safe_next_action = "Kiểm tra kết quả đã hoàn tất trước khi nhận yêu cầu tiếp theo."
+    if blocked:
+        status = "BLOCKED"
+    elif waiting_owner:
+        status = "WAITING_OWNER"
+    elif active:
+        status = "ACTIVE"
+    elif next_task is not None:
+        status = "READY"
+    else:
+        status = "DONE"
+    edges = [
+        {"from": dependency, "to": task.task_id}
+        for task in (plan.tasks[task_id] for task_id in order)
+        for dependency in task.dependencies
+    ]
+    return {
+        "schema_version": "p2p-auto-project-continuity/1",
+        "status": status,
+        "goal_id": plan.goal_id,
+        "plan_hash": plan.canonical_hash(),
+        "tasks": tasks,
+        "completed": completed,
+        "active": active,
+        "blocked": blocked,
+        "waiting_owner": waiting_owner,
+        "now_startable": startable,
+        "next_task_id": next_task.get("task_id") if next_task else None,
+        "next_task_title": next_task.get("title") if next_task else None,
+        "safe_next_action": safe_next_action,
+        "dependency_model": {
+            "topological_order": order,
+            "edges": edges,
+            "real_dependencies_only": True,
+            "cycle_detected": False,
+        },
+    }
+
+
+def _beginner_same_project(
+    gateway: Any,
+    charter: dict[str, object],
+    existing_gateway: dict[str, object] | None,
+) -> bool:
+    """Compare product context without treating generic continuation as new work."""
+
+    if not isinstance(existing_gateway, dict):
+        return False
+    current_label = str(charter.get("project_type") or "")
+    existing_label = str(existing_gateway.get("project_type") or "")
+    if current_label and current_label == existing_label:
+        return True
+    current_auto = charter.get("auto_decomposition") if isinstance(charter.get("auto_decomposition"), dict) else {}
+    existing_auto = existing_gateway.get("auto_decomposition") if isinstance(existing_gateway.get("auto_decomposition"), dict) else {}
+    current_key = ((current_auto.get("goal_derivation") or {}).get("project_type_key") if isinstance(current_auto, dict) else None)
+    existing_key = ((existing_auto.get("goal_derivation") or {}).get("project_type_key") if isinstance(existing_auto, dict) else None)
+    if current_key and current_key == existing_key:
+        return True
+    # A request that explicitly says continue the current app can reuse the
+    # current project even when it carries no domain vocabulary of its own.
+    continuation = getattr(gateway, "is_continuation_request", lambda value: False)
+    return bool(continuation(str(charter.get("request") or "")) and current_label in {"Ứng dụng web", "Sản phẩm số"})
+
+
+def _bind_beginner_contract(
+    contract: dict[str, object],
+    charter: dict[str, object],
+    continuity: dict[str, object],
+    *,
+    preserve_existing_gateway: bool = False,
+) -> dict[str, object]:
+    """Attach AUTO01 to the existing Goal Contract without changing its owner."""
+
+    updated = dict(contract)
+    if preserve_existing_gateway and isinstance(updated.get("beginner_gateway"), dict):
+        updated["beginner_continuation_projection"] = charter
+    else:
+        updated["beginner_gateway"] = charter
+        updated["auto_decomposition"] = charter.get("auto_decomposition", {})
+        updated["beginner_project_type"] = charter.get("project_type")
+        updated["beginner_project_state"] = charter.get("project_state")
+        updated["beginner_safe_next_action"] = charter.get("safe_next_action")
+        updated["beginner_status"] = charter.get("status")
+    updated["beginner_project_continuity"] = continuity
+    updated["goal_linter"] = lint_goal_contract(updated)
+    return updated
+
+
 def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = None) -> dict[str, object]:
     """Accept one Beginner request and bind it to existing P2P state surfaces.
 
@@ -1399,8 +1562,6 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
     inspection = inspect_project(root, request, package_hint)
     charter = gateway.derive_charter(request, inspection)
     normalized_request = str(charter.get("request") or "").strip()
-    public_projection = gateway.beginner_projection(charter)
-    advanced_projection = gateway.advanced_projection(charter)
     persistence: dict[str, object] = {
         "status": "NOT_PERSISTED",
         "goal_id": None,
@@ -1438,6 +1599,11 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
             "safety": safety,
         }
 
+    continuity = _beginner_continuity(task_state, existing_plan)
+    charter = gateway.derive_charter(request, inspection, continuity=continuity)
+    normalized_request = str(charter.get("request") or "").strip()
+    public_projection = gateway.beginner_projection(charter)
+    advanced_projection = gateway.advanced_projection(charter)
     existing_gateway = existing_contract.get("beginner_gateway") if isinstance(existing_contract, dict) else None
     existing_gateway_valid = bool(
         isinstance(existing_gateway, dict)
@@ -1449,7 +1615,15 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
         and existing_gateway_valid
         and str(existing_gateway.get("request") or "").strip() == normalized_request
     )
-    if existing_plan is not None and not same_request:
+    continuation_request = bool(getattr(gateway, "is_continuation_request", lambda value: False)(normalized_request))
+    compatible_continuation = bool(
+        existing_plan is not None
+        and not same_request
+        and existing_gateway_valid
+        and continuation_request
+        and _beginner_same_project(gateway, charter, existing_gateway)
+    )
+    if existing_plan is not None and not same_request and not compatible_continuation:
         decision = _beginner_decision_charter(
             charter,
             gateway,
@@ -1457,11 +1631,13 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
             ["Tiếp tục việc đang có", "Bắt đầu yêu cầu mới"],
             "EXISTING_TASK_STATE_REQUIRES_RECONCILIATION",
         )
+        decision = gateway.bind_continuity(decision, continuity)
         persistence.update(
             {
                 "status": "BLOCKED",
                 "reason": "EXISTING_TASK_STATE_REQUIRES_RECONCILIATION",
                 "existing_goal_id": existing_plan.goal_id,
+                "continuity_status": continuity.get("status"),
             }
         )
         recovery.update({"status": "EXISTING_TASK_STATE", "automatic_start": False})
@@ -1487,11 +1663,20 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
         }
 
     contract_path: Path | None = None
-    if same_request and isinstance(existing_contract, dict) and existing_gateway_valid:
+    continuation_added = False
+    if (same_request or compatible_continuation) and isinstance(existing_contract, dict) and existing_gateway_valid:
         contract = dict(existing_contract)
-        charter = dict(existing_gateway)
-        public_projection = gateway.beginner_projection(charter)
-        advanced_projection = gateway.advanced_projection(charter)
+        if not same_request:
+            history = list(contract.get("beginner_request_history") or [])
+            history_entry = {
+                "request": normalized_request,
+                "relation": "CONTINUATION",
+                "source": "OWNER_INPUT",
+            }
+            if not any(isinstance(item, dict) and item.get("request") == normalized_request for item in history):
+                history.append(history_entry)
+                continuation_added = True
+            contract["beginner_request_history"] = history
     else:
         governance_options = governance_candidates(root, package_hint)
         policy = policy_for(root, governance_options[0][0] if governance_options else None)
@@ -1503,11 +1688,7 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
             policy,
             package_hint=package_hint,
         )
-        contract["beginner_gateway"] = charter
-        contract["beginner_project_type"] = charter.get("project_type")
-        contract["beginner_project_state"] = charter.get("project_state")
-        contract["beginner_safe_next_action"] = charter.get("safe_next_action")
-        contract["beginner_status"] = charter.get("status")
+        contract = _bind_beginner_contract(contract, charter, continuity)
         contract_path = write_goal(root, contract)
 
     goal_id = str(contract.get("goal_id") or "")
@@ -1522,7 +1703,7 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
         else:
             task_plan = task_state.TaskPlan.from_goal(
                 contract,
-                [gateway.task_spec_for_charter(charter, goal_id)],
+                gateway.task_specs_for_charter(charter, goal_id),
             )
             plan = store.initialize(task_plan)
             state_status = "CREATED"
@@ -1532,6 +1713,17 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
                     "entrypoint": "BEGINNER",
                     "mode": gateway.BEGINNER_MODE,
                     "charter_ref": ".p2p/state/goal-contract.json",
+                    "auto_decomposition_schema": getattr(gateway, "AUTO_DECOMPOSITION_SCHEMA", "p2p-auto-goal-decomposition/1"),
+                    "workstream_count": len(task_plan.tasks),
+                },
+            )
+        if compatible_continuation and continuation_added:
+            store.record_event(
+                "beginner_gateway_continuation_bound",
+                details={
+                    "entrypoint": "BEGINNER",
+                    "charter_ref": ".p2p/state/goal-contract.json",
+                    "workstream_count": len(plan.tasks),
                 },
             )
     except Exception:
@@ -1550,6 +1742,16 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
             "safety": safety,
         }
 
+    continuity = _beginner_continuity(task_state, plan)
+    charter = gateway.bind_continuity(charter, continuity)
+    contract = _bind_beginner_contract(
+        contract,
+        charter,
+        continuity,
+        preserve_existing_gateway=compatible_continuation,
+    )
+    public_projection = gateway.beginner_projection(charter)
+    advanced_projection = gateway.advanced_projection(charter)
     try:
         recovery = control_tower.next_safe_session(root, "FOREGROUND")
     except Exception:
@@ -1567,9 +1769,8 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
         "automatic_start": False,
         "recommendation_status": recovery.get("status"),
     }
-    if contract_path is not None or "beginner_recovery_binding" not in existing_contract:
-        write_goal(root, contract)
-        contract_path = contract_path or (root / ".p2p" / "state" / "goal-contract.json")
+    write_goal(root, contract)
+    contract_path = contract_path or (root / ".p2p" / "state" / "goal-contract.json")
     persistence.update(
         {
             "status": state_status,
@@ -1578,6 +1779,8 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
             "task_state_path": ".p2p/state/task-state.json",
             "execution_ledger_path": ".p2p/state/execution-ledger.jsonl",
             "plan_hash": plan.canonical_hash(),
+            "workstream_count": len(plan.tasks),
+            "continuity_status": continuity.get("status"),
         }
     )
     return {
