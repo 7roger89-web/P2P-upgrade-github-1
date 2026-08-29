@@ -16,16 +16,18 @@ EXTERNAL_MANIFEST_PATH = REPO_ROOT / "manifest" / "external-sources.json"
 MENGTO_ROOT = REPO_ROOT / ".p2p" / "vendor" / "skill" / "mengto-gameplay-spine-4c716b5"
 MAJID_ROOT = REPO_ROOT / ".p2p" / "vendor" / "skill" / "majid-threejs-qa-release-7221c1f"
 
-CURRENT_MAIN_SHA = "9f5b91c9ab5178188aff6cc5520751b53b91dba7"
-CURRENT_MAIN_TREE = "75435057264d5e376d2306ea7e9e80135c172e58"
+CURRENT_MAIN_SHA = "1b456fe96649c6c509a26168f7cf0c1b8bf0e6d9"
+CURRENT_MAIN_TREE = "18e3681014185ec1ecb8db857a4c379e45bd0240"
 MENGTO_COMMIT = "4c716b516b6b0143f3037631306b3730d2832344"
 MENGTO_TREE = "faadfe0963132fdecee0ed55e79c4ed43ebae7e1"
 MENGTO_SNAPSHOT = "1d395a2c57b57b2572f3d851bf9105038eee26b5ab2d68f1e1eb7b7aa62382fb"
 MAJID_COMMIT = "7221c1f4a6d2ae189a4d85d058d24f3228499d46"
 MAJID_TREE = "9add48693c42ab51915576e3b03ede9ad2f61480"
 MAJID_SNAPSHOT = "94b65aa700ec7a1ad4f8734891902312a6112f0a7878bfa303c2478079d13db4"
-IMG2THREEJS_COMMIT = "441af85a96523569511154b6321859b79f3592f5"
-IMG2THREEJS_TREE = "02e909630089bc21162f4ed3340b321b955291d8"
+IMG2THREEJS_COMMIT = "dede5909be4e494b228c801a55dda47439143932"
+IMG2THREEJS_TREE = "25bcd4e1f1a487b9a61d69ade257342a3da767e3"
+IMG2THREEJS_PREVIOUS_COMMIT = "441af85a96523569511154b6321859b79f3592f5"
+IMG2THREEJS_PREVIOUS_TREE = "02e909630089bc21162f4ed3340b321b955291d8"
 
 MENGTO_IDS = (
     "game.mengto.build_isometric_arpg",
@@ -47,6 +49,8 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from p2p_capabilities import CAPABILITY_CLASSES, CANONICAL_IDENTITIES, load_registry  # noqa: E402
 from p2p_capabilities import vendor_skill  # noqa: E402
+from p2p_capabilities.host_projection import READY as HOST_READY  # noqa: E402
+from p2p_capabilities.host_projection import project_host_skill  # noqa: E402
 from p2p_capabilities.vendor_skill import (  # noqa: E402
     discover_vendor_skills,
     load_vendor_skill,
@@ -108,14 +112,29 @@ class P2PGameToolchain02ATests(unittest.TestCase):
         self.assertEqual(self._git("merge-base", "HEAD", CURRENT_MAIN_SHA), CURRENT_MAIN_SHA)
 
     def test_02_registry_preserves_foundation_and_adds_only_selected_skills(self) -> None:
-        self.assertEqual(self.registry["capability_count"], 27)
+        self.assertEqual(self.registry["capability_count"], 55)
         self.assertTrue(self.registry["valid"])
         self.assertEqual(tuple(self.registry["capability_classes"]), CAPABILITY_CLASSES)
         self.assertEqual(tuple(self.registry["canonical_identities"]), CANONICAL_IDENTITIES)
         self.assertEqual(self.registry["canonical_denominator"], 8)
         self.assertTrue(set(item["TYPE"] for item in self.registry_raw["capabilities"]).issubset(set(CAPABILITY_CLASSES)))
-        self.assertEqual([item["CAPABILITY_ID"] for item in self.registry_raw["capabilities"][-11:]], list(NEW_IDS))
-        self.assertFalse(any("img2threejs" in item["CAPABILITY_ID"] for item in self.registry_raw["capabilities"]))
+        registry_ids = [item["CAPABILITY_ID"] for item in self.registry_raw["capabilities"]]
+        self.assertTrue(all(capability_id in registry_ids for capability_id in NEW_IDS))
+
+        img2threejs = self.manifests["img2threejs"]
+        self.assertEqual(img2threejs.type, "SKILL")
+        self.assertEqual(img2threejs.semantic_kind, "EXTERNAL_RUNTIME")
+        self.assertEqual(img2threejs.status, "DISCOVERED")
+        self.assertFalse(img2threejs.canonical_quorum_member)
+        self.assertFalse(img2threejs.optional_specialist)
+        self.assertIn("C18", img2threejs.requires)
+        self.assertIn("C19", img2threejs.requires)
+        self.assertIn("img2threejs:ready-for-explicit-adapter", self.manifests["game.mengto.hybrid_assets"].context_pointers)
+        self.assertEqual(img2threejs.raw["UPSTREAM_PROVENANCE"]["upstream_commit"], IMG2THREEJS_COMMIT)
+        self.assertEqual(img2threejs.raw["UPSTREAM_PROVENANCE"]["upstream_tree"], IMG2THREEJS_TREE)
+        self.assertEqual(img2threejs.raw["UPSTREAM_PROVENANCE"]["license"]["kind"], "Apache-2.0")
+        self.assertTrue(img2threejs.raw["UPSTREAM_PROVENANCE"]["execution"]["state_evidence_workspace_only"])
+        self.assertFalse(img2threejs.raw["UPSTREAM_PROVENANCE"]["execution"]["shell"])
 
         for capability_id in NEW_IDS:
             manifest = self.manifests[capability_id]
@@ -260,14 +279,14 @@ class P2PGameToolchain02ATests(unittest.TestCase):
         self.assertFalse(any(item.startswith("visual.") for item in route["selected"]))
         self.assertFalse(any(item == MAJID_ID for item in route["selected"]))
 
-    def test_07_sword_reference_route_reuses_style_pointer_and_defers_img2threejs(self) -> None:
+    def test_07_sword_reference_route_reuses_style_pointer_without_implicit_img2threejs(self) -> None:
         request = "Create a Three.js xianxia sword from an approved reference."
         route = self._route(request)
         self.assertEqual(route["selected"], ["game.mengto.hybrid_assets", MAJID_ID])
         hybrid = self.manifests["game.mengto.hybrid_assets"]
         self.assertIn("visual.gpt_image_2_style_library", hybrid.context_pointers)
         self.assertIn("P2P-EXT-CANDIDATE-IMG2THREEJS-01", hybrid.context_pointers)
-        self.assertIn("img2threejs:provenance-only-pending", hybrid.context_pointers)
+        self.assertIn("img2threejs:ready-for-explicit-adapter", hybrid.context_pointers)
         self.assertFalse(any("tripo" in item.lower() for item in route["selected"]))
         self.assertFalse(any(item == "visual.gpt_image_2_style_library" for item in route["selected"]))
         requirement = self._requirement(request)
@@ -309,25 +328,95 @@ class P2PGameToolchain02ATests(unittest.TestCase):
         self.assertIn("@playwright/test", integration["dependency_notes"])
         self.assertIn("pngjs", integration["dependency_notes"])
 
-    def test_11_img2threejs_is_provenance_only_and_not_registered(self) -> None:
+    def test_11_img2threejs_current_record_preserves_02a_predecessor(self) -> None:
         candidates = self.external_manifest["candidate_sources"]
         self.assertEqual([item["source_id"] for item in self.external_manifest["sources"]], [f"P2P-EXT-{index:04d}" for index in range(1, 6)])
         self.assertEqual(len(candidates), 1)
         candidate = candidates[0]
         pending = self.provenance["img2threejs_pending"]
-        for value in (candidate, pending):
+        current = self.provenance["img2threejs_exec_01"]
+        for value in (candidate, current):
             self.assertEqual(value["upstream_commit"], IMG2THREEJS_COMMIT)
             self.assertEqual(value["upstream_tree"], IMG2THREEJS_TREE)
             self.assertEqual(value["license"], "Apache-2.0")
-            self.assertEqual(value["integration_status"], "EXECUTABLE_REGISTRATION_PENDING_OWNER_GATE")
-            self.assertTrue(value["executable_available_in_upstream"])
-            self.assertFalse(value["executable_registered_in_p2p"])
-            self.assertEqual(value["execution_status"], "NOT_EXECUTED")
-        self.assertIsNone(candidate["stored_path"])
-        self.assertIsNone(candidate["sha256"])
+        self.assertEqual(current["integration_status"], "REGISTERED_NONCANONICAL_EXPLICIT_ADAPTER")
+        self.assertTrue(current["executable_registered_in_p2p"])
+        self.assertEqual(current["execution_status"], "EXECUTED_FOCUSED_LOCAL_SMOKE")
+        self.assertEqual(current["browser_visual_status"], "NOT_EXECUTED_FUTURE_PROJECT_GATE")
+        self.assertEqual(current["owner_gate_status"], "PENDING_EXACT_SUBJECT_REVIEW")
+        self.assertEqual(current["predecessor_record"], "img2threejs_pending")
+        self.assertEqual(pending["upstream_commit"], IMG2THREEJS_PREVIOUS_COMMIT)
+        self.assertEqual(pending["upstream_tree"], IMG2THREEJS_PREVIOUS_TREE)
+        self.assertEqual(pending["integration_status"], "EXECUTABLE_REGISTRATION_PENDING_OWNER_GATE")
+        self.assertTrue(pending["executable_available_in_upstream"])
+        self.assertFalse(pending["executable_registered_in_p2p"])
+        self.assertEqual(pending["execution_status"], "NOT_EXECUTED")
+        self.assertEqual(candidate["integration_status"], "REGISTERED_NONCANONICAL_EXPLICIT_ADAPTER")
+        self.assertTrue(candidate["executable_registered_in_p2p"])
+        self.assertEqual(candidate["execution_status"], "EXECUTED_FOCUSED_LOCAL_SMOKE")
+        self.assertEqual(candidate["stored_path"], ".p2p/vendor/skill/img2threejs-safe-exec-1.5.1/SKILL.md")
+        self.assertEqual(candidate["sha256"], "bc94a52b66fa560d28c569af6e168d325052007fde4bcb11ff5ecbb431843a2f")
         self.assertEqual(candidate["provenance_manifest"], ".p2p/vendor/provenance/p2p-game-toolchain-02a.json")
         self.assertEqual([item["snapshot_path"] for item in pending["files"]], [None] * 5)
-        self.assertFalse(any("img2threejs" in item["CAPABILITY_ID"] for item in self.registry_raw["capabilities"]))
+        self.assertIn("img2threejs", [item["CAPABILITY_ID"] for item in self.registry_raw["capabilities"]])
+
+    def test_12_img2threejs_explicit_route_loads_only_contract(self) -> None:
+        route = self._route("Run img2threejs image-to-3d reconstruction for a future Character Lab.")
+        self.assertEqual(route["selected"], ["img2threejs"])
+        selected = next(item for item in route["skills"] if item["capability_id"] == "img2threejs")
+        self.assertTrue(selected["entrypoint_present"])
+        self.assertFalse(selected["content_loaded"])
+        self.assertFalse(selected["network_runtime"])
+        loaded = load_vendor_skill(
+            "img2threejs",
+            registry_path=REGISTRY_PATH,
+            repository_root=REPO_ROOT,
+        )
+        self.assertEqual(loaded["status"], "LOADED")
+        self.assertEqual(loaded["loaded_paths"], ["SKILL.md"])
+        self.assertFalse(loaded["permission_grant"])
+        self.assertFalse(loaded["network_used"])
+        self.assertIn("GOLDEN_CHARACTER_READY_FOR_FUTURE_EXECUTION=YES", loaded["skill"]["content"])
+
+    def test_13_img2threejs_host_projection_is_selective_and_pure(self) -> None:
+        loaded = load_vendor_skill(
+            "img2threejs",
+            registry_path=REGISTRY_PATH,
+            repository_root=REPO_ROOT,
+        )
+        plan = project_host_skill(
+            self.manifests["img2threejs"],
+            {
+                "load_stage": "LOAD",
+                "selected": True,
+                "entrypoint_content": loaded["skill"]["content"],
+                "entrypoint_hash": loaded["skill"]["sha256"],
+            },
+            {
+                "host_kind": "codex",
+                "scope": "project",
+                "host_evidence": {"status": "OK"},
+            },
+        )
+        self.assertEqual(plan.status, HOST_READY)
+        self.assertTrue(plan.content_loaded)
+        self.assertEqual(
+            [item.relative_target for item in plan.files],
+            [
+                ".agents/skills/img2threejs/SKILL.md",
+                ".agents/skills/img2threejs/agents/openai.yaml",
+            ],
+        )
+        self.assertFalse(plan.writes_performed)
+        self.assertFalse(plan.permission_mutated)
+
+    def test_14_missing_img2threejs_capability_fails_closed(self) -> None:
+        with self.assertRaisesRegex(vendor_skill.VendorSkillError, "VENDOR_CAPABILITY_NOT_FOUND"):
+            load_vendor_skill(
+                "img2threejs-missing",
+                registry_path=REGISTRY_PATH,
+                repository_root=REPO_ROOT,
+            )
 
 
 if __name__ == "__main__":

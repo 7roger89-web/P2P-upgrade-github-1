@@ -77,34 +77,67 @@
     {
       "source_id": "P2P-EXT-CANDIDATE-IMG2THREEJS-01",
       "type": "external_repository_capability_candidate",
-      "title": "img2threejs pinned provenance-only candidate for 02A",
+      "title": "img2threejs pinned executable-adapter candidate for EXEC-01",
       "url": "https://github.com/img2threejs/img2threejs.git",
-      "audited_at": "2026-08-29",
-      "upstream_commit": "441af85a96523569511154b6321859b79f3592f5",
-      "upstream_tree": "02e909630089bc21162f4ed3340b321b955291d8",
+      "audited_at": "2026-08-30",
+      "upstream_version": "1.5.1",
+      "upstream_commit": "dede5909be4e494b228c801a55dda47439143932",
+      "upstream_tree": "25bcd4e1f1a487b9a61d69ade257342a3da767e3",
       "license": "Apache-2.0",
-      "stored_path": null,
-      "sha256": null,
+      "stored_path": ".p2p/vendor/skill/img2threejs-safe-exec-1.5.1/SKILL.md",
+      "sha256": "bc94a52b66fa560d28c569af6e168d325052007fde4bcb11ff5ecbb431843a2f",
       "provenance_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
       "selected_upstream_paths": [
         "SKILL.md",
         "README.md",
         "LICENSE",
-        "docs/ARCHITECTURE.md",
-        "ROADMAP.md"
+        "forge/state.py",
+        "forge/next.py",
+        "forge/stage1_intake/fetch_cs2_metadata.py",
+        "forge/stage1_intake/material_region_analysis.py",
+        "forge/stage1_intake/probe_image.py",
+        "forge/stage2_spec/validate_sculpt_spec.py",
+        "forge/stage3_build/generate_threejs_factory.py"
       ],
-      "integration_status": "EXECUTABLE_REGISTRATION_PENDING_OWNER_GATE",
+      "adapter_path": ".p2p/system/p2p_capabilities/img2threejs_adapter.py",
+      "allowed_entrypoints": [
+        "forge/state.py",
+        "forge/next.py",
+        "forge/stage1_intake/probe_image.py",
+        "forge/stage2_spec/validate_sculpt_spec.py",
+        "forge/stage3_build/generate_threejs_factory.py"
+      ],
+      "denied_entrypoints": [
+        "forge/stage1_intake/fetch_cs2_metadata.py",
+        "forge/stage1_intake/material_region_analysis.py",
+        "forge/stage1_intake/run_vision_adapter.py",
+        "all-unlisted-entrypoints"
+      ],
+      "network_policy": "DENY",
+      "cs2_metadata_network": "DISABLED",
+      "filesystem_policy": "DECLARED_RECONSTRUCTION_WORKSPACE_ONLY",
+      "integration_status": "REGISTERED_NONCANONICAL_EXPLICIT_ADAPTER",
       "executable_available_in_upstream": true,
-      "executable_registered_in_p2p": false,
-      "execution_status": "NOT_EXECUTED",
+      "executable_registered_in_p2p": true,
+      "execution_status": "EXECUTED_FOCUSED_LOCAL_SMOKE",
+      "browser_visual_status": "NOT_EXECUTED_FUTURE_PROJECT_GATE",
+      "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+      "predecessor": {
+        "upstream_commit": "441af85a96523569511154b6321859b79f3592f5",
+        "upstream_tree": "02e909630089bc21162f4ed3340b321b955291d8",
+        "integration_status": "EXECUTABLE_REGISTRATION_PENDING_OWNER_GATE",
+        "executable_registered_in_p2p": false,
+        "execution_status": "NOT_EXECUTED"
+      },
       "boundary": [
         "procedural/reference-grounded reconstruction",
         "not neural image-to-mesh",
-        "not a production-ready environment/world pipeline",
-        "character v1.5 partial",
+        "character protocol-ready but visual proof pending",
+        "hard-surface asset-forge protocol separate",
+        "not a production-ready animation pipeline",
         "Tripo separate and not activated"
       ],
-      "rights_note": "Apache-2.0 at pinned commit; no source code or assets vendored; executable binding remains pending Owner gate."
+      "rights_note": "Apache-2.0 at the pinned release; the P2P snapshot contains contract text only, while executable source remains in a separately verified external checkout."
     }
   ],
   "security_reverse_catalog_recorded_at": "2026-08-29",
