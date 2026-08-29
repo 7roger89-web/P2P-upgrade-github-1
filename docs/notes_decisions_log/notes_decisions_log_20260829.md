@@ -133,3 +133,7 @@
 - One fresh candidate will be bound to current main after focused evidence;
   the single existing SEC01 Owner Gate remains required and canonical
   promotion remains false.
+- Candidate implementation checkpoint is `76901b24f30988159ebc1b96076512623d09eabd`
+  with tree `55f6db6567e6e512d28d8ef98b886188c842c67d`; its parent is the fresh
+  current main `bc686845fbb5817e50958d91e0d382a72c219b78`. The final candidate
+  identity includes the focused review record and remains unpromoted.

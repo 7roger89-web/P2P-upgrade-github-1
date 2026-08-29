@@ -59,6 +59,7 @@
 | E4-AUTO01-PRESERVE1 | AUTO01 preservation | PASS | The current-main AUTO01 delta remains intact; no `beginner_gateway.py`, `scripts/p2p_workflow.py`, or `tests/test_p2p_auto01_goal_decomposition.py` path is changed by SEC01 carry-forward. |
 | E4-SEC01-CARRY1 | Coherent SEC01 delta carry-forward | PASS | Seventeen non-overlapping SEC01 paths are carried forward; optional `SEMANTIC_KIND`, 12 IDs, EFF01 binding/fail-closed authorization, reverse evidence, APKiD adapter, catalog, focused tests, and both planned seams remain present. |
 | E4-SEC01-VERIFY1 | Fresh focused compatibility verification | PASS | SEC01 adapter/foundation `8/8`; capability foundation `28/28`; registry/JSON parse, uniqueness count `39`, five-module compile, and `git diff --check` pass. |
+| E4-CANDIDATE1 | New current-main candidate identity | PASS | Implementation checkpoint `76901b24f30988159ebc1b96076512623d09eabd`, tree `55f6db6567e6e512d28d8ef98b886188c842c67d`, parent/base `bc686845fbb5817e50958d91e0d382a72c219b78`; candidate was clean at this checkpoint and remains unpromoted. |
 
 ## Boundary declarations
 
