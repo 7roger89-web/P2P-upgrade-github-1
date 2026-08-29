@@ -12,6 +12,17 @@ import hashlib
 import json
 from typing import Any, Mapping
 
+from .security_contract import (
+    ACTIVE_TEST_AUTHORIZED,
+    ANALYSIS_LOCAL,
+    DESTRUCTIVE_OR_INTRUSIVE,
+    OFFENSIVE_HIGH_RISK,
+    SAFE_READONLY,
+    SECURITY_EXECUTION_CLASSES,
+    authorize_security_execution,
+    normalize_execution_class,
+)
+
 
 POLICY_SCHEMA = "p2p-adaptive-orchestration-policy/1"
 DIRECT = "DIRECT"
@@ -114,6 +125,10 @@ class TaskProfile:
     network_or_secret: bool = False
     migration: bool = False
     task_kind: str = "IMPLEMENTATION"
+    execution_class: str = SAFE_READONLY
+    target_authorized: bool = False
+    controlled_test_environment: bool = False
+    explicit_task_authority: bool = False
     context_proxy_bytes: int = 0
     context_refs: tuple[str, ...] = ()
     source_mutation: bool = False
@@ -153,6 +168,10 @@ class TaskProfile:
         task_kind = str(value.get("task_kind", "IMPLEMENTATION")).upper().strip()
         if not task_kind or len(task_kind) > 64:
             raise OrchestrationPolicyError("TASK_KIND_INVALID")
+        try:
+            execution_class = normalize_execution_class(value.get("execution_class", SAFE_READONLY))
+        except ValueError as exc:
+            raise OrchestrationPolicyError(str(exc)) from exc
         if "dependency_path_clear" in value:
             dependency_path = "CLEAR" if _bool(value["dependency_path_clear"], "dependency_path_clear") else "UNCLEAR"
         else:
@@ -188,6 +207,10 @@ class TaskProfile:
             network_or_secret=boolean("network_or_secret", False),
             migration=boolean("migration", False),
             task_kind=task_kind,
+            execution_class=execution_class,
+            target_authorized=boolean("target_authorized", False),
+            controlled_test_environment=boolean("controlled_test_environment", False),
+            explicit_task_authority=boolean("explicit_task_authority", False),
             context_proxy_bytes=raw_bytes,
             context_refs=_refs(value.get("context_refs", ()), "context_refs"),
             source_mutation=boolean("source_mutation", False),
@@ -230,6 +253,11 @@ def _verification(profile: TaskProfile) -> tuple[str, list[str]]:
         or profile.migration
         or profile.owner_gate != "NOT_REQUIRED"
         or profile.task_kind in {"SECURITY", "SECURITY_ANALYSIS"}
+        or profile.execution_class in {
+            ACTIVE_TEST_AUTHORIZED,
+            OFFENSIVE_HIGH_RISK,
+            DESTRUCTIVE_OR_INTRUSIVE,
+        }
     )
     if high_risk:
         return HIGH_RISK, ["MATERIAL_CONSEQUENCE_OR_OWNER_BOUNDARY"]
@@ -324,6 +352,12 @@ def _execution_lane(profile: TaskProfile) -> tuple[str, list[str]]:
     """Select the lowest safe execution lane from material evidence only."""
 
     critical: list[str] = []
+    if profile.execution_class in {
+        ACTIVE_TEST_AUTHORIZED,
+        OFFENSIVE_HIGH_RISK,
+        DESTRUCTIVE_OR_INTRUSIVE,
+    }:
+        critical.append("SECURITY_EXECUTION_CLASS")
     if profile.security_risk:
         critical.append("SECURITY_RISK")
     if profile.production:
@@ -380,6 +414,8 @@ def _execution_lane(profile: TaskProfile) -> tuple[str, list[str]]:
         return STRICT, sorted(set(strict))
 
     standard: list[str] = []
+    if profile.execution_class == ANALYSIS_LOCAL:
+        standard.append("LOCAL_SECURITY_ANALYSIS")
     if profile.source_mutation:
         standard.append("SOURCE_MUTATION_REQUIRED")
     if profile.mutation_risk == "LOW":
@@ -514,6 +550,17 @@ def _safety_invariants(profile: TaskProfile, lane: str) -> dict[str, Any]:
     }
 
 
+def _security_execution(profile: TaskProfile) -> dict[str, Any]:
+    """Bind security execution semantics into the existing policy output."""
+
+    return authorize_security_execution(
+        profile.execution_class,
+        target_authorized=profile.target_authorized,
+        controlled_test_environment=profile.controlled_test_environment,
+        explicit_task_authority=profile.explicit_task_authority,
+    )
+
+
 def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]:
     """Derive an inspectable abstract requirement without executing anything."""
 
@@ -523,11 +570,24 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
     reasoning_class, reasoning_reasons = _reasoning(profile, verification_class)
     worker_strategy, worker_reasons, worker_count = _worker_strategy(profile, context_class)
     execution_lane, execution_lane_reasons = _execution_lane(profile)
+    security_execution = _security_execution(profile)
+    if not security_execution["allowed"]:
+        worker_strategy = BLOCKED
+        worker_count = 0
+        worker_reasons = sorted(set(worker_reasons + ["SECURITY_AUTHORIZATION_BLOCKED"]))
     jit_skills = _jit_skills(profile, execution_lane)
     test_ceiling = _test_ceiling(profile, execution_lane)
     baseline_failure = _baseline_failure_policy(profile)
     safety_invariants = _safety_invariants(profile, execution_lane)
-    reason_codes = sorted(set(context_reasons + verification_reasons + reasoning_reasons + worker_reasons))
+    reason_codes = sorted(
+        set(
+            context_reasons
+            + verification_reasons
+            + reasoning_reasons
+            + worker_reasons
+            + security_execution["reason_codes"]
+        )
+    )
     blocked = worker_strategy == BLOCKED
     return {
         "schema": POLICY_SCHEMA,
@@ -535,6 +595,7 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
         "policy_principles": [MINIMUM_SUFFICIENT_WORK, RISK_PROPORTIONAL_EXECUTION],
         "execution_lane": execution_lane,
         "execution_lane_reasons": execution_lane_reasons,
+        "security_execution": security_execution,
         "execution_policy": {
             "minimum_sufficient_work": "ENFORCED",
             "risk_proportional_execution": "ENFORCED",
@@ -583,6 +644,7 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
             "worker_reasons": worker_reasons,
             "execution_lane": execution_lane,
             "execution_lane_reasons": execution_lane_reasons,
+            "security_execution_class": profile.execution_class,
             "ordered_inputs": [
                 "PROJECT_TASK_STATE",
                 "TASK_CHARACTERISTICS",
@@ -617,12 +679,15 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
 
 
 __all__ = [
+    "ACTIVE_TEST_AUTHORIZED",
+    "ANALYSIS_LOCAL",
     "BLOCKED",
     "CRITICAL",
     "CONTEXT_INSUFFICIENT",
     "CONTEXT_CLASSES",
     "DETERMINISTIC",
     "DIRECT",
+    "DESTRUCTIVE_OR_INTRUSIVE",
     "EXPANDED",
     "EXECUTION_LANES",
     "FAST",
@@ -634,9 +699,12 @@ __all__ = [
     "ONE_WORKER",
     "OrchestrationPolicyError",
     "POLICY_SCHEMA",
+    "OFFENSIVE_HIGH_RISK",
     "REASONING_CLASSES",
     "STANDARD",
     "STRICT",
+    "SAFE_READONLY",
+    "SECURITY_EXECUTION_CLASSES",
     "TaskProfile",
     "TWO_WORKERS",
     "VERIFICATION_CLASSES",

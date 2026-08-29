@@ -27,6 +27,17 @@ CAPABILITY_CLASSES = (
     "EVIDENCE_PROVIDER",
     "BACKEND_PROVIDER",
 )
+# `TYPE` remains the six-class capability contract above.  This orthogonal
+# vocabulary describes the semantic role of a capability/tool seam without
+# creating new registry classes or a second registry.
+SEMANTIC_KINDS = (
+    "SKILL",
+    "TOOL",
+    "ADAPTER",
+    "VENDOR",
+    "EXTERNAL_RUNTIME",
+    "KNOWLEDGE_SOURCE",
+)
 INVOCATION_CLASSES = ("USER_REQUESTED", "MODEL_ROUTABLE", "GOVERNANCE_MANDATED", "HOST_PRIMITIVE")
 TRUST_LEVELS = ("PURE_DATA", "HOST_CODE", "EXTERNAL_SERVICE")
 STATUSES = ("ACTIVE", "DISCOVERED", "DEFERRED", "RETIRED")
@@ -83,6 +94,7 @@ class CapabilityManifest:
     version: str
     status: str
     raw: Mapping[str, Any] = field(repr=False, compare=False)
+    semantic_kind: str | None = None
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any]) -> "CapabilityManifest":
@@ -109,6 +121,11 @@ class CapabilityManifest:
             version=value["VERSION"],
             status=value["STATUS"],
             raw=dict(value),
+            semantic_kind=(
+                str(value["SEMANTIC_KIND"]).upper().strip()
+                if value.get("SEMANTIC_KIND") is not None
+                else None
+            ),
         )
 
     @property
@@ -131,6 +148,10 @@ def _validate_one(value: Mapping[str, Any]) -> list[dict[str, Any]]:
         errors.append({"code": "CAPABILITY_ID_INVALID"})
     if value["TYPE"] not in CAPABILITY_CLASSES:
         errors.append({"code": "CAPABILITY_TYPE_INVALID", "actual": value["TYPE"]})
+    if value.get("SEMANTIC_KIND") is not None:
+        semantic_kind = value["SEMANTIC_KIND"]
+        if not isinstance(semantic_kind, str) or semantic_kind.upper().strip() not in SEMANTIC_KINDS:
+            errors.append({"code": "SEMANTIC_KIND_INVALID", "actual": semantic_kind})
     if value["INVOCATION_CLASS"] not in INVOCATION_CLASSES:
         errors.append({"code": "INVOCATION_CLASS_INVALID", "actual": value["INVOCATION_CLASS"]})
     if value["TRUST_LEVEL"] not in TRUST_LEVELS:
@@ -188,6 +209,7 @@ def validate_registry(values: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
         "valid": not errors,
         "capability_count": len(entries),
         "capability_classes": list(CAPABILITY_CLASSES),
+        "semantic_kinds": list(SEMANTIC_KINDS),
         "canonical_identities": list(CANONICAL_IDENTITIES),
         "canonical_denominator": 8,
         "full_quorum": "8/8",

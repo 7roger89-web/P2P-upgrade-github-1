@@ -90,3 +90,46 @@
 - Independent Supervisor report:
   `reports/supervisor/rp_supervisor_260829_122500_by_gpt-5-codex_p2p-auto01-current-canonical-reconciliation.md`.
 - Technical stop is Owner gate only; canonical remains unpromoted.
+
+## P2P-SEC01 current-canonical reconciliation — 2026-08-29
+
+### Authority and isolation
+
+- Fresh official `refs/heads/main` was resolved to
+  `bc686845fbb5817e50958d91e0d382a72c219b78` with tree
+  `68b16f0fd2116ec6e93bdb9dbecc31429a68ec6d`.
+- The old reviewed SEC01 candidate is
+  `bb30ca0a343b0902759a1a07a42cc8220c4ac260` with tree
+  `63b5093567929f45aad997414a85355c0f434c5d`, based on
+  `b8d09fc7a0e4a91e75db7f10dc8cfaea007ba37a`.
+- The new candidate is isolated in
+  `.tmp/p2p-sec01-current-canonical`; owner/canonical worktrees and the
+  existing SEC01 candidate were not modified.
+
+### Overlap and resolution
+
+- The exact overlap between `b8d09fc... -> bb30ca0...` and
+  `b8d09fc... -> current main` is only
+  `docs/notes_decisions_log/notes_decisions_log_20260829.md`.
+- The overlap is append-only documentation. Current AUTO01 content is
+  preserved verbatim; the SEC01 reconciliation is appended after it. No
+  AUTO01 production/control-plane path is overwritten or reverted.
+- The remaining 17 SEC01 paths are carried forward as the coherent SEC01
+  delta. No second registry, router, orchestrator, risk engine, truth store,
+  or deployment control plane is introduced.
+
+### Preservation and stop boundary
+
+- The optional `SEMANTIC_KIND` model, 12 security/reverse IDs, five EFF01
+  execution classes and fail-closed authorization, reverse evidence contract,
+  APKiD readonly/dependency-unavailable behavior, canonical `8/8`, and both
+  planned extension seams are preserved.
+- `AUTO01_PRESERVED=YES`; `SEC01_IMPLEMENTATION_PRESERVED=YES`;
+  `MONETIZATION_SEAM_PRESERVED=YES`; `INFRASTRUCTURE_SEAM_PRESERVED=YES`.
+- Verification remains the focused SEC01 compatibility ceiling. No broad
+  regression, Anvien, Council, full security stack, provider installation,
+  monetization test, infrastructure provisioning, promotion, release,
+  deployment, or live activation is permitted.
+- One fresh candidate will be bound to current main after focused evidence;
+  the single existing SEC01 Owner Gate remains required and canonical
+  promotion remains false.

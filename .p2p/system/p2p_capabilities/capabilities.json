@@ -2223,6 +2223,770 @@
    },
    "VERSION": "pinned-7221c1f",
    "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "android.protection.detect",
+   "TYPE": "BACKEND_PROVIDER",
+   "SEMANTIC_KIND": "ADAPTER",
+   "DESCRIPTION": "Bounded local APKiD-backed Android protection detection with hash-bound readonly evidence.",
+   "TRIGGERS": [
+    "apkid",
+    "apk protection",
+    "android packer",
+    "android protector",
+    "protection detect"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "frida",
+    "emulator",
+    "device",
+    "bypass",
+    "exploit",
+    "repack",
+    "sign"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "auto-install-dependency",
+    "network-runtime",
+    "device-or-emulator-runtime",
+    "mutate-apk",
+    "repack-or-sign",
+    "bypass-or-exploit",
+    "grant-permission-from-tool-output",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-apkid-cli-optional",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "android-apk-artifact",
+    "apkid-cli-output"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-apk-only",
+    "safe-readonly-or-analysis-local",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "artifact-sha256",
+    "backend-identity",
+    "normalized-findings",
+    "dependency-status",
+    "readonly-boundary"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "EXTERNAL_TOOL_MINIMAL_ADAPTER",
+    "external_tool": "APKiD",
+    "adapter_entrypoint": ".p2p/system/p2p_capabilities/apkid_adapter.py",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false,
+    "execution_status": "ADAPTER_TESTED_ONLY"
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "ACTIVE"
+  },
+  {
+   "CAPABILITY_ID": "android.artifact.decode",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Android artifact decoding contract for future bounded local adapters.",
+   "TRIGGERS": [
+    "android artifact decode",
+    "decode android artifact",
+    "dex decode",
+    "apk decode"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "device",
+    "emulator",
+    "bypass",
+    "exploit"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "auto-install-dependency",
+    "device-or-emulator-runtime",
+    "bypass-or-exploit",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "android-apk-artifact"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "artifact-sha256",
+    "tool-backend-identity",
+    "readonly-or-authorized-execution-class"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+    "external_tool": "Apktool",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "artifact.android.bundle.normalize",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Android bundle and APK normalization contract for future local analysis adapters.",
+   "TRIGGERS": [
+    "android bundle normalize",
+    "normalize android bundle",
+    "aab normalize",
+    "apk bundle normalize"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "deploy",
+    "production",
+    "device",
+    "emulator"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "auto-install-dependency",
+    "production-mutation",
+    "device-or-emulator-runtime",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "android-bundle-artifact"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "mutation-must-be-explicitly-authorized",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "artifact-sha256",
+    "normalization-receipt",
+    "mutation-surface"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+    "external_tool": "bundletool",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "security.mobile.static.assess",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "SKILL",
+   "DESCRIPTION": "Mobile static-security assessment contract over bounded local artifacts and evidence.",
+   "TRIGGERS": [
+    "mobile static assessment",
+    "android static security",
+    "static mobile security",
+    "security static assess"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "active exploit",
+    "bypass",
+    "device",
+    "production target"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "external-target-interaction",
+    "credential-use",
+    "exploit-execution",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "mobile-static-analysis"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "safe-readonly-or-analysis-local",
+    "active-test-authorization-before-runtime",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "claim-required-actual-status",
+    "artifact-sha256",
+    "backend-identity",
+    "uncertainty-state"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "P2P_SEMANTIC_CONTRACT",
+    "external_backend": "FUTURE_ADAPTERS_ONLY",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "android.runtime.instrument",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Authorization-gated Android runtime instrumentation contract; no runtime adapter is enabled by this foundation.",
+   "TRIGGERS": [
+    "android runtime instrument",
+    "runtime instrumentation android",
+    "instrument android runtime"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "safe readonly",
+    "without authorization",
+    "production device",
+    "bypass"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "explicit-task-authority",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "safe-class-bypass",
+    "unauthorized-target",
+    "uncontrolled-environment",
+    "auto-install-dependency",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract",
+    "active-test-authorization"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "android-runtime-instrumentation"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "active-test-authorized",
+    "controlled-test-environment",
+    "explicit-task-authority"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "target-authorization",
+    "controlled-environment",
+    "runtime-receipt",
+    "uncertainty-state"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_AUTHORIZATION_GATED_ADAPTER_ONLY",
+    "external_runtime": "Frida",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "android.network.inspect",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Authorization-gated Android network inspection contract; no live network or device execution is enabled.",
+   "TRIGGERS": [
+    "android network inspect",
+    "inspect android network",
+    "mobile network inspection"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "safe readonly",
+    "without authorization",
+    "production target",
+    "credential"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "explicit-task-authority",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "external-target-interaction",
+    "credential-use",
+    "uncontrolled-environment",
+    "auto-install-dependency",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract",
+    "active-test-authorization"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "android-network-inspection"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "active-test-authorized",
+    "controlled-test-environment",
+    "explicit-task-authority"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "target-authorization",
+    "network-scope",
+    "runtime-receipt",
+    "uncertainty-state"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_AUTHORIZATION_GATED_ADAPTER_ONLY",
+    "external_runtime": "FUTURE_NETWORK_INSPECTION_BACKEND",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "reverse.identify",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Static identification contract for Android/native/managed artifacts with evidence-bound labels.",
+   "TRIGGERS": [
+    "reverse identify",
+    "identify binary",
+    "identify native artifact",
+    "identify managed artifact"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "bypass",
+    "exploit",
+    "device",
+    "production target"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "unsupported-confidence",
+    "external-target-interaction",
+    "auto-install-dependency",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "reverse-identification"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "source-evidence-references",
+    "tool-backend-identity",
+    "confidence",
+    "uncertainty-state"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+    "external_candidates": [
+     "Detect It Easy",
+     "LIEF"
+    ],
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "reverse.decompile.managed",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Managed decompilation output contract explicitly distinct from reconstructed source semantics.",
+   "TRIGGERS": [
+    "managed decompile",
+    "reverse decompile managed",
+    "dotnet decompile",
+    "java decompile"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "original source recovered",
+    "bypass",
+    "exploit",
+    "production target"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "claim-original-source-recovery",
+    "auto-install-dependency",
+    "external-target-interaction",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "reverse-managed-decompilation"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "decompiled-output",
+    "tool-backend-identity",
+    "source-evidence-references",
+    "unknown-when-insufficient"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+    "external_candidates": [
+     "ILSpy",
+     "Vineflower"
+    ],
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "reverse.decompile.native",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Native decompilation output contract explicitly distinct from reconstructed source semantics.",
+   "TRIGGERS": [
+    "native decompile",
+    "reverse decompile native",
+    "c native decompile",
+    "assembly decompile"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "original source recovered",
+    "bypass",
+    "exploit",
+    "production target"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "claim-original-source-recovery",
+    "auto-install-dependency",
+    "external-target-interaction",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "reverse-native-decompilation"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "decompiled-output",
+    "tool-backend-identity",
+    "source-evidence-references",
+    "unknown-when-insufficient"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+    "external_candidates": [
+     "Ghidra",
+     "Detect It Easy",
+     "LIEF"
+    ],
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "reverse.deobfuscate",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "SKILL",
+   "DESCRIPTION": "Evidence-bound deobfuscation analysis contract with explicit uncertainty and no original-source claim.",
+   "TRIGGERS": [
+    "reverse deobfuscate",
+    "deobfuscate artifact",
+    "obfuscation analysis",
+    "deobfuscation analysis"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "bypass",
+    "exploit",
+    "original source recovered",
+    "production target"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "claim-original-source-recovery",
+    "unsupported-confidence",
+    "external-target-interaction",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "reverse-deobfuscation"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "source-evidence-references",
+    "inferred-semantic-label",
+    "confidence",
+    "contradiction-or-uncertainty"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "P2P_SEMANTIC_CONTRACT",
+    "external_backend": "FUTURE_ADAPTERS_ONLY",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "reverse.callgraph",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "TOOL",
+   "DESCRIPTION": "Static reverse call-graph contract with evidence references and bounded graph claims.",
+   "TRIGGERS": [
+    "reverse callgraph",
+    "call graph artifact",
+    "native call graph",
+    "managed call graph"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "runtime hook",
+    "device",
+    "bypass",
+    "exploit"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "claim-complete-runtime-behavior",
+    "auto-install-dependency",
+    "external-target-interaction",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "reverse-callgraph"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-artifact-only",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "source-evidence-references",
+    "tool-backend-identity",
+    "graph-scope",
+    "unknown-when-incomplete"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+    "external_runtime": "Ghidra",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
+  },
+  {
+   "CAPABILITY_ID": "reverse.semantic_reconstruct",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "SKILL",
+   "DESCRIPTION": "Minimal semantic reconstruction result contract; never represents recovery of original source code.",
+   "TRIGGERS": [
+    "reverse semantic reconstruct",
+    "semantic reconstruction",
+    "infer code semantics",
+    "reconstruct behavior semantics"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "original source recovered",
+    "source recovery guaranteed",
+    "bypass",
+    "exploit"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "existing-eff01-orchestration-policy",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "claim-original-source-recovery",
+    "hide-contradiction",
+    "invent-confidence",
+    "promote-without-owner-gate"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "security-reverse-evidence-contract"
+   ],
+   "CONTEXT_POINTERS": [
+    "p2p-security-reverse-foundation",
+    "reverse-semantic-reconstruction"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "local-evidence-only",
+    "unknown-when-insufficient",
+    "owner-gate-before-promotion"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "source-evidence-references",
+    "tool-backend-identity",
+    "inferred-semantic-label",
+    "confidence",
+    "contradiction-or-uncertainty"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "P2P_SEMANTIC_CONTRACT",
+    "implementation": "MINIMAL_RESULT_CONTRACT_ONLY",
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "vendor_snapshot": false
+   },
+   "VERSION": "security-reverse-foundation-1",
+   "STATUS": "DISCOVERED"
   }
   ]
 }
