@@ -111,12 +111,16 @@ workflow action is independent exact-subject supervisor review.
   checkout: six unlocked runtime additions and five protected runtime changes,
   including the intentionally scoped bootstrap documentation change. The package
   doctor portable-role mismatch is not applicable. No unrelated drift was repaired.
-- `E1-CLOSE4`: candidate before supervisor report is
-  `abc7a6b8a09f77dd25aa1f350e20a31e9510dfac`, tree
-  `124c71141c5a54c2250fad8d162c2641b3196909`; worktree is clean and no push or
+- `E1-CLOSE4`: candidate reviewed by supervisor is
+  `8799112e7153657ec5600cd2c0510ec4a02e3cf1`, tree
+  `9ccb988c966a50f5030c93a1869855506dad718a`; worktree was clean and no push or
   promotion occurred. The exact source prerequisite is the separate clean
   v1.5.1 checkout at `dede5909be4e494b228c801a55dda47439143932` /
   `25bcd4e1f1a487b9a61d69ade257342a3da767e3`.
 - `E1-CLOSE5`: coder handoff is recorded at
   `reports/coder/rp_coder_260830_0019_by_gpt-5-codex_p2p-img2threejs-exec-01.md`.
-  Supervisor review and final report remain required before the Owner Gate.
+- `E1-CLOSE6`: independent supervisor review is recorded at
+  `reports/supervisor/rp_supervisor_260830_0025_by_gpt-5-codex_p2p-img2threejs-exec-01.md`.
+  It is a technical PASS bound to the exact subject above. Owner approval,
+  promotion, push, release, deployment, and browser visual acceptance remain
+  unperformed and unclaimed.

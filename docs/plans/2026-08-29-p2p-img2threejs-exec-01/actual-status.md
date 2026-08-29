@@ -2,7 +2,7 @@
 
 Title: P2P img2threejs executable projection
 Date: 2026-08-29
-Status: P1 Complete; ready for exact-subject supervisor
+Status: Technical PASS; Owner Gate pending
 Companion plan: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/plan.md`
 Companion evidence: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/evidence.md`
 Companion benchmark: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/benchmark.md`
@@ -64,7 +64,7 @@ Out of scope:
 | R0 | 2026-08-29 | fresh P2P origin/main and fresh upstream refs | all target surfaces | baseline classifications above | E0-P0A-SRC1..E0-P0A-BOUNDARY1 | P1-A first; P1-B after refresh |
 | R1 | 2026-08-30 | after P1-A implementation | adapter/security | missing -> correct; unsafe upstream routes -> contained | E1-P1A-SEC1..SEC5, E1-P1A-TEST1 | P1-B allowed |
 | R2 | 2026-08-30 | after P1-B implementation | registry/projection/bootstrap | missing -> registered/selective; protocols missing -> protocol-ready; browser remains future | E1-P1B-REG1..E1-P1B-TEST1 | final Anvien/doctor/supervisor |
-| R3 | 2026-08-30 | final pre-supervisor closure on candidate `abc7a6b8a09f77dd25aa1f350e20a31e9510dfac` | focused validation, exact identity, clean worktree | technical gates PASS; doctor remains blocked by pre-existing development governance drift; supervisor pending | E1-CLOSE1..E1-CLOSE5 | independent exact-subject supervisor |
+| R3 | 2026-08-30 | final closure on reviewed subject `8799112e7153657ec5600cd2c0510ec4a02e3cf1` | focused validation, exact identity, clean worktree, supervisor review | technical gates PASS; doctor remains blocked by pre-existing development governance drift; supervisor PASS | E1-CLOSE1..E1-CLOSE6 | Owner Gate only; no promotion |
 
 ## Phase Touch Map
 
@@ -157,13 +157,13 @@ project projection; visual reconstruction remains explicitly unproven and future
 
 - [x] P1-A adapter and focused security execution evidence complete.
 - [x] P1-B registry, provenance, selective contract, and bootstrap hook complete.
-- [x] Final closure checks complete; independent exact-subject supervisor report is
-  the only remaining pre-Owner-Gate action.
+- [x] Final closure checks and independent exact-subject supervisor report complete.
 
 ## Closure decision
 
 - Technical candidate: `READY_FOR_EXACT_SUBJECT_SUPERVISOR`.
-- Reviewed pre-supervisor candidate: `abc7a6b8a09f77dd25aa1f350e20a31e9510dfac`.
-- Reviewed pre-supervisor tree: `124c71141c5a54c2250fad8d162c2641b3196909`.
+- Reviewed candidate: `8799112e7153657ec5600cd2c0510ec4a02e3cf1`.
+- Reviewed candidate tree: `9ccb988c966a50f5030c93a1869855506dad718a`.
+- Supervisor report: `reports/supervisor/rp_supervisor_260830_0025_by_gpt-5-codex_p2p-img2threejs-exec-01.md`.
 - Owner approval, promotion, push, release, deployment, and browser visual
   acceptance: not performed and not inferred.

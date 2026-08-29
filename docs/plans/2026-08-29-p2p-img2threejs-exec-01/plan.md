@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-29`
-- Status: `ready_for_exact_subject_supervisor`
+- Status: `complete_technical_pass_owner_gate_pending`
 - Plan: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/plan.md`
 - Evidence: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/evidence.md`
 - Benchmark: `docs/plans/2026-08-29-p2p-img2threejs-exec-01/benchmark.md`
@@ -255,13 +255,14 @@ execution adapter and an on-demand protocol projection are missing.
   - Actual-status Update: append R2 with selective projection and routing result.
   - Commit Boundary: commit after focused acceptance passes.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: exact-subject zero-trust review of code, metadata, security proof, and
     candidate identity before Owner Gate.
   - Work Steps: inspect source and diff independently, rerun focused gates, write a
     supervisor report, and fix only any rejected scope.
   - Implementation Gate: P1-A and P1-B are complete and candidate is frozen.
   - Acceptance: supervisor PASS or explicit blocker; no Owner approval inferred.
+    Exact reviewed subject is `8799112e7153657ec5600cd2c0510ec4a02e3cf1`.
 
 - [x] Pn-B: Remove dead work created during this plan.
   - Goal: leave only accepted plan artifacts; remove temp clones/output and stale
@@ -275,7 +276,7 @@ execution adapter and an on-demand protocol projection are missing.
     prerequisite for verification; no plan-created dead implementation artifact
     is tracked.
 
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: record final validation, detect-changes, exact candidate SHA/tree, clean
     worktree, and terminal verdict.
   - Work Steps: run focused suites and doctor/registry checks applicable to the
@@ -284,7 +285,7 @@ execution adapter and an on-demand protocol projection are missing.
   - Implementation Gate: supervisor review is PASS or a blocker is recorded.
   - Acceptance: `P2P_IMG2THREEJS_EXEC_01_READY_FOR_EXACT_SUBJECT_SUPERVISOR` after
     the independent supervisor report is written and the final candidate identity
-    is recorded.
+    is recorded. Owner Gate remains pending.
 
 ## Risk Notes
 
