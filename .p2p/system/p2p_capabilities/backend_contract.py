@@ -121,6 +121,58 @@ CAPABILITY_EXECUTION_SCOPE_MAP: dict[str, str] = {
     "bounded_documentation_write": "DOCUMENTATION_MUTATION_BOUNDED",
 }
 
+# One normalized operational vocabulary, represented by the existing
+# certification-scope field. These values are deliberately exact: a target
+# receives no adjacent capability by implication.
+OPERATIONAL_CAPABILITIES = (
+    "REPO_READ",
+    "REPO_SEARCH",
+    "STATIC_ANALYSIS",
+    "CODE_GENERATE",
+    "CODE_PATCH",
+    "FILESYSTEM_READ",
+    "FILESYSTEM_WRITE",
+    "TERMINAL_EXECUTE",
+    "TEST_EXECUTE",
+    "BUILD_EXECUTE",
+    "BROWSER_EXECUTE",
+    "DATABASE_SANDBOX",
+    "GIT_WRITE",
+    "REMOTE_PUSH",
+)
+
+# Execution claims are consumed by the existing independent role verifier.
+# The prefixes identify mechanical evidence pointers; ordinary reasoning or
+# certification prose can never satisfy these evidence classes.
+EXECUTION_CLAIM_REQUIREMENTS: dict[str, dict[str, Any]] = {
+    "TEST_PASS": {
+        "required_capability": "TEST_EXECUTE",
+        "mechanical_evidence_prefix": "mechanical:TEST_EXECUTE",
+    },
+    "BUILD_PASS": {
+        "required_capability": "BUILD_EXECUTE",
+        "mechanical_evidence_prefix": "mechanical:BUILD_EXECUTE",
+    },
+    "BROWSER_PASS": {
+        "required_capability": "BROWSER_EXECUTE",
+        "mechanical_evidence_prefix": "mechanical:BROWSER_EXECUTE",
+    },
+    "DATABASE_PASS": {
+        "required_capability": "DATABASE_SANDBOX",
+        "mechanical_evidence_prefix": "mechanical:DATABASE_SANDBOX",
+        "remote_observation_prefix": None,
+    },
+    "REMOTE_PUSHED": {
+        "required_capability": "REMOTE_PUSH",
+        "mechanical_evidence_prefix": "mechanical:REMOTE_PUSH",
+        "remote_observation_prefix": "remote-observation:",
+    },
+}
+
+STATIC_REASONING_EXECUTION_EVIDENCE_INVARIANT = (
+    "STATIC_REASONING != EXECUTION_EVIDENCE"
+)
+
 CERTIFICATION_SCOPES = (
     "SYNTHETIC_TEXT_EXECUTION",        # single-turn bounded text Q&A
     "API_TRANSPORT",                   # request/response transport works
@@ -131,7 +183,47 @@ CERTIFICATION_SCOPES = (
     "BROWSER_RUNTIME",                 # browser automation
     "LONG_HORIZON_EXECUTION",          # multi-step / multi-wave autonomy
     "DOCUMENTATION_MUTATION_BOUNDED",  # P2P-BW01: bounded documentation write
-)
+) + OPERATIONAL_CAPABILITIES
+
+
+def normalized_execution_claims(values: Iterable[Any]) -> tuple[str, ...]:
+    """Return recognized execution claims in stable declaration order."""
+    claims: list[str] = []
+    for value in values:
+        claim = str(value or "").strip().upper()
+        if claim in EXECUTION_CLAIM_REQUIREMENTS and claim not in claims:
+            claims.append(claim)
+    return tuple(claims)
+
+
+def execution_capability_for_claim(claim: str) -> str | None:
+    """Return the exact certified capability required by one claim."""
+    requirement = EXECUTION_CLAIM_REQUIREMENTS.get(
+        str(claim or "").strip().upper())
+    if requirement is None:
+        return None
+    return str(requirement["required_capability"])
+
+
+def mechanical_evidence_matches(pointer: str, capability: str) -> bool:
+    """Recognize only the bounded mechanical evidence pointer shape."""
+    value = str(pointer or "").strip()
+    prefix = f"mechanical:{str(capability).strip().upper()}"
+    return value == prefix or value.startswith(prefix + ":")
+
+
+def is_known_execution_evidence_requirement(value: str) -> bool:
+    """Validate evidence requirement labels without accepting free text."""
+    text = str(value or "").strip()
+    upper = text.upper()
+    if upper in EXECUTION_CLAIM_REQUIREMENTS:
+        return True
+    if text.lower().startswith("remote-observation:"):
+        return bool(text.split(":", 1)[1].strip())
+    if text.lower().startswith("mechanical:"):
+        parts = text.split(":", 2)
+        return len(parts) >= 2 and parts[1].upper() in OPERATIONAL_CAPABILITIES
+    return False
 
 
 @dataclass(frozen=True)
@@ -300,6 +392,7 @@ class BackendExecutionResult:
     target_fingerprint: str | None = None
     output_pointers: tuple[str, ...] = ()
     artifact_pointers: tuple[str, ...] = ()
+    execution_evidence_pointers: tuple[str, ...] = ()
     mutation_surface: str | None = None  # e.g. workspace path / scope touched
     usage_evidence: Mapping[str, Any] = field(default_factory=dict)
     error_class: str | None = None
@@ -325,6 +418,10 @@ class BackendExecutionResult:
             raise BackendContractError("OUTPUT_POINTERS_INVALID")
         if not isinstance(self.artifact_pointers, tuple) or not all(isinstance(p, str) for p in self.artifact_pointers):
             raise BackendContractError("ARTIFACT_POINTERS_INVALID")
+        if not isinstance(self.execution_evidence_pointers, tuple) or not all(
+            isinstance(p, str) for p in self.execution_evidence_pointers
+        ):
+            raise BackendContractError("EXECUTION_EVIDENCE_POINTERS_INVALID")
         if not isinstance(self.mutation_surface, (str, type(None))):
             raise BackendContractError("MUTATION_SURFACE_INVALID")
         if self.mutation_surface is not None:
@@ -373,6 +470,7 @@ class BackendExecutionResult:
             "target_fingerprint": self.target_fingerprint,
             "output_pointers": list(self.output_pointers),
             "artifact_pointers": list(self.artifact_pointers),
+            "execution_evidence_pointers": list(self.execution_evidence_pointers),
             "mutation_surface": self.mutation_surface,
             "usage_evidence": json.loads(json.dumps(self.usage_evidence)),
             "error_class": self.error_class,
@@ -401,6 +499,8 @@ class BackendExecutionResult:
             target_fingerprint=raw.get("target_fingerprint"),
             output_pointers=tuple(raw.get("output_pointers") or ()),
             artifact_pointers=tuple(raw.get("artifact_pointers") or ()),
+            execution_evidence_pointers=tuple(
+                raw.get("execution_evidence_pointers") or ()),
             mutation_surface=raw.get("mutation_surface"),
             usage_evidence=raw.get("usage_evidence") or {},
             error_class=raw.get("error_class"),

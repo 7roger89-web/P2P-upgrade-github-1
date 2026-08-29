@@ -71,6 +71,9 @@ def validate_task_contract(contract: Mapping[str, Any]) -> Mapping[str, Any]:
     body.setdefault("allowed_toolset", tuple(ALLOWED_TOOLS_DEFAULT))
     body.setdefault("permission_profile", "sandboxed-default")
     body.setdefault("input_evidence_pointers", ())
+    body.setdefault("required_capabilities", ())
+    body.setdefault("execution_claims", ())
+    body.setdefault("reasoning_provider_id", "")
     body.setdefault("task_budget", {"execution_attempts": 1, "retry": 0, "verification_attempts": 1})
     body.setdefault("retry_budget", 0)
     body.setdefault("forbidden_actions", tuple(FORBIDDEN_ACTIONS_DEFAULT))
@@ -80,6 +83,11 @@ def validate_task_contract(contract: Mapping[str, Any]) -> Mapping[str, Any]:
     body["expected_output"] = tuple(body["expected_output"])
     body["verify_spec"] = tuple(body["verify_spec"])
     body["input_evidence_pointers"] = tuple(body["input_evidence_pointers"])
+    body["required_capabilities"] = tuple(
+        str(capability).strip() for capability in body["required_capabilities"])
+    body["execution_claims"] = tuple(
+        str(claim).strip().upper() for claim in body["execution_claims"])
+    body["reasoning_provider_id"] = str(body["reasoning_provider_id"] or "").strip()
     body["forbidden_actions"] = tuple(str(a) for a in body["forbidden_actions"])
     return body
 

@@ -104,6 +104,7 @@ def role_receipt_to_dict(receipt: "RoleExecutionReceipt") -> dict[str, Any]:
         "permission_profile_fingerprint": receipt.permission_profile_fingerprint,
         "request_fingerprint": receipt.request_fingerprint,
         "task_fingerprint": receipt.task_fingerprint,
+        "reasoning_provider_id": receipt.reasoning_provider_id,
         "requested_target": receipt.requested_target,
         "observed_target": receipt.observed_target,
         "target_attestation_status": receipt.target_attestation_status,
@@ -112,6 +113,8 @@ def role_receipt_to_dict(receipt: "RoleExecutionReceipt") -> dict[str, Any]:
         "output_pointers": list(receipt.output_pointers),
         "artifact_pointers": list(receipt.artifact_pointers),
         "evidence_pointers": list(receipt.evidence_pointers),
+        "execution_evidence_pointers": list(
+            receipt.execution_evidence_pointers),
         "verifier_result": receipt.verifier_result,
         "verifier_reasons": list(receipt.verifier_reasons),
         "mutation_state": receipt.mutation_state,
@@ -151,6 +154,8 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
         "permission_profile_fingerprint": str(fields.get("permission_profile_fingerprint", "")),
         "request_fingerprint": str(fields.get("request_fingerprint", "")),
         "task_fingerprint": str(fields.get("task_fingerprint", "")),
+        "reasoning_provider_id": str(
+            fields.get("reasoning_provider_id", "")),
         "run_id": str(fields.get("run_id", "")),
         "dispatch_id": str(fields.get("dispatch_id", "")),
         "role_execution_contract_digest": str(
@@ -164,6 +169,8 @@ def new_role_receipt(**fields: Any) -> dict[str, Any]:
         "output_pointers": tuple(fields.get("output_pointers") or ()),
         "artifact_pointers": tuple(fields.get("artifact_pointers") or ()),
         "evidence_pointers": tuple(fields.get("evidence_pointers") or ()),
+        "execution_evidence_pointers": tuple(
+            fields.get("execution_evidence_pointers") or ()),
         "verifier_result": str(fields.get("verifier_result") or "UNKNOWN"),
         "verifier_reasons": tuple(fields.get("verifier_reasons") or ()),
         "mutation_state": str(fields.get("mutation_state") or "MUTATION_UNKNOWN"),
@@ -298,6 +305,9 @@ class RoleExecutionReceipt:
         task_fp = str(raw.get("task_fingerprint") or "").strip()
         self.task_fingerprint = (_validate_hash(task_fp, "task_fingerprint")
                                  if task_fp else "")
+        self.reasoning_provider_id = _validate_text(
+            raw.get("reasoning_provider_id") or "",
+            "reasoning_provider_id", 128)
         self.requested_target = _validate_text(raw.get("requested_target") or "", "requested_target", 128)
         self.observed_target = _validate_text(raw.get("observed_target") or "", "observed_target", 128)
         self.target_attestation_status = _validate_text(
@@ -310,6 +320,9 @@ class RoleExecutionReceipt:
         self.output_pointers = tuple(str(item) for item in (raw.get("output_pointers") or ()))
         self.artifact_pointers = tuple(str(item) for item in (raw.get("artifact_pointers") or ()))
         self.evidence_pointers = tuple(str(item) for item in (raw.get("evidence_pointers") or ()))
+        self.execution_evidence_pointers = tuple(
+            str(item) for item in
+            (raw.get("execution_evidence_pointers") or ()))
         self.verifier_result = _validate_text(raw.get("verifier_result") or "UNKNOWN", "verifier_result", 64)
         if self.verifier_result not in VERIFICATION_STATUSES:
             raise RoleReceiptError("RECEIPT_VERIFICATION_STATUS_INVALID", {"value": self.verifier_result})
@@ -329,6 +342,11 @@ class RoleExecutionReceipt:
         self.timestamps = timestamps
         self.raw_backend_receipt_pointer = _validate_text(
             raw.get("raw_backend_receipt_pointer") or "", "raw_backend_receipt_pointer", 512)
+
+    @property
+    def reasoning_provider(self) -> str:
+        """Compatibility alias for the explicit provider provenance field."""
+        return self.reasoning_provider_id
 
     def to_dict(self) -> dict[str, Any]:
         return role_receipt_to_dict(self)

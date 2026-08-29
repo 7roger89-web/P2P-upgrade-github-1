@@ -33,6 +33,7 @@ from .backend_contract import (
     BackendCapabilityCertification,
     CAPABILITY_EXECUTION_SCOPE_MAP,
     CERTIFICATION_SCOPES,
+    is_known_execution_evidence_requirement,
 )
 
 ELIGIBILITY_DECISIONS = ("ELIGIBLE", "INELIGIBLE", "UNKNOWN")
@@ -90,9 +91,17 @@ class TargetCertificationRecord:
             raise RoleEligibilityError("AUTH_STATE_INVALID",
                                        {"state": self.current_auth_state})
         for cert in self.scope_certifications:
+            if not isinstance(cert, BackendCapabilityCertification):
+                raise RoleEligibilityError("CERTIFICATION_RECORD_INVALID", {})
             if cert.scope not in CERTIFICATION_SCOPES:
                 raise RoleEligibilityError("CERTIFICATION_SCOPE_INVALID",
                                            {"scope": cert.scope})
+            if cert.adapter_id != self.adapter_id:
+                raise RoleEligibilityError(
+                    "CERTIFICATION_TARGET_MISMATCH",
+                    {"target_id": self.target_id,
+                     "adapter_id": self.adapter_id,
+                     "cert_adapter_id": cert.adapter_id})
 
 
 def certification_for_scope(record: TargetCertificationRecord,
@@ -156,6 +165,7 @@ def evaluate_role_target_eligibility(
     role_quorum_semantics: str,
     required_evidence: Iterable[str],
     task_permission_profile: Iterable[str],
+    task_required_capabilities: Iterable[str] = (),
     goal_permission_envelope: Iterable[str] = ("NONE",),
     target: TargetCertificationRecord,
     environment_binding: str = "LOCAL_PROJECT",
@@ -172,7 +182,9 @@ def evaluate_role_target_eligibility(
     reasons: list[str] = []
     unknown_flags: list[str] = []
 
-    role_caps = tuple(str(item) for item in role_required_capabilities)
+    role_caps = tuple(dict.fromkeys(
+        tuple(str(item).strip() for item in role_required_capabilities)
+        + tuple(str(item).strip() for item in task_required_capabilities)))
     cap_results: dict[str, str] = {}
     for scope in role_caps:
         if scope not in CERTIFICATION_SCOPES:
@@ -349,6 +361,8 @@ def evaluate_role_target_eligibility(
 
 def re_like_known(value: str) -> bool:
     """Known evidence requirement classes (bounded closed set)."""
+    if is_known_execution_evidence_requirement(value):
+        return True
     known = (
         "claim", "actual-evidence", "source-provenance", "fresh-governance-evidence",
         "boundary-evidence", "cross-scope-evidence", "required-evidence",
@@ -454,7 +468,7 @@ def load_target_registry() -> dict:
                 adapter_id=str(rec.get("adapter_id", "")),
                 scope_certifications=tuple(
                     BackendCapabilityCertification(
-                        adapter_id=tid,
+                        adapter_id=str(rec.get("adapter_id", "")),
                         scope=str(c.get("scope", "")),
                         status=str(c.get("status", "UNKNOWN")),
                         evidence_pointers=tuple(c.get(

@@ -38,6 +38,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from .backend_contract import CERTIFICATION_SCOPES
+
 # ---------------------------------------------------------------------------
 # Canonical truth — recovered, not invented. MUST equal the governance set.
 # ---------------------------------------------------------------------------
@@ -79,15 +81,9 @@ QUORUM_SEMANTICS_TYPES = (
 )
 
 CAPABILITY_REQUIREMENT_CLASSES = (
-    # C34 certification scopes reused as role capability vocabulary.
-    "SYNTHETIC_TEXT_EXECUTION",
-    "API_TRANSPORT",
-    "NON_MUTATING_TASK",
-    "FILE_WORKSPACE_OPERATION",
-    "CODE_MUTATION",
-    "TEST_EXECUTION",
-    "BROWSER_RUNTIME",
-    "LONG_HORIZON_EXECUTION",
+    # C34 certification scopes, including the normalized operational
+    # vocabulary, are the role capability vocabulary too.
+    *CERTIFICATION_SCOPES,
     # Registry-internal authority/ledger needs (not backend capabilities).
     "FACT_LEDGER",
     "evidence-contract",

@@ -26,7 +26,10 @@ from .backend_contract import (
     BackendAdapterIdentity,
     BackendExecutionResult,
     BackendCapabilityCertification,
-    CERTIFICATION_SCOPES,
+    EXECUTION_CLAIM_REQUIREMENTS,
+    STATIC_REASONING_EXECUTION_EVIDENCE_INVARIANT,
+    mechanical_evidence_matches,
+    normalized_execution_claims,
 )
 from .role_contract import (
     ROLE_CONTRACT_SCHEMA,
@@ -92,6 +95,9 @@ def verify_role_execution_receipt(
     the observed execution."""
     reasons: list[str] = []
     failure_class: str | None = None
+    required_evidence_items = tuple(str(item).strip()
+                                    for item in required_evidence)
+    certification_items = tuple(certification_records)
 
     # 1. Role identity bindings.
     if not _check_binding(expected_contract.role_id, receipt.role_id,
@@ -126,6 +132,21 @@ def verify_role_execution_receipt(
                           "WRONG_REQUEST_FINGERPRINT", reasons):
         failure_class = failure_class or "BINDING_MISMATCH"
 
+    # Reasoning provenance is deliberately separate from the execution
+    # target. It is an optional input binding, never an authority grant.
+    expected_reasoning_provider = str(
+        getattr(expected_contract, "reasoning_provider_id", "") or "").strip()
+    observed_reasoning_provider = str(
+        getattr(receipt, "reasoning_provider_id", "") or "").strip()
+    if expected_reasoning_provider:
+        if not _check_binding(expected_reasoning_provider,
+                              observed_reasoning_provider,
+                              "WRONG_REASONING_PROVIDER", reasons):
+            failure_class = failure_class or "BINDING_MISMATCH"
+    elif observed_reasoning_provider:
+        reasons.append("UNEXPECTED_REASONING_PROVIDER")
+        failure_class = failure_class or "BINDING_MISMATCH"
+
     # 5. Target binding: requested vs observed, attested only.
     if not _check_binding(expected_contract.target_fingerprint, receipt.target_fingerprint,
                           "WRONG_TARGET_FINGERPRINT", reasons):
@@ -156,6 +177,13 @@ def verify_role_execution_receipt(
         if not receipt.task_fingerprint or backend_result.request_fingerprint != receipt.task_fingerprint:
             reasons.append("BACKEND_RESULT_FINGERPRINT_MISMATCH")
             failure_class = failure_class or "BINDING_MISMATCH"
+        if backend_result.adapter_id != receipt.observed_target:
+            reasons.append("BACKEND_RESULT_TARGET_MISMATCH")
+            failure_class = failure_class or "BINDING_MISMATCH"
+        if (not backend_result.target_fingerprint or
+                backend_result.target_fingerprint != receipt.target_fingerprint):
+            reasons.append("BACKEND_RESULT_TARGET_FINGERPRINT_MISMATCH")
+            failure_class = failure_class or "BINDING_MISMATCH"
         if backend_result.verification_status != "VERIFIED":
             reasons.append("BACKEND_RESULT_SELF_CLAIM_ONLY")
             failure_class = failure_class or "BACKEND_RESULT_UNVERIFIED"
@@ -184,18 +212,20 @@ def verify_role_execution_receipt(
 
     # 9. Required evidence present and bound.
     missing_evidence: list[str] = []
-    for requirement in required_evidence:
-        requirement = str(requirement).strip()
+    for requirement in required_evidence_items:
         if not requirement:
             continue
-        found = any(requirement in pointer for pointer in receipt.evidence_pointers) \
-            or any(requirement in pointer for pointer in receipt.artifact_pointers)
+        receipt_evidence = (tuple(receipt.evidence_pointers)
+                            + tuple(receipt.artifact_pointers)
+                            + tuple(receipt.execution_evidence_pointers))
+        found = any(requirement in pointer for pointer in receipt_evidence)
         if not found:
             missing_evidence.append(requirement)
     if missing_evidence:
         reasons.append("MISSING_REQUIRED_EVIDENCE:" + ",".join(missing_evidence))
         failure_class = failure_class or "EVIDENCE_MISSING"
-    if not receipt.evidence_pointers and required_evidence:
+    if (not (receipt.evidence_pointers or receipt.artifact_pointers or
+             receipt.execution_evidence_pointers) and required_evidence_items):
         reasons.append("NO_EVIDENCE_POINTERS")
         failure_class = failure_class or "EVIDENCE_MISSING"
 
@@ -207,17 +237,97 @@ def verify_role_execution_receipt(
                           "EXISTING_P2P_ROUTER", "real-profile-readiness"):
             continue  # P2P-state satisfaction
         certified = any(
+            cert.adapter_id == receipt.observed_target and
             cert.scope == capability and
             cert.status == "LIVE_CERTIFIED_FOR_CAPABILITY"
-            for cert in certification_records
+            for cert in certification_items
         )
-        if capability in CERTIFICATION_SCOPES and not certified:
+        if not certified:
             reasons.append(f"UNSUPPORTED_OR_UNCERTIFIED_CAPABILITY:{capability}")
             failure_class = failure_class or "UNSUPPORTED_CAPABILITY"
 
+    # Execution claims are a stricter layer on the same verifier path:
+    # certification says what the target may do; the normalized result and
+    # role receipt must still carry the same mechanical observation. A
+    # static/reasoning pointer is intentionally not a mechanical pointer.
+    claim_inputs = (
+        tuple(getattr(expected_contract, "execution_claims", ()))
+        + tuple(expected_contract.acceptance_criteria)
+        + tuple(expected_contract.required_evidence)
+        + required_evidence_items
+    )
+    execution_claims = normalized_execution_claims(claim_inputs)
+    execution_claim_results: dict[str, dict[str, Any]] = {}
+    for claim in execution_claims:
+        requirement = EXECUTION_CLAIM_REQUIREMENTS[claim]
+        capability = str(requirement["required_capability"])
+        cap_bound = capability in tuple(expected_contract.required_capabilities)
+        target_certified = any(
+            cert.adapter_id == receipt.observed_target and
+            cert.scope == capability and
+            cert.status == "LIVE_CERTIFIED_FOR_CAPABILITY"
+            for cert in certification_items
+        )
+        backend_pointers: set[str] = set()
+        if backend_result is not None:
+            backend_pointers.update(
+                str(pointer) for pointer in
+                (tuple(getattr(backend_result,
+                              "execution_evidence_pointers", ()))
+                 + tuple(backend_result.output_pointers)
+                 + tuple(backend_result.artifact_pointers)))
+        receipt_pointers = set(
+            str(pointer) for pointer in
+            (tuple(getattr(receipt, "execution_evidence_pointers", ()))
+             + tuple(receipt.evidence_pointers)
+             + tuple(receipt.output_pointers)
+             + tuple(receipt.artifact_pointers)))
+        observed_pointers = backend_pointers & receipt_pointers
+        mechanical_ok = any(
+            mechanical_evidence_matches(pointer, capability)
+            for pointer in observed_pointers)
+        remote_prefix = requirement.get("remote_observation_prefix")
+        remote_observation_ok = (
+            remote_prefix is None or
+            any(pointer.startswith(str(remote_prefix))
+                for pointer in observed_pointers))
+        claim_reasons: list[str] = []
+        if not cap_bound:
+            claim_reasons.append("CAPABILITY_NOT_BOUND_TO_TASK")
+            reasons.append(
+                f"EXECUTION_CLAIM_CAPABILITY_NOT_BOUND:{claim}:{capability}")
+            failure_class = failure_class or "UNSUPPORTED_CAPABILITY"
+        if not target_certified:
+            claim_reasons.append("TARGET_CAPABILITY_NOT_CERTIFIED")
+            reasons.append(
+                f"EXECUTION_CLAIM_TARGET_CAPABILITY_NOT_CERTIFIED:{claim}:{capability}")
+            failure_class = failure_class or "UNSUPPORTED_CAPABILITY"
+        if not mechanical_ok:
+            claim_reasons.append("MECHANICAL_EVIDENCE_MISSING_OR_MISMATCHED")
+            reasons.append(f"EXECUTION_CLAIM_MECHANICAL_EVIDENCE_MISSING:{claim}")
+            failure_class = failure_class or "EVIDENCE_MISSING"
+        if not remote_observation_ok:
+            claim_reasons.append("REMOTE_OBSERVATION_MISSING")
+            reasons.append(f"EXECUTION_CLAIM_REMOTE_OBSERVATION_MISSING:{claim}")
+            failure_class = failure_class or "EVIDENCE_MISSING"
+        claim_status = "VERIFIED" if not claim_reasons else "NOT_PROVEN"
+        execution_claim_results[claim] = {
+            "claim": claim,
+            "required_capability": capability,
+            "target": receipt.observed_target,
+            "capability_bound_to_task": cap_bound,
+            "target_capability_certified": target_certified,
+            "mechanical_evidence": mechanical_ok,
+            "remote_observation": remote_observation_ok,
+            "status": claim_status,
+            "reasons": claim_reasons,
+        }
+        if claim_reasons:
+            reasons.append(f"EXECUTION_CLAIM_NOT_PROVEN:{claim}")
+
     # 11. Certification freshness where policy requires it.
-    if require_fresh_certification and certification_records:
-        stale = any(not cert.certified_at for cert in certification_records
+    if require_fresh_certification and certification_items:
+        stale = any(not cert.certified_at for cert in certification_items
                     if cert.status == "LIVE_CERTIFIED_FOR_CAPABILITY")
         if stale:
             reasons.append("CERTIFICATION_STALE_NO_TIMESTAMP")
@@ -236,6 +346,14 @@ def verify_role_execution_receipt(
         "reasons": reasons,
         "failure_class": failure_class if reasons else "NONE",
         "verifier_authority": "INDEPENDENT",
+        "evidence_invariant": STATIC_REASONING_EXECUTION_EVIDENCE_INVARIANT,
+        "execution_claim_status": (
+            "NOT_REQUIRED" if not execution_claim_results else
+            ("VERIFIED" if all(
+                result["status"] == "VERIFIED"
+                for result in execution_claim_results.values())
+             else "NOT_PROVEN")),
+        "execution_claims": execution_claim_results,
     }
 
 

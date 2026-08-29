@@ -32,6 +32,11 @@ from .agent_role import (
     CANONICAL_ROLES,
     OPTIONAL_SPECIALIST_ROLE,
 )
+from .backend_contract import (
+    EXECUTION_CLAIM_REQUIREMENTS,
+    execution_capability_for_claim,
+    normalized_execution_claims,
+)
 
 ROLE_CONTRACT_SCHEMA = "p2p-role-execution-contract/1"
 
@@ -72,8 +77,10 @@ _CONTRACT_FIELDS = (
     "required_capabilities",
     "acceptance_criteria",
     "required_evidence",
+    "execution_claims",
     "verification_policy",
     "explicit_execution_target",
+    "reasoning_provider_id",
     "target_fingerprint",
     "requested_target_attestation",
     "budget",
@@ -124,9 +131,11 @@ class RoleExecutionContract:
     required_capabilities: tuple[str, ...] = ()
     acceptance_criteria: tuple[str, ...] = ()
     required_evidence: tuple[str, ...] = ()
+    execution_claims: tuple[str, ...] = ()
     verification_policy: str = "INDEPENDENT"
 
     explicit_execution_target: str = ""
+    reasoning_provider_id: str = ""
     target_fingerprint: str = ""
     requested_target_attestation: str = "REQUESTED_ONLY"
 
@@ -139,12 +148,18 @@ class RoleExecutionContract:
     mutation_target_fingerprint: str = ""
     pre_mutation_surface_fingerprint: str = ""
 
+    @property
+    def reasoning_provider(self) -> str:
+        """Compatibility alias for the explicit provider provenance field."""
+        return self.reasoning_provider_id
+
     def __post_init__(self) -> None:
         object.__setattr__(self, "role_id", _role_id(self.role_id))
         for name, max_len in (("goal_id", 256), ("task_id", 256),
                               ("project_binding", 256), ("environment_binding", 128),
                               ("workspace_binding", 512), ("objective", 4096),
-                              ("explicit_execution_target", 128)):
+                              ("explicit_execution_target", 128),
+                              ("reasoning_provider_id", 128)):
             object.__setattr__(self, name,
                                _limited_text(getattr(self, name), name, max_len))
         object.__setattr__(self, "role_spec_hash",
@@ -160,6 +175,15 @@ class RoleExecutionContract:
         _assert_enum(self.verification_policy, ("INDEPENDENT", "UNKNOWN"),
                      "verification_policy")
         _assert_enum(self.budget, ("BOUNDED", "UNKNOWN"), "budget")
+        normalized_claims = tuple(str(item).strip().upper()
+                                  for item in self.execution_claims)
+        if any(item not in EXECUTION_CLAIM_REQUIREMENTS
+               for item in normalized_claims):
+            raise RoleContractError("EXECUTION_CLAIM_INVALID",
+                                    {"claims": list(normalized_claims)})
+        if len(set(normalized_claims)) != len(normalized_claims):
+            raise RoleContractError("EXECUTION_CLAIM_DUPLICATE", {})
+        object.__setattr__(self, "execution_claims", normalized_claims)
         _assert_enum(self.mutation_class,
                      ("", "bounded_documentation_write", "UNKNOWN"),
                      "mutation_class")
@@ -214,8 +238,10 @@ class RoleExecutionContract:
             "required_capabilities": list(self.required_capabilities),
             "acceptance_criteria": list(self.acceptance_criteria),
             "required_evidence": list(self.required_evidence),
+            "execution_claims": list(self.execution_claims),
             "verification_policy": self.verification_policy,
             "explicit_execution_target": self.explicit_execution_target,
+            "reasoning_provider_id": self.reasoning_provider_id,
             "target_fingerprint": self.target_fingerprint,
             "requested_target_attestation": self.requested_target_attestation,
             "budget": self.budget,
@@ -283,9 +309,14 @@ def build_role_execution_contract(
     permission_profile: Iterable[str] = (),
     acceptance_criteria: Iterable[str] = (),
     required_evidence: Iterable[str] = (),
+    task_required_capabilities: Iterable[str] = (),
+    required_capabilities: Iterable[str] | None = None,
+    execution_claims: Iterable[str] = (),
     budget: str = "BOUNDED",
     explicit_execution_target: str,
     target_fingerprint: str,
+    reasoning_provider_id: str = "",
+    reasoning_provider: str | None = None,
     mutation_class: str = "",
     mutation_authorization_id: str = "",
     mutation_target_fingerprint: str = "",
@@ -300,8 +331,24 @@ def build_role_execution_contract(
     the eligibility layer."""
     if not required_evidence:
         required_evidence = tuple(role_spec.evidence_requirements)
-    capabilities = tuple(role_spec.required_capabilities)
     acceptance = tuple(str(item) for item in acceptance_criteria) or ("role-objective-done",)
+    claims = normalized_execution_claims(
+        tuple(execution_claims) + tuple(acceptance) + tuple(required_evidence))
+    task_caps = tuple(str(item).strip() for item in task_required_capabilities)
+    if required_capabilities is not None:
+        task_caps += tuple(str(item).strip() for item in required_capabilities)
+    claim_caps = tuple(
+        execution_capability_for_claim(claim)
+        for claim in claims
+        if execution_capability_for_claim(claim) is not None)
+    capabilities = tuple(dict.fromkeys(
+        tuple(str(item).strip() for item in role_spec.required_capabilities)
+        + task_caps + claim_caps))
+    _reasoning_provider_id = str(
+        reasoning_provider_id or reasoning_provider or "").strip()
+    if reasoning_provider_id and reasoning_provider and \
+            str(reasoning_provider_id).strip() != str(reasoning_provider).strip():
+        raise RoleContractError("REASONING_PROVIDER_BINDING_CONFLICT", {})
     verification_policy = "INDEPENDENT"
     attestation = ("REQUESTED_ONLY"
                    if requested_target_attestation_is_unverified(target_fingerprint)
@@ -323,8 +370,10 @@ def build_role_execution_contract(
         "required_capabilities": capabilities,
         "acceptance_criteria": acceptance,
         "required_evidence": tuple(str(item) for item in required_evidence),
+        "execution_claims": claims,
         "verification_policy": verification_policy,
         "explicit_execution_target": explicit_execution_target,
+        "reasoning_provider_id": _reasoning_provider_id,
         "target_fingerprint": target_fingerprint,
         "requested_target_attestation": attestation,
         "budget": budget,

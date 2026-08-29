@@ -73,6 +73,13 @@ def contract_request_fingerprint(contract: Mapping[str, Any]) -> str:
         "objective": str(contract.get("task_objective", "")),
         "workspace": str(contract.get("workspace", "")),
         "target": str(contract.get("execution_target", "")),
+        "required_capabilities": tuple(
+            str(item) for item in (contract.get("required_capabilities") or ())),
+        "execution_claims": tuple(
+            str(item).strip().upper()
+            for item in (contract.get("execution_claims") or ())),
+        "reasoning_provider_id": str(
+            contract.get("reasoning_provider_id") or ""),
     }, sort_keys=True).encode()
     return hashlib.sha256(payload).hexdigest()
 
@@ -229,6 +236,12 @@ class BackendExecutionBridge:
             "auth_state_after": result.auth_state_after or "UNKNOWN",
             "usage_evidence": dict(result.usage_evidence),
             "evidence_pointers": tuple(result.artifact_pointers),
+            "execution_evidence_pointers": tuple(
+                result.execution_evidence_pointers),
+            "required_capabilities": tuple(
+                contract.get("required_capabilities") or ()),
+            "execution_claims": tuple(contract.get("execution_claims") or ()),
+            "target_fingerprint": result.target_fingerprint,
             "raw_backend_receipt_pointer": result.raw_backend_receipt_pointer,
             "bound_to_contract": bound,
             "fail_closed": fail_closed,
@@ -239,6 +252,9 @@ class BackendExecutionBridge:
                 "started_at": result.started_at,
                 "finished_at": result.finished_at,
                 "exit_status": result.exit_status,
+                "target_fingerprint": result.target_fingerprint,
+                "execution_evidence_pointers": tuple(
+                    result.execution_evidence_pointers),
                 "possible_mutation": bool(result.possible_mutation),
             },
             "duration_seconds": time.time() - started,
@@ -285,6 +301,11 @@ class BackendExecutionBridge:
             "auth_state_after": "UNKNOWN",
             "usage_evidence": {},
             "evidence_pointers": (),
+            "execution_evidence_pointers": (),
+            "required_capabilities": tuple(
+                contract.get("required_capabilities") or ()),
+            "execution_claims": tuple(contract.get("execution_claims") or ()),
+            "target_fingerprint": None,
             "raw_backend_receipt_pointer": None,
             "bound_to_contract": False,
             "fail_closed": True,
@@ -295,6 +316,8 @@ class BackendExecutionBridge:
                 "started_at": "",
                 "finished_at": "",
                 "exit_status": "NOT_RUN",
+                "target_fingerprint": None,
+                "execution_evidence_pointers": (),
                 "possible_mutation": False,
             },
             "duration_seconds": 0.0,

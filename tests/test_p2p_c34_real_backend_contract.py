@@ -647,6 +647,8 @@ class TestCandidatePolicyAudit:
         expected_untracked = frozenset((
             ".p2p/system/p2p_capabilities/backend_contract.py",
             ".p2p/system/p2p_capabilities/backend_execution_bridge.py",
+            "docs/plans/2026-08-29-p2p-reasoning-execution-decoupling/",
+            "tests/test_p2p_reasoning_execution_decoupling.py",
             ".p2p/system/p2p_capabilities/hermes_adapter.py",
             ".p2p/system/p2p_capabilities/manus_adapter.py",
             "docs/p2p-development/research/c34/",
@@ -762,6 +764,11 @@ class TestCandidatePolicyAudit:
             # C34 closure-reconciliation: capability-scoped certification
             # vocabulary + requested-vs-observed attestation binding.
             ".p2p/system/p2p_capabilities/backend_contract.py",
+            # Reasoning/execution decoupling keeps the same C34 bridge and
+            # task-contract normalization seam; these are approved runtime
+            # consumers of the extended scope vocabulary.
+            ".p2p/system/p2p_capabilities/backend_execution_bridge.py",
+            ".p2p/system/p2p_capabilities/fake_execution_backend.py",
             "scripts/p2p_goal_closure.py",
             "governance/development-control.json",
             "reports/candidates",
