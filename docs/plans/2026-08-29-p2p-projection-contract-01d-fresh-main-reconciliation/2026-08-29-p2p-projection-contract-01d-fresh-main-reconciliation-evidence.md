@@ -1,0 +1,85 @@
+# P2P Projection Contract 01D Fresh-Main Reconciliation Evidence Ledger
+
+## Metadata
+
+- Date: `2026-08-29`
+- Plan: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-plan.md`
+- Evidence: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-evidence.md`
+- Benchmark: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-benchmark.md`
+- Actual status: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-actual-status.md`
+
+## Evidence Rules
+
+Only fresh command output, direct source inspection, focused test output,
+exact Git object identity, and independent Supervisor evidence count. Prior
+01C evidence is source/intended-behavior input, not current-main proof. A
+PASS label without actual output is not evidence. Protected-state mutations
+are checked from isolated paths and not inferred.
+
+## E0 - P0 Evidence
+
+Matching plan item(s): `P0-A`
+
+- `E0-P0A-REMOTE1`: isolated workspace created from a valid Git object store;
+  origin set to `https://github.com/7roger89-web/P2P-upgrade-github-1.git`.
+- `E0-P0A-REMOTE2`: fresh direct fetch of `refs/heads/main` and direct
+  `ls-remote` returned
+  `1c84bc41421dcbe502d40b71fead5022231d0541`.
+- `E0-P0A-REMOTE3`: `refs/remotes/origin/main` tree is
+  `a11a44b676401d8a424db8ed05632c8d22952d26`.
+- `E0-P0A-INT1`: `76901b24f30988159ebc1b96076512623d09eabd` actual paths are
+  SEC01 capability/security adapter/registry/orchestration/tests; classified
+  `COMPATIBLE_ADJACENT_CHANGE`, not dropped.
+- `E0-P0A-INT2`: `61d51e16628ebdfe156b750a54ca8759b45634a7` changes only SEC01
+  decision/evidence documents; classified `UNRELATED` to implementation.
+- `E0-P0A-INT3`: `1c84bc41421dcbe502d40b71fead5022231d0541` adds only a SEC01
+  Supervisor report; classified `UNRELATED` to implementation.
+- `E0-P0A-SRC1`: fresh main `project_pin.py` is v1-only; old 01C source hash
+  differs and contains reviewed v2 mode/binding validation.
+- `E0-P0A-SRC2`: fresh main `project_context.py` has existing v1 readiness;
+  old 01C adds explicit v2 `PROJECTION_ONLY` dispatch while preserving v1.
+- `E0-P0A-SRC3`: fresh main `host_projection.py` remains the pure-plan
+  surface; no materializer or runtime copy is present.
+- `E0-P0A-SRC4`: current relevant SPEC cluster was read in full in declared
+  dependency order; repository contains no `SPEC-MAP.md`, so that absence is
+  recorded rather than invented.
+- `E0-P0A-SRC5`: old reviewed 01C has the projection-only SPEC and bounded
+  materializer; these are inspect-only behavior evidence, not copied blindly.
+- `E0-P0A-SRC6`: old reviewed 01C focused test module covers v2/security
+  contract; fresh main lacks it.
+- `E0-P0A-SRC7`: current C18, C19, FASTPATH, host projection, AUTO, and
+  workflow tests are present on fresh main and are preserve/validate targets.
+- `E0-P0A-ANV1`: `anvien analyze --force ...` failed while writing isolated
+  `.anvien/analyze.tmp/csv/relations.csv` with `There is not enough space on
+  the disk`; graph/file-detail/impact counts are therefore UNKNOWN.
+- `E0-P0A-ISO1`: only the new isolated workspace was inspected/used; no Owner,
+  old 01C, Thiên Hạ, or unrelated worktree path was targeted.
+- `E0-P0A-BOUND1`: no command or source change invoked img2threejs, Tripo,
+  providers, secrets, or Thiên Hạ; required counters remain zero.
+
+## E1 - P1 Evidence
+
+Matching plan item(s): `P1-A`, `P1-B`
+
+Pending until reconciliation source edits and focused contract tests complete.
+
+## E2 - P2 Evidence
+
+Matching plan item(s): `P2-A`, `P2-B`
+
+Pending until focused validation, exact candidate freeze, and Supervisor review
+complete. This section must contain the final exact SHA/tree and all test
+results before promotion is considered.
+
+## E3 - P3 Evidence
+
+Matching plan item(s): `P3-A`
+
+Pending until post-review fresh remote check. A drift or topology failure is a
+hard stop and must be recorded without mutating the frozen candidate.
+
+## Closure Evidence
+
+Pending. Reports and closure evidence must be written outside the frozen
+candidate subject, or before the final candidate commit; no post-review report
+commit may be appended to the promoted candidate.
