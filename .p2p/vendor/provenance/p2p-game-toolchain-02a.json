@@ -572,5 +572,50 @@
       "character v1.5 partial",
       "Tripo separate and not activated"
     ]
+  },
+  "img2threejs_exec_01": {
+    "upstream_repository": "https://github.com/img2threejs/img2threejs.git",
+    "upstream_version": "1.5.1",
+    "upstream_commit": "dede5909be4e494b228c801a55dda47439143932",
+    "upstream_tree": "25bcd4e1f1a487b9a61d69ade257342a3da767e3",
+    "license": "Apache-2.0",
+    "snapshot_path": ".p2p/vendor/skill/img2threejs-safe-exec-1.5.1/SKILL.md",
+    "snapshot_sha256": "bc94a52b66fa560d28c569af6e168d325052007fde4bcb11ff5ecbb431843a2f",
+    "snapshot_scope": "P2P-authored execution/protocol contract only; upstream source remains external",
+    "adapter_path": ".p2p/system/p2p_capabilities/img2threejs_adapter.py",
+    "allowed_entrypoints": [
+      "forge/state.py",
+      "forge/next.py",
+      "forge/stage1_intake/probe_image.py",
+      "forge/stage2_spec/validate_sculpt_spec.py",
+      "forge/stage3_build/generate_threejs_factory.py"
+    ],
+    "denied_entrypoints": [
+      "forge/stage1_intake/fetch_cs2_metadata.py",
+      "forge/stage1_intake/material_region_analysis.py",
+      "forge/stage1_intake/run_vision_adapter.py",
+      "all-unlisted-entrypoints"
+    ],
+    "network_policy": "DENY",
+    "cs2_metadata_network": "DISABLED",
+    "filesystem_policy": "DECLARED_RECONSTRUCTION_WORKSPACE_ONLY",
+    "shell": false,
+    "credentials": false,
+    "install_mode": "DISABLED",
+    "execution_status": "EXECUTED_FOCUSED_LOCAL_SMOKE",
+    "integration_status": "REGISTERED_NONCANONICAL_EXPLICIT_ADAPTER",
+    "executable_available_in_upstream": true,
+    "executable_registered_in_p2p": true,
+    "browser_visual_status": "NOT_EXECUTED_FUTURE_PROJECT_GATE",
+    "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+    "predecessor_record": "img2threejs_pending",
+    "boundary": [
+      "procedural/reference-grounded reconstruction",
+      "not neural image-to-mesh",
+      "character protocol-ready but visual proof pending",
+      "hard-surface asset-forge protocol separate",
+      "not a production-ready animation pipeline",
+      "Tripo separate and not activated"
+    ]
   }
 }

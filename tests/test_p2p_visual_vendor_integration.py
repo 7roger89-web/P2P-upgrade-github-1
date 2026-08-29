@@ -81,7 +81,7 @@ class P2PVisualVendorIntegrationTests(unittest.TestCase):
         records = [item for item in raw["capabilities"] if item["CAPABILITY_ID"] == CAPABILITY_ID]
         self.assertEqual(len(records), 1)
         record = records[0]
-        self.assertEqual(self.registry["capability_count"], 27)
+        self.assertEqual(self.registry["capability_count"], 40)
         self.assertEqual(record["TYPE"], "SKILL")
         self.assertEqual(record["INVOCATION_CLASS"], "MODEL_ROUTABLE")
         self.assertFalse(record["CANONICAL_QUORUM_MEMBER"])

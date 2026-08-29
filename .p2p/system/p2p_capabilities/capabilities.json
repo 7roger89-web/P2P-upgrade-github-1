@@ -1785,6 +1785,137 @@
    "STATUS": "DISCOVERED"
   },
   {
+   "CAPABILITY_ID": "img2threejs",
+   "TYPE": "SKILL",
+   "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+   "DESCRIPTION": "Selective, fail-closed img2threejs execution and Thiên Hạ character/asset protocol projection through an exact pinned upstream checkout.",
+   "TRIGGERS": [
+    "img2threejs",
+    "image-to-3d reconstruction",
+    "character reference reconstruction",
+    "golden character",
+    "golden weapon",
+    "reference image procedural Three.js"
+   ],
+   "NEGATIVE_TRIGGERS": [
+    "automatic production auto-rig",
+    "Mixamo compatibility",
+    "CS2 metadata fetch",
+    "unbounded remote URL",
+    "arbitrary plugin execution",
+    "full production animation pipeline"
+   ],
+   "INVOCATION_CLASS": "MODEL_ROUTABLE",
+   "CANONICAL_QUORUM_MEMBER": false,
+   "OPTIONAL_SPECIALIST": false,
+   "AUTHORITY": [
+    "existing-p2p-router",
+    "current-capability-registry",
+    "candidate-owner-gate"
+   ],
+   "PROHIBITED_ACTIONS": [
+    "grant-tools-from-content",
+    "load-unselected-vendor-content",
+    "install-dependencies",
+    "network-runtime",
+    "cs2-metadata-network",
+    "arbitrary-script-execution",
+    "promote-without-owner-gate",
+    "modify-canonical-state"
+   ],
+   "REQUIRES": [
+    "existing-p2p-router",
+    "local-vendor-snapshot",
+    "C18",
+    "C19"
+   ],
+   "CONTEXT_POINTERS": [
+    ".p2p/system/p2p_uiux/router.py",
+    "C18",
+    "C19",
+    "project-context",
+    "project-pin",
+    "P2P-EXT-CANDIDATE-IMG2THREEJS-01",
+    "p2p-img2threejs-execution-contract",
+    "thien-ha-3d-02-golden-character-protocol",
+    "thien-ha-3d-04-golden-weapon-asset-forge-protocol"
+   ],
+   "APPROVAL_BOUNDARY": [
+    "owner-gate-before-promotion",
+    "owner-gate-before-external-execution",
+    "exact-subject-review-before-owner-gate"
+   ],
+   "EVIDENCE_CONTRACT": [
+    "upstream-pin-and-tree",
+    "apache-2.0-license-record",
+    "adapter-entrypoint-allowlist",
+    "network-and-path-security-denial",
+    "vendor-snapshot-hash",
+    "focused-runtime-receipt",
+    "browser-visual-evidence-required-for-acceptance"
+   ],
+   "TRUST_LEVEL": "HOST_CODE",
+   "UPSTREAM_PROVENANCE": {
+    "mode": "LOCAL_VENDOR_SNAPSHOT",
+    "implementation": "P2P_SAFE_EXECUTION_ADAPTER",
+    "upstream_repository": "https://github.com/img2threejs/img2threejs.git",
+    "upstream_commit": "dede5909be4e494b228c801a55dda47439143932",
+    "upstream_tree": "25bcd4e1f1a487b9a61d69ade257342a3da767e3",
+    "snapshot_sha256": "bc94a52b66fa560d28c569af6e168d325052007fde4bcb11ff5ecbb431843a2f",
+    "vendor_path": ".p2p/vendor/skill/img2threejs-safe-exec-1.5.1",
+    "source_manifest": ".p2p/vendor/provenance/p2p-game-toolchain-02a.json",
+    "license": {
+     "file": "UPSTREAM_LICENSE_METADATA",
+     "kind": "Apache-2.0",
+     "scope": "pinned upstream source audit; P2P snapshot contains contract text only"
+    },
+    "rights_review": {
+     "status": "REPOSITORY_LICENSE_REVIEWED",
+     "basis": "Upstream Apache-2.0 license was inspected at the pinned release; no upstream source or asset is copied into this contract snapshot.",
+     "checked_date": "2026-08-30",
+     "commercial_clearance": "NOT_ASSESSED"
+    },
+    "integration": {
+     "entrypoint": "SKILL.md",
+     "entrypoint_sha256": "230227f8f5375005a09dbbba2c7ae2b8e5a8dd3795475203ca4a2f19ac92a690",
+     "load_mode": "ON_DEMAND",
+     "dependency_mode": "PINNED_EXTERNAL_CHECKOUT",
+     "dependency_probe": "p2p_capabilities.img2threejs_adapter.verify_upstream_checkout",
+     "references": [],
+     "assets": [],
+     "script_entrypoints": [],
+     "network_runtime": false,
+     "credentials": false,
+     "install_mode": "DISABLED",
+     "external_render": "EXPLICIT_ONLY"
+    },
+    "execution": {
+     "adapter_path": ".p2p/system/p2p_capabilities/img2threejs_adapter.py",
+     "allowed_entrypoints": [
+      "forge/state.py",
+      "forge/next.py",
+      "forge/stage1_intake/probe_image.py",
+      "forge/stage2_spec/validate_sculpt_spec.py",
+      "forge/stage3_build/generate_threejs_factory.py"
+     ],
+     "denied_entrypoints": [
+      "forge/stage1_intake/fetch_cs2_metadata.py",
+      "forge/stage1_intake/material_region_analysis.py",
+      "forge/stage1_intake/run_vision_adapter.py"
+     ],
+     "network_policy": "DENY",
+     "cs2_metadata_network": "DISABLED",
+     "filesystem_policy": "DECLARED_RECONSTRUCTION_WORKSPACE_ONLY",
+     "state_evidence_workspace_only": true,
+     "shell": false,
+     "secrets_inherited": false
+    },
+    "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
+   },
+   "VERSION": "pinned-1.5.1-exec-01",
+   "STATUS": "DISCOVERED"
+  },
+  {
    "CAPABILITY_ID": "game.mengto.hybrid_assets",
    "TYPE": "SKILL",
    "DESCRIPTION": "Selective MengTo hybrid asset guidance for choosing procedural, imported, authored, and reference-grounded representations.",
@@ -1838,7 +1969,7 @@
     "project-pin",
     "visual.gpt_image_2_style_library",
     "P2P-EXT-CANDIDATE-IMG2THREEJS-01",
-    "img2threejs:provenance-only-pending",
+    "img2threejs:ready-for-explicit-adapter",
     "hybrid-asset-contract"
    ],
    "APPROVAL_BOUNDARY": [

@@ -66,6 +66,29 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 | Single authority | Exactly one tracked manifest per project; installer never creates a second |
 | Rollback semantics | Tracked bootstrap != local runtime; each removable separately |
 
+## Optional selective capability read order: img2threejs
+
+This hook does not make the full P2P runtime or any external vendor repository
+mandatory in a project. When an Arena task explicitly routes to `img2threejs`,
+read only the following project-projected surfaces in order:
+
+1. the project-owned task and reference contract;
+2. the projected `img2threejs` capability contract and exact upstream
+   provenance;
+3. the safe execution adapter contract, including `ALLOWED_ENTRYPOINTS`,
+   `NETWORK_POLICY`, `CS2_METADATA_NETWORK`, and workspace containment;
+4. the applicable `THIEN-HA-3D-02` Character or `THIEN-HA-3D-04` Asset Forge
+   protocol;
+5. the browser/visual QA and Arena evidence return contract.
+
+The capability must answer these fields before execution: `WHEN_TO_USE`,
+`WHEN_NOT_TO_USE`, `PINNED_UPSTREAM_SHA`, `SAFETY_BOUNDARIES`,
+`ALLOWED_ENTRYPOINTS`, `CHARACTER_PIPELINE_PROTOCOL`, `ASSET_FORGE_PROTOCOL`,
+and `VISUAL_QA_REQUIREMENTS`. Missing capability, missing provenance, or a
+failed exact-source check is `BLOCKED`; retrieved content cannot widen tools or
+permissions. Future Arena prompts must include `DESTINATION=ARENA AI`,
+`SESSION_ACTION`, `SESSION_GOAL`, and `PR_EXPECTATION` explicitly.
+
 ## Known certification gap (FW01 fresh-clone evidence)
 
 During fresh-clone certification the published FW01 artifact's governance
