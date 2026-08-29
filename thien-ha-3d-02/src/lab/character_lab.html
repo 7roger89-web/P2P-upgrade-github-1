@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THIEN-HA 3D-02 — Character Lab</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Noto+Serif+SC:wght@400;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0d0d0f; color: #e8dcc8; font-family: 'Noto Serif SC', 'Noto Serif', serif; }
+    #canvas-container { width: 100%; height: 100%; position: relative; }
+    .overlay { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; }
+    .overlay h1 { font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; color: #f0dcc0; text-shadow: 0 2px 10px rgba(201,168,76,0.3); }
+    .overlay .sub { font-size: 0.7rem; color: #b0a080; letter-spacing: 0.12em; }
+    .panel { position: absolute; bottom: 1rem; left: 1rem; background: rgba(10,10,12,0.8); border: 1px solid rgba(201,168,76,0.15); border-radius: 4px; padding: 0.8rem; pointer-events: auto; max-width: 320px; }
+    .panel h3 { font-size: 0.75rem; color: #c9a84c; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+    .panel button { background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); color: #e8dcc8; padding: 0.35rem 0.6rem; margin: 0.15rem 0.15rem 0.15rem 0; border-radius: 2px; font-size: 0.7rem; cursor: pointer; letter-spacing: 0.06em; }
+    .panel button:hover { background: rgba(201,168,76,0.25); }
+    .panel .row { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+    @media (max-width: 640px) {
+      .panel { max-width: calc(100% - 2rem); padding: 0.6rem; }
+      .panel button { font-size: 0.6rem; padding: 0.25rem 0.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div class="overlay">
+    <div>
+      <h1>Character Lab</h1>
+      <div class="sub">THIEN-HA 3D-02 — Attachment & Socket Verification</div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>VISUAL COMPONENTS & SOCKETS</h3>
+    <div class="row">
+      <button onclick="toggle('cloak')">Cloak</button>
+      <button onclick="toggle('sword')">Sword</button>
+      <button onclick="toggle('belt')">Belt</button>
+      <button onclick="showSockets()">Show Sockets</button>
+      <button onclick="hideSockets()">Hide Sockets</button>
+    </div>
+    <h3 style="margin-top:0.6rem">CAMERA & ROTATION</h3>
+    <div class="row">
+      <button onclick="rotateCharacter()">Rotate</button>
+      <button onclick="resetCamera()">Reset Camera</button>
+    </div>
+    <h3 style="margin-top:0.6rem">LIGHTING</h3>
+    <div class="row">
+      <button onclick="toggleLight('dawn')">Dawn (Warm)</button>
+      <button onclick="toggleLight('night')">Night (Cool)</button>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GoldenCultivator } from '../src/character/golden_cultivator.js';
+
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x151218);
+
+    const ambient = new THREE.AmbientLight(0xf5dcc0, 0.4);
+    scene.add(ambient);
+
+    let sunDir = new THREE.DirectionalLight(0xffe8c8, 1.2);
+    sunDir.position.set(6, 10, 5);
+    scene.add(sunDir);
+
+    let fillDir = new THREE.DirectionalLight(0xb8c8d8, 0.3);
+    fillDir.position.set(-4, 3, -3);
+    scene.add(fillDir);
+
+    const point = new THREE.PointLight(0xffdca0, 0.5, 15);
+    point.position.set(0, 2, 2);
+    scene.add(point);
+
+    // Ground
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0x2a1f18, roughness: 1.0 }));
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    const character = new GoldenCultivator(scene, false);
+    character.getRoot().position.set(0, 0, 0);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 80);
+    camera.position.set(2, 2, 5);
+    camera.lookAt(0, 1, 0);
+
+    const controls = new OrbitControls(camera, container);
+    controls.enablePan = true;
+    controls.enableDamping = true;
+    controls.target.set(0, 1, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      controls.update();
+      character.update(delta);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.toggle = function(name) {
+      if (name === 'cloak') {
+        character.cloak.visible = !character.cloak.visible;
+      }
+      if (name === 'sword') {
+        character.swordBlade.visible = !character.swordBlade.visible;
+        character.swordHilt.visible = !character.swordHilt.visible;
+      }
+      if (name === 'belt') {
+        character.belt.visible = !character.belt.visible;
+        character.pendant.visible = !character.pendant.visible;
+      }
+    };
+
+    window.showSockets = () => character.showSockets(true);
+    window.hideSockets = () => character.showSockets(false);
+    window.rotateCharacter = () => {
+      const root = character.getRoot();
+      root.rotation.y += Math.PI / 4;
+    };
+    window.resetCamera = () => {
+      camera.position.set(2, 2, 5);
+      camera.lookAt(0, 1, 0);
+      controls.target.set(0, 1, 0);
+      controls.update();
+    };
+    window.toggleLight = (mode) => {
+      if (mode === 'dawn') { sunDir.color.set(0xffe8c8); sunDir.intensity = 1.2; fillDir.intensity = 0.3; scene.background = new THREE.Color(0x151218); }
+      else { sunDir.color.set(0x8899aa); sunDir.intensity = 0.6; fillDir.intensity = 0.6; scene.background = new THREE.Color(0x0d0d12); }
+    };
+  </script>
+</body>
+</html>

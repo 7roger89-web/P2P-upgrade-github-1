@@ -1,0 +1,75 @@
+{
+  "project": "THIEN_HA_3D_02",
+  "workstream": "THIEN-HA-3D-02-GOLDEN-CHARACTER",
+  "character_id": "golden_cultivator_01",
+  "name_display": "Golden Xianxia Cultivator",
+  "version": "0.1.0",
+  "created": "2026-08-29",
+  "author_project": "App Game Truyện",
+  "runtime_profile": "THREEJS_GAME",
+  "visual_identity": {
+    "archetype": "young_adult_cultivator",
+    "gender": "male",
+    "style": "elegant_xianxia_sect_robe",
+    "palette": ["#f5f5f0", "#1a3a2a", "#c9a84c", "#2d1b0e"],
+    "silhouette_priority": "readable_at_third_person_distance",
+    "mobile_readable": true
+  },
+  "base_body": {
+    "type": "procedural_mesh_rig",
+    "proportions": "realistic_human_adult_male",
+    "height_units": 1.78,
+    "mesh_density": "medium",
+    "rig_support": true
+  },
+  "visual_attachments": [
+    {"component": "hair", "type": "mesh_attachment", "socket": "head", "description": "long_dark_cultivation_hairstyle", "style": "high_topknot_with_loose_strands"},
+    {"component": "robe_primary", "type": "mesh_attachment", "socket": "torso", "description": "sect_robe_white_jade", "layers": ["inner_white", "outer_jade", "gold_trim"]},
+    {"component": "belt", "type": "mesh_attachment", "socket": "waist", "description": "slim_silk_belt_with_jade_pendant"},
+    {"component": "cloak", "type": "mesh_attachment", "socket": "back_root", "description": "light_flowing_white_cloak", "optional": true},
+    {"component": "sword_waist", "type": "weapon_attachment", "socket": "waist_weapon", "description": "slender_straight_sword_in_sheath"},
+    {"component": "accessory_neck", "type": "mesh_attachment", "socket": "neck", "description": "subtle_sect_amulet"}
+  ],
+  "attachment_sockets": [
+    {"name": "root", "target": "scene_root", "transform_type": "world"},
+    {"name": "head", "bone_target": "head_bone", "transform_type": "local"},
+    {"name": "torso", "bone_target": "spine_upper", "transform_type": "local"},
+    {"name": "waist", "bone_target": "spine_lower", "transform_type": "local"},
+    {"name": "hand_primary", "bone_target": "hand_r", "transform_type": "local"},
+    {"name": "hand_secondary", "bone_target": "hand_l", "transform_type": "local"},
+    {"name": "back_root", "bone_target": "spine_upper", "transform_type": "local", "offset": [0, 0.15, -0.1]},
+    {"name": "back_weapon", "bone_target": "spine_mid", "transform_type": "local", "offset": [0, 0.05, -0.25]},
+    {"name": "waist_weapon", "bone_target": "waist_bone", "transform_type": "local", "offset": [-0.15, -0.05, 0]},
+    {"name": "neck", "bone_target": "neck", "transform_type": "local", "offset": [0, 0.12, 0]}
+  ],
+  "animation_support": {
+    "idle": {"available": true, "method": "procedural_idle_rotation_and_breath", "quality": "lightweight"},
+    "movement_compatible": true,
+    "rig_type": "simple_bone_chain",
+    "full_state_machine": false,
+    "deferred": ["combat", "skill_cast", "flying", "mount", "defeat"]
+  },
+  "reference_evidence": {
+    "reference_sheet_path": "production/session-reports/THIEN-HA-3D-02/reference/character_reference_sheet.png",
+    "face_front_path": "production/session-reports/THIEN-HA-3D-02/reference/face_front_closeup.png",
+    "face_34_path": "production/session-reports/THIEN-HA-3D-02/reference/face_34_closeup.png"
+  },
+  "performance_profile": {
+    "target_draw_calls": "< 40 for character + scene",
+    "target_triangles": "< 8000",
+    "mobile_target_fps": 30,
+    "material_count": "<= 6"
+  },
+  "img2threejs_status": "NOT_EXECUTABLE_IN_ENVIRONMENT",
+  "img2threejs_notes": "Adapter framework (.p2p/system/p2p_capabilities/img2threejs_adapter.py) exists but upstream checkout (.p2p/vendor/skill/img2threejs-safe-exec-1.5.1) contains only SKILL.md, not executable upstream repository (expected at SHA dede5909be4e494b228c801a55dda47439143932 / tree 25bcd4e1f1a487b9a61d69ade257342a3da767e3). Using manual reference-first Three.js construction instead.",
+  "selected_p2p_capabilities": ["game.three.asset", "game.three.visual", "game.three.scene_authoring"],
+  "deferred_capabilities": ["game.three.cinematic", "game.three.spatial_query", "game.three.navigation", "game.three.adaptive_quality", "game.three.animation_catalog_full"],
+  "visual_correction_pass_applied": true,
+  "known_weaknesses": [
+    "No true skinned mesh / skeletal animation; uses lightweight bone rotation",
+    "No complex cloth simulation; robe uses simple cylinder + plane approximation",
+    "Sword model is geometric primitive, not high-poly mesh",
+    "Character Lab is minimal and does not include full customization system"
+  ],
+  "next_recommended_goal": "THIEN-HA-3D-04 Asset Forge — weapon/clothing customization pipeline, or THIEN-HA-3D-03 Scene Integration — full Shanmen scene with Golden Character as player proxy"
+}
