@@ -80,6 +80,31 @@ Matching plan item(s): `P1-A`, `P1-B`
   `Repository not found. Run: anvien analyze`; no graph change claim is made.
 - P1-A source acceptance is complete. P1-B behavioral SPEC/test work remains
   pending; no final candidate freeze has occurred.
+- `E1-P1B-SRC1`: projection-only SPEC and focused projection contract test
+  were added from the reviewed 01C behavior source; old reports/plans were not
+  copied.
+- `E1-P1B-SRC2`: P1-B diff is limited to the new SPEC and
+  `tests/test_p2p_projection_contract.py`; current-main SEC01 preservation
+  remains `NONE`.
+- `E1-P1B-TEST1`: projection/security contract unittest passed `15/15`.
+- `E1-P1B-TEST2`: pin lifecycle script passed with `negative_cases=5` and
+  `map_gate=FAIL_CLOSED`.
+- `E1-P1B-TEST3`: host projection passed `30/30` after supplying the three
+  existing read-only vendor snapshots as 98 hardlinks in the isolated test
+  workspace; links were removed and no source checkout changed.
+- `E1-P1B-TEST4`: workflow passed `7/7` in a dedicated validation clone whose
+  root was outside `.tmp`. A direct run rooted under `.tmp` produced one
+  setup/environment false negative because `helper_path_is_transient` sees
+  the workspace ancestor; the source function is unchanged and canonical-root
+  validation passed.
+- `E1-P1B-TEST5`: C18 `6/6`, C19 plus comparison `20/20`, FASTPATH `18/18`,
+  and AUTO `7/7` passed on the candidate source.
+- `E1-P1B-TEST6`: BOM-aware no-write compile already passed for 244 Python
+  files; the pre-existing `tests/test_p2p_live_certification.py:179`
+  SyntaxWarning remains non-fatal.
+- `E1-P1B-TEST7`: `git diff --check` passed after P1-B test/spec additions.
+- P1-B acceptance is complete. P2 focused validation and exact candidate
+  freeze remain; no Supervisor review or push has happened.
 
 ## E2 - P2 Evidence
 

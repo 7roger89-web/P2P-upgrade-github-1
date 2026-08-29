@@ -26,8 +26,11 @@ Build/test timing is validation evidence unless it is explicitly a target.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | Projection focused tests | cases | 0 on fresh main | pending | pending | all required cases pass | pending | `E1-P1B-TEST1` |
-| P1 | Projection implementation paths | paths | 0 new on fresh main | pending | pending | reviewed seam only | pending | `E1-P1A-SRC1..E1-P1B-SRC3` |
+| P1 | Projection focused tests | cases | 0 on fresh main | 15 | 15 | all required cases pass | +15 | `E1-P1B-TEST1` |
+| P1 | Pin lifecycle negatives | cases | 0 on fresh main | 5 | 5 | all required negatives pass | +5 | `E1-P1B-TEST2` |
+| P1 | Host projection regression | cases | 0 on fresh main | 30 | 30 | all required cases pass | +30 | `E1-P1B-TEST3` |
+| P1 | Workflow regression | cases | 0 on fresh main | 7 | 7 | all required cases pass | +7 | `E1-P1B-TEST4` |
+| P1 | Projection implementation paths | paths | 0 new on fresh main | 3 | 3 | reviewed seam only | +3 | `E1-P1A-SRC1..E1-P1B-SRC3` |
 
 ## B2 - P2 Benchmarks
 

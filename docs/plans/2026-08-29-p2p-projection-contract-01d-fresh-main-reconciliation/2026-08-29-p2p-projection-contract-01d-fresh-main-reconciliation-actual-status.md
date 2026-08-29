@@ -2,7 +2,7 @@
 
 Title: P2P Projection Contract 01D Fresh-Main Reconciliation
 Date: 2026-08-29
-Status: P1-A Complete / P1-B Pending
+Status: P1-B Complete / P2 Pending
 Companion plan: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-plan.md`
 Companion evidence: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-evidence.md`
 Companion benchmark: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-benchmark.md`
@@ -55,12 +55,12 @@ as the fallback and this limitation remains explicit.
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
 | Fresh remote/main | `1c84bc41421dcbe502d40b71fead5022231d0541`, tree `a11a44b676401d8a424db8ed05632c8d22952d26` | Fresh directly fetched authority | correct | N/A | `E0-P0A-REMOTE1..E0-P0A-REMOTE3` | preserve base |
 | Post-base SEC01 commits | 3 commits after `bc686845...` | All preserved in new candidate | correct/adjacent | N/A | `E0-P0A-INT1..E0-P0A-INT3` | inspect-only |
-| `project_pin.py` | reviewed v2 branch reconciled onto fresh main; source blob equals reviewed 01C | v1 preserved plus v2 closed modes, pending behavior tests | partial | UNKNOWN | `E0-P0A-SRC1`, `E1-P1A-SRC1`, `E1-P1A-VAL1` | validate P1-B |
-| `project_context.py` | mode-aware v1/v2 readiness dispatch reconciled; source blob equals reviewed 01C | mode-aware v1/v2 readiness, pending behavior tests | partial | UNKNOWN | `E0-P0A-SRC2`, `E1-P1A-SRC2`, `E1-P1A-VAL1` | validate P1-B |
-| `project_materialization.py` | bounded controlled writer added; source blob equals reviewed 01C | one bounded writer proven by behavior tests | partial | N/A | `E1-P1A-SRC3`, `E1-P1A-VAL1` | validate P1-B |
+| `project_pin.py` | reviewed v2 branch reconciled onto fresh main; source blob equals reviewed 01C; 15 projection tests and 5 lifecycle negatives pass | v1 preserved plus v2 closed modes | correct | UNKNOWN | `E1-P1A-SRC1`, `E1-P1A-TEST1..E1-P1B-TEST2` | preserve; validate P2 |
+| `project_context.py` | mode-aware v1/v2 readiness dispatch reconciled; projection readiness passes without runtime | mode-aware v1/v2 readiness | correct | UNKNOWN | `E1-P1A-SRC2`, `E1-P1B-TEST1` | preserve; validate P2 |
+| `project_materialization.py` | bounded controlled writer added; security, idempotency, collision, rollback, and pin-last tests pass | one bounded writer proven by behavior tests | correct | N/A | `E1-P1A-SRC3`, `E1-P1B-TEST1` | preserve; validate P2 |
 | `host_projection.py` | existing pure-plan implementation | pure plan preserved | correct | direct | `E0-P0A-SRC4` | preserve-only |
-| Projection-only SPEC | absent on fresh main | explicit v2 contract | missing | N/A | `E0-P0A-SRC5` | edit P1-B |
-| Projection focused tests | absent on fresh main | behavioral security/lifecycle coverage | missing | N/A | `E0-P0A-SRC5..E0-P0A-SRC6` | edit P1-B |
+| Projection-only SPEC | added from reviewed contract source | explicit v2 contract | correct | N/A | `E1-P1B-SRC1` | preserve; validate P2 |
+| Projection focused tests | added; 15/15 pass with negative cases | behavioral security/lifecycle coverage | correct | N/A | `E1-P1B-SRC2`, `E1-P1B-TEST1` | preserve; validate P2 |
 | C18/C19/FASTPATH/AUTO/workflow | current-main implementations present | preserved and focused-tested | correct/preserve | direct | `E0-P0A-SRC7` | validate P2-A |
 | img2threejs/Tripo/providers/secrets | no activation/execution requested or present in projection contract | false/zero/not executed | correct | direct | `E0-P0A-BOUND1` | preserve-only |
 | Anvien graph index | analyze failed on disk while writing relations | graph evidence if available | blocked tooling | N/A | `E0-P0A-ANV1` | direct evidence fallback |
@@ -72,6 +72,7 @@ as the fallback and this limitation remains explicit.
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-29 | fresh remote/main before implementation | all 01D scope | initial classification: projection partial/missing; SEC01 preserve-only; Anvien blocked | `E0-P0A-REMOTE1..E0-P0A-ISO1` | P1-A semantic reconciliation allowed; P1-B after source slice |
 | R1 | 2026-08-29 | after P1-A source reconciliation | pin/context missing/partial -> implemented pending behavior proof; materializer missing -> present pending behavior proof | `E1-P1A-SRC1..E1-P1A-VAL3` | P1-B focused SPEC/test work is next; no freeze yet |
+| R2 | 2026-08-29 | after P1-B focused tests | pin/context/materializer/SPEC/tests -> correct for focused contract boundary; workflow direct-root setup caveat recorded | `E1-P1B-SRC1..E1-P1B-TEST7` | P2 focused validation, exact identity freeze, and Supervisor review next |
 
 ## Phase Touch Map
 
@@ -125,7 +126,7 @@ correct/preserve-only.
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
 | P1-A | v2 pin/context branch and materializer are now reconciled and statically import/compile clean | mark P1-A complete; preserve exact source seam |
-| P1-B | SPEC and focused projection/security test are still missing | keep P1-B; add behavioral proof only |
+| P1-B | SPEC/test are present and focused behavior passes | mark P1-B complete; proceed to P2 without source redesign |
 | P2-A | current regressions exist and must be preserved | validate-only; no broad suite |
 | P3-A | remote is currently stable but can drift | defer until exact Supervisor PASS, fresh fetch |
 
@@ -140,6 +141,7 @@ correct/preserve-only.
 - [x] Missing/partial parts have exact next actions.
 - [x] Anvien blocker is recorded honestly.
 - [x] Status Refresh Log has R0 baseline and R1 source-slice refresh rows.
+- [x] Status Refresh Log has R2 behavioral-validation refresh row.
 - [x] Protected paths are do-not-touch.
 
 ## Final P0 Decision
@@ -162,3 +164,8 @@ is required and no graph PASS may be claimed.
 P1-A refresh: the reviewed source seam is now present with exact reviewed
 source blobs and no SEC01 diff. Behavioral validation remains intentionally
 owned by P1-B before the candidate can be frozen.
+
+P1-B refresh: SPEC and tests are now present and pass at the focused boundary.
+The one direct workflow-root failure was isolated to the `.tmp` ancestor in
+the required promotion workspace and was resolved by a separate validation
+clone outside `.tmp`; no workflow code was changed.

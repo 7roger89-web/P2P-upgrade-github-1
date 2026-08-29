@@ -186,7 +186,7 @@ without restoring older assumptions or expanding architecture.
   - Commit Boundary: commit after source acceptance and detect-changes if
     Anvien becomes available; otherwise record unavailable and commit locally.
 
-- [ ] P1-B: Add projection contract SPEC and behavior/security tests
+- [x] P1-B: Add projection contract SPEC and behavior/security tests
   - Goal: prove the reconciled contract at the nearest real Python boundary.
   - Scope Boundary:
     - Editable: one projection SPEC and one focused test module plus planner
