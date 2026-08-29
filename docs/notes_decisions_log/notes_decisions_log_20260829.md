@@ -36,3 +36,12 @@
 - Focused validation and the final coder/supervisor reports are recorded after
   the candidate commit; no merge, push, promotion, deployment, provider
   activation, dependency installation, or paid external call is permitted.
+
+## Final checkpoint
+
+- Candidate implementation commit: `deaff7dbd79af5a1beb1e7e6a07c0436a2b8362c`;
+  tree: `8495c1fe0f2faa8ae8a7a00d7f99b6a37195c1f3`.
+- Coder report: `reports/coder/rp_coder_260829_075037_by_gpt-5-codex_p2p-game-toolchain-02a.md`.
+- Independent supervisor report:
+  `reports/supervisor/rp_supervisor_260829_075037_by_gpt-5-codex_p2p-game-toolchain-02a.md`.
+- Technical stop: Owner gate, with img2threejs executable binding deferred.
