@@ -59,16 +59,42 @@ Matching plan item(s): `P0-A`
 
 Matching plan item(s): `P1-A`, `P1-B`
 
-- `E1-P1A-SRC1`: pending exact application of the reviewed 11-file delta after
-  P0 gate; current expected source/test overlap is zero.
-- `E1-P1A-TEST1`: pending direct 17-test run.
-- `E1-P1A-DIFF1`: pending post-port path/whitespace check.
-- `E1-P1B-TEST1`: pending focused direct/preservation results.
-- `E1-P1B-COMPILE1`: pending affected-module no-write Python compilation.
-- `E1-P1B-PARSE1`: pending relevant registry JSON and contract import/parse.
-- `E1-P1B-DIFF1`: pending final ancestry, changed-path, and diff check.
-- `E1-P1B-REPORT1`: pending current-lineage coder report.
-- `E1-P1B-IDENTITY1`: pending new candidate SHA/tree and current-main base.
+- `E1-P1A-SRC1`: the exact reviewed 11-file delta was applied with
+  `git apply --3way` from old candidate `e1410fa` onto the fresh-main branch.
+  The source checkpoint is `01336e1e180fc42ec0c3da7ab7fbb8cffd7db90a`, tree
+  `f3940503a4d9da4bb9d950bc8177384bdd4a94c6`, parent
+  `02b2806875a3a83a1bb7af274dc2c571674391ae`. All 11 carried blobs match the
+  old candidate, and all 9 later current-main blobs match `82d8a976`.
+  No current-main path overlaps the carried delta.
+- `E1-P1A-TEST1`: the direct suite
+  `tests/test_p2p_reasoning_execution_decoupling.py` passed `17 passed` in
+  `0.37s` on the fresh-main lineage.
+- `E1-P1A-DIFF1`: the source checkpoint has exactly the scoped 11 source/test
+  paths, `git diff --cached --check` passed before commit, and the committed
+  source slice has no whitespace error against fresh main.
+- `E1-P1B-TEST1`: directly affected preservation command
+  `tests/test_p2p_c34_real_backend_contract.py tests/test_p2p_c35_provider_neutral_runtime.py`
+  passed `94 passed, 14 skipped, 7 warnings` in `1.87s`. The first pre-checkpoint
+  run exposed only the expected C34 tracked-change allowlist for the not-yet-
+  committed new direct test (`93 passed, 14 skipped, 1 failed`); the identical
+  suite passed after the source/test checkpoint. No behavior failure remains.
+- `E1-P1B-COMPILE1`: no-write Python compilation passed for all 11 affected
+  source/test Python files: `COMPILE=PASS FILES=11`.
+- `E1-P1B-PARSE1`: `capabilities.json` parsed as a non-empty object with 3
+  top-level keys; the imported backend contract recognized the bounded claim
+  mapping and mechanical evidence pointer shape: `REGISTRY_JSON=PASS`
+  and `CONTRACT_PARSE=PASS`.
+- `E1-P1B-DIFF1`: exact Git verification reports 18 old-candidate paths, 9
+  later current-main paths, zero shared paths, zero carried-blob mismatches,
+  zero current-main-blob mismatches, `CURRENT_MAIN_ANCESTOR=TRUE`, and
+  `DIFF_CHECK_CURRENT_MAIN=PASS`. A fresh remote resolve after the checkpoint
+  still returned `82d8a976381157aeece51fde33ef972496ff8ce7`; no drift occurred.
+- `E1-P1B-REPORT1`: current-lineage coder report is recorded at
+  `reports/coder/rp_coder_260829_165137_by_gpt-5-codex_p2p-reasoning-execution-fresh-current-canonical-reconciliation.md`.
+- `E1-P1B-IDENTITY1`: the candidate remains directly descended from fresh
+  official main `82d8a976381157aeece51fde33ef972496ff8ce7` / tree
+  `ac2627b0a7ae1bfa8eef83992e4c76f325c0b905`; source checkpoint ancestry and
+  tree are recorded in `E1-P1A-SRC1`.
 
 ## E2 - P2 Evidence
 

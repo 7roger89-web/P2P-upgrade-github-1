@@ -28,11 +28,11 @@ broad regression benchmark is run.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | reviewed source/test delta paths | paths | 11 | pending | pending | 11 | pending | E1-P1A-SRC1 |
-| P1 | direct Reasoning/Execution tests | tests | 17 | pending | pending | 17 pass | pending | E1-P1A-TEST1 |
-| P1 | directly affected preservation tests passed | tests | 94 | pending | pending | no new failure | pending | E1-P1B-TEST1 |
-| P1 | directly affected preservation tests skipped | tests | 14 | pending | pending | environment-only | pending | E1-P1B-TEST1 |
-| P1 | affected modules compiled | files | 11 | pending | pending | all pass | pending | E1-P1B-COMPILE1 |
+| P1 | reviewed source/test delta paths | paths | 11 | 11 | 11 | 11 | 0 | E1-P1A-SRC1 |
+| P1 | direct Reasoning/Execution tests | tests | 17 | 17 pass | 17 pass | 17 pass | 0 | E1-P1A-TEST1 |
+| P1 | directly affected preservation tests passed | tests | 94 | 94 | 94 | 94 | 0 | E1-P1B-TEST1 |
+| P1 | directly affected preservation tests skipped | tests | 14 | 14 | 14 | 14 | 0 | E1-P1B-TEST1 |
+| P1 | affected modules compiled | files | 11 | 11 pass | 11 pass | all pass | 0 | E1-P1B-COMPILE1 |
 
 ## B2 - P2 Benchmarks
 

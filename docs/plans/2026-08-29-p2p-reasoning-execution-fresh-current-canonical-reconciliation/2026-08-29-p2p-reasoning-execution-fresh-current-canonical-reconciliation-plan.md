@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-29`
-- Status: `ready_for_implementation`
+- Status: `ready_for_supervisor`
 - Plan: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-plan.md`
 - Evidence: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-evidence.md`
 - Benchmark: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-benchmark.md`
@@ -140,7 +140,7 @@ delta has no path overlap with later canonical files, port only the coherent
   - P1-A: Port the exact reviewed Reasoning/Execution source/test delta.
   - P1-B: Run the verification ceiling and record reconciliation evidence.
 
-- [ ] P1-A: Port the exact reviewed Reasoning/Execution source/test delta.
+- [x] P1-A: Port the exact reviewed Reasoning/Execution source/test delta.
   - Goal: retain proven semantics without stale-history replay or later-main
     rollback.
   - Scope Boundary:
@@ -197,7 +197,7 @@ delta has no path overlap with later canonical files, port only the coherent
   - Actual-status Update: append R1 after the source/test checkpoint.
   - Commit Boundary: commit the verified source/test slice before P1-B.
 
-- [ ] P1-B: Run the verification ceiling and record reconciliation evidence.
+- [x] P1-B: Run the verification ceiling and record reconciliation evidence.
   - Goal: prove the carried-forward invariant at its nearest real boundaries.
   - Scope Boundary:
     - Editable: four plan artifacts, decision log entry, coder report, and

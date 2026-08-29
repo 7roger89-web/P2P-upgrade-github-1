@@ -91,6 +91,54 @@
   `reports/supervisor/rp_supervisor_260829_122500_by_gpt-5-codex_p2p-auto01-current-canonical-reconciliation.md`.
 - Technical stop is Owner gate only; canonical remains unpromoted.
 
+## P2P-REASONING/EXECUTION fresh current-canonical reconciliation — 2026-08-29
+
+### Authority and isolation
+
+- Fresh official `refs/heads/main` resolved to
+  `82d8a976381157aeece51fde33ef972496ff8ce7` with tree
+  `ac2627b0a7ae1bfa8eef83992e4c76f325c0b905`; a second post-checkpoint
+  resolution returned the same SHA.
+- The existing reviewed Reasoning/Execution candidate is
+  `e1410fa28fab5b9c3d0d9f1c37ef68a20165bcef` with tree
+  `5cccc26ab65ae525a43ee9b41557cf47f0cbf3db`, based on
+  `1c84bc41421dcbe502d40b71fead5022231d0541`.
+- Work is isolated to `.tmp/p2p-sec01-current-canonical`; the supplied root
+  is not a Git checkout and protected canonical/Owner worktrees were not
+  repaired or modified.
+
+### Reconciliation and verification
+
+- Old-base-to-old-candidate has 18 paths; old-base-to-fresh-main has 9 paths;
+  exact overlap and production/test overlap are both zero. Classification is
+  `NONE`.
+- Only the 11 reviewed Reasoning/Execution source/test paths were carried
+  forward. The source checkpoint is `01336e1e180fc42ec0c3da7ab7fbb8cffd7db90a`
+  / tree `f3940503a4d9da4bb9d950bc8177384bdd4a94c6`; parent is the plan
+  checkpoint `02b2806875a3a83a1bb7af274dc2c571674391ae`.
+- Newer 01D projection context/materialization/pin/spec/test and four plan
+  artifacts remain byte-identical to fresh main. No duplicate registry,
+  router, verifier, execution plane, risk engine, orchestrator, truth store,
+  MCP, or ArenaAdapter was added.
+- Direct Reasoning/Execution evidence: `17 passed`. Directly affected C34/C35
+  preservation evidence: `94 passed, 14 skipped`; affected compile `11/11`;
+  registry/contract parse PASS; exact ancestry/blob/diff checks PASS.
+- Coder report:
+  `reports/coder/rp_coder_260829_165137_by_gpt-5-codex_p2p-reasoning-execution-fresh-current-canonical-reconciliation.md`.
+
+### Stop boundary
+
+- Required semantics remain bound: normalized execution capabilities,
+  task-to-certified-target binding, separate reasoning provider identity,
+  host/surface/environment/permission-aware eligibility, mechanical execution
+  evidence, observed-target binding, stale/marketing fail-closed behavior,
+  permission non-widening, provider-neutral C35 runtime, and Owner/release
+  governance.
+- `MCP_REQUIRED_NOW=NO`; no broad regression, live execution, remote push,
+  promotion, release, deployment, or activation was run.
+- One independent Supervisor review remains required. Technical stop is the
+  Owner gate; canonical remains unpromoted.
+
 ## P2P-SEC01 current-canonical reconciliation — 2026-08-29
 
 ### Authority and isolation

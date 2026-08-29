@@ -2,7 +2,7 @@
 
 Title: P2P Reasoning/Execution Fresh Current-Canonical Reconciliation
 Date: 2026-08-29
-Status: P0 Complete
+Status: P1 Complete / Supervisor Pending
 Companion plan: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-plan.md`
 Companion evidence: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-evidence.md`
 Companion benchmark: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-benchmark.md`
@@ -66,10 +66,10 @@ the authorized substitutes.
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
 | Official main | remote/current clone resolve to `82d8a976/ac2627b0` and clone is clean | exact fresh canonical ancestor | correct | not measured; Anvien prohibited | `E0-P0A-REMOTE1`, `E0-P0A-CURRENT1` | create candidate branch from exact main |
-| Reviewed Reasoning/Execution candidate | `e1410fa/5cccc26`, based on `1c84bc4` | same 11-file implementation semantics on newest main | correct/reviewed | not measured; Anvien prohibited | `E0-P0A-OLD1` | port only reviewed delta in P1-A |
+| Reviewed Reasoning/Execution candidate | `e1410fa/5cccc26`, based on `1c84bc4` | same 11-file implementation semantics on newest main | correct/reviewed | not measured; Anvien prohibited | `E0-P0A-OLD1` | carried exactly at checkpoint `01336e1` |
 | Old-base/current-main overlap | empty; current main has 9 later 01D paths | no source/test conflict | correct | exact path inventory | `E0-P0A-OVERLAP1`, `E0-P0A-OVERLAP2` | classification `NONE`; no conflict resolution |
 | Later 01D projection work | current source/spec/test files exist on fresh main | preserve exactly; current main wins | correct | 9 paths; graph count not measured | `E0-P0A-LATE1` | preserve-only; never edit in P1 |
-| Reasoning/Execution source family | reviewed source/test delta exists only in old candidate | port 11 coherent paths without rebuilding | reviewed/unported | 11 candidate paths; graph count not measured | `E0-P0A-OLD1`, `E0-P0A-SPEC1` | edit only P1-A |
+| Reasoning/Execution source family | reviewed source/test delta was carried onto fresh main | preserve 11 coherent paths without rebuilding | correct/checkpointed | 11 candidate paths; graph count not measured | `E0-P0A-OLD1`, `E1-P1A-SRC1`, `E1-P1A-TEST1` | preserve implementation; Supervisor only |
 | Control-plane/Owner boundary | existing registry/router/verifier/runtime and Owner governance | no duplicate control plane or permission widening | correct | not measured; Anvien prohibited | `E0-P0A-SPEC1`, `E0-P0A-BOUNDARY1` | preserve; validate in P1/P2 |
 
 ## Status Refresh Log
@@ -77,6 +77,8 @@ the authorized substitutes.
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-08-29 | fresh remote and isolated current-main source before mutation | authority, old candidate, overlap, 01D later work | current main correct; candidate reviewed; overlap none; implementation unported | `E0-P0A-REMOTE1..E0-P0A-TOOL1` | P1-A may port exact 11-file delta; P1-B runs focused ceiling |
+| R1 | 2026-08-29 | source checkpoint `01336e1/f3940503`; parent `02b2806` | reviewed 11-file source/test delta | exact port applied; all carried blobs match old candidate; all 9 later-main blobs remain exact; direct 17 pass | `E1-P1A-SRC1`, `E1-P1A-TEST1`, `E1-P1A-DIFF1` | P1-A complete; run P1-B ceiling |
+| R2 | 2026-08-29 | fresh remote re-resolve still `82d8a976/ac2627b0` | preservation tests, compile, registry/contract parse, identity | `94 passed, 14 skipped`; compile 11/11; parse pass; zero overlap/mismatch; ancestry and diff pass | `E1-P1B-TEST1..E1-P1B-IDENTITY1` | P1 complete; require one focused Supervisor |
 
 ## Phase Touch Map
 
@@ -177,8 +179,8 @@ plane to connect the two contracts.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | The old reviewed 11-file source/test delta has zero current-main overlap and current main is clean/fresh. | proceed with exact port only |
-| P1-B | Focused evidence has not yet been run on the new lineage. | run direct/affected ceiling, compile, parse, diff |
+| P1-A | The old reviewed 11-file source/test delta was applied and checkpointed at `01336e1`; direct 17 tests passed. | complete; preserve exact checkpoint |
+| P1-B | Focused preservation, compile, parse, ancestry, hash, and diff checks pass on the new lineage. | complete; write one focused Supervisor review |
 | P2-A | No new-candidate Supervisor evidence exists yet. | require one focused independent review |
 
 ## Implementation Gate
@@ -214,4 +216,8 @@ Fresh official main is bound at `82d8a976/ac2627b0`; old candidate identity is
 bound at `e1410fa/5cccc26`; old-base/current-main path overlap is empty and the
 production/test overlap is zero. P1 may carry forward only the reviewed
 Reasoning/Execution source/test delta. Current 01D projection work is
-preserve-only. No Anvien/MCP/live/promotion action is permitted.
+preserve-only. The exact 11-file port is checkpointed at `01336e1` with direct
+17-test PASS; the affected C34/C35 preservation suite is `94 passed, 14
+skipped`. Compile, registry/contract parse, ancestry, blob, and diff checks
+pass. No Anvien/MCP/live/promotion action is permitted. P2 requires one
+focused Supervisor and then the Owner gate.
