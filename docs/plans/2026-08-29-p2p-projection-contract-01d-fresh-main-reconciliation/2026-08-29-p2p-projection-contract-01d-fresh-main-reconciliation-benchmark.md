@@ -36,8 +36,9 @@ Build/test timing is validation evidence unless it is explicitly a target.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | Focused validation cases | cases | pending | pending | pending | all listed boundaries pass | pending | `E2-P2A-TEST1..E2-P2A-TEST9` |
-| P2 | Candidate identity | SHA/tree | old 01C `b27dbe8/aa8255e` | pending | pending | new exact subject | pending | `E2-P2A-ID1..E2-P2A-ID3` |
+| P2 | Focused validation cases | cases | 0 | 103 plus 5 lifecycle negatives | 103 plus 5 lifecycle negatives | all listed boundaries pass | PASS | `E2-P2A-TEST1..E2-P2A-TEST8` |
+| P2 | Python static compile inventory | files | 0 | 245 | 245 | no syntax errors | +245 | `E2-P2A-TEST7` |
+| P2 | Candidate identity | SHA/tree | old 01C `b27dbe8/aa8255e` | `45fe0b3` pre-freeze | pending final docs commit | new exact subject | pending | `E2-P2A-ID1..E2-P2A-ID3` |
 
 ## B3 - P3 Benchmarks
 

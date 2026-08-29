@@ -110,9 +110,33 @@ Matching plan item(s): `P1-A`, `P1-B`
 
 Matching plan item(s): `P2-A`, `P2-B`
 
-Pending until focused validation, exact candidate freeze, and Supervisor review
-complete. This section must contain the final exact SHA/tree and all test
-results before promotion is considered.
+- `E2-P2A-TEST1`: projection/security contract passed `15/15` on the current
+  candidate HEAD.
+- `E2-P2A-TEST2`: pin lifecycle passed with `negative_cases=5` and
+  `map_gate=FAIL_CLOSED`.
+- `E2-P2A-TEST3`: C18 passed `6/6`; C19 plus comparison passed `20/20`.
+- `E2-P2A-TEST4`: FASTPATH passed `18/18`; AUTO passed `7/7`.
+- `E2-P2A-TEST5`: host projection passed `30/30` with 98 read-only hardlinked
+  snapshot fixture files; links were removed before candidate status was
+  checked.
+- `E2-P2A-TEST6`: workflow passed `7/7` in a dedicated validation clone
+  outside `.tmp`; the clone and test-created state were removed.
+- `E2-P2A-TEST7`: BOM-aware no-write compile passed for `245` Python files;
+  the only observed warning is the pre-existing
+  `tests/test_p2p_live_certification.py:179` SyntaxWarning.
+- `E2-P2A-TEST8`: full candidate-range `git diff --check` passed; SEC01
+  preservation diff is `NONE`.
+- `E2-P2A-ID1`: fresh main is an ancestor of the candidate HEAD;
+  `git rev-list --left-right --count origin/main...HEAD` is `0 3` and the
+  candidate range contains no merge commits.
+- `E2-P2A-ID2`: candidate diff allowlist is exactly two existing projection
+  files, one materializer, one projection SPEC, one focused test, and the four
+  01D planner artifacts; no SEC01 path is changed.
+- `E2-P2A-ID3`: exact final SHA/tree will be recorded out-of-tree immediately
+  after the last pre-freeze commit; no post-freeze evidence commit is allowed.
+- Focused validation is PASS. No Council, provider, secret, runtime, game, or
+  Thiên Hạ action was performed. Candidate is ready to freeze after this
+  evidence update and one final docs-only commit.
 
 ## E3 - P3 Evidence
 

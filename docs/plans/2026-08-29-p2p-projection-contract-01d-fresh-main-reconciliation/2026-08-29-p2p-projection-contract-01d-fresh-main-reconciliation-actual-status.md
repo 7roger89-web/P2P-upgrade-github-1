@@ -2,7 +2,7 @@
 
 Title: P2P Projection Contract 01D Fresh-Main Reconciliation
 Date: 2026-08-29
-Status: P1-B Complete / P2 Pending
+Status: P2-A Complete / P2-B Pending
 Companion plan: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-plan.md`
 Companion evidence: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-evidence.md`
 Companion benchmark: `docs/plans/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation/2026-08-29-p2p-projection-contract-01d-fresh-main-reconciliation-benchmark.md`
@@ -65,6 +65,7 @@ as the fallback and this limitation remains explicit.
 | img2threejs/Tripo/providers/secrets | no activation/execution requested or present in projection contract | false/zero/not executed | correct | direct | `E0-P0A-BOUND1` | preserve-only |
 | Anvien graph index | analyze failed on disk while writing relations | graph evidence if available | blocked tooling | N/A | `E0-P0A-ANV1` | direct evidence fallback |
 | Owner/Thiên Hạ state | outside isolated workspace | zero mutation | preserve-only | N/A | `E0-P0A-ISO1` | do-not-touch |
+| Current candidate subject | `45fe0b3` before final evidence commit; fresh-main ancestor and clean | exact frozen SHA/tree after final pre-freeze commit | partial | N/A | `E2-P2A-ID1..E2-P2A-ID3` | freeze then review |
 
 ## Status Refresh Log
 
@@ -73,6 +74,7 @@ as the fallback and this limitation remains explicit.
 | R0 | 2026-08-29 | fresh remote/main before implementation | all 01D scope | initial classification: projection partial/missing; SEC01 preserve-only; Anvien blocked | `E0-P0A-REMOTE1..E0-P0A-ISO1` | P1-A semantic reconciliation allowed; P1-B after source slice |
 | R1 | 2026-08-29 | after P1-A source reconciliation | pin/context missing/partial -> implemented pending behavior proof; materializer missing -> present pending behavior proof | `E1-P1A-SRC1..E1-P1A-VAL3` | P1-B focused SPEC/test work is next; no freeze yet |
 | R2 | 2026-08-29 | after P1-B focused tests | pin/context/materializer/SPEC/tests -> correct for focused contract boundary; workflow direct-root setup caveat recorded | `E1-P1B-SRC1..E1-P1B-TEST7` | P2 focused validation, exact identity freeze, and Supervisor review next |
+| R3 | 2026-08-29 | after P2 focused validation | focused boundary validated; candidate identity ready for final pre-freeze docs commit | `E2-P2A-TEST1..E2-P2A-ID3` | commit docs once, compute exact final SHA/tree, freeze; no later candidate mutation |
 
 ## Phase Touch Map
 
@@ -127,7 +129,7 @@ correct/preserve-only.
 |-----------|-----------------------|--------------------------------------|
 | P1-A | v2 pin/context branch and materializer are now reconciled and statically import/compile clean | mark P1-A complete; preserve exact source seam |
 | P1-B | SPEC/test are present and focused behavior passes | mark P1-B complete; proceed to P2 without source redesign |
-| P2-A | current regressions exist and must be preserved | validate-only; no broad suite |
+| P2-A | focused validation passed; current regressions preserved | mark P2-A complete; freeze exact subject after final docs commit |
 | P3-A | remote is currently stable but can drift | defer until exact Supervisor PASS, fresh fetch |
 
 ## Implementation Gate

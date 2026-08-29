@@ -249,7 +249,7 @@ without restoring older assumptions or expanding architecture.
   - P2-A: Run focused validation and freeze final candidate SHA/tree.
   - P2-B: Focused exact-subject Supervisor review and immutability check.
 
-- [ ] P2-A: Run focused validation and freeze final candidate SHA/tree
+- [x] P2-A: Run focused validation and freeze final candidate SHA/tree
   - Goal: establish all promotion-critical evidence on a clean exact subject.
   - Scope Boundary: affected Python modules/tests and git identity only.
   - Work Steps: run required modules separately, compile/static validation,
