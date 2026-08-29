@@ -61,7 +61,25 @@ Matching plan item(s): `P0-A`
 
 Matching plan item(s): `P1-A`, `P1-B`
 
-Pending until reconciliation source edits and focused contract tests complete.
+- `E1-P1A-SRC1`: `project_pin.py` working-tree blob is exactly
+  `f82d7b2176b8b23f20c1237cade352eb5751ae6a`, the reviewed 01C source blob.
+- `E1-P1A-SRC2`: `project_context.py` working-tree blob is exactly
+  `b595022e2d3f91c5eda5fd1e1e537a67882c2bf9`, the reviewed 01C source blob.
+- `E1-P1A-SRC3`: new `project_materialization.py` working-tree blob is exactly
+  `ff5088011f09e4f8820298529e79b77beaa5d612`, the reviewed 01C source blob.
+- `E1-P1A-SRC4`: direct diff against fresh `origin/main` contains only the
+  intended two modifications and one addition for P1-A; SEC01 paths have
+  `SEC01_PRESERVATION_DIFF=NONE`.
+- `E1-P1A-SRC5`: import smoke passed for project pin, project context, and
+  materializer; v1/v2 schema and mode constants were observable.
+- `E1-P1A-VAL1`: BOM-aware no-write Python compile passed for 244 files in
+  `.p2p/system/p2p_capabilities`, `scripts`, and `tests`; one pre-existing
+  SyntaxWarning remains in `tests/test_p2p_live_certification.py:179`.
+- `E1-P1A-VAL2`: `git diff --check` passed for the P1-A working tree.
+- `E1-P1A-VAL3`: `anvien detect-changes --scope all --json` returned
+  `Repository not found. Run: anvien analyze`; no graph change claim is made.
+- P1-A source acceptance is complete. P1-B behavioral SPEC/test work remains
+  pending; no final candidate freeze has occurred.
 
 ## E2 - P2 Evidence
 

@@ -128,7 +128,7 @@ without restoring older assumptions or expanding architecture.
   - P1-A: Reconcile v2 pin/readiness and bounded materializer.
   - P1-B: Add projection contract SPEC and behavior/security tests.
 
-- [ ] P1-A: Reconcile v2 pin/readiness and bounded materializer
+- [x] P1-A: Reconcile v2 pin/readiness and bounded materializer
   - Goal: carry forward the exact reviewed implementation semantics onto fresh
     main without touching SEC01 paths.
   - Scope Boundary:
@@ -182,7 +182,7 @@ without restoring older assumptions or expanding architecture.
   - Evidence Targets: source diffs, current-main preservation diff, import and
     compile output, and candidate status.
   - Actual-status Update: `partial/missing -> implemented, awaiting focused
-    behavioral validation`.
+    behavioral validation` (recorded in R1).
   - Commit Boundary: commit after source acceptance and detect-changes if
     Anvien becomes available; otherwise record unavailable and commit locally.
 

@@ -16,11 +16,11 @@ from dataclasses import dataclass, field
 try:
     from .context import retrieve_task_context, TASK_CONTEXT_SCHEMA
     from .project_map import ProjectMap
-    from .project_pin import ProjectPinError, validate_pin
+    from .project_pin import PROJECT_PIN_V2_SCHEMA, PROJECTION_ONLY, ProjectPinError, validate_pin
 except ImportError:
     from context import retrieve_task_context, TASK_CONTEXT_SCHEMA
     from project_map import ProjectMap
-    from project_pin import ProjectPinError, validate_pin
+    from project_pin import PROJECT_PIN_V2_SCHEMA, PROJECTION_ONLY, ProjectPinError, validate_pin
 
 PROJECT_CONTEXT_READY_SCHEMA = "p2p-project-context-ready/2"
 
@@ -60,7 +60,15 @@ class ProjectContextBootstrap:
         if not self.pin_path.exists():
             return False
         try:
-            validate_pin(self.project_root, metadata_root=self.p2p_dir / "system")
+            pin = json.loads(self.pin_path.read_text(encoding="utf-8"))
+            if pin.get("schema") == PROJECT_PIN_V2_SCHEMA and pin.get("mode") == PROJECTION_ONLY:
+                # Projection-only readiness is deliberately independent from
+                # packaged metadata and Doctor.  The v2 validator checks the
+                # bound plan, files, policy/context, and NOT_INSTALLED claim.
+                validate_pin(self.project_root)
+            else:
+                # Preserve the existing v1 packaged-runtime path verbatim.
+                validate_pin(self.project_root, metadata_root=self.p2p_dir / "system")
             return True
         except (OSError, ProjectPinError, ValueError, TypeError, json.JSONDecodeError):
             return False
