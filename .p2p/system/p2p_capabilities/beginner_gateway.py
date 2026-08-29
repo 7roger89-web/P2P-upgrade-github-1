@@ -19,6 +19,7 @@ from .orchestration_policy import derive_requirement
 
 
 BEGINNER_GATEWAY_SCHEMA = "p2p-beginner-gateway/1"
+AUTO_DECOMPOSITION_SCHEMA = "p2p-auto-goal-decomposition/1"
 BEGINNER_MODE = "BEGINNER"
 STATUS_IN_PROGRESS = "ĐANG LÀM"
 STATUS_DONE = "ĐÃ XONG"
@@ -35,6 +36,7 @@ _PUBLIC_FIELDS = (
     "acceptance_criteria",
     "important_constraints",
     "execution_workstreams",
+    "progress_summary",
     "safe_next_action",
     "question",
     "question_options",
@@ -47,9 +49,13 @@ _NEW_PATTERNS = (
     r"\b(?:dự\s+án\s+mới|bắt\s+đầu\s+từ\s+đầu)\b",
 )
 _EXISTING_PATTERNS = (
-    r"\b(?:current|existing|this\s+(?:project|app|application)|in\s+this|my\s+(?:current|existing)|improve|fix|update|enhance|refactor|maintain)\b",
-    r"\b(?:hiện\s+tại|đang\s+có|dự\s+án\s+này|ứng\s+dụng\s+hiện\s+có|cải\s+thiện|sửa|cập\s+nhật|nâng\s+cấp|bảo\s+trì)\b",
+    r"\b(?:current|existing|this\s+(?:project|app|application)|in\s+this|my\s+(?:current|existing)|improve|fix|update|enhance|refactor|maintain|continue|resume|finish|complete)\b",
+    r"\b(?:hiện\s+tại|đang\s+có|dự\s+án\s+này|ứng\s+dụng\s+hiện\s+có|cải\s+thiện|sửa|cập\s+nhật|nâng\s+cấp|bảo\s+trì|tiếp\s+tục|hoàn\s+thiện)\b",
     r"\b(?:thêm|bổ\s+sung)\s+(?:tính\s+năng|chức\s+năng)\b",
+)
+_CONTINUATION_PATTERNS = (
+    r"\b(?:continue|resume|finish|complete|keep\s+(?:working|improving)|carry\s+on)\b",
+    r"\b(?:tiếp\s+tục|hoàn\s+thiện|đang\s+làm|phần\s+còn\s+lại)\b",
 )
 _PROTECTED_PATTERNS = (
     r"\b(?:deploy|release|publish|promote|force[- ]push|go\s+live|production)\b",
@@ -102,6 +108,12 @@ def _matches(text: str, patterns: tuple[str, ...]) -> bool:
     return any(re.search(pattern, text, re.IGNORECASE) for pattern in patterns)
 
 
+def is_continuation_request(value: str) -> bool:
+    """Return whether the request explicitly asks to continue existing work."""
+
+    return isinstance(value, str) and _matches(value, _CONTINUATION_PATTERNS)
+
+
 def _inspection_value(inspection: Mapping[str, Any] | None, key: str, default: Any = None) -> Any:
     if not isinstance(inspection, Mapping):
         return default
@@ -136,13 +148,16 @@ def _strip_leading_request_words(value: str) -> str:
 
 def _subject_from_request(request: str) -> str:
     subject = _strip_leading_request_words(request)
-    subject = re.sub(
-        r"^(?:build|create|make|develop|start|improve|fix|update|enhance|refactor|làm|tạo|xây|dựng|phát triển|cải thiện|sửa|cập nhật|nâng cấp)\s+",
-        "",
-        subject,
-        count=1,
-        flags=re.IGNORECASE,
-    ).strip(" .!?\n\t")
+    action_prefix = (
+        r"^(?:build|create|make|develop|start|improve|fix|update|enhance|refactor|"
+        r"continue|resume|finish|complete|keep\s+(?:working|improving)|"
+        r"làm|tạo|xây|dựng|phát triển|cải thiện|sửa|cập nhật|nâng cấp|tiếp\s+tục|hoàn\s+thiện)\s+"
+    )
+    for _ in range(3):
+        stripped = re.sub(action_prefix, "", subject, count=1, flags=re.IGNORECASE).strip(" .!?\n\t")
+        if stripped == subject:
+            break
+        subject = stripped
     vague_subject = subject.casefold().strip(" .!?\n\t")
     if not subject or vague_subject in {
         "something",
@@ -260,6 +275,255 @@ def _workstreams(state: str, question: str | None) -> list[str]:
     ]
 
 
+def _workstream(
+    workstream_id: str,
+    title: str,
+    purpose: str,
+    acceptance: str,
+    *,
+    depends_on: tuple[str, ...] = (),
+    question: str | None = None,
+) -> dict[str, Any]:
+    return {
+        "workstream_id": workstream_id,
+        "title": title,
+        "purpose": purpose,
+        "depends_on": list(depends_on),
+        "acceptance": [acceptance],
+        "status": "WAITING_OWNER" if question else "READY" if not depends_on else "PLANNED",
+        "can_start_now": not bool(question) and not bool(depends_on),
+        "owner_input": question,
+    }
+
+
+def _auto_workstreams(
+    request: str,
+    state: str,
+    criteria: list[str],
+    question: str | None,
+) -> list[dict[str, Any]]:
+    """Derive a small, ordered workstream list inside the BG01 boundary."""
+
+    vietnamese = _language_is_vietnamese(request)
+    if question:
+        return [
+            _workstream(
+                "decision",
+                "Chốt quyết định còn thiếu." if vietnamese else "Resolve the missing decision.",
+                "Chỉ tiếp tục sau khi Owner chọn hướng sản phẩm an toàn." if vietnamese else "Continue only after the Owner chooses the safe product direction.",
+                "Câu hỏi sản phẩm có câu trả lời rõ ràng trước khi bắt đầu." if vietnamese else "The product question has a clear answer before work starts.",
+                question=question,
+            )
+        ]
+
+    if vietnamese:
+        scope_title = "Xác định phiên bản đầu tiên." if state != "EXISTING_PROJECT" else "Xác định phần đang cần cải thiện."
+        scope_purpose = "Chọn phạm vi nhỏ nhất có thể kiểm tra." if state != "EXISTING_PROJECT" else "Xác định đúng phần cần cải thiện và giữ nguyên phần đang hoạt động."
+        data_title = "Chuẩn bị dữ liệu cần thiết."
+        data_purpose = "Xác định dữ liệu đầu vào và cách kiểm tra dữ liệu trước khi dùng."
+        safety_title = "Chốt ranh giới an toàn và riêng tư."
+        safety_purpose = "Giữ dữ liệu và quyền truy cập trong phạm vi đã được đồng ý."
+        core_title = "Xây dựng luồng chính cho người dùng mục tiêu." if state != "EXISTING_PROJECT" else "Thực hiện thay đổi trong phạm vi nhỏ."
+        core_purpose = "Làm phần tạo ra giá trị chính cho người dùng." if state != "EXISTING_PROJECT" else "Thay đổi đúng phần đã xác định mà không làm hỏng luồng đang có."
+        verify_title = "Kiểm tra kết quả theo tiêu chí đã nêu."
+        verify_purpose = "Kiểm tra cả mục tiêu mới và phần đang được giữ nguyên."
+    else:
+        scope_title = "Define the smallest first version." if state != "EXISTING_PROJECT" else "Identify the part to improve."
+        scope_purpose = "Choose the smallest scope that can be checked." if state != "EXISTING_PROJECT" else "Identify the exact improvement while preserving working parts."
+        data_title = "Prepare the required data."
+        data_purpose = "Define input data and how it will be checked before use."
+        safety_title = "Set the safety and privacy boundary."
+        safety_purpose = "Keep data and access within the agreed boundary."
+        core_title = "Build the main user flow." if state != "EXISTING_PROJECT" else "Make the change within a small scope."
+        core_purpose = "Implement the part that creates the main user value." if state != "EXISTING_PROJECT" else "Change the identified part without breaking the current flow."
+        verify_title = "Check the result against the stated criteria."
+        verify_purpose = "Check both the new objective and the parts that must remain working."
+
+    lower = request.casefold()
+    data_needed = any(
+        term in lower
+        for term in ("import", "upload", "csv", "dataset", "inventory", "data", "dữ liệu", "nhập", "đồng bộ", "sync")
+    )
+    safety_needed = any(
+        term in lower
+        for term in ("private", "privacy", "sensitive", "secure", "security", "share", "permission", "auth", "riêng tư", "nhạy cảm", "bảo mật", "chia sẻ", "quyền truy cập")
+    )
+    workstreams = [_workstream("scope", scope_title, scope_purpose, criteria[0])]
+    if data_needed:
+        workstreams.append(
+            _workstream(
+                "data",
+                data_title,
+                data_purpose,
+                criteria[0],
+                depends_on=("scope",),
+            )
+        )
+    if safety_needed:
+        workstreams.append(
+            _workstream(
+                "safety",
+                safety_title,
+                safety_purpose,
+                criteria[-1],
+                depends_on=("scope",),
+            )
+        )
+    core_dependencies = tuple(item["workstream_id"] for item in workstreams[1:])
+    workstreams.append(
+        _workstream(
+            "core",
+            core_title,
+            core_purpose,
+            criteria[min(1, len(criteria) - 1)],
+            depends_on=core_dependencies or ("scope",),
+        )
+    )
+    workstreams.append(
+        _workstream(
+            "verify",
+            verify_title,
+            verify_purpose,
+            criteria[-1],
+            depends_on=("core",),
+        )
+    )
+    return workstreams[:5]
+
+
+def _progress_summary(
+    continuity: Mapping[str, Any] | None,
+    *,
+    question: str | None,
+    safe_next_action: str,
+) -> dict[str, Any]:
+    if not isinstance(continuity, Mapping) or not continuity.get("tasks"):
+        return {
+            "status": "Cần bạn chọn" if question else "Có thể bắt đầu",
+            "completed": [],
+            "active": [],
+            "blocked": [],
+            "waiting_for_you": ["Quyết định sản phẩm còn thiếu."] if question else [],
+            "next": safe_next_action,
+        }
+    tasks = [item for item in continuity.get("tasks", []) if isinstance(item, Mapping)]
+    def titles(status: str) -> list[str]:
+        return [str(item.get("title")) for item in tasks if item.get("status") == status and str(item.get("title") or "").strip()]
+    completed = titles("DONE")
+    active = titles("ACTIVE")
+    blocked = titles("BLOCKED")
+    waiting = titles("WAITING_OWNER")
+    if question:
+        status = "Cần bạn chọn"
+    elif active:
+        status = "Đang làm"
+    elif blocked:
+        status = "Đang bị chặn"
+    elif waiting:
+        status = "Cần bạn trả lời"
+    elif continuity.get("next_task_title"):
+        status = "Có thể bắt đầu"
+    else:
+        status = "Đã hoàn tất"
+    return {
+        "status": status,
+        "completed": completed,
+        "active": active,
+        "blocked": blocked,
+        "waiting_for_you": waiting,
+        "next": safe_next_action if question else str(continuity.get("safe_next_action") or safe_next_action),
+    }
+
+
+def _derive_auto_decomposition(
+    request: str,
+    state: str,
+    project_type_key: str,
+    outcome: str,
+    criteria: list[str],
+    constraints: list[str],
+    question: str | None,
+    question_reason: str | None,
+    safe_next_action: str,
+    continuity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    workstreams = _auto_workstreams(request, state, criteria, question)
+    workstream_ids = [str(item["workstream_id"]) for item in workstreams]
+    edges = [
+        {"from": dependency, "to": str(item["workstream_id"])}
+        for item in workstreams
+        for dependency in item.get("depends_on", [])
+    ]
+    owner_decisions = []
+    if question:
+        owner_decisions.append(
+            {
+                "status": "PENDING",
+                "question": question,
+                "reason": question_reason or "MATERIAL_PRODUCT_DECISION_REQUIRED",
+            }
+        )
+    continuity_value = dict(continuity) if isinstance(continuity, Mapping) else {
+        "status": "NOT_INITIALIZED",
+        "tasks": [],
+        "completed": [],
+        "active": [],
+        "blocked": [],
+        "waiting_owner": [],
+        "now_startable": [],
+        "next_task_id": None,
+        "next_task_title": None,
+    }
+    return {
+        "schema_version": AUTO_DECOMPOSITION_SCHEMA,
+        "goal_derivation": {
+            "outcome": outcome,
+            "project_state": state,
+            "project_type_key": project_type_key,
+            "source": "OWNER_INPUT_AND_PROJECT_INSPECTION",
+        },
+        "acceptance_derivation": [
+            {
+                "criterion_id": f"C{index}",
+                "criterion": criterion,
+                "reason": "minimum sufficient outcome check",
+            }
+            for index, criterion in enumerate(criteria, 1)
+        ],
+        "material_constraints": list(constraints),
+        "workstreams": workstreams,
+        "dependency_model": {
+            "topological_order": workstream_ids,
+            "edges": edges,
+            "real_dependencies_only": True,
+            "cycle_detected": False,
+        },
+        "now_startable": [
+            str(item["workstream_id"])
+            for item in workstreams
+            if bool(item.get("can_start_now"))
+        ],
+        "owner_decisions": owner_decisions,
+        "question_policy": {
+            "ask_only_material": True,
+            "material_triggers": [
+                "PRODUCT_INTENT",
+                "DESTRUCTIVE_OR_IRREVERSIBLE_ACTION",
+                "PRODUCTION_OR_SECURITY_BOUNDARY",
+                "MUTUALLY_EXCLUSIVE_DIRECTION",
+                "OWNER_GATE",
+            ],
+            "technical_ambiguity_asks_beginner": False,
+            "decision": question,
+            "reason": question_reason,
+        },
+        "existing_project_continuity": continuity_value,
+        "safe_next_action": safe_next_action,
+        "workstream_count": len(workstreams),
+        "max_workstreams": 5,
+    }
+
+
 def _question_for(request: str, subject: str, state: str, protected: bool) -> tuple[str | None, list[str], str | None]:
     vietnamese = _language_is_vietnamese(request)
     if protected:
@@ -317,7 +581,11 @@ def _fingerprint(value: Mapping[str, Any]) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def derive_charter(request: str, inspection: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def derive_charter(
+    request: str,
+    inspection: Mapping[str, Any] | None = None,
+    continuity: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     """Derive one bounded Beginner charter without performing work."""
 
     normalized = _normalise_request(request)
@@ -346,6 +614,20 @@ def derive_charter(request: str, inspection: Mapping[str, Any] | None = None) ->
     else:
         safe_action = "Chốt phiên bản đầu tiên bằng các tiêu chí trên rồi bắt đầu phần nhỏ nhất có thể kiểm tra."
     policy = _policy_for(question, protected)
+    auto_decomposition = _derive_auto_decomposition(
+        normalized,
+        state,
+        project_type_key,
+        outcome,
+        criteria,
+        constraints,
+        question,
+        question_reason,
+        safe_action,
+        continuity,
+    )
+    progress = _progress_summary(continuity, question=question, safe_next_action=safe_action)
+    execution_workstreams = [str(item.get("title")) for item in auto_decomposition["workstreams"]]
     signals = {
         "state_reason": state_reason,
         "subject_present": bool(subject),
@@ -354,6 +636,7 @@ def derive_charter(request: str, inspection: Mapping[str, Any] | None = None) ->
         "protected_action_detected": protected,
         "question_reason": question_reason,
         "audiences": audiences,
+        "continuation_request": is_continuation_request(normalized),
     }
     safety = {
         "canonical_integrity": "PRESERVED",
@@ -389,7 +672,9 @@ def derive_charter(request: str, inspection: Mapping[str, Any] | None = None) ->
         "project_state": state,
         "acceptance_criteria": criteria,
         "important_constraints": constraints,
-        "execution_workstreams": _workstreams(state, question),
+        "execution_workstreams": execution_workstreams,
+        "progress_summary": progress,
+        "auto_decomposition": auto_decomposition,
         "safe_next_action": safe_action,
         "question": question,
     }
@@ -403,49 +688,202 @@ def derive_charter(request: str, inspection: Mapping[str, Any] | None = None) ->
         "project_state": state,
         "acceptance_criteria": criteria,
         "important_constraints": constraints,
-        "execution_workstreams": _workstreams(state, question),
+        "execution_workstreams": execution_workstreams,
+        "progress_summary": progress,
         "safe_next_action": safe_action,
         "question": question,
         "question_options": question_options,
+        "auto_decomposition": auto_decomposition,
         "internal": internal,
         "charter_fingerprint": _fingerprint(fingerprint_basis),
     }
 
 
-def task_spec_for_charter(charter: Mapping[str, Any], goal_id: str) -> dict[str, Any]:
-    """Build one Goal-scoped task projection for the existing Task State store."""
+def bind_continuity(charter: Mapping[str, Any], continuity: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Project existing Task State onto a fresh charter without replacing it."""
+
+    if not isinstance(charter, Mapping):
+        raise BeginnerGatewayError("BEGINNER_CHARTER_REQUIRED")
+    if not isinstance(continuity, Mapping) or not continuity.get("tasks"):
+        return dict(charter)
+    updated = dict(charter)
+    auto = dict(updated.get("auto_decomposition") or {})
+    has_question = bool(str(updated.get("question") or "").strip())
+    bound_workstreams: list[dict[str, Any]] = []
+    for item in continuity.get("tasks", []):
+        if not isinstance(item, Mapping):
+            continue
+        task_id = str(item.get("task_id") or "").strip()
+        title = str(item.get("title") or "").strip()
+        if not task_id or not title:
+            continue
+        bound_workstreams.append(
+            {
+                "workstream_id": str(item.get("workstream_id") or task_id),
+                "task_id": task_id,
+                "title": title,
+                "purpose": str(item.get("purpose") or title),
+                "depends_on": list(item.get("dependencies") or []),
+                "acceptance": list(item.get("acceptance") or updated.get("acceptance_criteria") or []),
+                "status": str(item.get("status") or "UNKNOWN"),
+                "can_start_now": bool(item.get("can_start_now")) and not has_question,
+                "owner_input": item.get("owner_input"),
+            }
+        )
+    if not bound_workstreams:
+        return dict(charter)
+    task_to_workstream = {
+        str(item.get("task_id")): str(item.get("workstream_id"))
+        for item in bound_workstreams
+        if str(item.get("task_id") or "").strip()
+    }
+    for item in bound_workstreams:
+        item["depends_on"] = [
+            task_to_workstream.get(str(dependency), str(dependency))
+            for dependency in list(item.get("depends_on") or [])
+        ]
+    continuity_dependency_model = continuity.get("dependency_model")
+    if not isinstance(continuity_dependency_model, Mapping):
+        continuity_dependency_model = {}
+    auto["workstreams"] = bound_workstreams
+    auto["workstream_count"] = len(bound_workstreams)
+    auto["dependency_model"] = {
+        "topological_order": [str(item["workstream_id"]) for item in bound_workstreams],
+        "edges": [
+            {"from": dependency, "to": str(item["workstream_id"])}
+            for item in bound_workstreams
+            for dependency in item.get("depends_on", [])
+        ],
+        "real_dependencies_only": True,
+        "cycle_detected": bool(continuity_dependency_model.get("cycle_detected", False)),
+    }
+    auto["now_startable"] = [] if has_question else [
+        str(item["workstream_id"])
+        for item in bound_workstreams
+        if bool(item.get("can_start_now"))
+    ]
+    auto["existing_project_continuity"] = dict(continuity)
+    auto["safe_next_action"] = (
+        str(updated.get("safe_next_action") or "")
+        if has_question
+        else str(continuity.get("safe_next_action") or updated.get("safe_next_action") or "")
+    )
+    if has_question:
+        auto["owner_decisions"] = [
+            {
+                "status": "PENDING",
+                "question": str(updated.get("question")),
+                "reason": "MATERIAL_PRODUCT_DECISION_REQUIRED",
+            }
+        ]
+        question_policy = dict(auto.get("question_policy") or {})
+        question_policy["decision"] = str(updated.get("question"))
+        question_policy["reason"] = "MATERIAL_PRODUCT_DECISION_REQUIRED"
+        auto["question_policy"] = question_policy
+    updated["auto_decomposition"] = auto
+    updated["execution_workstreams"] = [item["title"] for item in bound_workstreams]
+    updated["safe_next_action"] = auto["safe_next_action"]
+    updated["progress_summary"] = _progress_summary(
+        continuity,
+        question=str(updated.get("question") or "").strip() or None,
+        safe_next_action=auto["safe_next_action"],
+    )
+    internal = dict(updated.get("internal") or {})
+    internal["continuity_status"] = continuity.get("status", "AVAILABLE")
+    internal["continuity_source"] = [".p2p/state/task-state.json", ".p2p/state/execution-ledger.jsonl"]
+    updated["internal"] = internal
+    fingerprint_basis = {
+        "request": updated.get("request"),
+        "intended_outcome": updated.get("intended_outcome"),
+        "project_type": updated.get("project_type"),
+        "project_state": updated.get("project_state"),
+        "acceptance_criteria": updated.get("acceptance_criteria"),
+        "important_constraints": updated.get("important_constraints"),
+        "execution_workstreams": updated.get("execution_workstreams"),
+        "progress_summary": updated.get("progress_summary"),
+        "safe_next_action": updated.get("safe_next_action"),
+        "question": updated.get("question"),
+        "auto_decomposition": auto,
+    }
+    updated["charter_fingerprint"] = _fingerprint(fingerprint_basis)
+    return updated
+
+
+def task_specs_for_charter(charter: Mapping[str, Any], goal_id: str) -> list[dict[str, Any]]:
+    """Build bounded Goal-scoped workstream tasks for the existing Task State store."""
 
     if not isinstance(charter, Mapping):
         raise BeginnerGatewayError("BEGINNER_CHARTER_REQUIRED")
     question = str(charter.get("question") or "").strip()
-    task: dict[str, Any] = {
-        "task_id": "beginner-gateway-next",
-        "goal_id": str(goal_id),
-        "title": "Continue the bounded project request",
-        "purpose": str(charter.get("safe_next_action") or "Continue the bounded request safely."),
-        "status": "WAITING_OWNER" if question else "READY",
-        "scope": ["BEGINNER_INTAKE", "BOUNDED_PROJECT_CHARTER"],
-        "non_scope": ["UNAUTHORIZED_PROTECTED_ACTIONS", "AUTOMATIC_HOST_START"],
-        "acceptance_requirements": list(charter.get("acceptance_criteria") or []),
-        "required_evidence": [".p2p/state/goal-contract.json", ".p2p/state/execution-ledger.jsonl"],
-        "context_refs": [".p2p/state/goal-contract.json"],
-        "requirement_refs": ["BEGINNER_GATEWAY_CHARTER"],
-        "required_capabilities": [],
-        "permission_needs": [],
+    auto = charter.get("auto_decomposition") if isinstance(charter.get("auto_decomposition"), Mapping) else {}
+    workstreams = auto.get("workstreams") if isinstance(auto, Mapping) else None
+    if not isinstance(workstreams, list) or not workstreams:
+        workstreams = [
+            {
+                "workstream_id": "next",
+                "title": "Continue the bounded project request",
+                "purpose": str(charter.get("safe_next_action") or "Continue the bounded request safely."),
+                "depends_on": [],
+                "acceptance": list(charter.get("acceptance_criteria") or []),
+                "status": "WAITING_OWNER" if question else "READY",
+                "can_start_now": not bool(question),
+                "owner_input": question,
+            }
+        ]
+    workstream_ids = {str(item.get("workstream_id")): index for index, item in enumerate(workstreams) if isinstance(item, Mapping)}
+    task_ids = {
+        workstream_id: "beginner-gateway-next" if index == 0 else f"beginner-gateway-next-{index + 1}"
+        for workstream_id, index in workstream_ids.items()
     }
-    if question:
-        task["owner_decision"] = {
-            "status": "PENDING",
-            "question": question,
-            "options": list(charter.get("question_options") or []),
-            "recommendation": "Keep the task paused until this product decision is answered.",
-            "consequences": {
-                "answer": "P2P can refine the same bounded request.",
-                "no_answer": "No project change starts.",
-            },
-            "approval_metadata": {"decision_scope": "PRODUCT_SCOPE_ONLY"},
+    tasks: list[dict[str, Any]] = []
+    for index, item in enumerate(workstreams):
+        if not isinstance(item, Mapping):
+            continue
+        workstream_id = str(item.get("workstream_id") or f"workstream-{index + 1}")
+        task_id = str(item.get("task_id") or task_ids.get(workstream_id) or f"beginner-gateway-next-{index + 1}")
+        dependencies = [
+            task_ids.get(str(dependency), str(dependency))
+            for dependency in list(item.get("depends_on") or [])
+        ]
+        status = "WAITING_OWNER" if question and index == 0 else "PLANNED" if dependencies else "READY"
+        task: dict[str, Any] = {
+            "task_id": task_id,
+            "goal_id": str(goal_id),
+            "title": str(item.get("title") or "Continue the bounded project request"),
+            "purpose": str(item.get("purpose") or charter.get("safe_next_action") or "Continue the bounded request safely."),
+            "status": status,
+            "dependencies": dependencies,
+            "scope": ["BEGINNER_INTAKE", "AUTO01_GOAL_DECOMPOSITION", f"WORKSTREAM:{workstream_id}"],
+            "non_scope": ["UNAUTHORIZED_PROTECTED_ACTIONS", "AUTOMATIC_HOST_START"],
+            "acceptance_requirements": list(item.get("acceptance") or charter.get("acceptance_criteria") or []),
+            "required_evidence": [".p2p/state/goal-contract.json", ".p2p/state/execution-ledger.jsonl"],
+            "context_refs": [".p2p/state/goal-contract.json"],
+            "requirement_refs": ["BEGINNER_GATEWAY_CHARTER", "AUTO01_GOAL_DECOMPOSITION"],
+            "required_capabilities": [],
+            "permission_needs": [],
         }
-    return task
+        if question and index == 0:
+            task["owner_decision"] = {
+                "status": "PENDING",
+                "question": question,
+                "options": list(charter.get("question_options") or []),
+                "recommendation": "Keep the task paused until this product decision is answered.",
+                "consequences": {
+                    "answer": "P2P can refine the same bounded request.",
+                    "no_answer": "No project change starts.",
+                },
+                "approval_metadata": {"decision_scope": "PRODUCT_SCOPE_ONLY"},
+            }
+        tasks.append(task)
+    if not tasks:
+        raise BeginnerGatewayError("BEGINNER_WORKSTREAMS_INVALID")
+    return tasks
+
+
+def task_spec_for_charter(charter: Mapping[str, Any], goal_id: str) -> dict[str, Any]:
+    """Return the compatibility first-task projection for existing callers."""
+
+    return task_specs_for_charter(charter, goal_id)[0]
 
 
 def beginner_projection(charter: Mapping[str, Any]) -> dict[str, Any]:
@@ -463,6 +901,7 @@ def advanced_projection(charter: Mapping[str, Any]) -> dict[str, Any]:
     result["advanced"] = {
         "schema_version": charter.get("schema_version"),
         "charter_fingerprint": charter.get("charter_fingerprint"),
+        "auto_decomposition": charter.get("auto_decomposition", {}),
         "internal": charter.get("internal", {}),
     }
     return result
@@ -490,6 +929,18 @@ def render_beginner(projection: Mapping[str, Any]) -> str:
     lines.extend(f"- {item}" for item in projection.get("important_constraints", []) or [])
     lines.append("\nCÁC PHẦN VIỆC")
     lines.extend(f"- {item}" for item in projection.get("execution_workstreams", []) or [])
+    progress = projection.get("progress_summary")
+    if isinstance(progress, Mapping):
+        lines.append("\nTIẾN ĐỘ HIỆN TẠI")
+        lines.append(f"- Trạng thái: {progress.get('status', '')}")
+        if progress.get("completed"):
+            lines.append("- Đã xong: " + "; ".join(str(item) for item in progress["completed"]))
+        if progress.get("active"):
+            lines.append("- Đang làm: " + "; ".join(str(item) for item in progress["active"]))
+        if progress.get("blocked"):
+            lines.append("- Đang chờ xử lý: " + "; ".join(str(item) for item in progress["blocked"]))
+        if progress.get("waiting_for_you"):
+            lines.append("- Cần bạn trả lời: " + "; ".join(str(item) for item in progress["waiting_for_you"]))
     lines.append(f"\nBƯỚC TIẾP THEO AN TOÀN\n{projection.get('safe_next_action', '')}")
     question = projection.get("question")
     if question:
@@ -503,6 +954,7 @@ def render_beginner(projection: Mapping[str, Any]) -> str:
 
 
 __all__ = [
+    "AUTO_DECOMPOSITION_SCHEMA",
     "BEGINNER_GATEWAY_SCHEMA",
     "BEGINNER_MODE",
     "STATUS_DONE",
@@ -510,8 +962,11 @@ __all__ = [
     "STATUS_NEEDS_DECISION",
     "BeginnerGatewayError",
     "advanced_projection",
+    "bind_continuity",
     "beginner_projection",
     "derive_charter",
+    "is_continuation_request",
     "render_beginner",
     "task_spec_for_charter",
+    "task_specs_for_charter",
 ]
