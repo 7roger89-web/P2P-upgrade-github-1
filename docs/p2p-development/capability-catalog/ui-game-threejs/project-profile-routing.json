@@ -31,7 +31,18 @@
         "game.three.spatial_query",
         "game.three.navigation",
         "game.three.adaptive_quality",
-        "game.three.scene_authoring"
+        "game.three.scene_authoring",
+        "game.character.generate",
+        "game.character.rig",
+        "game.character.runtime",
+        "game.character.expression",
+        "game.animation.motion_forge",
+        "game.animation.retarget",
+        "game.vfx.particles",
+        "game.vfx.shader",
+        "game.world.terrain",
+        "game.world.vegetation",
+        "img2threejs"
       ],
       "routing_principles": [
         "Visual direction must precede blind component assembly",
@@ -71,7 +82,18 @@
         "game.three.cinematic",
         "game.three.spatial_query",
         "game.three.navigation",
-        "game.three.scene_authoring"
+        "game.three.scene_authoring",
+        "game.character.generate",
+        "game.character.rig",
+        "game.character.runtime",
+        "game.character.expression",
+        "game.animation.motion_forge",
+        "game.animation.retarget",
+        "game.vfx.particles",
+        "game.vfx.shader",
+        "game.world.terrain",
+        "game.world.vegetation",
+        "img2threejs"
       ],
       "routing_principles": [
         "Mobile/responsive/touch QA required",
@@ -109,7 +131,18 @@
         "game.three.spatial_query",
         "game.three.navigation",
         "game.three.adaptive_quality",
-        "game.three.scene_authoring"
+        "game.three.scene_authoring",
+        "game.character.generate",
+        "game.character.rig",
+        "game.character.runtime",
+        "game.character.expression",
+        "game.animation.motion_forge",
+        "game.animation.retarget",
+        "game.vfx.particles",
+        "game.vfx.shader",
+        "game.world.terrain",
+        "game.world.vegetation",
+        "img2threejs"
       ],
       "routing_principles": [
         "Game/UI design methodology",
@@ -141,7 +174,18 @@
         "game.three.scene_authoring",
         "ui.design",
         "ui.frontend",
-        "ui.motion"
+        "ui.motion",
+        "game.character.generate",
+        "game.character.rig",
+        "game.character.runtime",
+        "game.character.expression",
+        "game.animation.motion_forge",
+        "game.animation.retarget",
+        "game.vfx.particles",
+        "game.vfx.shader",
+        "game.world.terrain",
+        "game.world.vegetation",
+        "img2threejs"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -173,7 +217,11 @@
         "CAND-GAME-UI-010": "CONDITIONAL (@react-facet) for reactive game UI",
         "CAND-GAME-UI-014": "RESEARCH_ONLY (threespace)",
         "CAND-GAME-UI-016": "RESEARCH_ONLY (Capsule)",
-        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)"
+        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)",
+        "CAND-ASSET-FORGE-007": "ACCEPT (three-vrm) runtime/expression",
+        "CAND-ASSET-FORGE-008": "ACCEPT (existing img2threejs) explicit adapter only",
+        "CAND-ASSET-FORGE-015": "ACCEPT (three.quarks) particles",
+        "CAND-ASSET-FORGE-018": "ACCEPT (THREE.Terrain) procedural terrain"
       }
     },
     "R3F_GAME": {
@@ -193,7 +241,18 @@
         "ui.design",
         "ui.frontend",
         "ui.motion",
-        "ui.design_system"
+        "ui.design_system",
+        "game.character.generate",
+        "game.character.rig",
+        "game.character.runtime",
+        "game.character.expression",
+        "game.animation.motion_forge",
+        "game.animation.retarget",
+        "game.vfx.particles",
+        "game.vfx.shader",
+        "game.world.terrain",
+        "game.world.vegetation",
+        "img2threejs"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -225,7 +284,11 @@
         "CAND-GAME-UI-015": "LICENSE_GATED (triplex)",
         "CAND-GAME-UI-016": "RESEARCH_ONLY (Capsule)",
         "CAND-GAME-UI-017": "LICENSE_GATED (react-three-game)",
-        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)"
+        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)",
+        "CAND-ASSET-FORGE-007": "ACCEPT (three-vrm) runtime/expression",
+        "CAND-ASSET-FORGE-008": "ACCEPT (existing img2threejs) explicit adapter only",
+        "CAND-ASSET-FORGE-015": "ACCEPT (three.quarks) particles",
+        "CAND-ASSET-FORGE-018": "ACCEPT (THREE.Terrain) procedural terrain"
       }
     }
   },
@@ -238,6 +301,12 @@
     "LICENSE_GATED and SECURITY_GATED require explicit owner approval",
     "game.three.visual != game.three.spatial_query != game.three.navigation != game.three.adaptive_quality != game.three.cinematic != game.three.scene_authoring",
     "COMPONENT_FOUNDATION != VISUAL_DIRECTION",
-    "GPU_TIER=HEURISTIC, GPU_TIER!=AUTHORITATIVE_DEVICE_CAPABILITY"
+    "GPU_TIER=HEURISTIC, GPU_TIER!=AUTHORITATIVE_DEVICE_CAPABILITY",
+    "Asset Forge capabilities are OPTIONAL GOAL_BASED PROJECT_SELECTIVE",
+    "WEB_APP MOBILE_APP 2D_GAME exclude Asset Forge by default",
+    "Heavy AI generation belongs in OFFLINE ASSET FORGE not shipped runtime",
+    "img2threejs security semantics must not be altered",
+    "GENERATION != RIGGING != SKINNING != RUNTIME != MOTION != EXPRESSION",
+    "Procedural Three.js is not the default final-asset pipeline for hero characters"
   ]
 }

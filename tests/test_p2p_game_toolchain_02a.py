@@ -112,7 +112,7 @@ class P2PGameToolchain02ATests(unittest.TestCase):
         self.assertEqual(self._git("merge-base", "HEAD", CURRENT_MAIN_SHA), CURRENT_MAIN_SHA)
 
     def test_02_registry_preserves_foundation_and_adds_only_selected_skills(self) -> None:
-        self.assertEqual(self.registry["capability_count"], 55)
+        self.assertEqual(self.registry["capability_count"], 65)
         self.assertTrue(self.registry["valid"])
         self.assertEqual(tuple(self.registry["capability_classes"]), CAPABILITY_CLASSES)
         self.assertEqual(tuple(self.registry["canonical_identities"]), CANONICAL_IDENTITIES)
