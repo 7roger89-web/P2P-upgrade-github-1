@@ -121,6 +121,47 @@ Policy and context bindings, when present, bind the canonical relative path,
 schema where applicable, and exact current bytes. Drift invalidates readiness;
 stale bytes are not silently refreshed.
 
+### Atomic multi-capability projection bundle
+
+When one project selects more than one already-validated host projection plan,
+the plans are aggregated before any target write. The aggregate is one
+project projection state, not a sequence of independent installations. The
+v2 pin remains the identity envelope; its projection contains either the
+legacy singular plan snapshot shape or a bundle with schema
+p2p-project-projection-bundle/1. No p2p-project-pin/3 is introduced.
+
+The bundle binds, in canonical order:
+
+- exact source repository, commit, and tree;
+- project identity, projection-only mode, and project fingerprint;
+- sorted selected capability evidence;
+- one wrapper per capability containing its exact plan SHA and plan snapshot;
+- the sorted union of every target path and its content hash; and
+- existing policy/context bindings when present.
+
+The bundle hash is computed from that canonical representation, so incidental
+input ordering cannot change identity. Constituent plans retain capability
+identity, host, provenance-derived source/entrypoint hashes, and declared
+files. All plans in one bundle use one supported host kind; mixed-host
+materialization remains outside this bounded contract.
+
+For each union path, one owner is accepted, identical content from multiple
+plans is deterministically deduplicated, and differing content fails closed
+with both capability IDs and hashes. Parent/child target paths also fail
+closed. The complete union is the only managed-file set written into the
+single resulting pin.
+
+Bundle refresh is one transaction. Preflight classifies every desired path as
+UNCHANGED, ADD, or UPDATE, and prior managed paths absent from the desired
+union as REMOVE_MANAGED. Removal or update is allowed only when the prior
+valid pin proves P2P ownership and the on-disk hash still matches. Unmanaged
+collisions, missing or tampered managed paths, stale pins, and cross-plan
+conflicts stop before mutation. The materializer writes the whole union,
+verifies every resulting hash, writes one pin last, and validates
+projection-only readiness only after the complete transaction succeeds.
+Failure rolls back the whole attempted bundle using only proven prior bytes,
+ownership, and created directories; it cannot produce a partial READY state.
+
 ### Runtime and rollback truth
 
 Projection-only pins contain exactly the truthful runtime boundary:
@@ -170,6 +211,12 @@ One controlled materializer may consume an already-`READY` plan. It may:
 - write exact bytes atomically;
 - return resulting hashes and prior states to the pin builder;
 - restore only bytes changed by this operation if a later write fails.
+
+For a multi-capability bundle, this same materializer consumes the complete
+canonical aggregate once. It validates cross-plan conflicts and computes the
+full union before the first write; it does not invoke the single-plan seam
+once per constituent plan. The resulting v2 projection binding records every
+managed path from that union.
 
 It may not select capabilities, expand context, install dependencies, copy the
 runtime, invoke Doctor, call a network service, execute a script, change
@@ -229,7 +276,10 @@ Focused evidence must cover v1 compatibility; projection readiness without
 context drift; traversal/absolute/symlink escape; unmanaged collision and
 tamper; partial failure and pin-last; idempotent rerun and owned update; C18,
 C19, and FASTPATH boundaries; `img2threejs=false`; Tripo inactive; and absence
-of runtime/registry/vendor/report copying.
+of runtime/registry/vendor/report copying. Multi-capability evidence must also
+cover deterministic bundle identity, duplicate-path deduplication, differing
+path conflict, complete union ownership, add/remove transitions, stale prior
+state, and whole-bundle rollback.
 
 The current C18 bridge must classify authoritative architecture replacement as
 `HIGH_RISK`, `CRITICAL`, and `OWNER_GATE_REQUIRED`; it must return `BLOCKED`

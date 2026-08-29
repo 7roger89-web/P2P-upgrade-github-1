@@ -754,6 +754,9 @@ class TestCandidatePolicyAudit:
             ".p2p/system/p2p_capabilities/p2p_fw01_live.py",
             "scripts/fw01/",
             "docs/p2p-development/research/framework-01/",
+            # P2P projection-bundle contract candidate (intentional,
+            # provider-neutral, projection-only source/spec/test changes).
+            "tests/test_p2p_projection_bundle.py",
 
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
@@ -905,6 +908,11 @@ class TestCandidatePolicyAudit:
             ".p2p/system/p2p_capabilities/failover_boundary.py",
             "tests/p2p_capabilities/test_failover_boundary.py",
             "tests/test_p2p_c37_adaptive_selection.py",
+            # P2P projection-bundle contract candidate: v2 bundle identity,
+            # atomic materialization, and its projection-only specification.
+            ".p2p/system/p2p_capabilities/project_pin.py",
+            ".p2p/system/p2p_capabilities/project_materialization.py",
+            "docs/SPEC/P2P-PROJECTION-ONLY-PROJECT-IDENTITY-SPEC.md",
             # C39 failover-boundary runtime surface (single CREATE_ONLY_IF_NECESSARY
             # decision machine; fail-closed by construction; authorized closure
             # growth per the C34/C35R/C36/C37 precedent):

@@ -18,6 +18,8 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping
 from urllib.parse import urlsplit
 
+from .model import ManifestValidationError, load_registry
+
 
 PROJECT_PIN_SCHEMA = "p2p-project-pin/1"
 PROJECT_PIN_V2_SCHEMA = "p2p-project-pin/2"
@@ -34,6 +36,7 @@ ARTIFACT_IDENTITY_NAME = "ARTIFACT-IDENTITY.json"
 VERSION_NAME = "VERSION"
 PROJECTION_BINDING_SCHEMA = "p2p-project-projection-binding/1"
 PROJECTION_MATERIALIZATION_VERSION = "p2p-project-materialization/1"
+PROJECTION_BUNDLE_SCHEMA = "p2p-project-projection-bundle/1"
 PROJECT_SOURCE_BINDING_SCHEMA = "p2p-project-source-binding/1"
 PROJECTED_FILE_OWNERSHIP = "P2P_MANAGED_PROJECTED_FILE"
 HEX64 = re.compile(r"^[0-9a-fA-F]{64}$")
@@ -65,10 +68,27 @@ _PROJECTION_BINDING_KEYS = {
     "host_kind",
     "plan_sha256",
     "plan_snapshot",
+    "bundle",
     "managed_files",
     "policy_binding",
     "context_binding",
 }
+_PROJECTION_BUNDLE_KEYS = {
+    "schema",
+    "bundle_sha256",
+    "source_binding",
+    "project_id",
+    "project_fingerprint",
+    "mode",
+    "host_kind",
+    "selected_capabilities",
+    "plans",
+    "managed_files",
+    "policy_binding",
+    "context_binding",
+}
+_PROJECTION_BUNDLE_PLAN_KEYS = {"capability_id", "plan_sha256", "plan_snapshot"}
+_PROJECTION_BUNDLE_FILE_KEYS = {"relative_path", "ownership", "content_sha256"}
 
 
 class ProjectPinError(ValueError):
@@ -351,6 +371,243 @@ def _validate_plan(projection_plan: Any) -> dict[str, Any]:
             raise ProjectPinError("PROJECTION_PLAN_OWNERSHIP_INVALID")
         _require_hex(item.get("content_hash"), "PLAN_CONTENT_HASH", HEX64)
     return plan
+
+
+def _plan_sha256(plan: Mapping[str, Any]) -> str:
+    return _bytes_sha256(canonical_json(dict(plan)).encode("utf-8"))
+
+
+def _bundle_sha256(bundle: Mapping[str, Any]) -> str:
+    payload = dict(bundle)
+    payload.pop("bundle_sha256", None)
+    return _bytes_sha256(canonical_json(payload).encode("utf-8"))
+
+
+def _bundle_plan_shape(bundle: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "files": [
+            {
+                "relative_target": record["relative_path"],
+                "content_hash": record["content_sha256"],
+                "ownership_class": "P2P_PROJECT_MANAGED",
+            }
+            for record in bundle["managed_files"]
+        ]
+    }
+
+
+def _validate_bundle_surface_binding(
+    value: Any,
+    *,
+    expected_relative: str,
+    expected_schema: str,
+    label: str,
+) -> dict[str, str]:
+    if not isinstance(value, Mapping):
+        raise ProjectPinError(f"{label}_INVALID")
+    if set(value) != {"relative_path", "schema", "sha256"}:
+        raise ProjectPinError(f"{label}_NONCANONICAL")
+    relative = _canonical_relative(value.get("relative_path"), f"{label}_PATH")
+    if relative != expected_relative or value.get("schema") != expected_schema:
+        raise ProjectPinError(f"{label}_INVALID")
+    return {
+        "relative_path": relative,
+        "schema": expected_schema,
+        "sha256": _require_hex(value.get("sha256"), f"{label}_SHA256", HEX64),
+    }
+
+
+def _canonical_capability_ids() -> set[str]:
+    """Return IDs from the existing canonical capability registry only."""
+
+    try:
+        registry = load_registry(Path(__file__).with_name("capabilities.json"))
+    except (OSError, UnicodeError, json.JSONDecodeError, ManifestValidationError) as exc:
+        raise ProjectPinError("PROJECTION_BUNDLE_REGISTRY_UNAVAILABLE") from exc
+    return {
+        manifest.capability_id
+        for manifest in registry["parsed"]
+        if isinstance(manifest.capability_id, str)
+    }
+
+
+def _validate_projection_bundle(value: Any) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ProjectPinError("PROJECTION_BUNDLE_OBJECT_REQUIRED")
+    raw = dict(value)
+    _reject_secret_fields(raw, "PROJECTION_BUNDLE")
+    unexpected = set(raw).difference(_PROJECTION_BUNDLE_KEYS)
+    if unexpected:
+        raise ProjectPinError(
+            f"PROJECTION_BUNDLE_FIELD_FORBIDDEN:{next(iter(unexpected))}"
+        )
+    if raw.get("schema") != PROJECTION_BUNDLE_SCHEMA:
+        raise ProjectPinError("PROJECTION_BUNDLE_SCHEMA_INVALID")
+    if raw.get("mode") != PROJECTION_ONLY:
+        raise ProjectPinError("PROJECTION_BUNDLE_MODE_INVALID")
+    project_id = _project_identifier(raw.get("project_id"))
+    project_fingerprint = _require_hex(
+        raw.get("project_fingerprint"), "PROJECTION_BUNDLE_PROJECT_FINGERPRINT", HEX64
+    )
+    host_kind = _require_text(raw.get("host_kind"), "PROJECTION_BUNDLE_HOST_KIND")
+    source = raw.get("source_binding")
+    if not isinstance(source, Mapping):
+        raise ProjectPinError("PROJECTION_BUNDLE_SOURCE_BINDING_INVALID")
+    source_values = _source_binding(
+        source.get("repository"), source.get("commit"), source.get("tree")
+    )
+    if dict(source) != source_values:
+        raise ProjectPinError("PROJECTION_BUNDLE_SOURCE_BINDING_NONCANONICAL")
+
+    selected = _normalise_capabilities(raw.get("selected_capabilities", []))
+    canonical_selected = sorted(selected, key=lambda item: item["capability_id"])
+    if selected != canonical_selected:
+        raise ProjectPinError("PROJECTION_BUNDLE_CAPABILITIES_NOT_CANONICAL")
+    unknown_capabilities = sorted(
+        set(item["capability_id"] for item in selected)
+        - _canonical_capability_ids()
+    )
+    if unknown_capabilities:
+        raise ProjectPinError(
+            "PROJECTION_BUNDLE_UNKNOWN_CAPABILITY:"
+            + ",".join(unknown_capabilities)
+        )
+
+    raw_plans = raw.get("plans")
+    if not isinstance(raw_plans, list) or not raw_plans:
+        raise ProjectPinError("PROJECTION_BUNDLE_PLANS_INVALID")
+    plans: list[dict[str, Any]] = []
+    plan_ids: set[str] = set()
+    plan_files: dict[str, dict[str, str]] = {}
+    for wrapper in raw_plans:
+        if not isinstance(wrapper, Mapping):
+            raise ProjectPinError("PROJECTION_BUNDLE_PLAN_INVALID")
+        if set(wrapper).difference(_PROJECTION_BUNDLE_PLAN_KEYS):
+            raise ProjectPinError("PROJECTION_BUNDLE_PLAN_FIELD_FORBIDDEN")
+        plan = _validate_plan(wrapper.get("plan_snapshot"))
+        capability_id = _require_text(wrapper.get("capability_id"), "PROJECTION_BUNDLE_PLAN_CAPABILITY_ID")
+        if capability_id != plan["capability_id"] or capability_id in plan_ids:
+            raise ProjectPinError("PROJECTION_BUNDLE_PLAN_CAPABILITY_DUPLICATE")
+        if plan["host_kind"] != host_kind:
+            raise ProjectPinError("PROJECTION_BUNDLE_HOST_KIND_CONFLICT")
+        plan_hash = _require_hex(
+            wrapper.get("plan_sha256"), "PROJECTION_BUNDLE_PLAN_SHA256", HEX64
+        )
+        if plan_hash != _plan_sha256(plan):
+            raise ProjectPinError("PROJECTION_BUNDLE_PLAN_SHA256_MISMATCH")
+        plan_ids.add(capability_id)
+        for item in plan["files"]:
+            relative = _canonical_relative(item.get("relative_target"), "PLAN_TARGET_PATH")
+            content_hash = _require_hex(item.get("content_hash"), "PLAN_CONTENT_HASH", HEX64)
+            previous = plan_files.get(relative)
+            if previous is not None and previous["content_sha256"] != content_hash:
+                raise ProjectPinError(
+                    "PROJECTION_BUNDLE_PATH_CONFLICT:"
+                    f"{relative}:{previous['capability_id']}:{previous['content_sha256']}:"
+                    f"{capability_id}:{content_hash}"
+                )
+            if previous is None:
+                plan_files[relative] = {
+                    "relative_path": relative,
+                    "ownership": PROJECTED_FILE_OWNERSHIP,
+                    "content_sha256": content_hash,
+                }
+        plans.append(
+            {
+                "capability_id": capability_id,
+                "plan_sha256": plan_hash,
+                "plan_snapshot": plan,
+            }
+        )
+    if plans != sorted(plans, key=lambda item: item["capability_id"]):
+        raise ProjectPinError("PROJECTION_BUNDLE_PLANS_NOT_CANONICAL")
+    selected_ids = {item["capability_id"] for item in selected}
+    if selected_ids != plan_ids or len(selected) != len(plan_ids):
+        raise ProjectPinError("PROJECTION_BUNDLE_CAPABILITY_SET_MISMATCH")
+    selected_by_id = {item["capability_id"]: item for item in selected}
+    for plan in plans:
+        snapshot = plan["plan_snapshot"]
+        selected_item = selected_by_id[plan["capability_id"]]
+        if (
+            snapshot["source_hash"].lower() != selected_item["source_hash"]
+            or snapshot["entrypoint_hash"].lower() != selected_item["entrypoint_hash"]
+        ):
+            raise ProjectPinError("PROJECTION_BUNDLE_CAPABILITY_HASH_MISMATCH")
+
+    ordered_paths = sorted(plan_files)
+    for relative in ordered_paths:
+        parts = PurePosixPath(relative).parts
+        for index in range(1, len(parts)):
+            ancestor = "/".join(parts[:index])
+            if ancestor in plan_files:
+                raise ProjectPinError(
+                    "PROJECTION_BUNDLE_PATH_HIERARCHY_CONFLICT:"
+                    f"{ancestor}:{plan_files[ancestor]['content_sha256']}:"
+                    f"{relative}:{plan_files[relative]['content_sha256']}"
+                )
+    raw_files = raw.get("managed_files")
+    if not isinstance(raw_files, list) or not raw_files:
+        raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILES_INVALID")
+    managed_files: list[dict[str, str]] = []
+    seen_paths: set[str] = set()
+    for record in raw_files:
+        if not isinstance(record, Mapping):
+            raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_INVALID")
+        if set(record).difference(_PROJECTION_BUNDLE_FILE_KEYS):
+            raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_FIELD_FORBIDDEN")
+        relative = _canonical_relative(record.get("relative_path"), "BUNDLE_MANAGED_FILE_PATH")
+        if relative in seen_paths:
+            raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_DUPLICATE")
+        seen_paths.add(relative)
+        ownership = record.get("ownership")
+        if ownership != PROJECTED_FILE_OWNERSHIP:
+            raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_OWNERSHIP_INVALID")
+        content_hash = _require_hex(
+            record.get("content_sha256"), "BUNDLE_MANAGED_FILE_CONTENT_SHA256", HEX64
+        )
+        expected = plan_files.get(relative)
+        if expected is None or expected["content_sha256"] != content_hash:
+            raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_SET_MISMATCH")
+        managed_files.append(
+            {
+                "relative_path": relative,
+                "ownership": PROJECTED_FILE_OWNERSHIP,
+                "content_sha256": content_hash,
+            }
+        )
+    if [item["relative_path"] for item in managed_files] != ordered_paths:
+        raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILES_NOT_CANONICAL")
+    if set(seen_paths) != set(plan_files):
+        raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_SET_MISMATCH")
+
+    normalized: dict[str, Any] = {
+        "schema": PROJECTION_BUNDLE_SCHEMA,
+        "source_binding": source_values,
+        "project_id": project_id,
+        "project_fingerprint": project_fingerprint,
+        "mode": PROJECTION_ONLY,
+        "host_kind": host_kind,
+        "selected_capabilities": selected,
+        "plans": plans,
+        "managed_files": managed_files,
+    }
+    for key, expected_relative, label, expected_schema in (
+        ("policy_binding", ".p2p/project-policy.json", "POLICY_BINDING", "p2p-codex-project-policy/1"),
+        ("context_binding", ".p2p/context/project_map.json", "CONTEXT_BINDING", "p2p-project-map/3"),
+    ):
+        if key in raw:
+            normalized[key] = _validate_bundle_surface_binding(
+                raw[key],
+                expected_relative=expected_relative,
+                expected_schema=expected_schema,
+                label=label,
+            )
+    normalized["bundle_sha256"] = _require_hex(
+        raw.get("bundle_sha256"), "PROJECTION_BUNDLE_SHA256", HEX64
+    )
+    if normalized["bundle_sha256"] != _bundle_sha256(normalized):
+        raise ProjectPinError("PROJECTION_BUNDLE_SHA256_MISMATCH")
+    return normalized
 
 
 def _validate_projection_request(
@@ -683,6 +940,115 @@ def build_projection_pin(
     return pin
 
 
+def _normalise_bundle_managed_files(
+    root: Path,
+    bundle: Mapping[str, Any],
+    managed_files: Iterable[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    records = _normalise_managed_files(root, _bundle_plan_shape(bundle), managed_files)
+    expected = [
+        (item["relative_path"], item["content_sha256"], item["ownership"])
+        for item in bundle["managed_files"]
+    ]
+    actual = [
+        (item["relative_path"], item["content_sha256"], item["ownership"])
+        for item in records
+    ]
+    if actual != expected:
+        raise ProjectPinError("PROJECTION_BUNDLE_MANAGED_FILE_SET_MISMATCH")
+    return records
+
+
+def build_projection_bundle_pin(
+    *,
+    project_root: Path,
+    project_id: str,
+    source_repository: str,
+    source_commit: str,
+    source_tree: str,
+    selected_capabilities: Iterable[Mapping[str, Any]],
+    projection_bundle: Any,
+    managed_files: Iterable[Mapping[str, Any]],
+    policy_path: Path | None = None,
+    context_path: Path | None = None,
+    project_name: str | None = None,
+    project_version: str | None = None,
+) -> dict[str, Any]:
+    """Build a v2 pin for one already-canonicalized projection bundle."""
+
+    root = project_root.resolve()
+    if not root.is_dir():
+        raise ProjectPinError("PROJECT_ROOT_NOT_FOUND")
+    source = _source_binding(source_repository, source_commit, source_tree)
+    capabilities = sorted(
+        _normalise_capabilities(selected_capabilities),
+        key=lambda item: item["capability_id"],
+    )
+    bundle = _validate_projection_bundle(projection_bundle)
+    identity = _project_identifier(project_id)
+    if bundle["project_id"] != identity:
+        raise ProjectPinError("PROJECTION_BUNDLE_PROJECT_ID_MISMATCH")
+    if bundle["source_binding"] != source:
+        raise ProjectPinError("PROJECTION_BUNDLE_SOURCE_BINDING_MISMATCH")
+    if bundle["selected_capabilities"] != capabilities:
+        raise ProjectPinError("PROJECTION_BUNDLE_CAPABILITIES_MISMATCH")
+    fingerprint = _require_hex(project_fingerprint(root), "PROJECT_FINGERPRINT", HEX64)
+    if bundle["project_fingerprint"] != fingerprint:
+        raise ProjectPinError("PROJECTION_BUNDLE_PROJECT_FINGERPRINT_MISMATCH")
+
+    if policy_path is None and "policy_binding" in bundle:
+        policy_path = root / ".p2p" / "project-policy.json"
+    if context_path is None and "context_binding" in bundle:
+        context_path = root / ".p2p" / "context" / "project_map.json"
+    policy = _surface_binding(
+        root,
+        policy_path,
+        ".p2p/project-policy.json",
+        "POLICY_BINDING",
+        "p2p-codex-project-policy/1",
+    )
+    context = _surface_binding(
+        root,
+        context_path,
+        ".p2p/context/project_map.json",
+        "CONTEXT_BINDING",
+        "p2p-project-map/3",
+    )
+    if policy != bundle.get("policy_binding") or context != bundle.get("context_binding"):
+        raise ProjectPinError("PROJECTION_BUNDLE_SURFACE_BINDING_MISMATCH")
+    records = _normalise_bundle_managed_files(root, bundle, managed_files)
+    identity_name = _require_text(project_name or root.name, "PROJECT_NAME")
+    pin: dict[str, Any] = {
+        "schema": PROJECT_PIN_V2_SCHEMA,
+        "mode": PROJECTION_ONLY,
+        "project_id": identity,
+        "project_name": identity_name,
+        "project_fingerprint": fingerprint,
+        "source_binding": source,
+        "selected_capabilities": capabilities,
+        "projection": {
+            "schema": PROJECTION_BINDING_SCHEMA,
+            "materialization_version": PROJECTION_MATERIALIZATION_VERSION,
+            "host_kind": bundle["host_kind"],
+            "plan_sha256": bundle["bundle_sha256"],
+            "bundle": bundle,
+            "managed_files": records,
+        },
+        "runtime_claim": {"installed": False, "status": "NOT_INSTALLED"},
+        "rollback": {"scope": "PROJECTED_FILES_ONLY", "prior_state_recorded": True},
+        "verification_status": "VERIFIED",
+        "producer": "p2p_capabilities.project_pin",
+    }
+    if project_version is not None:
+        pin["project_version"] = _require_text(project_version, "PROJECT_VERSION")
+    if policy is not None:
+        pin["projection"]["policy_binding"] = policy
+    if context is not None:
+        pin["projection"]["context_binding"] = context
+    _validate_projection_pin(root, pin)
+    return pin
+
+
 def write_pin(project_root: Path, pin: dict[str, Any]) -> Path:
     if not isinstance(pin, dict) or pin.get("schema") not in PROJECT_PIN_SCHEMAS:
         raise ProjectPinError("PROJECT_PIN_SCHEMA_INVALID")
@@ -835,22 +1201,50 @@ def _validate_projection_pin(
         raise ProjectPinError("PROJECT_PIN_PROJECTION_SCHEMA_INVALID")
     if projection.get("materialization_version") != PROJECTION_MATERIALIZATION_VERSION:
         raise ProjectPinError("PROJECT_PIN_MATERIALIZATION_VERSION_INVALID")
-    plan = _validate_plan(projection.get("plan_snapshot"))
+    has_plan = "plan_snapshot" in projection
+    has_bundle = "bundle" in projection
+    if has_plan == has_bundle:
+        raise ProjectPinError("PROJECT_PIN_PROJECTION_BINDING_SHAPE_INVALID")
     plan_hash = _require_hex(projection.get("plan_sha256"), "PLAN_SHA256", HEX64)
-    actual_plan_hash = _bytes_sha256(canonical_json(plan).encode("utf-8"))
-    if plan_hash != actual_plan_hash:
-        raise ProjectPinError("PROJECT_PIN_PLAN_SHA256_MISMATCH")
+    selected = {item["capability_id"]: item for item in capabilities}
+    if has_bundle:
+        bundle = _validate_projection_bundle(projection.get("bundle"))
+        if plan_hash != bundle["bundle_sha256"] or plan_hash != _bundle_sha256(bundle):
+            raise ProjectPinError("PROJECT_PIN_PLAN_SHA256_MISMATCH")
+        if bundle["project_id"] != pin["project_id"]:
+            raise ProjectPinError("PROJECTION_BUNDLE_PROJECT_ID_MISMATCH")
+        if bundle["project_fingerprint"] != fingerprint:
+            raise ProjectPinError("PROJECTION_BUNDLE_PROJECT_FINGERPRINT_MISMATCH")
+        if bundle["source_binding"] != source_values:
+            raise ProjectPinError("PROJECTION_BUNDLE_SOURCE_BINDING_MISMATCH")
+        if bundle["selected_capabilities"] != sorted(capabilities, key=lambda item: item["capability_id"]):
+            raise ProjectPinError("PROJECTION_BUNDLE_CAPABILITIES_MISMATCH")
+        if projection.get("host_kind") != bundle.get("host_kind"):
+            raise ProjectPinError("PROJECT_PIN_HOST_KIND_MISMATCH")
+        records = _normalise_bundle_managed_files(
+            root, bundle, projection.get("managed_files", [])
+        )
+        for key, _expected_relative, _label, _expected_schema in (
+            ("policy_binding", ".p2p/project-policy.json", "POLICY_BINDING", "p2p-codex-project-policy/1"),
+            ("context_binding", ".p2p/context/project_map.json", "CONTEXT_BINDING", "p2p-project-map/3"),
+        ):
+            if projection.get(key) != bundle.get(key):
+                raise ProjectPinError("PROJECTION_BUNDLE_SURFACE_BINDING_MISMATCH")
+    else:
+        plan = _validate_plan(projection.get("plan_snapshot"))
+        actual_plan_hash = _bytes_sha256(canonical_json(plan).encode("utf-8"))
+        if plan_hash != actual_plan_hash:
+            raise ProjectPinError("PROJECT_PIN_PLAN_SHA256_MISMATCH")
+        if projection.get("host_kind") != plan.get("host_kind"):
+            raise ProjectPinError("PROJECT_PIN_HOST_KIND_MISMATCH")
+        capability_id = plan["capability_id"]
+        if capability_id not in selected:
+            raise ProjectPinError("PLAN_CAPABILITY_NOT_SELECTED")
+        if plan["source_hash"].lower() != selected[capability_id]["source_hash"] or plan["entrypoint_hash"].lower() != selected[capability_id]["entrypoint_hash"]:
+            raise ProjectPinError("PLAN_CAPABILITY_HASH_MISMATCH")
+        records = _normalise_managed_files(root, plan, projection.get("managed_files", []))
     if expected_plan_sha256 is not None and plan_hash != _require_hex(expected_plan_sha256, "EXPECTED_PLAN_SHA256", HEX64):
         raise ProjectPinError("PROJECT_PIN_PLAN_SHA256_MISMATCH")
-    if projection.get("host_kind") != plan.get("host_kind"):
-        raise ProjectPinError("PROJECT_PIN_HOST_KIND_MISMATCH")
-    selected = {item["capability_id"]: item for item in capabilities}
-    capability_id = plan["capability_id"]
-    if capability_id not in selected:
-        raise ProjectPinError("PLAN_CAPABILITY_NOT_SELECTED")
-    if plan["source_hash"].lower() != selected[capability_id]["source_hash"] or plan["entrypoint_hash"].lower() != selected[capability_id]["entrypoint_hash"]:
-        raise ProjectPinError("PLAN_CAPABILITY_HASH_MISMATCH")
-    records = _normalise_managed_files(root, plan, projection.get("managed_files", []))
     for key, expected_relative, label, expected_schema in (
         ("policy_binding", ".p2p/project-policy.json", "POLICY_BINDING", "p2p-codex-project-policy/1"),
         ("context_binding", ".p2p/context/project_map.json", "CONTEXT_BINDING", "p2p-project-map/3"),
@@ -934,12 +1328,14 @@ __all__ = [
     "PROJECT_PIN_SCHEMA",
     "PROJECT_PIN_V2_SCHEMA",
     "PROJECT_PIN_SCHEMAS",
+    "PROJECTION_BUNDLE_SCHEMA",
     "PROJECTION_BINDING_SCHEMA",
     "PROJECTION_ONLY",
     "PROJECTION_MATERIALIZATION_VERSION",
     "PROJECTED_FILE_OWNERSHIP",
     "ProjectPinError",
     "build_pin",
+    "build_projection_bundle_pin",
     "build_projection_pin",
     "canonical_json",
     "project_fingerprint",
