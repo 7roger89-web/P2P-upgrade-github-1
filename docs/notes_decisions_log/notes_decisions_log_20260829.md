@@ -81,7 +81,7 @@
 - Candidate implementation checkpoint:
   `366c9826200fadbd170e4d07e37fdd10bc3bbdfb` / tree
   `d332b858bf1f68c836f1500f6061906d24034fd0`.
-- Final candidate after candidate-only evidence records:
+- Candidate evidence checkpoint before closure-note binding:
   `72ac8bb864ff69372324371f3842e18b0967b154` / tree
   `5a12b0de2d4391592dc418fdf5592b0f7b27c633`; base
   `b8d09fc7a0e4a91e75db7f10dc8cfaea007ba37a`.
