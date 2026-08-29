@@ -1616,6 +1616,15 @@ def beginner_entrypoint(root: Path, request: str, *, package_hint: str | None = 
         and existing_gateway_valid
         and str(existing_gateway.get("request") or "").strip() == normalized_request
     )
+    if same_request:
+        # Keep the accepted gateway as the source of truth for a repeated
+        # request.  Re-deriving it after PB01 changes the runtime hint from a
+        # source package to an installed project and rewrites the persisted
+        # inspection/context projection even though the request is identical.
+        # AUTO01 still refreshes the Task State continuity projection below.
+        charter = dict(existing_gateway)
+        public_projection = gateway.beginner_projection(charter)
+        advanced_projection = gateway.advanced_projection(charter)
     continuation_request = bool(getattr(gateway, "is_continuation_request", lambda value: False)(normalized_request))
     compatible_continuation = bool(
         existing_plan is not None
