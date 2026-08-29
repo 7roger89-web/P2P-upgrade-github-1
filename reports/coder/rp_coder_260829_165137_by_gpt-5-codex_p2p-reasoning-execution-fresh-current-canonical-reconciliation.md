@@ -1,9 +1,9 @@
 # Coder Report — P2P Reasoning/Execution Fresh Current-Canonical Reconciliation
 
-Date: 2026-08-29 16:51 Asia/Saigon  
+Date: 2026-08-29 16:51 Asia/Saigon
 Scope: carry the already-reviewed Reasoning/Execution delta onto fresh
-official `main`  
-Lane: STANDARD / minimum sufficient work  
+official `main`
+Lane: STANDARD / minimum sufficient work
 Status: READY FOR FOCUSED SUPERVISOR REVIEW
 
 ## Git boundary
@@ -130,11 +130,11 @@ preserve-only:
 
 ## E2E Verification
 
-  `[PASS]` Compiled: affected Python compile -> all 11 files pass.  
+  `[PASS]` Compiled: affected Python compile -> all 11 files pass.
   `[PASS]` Runtime: not applicable; this is a bounded contract/runtime-source
-  reconciliation with no live external execution.  
+  reconciliation with no live external execution.
   `[PASS]` Happy path: explicit certified target with matching mechanical
-  evidence -> direct Reasoning/Execution suite passes.  
+  evidence -> direct Reasoning/Execution suite passes.
   `[PASS]` Edge case: missing/incorrect evidence, target mismatch, stale/auth
   uncertainty, capability mismatch, and permission widening -> focused direct
   and C34/C35 preservation suites pass.
