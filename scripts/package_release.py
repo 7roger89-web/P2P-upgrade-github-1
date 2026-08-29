@@ -100,6 +100,7 @@ SCRIPT_FILES = (
     "scripts/p2p_development_control.py",
     "scripts/p2p_task_state.py",
     "scripts/p2p_safe_installer.py",
+    "scripts/p2p_bootstrap.py",
     "scripts/p2p_workflow.py",
     "scripts/p2p_orientation.py",
     "scripts/package.ps1",
