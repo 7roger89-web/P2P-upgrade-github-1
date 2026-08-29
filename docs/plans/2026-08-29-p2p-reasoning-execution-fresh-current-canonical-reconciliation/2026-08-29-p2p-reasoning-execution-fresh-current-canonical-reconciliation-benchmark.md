@@ -38,7 +38,7 @@ broad regression benchmark is run.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | independent Supervisor reviews | reviews | 0 | pending | pending | 1 | pending | E2-P2A-SUPERVISOR1 |
+| P2 | independent Supervisor reviews | reviews | 0 | 1 PASS | 1 PASS | 1 | 0 | E2-P2A-SUPERVISOR1 |
 
 ## Non-Benchmarkable Notes
 

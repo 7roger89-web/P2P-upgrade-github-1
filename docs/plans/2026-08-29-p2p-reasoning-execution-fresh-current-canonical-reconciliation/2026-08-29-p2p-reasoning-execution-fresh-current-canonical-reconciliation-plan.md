@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-08-29`
-- Status: `ready_for_supervisor`
+- Status: `ready_for_owner_gate`
 - Plan: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-plan.md`
 - Evidence: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-evidence.md`
 - Benchmark: `docs/plans/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation/2026-08-29-p2p-reasoning-execution-fresh-current-canonical-reconciliation-benchmark.md`
@@ -251,7 +251,7 @@ delta has no path overlap with later canonical files, port only the coherent
 
 ### P2: Independent acceptance and Owner-gate stop
 
-- [ ] P2-A: Run one focused independent Supervisor review.
+- [x] P2-A: Run one focused independent Supervisor review.
   - Goal: verify exact ancestry, all newer canonical preservation, required
     Reasoning/Execution/host-surface/evidence/permission invariants, duplicate
     control-plane absence, and Owner boundary.

@@ -185,3 +185,14 @@
   with tree `55f6db6567e6e512d28d8ef98b886188c842c67d`; its parent is the fresh
   current main `bc686845fbb5817e50958d91e0d382a72c219b78`. The final candidate
   identity includes the focused review record and remains unpromoted.
+
+### Supervisor and closure state
+
+- One independent focused Supervisor review passed at
+  `ace98bf638d118f796de0998292749cac4c460c3` / tree
+  `8dab26ab3c62419406e82cd80c75b15c00e108bf`. Report:
+  `reports/supervisor/rp_supervisor_260829_165639_by_gpt-5-codex_re-exec.md`.
+- The review found no source/test drift, no current-main preservation mismatch,
+  no duplicate control plane, and no Owner-boundary defect. The remaining
+  action is documentation-only final SHA/tree binding; `MCP_REQUIRED_NOW=NO`,
+  `OWNER_GATE_REQUIRED=YES`, and `CANONICAL_PROMOTED=NO` remain in force.

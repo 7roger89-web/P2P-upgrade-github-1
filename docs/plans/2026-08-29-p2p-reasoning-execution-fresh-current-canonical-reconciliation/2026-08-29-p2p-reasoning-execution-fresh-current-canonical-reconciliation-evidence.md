@@ -100,9 +100,19 @@ Matching plan item(s): `P1-A`, `P1-B`
 
 Matching plan item(s): `P2-A`
 
-- `E2-P2A-SUPERVISOR1`: pending one independent focused Supervisor report.
+- `E2-P2A-SUPERVISOR1`: one independent focused Supervisor review passed at
+  `ace98bf638d118f796de0998292749cac4c460c3` / tree
+  `8dab26ab3c62419406e82cd80c75b15c00e108bf`. The report reviewed subject
+  `8cac8c058deebeb7a7e33d98d129f8c0baf48f92` / tree
+  `a26b0d2a2f3070aae22c0163b43cb3e520b849c1` and cleared exact ancestry,
+  current-main preservation, Reasoning/Execution semantics, host/surface/
+  environment/permission awareness, mechanical evidence, no duplicate
+  control plane, and Owner-gate boundaries. Report:
+  `reports/supervisor/rp_supervisor_260829_165639_by_gpt-5-codex_re-exec.md`.
 
 ## Closure Evidence
 
-- `E3-PNA-CLOSE1`: pending final candidate identity, clean status, Owner-gate
-  stop, and `CANONICAL_PROMOTED=NO` confirmation.
+- `E3-PNA-CLOSE1`: closure is now limited to binding the final documentation
+  commit's exact SHA/tree, rechecking clean status, and recording the
+  Owner-gate stop. No source/test changes are permitted after the Supervisor
+  subject; `CANONICAL_PROMOTED=NO` remains required.
