@@ -201,7 +201,7 @@ class P2PImg2ThreeJSExec01Tests(unittest.TestCase):
                     )
 
     def test_remote_reference_identifier_and_output_escape_fail_closed(self) -> None:
-        for value in ("https://example.invalid/reference.png", "../outside.png", r"references\outside.png", str(self.workspace / "absolute.png")):
+        for value in ("https://example.invalid/reference.png", "../outside.png", r"references\outside.png", "C:outside.png", str(self.workspace / "absolute.png")):
             with self.subTest(reference=value):
                 with self.assertRaises(adapter.Img2ThreeJSAdapterError):
                     adapter.execute(
@@ -214,7 +214,7 @@ class P2PImg2ThreeJSExec01Tests(unittest.TestCase):
             with self.subTest(identifier=value):
                 with self.assertRaises(adapter.Img2ThreeJSAdapterError):
                     adapter.validate_identifier(value, field="region")
-        for value in ("../outside.json", r"references\outside.json", str(self.workspace / "outside.json")):
+        for value in ("../outside.json", r"references\outside.json", "C:outside.json", str(self.workspace / "outside.json")):
             with self.subTest(path=value):
                 with self.assertRaises(adapter.Img2ThreeJSAdapterError):
                     adapter.bounded_workspace_path(self.workspace, value, field="output")

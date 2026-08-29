@@ -87,6 +87,8 @@ def _workspace_root(value: str | Path) -> Path:
     root = Path(value).expanduser()
     if not root.is_absolute():
         raise Img2ThreeJSAdapterError("WORKSPACE_ROOT_MUST_BE_ABSOLUTE")
+    if root.is_symlink() or _reparse_point(root):
+        raise Img2ThreeJSAdapterError("WORKSPACE_ROOT_SYMLINK_OR_REPARSE")
     try:
         resolved = root.resolve(strict=True)
     except OSError as exc:
@@ -106,7 +108,7 @@ def _relative(value: str | Path, *, field: str) -> PurePosixPath:
         raise Img2ThreeJSAdapterError(f"{field.upper()}_NUL_BYTE")
     if "\\" in raw:
         raise Img2ThreeJSAdapterError(f"{field.upper()}_BACKSLASH_REJECTED")
-    if raw.startswith(("/", "~")) or re.match(r"^[A-Za-z]:[/\\]", raw):
+    if raw.startswith(("/", "~")) or re.match(r"^[A-Za-z]:", raw):
         raise Img2ThreeJSAdapterError(f"{field.upper()}_MUST_BE_WORKSPACE_RELATIVE")
     path = PurePosixPath(raw)
     if path.is_absolute() or "." in path.parts or ".." in path.parts:
@@ -167,6 +169,8 @@ def verify_upstream_checkout(source_root: str | Path) -> dict[str, str]:
     """Bind the executable source to the exact audited commit/tree and clean worktree."""
 
     source = Path(source_root).expanduser()
+    if source.is_symlink() or _reparse_point(source):
+        raise Img2ThreeJSAdapterError("UPSTREAM_SOURCE_SYMLINK_OR_REPARSE")
     try:
         resolved = source.resolve(strict=True)
     except OSError as exc:
