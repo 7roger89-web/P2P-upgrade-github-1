@@ -45,3 +45,43 @@
 - Independent supervisor report:
   `reports/supervisor/rp_supervisor_260829_075037_by_gpt-5-codex_p2p-game-toolchain-02a.md`.
 - Technical stop: Owner gate, with img2threejs executable binding deferred.
+
+## P2P-AUTO01 current-canonical reconciliation — 2026-08-29
+
+### Authority and isolation
+
+- Fresh official `refs/heads/main` resolved to
+  `b8d09fc7a0e4a91e75db7f10dc8cfaea007ba37a` with tree
+  `91012e41e67a956bbca311368dc51a45e8c0423b`.
+- Historical AUTO01 `ba1ae9df6603925871a6de788c74eb635019e20f` / tree
+  `c5feb0a442bed5172e69cba0f00ddeccce408046` was treated as implementation
+  evidence only.
+- Work is isolated to `.tmp/p2p-auto01-current-recon-20260829`; current
+  canonical checkout, owner worktrees, and remote refs were not modified.
+
+### Overlap and resolution
+
+- The exact old-base delta overlap was only this notes file. The primary
+  AUTO01 gateway/workflow paths were unchanged in current canonical, so their
+  behavior was carried through existing seams rather than overwritten.
+- Current PB01 and 02A commits remain ancestors. AUTO01 retains the existing
+  Goal Contract, TaskStateStore, execution ledger, Control Tower, beginner /
+  advanced projection, material-question policy, bounded workstreams, real
+  dependencies, five-workstream limit, and `automatic_start=false`.
+- The only new conflict was PB01 byte idempotency when the runtime hint changed
+  from source package to installed project. Repeated identical requests now
+  reuse the accepted gateway and refresh only Task State continuity.
+
+### Evidence and stop
+
+- AUTO01 `7/7`, BG01 `8/8`, PB01 `16/16`, and 02A `11/11` plus four subtests
+  passed; targeted compile and diff checks passed.
+- No Anvien, broad regression, benchmark regeneration, promotion, push,
+  deployment, or live activation was run.
+- Candidate implementation checkpoint:
+  `366c9826200fadbd170e4d07e37fdd10bc3bbdfb` / tree
+  `d332b858bf1f68c836f1500f6061906d24034fd0`.
+- Coder report:
+  `reports/coder/rp_coder_260829_121800_by_gpt-5-codex_p2p-auto01-current-canonical-reconciliation.md`.
+- Fresh independent Supervisor review and final candidate identity remain the
+  final closure evidence; stop is Owner gate only.
