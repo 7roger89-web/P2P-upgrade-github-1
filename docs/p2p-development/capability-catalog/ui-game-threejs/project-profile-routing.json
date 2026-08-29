@@ -1,0 +1,243 @@
+{
+  "routing_id": "ui-game-threejs-profile-routing",
+  "schema": "p2p-project-profile-routing/1",
+  "version": "1.0.0",
+  "generated_at": "2026-08-29T16:00:00Z",
+  "generated_by": "P2P-GAME-UI-CAP-01",
+  "authority": "Projection selects only applicable capabilities. Project profile determines required, optional, and gated capability sets. Selective activation prevents indiscriminate global installation.",
+  "profiles": {
+    "WEB_APP": {
+      "description": "Standard web application (React, Vue, etc.)",
+      "required_capabilities": [
+        "ui.design",
+        "ui.frontend"
+      ],
+      "optional_capabilities": [
+        "ui.design_system",
+        "ui.motion",
+        "ui.component_lab",
+        "ui.figma_bridge",
+        "ui.penpot_bridge"
+      ],
+      "gated_capabilities": [
+        "ui.penpot_bridge"
+      ],
+      "excluded_capabilities": [
+        "ui.game_hud",
+        "ui.spatial",
+        "game.three.visual",
+        "game.three.asset",
+        "game.three.cinematic",
+        "game.three.spatial_query",
+        "game.three.navigation",
+        "game.three.adaptive_quality",
+        "game.three.scene_authoring"
+      ],
+      "routing_principles": [
+        "Visual direction must precede blind component assembly",
+        "Component library supplies primitives, not product identity",
+        "Do not receive Three.js game infrastructure unless explicitly required",
+        "Do not force shadcn visual identity"
+      ],
+      "candidate_mappings": {
+        "CAND-GAME-UI-001": "PATTERN_ONLY (game-studio methodology)",
+        "CAND-GAME-UI-002": "ACCEPT (shadcn-ui/ui) when stack compatible",
+        "CAND-GAME-UI-003": "ACCEPT (motion) when animation needs justify",
+        "CAND-GAME-UI-004": "ACCEPT (storybook) when project size justifies",
+        "CAND-GAME-UI-009": "CONDITIONAL (detect-gpu) for WebGL/adaptive quality",
+        "CAND-GAME-UI-013": "SECURITY_GATED (penpot MCP)"
+      }
+    },
+    "MOBILE_APP": {
+      "description": "Mobile application (React Native, Flutter, etc.)",
+      "required_capabilities": [
+        "ui.design",
+        "ui.frontend"
+      ],
+      "optional_capabilities": [
+        "ui.design_system",
+        "ui.motion",
+        "ui.component_lab",
+        "ui.figma_bridge",
+        "ui.penpot_bridge"
+      ],
+      "gated_capabilities": [
+        "ui.penpot_bridge"
+      ],
+      "excluded_capabilities": [
+        "ui.spatial",
+        "game.three.visual",
+        "game.three.asset",
+        "game.three.cinematic",
+        "game.three.spatial_query",
+        "game.three.navigation",
+        "game.three.scene_authoring"
+      ],
+      "routing_principles": [
+        "Mobile/responsive/touch QA required",
+        "Do not assume React web runtime automatically",
+        "Design principles apply where applicable"
+      ],
+      "candidate_mappings": {
+        "CAND-GAME-UI-001": "PATTERN_ONLY (game-studio methodology)",
+        "CAND-GAME-UI-002": "ACCEPT (shadcn-ui/ui) when stack compatible",
+        "CAND-GAME-UI-003": "ACCEPT (motion) when animation needs justify",
+        "CAND-GAME-UI-004": "ACCEPT (storybook) when project size justifies",
+        "CAND-GAME-UI-013": "SECURITY_GATED (penpot MCP)"
+      }
+    },
+    "2D_GAME": {
+      "description": "2D game (canvas, sprite-based, etc.)",
+      "required_capabilities": [
+        "ui.game_hud",
+        "ui.design"
+      ],
+      "optional_capabilities": [
+        "ui.frontend",
+        "ui.motion",
+        "ui.figma_bridge",
+        "ui.penpot_bridge"
+      ],
+      "gated_capabilities": [
+        "ui.penpot_bridge"
+      ],
+      "excluded_capabilities": [
+        "ui.spatial",
+        "game.three.visual",
+        "game.three.asset",
+        "game.three.cinematic",
+        "game.three.spatial_query",
+        "game.three.navigation",
+        "game.three.adaptive_quality",
+        "game.three.scene_authoring"
+      ],
+      "routing_principles": [
+        "Game/UI design methodology",
+        "Game HUD",
+        "Playtest / visual QA",
+        "No Three.js/R3F capabilities unless project actually uses them",
+        "WORLD/GAME_VIEW=VISUALLY_PRIMARY",
+        "Avoid generic SaaS dashboard look",
+        "Prefer progressive/conditional HUD surfaces"
+      ],
+      "candidate_mappings": {
+        "CAND-GAME-UI-001": "PATTERN_ONLY (game-studio methodology)",
+        "CAND-GAME-UI-010": "CONDITIONAL (@react-facet) for reactive game UI",
+        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)"
+      }
+    },
+    "THREEJS_GAME": {
+      "description": "Vanilla Three.js game (no React)",
+      "required_capabilities": [
+        "game.three.visual",
+        "game.three.asset",
+        "ui.game_hud"
+      ],
+      "optional_capabilities": [
+        "game.three.spatial_query",
+        "game.three.navigation",
+        "game.three.adaptive_quality",
+        "game.three.cinematic",
+        "game.three.scene_authoring",
+        "ui.design",
+        "ui.frontend",
+        "ui.motion"
+      ],
+      "gated_capabilities": [
+        "ui.penpot_bridge"
+      ],
+      "excluded_capabilities": [
+        "ui.spatial"
+      ],
+      "routing_principles": [
+        "Vanilla Three.js visual/asset capabilities",
+        "Spatial query where needed",
+        "Navigation where needed",
+        "Adaptive quality where needed",
+        "Cinematic where needed",
+        "DOM HUD remains valid/default where appropriate",
+        "Do not inject R3F-only tooling",
+        "Do not automatically receive all game.three.* capabilities",
+        "Route by actual need"
+      ],
+      "candidate_mappings": {
+        "CAND-GAME-UI-001": "PATTERN_ONLY (game-studio methodology)",
+        "CAND-GAME-UI-002": "ACCEPT (shadcn-ui/ui) for DOM HUD when applicable",
+        "CAND-GAME-UI-003": "ACCEPT (motion) for DOM UI animation",
+        "CAND-GAME-UI-004": "ACCEPT (storybook) for component lab",
+        "CAND-GAME-UI-005": "ACCEPT (three-mesh-bvh) when measured need exists",
+        "CAND-GAME-UI-006": "CONDITIONAL (toonlab) for stylized pipelines",
+        "CAND-GAME-UI-007": "CONDITIONAL (theatre) for cinematic",
+        "CAND-GAME-UI-008": "ACCEPT (three-pathfinding) for navmesh",
+        "CAND-GAME-UI-009": "CONDITIONAL (detect-gpu) for adaptive quality",
+        "CAND-GAME-UI-010": "CONDITIONAL (@react-facet) for reactive game UI",
+        "CAND-GAME-UI-014": "RESEARCH_ONLY (threespace)",
+        "CAND-GAME-UI-016": "RESEARCH_ONLY (Capsule)",
+        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)"
+      }
+    },
+    "R3F_GAME": {
+      "description": "React Three Fiber game",
+      "required_capabilities": [
+        "game.three.visual",
+        "game.three.asset",
+        "ui.game_hud"
+      ],
+      "optional_capabilities": [
+        "game.three.spatial_query",
+        "game.three.navigation",
+        "game.three.adaptive_quality",
+        "game.three.cinematic",
+        "game.three.scene_authoring",
+        "ui.spatial",
+        "ui.design",
+        "ui.frontend",
+        "ui.motion",
+        "ui.design_system"
+      ],
+      "gated_capabilities": [
+        "ui.penpot_bridge"
+      ],
+      "excluded_capabilities": [],
+      "routing_principles": [
+        "Three.js fundamentals",
+        "React/R3F-specific scene/UI packages where justified",
+        "Spatial UI only when world-space UI is an actual requirement",
+        "DOM HUD remains valid/default where appropriate",
+        "Do not automatically receive all capabilities",
+        "Route by actual need",
+        "ui.spatial activation requires genuine spatial/XR/world-space requirement"
+      ],
+      "candidate_mappings": {
+        "CAND-GAME-UI-001": "PATTERN_ONLY (game-studio methodology)",
+        "CAND-GAME-UI-002": "ACCEPT (shadcn-ui/ui) for DOM HUD when applicable",
+        "CAND-GAME-UI-003": "ACCEPT (motion) for DOM UI animation",
+        "CAND-GAME-UI-004": "ACCEPT (storybook) for component lab",
+        "CAND-GAME-UI-005": "ACCEPT (three-mesh-bvh) when measured need exists",
+        "CAND-GAME-UI-006": "CONDITIONAL (toonlab) for stylized pipelines",
+        "CAND-GAME-UI-007": "CONDITIONAL (theatre) for cinematic",
+        "CAND-GAME-UI-008": "ACCEPT (three-pathfinding) for navmesh",
+        "CAND-GAME-UI-009": "CONDITIONAL (detect-gpu) for adaptive quality",
+        "CAND-GAME-UI-010": "CONDITIONAL (@react-facet) for reactive game UI",
+        "CAND-GAME-UI-011": "CONDITIONAL (uikit) for spatial UI when genuine requirement",
+        "CAND-GAME-UI-012": "CONDITIONAL (composer-suite) when architecture fits",
+        "CAND-GAME-UI-014": "RESEARCH_ONLY (threespace)",
+        "CAND-GAME-UI-015": "LICENSE_GATED (triplex)",
+        "CAND-GAME-UI-016": "RESEARCH_ONLY (Capsule)",
+        "CAND-GAME-UI-017": "LICENSE_GATED (react-three-game)",
+        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)"
+      }
+    }
+  },
+  "projection_invariants": [
+    "WEB_APP does not inherit game capabilities by default",
+    "THREEJS_GAME does not automatically receive R3F-only capabilities",
+    "R3F_GAME may receive R3F candidates but only when capability is relevant",
+    "2D_GAME does not receive Three.js/R3F capabilities unless project uses them",
+    "Gated candidates cannot become executable projection automatically",
+    "LICENSE_GATED and SECURITY_GATED require explicit owner approval",
+    "game.three.visual != game.three.spatial_query != game.three.navigation != game.three.adaptive_quality != game.three.cinematic != game.three.scene_authoring",
+    "COMPONENT_FOUNDATION != VISUAL_DIRECTION",
+    "GPU_TIER=HEURISTIC, GPU_TIER!=AUTHORITATIVE_DEVICE_CAPABILITY"
+  ]
+}

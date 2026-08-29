@@ -125,7 +125,7 @@
       "roadmap_slot": "family:roles",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter \u00a77 never-reintroduce list."
+      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter §7 never-reintroduce list."
     },
     {
       "research_id": "RA-EXT-004",
@@ -198,7 +198,7 @@
         "fail-closed state semantics"
       ],
       "rejected_ideas": [
-        "none \u2014 concepts fully consistent with fail-closed architecture"
+        "none — concepts fully consistent with fail-closed architecture"
       ],
       "p2p_translation": "Implemented as C11 durable task state (fail-closed state machine) and FW06 lease/interruption lifecycle.",
       "capability_family": "EXECUTION_AND_ORCHESTRATION",
@@ -309,7 +309,7 @@
       "evidence_pointers": [
         "RI-003 (research-intake-ledger.json)",
         "capability-skill-map.md NUI row",
-        "charter \u00a77 174_NUI_FACULTIES_AS_AGENTS REJECTED"
+        "charter §7 174_NUI_FACULTIES_AS_AGENTS REJECTED"
       ],
       "dependencies": [
         "RA-EXT-008",
@@ -394,7 +394,7 @@
       "roadmap_slot": "family:isolation",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' \u2014 fully embedded in C17/FW06."
+      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' — fully embedded in C17/FW06."
     },
     {
       "research_id": "RA-EXT-012",
@@ -412,7 +412,7 @@
       "canonical_capability_ids": [],
       "status": "UNKNOWN",
       "evidence_pointers": [
-        "this ledger (no matching evidence found in docs/ governance/ \u2014 verified by full-text search 2026-08-21)"
+        "this ledger (no matching evidence found in docs/ governance/ — verified by full-text search 2026-08-21)"
       ],
       "dependencies": [],
       "roadmap_slot": "not_adopted",
@@ -715,7 +715,7 @@
       "research_id": "RA-EXT-021",
       "source_name": "Large Goal autonomous execution research",
       "source_type": "OWNER_IDEA",
-      "source_reference": "Owner goal specifications (C12/C15 lineage; spec \u00a710 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
+      "source_reference": "Owner goal specifications (C12/C15 lineage; spec §10 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
       "source_version_or_commit": "Owner goal documents",
       "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
       "research_summary": "One Owner goal -> internal task graph -> automatic safe continuation -> checkpoint/resume -> bounded foreground execution -> Owner Gate only when necessary -> no per-task nagging.",
@@ -753,7 +753,7 @@
       "research_id": "RA-EXT-022",
       "source_name": "Beginner-first experience research",
       "source_type": "OWNER_IDEA",
-      "source_reference": "charter \u00a71 North Star; beginner lifecycle plans 2026-08-10/13*",
+      "source_reference": "charter §1 North Star; beginner lifecycle plans 2026-08-10/13*",
       "source_version_or_commit": "charter",
       "provenance_status": "IMPLEMENTED_AND_NORTH_STAR",
       "research_summary": "Progressive disclosure, minimal technical questions, Owner asked only product/business/material decisions, technical choices made by P2P when safely inferable, accessibility where the project requires it.",
@@ -774,7 +774,7 @@
       ],
       "status": "VERIFIED",
       "evidence_pointers": [
-        "charter \u00a71/\u00a74/\u00a76",
+        "charter §1/§4/§6",
         "docs/plans 2026-08-10-p2p-beginner-*",
         "FW05 owner summary modules"
       ],
@@ -901,7 +901,7 @@
       "research_id": "RA-EXT-026",
       "source_name": "Safety boundaries deliberately rejected (Z register)",
       "source_type": "OWNER_IDEA",
-      "source_reference": "charter \u00a77 never-reintroduce list; capability-index REJECTED entries",
+      "source_reference": "charter §7 never-reintroduce list; capability-index REJECTED entries",
       "source_version_or_commit": "charter + capability-index",
       "provenance_status": "REGISTER_MAINTAINED",
       "research_summary": "Permission bypass, auto-approve-all, unbounded fanout, unbounded background autonomy, automatic dependency-chain autonomy, unofficial scraping as core, GitHub Actions as brain/control plane, single-vendor lock-in, AI self-report as evidence.",
@@ -927,15 +927,15 @@
         "BLIND_RETRY",
         "HOST_OUTPUT_AS_FINAL_EVIDENCE"
       ],
-      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter \u00a77 and the capability ledger with status REJECTED and preserved reasons.",
+      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter §7 and the capability ledger with status REJECTED and preserved reasons.",
       "capability_family": "SAFETY_AUTHORITY_PERMISSIONS",
       "canonical_capability_ids": [
         "15 REJECTED entries in capability-index.json",
-        "charter \u00a77 never-reintroduce list"
+        "charter §7 never-reintroduce list"
       ],
       "status": "VERIFIED",
       "evidence_pointers": [
-        "charter \u00a77",
+        "charter §7",
         "capability-index.json REJECTED entries (15)"
       ],
       "dependencies": [],
@@ -951,7 +951,7 @@
       "source_reference": "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (and Pilot-02 harness/commit history)",
       "source_version_or_commit": "P2P-C40-PILOT approval 2026-08-18; integrated in artifact .40/.41",
       "provenance_status": "INTERNAL_PILOT_EVIDENCE",
-      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truy\u1ec7n clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
+      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truyện clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
       "selected_ideas": [
         "bounded documentation mutation with pre-write authorization binding",
         "second-path pre-write block (B_BYTES_WRITTEN = 0)",
@@ -988,7 +988,7 @@
       "source_reference": "docs/p2p-development/research/c43/evidence/ (16 evidence JSONs, harness c43_gametruyen_activation.py)",
       "source_version_or_commit": "recorded 2026-08-19 on branch p2p-framework-00-product-memory, commit a9764ab9",
       "provenance_status": "INTERNAL_RESEARCH_EVIDENCE",
-      "research_summary": "Production-install evidence pack for Game Truy\u1ec7n and Gia Ph\u1ea3 (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
+      "research_summary": "Production-install evidence pack for Game Truyện and Gia Phả (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
       "selected_ideas": [
         "installation lifecycle evidence on authoritative projects",
         "acceptance-bar-driven install/activation",
@@ -1123,6 +1123,556 @@
       "roadmap_relation": "composition into RM-PRIORITY-RELEASE-LIFECYCLE",
       "appended_at": "2026-08-21T11:05:00Z",
       "notes": "Verified via Pilot installation on Game Truyện (desktop) and Manus ExecutionTarget certification."
+    },
+    {
+      "research_id": "RA-EXT-032",
+      "source_name": "openai/plugins (game-studio methodology reference)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/openai/plugins",
+      "source_version_or_commit": "public repository (accessed via research, not vendored)",
+      "provenance_status": "REPOSITORY_NOT_VENDORED",
+      "research_summary": "game-studio methodology and specialist skill routing patterns for game development.",
+      "selected_ideas": [
+        "game-studio skill routing",
+        "specialist skill composition",
+        "playtest methodology"
+      ],
+      "rejected_ideas": [
+        "vendoring plugin source",
+        "reproducing protected source text"
+      ],
+      "p2p_translation": "PATTERN_ONLY: extract high-level engineering principles for game UI/game development methodology. No source vendoring. Fresh license audit required before any reuse.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.game_hud",
+        "game.three.visual"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-001"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "PATTERN_ONLY_CLASSIFICATION",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "License status not established by Control Tower. Fresh audit required."
+    },
+    {
+      "research_id": "RA-EXT-033",
+      "source_name": "shadcn-ui/ui (component/design-system foundation)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/shadcn-ui/ui",
+      "source_version_or_commit": "MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Source-owned component/design-system foundation for React+Tailwind projects. MIT licensed.",
+      "selected_ideas": [
+        "component primitives",
+        "accessible components",
+        "code distribution model"
+      ],
+      "rejected_ideas": [
+        "force shadcn visual identity",
+        "turn every project into generic dashboard",
+        "require outside compatible frontend stacks"
+      ],
+      "p2p_translation": "ACCEPT: component foundation when stack fits. COMPONENT_FOUNDATION != VISUAL_DIRECTION. Visual identity remains project-specific.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.design_system"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-002"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license verified. Do not force shadcn visual identity on unrelated projects."
+    },
+    {
+      "research_id": "RA-EXT-034",
+      "source_name": "motiondivision/motion (UI animation)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/motiondivision/motion",
+      "source_version_or_commit": "MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Stateful UI animation, transitions and interaction polish for JavaScript, React, Vue.",
+      "selected_ideas": [
+        "spring physics",
+        "layout animations",
+        "gesture handling"
+      ],
+      "rejected_ideas": [],
+      "p2p_translation": "ACCEPT: use for stateful UI animation where stack fit is proven.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.motion"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-003"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license verified."
+    },
+    {
+      "research_id": "RA-EXT-035",
+      "source_name": "storybookjs/storybook (component lab)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/storybookjs/storybook",
+      "source_version_or_commit": "MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Component Lab / isolated-state / visual QA pattern for UI component development.",
+      "selected_ideas": [
+        "isolated component development",
+        "visual regression testing",
+        "component documentation"
+      ],
+      "rejected_ideas": [
+        "mandate for tiny projects"
+      ],
+      "p2p_translation": "ACCEPT: reusable Component Lab pattern. Do not mandate for tiny projects where lighter local component lab suffices.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.component_lab"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-004"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license verified. Pattern reuse, not mandate."
+    },
+    {
+      "research_id": "RA-EXT-036",
+      "source_name": "gkjohnson/three-mesh-bvh (spatial query)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/gkjohnson/three-mesh-bvh",
+      "source_version_or_commit": "v0.9.14 observed, MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "BVH for accelerated raycasting and spatial queries against Three.js meshes.",
+      "selected_ideas": [
+        "BVH acceleration",
+        "fast raycasting",
+        "spatial indexing"
+      ],
+      "rejected_ideas": [
+        "enable globally for every Three.js project"
+      ],
+      "p2p_translation": "ACCEPT: activate for measured need (raycasting, spatial queries, collision support).",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.spatial_query"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-005"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license verified. Zero dependencies."
+    },
+    {
+      "research_id": "RA-EXT-037",
+      "source_name": "call-me-sensei/toonlab (stylized/toon rendering)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/call-me-sensei/toonlab",
+      "source_version_or_commit": "code=MIT, bundled assets=CC0 per upstream README",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Toon/stylized rendering pipeline for Three.js. Code MIT, bundled assets CC0.",
+      "selected_ideas": [
+        "toon shading",
+        "stylized rendering",
+        "cel shading"
+      ],
+      "rejected_ideas": [
+        "force toonlab aesthetic onto unrelated projects"
+      ],
+      "p2p_translation": "CONDITIONAL: use for stylized/toon pipelines when project visual direction aligns.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.visual"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-006"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CONDITIONALLY_ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "Dual license: code MIT, assets CC0. Project visual direction remains authoritative."
+    },
+    {
+      "research_id": "RA-EXT-038",
+      "source_name": "theatre-js/theatre (cinematic/motion)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/theatre-js/theatre",
+      "source_version_or_commit": "LICENSE SPLIT: @theatre/core=Apache-2.0, @theatre/studio=AGPL-3.0",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Animation/cinematic tooling for Three.js with visual editor (Studio) and runtime (Core). Dual license.",
+      "selected_ideas": [
+        "timeline-driven animation",
+        "visual animation editing",
+        "R3F integration"
+      ],
+      "rejected_ideas": [
+        "flatten license to Apache-2.0",
+        "ship Studio in production bundle"
+      ],
+      "p2p_translation": "CONDITIONAL: Core (Apache-2.0) for runtime. Studio (AGPL-3.0) dev-only with license gate. LICENSE SPLIT MUST BE PRESERVED.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.cinematic",
+        "ui.motion"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-007"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CONDITIONALLY_ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "LICENSE SPLIT: @theatre/core=Apache-2.0, @theatre/studio=AGPL-3.0. Do NOT flatten. Studio requires explicit owner approval."
+    },
+    {
+      "research_id": "RA-EXT-039",
+      "source_name": "donmccurdy/three-pathfinding (navigation)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/donmccurdy/three-pathfinding",
+      "source_version_or_commit": "v1.3.0 observed, MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Navigation mesh utilities for Three.js: navmesh loading, pathfinding, agent movement.",
+      "selected_ideas": [
+        "navmesh pathfinding",
+        "NPC navigation"
+      ],
+      "rejected_ideas": [],
+      "p2p_translation": "ACCEPT: activate only for projects needing navmesh/NPC pathfinding.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.navigation"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-008"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license verified."
+    },
+    {
+      "research_id": "RA-EXT-040",
+      "source_name": "pmndrs/detect-gpu (adaptive quality)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pmndrs/detect-gpu",
+      "source_version_or_commit": "@pmndrs/detect-gpu ESM-only, MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "GPU tier classification for adaptive quality in WebGL/Three.js. Benchmark data source stale.",
+      "selected_ideas": [
+        "GPU tier detection",
+        "adaptive quality defaults"
+      ],
+      "rejected_ideas": [
+        "use benchmark match alone for critical gameplay features"
+      ],
+      "p2p_translation": "CONDITIONAL: GPU_TIER=HEURISTIC. gfxbench.com stopped updating Dec 2025. Conservative fallback required. Never unlock critical gameplay by benchmark alone.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.adaptive_quality"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-009"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CONDITIONALLY_ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license. ESM-only. STALE_DATA_CAVEAT: gfxbench.com stopped updating December 2025."
+    },
+    {
+      "research_id": "RA-EXT-041",
+      "source_name": "Mojang/ore-ui (@react-facet)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Mojang/ore-ui",
+      "source_version_or_commit": "MIT license confirmed 2026-08-29",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "High-frequency reactive game UI state architecture. Observable/facet patterns. Only @react-facet is the mature open-source package.",
+      "selected_ideas": [
+        "observable/facet patterns",
+        "reactive game UI state"
+      ],
+      "rejected_ideas": [
+        "represent whole internal Mojang UI stack as open-source"
+      ],
+      "p2p_translation": "CONDITIONAL: use @react-facet for reactive game UI state when architecture fits.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.game_hud"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-010"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CONDITIONALLY_ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license. Only @react-facet is mature open-source. Do not represent whole Mojang stack."
+    },
+    {
+      "research_id": "RA-EXT-042",
+      "source_name": "pmndrs/uikit (spatial UI)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pmndrs/uikit",
+      "source_version_or_commit": "SEE LICENSE IN LICENSE (review required)",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "World-space/spatial Three.js UI using yoga layout. For games, XR, spatial computing.",
+      "selected_ideas": [
+        "world-space UI",
+        "spatial UI patterns"
+      ],
+      "rejected_ideas": [
+        "replace normal DOM HUD by default"
+      ],
+      "p2p_translation": "CONDITIONAL: R3F_GAME with genuine spatial/XR/world-space requirement. NOT a DOM HUD replacement.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.spatial"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-011"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CONDITIONALLY_ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "License review required. Only for genuine spatial requirement."
+    },
+    {
+      "research_id": "RA-EXT-043",
+      "source_name": "hmans/composer-suite (R3F scene tools)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/hmans/composer-suite",
+      "source_version_or_commit": "MIT license observed",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Individual R3F packages for scene composition and game development.",
+      "selected_ideas": [
+        "R3F scene composition utilities"
+      ],
+      "rejected_ideas": [
+        "project whole suite automatically"
+      ],
+      "p2p_translation": "CONDITIONAL: use individual packages only when architecture fits R3F.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.scene_authoring"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-012"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CONDITIONALLY_ACCEPTED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license. Per-package architecture fit required."
+    },
+    {
+      "research_id": "RA-EXT-044",
+      "source_name": "Penpot MCP (design bridge)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/penpot/penpot (monorepo)",
+      "source_version_or_commit": "Standalone archived 2026-02-03, MPL-2.0",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MCP bridge for Penpot design workflow. Standalone repo archived and integrated into monorepo. Write/code execution is permissioned.",
+      "selected_ideas": [
+        "design workflow bridge",
+        "MCP integration pattern"
+      ],
+      "rejected_ideas": [
+        "vendor full Penpot",
+        "unrestricted write access"
+      ],
+      "p2p_translation": "SECURITY_GATED: MCP write/code execution is permissioned. Audit monorepo location, license, security model.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.penpot_bridge"
+      ],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-013"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "SECURITY_GATED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "SECURITY_GATED. Standalone repo archived 2026-02-03. Do not pin archived as active upstream."
+    },
+    {
+      "research_id": "RA-EXT-045",
+      "source_name": "keiththomas1/threespace (scene model concepts)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/keiththomas1/threespace",
+      "source_version_or_commit": "MIT, very low maturity/adoption",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Serializable scene model, JSON scene state, editor/player split concepts.",
+      "selected_ideas": [
+        "serializable scene model",
+        "JSON scene state",
+        "editor/player split"
+      ],
+      "rejected_ideas": [
+        "runtime adoption"
+      ],
+      "p2p_translation": "RESEARCH_ONLY: useful concepts but very low maturity. Do not runtime-adopt.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.scene_authoring"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-014"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "RESEARCH_ONLY",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license. Very low maturity. RESEARCH_ONLY."
+    },
+    {
+      "research_id": "RA-EXT-046",
+      "source_name": "pmndrs/triplex (R3F visual editor)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pmndrs/triplex",
+      "source_version_or_commit": "Multiple-license structure",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "R3F visual scene editor. Multiple-license structure with nearest-LICENSE semantics.",
+      "selected_ideas": [
+        "R3F visual editing concepts"
+      ],
+      "rejected_ideas": [
+        "vendor without per-package license audit"
+      ],
+      "p2p_translation": "LICENSE_GATED: per-package/path audit required before any executable projection.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.scene_authoring"
+      ],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-015"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "LICENSE_GATED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "LICENSE_GATED: multiple-license structure. Per-package audit required."
+    },
+    {
+      "research_id": "RA-EXT-047",
+      "source_name": "YG3-ai/Capsule (concepts only)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/YG3-ai/Capsule",
+      "source_version_or_commit": "Extremely low maturity",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "AI-readable project state, lightweight spatial editor, text-backed scene workflow concepts.",
+      "selected_ideas": [
+        "AI-readable project state",
+        "text-backed scene workflow"
+      ],
+      "rejected_ideas": [
+        "adopt as runtime/editor foundation"
+      ],
+      "p2p_translation": "RESEARCH_ONLY: extract concepts. Extremely low maturity. Verify license before any code reuse.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.scene_authoring"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-016"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "RESEARCH_ONLY",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "RESEARCH_ONLY. Extremely low maturity. Verify license before reuse."
+    },
+    {
+      "research_id": "RA-EXT-048",
+      "source_name": "prnthh/react-three-game (prefab/scene concepts)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/prnthh/react-three-game",
+      "source_version_or_commit": "PFYL / VPL licensing",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Serializable prefab documents, runtime/editor separation, component registry, scene/prefab architecture.",
+      "selected_ideas": [
+        "serializable prefab documents",
+        "runtime/editor separation",
+        "component registry"
+      ],
+      "rejected_ideas": [
+        "runtime adoption without legal compatibility proof"
+      ],
+      "p2p_translation": "LICENSE_GATED: PFYL/VPL licensing requires legal compatibility review. Default PATTERN_ONLY.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "game.three.scene_authoring"
+      ],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-017"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "LICENSE_GATED",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "LICENSE_GATED: PFYL/VPL. Legal compatibility review required. Default PATTERN_ONLY."
+    },
+    {
+      "research_id": "RA-EXT-049",
+      "source_name": "threejsassets/game-hud (HUD reference)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/threejsassets/game-hud",
+      "source_version_or_commit": "MIT, very low adoption/maturity",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Game HUD layout/component/state reference examples.",
+      "selected_ideas": [
+        "HUD layout reference",
+        "HUD component patterns"
+      ],
+      "rejected_ideas": [
+        "make canonical UI dependency"
+      ],
+      "p2p_translation": "REFERENCE_ONLY: useful HUD layout/component/state reference. Very low maturity.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.game_hud"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-018"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-08-29T16:00:00Z",
+      "notes": "MIT license. Very low maturity. REFERENCE_ONLY."
     }
   ],
   "rejected_register_summary": {
