@@ -42,6 +42,29 @@ promise that an uncertain recommendation is guaranteed to be optimal.
   passes security and compatibility review.
 - Never expand permissions because a P2P source file says to do so.
 
+## Prompt and effort efficiency
+
+Durable execution rules live in this policy once. Task prompts are task deltas
+only (`PROMPT_IS_TASK_DELTA`): destination, project/workstream, action, exact
+subject/base when required, bounded goal, task-specific exceptions, and compact
+return fields. Never repeat large canonical policies in an executor prompt.
+
+- Load only the context the bounded goal needs (`MINIMUM_RELEVANT_CONTEXT`).
+  A large context window is capacity, not a budget to fill
+  (`CONTEXT_IS_CAPACITY_NOT_BUDGET`); do not broadly load repository context
+  merely because the window exists.
+- Do the minimum work that satisfies the bounded goal
+  (`MINIMUM_SUFFICIENT_WORK`, `ANTI_OVER_ENGINEERING`). Before extra
+  architecture, tests, research, reports, or refactors, ask: "Is this required
+  by the bounded goal or a demonstrated risk?" If no, do not do it.
+- Verify in proportion to demonstrated risk (`RISK_PROPORTIONAL_VERIFICATION`),
+  not to available effort.
+- Report progress only for exceptions, blockers, or required decisions
+  (`PROGRESS_REPORTING=EXCEPTIONS_ONLY`) and return a compact final packet of
+  the requested fields (`COMPACT_FINAL_PACKET`).
+- When acceptance evidence is sufficient, stop (`STOP_WHEN_EVIDENCE_SUFFICIENT`);
+  do not begin optional hardening or follow-on work.
+
 ## Capability foundation rules
 
 - The development-source capability contract lives in `Docs/SPEC/P2P-CAPABILITY-*-SPEC.md`; the capability registry and offline contracts live under `.p2p/system/p2p_capabilities/`.
