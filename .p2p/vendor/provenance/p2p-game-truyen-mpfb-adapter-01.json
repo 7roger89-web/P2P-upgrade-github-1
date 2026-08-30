@@ -1,0 +1,77 @@
+{
+  "schema": "p2p-game-truyen-mpfb-adapter-01/1",
+  "workstream": "P2P-GAME-TRUYEN-MPFB-ADAPTER-01",
+  "selection": {
+    "generator": "MPFB2 core parametric human generator",
+    "version": "2.0.17",
+    "rigging_skinning": "MPFB2 built-in GameEngine rig + skin weights",
+    "standardization": "Blender glTF 2.0 exporter",
+    "runtime_consumer": "Three.js GLTFLoader",
+    "visual_reference_is_executable_input": false
+  },
+  "upstream": {
+    "repository": "https://github.com/makehumancommunity/mpfb2.git",
+    "version": "2.0.17",
+    "release_sha": "80919fa4682335c41847f761a4d79dcad4124732",
+    "release_tree": "189a1d6694515ecfbdc40067218c5024389b4e43",
+    "code_license": "GPL-3.0-or-later",
+    "core_asset_license": "CC0-1.0",
+    "license_evidence": ["LICENSE.md", "LICENSE.CODE.md", "LICENSE.ASSETS.md"],
+    "source_vendored_in_game_truyen": false
+  },
+  "asset_policy": {
+    "selected": "CORE_CC0_ONLY",
+    "third_party_default": "DENY",
+    "third_party_without_manifest": "DENY",
+    "user_supplied_custom_asset": "SEPARATE_RIGHTS_GATE"
+  },
+  "input_contract": {
+    "visual_reference_pack_schema": "p2p-visual-reference-pack/1",
+    "visual_reference_views": ["full_body_front", "full_body_three_quarter", "full_body_side", "full_body_back", "face_front", "face_three_quarter"],
+    "parametric_recipe_schema": "p2p-character-recipe/1",
+    "unknown_recipe_keys": "REJECT"
+  },
+  "adapter_contract": {
+    "entrypoint": ".p2p/system/p2p_capabilities/mpfb_adapter.py",
+    "allowlisted_entrypoint": true,
+    "generic_python_execution": false,
+    "arbitrary_shell": false,
+    "workspace_per_job": true,
+    "output_root_explicit": true,
+    "path_containment": true,
+    "symlink_escape_rejected": true,
+    "minimal_environment": true,
+    "secret_inheritance": false,
+    "network_policy": "DENY",
+    "timeout_required": true,
+    "process_tree_termination_required": true,
+    "undeclared_outputs": "FAIL_CLOSED",
+    "provisioning_separate_from_execution": true,
+    "execution_authorized": false
+  },
+  "output_contract": {
+    "glb_name": "<character_id>.glb",
+    "provenance_name": "<character_id>.asset-provenance.json",
+    "gltf_version": "2.0",
+    "requires_scene": true,
+    "requires_mesh": true,
+    "requires_skin": true,
+    "requires_joints_0": true,
+    "requires_weights_0": true,
+    "requires_rooted_skeleton": true,
+    "requires_gameengine_rig_record": true,
+    "resources": "EMBEDDED_OR_HASH_BOUND"
+  },
+  "downstream_contract": {
+    "consumer": "Three.js GLTFLoader",
+    "future_smoke": ["independent_glTF_parse", "GLTFLoader_load", "skeleton_skin_presence", "Character_Lab", "actual_browser_QA"],
+    "status": "NOT_EXECUTED_IN_THIS_WORKSTREAM"
+  },
+  "readiness_boundary": {
+    "adapter_pass_is_execution_pass": false,
+    "execution_pass_is_visual_match_pass": false,
+    "visual_match_pass_is_golden_character_pass": false,
+    "golden_character_generated": false,
+    "game_truyen_modified": false
+  }
+}

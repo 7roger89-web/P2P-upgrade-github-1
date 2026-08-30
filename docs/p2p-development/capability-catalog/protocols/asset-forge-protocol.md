@@ -71,3 +71,43 @@ Default: OPTIONAL, GOAL_BASED, PROJECT_SELECTIVE. No global activation.
 PROJECT GOAL → P2P SELECTS MINIMUM CAPABILITIES → PROJECT PROJECTION → ARENA RECEIVES CONTRACT → OFFLINE ASSET FORGE IF NEEDED → FINAL ASSET ENTERS GAME REPO → ARENA INTEGRATES RUNTIME → ACTUAL BROWSER QA
 
 Reuse existing router, registry, projection, and profile system. Do not create a second ontology.
+
+## Selected MPFB2 character adapter contract
+
+For the already-selected Character Forge stack, `game.character.generate` is
+the existing P2P capability surface. The bounded adapter binds MPFB2 `2.0.17`
+to release commit `80919fa4682335c41847f761a4d79dcad4124732` and source tree
+`189a1d6694515ecfbdc40067218c5024389b4e43`. It does not add a registry,
+router, projection system, or generic shell executor.
+
+The executable input is a strict `p2p-character-recipe/1` JSON recipe. The
+six-view `p2p-visual-reference-pack/1` is supervised visual reference only:
+full-body front, full-body 3/4, full-body side, full-body back, face front,
+and face 3/4. Reference images inform authoring and review; they are not
+automatic MPFB2 reconstruction input and are not passed to the forge command.
+Unknown recipe keys are rejected.
+
+The first lane is `CORE_CC0_ONLY`. MPFB2 tool code is GPL-3.0-or-later while
+the bundled MPFB2 core graphical assets are CC0-1.0. Those are separate legal
+objects: the P2P adapter does not vendor or redistribute MPFB2 source into
+Game Truyện, and exported GLB provenance records the upstream boundary without
+asserting GPL control over the generated character asset. Any MPFB2 tool
+redistribution remains subject to its GPL obligations. Third-party assets are
+denied by default; a user-supplied custom asset requires a separate rights
+gate and manifest.
+
+The eventual invocation is a preprovisioned, hash-verified local Blender
+background process with one allowlisted P2P entrypoint, explicit per-job
+workspace and output root, path and symlink containment, minimal environment,
+no inherited secrets, network denied, bounded timeout, process-tree
+termination, and fail-closed undeclared-output detection. Provisioning is a
+separate process from forge execution. This adapter lane performs no Blender,
+MPFB2, Golden Character, or Game Truyện execution.
+
+The required durable output is `<character_id>.glb` plus
+`<character_id>.asset-provenance.json`. Structural validation requires glTF
+2.0, a scene-reachable mesh, skin, `JOINTS_0`, `WEIGHTS_0`, rooted skeleton,
+GameEngine rig provenance, and embedded or hash-bound resources. A future
+downstream smoke may independently parse the GLB, load it with Three.js
+`GLTFLoader`, check skeleton/skin presence, exercise Character Lab, and then
+run browser QA. None of those downstream or visual claims are made here.

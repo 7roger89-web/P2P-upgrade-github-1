@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-visual-reference-pack/1",
+  "title": "P2P six-view visual reference pack",
+  "description": "Supervised visual specification only; this object is never passed as an executable MPFB2 recipe.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "views"],
+  "properties": {
+    "schema": {"const": "p2p-visual-reference-pack/1"},
+    "views": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["view_id", "path", "sha256"],
+        "properties": {
+          "view_id": {"enum": ["full_body_front", "full_body_three_quarter", "full_body_side", "full_body_back", "face_front", "face_three_quarter"]},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

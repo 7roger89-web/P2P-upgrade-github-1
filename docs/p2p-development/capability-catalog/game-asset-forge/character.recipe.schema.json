@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-character-recipe/1",
+  "title": "P2P MPFB2 parametric character recipe",
+  "description": "Executable parametric inputs only. Visual reference images are a separate non-executable review pack.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "character_id", "body", "proportions", "base", "skin", "hair", "clothing", "rig", "scale", "export", "assets"],
+  "properties": {
+    "schema": {"const": "p2p-character-recipe/1"},
+    "character_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"},
+    "body": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gender", "age", "weight", "muscle"],
+      "properties": {
+        "gender": {"enum": ["female", "male", "neutral"]},
+        "age": {"type": "number", "minimum": 0, "maximum": 1},
+        "weight": {"type": "number", "minimum": 0, "maximum": 1},
+        "muscle": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "proportions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["head_scale", "shoulder_width", "torso_length", "arm_length", "leg_length"],
+      "properties": {
+        "head_scale": {"type": "number", "minimum": 0.5, "maximum": 1.5},
+        "shoulder_width": {"type": "number", "minimum": 0.5, "maximum": 1.5},
+        "torso_length": {"type": "number", "minimum": 0.5, "maximum": 1.5},
+        "arm_length": {"type": "number", "minimum": 0.5, "maximum": 1.5},
+        "leg_length": {"type": "number", "minimum": 0.5, "maximum": 1.5}
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "asset_id"],
+      "properties": {
+        "model": {"const": "human_base"},
+        "asset_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,95}$"}
+      }
+    },
+    "skin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material_id"],
+      "properties": {"material_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,95}$"}}
+    },
+    "hair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id"],
+      "properties": {"asset_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,95}$"}}
+    },
+    "clothing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,95}$"}
+        }
+      }
+    },
+    "rig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preset", "skinning"],
+      "properties": {
+        "preset": {"const": "GAMEENGINE"},
+        "skinning": {"const": "MPFB_BUILT_IN_WEIGHTS"}
+      }
+    },
+    "scale": {"type": "number", "exclusiveMinimum": 0, "maximum": 100},
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "gltf_version", "embed_resources"],
+      "properties": {
+        "format": {"const": "glb"},
+        "gltf_version": {"const": "2.0"},
+        "embed_resources": {"const": true}
+      }
+    },
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9:_-]{0,95}$"}
+    }
+  }
+}

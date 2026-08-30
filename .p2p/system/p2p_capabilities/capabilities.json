@@ -3844,9 +3844,22 @@
         "dataset-gate"
       ],
       "TRUST_LEVEL": "PURE_DATA",
+      "SEMANTIC_KIND": "ADAPTER",
       "UPSTREAM_PROVENANCE": {
-        "source": "P2P-GAME-ASSET-FORGE-01",
+        "source": "makehumancommunity/mpfb2",
         "scope": "offline_character_generation",
+        "upstream_version": "2.0.17",
+        "release_sha": "80919fa4682335c41847f761a4d79dcad4124732",
+        "release_tree": "189a1d6694515ecfbdc40067218c5024389b4e43",
+        "code_license": "GPL-3.0-or-later",
+        "core_asset_license": "CC0-1.0",
+        "asset_policy": "CORE_CC0_ONLY",
+        "third_party_asset_policy": "DENY_BY_DEFAULT",
+        "source_manifest": ".p2p/vendor/provenance/p2p-game-truyen-mpfb-adapter-01.json",
+        "adapter_entrypoint": ".p2p/system/p2p_capabilities/mpfb_adapter.py",
+        "recipe_schema": "p2p-character-recipe/1",
+        "provenance_schema": "p2p-character-asset-provenance/1",
+        "execution_authorized": false,
         "CERTIFIED": "CAND-ASSET-FORGE-001,002,003",
         "freshness": "CURRENT"
       },

@@ -1,0 +1,374 @@
+"""Focused static contract tests for P2P-GAME-TRUYEN-MPFB-ADAPTER-01."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import struct
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
+sys.path.insert(0, str(SYSTEM_ROOT))
+
+from p2p_capabilities import asset_provenance, character_recipe, glb_validator, mpfb_adapter  # noqa: E402
+
+
+def recipe_fixture() -> dict[str, object]:
+    return {
+        "schema": "p2p-character-recipe/1",
+        "character_id": "Oak",
+        "body": {"gender": "neutral", "age": 0.45, "weight": 0.5, "muscle": 0.35},
+        "proportions": {
+            "head_scale": 1.0,
+            "shoulder_width": 1.0,
+            "torso_length": 1.0,
+            "arm_length": 1.0,
+            "leg_length": 1.0,
+        },
+        "base": {"model": "human_base", "asset_id": "mpfb2-core:base-mesh"},
+        "skin": {"material_id": "mpfb2-core:skin-default"},
+        "hair": {"asset_id": "mpfb2-core:hair-default"},
+        "clothing": {"items": ["mpfb2-core:clothing-basic"]},
+        "rig": {"preset": "GAMEENGINE", "skinning": "MPFB_BUILT_IN_WEIGHTS"},
+        "scale": 1.0,
+        "export": {"format": "glb", "gltf_version": "2.0", "embed_resources": True},
+        "assets": [
+            "mpfb2-core:base-mesh",
+            "mpfb2-core:skin-default",
+            "mpfb2-core:hair-default",
+            "mpfb2-core:clothing-basic",
+        ],
+    }
+
+
+def provenance_fixture(recipe: dict[str, object], glb_sha256: str) -> dict[str, object]:
+    return {
+        "schema": "p2p-character-asset-provenance/1",
+        "character_id": recipe["character_id"],
+        "recipe_sha256": character_recipe.recipe_sha256(recipe),
+        "glb_sha256": glb_sha256,
+        "rights_policy": "CORE_CC0_ONLY",
+        "rigging": {
+            "generator": "MPFB2",
+            "generator_version": "2.0.17",
+            "rig_preset": "GAMEENGINE",
+            "skinning": "MPFB_BUILT_IN_WEIGHTS",
+        },
+        "resources": [],
+        "assets": [
+            {
+                "asset_id": asset_id,
+                "source": f"MPFB2 core assets/{asset_id.split(':', 1)[1]}",
+                "license": "CC0-1.0",
+                "sha256": hashlib.sha256(asset_id.encode("ascii")).hexdigest(),
+                "commercial_use": True,
+                "derivative_use": True,
+                "redistribution": True,
+            }
+            for asset_id in recipe["assets"]
+        ],
+    }
+
+
+def gltf_fixture(*, include_joints: bool = True, external_buffer: bool = False) -> dict[str, object]:
+    attributes: dict[str, int] = {"POSITION": 0, "WEIGHTS_0": 2}
+    if include_joints:
+        attributes["JOINTS_0"] = 1
+    document: dict[str, object] = {
+        "asset": {"version": "2.0"},
+        "scene": 0,
+        "scenes": [{"nodes": [0]}],
+        "nodes": [{"mesh": 0, "skin": 0, "children": [1]}, {"name": "GameEngineRoot"}],
+        "meshes": [{"primitives": [{"attributes": attributes}]}],
+        "skins": [{"joints": [1], "skeleton": 1}],
+        "accessors": [
+            {"bufferView": 0, "componentType": 5126, "count": 1, "type": "VEC3"},
+            {"bufferView": 1, "componentType": 5123, "count": 1, "type": "VEC4"},
+            {"bufferView": 2, "componentType": 5126, "count": 1, "type": "VEC4"},
+        ],
+        "bufferViews": [
+            {"buffer": 0, "byteOffset": 0, "byteLength": 16},
+            {"buffer": 0, "byteOffset": 16, "byteLength": 16},
+            {"buffer": 0, "byteOffset": 32, "byteLength": 16},
+        ],
+        "buffers": [{"byteLength": 48, **({"uri": "mesh.bin"} if external_buffer else {})}],
+    }
+    return document
+
+
+def write_glb(path: Path, document: dict[str, object]) -> None:
+    json_chunk = json.dumps(document, separators=(",", ":")).encode("utf-8")
+    json_chunk += b" " * ((-len(json_chunk)) % 4)
+    binary = bytes(range(48))
+    binary += b"\x00" * ((-len(binary)) % 4)
+    chunks = struct.pack("<I4s", len(json_chunk), b"JSON") + json_chunk
+    chunks += struct.pack("<I4s", len(binary), b"BIN\x00") + binary
+    path.write_bytes(struct.pack("<4sII", b"glTF", 2, 12 + len(chunks)) + chunks)
+
+
+class RecipeAndProvenanceTests(unittest.TestCase):
+    def test_checked_in_schema_ids_match_runtime_contracts(self) -> None:
+        recipe_schema = json.loads((REPO_ROOT / "docs/p2p-development/capability-catalog/game-asset-forge/character.recipe.schema.json").read_text(encoding="utf-8"))
+        reference_schema = json.loads((REPO_ROOT / "docs/p2p-development/capability-catalog/game-asset-forge/visual-reference-pack.schema.json").read_text(encoding="utf-8"))
+        provenance_schema = json.loads((REPO_ROOT / "docs/p2p-development/capability-catalog/game-asset-forge/asset-provenance.schema.json").read_text(encoding="utf-8"))
+        self.assertEqual(recipe_schema["$id"], character_recipe.RECIPE_SCHEMA)
+        self.assertEqual(reference_schema["$id"], character_recipe.VISUAL_REFERENCE_PACK_SCHEMA)
+        self.assertEqual(provenance_schema["$id"], asset_provenance.PROVENANCE_SCHEMA)
+
+    def test_recipe_is_allowlisted_and_images_are_not_executable_input(self) -> None:
+        recipe = recipe_fixture()
+        self.assertEqual(character_recipe.validate_recipe(recipe)["character_id"], "Oak")
+        recipe["reference_images"] = ["front.png"]
+        with self.assertRaises(character_recipe.CharacterRecipeError):
+            character_recipe.validate_recipe(recipe)
+
+    def test_unknown_nested_recipe_field_is_rejected(self) -> None:
+        recipe = recipe_fixture()
+        recipe["rig"]["extra"] = "arbitrary"  # type: ignore[index]
+        with self.assertRaises(character_recipe.CharacterRecipeError):
+            character_recipe.validate_recipe(recipe)
+
+    def test_visual_reference_pack_has_exact_six_non_executable_views(self) -> None:
+        names = [
+            "full_body_front",
+            "full_body_three_quarter",
+            "full_body_side",
+            "full_body_back",
+            "face_front",
+            "face_three_quarter",
+        ]
+        pack = {
+            "schema": "p2p-visual-reference-pack/1",
+            "views": [{"view_id": name, "path": f"references/{name}.png", "sha256": "a" * 64} for name in names],
+        }
+        self.assertEqual(len(character_recipe.validate_visual_reference_pack(pack)["views"]), 6)
+
+    def test_core_cc0_provenance_and_exact_recipe_binding(self) -> None:
+        recipe = recipe_fixture()
+        provenance = provenance_fixture(recipe, "b" * 64)
+        normalized = asset_provenance.validate_asset_provenance(provenance)
+        asset_provenance.validate_recipe_asset_binding(recipe, normalized)
+        self.assertEqual(normalized["rights_policy"], "CORE_CC0_ONLY")
+
+    def test_third_party_asset_without_manifest_is_rejected(self) -> None:
+        recipe = recipe_fixture()
+        recipe["assets"] = ["third-party:hair-pack"]
+        provenance = provenance_fixture(recipe, "b" * 64)
+        provenance["assets"][0]["asset_id"] = "third-party:hair-pack"  # type: ignore[index]
+        provenance["assets"][0]["license"] = "CC-BY-4.0"  # type: ignore[index]
+        with self.assertRaises(asset_provenance.AssetProvenanceError):
+            asset_provenance.validate_recipe_asset_binding(recipe, provenance)
+
+    def test_custom_asset_requires_separate_rights_gate(self) -> None:
+        recipe = recipe_fixture()
+        recipe["assets"] = ["user-custom:hair"]
+        provenance = provenance_fixture(recipe, "b" * 64)
+        provenance["assets"][0]["asset_id"] = "user-custom:hair"  # type: ignore[index]
+        with self.assertRaises(asset_provenance.AssetProvenanceError):
+            asset_provenance.validate_asset_provenance(provenance)
+
+
+class AdapterBoundaryTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix=".tmp-mpfb-adapter-test-")
+        self.workspace = Path(self.temp.name)
+        self.blender = self.workspace / "blender.exe"
+        self.blender.write_bytes(b"static blender fixture; never executed")
+        self.mpfb_root = self.workspace / "mpfb2"
+        self.mpfb_root.mkdir()
+        root_hash = mpfb_adapter.hash_provisioned_root(self.mpfb_root)
+        (self.mpfb_root / "provisioning-manifest.json").write_text(
+            json.dumps(
+                {
+                    "schema": "p2p-mpfb2-provisioning/1",
+                    "version": mpfb_adapter.MPFB_VERSION,
+                    "release_sha": mpfb_adapter.MPFB_RELEASE_SHA,
+                    "release_tree": mpfb_adapter.MPFB_RELEASE_TREE,
+                    "root_sha256": root_hash,
+                }
+            ),
+            encoding="utf-8",
+        )
+        (self.workspace / "character.recipe.json").write_text(json.dumps(recipe_fixture()), encoding="utf-8")
+
+    def tearDown(self) -> None:
+        self.temp.cleanup()
+
+    def _plan(self, **kwargs: object) -> mpfb_adapter.MpfbExecutionPlan:
+        return mpfb_adapter.build_execution_plan(
+            blender_executable=self.blender,
+            workspace_root=self.workspace,
+            job_id="Oak",
+            **kwargs,
+        )
+
+    def test_command_is_explicit_background_allowlisted_and_shell_free(self) -> None:
+        old_secret = os.environ.get("P2P_TEST_SECRET")
+        os.environ["P2P_TEST_SECRET"] = "must-not-inherit"
+        try:
+            plan = self._plan(timeout_seconds=42)
+        finally:
+            if old_secret is None:
+                os.environ.pop("P2P_TEST_SECRET", None)
+            else:
+                os.environ["P2P_TEST_SECRET"] = old_secret
+        self.assertEqual(plan.argv[1:5], ("--background", "--python", plan.argv[3], "--"))
+        self.assertIn("--asset-policy", plan.argv)
+        self.assertIn("CORE_CC0_ONLY", plan.argv)
+        self.assertIn("--network", plan.argv)
+        self.assertNotIn("P2P_TEST_SECRET", plan.environment)
+        self.assertFalse(any("PROXY" in key.upper() or "SECRET" in key.upper() for key in plan.environment))
+        self.assertFalse(plan.execution_authorized)
+
+    def test_network_request_and_traversal_fail_closed(self) -> None:
+        with self.assertRaises(mpfb_adapter.MpfbAdapterError):
+            self._plan(network_access=True)
+        with self.assertRaises(mpfb_adapter.MpfbAdapterError):
+            self._plan(recipe_path="../escape.json")
+        with self.assertRaises(mpfb_adapter.MpfbAdapterError):
+            self._plan(output_root="../outside")
+
+    def test_symlink_escape_is_rejected_when_platform_supports_symlinks(self) -> None:
+        link = self.workspace / "mpfb-link"
+        try:
+            link.symlink_to(self.mpfb_root, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlink creation is unavailable")
+        with self.assertRaises(mpfb_adapter.MpfbAdapterError):
+            self._plan(mpfb_root="mpfb-link")
+
+    def test_wrong_pinned_provisioning_manifest_is_rejected(self) -> None:
+        manifest = self.mpfb_root / "provisioning-manifest.json"
+        document = json.loads(manifest.read_text(encoding="utf-8"))
+        document["release_sha"] = "d" * 40
+        manifest.write_text(json.dumps(document), encoding="utf-8")
+        with self.assertRaises(mpfb_adapter.MpfbAdapterError):
+            self._plan()
+
+    def test_execution_requires_explicit_authorization_and_does_not_launch(self) -> None:
+        plan = self._plan()
+        popen = mock.Mock(side_effect=AssertionError("Blender must not launch in this workstream"))
+        with self.assertRaisesRegex(mpfb_adapter.MpfbAdapterError, "NOT_AUTHORIZED"):
+            mpfb_adapter.execute_plan(plan, popen_factory=popen)
+        popen.assert_not_called()
+
+    def test_undeclared_outputs_fail_closed(self) -> None:
+        output = self.workspace / "output"
+        output.mkdir()
+        (output / "Oak.glb").write_bytes(b"fixture")
+        (output / "Oak.asset-provenance.json").write_text("{}", encoding="utf-8")
+        (output / "unexpected.log").write_text("fixture", encoding="utf-8")
+        with self.assertRaisesRegex(mpfb_adapter.MpfbAdapterError, "UNDECLARED"):
+            mpfb_adapter.validate_output_directory(output, ("Oak.glb", "Oak.asset-provenance.json"))
+
+    def test_timeout_uses_process_tree_termination_without_shell(self) -> None:
+        process = mock.Mock(pid=4321)
+        runner = mock.Mock()
+        mpfb_adapter._terminate_process_tree(process, platform_name="nt", termination_runner=runner)
+        runner.assert_called_once()
+        args, kwargs = runner.call_args
+        self.assertEqual(args[0], ["taskkill", "/PID", "4321", "/T", "/F"])
+        self.assertFalse(kwargs["shell"])
+
+    def test_timeout_path_terminates_tree_and_never_reports_execution(self) -> None:
+        plan = self._plan()
+
+        class TimeoutProcess:
+            pid = 4321
+            returncode = None
+
+            def communicate(self, *, timeout: int) -> tuple[str, str]:
+                raise subprocess.TimeoutExpired(cmd=list(plan.argv), timeout=timeout)
+
+        popen = mock.Mock(return_value=TimeoutProcess())
+        runner = mock.Mock()
+        with self.assertRaises(mpfb_adapter.MpfbExecutionTimeout):
+            mpfb_adapter.execute_plan(
+                plan,
+                execution_authorized=True,
+                popen_factory=popen,
+                termination_runner=runner,
+                platform_name="nt",
+            )
+        popen.assert_called_once()
+        runner.assert_called_once()
+
+
+class GlbValidationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix=".tmp-mpfb-glb-test-")
+        self.root = Path(self.temp.name)
+        self.recipe = recipe_fixture()
+
+    def tearDown(self) -> None:
+        self.temp.cleanup()
+
+    def _write_valid_output(self, *, include_joints: bool = True, external_buffer: bool = False) -> tuple[Path, Path]:
+        glb = self.root / "Oak.glb"
+        write_glb(glb, gltf_fixture(include_joints=include_joints, external_buffer=external_buffer))
+        provenance = self.root / "Oak.asset-provenance.json"
+        document = provenance_fixture(self.recipe, hashlib.sha256(glb.read_bytes()).hexdigest())
+        if external_buffer:
+            document["resources"] = [{"uri": "mesh.bin", "sha256": "e" * 64}]
+        provenance.write_text(json.dumps(document), encoding="utf-8")
+        return glb, provenance
+
+    def test_rigged_glb_requires_glb20_scene_mesh_skin_joints_weights_and_root(self) -> None:
+        glb, provenance = self._write_valid_output()
+        result = glb_validator.validate_glb_output(glb, provenance, self.recipe)
+        self.assertEqual(result["status"], "STRUCTURALLY_VALID")
+        self.assertEqual(result["rig_preset"], "GAMEENGINE")
+
+    def test_missing_joints_or_external_resource_binding_is_rejected(self) -> None:
+        glb, provenance = self._write_valid_output(include_joints=False)
+        with self.assertRaises(glb_validator.GlbStructuralError):
+            glb_validator.validate_glb_output(glb, provenance, self.recipe)
+        glb, provenance = self._write_valid_output(external_buffer=True)
+        provenance_document = json.loads(provenance.read_text(encoding="utf-8"))
+        provenance_document["resources"] = []
+        provenance.write_text(json.dumps(provenance_document), encoding="utf-8")
+        with self.assertRaises(glb_validator.GlbStructuralError):
+            glb_validator.validate_glb_output(glb, provenance, self.recipe)
+
+    def test_glb_hash_and_output_naming_are_bound_to_provenance(self) -> None:
+        glb, provenance = self._write_valid_output()
+        glb.write_bytes(glb.read_bytes() + b"x")
+        with self.assertRaisesRegex(glb_validator.GlbStructuralError, "HASH_MISMATCH"):
+            glb_validator.validate_glb_output(glb, provenance, self.recipe)
+
+
+class ProjectionAndSourceBindingTests(unittest.TestCase):
+    def test_selected_catalog_and_existing_projection_are_bound_without_new_registry(self) -> None:
+        catalog = json.loads((REPO_ROOT / "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json").read_text(encoding="utf-8"))
+        candidate = next(item for item in catalog["candidates"] if item["candidate_id"] == "CAND-ASSET-FORGE-002")
+        self.assertEqual(candidate["pinned_sha_or_version"], mpfb_adapter.MPFB_RELEASE_SHA)
+        self.assertEqual(candidate["pinned_release_tree"], mpfb_adapter.MPFB_RELEASE_TREE)
+        self.assertEqual(candidate["static_production_clearance"], "SAFE_CONDITIONAL")
+        self.assertEqual(candidate["third_party_asset_policy"], "DENY_BY_DEFAULT")
+
+        capabilities = json.loads((SYSTEM_ROOT / "p2p_capabilities/capabilities.json").read_text(encoding="utf-8"))
+        ids = [item["CAPABILITY_ID"] for item in capabilities["capabilities"]]
+        self.assertEqual(len(ids), 65)
+        self.assertEqual(len(ids), len(set(ids)))
+        selected = next(item for item in capabilities["capabilities"] if item["CAPABILITY_ID"] == "game.character.generate")
+        self.assertEqual(selected["TYPE"], "KNOWLEDGE_SOURCE")
+        self.assertEqual(selected["SEMANTIC_KIND"], "ADAPTER")
+        self.assertEqual(selected["UPSTREAM_PROVENANCE"]["release_sha"], mpfb_adapter.MPFB_RELEASE_SHA)
+        self.assertEqual(selected["UPSTREAM_PROVENANCE"]["release_tree"], mpfb_adapter.MPFB_RELEASE_TREE)
+
+        routing = json.loads((REPO_ROOT / "docs/p2p-development/capability-catalog/ui-game-threejs/project-profile-routing.json").read_text(encoding="utf-8"))
+        self.assertIn("game.character.generate", routing["profiles"]["THREEJS_GAME"]["optional_capabilities"])
+        self.assertIn("game.character.generate", routing["profiles"]["R3F_GAME"]["optional_capabilities"])
+        self.assertEqual((REPO_ROOT / ".p2p/vendor/provenance/p2p-game-truyen-mpfb-adapter-01.json").exists(), True)
+
+
+if __name__ == "__main__":
+    unittest.main()

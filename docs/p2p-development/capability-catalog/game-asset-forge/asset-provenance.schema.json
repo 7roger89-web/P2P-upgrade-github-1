@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-character-asset-provenance/1",
+  "title": "P2P MPFB2 character asset provenance",
+  "description": "Core CC0-only output manifest; third-party and custom assets require a separate rights gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "character_id", "recipe_sha256", "glb_sha256", "rights_policy", "rigging", "resources", "assets"],
+  "properties": {
+    "schema": {"const": "p2p-character-asset-provenance/1"},
+    "character_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"},
+    "recipe_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "glb_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "rights_policy": {"const": "CORE_CC0_ONLY"},
+    "rigging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generator", "generator_version", "rig_preset", "skinning"],
+      "properties": {
+        "generator": {"const": "MPFB2"},
+        "generator_version": {"const": "2.0.17"},
+        "rig_preset": {"const": "GAMEENGINE"},
+        "skinning": {"const": "MPFB_BUILT_IN_WEIGHTS"}
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["uri", "sha256"],
+        "properties": {
+          "uri": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["asset_id", "source", "license", "sha256", "commercial_use", "derivative_use", "redistribution"],
+        "properties": {
+          "asset_id": {"type": "string", "pattern": "^mpfb2-core:[a-z0-9][a-z0-9:_-]{0,95}$"},
+          "source": {"type": "string", "pattern": "^MPFB2 core assets/.+"},
+          "license": {"const": "CC0-1.0"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "commercial_use": {"const": true},
+          "derivative_use": {"const": true},
+          "redistribution": {"const": true}
+        }
+      }
+    }
+  }
+}
