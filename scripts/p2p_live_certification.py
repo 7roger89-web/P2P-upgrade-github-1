@@ -27,6 +27,11 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+_SYSTEM_ROOT = Path(__file__).resolve().parent.parent / ".p2p" / "system"
+if str(_SYSTEM_ROOT) not in sys.path:
+    sys.path.insert(0, str(_SYSTEM_ROOT))
+from p2p_capabilities import fw06_operational_resilience as _fw06  # noqa: E402
+
 SCHEMA_VERSION = "1"
 CERTIFICATION_FRESHNESS_DAYS = 90
 DEFAULT_TIMEOUT_S = 120
@@ -318,8 +323,19 @@ def reconcile(
     archive_dir: Path,
     record: LiveCertificationRecord,
     verification: dict,
+    *,
+    registry_root: Path | None = None,
 ) -> dict:
-    """Safe reconciliation: archive raw evidence, remove isolated workspace."""
+    """Archive evidence, then delegate disposal to the FW06 TMPGC path.
+
+    A C27 record without a durable FW06 workspace identity is deliberately
+    retained.  This seam never performs an unregistered physical deletion.
+    """
+    workspace_input = Path(workspace).expanduser()
+    if not workspace_input.is_absolute():
+        workspace_input = Path.cwd() / workspace_input
+    workspace = workspace_input.resolve(strict=False)
+    archive_dir = Path(archive_dir).expanduser().resolve(strict=False)
     archive_dir.mkdir(parents=True, exist_ok=True)
     stamp = record.observed_at.replace(":", "-").replace("T", "_")
     host_dir = archive_dir / f"live-probe-{stamp[:16]}-{record.record_id[:8]}"
@@ -335,12 +351,105 @@ def reconcile(
         "verification": verification,
         "observed_at": record.observed_at,
     }, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
-    shutil.rmtree(workspace, ignore_errors=True)
-    return {
-        "status": "COMPLETED",
-        "archive_ref": f"raw:{host_dir}",
-        "workspace_removed": not workspace.exists(),
-    }
+    archive_ref = f"raw:{host_dir}"
+    if registry_root is None:
+        return {
+            "status": "COMPLETED_KEEP",
+            "archive_ref": archive_ref,
+            "workspace_removed": False,
+            "disposal": "KEEP",
+            "reason": "WORKSPACE_REGISTRY_ROOT_REQUIRED",
+        }
+    try:
+        root = Path(registry_root).expanduser().resolve()
+        policy = _fw06.load_tmp_gc_policy(root)
+        rows = _fw06.list_all_workspaces(root)
+        workspace_key = _fw06._path_key(workspace_input)
+        match = next(
+            (row for row in rows
+             if _fw06._path_key(_fw06._rooted_path(
+                 root, str(row.get("root_path", ""))
+             )) == workspace_key),
+            None,
+        )
+        if match is None:
+            return {
+                "status": "COMPLETED_KEEP",
+                "archive_ref": archive_ref,
+                "workspace_removed": False,
+                "disposal": "KEEP",
+                "reason": "WORKSPACE_REGISTRATION_NOT_FOUND",
+            }
+        workspace_id = str(match.get("workspace_id", ""))
+        if not _fw06._workspace_registry_is_well_formed(root):
+            return {
+                "status": "COMPLETED_KEEP",
+                "archive_ref": archive_ref,
+                "workspace_id": workspace_id,
+                "workspace_removed": False,
+                "disposal": "KEEP",
+                "reason": "WORKSPACE_REGISTRY_MALFORMED",
+            }
+        path_identity = _fw06._tmp_path_identity(
+            root,
+            workspace_input,
+            policy,
+            registered_non_temp=_fw06._registered_non_temp_worktrees(
+                root, policy,
+            ),
+        )
+        if not path_identity.get("ok"):
+            return {
+                "status": "COMPLETED_KEEP",
+                "archive_ref": archive_ref,
+                "workspace_id": workspace_id,
+                "workspace_removed": False,
+                "disposal": "KEEP",
+                "reason": "WORKSPACE_PATH_NOT_SAFE:" + str(
+                    path_identity.get("reason", "UNKNOWN")
+                ),
+            }
+        existing_reasons = [
+            reason for reason in match.get("protection_reasons", [])
+            if str(reason).upper() != "ACTIVE_SESSION"
+        ] if isinstance(match.get("protection_reasons"), list) else []
+        completed = _fw06.mark_workspace_complete(
+            root,
+            workspace_id,
+            policy=policy,
+            protection_reasons=existing_reasons,
+            evidence_status="DURABLE",
+            evidence_pointers=[str(host_dir / "record.json"),
+                               str(evidence)],
+            reconciliation_ref=archive_ref,
+        )
+        gc = _fw06.apply_tmp_gc(
+            root,
+            {"workspaces": [{"workspace_id": workspace_id}]},
+            policy=policy,
+        )
+        outcome = next(
+            (item for item in gc.get("applied", [])
+             if item.get("workspace_id") == workspace_id),
+            None,
+        )
+        return {
+            "status": "COMPLETED",
+            "archive_ref": archive_ref,
+            "workspace_id": workspace_id,
+            "workspace_removed": bool(outcome and outcome.get("status") == "DELETED"),
+            "disposal": "DELETED" if outcome and outcome.get("status") == "DELETED" else "KEEP",
+            "gc": gc,
+            "registry_lifecycle": completed.get("lifecycle_state"),
+        }
+    except (OSError, ValueError, _fw06.TmpGcError) as exc:
+        return {
+            "status": "COMPLETED_KEEP",
+            "archive_ref": archive_ref,
+            "workspace_removed": False,
+            "disposal": "KEEP",
+            "reason": "GC_CLASSIFICATION_UNAVAILABLE:" + str(exc),
+        }
 
 
 def build_record(
@@ -426,6 +535,10 @@ def main(argv: list[str] | None = None) -> int:
     rec_p.add_argument("--verification", required=True)
     rec_p.add_argument("--archive", required=True)
     rec_p.add_argument("--candidate", default="")
+    rec_p.add_argument(
+        "--registry-root",
+        help="project root containing the durable FW06 workspace registry",
+    )
 
     expiry_p = sub.add_parser("expiry-check", help="Report freshness of a record")
     expiry_p.add_argument("--record", required=True)
@@ -485,6 +598,7 @@ def main(argv: list[str] | None = None) -> int:
         if verification["status"] == "PASS":
             record.reconciliation = reconcile(
                 Path(args.workspace), Path(args.archive), record, verification,
+                registry_root=Path(args.registry_root) if args.registry_root else None,
             )
         else:
             record.reconciliation = {"status": "SKIPPED_VERIFICATION_FAILED"}
