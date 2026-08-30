@@ -32,3 +32,34 @@
   Static tests use synthetic recipes, manifests, and GLB fixtures only.
 - Structural GLB readiness, downstream GLTFLoader readiness, visual match, and
   Golden Character readiness remain separate claims.
+
+# Notes and decisions — P2P-FASTPATH-WIRE-01
+
+## Authority and isolation
+
+- Fresh canonical `origin/main` matched the expected SHA
+  `d661654746f090136f37370f76578ee345b74994` (tree
+  `92895a93a560221bdcd4664992ab16a4e8ec8cb4`). No drift; edited directly on the
+  session branch `arena/01a051d5-p2p-upgrade-github-1`.
+- MPFB, TMPGC, Game Truyen, local Windows execution, Blender, firewall, and TMP
+  cleanup were not touched.
+
+## Smallest useful wiring
+
+- The C18 orchestration policy already computes `execution_lane`,
+  `execution_policy` (minimum-sufficient-work / risk-proportional),
+  `test_ceiling`, and `stop_rule`. The workflow's result-exposure seam
+  (`orchestration_result_fields` + `verification_surface_for` in
+  `scripts/p2p_workflow.py`) dropped those fields.
+- Fix: forward the already-computed values as read-only result metadata. No new
+  router/ontology/context system/council/framework was created; no lane is
+  recomputed in the workflow.
+
+## Verification
+
+- Focused: `tests.test_p2p_lightweight_fastpath` 21/21 PASS (18 preserved + 3
+  new). Adjacent shared-file suites green: workflow 7/7, EFF01 7/7, projection
+  bundle 17/17.
+- Pre-existing/out-of-scope: `tests.test_p2p_game_toolchain_02a` has 2 failures
+  + 1 error at the unmodified baseline (fixture hash mismatches), not caused by
+  this change.
