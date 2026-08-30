@@ -167,6 +167,44 @@ class P2PLightweightFastpathTests(unittest.TestCase):
         self.assertEqual(contract["guards"]["max_agent_calls"], 0)
         self.assertEqual(contract["goal_eligibility"]["classification"], "DIRECT TASK")
 
+    def test_result_fields_surface_c18_fast_lane_and_minimum_sufficient_work(self) -> None:
+        request = "Write a precise Arena Agent prompt to improve the Three.js camera."
+        requirement = self._requirement(request)
+        fields = p2p_workflow.orchestration_result_fields(requirement, {}, [])
+
+        self.assertEqual(fields["execution_lane"], "FAST")
+        self.assertEqual(fields["minimum_sufficient_work"], "ENFORCED")
+        self.assertEqual(fields["risk_proportional_execution"], "ENFORCED")
+        surface = fields["verification_surface"]
+        self.assertEqual(surface["execution_lane"], "FAST")
+        self.assertEqual(surface["test_ceiling_level"], "TARGETED_EVIDENCE")
+        self.assertFalse(surface["broad_full_regression"])
+        self.assertEqual(surface["stop_after"], "TARGETED_EVIDENCE")
+        self.assertTrue(surface["proportional_route"])
+        self.assertFalse(surface["broad_controls_entered"])
+
+    def test_result_fields_surface_c18_critical_lane_for_high_impact(self) -> None:
+        request = "Design a high-impact production architecture and prepare deployment with owner approval."
+        requirement = self._requirement(request)
+        fields = p2p_workflow.orchestration_result_fields(requirement, {}, [])
+
+        self.assertEqual(fields["execution_lane"], "CRITICAL")
+        surface = fields["verification_surface"]
+        self.assertEqual(surface["execution_lane"], "CRITICAL")
+        self.assertEqual(surface["test_ceiling_level"], "BROAD_FULL_REGRESSION")
+        self.assertTrue(surface["broad_full_regression"])
+        self.assertFalse(surface["proportional_route"])
+
+    def test_result_fields_surface_standard_lane_for_local_implementation(self) -> None:
+        request = "Fix this isolated combat cooldown bug and run focused tests."
+        requirement = self._requirement(request)
+        fields = p2p_workflow.orchestration_result_fields(requirement, {}, [])
+
+        self.assertEqual(fields["execution_lane"], "STANDARD")
+        surface = fields["verification_surface"]
+        self.assertEqual(surface["test_ceiling_level"], "DIRECTLY_AFFECTED_MODULE")
+        self.assertFalse(surface["broad_full_regression"])
+
     def _context_module(self):
         return p2p_workflow.context_api(REPO_ROOT, str(REPO_ROOT))
 
@@ -295,6 +333,10 @@ class P2PLightweightFastpathTests(unittest.TestCase):
             self.assertFalse(result["quorum_entered"])
             self.assertTrue(result["verification_surface"]["proportional_route"])
             self.assertFalse(result["verification_surface"]["broad_controls_entered"])
+            self.assertEqual(result["execution_lane"], "FAST")
+            self.assertEqual(result["minimum_sufficient_work"], "ENFORCED")
+            self.assertEqual(result["verification_surface"]["test_ceiling_level"], "TARGETED_EVIDENCE")
+            self.assertFalse(result["verification_surface"]["broad_full_regression"])
             manifest = json.loads((project / result["context_manifest_pointer"]).read_text(encoding="utf-8"))
             self.assertEqual(manifest["task_targeted_context"]["status"], "SUFFICIENT")
             self.assertEqual(manifest["task_targeted_context"]["escalation_count"], 0)
@@ -340,6 +382,9 @@ class P2PLightweightFastpathTests(unittest.TestCase):
             self.assertEqual(result["status"], "BLOCKED")
             self.assertEqual(result["worker_strategy"], "BLOCKED")
             self.assertEqual(result["verification_class"], "HIGH_RISK")
+            self.assertEqual(result["execution_lane"], "CRITICAL")
+            self.assertTrue(result["verification_surface"]["broad_full_regression"])
+            self.assertFalse(result["verification_surface"]["proportional_route"])
             self.assertEqual(result["selected_agents"], [])
             self.assertIn("Owner", result["decision_required"])
             self.assertFalse(result["council_entered"])

@@ -2516,12 +2516,23 @@ def verification_surface_for(requirement: dict[str, object], affected: list[str]
         "supervisor",
         "promotion",
     }
+    # The C18 policy already computes the lowest-safe execution lane and the
+    # smallest sufficient verification ceiling.  Surface those existing values
+    # so downstream (result, ledger, report) can see the proportional route the
+    # policy chose without creating a second verification system.
+    execution_lane = str(requirement.get("execution_lane", "")) or None
+    test_ceiling = requirement.get("test_ceiling") if isinstance(requirement.get("test_ceiling"), dict) else {}
+    stop_rule = requirement.get("stop_rule") if isinstance(requirement.get("stop_rule"), dict) else {}
     return {
         "class": verification_class,
         "selected": selected,
         "workflow_controls_observed": sorted(set(affected)),
         "broad_controls_entered": bool(set(selected) & broad_controls),
         "proportional_route": verification_class == "DETERMINISTIC",
+        "execution_lane": execution_lane,
+        "test_ceiling_level": test_ceiling.get("selected_level"),
+        "broad_full_regression": bool(test_ceiling.get("broad_full_regression", False)),
+        "stop_after": stop_rule.get("stop_after"),
     }
 
 
@@ -2535,6 +2546,7 @@ def orchestration_result_fields(
     task_context = task_context if isinstance(task_context, dict) else {}
     profile = requirement.get("profile") if isinstance(requirement.get("profile"), dict) else {}
     source_selection = task_context.get("source_selection") if isinstance(task_context.get("source_selection"), dict) else {}
+    execution_policy = requirement.get("execution_policy") if isinstance(requirement.get("execution_policy"), dict) else {}
     return {
         "orchestration_status": requirement.get("status", "BLOCKED"),
         "worker_strategy": requirement.get("worker_strategy", "BLOCKED"),
@@ -2545,6 +2557,11 @@ def orchestration_result_fields(
         "reasoning_class": requirement.get("reasoning_class", "HIGH"),
         "verification_class": requirement.get("verification_class", "HIGH_RISK"),
         "task_kind": profile.get("task_kind"),
+        # Existing C18 lane and minimum-sufficient-work decision, surfaced as
+        # read-only result metadata.  No new lane is computed here.
+        "execution_lane": str(requirement.get("execution_lane", "")) or None,
+        "minimum_sufficient_work": execution_policy.get("minimum_sufficient_work"),
+        "risk_proportional_execution": execution_policy.get("risk_proportional_execution"),
         "council_entered": False,
         "quorum_entered": False,
         "context_source_count": source_selection.get("selected_source_count", 0),
