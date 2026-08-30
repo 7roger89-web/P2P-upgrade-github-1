@@ -1,0 +1,196 @@
+{
+  "schema": "p2p-openmontage-vendor-01-intake/1",
+  "workstream": "P2P-OPENMONTAGE-VENDOR-01",
+  "intake_type": "VENDOR_INTAKE_AND_SELECTIVE_CAPABILITY_PROJECTION",
+  "imported_at": "2026-08-30",
+  "execution_policy": "MINIMUM_SUFFICIENT_WORK",
+  "opened_as": "P2P-OPENMONTAGE-VENDOR-01",
+  "vendor": {
+    "vendor_id": "openmontage",
+    "display_name": "OpenMontage",
+    "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+    "upstream_repository_html": "https://github.com/calesthio/OpenMontage",
+    "upstream_default_branch": "main",
+    "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+    "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+    "upstream_version_marker": "0.1.0 (setup.py); no verified tagged release at pin",
+    "upstream_pushed_at": "2026-08-22T18:22:24Z",
+    "upstream_archived": false,
+    "upstream_size": "161MB shallow clone; 2142 files; source surface is small (largest files are demo MP4s)",
+    "verification_method": "git ls-remote + shallow clone at pin + GitHub API metadata (fresh read, no install, no execution)"
+  },
+  "license": {
+    "file": "LICENSE",
+    "spdx": "AGPL-3.0",
+    "verified_at": "2026-08-30",
+    "evidence": [
+      "LICENSE: full GNU Affero General Public License v3 text (19 November 2007)",
+      "GitHub API license.spdx_id = AGPL-3.0",
+      "README license badge: AGPLv3"
+    ],
+    "scope": "upstream repository code, skills, and pipeline definitions; third-party media/asset rights are separate"
+  },
+  "license_boundary": {
+    "boundary": "HARD_VENDOR_BOUNDARY_CONCERN",
+    "p2p_core_code_copied": false,
+    "upstream_source_vendored": false,
+    "upstream_license_copied_into_p2p": false,
+    "preferred_integration_shape": "P2P -> vendor adapter / capability projection -> isolated OpenMontage source/runtime -> durable artifacts -> P2P ReturnPacket/evidence",
+    "reasoning": "AGPL-3.0 is network-copyleft. P2P core cannot casually import, adapt, or snapshot OpenMontage implementation code without engaging AGPL obligations. Fail-closed choice: do not vendor source; keep a pinned reference-only record (URL, commit, tree, license pointer) in P2P; any future runtime invocation happens in an isolated external checkout/container owned by OpenMontage, not in P2P core.",
+    "legal_claim_scope": "This record states license facts observed upstream only. It makes no legal opinion beyond the license text and does not assert compatibility with P2P core licensing.",
+    "commercial_clearance": "NOT_ASSESSED"
+  },
+  "vendor_classification": {
+    "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+    "canonical_registry_mode": "PINNED_REFERENCE_ADAPTER",
+    "semantic_kind": "EXTERNAL_RUNTIME",
+    "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+    "source_state": "NOT_VENDORED",
+    "existing_vocabulary_only": true,
+    "rationale": "Uses existing canonical P2P vocabulary (registry mode PINNED_REFERENCE_ADAPTER as used by p2p-uiux; semantic kind EXTERNAL_RUNTIME and dependency mode EXTERNAL_RUNTIME_NOT_INSTALLED as used by img2threejs/majid records). No new vendor framework, registry, scheduler, orchestrator, provenance store, or governance ontology was created. LOCAL_VENDOR_SNAPSHOT was rejected because no AGPL source is snapshotted."
+  },
+  "architecture": {
+    "shape": "agent-first (no code orchestrator): pipeline YAML manifests + Markdown director skills + Python tool registry; the host coding agent is the orchestrator",
+    "p2p_authority_boundary": "P2P remains authority/orchestrator. OpenMontage is a bounded external production capability provider. P2P retains Control Tower, Work Factory, risk lanes, capability routing, ReturnPacket, Supervisor, Owner Gate. OpenMontage's internal pipeline/orchestration concepts are not imported as a second P2P authority layer.",
+    "stages": ["research", "proposal", "script", "scene_plan", "assets", "edit", "compose"],
+    "layers": [
+      "pipeline manifests (pipeline_defs/*.yaml)",
+      "stage director skills (skills/pipelines/*)",
+      "tool registry (tools/tool_registry.py)",
+      "scored provider selection (lib/scoring.py)",
+      "checkpoints/artifacts (schemas/checkpoints, schemas/artifacts)",
+      "render runtimes (Remotion, HyperFrames, FFmpeg)"
+    ],
+    "authority_retained_by_p2p": [
+      "existing-p2p-router",
+      "risk lanes",
+      "capability routing",
+      "ReturnPacket",
+      "Supervisor",
+      "Owner Gate",
+      "bounded P2P work item -> OpenMontage adapter -> durable artifacts/evidence"
+    ]
+  },
+  "requirements": {
+    "python": "3.10+ (requirements.txt: pyyaml, pydantic>=2, jsonschema, python-dotenv, Pillow, numpy, requests, google-auth, google-genai, openai>=2.44; plus fastapi/uvicorn/watchfiles for Backlot board)",
+    "node": "18+ for Remotion composer (remotion-composer/); 22+ documented for HyperFrames; npx required",
+    "ffmpeg": "required (compose/stitch/trim/mix/grade/analysis)",
+    "optional_python": ["piper-tts", "faster-whisper", "rembg", "realesrgan", "gfpgan", "manim", "transformers", "torch"],
+    "gpu": "requirements-gpu.txt (torch, torchaudio, torchvision) + diffusers/transformers/accelerate via make install-gpu; NVIDIA CUDA; 6-24GB VRAM depending on model",
+    "setup_surface": "make setup = venv + pip install requirements + remotion npm install + piper-tts pip install + npx hyperframes cache-warm + .env copy",
+    "disk": "repo ~161MB (mostly demo videos); Remotion node_modules; local models: ~4GB image diffusion, multi-GB video checkpoints; Piper voices ~100MB",
+    "platforms": ["macOS", "Linux", "Windows (documented PowerShell path)", "self-hosted cloud GPU (Modal LTX-2)"]
+  },
+  "inventory": {
+    "pipelines": [
+      "animated-explainer", "animation", "avatar-spokesperson", "character-animation",
+      "cinematic", "clip-factory", "documentary-montage", "hybrid",
+      "localization-dub", "podcast-repurpose", "screen-demo", "talking-head",
+      "framework-smoke (internal contract smoke manifest, not a production pipeline)"
+    ],
+    "tools": {
+      "tool_modules": 153,
+      "tool_dirs": [
+        "tools/video (40 modules)", "tools/audio (21)", "tools/graphics (23)",
+        "tools/analysis (15)", "tools/avatar (5)", "tools/subtitle (2)",
+        "tools/character (2)", "tools/capture (3)", "tools/enhancement (7)",
+        "tools/publishers (1)", "tools/_comfyui (3)", "tools/_kling (8)",
+        "atlas_client.py", "atlas_models.py", "base_tool.py", "cost_tracker.py", "google_credentials.py", "tool_registry.py"
+      ]
+    },
+    "skill_files": "157 markdown files under skills/ (marketing claim of 700+ counts docs and agent-hosting files too; repo has 1096 markdown files total)",
+    "artifact_schemas": 20,
+    "tool_schemas": 6,
+    "providers": "23 documented provider-to-tool rows in docs/PROVIDERS.md (Pexels, Pixabay, Unsplash, Archive.org, NASA, Wikimedia, Piper, Remotion, HyperFrames, FFmpeg, Google, OpenAI, ElevenLabs, fish.audio, Azure, fal.ai, Atlas Cloud, Kling Official, Volcengine Ark, MiniMax, xAI, Runway, Higgsfield, HeyGen, Suno, Tencent Hunyuan, ComfyUI Partner nodes, Modal, local GPU, local diffusion)"
+  },
+  "runtime_classification": {
+    "LOCAL_FREE": [
+      "Piper TTS (offline, no key, no network after voice download)",
+      "Archive.org, NASA, Wikimedia Commons (documented as no API key required)",
+      "Remotion composition (Node.js local render)",
+      "HyperFrames composition (HTML/GSAP local render, Node 22+ + FFmpeg)",
+      "FFmpeg compose/stitch/trim/mix/enhance/grade/analysis",
+      "subtitle generation (SRT/VTT, no install)",
+      "CLIP corpus building, scene detection, frame sampling, ffprobe media validation (Python + FFmpeg)"
+    ],
+    "FREE_SOURCE_OR_FREE_KEY": [
+      "Pexels API key (free registration), Pixabay API key (free), Unsplash access key (free)",
+      "Google API key free TTS tier (1M chars/month documented); ElevenLabs 10K chars/month free tier; fish.audio s2.1-pro-free; Azure free tier"
+    ],
+    "PAID_API": [
+      "fal.ai, OpenAI, xAI, Kling Official, Volcengine Ark, MiniMax, Runway, Higgsfield, HeyGen, Suno, Tencent Hunyuan, Atlas Cloud, ComfyUI Partner Nodes, Gemini/Veo/Imagen/Lyria (paid beyond free tier)"
+    ],
+    "LOCAL_GPU": [
+      "local diffusion images (SD, 4GB VRAM+), WAN 2.1/2.2, Hunyuan 1.5, CogVideo, LTX-2 local, ComfyUI local workflows (MiniMax H3 local graph)"
+    ],
+    "HYBRID": [
+      "ComfyUI (local workflows or hosted partner nodes), Modality gateway providers, LTX-2 on Modal (self-hosted cloud GPU)"
+    ],
+    "cost_reporting": {
+      "present": true,
+      "evidence": "tools/cost_tracker.py (estimate/reserve/reconcile/persist cost_log.json), config.yaml budget observe|warn|cap with total_usd/reserve_pct/single_action_approval_usd, schemas/artifacts/cost_log.schema.json, require_approval_for_new_paid_tool"
+    }
+  },
+  "selective_projection": {
+    "registered_capability_ids": [
+      "media.openmontage",
+      "media.openmontage.documentary",
+      "media.openmontage.explainer",
+      "media.openmontage.composition",
+      "media.openmontage.audio",
+      "media.openmontage.sourcing",
+      "media.openmontage.quality"
+    ],
+    "registered_count": 7,
+    "all_canonical_status": "DISCOVERED",
+    "all_canonical_readiness": {
+      "INSTALLED": false,
+      "DISCOVERED": true,
+      "ELIGIBLE": false,
+      "RESOLVED": false,
+      "EXECUTABLE": false,
+      "HEALTHY": false
+    },
+    "registered_execution": false,
+    "authorized_execution": false,
+    "runtime_proven": false,
+    "projection_manifest": "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json"
+  },
+  "security_assessment": {
+    "scope": "static surface inventory only; no execution, no broad security research",
+    "install_footprint": "large: Python requirements + pip optional extras + Node (Remotion, HyperFrames via npx), FFmpeg, optional GPU stack",
+    "subprocess_usage": "50 subprocess invocations across 23 tool/lib/script files (FFmpeg, Node/npx, git/pip surfaces)",
+    "network_access": "67 tool/lib files use HTTP clients; provider calls are per-tool and key-gated; archive/stock ingestion is outbound",
+    "api_key_handling": "dotenv (.env), 23+ env vars documented; no hardcoded keys found in scanned source; keys never stored in repo (.env ignored)",
+    "arbitrary_command_or_code_surfaces": "high: 12 of 13 pipeline manifests set extensions.custom_scripts=true and custom_skills=true; agentic operation means the host AI agent executes scripts by design",
+    "downloads": "99 tool/lib files reference download surfaces (first-run model weights, Piper voice models, ComfyUI workflows, stock/archive media)",
+    "output_paths": "default OPENMONTAGE_PROJECTS_DIR or <repo>/projects/<project>/renders/final.mp4 + hyperframes workspaces; checkpoints under pipeline storage dir; all overridable via env/config",
+    "provider_fallback": "scored 7-dimension selector with documented fall-through (e.g. Remotion -> FFmpeg Ken Burns when Remotion unavailable); budget cap and per-action approval for paid tools",
+    "local_gpu_requirements": "NVIDIA CUDA + torch stack; 6-24GB VRAM by model; documented NVML driver note and bf16/int8/int4 precision + offload modes",
+    "disk_requirements": "multi-GB for local models; ~161MB repo clone; Remotion/Node deps",
+    "fail_closed_policy_for_p2p": "vendor starts as REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR; no P2P code, no adapter execution, no installs, no keys, no rendering"
+  },
+  "no_execution_evidence": {
+    "pip_install": false,
+    "npm_install": false,
+    "make_setup": false,
+    "piper_installed": false,
+    "hyperframes_installed": false,
+    "ffmpeg_install": false,
+    "gpu_models_installed": false,
+    "video_models_downloaded": false,
+    "api_keys_used": false,
+    "paid_providers_called": false,
+    "video_rendered": false,
+    "downstream_projects_modified": false
+  },
+  "p2p_integration": {
+    "registry": ".p2p/system/p2p_capabilities/capabilities.json (existing single registry; 7 DISCOVERED records added)",
+    "router": "existing p2p_capabilities.routing (single router; no second router)",
+    "vendor_adapter": ".p2p/system/p2p_capabilities/vendor_skill.py (reference-only metadata + fail-closed readiness; no content load, no execution)",
+    "provenance": ".p2p/vendor/provenance/openmontage-vendor-01.json (this file)",
+    "selective_routing": "project-selective via existing TRIGGERS/NEGATIVE_TRIGGERS + DISCOVERED status; records are not ELIGIBLE",
+    "evidence": "normalized P2P ReturnPacket/evidence structures remain P2P-owned; no OpenMontage-specific evidence schema created",
+    "update_policy": "new pin record on upstream change; no in-place mutation; no upstream source vendored"
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "catalog_id": "openmontage-vendor-capability-catalog",
+  "schema": "p2p-capability-catalog/1",
+  "version": "1.0.0",
+  "generated_at": "2026-08-30",
+  "generated_by": "P2P-OPENMONTAGE-VENDOR-01",
+  "authority": "Selective capability projection of the pinned OpenMontage external runtime vendor. Extends the existing capability registry and single router. Does not create a second registry, scheduler, orchestrator, provenance store, or OpenMontage-specific governance ontology. OpenMontage pipeline/orchestration concepts are NOT imported into P2P; P2P retains authority/orchestrator ownership (Control Tower, Work Factory, risk lanes, capability routing, ReturnPacket, Supervisor, Owner Gate).",
+  "parent_registry": ".p2p/system/p2p_capabilities/capabilities.json",
+  "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+  "upstream": {
+    "repository": "https://github.com/calesthio/OpenMontage.git",
+    "commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+    "tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+    "branch": "main",
+    "license": "AGPL-3.0",
+    "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR"
+  },
+  "lifecycle_vocabulary": {
+    "note": "Canonical P2P status/readiness vocabulary is authoritative (STATUS=DISCOVERED; readiness INSTALLED/DISCOVERED/ELIGIBLE/RESOLVED/EXECUTABLE/HEALTHY). The five requested projection states are annotated per group only; no new registry enum was created.",
+    "DISCOVERED": "Upstream capability identified at exact pin; canonical STATUS=DISCOVERED; canonical readiness DISCOVERED=true.",
+    "PROJECTABLE": "Upstream tool/pipeline identity is known well enough to project as a bounded P2P work item. Static source inspection only - no runtime proof implied.",
+    "EXECUTION_REGISTERED": "False for every group: no P2P adapter invokes OpenMontage; nothing is wired into P2P execution.",
+    "EXECUTION_AUTHORIZED": "False for every group: no Owner Gate approval exists; no keys, no GPU budget, no runtime.",
+    "RUNTIME_PROVEN": "False for every group: OpenMontage was not installed or executed in this workstream, so execution readiness is never claimed."
+  },
+  "projected_groups": [
+    {
+      "group_id": "OM-UMBRELLA",
+      "capability_id": "media.openmontage",
+      "name": "OpenMontage external video-production vendor (umbrella)",
+      "description": "Single selective route to the pinned OpenMontage vendor as an external production capability provider. Everything below is scoped by this umbrella; P2P retains authority.",
+      "upstream_pipelines": [
+        "animated-explainer", "animation", "avatar-spokesperson", "character-animation",
+        "cinematic", "clip-factory", "documentary-montage", "hybrid",
+        "localization-dub", "podcast-repurpose", "screen-demo", "talking-head"
+      ],
+      "upstream_tools": ["tool_registry (discovery surface)", "pipeline_defs/*.yaml (13 manifests)", "skills/pipelines/*"],
+      "runtime_class": "HYBRID",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    },
+    {
+      "group_id": "OM-DOCUMENTARY",
+      "capability_id": "media.openmontage.documentary",
+      "name": "Real-footage documentary montage",
+      "description": "Retrieval-first thematic montage built from free/open archival + stock footage; CLIP-indexed corpus; narrative-beat edit; music sync; uniform color grade. Zero-paid-key route.",
+      "upstream_pipelines": ["documentary-montage"],
+      "upstream_tools": [
+        "tools/video/corpus_builder.py", "tools/video/direct_clip_search.py",
+        "tools/video/clip_search.py", "tools/video/clip_cache.py",
+        "tools/analysis/video_downloader.py", "tools/audio/music_gen.py",
+        "tools/video/video_compose.py", "lib/slideshow_risk.py", "lib/delivery_promise.py"
+      ],
+      "sources": ["archive_org", "nasa", "wikimedia", "pexels", "unsplash", "pixabay"],
+      "runtime_class": "LOCAL_FREE (archive/NASA/Wikimedia, no key) + FREE_SOURCE_OR_FREE_KEY (Pexels/Pixabay/Unsplash free keys)",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    },
+    {
+      "group_id": "OM-EXPLAINER",
+      "capability_id": "media.openmontage.explainer",
+      "name": "Animated explainer / character animation",
+      "description": "Research -> script -> narration -> asset -> scene plan -> render explainer flow, plus local SVG/GSAP character animation. Zero-paid-key path uses Piper + generated/reference images + Remotion/HyperFrames.",
+      "upstream_pipelines": ["animated-explainer", "animation", "character-animation"],
+      "upstream_tools": [
+        "tools/video/video_compose.py", "tools/video/hyperframes_compose.py",
+        "tools/character/character_animation.py", "tools/audio/piper_tts.py",
+        "tools/audio/tts_selector.py", "tools/graphics/image_gen.py",
+        "tools/graphics/image_selector.py", "tools/graphics/diagram_gen.py",
+        "tools/graphics/math_animate.py", "remotion-composer/ (React scene stack)",
+        "lib/shot_prompt_builder.py", "lib/verify_scene_pacing.py"
+      ],
+      "runtime_class": "LOCAL_FREE (Piper, Remotion, HyperFrames, FFmpeg) with optional PAID_API image providers",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    },
+    {
+      "group_id": "OM-COMPOSITION",
+      "capability_id": "media.openmontage.composition",
+      "name": "Composition / rendering runtimes",
+      "description": "Remotion (React), HyperFrames (HTML/GSAP), and FFmpeg composing/stitching/trimming. P2P may select a composition capability group without selecting generation providers.",
+      "upstream_pipelines": ["animation", "animated-explainer", "hybrid"],
+      "upstream_tools": [
+        "tools/video/video_compose.py", "tools/video/hyperframes_compose.py",
+        "tools/video/video_stitch.py", "tools/video/video_trimmer.py",
+        "tools/video/silence_cutter.py", "tools/video/auto_reframe.py",
+        "tools/video/green_screen_composite.py", "tools/video/green_screen_processor.py",
+        "tools/video/showcase_card.py", "tools/video/remotion_caption_burn.py",
+        "remotion-composer/", "lib/media_profiles.py", "lib/hyperframes_style_bridge.py"
+      ],
+      "runtime_class": "LOCAL_FREE (CPU: Node + FFmpeg; no API key)",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    },
+    {
+      "group_id": "OM-AUDIO",
+      "capability_id": "media.openmontage.audio",
+      "name": "Audio: narration, mixing, enhancement, music/SFX",
+      "description": "Offline Piper TTS plus scored cloud TTS selectors; audio mixing/enhancement; music and SFX selectors (local library, free-key, paid).",
+      "upstream_pipelines": ["animated-explainer", "documentary-montage", "talking-head"],
+      "upstream_tools": [
+        "tools/audio/piper_tts.py", "tools/audio/tts_selector.py",
+        "tools/audio/google_tts.py", "tools/audio/openai_tts.py", "tools/audio/elevenlabs_tts.py",
+        "tools/audio/azure_tts.py", "tools/audio/dashscope_tts.py", "tools/audio/doubao_tts.py",
+        "tools/audio/fish_audio_tts.py", "tools/audio/kling_tts.py",
+        "tools/audio/audio_mixer.py", "tools/audio/audio_enhance.py",
+        "tools/audio/music_library.py", "tools/audio/music_gen.py",
+        "tools/audio/pixabay_music.py", "tools/audio/freesound_music.py",
+        "tools/audio/google_music.py", "tools/audio/suno_music.py",
+        "tools/audio/fal_elevenlabs_music.py", "tools/audio/comfyui_music.py",
+        "tools/analysis/audio_energy.py", "tools/analysis/audio_probe.py"
+      ],
+      "runtime_class": "LOCAL_FREE (Piper, mixing, enhancement) + PAID_API/free-tier selectors",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    },
+    {
+      "group_id": "OM-SOURCING",
+      "capability_id": "media.openmontage.sourcing",
+      "name": "Media sourcing (free/open archives and stock)",
+      "description": "StockSource adapter protocol over Archive.org, NASA, Wikimedia Commons, Pexels, Pixabay, Unsplash; corpus building and direct clip search.",
+      "upstream_pipelines": ["documentary-montage", "hybrid"],
+      "upstream_tools": [
+        "tools/video/corpus_builder.py", "tools/video/direct_clip_search.py",
+        "tools/video/clip_search.py", "tools/video/clip_cache.py",
+        "tools/analysis/video_downloader.py", "tools/video/pexels_video.py",
+        "tools/video/pixabay_video.py", "tools/graphics/pexels_image.py",
+        "tools/graphics/pixabay_image.py", "lib/clip_embedder.py", "lib/corpus.py"
+      ],
+      "sources": [
+        {"name": "archive_org", "class": "LOCAL_FREE_OPEN_ARCHIVE", "key": "none"},
+        {"name": "nasa", "class": "LOCAL_FREE_OPEN_ARCHIVE", "key": "none"},
+        {"name": "wikimedia", "class": "LOCAL_FREE_OPEN_ARCHIVE", "key": "none"},
+        {"name": "pexels", "class": "FREE_SOURCE_OR_FREE_KEY", "key": "PEXELS_API_KEY"},
+        {"name": "pixabay", "class": "FREE_SOURCE_OR_FREE_KEY", "key": "PIXABAY_API_KEY"},
+        {"name": "unsplash", "class": "FREE_SOURCE_OR_FREE_KEY", "key": "UNSPLASH_ACCESS_KEY"}
+      ],
+      "runtime_class": "LOCAL_FREE + FREE_SOURCE_OR_FREE_KEY",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    },
+    {
+      "group_id": "OM-QUALITY",
+      "capability_id": "media.openmontage.quality",
+      "name": "Analysis / QA / media validation + subtitles",
+      "description": "ffprobe/media validation, transcription, scene detection, frame sampling, video understanding, audio-level validation, visual QA checkpoint flow, subtitle generation (SRT/VTT/word-level).",
+      "upstream_pipelines": ["all production pipelines (review stages)"],
+      "upstream_tools": [
+        "tools/analysis/audio_probe.py", "tools/analysis/audio_energy.py",
+        "tools/analysis/composition_validator.py", "tools/analysis/frame_sampler.py",
+        "tools/analysis/scene_detect.py", "tools/analysis/transcriber.py",
+        "tools/analysis/transcript_fetcher.py", "tools/analysis/video_analyzer.py",
+        "tools/analysis/video_understand.py", "tools/analysis/visual_qa.py",
+        "tools/analysis/azure_stt.py", "tools/analysis/dashscope_asr.py",
+        "tools/subtitle/subtitle_gen.py", "tools/video/remotion_caption_burn.py",
+        "lib/delivery_promise.py", "lib/slideshow_risk.py", "lib/source_media_review.py",
+        "lib/verify_scene_pacing.py", "lib/variation_checker.py",
+        "schemas/artifacts/final_review.schema.json", "schemas/artifacts/video_analysis_brief.schema.json"
+      ],
+      "runtime_class": "LOCAL_FREE (FFmpeg/Python) + FREE-SOURCE ASR tiers",
+      "lifecycle": {
+        "DISCOVERED": true, "PROJECTABLE": true,
+        "EXECUTION_REGISTERED": false, "EXECUTION_AUTHORIZED": false, "RUNTIME_PROVEN": false
+      }
+    }
+  ],
+  "deferred_groups": [
+    {
+      "group_id": "OM-GENERATION",
+      "name": "Image/video generation providers",
+      "capability_id": null,
+      "reason": "Predominantly PAID_API (fal.ai, OpenAI, xAI, Kling, Seedance, Runway, HeyGen, etc.) or LOCAL_GPU (WAN/Hunyuan/CogVideo/LTX/local diffusion). Not part of zero-paid-key projection. Provider calls and keys are out of scope for vendor intake; P2P would need an owner-gated paid/GPU envelope before any projection.",
+      "upstream_tools": [
+        "tools/graphics/flux_image.py", "tools/graphics/openai_image.py", "tools/graphics/google_imagen.py",
+        "tools/graphics/grok_image.py", "tools/graphics/minimax_image.py", "tools/graphics/recraft_image.py",
+        "tools/graphics/seedream_image.py", "tools/graphics/dashscope_image.py", "tools/graphics/hunyuan_image.py",
+        "tools/graphics/atlas_image.py", "tools/graphics/comfyui_image.py", "tools/graphics/kling_official_image.py",
+        "tools/graphics/local_diffusion.py", "tools/video/kling_video.py", "tools/video/veo_video.py",
+        "tools/video/seedance_video.py", "tools/video/seedance_ark.py", "tools/video/gemini_omni_video.py",
+        "tools/video/gemini_omni_fal.py", "tools/video/sora_video.py", "tools/video/runway_video.py",
+        "tools/video/heygen_video.py", "tools/video/higgsfield_video.py", "tools/video/hunyuan_cloud_video.py",
+        "tools/video/minimax_video.py", "tools/video/atlas_video.py", "tools/video/grok_video.py",
+        "tools/video/comfyui_video.py", "tools/video/wan_video.py", "tools/video/hunyuan_video.py",
+        "tools/video/cogvideo_video.py", "tools/video/ltx_video_local.py", "tools/video/ltx_video_modal.py"
+      ],
+      "runtime_class": "PAID_API / LOCAL_GPU / HYBRID"
+    },
+    {
+      "group_id": "OM-AVATAR",
+      "name": "Avatar spokesperson / talking head / lip sync",
+      "capability_id": null,
+      "reason": "Avatar-spokesperson and talking-head pipelines map to paid avatar providers (Kling avatar/lip-sync) or external local repositories (SadTalker, Wav2Lip) that are cloned/installed separately. Not part of the minimal zero-key projection; requires owner-gated runtime decision.",
+      "upstream_tools": [
+        "tools/avatar/talking_head.py", "tools/avatar/lip_sync.py",
+        "tools/avatar/kling_avatar.py", "tools/avatar/kling_lip_sync.py"
+      ],
+      "runtime_class": "PAID_API / EXTERNAL_LOCAL_REPO"
+    },
+    {
+      "group_id": "OM-OTHER_PIPELINES",
+      "name": "Screen demo, cinematic, clip factory, podcast repurpose, hybrid, localization/dub",
+      "capability_id": null,
+      "reason": "Useful but beyond the smallest useful projection for intake. Screen demo/repurpose/clip factory are largely LOCAL_FREE but need source footage and device capture surfaces; cinematic/hybrid blend paid generation; localization/dub is narration-heavy (paid TTS for many languages) with subtitles covered by the quality group. Deferred to a later project-selective routing pass.",
+      "upstream_pipelines": ["screen-demo", "cinematic", "clip-factory", "podcast-repurpose", "hybrid", "localization-dub"],
+      "upstream_tools": [
+        "tools/capture/screen_recorder.py", "tools/capture/cap_recorder.py",
+        "tools/capture/screen_capture_selector.py", "tools/video/silence_cutter.py",
+        "tools/publishers/export_bundle.py"
+      ],
+      "runtime_class": "MIXED (LOCAL_FREE + PAID_API)"
+    },
+    {
+      "group_id": "OM-ENHANCEMENT",
+      "name": "Enhancement (upscale, bg remove, face enhance/restore, color grade)",
+      "capability_id": null,
+      "reason": "LOCAL_FREE with optional GPU, but requires extra packages (realesrgan, gfpgan, rembg) and model weights; deferred with generation/GPU envelope.",
+      "upstream_tools": [
+        "tools/enhancement/upscale.py", "tools/enhancement/bg_remove.py",
+        "tools/enhancement/face_enhance.py", "tools/enhancement/face_restore.py",
+        "tools/enhancement/eye_enhance.py", "tools/enhancement/color_grade.py"
+      ],
+      "runtime_class": "LOCAL_FREE / LOCAL_GPU"
+    }
+  ],
+  "selected_p2p_capabilities": [
+    "media.openmontage",
+    "media.openmontage.documentary",
+    "media.openmontage.explainer",
+    "media.openmontage.composition",
+    "media.openmontage.audio",
+    "media.openmontage.sourcing",
+    "media.openmontage.quality"
+  ],
+  "deferred_capabilities": [
+    "media.openmontage.generation",
+    "media.openmontage.avatar",
+    "media.openmontage.screen_demo",
+    "media.openmontage.cinematic",
+    "media.openmontage.clip_factory",
+    "media.openmontage.podcast_repurpose",
+    "media.openmontage.hybrid",
+    "media.openmontage.localization_dub",
+    "media.openmontage.enhancement"
+  ],
+  "zero_paid_key_route": {
+    "summary": "Documentary montage (or explainer) via open archives + Pixel-based free keys + Piper narration + Remotion/HyperFrames/FFmpeg composition + built-in subtitles + ffprobe/audio QA.",
+    "sources": ["Archive.org", "NASA", "Wikimedia Commons (no key)"],
+    "optional_free_keys": ["Pexels", "Pixabay", "Unsplash (free registration keys)"],
+    "runtime": ["Piper TTS (offline)", "Remotion (Node 18+)", "HyperFrames (Node 22+, FFmpeg)", "FFmpeg", "subtitles (no install)"],
+    "verified_static_evidence": [
+      "docs/PROVIDERS.md: 'archive.org, nasa, and wikimedia work without API keys'",
+      "docs/PROVIDERS.md: Piper 'no API key, no cost, no network'",
+      "docs/PROVIDERS.md: Remotion 'Free. Always local.'; HyperFrames 'Free. Always local.'",
+      "README: zero-API-keys capability table"
+    ]
+  },
+  "local_gpu_route": {
+    "summary": "Not projected. Provided by upstream as LOCAL_GPU (make install-gpu; WAN 2.1/2.2, Hunyuan 1.5, CogVideo, LTX-2 local, local diffusion, ComfyUI local workflows). P2P would require an owner-gated envelope; no GPU install in this workstream.",
+    "vram_band": "6GB-24GB by model",
+    "upstream_evidence": "requirements-gpu.txt, docs/PROVIDERS.md local video generation section, tools/video/_wan_engine.py"
+  },
+  "paid_api_route": {
+    "summary": "Not projected. Providers are documented but no key is used and no provider is called. Cost reporting exists upstream (cost_tracker.py estimate/reserve/reconcile; budget observe/warn/cap; per-action approval; cost_log artifacts).",
+    "upstream_evidence": "tools/cost_tracker.py, config.yaml budget block, schemas/artifacts/cost_log.schema.json, docs/PROVIDERS.md"
+  },
+  "p2p_authority_boundary": {
+    "work_item_flow": "P2P WORK_ITEM -> OpenMontage vendor adapter (future, not registered) -> selected OpenMontage production pipeline/tools -> durable video/assets/evidence -> normalized P2P ReturnPacket",
+    "second_authority_layer_imported": false,
+    "p2p_retains": ["Control Tower", "Work Factory", "risk lanes", "capability routing", "ReturnPacket", "Supervisor", "Owner Gate"],
+    "execution_registered": false,
+    "execution_authorized": false
+  },
+  "gates": {
+    "LICENSE_GATES": [
+      "AGPL-3.0 upstream verified; no upstream source/implementation code copied into P2P core",
+      "reference-only pin record; no AGPL source snapshot",
+      "any future vendor adapter must remain a thin boundary (no import of OpenMontage implementation logic)",
+      "commercial_clearance NOT_ASSESSED; no license compatibility claim beyond license text"
+    ],
+    "RUNTIME_GATES": [
+      "no install (pip/npm/make) until owner-gated runtime envelope",
+      "no execution before RUNTIME_PROVEN via isolated runtime evidence",
+      "no paid provider calls from P2P; no API keys accepted",
+      "no local GPU/model download unless owner-gated",
+      "no claim of execution readiness from static source inspection"
+    ],
+    "SECURITY_GATES": [
+      "agentic custom-script surface (12/13 pipelines custom_scripts=true) requires isolated sandbox before any execution",
+      "network access is expected during provider runtime; P2P-side network policy remains DENY until owner-gated",
+      "subprocess/download surfaces (50 subprocess sites, 99 download-related files) require containment"
+    ]
+  }
+}
