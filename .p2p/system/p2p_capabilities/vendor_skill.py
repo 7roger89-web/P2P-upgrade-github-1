@@ -23,6 +23,8 @@ VENDOR_ROUTE_SCHEMA = "p2p-vendor-skill-route/1"
 VENDOR_LOAD_SCHEMA = "p2p-vendor-skill-load/1"
 VENDOR_DEPENDENCY_SCHEMA = "p2p-vendor-skill-dependency/1"
 VENDOR_INTEGRATION_MODE = "LOCAL_VENDOR_SNAPSHOT"
+VENDOR_REFERENCE_MODE = "PINNED_REFERENCE_ADAPTER"
+EXTERNAL_RUNTIME_NOT_INSTALLED = "EXTERNAL_RUNTIME_NOT_INSTALLED"
 _IGNORED_SNAPSHOT_DIRS = frozenset({".venv", "node_modules", "__pycache__"})
 
 
@@ -83,6 +85,27 @@ def is_vendor_skill(manifest: CapabilityManifest) -> bool:
     except VendorSkillError:
         return False
     return manifest.type == "SKILL" and not manifest.canonical_quorum_member and not manifest.optional_specialist
+
+
+def is_external_runtime_reference(manifest: CapabilityManifest) -> bool:
+    """Reference-only pinned external runtime vendor (no local source snapshot).
+
+    Uses the canonical ``PINNED_REFERENCE_ADAPTER`` mode with an explicit
+    ``EXTERNAL_RUNTIME_NOT_INSTALLED`` dependency declaration and no local
+    entrypoint. Such vendors are discovered as metadata but are never eligible
+    until an owner-gated runtime envelope exists (see ``_reference_readiness``).
+    """
+
+    provenance = manifest.upstream_provenance
+    integration = provenance.get("integration")
+    if manifest.type != "SKILL" or manifest.canonical_quorum_member or manifest.optional_specialist:
+        return False
+    if not isinstance(integration, Mapping) or provenance.get("mode") != VENDOR_REFERENCE_MODE:
+        return False
+    return (
+        integration.get("dependency_mode") == EXTERNAL_RUNTIME_NOT_INSTALLED
+        and integration.get("entrypoint") is None
+    )
 
 
 def _vendor_root(manifest: CapabilityManifest, root: Path) -> Path:
@@ -243,6 +266,57 @@ def vendor_readiness_snapshot(
     )
 
 
+def external_runtime_reference_metadata(manifest: CapabilityManifest) -> dict[str, Any]:
+    """Metadata for a reference-only external runtime vendor; no content is read."""
+
+    provenance = manifest.upstream_provenance
+    integration = provenance.get("integration")
+    integration = integration if isinstance(integration, Mapping) else {}
+    license_value = provenance.get("license")
+    return {
+        "capability_id": manifest.capability_id,
+        "implementation": provenance.get("implementation", "UNKNOWN"),
+        "vendor_path": None,
+        "entrypoint": None,
+        "load_mode": integration.get("load_mode", "REFERENCE_ONLY"),
+        "dependency_mode": integration.get("dependency_mode", "UNKNOWN"),
+        "references": [],
+        "assets": [],
+        "script_entrypoints": [],
+        "snapshot_sha256": None,
+        "entrypoint_sha256": None,
+        "upstream_repository": provenance.get("upstream_repository", "UNKNOWN"),
+        "upstream_commit": provenance.get("upstream_commit", "UNKNOWN"),
+        "version": manifest.version,
+        "license": license_value.get("kind", "UNKNOWN") if isinstance(license_value, Mapping) else "UNKNOWN",
+        "source_state": "NOT_VENDORED",
+        "entrypoint_present": False,
+        "content_loaded": False,
+        "permission_grant": False,
+        "network_runtime": False,
+        "runtime_network_requirement": bool(integration.get("network_runtime", False)),
+    }
+
+
+def _reference_readiness(manifest: CapabilityManifest) -> dict[str, Any]:
+    return readiness_snapshot(
+        manifest,
+        installed=False,
+        discovered=True,
+        eligible=False,
+        resolved=False,
+        executable=False,
+        healthy=False,
+        reasons=[
+            "EXTERNAL_RUNTIME_NOT_INSTALLED",
+            "REFERENCE_ONLY_ADAPTER",
+            "NO_P2P_EXECUTION_REGISTRATION",
+            "NO_EXECUTION_AUTHORIZATION",
+            "RUNTIME_PROVEN_FALSE",
+        ],
+    )
+
+
 def project_vendor_route(
     request: str,
     manifests: Iterable[CapabilityManifest],
@@ -256,13 +330,16 @@ def project_vendor_route(
     selected = set(route.get("selected", []))
     skills: list[dict[str, Any]] = []
     for manifest in manifests:
-        if not is_vendor_skill(manifest):
+        if not is_vendor_skill(manifest) and not is_external_runtime_reference(manifest):
             continue
-        metadata = vendor_skill_metadata(
-            manifest,
-            registry_path=registry_path,
-            repository_root=repository_root,
-        )
+        if is_vendor_skill(manifest):
+            metadata = vendor_skill_metadata(
+                manifest,
+                registry_path=registry_path,
+                repository_root=repository_root,
+            )
+        else:
+            metadata = external_runtime_reference_metadata(manifest)
         result = next(
             (item for item in route.get("results", []) if item.get("capability_id") == manifest.capability_id),
             {},
@@ -296,15 +373,16 @@ def discover_vendor_skills(
     registry = _registry_path(registry_path)
     loaded = load_registry(registry)
     root = _repository_root(registry, repository_root)
-    readiness = {
-        manifest.capability_id: vendor_readiness_snapshot(
-            manifest,
-            repository_root=root,
-            registry_path=registry,
-        )
-        for manifest in loaded["parsed"]
-        if is_vendor_skill(manifest)
-    }
+    readiness: dict[str, Mapping[str, Any]] = {}
+    for manifest in loaded["parsed"]:
+        if is_vendor_skill(manifest):
+            readiness[manifest.capability_id] = vendor_readiness_snapshot(
+                manifest,
+                repository_root=root,
+                registry_path=registry,
+            )
+        elif is_external_runtime_reference(manifest):
+            readiness[manifest.capability_id] = _reference_readiness(manifest)
     route = classify_capabilities(request, loaded["parsed"], readiness=readiness)
     projection = project_vendor_route(
         request,

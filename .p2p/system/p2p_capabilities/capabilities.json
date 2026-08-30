@@ -4342,6 +4342,690 @@
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "Selective, reference-only projection of the pinned OpenMontage external video-production runtime vendor. P2P remains authority/orchestrator; this is an isolated external production capability provider behind a future vendor adapter. Discovered only - not installed, not executed, not runtime-proven.",
+      "TRIGGERS": [
+        "openmontage",
+        "open montage",
+        "video production vendor",
+        "agentic video production",
+        "video montage"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "whiteboard animation",
+        "game asset forge",
+        "android artifact",
+        "reverse engineering",
+        "code refactor",
+        "ad copy",
+        "threejs scene"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "pipeline-defs-selective-projection",
+        "documentary-montage-zero-key-route"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage.documentary",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "OpenMontage documentary/real-footage montage projection: CLIP-indexed corpus over Archive.org, NASA, Wikimedia Commons and free-key stock sources; narrative-beat edit; music sync; uniform grade. Zero-paid-key route candidate; discovered only.",
+      "TRIGGERS": [
+        "openmontage documentary",
+        "documentary montage",
+        "real-footage montage",
+        "archival footage montage",
+        "openmontage real footage"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "screen demo",
+        "podcast",
+        "game asset",
+        "whiteboard",
+        "code"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "corpus-builder",
+        "direct-clip-search",
+        "clip-search",
+        "archive.org",
+        "nasa",
+        "wikimedia"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage.explainer",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "OpenMontage animated explainer and character-animation projection: research/script/narration/scene-plan/render flow with Piper TTS, Remotion/HyperFrames composition and local SVG/GSAP character acting. Discovered only.",
+      "TRIGGERS": [
+        "openmontage explainer",
+        "animated explainer",
+        "character animation",
+        "kinetic typography"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "game asset",
+        "whiteboard animation",
+        "ad copy",
+        "code"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "piper-tts-offline",
+        "remotion-scene-stack",
+        "hyperframes-gsap"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage.composition",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "OpenMontage composition/runtime projection: Remotion (React), HyperFrames (HTML/GSAP) and FFmpeg compose/stitch/trim/auto-reframe. Local CPU runtimes, no API key. Discovered only.",
+      "TRIGGERS": [
+        "openmontage composition",
+        "openmontage render",
+        "remotion composition",
+        "hyperframes composition",
+        "openmontage ffmpeg"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "game asset",
+        "whiteboard animation",
+        "code"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "remotion-composer",
+        "hyperframes-compose",
+        "ffmpeg-compose"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage.audio",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "OpenMontage audio projection: offline Piper TTS, scored cloud TTS selectors, audio mixing, enhancement and music/SFX selectors. Local free path plus optional free-tier/paid providers. Discovered only.",
+      "TRIGGERS": [
+        "openmontage audio",
+        "openmontage narration",
+        "piper tts",
+        "openmontage music",
+        "audio mixing"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "code",
+        "game asset",
+        "whiteboard"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "tts-selector",
+        "audio-mixer",
+        "music-selector"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage.sourcing",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "OpenMontage media sourcing projection: StockSource adapters for Archive.org, NASA, Wikimedia Commons (no key), Pexels/Pixabay/Unsplash (free keys), corpus building and direct clip search. Discovered only.",
+      "TRIGGERS": [
+        "openmontage stock footage",
+        "openmontage archives",
+        "archive.org",
+        "wikimedia commons",
+        "nasa footage"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "paid video generation",
+        "code"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "stock-source-protocol",
+        "corpus-builder"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "media.openmontage.quality",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "DESCRIPTION": "OpenMontage analysis/QA/subtitle projection: ffprobe and media validation, transcription, scene detection, frame sampling, audio-level validation, visual QA checkpoint flow and SRT/VTT/word-level subtitles. Discovered only.",
+      "TRIGGERS": [
+        "openmontage qa",
+        "openmontage validation",
+        "openmontage subtitles",
+        "openmontage transcription",
+        "video production quality gate"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "code",
+        "game asset"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "current-capability-registry",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "vendor-agpl-source-into-p2p-core",
+        "install-openmontage-dependencies",
+        "call-paid-providers-from-p2p",
+        "network-runtime-without-owner-authorization",
+        "claim-runtime-proven",
+        "promote-without-owner-gate",
+        "modify-canonical-state"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "owner-gate-before-runtime-invocation"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "docs/p2p-development/capability-catalog/openmontage-vendor/capability-catalog.json",
+        "delivery-promise",
+        "slideshow-risk",
+        "subtitle-gen"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-runtime-invocation",
+        "owner-gate-before-any-paid-provider",
+        "owner-gate-before-local-gpu"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "upstream-pin-and-tree",
+        "agpl-3.0-license-record",
+        "reference-only-adapter",
+        "selective-projection",
+        "no-runtime-claim"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_ADAPTER",
+        "vendor_class": "REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR",
+        "implementation": "OPENMONTAGE_UPSTREAM_PINNED_REFERENCE",
+        "upstream_repository": "https://github.com/calesthio/OpenMontage.git",
+        "upstream_commit": "cd9f3c1f03368be87b140af494914b8ee4e3c7a4",
+        "upstream_tree": "6cd1961d552dd9d2bcfba990b80ac06edfe4b061",
+        "vendor_path": null,
+        "source_manifest": ".p2p/vendor/provenance/openmontage-vendor-01.json",
+        "license": {
+          "file": "LICENSE",
+          "kind": "AGPL-3.0",
+          "scope": "upstream repository license evidence at pin; no upstream source vendored into P2P"
+        },
+        "rights_review": {
+          "status": "REPOSITORY_LICENSE_REVIEWED",
+          "basis": "Upstream LICENSE file (full AGPL-3.0 text) and GitHub API license.spdx_id=AGPL-3.0 inspected at the pinned commit; no upstream source or license text copied into P2P.",
+          "checked_date": "2026-08-30",
+          "commercial_clearance": "NOT_ASSESSED"
+        },
+        "integration": {
+          "entrypoint": null,
+          "load_mode": "REFERENCE_ONLY",
+          "dependency_mode": "EXTERNAL_RUNTIME_NOT_INSTALLED",
+          "dependency_probe": null,
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": true,
+          "credentials": true,
+          "install_mode": "DISABLED",
+          "external_render": "EXPLICIT_ONLY"
+        },
+        "update_policy": "new-pin-record-on-upstream-change; no in-place mutation; no upstream source vendored"
+      },
+      "VERSION": "pinned-cd9f3c1",
+      "STATUS": "DISCOVERED"
     }
   ]
 }
