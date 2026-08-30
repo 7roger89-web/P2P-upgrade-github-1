@@ -369,3 +369,12 @@ __all__ += [
     "compute_execution_requirements",
     "beginner_status",
 ]
+
+from .static_glb_standardizer import (
+    CAPABILITY_ID as STATIC_GLB_CAPABILITY_ID,
+    CAPABILITY_VERSION as STATIC_GLB_CAPABILITY_VERSION,
+    STATIC_CONTRACT,
+    StaticGlbError,
+    standardize_static_glb,
+    validate_static_glb_output,
+)

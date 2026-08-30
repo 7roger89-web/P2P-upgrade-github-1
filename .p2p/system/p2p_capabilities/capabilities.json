@@ -4342,6 +4342,73 @@
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.three.asset.static_glb_standardize",
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "ADAPTER",
+      "DESCRIPTION": "Bounded deterministic standardization of a static Three.js prop/object into a self-contained, validated GLB.",
+      "TRIGGERS": [
+        "static GLB",
+        "static glb standardization",
+        "Three.js prop export",
+        "weapon GLB"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "skin",
+        "skeleton",
+        "character rig",
+        "Blender",
+        "forge framework"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-capability-registry",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "generate-weapon",
+        "run-img2threejs",
+        "run-blender",
+        "install-dependencies",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "game.three.asset",
+        "game.three.visual",
+        "img2threejs"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-static-glb-asset/1",
+        "game.three.asset",
+        "game.three.visual",
+        "game.majid.threejs_qa_release"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-promotion",
+        "explicit-static-asset-input"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "static-validation-evidence",
+        "glb-parseability",
+        "provenance-binding",
+        "output-sha256"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "P2P_MINIMAL_STATIC_ADAPTER",
+        "implementation": ".p2p/system/p2p_capabilities/static_glb_standardizer.py",
+        "exporter": "CUSTOM_MINIMAL_GLTF2_WRITER",
+        "threejs_gltfexporter_reused": false,
+        "blender": false,
+        "network_runtime": false,
+        "install_mode": "DISABLED"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "CANDIDATE"
     }
   ]
 }
