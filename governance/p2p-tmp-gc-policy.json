@@ -1,0 +1,33 @@
+{
+  "schema": "p2p-tmp-gc-policy/1",
+  "allowlisted_temp_roots": [
+    ".tmp"
+  ],
+  "protected_roots": [],
+  "owner_roots": [],
+  "authoritative_roots": [],
+  "durable_roots": [
+    ".p2p/state",
+    "reports",
+    "archive"
+  ],
+  "grace_days": {
+    "NORMAL": 7,
+    "WARNING": 3,
+    "LOW": 1,
+    "CRITICAL": 0
+  },
+  "pressure": {
+    "warning_percent_free": 20,
+    "low_percent_free": 10,
+    "critical_percent_free": 5,
+    "warning_absolute_free_bytes": 21474836480,
+    "low_absolute_free_bytes": 10737418240,
+    "critical_absolute_free_bytes": 5368709120
+  },
+  "schedule": {
+    "daily_local_time": "03:00",
+    "activation": "OWNER_GATED"
+  },
+  "largest_consumers_limit": 10
+}
