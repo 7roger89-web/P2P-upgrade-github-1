@@ -18,9 +18,10 @@
 
 Documentation only. `.p2p/`, `governance/`, `source/`, `scripts/`, and `tests/` were not modified.
 `governance/research-adoption-ledger.json` was deliberately **left untouched**: it is
-append-and-reconcile only and its intake rule requires an Owner-accepted direction, so the
-`RA-EXT-069` append and the `RA-EXT-011` provenance reconciliation are recorded as Owner-gated next
-steps rather than performed here.
+append-and-reconcile only and its intake rule requires an Owner-accepted direction. No append was
+made and no existing record was edited. `RA_EXT_011_IDENTITY` stays `UNVERIFIED` and is **not**
+reconciled to `stablyai/orca` / `onorca.dev`; establishing that identity from observed runtime
+evidence belongs to the separate `P2P-NATIVE-HARNESS-ORCA-PROBE-01` goal.
 
 ## What was verified, and how
 
@@ -32,7 +33,27 @@ Repository facts were read from source, not recalled:
   `harness_identity` / `model_identity` / `protocol` / `workspace_binding` / `environment_binding`
   already exist.
 - `WorkItem` field list read directly (`work_item_handoff.py` lines 208–253), confirming there is
-  **no** `MODEL`/`EFFORT`/`PHASE` field — the basis for classifying Dely concept 6 as an addition.
+  **no** `MODEL`/`EFFORT`/`PHASE` field. This observation now supports the *opposite* of schema
+  growth: `WorkItem` is durable identity and binding, so harness/model/effort belong at dispatch.
+  Adding them would duplicate routing truth already held by the selection profile and
+  `BackendAdapterIdentity`. No `WorkItem` schema growth is proposed.
+- The existing selection/execution surfaces were read directly and already carry this data, which is
+  what makes `PHASE_MODEL_EFFORT_CLASSIFICATION = ALREADY_EXPRESSIBLE` true rather than asserted:
+  `selection_target.py:85` `target_kind` enumerates
+  `harness | provider | model | protocol | tool_set | workspace | reasoning_effort | execution_target`
+  with `model_id` and `reasoning_effort_classes`; `selection_request.py:36`
+  `REASONING_EFFORT_CLASSES = (LOW, MEDIUM, HIGH, VERY_HIGH, UNKNOWN)` and
+  `OwnerConstraints.maximum_reasoning_effort`; `live_execution.py` `default_execution_request()`
+  returns a closed set including `profile`, `model`, `provider`, `reasoning_effort`, `service_tier`,
+  and `_validate_execution_request` enforces `set(value) == allowed` (a closed, validated schema);
+  `target_registry.json` carries `adapter_id`, `scope_certifications`, `environment_binding`.
+- `fw06_operational_resilience.py` §10 read directly: `bounded_retry_decision(...)` takes
+  `failure_class, current_retries, max_retries, task_unchanged, permissions_unchanged,
+  target_compatible, mutation_state_known, cooldown_elapsed`, `ENVELOPE_FIELDS` includes
+  `retry_policy`, and `NO_RETRY_CLASSES` already refuses retry for `SCOPE_DRIFT` / `QUALITY_BLOCKED` /
+  `RETRY_EXHAUSTED` / `OWNER_GATE_REQUIRED`. This is what makes
+  `REMEDIATION_POLICY_CLASSIFICATION = ALREADY_EXPRESSIBLE` true: "one remediation pass then REPLAN"
+  is a bounded policy rule over existing controls, not a new primitive.
 - `control_tower_handoff.py:877` `worktree: str = "UNKNOWN"` confirms P2P records a worktree binding
   but never provisions one; a grep for `worktree` across `p2p_capabilities/` returned only recording
   sites.
@@ -96,8 +117,61 @@ for the seam design:
   confirmed absent.
 - Orca headless / self-hosted-server orchestration was not examined in depth.
 
+## Supervisor alignment pass (this revision)
+
+Fix-only documentation pass on the **same** PR #29, aligning the assessment with the independent
+Supervisor's final classification.
+
+- `SUPERVISOR_VERDICT` = `P2P_ORCA_FIT_PR29_SUPERVISOR_PASS`
+- `EXACT_REVIEWED_HEAD` = `dbae22fe7c4b38d5783f693bf8eaf6d554554387` — this revision is a direct
+  descendant of that exact head; no rebase, no history rewrite, no new PR.
+- Scope: documentation wording only. No code, no `WorkItem` schema, no ledger, no new architecture
+  layer, no adapter implementation, no Orca/Dely install.
+
+Corrections applied:
+
+1. **`WorkItem` schema growth removed and explicitly rejected.**
+   `PHASE_MODEL_EFFORT_CLASSIFICATION = ALREADY_EXPRESSIBLE`. Dely concept 6 was reclassified from
+   `USEFUL_SMALL_ADDITION` to `ALREADY_EXPRESSIBLE`, and the earlier recommendation to "add three
+   optional fields (`MODEL`, `EFFORT`, `PHASE`) to the work-item envelope" was deleted. The canonical
+   conclusion now states that harness/model/effort/phase selection reuses the existing execution
+   envelope / selection profile, `BackendAdapterIdentity`, and existing routing/adapter metadata.
+   `WORKITEM_SCHEMA_GROWTH_PROPOSED = NO`.
+2. **Remediation: no new subsystem or primitive.**
+   `REMEDIATION_POLICY_CLASSIFICATION = ALREADY_EXPRESSIBLE`. Dely concept 3 was reclassified to
+   `ALREADY_EXPRESSIBLE` and is now stated purely as a bounded policy rule over existing FW06 retry
+   controls. `REMEDIATION_NEW_SUBSYSTEM_PROPOSED = NO`.
+3. **Worktree retained as the single small addition, reusing an existing field.**
+   `WORKTREE_FIELD_CLASSIFICATION = NECESSARY_SMALL_ADDITION`. The wording was tightened to make
+   explicit that this populates the *existing* `ControlTowerReturnPacket.worktree` slot from execution
+   evidence/receipt where the adapter can prove it, and that no new worktree schema, field, or store
+   is added. `EXISTING_WORKTREE_FIELD_REUSE = YES`.
+4. **`RA-EXT-011` identity preserved as `UNVERIFIED`.** The earlier proposal to "reconcile
+   `RA-EXT-011`'s vague `source_reference`" and to append `RA-EXT-069` was removed from the next-goal
+   and owner-action text. `governance/research-adoption-ledger.json` is unmodified. Identity/runtime
+   probing remains the separate `P2P-NATIVE-HARNESS-ORCA-PROBE-01`.
+
+Preserved unchanged: Orca optional adapter only; Dely install NOT recommended; P2P Control Tower
+retains authority; Work Factory retains orchestration; `BackendExecutionBridge` is the integration
+seam; Git remains candidate truth; the existing `ReturnPacket` remains the normalized handoff; local
+runtime verification still required.
+
+### Environment note: local clone had lost the reviewed head
+
+At the start of this pass, local `HEAD` was `1c9eea39…` (the old `main`) and the two assessment files
+existed only as **untracked** files; `git cat-file -t dbae22fe…` returned
+`could not get object info`. The reviewed head existed only on the remote
+(`git ls-remote origin` → `dbae22fe…  refs/heads/arena/01a05381-p2p-upgrade-github-1`, matching
+PR #29's head). The files were backed up to `/tmp`, the branch was fetched and reset to `FETCH_HEAD`,
+and the restored files were confirmed byte-identical to the backup (`diff -q`, matching md5
+`91e964a6…` / `d309a4de…`) before any edit was made. This revision therefore sits on top of the exact
+reviewed head rather than on a reconstructed copy.
+
 ## Terminal state
 
-Assessment complete. Verdict: Orca **fits as an optional execution adapter** beneath the canonical
-Work Factory with no new orchestrator, ontology, or store; Dely install is **not recommended**.
-No implementation performed, no promotion, no merge, no release, no Owner Gate executed.
+Assessment complete and Supervisor-aligned. Verdict: Orca **fits as an optional execution adapter**
+beneath the canonical Work Factory with no new orchestrator, ontology, store, or schema growth; Dely
+install is **not recommended**. No implementation performed, no promotion, no merge, no release, no
+Owner Gate executed.
+
+`SUCCESS = P2P_ORCA_FIT_PR29_SUPERVISOR_ALIGNMENT_READY`
