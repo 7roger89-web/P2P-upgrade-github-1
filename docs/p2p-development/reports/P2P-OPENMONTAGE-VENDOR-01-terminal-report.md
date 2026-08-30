@@ -33,9 +33,9 @@
 | `VIDEO_RENDERED` | **NO** |
 | `FILES_CHANGED` | see below |
 | `FOCUSED_CHECKS` | registry validation (valid, 72 records), fail-closed routing probe (OpenMontage requests → DISCOVERED only, never selected), new focused unittest suite 6/6 PASS, JSON schema-ish parsing of all three artifacts; pre-existing unrelated test failures NOT touched (baseline stale, verified before change) |
-| `CANDIDATE_SHA` | filled at commit time (see §Git) |
-| `CANDIDATE_TREE` | filled at commit time (see §Git) |
-| `PR_NUMBER` | filled after push (see §Git) |
+| `CANDIDATE_SHA` | `d36318193c3051148bb8969a8363374347abbea8` |
+| `CANDIDATE_TREE` | `66f459b378f548643b83d4138e582fe191d0e5ed` |
+| `PR_NUMBER` | [#31](https://github.com/7roger89-web/P2P-upgrade-github-1/pull/31) |
 | `RUNTIME_SMOKE_REQUIRED` | **YES** — before any future execution path (isolated OpenMontage runtime owner-gated envelope); NOT required for intake |
 | `OWNER_ACTION_REQUIRED` | **YES** — owner gate before (a) any runtime invocation/execution registration, (b) any paid-provider or API-key path, (c) any local-GPU/model-download path; no owner decision requested for this intake |
 | `OVER_ENGINEERING_CHECK` | PASS — one provenance JSON, one catalog JSON, 7 registry records, minimal fail-closed readiness wiring in the existing single router, 1 focused test file, 1 report; no new registry/scheduler/orchestrator/provenance store/ontology |
@@ -115,6 +115,15 @@ Existing vendor registry/catalog → `capabilities.json` + `capability-catalog/*
 | `tests/test_p2p_openmontage_vendor_01.py` | focused offline test suite (6 tests) |
 | `tests/test_p2p_game_toolchain_02a.py` / `tests/test_p2p_visual_vendor_integration.py` | capability-count assertions 65 → 72 (both files already failing on unrelated stale pins; count kept honest) |
 
-## 8. EXECUTION POLICY / VERDICT
+## 8. GIT / PR
+
+| Item | Value |
+|---|---|
+| Branch | `arena/01a05508-p2p-upgrade-github-1` (pushed) |
+| Candidate commit | `d36318193c3051148bb8969a8363374347abbea8` |
+| Candidate tree | `66f459b378f548643b83d4138e582fe191d0e5ed` |
+| PR | [#31](https://github.com/7roger89-web/P2P-upgrade-github-1/pull/31) against `main` (`1c9eea39ce6aa0b721d67fa6b7130918357eea4d` / tree `0fab3c59bd34094219693ca8ac5e7e80e2200723`) |
+
+## 9. EXECUTION POLICY / VERDICT
 
 `EXECUTION_POLICY=MINIMUM_SUFFICIENT_WORK` honored: no upstream sources vendored, no adapters executed, no installs, no renders, no keys, no downstream mutation. `STOP_WHEN_EVIDENCE_SUFFICIENT=YES`. **Terminal verdict: intake complete; OpenMontage is registered as an isolated, pinned, selectively projectable, reference-only external video-production vendor. Owner gate remains required for any future runtime/execution/paid/GPU authorization.**
