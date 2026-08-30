@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest import mock
 
@@ -18,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 sys.path.insert(0, str(SYSTEM_ROOT))
 
-from p2p_capabilities import asset_provenance, character_recipe, glb_validator, mpfb_adapter  # noqa: E402
+from p2p_capabilities import asset_provenance, character_recipe, glb_validator, mpfb_adapter, mpfb_blender_entrypoint, windows_network_isolation  # noqa: E402
 
 
 def recipe_fixture() -> dict[str, object]:
@@ -184,6 +185,22 @@ class AdapterBoundaryTests(unittest.TestCase):
         self.blender.write_bytes(b"static blender fixture; never executed")
         self.mpfb_root = self.workspace / "mpfb2"
         self.mpfb_root.mkdir()
+        core_assets = {
+            "mpfb2-core:base-mesh": "core-assets/base-mesh.obj",
+            "mpfb2-core:skin-default": "core-assets/skin-default.mhmat",
+            "mpfb2-core:hair-default": "core-assets/hair-default.blend",
+            "mpfb2-core:clothing-basic": "core-assets/clothing-basic.mhclo",
+        }
+        core_manifest: dict[str, object] = {}
+        for asset_id, relative_path in core_assets.items():
+            asset_path = self.mpfb_root / relative_path
+            asset_path.parent.mkdir(parents=True, exist_ok=True)
+            asset_path.write_bytes(asset_id.encode("ascii"))
+            core_manifest[asset_id] = {
+                "relative_path": relative_path,
+                "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
+                "license": "CC0-1.0",
+            }
         root_hash = mpfb_adapter.hash_provisioned_root(self.mpfb_root)
         (self.mpfb_root / "provisioning-manifest.json").write_text(
             json.dumps(
@@ -193,6 +210,7 @@ class AdapterBoundaryTests(unittest.TestCase):
                     "release_sha": mpfb_adapter.MPFB_RELEASE_SHA,
                     "release_tree": mpfb_adapter.MPFB_RELEASE_TREE,
                     "root_sha256": root_hash,
+                    "core_assets": core_manifest,
                 }
             ),
             encoding="utf-8",
@@ -221,12 +239,43 @@ class AdapterBoundaryTests(unittest.TestCase):
             else:
                 os.environ["P2P_TEST_SECRET"] = old_secret
         self.assertEqual(plan.argv[1:5], ("--background", "--python", plan.argv[3], "--"))
+        self.assertEqual(plan.argv[3], (REPO_ROOT / mpfb_adapter.BLENDER_ENTRYPOINT).as_posix())
         self.assertIn("--asset-policy", plan.argv)
         self.assertIn("CORE_CC0_ONLY", plan.argv)
         self.assertIn("--network", plan.argv)
         self.assertNotIn("P2P_TEST_SECRET", plan.environment)
         self.assertFalse(any("PROXY" in key.upper() or "SECRET" in key.upper() for key in plan.environment))
         self.assertFalse(plan.execution_authorized)
+
+    def test_dedicated_entrypoint_rejects_unknown_duplicate_and_arbitrary_script_arguments(self) -> None:
+        arguments = ["--recipe", "character.recipe.json", "--output-root", "output"]
+        with self.assertRaisesRegex(mpfb_blender_entrypoint.BlenderEntrypointError, "ARGUMENT_SET_INVALID"):
+            mpfb_blender_entrypoint.parse_blender_script_arguments(arguments)
+        with self.assertRaisesRegex(mpfb_blender_entrypoint.BlenderEntrypointError, "ARGUMENT_NOT_ALLOWLISTED"):
+            mpfb_blender_entrypoint.parse_blender_script_arguments(["--python", "other.py"])
+        with self.assertRaisesRegex(mpfb_blender_entrypoint.BlenderEntrypointError, "ARGUMENT_DUPLICATE"):
+            mpfb_blender_entrypoint.parse_blender_script_arguments(["--network", "deny", "--network", "deny"])
+
+    def test_dedicated_entrypoint_binds_recipe_and_exact_mpfb_pin(self) -> None:
+        output = self.workspace / "output"
+        output.mkdir()
+        arguments = {
+            "--recipe": "character.recipe.json",
+            "--output-root": "output",
+            "--mpfb-root": "mpfb2",
+            "--mpfb-manifest": "mpfb2/provisioning-manifest.json",
+            "--character-id": "Oak",
+            "--mpfb-version": mpfb_adapter.MPFB_VERSION,
+            "--mpfb-release-sha": mpfb_adapter.MPFB_RELEASE_SHA,
+            "--asset-policy": "CORE_CC0_ONLY",
+            "--network": "deny",
+        }
+        job = mpfb_blender_entrypoint.validate_job(arguments, workspace_root=self.workspace)
+        self.assertEqual(job.recipe["character_id"], "Oak")
+        self.assertEqual(job.manifest["release_tree"], mpfb_adapter.MPFB_RELEASE_TREE)
+        arguments["--mpfb-release-sha"] = "0" * 40
+        with self.assertRaisesRegex(mpfb_blender_entrypoint.BlenderEntrypointError, "MPFB_PIN_MISMATCH"):
+            mpfb_blender_entrypoint.validate_job(arguments, workspace_root=self.workspace)
 
     def test_network_request_and_traversal_fail_closed(self) -> None:
         with self.assertRaises(mpfb_adapter.MpfbAdapterError):
@@ -251,6 +300,14 @@ class AdapterBoundaryTests(unittest.TestCase):
         document["release_sha"] = "d" * 40
         manifest.write_text(json.dumps(document), encoding="utf-8")
         with self.assertRaises(mpfb_adapter.MpfbAdapterError):
+            self._plan()
+
+    def test_core_asset_manifest_hash_and_recipe_binding_are_required(self) -> None:
+        manifest = self.mpfb_root / "provisioning-manifest.json"
+        document = json.loads(manifest.read_text(encoding="utf-8"))
+        document["core_assets"]["mpfb2-core:skin-default"]["sha256"] = "e" * 64
+        manifest.write_text(json.dumps(document), encoding="utf-8")
+        with self.assertRaisesRegex(mpfb_adapter.MpfbAdapterError, "MPFB_CORE_ASSET_HASH_MISMATCH"):
             self._plan()
 
     def test_execution_requires_explicit_authorization_and_does_not_launch(self) -> None:
@@ -280,6 +337,32 @@ class AdapterBoundaryTests(unittest.TestCase):
 
     def test_timeout_path_terminates_tree_and_never_reports_execution(self) -> None:
         plan = self._plan()
+        events: list[str] = []
+
+        class FakeIsolation:
+            receipt = windows_network_isolation.NetworkIsolationReceipt(
+                identity="fixture",
+                mechanism="fixture",
+                executable_path=str(plan.argv[0]),
+                rule_name="fixture",
+                platform="nt",
+                privilege_required="fixture",
+            )
+
+            def __enter__(self):
+                events.append("network-enter")
+                self.receipt.setup_result = "PASS"
+                self.receipt.enforcement_result = "PASS"
+                return self
+
+            def __exit__(self, exc_type, exc_value, traceback):
+                events.append("network-exit")
+                self.receipt.cleanup_result = "PASS"
+                return False
+
+        def isolation_factory(*args: object, **kwargs: object) -> FakeIsolation:
+            events.append("network-create")
+            return FakeIsolation()
 
         class TimeoutProcess:
             pid = 4321
@@ -297,9 +380,175 @@ class AdapterBoundaryTests(unittest.TestCase):
                 popen_factory=popen,
                 termination_runner=runner,
                 platform_name="nt",
+                network_isolation_factory=isolation_factory,
             )
         popen.assert_called_once()
         runner.assert_called_once()
+        self.assertEqual(events, ["network-create", "network-enter", "network-exit"])
+
+    def test_network_isolation_failure_happens_before_spawn(self) -> None:
+        plan = self._plan()
+        popen = mock.Mock(side_effect=AssertionError("spawn must not happen"))
+        events: list[str] = []
+
+        class FailedIsolation:
+            def __enter__(self):
+                events.append("network-enter")
+                raise windows_network_isolation.NetworkIsolationError("fixture unavailable")
+
+            def __exit__(self, exc_type, exc_value, traceback):
+                events.append("network-exit")
+                return False
+
+        def isolation_factory(*args: object, **kwargs: object) -> FailedIsolation:
+            events.append("network-create")
+            return FailedIsolation()
+
+        with self.assertRaises(windows_network_isolation.NetworkIsolationError):
+            mpfb_adapter.execute_plan(
+                plan,
+                execution_authorized=True,
+                popen_factory=popen,
+                network_isolation_factory=isolation_factory,
+            )
+        popen.assert_not_called()
+        self.assertEqual(events, ["network-create", "network-enter"])
+
+    def test_network_isolation_is_released_after_blender_failure(self) -> None:
+        plan = self._plan()
+        events: list[str] = []
+
+        class FakeIsolation:
+            receipt = windows_network_isolation.NetworkIsolationReceipt(
+                identity="fixture",
+                mechanism="fixture",
+                executable_path=str(plan.argv[0]),
+                rule_name="fixture",
+                platform="nt",
+                privilege_required="fixture",
+            )
+
+            def __enter__(self):
+                events.append("network-enter")
+                self.receipt.setup_result = "PASS"
+                self.receipt.enforcement_result = "PASS"
+                return self
+
+            def __exit__(self, exc_type, exc_value, traceback):
+                events.append("network-exit")
+                self.receipt.cleanup_result = "PASS"
+                return False
+
+        class FailedProcess:
+            returncode = 17
+
+            def communicate(self, *, timeout: int) -> tuple[str, str]:
+                events.append("communicate")
+                return "", ""
+
+        def isolation_factory(*args: object, **kwargs: object) -> FakeIsolation:
+            events.append("network-create")
+            return FakeIsolation()
+
+        def popen(*args: object, **kwargs: object) -> FailedProcess:
+            events.append("spawn")
+            return FailedProcess()
+
+        with self.assertRaisesRegex(mpfb_adapter.MpfbAdapterError, "BLENDER_COMMAND_FAILED"):
+            mpfb_adapter.execute_plan(
+                plan,
+                execution_authorized=True,
+                popen_factory=popen,
+                network_isolation_factory=isolation_factory,
+            )
+        self.assertEqual(events, ["network-create", "network-enter", "spawn", "communicate", "network-exit"])
+
+    def test_network_isolation_is_released_after_success_and_receipt_is_returned(self) -> None:
+        plan = self._plan()
+        events: list[str] = []
+
+        class FakeIsolation:
+            receipt = windows_network_isolation.NetworkIsolationReceipt(
+                identity="fixture",
+                mechanism="fixture",
+                executable_path=str(plan.argv[0]),
+                rule_name="fixture",
+                platform="nt",
+                privilege_required="fixture",
+            )
+
+            def __enter__(self):
+                events.append("network-enter")
+                self.receipt.setup_result = "PASS"
+                self.receipt.enforcement_result = "PASS"
+                return self
+
+            def __exit__(self, exc_type, exc_value, traceback):
+                events.append("network-exit")
+                self.receipt.cleanup_result = "PASS"
+                return False
+
+        class SuccessProcess:
+            returncode = 0
+
+            def communicate(self, *, timeout: int) -> tuple[str, str]:
+                events.append("communicate")
+                glb = plan.output_root / "Oak.glb"
+                write_glb(glb, gltf_fixture())
+                provenance = provenance_fixture(recipe_fixture(), hashlib.sha256(glb.read_bytes()).hexdigest())
+                (plan.output_root / "Oak.asset-provenance.json").write_text(json.dumps(provenance), encoding="utf-8")
+                return "stdout", "stderr"
+
+        def isolation_factory(*args: object, **kwargs: object) -> FakeIsolation:
+            events.append("network-create")
+            return FakeIsolation()
+
+        def popen(*args: object, **kwargs: object) -> SuccessProcess:
+            events.append("spawn")
+            return SuccessProcess()
+
+        result = mpfb_adapter.execute_plan(
+            plan,
+            execution_authorized=True,
+            popen_factory=popen,
+            network_isolation_factory=isolation_factory,
+        )
+        self.assertEqual(result["status"], "EXECUTED_AND_STRUCTURALLY_VALID")
+        self.assertEqual(result["network_isolation"]["enforcement_result"], "PASS")
+        self.assertEqual(result["network_isolation"]["cleanup_result"], "PASS")
+        self.assertEqual(events, ["network-create", "network-enter", "spawn", "communicate", "network-exit"])
+
+    def test_arbitrary_python_entrypoint_is_rejected_before_network_setup(self) -> None:
+        plan = self._plan()
+        tampered = replace(plan, argv=plan.argv[:3] + (str(self.workspace / "arbitrary.py"),) + plan.argv[4:])
+        popen = mock.Mock(side_effect=AssertionError("spawn must not happen"))
+        network_factory = mock.Mock(side_effect=AssertionError("network must not start"))
+        with self.assertRaisesRegex(mpfb_adapter.MpfbAdapterError, "ENTRYPOINT_NOT_ALLOWLISTED"):
+            mpfb_adapter.execute_plan(
+                tampered,
+                execution_authorized=True,
+                popen_factory=popen,
+                network_isolation_factory=network_factory,
+            )
+        popen.assert_not_called()
+        network_factory.assert_not_called()
+
+    def test_recipe_change_after_plan_is_rejected_before_network_setup(self) -> None:
+        plan = self._plan()
+        recipe = recipe_fixture()
+        recipe["body"]["age"] = 0.46  # type: ignore[index]
+        (self.workspace / "character.recipe.json").write_text(json.dumps(recipe), encoding="utf-8")
+        popen = mock.Mock(side_effect=AssertionError("spawn must not happen"))
+        network_factory = mock.Mock(side_effect=AssertionError("network must not start"))
+        with self.assertRaisesRegex(mpfb_adapter.MpfbAdapterError, "RECIPE_CHANGED_AFTER_PLAN"):
+            mpfb_adapter.execute_plan(
+                plan,
+                execution_authorized=True,
+                popen_factory=popen,
+                network_isolation_factory=network_factory,
+            )
+        popen.assert_not_called()
+        network_factory.assert_not_called()
 
 
 class GlbValidationTests(unittest.TestCase):
@@ -368,6 +617,115 @@ class ProjectionAndSourceBindingTests(unittest.TestCase):
         self.assertIn("game.character.generate", routing["profiles"]["THREEJS_GAME"]["optional_capabilities"])
         self.assertIn("game.character.generate", routing["profiles"]["R3F_GAME"]["optional_capabilities"])
         self.assertEqual((REPO_ROOT / ".p2p/vendor/provenance/p2p-game-truyen-mpfb-adapter-01.json").exists(), True)
+
+
+class NetworkIsolationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix=".tmp-mpfb-network-test-")
+        self.root = Path(self.temp.name)
+        self.blender = self.root / "blender.exe"
+        self.blender.write_bytes(b"static blender fixture; never executed")
+
+    def tearDown(self) -> None:
+        self.temp.cleanup()
+
+    def test_firewall_rule_is_exact_path_bound_and_released(self) -> None:
+        commands: list[list[str]] = []
+        rule_present = False
+
+        def runner(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            nonlocal rule_present
+            commands.append(command)
+            if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
+                return subprocess.CompletedProcess(command, 0, "[true,true,true]", "")
+            if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
+                payload = {
+                    "Enabled": True,
+                    "Direction": "Outbound",
+                    "Action": "Block",
+                    "Program": str(self.blender.resolve()),
+                }
+                return subprocess.CompletedProcess(command, 0, json.dumps(payload), "")
+            if command[0] == "netsh.exe" and command[3] == "show":
+                return subprocess.CompletedProcess(command, 0 if rule_present else 1, "", "")
+            if command[0] == "netsh.exe" and command[3] == "add":
+                rule_present = True
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            if command[0] == "netsh.exe" and command[3] == "delete":
+                rule_present = False
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            raise AssertionError(command)
+
+        lease = windows_network_isolation.create_network_isolation(
+            self.blender,
+            "Oak:fixture",
+            platform_name="nt",
+            runner=runner,
+        )
+        with lease:
+            self.assertEqual(lease.receipt.enforcement_result, "PASS")
+            add_command = next(command for command in commands if command[0] == "netsh.exe" and command[3] == "add")
+            self.assertIn("dir=out", add_command)
+            self.assertIn("action=block", add_command)
+            self.assertIn(f"program={self.blender.resolve()}", add_command)
+        self.assertEqual(lease.receipt.cleanup_result, "PASS")
+        self.assertFalse(rule_present)
+        self.assertLess(
+            next(index for index, command in enumerate(commands) if command[0] == "netsh.exe" and command[3] == "add"),
+            next(index for index, command in enumerate(commands) if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]),
+        )
+
+    def test_disabled_firewall_fails_closed_before_rule_creation(self) -> None:
+        commands: list[list[str]] = []
+
+        def runner(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            commands.append(command)
+            if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
+                return subprocess.CompletedProcess(command, 0, "[true,false,true]", "")
+            raise AssertionError("rule creation must not be attempted")
+
+        lease = windows_network_isolation.create_network_isolation(
+            self.blender,
+            "Oak:fixture",
+            platform_name="nt",
+            runner=runner,
+        )
+        with self.assertRaisesRegex(windows_network_isolation.NetworkIsolationError, "FIREWALL_DISABLED"):
+            lease.__enter__()
+        self.assertFalse(any(command[0] == "netsh.exe" and command[3] == "add" for command in commands))
+
+    def test_cleanup_failure_is_reported_and_never_silenced(self) -> None:
+        delete_failed = False
+        rule_present = False
+
+        def runner(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            nonlocal delete_failed, rule_present
+            if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
+                return subprocess.CompletedProcess(command, 0, "[true,true,true]", "")
+            if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
+                payload = {"Enabled": True, "Direction": "Outbound", "Action": "Block", "Program": str(self.blender.resolve())}
+                return subprocess.CompletedProcess(command, 0, json.dumps(payload), "")
+            if command[0] == "netsh.exe" and command[3] == "show":
+                return subprocess.CompletedProcess(command, 0 if rule_present else 1, "", "")
+            if command[0] == "netsh.exe" and command[3] == "add":
+                rule_present = True
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            if command[0] == "netsh.exe" and command[3] == "delete":
+                delete_failed = True
+                return subprocess.CompletedProcess(command, 1, "", "access denied")
+            raise AssertionError(command)
+
+        lease = windows_network_isolation.create_network_isolation(
+            self.blender,
+            "Oak:fixture",
+            platform_name="nt",
+            runner=runner,
+        )
+        lease.__enter__()
+        with self.assertRaisesRegex(windows_network_isolation.NetworkIsolationError, "RULE_DELETE_FAILED"):
+            lease.release()
+        self.assertTrue(delete_failed)
+        self.assertEqual(lease.receipt.cleanup_result, "FAIL")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
-"""Bounded P2P-side execution contract for the selected MPFB2 forge stack.
+"""Bounded parent/orchestrator for one pinned Blender MPFB2 job.
 
-This module builds and, only when a separately supplied authorization is true,
-executes one pinned Blender background command. The current workstream keeps
-that authorization false, so no Blender or MPFB process is launched here.
+The parent owns the job workspace, exact entrypoint, manifest and process
+lifecycle. The dedicated Blender-side body owns MPFB2 calls and output
+creation. Execution still requires separate explicit authorization; this
+workstream validates the boundary with mocks and does not launch Blender.
 """
 
 from __future__ import annotations
@@ -17,9 +18,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Final, Mapping, Sequence
 
-from .asset_provenance import CORE_ASSET_POLICY
-from .character_recipe import CharacterRecipeError, load_recipe
+from .asset_provenance import CORE_ASSET_LICENSE, CORE_ASSET_POLICY, CORE_ASSET_SOURCE_PREFIX, sha256_file
+from .character_recipe import CharacterRecipeError, load_recipe, recipe_sha256
 from .img2threejs_adapter import Img2ThreeJSAdapterError, bounded_workspace_path
+from .windows_network_isolation import create_network_isolation
 
 
 UPSTREAM_REPOSITORY: Final = "https://github.com/makehumancommunity/mpfb2.git"
@@ -29,6 +31,7 @@ MPFB_RELEASE_TREE: Final = "189a1d6694515ecfbdc40067218c5024389b4e43"
 MPFB_CODE_LICENSE: Final = "GPL-3.0-or-later"
 MPFB_CORE_ASSET_LICENSE: Final = "CC0-1.0"
 ADAPTER_ENTRYPOINT: Final = ".p2p/system/p2p_capabilities/mpfb_adapter.py"
+BLENDER_ENTRYPOINT: Final = ".p2p/system/p2p_capabilities/mpfb_blender_entrypoint.py"
 NETWORK_POLICY: Final = "DENY"
 THIRD_PARTY_ASSET_POLICY: Final = "DENY"
 THIRD_PARTY_ASSET_DEFAULT: Final = "DENY"
@@ -53,6 +56,9 @@ class MpfbExecutionPlan:
     recipe_path: Path
     output_root: Path
     mpfb_root: Path
+    manifest_path: Path
+    recipe_sha256: str
+    manifest_sha256: str
     argv: tuple[str, ...]
     environment: Mapping[str, str]
     timeout_seconds: int
@@ -100,14 +106,72 @@ def _validate_identifier(value: object, field: str) -> str:
     return value
 
 
-def _validate_pinned_manifest(path: Path) -> dict[str, str]:
+def _manifest_asset_file(root: Path, relative_path: object) -> Path:
+    if not isinstance(relative_path, str) or not relative_path.strip():
+        raise MpfbAdapterError("MPFB_CORE_ASSET_PATH_INVALID")
+    raw = relative_path.replace("\\", "/")
+    if raw.startswith(("/", "~")) or re.match(r"^[A-Za-z]:", raw):
+        raise MpfbAdapterError("MPFB_CORE_ASSET_PATH_NOT_RELATIVE")
+    parts = Path(raw).parts
+    if not parts or any(part in {"", ".", ".."} for part in parts):
+        raise MpfbAdapterError("MPFB_CORE_ASSET_PATH_INVALID")
+    current = root
+    for part in parts:
+        current = current / part
+        if current.exists() and (current.is_symlink() or _reparse_point(current)):
+            raise MpfbAdapterError("MPFB_CORE_ASSET_SYMLINK_OR_REPARSE")
+    try:
+        resolved = current.resolve(strict=True)
+        resolved.relative_to(root.resolve(strict=True))
+    except (OSError, ValueError) as exc:
+        raise MpfbAdapterError("MPFB_CORE_ASSET_PATH_INVALID") from exc
+    if resolved.is_symlink() or _reparse_point(resolved) or not resolved.is_file():
+        raise MpfbAdapterError("MPFB_CORE_ASSET_FILE_INVALID")
+    return resolved
+
+
+def _validate_core_assets(document: Mapping[str, object], root: Path, recipe_assets: Sequence[object]) -> None:
+    core_assets = document.get("core_assets")
+    if not isinstance(core_assets, dict):
+        raise MpfbAdapterError("MPFB_CORE_ASSET_MANIFEST_MISSING")
+    expected = set(recipe_assets)
+    if any(not isinstance(asset_id, str) for asset_id in expected) or not expected:
+        raise MpfbAdapterError("MPFB_CORE_ASSET_RECIPE_BINDING_INVALID")
+    if any(not asset_id.startswith(CORE_ASSET_SOURCE_PREFIX) for asset_id in expected):
+        raise MpfbAdapterError("THIRD_PARTY_ASSET_REJECTED")
+    if set(core_assets) != expected:
+        raise MpfbAdapterError("MPFB_CORE_ASSET_RECIPE_BINDING_INVALID")
+    for asset_id in sorted(expected):
+        entry = core_assets[asset_id]
+        if not isinstance(entry, dict) or set(entry) != {"relative_path", "sha256", "license"}:
+            raise MpfbAdapterError("MPFB_CORE_ASSET_MANIFEST_INVALID")
+        asset_path = _manifest_asset_file(root, entry["relative_path"])
+        if entry["license"] != CORE_ASSET_LICENSE:
+            raise MpfbAdapterError("THIRD_PARTY_ASSET_REJECTED")
+        digest = entry["sha256"]
+        if not isinstance(digest, str) or not _SHA256.fullmatch(digest):
+            raise MpfbAdapterError("MPFB_CORE_ASSET_HASH_INVALID")
+        try:
+            actual_digest = sha256_file(asset_path)
+        except Exception as exc:
+            raise MpfbAdapterError("MPFB_CORE_ASSET_FILE_UNREADABLE") from exc
+        if actual_digest != digest:
+            raise MpfbAdapterError("MPFB_CORE_ASSET_HASH_MISMATCH")
+
+
+def _validate_pinned_manifest(
+    path: Path,
+    *,
+    mpfb_root: Path,
+    recipe_assets: Sequence[object],
+) -> dict[str, object]:
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise MpfbAdapterError("MPFB_PROVISIONING_MANIFEST_UNREADABLE") from exc
     if not isinstance(document, dict):
         raise MpfbAdapterError("MPFB_PROVISIONING_MANIFEST_INVALID")
-    required = {"schema", "version", "release_sha", "release_tree", "root_sha256"}
+    required = {"schema", "version", "release_sha", "release_tree", "root_sha256", "core_assets"}
     if set(document) != required:
         raise MpfbAdapterError("MPFB_PROVISIONING_MANIFEST_KEYS_INVALID")
     if document["schema"] != "p2p-mpfb2-provisioning/1" or document["version"] != MPFB_VERSION:
@@ -116,7 +180,8 @@ def _validate_pinned_manifest(path: Path) -> dict[str, str]:
         raise MpfbAdapterError("MPFB_PROVISIONING_PIN_MISMATCH")
     if not isinstance(document["root_sha256"], str) or not _SHA256.fullmatch(document["root_sha256"]):
         raise MpfbAdapterError("MPFB_PROVISIONING_HASH_INVALID")
-    return {key: str(value) for key, value in document.items()}
+    _validate_core_assets(document, mpfb_root, recipe_assets)
+    return document
 
 
 def hash_provisioned_root(root: str | Path, *, exclude: str | Path | None = None) -> str:
@@ -226,14 +291,26 @@ def build_execution_plan(
     if manifest_target.parent != mpfb_directory and mpfb_directory not in manifest_target.parents:
         raise MpfbAdapterError("MPFB_MANIFEST_OUTSIDE_ROOT")
     manifest_file = _safe_local_file(manifest_target, "mpfb_manifest")
-    manifest = _validate_pinned_manifest(manifest_file)
+    manifest = _validate_pinned_manifest(manifest_file, mpfb_root=mpfb_directory, recipe_assets=recipe["assets"])
     if hash_provisioned_root(mpfb_directory, exclude=manifest_file) != manifest["root_sha256"]:
         raise MpfbAdapterError("MPFB_PROVISIONING_ROOT_HASH_MISMATCH")
     source_file = Path(__file__).resolve()
     repository_root = source_file.parents[3]
     if source_file.relative_to(repository_root).as_posix() != ADAPTER_ENTRYPOINT:
         raise MpfbAdapterError("ENTRYPOINT_BINDING_INVALID")
-    entrypoint = source_file.as_posix()
+    entrypoint_path = repository_root / BLENDER_ENTRYPOINT
+    entrypoint = _safe_local_file(entrypoint_path, "blender_entrypoint").as_posix()
+    if entrypoint_path.relative_to(repository_root).as_posix() != BLENDER_ENTRYPOINT:
+        raise MpfbAdapterError("BLENDER_ENTRYPOINT_BINDING_INVALID")
+    if output_target.exists():
+        output_directory = _safe_local_directory(output_target, "output_root")
+        if any(output_directory.iterdir()):
+            raise MpfbAdapterError("OUTPUT_ROOT_NOT_EMPTY")
+    else:
+        try:
+            output_target.mkdir()
+        except OSError as exc:
+            raise MpfbAdapterError("OUTPUT_ROOT_CREATE_FAILED") from exc
     environment = _minimal_environment(workspace)
     argv = (
         str(blender),
@@ -266,6 +343,9 @@ def build_execution_plan(
         recipe_path=recipe_target,
         output_root=output_target,
         mpfb_root=mpfb_directory,
+        manifest_path=manifest_file,
+        recipe_sha256=recipe_sha256(recipe),
+        manifest_sha256=sha256_file(manifest_file),
         argv=argv,
         environment=environment,
         timeout_seconds=timeout_seconds,
@@ -290,6 +370,45 @@ def validate_output_directory(output_root: str | Path, expected_outputs: Sequenc
         path = root / name
         if path.is_symlink() or _reparse_point(path) or not path.is_file():
             raise MpfbAdapterError("OUTPUT_FILE_INVALID")
+
+
+def _validate_output_root_ready(output_root: Path) -> None:
+    root = _safe_local_directory(output_root, "output_root")
+    if any(root.iterdir()):
+        raise MpfbAdapterError("OUTPUT_ROOT_NOT_EMPTY")
+
+
+def _validate_execution_argv(plan: MpfbExecutionPlan) -> None:
+    try:
+        recipe_relative = plan.recipe_path.relative_to(plan.workspace_root).as_posix()
+        output_relative = plan.output_root.relative_to(plan.workspace_root).as_posix()
+        mpfb_relative = plan.mpfb_root.relative_to(plan.workspace_root).as_posix()
+        manifest_relative = plan.manifest_path.relative_to(plan.workspace_root).as_posix()
+    except ValueError as exc:
+        raise MpfbAdapterError("PATH_BINDING_INVALID") from exc
+    character_id = plan.expected_outputs[0][:-4] if plan.expected_outputs[0].endswith(".glb") else ""
+    expected_tail = (
+        "--recipe",
+        recipe_relative,
+        "--output-root",
+        output_relative,
+        "--mpfb-root",
+        mpfb_relative,
+        "--mpfb-manifest",
+        manifest_relative,
+        "--character-id",
+        character_id,
+        "--mpfb-version",
+        MPFB_VERSION,
+        "--mpfb-release-sha",
+        MPFB_RELEASE_SHA,
+        "--asset-policy",
+        CORE_ASSET_POLICY,
+        "--network",
+        "deny",
+    )
+    if tuple(plan.argv[5:]) != expected_tail:
+        raise MpfbAdapterError("ENTRYPOINT_ARGUMENTS_NOT_ALLOWLISTED")
 
 
 def _terminate_process_tree(
@@ -336,6 +455,7 @@ def execute_plan(
     popen_factory: Callable[..., object] = subprocess.Popen,
     termination_runner: Callable[..., object] = subprocess.run,
     platform_name: str | None = None,
+    network_isolation_factory: Callable[..., object] = create_network_isolation,
 ) -> dict[str, object]:
     """Run the already-built plan only with explicit separate authorization."""
 
@@ -345,8 +465,10 @@ def execute_plan(
         raise MpfbAdapterError("EXECUTION_POLICY_MISMATCH")
     if len(plan.argv) < 5 or plan.argv[1:5] != ("--background", "--python", plan.argv[3], "--"):
         raise MpfbAdapterError("ENTRYPOINT_COMMAND_INVALID")
-    if plan.argv[3] != Path(__file__).resolve().as_posix() or any(flag in plan.argv for flag in ("--python-expr", "-c")):
+    expected_entrypoint = (Path(__file__).resolve().parents[3] / BLENDER_ENTRYPOINT).resolve().as_posix()
+    if plan.argv[3] != expected_entrypoint or any(flag in plan.argv for flag in ("--python-expr", "-c")):
         raise MpfbAdapterError("ENTRYPOINT_NOT_ALLOWLISTED")
+    _validate_execution_argv(plan)
     if set(plan.environment) - {"PATH", "PYTHONIOENCODING", "PYTHONDONTWRITEBYTECODE", "PYTHONNOUSERSITE", "TEMP", "TMP", "TMPDIR", "SystemRoot"}:
         raise MpfbAdapterError("ENVIRONMENT_NOT_MINIMAL")
     popen_kwargs: dict[str, object] = {
@@ -362,25 +484,52 @@ def execute_plan(
         popen_kwargs["creationflags"] = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
     else:
         popen_kwargs["start_new_session"] = True
-    process = popen_factory(list(plan.argv), **popen_kwargs)
-    try:
-        stdout, stderr = process.communicate(timeout=plan.timeout_seconds)
-    except subprocess.TimeoutExpired as exc:
-        _terminate_process_tree(process, platform_name=platform_name, termination_runner=termination_runner)
-        raise MpfbExecutionTimeout("TIMEOUT_PROCESS_TREE_TERMINATED") from exc
-    if getattr(process, "returncode", None) != 0:
-        raise MpfbAdapterError("BLENDER_COMMAND_FAILED")
-    validate_output_directory(plan.output_root, plan.expected_outputs)
-    from .glb_validator import validate_glb_output
+    current_recipe = load_recipe(plan.recipe_path)
+    character_id = plan.expected_outputs[0][:-4] if plan.expected_outputs[0].endswith(".glb") else ""
+    if current_recipe["character_id"] != character_id:
+        raise MpfbAdapterError("JOB_RECIPE_ID_MISMATCH")
+    if recipe_sha256(current_recipe) != plan.recipe_sha256:
+        raise MpfbAdapterError("RECIPE_CHANGED_AFTER_PLAN")
+    if sha256_file(plan.manifest_path) != plan.manifest_sha256:
+        raise MpfbAdapterError("MPFB_MANIFEST_CHANGED_AFTER_PLAN")
+    current_manifest = _validate_pinned_manifest(
+        plan.manifest_path,
+        mpfb_root=plan.mpfb_root,
+        recipe_assets=current_recipe["assets"],
+    )
+    if hash_provisioned_root(plan.mpfb_root, exclude=plan.manifest_path) != current_manifest["root_sha256"]:
+        raise MpfbAdapterError("MPFB_PROVISIONING_ROOT_HASH_MISMATCH")
+    _validate_output_root_ready(plan.output_root)
+    isolation_context = network_isolation_factory(
+        plan.argv[0],
+        f"{plan.expected_outputs[0]}:{plan.workspace_root}",
+        platform_name=platform_name or os.name,
+    )
+    with isolation_context as isolation:
+        process = popen_factory(list(plan.argv), **popen_kwargs)
+        try:
+            stdout, stderr = process.communicate(timeout=plan.timeout_seconds)
+        except subprocess.TimeoutExpired as exc:
+            _terminate_process_tree(process, platform_name=platform_name, termination_runner=termination_runner)
+            raise MpfbExecutionTimeout("TIMEOUT_PROCESS_TREE_TERMINATED") from exc
+        if getattr(process, "returncode", None) != 0:
+            raise MpfbAdapterError("BLENDER_COMMAND_FAILED")
+        validate_output_directory(plan.output_root, plan.expected_outputs)
+        from .glb_validator import validate_glb_output
 
-    glb_path = plan.output_root / plan.expected_outputs[0]
-    provenance_path = plan.output_root / plan.expected_outputs[1]
-    validation = validate_glb_output(glb_path, provenance_path, load_recipe(plan.recipe_path))
+        glb_path = plan.output_root / plan.expected_outputs[0]
+        provenance_path = plan.output_root / plan.expected_outputs[1]
+        validation = validate_glb_output(glb_path, provenance_path, current_recipe)
+    receipt = getattr(isolation_context, "receipt", None)
+    if receipt is None or not hasattr(receipt, "as_dict"):
+        raise MpfbAdapterError("NETWORK_ISOLATION_RECEIPT_MISSING")
     return {
         "status": "EXECUTED_AND_STRUCTURALLY_VALID",
         "argv": list(plan.argv),
+        "blender_entrypoint": BLENDER_ENTRYPOINT,
         "network_policy": NETWORK_POLICY,
         "network_used": False,
+        "network_isolation": receipt.as_dict(),
         "shell": False,
         "secrets_inherited": False,
         "stdout_sha256": hashlib.sha256(str(stdout).encode("utf-8")).hexdigest(),
@@ -391,6 +540,7 @@ def execute_plan(
 
 __all__ = [
     "ADAPTER_ENTRYPOINT",
+    "BLENDER_ENTRYPOINT",
     "EXECUTION_AUTHORIZED",
     "MAX_TIMEOUT_SECONDS",
     "MPFB_CODE_LICENSE",
