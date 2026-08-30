@@ -1,0 +1,188 @@
+{
+  "catalog_id": "education-course-capability-catalog",
+  "schema": "p2p-capability-catalog/1",
+  "version": "1.0.0",
+  "generated_at": "2026-08-30T00:00:00Z",
+  "generated_by": "P2P-OPENMAIC-VENDOR-01",
+  "authority": "This catalog records the OpenMAIC vendor intake result: pinned upstream identity, license boundaries, discovered capability inventory, and selective projection. It extends capabilities.json and the existing vendor provenance mechanism (.p2p/vendor/provenance/). It does NOT create a second ontology, registry, router, projection, provider catalog, or governance system. OpenMAIC internal multi-agent classroom/teacher/peer agents are VENDOR_INTERNAL_ONLY education semantics; P2P retains Control Tower authority, Work Factory, capability routing, execution lanes, Supervisor, Owner Gate, Git/evidence truth, BackendExecutionBridge, and ReturnPacket.",
+  "vendor": {
+    "vendor_id": "openmaic",
+    "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+    "repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+    "pinned_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+    "pinned_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+    "release": "v1.0.0 (tag commit aa2bfb3c1d406c47100c6744d90e788abdf1f6d5; main is 8 commits ahead of the tag)",
+    "root_license": "MIT",
+    "provenance_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+    "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+    "vendored": false,
+    "install_mode": "DISABLED",
+    "network_runtime": false,
+    "credentials": false,
+    "execution_status": "NOT_EXECUTED",
+    "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW"
+  },
+  "license_boundaries": [
+    {
+      "scope": "root + packages/@openmaic/*",
+      "license": "MIT",
+      "note": "MIT License, Copyright (c) 2026 THU-MAIC"
+    },
+    {
+      "scope": "packages/mathml2omml (vendored, v0.5.0, origin fiduswriter/mathml2omml)",
+      "license": "LGPL-3.0-or-later",
+      "note": "NOT covered by root MIT; own terms apply to that package's files"
+    },
+    {
+      "scope": "packages/pptxgenjs (vendored, v4.0.1, origin gitbrent/PptxGenJS)",
+      "license": "MIT (third-party)",
+      "note": "Third-party MIT; customized workspace copy"
+    },
+    {
+      "scope": "render-service, packages/docs",
+      "license": "UNSPECIFIED",
+      "note": "No license field/file found; no MIT claim from repository metadata"
+    },
+    {
+      "scope": "npm dependency tree (pnpm-lock.yaml)",
+      "license": "MIXED per-dependency (MIT/Apache-2.0/BSD/ISC/OFL ...)",
+      "note": "Not flattened into a single license claim"
+    },
+    {
+      "scope": "assets/ demo media (GIF/PNG/voxcpm/interactive_mode)",
+      "license": "NOT_INDIVIDUALLY_AUDITED",
+      "note": "Repository-level MIT notice does not establish per-asset rights; per-asset review only if mirrored"
+    }
+  ],
+  "domains": [
+    "education.course_authoring",
+    "education.classroom",
+    "education.learning_artifacts",
+    "education.material_ingestion",
+    "education.export",
+    "education.storage"
+  ],
+  "candidates": [
+    {
+      "candidate_id": "CAND-OPENMAIC-001",
+      "source_name": "OpenMAIC",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/THU-MAIC/OpenMAIC.git",
+      "source_version_or_commit": "dfebbcf33f3a56064129903faeab70a9e4243146 (tree bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45)",
+      "provenance_status": "REPOSITORY_FRESH_READ_VERIFIED_NOT_VENDORED",
+      "license": "MIT (root); LGPL-3.0-or-later (packages/mathml2omml); MIT third-party (packages/pptxgenjs)",
+      "license_url": "https://github.com/THU-MAIC/OpenMAIC/blob/main/LICENSE",
+      "license_verified_at": "2026-08-30",
+      "capability_domains": [
+        "education.course_authoring",
+        "education.classroom",
+        "education.learning_artifacts",
+        "education.material_ingestion",
+        "education.export",
+        "education.storage"
+      ],
+      "classification": "MANAGED_VENDOR_CANDIDATE_INTAKE_ONLY",
+      "rationale": "Pinned, selectively projectable education/course-production vendor candidate. Vendor intake only: no install, no runtime, no classroom generation, no downstream modification. Complete vendor capability/model catalog is NOT duplicated into P2P.",
+      "security_notes": "Static bounded review only. Observed: server-side credentials only; SSRF guard (hostname + DNS-pinned IP classification, redirect-safe); bounded downloads/uploads; ACCESS_CODE HMAC auth opt-in; CSP frame-ancestors; agent workbench is opt-in and PostgreSQL-backed by design. Generated interactive HTML runs in learner browser - containment review deferred to execution-registration gate.",
+      "execution_required": false,
+      "execution_status": "NOT_EXECUTED",
+      "boundary": [
+        "vendor-internal multi-agent classroom is NOT a P2P orchestration or review authority",
+        "no P2P hosting commitment",
+        "browser-only default requires no database; durable agent sessions require opt-in PostgreSQL runtime",
+        "full provider/model catalog stays vendor-internal",
+        "20+ built-in skills are vendor course tools, not first-class P2P capabilities"
+      ]
+    }
+  ],
+  "projected_capabilities": [
+    {
+      "capability_id": "education.course_generation",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "topic/document/materials -> course",
+      "registry_status": "DISCOVERED"
+    },
+    {
+      "capability_id": "education.interactive_classroom",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "AI teacher/peers, real-time discussion, TTS/ASR, whiteboard",
+      "registry_status": "DISCOVERED"
+    },
+    {
+      "capability_id": "education.course_editing",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "validated patch editing, slide editor, workbench steering",
+      "registry_status": "DISCOVERED"
+    },
+    {
+      "capability_id": "education.quiz_assessment",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "quiz scenes, real-time grading, PBL evaluation",
+      "registry_status": "DISCOVERED"
+    },
+    {
+      "capability_id": "education.interactive_simulation",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "HTML simulations, 3D visualization, games, mind maps",
+      "registry_status": "DISCOVERED"
+    },
+    {
+      "capability_id": "education.course_export",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "PPTX, interactive HTML, classroom ZIP, offline resource pack, optional MP4",
+      "registry_status": "DISCOVERED"
+    }
+  ],
+  "deferred_capabilities": [
+    "vendor-internal skill catalog (20+ built-in skills)",
+    "vendor model/provider catalog (LLM/media/search/parsing detail)",
+    "OpenClaw/ClawHub integration",
+    "MP4 video export render service",
+    "voice cloning registration",
+    "learner analytics beyond quiz grading",
+    "per-asset rights review of demo media"
+  ],
+  "excluded_capabilities": [
+    "vendor multi-agent orchestration as P2P authority (VENDOR_INTERNAL_ONLY)",
+    "P2P-side provider registry duplication",
+    "P2P-side persistence layer duplication",
+    "P2P-side scheduler duplication"
+  ],
+  "provider_classification": {
+    "LOCAL": ["Ollama", "Lemonade", "FunASR", "VoxCPM2", "ComfyUI", "MinerU self-host", "SearXNG", "browser storage"],
+    "BYO_API": ["cloud LLM/image/video/TTS/ASR/search providers", "S3 bucket", "PostgreSQL instance", "AliDocMind/MinerU cloud"],
+    "HOSTED": ["upstream public demo open.maic.chat (third-party access-code hosted; not a P2P service)"],
+    "HYBRID": ["OpenMAIC runtime default (browser/local) + optional server persistence + operator-chosen providers"]
+  },
+  "invariants": [
+    "static inspection yields DISCOVERED/PROJECTABLE, never RUNTIME_PROVEN",
+    "no vendor tree copied into P2P",
+    "no global activation",
+    "no P2P core code copied",
+    "no second vendor framework, orchestrator, provider registry, persistence layer, scheduler, or OpenMAIC governance ontology"
+  ]
+}

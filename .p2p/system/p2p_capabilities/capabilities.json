@@ -4342,6 +4342,567 @@
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"
+    },
+    {
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "network-runtime",
+        "vendor-multi-agent-orchestration-in-p2p",
+        "second-provider-registry",
+        "second-persistence-layer",
+        "second-scheduler",
+        "promote-without-owner-gate",
+        "global-activation"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "vendor-intake-provenance"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "bounded-classroom-or-course-generation",
+        "durable-artifacts-only",
+        "normalized-return-packet",
+        "owner-gate-before-execution-registration"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "pinned-upstream-sha",
+        "license-boundary",
+        "discovered-not-runtime-proven",
+        "execution-status"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "VERSION": "openmaic-v1.0.0-dfebbcf",
+      "STATUS": "DISCOVERED",
+      "CAPABILITY_ID": "education.course_generation",
+      "DESCRIPTION": "Selective OpenMAIC course generation projection: topic/document/materials to a full course; discovered, not execution-registered.",
+      "TRIGGERS": [
+        "course generation",
+        "topic to course",
+        "generate lesson",
+        "create a course",
+        "openmaic"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "vendor orchestration",
+        "p2p orchestration",
+        "install openmaic"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "openmaic-vendor-pin-dfebbcf"
+      ],
+      "UPSTREAM_PROVENANCE": {
+        "mode": "EXTERNAL_VENDOR_INTAKE_ONLY",
+        "vendor_id": "openmaic",
+        "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+        "upstream_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+        "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+        "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+        "upstream_version": "v1.0.0",
+        "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+        "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+        "root_license": "MIT",
+        "third_party_license_boundaries": [
+          "packages/mathml2omml: LGPL-3.0-or-later",
+          "packages/pptxgenjs: MIT (third-party)",
+          "render-service: UNSPECIFIED",
+          "packages/docs: UNSPECIFIED"
+        ],
+        "vendor_tree_snapshot": null,
+        "vendored": false,
+        "source_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "execution_registered": false,
+        "execution_authorized": false,
+        "runtime_proven": false,
+        "execution_status": "NOT_EXECUTED",
+        "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+        "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+        "freshness": "CURRENT",
+        "capability_surface": "education.course_generation"
+      }
+    },
+    {
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "network-runtime",
+        "vendor-multi-agent-orchestration-in-p2p",
+        "second-provider-registry",
+        "second-persistence-layer",
+        "second-scheduler",
+        "promote-without-owner-gate",
+        "global-activation"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "vendor-intake-provenance"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "bounded-classroom-or-course-generation",
+        "durable-artifacts-only",
+        "normalized-return-packet",
+        "owner-gate-before-execution-registration"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "pinned-upstream-sha",
+        "license-boundary",
+        "discovered-not-runtime-proven",
+        "execution-status"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "VERSION": "openmaic-v1.0.0-dfebbcf",
+      "STATUS": "DISCOVERED",
+      "CAPABILITY_ID": "education.interactive_classroom",
+      "DESCRIPTION": "Selective OpenMAIC interactive classroom projection: AI teacher/peers, real-time discussion, narration, whiteboard; discovered, not execution-registered.",
+      "TRIGGERS": [
+        "interactive classroom",
+        "ai teacher",
+        "ai classmates",
+        "classroom discussion",
+        "openmaic classroom"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "vendor orchestration",
+        "second p2p authority",
+        "install openmaic"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "openmaic-vendor-pin-dfebbcf"
+      ],
+      "UPSTREAM_PROVENANCE": {
+        "mode": "EXTERNAL_VENDOR_INTAKE_ONLY",
+        "vendor_id": "openmaic",
+        "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+        "upstream_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+        "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+        "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+        "upstream_version": "v1.0.0",
+        "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+        "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+        "root_license": "MIT",
+        "third_party_license_boundaries": [
+          "packages/mathml2omml: LGPL-3.0-or-later",
+          "packages/pptxgenjs: MIT (third-party)",
+          "render-service: UNSPECIFIED",
+          "packages/docs: UNSPECIFIED"
+        ],
+        "vendor_tree_snapshot": null,
+        "vendored": false,
+        "source_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "execution_registered": false,
+        "execution_authorized": false,
+        "runtime_proven": false,
+        "execution_status": "NOT_EXECUTED",
+        "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+        "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+        "freshness": "CURRENT",
+        "capability_surface": "education.interactive_classroom"
+      }
+    },
+    {
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "network-runtime",
+        "vendor-multi-agent-orchestration-in-p2p",
+        "second-provider-registry",
+        "second-persistence-layer",
+        "second-scheduler",
+        "promote-without-owner-gate",
+        "global-activation"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "vendor-intake-provenance"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "bounded-classroom-or-course-generation",
+        "durable-artifacts-only",
+        "normalized-return-packet",
+        "owner-gate-before-execution-registration"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "pinned-upstream-sha",
+        "license-boundary",
+        "discovered-not-runtime-proven",
+        "execution-status"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "VERSION": "openmaic-v1.0.0-dfebbcf",
+      "STATUS": "DISCOVERED",
+      "CAPABILITY_ID": "education.course_editing",
+      "DESCRIPTION": "Selective OpenMAIC course editing projection: validated patch editing, slide editor, workbench steering; discovered, not execution-registered.",
+      "TRIGGERS": [
+        "edit course",
+        "revise lesson",
+        "edit slides",
+        "course editing",
+        "openmaic edit"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "install openmaic",
+        "vendor orchestration"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "openmaic-vendor-pin-dfebbcf"
+      ],
+      "UPSTREAM_PROVENANCE": {
+        "mode": "EXTERNAL_VENDOR_INTAKE_ONLY",
+        "vendor_id": "openmaic",
+        "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+        "upstream_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+        "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+        "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+        "upstream_version": "v1.0.0",
+        "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+        "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+        "root_license": "MIT",
+        "third_party_license_boundaries": [
+          "packages/mathml2omml: LGPL-3.0-or-later",
+          "packages/pptxgenjs: MIT (third-party)",
+          "render-service: UNSPECIFIED",
+          "packages/docs: UNSPECIFIED"
+        ],
+        "vendor_tree_snapshot": null,
+        "vendored": false,
+        "source_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "execution_registered": false,
+        "execution_authorized": false,
+        "runtime_proven": false,
+        "execution_status": "NOT_EXECUTED",
+        "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+        "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+        "freshness": "CURRENT",
+        "capability_surface": "education.course_editing"
+      }
+    },
+    {
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "network-runtime",
+        "vendor-multi-agent-orchestration-in-p2p",
+        "second-provider-registry",
+        "second-persistence-layer",
+        "second-scheduler",
+        "promote-without-owner-gate",
+        "global-activation"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "vendor-intake-provenance"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "bounded-classroom-or-course-generation",
+        "durable-artifacts-only",
+        "normalized-return-packet",
+        "owner-gate-before-execution-registration"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "pinned-upstream-sha",
+        "license-boundary",
+        "discovered-not-runtime-proven",
+        "execution-status"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "VERSION": "openmaic-v1.0.0-dfebbcf",
+      "STATUS": "DISCOVERED",
+      "CAPABILITY_ID": "education.quiz_assessment",
+      "DESCRIPTION": "Selective OpenMAIC quiz and assessment projection: quiz scenes, real-time grading, PBL task evaluation; discovered, not execution-registered.",
+      "TRIGGERS": [
+        "quiz",
+        "assessment",
+        "grade quiz",
+        "pbl evaluation",
+        "openmaic quiz"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "install openmaic",
+        "vendor orchestration"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "openmaic-vendor-pin-dfebbcf"
+      ],
+      "UPSTREAM_PROVENANCE": {
+        "mode": "EXTERNAL_VENDOR_INTAKE_ONLY",
+        "vendor_id": "openmaic",
+        "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+        "upstream_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+        "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+        "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+        "upstream_version": "v1.0.0",
+        "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+        "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+        "root_license": "MIT",
+        "third_party_license_boundaries": [
+          "packages/mathml2omml: LGPL-3.0-or-later",
+          "packages/pptxgenjs: MIT (third-party)",
+          "render-service: UNSPECIFIED",
+          "packages/docs: UNSPECIFIED"
+        ],
+        "vendor_tree_snapshot": null,
+        "vendored": false,
+        "source_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "execution_registered": false,
+        "execution_authorized": false,
+        "runtime_proven": false,
+        "execution_status": "NOT_EXECUTED",
+        "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+        "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+        "freshness": "CURRENT",
+        "capability_surface": "education.quiz_assessment"
+      }
+    },
+    {
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "network-runtime",
+        "vendor-multi-agent-orchestration-in-p2p",
+        "second-provider-registry",
+        "second-persistence-layer",
+        "second-scheduler",
+        "promote-without-owner-gate",
+        "global-activation"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "vendor-intake-provenance"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "bounded-classroom-or-course-generation",
+        "durable-artifacts-only",
+        "normalized-return-packet",
+        "owner-gate-before-execution-registration"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "pinned-upstream-sha",
+        "license-boundary",
+        "discovered-not-runtime-proven",
+        "execution-status"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "VERSION": "openmaic-v1.0.0-dfebbcf",
+      "STATUS": "DISCOVERED",
+      "CAPABILITY_ID": "education.interactive_simulation",
+      "DESCRIPTION": "Selective OpenMAIC interactive simulation projection: HTML simulations, 3D visualization, games, mind maps; discovered, not execution-registered.",
+      "TRIGGERS": [
+        "interactive simulation",
+        "3d visualization",
+        "interactive game",
+        "mind map",
+        "deep interactive mode"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "install openmaic",
+        "vendor orchestration"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "openmaic-vendor-pin-dfebbcf"
+      ],
+      "UPSTREAM_PROVENANCE": {
+        "mode": "EXTERNAL_VENDOR_INTAKE_ONLY",
+        "vendor_id": "openmaic",
+        "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+        "upstream_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+        "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+        "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+        "upstream_version": "v1.0.0",
+        "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+        "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+        "root_license": "MIT",
+        "third_party_license_boundaries": [
+          "packages/mathml2omml: LGPL-3.0-or-later",
+          "packages/pptxgenjs: MIT (third-party)",
+          "render-service: UNSPECIFIED",
+          "packages/docs: UNSPECIFIED"
+        ],
+        "vendor_tree_snapshot": null,
+        "vendored": false,
+        "source_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "execution_registered": false,
+        "execution_authorized": false,
+        "runtime_proven": false,
+        "execution_status": "NOT_EXECUTED",
+        "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+        "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+        "freshness": "CURRENT",
+        "capability_surface": "education.interactive_simulation"
+      }
+    },
+    {
+      "TYPE": "BACKEND_PROVIDER",
+      "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "network-runtime",
+        "vendor-multi-agent-orchestration-in-p2p",
+        "second-provider-registry",
+        "second-persistence-layer",
+        "second-scheduler",
+        "promote-without-owner-gate",
+        "global-activation"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "existing-backend-execution-bridge",
+        "vendor-intake-provenance"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "bounded-classroom-or-course-generation",
+        "durable-artifacts-only",
+        "normalized-return-packet",
+        "owner-gate-before-execution-registration"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "pinned-upstream-sha",
+        "license-boundary",
+        "discovered-not-runtime-proven",
+        "execution-status"
+      ],
+      "TRUST_LEVEL": "EXTERNAL_SERVICE",
+      "VERSION": "openmaic-v1.0.0-dfebbcf",
+      "STATUS": "DISCOVERED",
+      "CAPABILITY_ID": "education.course_export",
+      "DESCRIPTION": "Selective OpenMAIC course export projection: editable PPTX, interactive HTML, classroom ZIP, offline resource pack; discovered, not execution-registered.",
+      "TRIGGERS": [
+        "export course",
+        "pptx export",
+        "interactive html export",
+        "classroom zip",
+        "offline classroom"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "install openmaic",
+        "vendor orchestration",
+        "render service"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "openmaic-vendor-pin-dfebbcf"
+      ],
+      "UPSTREAM_PROVENANCE": {
+        "mode": "EXTERNAL_VENDOR_INTAKE_ONLY",
+        "vendor_id": "openmaic",
+        "vendor_name": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+        "upstream_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+        "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+        "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+        "upstream_version": "v1.0.0",
+        "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+        "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+        "root_license": "MIT",
+        "third_party_license_boundaries": [
+          "packages/mathml2omml: LGPL-3.0-or-later",
+          "packages/pptxgenjs: MIT (third-party)",
+          "render-service: UNSPECIFIED",
+          "packages/docs: UNSPECIFIED"
+        ],
+        "vendor_tree_snapshot": null,
+        "vendored": false,
+        "source_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+        "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "execution_registered": false,
+        "execution_authorized": false,
+        "runtime_proven": false,
+        "execution_status": "NOT_EXECUTED",
+        "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+        "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+        "freshness": "CURRENT",
+        "capability_surface": "education.course_export"
+      }
     }
   ]
 }

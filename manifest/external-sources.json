@@ -138,7 +138,47 @@
         "Tripo separate and not activated"
       ],
       "rights_note": "Apache-2.0 at the pinned release; the P2P snapshot contains contract text only, while executable source remains in a separately verified external checkout."
-    }
+    },
+  {
+    "source_id": "P2P-EXT-CANDIDATE-OPENMAIC-01",
+    "type": "external_repository_vendor_candidate",
+    "title": "OpenMAIC pinned education/course-production vendor candidate (intake only)",
+    "url": "https://github.com/THU-MAIC/OpenMAIC.git",
+    "audited_at": "2026-08-30",
+    "upstream_version": "v1.0.0",
+    "upstream_tag_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+    "upstream_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+    "upstream_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+    "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+    "license": "MIT (root); LGPL-3.0-or-later (packages/mathml2omml); MIT third-party (packages/pptxgenjs); UNSPECIFIED (render-service, packages/docs)",
+    "stored_path": null,
+    "sha256": null,
+    "provenance_manifest": ".p2p/vendor/provenance/p2p-openmaic-intake-01.json",
+    "catalog_reference": "docs/p2p-development/capability-catalog/education-course/capability-catalog.json",
+    "selected_upstream_paths": [],
+    "vendored": false,
+    "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+    "executable_available_in_upstream": true,
+    "executable_registered_in_p2p": false,
+    "execution_status": "NOT_EXECUTED",
+    "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+    "projected_capability_ids": [
+      "education.course_generation",
+      "education.interactive_classroom",
+      "education.course_editing",
+      "education.quiz_assessment",
+      "education.interactive_simulation",
+      "education.course_export"
+    ],
+    "boundary": [
+      "vendor intake only; no install, no runtime, no classroom generation, no downstream modification",
+      "OpenMAIC internal multi-agent classroom is VENDOR_INTERNAL_ONLY education semantics",
+      "browser-only default requires no database; durable workbench sessions are opt-in PostgreSQL-backed",
+      "full provider/model catalog not projected into P2P",
+      "static inspection yields DISCOVERED/PROJECTABLE only, never RUNTIME_PROVEN"
+    ],
+    "rights_note": "MIT at root with explicit LGPL-3.0-or-later boundary for vendored packages/mathml2omml and third-party MIT for vendored packages/pptxgenjs; do not flatten into one license claim."
+  }
   ],
   "security_reverse_catalog_recorded_at": "2026-08-29",
   "external_tool_catalog": [

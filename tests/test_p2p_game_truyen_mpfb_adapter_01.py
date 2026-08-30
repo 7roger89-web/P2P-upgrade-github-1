@@ -605,7 +605,7 @@ class ProjectionAndSourceBindingTests(unittest.TestCase):
 
         capabilities = json.loads((SYSTEM_ROOT / "p2p_capabilities/capabilities.json").read_text(encoding="utf-8"))
         ids = [item["CAPABILITY_ID"] for item in capabilities["capabilities"]]
-        self.assertEqual(len(ids), 65)
+        self.assertEqual(len(ids), 71)
         self.assertEqual(len(ids), len(set(ids)))
         selected = next(item for item in capabilities["capabilities"] if item["CAPABILITY_ID"] == "game.character.generate")
         self.assertEqual(selected["TYPE"], "KNOWLEDGE_SOURCE")

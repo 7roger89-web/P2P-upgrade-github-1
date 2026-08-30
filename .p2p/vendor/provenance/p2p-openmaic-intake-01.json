@@ -1,0 +1,334 @@
+{
+  "schema": "p2p-openmaic-intake-01/1",
+  "document": "OpenMAIC vendor intake and selective capability projection (intake only)",
+  "workstream": "P2P-OPENMAIC-VENDOR-01",
+  "generated_at": "2026-08-30",
+  "generated_by": "P2P-OPENMAIC-VENDOR-01 (Arena Agent Mode)",
+  "audit_mode": "FRESH_READ_STATIC_ONLY",
+  "upstream_verified_by": [
+    "git ls-remote https://github.com/THU-MAIC/OpenMAIC.git HEAD refs/heads/main",
+    "fresh git clone --depth 1 to /tmp/openmaic (rev-parse HEAD / HEAD^{tree})",
+    "gh repo view / gh api (identity, license, latest release, compare)"
+  ],
+  "installation": {
+    "installed": false,
+    "pnpm_install_run": false,
+    "runtime_started": false,
+    "classroom_generated": false,
+    "downstream_projects_modified": false
+  },
+  "upstream": {
+    "repository_identity": "OpenMAIC (Open Multi-Agent Interactive Classroom)",
+    "repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+    "description": "Open Multi-Agent Interactive Classroom - Get an immersive, multi-agent learning experience in just one click",
+    "default_branch": "main",
+    "current_commit": "dfebbcf33f3a56064129903faeab70a9e4243146",
+    "current_tree": "bb8972cb6fa5e4d6c5a7eff6f2357e79bf930b45",
+    "current_commit_committed_at": "2026-08-29T19:48:04Z",
+    "release_tag": "v1.0.0",
+    "release_tag_object": "7179ab02ff78fa84822d5ba05e82cb48fb48e54a",
+    "release_commit": "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5",
+    "release_name": "OpenMAIC v1.0.0 - Build courses with an agent",
+    "release_published_at": "2026-08-27T13:13:53Z",
+    "main_vs_release_tag": "MAIN_IS_8_COMMITS_AHEAD_OF_TAG",
+    "root_license": "MIT",
+    "root_license_evidence": "LICENSE (MIT License, Copyright (c) 2026 THU-MAIC)",
+    "github_license_metadata": "MIT License (github licenseInfo key=mit)",
+    "npm_published_sdk": "@openmaic/dsl 0.11.0, @openmaic/editor 0.0.4, @openmaic/generation 0.3.1, @openmaic/importer 0.1.2, @openmaic/renderer 0.1.4, @openmaic/storage 0.27.0 (all MIT; editor has LICENSE file, no package.json license field)"
+  },
+  "third_party_license_boundaries": [
+    {
+      "component": "packages/mathml2omml",
+      "version": "0.5.0",
+      "license": "LGPL-3.0-or-later",
+      "origin": "github.com/fiduswriter/mathml2omml (vendored workspace package)",
+      "evidence": "packages/mathml2omml/LICENSE (GNU LESSER GENERAL PUBLIC LICENSE v3), packages/mathml2omml/package.json license=LGPL-3.0-or-later",
+      "declared_in_upstream_readme": true,
+      "boundary": "NOT covered by root MIT; LGPL-3.0-or-later terms apply to this package's files when redistributing the repository as a whole"
+    },
+    {
+      "component": "packages/pptxgenjs",
+      "version": "4.0.1",
+      "license": "MIT",
+      "origin": "github.com/gitbrent/PptxGenJS (vendored workspace package)",
+      "evidence": "packages/pptxgenjs/package.json license=MIT, repository=git+https://github.com/gitbrent/PptxGenJS.git",
+      "declared_in_upstream_readme": true,
+      "boundary": "Third-party MIT; retains upstream copyright; customized copy in workspace"
+    },
+    {
+      "component": "packages/@openmaic/*",
+      "licenses": "MIT (explicit LICENSE files: dsl, editor, generation, importer, renderer, storage)",
+      "evidence": "packages/@openmaic/<pkg>/LICENSE (MIT License, Copyright (c) 2026 THU-MAIC)",
+      "boundary": "Workspace SDK packages covered by root-style MIT of same owner"
+    },
+    {
+      "component": "render-service",
+      "license": "UNSPECIFIED",
+      "evidence": "render-service/package.json has no license field; no LICENSE file in render-service",
+      "boundary": "NOT an MIT claim from repository metadata; standalone npm-lockfile sub-project (Chromium + FFmpeg video renderer)"
+    },
+    {
+      "component": "packages/docs",
+      "license": "UNSPECIFIED",
+      "evidence": "packages/docs/package.json has no license field; excluded from pnpm workspace (own lockfile)",
+      "boundary": "Standalone docs sub-app, NOT part of root workspace build"
+    },
+    {
+      "component": "npm dependency tree (pnpm-lock.yaml 1,040,204 bytes)",
+      "license": "MIXED (MIT/Apache-2.0/BSD/ISC/OFL etc. per dependency)",
+      "evidence": "pnpm-lock.yaml; includes @fontsource/* (OFL fonts), LangGraph/CopilotKit/Next.js (MIT) and many others",
+      "boundary": "Dependency-level licenses are not flattened into a single vendor claim; they remain with each npm package"
+    },
+    {
+      "component": "assets/ demo media (GIF/PNG) and bundled font/audio assets",
+      "license": "NOT_INDIVIDUALLY_AUDITED",
+      "evidence": "assets/banner.png, assets/*.gif, assets/voxcpm/*, assets/interactive_mode/*",
+      "boundary": "Repository-level MIT notice does not establish rights for every individual demo asset; treat as upstream-owned demo media pending per-asset review if mirrored"
+    }
+  ],
+  "runtime_and_platform": {
+    "language_runtime": "Node.js >= 20.9.0 (engines); .nvmrc = 22; README prerequisites Node.js >= 20 and pnpm >= 10",
+    "package_manager": "pnpm@10.28.0+sha512.05df71d1421f21399e053fde567cea34d446fa02c76571441bfc1c7956e98e363088982d940465fd34480d4d90a0668bc12362f8aa88000a64e83d0b0e47be48",
+    "framework": "Next.js 16 (App Router, output=standalone outside Vercel), React 19, TypeScript 5, Tailwind CSS 4",
+    "orchestration": "LangGraph 1.1 (lib/orchestration/) + @copilotkit/runtime + @earendil-works/pi-agent-core / pi-ai (Pro workbench)",
+    "deployment_surfaces": [
+      "pnpm dev / pnpm build && pnpm start",
+      "Docker (Dockerfile, docker-compose.yml with profiles: server-persistence, video-export)",
+      "Vercel (vercel.json; VERCEL env changes output mode)"
+    ],
+    "additional_system_dependencies": "ffmpeg/ffprobe for optional local media extraction; Chromium + FFmpeg on Node 22 for optional MP4 render-service; local providers (Ollama, Lemonade, FunASR, VoxCPM2, ComfyUI, MinerU, SearXNG) run separately by operator",
+    "workspace_layout": "pnpm-workspace.yaml: packages/* + packages/@openmaic/*, excluding packages/docs; root postinstall builds mathml2omml, pptxgenjs and all @openmaic packages then runs scripts/sync-maic-importer.mjs; build runs scripts/assert-vendor-maic-importer.mjs first",
+    "repository_size": "206 MB clone; dominated by demo GIFs (largest assets/openclaw-feishu-demo.gif ~18.5 MB); no Git LFS configured"
+  },
+  "package_architecture": {
+    "app": "app/ (api routes: agent, stages, generate, generate-classroom, chat, pbl, quiz-grade, parse-pdf, web-search, transcription, persistence, classroom-media; classroom/[id] playback; workbench; workspace)",
+    "lib": "lib/ (generation two-stage pipeline, orchestration LangGraph director, playback state machine, action engine 28+ action types, ai provider abstraction, media/audio providers, export, persistence, server/agent-runtime durable runner, web-search, pdf, rag, document mime registry)",
+    "components": "components/ (slide-renderer canvas editor, scene-renderers, generation, workbench, chat, settings, whiteboard SVG, agent, roundtable, classroom, audio)",
+    "packages": "packages/@openmaic/{dsl,editor,generation,importer,renderer,storage}; vendored mathml2omml and pptxgenjs",
+    "render_service": "render-service/ standalone service for MP4 export (own package-lock.json, Dockerfile)",
+    "skills": "skills/agent-runtime (23 skill modules observed on disk incl. curriculum-planner, deep-research, feynman-learning, lecture-style, pptx-import, pro-editing, slide-dsl, vocational, workshop-style; upstream README describes the set as '20 built-in skills') plus skills/openmaic (OpenClaw/ClawHub SOP skill)",
+    "tests": "tests/ (vitest suites), eval/ (orchestration, outline-language, pbl-v2-planner, whiteboard-layout), e2e/ (playwright)"
+  },
+  "persistence_modes": {
+    "default_mode": "BROWSER_ONLY (no database required): localStorage KVStore; IndexedDB DocumentStore, RuntimeStore, asset store (registry + blobs), atomic asset registry",
+    "optional_http": "Embedded persistence HTTP server /api/persistence (no standalone service); HttpKVStore/HttpDocumentStore/etc. clients; NEXT_PUBLIC_PERSISTENCE build-time switch + PERSISTENCE_DEV_TOKEN / NEXT_PUBLIC_PERSISTENCE_TOKEN (development auth; production requires real server-auth)",
+    "optional_postgres": "PostgreSQL-backed documents, learner runtime, assets, durable agent sessions, session materials, user skills via @openmaic/storage server backends; docker compose --profile server-persistence (app + Postgres); DATABASE_URL required only for server persistence or agent runtime",
+    "optional_s3": "Server asset byte layer pluggable: PostgreSQL byte column or S3 (@aws-sdk/client-s3 + s3-request-presigner; signable S3 URLs OR redirect egress)",
+    "durable_agent_sessions": "server-backed by design: OPENMAIC_AGENT_RUNTIME_ENABLED=true + DATABASE_URL; sessions DB-backed with leases, heartbeats, crash resume, cancellation, follow-up steering; browser-only default does NOT provide durable workbench sessions",
+    "claim_verification": "CONFIRMED: default runtime can operate without PostgreSQL using browser storage (README 'OpenMAIC runs without a database by default ... use browser storage'; @openmaic/storage README 'zero-server clone-and-run default'). Nuance: the v1.0.0 agent workbench durable-session feature is opt-in and PostgreSQL-backed."
+  },
+  "providers_verified": {
+    "llm": [
+      "OpenAI", "Azure OpenAI", "Anthropic", "Amazon Bedrock", "Google Gemini", "DeepSeek",
+      "Qwen (DashScope/Alibaba)", "Kimi (Moonshot)", "MiniMax", "Grok (xAI)", "GLM (Zhipu)",
+      "Doubao (Volcengine)", "Tencent Hunyuan/TokenHub", "Xiaomi MiMo", "OpenRouter", "SiliconFlow",
+      "AtlasCloud", "Ollama (local)", "Lemonade (local)", "any OpenAI-compatible API"
+    ],
+    "llm_provider_registry_evidence": "lib/ai/providers.ts top-level provider ids: openai, azure, atlascloud, anthropic, bedrock, google, glm, qwen, deepseek, kimi, minimax, siliconflow, doubao, openrouter, grok, tencent-hunyuan, xiaomi, ollama, lemonade",
+    "image": ["OpenAI (gpt-image-1/2, image-01)", "Grok (grok-image/imagine)", "MiniMax", "Nano Banana (Google)", "Gemini image", "Qwen-Image", "Doubao Seedream", "Seedream", "ComfyUI (self-host)", "Lemonade (local)", "nano-banana"],
+    "video": ["Grok (grok-video/imagine-video)", "Kling", "MiniMax", "Seedance/Doubao Seedance", "HappyHorse", "Veo", "Sora", "Lemonade (local)"],
+    "tts": ["OpenAI", "Azure", "Doubao", "ElevenLabs", "GLM", "MiniMax", "Qwen", "VoxCPM2 (self-hosted local)", "Lemonade (local)"],
+    "asr": ["OpenAI", "Azure", "Qwen", "AssemblyAI", "FunASR (local)", "Lemonade (local)"],
+    "web_search": ["Tavily", "Brave", "Baidu", "Bocha", "MiniMax", "Doubao", "Claude", "AtlasCloud", "SearXNG (self-host)"],
+    "document_parsing": ["UnPDF (local/built-in)", "MinerU (cloud or self-host)", "AliDocMind (Alibaba Cloud)"],
+    "routing_notes": "Provider-neutral server-side capability discovery; credentials never reach the browser; unified <CAP>_<PREFIX>_ENABLED=false force-off switches can only disable, never enable; unresolved model routes fail loudly instead of guessing a vendor; client-sent base URLs are SSRF-validated and server config is authoritative"
+  },
+  "provider_cost_classification": {
+    "LOCAL": [
+      "Ollama (local LLM)", "Lemonade (local LLM/TTS/ASR/image)", "FunASR (local ASR)",
+      "VoxCPM2 (self-hosted TTS)", "ComfyUI (self-host image)", "MinerU (self-host parsing)", "SearXNG (self-host search)",
+      "browser storage/asset stores"
+    ],
+    "BYO_API": [
+      "all cloud LLM providers", "cloud image/video providers", "TTS/ASR providers",
+      "web search providers", "AliDocMind/MinerU cloud, S3 (BYO bucket), PostgreSQL (BYO instance)"
+    ],
+    "HOSTED": ["upstream public demo open.maic.chat (third-party hosted; access-code based; NOT a P2P service)"],
+    "HYBRID": ["OpenMAIC runtime: browser/local storage default + optional server-backed PostgreSQL/S3 + operator-chosen cloud or local providers"]
+  },
+  "export_formats": [
+    "Editable PowerPoint (.pptx) with images, charts, LaTeX formulas (lib/export/use-export-pptx.ts; customized pptxgenjs)",
+    "Interactive self-contained HTML pages (lib/export/use-export-script.ts, inline-assets.ts)",
+    "Classroom ZIP (.maic.zip): course structure + media, backup/sharing; import supported",
+    "Resource Pack (offline/inlined assets)",
+    "Offline/intranet: external assets (KaTeX, Three.js + addons, Tailwind CDN, Google Fonts, images) inlined as data: URIs at export time; unreachable hosts reported and left as URLs",
+    "MP4 video export (optional render-service: Chromium + FFmpeg on Node 22; falls back to project ZIP for local CLI rendering)"
+  ],
+  "capability_inventory": {
+    "A_COURSE_AUTHORING": {
+      "topic_document_to_course": "one-click lesson generation from topic or materials",
+      "curriculum_planning": "curriculum-planner skill; multi-lesson curriculum plans; course/folder creation",
+      "lesson_generation": "two-stage pipeline: outline generation -> scene content generation (@openmaic/generation)",
+      "iterative_agent_workbench_editing": "Pro workbench: validated JSON Patch scene edits, atomic single-scene patch, generate/duplicate/insert/delete/reorder pages, edit narration/deck structure, session history, resume/steer"
+    },
+    "B_CLASSROOM": {
+      "ai_teacher": true,
+      "ai_classmates_peers": true,
+      "real_time_discussion": "SSE streaming chat; proactive discussion; roundtable debate with multi-persona agents; Q&A mode",
+      "narration_tts": "multi-provider TTS, voice design/clone (VoxCPM2), per-agent voices",
+      "whiteboard": "SVG shared whiteboard, real-time drawing/text/shape/chart actions",
+      "asr": "mic speech recognition",
+      "playback": "state machine + 28+ action types (speech, spotlight, laser pointer)"
+    },
+    "C_LEARNING_ARTIFACTS": {
+      "slides": true,
+      "quizzes": "single/multiple choice, short answer, real-time AI grading",
+      "interactive_html_simulations": true,
+      "pbl": "PBL v2 with roles, milestones, deliverables, task engine",
+      "3d_and_deep_interactive": "Deep Interactive Mode: 3D visualization, simulations, mini-games, mind maps, online programming"
+    },
+    "D_MATERIAL_INGESTION": {
+      "documents": "PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT, MD, images and more (lib/document/mime.ts DOCUMENT_FORMATS registry)",
+      "audio": "upload + transcription (ASR providers, local ffmpeg/ffprobe extraction)",
+      "video": "upload + timestamped transcript extraction + keyframes via local ffmpeg",
+      "web_materials": "web search providers + trusted-URL fetch (origin allow-list, SSRF-guarded, byte-capped)",
+      "pptx_import": "@openmaic/importer PPTX -> slide DSL with layout preserved"
+    },
+    "E_EXPORT": {
+      "editable_pptx": true,
+      "interactive_html": true,
+      "classroom_zip_resource_package": true,
+      "offline_intranet_playback": true,
+      "mp4": "optional opt-in render-service"
+    },
+    "F_STORAGE": {
+      "browser_local_default": true,
+      "optional_http_postgres_s3": true,
+      "durable_agent_sessions": "true (PostgreSQL-backed, opt-in server runtime)"
+    },
+    "G_PROVIDER_ROUTING": {
+      "openai": "VERIFIED", "anthropic": "VERIFIED", "google_gemini": "VERIFIED", "deepseek": "VERIFIED",
+      "qwen": "VERIFIED", "kimi": "VERIFIED", "grok": "VERIFIED", "glm": "VERIFIED", "ollama": "VERIFIED (local)",
+      "lemonade": "VERIFIED (local)", "plus": "azure/bedrock/minimax/doubao/tencent/xiaomi/openrouter/siliconflow/atlascloud/OpenAI-compatible; media/provider sub-catalogs NOT projected into P2P"
+    }
+  },
+  "selective_projection": [
+    {
+      "capability_id": "education.course_generation",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "topic/document/materials -> course (generation pipeline + agent workbench)",
+      "route_classification": "HYBRID (LOCAL browser runtime + BYO_API providers; optional LOCAL Ollama/Lemonade)"
+    },
+    {
+      "capability_id": "education.interactive_classroom",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "AI teacher/peers, discussion, TTS/ASR, whiteboard, playback",
+      "route_classification": "HYBRID"
+    },
+    {
+      "capability_id": "education.course_editing",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "Pro workbench validated patch editing + slide editor",
+      "route_classification": "HYBRID"
+    },
+    {
+      "capability_id": "education.quiz_assessment",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "quiz scenes, real-time grading, PBL task evaluation",
+      "route_classification": "HYBRID"
+    },
+    {
+      "capability_id": "education.interactive_simulation",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "HTML simulations, 3D visualization, games, mind maps (Deep Interactive Mode)",
+      "route_classification": "HYBRID (rendering local; generation may use BYO_API/local images)"
+    },
+    {
+      "capability_id": "education.course_export",
+      "discovered": true,
+      "projectable": true,
+      "execution_registered": false,
+      "execution_authorized": false,
+      "runtime_proven": false,
+      "vendor_surface": "PPTX, interactive HTML, classroom ZIP, offline/inlined resource pack, optional MP4",
+      "route_classification": "LOCAL (browser/server export; optional render-service container)"
+    }
+  ],
+  "deferred_capabilities": [
+    "internal 20+ built-in skills and per-teaching-style prompt catalog (vendor-internal course tools; not first-class P2P capabilities)",
+    "complete provider/model catalog (vendor-internal routing table; P2P records only vendor-level families)",
+    "OpenClaw/ClawHub skill integration",
+    "full multi-agent orchestration surface (director graph, roundtable choreography) - vendor internal only",
+    "video generation / MP4 render service (heavy resource, opt-in service)",
+    "complex document ingestion providers (MinerU, AliDocMind, ComfyUI)",
+    "voice cloning/registration (bounded by vendor TTS)",
+    "proficiency/learner analytics beyond quiz grading",
+    "P2P hosting of OpenMAIC (no hosting commitment in intake)",
+    "per-asset rights review of upstream demo media"
+  ],
+  "authority_boundary": {
+    "openmaic_multi_agent_authority": "VENDOR_INTERNAL_ONLY",
+    "p2p_retains": [
+      "Control Tower authority", "Work Factory", "capability routing", "execution lanes",
+      "Supervisor", "Owner Gate", "Git/evidence truth", "BackendExecutionBridge", "ReturnPacket"
+    ],
+    "openmaic_education_semantics_only": [
+      "teacher/peer agents", "classroom discussion choreography", "course tools/skills",
+      "whiteboard/playback action engine"
+    ],
+    "no_second_authority": "OpenMAIC internal multi-agent classroom MUST NOT become P2P orchestration or review authority; its artifacts entering P2P are normalized through existing BackendExecutionBridge/ReturnPacket"
+  },
+  "security_static_assessment": {
+    "scope": "bounded static review only; no penetration test",
+    "secrets": "server-side provider config only; credentials never reach browser; server-providers.yml and .env* gitignored (only .env.example tracked); no committed API keys found in tracked files; ACCESS_CODE optional HMAC-signed cookie auth",
+    "network_calls": [
+      "LLM/media/search/pdf provider APIs (operator-configured)",
+      "web fetch/search surface gated: origin allow-list from session/user context; strict-fetch path with SSRF guard",
+      "SSRF controls CONFIRMED: lib/server/ssrf-guard.ts (hostname + DNS-resolution IP classification, IPv4/IPv6/mapped-v6, private/link-local/loopback rejection), pinned connection-time DNS via undici Agent lookup, redirect-safe; ALLOW_LOCAL_NETWORKS=true is an explicit weakener for self-hosted deployments",
+      "bounded downloads: response + aggregate byte budgets (e.g., remote images 20MB/100MB, web fetch default 5MB, classroom media 100MB), timeouts",
+      "render-service URL deliberately bypasses SSRF guard only when operator explicitly configures it (documented)"
+    ],
+    "uploaded_document_handling": [
+      "MIME registry + normalization (lib/document/mime.ts); unsupported/aliased types rejected",
+      "extraction pipeline (UnPDF/MinerU/AliDocMind/local ffmpeg) with provider capability checks; server-side extraction records with lease fencing",
+      "size bounds: agent upload default 50MB (OPENMAIC_AGENT_MAX_UPLOAD_BYTES), video export capped 300MB stream, VoxCPM voice clone 10MB",
+      "Next proxyClientMaxBodySize: 200mb"
+    ],
+    "generated_html_interactive_execution": [
+      "generated interactive HTML/simulation scenes run in the learner's browser; exported HTML is self-contained and inlines third-party libs as data URIs",
+      "P2P boundary: treat vendor-generated HTML as untrusted rendered content; containment/sandboxing review belongs to execution-registration gate, not intake"
+    ],
+    "web_fetch_search_surfaces": "web_search provider config server-side; fetch-url honored origin allow-list; content-type allow-list (text/html, text/plain, application/pdf, xhtml); readable extraction (readability/turndown/linkedom); results marked trusted/untrusted",
+    "local_provider_execution": "Ollama/Lemonade/FunASR/VoxCPM2/ComfyUI/MinerU/SearXNG are operator-run services on operator-controlled hosts; OpenMAIC is a client, not a sandbox host",
+    "server_side_persistence": "optional PostgreSQL/S3 with per-scope KV (device values never leave device), content-hash asset registry, sign-only S3 URLs or redirect egress; dev tokens must be replaced by real auth in production (documented)",
+    "file_export_import": "PPTX/HTML/ZIP export client- or server-side; classroom ZIP import validated; offline inlining attempts all referenced assets at export time and reports failures",
+    "dependency_install_footprint": "root: 130 direct deps (+ 32 dev) incl. Next.js 16, React 19, LangGraph, Vercel AI SDK, CopilotKit, ProseMirror, sharp, docx/pdf-lib/jszip/katex; pnpm-lock 1.04MB; ignoredBuiltDependencies sharp/unrs-resolver; postinstall builds all workspace packages (no network beyond registry)",
+    "headers": "CSP frame-ancestors 'self' (+optional ALLOWED_FRAME_ANCESTORS), X-Frame-Options SAMEORIGIN when no custom ancestors"
+  },
+  "vendor_tree_copied": false,
+  "vendor_snapshot_path": null,
+  "vendor_snapshot_sha256": null,
+  "source_manifest_reference": "manifest/external-sources.json -> P2P-EXT-CANDIDATE-OPENMAIC-01",
+  "integration_status": "INTAKE_AUDITED_PROJECTABLE_PENDING_EXECUTION_REGISTRATION",
+  "executable_available_in_upstream": true,
+  "executable_registered_in_p2p": false,
+  "execution_status": "NOT_EXECUTED",
+  "owner_gate_status": "PENDING_EXACT_SUBJECT_REVIEW",
+  "readiness_boundary": {
+    "static_inspection_is_not_runtime_proof": true,
+    "runtime_smoke_required": "NOT_EXECUTED - required before any EXECUTION_REGISTERED/EXECUTION_AUTHORIZED transition",
+    "classroom_generated": false,
+    "p2p_core_code_copied": false,
+    "global_activation": false
+  }
+}
