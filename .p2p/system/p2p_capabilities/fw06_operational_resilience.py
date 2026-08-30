@@ -4244,11 +4244,36 @@ def _restore_identity_proof(
                     "field": field,
                     "pointer": doc["pointer"],
                 }
+    # Every required field must be proven by at least one durable source.
+    # Caller-supplied identity values are claims, never proof: a partial
+    # durable registry plus caller values alone is BLOCKED even when the
+    # registry row is non-empty (fail closed on incomplete durable proof).
     doc_evidence = bool(docs)
-    if not registry_values and not doc_evidence:
+    proven_fields: set[str] = set(registry_values)
+    if doc_evidence:
+        # A binding-evidence document is only read after validating that it
+        # carries every required identity field, so one document covers all.
+        proven_fields.update(LIFECYCLE_RESTORE_REQUIRED_IDENTITY)
+    missing_dur_proof = [
+        field for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY
+        if field not in proven_fields
+    ]
+    if missing_dur_proof:
         return {
             "proven": False,
-            "reason": "EVIDENCE_INSUFFICIENT",
+            "reason": "INCOMPLETE_REGISTRY_FAIL_CLOSED",
+            "missing_dur_proof": missing_dur_proof,
+            "caller_value_accepted_as_proof": False,
+            "directory_name_inference_used": False,
+            "registry_source": dict(registry_values),
+            "registry_complete": len(registry_values) == len(
+                LIFECYCLE_RESTORE_REQUIRED_IDENTITY,
+            ),
+            "evidence_documents": [
+                {"pointer": doc["pointer"], "path": doc["path"],
+                 "sha256": doc["sha256"]}
+                for doc in docs
+            ],
         }
     return {
         "proven": True,

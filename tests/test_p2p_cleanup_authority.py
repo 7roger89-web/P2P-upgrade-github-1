@@ -113,8 +113,14 @@ def _register(root: Path, *, workspace_id: str, workspace_path: Path,
 def _raw_row(root: Path, *, workspace_id: str, workspace_path: Path,
              project_id: str = "project-alpha", task_id: str = "task-alpha",
              session_id: str = "session-alpha",
+             omit_identity: tuple[str, ...] = (),
              include_lifecycle: bool = False) -> dict:
-    """A registry row with a MISSING lifecycle record (the restore subject)."""
+    """A registry row with a MISSING lifecycle record (the restore subject).
+
+    ``omit_identity`` removes durable identity fields so a partial-registry
+    scenario can be constructed; the caller may still supply the missing
+    value and must NOT have it accepted as proof.
+    """
     workspace_path.mkdir(parents=True, exist_ok=True)
     row = {
         "workspace_id": workspace_id,
@@ -139,6 +145,8 @@ def _raw_row(root: Path, *, workspace_id: str, workspace_path: Path,
         "branch": "",
         "remote": "",
     }
+    for field in omit_identity:
+        row.pop(field, None)
     if include_lifecycle:
         row["lifecycle_state"] = "ACTIVE"
         row["protection_reasons"] = ["ACTIVE_SESSION"]
@@ -186,6 +194,10 @@ def _registry_lifecycle(root: Path, workspace_id: str) -> str:
             if row.get("workspace_id") == workspace_id:
                 rows.append(row)
     return str(rows[-1].get("lifecycle_state", "")).strip().upper() if rows else ""
+
+
+def _path_key_for_test(path: Path) -> str:
+    return os.path.normcase(os.path.abspath(os.path.normpath(str(path))))
 
 
 # ---------------------------------------------------------------- acceptance 1
@@ -524,3 +536,184 @@ def test_unknown_keep_invariant_preserved(sandbox):
     # No authority in this workstream ever granted DELETE.
     assert report["disposal_authorized"] is False
     assert by_id["ws-known"]["classification"] != "SAFE_DISPOSABLE_CANDIDATE"
+
+
+# ---------------------------------------------- Supervisor fail-open regression
+def _restore_identity(workspace_id: str, root_path: str,
+                      session_id: str = "session-alpha",
+                      project_id: str = "project-alpha",
+                      task_id: str = "task-alpha") -> dict:
+    return {
+        "workspace_id": workspace_id,
+        "project_id": project_id,
+        "task_id": task_id,
+        "session_id": session_id,
+        "root_path": root_path,
+        "base_revision": BASE_REVISION,
+    }
+
+
+def _last_lifecycle(root: Path, workspace_id: str) -> str:
+    rows = fw06.list_all_workspaces(root)
+    for row in reversed(rows):
+        if row.get("workspace_id") == workspace_id:
+            return str(row.get("lifecycle_state", "")).strip().upper()
+    return ""
+
+
+def test_restore_complete_durable_registry_allowed(sandbox):
+    """1. Complete durable registry => allowed subject to the Owner gate."""
+    ws_path = sandbox / ".tmp" / "ws-complete"
+    _raw_row(sandbox, workspace_id="ws-complete", workspace_path=ws_path)
+    root_rel = str(ws_path.relative_to(sandbox))
+
+    result = fw06.restore_workspace_lifecycle_binding(
+        sandbox,
+        authority=fw06.LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+        owner_authorization_id=OWNER_AUTH,
+        restored_lifecycle="COMPLETE",
+        identity=_restore_identity("ws-complete", root_rel),
+        evidence_pointers=[],
+        policy=_policy(),
+    )
+
+    assert result["status"] == "RESTORED"
+    assert result["final_action"] == "KEEP"
+    assert result["delete_authorized"] is False
+    assert result["binding_proof"]["registry_complete"] is True
+    assert result["binding_proof"]["proven"] is True
+    assert result["binding_proof"]["evidence_documents"] == []
+    assert _last_lifecycle(sandbox, "ws-complete") == "COMPLETE"
+
+
+def test_restore_partial_registry_without_docs_blocked(sandbox):
+    """2. Partial registry + no evidence docs => BLOCKED, even though the
+    caller supplies the missing field (caller value is never proof)."""
+    ws_path = sandbox / ".tmp" / "ws-partial"
+    _raw_row(sandbox, workspace_id="ws-partial", workspace_path=ws_path,
+             omit_identity=("session_id",))
+    root_rel = str(ws_path.relative_to(sandbox))
+    ledger = sandbox / ".p2p" / "state" / fw06.LIFECYCLE_RESTORE_LEDGER
+
+    result = fw06.restore_workspace_lifecycle_binding(
+        sandbox,
+        authority=fw06.LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+        owner_authorization_id=OWNER_AUTH,
+        restored_lifecycle="COMPLETE",
+        identity=_restore_identity("ws-partial", root_rel,
+                                   session_id="CALLER-SUPPLIED"),
+        evidence_pointers=[],
+        policy=_policy(),
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["final_action"] == "KEEP"
+    assert result["reason"] == "INCOMPLETE_REGISTRY_FAIL_CLOSED"
+    proof = result["binding_proof"]
+    assert proof["proven"] is False
+    assert proof["registry_complete"] is False
+    assert proof["missing_dur_proof"] == ["session_id"]
+    assert proof["caller_value_accepted_as_proof"] is False
+    assert proof["evidence_documents"] == []
+    assert _last_lifecycle(sandbox, "ws-partial") == ""
+    assert not ledger.exists()
+
+
+def test_restore_partial_registry_with_durable_docs_allowed(sandbox):
+    """3. Partial registry + durable evidence proving every missing field
+    => allowed, subject to the Owner gate."""
+    ws_path = sandbox / ".tmp" / "ws-partial-doc"
+    _raw_row(sandbox, workspace_id="ws-partial-doc", workspace_path=ws_path,
+             omit_identity=("session_id",))
+    root_rel = str(ws_path.relative_to(sandbox))
+    _binding_evidence(sandbox, name="binding-partial-doc.json",
+                      workspace_id="ws-partial-doc", root_path=root_rel)
+
+    result = fw06.restore_workspace_lifecycle_binding(
+        sandbox,
+        authority=fw06.LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+        owner_authorization_id=OWNER_AUTH,
+        restored_lifecycle="COMPLETE",
+        identity=_restore_identity("ws-partial-doc", root_rel,
+                                   session_id="session-alpha"),
+        evidence_pointers=["reports/binding-partial-doc.json"],
+        policy=_policy(),
+    )
+
+    assert result["status"] == "RESTORED"
+    assert result["final_action"] == "KEEP"
+    assert result["delete_authorized"] is False
+    proof = result["binding_proof"]
+    assert proof["proven"] is True
+    assert proof["registry_complete"] is False
+    assert len(proof["evidence_documents"]) == 1
+    assert proof["registry_source"] == {
+        "workspace_id": "ws-partial-doc",
+        "project_id": "project-alpha",
+        "task_id": "task-alpha",
+        "root_path": _path_key_for_test(sandbox / ".tmp" / "ws-partial-doc"),
+        "base_revision": BASE_REVISION,
+    }
+    assert _last_lifecycle(sandbox, "ws-partial-doc") == "COMPLETE"
+
+
+def test_restore_caller_value_never_proof_without_durable_source(sandbox):
+    """4. Caller supplies a missing/unproven field with no durable source
+    => BLOCKED. Caller-provided values are claims, never evidence."""
+    ws_path = sandbox / ".tmp" / "ws-caller-only"
+    _raw_row(sandbox, workspace_id="ws-caller-only", workspace_path=ws_path,
+             omit_identity=("session_id", "task_id", "owner_task_id"))
+    root_rel = str(ws_path.relative_to(sandbox))
+    ledger = sandbox / ".p2p" / "state" / fw06.LIFECYCLE_RESTORE_LEDGER
+
+    result = fw06.restore_workspace_lifecycle_binding(
+        sandbox,
+        authority=fw06.LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+        owner_authorization_id=OWNER_AUTH,
+        restored_lifecycle="COMPLETE",
+        identity=_restore_identity("ws-caller-only", root_rel,
+                                   session_id="CALLER-SUPPLIED",
+                                   task_id="CALLER-TASK"),
+        evidence_pointers=[],
+        policy=_policy(),
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["final_action"] == "KEEP"
+    assert result["reason"] == "INCOMPLETE_REGISTRY_FAIL_CLOSED"
+    proof = result["binding_proof"]
+    assert proof["proven"] is False
+    assert set(proof["missing_dur_proof"]) == {"session_id", "task_id"}
+    assert proof["caller_value_accepted_as_proof"] is False
+    assert _last_lifecycle(sandbox, "ws-caller-only") == ""
+    assert not ledger.exists()
+
+
+def test_restore_contradictory_durable_evidence_blocked(sandbox):
+    """5. Contradictory evidence (doc disagrees with the durable registry)
+    => BLOCKED / KEEP."""
+    ws_path = sandbox / ".tmp" / "ws-contradict"
+    _raw_row(sandbox, workspace_id="ws-contradict", workspace_path=ws_path)
+    root_rel = str(ws_path.relative_to(sandbox))
+    # Complete durable doc, but project_id disagrees with the registry.
+    _binding_evidence(sandbox, name="binding-contradict.json",
+                      workspace_id="ws-contradict", root_path=root_rel,
+                      project_id="project-BETA")
+
+    result = fw06.restore_workspace_lifecycle_binding(
+        sandbox,
+        authority=fw06.LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+        owner_authorization_id=OWNER_AUTH,
+        restored_lifecycle="COMPLETE",
+        identity=_restore_identity("ws-contradict", root_rel,
+                                   project_id="project-BETA"),
+        evidence_pointers=["reports/binding-contradict.json"],
+        policy=_policy(),
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["final_action"] == "KEEP"
+    assert result["reason"] == "BINDING_CONTRADICTS_DURABLE_REGISTRY"
+    assert result["binding_proof"]["proven"] is False
+    assert result["binding_proof"]["conflicting_field"] == "project_id"
+    assert _last_lifecycle(sandbox, "ws-contradict") == ""
