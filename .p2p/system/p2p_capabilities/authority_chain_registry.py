@@ -64,8 +64,15 @@ def _persist_registry(records: list) -> None:
 
 BACKEND_MUTATION_CERTIFICATION = "BACKEND_MUTATION_CERTIFICATION"
 ROLE_MUTATION_CERTIFICATION = "ROLE_MUTATION_CERTIFICATION"
+LIFECYCLE_BINDING_RESTORE_CERTIFICATION = (
+    "LIFECYCLE_BINDING_RESTORE_CERTIFICATION"
+)
 AUTHORITY_CERTIFICATION_KINDS = (BACKEND_MUTATION_CERTIFICATION,
-                                 ROLE_MUTATION_CERTIFICATION)
+                                 ROLE_MUTATION_CERTIFICATION,
+                                 LIFECYCLE_BINDING_RESTORE_CERTIFICATION)
+CANONICAL_RESTORE_SCOPE = "LIFECYCLE_BINDING_RESTORE_OWNER_GATED"
+CANONICAL_RESTORE_GRANT = "LIFECYCLE_BINDING_RESTORE"
+RESTORE_LIFECYCLE_STATUSES = ("ACTIVE", "COMPLETE", "DISPOSABLE")
 MUTATION_TARGET_LIVE = "LIVE_CERTIFIED_FOR_CAPABILITY"
 ROLE_MUTATION_LIVE = "ROLE_MUTATION_CERTIFIED"
 CANONICAL_BOUNDED_SCOPE = "DOCUMENTATION_MUTATION_BOUNDED"
@@ -177,6 +184,105 @@ def append_role_mutation_certification(
     records.append(entry)
     _persist_registry(records)
     return entry
+
+
+def append_lifecycle_binding_restore_certification(
+        *, role_id: str, owner_authorization_id: str,
+        workspace_id: str, project_id: str, task_id: str, session_id: str,
+        root_path: str, base_revision: str, restored_lifecycle: str,
+        evidence_pointers: tuple[str, ...] | list[str] = (),
+        source_commit: str = "",
+        lifetime_days: int = 7,
+        certified_at: str | None = None) -> dict:
+    """Record the exact proven binding plus the single explicit Owner
+    authorization that licensed one lifecycle-record restore.
+
+    Fail closed on any placeholder identity, non-Owner authorization id,
+    non-canonical scope/grant, unproven lifecycle, or missing durable
+    evidence pointers.  This certification never grants physical deletion.
+    """
+    role_id = str(role_id).strip()
+    _oaid = str(owner_authorization_id).strip()
+    workspace_id = str(workspace_id).strip()
+    project_id = str(project_id).strip()
+    task_id = str(task_id).strip()
+    session_id = str(session_id).strip()
+    root_path = str(root_path).strip()
+    base_revision = str(base_revision).strip()
+    for name, value in (("role_id", role_id), ("owner_authorization_id", _oaid),
+                        ("workspace_id", workspace_id),
+                        ("project_id", project_id), ("task_id", task_id),
+                        ("session_id", session_id), ("root_path", root_path),
+                        ("base_revision", base_revision)):
+        if not value or value.upper() in ("UNKNOWN", "NONE", ""):
+            raise ValueError(f"lifecycle restore certification: {name} "
+                             "placeholder rejected")
+    if not _oaid.startswith("owner-"):
+        raise ValueError("lifecycle restore certification: "
+                         "owner_authorization_id must be an owner-* id")
+    lifecycle = str(restored_lifecycle).strip().upper()
+    if lifecycle not in RESTORE_LIFECYCLE_STATUSES:
+        raise ValueError("lifecycle restore certification: "
+                         "restored_lifecycle must be ACTIVE, COMPLETE, or "
+                         "DISPOSABLE")
+    pointers = tuple(str(p).strip() for p in evidence_pointers if str(p).strip())
+    if not pointers:
+        raise ValueError("lifecycle restore certification: "
+                         "evidence_pointers required (durable proof)")
+    if not isinstance(lifetime_days, int) or lifetime_days <= 0:
+        raise ValueError("lifecycle restore certification: lifetime_days "
+                         "must be a positive integer")
+    _certified_at = (str(certified_at).strip() if certified_at
+                     else _utc_now())
+    _expiry = (_ac_datetime.datetime.fromisoformat(
+        _certified_at.replace("Z", "+00:00"))
+        + _ac_datetime.timedelta(days=lifetime_days)).isoformat()
+    entry = {
+        "schema": AUTHORITY_CHAIN_SCHEMA,
+        "kind": LIFECYCLE_BINDING_RESTORE_CERTIFICATION,
+        "role_id": role_id,
+        "owner_authorization_id": _oaid,
+        "scope": CANONICAL_RESTORE_SCOPE,
+        "permission_grant": CANONICAL_RESTORE_GRANT,
+        "workspace_id": workspace_id,
+        "project_id": project_id,
+        "task_id": task_id,
+        "session_id": session_id,
+        "root_path": root_path,
+        "base_revision": base_revision,
+        "restored_lifecycle": lifecycle,
+        "delete_authorized": False,
+        "evidence_pointers": pointers,
+        "source_commit": str(source_commit or "").strip().lower(),
+        "certified_at": _certified_at,
+        "expires_at": _expiry,
+        "registered_at": _utc_now(),
+    }
+    records = _registry_entries()
+    records.append(entry)
+    _persist_registry(records)
+    return entry
+
+
+def latest_lifecycle_binding_restore_certification(
+        workspace_id: str,
+        owner_authorization_id: str | None = None) -> dict | None:
+    """Latest restore certification bound to the exact workspace
+    (optionally bound to the exact owner authorization id). Absent means
+    provably uncertified."""
+    out: dict | None = None
+    for entry in _registry_entries():
+        if entry.get("kind") != LIFECYCLE_BINDING_RESTORE_CERTIFICATION:
+            continue
+        if str(entry.get("workspace_id", "")).strip() != str(
+                workspace_id).strip():
+            continue
+        if owner_authorization_id and str(
+                entry.get("owner_authorization_id", "")).strip() != str(
+                owner_authorization_id).strip():
+            continue
+        out = entry
+    return out
 
 
 def latest_backend_mutation_certification(target_id: str) -> dict | None:

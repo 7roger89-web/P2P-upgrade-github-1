@@ -71,6 +71,37 @@ TMP_PRESSURE_STATES = ("NORMAL", "WARNING", "LOW", "CRITICAL")
 TMP_GC_ACTIONS = ("KEEP", "DELETE_ELIGIBLE")
 _WINDOWS_REPARSE_POINT = 0x400
 
+# Authority model (additive over the existing FW06/TMPGC seams; no new
+# framework).  CLEANUP_INSPECTION_AUTHORITY is READ_ONLY by construction and
+# never licenses a mutation.  LIFECYCLE_BINDING_RESTORE_AUTHORITY licenses one
+# narrow Owner-gated lifecycle-record write and never physical deletion.
+CLEANUP_INSPECTION_AUTHORITY = "cleanup-inspection-read-only"
+LIFECYCLE_BINDING_RESTORE_AUTHORITY = "lifecycle-binding-restore-owner-gated"
+CLEANUP_INSPECTION_CLASSIFICATIONS = (
+    "SAFE_DISPOSABLE_CANDIDATE",
+    "KEEP",
+    "UNKNOWN",
+)
+CLEANUP_INSPECTION_SCHEMA = "p2p-cleanup-inspection/1"
+LIFECYCLE_RESTORE_REQUIRED_IDENTITY = (
+    "workspace_id",
+    "project_id",
+    "task_id",
+    "session_id",
+    "root_path",
+    "base_revision",
+)
+LIFECYCLE_RESTORE_STATUSES = ("ACTIVE", "COMPLETE", "DISPOSABLE")
+LIFECYCLE_BINDING_EVIDENCE_SCHEMA = "p2p-workspace-binding-evidence/1"
+LIFECYCLE_RESTORE_LEDGER = "fw06-lifecycle-restores.jsonl"
+_INSPECTION_MAX_FILES = 1000
+_INSPECTION_HASH_MAX_BYTES = 16 * 1024 * 1024
+_INSPECTION_DOC_MAX_BYTES = 4 * 1024 * 1024
+_INSPECTION_DOC_NAMES = (
+    "report", "receipt", "return", "packet", "decision", "evidence",
+    "audit", "ledger", "restore", "handoff",
+)
+
 # ---- §41 Failure classes ------------------------------------------------------
 
 FAILURE_CLASSES = (
@@ -1552,11 +1583,23 @@ def cleanup_workspace(root: str | Path, workspace_id: str,
                       evidence_committed: bool,
                       result_reconciled: bool,
                       owner_decision_resolved: bool,
-                      _serialization_held: bool = False) -> dict[str, Any]:
+                      _serialization_held: bool = False,
+                      authority: str | None = None) -> dict[str, Any]:
     """Idempotent cleanup with evidence-driven guards. NEVER deletes a
     workspace while: mutation state unknown; uncommitted evidence;
     unreconciled result; or unresolved owner decision. Unknown owner
-    → keeps workspace (no destructive action on ambiguous ownership)."""
+    → keeps workspace (no destructive action on ambiguous ownership).
+
+    ``authority`` is the authority-model gate: the READ_ONLY cleanup
+    inspection authority and the Owner-gated lifecycle restore authority
+    never imply physical deletion and are refused before any state change.
+    """
+    if authority == CLEANUP_INSPECTION_AUTHORITY:
+        raise InspectionAuthorityError("MUTATION_DENIED_UNDER_INSPECTION")
+    if authority == LIFECYCLE_BINDING_RESTORE_AUTHORITY:
+        raise InspectionAuthorityError(
+            "DELETE_NOT_GRANTED_TO_LIFECYCLE_RESTORE"
+        )
     if not _serialization_held:
         try:
             with _lease_writer_guard(root):
@@ -1567,6 +1610,7 @@ def cleanup_workspace(root: str | Path, workspace_id: str,
                     result_reconciled=result_reconciled,
                     owner_decision_resolved=owner_decision_resolved,
                     _serialization_held=True,
+                    authority=authority,
                 )
         except _LeaseLockUnavailable:
             return {"cleaned": False,
@@ -1709,12 +1753,14 @@ def create_isolated_worktree(root: str | Path, *,
 
 def cleanup_git_worktree(root: str | Path, repo_path: str | Path,
                          workspace_id: str, worktree_path: str | Path,
+                         authority: str | None = None,
                          **cleanup_guards: Any) -> dict[str, Any]:
     """Remove the worktree only after evidence-driven guards pass
     (delegated to cleanup_workspace). Idempotent."""
     repo_path = Path(repo_path)
     wt_path = Path(worktree_path)
-    guard = cleanup_workspace(root, workspace_id, **cleanup_guards)
+    guard = cleanup_workspace(root, workspace_id, authority=authority,
+                              **cleanup_guards)
     if not guard.get("cleaned"):
         return guard
     try:
@@ -3582,11 +3628,24 @@ def apply_tmp_gc(root: str | Path, inventory: Mapping[str, Any],
                  *,
                  policy: Mapping[str, Any] | None = None,
                  policy_path: str | Path | None = None,
-                 now: str | None = None) -> dict[str, Any]:
-    """Apply only after a fresh classification for every candidate."""
+                 now: str | None = None,
+                 authority: str | None = None) -> dict[str, Any]:
+    """Apply only after a fresh classification for every candidate.
+
+    The cleanup inspection authority is READ_ONLY and the lifecycle restore
+    authority never licenses physical deletion; both are denied here before
+    any state or filesystem change.
+    """
     root_path = Path(root).expanduser().resolve()
     policy_data = load_tmp_gc_policy(root_path, policy_path, policy)
     pressure = detect_disk_pressure(root_path, policy_data)
+    if authority in (CLEANUP_INSPECTION_AUTHORITY,
+                     LIFECYCLE_BINDING_RESTORE_AUTHORITY):
+        raise InspectionAuthorityError(
+            "MUTATION_DENIED_UNDER_INSPECTION"
+            if authority == CLEANUP_INSPECTION_AUTHORITY
+            else "DELETE_NOT_GRANTED_TO_LIFECYCLE_RESTORE"
+        )
     result = dict(inventory)
     result["dry_run"] = False
     result["apply_requested"] = True
@@ -3692,7 +3751,8 @@ def run_tmp_gc(root: str | Path, *,
                apply: bool = False,
                policy: Mapping[str, Any] | None = None,
                policy_path: str | Path | None = None,
-               now: str | None = None) -> dict[str, Any]:
+               now: str | None = None,
+               authority: str | None = None) -> dict[str, Any]:
     inventory = inventory_tmp_gc(
         root, policy=policy, policy_path=policy_path, now=now,
     )
@@ -3700,7 +3760,704 @@ def run_tmp_gc(root: str | Path, *,
         return inventory
     return apply_tmp_gc(
         root, inventory, policy=policy, policy_path=policy_path, now=now,
+        authority=authority,
     )
+
+
+# ---- §18-B Cleanup inspection & Owner-gated lifecycle restore authority -------
+
+class InspectionAuthorityError(PermissionError):
+    """Raised when the asserted authority does not license the action."""
+
+
+def _deny_mutation(authority: str | None, action: str) -> None:
+    """Deny a mutation attempted under a non-mutating authority."""
+    if authority == CLEANUP_INSPECTION_AUTHORITY:
+        raise InspectionAuthorityError(
+            "MUTATION_DENIED_UNDER_INSPECTION:" + str(action)
+        )
+    if authority == LIFECYCLE_BINDING_RESTORE_AUTHORITY:
+        raise InspectionAuthorityError(
+            "DELETE_NOT_GRANTED_TO_LIFECYCLE_RESTORE:" + str(action)
+        )
+
+
+class CleanupInspectionAuthority:
+    """READ_ONLY cleanup inspection authority over the canonical scope.
+
+    The handle exposes evidence collection only.  ``mutate`` is a deliberate
+    denial surface: an inspection session never holds a mutation grant, so
+    every mutation request is refused before any state or filesystem change.
+    """
+
+    def __init__(self, root: str | Path, *,
+                 policy: Mapping[str, Any] | None = None,
+                 policy_path: str | Path | None = None,
+                 now: str | None = None) -> None:
+        self.root = root
+        self.policy = policy
+        self.policy_path = policy_path
+        self.now = now
+
+    def inspect(self) -> dict[str, Any]:
+        return inspect_cleanup_scope(
+            self.root,
+            authority=CLEANUP_INSPECTION_AUTHORITY,
+            policy=self.policy,
+            policy_path=self.policy_path,
+            now=self.now,
+        )
+
+    def snapshot(self) -> dict[str, Any]:
+        return self.inspect()
+
+    def mutate(self, action: str = "MUTATION", *args: Any,
+               **kwargs: Any) -> dict[str, Any]:
+        _deny_mutation(CLEANUP_INSPECTION_AUTHORITY, action)
+        raise InspectionAuthorityError("MUTATION_DENIED_UNDER_INSPECTION")
+
+
+def _inspection_file_listing(root: Path, scope_root: Path,
+                             out: list[dict[str, Any]],
+                             budget: dict[str, int]) -> None:
+    """List files/directories inside one canonical scope root only.
+
+    Reparse points are recorded and never followed; hashes cover files up to
+    the inspection guard so equality comparison stays bounded and read-only.
+    """
+    if budget["files"] >= _INSPECTION_MAX_FILES:
+        budget["truncated"] = True
+        return
+    try:
+        entries = sorted(os.scandir(scope_root),
+                         key=lambda entry: entry.name.casefold())
+    except OSError:
+        budget["unreadable"] += 1
+        return
+    for entry in entries:
+        if budget["files"] >= _INSPECTION_MAX_FILES:
+            budget["truncated"] = True
+            return
+        try:
+            marker = _reparse_marker(Path(entry.path))
+            if marker is not False:
+                out.append({
+                    "path": str(Path(entry.path).relative_to(root)),
+                    "kind": "REPARSE_POINT",
+                    "size": 0,
+                    "mtime_utc": None,
+                    "sha256": None,
+                })
+                budget["files"] += 1
+                continue
+            info = entry.stat(follow_symlinks=False)
+            rel = str(Path(entry.path).relative_to(root))
+            mtime = datetime.fromtimestamp(
+                info.st_mtime, tz=timezone.utc,
+            ).strftime("%Y-%m-%dT%H:%M:%SZ")
+            if entry.is_dir(follow_symlinks=False):
+                out.append({
+                    "path": rel, "kind": "DIRECTORY", "size": 0,
+                    "mtime_utc": mtime, "sha256": None,
+                })
+                budget["files"] += 1
+                _inspection_file_listing(root, Path(entry.path), out, budget)
+            elif entry.is_file(follow_symlinks=False):
+                digest = (
+                    _sha256_file(Path(entry.path))
+                    if 0 < info.st_size <= _INSPECTION_HASH_MAX_BYTES
+                    else None
+                )
+                out.append({
+                    "path": rel, "kind": "FILE", "size": int(info.st_size),
+                    "mtime_utc": mtime, "sha256": digest,
+                })
+                budget["files"] += 1
+            else:
+                out.append({
+                    "path": rel, "kind": "OTHER", "size": 0,
+                    "mtime_utc": mtime, "sha256": None,
+                })
+                budget["files"] += 1
+        except OSError:
+            budget["unreadable"] += 1
+            continue
+
+
+def _inspection_scope_listing(root: Path,
+                              policy: Mapping[str, Any]
+                              ) -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
+    budget = {"files": 0, "unreadable": 0, "truncated": False}
+    for raw in policy.get("allowlisted_temp_roots", []):
+        scope_root = _configured_path(root, str(raw))
+        if scope_root is None or not scope_root.exists():
+            continue
+        marker = _reparse_marker(scope_root)
+        if marker is not False:
+            continue
+        _inspection_file_listing(root, scope_root, entries, budget)
+    return {"entries": entries, "budget": budget}
+
+
+def _inspection_durable_documents(root: Path,
+                                  policy: Mapping[str, Any]
+                                  ) -> list[dict[str, Any]]:
+    """Read-only inventory of durable reports/receipts/return packets/
+    decision logs (name-filtered, hash-checked, never opened for write)."""
+    out: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for raw in policy.get("durable_roots", []):
+        durable_root = _configured_path(root, str(raw))
+        if durable_root is None or not durable_root.exists():
+            continue
+        try:
+            candidates = sorted(durable_root.rglob("*"))
+        except OSError:
+            continue
+        for candidate in candidates:
+            if len(out) >= _INSPECTION_MAX_FILES:
+                break
+            if not candidate.is_file():
+                continue
+            marker = _reparse_marker(candidate)
+            if marker is not False:
+                continue
+            name = candidate.name.casefold()
+            if not any(tag in name for tag in _INSPECTION_DOC_NAMES):
+                continue
+            key = _path_key(candidate)
+            if key in seen:
+                continue
+            seen.add(key)
+            try:
+                size = candidate.stat().st_size
+            except OSError:
+                size = None
+            out.append({
+                "path": str(candidate),
+                "relative_path": (
+                    str(candidate.relative_to(root))
+                    if root in candidate.parents else str(candidate)
+                ),
+                "size": size,
+                "sha256": (
+                    _sha256_file(candidate)
+                    if size is not None
+                    and 0 < size <= _INSPECTION_HASH_MAX_BYTES else None
+                ),
+                "durable": True,
+            })
+    return out
+
+
+def _inspection_classification(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Map the existing TMPGC classifier verdict into the inspection
+    vocabulary. UNKNOWN stays KEEP (fail-closed invariant) and this
+    authority never authorizes disposal of anything."""
+    final_action = str(row.get("final_action", "KEEP")).strip().upper()
+    eligibility = str(row.get("eligibility", "")).strip().upper()
+    reasons = {str(reason).upper() for reason in row.get(
+        "protection_reasons", [])}
+    lifecycle = str(row.get("record_lifecycle", "")).strip().upper()
+    if final_action == "DELETE_ELIGIBLE" and eligibility == "PASS":
+        classification = "SAFE_DISPOSABLE_CANDIDATE"
+    elif lifecycle == "UNKNOWN" or "UNKNOWN" in reasons \
+            or "EVIDENCE_NOT_DURABLE" in reasons:
+        classification = "UNKNOWN"
+    elif final_action == "KEEP":
+        classification = "KEEP"
+    else:
+        classification = "UNKNOWN"
+    return {
+        "classification": classification,
+        "keep_invariant": classification == "UNKNOWN",
+        "disposal_authorized": False,
+        "final_action": "KEEP",
+    }
+
+
+def _inspection_workspace_entry(
+        root: Path,
+        row: Mapping[str, Any],
+        registry: Mapping[str, dict[str, Any]],
+        audit: list[dict[str, Any]],
+        events: list[dict[str, Any]],
+        policy_data: Mapping[str, Any],
+) -> dict[str, Any]:
+    workspace_id = str(row.get("workspace_id", ""))
+    record = registry.get(workspace_id)
+    record = dict(record) if record else {}
+    raw_path = str(record.get("root_path") or row.get("path", ""))
+    workspace = _rooted_path(root, raw_path)
+    classification = _inspection_classification(row)
+    git_state: dict[str, Any] = {"kind": "UNKNOWN", "clean": None,
+                                 "head": "", "status": ""}
+    if workspace.exists():
+        git_state = _git_workspace_state(workspace, record)
+        status = _git_run(workspace, ["status", "--porcelain",
+                                      "--untracked-files=all"])
+        if status is not None:
+            git_state["status"] = status.stdout.strip()
+    history_ok, history_reason = _history_state(
+        root, workspace, record, policy_data, git_state,
+    )
+    pointer_evidence: list[dict[str, Any]] = []
+    for pointer in record.get("evidence_pointers", []) or []:
+        durable = _durable_ref(root, workspace, pointer, policy_data)
+        pointer_evidence.append({
+            "pointer": str(pointer),
+            "durable": durable is not None,
+            "path": str(durable) if durable else None,
+            "sha256": _sha256_file(durable) if durable is not None else None,
+        })
+    return {
+        "workspace_id": workspace_id,
+        "path": str(workspace),
+        "exists": workspace.exists(),
+        "size": int(row.get("size", 0)),
+        "lifecycle": str(row.get("lifecycle", "UNKNOWN")),
+        "record_lifecycle": str(row.get("record_lifecycle", "UNKNOWN")),
+        "protection_reasons": list(row.get("protection_reasons", [])),
+        "predicates": dict(row.get("predicates", {})),
+        "registry_row": _json_safe(record) if record else None,
+        "git": git_state,
+        "history": {"history_preserved_or_reachable": history_ok,
+                    "reason": history_reason},
+        "evidence_pointers": pointer_evidence,
+        "audit": [dict(item) for item in audit
+                  if str(item.get("workspace_id", "")) == workspace_id],
+        "events": [dict(item) for item in events
+                   if str(item.get("payload", {}).get("workspace_id", ""))
+                   == workspace_id],
+        **classification,
+    }
+
+
+def inspect_cleanup_scope(
+        root: str | Path,
+        *,
+        authority: str,
+        workspace_id: str | None = None,
+        policy: Mapping[str, Any] | None = None,
+        policy_path: str | Path | None = None,
+        now: str | None = None,
+) -> dict[str, Any]:
+    """READ_ONLY cleanup inspection over the canonical TMPGC scope.
+
+    Collects enough evidence to classify every candidate
+    (SAFE_DISPOSABLE_CANDIDATE / KEEP / UNKNOWN), hashes local files for
+    equality comparison, compares local evidence with canonical Git history,
+    and reads registry/audit/decision state.  The surface never mutates and
+    never grants disposal; UNKNOWN always maps to KEEP.
+    """
+    if authority != CLEANUP_INSPECTION_AUTHORITY:
+        raise InspectionAuthorityError("CLEANUP_INSPECTION_AUTHORITY_REQUIRED")
+    root_path = Path(root).expanduser().resolve()
+    policy_data = load_tmp_gc_policy(root_path, policy_path, policy)
+    registry_well_formed = _workspace_registry_is_well_formed(root_path)
+    audit_rows = read_tmp_gc_audit(root_path)
+    audit_well_formed = _tmp_gc_audit_is_well_formed(root_path)
+    event_rows = read_fw06_events(root_path)
+    registry = _latest_workspace_rows(root_path)
+    inventory = inventory_tmp_gc(
+        root_path, policy=policy_data, now=now,
+    )
+    workspace_entries: list[dict[str, Any]] = []
+    for row in inventory.get("workspaces", []):
+        wid = str(row.get("workspace_id", ""))
+        if workspace_id and wid != workspace_id:
+            continue
+        workspace_entries.append(_inspection_workspace_entry(
+            root_path, row, registry, audit_rows, event_rows, policy_data,
+        ))
+    safe = sum(1 for item in workspace_entries
+               if item.get("classification") == "SAFE_DISPOSABLE_CANDIDATE")
+    keep = sum(1 for item in workspace_entries
+               if item.get("classification") == "KEEP")
+    unknown = sum(1 for item in workspace_entries
+                  if item.get("classification") == "UNKNOWN")
+    worktrees = _git_worktree_paths(root_path) or []
+    return {
+        "schema": CLEANUP_INSPECTION_SCHEMA,
+        "authority": CLEANUP_INSPECTION_AUTHORITY,
+        "read_only": True,
+        "mutation_authorized": False,
+        "disposal_authorized": False,
+        "root": str(root_path),
+        "policy": policy_data,
+        "registry_well_formed": registry_well_formed,
+        "audit_well_formed": audit_well_formed,
+        "pressure": detect_disk_pressure(root_path, policy_data),
+        "git": {
+            "worktrees": [str(path) for path in worktrees],
+        },
+        "durable_documents": _inspection_durable_documents(
+            root_path, policy_data,
+        ),
+        "scope_listing": _inspection_scope_listing(root_path, policy_data),
+        "workspaces": workspace_entries,
+        "summary": {
+            "total": len(workspace_entries),
+            "safe_disposable_candidates": safe,
+            "keep": keep,
+            "unknown_kept": unknown,
+            "unknown_keep_invariant_preserved": (
+                all(item.get("final_action") == "KEEP"
+                    for item in workspace_entries)
+                and all(item.get("keep_invariant")
+                        for item in workspace_entries
+                        if item.get("classification") == "UNKNOWN")
+            ),
+            "delete_authorized": False,
+        },
+    }
+
+
+def _restore_placeholder(value: Any) -> bool:
+    return str(value or "").strip().upper() in (
+        "", "UNKNOWN", "NONE", "TBD", "NULL",
+    )
+
+
+def _restore_blocked(reason: str, **extra: Any) -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "status": "BLOCKED",
+        "final_action": "KEEP",
+        "delete_authorized": False,
+        "reason": reason,
+    }
+    out.update(extra)
+    return out
+
+
+def _restore_compare_value(root: Path, field: str, value: Any) -> str:
+    if field == "root_path":
+        return _path_key(_rooted_path(root, str(value)))
+    return str(value or "").strip()
+
+
+def _read_restore_evidence_doc(path: Path) -> dict[str, Any] | None:
+    try:
+        size = path.stat().st_size
+        if size <= 0 or size > _INSPECTION_DOC_MAX_BYTES:
+            return None
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(raw, Mapping):
+        return None
+    if str(raw.get("schema", "")).strip() != LIFECYCLE_BINDING_EVIDENCE_SCHEMA:
+        return None
+    if not all(field in raw for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY):
+        return None
+    return dict(raw)
+
+
+def _restore_identity_proof(
+        root: Path,
+        identity: Mapping[str, Any],
+        latest: Mapping[str, Any] | None,
+        evidence_pointers: tuple[str, ...] | list[str],
+        policy_data: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Fail-closed proof of every required identity field.
+
+    Proof sources are the durable FW06 workspace registry (canonical state)
+    and/or durable canonical binding-evidence documents referenced by
+    ``evidence_pointers``.  Directory names are never used as identity
+    evidence.  Any contradiction between durable sources is ambiguous and
+    keeps the record KEEP.
+    """
+    workspace_path = _rooted_path(root, str(identity.get("root_path", "")))
+    claims: dict[str, str] = {}
+    for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY:
+        value = str(identity.get(field, "")).strip()
+        if _restore_placeholder(value):
+            return {
+                "proven": False, "reason": "IDENTITY_FIELD_MISSING",
+                "missing": [field],
+            }
+        claims[field] = _restore_compare_value(root, field, value)
+    # Registry contradiction: the durable registry remains canonical.
+    registry_values: dict[str, str] = {}
+    registry_missing: list[str] = []
+    if latest:
+        for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY:
+            raw = latest.get(field)
+            if field == "task_id" and _restore_placeholder(raw):
+                raw = latest.get("owner_task_id")
+            if _restore_placeholder(raw):
+                registry_missing.append(field)
+                continue
+            registry_values[field] = _restore_compare_value(
+                root, field, str(raw),
+            )
+        for field, value in registry_values.items():
+            if value != claims[field]:
+                return {
+                    "proven": False,
+                    "reason": "BINDING_CONTRADICTS_DURABLE_REGISTRY",
+                    "conflicting_field": field,
+                }
+    # Durable canonical binding documents.
+    docs: list[dict[str, Any]] = []
+    for raw_pointer in evidence_pointers:
+        pointer = str(raw_pointer).strip()
+        path = _durable_ref(root, workspace_path, pointer, policy_data)
+        if path is None:
+            return {
+                "proven": False,
+                "reason": "EVIDENCE_NOT_DURABLE",
+                "pointer": pointer,
+            }
+        doc = _read_restore_evidence_doc(path)
+        if doc is None:
+            return {
+                "proven": False,
+                "reason": "EVIDENCE_DOCUMENT_UNREADABLE_OR_INCOMPLETE",
+                "pointer": pointer,
+            }
+        docs.append({"pointer": pointer, "path": str(path),
+                     "sha256": _sha256_file(path), "document": doc})
+    if len(docs) >= 2:
+        signatures = {
+            _classification_digest({
+                field: _restore_compare_value(root, field, doc["document"].get(field))
+                for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY
+            })
+            for doc in docs
+        }
+        if len(signatures) > 1:
+            return {
+                "proven": False,
+                "reason": "AMBIGUOUS_BINDING_FAIL_CLOSED",
+                "evidence_documents": len(docs),
+            }
+    for doc in docs:
+        for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY:
+            if _restore_compare_value(root, field, doc["document"].get(field)) \
+                    != claims[field]:
+                return {
+                    "proven": False,
+                    "reason": "EVIDENCE_DOCUMENT_MISMATCH",
+                    "field": field,
+                    "pointer": doc["pointer"],
+                }
+    # Every required field must be proven by at least one durable source.
+    # Caller-supplied identity values are claims, never proof: a partial
+    # durable registry plus caller values alone is BLOCKED even when the
+    # registry row is non-empty (fail closed on incomplete durable proof).
+    doc_evidence = bool(docs)
+    proven_fields: set[str] = set(registry_values)
+    if doc_evidence:
+        # A binding-evidence document is only read after validating that it
+        # carries every required identity field, so one document covers all.
+        proven_fields.update(LIFECYCLE_RESTORE_REQUIRED_IDENTITY)
+    missing_dur_proof = [
+        field for field in LIFECYCLE_RESTORE_REQUIRED_IDENTITY
+        if field not in proven_fields
+    ]
+    if missing_dur_proof:
+        return {
+            "proven": False,
+            "reason": "INCOMPLETE_REGISTRY_FAIL_CLOSED",
+            "missing_dur_proof": missing_dur_proof,
+            "caller_value_accepted_as_proof": False,
+            "directory_name_inference_used": False,
+            "registry_source": dict(registry_values),
+            "registry_complete": len(registry_values) == len(
+                LIFECYCLE_RESTORE_REQUIRED_IDENTITY,
+            ),
+            "evidence_documents": [
+                {"pointer": doc["pointer"], "path": doc["path"],
+                 "sha256": doc["sha256"]}
+                for doc in docs
+            ],
+        }
+    return {
+        "proven": True,
+        "reason": "EXACT_DURABLE_BINDING_PROVEN",
+        "directory_name_inference_used": False,
+        "registry_source": dict(registry_values),
+        "registry_complete": len(registry_values) == len(
+            LIFECYCLE_RESTORE_REQUIRED_IDENTITY,
+        ),
+        "evidence_documents": [
+            {"pointer": doc["pointer"], "path": doc["path"],
+             "sha256": doc["sha256"]}
+            for doc in docs
+        ],
+        "identity_fields_proven": list(LIFECYCLE_RESTORE_REQUIRED_IDENTITY),
+    }
+
+
+def _restore_status_for_lifecycle(lifecycle: str) -> str:
+    return "ACTIVE" if lifecycle == "ACTIVE" else "QUIESCED"
+
+
+def _append_lifecycle_restore_ledger(
+        root: Path,
+        record: Mapping[str, Any],
+) -> None:
+    ledger = state_dir(root, mkdirs=True) / LIFECYCLE_RESTORE_LEDGER
+    payload = _json_safe(dict(record))
+    payload["recorded_at"] = _utc_now()
+    _append_jsonl(ledger, payload)
+
+
+def restore_workspace_lifecycle_binding(
+        root: str | Path,
+        *,
+        authority: str,
+        owner_authorization_id: str,
+        restored_lifecycle: str,
+        identity: Mapping[str, Any],
+        evidence_pointers: tuple[str, ...] | list[str] = (),
+        role_id: str = "",
+        policy: Mapping[str, Any] | None = None,
+        policy_path: str | Path | None = None,
+) -> dict[str, Any]:
+    """Restore one missing existing lifecycle record, Owner-gated.
+
+    This is the only write licensed by LIFECYCLE_BINDING_RESTORE_AUTHORITY
+    and it NEVER licenses physical deletion.  All required identity fields
+    must be proven from durable canonical evidence; missing, incomplete, or
+    contradictory evidence is BLOCKED / KEEP before any write.  Project,
+    task, session, and Owner identity are never inferred from a directory
+    name.
+    """
+    if authority != LIFECYCLE_BINDING_RESTORE_AUTHORITY:
+        return _restore_blocked("RESTORE_AUTHORITY_REQUIRED",
+                                authority=authority)
+    root_path = Path(root).expanduser().resolve()
+    try:
+        policy_data = load_tmp_gc_policy(root_path, policy_path, policy)
+    except (OSError, ValueError, TmpGcError) as exc:
+        return _restore_blocked("TMP_GC_POLICY_UNKNOWN:" + str(exc))
+    oaid = str(owner_authorization_id or "").strip()
+    if _restore_placeholder(oaid) or not oaid.startswith("owner-"):
+        return _restore_blocked("OWNER_AUTHORIZATION_REQUIRED",
+                                owner_authorization_present=False)
+    lifecycle = str(restored_lifecycle or "").strip().upper()
+    if lifecycle not in LIFECYCLE_RESTORE_STATUSES:
+        return _restore_blocked("LIFECYCLE_RESTORE_STATUS_INVALID",
+                                restored_lifecycle=lifecycle)
+    workspace_id = str(identity.get("workspace_id", "")).strip()
+    if _restore_placeholder(workspace_id):
+        return _restore_blocked("IDENTITY_FIELD_MISSING",
+                                missing=["workspace_id"])
+    latest = _latest_workspace_rows(root_path).get(workspace_id)
+    if latest is not None and str(latest.get("lifecycle_state", "")
+                                  ).strip().upper() == "DELETED":
+        return _restore_blocked("WORKSPACE_DELETED_STATE_IMMUTABLE")
+    proof = _restore_identity_proof(
+        root_path, identity, latest, evidence_pointers, policy_data,
+    )
+    if not proof.get("proven"):
+        return _restore_blocked(str(proof.get("reason", "BINDING_UNPROVEN")),
+                                binding_proof=proof,
+                                owner_authorization_present=True,
+                                delete_authorized=False)
+    try:
+        with _lease_writer_guard(root_path):
+            latest = _latest_workspace_rows(root_path).get(workspace_id)
+            if latest is None:
+                record = {
+                    "workspace_id": workspace_id,
+                    "project_id": str(identity["project_id"]).strip(),
+                    "owner_goal_id": "",
+                    "owner_task_id": str(identity["task_id"]).strip(),
+                    "task_id": str(identity["task_id"]).strip(),
+                    "session_id": str(identity["session_id"]).strip(),
+                    "root_path": str(identity["root_path"]).strip(),
+                    "temp_root": str(Path(str(identity["root_path"])).parent),
+                    "base_revision": str(identity["base_revision"]).strip(),
+                    "created_at": _utc_now(),
+                    "last_used_at": _utc_now(),
+                    "status": _restore_status_for_lifecycle(lifecycle),
+                    "lifecycle_state": lifecycle,
+                    "protection_reasons": (
+                        ["ACTIVE_SESSION"] if lifecycle == "ACTIVE"
+                        else ["UNKNOWN"]
+                    ),
+                    "mutation_policy": "UNKNOWN",
+                    "conflict_group": "",
+                    "git_worktree": False,
+                    "evidence_pointers": [str(p) for p in evidence_pointers],
+                    "workspace_type": "UNKNOWN",
+                    "purpose": "UNKNOWN",
+                    "creator": "",
+                    "restored_from_evidence": True,
+                    "owner_authorization_id": oaid,
+                    "restore_role_id": str(role_id or "").strip(),
+                    "restore_binding_proof": proof,
+                }
+                restored = register_workspace(
+                    root_path, record, _serialization_held=True,
+                )
+                event_type = "WORKSPACE_REGISTERED"
+            else:
+                status = _restore_status_for_lifecycle(lifecycle)
+                restored = _workspace_state_update(
+                    root_path,
+                    workspace_id,
+                    lifecycle_state=lifecycle,
+                    status=status,
+                    event_type="LIFECYCLE_BINDING_RESTORED",
+                    _serialization_held=True,
+                    owner_authorization_id=oaid,
+                    restore_role_id=str(role_id or "").strip(),
+                    restore_binding_proof=proof,
+                    restored_from_evidence=True,
+                )
+                event_type = "LIFECYCLE_BINDING_RESTORED"
+    except (OSError, ValueError) as exc:
+        return _restore_blocked("RESTORE_WRITE_FAILED:" + str(exc),
+                                owner_authorization_present=True,
+                                binding_proof=proof)
+    receipt = {
+        "schema": LIFECYCLE_BINDING_EVIDENCE_SCHEMA,
+        "authority": LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+        "status": "RESTORED",
+        "owner_authorization_id": oaid,
+        "restore_role_id": str(role_id or "").strip(),
+        "workspace_id": workspace_id,
+        "project_id": str(identity["project_id"]).strip(),
+        "task_id": str(identity["task_id"]).strip(),
+        "session_id": str(identity["session_id"]).strip(),
+        "root_path": str(identity["root_path"]).strip(),
+        "base_revision": str(identity["base_revision"]).strip(),
+        "restored_lifecycle": lifecycle,
+        "binding_proof": proof,
+        "evidence_pointers": [str(p) for p in evidence_pointers],
+        "delete_authorized": False,
+        "event_type": event_type,
+    }
+    try:
+        _append_lifecycle_restore_ledger(root_path, receipt)
+    except (OSError, ValueError) as exc:
+        return _restore_blocked("RESTORE_RECEIPT_WRITE_FAILED:" + str(exc),
+                                owner_authorization_present=True,
+                                binding_proof=proof)
+    return {
+        "status": "RESTORED",
+        "final_action": "KEEP",
+        "delete_authorized": False,
+        "restore_receipt": receipt,
+        "authority_model": {
+            "authority_license": LIFECYCLE_BINDING_RESTORE_AUTHORITY,
+            "owner_authorization_id": oaid,
+            "owner_authorization_present": True,
+            "delete_authorized": False,
+            "binding_proof": proof,
+        },
+        "workspace_id": workspace_id,
+        "restored_lifecycle": lifecycle,
+        "owner_authorization_present": True,
+        "binding_proof": proof,
+        "registry_record": _json_safe(restored),
+    }
 
 
 # ---- §19-22 Multi-project isolation (read-only coordinator) ---------------------
