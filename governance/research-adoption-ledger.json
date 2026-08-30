@@ -125,7 +125,7 @@
       "roadmap_slot": "family:roles",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter §7 never-reintroduce list."
+      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter \u00a77 never-reintroduce list."
     },
     {
       "research_id": "RA-EXT-004",
@@ -198,7 +198,7 @@
         "fail-closed state semantics"
       ],
       "rejected_ideas": [
-        "none — concepts fully consistent with fail-closed architecture"
+        "none \u2014 concepts fully consistent with fail-closed architecture"
       ],
       "p2p_translation": "Implemented as C11 durable task state (fail-closed state machine) and FW06 lease/interruption lifecycle.",
       "capability_family": "EXECUTION_AND_ORCHESTRATION",
@@ -309,7 +309,7 @@
       "evidence_pointers": [
         "RI-003 (research-intake-ledger.json)",
         "capability-skill-map.md NUI row",
-        "charter §7 174_NUI_FACULTIES_AS_AGENTS REJECTED"
+        "charter \u00a77 174_NUI_FACULTIES_AS_AGENTS REJECTED"
       ],
       "dependencies": [
         "RA-EXT-008",
@@ -394,7 +394,7 @@
       "roadmap_slot": "family:isolation",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' — fully embedded in C17/FW06."
+      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' \u2014 fully embedded in C17/FW06."
     },
     {
       "research_id": "RA-EXT-012",
@@ -412,7 +412,7 @@
       "canonical_capability_ids": [],
       "status": "UNKNOWN",
       "evidence_pointers": [
-        "this ledger (no matching evidence found in docs/ governance/ — verified by full-text search 2026-08-21)"
+        "this ledger (no matching evidence found in docs/ governance/ \u2014 verified by full-text search 2026-08-21)"
       ],
       "dependencies": [],
       "roadmap_slot": "not_adopted",
@@ -715,7 +715,7 @@
       "research_id": "RA-EXT-021",
       "source_name": "Large Goal autonomous execution research",
       "source_type": "OWNER_IDEA",
-      "source_reference": "Owner goal specifications (C12/C15 lineage; spec §10 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
+      "source_reference": "Owner goal specifications (C12/C15 lineage; spec \u00a710 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
       "source_version_or_commit": "Owner goal documents",
       "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
       "research_summary": "One Owner goal -> internal task graph -> automatic safe continuation -> checkpoint/resume -> bounded foreground execution -> Owner Gate only when necessary -> no per-task nagging.",
@@ -753,7 +753,7 @@
       "research_id": "RA-EXT-022",
       "source_name": "Beginner-first experience research",
       "source_type": "OWNER_IDEA",
-      "source_reference": "charter §1 North Star; beginner lifecycle plans 2026-08-10/13*",
+      "source_reference": "charter \u00a71 North Star; beginner lifecycle plans 2026-08-10/13*",
       "source_version_or_commit": "charter",
       "provenance_status": "IMPLEMENTED_AND_NORTH_STAR",
       "research_summary": "Progressive disclosure, minimal technical questions, Owner asked only product/business/material decisions, technical choices made by P2P when safely inferable, accessibility where the project requires it.",
@@ -774,7 +774,7 @@
       ],
       "status": "VERIFIED",
       "evidence_pointers": [
-        "charter §1/§4/§6",
+        "charter \u00a71/\u00a74/\u00a76",
         "docs/plans 2026-08-10-p2p-beginner-*",
         "FW05 owner summary modules"
       ],
@@ -901,7 +901,7 @@
       "research_id": "RA-EXT-026",
       "source_name": "Safety boundaries deliberately rejected (Z register)",
       "source_type": "OWNER_IDEA",
-      "source_reference": "charter §7 never-reintroduce list; capability-index REJECTED entries",
+      "source_reference": "charter \u00a77 never-reintroduce list; capability-index REJECTED entries",
       "source_version_or_commit": "charter + capability-index",
       "provenance_status": "REGISTER_MAINTAINED",
       "research_summary": "Permission bypass, auto-approve-all, unbounded fanout, unbounded background autonomy, automatic dependency-chain autonomy, unofficial scraping as core, GitHub Actions as brain/control plane, single-vendor lock-in, AI self-report as evidence.",
@@ -927,15 +927,15 @@
         "BLIND_RETRY",
         "HOST_OUTPUT_AS_FINAL_EVIDENCE"
       ],
-      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter §7 and the capability ledger with status REJECTED and preserved reasons.",
+      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter \u00a77 and the capability ledger with status REJECTED and preserved reasons.",
       "capability_family": "SAFETY_AUTHORITY_PERMISSIONS",
       "canonical_capability_ids": [
         "15 REJECTED entries in capability-index.json",
-        "charter §7 never-reintroduce list"
+        "charter \u00a77 never-reintroduce list"
       ],
       "status": "VERIFIED",
       "evidence_pointers": [
-        "charter §7",
+        "charter \u00a77",
         "capability-index.json REJECTED entries (15)"
       ],
       "dependencies": [],
@@ -951,7 +951,7 @@
       "source_reference": "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (and Pilot-02 harness/commit history)",
       "source_version_or_commit": "P2P-C40-PILOT approval 2026-08-18; integrated in artifact .40/.41",
       "provenance_status": "INTERNAL_PILOT_EVIDENCE",
-      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truyện clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
+      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truy\u1ec7n clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
       "selected_ideas": [
         "bounded documentation mutation with pre-write authorization binding",
         "second-path pre-write block (B_BYTES_WRITTEN = 0)",
@@ -988,7 +988,7 @@
       "source_reference": "docs/p2p-development/research/c43/evidence/ (16 evidence JSONs, harness c43_gametruyen_activation.py)",
       "source_version_or_commit": "recorded 2026-08-19 on branch p2p-framework-00-product-memory, commit a9764ab9",
       "provenance_status": "INTERNAL_RESEARCH_EVIDENCE",
-      "research_summary": "Production-install evidence pack for Game Truyện and Gia Phả (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
+      "research_summary": "Production-install evidence pack for Game Truy\u1ec7n and Gia Ph\u1ea3 (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
       "selected_ideas": [
         "installation lifecycle evidence on authoritative projects",
         "acceptance-bar-driven install/activation",
@@ -1065,7 +1065,7 @@
       ],
       "roadmap_relation": "composition into RM-PRIORITY-CONTEXT (B)",
       "appended_at": "2026-08-21T05:42:58Z",
-      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, \u00a79 Serialization, \u00a717 Contract, \u00a718 Permission Boundary. Verified via Candidate .45."
     },
     {
       "research_id": "RA-EXT-030",
@@ -1080,7 +1080,7 @@
       "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
       "lineage_note": "CRI adoption lineage: RA-EXT-029 (bound to RI-008 during INTAKE-CLOSURE-01) and this record (bound to RI-007) refer to the same Owner-accepted CRI direction. Roadmap consideration exists via RM-PRIORITY-CONTEXT composition entry (intake_record RI-008) and source_research_ids; this record adds the missing explicit RI-007 binding.",
       "roadmap_relation": "composed-in-RM-PRIORITY-CONTEXT",
-      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, \u00a79 Serialization, \u00a717 Contract, \u00a718 Permission Boundary. Verified via Candidate .45."
     },
     {
       "research_id": "RA-EXT-031",
@@ -1122,7 +1122,7 @@
       ],
       "roadmap_relation": "composition into RM-PRIORITY-RELEASE-LIFECYCLE",
       "appended_at": "2026-08-21T11:05:00Z",
-      "notes": "Verified via Pilot installation on Game Truyện (desktop) and Manus ExecutionTarget certification."
+      "notes": "Verified via Pilot installation on Game Truy\u1ec7n (desktop) and Manus ExecutionTarget certification."
     },
     {
       "research_id": "RA-EXT-032",
@@ -1673,6 +1673,595 @@
       "owner_decision_status": "REFERENCE_ONLY",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
       "notes": "MIT license. Very low maturity. REFERENCE_ONLY."
+    },
+    {
+      "research_id": "RA-EXT-050",
+      "source_name": "zjp-shadow/CharacterGen",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/zjp-shadow/CharacterGen",
+      "source_version_or_commit": "f329a835dbd5",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Apache-2.0 code; VRM dataset cannot be redistributed; GPU offline forge",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.character.generate. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.generate"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-001"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "Apache-2.0 code; VRM dataset cannot be redistributed; GPU offline forge"
+    },
+    {
+      "research_id": "RA-EXT-051",
+      "source_name": "makehumancommunity/mpfb2",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/makehumancommunity/mpfb2",
+      "source_version_or_commit": "437dd513888a",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "NOASSERTION license; Blender DCC; LICENSE_GATE",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.character.generate. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.generate"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-002"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "NOASSERTION license; Blender DCC; LICENSE_GATE"
+    },
+    {
+      "research_id": "RA-EXT-052",
+      "source_name": "Upliner/CharMorph",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Upliner/CharMorph",
+      "source_version_or_commit": "ec5e13dcd5a7",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "NOASSERTION license; Blender addon",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.character.generate. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.generate"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-003"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "NOASSERTION license; Blender addon"
+    },
+    {
+      "research_id": "RA-EXT-053",
+      "source_name": "VAST-AI-Research/SkinTokens",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/VAST-AI-Research/SkinTokens",
+      "source_version_or_commit": "273b691d3598",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT code; HF weights not downloaded; MODEL_WEIGHT_GATE",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.character.rig. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.rig"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-004"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT code; HF weights not downloaded; MODEL_WEIGHT_GATE"
+    },
+    {
+      "research_id": "RA-EXT-054",
+      "source_name": "VAST-AI-Research/UniRig",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/VAST-AI-Research/UniRig",
+      "source_version_or_commit": "6793c6640ff0",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT code; HF weights not downloaded",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.character.rig. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.rig"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-005"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT code; HF weights not downloaded"
+    },
+    {
+      "research_id": "RA-EXT-055",
+      "source_name": "Isabella98Liu/RigAnything",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Isabella98Liu/RigAnything",
+      "source_version_or_commit": "d03cdb21dd13",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "NOASSERTION license; LICENSE_GATE",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.character.rig. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.rig"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-006"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "NOASSERTION license; LICENSE_GATE"
+    },
+    {
+      "research_id": "RA-EXT-056",
+      "source_name": "pixiv/three-vrm",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pixiv/three-vrm",
+      "source_version_or_commit": "76e0109ef36f",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT Three.js VRM runtime",
+      "selected_ideas": [
+        "lightweight-runtime"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "ACCEPT: mapped to game.character.runtime. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.character.runtime"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-007"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "ACCEPT",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT Three.js VRM runtime"
+    },
+    {
+      "research_id": "RA-EXT-057",
+      "source_name": "img2threejs existing P2P capability",
+      "source_type": "P2P_CAPABILITY",
+      "source_reference": "https://github.com/img2threejs/img2threejs.git",
+      "source_version_or_commit": "dede5909be4e494b228c801a55dda47439143932",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Preserve security semantics; explicit adapter only",
+      "selected_ideas": [
+        "lightweight-runtime"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "ACCEPT: mapped to img2threejs. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "img2threejs"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-008"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "ACCEPT",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "Preserve security semantics; explicit adapter only"
+    },
+    {
+      "research_id": "RA-EXT-058",
+      "source_name": "TencentARC/InstantMesh",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/TencentARC/InstantMesh",
+      "source_version_or_commit": "08822c52fdc3",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Apache-2.0 code; weights not downloaded",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to img2threejs. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "img2threejs"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-009"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "Apache-2.0 code; weights not downloaded"
+    },
+    {
+      "research_id": "RA-EXT-059",
+      "source_name": "VAST-AI-Research/TripoSR",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/VAST-AI-Research/TripoSR",
+      "source_version_or_commit": "107cefdc244c",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT code; weights not downloaded",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to img2threejs. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "img2threejs"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-010"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT code; weights not downloaded"
+    },
+    {
+      "research_id": "RA-EXT-060",
+      "source_name": "microsoft/TRELLIS",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/microsoft/TRELLIS",
+      "source_version_or_commit": "442aa1e1afb9",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT code; MODEL_WEIGHT_GATE",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to img2threejs. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "img2threejs"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-011"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT code; MODEL_WEIGHT_GATE"
+    },
+    {
+      "research_id": "RA-EXT-061",
+      "source_name": "microsoft/TRELLIS.2",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/microsoft/TRELLIS.2",
+      "source_version_or_commit": "75fbf0183001",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT code; MODEL_WEIGHT_GATE",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to img2threejs. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "img2threejs"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-012"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT code; MODEL_WEIGHT_GATE"
+    },
+    {
+      "research_id": "RA-EXT-062",
+      "source_name": "nv-tlabs/kimodo",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/nv-tlabs/kimodo",
+      "source_version_or_commit": "1aece8c124d7",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Apache-2.0; not approved before owner gate",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.animation.motion_forge. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.animation.motion_forge"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-013"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "Apache-2.0; not approved before owner gate"
+    },
+    {
+      "research_id": "RA-EXT-063",
+      "source_name": "EricGuo5513/momask-codes",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/EricGuo5513/momask-codes",
+      "source_version_or_commit": "94a6636c9c46",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT code; HumanML3D dataset gate",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.animation.motion_forge. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.animation.motion_forge"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-014"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT code; HumanML3D dataset gate"
+    },
+    {
+      "research_id": "RA-EXT-064",
+      "source_name": "Alchemist0823/three.quarks",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Alchemist0823/three.quarks",
+      "source_version_or_commit": "de7c207f791c",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT particle runtime",
+      "selected_ideas": [
+        "lightweight-runtime"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "ACCEPT: mapped to game.vfx.particles. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.vfx.particles"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-015"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "ACCEPT",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT particle runtime"
+    },
+    {
+      "research_id": "RA-EXT-065",
+      "source_name": "mustache-dev/Three-VFX",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/mustache-dev/Three-VFX",
+      "source_version_or_commit": "c5533097adbc",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT WebGPU stack-conditional",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "CONDITIONAL: mapped to game.vfx.particles. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.vfx.particles"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-016"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT WebGPU stack-conditional"
+    },
+    {
+      "research_id": "RA-EXT-066",
+      "source_name": "ShaderFrog/core",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/ShaderFrog/core",
+      "source_version_or_commit": "9f5b0c08fb70",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "No GitHub SPDX license; do not vendor",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "REFERENCE_ONLY: mapped to game.vfx.shader. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.vfx.shader"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-017"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "No GitHub SPDX license; do not vendor"
+    },
+    {
+      "research_id": "RA-EXT-067",
+      "source_name": "IceCreamYou/THREE.Terrain",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/IceCreamYou/THREE.Terrain",
+      "source_version_or_commit": "434d977ffdba",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT procedural terrain",
+      "selected_ideas": [
+        "lightweight-runtime"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "ACCEPT: mapped to game.world.terrain. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.world.terrain"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-018"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "ACCEPT",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT procedural terrain"
+    },
+    {
+      "research_id": "RA-EXT-068",
+      "source_name": "CK42BB/procedural-landscapes-threejs",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/CK42BB/procedural-landscapes-threejs",
+      "source_version_or_commit": "f7c147a8ee3d",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "MIT low maturity",
+      "selected_ideas": [
+        "offline-forge-then-durable-asset"
+      ],
+      "rejected_ideas": [
+        "install-in-shipped-browser-game",
+        "download-weights-into-p2p",
+        "second-ontology"
+      ],
+      "p2p_translation": "REFERENCE_ONLY: mapped to game.world.terrain. No global install.",
+      "capability_family": "GAME_ASSET_FORGE",
+      "canonical_capability_ids": [
+        "game.world.terrain"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json CAND-ASSET-FORGE-019"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:game-asset-forge",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-08-29T20:00:00Z",
+      "notes": "MIT low maturity"
     }
   ],
   "rejected_register_summary": {

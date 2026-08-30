@@ -102,6 +102,14 @@ read only the following project-projected surfaces in order:
    protocol;
 5. the browser/visual QA and Arena evidence return contract.
 
+When an Arena task is an Asset Forge / character / VFX / terrain goal for
+`THREEJS_GAME` or `R3F_GAME`, discover only the projected minimum:
+
+1. `docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json`;
+2. `docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md`;
+3. existing `img2threejs` and `visual.gpt_image_2_style_library` records;
+4. project-profile routing (optional, goal-based, never global).
+
 The capability must answer these fields before execution: `WHEN_TO_USE`,
 `WHEN_NOT_TO_USE`, `PINNED_UPSTREAM_SHA`, `SAFETY_BOUNDARIES`,
 `ALLOWED_ENTRYPOINTS`, `CHARACTER_PIPELINE_PROTOCOL`, `ASSET_FORGE_PROTOCOL`,

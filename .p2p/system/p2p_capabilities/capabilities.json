@@ -300,20 +300,20 @@
         "screen",
         "dashboard",
         "design",
-        "thiết kế",
-        "dễ nhìn",
-        "quản lý",
-        "giao diện",
-        "màn hình",
-        "bố cục",
-        "quy trình",
-        "khó dùng",
-        "dễ dùng",
-        "khó tìm",
-        "dễ đọc",
-        "khó đọc",
-        "rối",
-        "điện thoại",
+        "thi\u1ebft k\u1ebf",
+        "d\u1ec5 nh\u00ecn",
+        "qu\u1ea3n l\u00fd",
+        "giao di\u1ec7n",
+        "m\u00e0n h\u00ecnh",
+        "b\u1ed1 c\u1ee5c",
+        "quy tr\u00ecnh",
+        "kh\u00f3 d\u00f9ng",
+        "d\u1ec5 d\u00f9ng",
+        "kh\u00f3 t\u00ecm",
+        "d\u1ec5 \u0111\u1ecdc",
+        "kh\u00f3 \u0111\u1ecdc",
+        "r\u1ed1i",
+        "\u0111i\u1ec7n tho\u1ea1i",
         "layout",
         "visual",
         "typography",
@@ -322,7 +322,7 @@
         "mobile",
         "accessibility",
         "button",
-        "nút",
+        "n\u00fat",
         "padding",
         "form",
         "navigation"
@@ -388,15 +388,15 @@
         "user need",
         "visual direction",
         "design system",
-        "thiết kế",
-        "dễ nhìn",
-        "quản lý",
-        "giao diện",
-        "màn hình",
-        "bố cục",
-        "quy trình",
-        "khó tìm",
-        "điện thoại",
+        "thi\u1ebft k\u1ebf",
+        "d\u1ec5 nh\u00ecn",
+        "qu\u1ea3n l\u00fd",
+        "giao di\u1ec7n",
+        "m\u00e0n h\u00ecnh",
+        "b\u1ed1 c\u1ee5c",
+        "quy tr\u00ecnh",
+        "kh\u00f3 t\u00ecm",
+        "\u0111i\u1ec7n tho\u1ea1i",
         "ux",
         "ui",
         "interface",
@@ -668,7 +668,7 @@
         "summarize",
         "translation",
         "translate",
-        "dịch",
+        "d\u1ecbch",
         "database",
         "db",
         "legal",
@@ -781,12 +781,12 @@
       "NEGATIVE_TRIGGERS": [
         "translate",
         "translation",
-        "dịch",
+        "d\u1ecbch",
         "read",
         "reading",
         "summarize",
         "summary",
-        "tóm tắt",
+        "t\u00f3m t\u1eaft",
         "timestamp",
         "timestamps",
         "timecode",
@@ -923,7 +923,7 @@
         "dependency",
         "translation",
         "translate",
-        "dịch",
+        "d\u1ecbch",
         "camera"
       ],
       "INVOCATION_CLASS": "MODEL_ROUTABLE",
@@ -1895,7 +1895,7 @@
       "CAPABILITY_ID": "img2threejs",
       "TYPE": "SKILL",
       "SEMANTIC_KIND": "EXTERNAL_RUNTIME",
-      "DESCRIPTION": "Selective, fail-closed img2threejs execution and Thiên Hạ character/asset protocol projection through an exact pinned upstream checkout.",
+      "DESCRIPTION": "Selective, fail-closed img2threejs execution and Thi\u00ean H\u1ea1 character/asset protocol projection through an exact pinned upstream checkout.",
       "TRIGGERS": [
         "img2threejs",
         "image-to-3d reconstruction",
@@ -3791,6 +3791,541 @@
         "CERTIFIED": "CAND-GAME-UI-012,014,015,016,017",
         "freshness": "CURRENT",
         "license_note": "Multiple sources with varying license gates. Per-candidate review required."
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.character.generate",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Offline character mesh generation contract. Not runtime. Distinct from rig/skin/runtime.",
+      "TRIGGERS": [
+        "character generation",
+        "character mesh",
+        "makehuman",
+        "charmorph",
+        "charactergen"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "three-vrm runtime",
+        "particle vfx",
+        "terrain"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "visual.gpt_image_2_style_library"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md",
+        "visual.gpt_image_2_style_library"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "offline-forge-contract",
+        "license-gate",
+        "dataset-gate"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "P2P-GAME-ASSET-FORGE-01",
+        "scope": "offline_character_generation",
+        "CERTIFIED": "CAND-ASSET-FORGE-001,002,003",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.character.rig",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Offline auto-rig/skin contract. Distinct from generation and runtime.",
+      "TRIGGERS": [
+        "auto rig",
+        "skinning",
+        "unirig",
+        "skintokens",
+        "riganything"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "vrm runtime",
+        "terrain",
+        "particles"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.character.generate"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md",
+        "game.mengto.rigged_assets"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "offline-forge-contract",
+        "model-weight-gate"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "P2P-GAME-ASSET-FORGE-01",
+        "scope": "offline_rig_skin",
+        "CERTIFIED": "CAND-ASSET-FORGE-004,005,006",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.character.runtime",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Lightweight Three.js humanoid/VRM runtime. Not a generator.",
+      "TRIGGERS": [
+        "three-vrm",
+        "vrm runtime",
+        "humanoid runtime",
+        "character runtime"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "generate character mesh",
+        "download unirig weights"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "treat-runtime-as-generator"
+      ],
+      "REQUIRES": [
+        "game.three.asset"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md",
+        "game.mengto.rigged_assets"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "project-selective-activation"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "durable-vrm-or-gltf",
+        "browser-visual-qa"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "pixiv/three-vrm",
+        "repository": "https://github.com/pixiv/three-vrm",
+        "license": "MIT",
+        "pinned": "76e0109ef36f",
+        "CERTIFIED": "CAND-ASSET-FORGE-007",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.character.expression",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Facial expression / viseme runtime distinct from motion clips.",
+      "TRIGGERS": [
+        "facial expression",
+        "viseme",
+        "vrm expression",
+        "blendshape"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "motion diffusion",
+        "terrain"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.character.runtime"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "expression-not-equal-motion"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "pixiv/three-vrm",
+        "license": "MIT",
+        "CERTIFIED": "CAND-ASSET-FORGE-007",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.animation.motion_forge",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Offline motion generation. kimodo/MoMask not approved until owner gate.",
+      "TRIGGERS": [
+        "motion forge",
+        "kimodo",
+        "momask",
+        "motion diffusion"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "three.quarks",
+        "terrain"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "approved-motion-source",
+        "dataset-gate",
+        "model-weight-gate"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "P2P-GAME-ASSET-FORGE-01",
+        "scope": "offline_motion",
+        "CERTIFIED": "CAND-ASSET-FORGE-013,014",
+        "freshness": "CURRENT",
+        "approval_note": "kimodo and MoMask are CONDITIONAL not approved"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.animation.retarget",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Retarget and bake motion to animation clips for game state machines.",
+      "TRIGGERS": [
+        "retarget",
+        "bake animation clip",
+        "animation retarget"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "generate mesh",
+        "particle authoring"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.animation.motion_forge"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md",
+        "game.three.asset"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "baked-animation-clip"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "P2P-GAME-ASSET-FORGE-01",
+        "scope": "retarget_bake",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.vfx.particles",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Three.js particle VFX runtime (three.quarks ACCEPT; Three-VFX CONDITIONAL WebGPU).",
+      "TRIGGERS": [
+        "particles",
+        "three.quarks",
+        "vfx particles"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "character generation",
+        "unirig"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.three.visual"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "performance-gate",
+        "vfx-lab"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "Alchemist0823/three.quarks",
+        "license": "MIT",
+        "pinned": "de7c207f791c",
+        "CERTIFIED": "CAND-ASSET-FORGE-015",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.vfx.shader",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Shader authoring contract. ShaderFrog/core is REFERENCE_ONLY until license exists.",
+      "TRIGGERS": [
+        "shader authoring",
+        "frogmaterial",
+        "custom shader"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "download trellis weights"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.three.visual"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "license-gate",
+        "performance-gate"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "ShaderFrog/core",
+        "license": "UNKNOWN",
+        "CERTIFIED": "CAND-ASSET-FORGE-017",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.world.terrain",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Procedural Three.js terrain geometry. Distinct from vegetation/atmosphere/landmarks.",
+      "TRIGGERS": [
+        "terrain",
+        "procedural terrain",
+        "THREE.Terrain"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "hero character",
+        "facial expression"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.three.visual"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "procedural-boundary-acknowledged"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "IceCreamYou/THREE.Terrain",
+        "license": "MIT",
+        "pinned": "434d977ffdba",
+        "CERTIFIED": "CAND-ASSET-FORGE-018",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "game.world.vegetation",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Vegetation/instancing separate from terrain geometry.",
+      "TRIGGERS": [
+        "vegetation",
+        "instancing foliage",
+        "scatter trees"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "hero character mesh"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "asset-forge-protocol",
+        "existing-p2p-router"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-upstream-ai-systems",
+        "download-model-weights",
+        "ship-heavy-ai-in-browser-runtime",
+        "promote-without-owner-gate",
+        "alter-img2threejs-security-semantics"
+      ],
+      "REQUIRES": [
+        "game.world.terrain"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/game-asset-forge/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/asset-forge-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-offline-forge-execution",
+        "license-gate",
+        "model-weight-gate"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "instancing-not-authored-landmark"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "P2P-GAME-ASSET-FORGE-01",
+        "CERTIFIED": "CAND-ASSET-FORGE-018",
+        "freshness": "CURRENT"
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"

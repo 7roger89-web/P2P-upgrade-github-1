@@ -79,8 +79,8 @@ Based on the project profile, provide references to:
 | `WEB_APP` | UI Design Protocol |
 | `MOBILE_APP` | UI Design Protocol |
 | `2D_GAME` | UI Design Protocol, Game UI Protocol |
-| `THREEJS_GAME` | UI Design Protocol, Game UI Protocol, Three.js Visual Protocol |
-| `R3F_GAME` | UI Design Protocol, Game UI Protocol, Three.js Visual Protocol |
+| `THREEJS_GAME` | UI Design Protocol, Game UI Protocol, Three.js Visual Protocol, Asset Forge Protocol |
+| `R3F_GAME` | UI Design Protocol, Game UI Protocol, Three.js Visual Protocol, Asset Forge Protocol |
 
 ## Step 8: Discover Activated Third-Party Capabilities
 
