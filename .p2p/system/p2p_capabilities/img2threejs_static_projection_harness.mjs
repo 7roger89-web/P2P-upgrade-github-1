@@ -12,12 +12,23 @@
 // array, or unusable geometry terminates the process with an error code on
 // the last stdout line and a non-zero exit status.
 //
+// This is also the verified generator boundary, so it owns exactly one
+// separation: the pinned generator populates every material's `userData` with
+// its OWN non-appearance bookkeeping (sculptMaterial, pbrConstraints,
+// materialEvidence, ...). Before the generic appearance projection runs, that
+// metadata is classified by `img2threejs_generator_metadata.mjs`; when — and
+// only when — it is proven to be the verified generator's inert metadata, it
+// is detached and attested in the bake manifest. Anything else stays
+// fail-closed. The generic material snapshot itself is unchanged and still
+// treats ANY arbitrary/non-empty userData as drift.
+//
 // This file is P2P-owned code, not an upstream allowlisted entrypoint.
 
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { materialSnapshot } from "./img2threejs_material_snapshot.mjs";
+import { separateGeneratorMaterialMetadata } from "./img2threejs_generator_metadata.mjs";
 
 const BAKE_SCHEMA = "p2p-img2threejs-runtime-bake/1";
 const MAX_NODES = 8192;
@@ -84,7 +95,31 @@ if (Array.isArray(root.animations) && root.animations.length > 0) fail("ANIMATIO
 
 root.updateMatrixWorld(true);
 
+// Bake attestation for the generator-metadata separation. The factory SHA256
+// already binds this manifest to the exact generated factory bytes, so these
+// two fields are sufficient audit evidence that the separation happened and
+// for exactly which keys. They never enter the static GLB material contract.
+const generatorMetadataKeys = new Set();
+let generatorMetadataPresent = false;
+
 function snapshotMaterial(material) {
+  // Generator/harness boundary separation, applied BEFORE the generic
+  // appearance projection: the verified pinned generator writes its own
+  // non-appearance bookkeeping into every material's `userData`, and the
+  // generic snapshot is right to reject arbitrary non-empty userData. Only a
+  // userData proven to be that generator's inert metadata is detached; every
+  // other value fails closed with an explicit code.
+  let separation;
+  try {
+    separation = separateGeneratorMaterialMetadata(material);
+  } catch (error) {
+    if (error && typeof error.code === "string") fail(error.code);
+    fail("MATERIAL_USERDATA_CLASSIFICATION_FAILED");
+  }
+  if (separation.present) {
+    generatorMetadataPresent = true;
+    for (const key of separation.keys) generatorMetadataKeys.add(key);
+  }
   try {
     return materialSnapshot(material);
   } catch (error) {
@@ -92,6 +127,10 @@ function snapshotMaterial(material) {
     // fail-closed reason; translate it into the harness's terminal fail line.
     if (error && typeof error.code === "string") fail(error.code);
     fail("MATERIAL_SNAPSHOT_FAILED");
+  } finally {
+    // The material is a live object in the scene graph: separation is
+    // evidence-backed and reversible, never a silent mutation.
+    separation.restore();
   }
 }
 
@@ -181,6 +220,10 @@ const manifest = {
   runtime: { node: process.version, three: THREE.REVISION },
   factory_sha256: factoryDigest,
   factory_export: candidateNames[0],
+  generator_material_metadata: {
+    present: generatorMetadataPresent,
+    keys: [...generatorMetadataKeys].sort(),
+  },
   aggregate: {
     nodes: nodes.length,
     skinned_meshes: skinnedMeshes,
