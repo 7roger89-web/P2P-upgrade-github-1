@@ -408,6 +408,187 @@ class MaterialDefaultUserDataTests(unittest.TestCase):
             _project(manifest)
 
 
+class GeneratorUserDataBoundaryTests(unittest.TestCase):
+    """P2P-IMG2THREEJS-GENERATOR-USERDATA-BOUNDARY-01.
+
+    The pinned generator writes its OWN non-appearance bookkeeping into every
+    material's ``userData`` (``sculptMaterial``, ``pbrConstraints``,
+    ``materialEvidence``, ...), so the verified generated factory legitimately
+    carries non-empty userData. The generator/harness boundary now separates
+    that proven metadata before the generic appearance projection and attests
+    it in the bake manifest.
+
+    These tests prove the separation is NOT laundering: the generic
+    ``userData`` rejection, the appearance fail-closed rules, the static GLB
+    material contract, and the factory SHA binding all behave exactly as they
+    did before the boundary existed.
+    """
+
+    ATTESTATION = {
+        "present": True,
+        "keys": [
+            "materialEvidence",
+            "pbrConstraints",
+            "pbrTextureSource",
+            "proceduralMapsIndependent",
+            "referenceMaterialId",
+            "referencePbr",
+            "sculptMaterial",
+            "validationViews",
+        ],
+    }
+
+    def _project_with_attestation(self, material, *, target=0.5):
+        manifest = _manifest(
+            [_group_node("root", None), _mesh_node("hilt", "root", positions=[0, 0, 0, 1, 0, 0, 0, 1, 0], material=material)],
+            generator_material_metadata=dict(self.ATTESTATION),
+        )
+        return _project(manifest, target=target)
+
+    def test_attested_separation_lets_a_default_appearance_material_through(self):
+        asset, evidence = self._project_with_attestation(_material(type="MeshPhysicalMaterial", drift=[]))
+        self.assertEqual(asset["meshes"][0]["material"]["type"], "MeshStandardMaterial")
+        self.assertEqual(evidence["material_narrowing"], {"physical_to_standard": 1})
+
+    def test_attestation_never_enters_the_static_glb_material_contract(self):
+        asset, _evidence = self._project_with_attestation(_material(type="MeshPhysicalMaterial", drift=[]))
+        serialized = json.dumps(asset, sort_keys=True)
+        for key in self.ATTESTATION["keys"]:
+            self.assertNotIn(key, serialized)
+        self.assertNotIn("userData", serialized)
+        self.assertNotIn("generator_material_metadata", serialized)
+        # the material contract surface is exactly the projected subset
+        self.assertEqual(
+            sorted(asset["meshes"][0]["material"]),
+            ["color", "metalness", "opacity", "roughness", "type"],
+        )
+
+    def test_attestation_present_does_not_launder_active_transmission(self):
+        with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "UNSUPPORTED_MATERIAL_FEATURE:transmission"):
+            self._project_with_attestation(_material(type="MeshPhysicalMaterial", drift=[["transmission", 0.4]]))
+
+    def test_attestation_present_does_not_launder_active_clearcoat(self):
+        with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "UNSUPPORTED_MATERIAL_FEATURE:clearcoat"):
+            self._project_with_attestation(_material(type="MeshPhysicalMaterial", drift=[["clearcoat", 1.0]]))
+
+    def test_attestation_present_does_not_launder_userdata_drift(self):
+        # an arbitrary/non-empty userData that reaches the generic boundary
+        # still fails closed; attestation is not a bypass
+        with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "UNSUPPORTED_MATERIAL_FEATURE:userData"):
+            self._project_with_attestation(_material(drift=[["userData", "object"]]))
+
+    def test_attestation_present_does_not_launder_nonfinite_attenuation_distance(self):
+        with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "UNSUPPORTED_MATERIAL_FEATURE:attenuationDistance"):
+            self._project_with_attestation(_material(type="MeshPhysicalMaterial", drift=[["attenuationDistance", float("nan")]]))
+
+
+class FactoryBindingWithGeneratorMetadataTests(unittest.TestCase):
+    """The generator-metadata separation lives inside the verified route only.
+
+    The bake manifest attestation is bound by the SAME factory SHA256 gate that
+    already binds every other manifest field, so an attestation cannot be
+    forged or replayed against a different factory.
+
+    Fully offline: the pinned-upstream and runtime-profile verifiers, the
+    upstream execution boundary, and the Node bake step are replaced by fakes
+    so the test proves only the adapter's own binding contract.
+    """
+
+    SPEC = b'{"name": "Oak", "componentTree": []}'
+
+    def _run_seam(self, workspace: Path, *, factory_sha256=None):
+        spec_path = workspace / "input" / "character-spec.json"
+        spec_path.parent.mkdir(parents=True, exist_ok=True)
+        spec_path.write_bytes(self.SPEC)
+        runtime_root = workspace / "runtime"
+        (runtime_root / "node_modules" / "three" / "build").mkdir(parents=True)
+        (runtime_root / "node_modules" / "three" / "build" / "three.module.js").write_text("export {}", encoding="utf-8")
+        (runtime_root / "node_modules" / "three" / "package.json").write_text(json.dumps({"version": adapter.VERIFIED_THREE_VERSION}), encoding="utf-8")
+
+        def fake_execute(entrypoint, **kwargs):
+            if entrypoint == GENERATE_ENTRYPOINT:
+                (workspace / kwargs["output_path"]).write_bytes(b"export function createFixtureModel() { throw 0; }\n")
+            return {"status": "EXECUTED", "entrypoint": entrypoint}
+
+        def fake_copytree(src, dst, **_kwargs):
+            source = Path(src)
+            target = Path(dst)
+            (target / "build").mkdir(parents=True, exist_ok=True)
+            (target / "package.json").write_bytes((source / "package.json").read_bytes())
+            (target / "build" / "three.module.js").write_bytes((source / "build" / "three.module.js").read_bytes())
+
+        def fake_run(argv, *args, **kwargs):
+            factory = Path(argv[argv.index("--factory") + 1])
+            out = Path(argv[argv.index("--out") + 1])
+            digest = hashlib.sha256(factory.read_bytes()).hexdigest() if factory_sha256 is None else factory_sha256
+            manifest = {
+                "schema": adapter.RUNTIME_BAKE_SCHEMA,
+                "status": "BAKED",
+                "up_axis": "Y",
+                "runtime": {"node": adapter.VERIFIED_NODE_VERSION, "three": adapter.VERIFIED_THREE_REVISION},
+                "factory_sha256": digest,
+                "factory_export": "createFixtureModel",
+                "generator_material_metadata": {
+                    "present": True,
+                    "keys": ["pbrTextureSource", "proceduralMapsIndependent", "sculptMaterial"],
+                },
+                "aggregate": {"nodes": 2, "skinned_meshes": 0, "bones": 0, "animations": 0, "skeletons": 0, "maximum_depth": 1},
+                "nodes": [
+                    _group_node("root", None),
+                    _mesh_node("n0001", "root", positions=[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                ],
+            }
+            out.write_text(json.dumps(manifest), encoding="utf-8")
+            return SimpleNamespace(returncode=0, stdout="P2P_IMG2THREEJS_BAKE_OK nodes=2\n", stderr="")
+
+        with (
+            mock.patch.object(adapter, "verify_upstream_checkout", lambda _root: {
+                "commit": adapter.UPSTREAM_SHA,
+                "tree": adapter.UPSTREAM_TREE,
+            }),
+            mock.patch.object(adapter, "verify_static_runtime_profile", lambda _root, *, node_executable="node": {
+                "node_executable": "node-fake",
+                "node_version": adapter.VERIFIED_NODE_VERSION,
+                "three_version": adapter.VERIFIED_THREE_VERSION,
+                "three_revision": adapter.VERIFIED_THREE_REVISION,
+                "three_entrypoint": str(runtime_root / "node_modules" / "three" / "build" / "three.module.js"),
+                "runtime_root": str(runtime_root),
+            }),
+            mock.patch.object(adapter.shutil, "copytree", fake_copytree),
+            mock.patch.object(adapter, "execute", fake_execute),
+            mock.patch.object(adapter.subprocess, "run", fake_run),
+        ):
+            return adapter.project_static_asset(
+                source_root=workspace / "pinned-upstream",
+                workspace_root=workspace,
+                runtime_root=runtime_root,
+                spec_path="input/character-spec.json",
+                asset_name="fixture_prop",
+                target_major_extent_meters=1.0,
+                run_id="run-generator-userdata-01",
+            )
+
+    def test_matching_factory_sha_with_attestation_projects(self):
+        with TemporaryDirectory() as directory:
+            receipt = self._run_seam(Path(directory))
+            self.assertEqual(receipt["status"], "PROJECTED")
+            # the attestation is not forwarded into the projected asset
+            self.assertNotIn("generator_material_metadata", json.dumps(receipt["asset"], sort_keys=True))
+
+    def test_mismatched_factory_sha_fails_closed_even_with_attestation(self):
+        with TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "BAKE_FACTORY_BINDING_MISMATCH"):
+                self._run_seam(Path(directory), factory_sha256="0" * 64)
+
+    def test_no_public_escape_hatch_is_exposed(self):
+        source = inspect.getsource(adapter)
+        for forbidden in ("--ignore-userdata", "--allow-userdata", "--nonstrict-material", "allow_userdata", "ignore_userdata"):
+            self.assertNotIn(forbidden, source)
+        signature = inspect.signature(adapter.project_static_asset)
+        self.assertNotIn("allow_userdata", signature.parameters)
+        self.assertNotIn("ignore_userdata", signature.parameters)
+
+
 class ProductionBoundaryTests(unittest.TestCase):
     def test_strict_quality_boundary_has_no_nonstrict_surface(self):
         source = inspect.getsource(adapter)
