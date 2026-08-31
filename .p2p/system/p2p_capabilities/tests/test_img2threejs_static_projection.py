@@ -249,6 +249,97 @@ class ProjectionCoreTests(unittest.TestCase):
         self.assertEqual(parsed["provenance"]["contract"], adapter.STATIC_PROJECTION_CONTRACT)
 
 
+class MaterialDefaultNonfiniteTests(unittest.TestCase):
+    """P2P-IMG2THREEJS-MATERIAL-DEFAULT-NONFINITE-01.
+
+    Bounded material runtime-default / non-finite fix. The corrected snapshot
+    (``img2threejs_material_snapshot.mjs``) compares a numeric property against
+    the material class's runtime default BEFORE the generic non-finite
+    rejection, so:
+
+      1. an exact runtime-default ``Infinity`` attenuationDistance on a
+         physical material is accepted as DEFAULT (the snapshot emits no drift
+         and the projection narrows to the canonical Standard subset accepted
+         by the standardizer);
+      2. an active / non-default attenuationDistance fails closed;
+      3. NaN attenuationDistance fails closed;
+      4. supported projected numeric fields (color channels, opacity,
+         metalness, roughness) remain finite-only.
+
+    These are adapter-boundary behaviors: the snapshot itself is exercised in
+    ``tests/img2threejs_material_snapshot.node_test.mjs``.
+    """
+
+    def test_runtime_default_physical_material_is_accepted_and_narrows(self):
+        manifest = _manifest([
+            _group_node("root", None),
+            _mesh_node(
+                "hilt",
+                "root",
+                positions=[0, 0, 0, 1, 0, 0, 0, 1, 0],
+                material=_material(type="MeshPhysicalMaterial", drift=[]),
+            ),
+        ])
+        asset, evidence = _project(manifest, target=0.5)
+        self.assertEqual(asset["meshes"][0]["material"]["type"], "MeshStandardMaterial")
+        self.assertEqual(evidence["material_narrowing"], {"physical_to_standard": 1})
+        # the corrected snapshot records no drift for a default-Infinity
+        # attenuationDistance, so the projection is accepted by the standardizer
+        with TemporaryDirectory() as directory:
+            result = standardize_static_glb(
+                asset,
+                Path(directory) / "fixture_prop.glb",
+                generating_capability="img2threejs",
+                run_id="material-default-001",
+            )
+            parsed = validate_static_glb_output(
+                result["glb_path"],
+                result["provenance_path"],
+                expected_asset_name="fixture_prop",
+                expected_generating_capability="img2threejs",
+                expected_run_id="material-default-001",
+            )
+        self.assertEqual(parsed["status"], "STRUCTURALLY_VALID")
+        self.assertFalse(result["validation"]["skin"])
+        self.assertFalse(result["validation"]["skeleton"])
+
+    def test_active_attenuation_distance_fails_closed(self):
+        for value in (2.5, float("nan"), float("inf")):
+            with self.subTest(value=value):
+                manifest = _manifest([
+                    _group_node("root", None),
+                    _mesh_node(
+                        "m",
+                        "root",
+                        positions=[0, 0, 0, 1, 0, 0, 0, 1, 0],
+                        material=_material(type="MeshPhysicalMaterial", drift=[["attenuationDistance", value]]),
+                    ),
+                ])
+                with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "UNSUPPORTED_MATERIAL_FEATURE:attenuationDistance"):
+                    _project(manifest)
+
+    def test_supported_projected_field_nonfinite_fails_closed(self):
+        cases = (
+            ("opacity", dict(opacity=float("inf")), r"MATERIAL\.OPACITY"),
+            ("metalness", dict(metalness=float("nan")), r"MATERIAL\.METALNESS"),
+            ("roughness", dict(roughness=float("inf")), r"MATERIAL\.ROUGHNESS"),
+            ("color", dict(color=[float("nan"), 0.5, 0.5]), r"MATERIAL\.COLOR\[0\]"),
+        )
+        for label, overrides, code in cases:
+            with self.subTest(field=label):
+                manifest = _manifest([
+                    _group_node("root", None),
+                    _mesh_node(
+                        "m",
+                        "root",
+                        positions=[0, 0, 0, 1, 0, 0, 0, 1, 0],
+                        material=_material(**overrides),
+                    ),
+                ])
+                with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, code):
+                    _project(manifest)
+
+
 class ProductionBoundaryTests(unittest.TestCase):
     def test_strict_quality_boundary_has_no_nonstrict_surface(self):
         source = inspect.getsource(adapter)
