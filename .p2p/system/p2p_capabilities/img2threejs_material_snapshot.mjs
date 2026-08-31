@@ -204,11 +204,34 @@ export function materialSnapshot(material) {
   if (!SUPPORTED_MATERIAL_TYPES.has(type)) reject(`MATERIAL_TYPE_UNSUPPORTED:${type}`);
   const reference = new material.constructor();
   if (reference.type !== type) reject("MATERIAL_SUBCLASS_UNSUPPORTED");
+
+  // Validate runtime version invariant OUTSIDE the generic ownKeys drift loop.
+  // The version property is required by the verified Three Material runtime as a
+  // finite non-negative safe-integer counter. A missing, undefined, or malformed
+  // version MUST fail closed (MATERIAL_VERSION_INVALID) rather than being skipped
+  // by the generic "if (value === undefined) continue" rule.
+  const version = material.version;
+  const baseVersion = reference.version;
+  if (
+    version === undefined ||
+    baseVersion === undefined ||
+    typeof version !== "number" ||
+    typeof baseVersion !== "number" ||
+    !Number.isSafeInteger(version) ||
+    !Number.isSafeInteger(baseVersion) ||
+    version < 0 ||
+    baseVersion < 0
+  ) {
+    reject("MATERIAL_VERSION_INVALID");
+  }
+  // version is now validated as a runtime bookkeeping counter; do not add it to drift.
+  // (It is intentionally NOT in PROJECTED_MATERIAL_KEYS and never enters the appearance contract.)
+
   const ownKeys = Object.keys(material);
   const out = { type };
   const drift = [];
   for (const key of ownKeys) {
-    if (key === "type" || key === "uuid" || key === "name") continue;
+    if (key === "type" || key === "uuid" || key === "name" || key === "version") continue;
     const value = material[key];
     const base = reference[key];
     if (value === undefined) continue;

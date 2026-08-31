@@ -70,6 +70,8 @@ class FakeBasicMaterial {
     this.color = new FakeColor(1, 1, 1);
     this.opacity = 1.0;
     this.userData = {};
+    // Three.js Material runtime version bookkeeping (safe integer counter).
+    this.version = 1;
   }
 }
 
@@ -523,4 +525,155 @@ test("semantic normalization never expands the projected key set", () => {
   for (const normalizedKey of ["version", "defines", "envMapRotation", "envMapIntensity", "clearcoatRoughness", "sheenColor", "iridescenceThicknessRange"]) {
     assert.equal(PROJECTED_MATERIAL_KEYS.has(normalizedKey), false, `${normalizedKey} must not be projected`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// P2P-IMG2THREEJS-MATERIAL-VERSION-01 — runtime version invariant validation.
+//
+// The version property is a verified Three Material runtime bookkeeping counter.
+// It MUST be validated OUTSIDE the generic ownKeys drift loop, fail-closed for
+// any missing/malformed value, and never laundered through
+// "if (value === undefined) continue".
+// ---------------------------------------------------------------------------
+
+function makeMaterialWithVersion(versionValue) {
+  const material = new FakeStandardMaterial();
+  material.version = versionValue;
+  return material;
+}
+
+test("valid version=0 is accepted as bookkeeping", () => {
+  const material = new FakeStandardMaterial();
+  material.version = 0;
+  const snapshot = materialSnapshot(material);
+  assert.equal(snapshot.type, "MeshStandardMaterial");
+  assert.deepEqual(snapshot.drift, []);
+  assert.equal(hasDrift(snapshot, "version"), false);
+});
+
+test("valid version=1 is accepted as bookkeeping", () => {
+  const material = new FakeStandardMaterial();
+  material.version = 1;
+  const snapshot = materialSnapshot(material);
+  assert.equal(snapshot.type, "MeshStandardMaterial");
+  assert.deepEqual(snapshot.drift, []);
+  assert.equal(hasDrift(snapshot, "version"), false);
+});
+
+test("valid version=MAX_SAFE_INTEGER is accepted as bookkeeping", () => {
+  const material = new FakeStandardMaterial();
+  material.version = Number.MAX_SAFE_INTEGER;
+  const snapshot = materialSnapshot(material);
+  assert.equal(snapshot.type, "MeshStandardMaterial");
+  assert.deepEqual(snapshot.drift, []);
+  assert.equal(hasDrift(snapshot, "version"), false);
+});
+
+test("version=undefined fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  material.version = undefined;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("version property deleted fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  delete material.version;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("version=NaN fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  material.version = NaN;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("version=Infinity fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  material.version = Infinity;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("version=-1 fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  material.version = -1;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("version=0.5 fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  material.version = 0.5;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test('version="1" (string) fails closed with MATERIAL_VERSION_INVALID', () => {
+  const material = new FakeStandardMaterial();
+  material.version = "1";
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("version=MAX_SAFE_INTEGER+1 fails closed with MATERIAL_VERSION_INVALID", () => {
+  const material = new FakeStandardMaterial();
+  material.version = Number.MAX_SAFE_INTEGER + 1;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("baseline constructor version must also be valid (fail-closed if missing)", () => {
+  // Regression: a constructor whose baseline version is missing/undefined must
+  // also fail closed, since the comparison requires both live and baseline values
+  // to be valid finite non-negative safe-integer counters.
+  class BrokenBaselineMaterial extends FakeStandardMaterial {
+    constructor() {
+      super();
+      this.type = "MeshStandardMaterial";
+      delete this.version; // baseline has no version
+    }
+  }
+  const material = new BrokenBaselineMaterial();
+  material.version = 1; // live version is valid
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_VERSION_INVALID",
+  );
+});
+
+test("existing positive production-like state still produces exact expected drift", () => {
+  // Regression: a normal MeshStandardMaterial with color drift must still
+  // produce exactly [["color","color"],["roughness",0.75]] post-normalization,
+  // and version must not enter the drift list.
+  const material = new FakeStandardMaterial();
+  material.color = new FakeColor(0.5, 0.5, 0.5);
+  material.roughness = 0.75;
+  material.version = 1;
+  const snapshot = materialSnapshot(material);
+  assert.equal(snapshot.type, "MeshStandardMaterial");
+  assert.deepEqual(snapshot.color, [0.5, 0.5, 0.5]);
+  assert.equal(snapshot.roughness, 0.75);
+  // version must NOT appear in drift (validated bookkeeping, not appearance drift)
+  assert.equal(hasDrift(snapshot, "version"), false);
+  // drift must be exactly the expected post-normalization result
+  assert.deepEqual(snapshot.drift, [["color", "color"], ["roughness", 0.75]]);
 });
