@@ -158,6 +158,17 @@ foreach ($MetadataName in @("CANDIDATE-DISTRIBUTION-MANIFEST.json", "SOURCE-BIND
   Copy-Item -LiteralPath $MetadataPath -Destination (Join-Path $SystemDestination $MetadataName) -Force
 }
 
+# P2P operations notebook: install the canonical full notebook into the
+# managed P2P system so the installed project can discover and follow it.
+# Fail closed if a canonical package that claims this feature is missing it.
+$OperationsNotebookRel = "docs\p2p-development\P2P-OPERATIONS-NOTEBOOK.md"
+$OperationsNotebookSource = Join-Path $PackageRoot $OperationsNotebookRel
+if (-not (Test-Path -LiteralPath $OperationsNotebookSource -PathType Leaf)) {
+  throw "Canonical P2P operations notebook is missing: $OperationsNotebookSource"
+}
+New-Item -ItemType Directory -Force -Path (Join-Path $SystemDestination "docs") | Out-Null
+Copy-Item -LiteralPath $OperationsNotebookSource -Destination (Join-Path $SystemDestination "docs\P2P-OPERATIONS-NOTEBOOK.md") -Force
+
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\approvals\requests") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\approvals\records") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\gates") | Out-Null

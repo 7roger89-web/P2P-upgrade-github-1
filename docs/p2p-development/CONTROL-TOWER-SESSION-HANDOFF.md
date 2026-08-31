@@ -97,6 +97,13 @@ session only for the same open PR and healthy context; start a new one for a
 new PR or goal, merged/closed PR, context exhaustion, or persistent tool
 confusion. Prompt count is not a rotation trigger.
 
+Arena executors also discover the single canonical operations notebook
+(`P2P_OPERATIONS_NOTEBOOK` at
+`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`; inherited digest in the
+installed project's `AGENTS.md` P2P block) for
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-14) and
+`RULE_ASSIMILATION_GATE_V1`.
+
 Before merge or promotion, applicable implementation, tests/QA evidence,
 screenshots, reports, handoff material, current-state/session-index files, and
 candidate-SHA-pinned visual evidence must already be on the candidate branch.
@@ -213,6 +220,7 @@ No second router, second truth store, nested certification system, simulated quo
 | Attachment-aware handoff artifact | `<SESSION_ID>-CONTROL-TOWER-HANDOFF.md` in the executor's scoped evidence directory |
 | This operator guide | docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md |
 | Arena Agent Mode protocol | docs/ARENA_AGENT_MODE_PROTOCOL.md |
+| P2P operations notebook | docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md |
 | Planner/evidence trail | docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/ |
 | Capability projection | docs/p2p-development/capability-ledger/capability-index.json |
 | Derived roadmap projection | docs/p2p-development/current-roadmap.md |

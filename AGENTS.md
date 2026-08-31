@@ -65,6 +65,77 @@ return fields. Never repeat large canonical policies in an executor prompt.
 - When acceptance evidence is sufficient, stop (`STOP_WHEN_EVIDENCE_SUFFICIENT`);
   do not begin optional hardening or follow-on work.
 
+## P2P_OPERATIONS_NOTEBOOK (install-inherited operations memory)
+
+`P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. Every normal P2P
+installation inherits the canonical operations notebook: this block is the
+installed-project digest, and the canonical full notebook is installed in this
+project at `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` (copied by
+`install.sh` / `install.ps1`). The development-source path is
+`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`, shipped in release packages
+via `scripts/package_release.py`; installed-project instructions must use the
+installed path and never depend on access to the original development repo. If
+this digest and the notebook ever differ, the notebook wins.
+
+Beginner-facing operational guidance must apply
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-15 in the notebook):
+
+- `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
+  `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
+  prompt goes (e.g. `ARENA AI — CHAT MỚI — WRITER`, `00 — P2P CONTROL TOWER`).
+- `RULE 02 CHAT_TITLE_REQUIRED` — every new execution chat is titled
+  `PROJECT | PR-or-TASK | ROLE | SHORT-GOAL`.
+- `RULE 03 SAME_CHAT_MUST_NAME_CHAT` — `SAME CHAT` instructions name the
+  exact existing chat, never "the old chat".
+- `RULE 04 GITHUB_IS_DURABLE_CHECKPOINT` — work identity =
+  `REPOSITORY + WORKSTREAM + PR_HEAD_SHA + PR_HEAD_TREE`; chat position or PR
+  number alone is not authority.
+- `RULE 05 SESSION_OR_QUOTA_RECOVERY` — after context loss/reset/quota/account
+  change, do not blindly restart: return to Control Tower, inspect the durable
+  branch/PR/head, continue from the verified checkpoint.
+- `RULE 06 NO_DUPLICATE_PR` — same goal + usable open PR => continue it; do
+  not create a duplicate PR because the execution chat changed.
+- `RULE 07 WRITER_BOUNDARY` — one Writer unit = 1 bounded goal -> 1 branch ->
+  1 PR; a new workstream or closed PR normally needs a new Writer chat.
+- `RULE 08 INDEPENDENT_SUPERVISOR` — Supervisor review is read/review only in
+  a NEW CHAT, independent from the Writer; bounded re-review of a corrected
+  head may reuse the same Supervisor chat.
+- `RULE 09 ONE_ACTION_NOW_FOR_BEGINNER` — separate `LÀM BÂY GIỜ` from later
+  workflow; give exactly one immediate action.
+- `RULE 10 SUCCESS_SIGNAL_AND_RETURN` — every instruction states what success
+  looks like and the exact ReturnPacket to paste back to Control Tower.
+- `RULE 11 OWNER_GATE_ONLY_WHEN_REAL` — Owner Gate only for canonical
+  merge/promotion, production deployment, destructive deletion,
+  secrets/credentials, major paid spending, hard rollback, or equivalent
+  high-risk authority changes.
+- `RULE 12 MINIMUM_SUFFICIENT_WORK` — see "Prompt and effort efficiency"
+  above (`MINIMUM_RELEVANT_CONTEXT`, `MINIMUM_SUFFICIENT_WORK`,
+  `RISK_PROPORTIONAL_VERIFICATION`, `PROGRESS_REPORTING=EXCEPTIONS_ONLY`,
+  `STOP_WHEN_EVIDENCE_SUFFICIENT`, `ANTI_OVER_ENGINEERING`,
+  `CONTEXT_IS_CAPACITY_NOT_BUDGET`).
+- `RULE 13 CONTROL_TOWER_STATE_RESPONSIBILITY` — Control Tower tracks
+  workstream/branch/PR/SHA/review/Owner Gate/next action; the beginner never
+  memorizes internal Git state.
+- `RULE 14 OVER_ENGINEERING_CHECK` — end beginner guidance with
+  `Không bị over engineering chứ? PASS/FAIL`; expected `PASS`.
+- `RULE 15 ARENA_TASK_COMPLETION_DIALOG` — when asked "Was this task
+  successful?", `YES` means the bounded Arena execution reached its requested
+  terminal state and returned the required result (technical PASS is NOT
+  required; an honest `BLOCKED`/fail-closed result can still be `YES`);
+  `KEEP WORKING` means same-chat continuation / execution unit not yet
+  terminal; `NO` means Arena materially failed the task/execution (wrong task,
+  wrong repo/workstream, unusable result, ignored required scope,
+  premature/incorrect termination) — never merely a technical `BLOCKED`.
+
+Enduring rule promises are tracked by `RULE_ASSIMILATION_GATE_V1`: an
+accepted rule deferred to a later task stays
+`RULE_ASSIMILATION_STATUS=PENDING` until a Writer task lists it as a
+deliverable, its ReturnPacket reports `RULE_ASSIMILATED=YES` with the exact
+artifact/section, and Control Tower verifies the PR head/tree — only then
+`VERIFIED`; otherwise the item is surfaced as `RULE_ASSIMILATION_MISSED`.
+The machine-readable `RULE_ASSIMILATION_LEDGER` and current statuses live in
+the canonical notebook.
+
 ## Capability foundation rules
 
 - The development-source capability contract lives in `Docs/SPEC/P2P-CAPABILITY-*-SPEC.md`; the capability registry and offline contracts live under `.p2p/system/p2p_capabilities/`.
