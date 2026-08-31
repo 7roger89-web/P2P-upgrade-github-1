@@ -11,6 +11,7 @@ Repository-side contract and composition coverage only:
 
 from __future__ import annotations
 
+import hashlib
 import inspect
 import json
 import math
@@ -19,6 +20,8 @@ import sys
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -320,6 +323,155 @@ class ProductionBoundaryTests(unittest.TestCase):
             with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "NODE_VERSION_UNVERIFIED"):
                 adapter.verify_static_runtime_profile(Path("/"))
         self.assertFalse(hasattr(adapter, "install"))
+
+
+VALIDATE_ENTRYPOINT = "forge/stage2_spec/validate_sculpt_spec.py"
+GENERATE_ENTRYPOINT = "forge/stage3_build/generate_threejs_factory.py"
+
+
+class SpecToctouTests(unittest.TestCase):
+    """SPEC_VALIDATION_GENERATION_TOCTOU remediation.
+
+    Fully offline dry run: the pinned-upstream and runtime-profile verifiers,
+    the execution boundary, and the Node bake step are replaced by fakes so
+    the test proves only the adapter's own capture/hash-binding contract.
+    No external runtime proof is claimed.
+    """
+
+    SPEC = b'{"name": "Oak", "componentTree": []}'
+
+    def _run_seam(self, workspace: Path, *, on_validate=None):
+        spec_path = workspace / "input" / "character-spec.json"
+        spec_path.parent.mkdir(parents=True, exist_ok=True)
+        spec_path.write_bytes(self.SPEC)
+        runtime_root = workspace / "runtime"
+        (runtime_root / "node_modules" / "three" / "build").mkdir(parents=True)
+        (runtime_root / "node_modules" / "three" / "build" / "three.module.js").write_text("export {}", encoding="utf-8")
+        (runtime_root / "node_modules" / "three" / "package.json").write_text(json.dumps({"version": adapter.VERIFIED_THREE_VERSION}), encoding="utf-8")
+        calls: list[tuple[str, dict]] = []
+
+        def fake_execute(entrypoint, **kwargs):
+            calls.append((entrypoint, kwargs))
+            if entrypoint == VALIDATE_ENTRYPOINT and on_validate is not None:
+                on_validate(workspace, kwargs)
+            if entrypoint == GENERATE_ENTRYPOINT:
+                (workspace / kwargs["output_path"]).write_bytes(b"export function createFixtureModel() { throw 0; }\n")
+            return {"status": "EXECUTED", "entrypoint": entrypoint}
+
+        def fake_copytree(_src, dst, **_kwargs):
+            Path(dst).mkdir(parents=True, exist_ok=True)
+
+        def fake_run(argv, *args, **kwargs):
+            factory = Path(argv[argv.index("--factory") + 1])
+            out = Path(argv[argv.index("--out") + 1])
+            manifest = {
+                "schema": adapter.RUNTIME_BAKE_SCHEMA,
+                "status": "BAKED",
+                "up_axis": "Y",
+                "runtime": {"node": adapter.VERIFIED_NODE_VERSION, "three": adapter.VERIFIED_THREE_REVISION},
+                "factory_sha256": hashlib.sha256(factory.read_bytes()).hexdigest(),
+                "aggregate": {"nodes": 2, "skinned_meshes": 0, "bones": 0, "animations": 0, "skeletons": 0, "maximum_depth": 1},
+                "nodes": [
+                    _group_node("root", None),
+                    _mesh_node("n0001", "root", positions=[0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
+                ],
+            }
+            out.write_text(json.dumps(manifest), encoding="utf-8")
+            return SimpleNamespace(returncode=0, stdout="P2P_IMG2THREEJS_BAKE_OK nodes=2\n", stderr="")
+
+        with (
+            mock.patch.object(adapter, "verify_upstream_checkout", lambda _root: {"commit": adapter.UPSTREAM_SHA, "tree": adapter.UPSTREAM_TREE}),
+            mock.patch.object(adapter, "verify_static_runtime_profile", lambda _root, *, node_executable="node": {
+                "node_executable": "node-fake",
+                "node_version": adapter.VERIFIED_NODE_VERSION,
+                "three_version": adapter.VERIFIED_THREE_VERSION,
+                "three_revision": adapter.VERIFIED_THREE_REVISION,
+                "three_entrypoint": "fake",
+                "runtime_root": str(runtime_root),
+            }),
+            mock.patch.object(adapter.shutil, "copytree", fake_copytree),
+            mock.patch.object(adapter, "execute", fake_execute),
+            mock.patch.object(adapter.subprocess, "run", fake_run),
+        ):
+            receipt = adapter.project_static_asset(
+                source_root=workspace / "pinned-upstream",
+                workspace_root=workspace,
+                runtime_root=runtime_root,
+                spec_path="input/character-spec.json",
+                asset_name="fixture_prop",
+                target_major_extent_meters=1.0,
+                run_id="run-toctou-01",
+            )
+        return receipt, calls
+
+    def test_A_success_binds_captured_bytes_to_owned_copy(self):
+        with TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            receipt, calls = self._run_seam(workspace)
+            expected_sha = hashlib.sha256(self.SPEC).hexdigest()
+            owned_relative = "static-projection/run-toctou-01/input-spec.json"
+            self.assertEqual(receipt["status"], "PROJECTED")
+            self.assertEqual(receipt["spec_sha256"], expected_sha)
+            self.assertEqual(receipt["spec"]["sha256"], expected_sha)
+            self.assertEqual(receipt["spec"]["workspace_relative_path"], owned_relative)
+            self.assertEqual(receipt["spec"]["source_workspace_relative_path"], "input/character-spec.json")
+            self.assertEqual([entrypoint for entrypoint, _ in calls], [VALIDATE_ENTRYPOINT, GENERATE_ENTRYPOINT])
+            for _, kwargs in calls:
+                # both upstream subprocesses receive ONLY the owned path
+                self.assertEqual(kwargs["spec_path"], owned_relative)
+            self.assertEqual((workspace / owned_relative).read_bytes(), self.SPEC)
+            self.assertTrue((workspace / Path(owned_relative).parent / "projection.json").is_file())
+
+    def test_B_caller_mutation_after_capture_cannot_reach_generation(self):
+        def mutate_source(workspace, _kwargs):
+            (workspace / "input" / "character-spec.json").write_bytes(b'{"name": "Evil", "componentTree": []}')
+
+        with TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            receipt, calls = self._run_seam(workspace, on_validate=mutate_source)
+            owned_relative = "static-projection/run-toctou-01/input-spec.json"
+            # caller source really did change after capture
+            self.assertNotEqual((workspace / "input" / "character-spec.json").read_bytes(), self.SPEC)
+            # generation still operated on the captured owned bytes
+            self.assertEqual((workspace / owned_relative).read_bytes(), self.SPEC)
+            self.assertEqual(calls[1][1]["spec_path"], owned_relative)
+            self.assertEqual(receipt["spec_sha256"], hashlib.sha256(self.SPEC).hexdigest())
+
+    def test_C_owned_copy_tamper_before_generation_fails_closed(self):
+        def tamper_owned(workspace, kwargs):
+            (workspace / kwargs["spec_path"]).write_bytes(b'{"tampered": true}')
+
+        with TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "SPEC_CONTENT_CHANGED"):
+                self._run_seam(workspace, on_validate=tamper_owned)
+            # after a failed pre-generation hash re-bind, generation never starts
+            receipt_dir = workspace / "static-projection" / "run-toctou-01"
+            self.assertFalse((receipt_dir / "factory.ts").exists())
+
+    def test_D_bounded_capture_rejects_oversize_and_missing(self):
+        with TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            spec_path = workspace / "input" / "character-spec.json"
+            spec_path.parent.mkdir(parents=True, exist_ok=True)
+            spec_path.write_bytes(b"x" * (adapter.MAX_SPEC_BYTES + 1))
+            with mock.patch.object(adapter, "verify_upstream_checkout", lambda _root: {}), mock.patch.object(
+                adapter, "verify_static_runtime_profile", lambda _root, **_kw: {"runtime_root": str(workspace)}
+            ):
+                with self.assertRaisesRegex(adapter.Img2ThreeJSAdapterError, "SPEC_INPUT_TOO_LARGE"):
+                    adapter.project_static_asset(
+                        source_root=workspace, workspace_root=workspace, runtime_root=workspace,
+                        spec_path="input/character-spec.json", asset_name="fixture_prop",
+                        target_major_extent_meters=1.0, run_id="run-toctou-02",
+                    )
+
+    def test_existing_receipt_records_do_not_inline_the_spec(self):
+        with TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            receipt, _calls = self._run_seam(workspace)
+            serialized = json.dumps(receipt, sort_keys=True)
+            self.assertNotIn('"name": "Oak"', serialized)
+            self.assertNotIn("componentTree", serialized)
 
 
 if __name__ == "__main__":

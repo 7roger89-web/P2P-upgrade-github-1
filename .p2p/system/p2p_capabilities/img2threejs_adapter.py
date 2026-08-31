@@ -79,6 +79,7 @@ VERIFIED_THREE_VERSION: Final = "0.169.0"
 VERIFIED_THREE_REVISION: Final = "169"
 STATIC_HARNESS_FILENAME: Final = "img2threejs_static_projection_harness.mjs"
 MAX_BAKE_BYTES: Final = 64 * 1024 * 1024
+MAX_SPEC_BYTES: Final = 8 * 1024 * 1024
 MAX_STATIC_NODES: Final = 8192
 MAX_STATIC_MESHES: Final = 2048
 MAX_STATIC_TRIANGLES: Final = 1_000_000
@@ -764,6 +765,11 @@ def project_static_asset(
     never inferred from relative units). The generation route never exposes,
     accepts, or forwards the upstream test-only ``--allow-nonstrict`` escape
     hatch; a strict-quality gate failure aborts before any generation.
+    The caller spec is captured once into a bounded buffer, bound by
+    ``SPEC_SHA256``, and copied to an owned per-run path; the strict gate and
+    the generator consume only that owned copy, whose hash is re-verified
+    immediately before generation. The caller path is never reopened after
+    capture, so post-capture mutation cannot alter the generated input.
     """
 
     name = _static_asset_name(asset_name)
@@ -780,17 +786,33 @@ def project_static_asset(
     if not spec_target.is_file():
         raise Img2ThreeJSAdapterError("SPEC_NOT_FOUND")
 
+    # TOCTOU closure: the caller-controlled spec is a trust dependency only
+    # until the bytes are captured exactly once into a bounded buffer. From
+    # here on every upstream subprocess consumes ONLY the owned per-run copy;
+    # the caller path is never reopened during validation or generation, so
+    # post-capture mutation, replacement, deletion, or symlink-swap of the
+    # source cannot alter what is validated or generated.
+    captured = spec_target.read_bytes()
+    if len(captured) > MAX_SPEC_BYTES:
+        raise Img2ThreeJSAdapterError("SPEC_INPUT_TOO_LARGE")
+    spec_sha256 = _sha256(captured)
+
     run_relative = PurePosixPath("static-projection") / run_id
-    run_dir = bounded_workspace_path(workspace, run_relative, field="run")
+    run_dir = bounded_workspace_path(workspace, run_relative.as_posix(), field="run")
     if run_dir.exists():
         shutil.rmtree(run_dir)
     (run_dir / "node_modules").mkdir(parents=True, exist_ok=True)
+    owned_spec_relative = (run_relative / "input-spec.json").as_posix()
+    owned_spec_target = bounded_workspace_path(workspace, owned_spec_relative, field="owned_spec")
+    owned_spec_target.write_bytes(captured)  # written once; never rewritten by the adapter
     three_source = Path(profile["runtime_root"]) / "node_modules" / "three"
     shutil.copytree(three_source, run_dir / "node_modules" / "three", symlinks=False)
     (run_dir / "package.json").write_text(
         json.dumps({"name": f"p2p-img2threejs-static-{run_id}", "private": True, "type": "module"}, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    if _sha256(owned_spec_target.read_bytes()) != spec_sha256:
+        raise Img2ThreeJSAdapterError("SPEC_CONTENT_CHANGED")
 
     # Strict-quality production gate. _build_argv pins --strict-quality for
     # this entrypoint and has no parameter surface for the nonstrict hatch.
@@ -798,16 +820,21 @@ def project_static_asset(
         "forge/stage2_spec/validate_sculpt_spec.py",
         source_root=source_root,
         workspace_root=workspace,
-        spec_path=spec_relative,
+        spec_path=owned_spec_relative,
         timeout_seconds=timeout_seconds,
     )
+
+    # Re-bind the exact validated bytes before generation. If the owned copy
+    # drifted for any reason after validation, generation must not start.
+    if _sha256(owned_spec_target.read_bytes()) != spec_sha256:
+        raise Img2ThreeJSAdapterError("SPEC_CONTENT_CHANGED")
 
     factory_relative = (run_relative / "factory.ts").as_posix()
     generate_receipt = execute(
         "forge/stage3_build/generate_threejs_factory.py",
         source_root=source_root,
         workspace_root=workspace,
-        spec_path=spec_relative,
+        spec_path=owned_spec_relative,
         output_path=factory_relative,
         timeout_seconds=timeout_seconds,
     )
@@ -859,6 +886,8 @@ def project_static_asset(
         "run_id": run_id,
         "source": provenance,
         "runtime_profile": {key: profile[key] for key in ("node_version", "three_version", "three_revision")},
+        "spec_sha256": spec_sha256,
+        "spec": {"workspace_relative_path": owned_spec_relative, "sha256": spec_sha256, "source_workspace_relative_path": spec_relative},
         "strict_quality_gate": {"entrypoint": "forge/stage2_spec/validate_sculpt_spec.py", "enforced": True, "receipt_status": validate_receipt["status"], "allow_nonstrict": "NEVER_EXPOSED"},
         "factory": {"entrypoint": "forge/stage3_build/generate_threejs_factory.py", "workspace_relative_path": factory_relative, "sha256": _sha256(factory_bytes), "receipt_status": generate_receipt["status"]},
         "bake": {"workspace_relative_path": bake_relative, "sha256": _sha256(bake_bytes), "stdout_sha256": _sha256(bake_result.stdout.encode("utf-8")), "stderr_sha256": _sha256(bake_result.stderr.encode("utf-8")), "shell": False, "network_policy": NETWORK_POLICY},

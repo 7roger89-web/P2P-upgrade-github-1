@@ -131,7 +131,7 @@ only as a test-fixture escape hatch on the probe side). Supervisor return:
 
 ```text
 RUNTIME_PROBE_VERDICT=P2P_IMG2THREEJS_RUNTIME_STATIC_EXPORT_FEASIBLE
-RUNTIME_MATERIALIZATION_SOURCE=PROVEN
+RUNTIME_MATERIALIZATION_SOURCE=PROVEN_FEASIBILITY
 WORLD_MATRIX_BAKE_FEASIBLE=YES
 Y_UP_RUNTIME_PROVEN=YES
 EXPLICIT_PHYSICAL_SCALE_ANCHOR_FEASIBLE=YES
@@ -210,4 +210,56 @@ PRODUCTION_ADAPTER_RUNTIME_PROVEN=NO
 NEXT_RUNTIME_SMOKE=CODEX_WINDOWS_PRODUCTION_ADAPTER_SMOKE
 EXECUTION_AUTHORIZED=NO
 AUTO_ACTIVATION=NO
+```
+
+## E6 — Supervisor micro-remediation: SPEC_VALIDATION_GENERATION_TOCTOU
+
+Finding fixed at reviewed head `3f44884` (one blocking finding): the caller-
+controlled spec path was previously handed to BOTH upstream subprocesses as a
+live trust dependency, permitting source mutation between strict validation
+and factory generation.
+
+Closure, adapter-local only (no new filesystem abstraction):
+
+1. Caller path validated by the existing guards (`_relative_string` +
+   `bounded_workspace_path` + `SPEC_NOT_FOUND`), then read ONCE into a bounded
+   buffer (`MAX_SPEC_BYTES`, reject `SPEC_INPUT_TOO_LARGE`).
+   `spec_sha256 = sha256(captured bytes)`.
+2. Owned per-run immutable working copy `static-projection/<run_id>/input-spec.json`
+   written exactly once from the captured bytes inside the existing
+   containment primitives; the adapter never rewrites it and never reopens the
+   caller path afterwards.
+3. Both upstream calls (strict gate and generator) receive ONLY the owned
+   workspace-relative path; argv construction unchanged (`_build_argv`, no
+   nonstrict surface; `STRICT_QUALITY_REQUIRED=YES` preserved).
+4. Hash re-bind before validation (write-back verify) and again immediately
+   before generation; any mismatch fails closed with `SPEC_CONTENT_CHANGED`;
+   no silent recopy, no caller-path fallback.
+5. Receipt binding: top-level `spec_sha256` plus `spec` record
+   (`workspace_relative_path`, `sha256`, `source_workspace_relative_path`)
+   using the existing receipt/path representation; the spec body is not
+   inlined; no new provenance store.
+
+Evidence chain now: caller input -> captured bytes -> spec_sha256 -> owned
+spec copy -> strict validation -> same owned copy (re-hash bound) ->
+generation -> factory_sha256 -> bake manifest -> normalized projection.
+
+Also corrected en route (strictly required to exercise the owned path): the
+run-directory containment call now passes the POSIX string form expected by
+the existing `_relative` guard.
+
+Focused tests added (`SpecToctouTests`, offline dry-run with faked execution
+boundary; no external runtime proof): A successful binding and owned-only
+argv spec paths; B post-capture caller mutation isolated (generation operates
+on captured bytes, receipt hash = sha256(S1)); C owned-copy tamper before
+generation fails closed and generation never starts; D oversize capture
+rejected and receipt never inlines the spec. Seam suite 17/17; static GLB
+7/7; registry valid at 66 entries; `git diff --check` clean. All previously
+passed contracts (transform/scale/runtime identity/containment/material/
+registry authority) untouched by this remediation.
+
+```text
+SUPERVISOR_FINDING=SPEC_VALIDATION_GENERATION_TOCTOU CLOSED
+PRODUCTION_ADAPTER_RUNTIME_PROVEN=NO
+NEXT_RUNTIME_SMOKE=CODEX_WINDOWS_PRODUCTION_ADAPTER_SMOKE
 ```
