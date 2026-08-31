@@ -16,6 +16,7 @@ import inspect
 import json
 import math
 import shutil
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -418,6 +419,109 @@ class ProductionBoundaryTests(unittest.TestCase):
 
 VALIDATE_ENTRYPOINT = "forge/stage2_spec/validate_sculpt_spec.py"
 GENERATE_ENTRYPOINT = "forge/stage3_build/generate_threejs_factory.py"
+HARNESS_PATH = Path(__file__).resolve().parent.parent / "img2threejs_static_projection_harness.mjs"
+
+
+class HarnessThreeRuntimeResolutionTests(unittest.TestCase):
+    def _write_fake_three(self, run_dir: Path, *, revision="169", up=(0, 1, 0)) -> Path:
+        three_dir = run_dir / "node_modules" / "three"
+        (three_dir / "build").mkdir(parents=True, exist_ok=True)
+        (three_dir / "package.json").write_text(
+            json.dumps({"name": "three", "version": "0.169.0", "type": "module", "main": "./build/three.module.js", "exports": "./build/three.module.js"}),
+            encoding="utf-8",
+        )
+        three_entry = three_dir / "build" / "three.module.js"
+        module_source = f"""
+export const REVISION = {json.dumps(str(revision))};
+export class Object3D {{
+  static DEFAULT_UP = {{ x: {up[0]}, y: {up[1]}, z: {up[2]} }};
+  constructor() {{
+    this.isObject3D = true;
+    this.visible = true;
+    this.children = [];
+    this.parent = null;
+    this.matrix = {{ elements: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }};
+  }}
+  updateMatrixWorld() {{}}
+}}
+export class Group extends Object3D {{
+  constructor() {{
+    super();
+    this.isGroup = true;
+    this.type = "Group";
+  }}
+}}
+""".strip() + "\n"
+        three_entry.write_text(module_source, encoding="utf-8")
+        return three_entry
+
+    def _write_factory(self, run_dir: Path) -> Path:
+        factory = run_dir / "factory.mjs"
+        factory.write_text(
+            'import { Group, REVISION } from "three";\nexport function createFixtureModel() {\n  if (String(REVISION) !== "169") throw new Error("wrong factory runtime");\n  return new Group();\n}\n',
+            encoding="utf-8",
+        )
+        return factory
+
+    def _run_harness(self, run_dir: Path, *, three_entry=None, include_three_entry=True) -> subprocess.CompletedProcess:
+        factory = self._write_factory(run_dir)
+        out = run_dir / "bake.json"
+        argv = ["node", str(HARNESS_PATH), "--factory", str(factory), "--out", str(out)]
+        if include_three_entry:
+            argv.extend(["--three-entry", str(three_entry if three_entry is not None else self._write_fake_three(run_dir))])
+        return subprocess.run(argv, cwd=run_dir.parent, stdin=subprocess.DEVNULL, capture_output=True, text=True, check=False, timeout=20)
+
+    def test_harness_has_no_production_bare_three_import_dependency(self):
+        source = HARNESS_PATH.read_text(encoding="utf-8")
+        self.assertIn('"--three-entry"', source)
+        self.assertIn("pathToFileURL(args.threeEntry).href", source)
+        self.assertNotIn('await import("three")', source)
+        self.assertNotIn("await import('three')", source)
+
+    def test_missing_three_entry_fails_closed(self):
+        with TemporaryDirectory() as directory:
+            run_dir = Path(directory) / "run"
+            run_dir.mkdir()
+            result = self._run_harness(run_dir, include_three_entry=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("P2P_IMG2THREEJS_BAKE_FAIL HARNESS_ARGUMENT_REQUIRED", result.stdout)
+
+    def test_nonexistent_three_entry_fails_closed(self):
+        with TemporaryDirectory() as directory:
+            run_dir = Path(directory) / "run"
+            run_dir.mkdir()
+            result = self._run_harness(run_dir, three_entry=run_dir / "missing" / "three.module.js")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("P2P_IMG2THREEJS_BAKE_FAIL THREE_RUNTIME_UNAVAILABLE", result.stdout)
+
+    def test_valid_explicit_three_entry_imports_successfully(self):
+        with TemporaryDirectory() as directory:
+            run_dir = Path(directory) / "run"
+            run_dir.mkdir()
+            three_entry = self._write_fake_three(run_dir)
+            result = self._run_harness(run_dir, three_entry=three_entry)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("P2P_IMG2THREEJS_BAKE_OK", result.stdout)
+            manifest = json.loads((run_dir / "bake.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["runtime"]["three"], "169")
+
+    def test_wrong_three_revision_fails_closed_after_import(self):
+        with TemporaryDirectory() as directory:
+            run_dir = Path(directory) / "run"
+            run_dir.mkdir()
+            three_entry = self._write_fake_three(run_dir, revision="168")
+            result = self._run_harness(run_dir, three_entry=three_entry)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("P2P_IMG2THREEJS_BAKE_FAIL THREE_RUNTIME_REVISION_UNVERIFIED", result.stdout)
+
+    def test_y_up_check_remains_enforced_on_imported_runtime(self):
+        with TemporaryDirectory() as directory:
+            run_dir = Path(directory) / "run"
+            run_dir.mkdir()
+            three_entry = self._write_fake_three(run_dir, up=(0, 0, 1))
+            result = self._run_harness(run_dir, three_entry=three_entry)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("P2P_IMG2THREEJS_BAKE_FAIL Y_UP_RUNTIME_CONTRACT_FAILED", result.stdout)
 
 
 class SpecToctouTests(unittest.TestCase):
@@ -449,10 +553,17 @@ class SpecToctouTests(unittest.TestCase):
                 (workspace / kwargs["output_path"]).write_bytes(b"export function createFixtureModel() { throw 0; }\n")
             return {"status": "EXECUTED", "entrypoint": entrypoint}
 
-        def fake_copytree(_src, dst, **_kwargs):
-            Path(dst).mkdir(parents=True, exist_ok=True)
+        bake_argv: list[list[str]] = []
+
+        def fake_copytree(src, dst, **_kwargs):
+            source = Path(src)
+            target = Path(dst)
+            (target / "build").mkdir(parents=True, exist_ok=True)
+            (target / "package.json").write_bytes((source / "package.json").read_bytes())
+            (target / "build" / "three.module.js").write_bytes((source / "build" / "three.module.js").read_bytes())
 
         def fake_run(argv, *args, **kwargs):
+            bake_argv.append(list(argv))
             factory = Path(argv[argv.index("--factory") + 1])
             out = Path(argv[argv.index("--out") + 1])
             manifest = {
@@ -477,7 +588,7 @@ class SpecToctouTests(unittest.TestCase):
                 "node_version": adapter.VERIFIED_NODE_VERSION,
                 "three_version": adapter.VERIFIED_THREE_VERSION,
                 "three_revision": adapter.VERIFIED_THREE_REVISION,
-                "three_entrypoint": "fake",
+                "three_entrypoint": str(runtime_root / "node_modules" / "three" / "build" / "three.module.js"),
                 "runtime_root": str(runtime_root),
             }),
             mock.patch.object(adapter.shutil, "copytree", fake_copytree),
@@ -493,12 +604,12 @@ class SpecToctouTests(unittest.TestCase):
                 target_major_extent_meters=1.0,
                 run_id="run-toctou-01",
             )
-        return receipt, calls
+        return receipt, calls, bake_argv
 
     def test_A_success_binds_captured_bytes_to_owned_copy(self):
         with TemporaryDirectory() as directory:
             workspace = Path(directory)
-            receipt, calls = self._run_seam(workspace)
+            receipt, calls, _bake_argv = self._run_seam(workspace)
             expected_sha = hashlib.sha256(self.SPEC).hexdigest()
             owned_relative = "static-projection/run-toctou-01/input-spec.json"
             self.assertEqual(receipt["status"], "PROJECTED")
@@ -519,7 +630,7 @@ class SpecToctouTests(unittest.TestCase):
 
         with TemporaryDirectory() as directory:
             workspace = Path(directory)
-            receipt, calls = self._run_seam(workspace, on_validate=mutate_source)
+            receipt, calls, _bake_argv = self._run_seam(workspace, on_validate=mutate_source)
             owned_relative = "static-projection/run-toctou-01/input-spec.json"
             # caller source really did change after capture
             self.assertNotEqual((workspace / "input" / "character-spec.json").read_bytes(), self.SPEC)
@@ -559,10 +670,29 @@ class SpecToctouTests(unittest.TestCase):
     def test_existing_receipt_records_do_not_inline_the_spec(self):
         with TemporaryDirectory() as directory:
             workspace = Path(directory)
-            receipt, _calls = self._run_seam(workspace)
+            receipt, _calls, _bake_argv = self._run_seam(workspace)
             serialized = json.dumps(receipt, sort_keys=True)
             self.assertNotIn('"name": "Oak"', serialized)
             self.assertNotIn("componentTree", serialized)
+
+    def test_E_bake_argv_contains_adapter_derived_per_run_three_entrypoint(self):
+        with TemporaryDirectory() as directory:
+            workspace = Path(directory)
+            receipt, _calls, bake_argv = self._run_seam(workspace)
+            self.assertEqual(len(bake_argv), 1)
+            argv = bake_argv[0]
+            self.assertIn("--three-entry", argv)
+            three_entry = Path(argv[argv.index("--three-entry") + 1])
+            expected = workspace / "static-projection" / "run-toctou-01" / "node_modules" / "three" / "build" / "three.module.js"
+            self.assertEqual(three_entry, expected)
+            self.assertTrue(three_entry.is_file())
+            self.assertEqual(receipt["runtime_profile"]["per_run_three_entrypoint"], str(expected))
+            self.assertEqual(receipt["runtime_profile"]["source_three_entry_sha256"], receipt["runtime_profile"]["copied_three_entry_sha256"])
+
+    def test_F_no_external_three_entrypoint_api_is_exposed(self):
+        signature = inspect.signature(adapter.project_static_asset)
+        forbidden = {"three_entry", "three_entrypoint", "three_path", "three_module", "runtime_entrypoint"}
+        self.assertTrue(forbidden.isdisjoint(signature.parameters))
 
 
 if __name__ == "__main__":

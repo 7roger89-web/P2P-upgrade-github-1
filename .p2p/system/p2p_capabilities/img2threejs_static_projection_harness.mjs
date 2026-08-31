@@ -36,22 +36,26 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === "--factory") out.factory = argv[(i += 1)];
     else if (argv[i] === "--out") out.out = argv[(i += 1)];
+    else if (argv[i] === "--three-entry") out.threeEntry = argv[(i += 1)];
     else fail("HARNESS_ARGUMENT_INVALID");
   }
-  if (!out.factory || !out.out) fail("HARNESS_ARGUMENT_REQUIRED");
+  if (!out.factory || !out.out || !out.threeEntry) fail("HARNESS_ARGUMENT_REQUIRED");
   if (!existsSync(out.factory)) fail("FACTORY_MODULE_MISSING");
+  if (!existsSync(out.threeEntry)) fail("THREE_RUNTIME_UNAVAILABLE");
   return out;
 }
 
 const args = parseArgs(process.argv.slice(2));
 let THREE;
 try {
-  THREE = await import("three");
+  const threeUrl = pathToFileURL(args.threeEntry).href;
+  THREE = await import(threeUrl);
 } catch (error) {
   fail("THREE_RUNTIME_UNAVAILABLE");
 }
 
-const up = THREE.Object3D.DEFAULT_UP ?? THREE.Object3D.DefaultUp;
+if (String(THREE.REVISION) !== "169") fail("THREE_RUNTIME_REVISION_UNVERIFIED");
+const up = THREE.Object3D?.DEFAULT_UP ?? THREE.Object3D?.DefaultUp;
 if (!up || up.x !== 0 || up.y !== 1 || up.z !== 0) fail("Y_UP_RUNTIME_CONTRACT_FAILED");
 
 const factoryUrl = pathToFileURL(args.factory).href;

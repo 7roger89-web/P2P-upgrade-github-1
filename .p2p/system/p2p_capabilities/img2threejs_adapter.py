@@ -806,7 +806,29 @@ def project_static_asset(
     owned_spec_target = bounded_workspace_path(workspace, owned_spec_relative, field="owned_spec")
     owned_spec_target.write_bytes(captured)  # written once; never rewritten by the adapter
     three_source = Path(profile["runtime_root"]) / "node_modules" / "three"
-    shutil.copytree(three_source, run_dir / "node_modules" / "three", symlinks=False)
+    source_three_entrypoint = Path(profile["three_entrypoint"])
+    try:
+        source_three_entrypoint = source_three_entrypoint.resolve(strict=True)
+        if source_three_entrypoint != (three_source / "build" / "three.module.js").resolve(strict=True):
+            raise Img2ThreeJSAdapterError("THREE_ENTRYPOINT_BINDING_MISMATCH")
+        source_three_entry_sha256 = _sha256(source_three_entrypoint.read_bytes())
+    except OSError as exc:
+        raise Img2ThreeJSAdapterError("THREE_RUNTIME_MISSING") from exc
+    copied_three_root = run_dir / "node_modules" / "three"
+    shutil.copytree(three_source, copied_three_root, symlinks=False)
+    copied_three_package = copied_three_root / "package.json"
+    copied_three_entrypoint = copied_three_root / "build" / "three.module.js"
+    if not copied_three_package.is_file() or not copied_three_entrypoint.is_file():
+        raise Img2ThreeJSAdapterError("THREE_RUNTIME_COPY_INCOMPLETE")
+    try:
+        copied_three_manifest = json.loads(copied_three_package.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise Img2ThreeJSAdapterError("THREE_PACKAGE_MANIFEST_UNREADABLE") from exc
+    if not isinstance(copied_three_manifest, dict) or copied_three_manifest.get("version") != VERIFIED_THREE_VERSION:
+        raise Img2ThreeJSAdapterError(f"THREE_VERSION_UNVERIFIED:expected {VERIFIED_THREE_VERSION}")
+    copied_three_entry_sha256 = _sha256(copied_three_entrypoint.read_bytes())
+    if copied_three_entry_sha256 != source_three_entry_sha256:
+        raise Img2ThreeJSAdapterError("THREE_ENTRYPOINT_COPY_DRIFT")
     (run_dir / "package.json").write_text(
         json.dumps({"name": f"p2p-img2threejs-static-{run_id}", "private": True, "type": "module"}, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -849,7 +871,7 @@ def project_static_asset(
     bake_env = _minimal_environment(workspace)
     bake_env["NODE_OPTIONS"] = ""
     bake_result = subprocess.run(
-        [profile["node_executable"], str(harness), "--factory", str(factory_target), "--out", str(bake_target)],
+        [profile["node_executable"], str(harness), "--factory", str(factory_target), "--out", str(bake_target), "--three-entry", str(copied_three_entrypoint)],
         cwd=run_dir,
         env=bake_env,
         stdin=subprocess.DEVNULL,
@@ -885,7 +907,13 @@ def project_static_asset(
         "generating_capability": "img2threejs",
         "run_id": run_id,
         "source": provenance,
-        "runtime_profile": {key: profile[key] for key in ("node_version", "three_version", "three_revision")},
+        "runtime_profile": {
+            **{key: profile[key] for key in ("node_version", "three_version", "three_revision")},
+            "source_three_entrypoint": str(source_three_entrypoint),
+            "per_run_three_entrypoint": str(copied_three_entrypoint),
+            "source_three_entry_sha256": source_three_entry_sha256,
+            "copied_three_entry_sha256": copied_three_entry_sha256,
+        },
         "spec_sha256": spec_sha256,
         "spec": {"workspace_relative_path": owned_spec_relative, "sha256": spec_sha256, "source_workspace_relative_path": spec_relative},
         "strict_quality_gate": {"entrypoint": "forge/stage2_spec/validate_sculpt_spec.py", "enforced": True, "receipt_status": validate_receipt["status"], "allow_nonstrict": "NEVER_EXPOSED"},
