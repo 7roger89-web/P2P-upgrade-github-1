@@ -17,18 +17,12 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import { materialSnapshot } from "./img2threejs_material_snapshot.mjs";
 
 const BAKE_SCHEMA = "p2p-img2threejs-runtime-bake/1";
 const MAX_NODES = 8192;
 const MAX_POSITION_FLOATS = 3_000_000;
 const MAX_HIERARCHY_DEPTH = 512;
-const SUPPORTED_MATERIAL_TYPES = new Set([
-  "MeshBasicMaterial",
-  "MeshLambertMaterial",
-  "MeshPhongMaterial",
-  "MeshStandardMaterial",
-  "MeshPhysicalMaterial",
-]);
 
 function fail(code) {
   const line = `P2P_IMG2THREEJS_BAKE_FAIL ${code}`;
@@ -86,76 +80,15 @@ if (Array.isArray(root.animations) && root.animations.length > 0) fail("ANIMATIO
 
 root.updateMatrixWorld(true);
 
-function isNumberValue(value) {
-  return typeof value === "number" && Number.isFinite(value);
-}
-
-function sameVectorish(a, b) {
-  const av = a.isVector2 || a.isVector3 || a.isVector4 ? a.toArray() : null;
-  const bv = b.isVector2 || b.isVector3 || b.isVector4 ? b.toArray() : null;
-  if (!av || !bv || av.length !== bv.length) return false;
-  return av.every((value, index) => Object.is(value, bv[index]));
-}
-
-function sameColor(a, b) {
-  if (typeof a?.getHex === "function" && typeof b?.getHex === "function") {
-    return a.getHex() === b.getHex();
+function snapshotMaterial(material) {
+  try {
+    return materialSnapshot(material);
+  } catch (error) {
+    // The snapshot module throws Errors whose `code` carries the exact
+    // fail-closed reason; translate it into the harness's terminal fail line.
+    if (error && typeof error.code === "string") fail(error.code);
+    fail("MATERIAL_SNAPSHOT_FAILED");
   }
-  return false;
-}
-
-function materialSnapshot(material) {
-  if (Array.isArray(material)) fail("MATERIAL_MULTI_UNSUPPORTED");
-  if (!material) return null;
-  const type = material.type;
-  if (!SUPPORTED_MATERIAL_TYPES.has(type)) fail(`MATERIAL_TYPE_UNSUPPORTED:${type}`);
-  const reference = new material.constructor();
-  if (reference.type !== type) fail("MATERIAL_SUBCLASS_UNSUPPORTED");
-  const ownKeys = Object.keys(material);
-  const out = { type };
-  const drift = [];
-  for (const key of ownKeys) {
-    if (key === "type" || key === "uuid" || key === "name") continue;
-    const value = material[key];
-    const base = reference[key];
-    if (value === undefined) continue;
-    if (value && value.isTexture) {
-      if (base && base.isTexture) continue;
-      drift.push([key, "texture"]);
-      continue;
-    }
-    if (value && (value.isColor || base && base.isColor)) {
-      if (!sameColor(value, base)) drift.push([key, "color"]);
-      continue;
-    }
-    if (typeof value === "number") {
-      if (!Number.isFinite(value)) fail(`MATERIAL_NONFINITE:${key}`);
-      if (value !== base) drift.push([key, value]);
-      continue;
-    }
-    if (typeof value === "boolean" || typeof value === "string") {
-      if (value !== base) drift.push([key, value]);
-      continue;
-    }
-    if (value && (value.isVector2 || value.isVector3 || value.isVector4)) {
-      if (!sameVectorish(value, base)) drift.push([key, "vector"]);
-      continue;
-    }
-    if (typeof value === "function") continue;
-    if (value === null && (base === null || base === undefined)) continue;
-    if (value !== base) drift.push([key, "object"]);
-  }
-  const color = material.color;
-  if (!color || typeof color.r !== "number") fail("MATERIAL_COLOR_MISSING");
-  for (const channel of [color.r, color.g, color.b]) {
-    if (!Number.isFinite(channel)) fail("MATERIAL_COLOR_NONFINITE");
-  }
-  out.color = [color.r, color.g, color.b];
-  out.opacity = isNumberValue(material.opacity) ? material.opacity : fail("MATERIAL_OPACITY_INVALID");
-  if (typeof material.metalness === "number") out.metalness = material.metalness;
-  if (typeof material.roughness === "number") out.roughness = material.roughness;
-  out.drift = drift;
-  return out;
 }
 
 function geometrySnapshot(geometry) {
@@ -225,7 +158,7 @@ function visit(node, depth) {
 
   const record = { id, parent: node.parent ? ids.get(node.parent) : null, kind, matrix };
   if (kind === "mesh") {
-    record.mesh = { geometry: geometrySnapshot(node.geometry), material: materialSnapshot(node.material) };
+    record.mesh = { geometry: geometrySnapshot(node.geometry), material: snapshotMaterial(node.material) };
     if (node.geometry.attributes.skinIndex || node.geometry.attributes.skinWeight) fail("STATIC_ASSET_MUST_NOT_REQUIRE_SKIN");
   }
   nodes.push(record);
