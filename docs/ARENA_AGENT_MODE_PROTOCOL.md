@@ -229,17 +229,21 @@ When the paths exist, use this bootstrap order:
 3. `docs/CURRENT_STATE.md`;
 4. `production/SESSION_INDEX.md`;
 5. latest accepted session report;
-6. task-specific projected P2P capabilities; and
-7. this Arena Agent Mode protocol.
+6. task-specific projected P2P capabilities;
+7. this Arena Agent Mode protocol; and
+8. the P2P operations notebook (`P2P_OPERATIONS_NOTEBOOK`) when the
+   project's `AGENTS.md` block or this protocol points to it.
 
 The current P2P development source binds the generic names to its real
 surfaces: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md` is the master
 development specification, `governance/development-control.json` and
 `docs/p2p-development/current-roadmap.md` carry current development state,
 accepted reports are selected from the relevant
-`docs/p2p-development/reports/` or candidate evidence path, and the
+`docs/p2p-development/reports/` or candidate evidence path, the
 task-specific capability projection is
-`docs/p2p-development/capability-ledger/capability-index.json`.
+`docs/p2p-development/capability-ledger/capability-index.json`, and the
+canonical operations notebook is
+`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`.
 
 If a project has no `docs/CURRENT_STATE.md` or
 `production/SESSION_INDEX.md`, do not create a fake duplicate solely for
@@ -286,7 +290,23 @@ applicable selected plan is not claimed to have received the protocol.
 projection-policy update exposes no missing invariant that justifies reopening
 or prematurely implementing that workstream.
 
-## 10. Evidence boundary
+## 11. P2P operations notebook discovery
+
+Arena executors operating a P2P-installed project discover the single
+canonical operations notebook `P2P_OPERATIONS_NOTEBOOK` before generating
+beginner-facing operating instructions:
+
+- P2P development source: `docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`.
+- Installed projects: the inherited digest in the project's `AGENTS.md` P2P
+  block (`P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`), which
+  points to this protocol for the Arena session contract.
+
+The notebook canonicalizes `P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-14) and
+`RULE_ASSIMILATION_GATE_V1`. This protocol remains the canonical Arena
+session contract (sections 1-10); it references the notebook for general
+operations memory and does not maintain a divergent copy of notebook rules.
+
+## 12. Evidence boundary
 
 No usage observation in this documentation is a universal quota estimate. The
 fixed-count policy is rejected by the execution-unit contract above, not by a
