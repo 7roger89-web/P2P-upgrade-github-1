@@ -670,6 +670,22 @@ class TestCandidatePolicyAudit:
             "docs/p2p-development/research/c35r/",
             # C35R canonical terminal report (research-only artifact).
             "docs/p2p-development/reports/P2P-C35R-terminal-report.md",
+            # C36 canonical terminal report (final closure artifact).
+            "docs/p2p-development/reports/P2P-C36-terminal-report.md",
+            # C36 final-closure evidence archive (machine transcripts,
+            # regression diff, CP0 prompt-integrity evidence).
+            "docs/p2p-development/research/c36/",
+            # C36 evidence-bound context and efficiency intelligence runtime
+            # surface (candidate-gated modules; authorized closure growth
+            # per the C34/C35R precedent):
+            ".p2p/system/p2p_capabilities/context_manifest.py",
+            ".p2p/system/p2p_capabilities/context_envelope.py",
+            ".p2p/system/p2p_capabilities/read_evidence.py",
+            ".p2p/system/p2p_capabilities/context_cache.py",
+            ".p2p/system/p2p_capabilities/context_efficiency.py",
+            ".p2p/system/p2p_capabilities/context_loop_guard.py",
+            "docs/p2p-development/research/c36/",
+            "tests/test_p2p_c36_evidence_bound_context.py",
         ))
         # C34-approved design fixes to pre-existing tests (e.g. the cf21
         # adapter-boundary exemption) are legitimate tracked modifications.
@@ -745,6 +761,24 @@ class TestCandidatePolicyAudit:
             # C35R matrix summary recount (ADAPT 7/DEFER 5/REJECT 4; rows
             # unchanged — aggregation-only mechanical reconciliation).
             "docs/p2p-development/research/c35r/zaofu-build-vs-reuse-matrix.json",
+            # C36 evidence-bound context and efficiency intelligence:
+            # ContextManifest (authority classification + deterministic
+            # identity), DeliveryEnvelope/Receipt (DELIVERED != READ),
+            # ReadEvidence/ReadGap, ContextCache (identity/freshness/
+            # transformation provenance), ContextEfficiency (telemetry +
+            # soft budget), ContextLoopGuard (bounded retry guards).
+            # Authorized closure growth per the C34/C35R precedent —
+            # candidate-gated runtime surface governed by the canonical
+            # candidate-policy machinery.
+            ".p2p/system/p2p_capabilities/context_manifest.py",
+            ".p2p/system/p2p_capabilities/context_envelope.py",
+            ".p2p/system/p2p_capabilities/read_evidence.py",
+            ".p2p/system/p2p_capabilities/context_cache.py",
+            ".p2p/system/p2p_capabilities/context_efficiency.py",
+            ".p2p/system/p2p_capabilities/context_loop_guard.py",
+            "tests/test_p2p_c36_evidence_bound_context.py",
+            # C36 canonical terminal report (tracked closure artifact).
+            "docs/p2p-development/reports/P2P-C36-terminal-report.md",
         ))
         lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
         for ln in lines:
