@@ -151,15 +151,23 @@ def _structural(doc,binary):
     _require_index(scene_index,len(scenes),"scene")
     roots=scenes[scene_index].get("nodes") if isinstance(scenes[scene_index],dict) else None
     if not isinstance(roots,list) or not roots: raise StaticGlbError("GLB_SCENE_ROOTS_INVALID")
-    seen=set(); stack=list(roots)
-    while stack:
-        i=_require_index(stack.pop(),len(nodes),"scene.node")
-        if i in seen: continue
-        seen.add(i); children=nodes[i].get("children",[])
+    seen=set(); visiting=set(); reachable_meshes=set()
+    def visit(i):
+        i=_require_index(i,len(nodes),"scene.node")
+        if i in visiting: raise StaticGlbError("GLB_NODE_CYCLE")
+        if i in seen: return
+        visiting.add(i); node=nodes[i]
+        if not isinstance(node,dict): raise StaticGlbError("GLB_NODE_INVALID")
+        reachable_meshes.add(_require_index(node.get("mesh"),len(meshes),"node.mesh"))
+        children=node.get("children",[])
         if not isinstance(children,list): raise StaticGlbError("GLB_NODE_CHILDREN_INVALID")
-        stack.extend(children)
+        for child in children: visit(child)
+        visiting.remove(i); seen.add(i)
+    for root in roots: visit(root)
     if not any("mesh" in nodes[i] for i in seen): raise StaticGlbError("GLB_SCENE_MESH_MISSING")
-    return {"status":"STRUCTURALLY_VALID","gltf_version":"2.0","reachable_nodes":len(seen)}
+    if len(seen) != len(nodes): raise StaticGlbError("GLB_UNREACHABLE_NODE")
+    if reachable_meshes != set(range(len(meshes))): raise StaticGlbError("GLB_UNREACHABLE_MESH")
+    return {"status":"STRUCTURALLY_VALID","gltf_version":"2.0","reachable_nodes":len(seen),"reachable_meshes":len(reachable_meshes)}
 
 def validate_static_glb_output(glb_path: str|Path, provenance_path: str|Path, *, expected_asset_name: str|None=None, expected_generating_capability: str|None=None, expected_run_id: str|None=None) -> dict[str,Any]:
     glb=Path(glb_path); data,doc,binary=_parse(glb)

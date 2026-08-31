@@ -63,6 +63,30 @@ class StaticGlbStandardizerTests(unittest.TestCase):
             with self.assertRaisesRegex(StaticGlbError, "MESH_INDICES_INVALID"):
                 standardize_static_glb({**ASSET, "meshes":[{**ASSET["meshes"][0], "indices":[0,1,9]}]}, Path(directory)/"bad.glb", generating_capability="img2threejs", run_id="r")
 
+    def test_emitted_orphan_nodes_and_meshes_fail_closed(self):
+        with TemporaryDirectory() as directory:
+            result = standardize_static_glb(ASSET, Path(directory) / "x.glb", generating_capability="img2threejs", run_id="r")
+            data, doc, binary = _parse(Path(result["glb_path"]))
+            orphan_mesh = dict(doc["meshes"][0]); orphan_mesh["name"] = "orphan_mesh"
+            doc["meshes"].append(orphan_mesh)
+            doc["nodes"].append({"name": "orphan_node", "mesh": 1})
+            Path(result["glb_path"]).write_bytes(_encode(doc, binary))
+            manifest = json.loads(Path(result["provenance_path"]).read_text())
+            manifest["glb_sha256"] = hashlib.sha256(Path(result["glb_path"]).read_bytes()).hexdigest()
+            Path(result["provenance_path"]).write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(StaticGlbError, "GLB_UNREACHABLE_NODE"):
+                validate_static_glb_output(result["glb_path"], result["provenance_path"], expected_asset_name="golden_sword_static", expected_generating_capability="img2threejs", expected_run_id="r")
+
+            result = standardize_static_glb(ASSET, Path(directory) / "mesh-only.glb", generating_capability="img2threejs", run_id="r")
+            _, doc, binary = _parse(Path(result["glb_path"]))
+            doc["meshes"].append(dict(doc["meshes"][0]))
+            Path(result["glb_path"]).write_bytes(_encode(doc, binary))
+            manifest = json.loads(Path(result["provenance_path"]).read_text())
+            manifest["glb_sha256"] = hashlib.sha256(Path(result["glb_path"]).read_bytes()).hexdigest()
+            Path(result["provenance_path"]).write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(StaticGlbError, "GLB_UNREACHABLE_MESH"):
+                validate_static_glb_output(result["glb_path"], result["provenance_path"], expected_asset_name="golden_sword_static", expected_generating_capability="img2threejs", expected_run_id="r")
+
     def test_provenance_and_transform_fail_closed(self):
         with TemporaryDirectory() as directory:
             result = standardize_static_glb(ASSET, Path(directory) / "x.glb", generating_capability="img2threejs", run_id="r")
