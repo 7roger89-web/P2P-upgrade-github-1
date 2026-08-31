@@ -141,10 +141,12 @@ export function materialSnapshot(material) {
       // expansion): the live material and the constructor baseline each carry
       // their own freshly allocated empty `userData = {}`, so distinct object
       // identity alone must not create drift for two empty plain records.
-      // Anything else — non-empty metadata, non-plain objects, replaced
-      // baselines — remains fail-closed for the downstream projection seam.
+      // ONLY two empty plain records are DEFAULT. Every other userData value
+      // is fail-closed drift regardless of reference equality, so even a
+      // non-empty object shared by the live material and the constructor
+      // baseline cannot be laundered through `value === base`.
       if (isEmptyPlainRecord(value) && isEmptyPlainRecord(base)) continue;
-      if (value !== base) drift.push([key, "object"]);
+      drift.push([key, "object"]);
       continue;
     }
     if (typeof value === "function") continue;

@@ -159,6 +159,22 @@ test("non-empty runtime userData while baseline is empty remains drift (fail-clo
   assert.deepEqual(snapshot.drift, [["userData", "object"]]);
 });
 
+test("same non-empty userData identity still emits drift (fail-closed)", () => {
+  // Regression: the DEFAULT exception is strictly "two empty plain records".
+  // If the live material and the constructor baseline happen to share the
+  // SAME non-empty userData object, reference equality must not silence the
+  // drift — non-empty metadata remains fail-closed either way.
+  const shared = { customTag: "shared-id" };
+  class SharedUserDataMaterial extends FakeStandardMaterial {
+    constructor() {
+      super();
+      this.userData = shared;
+    }
+  }
+  const snapshot = materialSnapshot(new SharedUserDataMaterial());
+  assert.deepEqual(snapshot.drift, [["userData", "object"]]);
+});
+
 test("non-plain or hidden-key userData remains drift (fail-closed)", () => {
   const variants = [
     ["Map", new Map([["k", "v"]])],
