@@ -113,6 +113,18 @@ for metadata_name in \
   cp "$package_root/$metadata_name" "$system_destination/$metadata_name"
 done
 
+# P2P operations notebook: install the canonical full notebook into the
+# managed P2P system so the installed project can discover and follow it.
+# Fail closed if a canonical package that claims this feature is missing it.
+operations_notebook_rel="docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
+operations_notebook_src="$package_root/$operations_notebook_rel"
+if [[ ! -f "$operations_notebook_src" ]]; then
+  echo "Canonical P2P operations notebook is missing: $operations_notebook_src" >&2
+  exit 2
+fi
+mkdir -p "$system_destination/docs"
+cp "$operations_notebook_src" "$system_destination/docs/P2P-OPERATIONS-NOTEBOOK.md"
+
 uiux_runtime="$package_root/runtime"
 if [[ -d "$uiux_runtime" ]]; then
   for required_path in \

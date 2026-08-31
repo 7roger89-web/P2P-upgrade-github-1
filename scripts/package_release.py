@@ -86,6 +86,7 @@ DOC_FILES = (
     "docs/PHAN-TICH-CHIEU-NGANG-DOC.md",
     "docs/QUAN-TRI-FACT-EVAL-RAG.md",
     "docs/SU-DUNG.md",
+    "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
 )
 SCRIPT_FILES = (
     "scripts/doctor.py",
