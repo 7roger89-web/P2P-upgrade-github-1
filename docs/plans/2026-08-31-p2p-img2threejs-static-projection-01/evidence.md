@@ -109,3 +109,105 @@ TERMINAL_VERDICT=BLOCKED_UNIT_SCALE_CONTRACT_MISSING
 Until one exists, the correct composition-testable state of this workstream
 is a fail-closed rejection, which the already-promoted standardizer
 performs on its own input boundary today (`STATIC_CONVENTION_INVALID`).
+
+---
+
+## E4 — SUPERSESSION: blocked route resolved by Owner-side runtime probe (2026-08-31)
+
+The E1–E3 findings are preserved as accurate for what they examined: the
+DATA-ONLY route. They are not retracted. What E1–E3 proved was that no
+static projection can be derived from the spec file alone without a
+physical-scale contract, and that conclusion stands.
+
+```text
+DATA_ONLY_PROJECTION_SOURCE=NO_SAFE_SOURCE
+DATA_ONLY_ROUTE=BLOCKED (permanently; do not retry data-only projection)
+```
+
+The Owner-side supervisor then executed a disposable runtime feasibility
+probe (Node v25.2.1, three@0.169.0, pinned upstream
+`dede5909be4e494b228c801a55dda47439143932`, with `--allow-nonstrict` used
+only as a test-fixture escape hatch on the probe side). Supervisor return:
+
+```text
+RUNTIME_PROBE_VERDICT=P2P_IMG2THREEJS_RUNTIME_STATIC_EXPORT_FEASIBLE
+RUNTIME_MATERIALIZATION_SOURCE=PROVEN
+WORLD_MATRIX_BAKE_FEASIBLE=YES
+Y_UP_RUNTIME_PROVEN=YES
+EXPLICIT_PHYSICAL_SCALE_ANCHOR_FEASIBLE=YES
+STATIC_STANDARDIZER_COMPOSITION_PROVEN=YES
+```
+
+The probe proves the ROUTE, not any production adapter. The blocked
+assumptions are superseded only along the replacement route:
+
+1. Geometry: materialized by executing the pinned upstream generator inside
+   the existing contained adapter, then baked in the P2P-owned Node harness +
+   deterministic Python world-matrix seam (no TypeScript parsing).
+2. Units: the absent implicit relative->meters mapping is NOT invented. The
+   seam requires an explicit caller anchor
+   `TARGET_MAJOR_EXTENT_METERS` applied once to the aggregate
+   world-transform-baked bounding box
+   (`relative_to_meter_scale = target / baked_relative_major_extent`).
+   Missing/invalid anchor, non-positive extent, or empty geometry fail closed.
+
+## E5 — Production seam candidate on PR #33
+
+- Implementation: `.p2p/system/p2p_capabilities/img2threejs_adapter.py`
+  extended in place (`bake_static_projection`,
+  `verify_static_runtime_profile`, `project_static_asset`) plus the
+  P2P-owned contained harness
+  `.p2p/system/p2p_capabilities/img2threejs_static_projection_harness.mjs`.
+  No new capability ID, registry class, router, provenance store, or Asset
+  Forge framework. The operation is recorded on the existing `img2threejs`
+  capability as `execution.static_projection` (kind
+  `BOUNDED_ADAPTER_OPERATION_NOT_A_NEW_CAPABILITY`); the promoted
+  standardizer record keeps its own semantics and only updates
+  `img2threejs_seam` to `PROJECTION_CANDIDATE_PR33`.
+- Strict quality: production route composes `--strict-quality` validation via
+  the existing `_build_argv`; the upstream test-only `--allow-nonstrict`
+  hatch is not exposed, accepted, or constructible (asserted by test).
+- Containment: per-run workspace directory
+  `static-projection/<run-id>/`, fixed generator entrypoints, fixed factory
+  and bake paths, argv-only subprocess, `shell=False`, minimal sanitized
+  environment (NODE_OPTIONS cleared), bounded timeout and 64 MiB bounded
+  output, workspace-relative paths with symlink/reparse rejection retained.
+- Runtime profile: exact-pin gate for Node `v25.2.1` and three `0.169.0`
+  against the pre-provisioned external runtime; no npm, no bundling, no
+  download; wrong/missing/unverified runtime fails closed before any
+  generation. Broader compatibility is NOT claimed.
+- Static-only: harness rejects skinned meshes, bones, skeletons,
+  animations, instanced/line/points/sprite nodes, morph targets,
+  non-BufferGeometry, non-finite data; Python re-validates aggregate counters
+  and bakes world matrices with duplicate-identity, cycle, and
+  missing-parent rejection; output `transform.space=flat` carries no
+  hierarchy keys.
+- Materials: only the canonical standardizer subset is projected
+  (color/opacity/metalness/roughness). Any material property that differs
+  from the material class's own runtime default and is not representable by
+  the contract (textures, emissive, flat shading, Phong specular/shininess,
+  MeshPhysical transmission/thickness/clearcoat/sheen/iridescence/etc.)
+  fails closed with `UNSUPPORTED_MATERIAL_FEATURE:<key>`.
+  MeshPhysicalMaterial with all-physical-default properties narrows to
+  MeshStandardMaterial; equivalence is never silently claimed.
+- Responsibility boundary held: the seam emits the normalized projection
+  only; GLB writing/validation/provenance stays with
+  `game.three.asset.static_glb_standardize` (unchanged).
+- Tests: `.p2p/system/p2p_capabilities/tests/test_img2threejs_static_projection.py`
+  12/12 PASS, including repo-side composition (bounded synthetic bake-manifest
+  fixture -> projection -> standardizer -> validated GLB).
+  `test_static_glb_standardizer` remains 7/7; img2threejs exec suite skips
+  cleanly without the external checkout; capability-catalog UI suite 35/35.
+  Registry `load_registry` valid at 66 entries (no new identity).
+- Status: `STATUS=DISCOVERED`-class only (candidate). This sandbox proves no
+  external runtime (local Node here is v22.x and is correctly REFUSED by the
+  profile gate; the sandbox has no three package).
+
+```text
+COMPOSITION_TESTED=YES (repo-side, bounded fixtures)
+EXTERNAL_IMG2THREEJS_RUNTIME_PROVEN=NO
+PRODUCTION_ADAPTER_RUNTIME_PROVEN=NO
+NEXT_RUNTIME_SMOKE=CODEX_WINDOWS_PRODUCTION_ADAPTER_SMOKE
+EXECUTION_AUTHORIZED=NO
+AUTO_ACTIVATION=NO
+```

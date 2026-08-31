@@ -1898,6 +1898,7 @@
       "DESCRIPTION": "Selective, fail-closed img2threejs execution and Thi\u00ean H\u1ea1 character/asset protocol projection through an exact pinned upstream checkout.",
       "TRIGGERS": [
         "img2threejs",
+        "img2threejs static projection",
         "image-to-3d reconstruction",
         "character reference reconstruction",
         "golden character",
@@ -1945,7 +1946,8 @@
         "P2P-EXT-CANDIDATE-IMG2THREEJS-01",
         "p2p-img2threejs-execution-contract",
         "thien-ha-3d-02-golden-character-protocol",
-        "thien-ha-3d-04-golden-weapon-asset-forge-protocol"
+        "thien-ha-3d-04-golden-weapon-asset-forge-protocol",
+        "P2P-IMG2THREEJS-STATIC-PROJECTION-01"
       ],
       "APPROVAL_BOUNDARY": [
         "owner-gate-before-promotion",
@@ -2015,7 +2017,28 @@
           "filesystem_policy": "DECLARED_RECONSTRUCTION_WORKSPACE_ONLY",
           "state_evidence_workspace_only": true,
           "shell": false,
-          "secrets_inherited": false
+          "secrets_inherited": false,
+          "static_projection": {
+            "operation_id": "img2threejs.static_projection",
+            "operation_version": "1.0.0",
+            "kind": "BOUNDED_ADAPTER_OPERATION_NOT_A_NEW_CAPABILITY",
+            "implementation": ".p2p/system/p2p_capabilities/img2threejs_adapter.py",
+            "harness": ".p2p/system/p2p_capabilities/img2threejs_static_projection_harness.mjs",
+            "status": "CANDIDATE",
+            "execution_authorized": false,
+            "runtime_proven": false,
+            "auto_activation": false,
+            "strict_quality_gate": "REQUIRED",
+            "allow_nonstrict": "NEVER_EXPOSED",
+            "verified_runtime_profile": {
+              "node": "v25.2.1",
+              "three": "0.169.0"
+            },
+            "physical_anchor_contract": "TARGET_MAJOR_EXTENT_METERS required, finite, positive, no default, never inferred from relative units",
+            "output_contract": "p2p-static-glb-asset/1",
+            "emits_glb": false,
+            "external_runtime_proven": false
+          }
         },
         "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
       },
@@ -4405,7 +4428,7 @@
         "blender": false,
         "network_runtime": false,
         "install_mode": "DISABLED",
-        "img2threejs_seam": "MISSING_SEAM",
+        "img2threejs_seam": "PROJECTION_CANDIDATE_PR33",
         "future_bounded_dependency": "P2P-IMG2THREEJS-STATIC-PROJECTION-01",
         "auto_activation": false,
         "execution_authorized": false,
