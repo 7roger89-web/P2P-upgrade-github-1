@@ -158,3 +158,56 @@ Focused test — tests/test_p2p_operations_notebook.py (RULE 15 semantics)
 The historical facts of the first edit (starting from `c1481ef7...`) are
 preserved above and are not rewritten as though the first edit started from
 the reanchored base.
+
+## REAL INSTALLED PROJECT NOTEBOOK INHERITANCE (CT blocker fix)
+
+Control Tower identified a focused install-inheritance blocker: the installed
+`AGENTS.md` digest claimed rules 01-15 but enumerated only RULE 01-14, and the
+full canonical notebook was shipped in the release package but not copied into
+every installed project tree. This violated the Owner practical requirement
+that an installed project can actually discover and follow the canonical
+rules. Fixed on the same PR38 (no new PR).
+
+```text
+REAL_INSTALLED_PROJECT_NOTEBOOK_INHERITANCE=PASS
+INSTALLED_NOTEBOOK_PATH=.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md
+INSTALLED_RULES_01_15_DISCOVERABLE=YES
+```
+
+Mechanism (existing package copy structure, no new installer):
+
+- `install.sh` now creates `$system_destination/docs` and copies
+  `docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md` to
+  `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md`; fails closed (`exit 2`) if the
+  canonical notebook is missing from a package that claims this feature.
+- `install.ps1` does the equivalent:
+  `docs\p2p-development\P2P-OPERATIONS-NOTEBOOK.md` ->
+  `$SystemDestination\docs\P2P-OPERATIONS-NOTEBOOK.md`; fails closed (`throw`)
+  if missing.
+- `AGENTS.md` digest now points the installed project at the local installed
+  notebook (`.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md`) so it never depends
+  on access to the original development repo, and adds a concise RULE 15
+  digest entry so the digest enumerates RULE 01-15.
+- Release projection unchanged: `scripts/package_release.py` `DOC_FILES`
+  already ships the full notebook (single release artifact, no duplicate).
+
+Focused simulation (temp project, exact installer merge semantics):
+
+```text
+PASS installed notebook at .p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md
+PASS installed notebook contains RULE_ASSIMILATION_GATE_V1
+PASS installed notebook contains RULE 15 — ARENA_TASK_COMPLETION_DIALOG
+PASS installed AGENTS.md references .p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md
+PASS installed AGENTS.md digest enumerates RULE 01-15 (15 bullets, incl. RULE 15)
+PASS owner/project pre-existing AGENTS content preserved
+PASS single P2P block; no second notebook/framework
+REAL_INSTALLED_PROJECT_NOTEBOOK_INHERITANCE=PASS
+```
+
+Focused tests: `tests/test_p2p_operations_notebook.py` extended to 19 checks
+(A-H: release contains full notebook; install.sh path; install.ps1 path;
+installed AGENTS local reference; digest RULE 01-15 incl. RULE 15; installed
+notebook contains gate + RULE 15; owner content preserved; no second
+framework). 19/19 PASS. Related focused suites (beginner_routing,
+orientation_packaging, eff01, orientation, control_tower_session_handoff,
+control_tower_durable): OK.

@@ -69,9 +69,12 @@ return fields. Never repeat large canonical policies in an executor prompt.
 
 `P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. Every normal P2P
 installation inherits the canonical operations notebook: this block is the
-installed-project digest, and the canonical full notebook is
-`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md` in the P2P development
-source (shipped in release packages via `scripts/package_release.py`). If
+installed-project digest, and the canonical full notebook is installed in this
+project at `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` (copied by
+`install.sh` / `install.ps1`). The development-source path is
+`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`, shipped in release packages
+via `scripts/package_release.py`; installed-project instructions must use the
+installed path and never depend on access to the original development repo. If
 this digest and the notebook ever differ, the notebook wins.
 
 Beginner-facing operational guidance must apply
@@ -115,6 +118,14 @@ Beginner-facing operational guidance must apply
   memorizes internal Git state.
 - `RULE 14 OVER_ENGINEERING_CHECK` — end beginner guidance with
   `Không bị over engineering chứ? PASS/FAIL`; expected `PASS`.
+- `RULE 15 ARENA_TASK_COMPLETION_DIALOG` — when asked "Was this task
+  successful?", `YES` means the bounded Arena execution reached its requested
+  terminal state and returned the required result (technical PASS is NOT
+  required; an honest `BLOCKED`/fail-closed result can still be `YES`);
+  `KEEP WORKING` means same-chat continuation / execution unit not yet
+  terminal; `NO` means Arena materially failed the task/execution (wrong task,
+  wrong repo/workstream, unusable result, ignored required scope,
+  premature/incorrect termination) — never merely a technical `BLOCKED`.
 
 Enduring rule promises are tracked by `RULE_ASSIMILATION_GATE_V1`: an
 accepted rule deferred to a later task stays

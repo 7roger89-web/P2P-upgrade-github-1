@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -21,8 +23,11 @@ AGENTS = REPO_ROOT / "AGENTS.md"
 ARENA_PROTOCOL = REPO_ROOT / "docs" / "ARENA_AGENT_MODE_PROTOCOL.md"
 CT_HANDOFF = REPO_ROOT / "docs" / "p2p-development" / "CONTROL-TOWER-SESSION-HANDOFF.md"
 PACKAGE_RELEASE = REPO_ROOT / "scripts" / "package_release.py"
+INSTALL_SH = REPO_ROOT / "install.sh"
+INSTALL_PS1 = REPO_ROOT / "install.ps1"
 
 NOTEBOOK_RELATIVE = "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
+INSTALLED_NOTEBOOK_RELATIVE = ".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md"
 
 RULE_HEADINGS = (
     "RULE 01 — EXPLICIT_DESTINATION",
@@ -157,6 +162,110 @@ class P2POperationsNotebookTests(unittest.TestCase):
                       self.notebook_text)
         self.assertIn("It does not add a router, scheduler, orchestrator, memory framework",
                       self.notebook_text)
+
+    # --- REAL INSTALLED PROJECT NOTEBOOK INHERITANCE (C.T. blocker) ---
+
+    def test_release_package_contains_full_notebook(self) -> None:
+        # A. Release package ships the FULL canonical notebook (DOC_FILES
+        # entry and the actual file present with the canonical rule set), not a
+        # stub.
+        self.assertIn(f'"{NOTEBOOK_RELATIVE}"', self.package_text)
+        self.assertTrue(NOTEBOOK.is_file(), "canonical notebook file must exist")
+        self.assertIn("RULE_ASSIMILATION_GATE_V1", self.notebook_text)
+        self.assertIn("### RULE 15", self.notebook_text)
+        self.assertIn("P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT", self.notebook_text)
+
+    def test_install_sh_copies_notebook_to_managed_docs(self) -> None:
+        # B. install.sh installs .p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md.
+        sh_text = INSTALL_SH.read_text(encoding="utf-8")
+        self.assertIn("operations_notebook_src", sh_text)
+        self.assertIn("$system_destination/docs", sh_text)
+        self.assertIn("P2P-OPERATIONS-NOTEBOOK.md", sh_text)
+        # Fail-closed when the canonical notebook is missing.
+        self.assertIn("operations notebook is missing", sh_text)
+        self.assertIn("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md", sh_text)
+
+    def test_install_ps1_copies_notebook_to_managed_docs(self) -> None:
+        # C. install.ps1 installs the equivalent path.
+        ps_text = INSTALL_PS1.read_text(encoding="utf-8")
+        self.assertIn("OperationsNotebook", ps_text)
+        self.assertIn('(Join-Path $SystemDestination "docs")', ps_text)
+        self.assertIn('docs\\P2P-OPERATIONS-NOTEBOOK.md', ps_text)
+        # Fail-closed when the canonical notebook is missing.
+        self.assertIn("operations notebook is missing", ps_text)
+        self.assertIn("docs\\p2p-development\\P2P-OPERATIONS-NOTEBOOK.md", ps_text)
+
+    def test_installed_agents_refers_local_installed_notebook(self) -> None:
+        # D. Installed AGENTS.md digest points to the local installed notebook,
+        # not (only) the development-source path.
+        self.assertIn(INSTALLED_NOTEBOOK_RELATIVE, self.agents_text)
+        self.assertIn("never depend on access to the original development repo",
+                      self.agents_text)
+        self.assertIn("P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT",
+                      self.agents_text)
+
+    def test_installed_agents_digest_has_all_rules_01_15(self) -> None:
+        # E. Installed AGENTS.md digest enumerates RULE 01-15 (including 15).
+        match = re.search(
+            r"## P2P_OPERATIONS_NOTEBOOK.*?(?=\n## )", self.agents_text, re.DOTALL
+        )
+        self.assertIsNotNone(match, "digest section must exist")
+        assert match is not None
+        digest = match.group(0)
+        for n in range(1, 16):
+            self.assertRegex(digest, r"`RULE %02d " % n)
+        self.assertIn("RULE 15 ARENA_TASK_COMPLETION_DIALOG", digest)
+        self.assertRegex(digest, r"reached its requested\s+terminal state")
+        self.assertIn("KEEP WORKING", digest)
+        self.assertIn("never merely a technical `BLOCKED`", digest)
+
+    def test_installed_notebook_contains_gate_and_rule15(self) -> None:
+        # F. The installed canonical notebook contains RULE_ASSIMILATION_GATE_V1
+        # and RULE 15.
+        self.assertTrue(NOTEBOOK.is_file())
+        self.assertIn("## 4. RULE_ASSIMILATION_GATE_V1", self.notebook_text)
+        self.assertIn("### RULE 15 — ARENA_TASK_COMPLETION_DIALOG", self.notebook_text)
+        self.assertIn("RULE_ASSIMILATION_LEDGER", self.notebook_text)
+
+    def test_install_projection_preserves_existing_agents_content(self) -> None:
+        # G. The installer merge preserves owner/project pre-existing AGENTS
+        # content (backup + insert/replace of the P2P CODEX block only).
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "AGENTS.md"
+            owner_marker = "# My Project Owner Notes"
+            target.write_text(
+                owner_marker + "\n\nKeep this.\n<!-- BEGIN P2P CODEX -->\nOLD\n<!-- END P2P CODEX -->\n",
+                encoding="utf-8",
+            )
+            source = AGENTS.read_text(encoding="utf-8")
+            begin, end = "<!-- BEGIN P2P CODEX -->", "<!-- END P2P CODEX -->"
+            block = begin + "\n" + source.strip() + "\n" + end
+            text = target.read_text(encoding="utf-8")
+            pattern = re.escape(begin) + r".*?" + re.escape(end)
+            merged = re.sub(pattern, block, text, flags=re.S)
+            target.write_text(merged, encoding="utf-8")
+            merged_text = target.read_text(encoding="utf-8")
+            # Owner content preserved (markers outside the P2P block).
+            self.assertIn(owner_marker, merged_text)
+            self.assertIn("Keep this.", merged_text)
+            # Old stale block replaced, new digest present.
+            self.assertNotIn("OLD", merged_text)
+            self.assertIn(INSTALLED_NOTEBOOK_RELATIVE, merged_text)
+            self.assertIn("RULE 15 ARENA_TASK_COMPLETION_DIALOG", merged_text)
+            # Exactly one P2P block.
+            self.assertEqual(merged_text.count(begin), 1)
+            self.assertEqual(merged_text.count(end), 1)
+
+    def test_no_second_notebook_framework_exists(self) -> None:
+        # H. Only the single canonical notebook file exists (no parallel
+        # operations notebook/manual/framework recreated).
+        matches = list(REPO_ROOT.rglob("*P2P-OPERATIONS-NOTEBOOK*"))
+        # Ignore the evidence/plan document which references (but is not) the
+        # notebook; only the canonical .md counts as an operations notebook.
+        notebook_files = [p for p in matches if p.is_file() and p.suffix == ".md"
+                          and p.name == "P2P-OPERATIONS-NOTEBOOK.md"]
+        self.assertEqual(len(notebook_files), 1, f"multiple notebooks: {notebook_files}")
+        self.assertEqual(notebook_files[0].resolve(), NOTEBOOK.resolve())
 
 
 if __name__ == "__main__":
