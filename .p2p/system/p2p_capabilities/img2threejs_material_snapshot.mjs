@@ -20,6 +20,12 @@
 //   5. an active / non-default `attenuationDistance` remains fail-closed
 //   6. active transmission / clearcoat / etc. drift remains fail-closed
 //   7. no material support expansion (no new types, no new projected keys)
+//   8. `userData` is a special runtime-default metadata comparison: three's
+//      Material constructor allocates a fresh empty `{}` per instance, so the
+//      live value and the constructor baseline are two independently allocated
+//      empty plain records that are default-equivalent (identity differs,
+//      appearance semantics identical). Two empty plain records -> DEFAULT ->
+//      no drift. Non-empty or non-plain userData stays fail-closed drift.
 //
 // This file is P2P-owned code, not an upstream allowlisted entrypoint.
 //
@@ -73,6 +79,17 @@ function sameColor(a, b) {
   return false;
 }
 
+// A plain record-like object with no own properties of any kind (string,
+// symbol, enumerable or not). This deliberately excludes arrays, class
+// instances, Maps, and other exotic objects so the userData special case can
+// never launder a non-default metadata carrier.
+function isEmptyPlainRecord(value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) return false;
+  return Reflect.ownKeys(value).length === 0;
+}
+
 export function materialSnapshot(material) {
   if (Array.isArray(material)) reject("MATERIAL_MULTI_UNSUPPORTED");
   if (!material) return null;
@@ -117,6 +134,17 @@ export function materialSnapshot(material) {
     }
     if (value && (value.isVector2 || value.isVector3 || value.isVector4)) {
       if (!sameVectorish(value, base)) drift.push([key, "vector"]);
+      continue;
+    }
+    if (key === "userData") {
+      // Runtime-default metadata special case (NOT a material support
+      // expansion): the live material and the constructor baseline each carry
+      // their own freshly allocated empty `userData = {}`, so distinct object
+      // identity alone must not create drift for two empty plain records.
+      // Anything else — non-empty metadata, non-plain objects, replaced
+      // baselines — remains fail-closed for the downstream projection seam.
+      if (isEmptyPlainRecord(value) && isEmptyPlainRecord(base)) continue;
+      if (value !== base) drift.push([key, "object"]);
       continue;
     }
     if (typeof value === "function") continue;

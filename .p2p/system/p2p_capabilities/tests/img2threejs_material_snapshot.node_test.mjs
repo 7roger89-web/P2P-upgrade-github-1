@@ -1,4 +1,5 @@
-// P2P-IMG2THREEJS-MATERIAL-DEFAULT-NONFINITE-01 — material snapshot semantics.
+// P2P-IMG2THREEJS-MATERIAL-DEFAULT-NONFINITE-01 / P2P-IMG2THREEJS-MATERIAL-DEFAULT-USERDATA-01
+// — material snapshot semantics.
 //
 // Unit-tests the standalone material snapshot module WITHOUT a real THREE
 // runtime. The module is intentionally free of `process.exit` and only needs a
@@ -40,6 +41,9 @@ class FakeStandardMaterial {
     this.opacity = 1.0;
     this.metalness = 0.0;
     this.roughness = 1.0;
+    // three's base Material constructor allocates a fresh empty record per
+    // instance; the snapshot baseline is an independently allocated instance.
+    this.userData = {};
   }
 }
 
@@ -48,6 +52,7 @@ class FakeBasicMaterial {
     this.type = "MeshBasicMaterial";
     this.color = new FakeColor(1, 1, 1);
     this.opacity = 1.0;
+    this.userData = {};
   }
 }
 
@@ -58,6 +63,7 @@ class FakePhysicalMaterial {
     this.opacity = 1.0;
     this.metalness = 0.0;
     this.roughness = 1.0;
+    this.userData = {};
     // runtime defaults (three r169 MeshPhysicalMaterial)
     this.transmission = 0.0;
     this.clearcoat = 0.0;
@@ -96,6 +102,8 @@ test("default MeshStandardMaterial is written with empty drift", () => {
   assert.equal(snapshot.metalness, 0.0);
   assert.equal(snapshot.roughness, 1.0);
   assert.deepEqual(snapshot.drift, []);
+  // the per-instance empty userData record is not a drift entry
+  assert.equal(hasDrift(snapshot, "userData"), false);
 });
 
 test("default MeshBasicMaterial omits metalness/roughness projected fields", () => {
@@ -120,14 +128,50 @@ test("default-Infinity attenuationDistance is accepted as DEFAULT with no drift 
   // regression: the numeric default-Infinity must be compared against the
   // runtime default BEFORE the generic non-finite rejection, so a MeshPhysical
   // material whose only physical semantics are its own defaults survives.
-  const snapshot = materialSnapshot(new FakePhysicalMaterial());
+  const material = new FakePhysicalMaterial();
+  material.userData = {}; // reallocate: two independently created empty records
+  const snapshot = materialSnapshot(material);
   assert.equal(snapshot.type, "MeshPhysicalMaterial");
   assert.deepEqual(snapshot.drift, []);
   assert.equal(hasDrift(snapshot, "attenuationDistance"), false);
+  assert.equal(hasDrift(snapshot, "userData"), false);
   // a sanitized, default-Infinity runtime value is never laundered into a
   // MaterialNonFinite failure and never leaks into the drift list.
   const nonFiniteEntries = snapshot.drift.filter((entry) => entry[1] === Infinity);
   assert.deepEqual(nonFiniteEntries, []);
+});
+
+test("two separately allocated empty default userData records never create drift", () => {
+  // regression: `value !== base` identity comparison used to classify two
+  // independently created empty `userData = {}` objects as drift even though
+  // no material appearance feature is active.
+  const material = new FakeStandardMaterial();
+  material.userData = {}; // distinct object identity from the constructor baseline
+  const snapshot = materialSnapshot(material);
+  assert.deepEqual(snapshot.drift, []);
+  assert.equal(hasDrift(snapshot, "userData"), false);
+});
+
+test("non-empty runtime userData while baseline is empty remains drift (fail-closed)", () => {
+  const material = new FakeStandardMaterial();
+  material.userData = { customTag: "unique-id" };
+  const snapshot = materialSnapshot(material);
+  assert.deepEqual(snapshot.drift, [["userData", "object"]]);
+});
+
+test("non-plain or hidden-key userData remains drift (fail-closed)", () => {
+  const variants = [
+    ["Map", new Map([["k", "v"]])],
+    ["class instance", new (class Wrapper {})()],
+    ["symbol key", (() => { const value = {}; value[Symbol("k")] = 1; return value; })()],
+    ["non-enumerable key", (() => { const value = {}; Object.defineProperty(value, "hidden", { value: 1 }); return value; })()],
+  ];
+  for (const [label, userData] of variants) {
+    const material = new FakeStandardMaterial();
+    material.userData = userData;
+    const snapshot = materialSnapshot(material);
+    assert.equal(hasDrift(snapshot, "userData"), true, label);
+  }
 });
 
 test("active finite attenuationDistance is recorded as drift (fail-closed downstream)", () => {
@@ -144,6 +188,17 @@ test("active finite attenuationDistance is recorded as drift (fail-closed downst
 test("NaN attenuationDistance is a hard reject (never a valid default)", () => {
   const material = new FakePhysicalMaterial();
   material.attenuationDistance = NaN;
+  assert.throws(
+    () => materialSnapshot(material),
+    (error) => error.code === "MATERIAL_NONFINITE:attenuationDistance",
+  );
+});
+
+test("non-default -Infinity attenuationDistance is a hard reject", () => {
+  // only the exact runtime default (+Infinity) may pass as DEFAULT; any other
+  // non-finite value must still hit the finite-only rejection.
+  const material = new FakePhysicalMaterial();
+  material.attenuationDistance = -Infinity;
   assert.throws(
     () => materialSnapshot(material),
     (error) => error.code === "MATERIAL_NONFINITE:attenuationDistance",
