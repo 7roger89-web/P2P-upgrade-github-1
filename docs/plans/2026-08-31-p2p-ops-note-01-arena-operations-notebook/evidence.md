@@ -122,3 +122,39 @@ items A-E and G (F stays PENDING under the gate).
 - `scripts/package_release.py` (DOC_FILES include)
 - `tests/test_p2p_operations_notebook.py` (NEW — structural validation)
 - `docs/plans/2026-08-31-p2p-ops-note-01-arena-operations-notebook/evidence.md` (this file)
+
+---
+
+## REANCHOR (2026-08-31, second delta on the same PR)
+
+The initial implementation above started from `c1481ef7...` (fresh main at
+that time). PR #37 merged afterward, so the PR38 branch was reanchored onto
+current canonical main via a normal non-destructive merge (no force push, no
+history rewrite, no new PR, no cherry-pick, operations commit preserved):
+
+```text
+REANCHORED_FINAL_BASE=cbf26b4d5380656743eddbbdc55c4924cd09ce36
+REANCHORED_FINAL_BASE_TREE=d75d33a83488c99d168b5ade9b2f319ef3477ab2
+REANCHORED_HEAD_BEFORE_RULE15=cecc2cb14cfbd563b0dc47f3551b22d69577e4bf
+REANCHORED_HEAD_BEFORE_RULE15_TREE=9d599eaddcdb423e37ed9ab035056b8b571f3736
+PR37_RUNTIME_DIFF=ZERO (img2threejs userdata files inherited unchanged)
+UNEXPECTED_FILES=0 (diff vs fresh main = only the original 7 notebook paths)
+```
+
+## BACKLOG_H — Arena task completion dialog (assimilated on the same PR)
+
+The Owner accepted one additional beginner-operating rule after the original
+implementation: the Arena completion dialog ("Was this task successful?" —
+Yes / No / Keep working). Under `RULE_ASSIMILATION_GATE_V1` this accepted
+rule was assimilated into the open PR38 before closure:
+
+```text
+BACKLOG_H_ARENA_COMPLETION_DIALOG=VERIFIED
+RULE 15 — ARENA_TASK_COMPLETION_DIALOG — docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md
+Arena linkage — docs/ARENA_AGENT_MODE_PROTOCOL.md section 11 (completion-dialog handling)
+Focused test — tests/test_p2p_operations_notebook.py (RULE 15 semantics)
+```
+
+The historical facts of the first edit (starting from `c1481ef7...`) are
+preserved above and are not rewritten as though the first edit started from
+the reanchored base.

@@ -39,6 +39,7 @@ RULE_HEADINGS = (
     "RULE 12 — MINIMUM_SUFFICIENT_WORK",
     "RULE 13 — CONTROL_TOWER_STATE_RESPONSIBILITY",
     "RULE 14 — OVER_ENGINEERING_CHECK",
+    "RULE 15 — ARENA_TASK_COMPLETION_DIALOG",
 )
 
 LEDGER_STATUSES = {"PENDING", "VERIFIED", "RULE_ASSIMILATION_MISSED"}
@@ -81,7 +82,11 @@ class P2POperationsNotebookTests(unittest.TestCase):
         ids = [entry["id"] for entry in ledger["entries"]]
         self.assertEqual(set(ids), {"BACKLOG_A", "BACKLOG_B", "BACKLOG_C",
                                     "BACKLOG_D", "BACKLOG_E", "BACKLOG_F",
-                                    "BACKLOG_G"})
+                                    "BACKLOG_G", "BACKLOG_H"})
+        backlog_h = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_H")
+        self.assertEqual(backlog_h["item"], "ARENA_TASK_COMPLETION_DIALOG")
+        self.assertEqual(backlog_h["status"], "VERIFIED")
+        self.assertTrue(any("RULE 15" in line for line in backlog_h["evidence"]))
         for entry in ledger["entries"]:
             self.assertIn(entry["status"], LEDGER_STATUSES, entry["id"])
             self.assertIsInstance(entry["evidence"], list)
@@ -111,6 +116,38 @@ class P2POperationsNotebookTests(unittest.TestCase):
 
     def test_release_projection_includes_notebook(self) -> None:
         self.assertIn(f'"{NOTEBOOK_RELATIVE}"', self.package_text)
+
+    def test_rule15_completion_dialog_semantics(self) -> None:
+        self.assertIn("### RULE 15 — ARENA_TASK_COMPLETION_DIALOG", self.notebook_text)
+        # YES: terminal state + ReturnPacket returned; honest BLOCKED/fail-closed
+        # is still a valid YES (technical PASS is NOT required).
+        self.assertIn("reached the requested terminal state", self.notebook_text)
+        self.assertIn("YES` does NOT mean the technical outcome must be PASS", self.notebook_text)
+        self.assertIn("honest\n`BLOCKED` / fail-closed result can still be `YES`",
+                      self.notebook_text)
+        # KEEP WORKING: same-chat continuation (Control Tower requires more
+        # work in the SAME CHAT, or terminal state not yet reached).
+        self.assertIn("KEEP WORKING", self.notebook_text)
+        self.assertIn("requires more work in the SAME CHAT", self.notebook_text)
+        # NO: executor/task failure (wrong task, wrong repo/workstream,
+        # unusable result, ignored scope, premature termination) — never
+        # merely because the technical outcome is BLOCKED.
+        self.assertIn("wrong task", self.notebook_text)
+        self.assertIn("wrong repository/workstream", self.notebook_text)
+        self.assertIn("unusable result", self.notebook_text)
+        self.assertIn("ignored required scope", self.notebook_text)
+        self.assertIn("premature/incorrect termination", self.notebook_text)
+        self.assertIn("Do NOT select `NO` merely because the bounded technical outcome is",
+                      self.notebook_text)
+        # Beginner mnemonic.
+        self.assertIn("XONG ĐÚNG PHẠM VI + ĐÃ TRẢ KẾT QUẢ", self.notebook_text)
+        self.assertIn("CÒN TIẾP TỤC CHÍNH CHAT NÀY", self.notebook_text)
+        self.assertIn("ARENA LÀM SAI / KẾT QUẢ KHÔNG DÙNG ĐƯỢC", self.notebook_text)
+
+    def test_arena_protocol_references_rule15(self) -> None:
+        self.assertIn("RULE 15", self.arena_text)
+        self.assertIn("ARENA_TASK_COMPLETION_DIALOG", self.arena_text)
+        self.assertIn("Completion-dialog handling", self.arena_text)
 
     def test_no_second_notebook_framework_created(self) -> None:
         # The notebook must reference the existing Arena/Control Tower

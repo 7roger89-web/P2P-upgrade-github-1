@@ -75,7 +75,7 @@ source (shipped in release packages via `scripts/package_release.py`). If
 this digest and the notebook ever differ, the notebook wins.
 
 Beginner-facing operational guidance must apply
-`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-14 in the notebook):
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-15 in the notebook):
 
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a

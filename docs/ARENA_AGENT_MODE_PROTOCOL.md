@@ -301,10 +301,20 @@ beginner-facing operating instructions:
   block (`P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`), which
   points to this protocol for the Arena session contract.
 
-The notebook canonicalizes `P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-14) and
+The notebook canonicalizes `P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-15) and
 `RULE_ASSIMILATION_GATE_V1`. This protocol remains the canonical Arena
 session contract (sections 1-10); it references the notebook for general
 operations memory and does not maintain a divergent copy of notebook rules.
+
+Completion-dialog handling ("Was this task successful?" — Yes / No / Keep
+working) follows notebook RULE 15
+(`ARENA_TASK_COMPLETION_DIALOG`): `YES` means the execution unit reached its
+requested terminal state and returned the required ReturnPacket — an honest
+`BLOCKED`/fail-closed result can still be `YES`; `KEEP WORKING` means more
+work in the same chat; `NO` means Arena materially failed the execution
+itself (wrong task, wrong repository/workstream, unusable result, ignored
+required scope, or premature/incorrect termination), never merely a technical
+`BLOCKED` outcome.
 
 ## 12. Evidence boundary
 

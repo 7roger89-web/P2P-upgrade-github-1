@@ -230,6 +230,51 @@ Không bị over engineering chứ? PASS/FAIL
 The expected normal result is `PASS`. `FAIL` means the proposed process
 itself should be simplified before execution.
 
+### RULE 15 — ARENA_TASK_COMPLETION_DIALOG
+
+When the beginner is asked "Was this task successful?" (Yes / No / Keep
+working), the mapping is canonical:
+
+```text
+YES
+= The Arena execution unit has reached the requested terminal state and
+  returned the required result/ReturnPacket, and no more work is currently
+  required in that same chat.
+```
+
+Important: `YES` does NOT mean the technical outcome must be PASS. An honest
+`BLOCKED` / fail-closed result can still be `YES` if Arena correctly
+performed the bounded task, stopped at the required boundary, and returned
+the required evidence.
+
+```text
+KEEP WORKING
+= Use when Control Tower explicitly requires more work in the SAME CHAT,
+  or the current bounded task has not yet reached its required terminal
+  state.
+```
+
+```text
+NO
+= Use only when Arena materially failed the execution itself, for example:
+  - wrong task
+  - wrong repository/workstream
+  - unusable result
+  - ignored required scope
+  - premature/incorrect termination
+```
+
+Do NOT select `NO` merely because the bounded technical outcome is
+`BLOCKED`.
+
+Canonical beginner mnemonic:
+
+```text
+XONG ĐÚNG PHẠM VI + ĐÃ TRẢ KẾT QUẢ       -> YES
+CÒN TIẾP TỤC CHÍNH CHAT NÀY             -> KEEP WORKING
+ARENA LÀM SAI / KẾT QUẢ KHÔNG DÙNG ĐƯỢC  -> NO
+```
+
 ## 4. RULE_ASSIMILATION_GATE_V1
 
 ### 4.1 Failure mode fixed
@@ -348,6 +393,16 @@ machine-readable ledger below is the durable record.
         "governance/development-control.json roadmap records C18/C19 DONE",
         "No unrelated runtime wiring was performed by the notebook task; unresolved sub-items remain PENDING under this same ledger"
       ]
+    },
+    {
+      "id": "BACKLOG_H",
+      "item": "ARENA_TASK_COMPLETION_DIALOG",
+      "status": "VERIFIED",
+      "evidence": [
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 15 — ARENA_TASK_COMPLETION_DIALOG)",
+        "docs/ARENA_AGENT_MODE_PROTOCOL.md section 11 (completion-dialog handling references notebook RULE 15)",
+        "tests/test_p2p_operations_notebook.py (RULE 15 semantics checks)"
+      ]
     }
   ]
 }
@@ -385,6 +440,10 @@ section 4.3.
   for the canonical C18/C19 runtime surfaces (referenced above); no
   unrelated runtime wiring is performed by this task, and any still-unresolved
   sub-items remain `PENDING` under the same ledger instead of disappearing.
+- **H. Arena task completion dialog (Yes / No / Keep working)** — `VERIFIED`
+  (RULE 15 above, accepted by the Owner after the original PR38
+  implementation and assimilated under RULE_ASSIMILATION_GATE_V1 before PR38
+  closes).
 
 ## 6. Discovery and operator paths
 
