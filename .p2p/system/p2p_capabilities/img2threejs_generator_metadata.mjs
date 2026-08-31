@@ -21,7 +21,13 @@
 //     material.userData.materialEvidence = spec.materialEvidence ?? null;
 //     material.userData.validationViews = spec.materialReference?.validationViews ?? [];
 //
-// So EVERY material a verified factory produces carries non-empty userData.
+// So every material produced through `createSculptMaterial` — the route the
+// proven positive production smoke exercises — carries non-empty userData.
+// The generator additionally contains inline `?? new THREE.MeshStandardMaterial({ color: 0x888888 })`
+// fallbacks for unresolved material references (lines ~3504/~3817); such
+// fallback materials carry an EMPTY userData, which the generic runtime-default
+// rule already classifies as DEFAULT, so their existence does not invalidate
+// this root cause and needs no special handling here.
 // The generic appearance authority
 // (`img2threejs_material_snapshot.mjs`) is correct to fail that closed: it
 // cannot know that those eight records are bookkeeping rather than appearance.
