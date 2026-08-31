@@ -50,10 +50,14 @@ material.userData.validationViews = spec.materialReference?.validationViews ?? [
 ```
 
 These eight assignments are **unconditional** — there is no branch that omits
-them — and `createSculptMaterial` is the only material constructor the
-generator emits (called at lines 3457 and 3502). So every material in every
-verified generated factory carries non-empty `userData`, and the key universe
-is exactly the eight keys the smoke observed.
+them. All materials produced through `createSculptMaterial` receive the eight
+generator-owned metadata keys, and the proven positive production route uses
+`createSculptMaterial` (called at lines 3457 and 3502). A separate
+`MeshStandardMaterial` fallback constructor can exist in the generator without
+invalidating this root cause: the classification stays allowlist-only, so a
+material that does not carry exactly these keys is not separated and still
+fails closed. So every material on the proven route carries non-empty
+`userData`, and the key universe is exactly the eight keys the smoke observed.
 
 Therefore the positive fixture legitimately produces non-empty `userData`, and
 PR37's generic rule — any arbitrary/non-empty `userData` reaching

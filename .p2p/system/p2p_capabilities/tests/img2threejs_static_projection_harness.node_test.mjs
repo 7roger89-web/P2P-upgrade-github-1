@@ -44,7 +44,42 @@ const GENERATOR_USERDATA_LITERAL = `{
     validationViews: [],
   }`;
 
-function factorySource({ userDataExpression, transmission = "0", clearcoat = "0" }) {
+function factorySource({ userDataExpression, transmission = "0", clearcoat = "0", attenuationDistance = "Infinity", restoreMarker = null, extraMeshes = [] }) {
+  const meshSpecs = [{ userDataExpression, transmission, clearcoat, attenuationDistance, restoreMarker }, ...extraMeshes];
+  const meshBlocks = meshSpecs
+    .map((spec) => {
+      // When a restore marker is requested, `userData` becomes an accessor
+      // AFTER the generator-shaped record is assigned, so the marker line is
+      // emitted exactly when the harness's separation.restore() re-assigns
+      // the ORIGINAL record (identified by its sculptMaterial key) — never at
+      // setup and never for the detached empty record. Reading marker order
+      // against the terminal fail line in stdout observes restore-before-exit.
+      const observe = spec.restoreMarker
+        ? `  {
+    let live = material.userData;
+    Object.defineProperty(material, "userData", {
+      get() { return live; },
+      set(value) {
+        live = value;
+        if (value && typeof value === "object" && "sculptMaterial" in value) {
+          process.stdout.write(${JSON.stringify(spec.restoreMarker)} + "\\n");
+        }
+      },
+    });
+  }
+`
+        : "";
+      return `  {
+  const material = new StubPhysicalMaterial();
+  material.transmission = ${spec.transmission ?? "0"};
+  material.clearcoat = ${spec.clearcoat ?? "0"};
+  material.attenuationDistance = ${spec.attenuationDistance ?? "Infinity"};
+  material.userData = ${spec.userDataExpression};
+${observe}  meshes.push(makeStubMesh(material));
+  }
+`;
+    })
+    .join("");
   return `class StubColor {
   constructor() {
     this.isColor = true;
@@ -77,11 +112,9 @@ class StubPhysicalMaterial {
   }
 }
 
-export function createStubModel() {
-  const material = new StubPhysicalMaterial();
-  material.transmission = ${transmission};
-  material.clearcoat = ${clearcoat};
-  material.userData = ${userDataExpression};
+const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+function makeStubMesh(material) {
   const geometry = {
     type: "BufferGeometry",
     morphAttributes: {},
@@ -94,29 +127,32 @@ export function createStubModel() {
       return null;
     },
   };
-  const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-  const mesh = { isObject3D: true, isMesh: true, visible: true, matrix: { elements: identity }, geometry, material, children: [] };
-  return {
+  return { isObject3D: true, isMesh: true, visible: true, matrix: { elements: identity }, geometry, material, children: [] };
+}
+
+export function createStubModel() {
+  const meshes = [];
+${meshBlocks}  return {
     isObject3D: true,
     isGroup: true,
     type: "Group",
     visible: true,
     matrix: { elements: identity },
-    children: [mesh],
+    children: meshes,
     updateMatrixWorld() {},
   };
 }
 `;
 }
 
-function runHarness({ userDataExpression, transmission = "0", clearcoat = "0" }) {
+function runHarness({ userDataExpression, transmission = "0", clearcoat = "0", attenuationDistance = "Infinity", restoreMarker = null, extraMeshes = [] }) {
   const directory = mkdtempSync(join(tmpdir(), "p2p-generator-userdata-"));
   try {
     const factory = join(directory, "factory.mjs");
     const three = join(directory, "three.module.js");
     const out = join(directory, "bake-manifest.json");
     writeFileSync(three, THREE_STUB, "utf8");
-    writeFileSync(factory, factorySource({ userDataExpression, transmission, clearcoat }), "utf8");
+    writeFileSync(factory, factorySource({ userDataExpression, transmission, clearcoat, attenuationDistance, restoreMarker, extraMeshes }), "utf8");
     const result = spawnSync(
       process.execPath,
       [HARNESS, "--factory", factory, "--out", out, "--three-entry", three],
@@ -261,4 +297,72 @@ test("default attenuationDistance=Infinity still bakes clean with metadata separ
   // and nothing non-finite leaks into the baked material record
   assert.deepEqual(material.drift, []);
   assert.equal(JSON.stringify(material).includes("Infinity"), false);
+});
+
+// --- 10. restore is guaranteed BEFORE the terminal fail line ----------------
+//
+// Regression for the snapshotMaterial control-flow defect: fail() exits the
+// process synchronously (process.exit does not unwind `finally`), so a
+// materialSnapshot rejection used to terminate the process with the generator
+// metadata still detached. These tests observe separation.restore() through a
+// userData accessor in the stub factory that prints a marker line exactly when
+// the ORIGINAL generator record is re-assigned, and compare stdout ordering
+// against the terminal fail line.
+
+test("materialSnapshot rejection restores generator userData BEFORE the terminal fail line", () => {
+  const run = runHarness({
+    userDataExpression: GENERATOR_USERDATA_LITERAL,
+    attenuationDistance: "NaN",
+    restoreMarker: "P2P_TEST_USERDATA_RESTORED_M0",
+  });
+  // terminal process exit is still a failure with the unchanged fail code
+  assert.equal(run.status, 1);
+  const restoreIndex = run.stdout.indexOf("P2P_TEST_USERDATA_RESTORED_M0");
+  const failIndex = run.stdout.indexOf("P2P_IMG2THREEJS_BAKE_FAIL MATERIAL_NONFINITE:attenuationDistance");
+  assert.notEqual(restoreIndex, -1, `restore marker missing: ${JSON.stringify(run.stdout)}`);
+  assert.notEqual(failIndex, -1, `fail line missing: ${JSON.stringify(run.stdout)}`);
+  // RESTORE_EXECUTED_BEFORE_TERMINAL_FAILURE
+  assert.ok(restoreIndex < failIndex, `restore must precede terminal failure: ${JSON.stringify(run.stdout)}`);
+  // fail-closed: no bake manifest is written
+  assert.equal(run.manifest, null);
+});
+
+test("success path still restores the original generator userData", () => {
+  const run = runHarness({
+    userDataExpression: GENERATOR_USERDATA_LITERAL,
+    restoreMarker: "P2P_TEST_USERDATA_RESTORED_M0",
+  });
+  assert.equal(run.status, 0, run.stderr);
+  const restoreIndex = run.stdout.indexOf("P2P_TEST_USERDATA_RESTORED_M0");
+  const okIndex = run.stdout.indexOf("P2P_IMG2THREEJS_BAKE_OK");
+  assert.notEqual(restoreIndex, -1);
+  assert.ok(restoreIndex < okIndex);
+  // attestation and manifest are unchanged by the observability hook
+  assert.equal(run.manifest.generator_material_metadata.present, true);
+  assert.deepEqual(run.manifest.generator_material_metadata.keys, EXPECTED_KEYS);
+});
+
+test("multiple materials: earlier material restored on success, failing material restored before terminal failure", () => {
+  const run = runHarness({
+    userDataExpression: GENERATOR_USERDATA_LITERAL,
+    restoreMarker: "P2P_TEST_USERDATA_RESTORED_M0",
+    extraMeshes: [
+      {
+        userDataExpression: GENERATOR_USERDATA_LITERAL,
+        attenuationDistance: "NaN",
+        restoreMarker: "P2P_TEST_USERDATA_RESTORED_M1",
+      },
+    ],
+  });
+  assert.equal(run.status, 1);
+  const firstRestore = run.stdout.indexOf("P2P_TEST_USERDATA_RESTORED_M0");
+  const secondRestore = run.stdout.indexOf("P2P_TEST_USERDATA_RESTORED_M1");
+  const failIndex = run.stdout.indexOf("P2P_IMG2THREEJS_BAKE_FAIL MATERIAL_NONFINITE:attenuationDistance");
+  assert.notEqual(firstRestore, -1, `first restore marker missing: ${JSON.stringify(run.stdout)}`);
+  assert.notEqual(secondRestore, -1, `second restore marker missing: ${JSON.stringify(run.stdout)}`);
+  assert.notEqual(failIndex, -1);
+  // both materials were restored, and the failing one before the terminal line
+  assert.ok(firstRestore < secondRestore);
+  assert.ok(secondRestore < failIndex);
+  assert.equal(run.manifest, null);
 });

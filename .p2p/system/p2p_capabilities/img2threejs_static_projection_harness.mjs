@@ -120,18 +120,25 @@ function snapshotMaterial(material) {
     generatorMetadataPresent = true;
     for (const key of separation.keys) generatorMetadataKeys.add(key);
   }
+  // The snapshot module throws Errors whose `code` carries the exact
+  // fail-closed reason. fail() terminates the process synchronously via
+  // process.exit(1), which does NOT unwind `finally` blocks — so the failure
+  // is CAPTURED here instead of failing inside the catch, the reversible
+  // separation is ALWAYS restored first, and only then is the captured code
+  // translated into the harness's terminal fail line.
+  let snapshot;
+  let failureCode = null;
   try {
-    return materialSnapshot(material);
+    snapshot = materialSnapshot(material);
   } catch (error) {
-    // The snapshot module throws Errors whose `code` carries the exact
-    // fail-closed reason; translate it into the harness's terminal fail line.
-    if (error && typeof error.code === "string") fail(error.code);
-    fail("MATERIAL_SNAPSHOT_FAILED");
-  } finally {
-    // The material is a live object in the scene graph: separation is
-    // evidence-backed and reversible, never a silent mutation.
-    separation.restore();
+    failureCode = error && typeof error.code === "string" ? error.code : "MATERIAL_SNAPSHOT_FAILED";
   }
+  // The material is a live object in the scene graph: separation is
+  // evidence-backed and reversible, never a silent mutation. Restore runs
+  // unconditionally — on the success path AND before any terminal failure.
+  separation.restore();
+  if (failureCode !== null) fail(failureCode);
+  return snapshot;
 }
 
 function geometrySnapshot(geometry) {
