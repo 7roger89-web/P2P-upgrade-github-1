@@ -49,11 +49,19 @@ material.userData.materialEvidence = spec.materialEvidence ?? null;
 material.userData.validationViews = spec.materialReference?.validationViews ?? [];
 ```
 
-These eight assignments are **unconditional** — there is no branch that omits
-them — and `createSculptMaterial` is the only material constructor the
-generator emits (called at lines 3457 and 3502). So every material in every
-verified generated factory carries non-empty `userData`, and the key universe
-is exactly the eight keys the smoke observed.
+These eight assignments are **unconditional** inside `createSculptMaterial`
+— there is no branch within it that omits them — and every material produced
+through `createSculptMaterial` (called at lines 3457 and 3502) therefore
+carries non-empty `userData` with exactly the eight keys the smoke observed.
+The proven positive production route uses `createSculptMaterial` for its
+materials. The generator additionally contains an inline
+`?? new THREE.MeshStandardMaterial({ color: 0x888888 })` fallback for
+unresolved material references (lines 3504 and 3817); that path may exist,
+and it does not invalidate this root cause: a fallback material carries the
+freshly allocated empty `userData` that PR37 already classifies as DEFAULT,
+and it does not carry the eight generator keys. The classifier treats it
+exactly like any other default material — `separateGeneratorMaterialMetadata`
+returns `present: false`, nothing is detached, and the generic rule applies.
 
 Therefore the positive fixture legitimately produces non-empty `userData`, and
 PR37's generic rule — any arbitrary/non-empty `userData` reaching
@@ -175,6 +183,43 @@ P2P_IMG2THREEJS_BAKE_FAIL GENERATOR_MATERIAL_METADATA_CYCLIC
 P2P_IMG2THREEJS_BAKE_FAIL GENERATOR_MATERIAL_METADATA_NON_INERT_VALUE:sculptMaterial
 ```
 
+## Supervisor delta — restore-before-terminal-fail (FIX_PR39_USERDATA_RESTORE_BEFORE_TERMINAL_FAIL)
+
+Finding (REJECT — USERDATA_RESTORE_SEMANTICS): in `snapshotMaterial()`, a
+`materialSnapshot` failure was translated by calling `fail()` directly from
+the `catch`. `fail()` calls `process.exit(1)`, which terminates Node
+synchronously, so the enclosing `finally` never ran and `separation.restore()`
+was skipped — a material could be left with its generator `userData` detached
+when a terminal failure followed.
+
+Fix (control flow only): the `catch` now CAPTURES the failure
+(`error.code` when present, else `MATERIAL_SNAPSHOT_FAILED`); the `finally`
+restores on every path; the captured failure is translated through `fail()`
+AFTER the `finally`. The success path is unchanged (`return snapshot`). No
+change to `img2threejs_material_snapshot.mjs`, `img2threejs_adapter.py`, the
+metadata key universe, `PROJECTED_MATERIAL_KEYS`, material support, the
+factory SHA binding, the scale/world-bake contracts, the Three pin, the
+fixture, or the attestation format.
+
+Regression proof (5 tests appended to the projection-harness node suite, run
+against the REAL harness process with an instrumented `userData` setter that
+logs every `DETACH:<i>` / `RESTORE:<i>` assignment):
+
+| Case | Observed |
+| --- | --- |
+| success, valid generator metadata | `DETACH:0`, `RESTORE:0`, manifest written, exit 0 |
+| coded terminal fail (`attenuationDistance=NaN`, valid generator metadata) | `DETACH:0`, `RESTORE:0` BEFORE `P2P_IMG2THREEJS_BAKE_FAIL MATERIAL_NONFINITE:attenuationDistance`, exit 1, no manifest |
+| uncoded `materialSnapshot` exception | `DETACH:0`, `RESTORE:0` BEFORE `MATERIAL_SNAPSHOT_FAILED`, exit 1 |
+| classifier rejection (`customTag`) | no `DETACH`/`RESTORE` at all — rejection throws before any mutation, nothing to restore, fail-closed code unchanged |
+| two materials, second fails terminally | `DETACH:0`, `RESTORE:0`, `DETACH:1`, `RESTORE:1` BEFORE the terminal fail — per-mesh restoration including the failing mesh |
+
+Mutation check: re-introducing the defective ordering (`fail()` inside
+`catch`) against the fixed suite fails exactly the three restore-before-
+terminal-fail tests (10/13 pass); with the fix, 13/13 pass. Evidence
+wording for the `createSculptMaterial` universality claim corrected in the
+Root cause section above and in both file headers (fallback
+`?? new THREE.MeshStandardMaterial(...)` path acknowledged).
+
 ## Appearance safety preserved
 
 | Behaviour | Result |
@@ -193,7 +238,7 @@ P2P_IMG2THREEJS_BAKE_FAIL GENERATOR_MATERIAL_METADATA_NON_INERT_VALUE:sculptMate
 ```text
 material snapshot node      = 16/16  (unchanged file; pristine-base baseline is also 16/16)
 generator metadata node     = 17/17  (NEW)
-projection harness node     =  8/8   (NEW; real harness subprocess)
+projection harness node     = 13/13  (NEW; real harness subprocess; 8 base + 5 restore-delta tests)
 projection seam python      = 39/39  (baseline 30/30, +9)
 static GLB standardizer     =  7/7   (code untouched; run only as a downstream guard)
 BROAD_TESTS_RUN             = NO

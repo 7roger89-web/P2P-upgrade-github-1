@@ -13,13 +13,16 @@
 // the last stdout line and a non-zero exit status.
 //
 // This is also the verified generator boundary, so it owns exactly one
-// separation: the pinned generator populates every material's `userData` with
-// its OWN non-appearance bookkeeping (sculptMaterial, pbrConstraints,
+// separation: every material the pinned generator produces through
+// `createSculptMaterial` — the proven positive production route — carries its
+// OWN non-appearance bookkeeping in `userData` (sculptMaterial, pbrConstraints,
 // materialEvidence, ...). Before the generic appearance projection runs, that
 // metadata is classified by `img2threejs_generator_metadata.mjs`; when — and
 // only when — it is proven to be the verified generator's inert metadata, it
-// is detached and attested in the bake manifest. Anything else stays
-// fail-closed. The generic material snapshot itself is unchanged and still
+// is detached and attested in the bake manifest. Anything else — including the
+// generator's inline `?? new THREE.MeshStandardMaterial(...)` fallbacks, whose
+// empty userData is a plain runtime default — stays fail-closed. The generic
+// material snapshot itself is unchanged and still
 // treats ANY arbitrary/non-empty userData as drift.
 //
 // This file is P2P-owned code, not an upstream allowlisted entrypoint.
@@ -104,11 +107,13 @@ let generatorMetadataPresent = false;
 
 function snapshotMaterial(material) {
   // Generator/harness boundary separation, applied BEFORE the generic
-  // appearance projection: the verified pinned generator writes its own
-  // non-appearance bookkeeping into every material's `userData`, and the
-  // generic snapshot is right to reject arbitrary non-empty userData. Only a
-  // userData proven to be that generator's inert metadata is detached; every
-  // other value fails closed with an explicit code.
+  // appearance projection: every material the verified pinned generator
+  // builds through `createSculptMaterial` — the proven positive production
+  // route — carries that generator's own non-appearance bookkeeping in
+  // `userData`, and the generic snapshot is right to reject arbitrary
+  // non-empty userData. Only a userData proven to be that generator's inert
+  // metadata is detached; every other value fails closed with an explicit
+  // code.
   let separation;
   try {
     separation = separateGeneratorMaterialMetadata(material);
@@ -120,18 +125,28 @@ function snapshotMaterial(material) {
     generatorMetadataPresent = true;
     for (const key of separation.keys) generatorMetadataKeys.add(key);
   }
+  // The failure must be CAPTURED here, not translated here: fail() calls
+  // process.exit(), which terminates Node synchronously and would skip the
+  // finally block below, leaving the detached userData unrestored on the
+  // live material. The required order is capture -> restore -> fail, so the
+  // terminal fail line is emitted only after restoration has run.
+  let snapshotFailure = null;
+  let snapshot = null;
   try {
-    return materialSnapshot(material);
+    snapshot = materialSnapshot(material);
   } catch (error) {
     // The snapshot module throws Errors whose `code` carries the exact
-    // fail-closed reason; translate it into the harness's terminal fail line.
-    if (error && typeof error.code === "string") fail(error.code);
-    fail("MATERIAL_SNAPSHOT_FAILED");
+    // fail-closed reason; capture it for translation after restoration.
+    snapshotFailure = error && typeof error.code === "string" ? error.code : "MATERIAL_SNAPSHOT_FAILED";
   } finally {
     // The material is a live object in the scene graph: separation is
-    // evidence-backed and reversible, never a silent mutation.
+    // evidence-backed and reversible, never a silent mutation. This runs on
+    // every path — success and materialSnapshot failure alike — strictly
+    // before the fail translation below.
     separation.restore();
   }
+  if (snapshotFailure !== null) fail(snapshotFailure);
+  return snapshot;
 }
 
 function geometrySnapshot(geometry) {
