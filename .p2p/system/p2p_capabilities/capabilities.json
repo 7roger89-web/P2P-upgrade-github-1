@@ -4351,8 +4351,7 @@
       "TRIGGERS": [
         "static GLB",
         "static glb standardization",
-        "Three.js prop export",
-        "weapon GLB"
+        "Three.js prop export"
       ],
       "NEGATIVE_TRIGGERS": [
         "skin",
@@ -4378,14 +4377,14 @@
       ],
       "REQUIRES": [
         "game.three.asset",
-        "game.three.visual",
-        "img2threejs"
+        "game.three.visual"
       ],
       "CONTEXT_POINTERS": [
         "p2p-static-glb-asset/1",
         "game.three.asset",
         "game.three.visual",
-        "game.majid.threejs_qa_release"
+        "game.majid.threejs_qa_release",
+        "P2P-IMG2THREEJS-STATIC-PROJECTION-01"
       ],
       "APPROVAL_BOUNDARY": [
         "owner-gate-before-promotion",
@@ -4405,10 +4404,15 @@
         "threejs_gltfexporter_reused": false,
         "blender": false,
         "network_runtime": false,
-        "install_mode": "DISABLED"
+        "install_mode": "DISABLED",
+        "img2threejs_seam": "MISSING_SEAM",
+        "future_bounded_dependency": "P2P-IMG2THREEJS-STATIC-PROJECTION-01",
+        "auto_activation": false,
+        "execution_authorized": false,
+        "runtime_proven": false
       },
       "VERSION": "1.0.0",
-      "STATUS": "CANDIDATE"
+      "STATUS": "DISCOVERED"
     }
   ]
 }
