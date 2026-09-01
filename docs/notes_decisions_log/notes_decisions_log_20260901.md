@@ -2,9 +2,11 @@
 
 ## P2P-HUMANIZER-01 / Issue #51
 
-- Fresh `origin/main` was bound to
-  `d80934bc0090ef0cc6770f8c7d09b7b4cd4670b7` / tree
-  `b2d5d03bcb81058ae4be9fea525603d53ea28ee5` in a valid isolated clone.
+- Initial fresh `origin/main` was bound to `d80934bc...` / tree `b2d5d03...`;
+  a later remote check found unrelated PR #50 and advanced current main to
+  `b65948b00ed2a8969fed70ab59f68b5d9b53858d` / tree
+  `6553b9cb55990f66f6da5b2db83dc6f5ec7e393c`. The sole branch was rebased
+  onto current main before push.
 - Existing `creative.copywriting` was reconciled as marketing-only and kept
   unchanged. The new distinct ID is `creative.prose.humanize`.
 - Exact upstream Humanizer subject:

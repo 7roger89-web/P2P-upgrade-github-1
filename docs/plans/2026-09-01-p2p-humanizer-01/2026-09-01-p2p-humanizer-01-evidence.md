@@ -55,10 +55,15 @@ Evidence sections follow the plan phases: `E0` for P0, `E1` for P1, and `E2` for
 Matching plan item(s): `P0-A`
 
 - `E0-P0A-GIT1`: Fresh clone of `7roger89-web/P2P-upgrade-github-1` was
-  created under repo-local `.tmp/p2p-humanizer-01`; `git fetch origin main
-  --prune` completed. Current `origin/main`/HEAD is commit
-  `d80934bc0090ef0cc6770f8c7d09b7b4cd4670b7`, tree
-  `b2d5d03bcb81058ae4be9fea525603d53ea28ee5`, with a clean worktree.
+  created under repo-local `.tmp/p2p-humanizer-01`; the initial
+  `git fetch origin main --prune` bound `d80934bc...` and tree
+  `b2d5d03b...` before implementation.
+- `E0-P0A-REBASE1`: A second fresh remote check found unrelated upstream main
+  delta PR #50 and advanced `origin/main` to commit
+  `b65948b00ed2a8969fed70ab59f68b5d9b53858d`, tree
+  `6553b9cb55990f66f6da5b2db83dc6f5ec7e393c`. The sole Writer branch was
+  rebased onto that exact current main; merge-base now equals `b65948b...` and
+  no Humanizer conflict occurred.
 - `E0-P0A-UP1`: Detached upstream checkout is
   `https://github.com/blader/humanizer.git` at commit
   `e2e92e7b4b8229253ed5c8e81dc65463fdeddda5`, tree

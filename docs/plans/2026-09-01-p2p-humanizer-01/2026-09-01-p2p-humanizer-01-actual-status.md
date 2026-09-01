@@ -63,7 +63,7 @@ Out of scope:
 
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
-| fresh P2P clone / `origin/main` | Exact clean clone at `d80934b...` / `b2d5d03...` | clean authoritative base | correct | N/A | `E0-P0A-GIT1` | preserve; create one branch |
+| fresh P2P clone / `origin/main` | Exact clean clone rebased onto current remote `b65948b...` / `6553b9c...`; original initial fetch was `d80934b...` / `b2d5d03...` | clean authoritative base | correct | N/A | `E0-P0A-GIT1`, `E0-P0A-REBASE1` | preserve; push only after final remote check |
 | existing `creative.copywriting` | Marketing/double-semantic snapshot; one unique record | remain marketing-only, no duplicate | correct | N/A | `E0-P0A-REG1` | preserve-only in P1-A |
 | existing `vendor_skill.py` + single router | Generic metadata/JIT loader and one router already exist | reuse existing boundary | correct | N/A hidden path | `E0-P0A-ADAPTER1` | preserve-only in P1-A/B |
 | upstream Humanizer subject | Detached exact commit/tree, not yet vendored | exact source audit record | correct | N/A | `E0-P0A-UP1` | inspect-only input to P1-A |
@@ -80,7 +80,7 @@ Out of scope:
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-01 | fresh fetched `origin/main` before implementation | full Issue #51 target family | existing surfaces correct; Humanizer snapshot/manifest/tests missing; wider suite partial from baseline failures | `E0-P0A-GIT1`, `E0-P0A-UP1`, `E0-P0A-REG1`, `E0-P0A-ADAPTER1`, `E0-P0A-GRAPH1`, `E0-P0A-BASE1`, `E0-P0A-SCOPE1` | P1-A adds only exact two files + one record; P1-B adds fixtures/tests after production acceptance |
 | R1 | 2026-09-01 | after P1-A exact snapshot/registry smoke | Humanizer vendor root and manifest | Humanizer snapshot `missing -> correct`; manifest `missing -> correct`; focused tests remain missing | `E1-P1A-SRC1`, `E1-P1A-REG1`, `E1-P1A-HASH1`, `E1-P1A-ROUTE1`, `E1-P1A-ROUTE2` | P1-B proceeds with fixtures/tests only; no production adapter/router edits |
-| R2 | 2026-09-01 | after P1-B corrected focused module and graph refresh | Humanizer fixture/test surface | focused tests `missing -> correct`; exact production surfaces remain correct; graph detail now known | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E1-P1B-TEST4`, `E1-P1B-TEST5`, `E1-P1B-TEST6`, `E1-P1B-TEST7`, `E1-P1B-TEST8`, `E1-P1B-GRAPH1`, `E1-P1B-BUILD1`, `E1-P1B-GLOBAL1`, `E1-P1B-GLOBAL2`, `E1-P1B-RETRY1` | run staged Anvien detect-changes, then checkpoint commit; leave governance drift unpromoted |
+| R2 | 2026-09-01 | after P1-B corrected focused module and graph refresh | Humanizer fixture/test surface | focused tests `missing -> correct`; exact production surfaces remain correct; graph detail now known | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E1-P1B-TEST4`, `E1-P1B-TEST5`, `E1-P1B-TEST6`, `E1-P1B-TEST7`, `E1-P1B-TEST8`, `E1-P1B-GRAPH1`, `E1-P1B-BUILD1`, `E1-P1B-GLOBAL1`, `E1-P1B-GLOBAL2`, `E1-P1B-RETRY1`, `E0-P0A-REBASE1` | final remote main is now bound; rerun nearest checks after rebase, then push only exact candidate |
 
 ## Phase Touch Map
 

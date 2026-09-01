@@ -169,11 +169,13 @@ integration; this report makes no live-model certification claim.
 ## Git Reference
 
 - Repository: `7roger89-web/P2P-upgrade-github-1`
-- Base main: `d80934bc0090ef0cc6770f8c7d09b7b4cd4670b7`
+- Initial fetched base main: `d80934bc0090ef0cc6770f8c7d09b7b4cd4670b7`
+- Current remote base main after fresh re-fetch/rebase: `b65948b00ed2a8969fed70ab59f68b5d9b53858d`; tree `6553b9cb55990f66f6da5b2db83dc6f5ec7e393c`
 - Branch: `codex/p2p-humanizer-01`
-- Production integration checkpoint: `2c85e855273ba9379507be62ad1cb6f4c0c8354f`
-- Focused verification checkpoint: `120c1a1eb468d0a10f0a8341bbf14573d2b4d4fd`
-- Report commit and final PR head will be recorded by the Writer handoff.
+- Rebased production integration checkpoint: `9e748bd05d7db6ba1d0b8b2d64aef796f0b5c251`
+- Rebased focused verification checkpoint: `1702c0d437e59b305d0e9de1e39fbdeedac62746`
+- Rebased report checkpoint before this metadata refresh: `e392e0879588f483bbc28a51670554e5737c5db9`
+- Final PR head will be recorded by the Writer handoff.
 
 ## Handoff
 
