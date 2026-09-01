@@ -78,6 +78,7 @@ is UNKNOWN for that file. The focused test file has 143 local relationships.
 | R0 | 2026-09-01 | fresh clone before source edit | all target surfaces | entrypoint partial/wrong; cache partial; security/pins correct | E0-P0A-GIT1, E0-P0A-RUNTIME1, E0-P0A-MPFB1, E0-P0A-SRC1 | P1-A required |
 | R1 | 2026-09-01 | real bare/extension probes and cache quarantine | addon/runtime | extension correct but canonical unbound; cache partial -> correct; decision=BOUNDED_SOURCE_FIX | E1-P1A-RUNTIME1, E1-P1A-RUNTIME2, E1-P1A-DECISION1, E1-P1B-CACHE1 | start P1-B |
 | R2 | 2026-09-01 | source commit and one canonical real smoke | child/addon/character | P1-B and P2-A PASS; P2-B reaches first downstream structural blocker; cleanup and immutability PASS | E1-P1B-SRC1, E1-P1B-TEST1, E2-P2A-ADDON1..2, E2-P2B-RUN1, E2-P2B-STOP1, E2-P2B-CLEAN1, E2-P2B-IMMUT1 | stop at `GLB_skeleton: index invalid` |
+| R3 | 2026-09-01 | supervisor review, dead-work review, and PR closure | workstream closure | bounded addon-init claim PASS; full route remains blocked; PR #54 open and unmerged | E3-P3A-SUP1, E3-P3B-CLEAN1, E3-P3C-CLOSE1 | emit exact final subject in terminal packet |
 
 ## Phase Touch Map
 
@@ -152,6 +153,9 @@ No addon registry injection, bare fallback, upstream edit, or adapter redesign.
 - [x] P1-B source commit and post-edit refresh complete.
 - [x] P2-A canonical child smoke and addon gates complete.
 - [x] P2-B stopped at the first new downstream blocker with cleanup proof.
+- [x] P3-A supervisor review completed for the bounded claim.
+- [x] P3-B dead-work review completed; no unrelated implementation retained.
+- [x] P3-C final evidence and PR state recorded without merge.
 
 ## Final P0 Decision
 
@@ -173,3 +177,9 @@ Final implementation note:
 The bounded source fix is complete and verified. The full character route is
 not accepted because the first downstream structural validator rejected the
 native GLB skeleton field. No second blocker was repaired or retried.
+
+Final closure note:
+
+PR #54 is the single open PR for this branch. The production source remains
+the one-entrypoint bounded fix; the remaining blocker is
+`GLB_skeleton: index invalid` with `skins[0].skeleton = null`.

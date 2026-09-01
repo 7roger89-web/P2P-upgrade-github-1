@@ -151,6 +151,16 @@ Matching plan item(s): `P2-A`, `P2-B`
 
 ## Closure Evidence
 
-- `E3-P3A-SUP1`: Supervisor report and independent verdict.
-- `E3-P3B-CLEAN1`: dead-work review.
-- `E3-P3C-CLOSE1`: final commit/branch/PR/detect-changes/terminal packet.
+- `E3-P3A-SUP1`: supervisor report
+  `reports/supervisor/rp_supervisor_260901_184112_by_gpt-5-codex_p2p-mpfb2-addon-init-01.md`;
+  PASS is limited to the bounded addon-init claim and stop-law evidence.
+- `E3-P3B-CLEAN1`: dead-work review found no unneeded plan-created
+  implementation artifact. Retained files are the plan, ledgers, coder report,
+  supervisor report, and runtime-local evidence requested by this workstream.
+- `E3-P3C-CLOSE1`: fresh origin/main remained the exact canonical base;
+  branch `workstream/p2p-mpfb2-addon-init-01-final` was pushed non-force and
+  PR #54 was created at
+  `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/54`. The PR is
+  open and unmerged. The closure-only documentation update does not alter the
+  production source or the reviewed runtime result; final HEAD/tree are
+  emitted in the terminal return packet.

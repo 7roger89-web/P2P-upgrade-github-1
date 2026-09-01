@@ -252,27 +252,32 @@ not a real Blender addon identity and fails at initialization.
   - Actual-status Update: final terminal verdict is only set from direct proof.
   - Commit Boundary: no source commit.
 
-- [ ] P3-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] P3-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: independently review exact subject, source, runtime, and evidence.
   - Work Steps: review source/diff, ledgers, logs, artifacts, cleanup, and old
     blocker; on REJECT return only to failed bounded slice and re-review.
   - Implementation Gate: all in-scope slices complete or blocked exactly.
-  - Acceptance: one Supervisor PASS or evidence-backed REJECT.
+  - Acceptance: one Supervisor PASS or evidence-backed REJECT. PASS recorded
+    for the bounded addon-init claim in the supervisor report.
 
-- [ ] P3-B: Remove dead work created during this plan.
+- [x] P3-B: Remove dead work created during this plan.
   - Goal: keep only useful bounded artifacts and preserve historical evidence.
   - Work Steps: inspect plan-created files, remove only exact dead artifacts,
     then run Supervisor cleanup review.
   - Implementation Gate: no unrelated/rejected source remains.
-  - Acceptance: final diff has no dead plan-created artifact.
+  - Acceptance: final diff has no dead plan-created artifact. The retained
+    plan/report/ledger files are evidence artifacts; runtime-local probes,
+    manifest, quarantine, logs, and outputs are the requested local evidence.
 
-- [ ] P3-C: Close the plan.
+- [x] P3-C: Close the plan.
   - Goal: finalize evidence, benchmark, change detection, commit/PR state, and
     exact return fields without merge.
   - Work Steps: record final native runtime proof, source subject, security and
     immutability checks, and terminal verdict.
   - Implementation Gate: P3-A/P3-B pass or record blocker.
-  - Acceptance: evidence complete and worktree/PR state known.
+  - Acceptance: evidence complete and worktree/PR state known; PR #54 is open
+    with no merge performed and the terminal verdict is the first downstream
+    blocker.
 
 Current execution result: addon initialization gates PASS, but the one real
 character route is blocked by `GLB_skeleton: index invalid` because the native
