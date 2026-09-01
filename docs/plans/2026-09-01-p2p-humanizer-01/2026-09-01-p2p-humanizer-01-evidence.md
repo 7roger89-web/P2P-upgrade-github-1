@@ -106,8 +106,35 @@ Matching plan item(s): `P0-A`
 
 Matching plan item(s): `P1-A`, `P1-B`
 
-Implementation evidence will be appended as exact IDs after each slice. The
-following IDs are reserved by the plan:
+P1-A implementation evidence:
+
+- `E1-P1A-SRC1`: The P2P vendor root contains exactly `SKILL.md` and
+  `LICENSE`; byte comparison against the detached upstream checkout returned
+  zero differences for both files.
+- `E1-P1A-REG1`: Existing `load_registry` accepted 68 valid records with one
+  `creative.copywriting` and one `creative.prose.humanize`; canonical
+  identities remain eight and `full_quorum` remains `8/8`. The new record is
+  `TYPE=SKILL`, `INVOCATION_CLASS=USER_REQUESTED`, `STATUS=ACTIVE`,
+  `VERSION=2.11.2`, noncanonical, and non-optional.
+- `E1-P1A-HASH1`: `snapshot_tree_sha256` returned
+  `46249684a9dbb7f4a8b759f04178f0078dd3448ef5b77d203dbf7834d0c88607` and the
+  loaded entrypoint returned the registry SHA-256
+  `14fc8a965b6e0a8dc100ba4dffeab55cb94bbac112abbde7e014d5c15a35c202`.
+  The vendored `LICENSE` canonical hash is
+  `4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96`.
+- `E1-P1A-ROUTE1`: Existing `discover_vendor_skills` selected exactly
+  `creative.prose.humanize` for an explicit humanization request while
+  returning `content_loaded=false`; `load_vendor_skill` then loaded only
+  `SKILL.md` with `permission_grant=false` and `network_used=false`.
+- `E1-P1A-ROUTE2`: The ordinary request `Write an article about natural
+  prose.` did not select the new capability, and the no-dependency load probe
+  returned `NOT_REQUIRED` without installation or network.
+- `E1-P1A-FAIL1`: The first smoke command used a relative `Path('.')` parent
+  and looked for the audit checkout in the wrong directory. The command was
+  corrected to use `Path.cwd()`; the corrected P1-A smoke passed and no source
+  was changed by the failed assertion.
+
+P1-B evidence remains pending. The following IDs are reserved by the plan:
 
 - `E1-P1A-SRC1`: exact two-file vendor snapshot comparison.
 - `E1-P1A-REG1`: manifest parse/provenance/contract metadata.

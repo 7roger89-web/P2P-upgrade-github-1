@@ -759,6 +759,154 @@
       "STATUS": "ACTIVE"
     },
     {
+      "CAPABILITY_ID": "creative.prose.humanize",
+      "TYPE": "SKILL",
+      "DESCRIPTION": "Rewrite AI-sounding prose so it reads naturally without changing facts, voice, or protected Markdown content.",
+      "TRIGGERS": [
+        "creative.prose.humanize",
+        "humanize",
+        "humanizer",
+        "humanise",
+        "humaniser",
+        "humanized prose",
+        "humanize prose",
+        "humanize writing",
+        "humanize markdown",
+        "remove AI writing patterns",
+        "rewrite in my voice",
+        "make this sound natural"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "source code",
+        "code block",
+        "fenced code",
+        "shell command",
+        "command",
+        "hash",
+        "sha",
+        "sha-256",
+        "git sha",
+        "url",
+        "link target",
+        "citation",
+        "quoted evidence",
+        "json",
+        "yaml",
+        "toml",
+        "structured table",
+        "table data",
+        "provenance",
+        "security evidence",
+        "qa packet",
+        "supervisor packet",
+        "machine return packet",
+        "detector evasion",
+        "detector bypass"
+      ],
+      "INVOCATION_CLASS": "USER_REQUESTED",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "local-vendor-snapshot",
+        "user-supplied-source-prose"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "add-unsupported-facts",
+        "add-unsupported-names",
+        "add-unsupported-numbers",
+        "add-unsupported-dates",
+        "add-unsupported-quotes",
+        "add-unsupported-citations",
+        "rewrite-source-code",
+        "rewrite-code-blocks",
+        "rewrite-shell-commands",
+        "rewrite-hashes-or-git-shas",
+        "rewrite-url-or-link-targets",
+        "rewrite-citations-or-quoted-evidence",
+        "rewrite-json-yaml-toml",
+        "rewrite-structured-tables-or-data",
+        "rewrite-frontmatter",
+        "rewrite-provenance-or-security-evidence",
+        "rewrite-qa-or-supervisor-return-packets",
+        "weaken-technical-legal-compliance-precision",
+        "detector-evasion",
+        "promise-detector-bypass"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "local-vendor-snapshot",
+        "explicit-user-or-profile-selection"
+      ],
+      "CONTEXT_POINTERS": [
+        ".p2p/vendor/skill/blader-humanizer-e2e92e7/SKILL.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "p2p-integration-candidate-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "selected-route",
+        "exact-upstream-skill-hash",
+        "snapshot-provenance",
+        "no-fabrication",
+        "voice-calibration",
+        "rewrite-audit-final-rewrite-workflow",
+        "prose-only-file-mode",
+        "protected-content-preservation"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "LOCAL_VENDOR_SNAPSHOT",
+        "implementation": "blader-humanizer",
+        "vendor_path": ".p2p/vendor/skill/blader-humanizer-e2e92e7",
+        "upstream_repository": "https://github.com/blader/humanizer.git",
+        "upstream_commit": "e2e92e7b4b8229253ed5c8e81dc65463fdeddda5",
+        "upstream_tree": "b8a8804ed9210e539531fc26c2d84fdb603960f4",
+        "upstream_tag": "UNKNOWN",
+        "upstream_tag_binding": "NOT_OBSERVED_AT_PIN",
+        "snapshot_sha256": "46249684a9dbb7f4a8b759f04178f0078dd3448ef5b77d203dbf7834d0c88607",
+        "source_files": [
+          {
+            "upstream_path": "SKILL.md",
+            "snapshot_path": "SKILL.md",
+            "sha256": "14fc8a965b6e0a8dc100ba4dffeab55cb94bbac112abbde7e014d5c15a35c202",
+            "canonical_sha256": "14fc8a965b6e0a8dc100ba4dffeab55cb94bbac112abbde7e014d5c15a35c202",
+            "status": "VENDORED"
+          },
+          {
+            "upstream_path": "LICENSE",
+            "snapshot_path": "LICENSE",
+            "sha256": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96",
+            "canonical_sha256": "4ac4810254ab36d45419141aeb8e69bf50652cfafe5b2dab947d06d44e5cbf96",
+            "status": "VENDORED"
+          }
+        ],
+        "license": {
+          "file": "LICENSE",
+          "kind": "MIT",
+          "scope": "the vendored SKILL.md and its exact local snapshot"
+        },
+        "integration": {
+          "entrypoint": "SKILL.md",
+          "entrypoint_sha256": "14fc8a965b6e0a8dc100ba4dffeab55cb94bbac112abbde7e014d5c15a35c202",
+          "load_mode": "ON_DEMAND",
+          "selection_mode": "EXPLICIT_OR_PROFILE_SELECTED",
+          "file_mode": "PROSE_ONLY",
+          "protected_content_mode": "PRESERVE_EXACT",
+          "dependency_mode": "NONE",
+          "references": [],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": false,
+          "credentials": false,
+          "install_mode": "DISABLED",
+          "external_render": "NOT_APPLICABLE"
+        }
+      },
+      "VERSION": "2.11.2",
+      "STATUS": "ACTIVE"
+    },
+    {
       "CAPABILITY_ID": "media.whiteboard_animation",
       "TYPE": "SKILL",
       "DESCRIPTION": "Local upstream SRT-to-whiteboard animation and storyboard skill, selected only for animation production work.",

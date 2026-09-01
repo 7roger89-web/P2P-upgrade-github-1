@@ -67,8 +67,8 @@ Out of scope:
 | existing `creative.copywriting` | Marketing/double-semantic snapshot; one unique record | remain marketing-only, no duplicate | correct | N/A | `E0-P0A-REG1` | preserve-only in P1-A |
 | existing `vendor_skill.py` + single router | Generic metadata/JIT loader and one router already exist | reuse existing boundary | correct | N/A hidden path | `E0-P0A-ADAPTER1` | preserve-only in P1-A/B |
 | upstream Humanizer subject | Detached exact commit/tree, not yet vendored | exact source audit record | correct | N/A | `E0-P0A-UP1` | inspect-only input to P1-A |
-| Humanizer vendor snapshot | No P2P root before this task | exactly `SKILL.md` + `LICENSE` | missing | N/A | `E0-P0A-SCOPE1` | edit P1-A |
-| Humanizer registry manifest | No `creative.prose.humanize` ID before this task | one noncanonical `SKILL` record, explicit/on-demand | missing | N/A hidden path | `E0-P0A-REG1` | edit P1-A |
+| Humanizer vendor snapshot | exact P2P root contains only `SKILL.md` + `LICENSE`, byte-identical to upstream | exactly `SKILL.md` + `LICENSE` | correct | N/A | `E1-P1A-SRC1`, `E1-P1A-HASH1` | preserve-only; P1-B may test it |
+| Humanizer registry manifest | one valid `creative.prose.humanize` record, explicit/on-demand, 2.11.2 provenance | one noncanonical `SKILL` record, explicit/on-demand | correct | N/A hidden path | `E1-P1A-REG1`, `E1-P1A-ROUTE1` | preserve-only; P1-B may test it |
 | focused Humanizer fixture/test surface | No direct Issue #51 test module/fixtures | A-G focused behavior/value tests | missing | N/A | `E0-P0A-SCOPE1` | edit P1-B after P1-A |
 | wider legacy suite | 104 tests: 97 pass, 7 baseline failures | no new Humanizer regressions; unrelated failures remain disclosed | partial | per test surfaces | `E0-P0A-BASE1` | do not broaden scope; rerun nearest checks |
 | plan/evidence/benchmark/actual-status | newly created P0 standard set | living evidence updated per slice | correct | N/A | `E0-P0A-SCOPE1` | preserve and refresh |
@@ -79,6 +79,7 @@ Out of scope:
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-01 | fresh fetched `origin/main` before implementation | full Issue #51 target family | existing surfaces correct; Humanizer snapshot/manifest/tests missing; wider suite partial from baseline failures | `E0-P0A-GIT1`, `E0-P0A-UP1`, `E0-P0A-REG1`, `E0-P0A-ADAPTER1`, `E0-P0A-GRAPH1`, `E0-P0A-BASE1`, `E0-P0A-SCOPE1` | P1-A adds only exact two files + one record; P1-B adds fixtures/tests after production acceptance |
+| R1 | 2026-09-01 | after P1-A exact snapshot/registry smoke | Humanizer vendor root and manifest | Humanizer snapshot `missing -> correct`; manifest `missing -> correct`; focused tests remain missing | `E1-P1A-SRC1`, `E1-P1A-REG1`, `E1-P1A-HASH1`, `E1-P1A-ROUTE1`, `E1-P1A-ROUTE2` | P1-B proceeds with fixtures/tests only; no production adapter/router edits |
 
 ## Phase Touch Map
 
@@ -219,8 +220,8 @@ Do not vendor unrelated upstream content or implement a rewrite engine.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | Humanizer source is exact and audited; P2P snapshot/manifest are missing; existing loader is correct | edit only the two upstream files and one registry record; keep loader/router/copywriting preserve-only |
-| P1-B | No focused tests/fixtures exist; wider baseline is already partial with seven unrelated failures | add seven bounded cases after P1-A; do not use the stale wider failures as Humanizer proof |
+| P1-A | Humanizer source is exact and audited; P2P snapshot/manifest now pass exact smoke | preserve the two files and one record; keep loader/router/copywriting preserve-only |
+| P1-B | No focused tests/fixtures exist; P1-A production surfaces are correct; wider baseline remains partial with seven unrelated failures | add seven bounded cases now; do not use the stale wider failures as Humanizer proof |
 | P2-A/P2-C | Writer handoff has no independent review or PR yet | keep pending until implementation evidence is complete; stop before Supervisor/merge/promotion |
 
 ## Implementation Gate
@@ -236,8 +237,8 @@ Do not vendor unrelated upstream content or implement a rewrite engine.
 - [x] Blockers are recorded, if any.
 - [x] Next phase status assumptions, next action, and work steps have been updated from this status file when needed.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
-- [ ] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
+- [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
+- [x] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
 ## Final P0 Decision
 

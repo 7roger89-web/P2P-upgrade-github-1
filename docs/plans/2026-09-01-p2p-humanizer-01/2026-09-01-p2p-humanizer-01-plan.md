@@ -187,7 +187,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
   - P1-A: Vendor exact upstream files and add the minimal manifest record.
   - P1-B: Add focused value/boundary fixtures and direct integration tests.
 
-- [ ] P1-A: Vendor exact upstream files and add the minimal manifest record
+- [x] P1-A: Vendor exact upstream files and add the minimal manifest record
   - Goal: make `creative.prose.humanize` discoverable through the existing P2P registry and vendor loader while preserving exact upstream bytes and strict P2P boundaries.
   - Scope Boundary:
     - Editable: `.p2p/vendor/skill/blader-humanizer-e2e92e7/SKILL.md`, `.p2p/vendor/skill/blader-humanizer-e2e92e7/LICENSE`, and the one new `capabilities.json` record.
@@ -248,7 +248,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
     - Actual-status rows refreshed: Humanizer snapshot/manifest transition `missing -> correct`; adapter/copywriting remain `correct`.
   - Evidence Targets: `E1-P1A-SRC1`, `E1-P1A-REG1`, `E1-P1A-HASH1`, `E1-P1A-ROUTE1`, `E1-P1A-ROUTE2`.
   - Actual-status Update: mark the new vendor snapshot and manifest `correct` only after exact hashes, registry parse, and route/load evidence pass; append R1 and update P1-B assumptions if any field differs.
-  - Commit Boundary: commit after this slice when acceptance passes.
+  - Commit Boundary: commit after this slice when acceptance passes. P1-A acceptance passed with the exact two-file snapshot, registry parse, explicit route, no-default route, selected `SKILL.md` load, and zero network/permission flags.
 
 - [ ] P1-B: Add focused value/boundary fixtures and direct integration tests
   - Goal: prove the requested value and preservation boundary without implementing a rewrite engine or invoking an external model.

@@ -37,9 +37,9 @@ remain in the evidence ledger.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | Humanizer vendor snapshot files | files | 0 | pending | pending | 2 | pending | `E1-P1A-SRC1` |
-| P1 | Humanizer declared references/assets/scripts | entries | 0 | pending | pending | 0 | pending | `E1-P1A-REG1` |
-| P1 | Humanizer network/credential/install flags | enabled flags | 0 | pending | pending | 0 | pending | `E1-P1A-REG1` |
+| P1 | Humanizer vendor snapshot files | files | 0 | 2 | 2 | 2 | +2 | `E1-P1A-SRC1` |
+| P1 | Humanizer declared references/assets/scripts | entries | 0 | 0 | 0 | 0 | 0 | `E1-P1A-REG1` |
+| P1 | Humanizer network/credential/install flags | enabled flags | 0 | 0 | 0 | 0 | 0 | `E1-P1A-REG1` |
 | P1 | Focused Issue #51 test cases | cases | 0 | pending | pending | 7 | pending | `E1-P1B-TEST1..E1-P1B-TEST7` |
 
 ## B2 - P2 Benchmarks
