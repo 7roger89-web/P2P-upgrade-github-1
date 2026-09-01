@@ -2,7 +2,7 @@
 
 Title: P2P MPFB2 Addon Init 01
 Date: 2026-09-01
-Status: P1-B implementation in progress
+Status: P2-B blocked at first downstream structural-validation blocker
 Companion plan: `docs/plans/2026-09-01-p2p-mpfb2-addon-init-01/2026-09-01-p2p-mpfb2-addon-init-01-plan.md`
 Companion evidence: `docs/plans/2026-09-01-p2p-mpfb2-addon-init-01/2026-09-01-p2p-mpfb2-addon-init-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-01-p2p-mpfb2-addon-init-01/2026-09-01-p2p-mpfb2-addon-init-01-benchmark.md`
@@ -63,11 +63,12 @@ is UNKNOWN for that file. The focused test file has 143 local relationships.
 | canonical subject | clean branch at `b65948b...`, tree `6553b9...` | exact isolated subject | correct | N/A | E0-P0A-GIT1 | preserve |
 | parent adapter | canonical firewall-before-Popen and output/provenance route | unchanged | correct/preserve-only | hidden/UNKNOWN | E0-P0A-SRC1 | no edit |
 | firewall helper | canonical profiles/DisplayName/rule/cleanup path | unchanged | correct/preserve-only | hidden/UNKNOWN | E0-P0A-SRC1 | no edit |
-| child entrypoint | bare import `mpfb` + explicit register without Blender addon identity | extension identity before service access | partial/wrong/unbound | hidden/UNKNOWN | E0-P0A-SRC1, E1-P1A-RUNTIME1 | P1-B edit |
+| child entrypoint | Blender local-extension registration with identity, preference, and registration gates | extension identity before service access | correct/bound/verified | hidden/UNKNOWN | E0-P0A-SRC1, E1-P1A-RUNTIME1, E1-P1B-SRC1, E2-P2A-ADDON1..2 | preserve |
 | MPFB2 source | exact 2810/2810 archive bytes; cache now quarantined | exact source/root hash | correct after cache reconciliation | N/A | E0-P0A-MPFB1, E1-P1B-CACHE1 | preserve |
 | Blender runtime | 4.2.23 LTS exact binary hash | same | correct/preserve-only | N/A | E0-P0A-RUNTIME1 | reuse |
-| extension contract | `bl_ext.src.mpfb`, addon key, preference, register all PASS | canonical child uses it | correct/unbound | N/A | E1-P1A-RUNTIME2 | wire P1-B |
+| extension contract | `bl_ext.src.mpfb`, addon key, preference, register all PASS | canonical child uses it | correct/bound | N/A | E1-P1A-RUNTIME2, E2-P2A-ADDON1..2 | preserve |
 | output/provenance | existing exact downstream validators | unchanged | correct/preserve-only | hidden/UNKNOWN | E0-P0A-SRC1 | validate-only |
+| real character smoke | native MPFB2 child reached HumanService, rig, skin, and GLB export; structural validator rejected `skins[0].skeleton = null` | structurally valid GLB | blocked at first new downstream blocker | hidden/UNKNOWN | E2-P2B-RUN1, E2-P2B-ARTIFACT1, E2-P2B-STOP1 | stop; no second fix |
 | Game Truyen | not accessed | no mutation | correct/do-not-touch | N/A | E0-P0A-LOG1 | fingerprint before/after |
 
 ## Status Refresh Log
@@ -76,6 +77,7 @@ is UNKNOWN for that file. The focused test file has 143 local relationships.
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-01 | fresh clone before source edit | all target surfaces | entrypoint partial/wrong; cache partial; security/pins correct | E0-P0A-GIT1, E0-P0A-RUNTIME1, E0-P0A-MPFB1, E0-P0A-SRC1 | P1-A required |
 | R1 | 2026-09-01 | real bare/extension probes and cache quarantine | addon/runtime | extension correct but canonical unbound; cache partial -> correct; decision=BOUNDED_SOURCE_FIX | E1-P1A-RUNTIME1, E1-P1A-RUNTIME2, E1-P1A-DECISION1, E1-P1B-CACHE1 | start P1-B |
+| R2 | 2026-09-01 | source commit and one canonical real smoke | child/addon/character | P1-B and P2-A PASS; P2-B reaches first downstream structural blocker; cleanup and immutability PASS | E1-P1B-SRC1, E1-P1B-TEST1, E2-P2A-ADDON1..2, E2-P2B-RUN1, E2-P2B-STOP1, E2-P2B-CLEAN1, E2-P2B-IMMUT1 | stop at `GLB_skeleton: index invalid` |
 
 ## Phase Touch Map
 
@@ -135,9 +137,9 @@ No addon registry injection, bare fallback, upstream edit, or adapter redesign.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-B | source fix is required and not yet committed | edit only the child entrypoint; preserve siblings |
-| P2-A | probe gates pass but final canonical child not rerun | rerun after P1-B commit |
-| P2-B | not run | blocked until P2-A PASS |
+| P1-B | source fix committed; focused checks pass | preserve the one bounded source change |
+| P2-A | canonical real child passed identity, preference, and registration gates | preserve exact runtime binding |
+| P2-B | one character exported; structural validation stopped at `GLB_skeleton: index invalid` | stop; do not repair a second downstream blocker |
 
 ## Implementation Gate
 
@@ -147,7 +149,9 @@ No addon registry injection, bare fallback, upstream edit, or adapter redesign.
 - [x] Touch map and preserve-only surfaces recorded.
 - [x] P0/P1-A status refreshes recorded.
 - [x] P1-B gate is based on fresh real proof.
-- [ ] P1-B source commit and post-edit refresh complete.
+- [x] P1-B source commit and post-edit refresh complete.
+- [x] P2-A canonical child smoke and addon gates complete.
+- [x] P2-B stopped at the first new downstream blocker with cleanup proof.
 
 ## Final P0 Decision
 
@@ -163,3 +167,9 @@ Decision note:
 The real extension path is proven. Because the canonical source remains
 unbound, the only authorized remediation is a bounded source fix in the child
 entrypoint; no firewall or adapter change is justified.
+
+Final implementation note:
+
+The bounded source fix is complete and verified. The full character route is
+not accepted because the first downstream structural validator rejected the
+native GLB skeleton field. No second blocker was repaired or retried.

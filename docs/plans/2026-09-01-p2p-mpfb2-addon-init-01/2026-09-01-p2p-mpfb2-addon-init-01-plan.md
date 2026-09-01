@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-09-01`
-- Status: `P1-B implementation in progress`
+- Status: `P2-B blocked at first downstream structural-validation blocker`
 - Plan: `docs/plans/2026-09-01-p2p-mpfb2-addon-init-01/2026-09-01-p2p-mpfb2-addon-init-01-plan.md`
 - Evidence: `docs/plans/2026-09-01-p2p-mpfb2-addon-init-01/2026-09-01-p2p-mpfb2-addon-init-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-01-p2p-mpfb2-addon-init-01/2026-09-01-p2p-mpfb2-addon-init-01-benchmark.md`
@@ -149,7 +149,7 @@ not a real Blender addon identity and fails at initialization.
     remains bare-imported.
   - Commit Boundary: no source commit.
 
-- [ ] P1-B: Minimum supported entrypoint binding.
+- [x] P1-B: Minimum supported entrypoint binding.
   - Goal: use the proven extension lifecycle without changing other invariants.
   - Scope Boundary:
     - Editable: only `.p2p/system/p2p_capabilities/mpfb_blender_entrypoint.py`
@@ -185,7 +185,7 @@ not a real Blender addon identity and fails at initialization.
     - Evidence IDs: `E1-P1B-*`.
     - Actual-status rows refreshed: source subject/remediation.
   - Evidence Targets: `E1-P1B-*`.
-  - Actual-status Update: record candidate SHA/tree and frozen diff.
+  - Actual-status Update: candidate source commit is `0e3cc85d3b8ea599a1918be91873d1ef17ba14b1`; final candidate tree is updated after evidence closure.
   - Commit Boundary: one commit after focused checks and detect-changes.
 
 ### P2: One real character smoke
@@ -202,7 +202,7 @@ not a real Blender addon identity and fails at initialization.
   - P2-A: Frozen preflight and addon gates.
   - P2-B: One character and artifact/cleanup proof.
 
-- [ ] P2-A: Frozen preflight and addon gates.
+- [x] P2-A: Frozen preflight and addon gates.
   - Goal: prove the final launch subject before generation.
   - Scope Boundary: logs/evidence only; all source/runtime inputs frozen.
   - Non-Goals: no character call if any addon gate fails.
@@ -225,7 +225,8 @@ not a real Blender addon identity and fails at initialization.
   - Actual-status Update: mark P2-B ready only after PASS.
   - Commit Boundary: no source commit.
 
-- [ ] P2-B: One character and artifact/cleanup proof.
+- [x] P2-B: One character and artifact/cleanup proof — blocked at the first
+  new downstream structural-validation error after addon initialization.
   - Goal: execute one neutral recipe through the existing canonical route.
   - Scope Boundary: isolated outputs/logs/receipts; source and Game Truyen
     inspect-only; firewall/adapter preserve-only.
@@ -245,7 +246,8 @@ not a real Blender addon identity and fails at initialization.
        - Evidence target: `E2-P2B-ARTIFACT1..2`, `E2-P2B-CLEAN1`,
          `E2-P2B-IMMUT1`.
   - Implementation Gate: P2-A PASS.
-  - Acceptance: full route PASS or first exact downstream blocker.
+  - Acceptance: first exact downstream blocker is recorded with truthful output,
+    provenance, cleanup, and NOT_RUN semantics; no second blocker is repaired.
   - Evidence Targets: `E2-P2B-*`.
   - Actual-status Update: final terminal verdict is only set from direct proof.
   - Commit Boundary: no source commit.
@@ -271,6 +273,11 @@ not a real Blender addon identity and fails at initialization.
     immutability checks, and terminal verdict.
   - Implementation Gate: P3-A/P3-B pass or record blocker.
   - Acceptance: evidence complete and worktree/PR state known.
+
+Current execution result: addon initialization gates PASS, but the one real
+character route is blocked by `GLB_skeleton: index invalid` because the native
+export's only skin has `skeleton = null`. This is a new downstream blocker and
+is outside the addon-init fix; do not repair or rerun with a different route.
 
 ## Risk Notes
 
