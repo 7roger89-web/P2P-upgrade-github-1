@@ -31,6 +31,11 @@
 - [ ] **PROVENANCE**: every changed record has `origin_refs` (no fabricated origins) and a valid `origin_type` enum value; `UNKNOWN` origin_type only with refs exactly `['origin_unknown_or_not_durably_recovered']`.
 - [ ] **DEPENDENCY_VALIDITY**: every changed record's `dependencies` references valid ledger IDs, has no self-dependency, no invalid duplicates, and introduces no new cycle; a rejected or obsolete capability is not newly required without explicit documentation.
 - [ ] **ROADMAP_SYNC**: roadmap impact declared in the Goal Contract matches the governance record; no orphaned `PLANNED`/`ACTIVE` capability without a roadmap presence, and no roadmap item referencing a capability absent from the ledger.
+- [ ] **TERMINAL_STATE_CONSISTENCY**: the terminal verdict in the terminal report equals the roadmap item status and the `current`/`likely_next` values in governance (`PASS`→`DONE`, `BLOCKED`→`BLOCKED`, `FAIL`→`FAIL`); no silent divergence across roadmap, development-control, report, and supervisor verdict.
+- [ ] **CANDIDATE_POLICY_COMPLIANCE**: the deterministic candidate policy was applied (`CANDIDATE_REQUIRED` declared in the contract); if `YES` and verdict `PASS`, the candidate record exists with a non-placeholder SHA-256, verify evidence, and `UNPROMOTED` status; if `NO`, no candidate record claims otherwise.
+- [ ] **CAPABILITY_CLAIM_SEPARATION**: machinery capability statuses (evidence-based: `FOUNDATION_READY`, `PARTIAL`) are never conflated with goal roadmap statuses (`DONE`/`BLOCKED`), and no outcome capability is assigned a machinery-only status without real execution evidence.
+- [ ] **DEVELOPMENT_CONTROL_SYNC**: `current_development`, `candidate_records`, provenance, and the capability ledger agree with the roadmap projection; no record references a state this goal did not durably change.
+- [ ] **PR_LINEAGE_INTEGRITY**: this goal's branch contains the full ancestry of its parent branch (every prior merged-equivalent branch tip is an ancestor), and the pull-request base matches the declared parent branch; any retarget is reported to the Owner with no commit rewrite.
 - [ ] **NO_UNDECLARED_CAPABILITY_PROMOTION**: no capability status rose to `VERIFIED_IMPLEMENTED` or `FOUNDATION_READY` without a Goal Contract that declared it in advance.
 
 ### 2. Discrepancies found
@@ -48,4 +53,4 @@ Supervisor may recommend promotion or not; **promotion itself is an owner approv
 
 ---
 
-*Template version 2 — extended by P2P-C26 (provenance, dependency, and ledger-delta checks). Extend only through a goal with evidence.*
+*Template version 3 — extended by P2P-C29 (terminal-state consistency, candidate policy compliance, capability claim separation, development-control sync, PR lineage integrity) and by P2P-C26 (provenance, dependency, and ledger-delta checks). Extend only through a goal with evidence.*

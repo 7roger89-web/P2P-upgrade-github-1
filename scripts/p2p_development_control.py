@@ -350,6 +350,8 @@ def _validate_roadmap(control: dict[str, Any]) -> dict[str, dict[str, Any]]:
             previous_status = by_id[goal_ids[index - 1]]["status"]
             if status in ("PLANNED", "BLOCKED") and previous_status in ("PLANNED", "BLOCKED"):
                 continue  # consecutive PLANNED/BLOCKED states are the normal pre-implementation projection
+            if status == "DONE" and previous_status == "BLOCKED":
+                continue  # C09->C10 precedent: a blocked predecessor does not gate independent completion
             _require(
                 previous_status == "DONE",
                 "ROADMAP_STATUS",

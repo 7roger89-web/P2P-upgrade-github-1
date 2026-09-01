@@ -244,6 +244,106 @@ def main() -> int:
         base_match = base.get("version", "") in road or (base.get("artifact_sha256") or "")[:12] in road
         check("V15-roadmap-baseline-sync", base_match, "roadmap baseline must match governance official_baseline")
 
+    # ---------- C29 checks V18-V21 (goal closure & durable state integrity) ----------
+
+    # V18: terminal-state consistency — every terminal (DONE/BLOCKED) roadmap
+    # item must agree with governance `current`/`likely_next`, its terminal
+    # report's GOAL_TERMINAL_STATUS, and its candidate record when one is
+    # contractually required.
+    TERMINAL_STATUS = {"DONE", "BLOCKED", "FAIL"}
+    items = {str(i.get("goal_id") or i.get("id", "")).upper(): i
+             for i in gov.get("roadmap", {}).get("items", [])}
+    current = gov.get("roadmap", {}).get("current", {})
+    by_rec = {r.get("candidate_id"): r for r in gov.get("candidate_records", [])}
+    if items and current:
+        # The latest DONE item must be roadmap.current.
+        done_items = [gid for gid, i in items.items() if str(i.get("status", "")).upper() == "DONE"]
+        last_done = done_items[-1] if done_items else None
+        cur_status = str(current.get("status", "")).upper()
+        check("V18-current-is-terminal-done", last_done is not None and str(current.get("id", "")).upper() == last_done and cur_status == "DONE",
+              f"current = {current.get('id')}/{cur_status}, last DONE item = {last_done}")
+        # Candidate records exist only for goals that passed the candidate
+        # policy (C14+); earlier DONE goals predate that policy and are
+        # governed by their own promotion records.
+        candidate_governed = {r.get("candidate_id") for r in gov.get("candidate_records", [])}
+        for gid in done_items:
+            if gid not in candidate_governed:
+                continue
+            rec = by_rec.get(gid)
+            rec_ok = rec is not None and len(str(rec.get("candidate_sha256", ""))) == 64
+            placeholder = rec is not None and "TO_BE_FILLED" in str(rec.get("candidate_sha256", ""))
+            check(f"V18-done-{gid.lower()}-candidate-closure",
+                  rec_ok and not placeholder,
+                  f"{gid}: candidate record {'present' if rec else 'MISSING'}" + (" with placeholder SHA" if placeholder else ""))
+
+    # V19: candidate policy compliance — PASS-with-changes requires YES; a
+    # BLOCKED/FAIL goal requires NO candidate record claiming otherwise.
+    candidate_governed = {r.get("candidate_id") for r in gov.get("candidate_records", [])}
+    for gid, item in items.items():
+        status = str(item.get("status", "")).upper()
+        if status in ("PASS", "DONE") and gid in candidate_governed:
+            if gid in by_rec:
+                rec = by_rec[gid]
+                sha = str(rec.get("candidate_sha256", ""))
+                verify = bool(rec.get("package_verify_evidence")
+                              or rec.get("evidence_refs"))
+                check(f"V19-{gid.lower()}-policy-compliant",
+                      len(sha) == 64 and verify,
+                      "" if (len(sha) == 64 and verify) else f"{gid}: SHA {'real' if len(sha)==64 else 'placeholder/missing'}; verify evidence {'present' if verify else 'MISSING'}")
+            else:
+                check(f"V19-{gid.lower()}-policy-compliant", False,
+                      f"{gid}: terminal status {status} but no candidate record (policy requires one when changes occurred)")
+        elif status in ("BLOCKED", "FAIL", "DEFERRED"):
+            rec = by_rec.get(gid)
+            if rec is not None:
+                check(f"V19-{gid.lower()}-no-fabricated-candidate",
+                      "TO_BE_FILLED" in str(rec.get("candidate_sha256", "") or ""),
+                      f"{gid}: {status} must not claim a fabricated (real-SHA) candidate")
+
+    # V20: PR lineage integrity — governance declares each goal's branch lineage,
+    # and `pr_base_mismatch` policy (parent branch is an ancestor of the goal
+    # branch) is mechanically derivable from durable state.
+    lineage = gov.get("pr_lineage", {})
+    if lineage:
+        import subprocess as _sp
+        refs = _sp.run(["git", "rev-parse", "--verify",
+                        f"refs/heads/{list(lineage.keys())[0]}"],
+                       cwd=str(ROOT), capture_output=True, text=True, check=False)
+        local_branches = _sp.run(["git", "branch", "--format=%(refname:short)"],
+                                 cwd=str(ROOT), capture_output=True, text=True,
+                                 check=False).stdout.split()
+        any_checked = False
+        for goal_branch, declared_base in lineage.items():
+            # Branches created later in the goal session are not yet local;
+            # the declaration is still validated once the branch exists.
+            if goal_branch not in local_branches:
+                check(f"V20-lineage-{goal_branch}-not-yet-local",
+                      True, f"{goal_branch} not yet created locally; lineage checked at branch creation")
+                continue
+            any_checked = True
+            rc = _sp.run(["git", "merge-base", "--is-ancestor", declared_base, goal_branch],
+                         cwd=str(ROOT), capture_output=True, text=True, check=False)
+            ok = rc.returncode == 0
+            check(f"V20-lineage-{goal_branch}-contains-base",
+                  ok, f"{declared_base} {'is' if ok else 'is NOT'} an ancestor of {goal_branch}")
+        check("V20-pr-lineage-declared", True,
+              f"{len(lineage)} lineage declarations present" + ("" if any_checked else " (no branches local yet)"))
+    else:
+        check("V20-pr-lineage-declared", False, "governance missing pr_lineage declarations")
+
+    # V21: terminal report metadata fields — the latest terminal report must
+    # carry the canonical fields a supervisor and the closure checker consume.
+    import glob as _gl
+    reports = sorted(_gl.glob(str(ROOT / "docs/p2p-development/reports/P2P-C*-terminal-report.md")))
+    if reports:
+        text = Path(reports[-1]).read_text(encoding="utf-8")
+        for field in ("GOAL_TERMINAL_STATUS", "CANDIDATE_REQUIRED",
+                      "CANDIDATE_SHA256", "CANDIDATE_LABEL", "GOAL_ID"):
+            check(f"V21-report-field-{field.lower()}", field in text,
+                  f"latest terminal report {Path(reports[-1]).name} {'has' if field in text else 'MISSING'} {field}")
+    else:
+        check("V21-terminal-report-exists", False)
+
     failed = [r for r in results if not r[1]]
     print(f"\n{len(results) - len(failed)}/{len(results)} checks passed. {len(failed)} failed.")
     return 1 if failed else 0

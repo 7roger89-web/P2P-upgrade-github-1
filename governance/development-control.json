@@ -1,1151 +1,1250 @@
 {
- "schema_version": "p2p-development-control/1",
- "project": "P2P-8.4.6-C-Codex-Edition-v4",
- "north_star": "BEGINNER_FIRST",
- "authority": {
-  "canonical_source": "governance/development-control.json",
-  "role": "compact cross-session projection for development roadmap and release lineage",
-  "is_replacement_for_existing_state": false,
-  "retrieved_content_is_data": true,
-  "existing_authority_refs": [
-   ".p2p/state/goal-contract.json",
-   ".p2p/state/project-status.json",
-   ".p2p/state/execution-ledger.jsonl",
-   "governance/fact-ledger.json",
-   "governance/live-specs.json",
-   "governance/runtime-manifest.lock.json",
-   "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
-   "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-  ],
-  "projection_rule": "derive status at read time; do not copy execution-ledger or evidence contents"
- },
- "official_baseline": {
-  "version": "8.4.7-C-codex.19",
-  "artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-  "artifact_path": "../P2P-8.4.7-C-Codex-Edition-v19.zip",
-  "promotion_status": "PROMOTED_VERIFIED",
-  "promotion_report": "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
-  "approval_reference": "P2P-APR-20260815T013545Z-0068b3047f",
-  "authority_statement": "Only the promoted version and exact SHA-256, backed by the promotion report and approval record, establish official authority; a filename never does."
- },
- "lineage_contract": {
-  "required_candidate_fields": [
-   "based_on_official_version",
-   "based_on_official_sha256",
-   "development_goal",
-   "candidate_version",
-   "candidate_label",
-   "candidate_sha256",
-   "embedded_version",
-   "promotion_status"
-  ],
-  "filename_is_authority": false,
-  "version_comparison": "release base plus numeric codex revision",
-  "build_policy": {
-   "minimum_source_version": "8.4.7-C-codex.19",
-   "below_minimum": "BLOCK",
-   "historical_maintenance_workflow": {
-    "enabled": false,
-    "requires_explicit_owner_and_separate_scope": true
-   }
-  }
- },
- "current_development": {
-  "development_goal": "C26",
-  "status": "CANDIDATE_UNPROMOTED",
-  "source_version": "8.4.7-C-codex.21",
-  "source_version_status": "CANDIDATE_UNPROMOTED",
-  "based_on_official_version": "8.4.7-C-codex.19",
-  "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-  "source_drift_classification": {
-   "primary": "RECONCILED_TO_PROMOTED_BASELINE",
-   "contributors": [
-    "C17_LINEAGE_RECONCILIATION",
-    "C18_ADAPTIVE_POLICY",
-    "C18_VALIDATED",
-    "C19_TASK_TARGETED_CONTEXT",
-    "C19_CROSS_PLATFORM_RECONCILIATION",
-    "C20_HOST_EXECUTOR_NEUTRALITY",
-    "C21_HOST_SELECTION_POLICY"
-   ],
-   "implementation_bug": false,
-   "evidence_refs": [
-    "E0-P0A-BASE1",
-    "E0-P0A-SOURCE2",
-    "E0-P0A-CTRL1",
-    "E1-P1A-LINEAGE1",
-    "E1-P1-C21-SOURCE",
-    "E2-P2-C21-HS1-HS30",
-    "E3-P3-C21-PACKAGE"
-   ]
-  },
-  "historical_maintenance_mode": "DISABLED",
-  "owner_action_required": "C21 host selection policy foundation PASS; candidate remains UNPROMOTED; automatic host routing and live Manus adapter certification are not claimed.",
-  "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
-  "lineage_reconciliation": {
-   "from_source_version": "8.4.7-C-codex.15",
-   "to_source_version": "8.4.7-C-codex.21",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "evidence_refs": [
-    "E0-P0A-BASE1",
-    "E0-P0A-SOURCE2",
-    "E0-P0A-CTRL1",
-    "E1-P1A-LINEAGE1"
-   ]
-  },
-  "candidate_id": "C26",
-  "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-  "candidate_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5",
-  "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-  "promotion_status": "UNPROMOTED",
-  "foundation_status": "HOST_SELECTION_POLICY_FOUNDATION_READY",
-  "portable_execution_envelope_ready": true,
-  "portable_result_receipt_ready": true,
-  "cross_host_continuation_contract_ready": true,
-  "automatic_host_routing_ready": false,
-  "live_manus_adapter_certified": false,
-  "host_requirement_profile_ready": true,
-  "host_capability_discovery_foundation_ready": true
- },
- "candidate_records": [
-  {
-   "candidate_id": "C14",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C14",
-   "candidate_version": "8.4.7-C-codex.19",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v19.zip",
-   "candidate_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "embedded_version": "8.4.7-C-codex.19",
-   "promotion_status": "PROMOTED_VERIFIED",
-   "lineage_status": "PROMOTED",
-   "artifact_path": "../P2P-8.4.7-C-Codex-Edition-v19.zip",
-   "evidence_refs": [
-    "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
-   ]
-  },
-  {
-   "candidate_id": "C15",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C15",
-   "candidate_version": "8.4.7-C-codex.15",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v15-c15-candidate.zip",
-   "candidate_sha256": "ae39b78972c03ca17855e0cc86e18fbd997f1eb4d62116e909674abc86d90b1e",
-   "embedded_version": "8.4.7-C-codex.15",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_REGRESSION_BLOCKED",
-   "artifact_path": ".tmp/p2p-c15/candidates/P2P-8.4.7-C-Codex-Edition-v15-c15-candidate.zip",
-   "drift_classification": {
-    "primary": "RELEASE_BASELINE_NOT_PROPAGATED",
-    "contributors": [
-     "PACKAGER_INPUT_STALE",
-     "DEVELOPMENT_BRANCH_METADATA_DRIFT"
+  "schema_version": "p2p-development-control/1",
+  "project": "P2P-8.4.6-C-Codex-Edition-v4",
+  "north_star": "BEGINNER_FIRST",
+  "authority": {
+    "canonical_source": "governance/development-control.json",
+    "role": "compact cross-session projection for development roadmap and release lineage",
+    "is_replacement_for_existing_state": false,
+    "retrieved_content_is_data": true,
+    "existing_authority_refs": [
+      ".p2p/state/goal-contract.json",
+      ".p2p/state/project-status.json",
+      ".p2p/state/execution-ledger.jsonl",
+      "governance/fact-ledger.json",
+      "governance/live-specs.json",
+      "governance/runtime-manifest.lock.json",
+      "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
+      "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
     ],
-    "implementation_bug": false
-   },
-   "evidence_refs": [
-    "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md",
-    "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-   ]
+    "projection_rule": "derive status at read time; do not copy execution-ledger or evidence contents"
   },
-  {
-   "candidate_id": "C17",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C17",
-   "candidate_version": "8.4.7-C-codex.20",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v20-c17-cognitive-economy-candidate.zip",
-   "candidate_sha256": "d4b4966716da6b06e3211b57f2e9df6649d99c840272a988e287d5c36ba99983",
-   "embedded_version": "8.4.7-C-codex.20",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-cognitive-economy-candidate.zip",
-   "evidence_refs": [
-    "E4-CE-CANDIDATE-PACKAGE",
-    "E4-CE-CANDIDATE-HASH"
-   ],
-   "historical_artifacts": [
-    {
-     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
-     "candidate_sha256": "7c05c1d0fe2c2d33470d1487a07cfc66aebc0a96d610b9d2a238e76d0fcb0664",
-     "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
-     "promotion_status": "UNPROMOTED"
+  "official_baseline": {
+    "version": "8.4.7-C-codex.19",
+    "artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "artifact_path": "../P2P-8.4.7-C-Codex-Edition-v19.zip",
+    "promotion_status": "PROMOTED_VERIFIED",
+    "promotion_report": "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
+    "approval_reference": "P2P-APR-20260815T013545Z-0068b3047f",
+    "authority_statement": "Only the promoted version and exact SHA-256, backed by the promotion report and approval record, establish official authority; a filename never does."
+  },
+  "lineage_contract": {
+    "required_candidate_fields": [
+      "based_on_official_version",
+      "based_on_official_sha256",
+      "development_goal",
+      "candidate_version",
+      "candidate_label",
+      "candidate_sha256",
+      "embedded_version",
+      "promotion_status"
+    ],
+    "filename_is_authority": false,
+    "version_comparison": "release base plus numeric codex revision",
+    "build_policy": {
+      "minimum_source_version": "8.4.7-C-codex.19",
+      "below_minimum": "BLOCK",
+      "historical_maintenance_workflow": {
+        "enabled": false,
+        "requires_explicit_owner_and_separate_scope": true
+      }
     }
-   ]
   },
-  {
-   "candidate_id": "C18",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C18",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-final2-candidate.zip",
-   "candidate_sha256": "a6848f90244f02b778fb2c844eaabcc677fdff44f9051a0f28fe3088b6eae58f",
-   "embedded_version": "8.4.7-C-codex.21",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": ".tmp/p2p-c18/candidates/P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-final2-candidate.zip",
-   "evidence_refs": [
-    "E2-P2-PACKAGE1",
-    "E2-P2-LINEAGE1"
-   ],
-   "historical_artifacts": [
-    {
-     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-candidate.zip",
-     "candidate_sha256": "52180170b6302a370f14e92aff840eb552ec3b04046ade0f889ab292e0f76864",
-     "artifact_path": ".tmp/p2p-c18/candidates/P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-candidate.zip",
-     "promotion_status": "UNPROMOTED"
-    }
-   ]
+  "current_development": {
+    "development_goal": "C29",
+    "status": "CANDIDATE_UNPROMOTED",
+    "source_version": "8.4.7-C-codex.23",
+    "source_version_status": "CANDIDATE_UNPROMOTED",
+    "based_on_official_version": "8.4.7-C-codex.19",
+    "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "source_drift_classification": {
+      "primary": "RECONCILED_TO_PROMOTED_BASELINE",
+      "contributors": [
+        "C17_LINEAGE_RECONCILIATION",
+        "C18_ADAPTIVE_POLICY",
+        "C18_VALIDATED",
+        "C19_TASK_TARGETED_CONTEXT",
+        "C19_CROSS_PLATFORM_RECONCILIATION",
+        "C20_HOST_EXECUTOR_NEUTRALITY",
+        "C21_HOST_SELECTION_POLICY"
+      ],
+      "implementation_bug": false,
+      "evidence_refs": [
+        "E0-P0A-BASE1",
+        "E0-P0A-SOURCE2",
+        "E0-P0A-CTRL1",
+        "E1-P1A-LINEAGE1",
+        "E1-P1-C21-SOURCE",
+        "E2-P2-C21-HS1-HS30",
+        "E3-P3-C21-PACKAGE"
+      ]
+    },
+    "historical_maintenance_mode": "DISABLED",
+    "owner_action_required": "C29 terminal PASS (closure integrity reconciled); candidates remain UNPROMOTED; C27 reopen needs one Owner action outside chat (codex login or Manus API connector); no goal auto-started.",
+    "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
+    "lineage_reconciliation": {
+      "from_source_version": "8.4.7-C-codex.15",
+      "to_source_version": "8.4.7-C-codex.21",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "evidence_refs": [
+        "E0-P0A-BASE1",
+        "E0-P0A-SOURCE2",
+        "E0-P0A-CTRL1",
+        "E1-P1A-LINEAGE1"
+      ]
+    },
+    "candidate_id": "C29",
+    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip",
+    "candidate_sha256": "61ed699297f91cdc6e545c796f046c313e2318b8838da9442f5e82f1d2825e8f",
+    "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+    "promotion_status": "UNPROMOTED",
+    "foundation_status": "ONBOARDING_MACHINERY_FOUNDATION_READY",
+    "portable_execution_envelope_ready": true,
+    "portable_result_receipt_ready": true,
+    "cross_host_continuation_contract_ready": true,
+    "automatic_host_routing_ready": false,
+    "live_manus_adapter_certified": false,
+    "host_requirement_profile_ready": true,
+    "host_capability_discovery_foundation_ready": true,
+    "candidate_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip"
   },
-  {
-   "candidate_id": "C19",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C19",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-final-candidate.zip",
-   "candidate_sha256": "38111521f528ae438b61211a1abb6ac9769f7d919c3c3badee05105cf6ae1d35",
-   "embedded_version": "8.4.7-C-codex.21",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-final-candidate.zip",
-   "evidence_refs": [
-    "E1-P1-CROSS-PLATFORM-RECONCILIATION",
-    "E2-P2-UIUX-INLINE-JSON",
-    "E2-P2-PATH-CASING",
-    "E2-P2-DT24-C19-C18-C17",
-    "E2-P2-FULL-SUITE-274",
-    "E3-P3-CANDIDATE-PACKAGE-CROSS-PLATFORM"
-   ],
-   "historical_artifacts": [
+  "candidate_records": [
     {
-     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c19-task-targeted-context-final3-candidate.zip",
-     "candidate_sha256": "4c8e80f658b233c36c4cab0f660ec72149b763ba6fcaf03bb7185f3c32ec2220",
-     "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-task-targeted-context-final3-candidate.zip",
-     "promotion_status": "UNPROMOTED"
+      "candidate_id": "C14",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C14",
+      "candidate_version": "8.4.7-C-codex.19",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v19.zip",
+      "candidate_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "embedded_version": "8.4.7-C-codex.19",
+      "promotion_status": "PROMOTED_VERIFIED",
+      "lineage_status": "PROMOTED",
+      "artifact_path": "../P2P-8.4.7-C-Codex-Edition-v19.zip",
+      "evidence_refs": [
+        "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
+      ]
     },
     {
-     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-candidate.zip",
-     "candidate_sha256": "a8fb2be4b8885ff9e1fb2ba4188afafe07b8e8d5246ec1d6eda1d998f008817d",
-     "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-candidate.zip",
-     "promotion_status": "UNPROMOTED"
-    }
-   ]
-  },
-  {
-   "candidate_id": "C20",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-final-candidate.zip",
-   "candidate_sha256": "d082ab329740cfe256956554c13be3dcee7f994fd45988f0348b546d8dd20fce",
-   "embedded_version": "8.4.7-C-codex.21",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": ".tmp/p2p-c20/candidates/P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-final-candidate.zip",
-   "evidence_refs": [
-    "E1-P1-C20-SOURCE-MAPPING",
-    "E2-P2-C20-HN1-HN24",
-    "E2-P2-C20-C10-C19-INTEGRATION",
-    "E2-P2-C20-FULL-REGRESSION-300",
-    "E3-P3-C20-PACKAGE-d082ab"
-   ],
-   "development_goal": "C20",
-   "historical_artifacts": [
+      "candidate_id": "C15",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C15",
+      "candidate_version": "8.4.7-C-codex.15",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v15-c15-candidate.zip",
+      "candidate_sha256": "ae39b78972c03ca17855e0cc86e18fbd997f1eb4d62116e909674abc86d90b1e",
+      "embedded_version": "8.4.7-C-codex.15",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_REGRESSION_BLOCKED",
+      "artifact_path": ".tmp/p2p-c15/candidates/P2P-8.4.7-C-Codex-Edition-v15-c15-candidate.zip",
+      "drift_classification": {
+        "primary": "RELEASE_BASELINE_NOT_PROPAGATED",
+        "contributors": [
+          "PACKAGER_INPUT_STALE",
+          "DEVELOPMENT_BRANCH_METADATA_DRIFT"
+        ],
+        "implementation_bug": false
+      },
+      "evidence_refs": [
+        "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md",
+        "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
+      ]
+    },
     {
-     "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-candidate.zip",
-     "candidate_sha256": "88d3214dc3dc61993d192c161f4d4d8f3d88f6ae11f4a219ac05cdefea3d22ec",
-     "artifact_path": ".tmp/p2p-c20/candidates/P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-candidate.zip",
-     "promotion_status": "UNPROMOTED"
+      "candidate_id": "C17",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C17",
+      "candidate_version": "8.4.7-C-codex.20",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v20-c17-cognitive-economy-candidate.zip",
+      "candidate_sha256": "d4b4966716da6b06e3211b57f2e9df6649d99c840272a988e287d5c36ba99983",
+      "embedded_version": "8.4.7-C-codex.20",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-cognitive-economy-candidate.zip",
+      "evidence_refs": [
+        "E4-CE-CANDIDATE-PACKAGE",
+        "E4-CE-CANDIDATE-HASH"
+      ],
+      "historical_artifacts": [
+        {
+          "candidate_label": "P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
+          "candidate_sha256": "7c05c1d0fe2c2d33470d1487a07cfc66aebc0a96d610b9d2a238e76d0fcb0664",
+          "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
+          "promotion_status": "UNPROMOTED"
+        }
+      ]
+    },
+    {
+      "candidate_id": "C18",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C18",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-final2-candidate.zip",
+      "candidate_sha256": "a6848f90244f02b778fb2c844eaabcc677fdff44f9051a0f28fe3088b6eae58f",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": ".tmp/p2p-c18/candidates/P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-final2-candidate.zip",
+      "evidence_refs": [
+        "E2-P2-PACKAGE1",
+        "E2-P2-LINEAGE1"
+      ],
+      "historical_artifacts": [
+        {
+          "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-candidate.zip",
+          "candidate_sha256": "52180170b6302a370f14e92aff840eb552ec3b04046ade0f889ab292e0f76864",
+          "artifact_path": ".tmp/p2p-c18/candidates/P2P-8.4.7-C-Codex-Edition-v21-c18-adaptive-orchestration-policy-candidate.zip",
+          "promotion_status": "UNPROMOTED"
+        }
+      ]
+    },
+    {
+      "candidate_id": "C19",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C19",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-final-candidate.zip",
+      "candidate_sha256": "38111521f528ae438b61211a1abb6ac9769f7d919c3c3badee05105cf6ae1d35",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-final-candidate.zip",
+      "evidence_refs": [
+        "E1-P1-CROSS-PLATFORM-RECONCILIATION",
+        "E2-P2-UIUX-INLINE-JSON",
+        "E2-P2-PATH-CASING",
+        "E2-P2-DT24-C19-C18-C17",
+        "E2-P2-FULL-SUITE-274",
+        "E3-P3-CANDIDATE-PACKAGE-CROSS-PLATFORM"
+      ],
+      "historical_artifacts": [
+        {
+          "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c19-task-targeted-context-final3-candidate.zip",
+          "candidate_sha256": "4c8e80f658b233c36c4cab0f660ec72149b763ba6fcaf03bb7185f3c32ec2220",
+          "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-task-targeted-context-final3-candidate.zip",
+          "promotion_status": "UNPROMOTED"
+        },
+        {
+          "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-candidate.zip",
+          "candidate_sha256": "a8fb2be4b8885ff9e1fb2ba4188afafe07b8e8d5246ec1d6eda1d998f008817d",
+          "artifact_path": ".tmp/p2p-c19/candidates/P2P-8.4.7-C-Codex-Edition-v21-c19-cross-platform-reconciled-candidate.zip",
+          "promotion_status": "UNPROMOTED"
+        }
+      ]
+    },
+    {
+      "candidate_id": "C20",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-final-candidate.zip",
+      "candidate_sha256": "d082ab329740cfe256956554c13be3dcee7f994fd45988f0348b546d8dd20fce",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": ".tmp/p2p-c20/candidates/P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-final-candidate.zip",
+      "evidence_refs": [
+        "E1-P1-C20-SOURCE-MAPPING",
+        "E2-P2-C20-HN1-HN24",
+        "E2-P2-C20-C10-C19-INTEGRATION",
+        "E2-P2-C20-FULL-REGRESSION-300",
+        "E3-P3-C20-PACKAGE-d082ab"
+      ],
+      "development_goal": "C20",
+      "historical_artifacts": [
+        {
+          "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-candidate.zip",
+          "candidate_sha256": "88d3214dc3dc61993d192c161f4d4d8f3d88f6ae11f4a219ac05cdefea3d22ec",
+          "artifact_path": ".tmp/p2p-c20/candidates/P2P-8.4.7-C-Codex-Edition-v21-c20-host-executor-neutrality-foundation-candidate.zip",
+          "promotion_status": "UNPROMOTED"
+        }
+      ]
+    },
+    {
+      "candidate_id": "C21",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C21",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
+      "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
+      "evidence_refs": [
+        "E2-P2-C21-HS1-HS30",
+        "E3-P3-C21-PACKAGE",
+        "E3-P3-C21-SUPERVISOR"
+      ]
+    },
+    {
+      "candidate_id": "C25",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C25",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c25-durable-development-charter-ledger-framework-candidate.zip",
+      "candidate_sha256": "5adb0176677ad5ffdf4cf8dc1c5a07c5d7b7d8ec9005e9fa8903ce9c0bec94f0",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c25-durable-development-charter-ledger-framework-candidate.zip",
+      "evidence_refs": [
+        "CL1-CL40 PASS (tests/test_p2p_development_charter.py)",
+        "framework validator 19/19 PASS (scripts/validate_p2p_development_framework.py)",
+        "E3-P3-C25-PACKAGE (package_release.py build/verify on candidate)"
+      ]
+    },
+    {
+      "candidate_id": "C26",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "development_goal": "C26",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "candidate_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5",
+      "embedded_version": "8.4.7-C-codex.21",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "LINEAGE_RECONCILED",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "evidence_refs": [
+        "CP1-CP50 PASS (tests/test_p2p_ledger_provenance.py)",
+        "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py; V11-V17 added)",
+        "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
+        "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%",
+        "EXECUTION_POLICY<->PARALLEL_EXECUTION dependency cycle broken and documented"
+      ]
+    },
+    {
+      "candidate_id": "C28",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v22-c28-secure-host-connection-credential-onboarding-candidate-v1.zip",
+      "candidate_sha256": "7706bdcd1012225234ca31a64ee430d63902b9e6a0b278af9322b2b1ace8cb95",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v22-c28-secure-host-connection-credential-onboarding-candidate-v1.zip",
+      "promotion_status": "UNPROMOTED",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-C28-terminal-report.md",
+        "scripts/package_release.py verify PASS (embedded 8.4.7-C-codex.22, official baseline 8.4.7-C-codex.19)",
+        "P2P-C28 intake; terminal PASS reconciled under C29 closure policy"
+      ],
+      "candidate_version": "8.4.7-C-codex.22",
+      "development_goal": "C28",
+      "embedded_version": "8.4.7-C-codex.22",
+      "lineage_status": "LINEAGE_OK",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "package_verify_evidence": "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.22, official baseline 8.4.7-C-codex.19"
+    },
+    {
+      "candidate_id": "C29",
+      "development_goal": "C29",
+      "candidate_version": "8.4.7-C-codex.23",
+      "candidate_label": "P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip",
+      "candidate_sha256": "61ed699297f91cdc6e545c796f046c313e2318b8838da9442f5e82f1d2825e8f",
+      "embedded_version": "8.4.7-C-codex.23",
+      "based_on_official_version": "8.4.7-C-codex.19",
+      "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+      "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip",
+      "promotion_status": "UNPROMOTED",
+      "lineage_status": "verify PASS; full lineage verify pending owner action (codex login / Manus connector)",
+      "evidence_refs": [
+        "scripts/package_release.py build on staged source: RC 0",
+        "scripts/package_release.py verify on extracted candidate: status PASS, embedded 8.4.7-C-codex.23, official baseline 8.4.7-C-codex.19",
+        "docs/p2p-development/reports/P2P-C29-terminal-report.md"
+      ]
     }
-   ]
-  },
-  {
-   "candidate_id": "C21",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C21",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
-   "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
-   "embedded_version": "8.4.7-C-codex.21",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c21-compatible-host-discovery-selection-foundation-final-candidate-v2.zip",
-   "evidence_refs": [
-    "E2-P2-C21-HS1-HS30",
-    "E3-P3-C21-PACKAGE",
-    "E3-P3-C21-SUPERVISOR"
-   ]
-  },
-  {
-   "candidate_id": "C25",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C25",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c25-durable-development-charter-ledger-framework-candidate.zip",
-   "candidate_sha256": "5adb0176677ad5ffdf4cf8dc1c5a07c5d7b7d8ec9005e9fa8903ce9c0bec94f0",
-   "embedded_version": "8.4.7-C-codex.21",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c25-durable-development-charter-ledger-framework-candidate.zip",
-   "evidence_refs": [
-    "CL1-CL40 PASS (tests/test_p2p_development_charter.py)",
-    "framework validator 19/19 PASS (scripts/validate_p2p_development_framework.py)",
-    "E3-P3-C25-PACKAGE (package_release.py build/verify on candidate)"
-   ]
-  },
-  {
-   "candidate_id": "C26",
-   "based_on_official_version": "8.4.7-C-codex.19",
-   "based_on_official_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
-   "development_goal": "C26",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_label": "P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-   "candidate_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5",
-   "embedded_version": "8.4.7-C-codex.21",
-   "promotion_status": "UNPROMOTED",
-   "lineage_status": "LINEAGE_RECONCILED",
-   "artifact_path": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-   "evidence_refs": [
-    "CP1-CP50 PASS (tests/test_p2p_ledger_provenance.py)",
-    "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py; V11-V17 added)",
-    "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
-    "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%",
-    "EXECUTION_POLICY<->PARALLEL_EXECUTION dependency cycle broken and documented"
-   ]
-  }
- ],
- "capability_status": [
-  {
-   "id": "C08",
-   "status": "DEFERRED",
-   "result": "DEFERRED",
-   "reason": "Preserved as a deferred historical roadmap item."
-  },
-  {
-   "id": "C09",
-   "status": "BLOCKED",
-   "result": "BLOCKED",
-   "blocker": "EVENT_EVIDENCE_UNAVAILABLE",
-   "reason": "Live host event evidence is unavailable."
-  },
-  {
-   "id": "C10",
-   "status": "DONE",
-   "result": "PASS",
-   "evidence_ref": "C10 PASS report and plan"
-  },
-  {
-   "id": "C11",
-   "status": "DONE",
-   "result": "PASS",
-   "evidence_ref": "C11 PASS report and plan"
-  },
-  {
-   "id": "C12",
-   "status": "DONE",
-   "result": "PASS",
-   "evidence_ref": "C12 PASS report and plan"
-  },
-  {
-   "id": "C13",
-   "status": "DONE",
-   "result": "PASS",
-   "evidence_ref": "C13 PASS report and plan"
-  },
-  {
-   "id": "C14",
-   "status": "DONE",
-   "result": "PROMOTED_VERIFIED",
-   "evidence_ref": "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
-  },
-  {
-   "id": "C15",
-   "status": "DONE",
-   "result": "PASS",
-   "foundation_status": "BOUNDED_DELEGATION_FOUNDATION_READY",
-   "live_delegation_certified": false,
-   "live_delegation_status": "NOT_CERTIFIED",
-   "candidate_id": "C15",
-   "evidence_ref": "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-  },
-  {
-   "id": "C17",
-   "status": "DONE",
-   "result": "PASS",
-   "foundation_status": "PARALLEL_EXECUTION_FOUNDATION_READY",
-   "live_parallel_execution_certified": false,
-   "live_parallel_execution_status": "NOT_CERTIFIED",
-   "candidate_id": "C17",
-   "evidence_ref": "E2-P2-C17-FOCUSED",
-   "cognitive_economy_parallel_orchestration_evaluated": true,
-   "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
-   "cognitive_economy_evidence_ref": "E4-CE-CLASSIFICATION"
-  },
-  {
-   "id": "C18",
-   "status": "DONE",
-   "result": "PASS",
-   "foundation_status": "ADAPTIVE_ORCHESTRATION_POLICY_FOUNDATION_READY",
-   "candidate_id": "C18",
-   "candidate_sha256": "a6848f90244f02b778fb2c844eaabcc677fdff44f9051a0f28fe3088b6eae58f",
-   "promotion_status": "UNPROMOTED",
-   "evidence_ref": "E2-P2-SUPERVISOR1"
-  },
-  {
-   "id": "C19",
-   "status": "DONE",
-   "result": "PASS",
-   "foundation_status": "TASK_TARGETED_CONTEXT_RETRIEVAL_FOUNDATION_READY",
-   "candidate_id": "C19",
-   "candidate_sha256": "4c8e80f658b233c36c4cab0f660ec72149b763ba6fcaf03bb7185f3c32ec2220",
-   "promotion_status": "UNPROMOTED",
-   "evidence_ref": "E3-P3-SUPERVISOR1"
-  },
-  {
-   "id": "C20",
-   "status": "DONE",
-   "result": "PASS",
-   "foundation_status": "HOST_EXECUTOR_NEUTRALITY_FOUNDATION_READY",
-   "portable_execution_envelope_ready": true,
-   "portable_result_receipt_ready": true,
-   "cross_host_continuation_contract_ready": true,
-   "automatic_host_routing_ready": false,
-   "live_manus_adapter_certified": false,
-   "candidate_id": "C20",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_sha256": "d082ab329740cfe256956554c13be3dcee7f994fd45988f0348b546d8dd20fce",
-   "promotion_status": "UNPROMOTED",
-   "evidence_ref": "E2-P2-C20-HN1-HN24"
-  },
-  {
-   "id": "C21",
-   "status": "DONE",
-   "result": "PASS",
-   "foundation_status": "HOST_SELECTION_POLICY_FOUNDATION_READY",
-   "host_requirement_profile_ready": true,
-   "host_capability_discovery_foundation_ready": true,
-   "automatic_host_routing_ready": false,
-   "live_manus_adapter_certified": false,
-   "candidate_id": "C21",
-   "candidate_version": "8.4.7-C-codex.21",
-   "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
-   "promotion_status": "UNPROMOTED",
-   "evidence_ref": "E2-P2-C21-HS1-HS30"
-  }
- ],
- "design_intelligence": {
-  "metadata_faculties": 174,
-  "primary_router": "p2p-uiux",
-  "aesthetica": "OPTIONAL_NONCANONICAL",
-  "source_of_truth": "C13 frozen source and promoted .19 evidence"
- },
- "canonical_capability_set": {
-  "denominator": 8,
-  "quorum": "8/8",
-  "members": [
-   "p2p_iris",
-   "p2p_tecton",
-   "p2p_axiom",
-   "p2p_vector",
-   "p2p_datos",
-   "p2p_anon",
-   "p2p_architecton",
-   "p2p_helios"
   ],
-  "aesthetica_policy": "supporting optional only; never canonical and never counted"
- },
- "roadmap": {
-  "allowed_statuses": [
-   "ACTIVE",
-   "BLOCKED",
-   "DEFERRED",
-   "DONE",
-   "PLANNED",
-   "REJECTED"
+  "capability_status": [
+    {
+      "id": "C08",
+      "status": "DEFERRED",
+      "result": "DEFERRED",
+      "reason": "Preserved as a deferred historical roadmap item."
+    },
+    {
+      "id": "C09",
+      "status": "BLOCKED",
+      "result": "BLOCKED",
+      "blocker": "EVENT_EVIDENCE_UNAVAILABLE",
+      "reason": "Live host event evidence is unavailable."
+    },
+    {
+      "id": "C10",
+      "status": "DONE",
+      "result": "PASS",
+      "evidence_ref": "C10 PASS report and plan"
+    },
+    {
+      "id": "C11",
+      "status": "DONE",
+      "result": "PASS",
+      "evidence_ref": "C11 PASS report and plan"
+    },
+    {
+      "id": "C12",
+      "status": "DONE",
+      "result": "PASS",
+      "evidence_ref": "C12 PASS report and plan"
+    },
+    {
+      "id": "C13",
+      "status": "DONE",
+      "result": "PASS",
+      "evidence_ref": "C13 PASS report and plan"
+    },
+    {
+      "id": "C14",
+      "status": "DONE",
+      "result": "PROMOTED_VERIFIED",
+      "evidence_ref": "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
+    },
+    {
+      "id": "C15",
+      "status": "DONE",
+      "result": "PASS",
+      "foundation_status": "BOUNDED_DELEGATION_FOUNDATION_READY",
+      "live_delegation_certified": false,
+      "live_delegation_status": "NOT_CERTIFIED",
+      "candidate_id": "C15",
+      "evidence_ref": "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
+    },
+    {
+      "id": "C17",
+      "status": "DONE",
+      "result": "PASS",
+      "foundation_status": "PARALLEL_EXECUTION_FOUNDATION_READY",
+      "live_parallel_execution_certified": false,
+      "live_parallel_execution_status": "NOT_CERTIFIED",
+      "candidate_id": "C17",
+      "evidence_ref": "E2-P2-C17-FOCUSED",
+      "cognitive_economy_parallel_orchestration_evaluated": true,
+      "cognitive_economy_status": "EVALUATED_BOUNDED_PARALLEL_SLICE",
+      "cognitive_economy_evidence_ref": "E4-CE-CLASSIFICATION"
+    },
+    {
+      "id": "C18",
+      "status": "DONE",
+      "result": "PASS",
+      "foundation_status": "ADAPTIVE_ORCHESTRATION_POLICY_FOUNDATION_READY",
+      "candidate_id": "C18",
+      "candidate_sha256": "a6848f90244f02b778fb2c844eaabcc677fdff44f9051a0f28fe3088b6eae58f",
+      "promotion_status": "UNPROMOTED",
+      "evidence_ref": "E2-P2-SUPERVISOR1"
+    },
+    {
+      "id": "C19",
+      "status": "DONE",
+      "result": "PASS",
+      "foundation_status": "TASK_TARGETED_CONTEXT_RETRIEVAL_FOUNDATION_READY",
+      "candidate_id": "C19",
+      "candidate_sha256": "4c8e80f658b233c36c4cab0f660ec72149b763ba6fcaf03bb7185f3c32ec2220",
+      "promotion_status": "UNPROMOTED",
+      "evidence_ref": "E3-P3-SUPERVISOR1"
+    },
+    {
+      "id": "C20",
+      "status": "DONE",
+      "result": "PASS",
+      "foundation_status": "HOST_EXECUTOR_NEUTRALITY_FOUNDATION_READY",
+      "portable_execution_envelope_ready": true,
+      "portable_result_receipt_ready": true,
+      "cross_host_continuation_contract_ready": true,
+      "automatic_host_routing_ready": false,
+      "live_manus_adapter_certified": false,
+      "candidate_id": "C20",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_sha256": "d082ab329740cfe256956554c13be3dcee7f994fd45988f0348b546d8dd20fce",
+      "promotion_status": "UNPROMOTED",
+      "evidence_ref": "E2-P2-C20-HN1-HN24"
+    },
+    {
+      "id": "C21",
+      "status": "DONE",
+      "result": "PASS",
+      "foundation_status": "HOST_SELECTION_POLICY_FOUNDATION_READY",
+      "host_requirement_profile_ready": true,
+      "host_capability_discovery_foundation_ready": true,
+      "automatic_host_routing_ready": false,
+      "live_manus_adapter_certified": false,
+      "candidate_id": "C21",
+      "candidate_version": "8.4.7-C-codex.21",
+      "candidate_sha256": "bcf5589d91bbfb18fbc572ff40f685b4d7cb6ab3819449148648801144896730",
+      "promotion_status": "UNPROMOTED",
+      "evidence_ref": "E2-P2-C21-HS1-HS30"
+    }
   ],
-  "items": [
-   {
-    "id": "C08",
-    "title": "Controlled continuation",
-    "status": "DEFERRED",
-    "evidence_ref": "C08 roadmap record"
-   },
-   {
-    "id": "C09",
-    "title": "Live host identity and event boundary",
-    "status": "BLOCKED",
-    "evidence_ref": "C09 EVENT_EVIDENCE_UNAVAILABLE"
-   },
-   {
-    "id": "C10",
-    "title": "Evidence authority and permission hardening",
-    "status": "DONE",
-    "evidence_ref": "C10 PASS"
-   },
-   {
-    "id": "C11",
-    "title": "Durable task foundation",
-    "status": "DONE",
-    "evidence_ref": "C11 PASS"
-   },
-   {
-    "id": "C12",
-    "title": "Bounded foreground execution",
-    "status": "DONE",
-    "evidence_ref": "C12 PASS"
-   },
-   {
-    "id": "C13",
-    "title": "Design intelligence foundation",
-    "status": "DONE",
-    "evidence_ref": "C13 PASS"
-   },
-   {
-    "id": "C14",
-    "title": "Design intelligence release readiness",
-    "status": "DONE",
-    "evidence_ref": "C14 PROMOTED_VERIFIED"
-   },
-   {
-    "id": "C15",
-    "title": "Bounded foreground delegation foundation",
-    "status": "DONE",
-    "evidence_ref": "C15 PASS"
-   },
-   {
-    "id": "C16",
-    "title": "Durable product roadmap and release lineage foundation",
-    "status": "DONE",
-    "evidence_ref": "docs/plans/2026-08-16-p2p-c16-roadmap-lineage"
-   },
-   {
-    "id": "C17",
-    "title": "Safe bounded parallel foreground execution",
-    "status": "DONE",
-    "evidence_ref": "E2-P2-C17-FOCUSED"
-   },
-   {
-    "id": "C18",
-    "title": "Adaptive orchestration policy foundation",
-    "status": "DONE",
-    "evidence_ref": "docs/plans/2026-08-16-p2p-c18-adaptive-orchestration-policy"
-   },
-   {
-    "id": "C19",
-    "title": "Task-targeted context retrieval, coverage, and reuse foundation",
-    "status": "DONE",
-    "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context"
-   },
-   {
-    "id": "FACT_LIVE_SPECS",
-    "title": "FACT_LEDGER and Live Specs authority",
-    "status": "DONE",
-    "evidence_ref": "governance/fact-ledger.json; governance/live-specs.json"
-   },
-   {
-    "id": "PROJECT_SPECIFIC_EVAL",
-    "title": "Project-specific evaluation",
-    "status": "DONE",
-    "evidence_ref": ".p2p/evals/suite.json"
-   },
-   {
-    "id": "RAG_BOUNDARIES",
-    "title": "RAG trust and boundary controls",
-    "status": "DONE",
-    "evidence_ref": "RAG specifications and eval references"
-   },
-   {
-    "id": "CAPSULE_SESSION_RECOVERY",
-    "title": "CAPSULE session recovery",
-    "status": "DONE",
-    "evidence_ref": "p2p-capsule references"
-   },
-   {
-    "id": "SCOPE",
-    "title": "SCOPE.HELM bounded decomposition",
-    "status": "DONE",
-    "evidence_ref": "p2p-scope references"
-   },
-   {
-    "id": "CONTEXT_COMPRESSION_EFFICIENCY",
-    "title": "Context compression efficiency",
-    "status": "DONE",
-    "evidence_ref": "C06 context delivery evidence"
-   },
-   {
-    "id": "REASONING",
-    "title": "Reasoning and decision trace",
-    "status": "DONE",
-    "evidence_ref": "decision trace specifications"
-   },
-   {
-    "id": "SECURITY",
-    "title": "Security and secret boundaries",
-    "status": "DONE",
-    "evidence_ref": "security scan and governance"
-   },
-   {
-    "id": "DRIFT_GATES",
-    "title": "Drift gates and protected runtime lock",
-    "status": "DONE",
-    "evidence_ref": "governance drift reports"
-   },
-   {
-    "id": "ROLLBACK",
-    "title": "Rollback and preserved release history",
-    "status": "DONE",
-    "evidence_ref": "release governance reports"
-   },
-   {
-    "id": "INSTALLER_DOCTOR",
-    "title": "Installer and doctor lifecycle",
-    "status": "DONE",
-    "evidence_ref": "doctor and installer tests"
-   },
-   {
-    "id": "UPDATE_UNINSTALL",
-    "title": "Update and uninstall behavior",
-    "status": "DONE",
-    "evidence_ref": "lifecycle tests"
-   },
-   {
-    "id": "LIVE_DATA_FRESHNESS",
-    "title": "Live-data freshness and external-source registry",
-    "status": "DONE",
-    "evidence_ref": "manifest/external-sources.json"
-   },
-   {
-    "id": "BEGINNER_DOCS_EXPERIENCE",
-    "title": "Beginner documentation experience",
-    "status": "DONE",
-    "evidence_ref": "beginner guides and routing"
-   },
-   {
-    "id": "PARITY_REGRESSION",
-    "title": "Parity and regression protection",
-    "status": "DONE",
-    "evidence_ref": "release and full regression suites"
-   },
-   {
-    "id": "OWNER_APPROVAL",
-    "title": "Owner approval for protected actions",
-    "status": "DONE",
-    "evidence_ref": "approval policy and C14 approval"
-   },
-   {
-    "id": "C20",
-    "title": "Provider-neutral host/executor boundary foundation",
-    "status": "DONE",
-    "evidence_ref": "E2-P2-C20-HN1-HN24"
-   },
-   {
-    "id": "C21",
-    "title": "Compatible host discovery and minimum-sufficient selection policy foundation",
-    "status": "DONE",
-    "evidence_ref": "E2-P2-C21-HS1-HS30"
-   },
-   {
-    "id": "C25",
-    "status": "DONE",
-    "notes": "C25 framework complete (Charter, Capability Ledger 109 records, Goal Contract & Supervisor templates, roadmap projection, validator, CL1-CL40); candidate UNPROMOTED pending owner review."
-   },
-   {
-    "id": "C26",
-    "status": "DONE",
-    "title": "Durable Capability Provenance, Dependency & Goal-to-Ledger Governance",
-    "evidence_ref": "P2P-C26 intake; chat-discussion intake rule; dependency & provenance model"
-   },
-   {
-    "id": "C27",
-    "title": "Real Host Execution Certification",
-    "status": "BLOCKED",
-    "notes": "BLOCKED: LIVE_HOST_EVIDENCE_UNAVAILABLE. Host-by-host: Codex CLI 0.147.0 installed but 401 on api.openai.com (no real OpenAI key); Claude Code / Gemini CLI / Cursor ACP / Copilot CLI absent; Manus API connector unconfigured. C26 remains the active goal (CANDIDATE_UNPROMOTED).",
-    "evidence_ref": "docs/p2p-development/reports/P2P-C27-terminal-report.md"
-   },
-   {
-    "id": "C28",
-    "status": "PLANNED",
-    "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
-    "evidence_ref": "GOAL-C28",
-    "notes": "C28 terminal state: PASS (machinery + verification; no live certification claimed)."
-   }
+  "design_intelligence": {
+    "metadata_faculties": 174,
+    "primary_router": "p2p-uiux",
+    "aesthetica": "OPTIONAL_NONCANONICAL",
+    "source_of_truth": "C13 frozen source and promoted .19 evidence"
+  },
+  "canonical_capability_set": {
+    "denominator": 8,
+    "quorum": "8/8",
+    "members": [
+      "p2p_iris",
+      "p2p_tecton",
+      "p2p_axiom",
+      "p2p_vector",
+      "p2p_datos",
+      "p2p_anon",
+      "p2p_architecton",
+      "p2p_helios"
+    ],
+    "aesthetica_policy": "supporting optional only; never canonical and never counted"
+  },
+  "roadmap": {
+    "allowed_statuses": [
+      "ACTIVE",
+      "BLOCKED",
+      "DEFERRED",
+      "DONE",
+      "PLANNED",
+      "REJECTED"
+    ],
+    "items": [
+      {
+        "id": "C08",
+        "title": "Controlled continuation",
+        "status": "DEFERRED",
+        "evidence_ref": "C08 roadmap record"
+      },
+      {
+        "id": "C09",
+        "title": "Live host identity and event boundary",
+        "status": "BLOCKED",
+        "evidence_ref": "C09 EVENT_EVIDENCE_UNAVAILABLE"
+      },
+      {
+        "id": "C10",
+        "title": "Evidence authority and permission hardening",
+        "status": "DONE",
+        "evidence_ref": "C10 PASS"
+      },
+      {
+        "id": "C11",
+        "title": "Durable task foundation",
+        "status": "DONE",
+        "evidence_ref": "C11 PASS"
+      },
+      {
+        "id": "C12",
+        "title": "Bounded foreground execution",
+        "status": "DONE",
+        "evidence_ref": "C12 PASS"
+      },
+      {
+        "id": "C13",
+        "title": "Design intelligence foundation",
+        "status": "DONE",
+        "evidence_ref": "C13 PASS"
+      },
+      {
+        "id": "C14",
+        "title": "Design intelligence release readiness",
+        "status": "DONE",
+        "evidence_ref": "C14 PROMOTED_VERIFIED"
+      },
+      {
+        "id": "C15",
+        "title": "Bounded foreground delegation foundation",
+        "status": "DONE",
+        "evidence_ref": "C15 PASS"
+      },
+      {
+        "id": "C16",
+        "title": "Durable product roadmap and release lineage foundation",
+        "status": "DONE",
+        "evidence_ref": "docs/plans/2026-08-16-p2p-c16-roadmap-lineage"
+      },
+      {
+        "id": "C17",
+        "title": "Safe bounded parallel foreground execution",
+        "status": "DONE",
+        "evidence_ref": "E2-P2-C17-FOCUSED"
+      },
+      {
+        "id": "C18",
+        "title": "Adaptive orchestration policy foundation",
+        "status": "DONE",
+        "evidence_ref": "docs/plans/2026-08-16-p2p-c18-adaptive-orchestration-policy"
+      },
+      {
+        "id": "C19",
+        "title": "Task-targeted context retrieval, coverage, and reuse foundation",
+        "status": "DONE",
+        "evidence_ref": "docs/plans/2026-08-16-p2p-c19-task-targeted-context"
+      },
+      {
+        "id": "FACT_LIVE_SPECS",
+        "title": "FACT_LEDGER and Live Specs authority",
+        "status": "DONE",
+        "evidence_ref": "governance/fact-ledger.json; governance/live-specs.json"
+      },
+      {
+        "id": "PROJECT_SPECIFIC_EVAL",
+        "title": "Project-specific evaluation",
+        "status": "DONE",
+        "evidence_ref": ".p2p/evals/suite.json"
+      },
+      {
+        "id": "RAG_BOUNDARIES",
+        "title": "RAG trust and boundary controls",
+        "status": "DONE",
+        "evidence_ref": "RAG specifications and eval references"
+      },
+      {
+        "id": "CAPSULE_SESSION_RECOVERY",
+        "title": "CAPSULE session recovery",
+        "status": "DONE",
+        "evidence_ref": "p2p-capsule references"
+      },
+      {
+        "id": "SCOPE",
+        "title": "SCOPE.HELM bounded decomposition",
+        "status": "DONE",
+        "evidence_ref": "p2p-scope references"
+      },
+      {
+        "id": "CONTEXT_COMPRESSION_EFFICIENCY",
+        "title": "Context compression efficiency",
+        "status": "DONE",
+        "evidence_ref": "C06 context delivery evidence"
+      },
+      {
+        "id": "REASONING",
+        "title": "Reasoning and decision trace",
+        "status": "DONE",
+        "evidence_ref": "decision trace specifications"
+      },
+      {
+        "id": "SECURITY",
+        "title": "Security and secret boundaries",
+        "status": "DONE",
+        "evidence_ref": "security scan and governance"
+      },
+      {
+        "id": "DRIFT_GATES",
+        "title": "Drift gates and protected runtime lock",
+        "status": "DONE",
+        "evidence_ref": "governance drift reports"
+      },
+      {
+        "id": "ROLLBACK",
+        "title": "Rollback and preserved release history",
+        "status": "DONE",
+        "evidence_ref": "release governance reports"
+      },
+      {
+        "id": "INSTALLER_DOCTOR",
+        "title": "Installer and doctor lifecycle",
+        "status": "DONE",
+        "evidence_ref": "doctor and installer tests"
+      },
+      {
+        "id": "UPDATE_UNINSTALL",
+        "title": "Update and uninstall behavior",
+        "status": "DONE",
+        "evidence_ref": "lifecycle tests"
+      },
+      {
+        "id": "LIVE_DATA_FRESHNESS",
+        "title": "Live-data freshness and external-source registry",
+        "status": "DONE",
+        "evidence_ref": "manifest/external-sources.json"
+      },
+      {
+        "id": "BEGINNER_DOCS_EXPERIENCE",
+        "title": "Beginner documentation experience",
+        "status": "DONE",
+        "evidence_ref": "beginner guides and routing"
+      },
+      {
+        "id": "PARITY_REGRESSION",
+        "title": "Parity and regression protection",
+        "status": "DONE",
+        "evidence_ref": "release and full regression suites"
+      },
+      {
+        "id": "OWNER_APPROVAL",
+        "title": "Owner approval for protected actions",
+        "status": "DONE",
+        "evidence_ref": "approval policy and C14 approval"
+      },
+      {
+        "id": "C20",
+        "title": "Provider-neutral host/executor boundary foundation",
+        "status": "DONE",
+        "evidence_ref": "E2-P2-C20-HN1-HN24"
+      },
+      {
+        "id": "C21",
+        "title": "Compatible host discovery and minimum-sufficient selection policy foundation",
+        "status": "DONE",
+        "evidence_ref": "E2-P2-C21-HS1-HS30"
+      },
+      {
+        "id": "C25",
+        "status": "DONE",
+        "notes": "C25 framework complete (Charter, Capability Ledger 109 records, Goal Contract & Supervisor templates, roadmap projection, validator, CL1-CL40); candidate UNPROMOTED pending owner review."
+      },
+      {
+        "id": "C26",
+        "status": "DONE",
+        "title": "Durable Capability Provenance, Dependency & Goal-to-Ledger Governance",
+        "evidence_ref": "P2P-C26 intake; chat-discussion intake rule; dependency & provenance model"
+      },
+      {
+        "id": "C27",
+        "title": "Real Host Execution Certification",
+        "status": "BLOCKED",
+        "notes": "BLOCKED: LIVE_HOST_EVIDENCE_UNAVAILABLE. Host-by-host: Codex CLI 0.147.0 installed but 401 on api.openai.com (no real OpenAI key); Claude Code / Gemini CLI / Cursor ACP / Copilot CLI absent; Manus API connector unconfigured. C26 remains the active goal (CANDIDATE_UNPROMOTED).",
+        "evidence_ref": "docs/p2p-development/reports/P2P-C27-terminal-report.md",
+        "reopen_condition": "at least one real host reaches connection_status AUTH_REQUIRED or stronger (live probe eligible); metadata only, never auto-executed",
+        "reopen_executes": "no"
+      },
+      {
+        "id": "C28",
+        "status": "DONE",
+        "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat",
+        "evidence_ref": "GOAL-C28",
+        "notes": "C28 terminal state: PASS (machinery). Full provider-neutral connection + credential onboarding layer implemented and verified (70 HO tests, 31/31 validator, secret scan 0). No host claimed live-certified; owner action codex login / Manus connector remains the irreducible next step."
+      }
+    ],
+    "current": {
+      "id": "C28",
+      "status": "DONE",
+      "title": "Secure Host Connection & Credential Onboarding - determine required auth, verify safely, minimal Owner action outside chat"
+    },
+    "likely_next": {
+      "id": "C28",
+      "status": "DONE",
+      "title": "Secure Host Connection & Credential Onboarding - determine required auth, verify safely, minimal Owner action outside chat"
+    },
+    "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion."
+  },
+  "research_decisions": [
+    {
+      "name": "Comp AI CRM",
+      "status": "ADAPTED",
+      "vendored": false,
+      "decision": "Use interaction/context patterns only as UI source-of-truth research."
+    },
+    {
+      "name": "Semantica",
+      "status": "DEFERRED",
+      "vendored": false,
+      "decision": "Provider seam research only; no runtime dependency."
+    },
+    {
+      "name": "TencentDB Agent Memory",
+      "status": "RESEARCH_ONLY",
+      "vendored": false,
+      "decision": "Memory-pattern research only."
+    },
+    {
+      "name": "Zimster",
+      "status": "RESEARCH_ONLY",
+      "vendored": false,
+      "decision": "Research route only."
+    },
+    {
+      "name": "Agent TaskGraph Protocol",
+      "status": "RESEARCH_ONLY",
+      "vendored": false,
+      "decision": "Graph/task pattern research only; no second orchestrator."
+    },
+    {
+      "name": "DeepSeek Harness",
+      "status": "DEFERRED",
+      "vendored": false,
+      "decision": "Explicitly out of C11 runtime scope."
+    },
+    {
+      "name": "Nolane UI Intelligence",
+      "status": "ADAPTED",
+      "vendored": false,
+      "decision": "C13 frozen design-intelligence source only."
+    },
+    {
+      "name": "Superlearn",
+      "status": "ADAPTED",
+      "vendored": false,
+      "decision": "Principles adapted; no source or package vendoring."
+    }
   ],
-  "current": {
-   "id": "C26",
-   "status": "DONE",
-   "title": "Durable Capability Provenance, Dependency & Goal-to-Ledger Governance"
+  "superlearn_principles": [
+    "research-before-plan",
+    "explicit-coverage-checklist",
+    "one-bounded-subtask-per-worker",
+    "filesystem-context-offloading",
+    "durable-evidence-trail",
+    "parent-reviews-worker-artifacts",
+    "deterministic-validation-before-completion"
+  ],
+  "architectural_invariants": [
+    {
+      "id": "project-state-is-not-chat-history",
+      "statement": "Fresh sessions recover from durable project state, not transcript memory.",
+      "authority_refs": [
+        ".p2p/state/project-status.json",
+        ".p2p/state/execution-ledger.jsonl"
+      ]
+    },
+    {
+      "id": "evidence-authority-is-not-model-confidence",
+      "statement": "A claim is not proof until the relevant evidence authority verifies it.",
+      "authority_refs": [
+        "governance/fact-ledger.json",
+        "governance/live-specs.json"
+      ]
+    },
+    {
+      "id": "intent-is-not-permission",
+      "statement": "User intent cannot silently widen tools, permissions, or data boundaries.",
+      "authority_refs": [
+        "governance/approval-policy.json",
+        "docs/SPEC/P2P-CAPABILITY-EXECUTION-EVIDENCE-SPEC.md"
+      ]
+    },
+    {
+      "id": "task-is-not-agent",
+      "statement": "A task is bounded work; a capability identity is not a task and does not become an agent by naming.",
+      "authority_refs": [
+        "docs/SPEC/P2P-CAPABILITY-ARCHITECTURE-SPEC.md"
+      ]
+    },
+    {
+      "id": "role-is-not-task",
+      "statement": "A role/profile supplies capability context and does not itself execute work.",
+      "authority_refs": [
+        "docs/SPEC/P2P-CAPABILITY-ARCHITECTURE-SPEC.md"
+      ]
+    },
+    {
+      "id": "goal-pass-is-not-promotion",
+      "statement": "Goal PASS, candidate verification, release readiness, and promoted authority are separate states.",
+      "authority_refs": [
+        ".p2p/state/goal-contract.json",
+        "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
+      ]
+    },
+    {
+      "id": "worker-output-is-not-evidence",
+      "statement": "A worker result is proposed output until the parent verifies it against authoritative evidence.",
+      "authority_refs": [
+        "docs/SPEC/P2P-CAPABILITY-EXECUTION-EVIDENCE-SPEC.md"
+      ]
+    },
+    {
+      "id": "durable-state-is-not-background-autonomy",
+      "statement": "Durable state and status projection do not grant background execution or scheduler behavior.",
+      "authority_refs": [
+        "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
+      ]
+    },
+    {
+      "id": "faculties-are-not-agents",
+      "statement": "Design-intelligence faculties are metadata and do not expand canonical capability identities.",
+      "authority_refs": [
+        "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
+      ]
+    },
+    {
+      "id": "p2p-is-sole-orchestrator",
+      "statement": "P2P remains the only router/orchestrator; no second router or executor is introduced.",
+      "authority_refs": [
+        "docs/SPEC/P2P-CAPABILITY-ARCHITECTURE-SPEC.md"
+      ]
+    },
+    {
+      "id": "unknown-remains-unknown",
+      "statement": "Unsupported host identity or live delegation remains UNKNOWN/NOT_CERTIFIED.",
+      "authority_refs": [
+        "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
+      ]
+    },
+    {
+      "id": "no-silent-upstream-update",
+      "statement": "A promoted baseline changes only through the approved release and lineage workflow.",
+      "authority_refs": [
+        "governance/approval-policy.json",
+        "scripts/package_release.py"
+      ]
+    }
+  ],
+  "provenance_log": [
+    {
+      "change_id": "C16-BASELINE-001",
+      "changed_at": "2026-08-15T09:31:22+00:00",
+      "changed_by": "p2p-c14-promotion-verification",
+      "what_changed": "Recorded the promoted official baseline .19 and its exact artifact SHA-256.",
+      "why": "C14 promotion verification established the release authority.",
+      "evidence_refs": [
+        "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
+        "P2P-APR-20260815T013545Z-0068b3047f"
+      ]
+    },
+    {
+      "change_id": "C16-C15-DRIFT-002",
+      "changed_at": "2026-08-16T00:40:00+00:00",
+      "changed_by": "p2p-c15-governance-lock",
+      "what_changed": "Recorded C15 as PASS foundation-ready while keeping live delegation NOT_CERTIFIED and the .15 candidate unpromoted.",
+      "why": "C15 verification found a bounded foundation but no supported host callback/evidence.",
+      "evidence_refs": [
+        "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md",
+        "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
+      ]
+    },
+    {
+      "change_id": "C16-ROADMAP-003",
+      "changed_at": "2026-08-16T01:00:00+00:00",
+      "changed_by": "p2p-c16",
+      "what_changed": "Created the durable roadmap and release-lineage projection with C16 ACTIVE and C17 PLANNED.",
+      "why": "Fresh sessions need an explicit, version-safe development status without relying on chat history.",
+      "evidence_refs": [
+        "docs/plans/2026-08-16-p2p-c16-roadmap-lineage",
+        "scripts/p2p_development_control.py"
+      ]
+    },
+    {
+      "change_id": "C17-LINEAGE-004",
+      "changed_at": "2026-08-16T03:30:00+00:00",
+      "changed_by": "p2p-c17-lineage-reconciliation",
+      "what_changed": "active development metadata: 8.4.7-C-codex.15 -> 8.4.7-C-codex.20; official .19 ancestry retained",
+      "why": "C17 requires a coherent development line after the promoted .19 baseline while preserving the cumulative C10-C16 source.",
+      "evidence_refs": [
+        "E0-P0A-BASE1",
+        "E0-P0A-SOURCE2",
+        "E0-P0A-CTRL1",
+        "E1-P1A-LINEAGE1"
+      ]
+    },
+    {
+      "change_id": "C17-COMPLETION-005",
+      "changed_at": "2026-08-16T04:15:00+00:00",
+      "changed_by": "p2p-c17-completion",
+      "what_changed": "C17 recorded DONE/PASS with parallel foundation ready and live certification NOT_CERTIFIED; candidate remains UNPROMOTED.",
+      "why": "C17 validation and supervisor evidence completed without changing promoted authority.",
+      "evidence_refs": [
+        "E2-P2-C17-FOCUSED",
+        "E3-P3-PACKAGE",
+        "E3-P3-REGRESSION"
+      ]
+    },
+    {
+      "change_id": "C17-CANDIDATE-006",
+      "changed_at": "2026-08-16T04:55:00+00:00",
+      "changed_by": "p2p-c17-final-candidate-refresh",
+      "what_changed": "C17 candidate record rebound to the final rebuilt unpromoted artifact.",
+      "why": "The final candidate was built after C17 durable completion so its package carries the completed foundation state.",
+      "evidence_refs": [
+        "E1-P1B-FINAL-PACKAGE",
+        "E3-P3A-FINAL-HASH"
+      ]
+    },
+    {
+      "change_id": "C17-CANDIDATE-007",
+      "changed_at": "2026-08-16T05:20:00+00:00",
+      "changed_by": "p2p-c17-final2-candidate-refresh",
+      "what_changed": "C17 candidate record rebound to the final rebuilt unpromoted artifact.",
+      "why": "The final candidate was built after C17 durable completion so its package carries the completed foundation state.",
+      "evidence_refs": [
+        "E1-P1B-FINAL2-PACKAGE",
+        "E3-P3A-FINAL2-HASH"
+      ]
+    },
+    {
+      "change_id": "C17-CANDIDATE-008",
+      "changed_at": "2026-08-16T07:23:10+00:00",
+      "changed_by": "p2p-c17-cognitive-economy-candidate-refresh",
+      "what_changed": "C17 candidate record rebound to the final rebuilt unpromoted artifact.",
+      "why": "The new candidate carries the bounded cognitive-economy slice; the prior candidate remains recorded as historical and unpromoted.",
+      "evidence_refs": [
+        "E4-CE-CANDIDATE-PACKAGE",
+        "E4-CE-CANDIDATE-HASH"
+      ],
+      "previous_candidate": {
+        "candidate_label": "P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
+        "candidate_sha256": "7c05c1d0fe2c2d33470d1487a07cfc66aebc0a96d610b9d2a238e76d0fcb0664",
+        "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
+        "promotion_status": "UNPROMOTED"
+      },
+      "new_candidate_sha256": "d4b4966716da6b06e3211b57f2e9df6649d99c840272a988e287d5c36ba99983"
+    },
+    {
+      "change_id": "C17-COGNITIVE-ECONOMY-009",
+      "changed_at": "2026-08-16T07:23:19+00:00",
+      "changed_by": "p2p-c17-cognitive-economy",
+      "what_changed": "C17 cognitive economy status recorded as an evaluated bounded parallel orchestration slice.",
+      "why": "CE1-CE10 and focused quality/non-regression evidence cover economy gates while preserving the existing C17 safety foundation and unpromoted candidate boundary.",
+      "evidence_refs": [
+        "E4-CE-CLASSIFICATION",
+        "E4-CE-GATE",
+        "E4-CE1-CE10",
+        "E4-CE-SPAWN",
+        "E4-CE-CONTEXT",
+        "E4-CE-SEAMS",
+        "E4-CE-GOVERNANCE"
+      ]
+    },
+    {
+      "change_id": "C18-COMPLETION-010",
+      "changed_at": "2026-08-16T15:00:00+07:00",
+      "changed_by": "p2p-c18-adaptive-orchestration-policy",
+      "what_changed": "Recorded C18 as DONE/PASS with an adaptive orchestration policy foundation and a new unpromoted .21 candidate.",
+      "why": "AO1-AO20 deterministic evaluation, naive-policy comparison, focused regression, package verification, and lineage checks established a bounded provider-neutral policy without changing canonical governance.",
+      "evidence_refs": [
+        "E1-P1B-AO1",
+        "E1-P1B-NAIVE1",
+        "E2-P2-REGRESSION1",
+        "E2-P2-PACKAGE1",
+        "E2-P2-LINEAGE1",
+        "E2-P2-SUPERVISOR1"
+      ]
+    },
+    {
+      "change_id": "C19-COMPLETION-011",
+      "changed_at": "2026-08-16T16:30:00+07:00",
+      "changed_by": "p2p-c19-task-targeted-context",
+      "what_changed": "Recorded C19 as DONE/PASS with a task-targeted context retrieval, coverage accounting, bounded escalation, and validation-only reuse foundation; candidate remains unpromoted.",
+      "why": "CR1-CR20 deterministic evaluation, frozen-fixture policy comparison, focused/full regression, package build, lineage binding, and supervisor review establish the bounded C19 foundation without adding a router, store, vector database, provider router, or live certification.",
+      "evidence_refs": [
+        "E1-P1-CONTEXT",
+        "E2-P2-CR1-CR20",
+        "E2-P2-COMPARISON",
+        "E2-P2-FULL-SUITE",
+        "E3-P3-CANDIDATE-PACKAGE",
+        "E3-P3-SUPERVISOR1"
+      ]
+    },
+    {
+      "change_id": "C19-CROSS-PLATFORM-RECONCILIATION-012",
+      "changed_at": "2026-08-16T14:23:23+00:00",
+      "changed_by": "p2p-c19-cross-platform-reconciliation",
+      "what_changed": "Recorded post-C19 cross-environment reconciliation: the authoritative Windows source now contains the bounded inline-JSON path guard and canonical docs/decisions path casing; original C19 PASS remains preserved.",
+      "why": "Independent Linux verification found two latent portability defects. Each repair was inspected against the authoritative Windows source, reconciled without architecture changes, and verified by focused tests plus the full regression suite.",
+      "evidence_refs": [
+        "E1-P1-CROSS-PLATFORM-RECONCILIATION",
+        "E2-P2-UIUX-INLINE-JSON",
+        "E2-P2-PATH-CASING",
+        "E2-P2-DT24-C19-C18-C17",
+        "E2-P2-FULL-SUITE-274",
+        "E3-P3-CANDIDATE-PACKAGE-CROSS-PLATFORM",
+        "OFFICIAL-BASELINE-3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8"
+      ],
+      "historical_truth": "original C19 PASS + later Linux portability verification + Windows reconciliation result",
+      "promotion_status": "UNPROMOTED"
+    },
+    {
+      "change_id": "C20-COMPLETION-013",
+      "changed_at": "2026-08-16T15:05:15+00:00",
+      "changed_by": "p2p-c20-host-executor-neutrality",
+      "what_changed": "Recorded C20 DONE/PASS with the bounded provider-neutral host/executor contract, portable execution envelope, normalized result/receipt, cross-host continuation handoff, capability-state semantics, and permission-subset enforcement; candidate remains UNPROMOTED.",
+      "why": "HN1-HN24 frozen evaluation, C10-C19 integration tests, full regression, canonical package build, independent package verification, and supervisor review established the exact foundation claims without adding automatic host routing, live adapter certification, background autonomy, remote bridge, swarm execution, or a second executor.",
+      "evidence_refs": [
+        "E1-P1-C20-SOURCE-MAPPING",
+        "E2-P2-C20-HN1-HN24",
+        "E2-P2-C20-C10-C19-INTEGRATION",
+        "E2-P2-C20-FULL-REGRESSION-300",
+        "E3-P3-C20-PACKAGE-d082ab",
+        "OFFICIAL-BASELINE-3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8"
+      ],
+      "bounded_claims": [
+        "HOST_EXECUTOR_NEUTRALITY_FOUNDATION_READY",
+        "PORTABLE_EXECUTION_ENVELOPE_READY",
+        "PORTABLE_RESULT_RECEIPT_READY",
+        "CROSS_HOST_CONTINUATION_CONTRACT_READY"
+      ],
+      "not_claimed": [
+        "AUTOMATIC_HOST_ROUTING_READY",
+        "LIVE_MANUS_ADAPTER_CERTIFIED"
+      ],
+      "promotion_status": "UNPROMOTED"
+    },
+    {
+      "change_id": "C21-COMPLETION-014",
+      "changed_at": "2026-08-16T23:15:00+07:00",
+      "changed_by": "p2p-c21-compatible-host-discovery-selection",
+      "what_changed": "Recorded C21 DONE/PASS with bounded host requirement derivation, explicit discovery and availability evidence, deterministic hard gates, minimum-sufficient selection, stable tie-break, portable handoff, and safe reselection semantics.",
+      "why": "HS1-HS30 frozen fixtures, focused C20 compatibility tests, full regression, package build, and independent package verification establish the host selection foundation without automatic routing, live adapter certification, background autonomy, remote bridge, swarm execution, provider/model routing, or a second executor.",
+      "evidence_refs": [
+        "E1-P1-C21-SOURCE",
+        "E2-P2-C21-HS1-HS30",
+        "E2-P2-FULL-REGRESSION-330",
+        "E3-P3-C21-PACKAGE",
+        "E3-P3-C21-SUPERVISOR"
+      ],
+      "bounded_claims": [
+        "HOST_SELECTION_POLICY_FOUNDATION_READY",
+        "HOST_REQUIREMENT_PROFILE_READY",
+        "HOST_CAPABILITY_DISCOVERY_FOUNDATION_READY"
+      ],
+      "not_claimed": [
+        "AUTOMATIC_HOST_ROUTING_READY",
+        "LIVE_MANUS_ADAPTER_CERTIFIED"
+      ],
+      "promotion_status": "UNPROMOTED"
+    },
+    {
+      "ts": "2026-08-17",
+      "session": "manus-p2p-c25",
+      "event": "C25 framework created; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN/not-recovered per durability rule.",
+      "change_id": "p2p-c25-migrate",
+      "changed_at": "2026-08-17",
+      "what_changed": "C25 framework created; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN/not-recovered per durability rule.",
+      "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
+      "evidence_refs": [
+        "E1-P2-C25-PROVENANCE-MIGRATION"
+      ]
+    },
+    {
+      "change_id": "C25-prebuild-reconcile-manus",
+      "changed_at": "2026-08-17",
+      "what_changed": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
+      "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
+      "evidence_refs": [
+        "E1-P2-C25-PROVENANCE-MIGRATION"
+      ]
+    },
+    {
+      "change_id": "C25-candidate-build-manus",
+      "changed_at": "2026-08-17",
+      "what_changed": "C25 candidate built and lineage recorded (real SHA); C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN, not guessed.",
+      "why": "Candidate artifact must carry its real SHA-256 for durable lineage; governance was reverted to C21 only for the duration of the build.",
+      "evidence_refs": [
+        "E3-P3-C25-PACKAGE",
+        "CL1-CL40",
+        "E1-P2-C25-VALIDATOR"
+      ]
+    },
+    {
+      "change_id": "C25-candidate-finalize-manus",
+      "changed_at": "2026-08-17",
+      "what_changed": "C25 candidate recorded with real SHA; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN, not guessed. current_development remains C21 PASS per durable validator authority (valid goal set C16-C21).",
+      "why": "Candidate records are the append-only durable surface for completed goals; the current_development active record must stay within the validator's accepted goal set.",
+      "evidence_refs": [
+        "E3-P3-C25-PACKAGE",
+        "CL1-CL40",
+        "E1-P2-C25-VALIDATOR"
+      ]
+    },
+    {
+      "change_id": "C26-INTAKE-022",
+      "changed_at": "2026-08-17T00:00:00+07:00",
+      "changed_by": "p2p-c26-session",
+      "what_changed": "C26 intake: current_development -> C26; roadmap current -> C25/DONE; C26 PLANNED item; C26 candidate record UNPROMOTED; capability provenance/dependency model and Goal-Contract Ledger Delta standard introduced",
+      "why": "Owner accepted durable capability provenance, dependency and Goal-to-Ledger governance as C26; accepted chat ideas must durably enter the roadmap (PLANNED), never chat-authority status.",
+      "evidence_refs": [
+        "docs/p2p-development/P2P-C26-terminal-report.md",
+        "docs/p2p-development/capability-ledger/capability-index.json",
+        "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
+      ]
+    },
+    {
+      "change_id": "P2P-C26-CANDIDATE",
+      "changed_at": "2026-08-17T00:00:00Z",
+      "what_changed": "C26 candidate built and verified (package_release verify PASS): P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "why": "Goal C26 reached terminal state with a verified candidate package; governance advanced current_development to C26",
+      "evidence_refs": [
+        "CP1-CP50 PASS (tests/test_p2p_ledger_provenance.py)",
+        "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py; V11-V17 added)",
+        "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
+        "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%"
+      ],
+      "artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
+      "artifact_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5"
+    },
+    {
+      "change_id": "P2P-C27-BLOCKED-LIVE-HOST-EVIDENCE-UNAVAILABLE",
+      "changed_at": "2026-08-17T01:49:51Z",
+      "changed_by": "manus-agent",
+      "change_type": "GOAL_C27_BLOCKED",
+      "what_changed": "C27 Real Host Execution Certification concluded BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE after host-by-host discovery. Codex CLI 0.147.0 installed but unreachable (api.openai.com 401; env OPENAI_API_KEY is a Manus proxy key, not accepted by the Responses API; default/never-approval/danger-sandbox/--local-provider variants all failed pre-model-contact, mutation KNOWN_NONE). Claude Code, Gemini CLI, Cursor ACP, GitHub Copilot CLI not installed. Manus API connector not configured in this session. Certification machinery (scripts/p2p_live_certification.py + LH1-LH35) delivered as the certified pathway; HOST_LIVE_EXECUTION_CERTIFICATION remains UNKNOWN.",
+      "why": "C26 delta standard + honesty rule: never fabricate a live PASS; block and record evidence when no real host is reachable.",
+      "evidence_refs": [
+        "P2P-C27 terminal report (docs/p2p-development/reports/)",
+        "codex doctor health summary (auth env, 401 evidence)",
+        "probe attempts 1-4 evidence (E27-PROBE, session ids, request ids)"
+      ]
+    },
+    {
+      "goal": "C28",
+      "change_id": "C28-2026T08T17T02T22T56Z",
+      "changed_at": "2026-08-17T02:22:56Z",
+      "what_changed": "Secure host connection & credential onboarding machinery implemented: provider-neutral state model, auth requirement discovery, credential-reference model (never secret value), endpoint binding, zero-credit verification, beginner owner-action model, drift detection, connection doctor",
+      "why": "Turn discovered-but-unusable hosts into securely connected, verified, live-probe-eligible hosts without technical Owner intervention (C27 gap).",
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-C28-terminal-report.md",
+        "HO1-HO70 PASS (tests/test_p2p_secure_onboarding.py)",
+        "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py)",
+        "C27 Codex 401 evidence reused (E27-PROBE-1f71d9b55eb78d8e)",
+        "codex doctor + preflight zero-model-call evidence (model_calls_used_for_onboarding = 0)"
+      ]
+    },
+    {
+      "goal": "C29",
+      "change_id": "C29-2026T08T17T02T40T00Z",
+      "changed_at": "2026-08-17T02:40:00Z",
+      "what_changed": "Goal closure integrity: terminal verdict reconciled across roadmap, development-control, ledger, candidate policy; C28 roadmap DONE; terminal likely_next sentinel C28/DONE; candidate policy applied deterministically (C28 candidate required and recorded UNPROMOTED); C27 reopen_condition metadata added; C27 machinery status audited to FOUNDATION_READY with real-execution evidence",
+      "why": "C29 specification: terminal verdict must be semantically consistent with all durable surfaces; the C28 terminal-time candidate exemption was an AI judgment and was corrected by deterministic policy",
+      "evidence_refs": [
+        "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+        "scripts/p2p_goal_closure.py (deterministic closure policy)",
+        "CHANGE-DIFF-PR5"
+      ]
+    },
+    {
+      "what_changed": "candidate_records.C28.candidate_sha256: TO_BE_FILLED_BY_PACKAGING -> verified SHA-256; lineage_status PENDING_LINEAGE_VERIFY -> LINEAGE_OK; evidence_refs updated",
+      "why": "C29 closure policy: C28 contract required an immutable candidate on PASS; canonical packaging via package_release build + verify",
+      "changed_by": "p2p-c29-goal-closure-integrity",
+      "changed_at": "2026-08-17T02:55:00+07:00",
+      "evidence_refs": [
+        "reports/candidates/P2P-8.4.7-C-Codex-Edition-v22-c28-secure-host-connection-credential-onboarding-candidate-v1.zip",
+        "scripts/package_release.py --root /tmp/c28-extract verify: status PASS"
+      ],
+      "goal": "C29",
+      "change_id": "C29-2026T08T17T02T55T00Z"
+    },
+    {
+      "goal": "C29",
+      "change_id": "C29-PACKAGING",
+      "changed_at": "2026-08-17T03:00:00Z",
+      "what_changed": "C29 candidate built, verified, UNPROMOTED (deterministic self-application of candidate policy); current_development synced to C29; ledger +3 records",
+      "why": "C29 terminal PASS with governance/runtime/release changes -> candidate REQUIRED by deterministic policy; the checker applies the rule it created",
+      "changed_by": "p2p-c29-goal-closure-integrity",
+      "evidence_refs": [
+        "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip",
+        "scripts/package_release.py build RC 0; verify status PASS (embedded 8.4.7-C-codex.23, baseline 8.4.7-C-codex.19)",
+        "docs/p2p-development/reports/P2P-C29-terminal-report.md"
+      ]
+    }
+  ],
+  "pr_lineage": {
+    "p2p-c25-charter-ledger": "main",
+    "p2p-c26-capability-provenance": "p2p-c25-charter-ledger",
+    "p2p-c27-real-host-certification": "p2p-c26-capability-provenance",
+    "p2p-c28-secure-onboarding": "p2p-c27-real-host-certification",
+    "p2p-c29-goal-closure-integrity": "p2p-c28-secure-onboarding"
   },
-  "likely_next": {
-   "id": "C28",
-   "status": "PLANNED",
-   "title": "Secure Host Connection & Credential Onboarding — determine required auth, verify safely, minimal Owner action outside chat"
-  },
-  "stop_rule": "After C21 host discovery and selection policy foundation verifies PASS, stop before C22, automatic host routing, provider/model resolution, or promotion."
- },
- "research_decisions": [
-  {
-   "name": "Comp AI CRM",
-   "status": "ADAPTED",
-   "vendored": false,
-   "decision": "Use interaction/context patterns only as UI source-of-truth research."
-  },
-  {
-   "name": "Semantica",
-   "status": "DEFERRED",
-   "vendored": false,
-   "decision": "Provider seam research only; no runtime dependency."
-  },
-  {
-   "name": "TencentDB Agent Memory",
-   "status": "RESEARCH_ONLY",
-   "vendored": false,
-   "decision": "Memory-pattern research only."
-  },
-  {
-   "name": "Zimster",
-   "status": "RESEARCH_ONLY",
-   "vendored": false,
-   "decision": "Research route only."
-  },
-  {
-   "name": "Agent TaskGraph Protocol",
-   "status": "RESEARCH_ONLY",
-   "vendored": false,
-   "decision": "Graph/task pattern research only; no second orchestrator."
-  },
-  {
-   "name": "DeepSeek Harness",
-   "status": "DEFERRED",
-   "vendored": false,
-   "decision": "Explicitly out of C11 runtime scope."
-  },
-  {
-   "name": "Nolane UI Intelligence",
-   "status": "ADAPTED",
-   "vendored": false,
-   "decision": "C13 frozen design-intelligence source only."
-  },
-  {
-   "name": "Superlearn",
-   "status": "ADAPTED",
-   "vendored": false,
-   "decision": "Principles adapted; no source or package vendoring."
-  }
- ],
- "superlearn_principles": [
-  "research-before-plan",
-  "explicit-coverage-checklist",
-  "one-bounded-subtask-per-worker",
-  "filesystem-context-offloading",
-  "durable-evidence-trail",
-  "parent-reviews-worker-artifacts",
-  "deterministic-validation-before-completion"
- ],
- "architectural_invariants": [
-  {
-   "id": "project-state-is-not-chat-history",
-   "statement": "Fresh sessions recover from durable project state, not transcript memory.",
-   "authority_refs": [
-    ".p2p/state/project-status.json",
-    ".p2p/state/execution-ledger.jsonl"
-   ]
-  },
-  {
-   "id": "evidence-authority-is-not-model-confidence",
-   "statement": "A claim is not proof until the relevant evidence authority verifies it.",
-   "authority_refs": [
-    "governance/fact-ledger.json",
-    "governance/live-specs.json"
-   ]
-  },
-  {
-   "id": "intent-is-not-permission",
-   "statement": "User intent cannot silently widen tools, permissions, or data boundaries.",
-   "authority_refs": [
-    "governance/approval-policy.json",
-    "docs/SPEC/P2P-CAPABILITY-EXECUTION-EVIDENCE-SPEC.md"
-   ]
-  },
-  {
-   "id": "task-is-not-agent",
-   "statement": "A task is bounded work; a capability identity is not a task and does not become an agent by naming.",
-   "authority_refs": [
-    "docs/SPEC/P2P-CAPABILITY-ARCHITECTURE-SPEC.md"
-   ]
-  },
-  {
-   "id": "role-is-not-task",
-   "statement": "A role/profile supplies capability context and does not itself execute work.",
-   "authority_refs": [
-    "docs/SPEC/P2P-CAPABILITY-ARCHITECTURE-SPEC.md"
-   ]
-  },
-  {
-   "id": "goal-pass-is-not-promotion",
-   "statement": "Goal PASS, candidate verification, release readiness, and promoted authority are separate states.",
-   "authority_refs": [
-    ".p2p/state/goal-contract.json",
-    "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
-   ]
-  },
-  {
-   "id": "worker-output-is-not-evidence",
-   "statement": "A worker result is proposed output until the parent verifies it against authoritative evidence.",
-   "authority_refs": [
-    "docs/SPEC/P2P-CAPABILITY-EXECUTION-EVIDENCE-SPEC.md"
-   ]
-  },
-  {
-   "id": "durable-state-is-not-background-autonomy",
-   "statement": "Durable state and status projection do not grant background execution or scheduler behavior.",
-   "authority_refs": [
-    "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-   ]
-  },
-  {
-   "id": "faculties-are-not-agents",
-   "statement": "Design-intelligence faculties are metadata and do not expand canonical capability identities.",
-   "authority_refs": [
-    "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md"
-   ]
-  },
-  {
-   "id": "p2p-is-sole-orchestrator",
-   "statement": "P2P remains the only router/orchestrator; no second router or executor is introduced.",
-   "authority_refs": [
-    "docs/SPEC/P2P-CAPABILITY-ARCHITECTURE-SPEC.md"
-   ]
-  },
-  {
-   "id": "unknown-remains-unknown",
-   "statement": "Unsupported host identity or live delegation remains UNKNOWN/NOT_CERTIFIED.",
-   "authority_refs": [
-    "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-   ]
-  },
-  {
-   "id": "no-silent-upstream-update",
-   "statement": "A promoted baseline changes only through the approved release and lineage workflow.",
-   "authority_refs": [
-    "governance/approval-policy.json",
-    "scripts/package_release.py"
-   ]
-  }
- ],
- "provenance_log": [
-  {
-   "change_id": "C16-BASELINE-001",
-   "changed_at": "2026-08-15T09:31:22+00:00",
-   "changed_by": "p2p-c14-promotion-verification",
-   "what_changed": "Recorded the promoted official baseline .19 and its exact artifact SHA-256.",
-   "why": "C14 promotion verification established the release authority.",
-   "evidence_refs": [
-    "reports/supervisor/rp_supervisor_260815_093122_by_gpt-5-codex_p2p-c14-promotion-verification.md",
-    "P2P-APR-20260815T013545Z-0068b3047f"
-   ]
-  },
-  {
-   "change_id": "C16-C15-DRIFT-002",
-   "changed_at": "2026-08-16T00:40:00+00:00",
-   "changed_by": "p2p-c15-governance-lock",
-   "what_changed": "Recorded C15 as PASS foundation-ready while keeping live delegation NOT_CERTIFIED and the .15 candidate unpromoted.",
-   "why": "C15 verification found a bounded foundation but no supported host callback/evidence.",
-   "evidence_refs": [
-    "reports/supervisor/rp_supervisor_260816_003700_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md",
-    "reports/supervisor/rp_supervisor_260816_004000_by_gpt-5-codex_p2p-c15-bounded-foreground-delegation.md"
-   ]
-  },
-  {
-   "change_id": "C16-ROADMAP-003",
-   "changed_at": "2026-08-16T01:00:00+00:00",
-   "changed_by": "p2p-c16",
-   "what_changed": "Created the durable roadmap and release-lineage projection with C16 ACTIVE and C17 PLANNED.",
-   "why": "Fresh sessions need an explicit, version-safe development status without relying on chat history.",
-   "evidence_refs": [
-    "docs/plans/2026-08-16-p2p-c16-roadmap-lineage",
-    "scripts/p2p_development_control.py"
-   ]
-  },
-  {
-   "change_id": "C17-LINEAGE-004",
-   "changed_at": "2026-08-16T03:30:00+00:00",
-   "changed_by": "p2p-c17-lineage-reconciliation",
-   "what_changed": "active development metadata: 8.4.7-C-codex.15 -> 8.4.7-C-codex.20; official .19 ancestry retained",
-   "why": "C17 requires a coherent development line after the promoted .19 baseline while preserving the cumulative C10-C16 source.",
-   "evidence_refs": [
-    "E0-P0A-BASE1",
-    "E0-P0A-SOURCE2",
-    "E0-P0A-CTRL1",
-    "E1-P1A-LINEAGE1"
-   ]
-  },
-  {
-   "change_id": "C17-COMPLETION-005",
-   "changed_at": "2026-08-16T04:15:00+00:00",
-   "changed_by": "p2p-c17-completion",
-   "what_changed": "C17 recorded DONE/PASS with parallel foundation ready and live certification NOT_CERTIFIED; candidate remains UNPROMOTED.",
-   "why": "C17 validation and supervisor evidence completed without changing promoted authority.",
-   "evidence_refs": [
-    "E2-P2-C17-FOCUSED",
-    "E3-P3-PACKAGE",
-    "E3-P3-REGRESSION"
-   ]
-  },
-  {
-   "change_id": "C17-CANDIDATE-006",
-   "changed_at": "2026-08-16T04:55:00+00:00",
-   "changed_by": "p2p-c17-final-candidate-refresh",
-   "what_changed": "C17 candidate record rebound to the final rebuilt unpromoted artifact.",
-   "why": "The final candidate was built after C17 durable completion so its package carries the completed foundation state.",
-   "evidence_refs": [
-    "E1-P1B-FINAL-PACKAGE",
-    "E3-P3A-FINAL-HASH"
-   ]
-  },
-  {
-   "change_id": "C17-CANDIDATE-007",
-   "changed_at": "2026-08-16T05:20:00+00:00",
-   "changed_by": "p2p-c17-final2-candidate-refresh",
-   "what_changed": "C17 candidate record rebound to the final rebuilt unpromoted artifact.",
-   "why": "The final candidate was built after C17 durable completion so its package carries the completed foundation state.",
-   "evidence_refs": [
-    "E1-P1B-FINAL2-PACKAGE",
-    "E3-P3A-FINAL2-HASH"
-   ]
-  },
-  {
-   "change_id": "C17-CANDIDATE-008",
-   "changed_at": "2026-08-16T07:23:10+00:00",
-   "changed_by": "p2p-c17-cognitive-economy-candidate-refresh",
-   "what_changed": "C17 candidate record rebound to the final rebuilt unpromoted artifact.",
-   "why": "The new candidate carries the bounded cognitive-economy slice; the prior candidate remains recorded as historical and unpromoted.",
-   "evidence_refs": [
-    "E4-CE-CANDIDATE-PACKAGE",
-    "E4-CE-CANDIDATE-HASH"
-   ],
-   "previous_candidate": {
-    "candidate_label": "P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
-    "candidate_sha256": "7c05c1d0fe2c2d33470d1487a07cfc66aebc0a96d610b9d2a238e76d0fcb0664",
-    "artifact_path": ".tmp/p2p-c17/candidates/P2P-8.4.7-C-Codex-Edition-v20-c17-final2-candidate.zip",
-    "promotion_status": "UNPROMOTED"
-   },
-   "new_candidate_sha256": "d4b4966716da6b06e3211b57f2e9df6649d99c840272a988e287d5c36ba99983"
-  },
-  {
-   "change_id": "C17-COGNITIVE-ECONOMY-009",
-   "changed_at": "2026-08-16T07:23:19+00:00",
-   "changed_by": "p2p-c17-cognitive-economy",
-   "what_changed": "C17 cognitive economy status recorded as an evaluated bounded parallel orchestration slice.",
-   "why": "CE1-CE10 and focused quality/non-regression evidence cover economy gates while preserving the existing C17 safety foundation and unpromoted candidate boundary.",
-   "evidence_refs": [
-    "E4-CE-CLASSIFICATION",
-    "E4-CE-GATE",
-    "E4-CE1-CE10",
-    "E4-CE-SPAWN",
-    "E4-CE-CONTEXT",
-    "E4-CE-SEAMS",
-    "E4-CE-GOVERNANCE"
-   ]
-  },
-  {
-   "change_id": "C18-COMPLETION-010",
-   "changed_at": "2026-08-16T15:00:00+07:00",
-   "changed_by": "p2p-c18-adaptive-orchestration-policy",
-   "what_changed": "Recorded C18 as DONE/PASS with an adaptive orchestration policy foundation and a new unpromoted .21 candidate.",
-   "why": "AO1-AO20 deterministic evaluation, naive-policy comparison, focused regression, package verification, and lineage checks established a bounded provider-neutral policy without changing canonical governance.",
-   "evidence_refs": [
-    "E1-P1B-AO1",
-    "E1-P1B-NAIVE1",
-    "E2-P2-REGRESSION1",
-    "E2-P2-PACKAGE1",
-    "E2-P2-LINEAGE1",
-    "E2-P2-SUPERVISOR1"
-   ]
-  },
-  {
-   "change_id": "C19-COMPLETION-011",
-   "changed_at": "2026-08-16T16:30:00+07:00",
-   "changed_by": "p2p-c19-task-targeted-context",
-   "what_changed": "Recorded C19 as DONE/PASS with a task-targeted context retrieval, coverage accounting, bounded escalation, and validation-only reuse foundation; candidate remains unpromoted.",
-   "why": "CR1-CR20 deterministic evaluation, frozen-fixture policy comparison, focused/full regression, package build, lineage binding, and supervisor review establish the bounded C19 foundation without adding a router, store, vector database, provider router, or live certification.",
-   "evidence_refs": [
-    "E1-P1-CONTEXT",
-    "E2-P2-CR1-CR20",
-    "E2-P2-COMPARISON",
-    "E2-P2-FULL-SUITE",
-    "E3-P3-CANDIDATE-PACKAGE",
-    "E3-P3-SUPERVISOR1"
-   ]
-  },
-  {
-   "change_id": "C19-CROSS-PLATFORM-RECONCILIATION-012",
-   "changed_at": "2026-08-16T14:23:23+00:00",
-   "changed_by": "p2p-c19-cross-platform-reconciliation",
-   "what_changed": "Recorded post-C19 cross-environment reconciliation: the authoritative Windows source now contains the bounded inline-JSON path guard and canonical docs/decisions path casing; original C19 PASS remains preserved.",
-   "why": "Independent Linux verification found two latent portability defects. Each repair was inspected against the authoritative Windows source, reconciled without architecture changes, and verified by focused tests plus the full regression suite.",
-   "evidence_refs": [
-    "E1-P1-CROSS-PLATFORM-RECONCILIATION",
-    "E2-P2-UIUX-INLINE-JSON",
-    "E2-P2-PATH-CASING",
-    "E2-P2-DT24-C19-C18-C17",
-    "E2-P2-FULL-SUITE-274",
-    "E3-P3-CANDIDATE-PACKAGE-CROSS-PLATFORM",
-    "OFFICIAL-BASELINE-3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8"
-   ],
-   "historical_truth": "original C19 PASS + later Linux portability verification + Windows reconciliation result",
-   "promotion_status": "UNPROMOTED"
-  },
-  {
-   "change_id": "C20-COMPLETION-013",
-   "changed_at": "2026-08-16T15:05:15+00:00",
-   "changed_by": "p2p-c20-host-executor-neutrality",
-   "what_changed": "Recorded C20 DONE/PASS with the bounded provider-neutral host/executor contract, portable execution envelope, normalized result/receipt, cross-host continuation handoff, capability-state semantics, and permission-subset enforcement; candidate remains UNPROMOTED.",
-   "why": "HN1-HN24 frozen evaluation, C10-C19 integration tests, full regression, canonical package build, independent package verification, and supervisor review established the exact foundation claims without adding automatic host routing, live adapter certification, background autonomy, remote bridge, swarm execution, or a second executor.",
-   "evidence_refs": [
-    "E1-P1-C20-SOURCE-MAPPING",
-    "E2-P2-C20-HN1-HN24",
-    "E2-P2-C20-C10-C19-INTEGRATION",
-    "E2-P2-C20-FULL-REGRESSION-300",
-    "E3-P3-C20-PACKAGE-d082ab",
-    "OFFICIAL-BASELINE-3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8"
-   ],
-   "bounded_claims": [
-    "HOST_EXECUTOR_NEUTRALITY_FOUNDATION_READY",
-    "PORTABLE_EXECUTION_ENVELOPE_READY",
-    "PORTABLE_RESULT_RECEIPT_READY",
-    "CROSS_HOST_CONTINUATION_CONTRACT_READY"
-   ],
-   "not_claimed": [
-    "AUTOMATIC_HOST_ROUTING_READY",
-    "LIVE_MANUS_ADAPTER_CERTIFIED"
-   ],
-   "promotion_status": "UNPROMOTED"
-  },
-  {
-   "change_id": "C21-COMPLETION-014",
-   "changed_at": "2026-08-16T23:15:00+07:00",
-   "changed_by": "p2p-c21-compatible-host-discovery-selection",
-   "what_changed": "Recorded C21 DONE/PASS with bounded host requirement derivation, explicit discovery and availability evidence, deterministic hard gates, minimum-sufficient selection, stable tie-break, portable handoff, and safe reselection semantics.",
-   "why": "HS1-HS30 frozen fixtures, focused C20 compatibility tests, full regression, package build, and independent package verification establish the host selection foundation without automatic routing, live adapter certification, background autonomy, remote bridge, swarm execution, provider/model routing, or a second executor.",
-   "evidence_refs": [
-    "E1-P1-C21-SOURCE",
-    "E2-P2-C21-HS1-HS30",
-    "E2-P2-FULL-REGRESSION-330",
-    "E3-P3-C21-PACKAGE",
-    "E3-P3-C21-SUPERVISOR"
-   ],
-   "bounded_claims": [
-    "HOST_SELECTION_POLICY_FOUNDATION_READY",
-    "HOST_REQUIREMENT_PROFILE_READY",
-    "HOST_CAPABILITY_DISCOVERY_FOUNDATION_READY"
-   ],
-   "not_claimed": [
-    "AUTOMATIC_HOST_ROUTING_READY",
-    "LIVE_MANUS_ADAPTER_CERTIFIED"
-   ],
-   "promotion_status": "UNPROMOTED"
-  },
-  {
-   "ts": "2026-08-17",
-   "session": "manus-p2p-c25",
-   "event": "C25 framework created; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN/not-recovered per durability rule.",
-   "change_id": "p2p-c25-migrate",
-   "changed_at": "2026-08-17",
-   "what_changed": "C25 framework created; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN/not-recovered per durability rule.",
-   "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
-   "evidence_refs": [
-    "E1-P2-C25-PROVENANCE-MIGRATION"
-   ]
-  },
-  {
-   "change_id": "C25-prebuild-reconcile-manus",
-   "changed_at": "2026-08-17",
-   "what_changed": "Pre-build reconciliation: governance temporarily back to C21 PASS while C25 candidate is built (required by build lineage checks).",
-   "why": "Provenance records predating the C25 governance session used an older schema; normalized to the required shape without altering their meaning.",
-   "evidence_refs": [
-    "E1-P2-C25-PROVENANCE-MIGRATION"
-   ]
-  },
-  {
-   "change_id": "C25-candidate-build-manus",
-   "changed_at": "2026-08-17",
-   "what_changed": "C25 candidate built and lineage recorded (real SHA); C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN, not guessed.",
-   "why": "Candidate artifact must carry its real SHA-256 for durable lineage; governance was reverted to C21 only for the duration of the build.",
-   "evidence_refs": [
-    "E3-P3-C25-PACKAGE",
-    "CL1-CL40",
-    "E1-P2-C25-VALIDATOR"
-   ]
-  },
-  {
-   "change_id": "C25-candidate-finalize-manus",
-   "changed_at": "2026-08-17",
-   "what_changed": "C25 candidate recorded with real SHA; C22-C24 durable evidence NOT FOUND in this copy; marked UNKNOWN, not guessed. current_development remains C21 PASS per durable validator authority (valid goal set C16-C21).",
-   "why": "Candidate records are the append-only durable surface for completed goals; the current_development active record must stay within the validator's accepted goal set.",
-   "evidence_refs": [
-    "E3-P3-C25-PACKAGE",
-    "CL1-CL40",
-    "E1-P2-C25-VALIDATOR"
-   ]
-  },
-  {
-   "change_id": "C26-INTAKE-022",
-   "changed_at": "2026-08-17T00:00:00+07:00",
-   "changed_by": "p2p-c26-session",
-   "what_changed": "C26 intake: current_development -> C26; roadmap current -> C25/DONE; C26 PLANNED item; C26 candidate record UNPROMOTED; capability provenance/dependency model and Goal-Contract Ledger Delta standard introduced",
-   "why": "Owner accepted durable capability provenance, dependency and Goal-to-Ledger governance as C26; accepted chat ideas must durably enter the roadmap (PLANNED), never chat-authority status.",
-   "evidence_refs": [
-    "docs/p2p-development/P2P-C26-terminal-report.md",
-    "docs/p2p-development/capability-ledger/capability-index.json",
-    "docs/p2p-development/templates/P2P-GOAL-CONTRACT-TEMPLATE.md"
-   ]
-  },
-  {
-   "change_id": "P2P-C26-CANDIDATE",
-   "changed_at": "2026-08-17T00:00:00Z",
-   "what_changed": "C26 candidate built and verified (package_release verify PASS): P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-   "why": "Goal C26 reached terminal state with a verified candidate package; governance advanced current_development to C26",
-   "evidence_refs": [
-    "CP1-CP50 PASS (tests/test_p2p_ledger_provenance.py)",
-    "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py; V11-V17 added)",
-    "E3-P3-C26-PACKAGE (package_release.py verify PASS on candidate)",
-    "capability-index.json schema v2 with 129 records; origin + dependency coverage 100%"
-   ],
-   "artifact": "reports/candidates/P2P-8.4.7-C-Codex-Edition-v21-c26-durable-capability-provenance-goal-ledger-dependency-governance-candidate-v1.zip",
-   "artifact_sha256": "ee325fd1cce13fb66a6eeae7a0e852642e4135657ae897e2b7773f62c9847ab5"
-  },
-  {
-   "change_id": "P2P-C27-BLOCKED-LIVE-HOST-EVIDENCE-UNAVAILABLE",
-   "changed_at": "2026-08-17T01:49:51Z",
-   "changed_by": "manus-agent",
-   "change_type": "GOAL_C27_BLOCKED",
-   "what_changed": "C27 Real Host Execution Certification concluded BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE after host-by-host discovery. Codex CLI 0.147.0 installed but unreachable (api.openai.com 401; env OPENAI_API_KEY is a Manus proxy key, not accepted by the Responses API; default/never-approval/danger-sandbox/--local-provider variants all failed pre-model-contact, mutation KNOWN_NONE). Claude Code, Gemini CLI, Cursor ACP, GitHub Copilot CLI not installed. Manus API connector not configured in this session. Certification machinery (scripts/p2p_live_certification.py + LH1-LH35) delivered as the certified pathway; HOST_LIVE_EXECUTION_CERTIFICATION remains UNKNOWN.",
-   "why": "C26 delta standard + honesty rule: never fabricate a live PASS; block and record evidence when no real host is reachable.",
-   "evidence_refs": [
-    "P2P-C27 terminal report (docs/p2p-development/reports/)",
-    "codex doctor health summary (auth env, 401 evidence)",
-    "probe attempts 1-4 evidence (E27-PROBE, session ids, request ids)"
-   ]
-  },
-  {
-   "goal": "C28",
-   "change_id": "C28-2026T08T17T02T22T56Z",
-   "changed_at": "2026-08-17T02:22:56Z",
-   "what_changed": "Secure host connection & credential onboarding machinery implemented: provider-neutral state model, auth requirement discovery, credential-reference model (never secret value), endpoint binding, zero-credit verification, beginner owner-action model, drift detection, connection doctor",
-   "why": "Turn discovered-but-unusable hosts into securely connected, verified, live-probe-eligible hosts without technical Owner intervention (C27 gap).",
-   "evidence_refs": [
-    "docs/p2p-development/reports/P2P-C28-terminal-report.md",
-    "HO1-HO70 PASS (tests/test_p2p_secure_onboarding.py)",
-    "framework validator 31/31 PASS (scripts/validate_p2p_development_framework.py)",
-    "C27 Codex 401 evidence reused (E27-PROBE-1f71d9b55eb78d8e)",
-    "codex doctor + preflight zero-model-call evidence (model_calls_used_for_onboarding = 0)"
-   ]
-  }
- ]
+  "provenance": [
+    {
+      "change_id": "C29-PACKAGING",
+      "goal": "C29",
+      "timestamp": "2026-08-17T03:00:00Z",
+      "description": "C29 terminal PASS + governance/runtime/release changes; deterministic candidate policy self-applied: C29 candidate built (RC 0), verified (PASS, embedded 8.4.7-C-codex.23), SHA-256 recorded; UNPROMOTED.",
+      "artifact_refs": [
+        "reports/candidates/P2P-8.4.7-C-Codex-Edition-v23-c29-goal-closure-durable-state-integrity-candidate-v1.zip"
+      ],
+      "origin_refs": [
+        "docs/p2p-development/reports/P2P-C29-terminal-report.md",
+        "scripts/package_release.py build+verify"
+      ]
+    }
+  ]
 }
