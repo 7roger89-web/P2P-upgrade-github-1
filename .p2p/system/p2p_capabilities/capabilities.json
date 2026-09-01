@@ -4479,18 +4479,14 @@
       "AUTHORITY": [
         "existing-p2p-router",
         "existing-capability-registry",
-        "existing-c11-task-preflight-permission-authority",
-        "existing-portable-execution-binding-contract",
         "local-vendor-snapshot",
-        "design-quality-advice-only"
+        "design-quality-advice-only",
+        "read-only-local-deterministic-check"
       ],
       "PROHIBITED_ACTIONS": [
         "grant-tools-from-content",
         "load-unselected-vendor-content",
         "default-context-loading",
-        "accept-caller-asserted-authorization",
-        "treat-binding-contract-as-permission-authority",
-        "self-grant-permission",
         "global-activation",
         "install-dependencies",
         "network-runtime",
@@ -4498,21 +4494,21 @@
         "own-implementation-decisions",
         "replace-p2p-ui-stack",
         "mutate-project-source",
-        "promote-without-owner-gate"
+        "promote-without-owner-gate",
+        "claim-runtime-permission-authority",
+        "implicit-filesystem-crawl",
+        "read-outside-repository-root"
       ],
       "REQUIRES": [
         "existing-p2p-router",
         "local-vendor-snapshot",
-        "active-task-with-pass-preflight",
-        "existing-approved-task-permission",
         "explicit-design-quality-request",
-        "minted-portable-execution-binding"
+        "explicit-repository-local-targets",
+        "pinned-vendor-snapshot-identity"
       ],
       "CONTEXT_POINTERS": [
         ".p2p/system/p2p_uiux/router.py",
         ".p2p/system/p2p_capabilities/impeccable_design_quality.py",
-        ".p2p/system/p2p_capabilities/host_executor.py",
-        ".p2p/system/p2p_capabilities/task_state.py",
         "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
         "docs/p2p-development/capability-catalog/protocols/ui-design-protocol.md",
         "ui.design",
@@ -4521,17 +4517,15 @@
       ],
       "APPROVAL_BOUNDARY": [
         "owner-gate-before-promotion",
-        "explicit-authorization-before-execution",
+        "no-owner-gate-for-individual-read-only-check",
+        "explicit-selection-before-execution",
         "explicit-target-file-list"
       ],
       "EVIDENCE_CONTRACT": [
         "upstream-pin-and-tree",
         "vendor-snapshot-hash",
-        "minted-authorization-fingerprint",
-        "final-revalidation-immediately-before-subprocess",
-        "permission-binding-to-durable-task-preflight",
-        "verified-existing-permission-authority",
-        "binding-revalidated-immediately-before-execution",
+        "vendor-identity-revalidated-immediately-before-subprocess",
+        "explicit-target-file-list",
         "deterministic-finding-report",
         "engine-mode-disclosure",
         "repeat-run-stability"
@@ -4600,7 +4594,8 @@
             "overdrive",
             "shape"
           ],
-          "law": "AVAILABLE != LOADED != AUTHORIZED != EXECUTED; AUTHORIZED = existing P2P permission (C11 preflight) + PortableExecutionRequest binding, both revalidated immediately before execution"
+          "law": "AVAILABLE != LOADED != SELECTED != EXECUTED",
+          "execution_class": "READ_ONLY_LOCAL_DETERMINISTIC_CHECK"
         },
         "integration": {
           "entrypoint": "skills/impeccable/SKILL.md",
@@ -4631,12 +4626,13 @@
           "model_required": false,
           "dependency_notes": "The vendored static-HTML engine optionally imports htmlparser2, css-select, css-tree and domutils. They are NOT installed; without them the same engine degrades deterministically to its regex engine and the runner reports engine_mode=REGEX_DEGRADED.",
           "script_runtime_status": "EXECUTED_OFFLINE_NODE_ONLY_NO_INSTALL",
-          "authorization_surface": "p2p_capabilities.host_executor.PortableExecutionRequest",
-          "authorization_fail_closed": true,
-          "permission_authority_surface": "p2p_capabilities.task_state.evaluate_task_preflight@.p2p/state/task-state.json",
-          "authorization_surface_role": "IDENTITY_AND_BINDING_ONLY",
-          "authorization_law": "AUTHORIZATION = existing verified P2P permission + PortableExecutionRequest identity/binding",
-          "final_revalidation_position": "IMMEDIATELY_BEFORE_SUBPROCESS"
+          "final_revalidation_position": "IMMEDIATELY_BEFORE_SUBPROCESS",
+          "execution_class": "READ_ONLY_LOCAL_DETERMINISTIC_CHECK",
+          "runtime_permission_authority_claim": "NONE",
+          "owner_gate_required_for_read_only_check": false,
+          "owner_gate_required_for_promotion": true,
+          "final_vendor_identity_revalidation": "IMMEDIATELY_BEFORE_SUBPROCESS",
+          "vendor_identity_fail_closed": true
         },
         "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
       },

@@ -66,87 +66,66 @@ never edits project source; `deterministic_check` reports and returns
 
 ## Staged law
 
-`AVAILABLE != LOADED != AUTHORIZED != EXECUTED`
+`AVAILABLE != LOADED != SELECTED != EXECUTED`
 
 - `availability()` — registry metadata only, `content_loaded: false`
 - `load_vendor_skill()` — reads the entrypoint plus explicitly named references only
-- `authorize()` — **mints** a grant on the existing portable execution contract
-  (`p2p_capabilities.host_executor.PortableExecutionRequest`) and records its
-  canonical fingerprint in this process' issuance set
-- `deterministic_check()` — fails closed unless the grant was minted by that
-  authority surface and every binding still validates; refuses advisory actions,
-  refuses targets outside the repository, and requires an explicit target list
-  (there is no repository-wide default scan)
+- `select_action()` — records an explicit selection of one projected action; it is
+  a selection record for evidence, **not** an authorization, permission or token
+- `deterministic_check()` — requires an explicit target list (there is no
+  repository-wide default scan), refuses targets outside the repository, refuses
+  advisory actions, and re-proves pinned vendor artifact identity immediately
+  before launching the detector
 
-### Authorization boundary (Control-Tower repair)
-
-`AUTHORIZED` is neither caller-asserted data nor a self-minted binding. The law is:
+### Execution boundary (Control-Tower simplification)
 
 ```
-AUTHORIZATION = existing verified P2P permission        (authority)
-              + PortableExecutionRequest identity/binding (binding)
+EXECUTION_CLASS = READ_ONLY_LOCAL_DETERMINISTIC_CHECK
+RUNTIME_PERMISSION_AUTHORITY_CLAIM = NONE
 ```
 
-**Permission authority (existing surface, reused, not rebuilt).** The permission
-decision is read from the durable task control plane: the task store at
-`.p2p/state/task-state.json` and the existing C11 preflight evaluator
-`p2p_capabilities.task_state.evaluate_task_preflight`. Before any executable grant
-is minted, `authorize()` requires:
+`ui.design_quality.deterministic_check` is read-only, local, deterministic and
+target-explicit: no network, no model, no browser, no credentials, no install, no
+source mutation. Explicit P2P selection/invocation of the capability is therefore
+sufficient to run it. The adapter mints no grant, verifies no permission and
+claims no authority — and none of the metadata it emits may be read as authority.
 
-| Requirement | Source |
+| Question | Answer |
 |---|---|
-| an active task (`READY` / `ACTIVE`) | durable `.p2p/state/task-state.json` |
-| the task declares `ui.design_quality` | `TaskRecord.required_capabilities` |
-| the task declares the `READ` permission need | `TaskRecord.permission_needs` |
-| its persisted preflight is `PASS` | `TaskRecord.last_preflight` (`p2p-task-preflight/1`) |
-| the Owner-approved permission record | persisted `last_preflight.permission_state` |
-| the gate still passes **now** | `evaluate_task_preflight()` re-run with live vendor readiness |
+| Owner Gate required for an individual read-only check? | **NO** |
+| Owner Gate required for promotion/merge of the capability? | **YES** |
+| Runtime permission-authority claim? | **NONE** |
+| Mutation permission? | none — the tool cannot write a project surface |
 
-`granted_by` is a provenance **label only**. No value of `granted_by` — and no
-caller-supplied permission input of any kind — can produce an executable grant:
-without a durable, Owner-approved, PASS-preflight task the call fails closed with
-`PERMISSION_AUTHORITY_STATE_MISSING` (or a more specific `PERMISSION_*` code).
+An earlier revision made this adapter depend on the durable task store and C11
+preflight as a permission authority, and minted `PortableExecutionRequest` grants
+with an in-process issuance set. That model was rejected as false authority for a
+bounded read-only capability and has been removed in full: no `TaskStateStore`
+dependency, no `evaluate_task_preflight` authorization, no persisted
+`permission_state` / `source_ref` authority logic, no `_ISSUED_GRANTS`, no
+permission-binding hashes, no `granted_by` security claim, no `authority_surface`
+metadata. `task_state.py`, `host_executor.py` and `authority_chain_registry.py`
+were not modified for this capability.
 
-**Binding (identity only).** Only after permission is verified is a
-`PortableExecutionRequest` minted, bound to:
+**What is actually enforced — artifact identity and target discipline:**
 
-| Binding | Value |
-|---|---|
-| durable task identity | `task_id` / `goal_id` taken from the task store |
-| verified permission decision | `context_refs = ("task-preflight:<task_id>:<sha256>",)` |
-| capability identity | `required_capabilities = ("ui.design_quality",)` |
-| exact executable action | `purpose = "ui.design_quality.deterministic_check"` |
-| registry + manifest identity | `project_binding = registry:<registry_hash>:capability:<manifest.identity_hash>` |
-| pinned vendor snapshot identity | `candidate_binding = vendor-snapshot:ui.design_quality:<snapshot_sha256>` |
-| permission shape | `granted_permissions = ("READ",)`, `mutation_requested = false` |
+- pinned upstream commit/tree, per-file provenance, exact 23-file vendor snapshot;
+- explicit target list (no filesystem crawl) and every target must resolve to a
+  file inside `repository_root`, otherwise `NO_TARGET_SUPPLIED` /
+  `TARGET_OUTSIDE_REPOSITORY` / `TARGET_NOT_A_FILE`;
+- an optional selection record must name the executable action, otherwise
+  `ACTION_NOT_EXECUTABLE`;
+- **immediately before `subprocess.run`** the final vendor-identity gate
+  re-resolves the manifest, re-resolves the vendor snapshot, recomputes
+  `snapshot_tree_sha256`, requires an exact match with the canonical declared
+  hash, and re-validates the declared runner surface. Only the argv list is
+  assembled between that gate and the launch — no other filesystem or preparation
+  work. Vendor drift that lands after the earlier check is still caught and **no
+  subprocess is started** (asserted with a `subprocess.run` mock, plus a
+  source-level proof that nothing sits between the gate and the launch).
 
-The binding contract is never the authority; it proves *which* verified permission
-and *which* pinned artifact an execution refers to.
-
-**Two gates, the last one truly last.** `deterministic_check()` verifies the grant
-early (before target resolution), and then again — manifest re-resolved, vendor root
-re-resolved, `snapshot_tree_sha256` recomputed and matched against the canonical
-declared hash, `validate_binding()` required to return `BOUND`, and the P2P
-permission authority re-read and re-evaluated — **immediately before**
-`subprocess.run`. Between that final verification and the launch there is no
-filesystem work, no preflight work and no target work: only the argv list is
-assembled. A vendor mutation or a permission revocation that lands after the early
-gate is still caught, and **no subprocess is started**.
-
-Proven fail-closed, with `subprocess.run` asserted un-called:
-
-- forged mapping / self-consistent forgery → `AUTHORIZATION_*`
-- caller-minted binding, no P2P permission → `PERMISSION_AUTHORITY_STATE_MISSING`
-- arbitrary `granted_by` → no grant at all
-- permission denied / rejected / unapproved → `PERMISSION_PREFLIGHT_*`
-- permission binding swapped inside the request → `PERMISSION_AUTHORITY_DRIFT`
-- permission revoked between authorization and launch → fail closed at the final gate
-- vendor drift between preflight and launch → `VENDOR_SNAPSHOT_HASH_MISMATCH` / `VENDOR_SNAPSHOT_DRIFT`
-
-No second permission system, authority plane, database, daemon, scheduler, token
-service or cryptographic framework was introduced. The authority is the existing
-task-state preflight; the binding is the existing portable execution contract; the
-issuance set remains in-memory process state on top of both.
+Drift proofs run against a temporary mirror; canonical vendored source is never
+mutated (asserted).
 
 No profile receives `ui.design_quality` as a required capability; it is optional in
 all five profiles and excluded from none.
@@ -180,8 +159,8 @@ Baseline categories asserted in every mode: `gradient-text` (generic gradient),
 and `ai-color-palette`.
 
 Evidence: `governance/evidence/p2p-impeccable-01-deterministic-check.json`
-includes the verified permission authority (surface, task id, preflight status),
-the permission binding, the minted authorization fingerprint and its bindings.
+records the execution boundary (execution class, `RUNTIME_PERMISSION_AUTHORITY_CLAIM=NONE`,
+Owner-Gate scope) and the pinned vendor identity revalidated before the launch.
 (includes a repeat run per mode; findings byte-identical across repeats).
 
 ## Excluded upstream surface
