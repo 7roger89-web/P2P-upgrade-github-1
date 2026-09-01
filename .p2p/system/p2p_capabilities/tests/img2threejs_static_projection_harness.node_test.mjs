@@ -66,6 +66,7 @@ class StubPhysicalMaterial {
     this.metalness = 0;
     this.roughness = 1;
     this.userData = {};
+    this.version = 0;
     this.transmission = 0;
     this.clearcoat = 0;
     this.sheen = 0;
@@ -326,6 +327,7 @@ class StubPhysicalMaterial {
     this.metalness = 0;
     this.roughness = 1;
     this.userData = {};
+    this.version = 0;
     this.transmission = 0;
     this.clearcoat = 0;
     this.sheen = 0;
