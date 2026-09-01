@@ -26,6 +26,17 @@ TASK_STATE_SCHEMA = "p2p-task-state/1"
 TASK_PLAN_SCHEMA = "p2p-task-plan/1"
 TASK_EVENT_SCHEMA = "p2p-task-event/1"
 PLAN_REVISION_SCHEMA = "p2p-task-plan-revision/1"
+PLAN_LIFECYCLE_EVENT_SCHEMA = "p2p-task-plan-lifecycle-event/1"
+PLAN_IDENTITY_SCHEMA = "p2p-task-plan-identity/1"
+PLAN_AUTHORITY_RESOLUTION_SCHEMA = "p2p-plan-authority-resolution/1"
+
+# Plan-level authority lifecycle (P2P-CONTEXT-HYGIENE-01).  A plan is
+# created ACTIVE; an explicit closure or supersession makes it historical.
+# CLOSED and SUPERSEDED plans are retained, explicitly readable, and lose
+# ACTIVE authority: they can never transition back to ACTIVE, and any
+# mutation of their tasks fails closed.  Continuation of closed work is a
+# NEW plan that references the closed one through source refs.
+PLAN_LIFECYCLE_STATES = ("ACTIVE", "CLOSED", "SUPERSEDED")
 
 TASK_STATES = (
     "PLANNED",
@@ -137,6 +148,10 @@ class TaskControlPlaneError(TaskStateError):
     """Raised when durable task control-plane state cannot be trusted."""
 
 
+class TaskLifecycleError(TaskStateError):
+    """Raised when a non-active (closed/superseded) plan is used as active authority."""
+
+
 def utc_now() -> str:
     """Return a timezone-qualified timestamp suitable for durable state."""
 
@@ -234,6 +249,19 @@ def _assert_sha256(value: Any, field_name: str) -> str:
     return value.lower()
 
 
+# Canonical Git object-id shape used across P2P (same 40 lowercase hex form as
+# _GIT_SHA_RE in scripts/p2p_development_control.py).  Git commit and tree
+# object IDs are NOT SHA-256 digests; artifact/content SHA-256 values belong
+# to the existing artifact governance surfaces, never to plan identity.
+_GIT_OID_RE = re.compile(r"^[0-9a-f]{40}$")
+
+
+def _assert_git_oid(value: Any, field_name: str) -> str:
+    if not isinstance(value, str) or not _GIT_OID_RE.fullmatch(value):
+        raise TaskContractError(f"{field_name}_GIT_OID_REQUIRED")
+    return value
+
+
 def _json_safe(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _json_safe(child) for key, child in value.items()}
@@ -329,6 +357,69 @@ class LogicalOwner:
             state_ref=str(value.get("state_ref", "")),
             background_execution=bool(value.get("background_execution", False)),
             process_survives_session=bool(value.get("process_survives_session", False)),
+        )
+
+
+@dataclass(frozen=True)
+class PlanIdentity:
+    """Exact durable identity binding for a plan.
+
+    The binding is the repository plus the workstream plus the current
+    durable subject, optionally tightened with a Git commit object ID, a Git
+    tree object ID, and a PR reference.  ``source_commit`` and ``source_tree``
+    are real 40-character Git object IDs (lowercase hex), NOT SHA-256 digests;
+    artifact/content SHA-256 values live in the existing artifact governance
+    surfaces and are intentionally kept out of plan identity.  Exact durable
+    identity outranks semantic text similarity: a record whose binding does
+    not match exactly is ineligible for active authority no matter how
+    similar its text is.
+    """
+
+    repository: str
+    workstream: str
+    subject: str
+    source_commit: str = ""
+    source_tree: str = ""
+    pr: str = ""
+
+    def __post_init__(self) -> None:
+        _required_text(self.repository, "plan_identity.repository", max_length=512)
+        _required_text(self.workstream, "plan_identity.workstream", max_length=256)
+        _required_text(self.subject, "plan_identity.subject", max_length=512)
+        if self.source_commit:
+            _assert_git_oid(self.source_commit, "plan_identity.source_commit")
+        if self.source_tree:
+            _assert_git_oid(self.source_tree, "plan_identity.source_tree")
+        if self.pr:
+            _required_text(self.pr, "plan_identity.pr", max_length=64)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema": PLAN_IDENTITY_SCHEMA,
+            "repository": self.repository,
+            "workstream": self.workstream,
+            "subject": self.subject,
+            "source_commit": self.source_commit,
+            "source_tree": self.source_tree,
+            "pr": self.pr,
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "PlanIdentity":
+        if not isinstance(value, Mapping):
+            raise TaskContractError("PLAN_IDENTITY_MUST_BE_OBJECT")
+        _assert_no_identity_fields(value, path="plan_identity")
+        allowed = {"schema", "repository", "workstream", "subject", "source_commit", "source_tree", "pr"}
+        unknown = sorted(str(key) for key in value if str(key) not in allowed)
+        if unknown:
+            raise TaskContractError("PLAN_IDENTITY_FIELDS_INVALID:" + ",".join(unknown))
+        return cls(
+            repository=str(value.get("repository", "")),
+            workstream=str(value.get("workstream", "")),
+            subject=str(value.get("subject", "")),
+            source_commit=str(value.get("source_commit", "") or "").strip(),
+            source_tree=str(value.get("source_tree", "") or "").strip(),
+            pr=str(value.get("pr", "") or "").strip(),
         )
 
 
@@ -812,6 +903,34 @@ def evaluate_task_preflight(
     }
 
 
+def _validate_lifecycle_event(value: Any, *, expected_to_state: str) -> None:
+    """Validate one provenance-linked plan-lifecycle event.
+
+    The only legal lifecycle transitions are ACTIVE -> CLOSED and
+    ACTIVE -> SUPERSEDED.  A closed or superseded plan can never carry an
+    event that leads back to ACTIVE, which is what keeps a closed plan
+    from silently regaining ACTIVE authority.
+    """
+
+    if not isinstance(value, Mapping):
+        raise TaskContractError("PLAN_LIFECYCLE_ENTRY_INVALID")
+    allowed = {"schema", "at", "from_state", "to_state", "reason", "source_refs", "successor_ref"}
+    unknown = sorted(str(key) for key in value if str(key) not in allowed)
+    if unknown:
+        raise TaskContractError("PLAN_LIFECYCLE_FIELDS_INVALID:" + ",".join(unknown))
+    if value.get("schema") != PLAN_LIFECYCLE_EVENT_SCHEMA:
+        raise TaskContractError("PLAN_LIFECYCLE_ENTRY_INVALID")
+    if value.get("from_state") != "ACTIVE":
+        raise TaskContractError("PLAN_LIFECYCLE_FROM_STATE_INVALID")
+    if value.get("to_state") != expected_to_state:
+        raise TaskContractError("PLAN_LIFECYCLE_TO_STATE_INVALID")
+    _check_timestamp(value.get("at"), "plan_lifecycle.at")
+    _required_text(value.get("reason"), "plan_lifecycle.reason", max_length=4096)
+    _unique_refs(value.get("source_refs", ()), "plan_lifecycle.source_refs")
+    if expected_to_state == "SUPERSEDED":
+        _required_text(value.get("successor_ref"), "plan_lifecycle.successor_ref", max_length=1024)
+
+
 @dataclass(frozen=True)
 class TaskPlan:
     """A bounded Goal-scoped task projection."""
@@ -825,10 +944,25 @@ class TaskPlan:
     source_refs: tuple[str, ...] = ()
     plan_revision: int = 1
     plan_revisions: tuple[dict[str, Any], ...] = ()
+    plan_lifecycle: str = "ACTIVE"
+    plan_lifecycle_events: tuple[dict[str, Any], ...] = ()
+    plan_identity: PlanIdentity | None = None
     created_at: str = field(default_factory=utc_now)
     updated_at: str = field(default_factory=utc_now)
 
     def __post_init__(self) -> None:
+        if self.plan_lifecycle not in PLAN_LIFECYCLE_STATES:
+            raise TaskContractError("PLAN_LIFECYCLE_INVALID")
+        if not isinstance(self.plan_lifecycle_events, tuple):
+            raise TaskContractError("PLAN_LIFECYCLE_EVENTS_MUST_BE_TUPLE")
+        if self.plan_lifecycle == "ACTIVE" and self.plan_lifecycle_events:
+            raise TaskContractError("ACTIVE_PLAN_MUST_HAVE_NO_LIFECYCLE_EVENTS")
+        if self.plan_lifecycle != "ACTIVE":
+            if len(self.plan_lifecycle_events) != 1:
+                raise TaskContractError("PLAN_LIFECYCLE_EVENTS_INVALID")
+            _validate_lifecycle_event(self.plan_lifecycle_events[0], expected_to_state=self.plan_lifecycle)
+        if self.plan_identity is not None and not isinstance(self.plan_identity, PlanIdentity):
+            raise TaskContractError("PLAN_IDENTITY_INVALID")
         goal_id = _required_text(self.goal_id, "goal_id", max_length=512)
         if self.logical_owner.goal_id != goal_id:
             raise TaskContractError("LOGICAL_OWNER_GOAL_MISMATCH")
@@ -903,6 +1037,7 @@ class TaskPlan:
         task_specs: Sequence[Mapping[str, Any] | TaskRecord],
         *,
         now: str | None = None,
+        plan_identity: PlanIdentity | Mapping[str, Any] | None = None,
     ) -> "TaskPlan":
         if not isinstance(goal, Mapping):
             raise TaskContractError("GOAL_CONTRACT_MUST_BE_OBJECT")
@@ -940,6 +1075,11 @@ class TaskPlan:
         if not plan_scope:
             plan_scope = ("GOAL_SCOPED_TASK_WORK",)
         plan_non_scope = tuple(str(item) for item in (goal.get("out_of_scope") or []))
+        identity = (
+            None
+            if plan_identity is None
+            else (plan_identity if isinstance(plan_identity, PlanIdentity) else PlanIdentity.from_mapping(plan_identity))
+        )
         plan = cls(
             goal_id=goal_id,
             logical_owner=LogicalOwner.for_goal(goal_id),
@@ -950,6 +1090,7 @@ class TaskPlan:
             source_refs=(".p2p/state/goal-contract.json",),
             created_at=timestamp,
             updated_at=timestamp,
+            plan_identity=identity,
         )
         initial_hash = _sha256(plan.to_dict())
         return replace(
@@ -982,6 +1123,9 @@ class TaskPlan:
             "source_refs",
             "plan_revision",
             "plan_revisions",
+            "plan_lifecycle",
+            "plan_lifecycle_events",
+            "plan_identity",
             "created_at",
             "updated_at",
         }
@@ -1002,6 +1146,10 @@ class TaskPlan:
         revisions = value.get("plan_revisions", [])
         if not isinstance(revisions, list):
             raise TaskContractError("PLAN_REVISIONS_MUST_BE_LIST")
+        lifecycle_events = value.get("plan_lifecycle_events", [])
+        if not isinstance(lifecycle_events, list):
+            raise TaskContractError("PLAN_LIFECYCLE_EVENTS_MUST_BE_LIST")
+        raw_identity = value.get("plan_identity")
         return cls(
             goal_id=str(value.get("goal_id", "")),
             logical_owner=LogicalOwner.from_mapping(value.get("logical_owner", {})),
@@ -1012,6 +1160,9 @@ class TaskPlan:
             source_refs=tuple(value.get("source_refs", ())),
             plan_revision=int(value.get("plan_revision", 1)),
             plan_revisions=tuple(_copy_dict(item) or {} for item in revisions),
+            plan_lifecycle=str(value.get("plan_lifecycle", "ACTIVE")),
+            plan_lifecycle_events=tuple(_copy_dict(item) or {} for item in lifecycle_events),
+            plan_identity=PlanIdentity.from_mapping(raw_identity) if isinstance(raw_identity, Mapping) else None,
             created_at=str(value.get("created_at", "")),
             updated_at=str(value.get("updated_at", "")),
         )
@@ -1028,6 +1179,9 @@ class TaskPlan:
             "source_refs": list(self.source_refs),
             "plan_revision": self.plan_revision,
             "plan_revisions": [_json_safe(item) for item in self.plan_revisions],
+            "plan_lifecycle": self.plan_lifecycle,
+            "plan_lifecycle_events": [_json_safe(item) for item in self.plan_lifecycle_events],
+            "plan_identity": None if self.plan_identity is None else self.plan_identity.to_dict(),
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
@@ -1037,6 +1191,82 @@ class TaskPlan:
 
     def topological_order(self) -> tuple[str, ...]:
         return validate_dependency_graph(self.tasks)
+
+    def _require_active(self) -> None:
+        """Fail closed when a non-active plan is used as active authority."""
+
+        if self.plan_lifecycle != "ACTIVE":
+            raise TaskLifecycleError(f"PLAN_NOT_ACTIVE:{self.plan_lifecycle}")
+
+    def close_plan(
+        self,
+        reason: str,
+        *,
+        source_refs: Iterable[str] = (),
+        now: str | None = None,
+    ) -> "TaskPlan":
+        """Explicitly close this plan; it loses ACTIVE authority.
+
+        The plan is retained, not deleted: it remains readable for explicit
+        historical retrieval, but every mutating operation on it fails
+        closed.  Continuation of closed work is a NEW plan that references
+        this one through source refs.
+        """
+
+        self._require_active()
+        timestamp = _check_timestamp(now or utc_now(), "plan_lifecycle.at")
+        event = {
+            "schema": PLAN_LIFECYCLE_EVENT_SCHEMA,
+            "at": timestamp,
+            "from_state": "ACTIVE",
+            "to_state": "CLOSED",
+            "reason": _required_text(reason, "plan_lifecycle.reason", max_length=4096),
+            "source_refs": list(_unique_refs(tuple(str(item) for item in source_refs), "plan_lifecycle.source_refs")),
+        }
+        return replace(self, plan_lifecycle="CLOSED", plan_lifecycle_events=(event,), updated_at=timestamp)
+
+    def supersede_plan(
+        self,
+        successor_ref: str,
+        reason: str,
+        *,
+        source_refs: Iterable[str] = (),
+        now: str | None = None,
+    ) -> "TaskPlan":
+        """Explicitly supersede this plan with a durable successor reference."""
+
+        self._require_active()
+        timestamp = _check_timestamp(now or utc_now(), "plan_lifecycle.at")
+        event = {
+            "schema": PLAN_LIFECYCLE_EVENT_SCHEMA,
+            "at": timestamp,
+            "from_state": "ACTIVE",
+            "to_state": "SUPERSEDED",
+            "reason": _required_text(reason, "plan_lifecycle.reason", max_length=4096),
+            "source_refs": list(_unique_refs(tuple(str(item) for item in source_refs), "plan_lifecycle.source_refs")),
+            "successor_ref": _required_text(successor_ref, "plan_lifecycle.successor_ref", max_length=1024),
+        }
+        return replace(self, plan_lifecycle="SUPERSEDED", plan_lifecycle_events=(event,), updated_at=timestamp)
+
+    def bind_plan_identity(
+        self,
+        identity: PlanIdentity | Mapping[str, Any],
+        *,
+        now: str | None = None,
+    ) -> "TaskPlan":
+        """Bind the one exact durable identity for this plan (one-shot).
+
+        A plan's identity is bound exactly once while the plan is active;
+        it can never be silently rebound.  A re-bound identity is a NEW
+        plan, not a mutation of this one.
+        """
+
+        self._require_active()
+        if self.plan_identity is not None:
+            raise TaskContractError("PLAN_IDENTITY_ALREADY_BOUND")
+        normalized = identity if isinstance(identity, PlanIdentity) else PlanIdentity.from_mapping(identity)
+        timestamp = _check_timestamp(now or utc_now(), "plan_identity.bound_at")
+        return replace(self, plan_identity=normalized, updated_at=timestamp)
 
     def transition(
         self,
@@ -1050,6 +1280,7 @@ class TaskPlan:
         checkpoint: Mapping[str, Any] | None = None,
         preflight: Mapping[str, Any] | None = None,
     ) -> "TaskPlan":
+        self._require_active()
         task = self.tasks.get(task_id)
         if task is None:
             raise TaskTransitionError(f"TASK_NOT_FOUND:{task_id}")
@@ -1112,6 +1343,7 @@ class TaskPlan:
         *,
         now: str | None = None,
     ) -> "TaskPlan":
+        self._require_active()
         task = self.tasks.get(task_id)
         if task is None:
             raise TaskEvidenceError(f"TASK_NOT_FOUND:{task_id}")
@@ -1129,6 +1361,7 @@ class TaskPlan:
         context_state: Mapping[str, Mapping[str, Any]] | None = None,
         now: str | None = None,
     ) -> tuple["TaskPlan", dict[str, Any]]:
+        self._require_active()
         task = self.tasks.get(task_id)
         if task is None:
             raise TaskGateError(f"TASK_NOT_FOUND:{task_id}")
@@ -1177,9 +1410,11 @@ class TaskPlan:
 
         Capability and permission tasks remain PLANNED until an explicit
         current preflight is supplied.  This keeps a stale persisted plan from
-        becoming executable merely because a session resumed.
+        becoming executable merely because a session resumed.  A closed or
+        superseded plan is never refreshed: it has no active authority.
         """
 
+        self._require_active()
         current = self
         timestamp = now or utc_now()
         for task_id in current.topological_order():
@@ -1202,6 +1437,7 @@ class TaskPlan:
     ) -> "TaskPlan":
         """Create a provenance-linked plan revision without erasing history."""
 
+        self._require_active()
         revision_reason = _required_text(reason, "plan_revision.reason", max_length=4096)
         timestamp = now or utc_now()
         next_tasks = dict(self.tasks)
@@ -1314,6 +1550,7 @@ def request_owner_decision(
     approval_metadata: Mapping[str, Any] | None = None,
     now: str | None = None,
 ) -> TaskPlan:
+    plan._require_active()
     task = plan.tasks.get(task_id)
     if task is None:
         raise TaskGateError(f"TASK_NOT_FOUND:{task_id}")
@@ -1362,6 +1599,7 @@ def resolve_owner_decision(
     decision_refs: Iterable[str] = (),
     now: str | None = None,
 ) -> TaskPlan:
+    plan._require_active()
     task = plan.tasks.get(task_id)
     if task is None:
         raise TaskGateError(f"TASK_NOT_FOUND:{task_id}")
@@ -1451,6 +1689,7 @@ def _validate_checkpoint(value: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def checkpoint_task(plan: TaskPlan, task_id: str, checkpoint: Mapping[str, Any], *, now: str | None = None) -> TaskPlan:
+    plan._require_active()
     task = plan.tasks.get(task_id)
     if task is None:
         raise TaskStateError(f"TASK_NOT_FOUND:{task_id}")
@@ -1551,6 +1790,8 @@ def resume_summary(
 
 
 def next_safe_task(plan: TaskPlan) -> TaskRecord | None:
+    if plan.plan_lifecycle != "ACTIVE":
+        return None
     for task_id in plan.topological_order():
         task = plan.tasks[task_id]
         if task.status != "READY" or task.blocker is not None or _owner_decision_is_pending(task):
@@ -1595,6 +1836,140 @@ def dependency_handoff(plan: TaskPlan, completed_task_id: str) -> dict[str, Any]
         "downstream_tasks": downstream,
         "automatic_start": False,
     }
+
+
+def is_active_authority(plan: TaskPlan) -> bool:
+    """True only when the plan is in the ACTIVE lifecycle."""
+
+    if not isinstance(plan, TaskPlan):
+        raise TaskContractError("TASK_PLAN_REQUIRED")
+    return plan.plan_lifecycle == "ACTIVE"
+
+
+def close_plan(
+    plan: TaskPlan,
+    reason: str,
+    *,
+    source_refs: Iterable[str] = (),
+    now: str | None = None,
+) -> TaskPlan:
+    """Pure convenience wrapper: explicitly close a plan."""
+
+    return plan.close_plan(reason, source_refs=source_refs, now=now)
+
+
+def supersede_plan(
+    plan: TaskPlan,
+    successor_ref: str,
+    reason: str,
+    *,
+    source_refs: Iterable[str] = (),
+    now: str | None = None,
+) -> TaskPlan:
+    """Pure convenience wrapper: explicitly supersede a plan."""
+
+    return plan.supersede_plan(successor_ref, reason, source_refs=source_refs, now=now)
+
+
+def bind_plan_identity(
+    plan: TaskPlan,
+    identity: PlanIdentity | Mapping[str, Any],
+    *,
+    now: str | None = None,
+) -> TaskPlan:
+    """Pure convenience wrapper: bind the one exact durable plan identity."""
+
+    return plan.bind_plan_identity(identity, now=now)
+
+
+def resolve_authoritative_plan(
+    candidates: Iterable[TaskPlan | Mapping[str, Any]],
+    binding: PlanIdentity | Mapping[str, Any],
+) -> dict[str, Any]:
+    """Determine the single authoritative plan for an exact durable binding.
+
+    Exact durable identity -- repository + workstream + current durable
+    subject, plus Git commit / tree object IDs and PR where the binding
+    supplies them -- outranks semantic text similarity.  A candidate whose
+    identity does not match exactly is simply ineligible; similarity is never
+    consulted.  A plan that is closed or superseded can never win, so a closed
+    plan cannot silently regain active authority through resolution.
+    """
+
+    bind = binding if isinstance(binding, PlanIdentity) else PlanIdentity.from_mapping(binding)
+    eligible: list[TaskPlan] = []
+    diagnostics: list[dict[str, Any]] = []
+    for index, raw in enumerate(candidates):
+        label = f"candidate-{index}"
+        if isinstance(raw, TaskPlan):
+            plan = raw
+        else:
+            try:
+                plan = TaskPlan.from_mapping(raw)
+            except TaskStateError as exc:
+                diagnostics.append({"candidate": label, "status": "INVALID_PLAN", "detail": str(exc)})
+                continue
+        entry: dict[str, Any] = {
+            "candidate": label,
+            "goal_id": plan.goal_id,
+            "plan_hash": plan.canonical_hash(),
+            "plan_lifecycle": plan.plan_lifecycle,
+        }
+        identity = plan.plan_identity
+        if identity is None:
+            entry["status"] = "UNBOUND"
+            diagnostics.append(entry)
+            continue
+        if not (
+            identity.repository.casefold() == bind.repository.casefold()
+            and identity.workstream.casefold() == bind.workstream.casefold()
+            and identity.subject.casefold() == bind.subject.casefold()
+        ):
+            entry["status"] = "IDENTITY_MISMATCH"
+            diagnostics.append(entry)
+            continue
+        field_mismatches = [
+            field_name
+            for field_name in ("source_commit", "source_tree", "pr")
+            if getattr(bind, field_name) and getattr(identity, field_name).casefold() != getattr(bind, field_name).casefold()
+        ]
+        if field_mismatches:
+            entry["status"] = "BINDING_FIELD_MISMATCH"
+            entry["fields"] = field_mismatches
+            diagnostics.append(entry)
+            continue
+        if plan.plan_lifecycle != "ACTIVE":
+            entry["status"] = f"PLAN_NOT_ACTIVE:{plan.plan_lifecycle}"
+            diagnostics.append(entry)
+            continue
+        entry["status"] = "ELIGIBLE"
+        diagnostics.append(entry)
+        eligible.append(plan)
+    if len(eligible) > 1:
+        status = "AUTHORITY_CONFLICT"
+        selected: TaskPlan | None = None
+    elif len(eligible) == 1:
+        status = "PASS"
+        selected = eligible[0]
+    else:
+        status = "NOT_FOUND"
+        selected = None
+    result: dict[str, Any] = {
+        "schema": PLAN_AUTHORITY_RESOLUTION_SCHEMA,
+        "status": status,
+        "binding": bind.to_dict(),
+        "similarity_used": False,
+        "candidates": diagnostics,
+    }
+    if selected is not None:
+        result["selected_plan"] = {
+            "goal_id": selected.goal_id,
+            "plan_hash": selected.canonical_hash(),
+            "plan_revision": selected.plan_revision,
+            "plan_lifecycle": selected.plan_lifecycle,
+            "plan_identity": selected.plan_identity.to_dict() if selected.plan_identity is not None else None,
+        }
+    return result
 
 
 class TaskStateStore:
@@ -1809,6 +2184,32 @@ class TaskStateStore:
             updated = current.revise(*args, **kwargs)
             return self.save(updated, event_name="task_plan_revised", details={"plan_revision": updated.plan_revision}, at=kwargs.get("now"))
 
+    def close_plan(self, reason: str, *, source_refs: Iterable[str] = (), at: str | None = None) -> TaskPlan:
+        """Persist an explicit plan closure; the plan loses active authority."""
+
+        with self._lock:
+            current = self.require()
+            updated = current.close_plan(reason, source_refs=source_refs, now=at)
+            return self.save(
+                updated,
+                event_name="task_plan_closed",
+                details={"from_state": "ACTIVE", "to_state": "CLOSED", "reason": reason},
+                at=at,
+            )
+
+    def supersede_plan(self, successor_ref: str, reason: str, *, source_refs: Iterable[str] = (), at: str | None = None) -> TaskPlan:
+        """Persist an explicit plan supersession with a durable successor ref."""
+
+        with self._lock:
+            current = self.require()
+            updated = current.supersede_plan(successor_ref, reason, source_refs=source_refs, now=at)
+            return self.save(
+                updated,
+                event_name="task_plan_superseded",
+                details={"from_state": "ACTIVE", "to_state": "SUPERSEDED", "successor_ref": successor_ref, "reason": reason},
+                at=at,
+            )
+
     def record_event(
         self,
         event_name: str,
@@ -1865,6 +2266,9 @@ __all__ = [
     "TASK_STATE_SCHEMA",
     "TASK_PLAN_SCHEMA",
     "TASK_EVENT_SCHEMA",
+    "PLAN_LIFECYCLE_EVENT_SCHEMA",
+    "PLAN_IDENTITY_SCHEMA",
+    "PLAN_AUTHORITY_RESOLUTION_SCHEMA",
     "STATE_RELATIVE_PATH",
     "LEDGER_RELATIVE_PATH",
     "TASK_STATES",
@@ -1872,6 +2276,7 @@ __all__ = [
     "PREFLIGHT_STATES",
     "RESUME_CLASSIFICATIONS",
     "ALLOWED_TRANSITIONS",
+    "PLAN_LIFECYCLE_STATES",
     "TaskStateError",
     "TaskContractError",
     "TaskGraphError",
@@ -1879,7 +2284,9 @@ __all__ = [
     "TaskEvidenceError",
     "TaskGateError",
     "TaskControlPlaneError",
+    "TaskLifecycleError",
     "LogicalOwner",
+    "PlanIdentity",
     "TaskRecord",
     "TaskPlan",
     "EvidenceClaim",
@@ -1895,6 +2302,11 @@ __all__ = [
     "resume_summary",
     "next_safe_task",
     "dependency_handoff",
+    "is_active_authority",
+    "close_plan",
+    "supersede_plan",
+    "bind_plan_identity",
+    "resolve_authoritative_plan",
     "TaskStateStore",
     "validate_dependency_graph",
     "utc_now",

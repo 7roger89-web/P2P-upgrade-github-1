@@ -58,6 +58,19 @@ RETRIEVAL_ORDER = (
     "TARGETED_SOURCE",
 )
 
+# Plan/source lifecycle (P2P-CONTEXT-HYGIENE-01).  DEFAULT_RETRIEVAL selects
+# ACTIVE (CURRENT) material plus the task's required canonical refs only.
+# HISTORICAL / SUPERSEDED / CLOSED / ARCHIVED material is retained and
+# explicitly retrievable (include_historical=True) but excluded from default
+# active retrieval.  No lifecycle transition is implicit: a closed source or
+# plan never regains default authority by being resurfaced.
+SOURCE_LIFECYCLES = ("CURRENT", "HISTORICAL", "SUPERSEDED", "CLOSED", "ARCHIVED")
+DEFAULT_RETRIEVAL_LIFECYCLE = "CURRENT"
+NON_ACTIVE_LIFECYCLES = tuple(item for item in SOURCE_LIFECYCLES if item != DEFAULT_RETRIEVAL_LIFECYCLE)
+# Source classes that are data, never instruction authority, even when their
+# text is highly relevant to the task (EVIDENCE stays non-instructional).
+NON_INSTRUCTION_SOURCE_CLASSES = {"EVIDENCE", "REFERENCE", "HISTORICAL_ARTIFACT", "DATA_ONLY"}
+
 ITEM_CATEGORIES = (
     "relevant_facts",
     "relevant_decisions",
@@ -635,6 +648,10 @@ def _source_records(source_catalog: Mapping[str, Any] | Iterable[Mapping[str, An
             raise ContextBindingError(f"SOURCE_HASH_REQUIRED_OR_INVALID: {source_id}")
         record["source_hash"] = str(current).lower()
         record["source_class"] = str(record.get("source_class") or record.get("class") or "AUTHORITATIVE_PROJECT_SOURCE")
+        lifecycle = str(record.get("lifecycle") or DEFAULT_RETRIEVAL_LIFECYCLE).upper()
+        if lifecycle not in SOURCE_LIFECYCLES:
+            raise ContextBindingError(f"SOURCE_LIFECYCLE_INVALID: {source_id}")
+        record["lifecycle"] = lifecycle
         record["retrieval_role"] = str(record.get("retrieval_role") or record.get("role") or "TARGETED_SOURCE")
         record["scope"] = _string_list(record.get("scope") or ["*"], f"source_scope:{source_id}")
         record["coverage_ids"] = _string_list(record.get("coverage_ids") or record.get("coverage") or [], f"coverage_ids:{source_id}")
@@ -788,18 +805,25 @@ def retrieve_task_context(
     context_class: str = MINIMAL,
     candidate_binding: str | None = None,
     allow_external: bool = False,
+    include_historical: bool = False,
 ) -> dict[str, Any]:
     """Select a bounded, authoritative context plan from explicit task metadata.
 
     Selection is deterministic and reference/coverage driven.  It never treats
     generic similarity, model confidence, or the existence of related files as
     proof that an acceptance obligation is covered.
+
+    By default only ACTIVE (CURRENT-lifecycle) material is selected.  Sources
+    marked HISTORICAL / SUPERSEDED / CLOSED / ARCHIVED are retained but
+    excluded from default retrieval with an explicit reason; set
+    ``include_historical=True`` for explicit historical retrieval.
     """
 
     if not isinstance(task, Mapping):
         raise ContextSafetyError("TASK_CONTRACT_MUST_BE_MAPPING")
     if context_class not in CONTEXT_CLASSES:
         raise ContextSafetyError(f"CONTEXT_CLASS_INVALID: {context_class}")
+    include_historical = bool(include_historical)
     if context_class == CONTEXT_INSUFFICIENT:
         return {
             "schema": TASK_CONTEXT_SCHEMA,
@@ -837,6 +861,12 @@ def retrieve_task_context(
             source_id = str(record["source_id"])
             if source_id in seen:
                 continue
+            if not include_historical and record["lifecycle"] != DEFAULT_RETRIEVAL_LIFECYCLE:
+                # Historical/superseded/closed/archived material stays
+                # retained and explicitly retrievable, but it is never part
+                # of default active retrieval.
+                excluded.append({"source_id": source_id, "reason": "HISTORICAL_EXCLUDED_BY_DEFAULT"})
+                continue
             if str(record.get("source_class", "")).upper() == "EXTERNAL" and not allow_external:
                 excluded.append({"source_id": source_id, "reason": "EXTERNAL_RETRIEVAL_NOT_AUTHORIZED"})
                 continue
@@ -855,6 +885,8 @@ def retrieve_task_context(
                     "path": record.get("path"),
                     "source_class": record.get("source_class"),
                     "retrieval_role": role,
+                    "lifecycle": record["lifecycle"],
+                    "instruction_authority": str(record.get("source_class", "")).upper() not in NON_INSTRUCTION_SOURCE_CLASSES,
                     "pointer_id": record.get("pointer_id") or f"pointer-{source_id}",
                     "scope": record.get("scope", ["*"]),
                 }
@@ -918,7 +950,13 @@ def retrieve_task_context(
     else:
         effective_class = context_class
     source_bindings = [
-        {"source_id": item["source_id"], "source_hash": item["source_hash"], "scope": item["scope"]}
+        {
+            "source_id": item["source_id"],
+            "source_hash": item["source_hash"],
+            "lifecycle": item["lifecycle"],
+            "instruction_authority": item["instruction_authority"],
+            "scope": item["scope"],
+        }
         for item in selected
     ]
     manifest = {
@@ -928,6 +966,8 @@ def retrieve_task_context(
         "task_purpose": str(task.get("task_purpose") or task.get("purpose") or task.get("task_or_goal") or ""),
         "scope": _string_list(task.get("scope") or ["current-task"], "task_scope"),
         "candidate_binding": candidate_binding,
+        "include_historical": include_historical,
+        "evidence_authority_guarantee": "EVIDENCE_NEVER_INSTRUCTION_AUTHORITY",
         "retrieval_order": list(RETRIEVAL_ORDER),
         "selected_source_ids": [item["source_id"] for item in selected],
         "source_bindings": source_bindings,
@@ -984,6 +1024,7 @@ def escalate_task_context(
         context_class=next_class,
         candidate_binding=candidate_binding if candidate_binding is not None else prior_plan.get("candidate_binding"),
         allow_external=allow_external,
+        include_historical=bool(prior_plan.get("include_historical", False)),
     )
 
 
@@ -1069,6 +1110,9 @@ def materialize_task_context(
                 "source_id": record["source_id"],
                 "path": record.get("path"),
                 "source_hash": record["source_hash"],
+                "source_class": record.get("source_class"),
+                "lifecycle": record.get("lifecycle", DEFAULT_RETRIEVAL_LIFECYCLE),
+                "instruction_authority": str(record.get("source_class", "")).upper() not in NON_INSTRUCTION_SOURCE_CLASSES,
                 "scope": record.get("scope", ["*"]),
             }
             if "content" in record:

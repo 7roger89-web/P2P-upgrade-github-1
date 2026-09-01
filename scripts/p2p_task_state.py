@@ -35,6 +35,7 @@ from p2p_capabilities.task_state import (  # noqa: E402
     TaskStateError,
     TaskStateStore,
     beginner_owner_message,
+    is_active_authority,
     next_safe_task,
     request_owner_decision,
     resolve_owner_decision,
@@ -87,6 +88,9 @@ def _summary(plan: TaskPlan) -> dict[str, Any]:
         "goal_id": plan.goal_id,
         "plan_revision": plan.plan_revision,
         "plan_hash": plan.canonical_hash(),
+        "plan_lifecycle": plan.plan_lifecycle,
+        "active_authority": is_active_authority(plan),
+        "plan_identity": None if plan.plan_identity is None else plan.plan_identity.to_dict(),
         "task_count": len(plan.tasks),
         "status_counts": counts,
         "topological_order": list(plan.topological_order()),
@@ -146,6 +150,15 @@ def _parser() -> argparse.ArgumentParser:
     revise.add_argument("--changes", required=True, help="JSON object keyed by task ID")
     revise.add_argument("--reason", required=True)
     revise.add_argument("--source-ref", action="append", default=[])
+
+    close_plan = sub.add_parser("close-plan", help="explicitly close the plan; it loses ACTIVE authority and is retained")
+    close_plan.add_argument("--reason", required=True)
+    close_plan.add_argument("--source-ref", action="append", default=[])
+
+    supersede_plan = sub.add_parser("supersede-plan", help="explicitly supersede the plan with a durable successor reference")
+    supersede_plan.add_argument("--successor-ref", required=True)
+    supersede_plan.add_argument("--reason", required=True)
+    supersede_plan.add_argument("--source-ref", action="append", default=[])
 
     owner_request = sub.add_parser("owner-request", help="record a pending owner decision")
     owner_request.add_argument("--task-id", required=True)
@@ -241,6 +254,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "revise":
             changes = _mapping(_read_json(args.changes), "CHANGES_OBJECT_REQUIRED")
             _write_result(_summary(store.revise(task_updates=changes, reason=args.reason, source_refs=args.source_ref)))
+            return 0
+        if args.command == "close-plan":
+            _write_result(_summary(store.close_plan(args.reason, source_refs=args.source_ref)))
+            return 0
+        if args.command == "supersede-plan":
+            _write_result(_summary(store.supersede_plan(args.successor_ref, args.reason, source_refs=args.source_ref)))
             return 0
         if args.command == "owner-request":
             current = store.require()
