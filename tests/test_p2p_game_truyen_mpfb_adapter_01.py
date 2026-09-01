@@ -619,6 +619,17 @@ class ProjectionAndSourceBindingTests(unittest.TestCase):
         self.assertEqual((REPO_ROOT / ".p2p/vendor/provenance/p2p-game-truyen-mpfb-adapter-01.json").exists(), True)
 
 
+def isolation_command_kind(command: list[str]) -> str:
+    """Classify one canonical isolation command so tests can assert exact order."""
+    if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
+        return "profile-probe"
+    if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
+        return "rule-verify"
+    if command[0] == "netsh.exe":
+        return f"netsh-{command[3]}"
+    raise AssertionError(f"unexpected command {command}")
+
+
 class NetworkIsolationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix=".tmp-mpfb-network-test-")
@@ -726,6 +737,121 @@ class NetworkIsolationTests(unittest.TestCase):
             lease.release()
         self.assertTrue(delete_failed)
         self.assertEqual(lease.receipt.cleanup_result, "FAIL")
+
+    def _drive_profile_check(
+        self, payload: str
+    ) -> tuple[windows_network_isolation.NetworkIsolationLease, list[list[str]], dict[str, int | bool]]:
+        """Build a lease whose PowerShell profile probe returns ``payload``.
+
+        Only ``_validate_executable`` is stubbed, and only because it refuses
+        to run on a non-Windows review host.  The profile probe, the strict
+        normalization, the rule-name collision check, exact rule creation, the
+        post-create verification, and cleanup all run the canonical code path,
+        including the exact-path comparison against the lease executable.
+        """
+        commands: list[list[str]] = []
+        state: dict[str, int | bool] = {"rule_present": False, "add_count": 0, "delete_count": 0, "verify_count": 0}
+
+        def runner(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            commands.append(command)
+            if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
+                return subprocess.CompletedProcess(command, 0, payload, "")
+            if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
+                state["verify_count"] += 1
+                verified = {
+                    "Enabled": True,
+                    "Direction": "Outbound",
+                    "Action": "Block",
+                    "Program": str(self.blender.resolve()),
+                }
+                return subprocess.CompletedProcess(command, 0, json.dumps(verified), "")
+            if command[0] == "netsh.exe" and command[3] == "show":
+                return subprocess.CompletedProcess(command, 0 if state["rule_present"] else 1, "", "")
+            if command[0] == "netsh.exe" and command[3] == "add":
+                state["rule_present"] = True
+                state["add_count"] += 1
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            if command[0] == "netsh.exe" and command[3] == "delete":
+                state["rule_present"] = False
+                state["delete_count"] += 1
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            raise AssertionError(command)
+
+        resolved = self.blender.resolve()
+        with mock.patch.object(windows_network_isolation, "_validate_executable", return_value=resolved):
+            lease = windows_network_isolation.create_network_isolation(
+                self.blender,
+                "Oak:fixture",
+                platform_name="nt",
+                runner=runner,
+            )
+        return lease, commands, state
+
+    def test_enabled_profiles_accept_boolean_and_integer_serialization(self) -> None:
+        for payload in ("[true,true,true]", "[1,1,1]", "[true,1,true]"):
+            with self.subTest(payload=payload):
+                lease, commands, state = self._drive_profile_check(payload)
+                with lease:
+                    self.assertEqual(lease.receipt.setup_result, "PASS")
+                    self.assertEqual(lease.receipt.enforcement_result, "PASS")
+                    self.assertTrue(lease.receipt.rule_created)
+                self.assertEqual(lease.receipt.cleanup_result, "PASS")
+                self.assertFalse(state["rule_present"])
+                self.assertEqual(
+                    [isolation_command_kind(command) for command in commands],
+                    ["profile-probe", "netsh-show", "netsh-add", "rule-verify", "netsh-delete", "netsh-show"],
+                    "isolation must be verified before release and the profile probe must precede any rule mutation",
+                )
+                self.assertEqual(
+                    commands[0][-1],
+                    "@(Get-NetFirewallProfile -All | Select-Object -ExpandProperty Enabled) | ConvertTo-Json -Compress",
+                )
+                add_command = commands[2]
+                self.assertIn(f"name={lease.rule_name}", add_command)
+                self.assertIn("dir=out", add_command)
+                self.assertIn("action=block", add_command)
+                self.assertIn("enable=yes", add_command)
+                self.assertIn("profile=any", add_command)
+                self.assertIn(f"program={self.blender.resolve()}", add_command)
+
+    def test_unsupported_profile_values_fail_closed_before_any_rule_mutation(self) -> None:
+        cases = {
+            "[1,1,0]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[true,false,true]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[1,1,2]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[-1,1,1]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[1.0,1,1]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[1,1,0.9999]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            '["1",1,1]': "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            '["true",true,true]': "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[null,true,true]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            '[{"Enabled":true},1,1]': "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[[1],1,1]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[1,1]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[1,1,1,1]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[]": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "true": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "1": "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            '{"Enabled":[true,true,true]}': "NETWORK_ISOLATION_FIREWALL_DISABLED",
+            "[true,true,": "NETWORK_ISOLATION_FIREWALL_PROFILE_CHECK_FAILED",
+            "": "NETWORK_ISOLATION_FIREWALL_PROFILE_CHECK_FAILED",
+            "not-json": "NETWORK_ISOLATION_FIREWALL_PROFILE_CHECK_FAILED",
+        }
+        for payload, error_code in cases.items():
+            with self.subTest(payload=payload):
+                lease, commands, state = self._drive_profile_check(payload)
+                with self.assertRaises(windows_network_isolation.NetworkIsolationError) as caught:
+                    lease.__enter__()
+                self.assertEqual(str(caught.exception), error_code)
+                self.assertEqual(
+                    [isolation_command_kind(command) for command in commands],
+                    ["profile-probe"],
+                    "a rejected profile payload must stop setup before any rule mutation",
+                )
+                self.assertFalse(state["rule_present"])
+                self.assertEqual(lease.receipt.setup_result, "FAIL")
+                self.assertEqual(lease.receipt.enforcement_result, "NOT_VERIFIED")
+                self.assertFalse(lease.receipt.rule_created)
 
 
 if __name__ == "__main__":
