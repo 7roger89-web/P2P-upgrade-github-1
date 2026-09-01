@@ -9,6 +9,7 @@ caller-controlled script or expression loading path.
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -320,17 +321,76 @@ def execute_job(job: BlenderJob) -> int:
 
     _ensure_p2p_import_path()
     import bpy
+    import addon_utils
 
-    source_root = job.mpfb_root / "src"
-    if not (source_root / "mpfb" / "__init__.py").is_file():
+    source_root = (job.mpfb_root / "src").resolve(strict=True)
+    if not (source_root / "mpfb" / "__init__.py").is_file() or not (
+        source_root / "mpfb" / "blender_manifest.toml"
+    ).is_file():
         raise BlenderEntrypointError(4, "MPFB_SOURCE_PACKAGE_MISSING")
-    sys.path.insert(0, str(source_root))
-    import mpfb
+
+    repo_module: str | None = None
+    for repo in bpy.context.preferences.extensions.repos:
+        try:
+            repo_path = Path(repo.directory).resolve(strict=True)
+        except (OSError, RuntimeError):
+            continue
+        if repo_path == source_root:
+            repo.enabled = True
+            repo_module = str(repo.module)
+            break
+    if repo_module is None:
+        result = bpy.ops.preferences.extension_repo_add(
+            name="P2P MPFB2 Local",
+            type="LOCAL",
+            use_custom_directory=True,
+            custom_directory=str(source_root),
+        )
+        if "FINISHED" not in result:
+            raise BlenderEntrypointError(4, f"MPFB_EXTENSION_REPOSITORY_ADD_FAILED:{result!r}")
+        for repo in bpy.context.preferences.extensions.repos:
+            try:
+                repo_path = Path(repo.directory).resolve(strict=True)
+            except (OSError, RuntimeError):
+                continue
+            if repo_path == source_root:
+                repo.enabled = True
+                repo_module = str(repo.module)
+                break
+    if not repo_module or not repo_module.isidentifier():
+        raise BlenderEntrypointError(4, "MPFB_EXTENSION_REPOSITORY_MODULE_INVALID")
+
+    addon_utils.extensions_refresh()
+    module_name = f"bl_ext.{repo_module}.mpfb"
+    # Blender's supported addon lifecycle calls exactly one module.register()
+    # inside addon_utils.enable(), after default_set creates the preference key.
+    mpfb = addon_utils.enable(module_name, default_set=True, persistent=False)
+    if mpfb is None:
+        raise BlenderEntrypointError(4, "MPFB_EXTENSION_ENABLE_FAILED")
+    if str(getattr(mpfb, "__name__", "")) != module_name or str(
+        getattr(mpfb, "__package__", "")
+    ) != module_name:
+        raise BlenderEntrypointError(4, "MPFB_EXTENSION_IDENTITY_MISMATCH")
+    if module_name not in bpy.context.preferences.addons:
+        raise BlenderEntrypointError(4, "MPFB_EXTENSION_IDENTITY_MISSING")
+    print("MPFB_ADDON_IDENTITY_PRESENT=YES")
 
     if tuple(getattr(mpfb, "VERSION", ())) != MPFB_VERSION_TUPLE:
         raise BlenderEntrypointError(4, "MPFB_RUNTIME_VERSION_MISMATCH")
-    mpfb.register()
-    from mpfb.services import HumanService
+    try:
+        mpfb.get_preference("mpfb_user_data")
+    except Exception as exc:
+        raise BlenderEntrypointError(
+            4,
+            f"MPFB_PREFERENCE_INITIALIZATION_FAILED:{type(exc).__name__}:{exc}",
+        ) from exc
+    print("MPFB_GET_PREFERENCE_PASS=YES")
+    if not getattr(mpfb, "MPFB_CONTEXTUAL_INFORMATION", None) or not getattr(
+        mpfb, "__addon_enabled__", False
+    ):
+        raise BlenderEntrypointError(4, "MPFB_REGISTER_NOT_CONFIRMED")
+    print("MPFB_REGISTER_PASS=YES")
+    HumanService = importlib.import_module(f"{module_name}.services").HumanService
 
     skin_asset_id = str(job.recipe["skin"]["material_id"])
     skin_path = _core_asset_path(job, skin_asset_id)
