@@ -208,13 +208,23 @@ class NetworkIsolationLease:
                 raise NetworkIsolationError("NETWORK_ISOLATION_RULE_CREATE_FAILED")
             self.receipt.rule_created = True
 
+            # netsh rules are addressed by their display-name surface: the
+            # legacy -Name parameter queries InstanceID, which does not match
+            # the netsh rule name, so canonical verification must use the
+            # exact -DisplayName surface.  The result is forced to an array
+            # and must contain exactly one rule; the returned DisplayName is
+            # re-compared exactly in Python below, so the query surface alone
+            # is never trusted.
             script = (
-                "$rule = Get-NetFirewallRule -Name '"
+                "$rules = @(Get-NetFirewallRule -DisplayName '"
                 + self.rule_name
-                + "' -ErrorAction Stop; "
+                + "' -ErrorAction Stop); "
+                "if ($rules.Count -ne 1) { throw 'P2P_RULE_DISPLAYNAME_NOT_EXACTLY_ONE' }; "
+                "$rule = $rules[0]; "
                 "$app = $rule | Get-NetFirewallApplicationFilter -ErrorAction Stop; "
-                "[pscustomobject]@{Enabled=[bool]$rule.Enabled;Direction=[string]$rule.Direction;"
-                "Action=[string]$rule.Action;Program=[string]$app.Program} | ConvertTo-Json -Compress"
+                "[pscustomobject]@{DisplayName=[string]$rule.DisplayName;Enabled=[bool]$rule.Enabled;"
+                "Direction=[string]$rule.Direction;Action=[string]$rule.Action;"
+                "Program=[string]$app.Program} | ConvertTo-Json -Compress"
             )
             verified = _powershell_json(
                 _powershell(self.runner, script),
@@ -224,7 +234,8 @@ class NetworkIsolationLease:
                 raise NetworkIsolationError("NETWORK_ISOLATION_RULE_VERIFY_FAILED")
             program = str(verified.get("Program", ""))
             if (
-                verified.get("Enabled") is not True
+                verified.get("DisplayName") != self.rule_name
+                or verified.get("Enabled") is not True
                 or str(verified.get("Direction", "")).casefold() != "outbound"
                 or str(verified.get("Action", "")).casefold() != "block"
                 or Path(program).resolve() != self.executable_path
