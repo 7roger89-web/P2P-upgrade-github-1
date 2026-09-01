@@ -7,6 +7,7 @@
   "authority": "This catalog records capability candidates, their provenance, classification, and project-profile routing. It extends the research-adoption-ledger and capabilities.json. Available-for-project-selection does not mean globally installed.",
   "domains": [
     "ui.design",
+    "ui.design_quality",
     "ui.design_system",
     "ui.frontend",
     "ui.motion",
@@ -410,6 +411,39 @@
         "REFERENCE_ONLY: Do not make canonical UI dependency"
       ],
       "project_profiles_applicable": ["THREEJS_GAME", "R3F_GAME", "2D_GAME"],
+      "global_install": false
+    },
+    {
+      "candidate_id": "CAND-GAME-UI-019",
+      "source_name": "pbakaus/impeccable (design-quality critique + deterministic detector)",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pbakaus/impeccable",
+      "source_version_or_commit": "94b7f34f6e27b95bc32d8284a671601ed6ac1b2a (tree 604c0d2d5f0c1c6bd1f3bd1cbc06bef637e24139, package version 3.6.1)",
+      "provenance_status": "REPOSITORY_EVIDENCED_PARTIAL_VENDOR_SNAPSHOT",
+      "license": "Apache-2.0",
+      "license_url": "https://github.com/pbakaus/impeccable/blob/main/LICENSE",
+      "license_verified_at": "2026-09-01",
+      "capability_domains": [
+        "ui.design_quality",
+        "ui.design",
+        "ui.frontend"
+      ],
+      "classification": "CONDITIONAL",
+      "rationale": "Design-quality critique/polish review plus an offline deterministic anti-generic-design detector for an EXISTING P2P UI/game surface. REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY: it does not own routing, project scope, execution permission, evidence, Owner Gates or release. Only the critique/polish/bolder/quieter/layout/typeset review actions and the deterministic check are projected; init/live/audit/document/extract and the whole install, hook and browser-live surface are not.",
+      "security_notes": "Apache-2.0 with upstream NOTICE retained. Only 23 unmodified files are vendored (.p2p/vendor/skill/pbakaus-impeccable-94b7f34). No npm install, no CLI, no hooks, no agent auto-activation wiring, no puppeteer/browser-live session, no cache or live-editing state. The vendored detector engines run on node builtins only; their optional HTML parser modules are not installed and the engine degrades deterministically instead.",
+      "activation_conditions": [
+        "Explicit design-quality/critique request on an existing UI surface",
+        "Explicit authorization record before any execution",
+        "Explicit target file list; no repository-wide default scan",
+        "P2P retains implementation authority and Owner Gate control"
+      ],
+      "project_profiles_applicable": [
+        "WEB_APP",
+        "MOBILE_APP",
+        "2D_GAME",
+        "THREEJS_GAME",
+        "R3F_GAME"
+      ],
       "global_install": false
     }
   ],

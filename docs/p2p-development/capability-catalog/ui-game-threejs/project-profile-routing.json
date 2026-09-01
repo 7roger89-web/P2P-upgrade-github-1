@@ -17,7 +17,8 @@
         "ui.motion",
         "ui.component_lab",
         "ui.figma_bridge",
-        "ui.penpot_bridge"
+        "ui.penpot_bridge",
+        "ui.design_quality"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -56,7 +57,8 @@
         "CAND-GAME-UI-003": "ACCEPT (motion) when animation needs justify",
         "CAND-GAME-UI-004": "ACCEPT (storybook) when project size justifies",
         "CAND-GAME-UI-009": "CONDITIONAL (detect-gpu) for WebGL/adaptive quality",
-        "CAND-GAME-UI-013": "SECURITY_GATED (penpot MCP)"
+        "CAND-GAME-UI-013": "SECURITY_GATED (penpot MCP)",
+        "CAND-GAME-UI-019": "CONDITIONAL (impeccable) design-quality review/deterministic check on an existing surface only"
       }
     },
     "MOBILE_APP": {
@@ -70,7 +72,8 @@
         "ui.motion",
         "ui.component_lab",
         "ui.figma_bridge",
-        "ui.penpot_bridge"
+        "ui.penpot_bridge",
+        "ui.design_quality"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -105,7 +108,8 @@
         "CAND-GAME-UI-002": "ACCEPT (shadcn-ui/ui) when stack compatible",
         "CAND-GAME-UI-003": "ACCEPT (motion) when animation needs justify",
         "CAND-GAME-UI-004": "ACCEPT (storybook) when project size justifies",
-        "CAND-GAME-UI-013": "SECURITY_GATED (penpot MCP)"
+        "CAND-GAME-UI-013": "SECURITY_GATED (penpot MCP)",
+        "CAND-GAME-UI-019": "CONDITIONAL (impeccable) design-quality review/deterministic check on an existing surface only"
       }
     },
     "2D_GAME": {
@@ -118,7 +122,8 @@
         "ui.frontend",
         "ui.motion",
         "ui.figma_bridge",
-        "ui.penpot_bridge"
+        "ui.penpot_bridge",
+        "ui.design_quality"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -156,7 +161,8 @@
       "candidate_mappings": {
         "CAND-GAME-UI-001": "PATTERN_ONLY (game-studio methodology)",
         "CAND-GAME-UI-010": "CONDITIONAL (@react-facet) for reactive game UI",
-        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)"
+        "CAND-GAME-UI-018": "REFERENCE_ONLY (game-hud examples)",
+        "CAND-GAME-UI-019": "CONDITIONAL (impeccable) design-quality review/deterministic check on an existing surface only"
       }
     },
     "THREEJS_GAME": {
@@ -185,7 +191,8 @@
         "game.vfx.shader",
         "game.world.terrain",
         "game.world.vegetation",
-        "img2threejs"
+        "img2threejs",
+        "ui.design_quality"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -221,7 +228,8 @@
         "CAND-ASSET-FORGE-007": "ACCEPT (three-vrm) runtime/expression",
         "CAND-ASSET-FORGE-008": "ACCEPT (existing img2threejs) explicit adapter only",
         "CAND-ASSET-FORGE-015": "ACCEPT (three.quarks) particles",
-        "CAND-ASSET-FORGE-018": "ACCEPT (THREE.Terrain) procedural terrain"
+        "CAND-ASSET-FORGE-018": "ACCEPT (THREE.Terrain) procedural terrain",
+        "CAND-GAME-UI-019": "CONDITIONAL (impeccable) design-quality review/deterministic check on an existing surface only"
       }
     },
     "R3F_GAME": {
@@ -252,7 +260,8 @@
         "game.vfx.shader",
         "game.world.terrain",
         "game.world.vegetation",
-        "img2threejs"
+        "img2threejs",
+        "ui.design_quality"
       ],
       "gated_capabilities": [
         "ui.penpot_bridge"
@@ -288,7 +297,8 @@
         "CAND-ASSET-FORGE-007": "ACCEPT (three-vrm) runtime/expression",
         "CAND-ASSET-FORGE-008": "ACCEPT (existing img2threejs) explicit adapter only",
         "CAND-ASSET-FORGE-015": "ACCEPT (three.quarks) particles",
-        "CAND-ASSET-FORGE-018": "ACCEPT (THREE.Terrain) procedural terrain"
+        "CAND-ASSET-FORGE-018": "ACCEPT (THREE.Terrain) procedural terrain",
+        "CAND-GAME-UI-019": "CONDITIONAL (impeccable) design-quality review/deterministic check on an existing surface only"
       }
     }
   },
@@ -307,6 +317,9 @@
     "Heavy AI generation belongs in OFFLINE ASSET FORGE not shipped runtime",
     "img2threejs security semantics must not be altered",
     "GENERATION != RIGGING != SKINNING != RUNTIME != MOTION != EXPRESSION",
-    "Procedural Three.js is not the default final-asset pipeline for hero characters"
+    "Procedural Three.js is not the default final-asset pipeline for hero characters",
+    "ui.design_quality is OPTIONAL EXPLICIT_REQUEST_ONLY and is never a required capability",
+    "DESIGN_REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY",
+    "AVAILABLE != LOADED != AUTHORIZED != EXECUTED"
   ]
 }

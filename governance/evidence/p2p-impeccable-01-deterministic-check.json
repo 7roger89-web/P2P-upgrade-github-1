@@ -1,0 +1,655 @@
+{
+  "schema": "p2p-impeccable-01-evidence/1",
+  "workstream": "P2P-IMPECCABLE-01",
+  "issue": 44,
+  "generated_at": "2026-09-01",
+  "capability_id": "ui.design_quality",
+  "law": "AVAILABLE != LOADED != SELECTED != EXECUTED",
+  "fixture": {
+    "surface": "tests/fixtures/p2p-impeccable-design-quality",
+    "kind": "BOUNDED_SYNTHETIC_P2P_OWNED_FIXTURE",
+    "game_truyen_source_mutated": false,
+    "product_runtime_surface": false
+  },
+  "claims": {
+    "DETERMINISTIC_CHECK_REPRODUCIBLE": "YES",
+    "NO_MODEL_REQUIRED_FOR_DETERMINISTIC_CHECK": "YES",
+    "FINDINGS_STABLE_ACROSS_REPEAT_RUN": "YES",
+    "DEFAULT_CONTEXT_LOADING": "NO",
+    "GLOBAL_ACTIVATION": "NO"
+  },
+  "engine_modes": {
+    "REGEX_DEGRADED": "Zero-dependency default. Reproducible offline on any node runtime with no install. This is the durable, asserted baseline.",
+    "STATIC_HTML_FULL": "Observed only. Requires the optional upstream parser modules (htmlparser2, css-select, css-tree, domutils), which P2P does NOT install or vendor. Recorded as an environment-dependent observation, not a durable P2P guarantee."
+  },
+  "runs": {
+    "REGEX_DEGRADED": {
+      "before_run_1": {
+        "engine_mode": "REGEX_DEGRADED",
+        "finding_count": 6,
+        "antipattern_counts": {
+          "dark-glow": 1,
+          "flat-type-hierarchy": 1,
+          "gradient-text": 1,
+          "monotonous-spacing": 1,
+          "overused-font": 1,
+          "side-tab": 1
+        },
+        "findings": [
+          {
+            "antipattern": "monotonous-spacing",
+            "name": "Monotonous spacing",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "~8px used 16/16 times (100%)"
+          },
+          {
+            "antipattern": "overused-font",
+            "name": "Overused font",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 15,
+            "snippet": "font-family: Inter"
+          },
+          {
+            "antipattern": "side-tab",
+            "name": "Side-tab accent border",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 23,
+            "snippet": "border-left: 4px solid #7c3aed"
+          },
+          {
+            "antipattern": "dark-glow",
+            "name": "Glowing shadow accents",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 25,
+            "snippet": "Zero-offset box-shadow glow (#7c3aed)"
+          },
+          {
+            "antipattern": "flat-type-hierarchy",
+            "name": "Flat type hierarchy",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 34,
+            "snippet": "Sizes: 10px, 11px, 15px, 16px, 17px (ratio 1.7:1)"
+          },
+          {
+            "antipattern": "gradient-text",
+            "name": "Gradient text",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 34,
+            "snippet": "background-clip: text + gradient"
+          }
+        ],
+        "model_used": false,
+        "network_used": false,
+        "browser_used": false,
+        "scanned": [
+          "tests/fixtures/p2p-impeccable-design-quality/before.html"
+        ]
+      },
+      "before_run_2_repeat": {
+        "engine_mode": "REGEX_DEGRADED",
+        "finding_count": 6,
+        "antipattern_counts": {
+          "dark-glow": 1,
+          "flat-type-hierarchy": 1,
+          "gradient-text": 1,
+          "monotonous-spacing": 1,
+          "overused-font": 1,
+          "side-tab": 1
+        },
+        "findings": [
+          {
+            "antipattern": "monotonous-spacing",
+            "name": "Monotonous spacing",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "~8px used 16/16 times (100%)"
+          },
+          {
+            "antipattern": "overused-font",
+            "name": "Overused font",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 15,
+            "snippet": "font-family: Inter"
+          },
+          {
+            "antipattern": "side-tab",
+            "name": "Side-tab accent border",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 23,
+            "snippet": "border-left: 4px solid #7c3aed"
+          },
+          {
+            "antipattern": "dark-glow",
+            "name": "Glowing shadow accents",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 25,
+            "snippet": "Zero-offset box-shadow glow (#7c3aed)"
+          },
+          {
+            "antipattern": "flat-type-hierarchy",
+            "name": "Flat type hierarchy",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 34,
+            "snippet": "Sizes: 10px, 11px, 15px, 16px, 17px (ratio 1.7:1)"
+          },
+          {
+            "antipattern": "gradient-text",
+            "name": "Gradient text",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 34,
+            "snippet": "background-clip: text + gradient"
+          }
+        ],
+        "model_used": false,
+        "network_used": false,
+        "browser_used": false,
+        "scanned": [
+          "tests/fixtures/p2p-impeccable-design-quality/before.html"
+        ]
+      },
+      "repeat_run_identical": true,
+      "after_minimum_correction": {
+        "engine_mode": "REGEX_DEGRADED",
+        "finding_count": 0,
+        "antipattern_counts": {},
+        "findings": [],
+        "model_used": false,
+        "network_used": false,
+        "browser_used": false,
+        "scanned": [
+          "tests/fixtures/p2p-impeccable-design-quality/after.html"
+        ]
+      },
+      "delta": {
+        "before_finding_count": 6,
+        "after_finding_count": 0,
+        "resolved_antipatterns": [
+          "dark-glow",
+          "flat-type-hierarchy",
+          "gradient-text",
+          "monotonous-spacing",
+          "overused-font",
+          "side-tab"
+        ],
+        "introduced_antipatterns": [],
+        "engine_mode_before": "REGEX_DEGRADED",
+        "engine_mode_after": "REGEX_DEGRADED"
+      }
+    },
+    "STATIC_HTML_FULL": {
+      "before_run_1": {
+        "engine_mode": "STATIC_HTML_FULL",
+        "finding_count": 14,
+        "antipattern_counts": {
+          "ai-color-palette": 1,
+          "dark-glow": 1,
+          "flat-type-hierarchy": 1,
+          "gradient-text": 1,
+          "gray-on-color": 1,
+          "low-contrast": 1,
+          "monotonous-spacing": 1,
+          "nested-cards": 1,
+          "overused-font": 1,
+          "side-tab": 1,
+          "tight-leading": 1,
+          "tiny-text": 1,
+          "undersized-ui-text": 2
+        },
+        "findings": [
+          {
+            "antipattern": "ai-color-palette",
+            "name": "AI color palette",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Purple/violet accent colors detected"
+          },
+          {
+            "antipattern": "dark-glow",
+            "name": "Glowing shadow accents",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Zero-offset box-shadow glow (#7c3aed)"
+          },
+          {
+            "antipattern": "flat-type-hierarchy",
+            "name": "Flat type hierarchy",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Sizes: 10px, 11px, 15px, 16px, 17px (ratio 1.7:1)"
+          },
+          {
+            "antipattern": "gradient-text",
+            "name": "Gradient text",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "background-clip: text + gradient"
+          },
+          {
+            "antipattern": "gray-on-color",
+            "name": "Gray text on colored background",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "text #8a8a99 on bg gradient(#667eea, #764ba2)"
+          },
+          {
+            "antipattern": "low-contrast",
+            "name": "Low contrast text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "1.1:1 (need 4.5:1) — text #8a8a99 on #667eea"
+          },
+          {
+            "antipattern": "monotonous-spacing",
+            "name": "Monotonous spacing",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "~8px used 16/16 times (100%)"
+          },
+          {
+            "antipattern": "nested-cards",
+            "name": "Nested cards",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Card inside card (div)"
+          },
+          {
+            "antipattern": "overused-font",
+            "name": "Overused font",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Primary font: inter"
+          },
+          {
+            "antipattern": "side-tab",
+            "name": "Side-tab accent border",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "border-left: 4px + border-radius: 14px"
+          },
+          {
+            "antipattern": "tight-leading",
+            "name": "Tight line height",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "line-height 1.05x (need >=1.3)"
+          },
+          {
+            "antipattern": "tiny-text",
+            "name": "Tiny body text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "11px body text"
+          },
+          {
+            "antipattern": "undersized-ui-text",
+            "name": "Undersized functional text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "10px functional text \"OK\" (below 11px floor)"
+          },
+          {
+            "antipattern": "undersized-ui-text",
+            "name": "Undersized functional text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "10px functional text \"OVERVIEW\" (below 11px floor)"
+          }
+        ],
+        "model_used": false,
+        "network_used": false,
+        "browser_used": false,
+        "scanned": [
+          "tests/fixtures/p2p-impeccable-design-quality/before.html"
+        ]
+      },
+      "before_run_2_repeat": {
+        "engine_mode": "STATIC_HTML_FULL",
+        "finding_count": 14,
+        "antipattern_counts": {
+          "ai-color-palette": 1,
+          "dark-glow": 1,
+          "flat-type-hierarchy": 1,
+          "gradient-text": 1,
+          "gray-on-color": 1,
+          "low-contrast": 1,
+          "monotonous-spacing": 1,
+          "nested-cards": 1,
+          "overused-font": 1,
+          "side-tab": 1,
+          "tight-leading": 1,
+          "tiny-text": 1,
+          "undersized-ui-text": 2
+        },
+        "findings": [
+          {
+            "antipattern": "ai-color-palette",
+            "name": "AI color palette",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Purple/violet accent colors detected"
+          },
+          {
+            "antipattern": "dark-glow",
+            "name": "Glowing shadow accents",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Zero-offset box-shadow glow (#7c3aed)"
+          },
+          {
+            "antipattern": "flat-type-hierarchy",
+            "name": "Flat type hierarchy",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Sizes: 10px, 11px, 15px, 16px, 17px (ratio 1.7:1)"
+          },
+          {
+            "antipattern": "gradient-text",
+            "name": "Gradient text",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "background-clip: text + gradient"
+          },
+          {
+            "antipattern": "gray-on-color",
+            "name": "Gray text on colored background",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "text #8a8a99 on bg gradient(#667eea, #764ba2)"
+          },
+          {
+            "antipattern": "low-contrast",
+            "name": "Low contrast text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "1.1:1 (need 4.5:1) — text #8a8a99 on #667eea"
+          },
+          {
+            "antipattern": "monotonous-spacing",
+            "name": "Monotonous spacing",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "~8px used 16/16 times (100%)"
+          },
+          {
+            "antipattern": "nested-cards",
+            "name": "Nested cards",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Card inside card (div)"
+          },
+          {
+            "antipattern": "overused-font",
+            "name": "Overused font",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "Primary font: inter"
+          },
+          {
+            "antipattern": "side-tab",
+            "name": "Side-tab accent border",
+            "category": "slop",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "border-left: 4px + border-radius: 14px"
+          },
+          {
+            "antipattern": "tight-leading",
+            "name": "Tight line height",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "line-height 1.05x (need >=1.3)"
+          },
+          {
+            "antipattern": "tiny-text",
+            "name": "Tiny body text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "11px body text"
+          },
+          {
+            "antipattern": "undersized-ui-text",
+            "name": "Undersized functional text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "10px functional text \"OK\" (below 11px floor)"
+          },
+          {
+            "antipattern": "undersized-ui-text",
+            "name": "Undersized functional text",
+            "category": "quality",
+            "severity": "warning",
+            "advisory": false,
+            "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
+            "line": 0,
+            "snippet": "10px functional text \"OVERVIEW\" (below 11px floor)"
+          }
+        ],
+        "model_used": false,
+        "network_used": false,
+        "browser_used": false,
+        "scanned": [
+          "tests/fixtures/p2p-impeccable-design-quality/before.html"
+        ]
+      },
+      "repeat_run_identical": true,
+      "after_minimum_correction": {
+        "engine_mode": "STATIC_HTML_FULL",
+        "finding_count": 0,
+        "antipattern_counts": {},
+        "findings": [],
+        "model_used": false,
+        "network_used": false,
+        "browser_used": false,
+        "scanned": [
+          "tests/fixtures/p2p-impeccable-design-quality/after.html"
+        ]
+      },
+      "delta": {
+        "before_finding_count": 14,
+        "after_finding_count": 0,
+        "resolved_antipatterns": [
+          "ai-color-palette",
+          "dark-glow",
+          "flat-type-hierarchy",
+          "gradient-text",
+          "gray-on-color",
+          "low-contrast",
+          "monotonous-spacing",
+          "nested-cards",
+          "overused-font",
+          "side-tab",
+          "tight-leading",
+          "tiny-text",
+          "undersized-ui-text"
+        ],
+        "introduced_antipatterns": [],
+        "engine_mode_before": "STATIC_HTML_FULL",
+        "engine_mode_after": "STATIC_HTML_FULL"
+      }
+    }
+  },
+  "execution_boundary": {
+    "execution_class": "READ_ONLY_LOCAL_DETERMINISTIC_CHECK",
+    "runtime_permission_authority_claim": "NONE",
+    "owner_gate_required_for_read_only_check": false,
+    "owner_gate_required_for_promotion": true,
+    "authorization_semantics": "Explicit P2P selection/invocation of this read-only capability is sufficient. The adapter mints no grant, verifies no permission and claims no runtime authority. Individual read-only checks do not create an Owner Gate; promotion/merge of the capability remains the real Owner Gate.",
+    "enforced_boundary": [
+      "explicit target list required (no filesystem crawl)",
+      "every target must resolve to a file inside repository_root",
+      "pinned upstream commit/tree and per-file provenance",
+      "exact vendor snapshot with canonical snapshot hash",
+      "declared runner surface must still be present and repository-local",
+      "no install, no network, no browser, no model, no credentials, no source mutation"
+    ],
+    "final_vendor_identity_gate": [
+      "manifest re-resolved from the registry on disk",
+      "vendor snapshot re-resolved and re-hashed",
+      "exact match required against the canonical declared snapshot hash",
+      "runner/declared execution surface re-validated"
+    ],
+    "final_gate_position": "IMMEDIATELY_BEFORE_SUBPROCESS",
+    "work_between_final_gate_and_launch": "NONE (argv assembly only)",
+    "NO_TARGET_FAIL_CLOSED": "YES",
+    "OUTSIDE_REPOSITORY_TARGET_FAIL_CLOSED": "YES",
+    "VENDOR_DRIFT_FAIL_CLOSED": "YES",
+    "LAST_MOMENT_VENDOR_DRIFT_FAIL_CLOSED": "YES",
+    "SUBPROCESS_NOT_LAUNCHED_ON_FAILURE": "YES",
+    "fail_closed_codes": [
+      "NO_TARGET_SUPPLIED",
+      "TARGET_OUTSIDE_REPOSITORY",
+      "TARGET_NOT_A_FILE",
+      "ACTION_NOT_PROJECTED",
+      "ACTION_NOT_EXECUTABLE",
+      "SELECTION_RECORD_INVALID",
+      "SELECTION_CAPABILITY_MISMATCH",
+      "RUNNER_MISSING",
+      "RUNNER_OUTSIDE_REPOSITORY",
+      "VENDOR_PATH_MISSING",
+      "VENDOR_PATH_OUTSIDE_REPOSITORY",
+      "VENDOR_SNAPSHOT_MISSING",
+      "VENDOR_SNAPSHOT_DRIFT",
+      "VENDOR_SNAPSHOT_HASH_MISMATCH",
+      "CANONICAL_SNAPSHOT_HASH_UNDECLARED",
+      "NOT_A_LOCAL_VENDOR_SKILL"
+    ],
+    "removed_in_this_repair": [
+      "TaskStateStore permission-authority dependency",
+      "evaluate_task_preflight as authorization authority",
+      "persisted permission_state / source_ref-as-authority logic",
+      "_ISSUED_GRANTS self-issued grant machinery",
+      "PortableExecutionRequest binding used as authorization",
+      "permission-binding hashes introduced only for that mechanism",
+      "granted_by security claims and authority_surface metadata",
+      "tests whose only purpose was proving that permission model"
+    ],
+    "new_permission_system": false,
+    "new_authority_plane": false,
+    "new_authority_chain_kind": false,
+    "new_database": false,
+    "new_ledger": false,
+    "new_daemon": false,
+    "new_token_service": false,
+    "new_owner_gate": false,
+    "canonical_task_state_modified": false,
+    "host_executor_modified": false,
+    "drift_proofs_use_temporary_mirror_only": true
+  }
+}

@@ -2262,6 +2262,47 @@
       "owner_decision_status": "REFERENCE_ONLY",
       "last_reviewed_at": "2026-08-29T20:00:00Z",
       "notes": "MIT low maturity"
+    },
+    {
+      "research_id": "RA-EXT-069",
+      "source_name": "pbakaus/impeccable",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pbakaus/impeccable",
+      "source_version_or_commit": "94b7f34f6e27b95bc32d8284a671601ed6ac1b2a",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Apache-2.0 design-quality agent skill (23 commands) with an offline deterministic anti-generic-design detector (59 rules).",
+      "selected_ideas": [
+        "deterministic-anti-generic-design-detection",
+        "design-critique-and-polish-review-vocabulary",
+        "engine-mode-disclosure-instead-of-silent-undercount"
+      ],
+      "rejected_ideas": [
+        "global-skill-activation-and-agent-hooks",
+        "cli-install-and-provider-download-surface",
+        "browser-live-variant-session-and-cache-state",
+        "second-design-system-or-router",
+        "impeccable-as-implementation-authority"
+      ],
+      "p2p_translation": "CONDITIONAL: projected as ui.design_quality (6 advisory review actions + 1 executable deterministic check) through the existing capability registry, vendor-skill machinery and project-profile routing. ON_DEMAND load, no global install.",
+      "capability_family": "UI_GAME_THREEJS",
+      "canonical_capability_ids": [
+        "ui.design_quality"
+      ],
+      "status": "PARTIAL",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json CAND-GAME-UI-019",
+        ".p2p/vendor/provenance/p2p-impeccable-01.json",
+        "governance/evidence/p2p-impeccable-01-deterministic-check.json",
+        "tests/test_p2p_impeccable_design_quality.py"
+      ],
+      "dependencies": [
+        "ui.design",
+        "ui.frontend"
+      ],
+      "roadmap_slot": "family:ui-game-threejs",
+      "owner_decision_status": "CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE",
+      "last_reviewed_at": "2026-09-01T00:00:00Z",
+      "notes": "P2P-IMPECCABLE-01 / issue #44. REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY. AVAILABLE != LOADED != AUTHORIZED != EXECUTED."
     }
   ],
   "rejected_register_summary": {
