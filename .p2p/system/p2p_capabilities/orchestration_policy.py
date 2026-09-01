@@ -53,6 +53,29 @@ STRICT = "STRICT"
 CRITICAL = "CRITICAL"
 EXECUTION_LANES = (FAST, STANDARD, STRICT, CRITICAL)
 
+# OWNER_MICRO_LOOP_SUPPRESSION (P2P-CONTEXT-HYGIENE-01 / notebook RULE 11).
+# A bounded finding and the repairs it directly induces stay inside the SAME
+# Writer repair loop; they are not relayed to the Owner as decisions.  Only
+# real Owner Gates escalate.  This policy classifies requests -- it grants
+# nothing and removes no real Owner Gate.
+OWNER_MICRO_LOOP_SUPPRESSION = "OWNER_MICRO_LOOP_SUPPRESSION"
+OWNER_GATE_CLASSES = (
+    "MERGE_PROMOTION",
+    "PRODUCTION_DEPLOY",
+    "DESTRUCTIVE_MUTATION",
+    "SECRETS",
+    "MAJOR_SPEND_INFRASTRUCTURE",
+    "HARD_ROLLBACK",
+    "SCOPE_CHANGING_BLOCKER",
+)
+OWNER_MICRO_REPAIR_CLASSES = (
+    "FINDING",
+    "FIXTURE_REPAIR",
+    "FOCUSED_TEST_REPAIR",
+    "EVIDENCE_COUNT_CORRECTION",
+    "REMOTE_SYNC_CORRECTION",
+)
+
 _ENUMS = {
     "task_size": {"TINY", "SMALL", "MODERATE", "LARGE"},
     "dependency_complexity": {"NONE", "LOW", "HIGH", "UNKNOWN"},
@@ -678,6 +701,41 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
     }
 
 
+def classify_owner_escalation(action: Any, *, finding_ref: Any = None) -> dict[str, Any]:
+    """Classify one escalation request under OWNER_MICRO_LOOP_SUPPRESSION.
+
+    Real Owner Gates (merge/promotion, production deploy, destructive
+    mutation, secrets, major spend/infrastructure, hard rollback, genuine
+    scope-changing blockers) always route to the Owner.  A bounded finding
+    and the repairs it directly induces (fixture repair, focused test
+    repair, evidence-count correction, remote-sync correction) route back
+    into the SAME Writer repair loop instead of being relayed to the Owner.
+    Unknown action classes fail closed with an error.  This function grants
+    no permission and removes no real Owner Gate.
+    """
+
+    normalized = str(action).upper().strip()
+    if normalized in OWNER_GATE_CLASSES:
+        route = "OWNER_GATE"
+    elif normalized in OWNER_MICRO_REPAIR_CLASSES:
+        route = "WRITER_REPAIR_LOOP"
+    else:
+        raise OrchestrationPolicyError(f"ESCALATION_ACTION_INVALID:{normalized}")
+    result: dict[str, Any] = {
+        "schema": "p2p-owner-escalation-classification/1",
+        "policy": OWNER_MICRO_LOOP_SUPPRESSION,
+        "action": normalized,
+        "route": route,
+        "owner_gate_required": route == "OWNER_GATE",
+        "real_owner_gates_preserved": True,
+        "owner_gate_classes": list(OWNER_GATE_CLASSES),
+    }
+    if route == "WRITER_REPAIR_LOOP":
+        result["suppressed_owner_relay"] = True
+        result["finding_ref"] = str(finding_ref) if finding_ref else None
+    return result
+
+
 __all__ = [
     "ACTIVE_TEST_AUTHORIZED",
     "ANALYSIS_LOCAL",
@@ -698,6 +756,10 @@ __all__ = [
     "MINIMUM_SUFFICIENT_WORK",
     "ONE_WORKER",
     "OrchestrationPolicyError",
+    "OWNER_GATE_CLASSES",
+    "OWNER_MICRO_LOOP_SUPPRESSION",
+    "OWNER_MICRO_REPAIR_CLASSES",
+    "classify_owner_escalation",
     "POLICY_SCHEMA",
     "OFFENSIVE_HIGH_RISK",
     "REASONING_CLASSES",

@@ -185,6 +185,17 @@ for meaningful authority boundaries such as:
 - hard rollback
 - equivalent high-risk authority changes
 
+`OWNER_MICRO_LOOP_SUPPRESSION` (assimilated from Issue #42,
+CONTEXT_HYGIENE_01): a bounded finding and the repairs it directly induces —
+fixture repair, focused test repair, evidence-count correction, remote-sync
+correction — belong to the SAME bounded Writer repair loop. Do not relay each
+micro-fix through the Owner. Escalate to the Owner only for the real Owner
+Gates listed above, secrets, destructive actions, major spend/infrastructure,
+hard rollback, or a genuine scope-changing blocker. This suppression
+never removes or weakens a real Owner Gate; it only stops routine
+micro-repair relays. Machine-readable classification:
+`orchestration_policy.py` (`classify_owner_escalation`).
+
 ### RULE 12 — MINIMUM_SUFFICIENT_WORK
 
 Default operating laws:
@@ -274,6 +285,40 @@ XONG ĐÚNG PHẠM VI + ĐÃ TRẢ KẾT QUẢ       -> YES
 CÒN TIẾP TỤC CHÍNH CHAT NÀY             -> KEEP WORKING
 ARENA LÀM SAI / KẾT QUẢ KHÔNG DÙNG ĐƯỢC  -> NO
 ```
+
+### RULE 16 — CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE
+
+Session context is not authority. Durable task authority comes only from the
+active task state, the canonical specs, and explicit Owner/Governance
+decisions:
+
+```text
+SESSION_CONTEXT != AUTHORITY
+DEFAULT_RETRIEVAL = ACTIVE_TASK + REQUIRED_CANONICAL_SPECS
+HISTORICAL / SUPERSEDED / CLOSED MATERIAL = RETAINED, EXPLICITLY
+    RETRIEVABLE, EXCLUDED FROM DEFAULT ACTIVE RETRIEVAL
+EXACT DURABLE IDENTITY (REPOSITORY + WORKSTREAM + CURRENT DURABLE
+    SUBJECT + SHA/TREE/PR WHERE APPLICABLE) OUTRANKS SEMANTIC TEXT SIMILARITY
+CLOSED OR SUPERSEDED PLANS LOSE ACTIVE AUTHORITY AND CANNOT SILENTLY
+    REGAIN IT; CONTINUATION IS A NEW PLAN THAT REFERENCES THE CLOSED ONE
+EVIDENCE IS DURABLE AND QUERYABLE, NEVER INSTRUCTION AUTHORITY MERELY
+    BECAUSE ITS TEXT IS RELEVANT
+NO_BLIND_DELETE_AFTER_MERGE = YES
+```
+
+Runtime enforcement (existing machinery, no new subsystem):
+
+- `task_state.py` — plan lifecycle (`ACTIVE` / `CLOSED` / `SUPERSEDED`),
+  one-shot durable `PlanIdentity` binding, `resolve_authoritative_plan`
+  (exact identity beats text similarity), and fail-closed mutation guards on
+  non-active plans.
+- `context.py` — lifecycle-aware default retrieval: active/canonical sources
+  are selected by default; `HISTORICAL` / `SUPERSEDED` / `CLOSED` /
+  `ARCHIVED` sources are retained and retrievable via explicit
+  `include_historical=True`; evidence sources are flagged
+  `instruction_authority: false`.
+- `orchestration_policy.py` — `classify_owner_escalation` under
+  OWNER_MICRO_LOOP_SUPPRESSION (RULE 11).
 
 ## 4. RULE_ASSIMILATION_GATE_V1
 
@@ -403,10 +448,27 @@ machine-readable ledger below is the durable record.
         "docs/ARENA_AGENT_MODE_PROTOCOL.md section 11 (completion-dialog handling references notebook RULE 15)",
         "tests/test_p2p_operations_notebook.py (RULE 15 semantics checks)"
       ]
+    },
+    {
+      "id": "BACKLOG_I",
+      "item": "CONTEXT_HYGIENE_01",
+      "status": "PENDING",
+      "evidence": [
+        "Issue #42 P2P-CONTEXT-HYGIENE-01 (bounded goal, required laws, OWNER_MICRO_LOOP_SUPPRESSION)",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 11 OWNER_MICRO_LOOP_SUPPRESSION, RULE 16 CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE)",
+        ".p2p/system/p2p_capabilities/task_state.py (plan lifecycle, PlanIdentity binding, resolve_authoritative_plan)",
+        ".p2p/system/p2p_capabilities/context.py (lifecycle-aware default retrieval, evidence non-instructional)",
+        ".p2p/system/p2p_capabilities/orchestration_policy.py (classify_owner_escalation)",
+        "governance/development-control.json (session-context-is-not-authority invariant)",
+        "tests/test_p2p_context_hygiene.py"
+      ]
     }
   ]
 }
 ```
+
+`BACKLOG_I` stays `PENDING` until Control Tower independently verifies the
+exact PR head/tree for Issue #42 under RULE_ASSIMILATION_GATE_V1.
 
 ## 5. ASSIMILATION_BACKLOG — previously promised items
 
@@ -444,6 +506,12 @@ section 4.3.
   (RULE 15 above, accepted by the Owner after the original PR38
   implementation and assimilated under RULE_ASSIMILATION_GATE_V1 before PR38
   closes).
+- **I. Context hygiene / plan lifecycle (CONTEXT_HYGIENE_01)** — `PENDING`.
+  Issue #42 PR candidate: RULE 11 OWNER_MICRO_LOOP_SUPPRESSION + RULE 16
+  CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE above, runtime enforcement in
+  `task_state.py` / `context.py` / `orchestration_policy.py`, focused tests
+  in `tests/test_p2p_context_hygiene.py`. Flips to `VERIFIED` only after
+  Control Tower verifies the exact PR head/tree.
 
 ## 6. Discovery and operator paths
 

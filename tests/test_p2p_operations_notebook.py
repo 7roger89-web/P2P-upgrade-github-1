@@ -45,6 +45,7 @@ RULE_HEADINGS = (
     "RULE 13 — CONTROL_TOWER_STATE_RESPONSIBILITY",
     "RULE 14 — OVER_ENGINEERING_CHECK",
     "RULE 15 — ARENA_TASK_COMPLETION_DIALOG",
+    "RULE 16 — CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE",
 )
 
 LEDGER_STATUSES = {"PENDING", "VERIFIED", "RULE_ASSIMILATION_MISSED"}
@@ -87,11 +88,17 @@ class P2POperationsNotebookTests(unittest.TestCase):
         ids = [entry["id"] for entry in ledger["entries"]]
         self.assertEqual(set(ids), {"BACKLOG_A", "BACKLOG_B", "BACKLOG_C",
                                     "BACKLOG_D", "BACKLOG_E", "BACKLOG_F",
-                                    "BACKLOG_G", "BACKLOG_H"})
+                                    "BACKLOG_G", "BACKLOG_H", "BACKLOG_I"})
         backlog_h = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_H")
         self.assertEqual(backlog_h["item"], "ARENA_TASK_COMPLETION_DIALOG")
         self.assertEqual(backlog_h["status"], "VERIFIED")
         self.assertTrue(any("RULE 15" in line for line in backlog_h["evidence"]))
+        # CONTEXT_HYGIENE_01 (Issue #42) is tracked truthfully: PENDING until
+        # Control Tower independently verifies the exact PR head/tree.
+        backlog_i = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_I")
+        self.assertEqual(backlog_i["item"], "CONTEXT_HYGIENE_01")
+        self.assertEqual(backlog_i["status"], "PENDING")
+        self.assertTrue(any("test_p2p_context_hygiene" in line for line in backlog_i["evidence"]))
         for entry in ledger["entries"]:
             self.assertIn(entry["status"], LEDGER_STATUSES, entry["id"])
             self.assertIsInstance(entry["evidence"], list)
@@ -153,6 +160,41 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("RULE 15", self.arena_text)
         self.assertIn("ARENA_TASK_COMPLETION_DIALOG", self.arena_text)
         self.assertIn("Completion-dialog handling", self.arena_text)
+
+    def test_rule11_owner_micro_loop_suppression_preserves_real_gates(self) -> None:
+        # The workflow law is assimilated into RULE 11 ...
+        self.assertIn("OWNER_MICRO_LOOP_SUPPRESSION", self.notebook_text)
+        self.assertIn("SAME bounded Writer repair loop", self.notebook_text)
+        # ... without removing the real Owner Gates.
+        for gate in (
+            "canonical merge/promotion",
+            "production deployment",
+            "destructive deletion",
+            "secrets/credentials",
+            "major paid infrastructure/spending",
+            "hard rollback",
+        ):
+            self.assertIn(gate, self.notebook_text, gate)
+        self.assertIn("never removes or weakens a real Owner Gate", self.notebook_text)
+
+    def test_rule16_context_hygiene_laws_are_canonical(self) -> None:
+        self.assertIn("### RULE 16 — CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE", self.notebook_text)
+        # The law block is formatted as a wrapped code block, so match against
+        # whitespace-normalized text (newlines collapse to single spaces).
+        flat = re.sub(r"\s+", " ", self.notebook_text)
+        for law in (
+            "SESSION_CONTEXT != AUTHORITY",
+            "DEFAULT_RETRIEVAL = ACTIVE_TASK + REQUIRED_CANONICAL_SPECS",
+            "EXCLUDED FROM DEFAULT ACTIVE RETRIEVAL",
+            "OUTRANKS SEMANTIC TEXT SIMILARITY",
+            "CANNOT SILENTLY REGAIN IT",
+            "EVIDENCE IS DURABLE AND QUERYABLE, NEVER INSTRUCTION AUTHORITY",
+            "NO_BLIND_DELETE_AFTER_MERGE = YES",
+        ):
+            self.assertIn(law, flat, law)
+        # The installed digest stays consistent with the canonical rule set.
+        self.assertIn("RULE 16 CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE", self.agents_text)
+        self.assertIn("OWNER_MICRO_LOOP_SUPPRESSION", self.agents_text)
 
     def test_no_second_notebook_framework_created(self) -> None:
         # The notebook must reference the existing Arena/Control Tower
