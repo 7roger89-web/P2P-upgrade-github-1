@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import struct
 import subprocess
 import sys
@@ -630,6 +631,20 @@ def isolation_command_kind(command: list[str]) -> str:
     raise AssertionError(f"unexpected command {command}")
 
 
+def display_name_from_verify_command(command: list[str]) -> str:
+    """Return the exact rule name the canonical verification queries.
+
+    The canonical verify command must query the netsh-created rule through
+    its ``-DisplayName`` surface (the legacy ``-Name`` parameter queries
+    InstanceID, which does not match the netsh rule name).  A verify command
+    that no longer carries the exact ``-DisplayName '<rule>'`` literal is a
+    contract break, so the helper fails loudly instead of guessing.
+    """
+    match = re.search(r"Get-NetFirewallRule -DisplayName '([^']+)'", command[-1])
+    assert match is not None, "canonical verification must query the exact -DisplayName surface"
+    return match.group(1)
+
+
 class NetworkIsolationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix=".tmp-mpfb-network-test-")
@@ -651,6 +666,7 @@ class NetworkIsolationTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0, "[true,true,true]", "")
             if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
                 payload = {
+                    "DisplayName": display_name_from_verify_command(command),
                     "Enabled": True,
                     "Direction": "Outbound",
                     "Action": "Block",
@@ -667,12 +683,14 @@ class NetworkIsolationTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0, "Ok.", "")
             raise AssertionError(command)
 
-        lease = windows_network_isolation.create_network_isolation(
-            self.blender,
-            "Oak:fixture",
-            platform_name="nt",
-            runner=runner,
-        )
+        resolved = self.blender.resolve()
+        with mock.patch.object(windows_network_isolation, "_validate_executable", return_value=resolved):
+            lease = windows_network_isolation.create_network_isolation(
+                self.blender,
+                "Oak:fixture",
+                platform_name="nt",
+                runner=runner,
+            )
         with lease:
             self.assertEqual(lease.receipt.enforcement_result, "PASS")
             add_command = next(command for command in commands if command[0] == "netsh.exe" and command[3] == "add")
@@ -695,12 +713,14 @@ class NetworkIsolationTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0, "[true,false,true]", "")
             raise AssertionError("rule creation must not be attempted")
 
-        lease = windows_network_isolation.create_network_isolation(
-            self.blender,
-            "Oak:fixture",
-            platform_name="nt",
-            runner=runner,
-        )
+        resolved = self.blender.resolve()
+        with mock.patch.object(windows_network_isolation, "_validate_executable", return_value=resolved):
+            lease = windows_network_isolation.create_network_isolation(
+                self.blender,
+                "Oak:fixture",
+                platform_name="nt",
+                runner=runner,
+            )
         with self.assertRaisesRegex(windows_network_isolation.NetworkIsolationError, "FIREWALL_DISABLED"):
             lease.__enter__()
         self.assertFalse(any(command[0] == "netsh.exe" and command[3] == "add" for command in commands))
@@ -714,7 +734,13 @@ class NetworkIsolationTests(unittest.TestCase):
             if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
                 return subprocess.CompletedProcess(command, 0, "[true,true,true]", "")
             if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
-                payload = {"Enabled": True, "Direction": "Outbound", "Action": "Block", "Program": str(self.blender.resolve())}
+                payload = {
+                    "DisplayName": display_name_from_verify_command(command),
+                    "Enabled": True,
+                    "Direction": "Outbound",
+                    "Action": "Block",
+                    "Program": str(self.blender.resolve()),
+                }
                 return subprocess.CompletedProcess(command, 0, json.dumps(payload), "")
             if command[0] == "netsh.exe" and command[3] == "show":
                 return subprocess.CompletedProcess(command, 0 if rule_present else 1, "", "")
@@ -726,12 +752,14 @@ class NetworkIsolationTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 1, "", "access denied")
             raise AssertionError(command)
 
-        lease = windows_network_isolation.create_network_isolation(
-            self.blender,
-            "Oak:fixture",
-            platform_name="nt",
-            runner=runner,
-        )
+        resolved = self.blender.resolve()
+        with mock.patch.object(windows_network_isolation, "_validate_executable", return_value=resolved):
+            lease = windows_network_isolation.create_network_isolation(
+                self.blender,
+                "Oak:fixture",
+                platform_name="nt",
+                runner=runner,
+            )
         lease.__enter__()
         with self.assertRaisesRegex(windows_network_isolation.NetworkIsolationError, "RULE_DELETE_FAILED"):
             lease.release()
@@ -759,6 +787,7 @@ class NetworkIsolationTests(unittest.TestCase):
             if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
                 state["verify_count"] += 1
                 verified = {
+                    "DisplayName": display_name_from_verify_command(command),
                     "Enabled": True,
                     "Direction": "Outbound",
                     "Action": "Block",
@@ -786,6 +815,102 @@ class NetworkIsolationTests(unittest.TestCase):
                 runner=runner,
             )
         return lease, commands, state
+
+    def _drive_verify(
+        self,
+        *,
+        verify_payload: dict[str, object] | None = None,
+        verify_stdout: str | None = None,
+        verify_returncode: int = 0,
+        verify_stderr: str = "",
+    ) -> tuple[windows_network_isolation.NetworkIsolationLease, list[list[str]], dict[str, int | bool]]:
+        """Build a lease that drives the canonical post-create verification path.
+
+        The profile probe, the strict normalization, the rule-name collision
+        check, exact rule creation, the post-create verification, and cleanup
+        all run the canonical code path.  Only ``_validate_executable`` is
+        stubbed (non-Windows review host) and the PowerShell verify response
+        is configurable, so each negative proof is driven at the exact
+        Python/PowerShell boundary the module sees.  With no override the
+        verify response is the exact single display-name rule (enabled,
+        outbound, block, exact program) with its DisplayName echoed from the
+        canonical verify command itself.
+        """
+        commands: list[list[str]] = []
+        state: dict[str, int | bool] = {
+            "rule_present": False,
+            "add_count": 0,
+            "delete_count": 0,
+            "verify_count": 0,
+        }
+
+        def runner(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            commands.append(command)
+            if command[0] == "powershell.exe" and "Get-NetFirewallProfile" in command[-1]:
+                return subprocess.CompletedProcess(command, 0, "[true,true,true]", "")
+            if command[0] == "powershell.exe" and "Get-NetFirewallRule" in command[-1]:
+                state["verify_count"] += 1
+                if verify_stdout is not None or verify_returncode != 0:
+                    return subprocess.CompletedProcess(
+                        command, verify_returncode, verify_stdout or "", verify_stderr
+                    )
+                payload = verify_payload
+                if payload is None:
+                    payload = {
+                        "DisplayName": display_name_from_verify_command(command),
+                        "Enabled": True,
+                        "Direction": "Outbound",
+                        "Action": "Block",
+                        "Program": str(self.blender.resolve()),
+                    }
+                return subprocess.CompletedProcess(command, 0, json.dumps(payload), "")
+            if command[0] == "netsh.exe" and command[3] == "show":
+                return subprocess.CompletedProcess(command, 0 if state["rule_present"] else 1, "", "")
+            if command[0] == "netsh.exe" and command[3] == "add":
+                state["rule_present"] = True
+                state["add_count"] += 1
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            if command[0] == "netsh.exe" and command[3] == "delete":
+                state["rule_present"] = False
+                state["delete_count"] += 1
+                return subprocess.CompletedProcess(command, 0, "Ok.", "")
+            raise AssertionError(command)
+
+        resolved = self.blender.resolve()
+        with mock.patch.object(windows_network_isolation, "_validate_executable", return_value=resolved):
+            lease = windows_network_isolation.create_network_isolation(
+                self.blender,
+                "Oak:fixture",
+                platform_name="nt",
+                runner=runner,
+            )
+        return lease, commands, state
+
+    def _assert_verify_fail_closed(
+        self,
+        lease: windows_network_isolation.NetworkIsolationLease,
+        commands: list[list[str]],
+        state: dict[str, int | bool],
+    ) -> None:
+        """Assert the shared fail-closed outcome of one verification failure.
+
+        Encodes PROCESS_SPAWN_ALLOWED=NO: setup raised before any child could
+        be spawned.  Encodes CLEANUP_ATTEMPTED_IF_RULE_CREATED=YES: the
+        just-created rule is deleted and its absence re-verified.
+        """
+        self.assertEqual(state["add_count"], 1)
+        self.assertEqual(
+            [isolation_command_kind(command) for command in commands],
+            ["profile-probe", "netsh-show", "netsh-add", "rule-verify", "netsh-delete", "netsh-show"],
+            "a failed verification must stop before spawn and attempt cleanup of the created rule",
+        )
+        self.assertEqual(state["verify_count"], 1)
+        self.assertEqual(state["delete_count"], 1)
+        self.assertFalse(state["rule_present"])
+        self.assertEqual(lease.receipt.setup_result, "FAIL")
+        self.assertEqual(lease.receipt.enforcement_result, "NOT_VERIFIED")
+        self.assertEqual(lease.receipt.cleanup_result, "NOT_STARTED")
+        self.assertFalse(lease.receipt.rule_created)
 
     def test_enabled_profiles_accept_boolean_and_integer_serialization(self) -> None:
         for payload in ("[true,true,true]", "[1,1,1]", "[true,1,true]"):
@@ -852,6 +977,163 @@ class NetworkIsolationTests(unittest.TestCase):
                 self.assertEqual(lease.receipt.setup_result, "FAIL")
                 self.assertEqual(lease.receipt.enforcement_result, "NOT_VERIFIED")
                 self.assertFalse(lease.receipt.rule_created)
+
+    def test_verify_exact_single_displayname_rule_passes(self) -> None:
+        lease, commands, state = self._drive_verify()
+        with lease:
+            self.assertEqual(lease.receipt.setup_result, "PASS")
+            self.assertEqual(lease.receipt.enforcement_result, "PASS")
+            self.assertTrue(lease.receipt.rule_created)
+        self.assertEqual(lease.receipt.cleanup_result, "PASS")
+        self.assertFalse(state["rule_present"])
+        verify = next(command for command in commands if isolation_command_kind(command) == "rule-verify")
+        script = verify[-1]
+        self.assertIn(f"Get-NetFirewallRule -DisplayName '{lease.rule_name}' -ErrorAction Stop", script)
+        self.assertIn("if ($rules.Count -ne 1) { throw", script)
+        self.assertIn("$rule = $rules[0]", script)
+        self.assertIn("Get-NetFirewallApplicationFilter -ErrorAction Stop", script)
+        self.assertIn("DisplayName=[string]$rule.DisplayName", script)
+        self.assertNotIn("Get-NetFirewallRule -Name", script)
+        self.assertNotIn("*", script)
+        self.assertNotIn("?", script)
+        self.assertEqual(
+            [isolation_command_kind(command) for command in commands],
+            ["profile-probe", "netsh-show", "netsh-add", "rule-verify", "netsh-delete", "netsh-show"],
+        )
+
+    def test_verify_zero_matching_rules_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(
+            verify_returncode=1,
+            verify_stderr=(
+                "Get-NetFirewallRule : No MSFT_NetFirewallRule objects found with property "
+                "'DisplayName' equal to 'P2P-MPFB-DENY-<rule>'.\n"
+                "    + CategoryInfo : ObjectNotFound: (P2P-MPFB-DENY-<rule>:String) [Get-NetFirewallRule]"
+            ),
+        )
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_VERIFY_FAILED"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_multiple_matching_rules_fail_closed(self) -> None:
+        lease, commands, state = self._drive_verify(
+            verify_returncode=1,
+            verify_stderr="P2P_RULE_DISPLAYNAME_NOT_EXACTLY_ONE (two rules matched the P2P display name)",
+        )
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_VERIFY_FAILED"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_wrong_displayname_fails_closed(self) -> None:
+        probe, _, _ = self._drive_verify()
+        wrong_name = probe.rule_name[:-1] + ("0" if probe.rule_name[-1] != "0" else "1")
+        lease, commands, state = self._drive_verify(
+            verify_payload={
+                "DisplayName": wrong_name,
+                "Enabled": True,
+                "Direction": "Outbound",
+                "Action": "Block",
+                "Program": str(self.blender.resolve()),
+            }
+        )
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_NOT_EXACT"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def _verify_payload(self, **overrides: object) -> dict[str, object]:
+        """Exact passing verify payload with one field overridden per test.
+
+        The correct DisplayName comes from a probe lease: the lease never
+        enters (no commands run), and because the fixture path and job
+        identity are stable, the probe rule name equals the test rule name.
+        Each negative proof therefore differs from the passing payload by
+        exactly one field, so the failure is attributable to that field.
+        """
+        probe, _, _ = self._drive_verify()
+        payload: dict[str, object] = {
+            "DisplayName": probe.rule_name,
+            "Enabled": True,
+            "Direction": "Outbound",
+            "Action": "Block",
+            "Program": str(self.blender.resolve()),
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_verify_disabled_rule_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(verify_payload=self._verify_payload(Enabled=False))
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_NOT_EXACT"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_inbound_rule_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(verify_payload=self._verify_payload(Direction="Inbound"))
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_NOT_EXACT"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_allow_rule_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(verify_payload=self._verify_payload(Action="Allow"))
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_NOT_EXACT"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_wrong_program_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(
+            verify_payload=self._verify_payload(Program=str(self.root / "other.exe"))
+        )
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_NOT_EXACT"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_powershell_command_failure_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(
+            verify_returncode=1,
+            verify_stderr="powershell.exe exited without verification output",
+        )
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_VERIFY_FAILED"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_malformed_response_fails_closed(self) -> None:
+        for stdout in ("", "not-json", "null", "[1,1,1]", "1", "{broken json"):
+            with self.subTest(stdout=stdout):
+                lease, commands, state = self._drive_verify(verify_stdout=stdout)
+                with self.assertRaisesRegex(
+                    windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_VERIFY_FAILED"
+                ):
+                    lease.__enter__()
+                self._assert_verify_fail_closed(lease, commands, state)
+
+    def test_verify_dict_missing_exact_displayname_fails_closed(self) -> None:
+        lease, commands, state = self._drive_verify(
+            verify_payload={
+                "Enabled": True,
+                "Direction": "Outbound",
+                "Action": "Block",
+                "Program": str(self.blender.resolve()),
+            }
+        )
+        with self.assertRaisesRegex(
+            windows_network_isolation.NetworkIsolationError, "NETWORK_ISOLATION_RULE_NOT_EXACT"
+        ):
+            lease.__enter__()
+        self._assert_verify_fail_closed(lease, commands, state)
 
 
 if __name__ == "__main__":
