@@ -80,32 +80,73 @@ never edits project source; `deterministic_check` reports and returns
 
 ### Authorization boundary (Control-Tower repair)
 
-`AUTHORIZED` is not caller-asserted data. A grant is a `PortableExecutionRequest`
-bound to:
+`AUTHORIZED` is neither caller-asserted data nor a self-minted binding. The law is:
+
+```
+AUTHORIZATION = existing verified P2P permission        (authority)
+              + PortableExecutionRequest identity/binding (binding)
+```
+
+**Permission authority (existing surface, reused, not rebuilt).** The permission
+decision is read from the durable task control plane: the task store at
+`.p2p/state/task-state.json` and the existing C11 preflight evaluator
+`p2p_capabilities.task_state.evaluate_task_preflight`. Before any executable grant
+is minted, `authorize()` requires:
+
+| Requirement | Source |
+|---|---|
+| an active task (`READY` / `ACTIVE`) | durable `.p2p/state/task-state.json` |
+| the task declares `ui.design_quality` | `TaskRecord.required_capabilities` |
+| the task declares the `READ` permission need | `TaskRecord.permission_needs` |
+| its persisted preflight is `PASS` | `TaskRecord.last_preflight` (`p2p-task-preflight/1`) |
+| the Owner-approved permission record | persisted `last_preflight.permission_state` |
+| the gate still passes **now** | `evaluate_task_preflight()` re-run with live vendor readiness |
+
+`granted_by` is a provenance **label only**. No value of `granted_by` — and no
+caller-supplied permission input of any kind — can produce an executable grant:
+without a durable, Owner-approved, PASS-preflight task the call fails closed with
+`PERMISSION_AUTHORITY_STATE_MISSING` (or a more specific `PERMISSION_*` code).
+
+**Binding (identity only).** Only after permission is verified is a
+`PortableExecutionRequest` minted, bound to:
 
 | Binding | Value |
 |---|---|
+| durable task identity | `task_id` / `goal_id` taken from the task store |
+| verified permission decision | `context_refs = ("task-preflight:<task_id>:<sha256>",)` |
 | capability identity | `required_capabilities = ("ui.design_quality",)` |
 | exact executable action | `purpose = "ui.design_quality.deterministic_check"` |
 | registry + manifest identity | `project_binding = registry:<registry_hash>:capability:<manifest.identity_hash>` |
 | pinned vendor snapshot identity | `candidate_binding = vendor-snapshot:ui.design_quality:<snapshot_sha256>` |
 | permission shape | `granted_permissions = ("READ",)`, `mutation_requested = false` |
 
-Immediately **before** the detector subprocess is launched, `deterministic_check()`
-re-resolves the manifest from the registry on disk, re-resolves the vendor root,
-recomputes `snapshot_tree_sha256`, requires an exact match with the canonical
-declared hash, and requires `validate_binding()` to return `BOUND`. Any mismatch
-raises `DesignQualityAuthorizationError` and **no subprocess is started**.
+The binding contract is never the authority; it proves *which* verified permission
+and *which* pinned artifact an execution refers to.
 
-A hand-built `{"authorized": true, ...}` mapping fails closed. Even a
-self-consistent forgery that recomputes the correct fingerprint fails closed with
-`AUTHORIZATION_NOT_ISSUED_BY_P2P_AUTHORITY`, because it was never minted by the
-authority surface. Post-authorization vendor drift fails closed with
-`VENDOR_SNAPSHOT_HASH_MISMATCH` / `VENDOR_SNAPSHOT_DRIFT`.
+**Two gates, the last one truly last.** `deterministic_check()` verifies the grant
+early (before target resolution), and then again — manifest re-resolved, vendor root
+re-resolved, `snapshot_tree_sha256` recomputed and matched against the canonical
+declared hash, `validate_binding()` required to return `BOUND`, and the P2P
+permission authority re-read and re-evaluated — **immediately before**
+`subprocess.run`. Between that final verification and the launch there is no
+filesystem work, no preflight work and no target work: only the argv list is
+assembled. A vendor mutation or a permission revocation that lands after the early
+gate is still caught, and **no subprocess is started**.
+
+Proven fail-closed, with `subprocess.run` asserted un-called:
+
+- forged mapping / self-consistent forgery → `AUTHORIZATION_*`
+- caller-minted binding, no P2P permission → `PERMISSION_AUTHORITY_STATE_MISSING`
+- arbitrary `granted_by` → no grant at all
+- permission denied / rejected / unapproved → `PERMISSION_PREFLIGHT_*`
+- permission binding swapped inside the request → `PERMISSION_AUTHORITY_DRIFT`
+- permission revoked between authorization and launch → fail closed at the final gate
+- vendor drift between preflight and launch → `VENDOR_SNAPSHOT_HASH_MISMATCH` / `VENDOR_SNAPSHOT_DRIFT`
 
 No second permission system, authority plane, database, daemon, scheduler, token
-service or cryptographic framework was introduced; the issuance set is in-memory
-state on top of the existing contract.
+service or cryptographic framework was introduced. The authority is the existing
+task-state preflight; the binding is the existing portable execution contract; the
+issuance set remains in-memory process state on top of both.
 
 No profile receives `ui.design_quality` as a required capability; it is optional in
 all five profiles and excluded from none.
@@ -139,7 +180,8 @@ Baseline categories asserted in every mode: `gradient-text` (generic gradient),
 and `ai-color-palette`.
 
 Evidence: `governance/evidence/p2p-impeccable-01-deterministic-check.json`
-includes the minted authorization fingerprint and its bindings.
+includes the verified permission authority (surface, task id, preflight status),
+the permission binding, the minted authorization fingerprint and its bindings.
 (includes a repeat run per mode; findings byte-identical across repeats).
 
 ## Excluded upstream surface

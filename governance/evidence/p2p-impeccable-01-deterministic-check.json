@@ -5,11 +5,18 @@
   "generated_at": "2026-09-01",
   "capability_id": "ui.design_quality",
   "authorization": {
-    "authority_surface": "p2p_capabilities.host_executor.PortableExecutionRequest",
-    "schema": "p2p-impeccable-authorization/2",
+    "law": "AUTHORIZATION = existing verified P2P permission + PortableExecutionRequest identity/binding",
+    "permission_authority_surface": "p2p_capabilities.task_state.evaluate_task_preflight@.p2p/state/task-state.json",
+    "permission_authority_kind": "EXISTING_C11_TASK_PREFLIGHT",
+    "permission_state_ref": ".p2p/state/task-state.json",
+    "permission_task_id": "p2p-impeccable-01",
+    "permission_preflight_status": "PASS",
+    "binding_surface": "p2p_capabilities.host_executor.PortableExecutionRequest",
+    "binding_is_not_permission": true,
+    "schema": "p2p-impeccable-authorization/3",
     "action": "ui.design_quality.deterministic_check",
-    "granted_by": "P2P-IMPECCABLE-01",
-    "request_fingerprint": "70629b4e614c5eb15cdf40f5a3c7a0a4b4bbeadf3a93423543b3bab1d92a447f",
+    "granted_by_is_a_label_only": true,
+    "request_fingerprint": "e4a6fe558afb76edf0192ef97bd92f324e72d62ff9c0374302ca2cac8c74fdca",
     "project_binding": "registry:64fe487c103566fa4a4704a0ac8847432abbf14e7ef735c7ca1bd05c587a6bd5:capability:5eae88b207248396efad8a614e786faa9d474817cf52a2a66f4c1a7bc1b16fd2",
     "candidate_binding": "vendor-snapshot:ui.design_quality:13b23decab14fa3ee2f0e9d1c0c12216b2caade6bb35fda5003d93d592d45a0f",
     "registry_hash": "64fe487c103566fa4a4704a0ac8847432abbf14e7ef735c7ca1bd05c587a6bd5",
@@ -18,7 +25,7 @@
     "upstream_commit": "94b7f34f6e27b95bc32d8284a671601ed6ac1b2a",
     "implementation_authority": "P2P"
   },
-  "law": "AVAILABLE != LOADED != AUTHORIZED != EXECUTED",
+  "law": "AVAILABLE != LOADED != AUTHORIZED != EXECUTED; AUTHORIZED = P2P PERMISSION + BINDING",
   "fixture": {
     "surface": "tests/fixtures/p2p-impeccable-design-quality",
     "kind": "BOUNDED_SYNTHETIC_P2P_OWNED_FIXTURE",
@@ -305,7 +312,7 @@
             "advisory": false,
             "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
             "line": 0,
-            "snippet": "1.1:1 (need 4.5:1) \u2014 text #8a8a99 on #667eea"
+            "snippet": "1.1:1 (need 4.5:1) — text #8a8a99 on #667eea"
           },
           {
             "antipattern": "monotonous-spacing",
@@ -472,7 +479,7 @@
             "advisory": false,
             "file": "tests/fixtures/p2p-impeccable-design-quality/before.html",
             "line": 0,
-            "snippet": "1.1:1 (need 4.5:1) \u2014 text #8a8a99 on #667eea"
+            "snippet": "1.1:1 (need 4.5:1) — text #8a8a99 on #667eea"
           },
           {
             "antipattern": "monotonous-spacing",
@@ -600,10 +607,19 @@
     }
   },
   "authorization_boundary": {
-    "finding_repaired": "IMPECCABLE_AUTHORIZATION_BOUNDARY_IS_FORGEABLE_AND_NOT_REVALIDATED_AT_EXECUTION",
-    "reused_surface": "p2p_capabilities.host_executor.PortableExecutionRequest / validate_binding",
-    "grant_minting": "authorize() mints a PortableExecutionRequest and records its canonical fingerprint in this process issuance set",
+    "finding_repaired": [
+      "IMPECCABLE_AUTHORIZATION_BOUNDARY_IS_FORGEABLE_AND_NOT_REVALIDATED_AT_EXECUTION",
+      "BINDING_CONTRACT_WAS_TREATED_AS_PERMISSION_AUTHORITY",
+      "FINAL_REVALIDATION_WAS_NOT_THE_LAST_STEP_BEFORE_SUBPROCESS_LAUNCH"
+    ],
+    "reused_surface": [
+      "p2p_capabilities.task_state.evaluate_task_preflight (C11 preflight) over the durable .p2p/state/task-state.json task store — PERMISSION AUTHORITY",
+      "p2p_capabilities.host_executor.PortableExecutionRequest / validate_binding — IDENTITY/BINDING ONLY"
+    ],
+    "grant_minting": "authorize() first verifies an EXISTING permission decision: an active task in the durable task store that declares ui.design_quality and the READ permission need, whose persisted C11 preflight is PASS and still re-evaluates to PASS with live capability readiness. Only then is a PortableExecutionRequest minted, bound to that task and to a permission binding derived from the persisted preflight.",
     "bound_to": [
+      "durable task identity (task_id + goal_id) from .p2p/state/task-state.json",
+      "permission binding derived from the persisted C11 preflight decision",
       "capability identity",
       "exact executable action",
       "registry hash + manifest identity_hash",
@@ -613,32 +629,60 @@
       "manifest re-resolved from the registry on disk",
       "vendor snapshot re-resolved and re-hashed",
       "exact match required against the canonical declared snapshot hash",
-      "validate_binding() must return BOUND"
+      "validate_binding() must return BOUND",
+      "P2P permission authority re-read from the durable task store and re-evaluated through C11 preflight"
     ],
     "FORGED_AUTHORIZATION_FAIL_CLOSED": "YES",
     "POST_AUTH_SNAPSHOT_DRIFT_FAIL_CLOSED": "YES",
     "SUBPROCESS_NOT_LAUNCHED_ON_FAILURE": "YES",
     "fail_closed_codes": [
-      "AUTHORIZATION_SCHEMA_INVALID",
-      "AUTHORIZATION_MALFORMED",
-      "AUTHORIZATION_CAPABILITY_MISMATCH",
       "ACTION_NOT_EXECUTABLE",
-      "AUTHORIZATION_REQUEST_MISSING",
-      "AUTHORIZATION_REQUEST_INVALID",
-      "AUTHORIZATION_FINGERPRINT_MISMATCH",
-      "AUTHORIZATION_NOT_ISSUED_BY_P2P_AUTHORITY",
       "AUTHORIZATION_ACTION_BINDING_MISMATCH",
+      "AUTHORIZATION_BINDING_STALE_REQUEST",
+      "AUTHORIZATION_CAPABILITY_MISMATCH",
+      "AUTHORIZATION_FINGERPRINT_MISMATCH",
+      "AUTHORIZATION_MALFORMED",
+      "AUTHORIZATION_NOT_ISSUED_BY_P2P_AUTHORITY",
       "AUTHORIZATION_PERMISSION_BINDING_INVALID",
+      "AUTHORIZATION_REQUEST_INVALID",
+      "AUTHORIZATION_REQUEST_MISSING",
+      "AUTHORIZATION_SCHEMA_INVALID",
+      "CANONICAL_SNAPSHOT_HASH_UNDECLARED",
+      "PERMISSION_AUTHORITY_DRIFT",
+      "PERMISSION_AUTHORITY_STATE_MISSING",
+      "PERMISSION_AUTHORITY_UNREADABLE",
+      "PERMISSION_BINDING_MISMATCH",
+      "PERMISSION_CAPABILITY_NOT_IN_TASK_SCOPE",
+      "PERMISSION_NOT_GRANTED_BY_P2P_PREFLIGHT",
+      "PERMISSION_NOT_REQUESTED_BY_TASK",
+      "PERMISSION_PLAN_NOT_ACTIVE",
+      "PERMISSION_PREFLIGHT_BLOCKED",
+      "PERMISSION_PREFLIGHT_MISSING",
+      "PERMISSION_PREFLIGHT_NOT_PASSED",
+      "PERMISSION_PREFLIGHT_WAITING_OWNER",
+      "PERMISSION_STATE_MISSING",
+      "PERMISSION_TASK_AMBIGUOUS",
+      "PERMISSION_TASK_BINDING_MISMATCH",
+      "PERMISSION_TASK_NOT_ACTIVE",
+      "PERMISSION_TASK_NOT_FOUND",
       "REGISTRY_MANIFEST_IDENTITY_DRIFT",
       "VENDOR_SNAPSHOT_DRIFT",
       "VENDOR_SNAPSHOT_HASH_MISMATCH",
-      "VENDOR_SNAPSHOT_MISSING",
-      "AUTHORIZATION_BINDING_STALE_REQUEST"
+      "VENDOR_SNAPSHOT_MISSING"
     ],
     "new_authority_plane": false,
     "new_database": false,
     "new_daemon": false,
     "new_token_service": false,
-    "tamper_proofs_use_temporary_mirror_only": true
+    "tamper_proofs_use_temporary_mirror_only": true,
+    "final_revalidation_position": "IMMEDIATELY_BEFORE_SUBPROCESS",
+    "work_between_final_revalidation_and_launch": "NONE",
+    "ARBITRARY_GRANTED_BY_CANNOT_AUTHORIZE": "YES",
+    "CALLER_MINTED_BINDING_WITHOUT_PERMISSION_FAILS_CLOSED": "YES",
+    "PERMISSION_REVOCATION_AFTER_AUTHORIZATION_FAIL_CLOSED": "YES",
+    "LAST_MOMENT_VENDOR_DRIFT_FAIL_CLOSED": "YES",
+    "SUBPROCESS_NOT_LAUNCHED_ON_FINAL_DRIFT": "YES",
+    "new_permission_system": false,
+    "execution_proofs_use_temporary_mirror_only": true
   }
 }
