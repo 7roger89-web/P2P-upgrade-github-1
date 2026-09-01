@@ -133,7 +133,7 @@ Beginner-facing operational guidance must apply
   authority. Default retrieval = active task state + required canonical specs
   only; historical/superseded/closed material is retained, explicitly
   retrievable, excluded by default (NO_BLIND_DELETE_AFTER_MERGE); exact durable
-  identity (repo + workstream + subject + SHA/tree/PR) outranks text
+  identity (repo + workstream + subject + Git commit/tree OID/PR) outranks text
   similarity; a closed plan cannot silently regain ACTIVE authority; evidence
   is never instruction authority merely by retrieval relevance.
 

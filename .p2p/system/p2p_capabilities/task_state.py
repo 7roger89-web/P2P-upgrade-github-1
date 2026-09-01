@@ -249,6 +249,19 @@ def _assert_sha256(value: Any, field_name: str) -> str:
     return value.lower()
 
 
+# Canonical Git object-id shape used across P2P (same 40 lowercase hex form as
+# _GIT_SHA_RE in scripts/p2p_development_control.py).  Git commit and tree
+# object IDs are NOT SHA-256 digests; artifact/content SHA-256 values belong
+# to the existing artifact governance surfaces, never to plan identity.
+_GIT_OID_RE = re.compile(r"^[0-9a-f]{40}$")
+
+
+def _assert_git_oid(value: Any, field_name: str) -> str:
+    if not isinstance(value, str) or not _GIT_OID_RE.fullmatch(value):
+        raise TaskContractError(f"{field_name}_GIT_OID_REQUIRED")
+    return value
+
+
 def _json_safe(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _json_safe(child) for key, child in value.items()}
@@ -352,16 +365,20 @@ class PlanIdentity:
     """Exact durable identity binding for a plan.
 
     The binding is the repository plus the workstream plus the current
-    durable subject, optionally tightened with a source SHA-256, a git tree
-    SHA-256, and a PR reference.  Exact durable identity outranks semantic
-    text similarity: a record whose binding does not match exactly is
-    ineligible for active authority no matter how similar its text is.
+    durable subject, optionally tightened with a Git commit object ID, a Git
+    tree object ID, and a PR reference.  ``source_commit`` and ``source_tree``
+    are real 40-character Git object IDs (lowercase hex), NOT SHA-256 digests;
+    artifact/content SHA-256 values live in the existing artifact governance
+    surfaces and are intentionally kept out of plan identity.  Exact durable
+    identity outranks semantic text similarity: a record whose binding does
+    not match exactly is ineligible for active authority no matter how
+    similar its text is.
     """
 
     repository: str
     workstream: str
     subject: str
-    source_sha256: str = ""
+    source_commit: str = ""
     source_tree: str = ""
     pr: str = ""
 
@@ -369,10 +386,10 @@ class PlanIdentity:
         _required_text(self.repository, "plan_identity.repository", max_length=512)
         _required_text(self.workstream, "plan_identity.workstream", max_length=256)
         _required_text(self.subject, "plan_identity.subject", max_length=512)
-        if self.source_sha256:
-            _assert_sha256(self.source_sha256, "plan_identity.source_sha256")
+        if self.source_commit:
+            _assert_git_oid(self.source_commit, "plan_identity.source_commit")
         if self.source_tree:
-            _assert_sha256(self.source_tree, "plan_identity.source_tree")
+            _assert_git_oid(self.source_tree, "plan_identity.source_tree")
         if self.pr:
             _required_text(self.pr, "plan_identity.pr", max_length=64)
 
@@ -382,7 +399,7 @@ class PlanIdentity:
             "repository": self.repository,
             "workstream": self.workstream,
             "subject": self.subject,
-            "source_sha256": self.source_sha256,
+            "source_commit": self.source_commit,
             "source_tree": self.source_tree,
             "pr": self.pr,
         }
@@ -392,7 +409,7 @@ class PlanIdentity:
         if not isinstance(value, Mapping):
             raise TaskContractError("PLAN_IDENTITY_MUST_BE_OBJECT")
         _assert_no_identity_fields(value, path="plan_identity")
-        allowed = {"schema", "repository", "workstream", "subject", "source_sha256", "source_tree", "pr"}
+        allowed = {"schema", "repository", "workstream", "subject", "source_commit", "source_tree", "pr"}
         unknown = sorted(str(key) for key in value if str(key) not in allowed)
         if unknown:
             raise TaskContractError("PLAN_IDENTITY_FIELDS_INVALID:" + ",".join(unknown))
@@ -400,8 +417,8 @@ class PlanIdentity:
             repository=str(value.get("repository", "")),
             workstream=str(value.get("workstream", "")),
             subject=str(value.get("subject", "")),
-            source_sha256=str(value.get("source_sha256", "") or "").strip().lower(),
-            source_tree=str(value.get("source_tree", "") or "").strip().lower(),
+            source_commit=str(value.get("source_commit", "") or "").strip(),
+            source_tree=str(value.get("source_tree", "") or "").strip(),
             pr=str(value.get("pr", "") or "").strip(),
         )
 
@@ -1872,11 +1889,11 @@ def resolve_authoritative_plan(
     """Determine the single authoritative plan for an exact durable binding.
 
     Exact durable identity -- repository + workstream + current durable
-    subject, plus source SHA / tree / PR where the binding supplies them --
-    outranks semantic text similarity.  A candidate whose identity does not
-    match exactly is simply ineligible; similarity is never consulted.  A
-    plan that is closed or superseded can never win, so a closed plan cannot
-    silently regain active authority through resolution.
+    subject, plus Git commit / tree object IDs and PR where the binding
+    supplies them -- outranks semantic text similarity.  A candidate whose
+    identity does not match exactly is simply ineligible; similarity is never
+    consulted.  A plan that is closed or superseded can never win, so a closed
+    plan cannot silently regain active authority through resolution.
     """
 
     bind = binding if isinstance(binding, PlanIdentity) else PlanIdentity.from_mapping(binding)
@@ -1913,7 +1930,7 @@ def resolve_authoritative_plan(
             continue
         field_mismatches = [
             field_name
-            for field_name in ("source_sha256", "source_tree", "pr")
+            for field_name in ("source_commit", "source_tree", "pr")
             if getattr(bind, field_name) and getattr(identity, field_name).casefold() != getattr(bind, field_name).casefold()
         ]
         if field_mismatches:

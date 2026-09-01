@@ -59,10 +59,14 @@ from p2p_capabilities.task_state import (  # noqa: E402
 
 
 NOW = "2026-09-01T00:00:00+00:00"
-SHA_A = "a" * 64
-SHA_B = "b" * 64
-SHA_C = "c" * 64
-TREE_A = "d" * 64
+# Real-format 40-character Git object IDs (lowercase hex).
+COMMIT_A = "39a1573457cc257eb96bbaf862e6ef59608b5939"  # actual main commit
+TREE_A = "5c71fa23be7648956e8d57ac52cbff6503540d17"  # actual main tree
+COMMIT_B = "b" * 40  # stale synthetic commit OID
+COMMIT_C = "c" * 40  # sibling synthetic commit OID
+# SHA-256 fingerprint: a separate concept (checkpoint state fingerprint), not
+# a Git object ID.
+FINGERPRINT_A = "a" * 64
 REPOSITORY = "7roger89-web/P2P-upgrade-github-1"
 WORKSTREAM = "P2P-CONTEXT-HYGIENE-01"
 SUBJECT = "authority-aware active-context lifecycle"
@@ -129,7 +133,7 @@ def make_plan(goal_id: str = "goal-hygiene", **identity: object) -> TaskPlan:
             repository=str(identity.get("repository", REPOSITORY)),
             workstream=str(identity.get("workstream", WORKSTREAM)),
             subject=str(identity.get("subject", SUBJECT)),
-            source_sha256=str(identity.get("source_sha256", "")),
+            source_commit=str(identity.get("source_commit", "")),
             source_tree=str(identity.get("source_tree", "")),
             pr=str(identity.get("pr", "")),
         )
@@ -260,7 +264,7 @@ class D_ClosedPlanAuthorityBlockedTests(unittest.TestCase):
         with self.assertRaises(TaskLifecycleError):
             checkpoint_task(plan, "one", {
                 "checkpoint_ref": "checkpoint/stale",
-                "state_fingerprint": SHA_A,
+                "state_fingerprint": FINGERPRINT_A,
                 "recovery_classification": "SAFE_TO_RESUME",
                 "next_safe_step": "stale",
                 "captured_at": "2026-09-01T02:00:00+00:00",
@@ -346,17 +350,17 @@ class E_ExactBindingBeatsTextSimilarityTests(unittest.TestCase):
 
     def _candidates(self) -> dict[str, TaskPlan]:
         # Current authoritative plan: exact identity binding with SHA/tree/PR.
-        current = make_plan(goal_id="goal-current", source_sha256=SHA_A, source_tree=TREE_A, pr="43")
+        current = make_plan(goal_id="goal-current", source_commit=COMMIT_A, source_tree=TREE_A, pr="43")
         # Stale record: same repo/workstream/subject, stale SHA, and text that
         # is deliberately MORE similar to the current subject wording.
         stale = make_plan(
             goal_id="goal-stale",
             subject=SUBJECT,
-            source_sha256=SHA_B,
+            source_commit=COMMIT_B,
         )
         stale = self._retitle(stale, "authority-aware active-context lifecycle (current wording)")
         # Text-similar but different workstream.
-        sibling = make_plan(goal_id="goal-sibling", subject=SUBJECT, workstream="P2P-CONTEXT-HYGIENE-00", source_sha256=SHA_C)
+        sibling = make_plan(goal_id="goal-sibling", subject=SUBJECT, workstream="P2P-CONTEXT-HYGIENE-00", source_commit=COMMIT_C)
         # Unbound plan with identical text.
         unbound = make_plan(goal_id="goal-unbound")
         return {"current": current, "stale": stale, "sibling": sibling, "unbound": unbound}
@@ -373,7 +377,7 @@ class E_ExactBindingBeatsTextSimilarityTests(unittest.TestCase):
         candidates = self._candidates()
         result = resolve_authoritative_plan(
             [candidates["stale"], candidates["sibling"], candidates["unbound"], candidates["current"]],
-            {"repository": REPOSITORY, "workstream": WORKSTREAM, "subject": SUBJECT, "source_sha256": SHA_A, "source_tree": TREE_A, "pr": "43"},
+            {"repository": REPOSITORY, "workstream": WORKSTREAM, "subject": SUBJECT, "source_commit": COMMIT_A, "source_tree": TREE_A, "pr": "43"},
         )
         self.assertEqual(result["status"], "PASS", result)
         self.assertFalse(result["similarity_used"])
@@ -400,19 +404,92 @@ class E_ExactBindingBeatsTextSimilarityTests(unittest.TestCase):
         closed_current = candidates["current"].close_plan("closed", now="2026-09-01T01:00:00+00:00")
         result = resolve_authoritative_plan(
             [closed_current, candidates["stale"]],
-            {"repository": REPOSITORY, "workstream": WORKSTREAM, "subject": SUBJECT, "source_sha256": SHA_A, "source_tree": TREE_A, "pr": "43"},
+            {"repository": REPOSITORY, "workstream": WORKSTREAM, "subject": SUBJECT, "source_commit": COMMIT_A, "source_tree": TREE_A, "pr": "43"},
         )
         self.assertEqual(result["status"], "NOT_FOUND")
         by_status = {item["candidate"]: item["status"] for item in result["candidates"]}
         self.assertEqual(by_status["candidate-0"], "PLAN_NOT_ACTIVE:CLOSED")
 
     def test_identity_is_one_shot_and_not_rebindable(self) -> None:
-        plan = make_plan(goal_id="goal-once", source_sha256=SHA_A)
+        plan = make_plan(goal_id="goal-once", source_commit=COMMIT_A)
         with self.assertRaises(TaskContractError):
-            plan.bind_plan_identity(PlanIdentity(repository=REPOSITORY, workstream=WORKSTREAM, subject=SUBJECT, source_sha256=SHA_B), now="2026-09-01T01:00:00+00:00")
-        closed = make_plan(goal_id="goal-once-closed", source_sha256=SHA_A).close_plan("closed", now="2026-09-01T01:00:00+00:00")
+            plan.bind_plan_identity(PlanIdentity(repository=REPOSITORY, workstream=WORKSTREAM, subject=SUBJECT, source_commit=COMMIT_B), now="2026-09-01T01:00:00+00:00")
+        closed = make_plan(goal_id="goal-once-closed", source_commit=COMMIT_A).close_plan("closed", now="2026-09-01T01:00:00+00:00")
         with self.assertRaises(TaskLifecycleError):
             closed.bind_plan_identity(PlanIdentity(repository=REPOSITORY, workstream=WORKSTREAM, subject=SUBJECT), now="2026-09-01T02:00:00+00:00")
+
+
+class E2_GitObjectIdentityTests(unittest.TestCase):
+    """E2. PlanIdentity carries real Git commit/tree object IDs, not SHA-256."""
+
+    def test_real_repository_commit_and_tree_oids_accepted(self) -> None:
+        # COMMIT_A / TREE_A are the actual main commit and tree object IDs of
+        # this repository (verified via git rev-parse).
+        self.assertEqual(len(COMMIT_A), 40)
+        self.assertEqual(len(TREE_A), 40)
+        identity = PlanIdentity(
+            repository=REPOSITORY,
+            workstream=WORKSTREAM,
+            subject=SUBJECT,
+            source_commit=COMMIT_A,
+            source_tree=TREE_A,
+            pr="43",
+        )
+        self.assertEqual(identity.source_commit, COMMIT_A)
+        self.assertEqual(identity.source_tree, TREE_A)
+        payload = identity.to_dict()
+        self.assertEqual(payload["source_commit"], COMMIT_A)
+        self.assertEqual(payload["source_tree"], TREE_A)
+        self.assertNotIn("source_sha256", payload)
+        rebuilt = PlanIdentity.from_mapping(payload)
+        self.assertEqual(rebuilt.source_commit, COMMIT_A)
+        self.assertEqual(rebuilt.source_tree, TREE_A)
+
+    def test_real_oid_plan_resolves_as_authoritative(self) -> None:
+        plan = make_plan(goal_id="goal-real", source_commit=COMMIT_A, source_tree=TREE_A, pr="43")
+        result = resolve_authoritative_plan(
+            [plan],
+            {"repository": REPOSITORY, "workstream": WORKSTREAM, "subject": SUBJECT, "source_commit": COMMIT_A, "source_tree": TREE_A, "pr": "43"},
+        )
+        self.assertEqual(result["status"], "PASS", result)
+        self.assertEqual(result["selected_plan"]["plan_identity"]["source_commit"], COMMIT_A)
+        self.assertEqual(result["selected_plan"]["plan_identity"]["source_tree"], TREE_A)
+
+    def test_malformed_git_oids_rejected(self) -> None:
+        base = dict(repository=REPOSITORY, workstream=WORKSTREAM, subject=SUBJECT)
+        malformed_commits = (
+            "a" * 64,  # a SHA-256 digest is not a Git object ID
+            "a" * 39,  # one character short
+            "a" * 41,  # one character long
+            "g" * 40,  # non-hex character
+            COMMIT_A.upper(),  # uppercase is not the canonical lowercase form
+            COMMIT_A + " ",  # trailing whitespace
+            "39a1573457cc257eb96bbaf862e6ef59608b593",  # 39 hex chars
+        )
+        for bad in malformed_commits:
+            with self.assertRaises(TaskContractError, msg=repr(bad)):
+                PlanIdentity(source_commit=bad, **base)
+        for bad in malformed_commits:
+            with self.assertRaises(TaskContractError, msg=repr(bad)):
+                PlanIdentity(source_tree=bad, **base)
+
+    def test_sha256_field_name_is_not_accepted(self) -> None:
+        # The SHA-256 concept stays separate: the identity schema rejects a
+        # source_sha256 key instead of silently mapping it to a Git OID.
+        with self.assertRaises(TaskContractError):
+            PlanIdentity.from_mapping(
+                {**base_identity(), "source_sha256": "a" * 64}
+            )
+
+    def test_optional_oid_fields_may_be_absent(self) -> None:
+        identity = PlanIdentity(**base_identity())
+        self.assertEqual(identity.source_commit, "")
+        self.assertEqual(identity.source_tree, "")
+        self.assertEqual(identity.pr, "")
+
+
+def base_identity() -> dict[str, str]:
+    return {"repository": REPOSITORY, "workstream": WORKSTREAM, "subject": SUBJECT}
 
 
 class F_EvidenceNonInstructionalTests(unittest.TestCase):

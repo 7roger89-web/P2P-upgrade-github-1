@@ -28,8 +28,9 @@ Changed functional paths (all existing files):
   `plan_lifecycle` (ACTIVE/CLOSED/SUPERSEDED) with a single
   provenance-linked lifecycle event (`ACTIVE -> CLOSED|SUPERSEDED` only —
   no transition back to ACTIVE exists), one-shot durable `PlanIdentity`
-  binding (repository + workstream + subject + optional source SHA / git
-  tree / PR, SHA-256 validated, not rebindable), `resolve_authoritative_plan`
+  binding (repository + workstream + subject + optional Git commit OID /
+  Git tree OID / PR — 40-character lowercase object IDs, canonical
+  _GIT_SHA_RE shape, NOT SHA-256; not rebindable), `resolve_authoritative_plan`
   (exact durable identity outranks text similarity; similarity is never
   consulted; closed/superseded candidates never win; unpinned multi-match
   fails closed with AUTHORITY_CONFLICT), and fail-closed `_require_active`
