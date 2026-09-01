@@ -69,7 +69,7 @@ Out of scope:
 | upstream Humanizer subject | Detached exact commit/tree, not yet vendored | exact source audit record | correct | N/A | `E0-P0A-UP1` | inspect-only input to P1-A |
 | Humanizer vendor snapshot | exact P2P root contains only `SKILL.md` + `LICENSE`, byte-identical to upstream | exactly `SKILL.md` + `LICENSE` | correct | N/A | `E1-P1A-SRC1`, `E1-P1A-HASH1` | preserve-only; P1-B may test it |
 | Humanizer registry manifest | one valid `creative.prose.humanize` record, explicit/on-demand, 2.11.2 provenance | one noncanonical `SKILL` record, explicit/on-demand | correct | N/A hidden path | `E1-P1A-REG1`, `E1-P1A-ROUTE1` | preserve-only; P1-B may test it |
-| focused Humanizer fixture/test surface | No direct Issue #51 test module/fixtures | A-G focused behavior/value tests | missing | N/A | `E0-P0A-SCOPE1` | edit P1-B after P1-A |
+| focused Humanizer fixture/test surface | `tests/test_p2p_humanizer_integration.py` and four fixture pairs; direct module passes 9/9; Anvien reports 33 symbols/24 local relationships | A-G focused behavior/value tests | correct | 24 local relationships | `E1-P1B-TEST1..E1-P1B-TEST8`, `E1-P1B-GRAPH1` | preserve; run final detect |
 | wider legacy suite | 104 tests: 97 pass, 7 baseline failures | no new Humanizer regressions; unrelated failures remain disclosed | partial | per test surfaces | `E0-P0A-BASE1` | do not broaden scope; rerun nearest checks |
 | plan/evidence/benchmark/actual-status | newly created P0 standard set | living evidence updated per slice | correct | N/A | `E0-P0A-SCOPE1` | preserve and refresh |
 | release/promotion/Owner gate | not requested at Writer stage | remain unexecuted | correct | N/A | `E0-P0A-SCOPE1` | stop at independent Supervisor |
@@ -80,6 +80,7 @@ Out of scope:
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-01 | fresh fetched `origin/main` before implementation | full Issue #51 target family | existing surfaces correct; Humanizer snapshot/manifest/tests missing; wider suite partial from baseline failures | `E0-P0A-GIT1`, `E0-P0A-UP1`, `E0-P0A-REG1`, `E0-P0A-ADAPTER1`, `E0-P0A-GRAPH1`, `E0-P0A-BASE1`, `E0-P0A-SCOPE1` | P1-A adds only exact two files + one record; P1-B adds fixtures/tests after production acceptance |
 | R1 | 2026-09-01 | after P1-A exact snapshot/registry smoke | Humanizer vendor root and manifest | Humanizer snapshot `missing -> correct`; manifest `missing -> correct`; focused tests remain missing | `E1-P1A-SRC1`, `E1-P1A-REG1`, `E1-P1A-HASH1`, `E1-P1A-ROUTE1`, `E1-P1A-ROUTE2` | P1-B proceeds with fixtures/tests only; no production adapter/router edits |
+| R2 | 2026-09-01 | after P1-B corrected focused module and graph refresh | Humanizer fixture/test surface | focused tests `missing -> correct`; exact production surfaces remain correct; graph detail now known | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E1-P1B-TEST4`, `E1-P1B-TEST5`, `E1-P1B-TEST6`, `E1-P1B-TEST7`, `E1-P1B-TEST8`, `E1-P1B-GRAPH1`, `E1-P1B-BUILD1`, `E1-P1B-GLOBAL1`, `E1-P1B-GLOBAL2`, `E1-P1B-RETRY1` | run staged Anvien detect-changes, then checkpoint commit; leave governance drift unpromoted |
 
 ## Phase Touch Map
 
@@ -221,7 +222,7 @@ Do not vendor unrelated upstream content or implement a rewrite engine.
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
 | P1-A | Humanizer source is exact and audited; P2P snapshot/manifest now pass exact smoke | preserve the two files and one record; keep loader/router/copywriting preserve-only |
-| P1-B | No focused tests/fixtures exist; P1-A production surfaces are correct; wider baseline remains partial with seven unrelated failures | add seven bounded cases now; do not use the stale wider failures as Humanizer proof |
+| P1-B | Focused module now has 9/9 passing cases; P1-A production surfaces are correct; wider baseline remains partial with seven unrelated failures | preserve focused surface; run final compile/build-equivalent and detect-changes; do not use the stale wider failures as Humanizer proof |
 | P2-A/P2-C | Writer handoff has no independent review or PR yet | keep pending until implementation evidence is complete; stop before Supervisor/merge/promotion |
 
 ## Implementation Gate

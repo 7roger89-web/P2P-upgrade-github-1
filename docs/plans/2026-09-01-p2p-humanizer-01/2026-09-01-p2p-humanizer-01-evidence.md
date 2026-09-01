@@ -134,7 +134,7 @@ P1-A implementation evidence:
   corrected to use `Path.cwd()`; the corrected P1-A smoke passed and no source
   was changed by the failed assertion.
 
-P1-B evidence remains pending. The following IDs are reserved by the plan:
+The following P1-B evidence IDs are reserved by the plan:
 
 - `E1-P1A-SRC1`: exact two-file vendor snapshot comparison.
 - `E1-P1A-REG1`: manifest parse/provenance/contract metadata.
@@ -144,6 +144,64 @@ P1-B evidence remains pending. The following IDs are reserved by the plan:
 - `E1-P1B-TEST1..E1-P1B-TEST7`: focused A-G value/boundary cases.
 - `E1-P1B-BUILD1`: compile/build-equivalent and nearest-boundary validation.
 - `E1-P1B-DETECT1`: Anvien detect-changes immediately before the slice commit.
+
+P1-B implementation evidence:
+
+- `E1-P1B-TEST1`: Case A passed in
+  `tests/test_p2p_humanizer_integration.py`: the obvious AI-style fixture
+  changes to a shorter natural sentence while preserving `dashboard`, `CSV
+  files`, and `12 users`.
+- `E1-P1B-TEST2`: Case B passed: unsupported facts/names/numbers/dates/quotes/
+  citations and detector-evasion/bypass claims are prohibited by the manifest,
+  and the loaded upstream prompt contains its no-fabrication rule.
+- `E1-P1B-TEST3`: Case C passed: the supplied writer sample's `So` cadence is
+  reflected in the expected output while the source facts remain present.
+- `E1-P1B-TEST4`: Case D passed: the mixed Markdown fixture changes prose only;
+  frontmatter, fenced code, URL targets, and the structured table are identical.
+- `E1-P1B-TEST5`: Case E passed: technical fixture preserves inline command,
+  SHA/commit/tree values, quoted evidence, and citation target exactly.
+- `E1-P1B-TEST6`: Case F passed: empty, ordinary article, and unrelated
+  PostgreSQL requests do not select or load the Humanizer capability; metadata
+  reports `ON_DEMAND`.
+- `E1-P1B-TEST7`: Case G passed: explicit
+  `creative.prose.humanize` invocation selects only the new capability through
+  the existing single router and loads only `SKILL.md` without permission or
+  network flags.
+- `E1-P1B-TEST8`: Exact snapshot/workflow and no-dependency boundary tests
+  passed, bringing the direct module result to 9/9.
+- `E1-P1B-GRAPH1`: After the focused test was added, Anvien file detail parsed
+  `tests/test_p2p_humanizer_integration.py` with 33 symbols and 24 local
+  relationships, risk `high`, stale `false`; file impact found no affected
+  production files or flows. The high label is a scope warning for a test
+  file, not evidence of a production blast radius.
+- `E1-P1B-BUILD1`: `python -m compileall -q .p2p/system/p2p_capabilities
+  scripts tests` exited 0 (one pre-existing SyntaxWarning in
+  `test_p2p_live_certification.py`); nearest-boundary unittest batch
+  `tests.test_p2p_humanizer_integration`, `tests.test_p2p_vendor_skill_integration`,
+  and `tests.test_p2p_host_skill_projection` passed 61/61; `git diff --check`
+  exited 0.
+- `E1-P1B-GLOBAL1`: `python scripts/doctor.py --package . --role development
+  --json` returned exit 1 because the current development checkout has a
+  governance-drift report for unlocked/protected runtime files. This is a
+  candidate-state governance signal, not a Humanizer route/load failure; the
+  user requested no promotion or lock rebuild in this Writer lane.
+- `E1-P1B-GLOBAL2`: The broad framework validator returned 52/59 with seven
+  failures in existing ledger/charter/dependency/freshness/governance fields;
+  none is a Humanizer capability/loader assertion. It is retained as a
+  disclosed current-baseline limitation and excluded from focused PASS.
+- `E1-P1B-RETRY1`: The first fixture run exposed an over-broad assertion that
+  demanded upstream commit/tree values in a candidate-only technical fixture.
+  Removing that unrelated expectation kept the acceptance boundary precise;
+  the corrected focused module passed 9/9.
+- `E1-P1B-DETECT1`: Staged `anvien detect-changes --scope all` after the graph
+  refresh reported 14 changed files in the current slice, 5 affected files,
+  overall risk `low`, and the focused test file as the only `high` file-risk
+  warning. It reported no affected production files or execution flows; the
+  registry/vendor production changes were already checkpointed in `2c85e855`.
+
+The staged change-detection command will be rerun once after this evidence
+update and recorded in the checkpoint command output immediately before the
+P1-B commit.
 
 ## E2 - P2 Evidence
 

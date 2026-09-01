@@ -250,7 +250,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
   - Actual-status Update: mark the new vendor snapshot and manifest `correct` only after exact hashes, registry parse, and route/load evidence pass; append R1 and update P1-B assumptions if any field differs.
   - Commit Boundary: commit after this slice when acceptance passes. P1-A acceptance passed with the exact two-file snapshot, registry parse, explicit route, no-default route, selected `SKILL.md` load, and zero network/permission flags.
 
-- [ ] P1-B: Add focused value/boundary fixtures and direct integration tests
+- [x] P1-B: Add focused value/boundary fixtures and direct integration tests
   - Goal: prove the requested value and preservation boundary without implementing a rewrite engine or invoking an external model.
   - Scope Boundary:
     - Editable: `tests/test_p2p_humanizer_integration.py` and `tests/fixtures/p2p-humanizer/*` only, plus the P1 evidence/actual-status documents.
@@ -311,7 +311,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
     - Actual-status rows refreshed: focused test surface `missing -> correct`; baseline legacy failures remain explicitly pre-existing/out of scope.
   - Evidence Targets: focused test output, fixture comparison output, package/registry validation, compileall, diff check, and detect-changes.
   - Actual-status Update: append R2 with test evidence and keep any unverified model-runtime claim explicitly `NOT_APPLICABLE`.
-  - Commit Boundary: commit after this slice when acceptance passes.
+  - Commit Boundary: commit after this slice when acceptance passes. P1-B focused tests passed 9/9, covering A-G plus exact snapshot/workflow and no-dependency boundaries.
 
 - [ ] P2-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.

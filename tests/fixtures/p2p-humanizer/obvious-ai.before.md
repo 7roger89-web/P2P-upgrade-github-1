@@ -1,0 +1,1 @@
+Additionally, this release represents a significant step forward in our ongoing journey. It is important to note that the dashboard exports CSV files and supports 12 users. This comprehensive improvement enhances the overall experience.

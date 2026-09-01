@@ -28,9 +28,9 @@ remain in the evidence ledger.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P0 | Current capability registry records | records | 67 | 67 | pending | 68 after one new record | pending | `E0-P0A-REG1` |
-| P0 | Existing local vendor-snapshot capabilities | records | 15 | 15 | pending | 16 after one new record | pending | `E0-P0A-REG1` |
-| P0 | Selected upstream files | files | 2 available (`SKILL.md`, `LICENSE`) | 2 audited | pending | 2 | pending | `E0-P0A-UP1` |
+| P0 | Current capability registry records | records | 67 | 68 | 68 | 68 after one new record | +1 | `E0-P0A-REG1`, `E1-P1A-REG1` |
+| P0 | Existing local vendor-snapshot capabilities | records | 15 | 16 | 16 | 16 after one new record | +1 | `E0-P0A-REG1`, `E1-P1A-REG1` |
+| P0 | Selected upstream files | files | 2 available (`SKILL.md`, `LICENSE`) | 2 audited | 2 | 2 | 0 | `E0-P0A-UP1`, `E1-P1A-SRC1` |
 | P0 | Anvien parse failures | files | 0 | 0 | pending | 0 | 0 | `E0-P0A-GRAPH1` |
 
 ## B1 - P1 Benchmarks
@@ -40,7 +40,7 @@ remain in the evidence ledger.
 | P1 | Humanizer vendor snapshot files | files | 0 | 2 | 2 | 2 | +2 | `E1-P1A-SRC1` |
 | P1 | Humanizer declared references/assets/scripts | entries | 0 | 0 | 0 | 0 | 0 | `E1-P1A-REG1` |
 | P1 | Humanizer network/credential/install flags | enabled flags | 0 | 0 | 0 | 0 | 0 | `E1-P1A-REG1` |
-| P1 | Focused Issue #51 test cases | cases | 0 | pending | pending | 7 | pending | `E1-P1B-TEST1..E1-P1B-TEST7` |
+| P1 | Focused Issue #51 test cases | cases | 0 | 9 | 9 | at least 7 | +9 | `E1-P1B-TEST1..E1-P1B-TEST8` |
 
 ## B2 - P2 Benchmarks
 
