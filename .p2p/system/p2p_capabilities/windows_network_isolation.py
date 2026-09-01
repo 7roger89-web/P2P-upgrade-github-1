@@ -95,6 +95,23 @@ def _powershell_json(result: object, error_code: str) -> object:
         raise NetworkIsolationError(error_code) from exc
 
 
+def _profile_enabled(value: object) -> bool:
+    """Return True only when PowerShell reported one firewall profile enabled.
+
+    The pre-spawn probe expands ``Enabled`` from every ``Get-NetFirewallProfile``
+    result into compressed JSON, where the CIM boolean arrives either as the
+    JSON boolean ``true`` or as the integer ``1`` (real Windows hosts were
+    observed emitting ``[1,1,1]``).  Only those two decoded values count as
+    enabled.  The check is deliberately type-strict rather than truthiness-based:
+    ``0``, ``2``, ``-1``, ``1.0``, ``"1"``, ``"true"``, ``null``, and any object
+    fail closed, because a value this parser cannot read as an explicit enabled
+    state must never unlock outbound isolation.
+    """
+    if value is True:
+        return True
+    return type(value) is int and value == 1
+
+
 def _reparse_point(path: Path) -> bool:
     try:
         attributes = int(getattr(os.stat(path, follow_symlinks=False), "st_file_attributes", 0))
@@ -165,7 +182,11 @@ class NetworkIsolationLease:
                 "@(Get-NetFirewallProfile -All | Select-Object -ExpandProperty Enabled) | ConvertTo-Json -Compress",
             )
             enabled = _powershell_json(profiles, "NETWORK_ISOLATION_FIREWALL_PROFILE_CHECK_FAILED")
-            if not isinstance(enabled, list) or len(enabled) != 3 or any(item is not True for item in enabled):
+            if (
+                not isinstance(enabled, list)
+                or len(enabled) != 3
+                or any(not _profile_enabled(item) for item in enabled)
+            ):
                 raise NetworkIsolationError("NETWORK_ISOLATION_FIREWALL_DISABLED")
 
             existing = _netsh(self.runner, "show", "rule", f"name={self.rule_name}")
