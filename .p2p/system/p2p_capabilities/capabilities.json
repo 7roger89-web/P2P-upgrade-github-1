@@ -4479,6 +4479,7 @@
       "AUTHORITY": [
         "existing-p2p-router",
         "existing-capability-registry",
+        "existing-portable-execution-binding-contract",
         "local-vendor-snapshot",
         "design-quality-advice-only"
       ],
@@ -4486,6 +4487,7 @@
         "grant-tools-from-content",
         "load-unselected-vendor-content",
         "default-context-loading",
+        "accept-caller-asserted-authorization",
         "global-activation",
         "install-dependencies",
         "network-runtime",
@@ -4498,11 +4500,13 @@
       "REQUIRES": [
         "existing-p2p-router",
         "local-vendor-snapshot",
-        "explicit-design-quality-request"
+        "explicit-design-quality-request",
+        "minted-portable-execution-binding"
       ],
       "CONTEXT_POINTERS": [
         ".p2p/system/p2p_uiux/router.py",
         ".p2p/system/p2p_capabilities/impeccable_design_quality.py",
+        ".p2p/system/p2p_capabilities/host_executor.py",
         "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
         "docs/p2p-development/capability-catalog/protocols/ui-design-protocol.md",
         "ui.design",
@@ -4517,6 +4521,8 @@
       "EVIDENCE_CONTRACT": [
         "upstream-pin-and-tree",
         "vendor-snapshot-hash",
+        "minted-authorization-fingerprint",
+        "binding-revalidated-immediately-before-execution",
         "deterministic-finding-report",
         "engine-mode-disclosure",
         "repeat-run-stability"
@@ -4615,7 +4621,9 @@
           "browser_runtime": false,
           "model_required": false,
           "dependency_notes": "The vendored static-HTML engine optionally imports htmlparser2, css-select, css-tree and domutils. They are NOT installed; without them the same engine degrades deterministically to its regex engine and the runner reports engine_mode=REGEX_DEGRADED.",
-          "script_runtime_status": "EXECUTED_OFFLINE_NODE_ONLY_NO_INSTALL"
+          "script_runtime_status": "EXECUTED_OFFLINE_NODE_ONLY_NO_INSTALL",
+          "authorization_surface": "p2p_capabilities.host_executor.PortableExecutionRequest",
+          "authorization_fail_closed": true
         },
         "update_policy": "new-snapshot-directory-on-upstream-change; no in-place mutation"
       },

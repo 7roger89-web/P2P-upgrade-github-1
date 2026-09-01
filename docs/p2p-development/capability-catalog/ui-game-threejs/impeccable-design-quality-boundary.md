@@ -70,10 +70,42 @@ never edits project source; `deterministic_check` reports and returns
 
 - `availability()` — registry metadata only, `content_loaded: false`
 - `load_vendor_skill()` — reads the entrypoint plus explicitly named references only
-- `authorize()` — requires a named grant and re-verifies the snapshot tree hash
-- `deterministic_check()` — refuses without that grant, refuses advisory actions,
+- `authorize()` — **mints** a grant on the existing portable execution contract
+  (`p2p_capabilities.host_executor.PortableExecutionRequest`) and records its
+  canonical fingerprint in this process' issuance set
+- `deterministic_check()` — fails closed unless the grant was minted by that
+  authority surface and every binding still validates; refuses advisory actions,
   refuses targets outside the repository, and requires an explicit target list
   (there is no repository-wide default scan)
+
+### Authorization boundary (Control-Tower repair)
+
+`AUTHORIZED` is not caller-asserted data. A grant is a `PortableExecutionRequest`
+bound to:
+
+| Binding | Value |
+|---|---|
+| capability identity | `required_capabilities = ("ui.design_quality",)` |
+| exact executable action | `purpose = "ui.design_quality.deterministic_check"` |
+| registry + manifest identity | `project_binding = registry:<registry_hash>:capability:<manifest.identity_hash>` |
+| pinned vendor snapshot identity | `candidate_binding = vendor-snapshot:ui.design_quality:<snapshot_sha256>` |
+| permission shape | `granted_permissions = ("READ",)`, `mutation_requested = false` |
+
+Immediately **before** the detector subprocess is launched, `deterministic_check()`
+re-resolves the manifest from the registry on disk, re-resolves the vendor root,
+recomputes `snapshot_tree_sha256`, requires an exact match with the canonical
+declared hash, and requires `validate_binding()` to return `BOUND`. Any mismatch
+raises `DesignQualityAuthorizationError` and **no subprocess is started**.
+
+A hand-built `{"authorized": true, ...}` mapping fails closed. Even a
+self-consistent forgery that recomputes the correct fingerprint fails closed with
+`AUTHORIZATION_NOT_ISSUED_BY_P2P_AUTHORITY`, because it was never minted by the
+authority surface. Post-authorization vendor drift fails closed with
+`VENDOR_SNAPSHOT_HASH_MISMATCH` / `VENDOR_SNAPSHOT_DRIFT`.
+
+No second permission system, authority plane, database, daemon, scheduler, token
+service or cryptographic framework was introduced; the issuance set is in-memory
+state on top of the existing contract.
 
 No profile receives `ui.design_quality` as a required capability; it is optional in
 all five profiles and excluded from none.
@@ -107,6 +139,7 @@ Baseline categories asserted in every mode: `gradient-text` (generic gradient),
 and `ai-color-palette`.
 
 Evidence: `governance/evidence/p2p-impeccable-01-deterministic-check.json`
+includes the minted authorization fingerprint and its bindings.
 (includes a repeat run per mode; findings byte-identical across repeats).
 
 ## Excluded upstream surface

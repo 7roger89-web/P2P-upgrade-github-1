@@ -11,11 +11,15 @@ Scope is deliberately narrow:
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
@@ -46,6 +50,7 @@ REQUIRED_ANTIPATTERNS = {
 sys.path.insert(0, str(SYSTEM_ROOT))
 
 from p2p_capabilities import impeccable_design_quality as idq  # noqa: E402
+from p2p_capabilities.host_executor import PortableExecutionRequest  # noqa: E402
 from p2p_capabilities.model import load_registry  # noqa: E402
 from p2p_capabilities.vendor_skill import (  # noqa: E402
     discover_vendor_skills,
@@ -58,6 +63,34 @@ from p2p_capabilities.vendor_skill import (  # noqa: E402
 def _registry_entry() -> dict:
     raw = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     return next(item for item in raw["capabilities"] if item["CAPABILITY_ID"] == CAPABILITY_ID)
+
+
+def _grant(action: str = "ui.design_quality.deterministic_check", **kwargs) -> dict:
+    return idq.authorize(
+        action,
+        granted_by=kwargs.pop("granted_by", "P2P-IMPECCABLE-01-test"),
+        registry_path=kwargs.pop("registry_path", REGISTRY_PATH),
+        repository_root=kwargs.pop("repository_root", REPO_ROOT),
+    )
+
+
+def _mirror_repository(destination: Path) -> Path:
+    """Copy only what the adapter needs into a throwaway root.
+
+    Tamper proofs run against this mirror; canonical vendored source is never
+    mutated by the test suite.
+    """
+
+    for relative in (
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        ".p2p/system/p2p_capabilities/impeccable_detector_runner.mjs",
+        "tests/fixtures/p2p-impeccable-design-quality/before.html",
+    ):
+        target = destination / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / relative, target)
+    shutil.copytree(VENDOR_ROOT, destination / VENDOR_ROOT.relative_to(REPO_ROOT))
+    return destination
 
 
 def _route(request: str) -> dict:
@@ -167,13 +200,20 @@ class AuthorizationLawTests(unittest.TestCase):
         with self.assertRaises(idq.DesignQualityError):
             idq.deterministic_check([BEFORE], authorization={}, repository_root=REPO_ROOT, registry_path=REGISTRY_PATH)
 
-    def test_advisory_action_cannot_execute(self) -> None:
-        grant = idq.authorize(
-            "ui.design_quality.critique",
-            granted_by="P2P-IMPECCABLE-01-test",
-            registry_path=REGISTRY_PATH,
-            repository_root=REPO_ROOT,
+    def test_authorization_uses_the_existing_portable_execution_contract(self) -> None:
+        grant = _grant()
+        self.assertEqual(
+            grant["authority_surface"], "p2p_capabilities.host_executor.PortableExecutionRequest"
         )
+        request = PortableExecutionRequest.from_mapping(grant["request"])
+        self.assertEqual(request.required_capabilities, (CAPABILITY_ID,))
+        self.assertEqual(request.purpose, "ui.design_quality.deterministic_check")
+        self.assertEqual(request.task_fingerprint, grant["manifest_identity"])
+        self.assertFalse(request.mutation_requested)
+        self.assertEqual(request.fingerprint, grant["request_fingerprint"])
+
+    def test_advisory_action_cannot_execute(self) -> None:
+        grant = _grant("ui.design_quality.critique")
         self.assertTrue(grant["advisory_only"])
         with self.assertRaises(idq.DesignQualityError):
             idq.deterministic_check([BEFORE], authorization=grant, repository_root=REPO_ROOT, registry_path=REGISTRY_PATH)
@@ -188,12 +228,7 @@ class AuthorizationLawTests(unittest.TestCase):
             )
 
     def test_authorization_binds_verified_snapshot(self) -> None:
-        grant = idq.authorize(
-            "ui.design_quality.deterministic_check",
-            granted_by="P2P-IMPECCABLE-01-test",
-            registry_path=REGISTRY_PATH,
-            repository_root=REPO_ROOT,
-        )
+        grant = _grant()
         self.assertTrue(grant["authorized"])
         self.assertFalse(grant["executed"])
         self.assertEqual(grant["upstream_commit"], UPSTREAM_COMMIT)
@@ -201,15 +236,145 @@ class AuthorizationLawTests(unittest.TestCase):
         self.assertEqual(grant["implementation_authority"], "P2P")
 
 
+class AuthorizationFailClosedTests(unittest.TestCase):
+    """Control-Tower finding: authorization must not be forgeable caller data."""
+
+    def _expect_fail_closed(self, authorization, *, root=REPO_ROOT, registry=REGISTRY_PATH, target=BEFORE):
+        with mock.patch.object(idq.subprocess, "run") as spawned:
+            with self.assertRaises(idq.DesignQualityAuthorizationError) as caught:
+                idq.deterministic_check(
+                    [target], authorization=authorization, repository_root=root, registry_path=registry
+                )
+            spawned.assert_not_called()
+        return str(caught.exception)
+
+    # --- A. forged authorization -------------------------------------------
+    def test_a1_naive_forged_mapping_fails_closed(self) -> None:
+        reason = self._expect_fail_closed(
+            {"authorized": True, "capability_id": CAPABILITY_ID, "action": "ui.design_quality.deterministic_check"}
+        )
+        self.assertEqual(reason, "AUTHORIZATION_SCHEMA_INVALID")
+
+    def test_a2_self_consistent_forgery_is_not_an_issued_grant(self) -> None:
+        """An attacker can rebuild the request and its fingerprint; it still fails."""
+
+        real = _grant()
+        forged = copy.deepcopy(real)
+        rebuilt = PortableExecutionRequest.from_mapping(forged["request"])
+        forged["request_fingerprint"] = rebuilt.fingerprint
+        forged["granted_by"] = "attacker"
+        self.assertEqual(forged["request_fingerprint"], real["request_fingerprint"])
+        idq._ISSUED_GRANTS.discard(forged["request_fingerprint"])  # never minted here
+        try:
+            reason = self._expect_fail_closed(forged)
+        finally:
+            idq._ISSUED_GRANTS.add(real["request_fingerprint"])
+        self.assertEqual(reason, "AUTHORIZATION_NOT_ISSUED_BY_P2P_AUTHORITY")
+
+    def test_a3_tampered_fingerprint_fails_closed(self) -> None:
+        forged = copy.deepcopy(_grant())
+        forged["request_fingerprint"] = "0" * 64
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_FINGERPRINT_MISMATCH")
+
+    def test_a4_missing_request_binding_fails_closed(self) -> None:
+        forged = copy.deepcopy(_grant())
+        forged.pop("request")
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_REQUEST_MISSING")
+
+    # --- C. wrong capability / action / binding ----------------------------
+    def test_c1_wrong_capability_fails_closed(self) -> None:
+        forged = copy.deepcopy(_grant())
+        forged["capability_id"] = "ui.design"
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_CAPABILITY_MISMATCH")
+
+    def test_c2_advisory_action_cannot_be_promoted_to_execution(self) -> None:
+        forged = copy.deepcopy(_grant("ui.design_quality.critique"))
+        forged["action"] = "ui.design_quality.deterministic_check"
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_ACTION_BINDING_MISMATCH")
+
+    def test_c3_action_swap_inside_the_bound_request_fails_closed(self) -> None:
+        forged = copy.deepcopy(_grant())
+        forged["request"]["purpose"] = "ui.design_quality.polish"
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_FINGERPRINT_MISMATCH")
+
+    def test_c4_rebinding_to_another_snapshot_fails_closed(self) -> None:
+        forged = copy.deepcopy(_grant())
+        forged["request"]["candidate_binding"] = "vendor-snapshot:ui.design_quality:" + "f" * 64
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_FINGERPRINT_MISMATCH")
+
+    def test_c5_escalated_permissions_fail_closed(self) -> None:
+        forged = copy.deepcopy(_grant())
+        forged["request"]["permission_needs"] = ["READ", "MUTATE"]
+        forged["request"]["granted_permissions"] = ["READ", "MUTATE"]
+        self.assertEqual(self._expect_fail_closed(forged), "AUTHORIZATION_FINGERPRINT_MISMATCH")
+
+    # --- B. post-authorization snapshot drift ------------------------------
+    def test_b1_vendor_drift_after_authorization_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            mirror = _mirror_repository(Path(raw).resolve())
+            registry = mirror / ".p2p" / "system" / "p2p_capabilities" / "capabilities.json"
+            target = mirror / "tests" / "fixtures" / "p2p-impeccable-design-quality" / "before.html"
+            grant = _grant(registry_path=registry, repository_root=mirror)
+
+            # Authorization is valid at mint time against the mirror.
+            self.assertTrue(grant["authorized"])
+
+            # Vendor content changes AFTER authorization, BEFORE execution.
+            drifted = mirror / VENDOR_ROOT.relative_to(REPO_ROOT) / "skills" / "impeccable" / "scripts" / "detector" / "registry" / "antipatterns.mjs"
+            drifted.write_text(drifted.read_text(encoding="utf-8") + "\n// injected after authorization\n", encoding="utf-8")
+
+            reason = self._expect_fail_closed(grant, root=mirror, registry=registry, target=target)
+            self.assertIn(reason, {"VENDOR_SNAPSHOT_HASH_MISMATCH", "VENDOR_SNAPSHOT_DRIFT"})
+
+        # Canonical vendored source is untouched by this proof.
+        entry = _registry_entry()["UPSTREAM_PROVENANCE"]
+        self.assertEqual(entry["snapshot_sha256"], snapshot_tree_sha256(VENDOR_ROOT))
+
+    def test_b2_vendor_removal_after_authorization_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            mirror = _mirror_repository(Path(raw).resolve())
+            registry = mirror / ".p2p" / "system" / "p2p_capabilities" / "capabilities.json"
+            target = mirror / "tests" / "fixtures" / "p2p-impeccable-design-quality" / "before.html"
+            grant = _grant(registry_path=registry, repository_root=mirror)
+            shutil.rmtree(mirror / VENDOR_ROOT.relative_to(REPO_ROOT))
+            self.assertEqual(
+                self._expect_fail_closed(grant, root=mirror, registry=registry, target=target),
+                "VENDOR_SNAPSHOT_MISSING",
+            )
+
+    # --- D. valid unchanged authorized execution ---------------------------
+    def test_d1_valid_grant_executes_after_revalidation(self) -> None:
+        report = idq.deterministic_check(
+            [BEFORE], authorization=_grant(), repository_root=REPO_ROOT, registry_path=REGISTRY_PATH
+        )
+        if report.get("status") == "BLOCKED_OPTIONAL_RUNTIME":
+            self.skipTest("node runtime unavailable")
+        self.assertEqual(report["status"], "COMPLETED")
+        self.assertTrue(report["binding_revalidated_before_execution"])
+        self.assertEqual(report["snapshot_sha256"], snapshot_tree_sha256(VENDOR_ROOT))
+        self.assertFalse(report["source_mutation"])
+        self.assertFalse(report["network_used"])
+        self.assertFalse(report["model_used"])
+
+    def test_d2_mirror_execution_still_works_without_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            mirror = _mirror_repository(Path(raw).resolve())
+            registry = mirror / ".p2p" / "system" / "p2p_capabilities" / "capabilities.json"
+            target = mirror / "tests" / "fixtures" / "p2p-impeccable-design-quality" / "before.html"
+            grant = _grant(registry_path=registry, repository_root=mirror)
+            report = idq.deterministic_check(
+                [target], authorization=grant, repository_root=mirror, registry_path=registry
+            )
+            if report.get("status") == "BLOCKED_OPTIONAL_RUNTIME":
+                self.skipTest("node runtime unavailable")
+            self.assertEqual(report["status"], "COMPLETED")
+            self.assertTrue(REQUIRED_ANTIPATTERNS.issubset(set(report["antipattern_counts"])))
+
+
 class DeterministicDetectorProofTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.grant = idq.authorize(
-            "ui.design_quality.deterministic_check",
-            granted_by="P2P-IMPECCABLE-01-test",
-            registry_path=REGISTRY_PATH,
-            repository_root=REPO_ROOT,
-        )
+        cls.grant = _grant()
 
     def check(self, target: Path) -> dict:
         return idq.deterministic_check(

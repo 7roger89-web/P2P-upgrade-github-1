@@ -5,9 +5,15 @@
   "generated_at": "2026-09-01",
   "capability_id": "ui.design_quality",
   "authorization": {
+    "authority_surface": "p2p_capabilities.host_executor.PortableExecutionRequest",
+    "schema": "p2p-impeccable-authorization/2",
     "action": "ui.design_quality.deterministic_check",
     "granted_by": "P2P-IMPECCABLE-01",
-    "authorized": true,
+    "request_fingerprint": "70629b4e614c5eb15cdf40f5a3c7a0a4b4bbeadf3a93423543b3bab1d92a447f",
+    "project_binding": "registry:64fe487c103566fa4a4704a0ac8847432abbf14e7ef735c7ca1bd05c587a6bd5:capability:5eae88b207248396efad8a614e786faa9d474817cf52a2a66f4c1a7bc1b16fd2",
+    "candidate_binding": "vendor-snapshot:ui.design_quality:13b23decab14fa3ee2f0e9d1c0c12216b2caade6bb35fda5003d93d592d45a0f",
+    "registry_hash": "64fe487c103566fa4a4704a0ac8847432abbf14e7ef735c7ca1bd05c587a6bd5",
+    "manifest_identity": "5eae88b207248396efad8a614e786faa9d474817cf52a2a66f4c1a7bc1b16fd2",
     "snapshot_sha256": "13b23decab14fa3ee2f0e9d1c0c12216b2caade6bb35fda5003d93d592d45a0f",
     "upstream_commit": "94b7f34f6e27b95bc32d8284a671601ed6ac1b2a",
     "implementation_authority": "P2P"
@@ -592,5 +598,47 @@
         "engine_mode_after": "STATIC_HTML_FULL"
       }
     }
+  },
+  "authorization_boundary": {
+    "finding_repaired": "IMPECCABLE_AUTHORIZATION_BOUNDARY_IS_FORGEABLE_AND_NOT_REVALIDATED_AT_EXECUTION",
+    "reused_surface": "p2p_capabilities.host_executor.PortableExecutionRequest / validate_binding",
+    "grant_minting": "authorize() mints a PortableExecutionRequest and records its canonical fingerprint in this process issuance set",
+    "bound_to": [
+      "capability identity",
+      "exact executable action",
+      "registry hash + manifest identity_hash",
+      "pinned vendor snapshot sha256"
+    ],
+    "revalidated_immediately_before_execution": [
+      "manifest re-resolved from the registry on disk",
+      "vendor snapshot re-resolved and re-hashed",
+      "exact match required against the canonical declared snapshot hash",
+      "validate_binding() must return BOUND"
+    ],
+    "FORGED_AUTHORIZATION_FAIL_CLOSED": "YES",
+    "POST_AUTH_SNAPSHOT_DRIFT_FAIL_CLOSED": "YES",
+    "SUBPROCESS_NOT_LAUNCHED_ON_FAILURE": "YES",
+    "fail_closed_codes": [
+      "AUTHORIZATION_SCHEMA_INVALID",
+      "AUTHORIZATION_MALFORMED",
+      "AUTHORIZATION_CAPABILITY_MISMATCH",
+      "ACTION_NOT_EXECUTABLE",
+      "AUTHORIZATION_REQUEST_MISSING",
+      "AUTHORIZATION_REQUEST_INVALID",
+      "AUTHORIZATION_FINGERPRINT_MISMATCH",
+      "AUTHORIZATION_NOT_ISSUED_BY_P2P_AUTHORITY",
+      "AUTHORIZATION_ACTION_BINDING_MISMATCH",
+      "AUTHORIZATION_PERMISSION_BINDING_INVALID",
+      "REGISTRY_MANIFEST_IDENTITY_DRIFT",
+      "VENDOR_SNAPSHOT_DRIFT",
+      "VENDOR_SNAPSHOT_HASH_MISMATCH",
+      "VENDOR_SNAPSHOT_MISSING",
+      "AUTHORIZATION_BINDING_STALE_REQUEST"
+    ],
+    "new_authority_plane": false,
+    "new_database": false,
+    "new_daemon": false,
+    "new_token_service": false,
+    "tamper_proofs_use_temporary_mirror_only": true
   }
 }
