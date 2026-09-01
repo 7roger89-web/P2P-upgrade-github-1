@@ -158,9 +158,10 @@ re-proven instead (below).
 
 ```
 node --test .p2p/system/p2p_capabilities/tests/*.node_test.mjs
-# tests 62   # pass 62   # fail 0
-  (img2threejs_material_snapshot: 32 — 16 prior + 16 new semantic-drift)
-  (img2threejs_generator_metadata + img2threejs_static_projection_harness: 30)
+# tests 75   # pass 75   # fail 0
+  (img2threejs_material_snapshot: 45)
+  (img2threejs_generator_metadata: 17)
+  (img2threejs_static_projection_harness: 13)
 
 python3 -m unittest (sys.path=.p2p/system)
   p2p_capabilities.tests.test_img2threejs_static_projection

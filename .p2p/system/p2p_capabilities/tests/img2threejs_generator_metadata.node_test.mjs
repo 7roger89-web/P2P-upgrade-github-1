@@ -45,6 +45,7 @@ class FakePhysicalMaterial {
     this.metalness = 0.0;
     this.roughness = 1.0;
     this.userData = {};
+    this.version = 0;
     this.transmission = 0.0;
     this.clearcoat = 0.0;
     this.sheen = 0.0;
