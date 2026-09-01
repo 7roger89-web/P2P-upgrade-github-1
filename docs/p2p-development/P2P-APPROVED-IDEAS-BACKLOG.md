@@ -263,6 +263,147 @@ They remain **not execution-registered, not execution-authorized, and not runtim
 
 ---
 
+## OPENMONTAGE_01 — Existing Reference-Only Media Vendor Candidate
+
+`STATUS=HOLD_EXISTING_CANDIDATE`
+
+Owner reminder recovered from pre-backlog work: preserve the existing OpenMontage intake; do not restart it from chat memory.
+
+Existing P2P subject:
+
+```text
+PR=31
+WORKSTREAM=P2P-OPENMONTAGE-VENDOR-01
+UPSTREAM=calesthio/OpenMontage
+CURRENT_PR_STATE=OPEN_NOT_MERGED
+CANDIDATE_HEAD_SHA=653b2ee3cf3ca5e325a6fb53620f9768070e347b
+UPSTREAM_SHA=cd9f3c1f03368be87b140af494914b8ee4e3c7a4
+UPSTREAM_TREE=6cd1961d552dd9d2bcfba990b80ac06edfe4b061
+ROOT_LICENSE=AGPL-3.0
+CLASSIFICATION=REFERENCE_ONLY_EXTERNAL_RUNTIME_VENDOR
+```
+
+PR31 recorded seven `DISCOVERED` reference-only projections (`media.openmontage` plus documentary/explainer/composition/audio/sourcing/quality). They were not installed, eligible, executable, or runtime-proven.
+
+### Continuation rule
+
+- Do not create a duplicate OpenMontage intake.
+- Fresh-reconcile PR31 against current canonical main before any continuation; its intake base is historical/stale.
+- Preserve the AGPL fail-closed boundary; no source vendoring/copying into P2P merely to make integration convenient.
+- Commercial compatibility/clearance remains unproven until explicitly assessed.
+- Any later runtime/render path requires a separate bounded authorization and runtime smoke.
+
+---
+
+## ORCA_01 — Existing Optional Native-Harness Assessment
+
+`STATUS=EXISTING_DURABLE_WORK`
+
+Existing P2P subject:
+
+```text
+PR=29
+WORKSTREAM=P2P-NATIVE-HARNESS-ORCA-FIT-01
+UPSTREAM=stablyai/orca
+PR_STATE=MERGED
+MERGE_COMMIT=d7d3b5d95f5bb6dae2daf50055ca5fbeb02bf8bd
+FINAL_ASSESSMENT_HEAD=78f647409dc4111d760bdb20b020e767b079960f
+```
+
+The durable assessment concluded that Orca fits only as an **optional native-harness execution adapter** beneath the canonical P2P Work Factory. It explicitly rejected a second orchestrator/authority plane, rejected Dely as a required control plane, and identified the minimum seam as reusing existing backend-adapter/return-packet surfaces rather than inventing a new WorkItem ontology.
+
+Known durable boundary:
+
+```text
+ORCA_OPTIONAL_ONLY=YES
+Dely_REQUIRED=NO
+SECOND_ORCHESTRATOR=NO
+RA_EXT_011_IDENTITY=UNVERIFIED
+```
+
+### Continuation rule
+
+- Do not repeat the architecture-fit assessment from scratch.
+- Reconcile from the merged PR29 outcome and current canonical main.
+- If value remains after current priorities, the next legitimate step is a separate bounded read-only/native-harness probe rather than automatic install or activation.
+- Keep Orca adapter status honest until runtime evidence exists; architecture compatibility is not live certification.
+
+---
+
+## GOOSE_01 — Goose Execution-Harness / Agent-Host Evaluation
+
+`STATUS=PENDING_RECONCILIATION`
+
+Upstream: `aaif-goose/goose`.
+
+Durable-recovery finding: prior discussion existed, but no Goose-specific P2P PR or repository record was found during this backlog reconciliation. Therefore Goose was at real risk of being lost across chat/session rotation.
+
+Observed upstream at recovery time: open-source extensible AI agent, Rust implementation, Apache-2.0, with MCP/ACP-oriented integration surfaces and an execution model that can install, execute, edit, and test using different LLMs.
+
+### Approved preservation direction
+
+Do **not** install Goose merely because it is popular or capable. Future work should first compare it against capabilities P2P already has through the provider-neutral runtime, Work Factory, Codex/Manus/Hermes paths, and Orca assessment.
+
+Potential value to evaluate:
+
+- optional execution-harness/host adapter;
+- MCP/ACP interoperability concepts;
+- reusable tool/extension/session patterns;
+- any execution mechanics that reduce host-specific code without displacing P2P governance.
+
+### Constraints
+
+```text
+SECOND_ORCHESTRATOR=NO
+P2P_AUTHORITY_REPLACEMENT=NO
+GLOBAL_INSTALL_BY_DEFAULT=NO
+RUNTIME_PROVEN=NO
+```
+
+Open a bounded research/fit workstream before any install, adapter registration, or live execution claim. Pin upstream SHA/tree/license at that time rather than treating this backlog entry as a freshness authority.
+
+---
+
+## CYBERSECURITY_SKILLS_REGISTRY_01 — Selective Cybersecurity Skills Source
+
+`STATUS=PENDING_RECONCILIATION`
+
+Upstream: `mukul975/Anthropic-Cybersecurity-Skills`.
+
+Durable-recovery finding: no matching P2P PR or repository record was found during this backlog reconciliation, so this pre-backlog idea was also at risk of being forgotten.
+
+Observed upstream at recovery time: repository metadata advertises a large Agent Skills corpus for cybersecurity, mapped across multiple security frameworks (including MITRE ATT&CK, NIST CSF, MITRE ATLAS, D3FEND and AI-risk/fraud frameworks), Apache-2.0, and compatibility with common coding-agent hosts.
+
+### Approved preservation direction
+
+Treat this only as a **selective external security skill registry/source**, never as a blanket offensive-security capability and never as default context.
+
+Required routing model:
+
+```text
+security task
+  -> classify authorized scope and defensive/offensive risk
+  -> search minimum relevant skills
+  -> provenance/license/security review
+  -> select only required skill(s)
+  -> explicit execution authorization and sandbox boundary
+  -> evidence + Supervisor
+```
+
+### Required laws
+
+```text
+BULK_IMPORT=NO
+DEFAULT_CONTEXT=NO
+AUTO_EXECUTE_SECURITY_SKILLS=NO
+AUTHORIZED_SCOPE_REQUIRED=YES
+HIGH_RISK_ACTIONS_FAIL_CLOSED=YES
+```
+
+The future evaluation must distinguish harmless review/hardening/reference use from intrusive or dual-use execution. Availability of a skill is never permission to run it.
+
+---
+
 ## Cross-cutting capability law accepted with these entries
 
 ```text
@@ -271,6 +412,7 @@ CAPABILITY_CATALOG != ACTIVE_CONTEXT
 AVAILABLE != LOADED
 LOADED != AUTHORIZED
 AUTHORIZED != EXECUTED
+EXISTING_DURABLE_SUBJECT -> RECONCILE, DO_NOT_RESTART
 ```
 
 As P2P grows, routing must load the **minimum relevant, authority-valid capability set** for the current task. Large libraries, rule corpora, vendor catalogs, and historical candidates must not become default context merely because they exist.
