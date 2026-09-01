@@ -175,7 +175,10 @@ integration; this report makes no live-model certification claim.
 - Rebased production integration checkpoint: `9e748bd05d7db6ba1d0b8b2d64aef796f0b5c251`
 - Rebased focused verification checkpoint: `1702c0d437e59b305d0e9de1e39fbdeedac62746`
 - Rebased report checkpoint before this metadata refresh: `e392e0879588f483bbc28a51670554e5737c5db9`
-- Final PR head will be recorded by the Writer handoff.
+- Draft PR: #53, `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/53`,
+  linked with `Refs #51`.
+- Candidate head/tree at PR creation: `b633548bbc825d7c9b0aceec7d6c0d05af9d4a56` /
+  `ed41b51c670f6bea3c3350560143728f05cec928`; remote branch matches.
 
 ## Handoff
 

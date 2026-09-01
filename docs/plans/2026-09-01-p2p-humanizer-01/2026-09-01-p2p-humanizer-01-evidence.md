@@ -214,8 +214,13 @@ Matching plan item(s): `P2-A`, `P2-B`, `P2-C`
 
 - `E2-P2A-SUP1`: reserved for a new independent Supervisor review; not run by
   the Writer lane before handoff.
-- `E2-P2C-PR1`: reserved for exact branch/PR/Issue #51 linkage and candidate
-  head/tree binding.
+- `E2-P2C-PR1`: Draft PR #53 is open at
+  `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/53`, links Issue
+  #51 with `Refs #51`, uses base `main` at
+  `b65948b00ed2a8969fed70ab59f68b5d9b53858d`, and has remote branch
+  `codex/p2p-humanizer-01` at head
+  `b633548bbc825d7c9b0aceec7d6c0d05af9d4a56` with tree
+  `ed41b51c670f6bea3c3350560143728f05cec928`.
 
 ## Closure Evidence
 
@@ -223,3 +228,7 @@ Writer closure evidence will contain the final focused results, branch/PR
 identity, exact candidate SHA/tree, `git status`, detect-changes result, and
 the explicit stop at `NEXT_STEP=INDEPENDENT_SUPERVISOR`. Merge, promotion, and
 Owner approval execution are not part of this Writer handoff.
+
+Current Writer handoff binding: PR #53 is draft/open, remote head matches the
+local candidate at `b633548bbc825d7c9b0aceec7d6c0d05af9d4a56`, and the branch
+was pushed non-force after a fresh remote-main check.

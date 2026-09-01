@@ -47,7 +47,7 @@ remain in the evidence ledger.
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
 | P2 | Independent Supervisor verdict | verdict | not run | pending | pending | independent review | pending | `E2-P2A-SUP1` |
-| P2 | One branch / one PR | items | 0 / 0 | pending | pending | 1 / 1 | pending | `E2-P2C-PR1` |
+| P2 | One branch / one PR | items | 0 / 0 | 1 / 1 | 1 / 1 | 1 / 1 | +1 / +1 | `E2-P2C-PR1` |
 
 ## Non-Benchmarkable Notes
 
