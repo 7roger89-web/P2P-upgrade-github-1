@@ -63,4 +63,4 @@
   stale actual-status header. The rejected evidence is preserved.
 - Descendant correction uses the minimum taxonomy/test/status fix only; no
   Blender rerun was made because the runtime source, recipe, and artifact are
-  unchanged. Fresh Supervisor review remains pending on the new exact subject.
+  unchanged. Fresh Supervisor review was then run on the new exact subject.

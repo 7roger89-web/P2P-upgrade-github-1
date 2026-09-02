@@ -2,7 +2,7 @@
 
 Title: P2P Character Forge Productization ISSUE 59
 Date: 2026-09-02
-Status: P2 Complete; Supervisor Re-review Pending
+Status: P2 Complete; Supervisor PASS; Owner Gate Pending
 Companion plan: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-plan.md`
 Companion evidence: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-benchmark.md`
@@ -89,6 +89,7 @@ Out of scope:
 | R2 | 2026-09-02 | One fresh facade smoke plus independent runtime/artifact/OS validation | P2-A/P2-B | all requested product flags PASS/YES; exact output/provenance hashes recorded; 0 residual Blender processes/rules; root hash unchanged; Game Truyen unchanged | `E2-P2A-BUILD1..E2-P2B-STOP1` | implementation PASS; create one independent Supervisor review |
 | R3 | 2026-09-02 | Independent Supervisor review of candidate `8d338c0600d77b0f4fd4f790f6fa1f2422faebe8` | Supervisor review | REJECT limited to missing `SUPPORTED_DETERMINISTIC` taxonomy and stale status header; no runtime blocker; rejected evidence preserved | `reports/supervisor/rp_supervisor_260902_122647_by_gpt-5-codex_p2p-character-forge-productization-01.md` | create one descendant with minimum metadata/test/status correction; do not rerun smoke |
 | R4 | 2026-09-02 | Descendant correction after R3; source/test/status bookkeeping only | Supervisor resubmission preparation | taxonomy now uses `SUPPORTED_DETERMINISTIC` for name/gender/age_class/build and `SUPPORTED_BY_SAFE_DEFAULT` for rig/output_format; status header current; focused tests 12/12 pass | `E1-P1A-TAXONOMY1`, `E1-P1A-TEST1..3` | fresh Supervisor review required on new exact subject |
+| R5 | 2026-09-02 | Fresh independent Supervisor resubmission review of `40c8a2006fd50a6a72f2b426fae94e7615e5d299` / `a57d54ecb8894977a212499bc820ad5833838cd1` | Supervisor acceptance | PASS; taxonomy/status findings closed; runtime/artifact/isolation evidence accepted; no residual same-invariant gap | `E3-SUPERVISOR1` | stop at Owner Gate; PR remains unmerged |
 
 ## Phase Touch Map
 
@@ -274,7 +275,7 @@ Do not silently drop height/hair/clothing intent or claim visual customization.
 | P1-B | New facade delegates to existing adapter and validators and returns a validated receipt; 12/12 focused tests pass | complete; proceed to P2 without editing protected route |
 | P2-A | One ISSUE=59 facade smoke completed with real Blender PID 21596 and all required product flags PASS/YES | complete; no second run |
 | P2-B | Independent artifact, provenance, structural, process, firewall, root, cleanup, and no-retry checks PASS | complete; no rerun or repair |
-| Supervisor | First review rejected only two same-scope metadata issues; descendant correction is prepared | create one fresh independent Supervisor review on the new exact subject |
+| Supervisor | Fresh independent resubmission review PASS on corrected subject `40c8a2006fd50a6a72f2b426fae94e7615e5d299` / tree `a57d54ecb8894977a212499bc820ad5833838cd1`; no same-invariant gap remains | stop at Owner Gate; do not infer approval or merge |
 
 ## Implementation Gate
 
@@ -319,3 +320,8 @@ and skinned GLB plus one provenance sidecar. Exact height, age-in-years, hair,
 and clothing intent remain `NOT_CURRENTLY_SUPPORTED` and fail closed. The
 implementation is ready for one independent Supervisor review; no Owner
 approval or merge is inferred.
+
+Supervisor closure: the fresh independent review for the corrected descendant
+returned PASS. Technical readiness is complete; the workflow stops at
+`OWNER_GATE`. This does not authorize merge, release, deployment, promotion,
+or any additional runtime run.

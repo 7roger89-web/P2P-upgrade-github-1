@@ -257,7 +257,19 @@ fail closed; the receipt makes no visual-customization claim.
 
 ## Closure Evidence
 
-Pending. Final closure must include fresh Anvien detect-changes, focused
-validation/build output, exact candidate commit/tree, one unmerged PR, and one
-independent Supervisor report. A real smoke blocker must remain `BLOCKED`, not be
-repaired under this workstream.
+- `E3-SUPERVISOR1`: fresh independent Supervisor resubmission review passed the
+  exact corrected implementation subject `40c8a2006fd50a6a72f2b426fae94e7615e5d299`
+  / tree `a57d54ecb8894977a212499bc820ad5833838cd1`. It verified the prior
+  taxonomy/status findings are closed, the bounded runtime evidence remains
+  valid, and no same-invariant gap remains. Report:
+  `reports/supervisor/rp_supervisor_260902_124500_by_gpt-5-codex_p2p-character-forge-productization-01-final.md`.
+- `E3-CLEAN1`: the rejected subjects and their reports remain preserved; the
+  final candidate contains only the bounded facade, schema/tests, plan/evidence/
+  benchmark/status, and review/coder reports. No production/runtime source,
+  Game Truyen path, or ephemeral smoke helper remains changed.
+- `E3-STOP1`: terminal technical state is PASS and the workflow stops at
+  `OWNER_GATE`; no merge, release, deployment, promotion, or Owner approval is
+  inferred.
+
+Closure decision: PASS for technical readiness, pending Owner Gate. The PR is
+the only remaining external publication step and must remain unmerged.

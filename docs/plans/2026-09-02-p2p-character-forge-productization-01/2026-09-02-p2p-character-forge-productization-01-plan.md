@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-09-02`
-- Status: `in_progress`
+- Status: `complete; supervisor-pass; owner-gate`
 - Plan: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-plan.md`
 - Evidence: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-benchmark.md`
@@ -394,7 +394,7 @@ The receipt must validate:
   - Actual-status Update: set terminal readiness for Supervisor review only after all requested flags are current.
   - Commit Boundary: commit evidence/report only after all checks are recorded.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.
   - Work Steps:
     1. Create one independent Supervisor chat and provide the exact candidate head/tree, scope, source diff, focused tests, real product smoke evidence, and protected-surface checks.
@@ -403,7 +403,7 @@ The receipt must validate:
   - Implementation Gate: all planned implementation phases must be completed or explicitly blocked before this review.
   - Acceptance: Supervisor returns `PASS`, residual same-invariant unverified surfaces are none, and the plan stops at Owner Gate.
 
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only artifacts that still serve the accepted productization scope.
   - Work Steps:
     1. Review production source, tests, schema, plan artifacts, reports, and repo-local smoke helpers created by this plan.
@@ -412,7 +412,7 @@ The receipt must validate:
   - Implementation Gate: only plan-created artifacts may be removed.
   - Acceptance: final status/diff has no dead plan-created artifacts and the cleanup is recorded.
 
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, PR, and final status.
   - Work Steps:
     1. Run final focused validation and compile/build evidence; do not run unrelated full suites.
