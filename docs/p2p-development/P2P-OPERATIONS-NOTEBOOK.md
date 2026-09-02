@@ -321,6 +321,88 @@ Runtime enforcement (existing machinery, no new subsystem):
 - `orchestration_policy.py` — `classify_owner_escalation` under
   OWNER_MICRO_LOOP_SUPPRESSION (RULE 11).
 
+### RULE 17 — UPSTREAM_FIRST_REFERENCE_PRESERVATION
+
+For a bounded project outcome, P2P is the control-plane orchestrator. Select
+and execute the best working upstream or reference implementation before
+inventing a P2P abstraction, then adapt only the smallest project delta and
+prove the real project result. This is an operating policy over existing P2P
+surfaces; it creates no new runtime, registry, router, or upstream framework.
+
+The durable policy is:
+
+```text
+UPSTREAM_FIRST=YES
+REFERENCE_IMPLEMENTATION_FIRST=YES
+EXECUTION_FIRST=YES
+ABSTRACTION_LATER=YES
+P2P_ROLE=CONTROL_PLANE_ORCHESTRATOR
+```
+
+The core execution law is:
+
+```text
+USER_GOAL
+→ SELECT_BEST_UPSTREAM_OR_REFERENCE
+→ INSPECT_COMPLETE_IMPLEMENTATION_WHERE_RELEVANT
+→ EXECUTE_OR_REUSE_UPSTREAM_NATIVE_FIRST
+→ ADAPT_SMALLEST_PROJECT_DELTA
+→ PROVE_REAL_PROJECT_RESULT
+→ STOP_WHEN_SUFFICIENT
+```
+
+A P2P wrapper, adapter, capability, or registry entry is not a prerequisite
+for using a working upstream. When
+`UPSTREAM_EXECUTABLE=YES` and `P2P_WRAPPER_EXECUTABLE=NO`, the required
+decision is `USE_UPSTREAM_DIRECTLY=YES`.
+
+For rich implementation sources — including Three.js games, cameras, combat,
+enemy systems, VFX, shaders, game feel, UI systems, character systems, and
+visual reference implementations — preserve the complete reference
+implementation and its interactions while adapting it.
+`SOURCE_CLASS=REFERENCE_IMPLEMENTATION` is metadata/semantics only; it must not
+trigger a new capability ID, registry, router, or infrastructure.
+
+`CAPABILITY_REGISTERED=PASS` is not sufficient evidence of success. For game,
+UI, and visual work, acceptance prioritizes:
+
+```text
+PROJECT_RESULT_VISIBLE
+UPSTREAM_NATIVE_EXECUTION (where applicable)
+QUALITY_COMPARABLE_TO_REFERENCE (where applicable)
+INTERACTION_FEELS_GOOD (where applicable)
+```
+
+If P2P abstraction materially degrades upstream quality,
+`P2P_INTEGRATION=FAIL`, even when structural tests pass. Generalization follows
+actual reuse: first success uses the upstream directly; repeated success may
+record a lightweight execution recipe; only multiple real reuses justify a
+generic capability abstraction.
+
+Useful upstream repositories may live in a dedicated local upstream pool or
+cache, preserve-first and effectively read-only. Full upstream repositories do
+not normally enter canonical P2P Git; retain only minimal source
+identity/provenance metadata when useful. Do not rewrite upstream repositories
+for P2P conformity.
+
+This rule does not authorize network access, installation, authentication,
+vendoring, or project mutation by itself. Existing approval, security,
+provenance, scope, and evidence boundaries still apply. It also does not
+authorize a second router, second registry, generic upstream framework,
+repository-ingestion framework, synchronization daemon, universal wrapper, new
+database/service/runtime, bulk capability migration, whole-repository
+vendoring, or additional Game/Three.js capabilities merely because useful
+repositories exist.
+
+For APP GAME TRUYỆN, the default remains:
+
+```text
+UPSTREAM_REFERENCE
+→ PROJECT_EXECUTION
+→ VISUAL_PLAYABLE_PROOF
+→ ABSTRACTION_DECISION_LATER
+```
+
 ## 4. RULE_ASSIMILATION_GATE_V1
 
 ### 4.1 Failure mode fixed
