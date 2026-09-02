@@ -2,14 +2,16 @@
 
 Title: P2P Social Content Skills Phase 1
 Date: 2026-09-02
-Status: P1-A Complete / P1-B Pending
+Status: P1 Complete / Supervisor Pending
 Companion plan: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-plan.md`
 Companion evidence: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-evidence.md`
 Companion benchmark: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-benchmark.md`
 
 ## Purpose
 
-This file records the real current state before implementation.
+This file records the real current state. The R0 section preserves the
+pre-implementation baseline; R1 and R2 below refresh it after the two bounded
+implementation slices.
 
 Implementation must not start until the target scope has a completed status row, evidence IDs, and a downstream plan decision.
 
@@ -94,7 +96,7 @@ Record how many files the target is related to before deciding touch mode. A fil
 | Existing context machinery | Context pointers/fingerprints/freshness/provenance exist; no voice-specific contract. | Voice profile represented as bounded shared pointer without new memory platform. | partial | source inspection | `E0-P0A-SRC3` | edit projection docs only; reuse machinery |
 | Humanizer Issue #51 / PR #53 | Open/draft unmerged candidate, distinct prose-only polishing contract. | Independent optional downstream compatibility, no Issue #60 mutation. | correct | separate candidate | `E0-P0A-HUM1` | inspect-only; no PR repair/merge |
 | Visual/image/media capabilities | Existing copywriting, whiteboard, and visual style-library snapshots remain available. | No unintended selection/loading for social requests. | correct | registry/source inspection | `E0-P0A-SRC1` | negative tests P1-B |
-| Social capability family | Five separate adapted snapshots and registry records exist; focused behavior suite is not yet complete. | Five separate selectable provider-neutral capabilities with direct tests. | partial | new bounded files | `E0-P0A-DEC1`, `E1-P1A-SRC1..E1-P1A-SRC7` | run P1-B tests |
+| Social capability family | Five separate adapted snapshots and registry records exist; focused behavior suite is `12/12 PASS`. | Five separate selectable provider-neutral capabilities with direct tests. | correct | new bounded files | `E0-P0A-DEC1`, `E1-P1A-SRC1..E1-P1A-SRC7`, `E1-P1B-TEST1..E1-P1B-TEST8` | supervisor review |
 | User voice data | No user-specific samples/profile in canonical source. | Synthetic test evidence only; required user evidence at runtime; no fabricated default. | correct | N/A | `E0-P0A-SRC3`, `E0-P0A-UP2` | encode P1-A contract and P1-B negatives |
 | External execution | No provider/API/social/browser execution performed. | Remains disabled. | correct | N/A | `E0-P0A-UP1` | preserve; fail-closed tests |
 | Issue #59 / other projects | Separate worktrees/projects untouched. | Remains untouched. | correct | N/A | `E0-P0A-GIT1` | do not touch |
@@ -105,6 +107,8 @@ Record how many files the target is related to before deciding touch mode. A fil
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-02 | exact canonical worktree before P0 implementation | Issue #60 selective intake | initial classifications recorded; social family missing; copywriting overlap partial | `E0-P0A-GIT1`, `E0-P0A-UP1..E0-P0A-UP2`, `E0-P0A-SRC1..E0-P0A-SRC3`, `E0-P0A-HUM1`, `E0-P0A-ANV1`, `E0-P0A-DEC1` | P1-A is narrowed to adapted snapshots, registry/provenance, and social-overlap exclusions; loader/router/context remain preserve-only |
 | R1 | 2026-09-02 | P1-A source smoke and exact hash checks | adapted roots, registry, provenance, copywriting boundary | registry/projection `partial/missing -> correct`; social family `missing -> partial` pending behavior tests | `E1-P1A-SRC1..E1-P1A-SRC8`, `E1-P1A-ROUTE1..E1-P1A-ROUTE4` | P1-B remains focused on selected-only loading, context linkage, determinism, and negative gates |
+| R2 | 2026-09-02 | P1-B focused behavior/compile/vendor checks | social capability tests and same-invariant regressions | social family `partial -> correct`; supervisor remains pending | `E1-P1B-TEST1..E1-P1B-TEST9` | move to one independent Supervisor; preserve two unrelated foundation baseline failures as out of scope |
+| R3 | 2026-09-02 | fresh final Anvien graph plus pre-commit detect-changes | plan/evidence/status ledgers and final change boundary | no product-status change; candidate change set is bounded and low-risk | `E1-P1B-DETECT1` | commit only the intentional test and four ledgers, then run one independent Supervisor |
 
 ## Phase Touch Map
 
@@ -167,11 +171,11 @@ Do not repair the malformed root `.git`, modify the upstream checkout, or use a 
 
 Current state:
 
-The existing registry, loader, router, and context machinery already express
-the needed six-class/on-demand/provider-neutral boundary. The missing part is
-the five social records and adapted entrypoints. The registry is a shared JSON
-contract; Anvien cannot expose it in the parsed file projection, so no false
-zero-impact conclusion is made.
+The existing registry, loader, router, and context machinery express the
+needed six-class/on-demand/provider-neutral boundary. The five social records,
+provenance record, and adapted entrypoints are now present. The registry is a
+shared JSON contract; Anvien cannot expose it in the parsed file projection,
+so no false zero-impact conclusion is made.
 
 Required state:
 
@@ -196,11 +200,12 @@ Relationship and impact:
 
 Classification:
 
-partial
+correct
 
 Allowed next action:
 
-Implement P1-A registry/projection only, then test P1-B.
+Proceed to the independent Supervisor review; preserve the existing loader,
+router, and context code.
 
 Forbidden next action:
 
@@ -250,9 +255,10 @@ Do not repair, merge, cherry-pick, or make the new family require Humanizer.
 
 Current state:
 
-The capability family is missing. Upstream provides five distinct boundaries,
-but all five require host-neutral adaptation. No raw upstream content is
-justified for canonical vendoring.
+Five distinct provider-neutral projections now exist under isolated sparse
+roots. Each projection is selected independently, loaded only on demand, and
+bound to the exact upstream provenance without copying the raw upstream skill
+files. Focused behavior verification is green.
 
 Required state:
 
@@ -265,7 +271,12 @@ contracts.
 Evidence:
 
 - `E0-P0A-UP2`: per-skill audit and ADAPT decisions.
-- `E0-P0A-DEC1`: P1-A authorization from completed P0.
+- `E1-P1A-SRC1..E1-P1A-SRC8`: projection, registry, provenance, and authority
+  preservation checks.
+- `E1-P1A-ROUTE1..E1-P1A-ROUTE4`: route-selection and copywriting boundary
+  checks.
+- `E1-P1B-TEST1..E1-P1B-TEST9`: focused behavior, fail-closed, context,
+  determinism, and baseline-separation checks.
 
 Relationship and impact:
 
@@ -275,11 +286,12 @@ Relationship and impact:
 
 Classification:
 
-missing
+correct
 
 Allowed next action:
 
-Implement P1-A.
+Run one independent Supervisor against the stable candidate; do not begin
+Phase 2.
 
 Forbidden next action:
 
@@ -289,9 +301,9 @@ Do not bulk-copy upstream trees or execute external/provider/publishing paths.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | Social family is missing; existing loader/router/context are reusable and preserve-only; copywriting overlap is partial. | keep P1-A, edit only registry/provenance/adapted snapshots and precise overlap exclusions; preserve loader/router/context |
-| P1-B | No focused tests exist for the new family; existing sibling tests provide reusable conventions and synthetic isolation. | keep P1-B, create one direct test file after P1-A source behavior is correct |
-| Pn-A | No candidate exists yet. | pending until P1-A/P1-B stable |
+| P1-A | Five sparse adapted projections, exact provenance, registry records, and precise copywriting exclusions are committed. | complete; preserve the existing loader/router/context and do not bulk-vendor upstream |
+| P1-B | Focused suite is `12/12 PASS`; nearest vendor integration is `22/22 PASS`; compile boundary is PASS. | complete; retain the two unrelated foundation baseline failures as documented out of scope |
+| Pn-A | Stable implementation candidate is ready; independent Supervisor has not yet run. | call exactly one independent Supervisor; if PASS, prepare one draft PR and stop at `OWNER_GATE` |
 
 ## Implementation Gate
 
@@ -306,8 +318,9 @@ Do not bulk-copy upstream trees or execute external/provider/publishing paths.
 - [x] Blockers are recorded: malformed root Git is bypassed by a valid authority clone/worktree; no implementation blocker remains.
 - [x] Next phase status assumptions, next action, and work steps have been updated from this status file when needed.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
-- [ ] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
+- [x] Status Refresh Log includes R1 and R2 implementation refresh rows.
+- [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
+- [x] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
 ## Final P0 Decision
 
@@ -321,7 +334,8 @@ Choose one:
 
 Decision note:
 
-P0 is complete. The exact subjects are bound, all five upstream skills are
-audited, existing P2P authority is reconciled, Humanizer compatibility is
-`NO`, and the selective projection boundary is clear. P1-A may proceed only in
-the isolated worktree with the loader/router/context preserved.
+P0 is complete and P1 is complete. The exact subjects remain bound, all five
+upstream skills are audited, existing P2P authority is preserved, Humanizer
+compatibility is `NO`, and the selective projection boundary is verified. The
+only remaining action is one independent Supervisor review followed by a
+draft PR and Owner Gate; no merge, promotion, or Phase 2 work is authorized.

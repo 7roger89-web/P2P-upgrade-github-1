@@ -191,7 +191,90 @@ The requests `Give me 6 hooks about AI agents.` and `Give me 20 content ideas.` 
 
 `Format this as AIDA.` selected only `creative.social.post_format`; `Write an advertising slogan for a new brand.` selected only the preserved `creative.copywriting` capability.
 
-P1-A source acceptance passes. P1-B remains pending for selected-only loading, shared context linkage, deterministic behavior tests, and fail-closed negative cases.
+P1-A source acceptance passes. The P1-B selected-only loading, shared context, deterministic, and fail-closed checks are recorded below.
+
+### E1-P1B-TEST1 - focused suite
+
+`python -m unittest -q tests.test_p2p_social_content_skills` returned `12/12 PASS`.
+
+The suite directly covers registry identity, five route selections, preserved
+marketing copywriting, metadata-only discovery, selected-only loading,
+context-pointer resolution, sample-evidence/no-default rules, Humanizer
+separation, deterministic load output, offline optional operations, the
+single-router boundary, and sparse/private-data policy.
+
+### E1-P1B-TEST2 - nearest vendor regression
+
+`python -m unittest -q tests.test_p2p_vendor_skill_integration` returned `22/22 PASS`.
+The existing copywriting, whiteboard, and visual vendor paths remain green.
+
+### E1-P1B-TEST3 - compile boundary
+
+`python -m compileall -q .p2p/system/p2p_capabilities tests/test_p2p_social_content_skills.py` passed for the changed Python test and the existing capability package. Bytecode output is ignored local cache only and is not part of the candidate.
+
+### E1-P1B-TEST4 - selected-only read boundary
+
+The focused selected-load test wrapped the existing loader's hash reader and
+confirmed that loading `creative.social.post` touched only its own snapshot
+root. The other four projection roots were not read. Discovery was separately
+run with the same hash reader forbidden and performed no entrypoint content
+read.
+
+### E1-P1B-TEST5 - shared context boundary
+
+The focused context test resolved a synthetic, sensitive
+`creative.social.voice_profile` pointer for a downstream social-post request.
+The existing resolver returned the selected pointer with
+`content_grants_permissions=false`; the four downstream manifests reference
+the same pointer ID without making it a new router or memory store.
+
+### E1-P1B-TEST6 - Humanizer and copywriting compatibility
+
+The focused suite confirms the new family does not require or auto-invoke
+`creative.prose.humanize`, while each writing-related projection labels it as
+independent optional downstream prose polishing. Existing marketing copywriting
+remains the sole selected capability for the advertising-slogan case.
+
+### E1-P1B-TEST7 - fail-closed and privacy boundary
+
+The focused suite confirms missing voice evidence is described as visible
+`INCOMPLETE`, unsupported facts/services are not fabricated or executed, no
+provider/API tokens or host interaction markers are in the adapted entrypoints,
+and provenance declares no private sample text in metadata. Optional load
+operations return `NOT_REQUIRED` without subprocess execution, installation,
+network use, or credentials.
+
+### E1-P1B-TEST8 - deterministic projection
+
+Two independent loads and two independent snapshot hash calculations for each
+of the five roots produced byte-equivalent load JSON and equal snapshot hashes.
+
+### E1-P1B-TEST9 - baseline failures explicitly separated
+
+The nearest combined vendor/foundation command ran `50` tests with `48 PASS`
+and two failures in the pre-existing foundation test file. Exact canonical base
+facts prove these are not introduced by Issue #60: the base registry already
+contains `67` records while `test_cf1` asserts `39`, and the base test's
+`test_cf21` adapter allowlist omits the already tracked
+`.p2p/system/p2p_capabilities/img2threejs_adapter.py`. Neither foundation test
+nor the unrelated adapter source is changed in this workstream. The focused
+Issue #60 suite and the full nearest vendor suite are green; these baseline
+failures are recorded, not silently repaired.
+
+P1-B focused acceptance passes. The work is ready for the single independent
+Supervisor review; no broad regression or Phase 2 work is authorized.
+
+### E1-P1B-DETECT1 - pre-commit change detection
+
+After a fresh graph refresh under the unique Anvien alias
+`p2p-social-content-skills-01-finalgraph`,
+`anvien detect-changes --repo p2p-social-content-skills-01-finalgraph --scope all`
+reported `changed_files=4`, `affected_files=4`, `risk_level=low`, no affected
+processes, and no resolution-gap changes. The four reported files are the
+intentional plan/evidence/status ledgers; the new untracked test is covered by
+the direct focused test and will be included in the bounded commit. Anvien
+generated line-ending churn was discarded after verification and is not part
+of the candidate.
 
 ## E2 - P2 Evidence
 
@@ -201,4 +284,6 @@ No P2 phase is authorized in this Issue #60 workstream. Phase 2 upstream skills 
 
 ## Closure Evidence
 
-Pending candidate commit, detect-changes result, draft PR, independent Supervisor report, and final stop state.
+Pending candidate commit, draft PR, independent Supervisor report, and final
+stop state. The pre-commit detect-changes result is recorded as
+`E1-P1B-DETECT1`.

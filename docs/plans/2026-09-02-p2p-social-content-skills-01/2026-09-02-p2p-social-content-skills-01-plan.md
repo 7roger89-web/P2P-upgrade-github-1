@@ -183,7 +183,7 @@ content.
   - Actual-status Update: record each projection root, registry, and overlap boundary as correct/partial with exact evidence; update P1-B assumptions before tests.
   - Commit Boundary: commit after this slice when source smoke, registry validation, and diff checks pass.
 
-- [ ] P1-B: Add focused behavior and fail-closed tests for the complete family.
+- [x] P1-B: Add focused behavior and fail-closed tests for the complete family.
   - Goal: prove the five capabilities are independently selectable, on-demand, provider-neutral, context-compatible, deterministic, and distinct from Humanizer/copywriting.
   - Scope Boundary:
     - Editable: new `tests/test_p2p_social_content_skills.py` and the four plan/evidence/status ledgers.

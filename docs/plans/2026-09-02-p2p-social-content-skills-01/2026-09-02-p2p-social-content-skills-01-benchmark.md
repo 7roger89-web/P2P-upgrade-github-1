@@ -57,8 +57,10 @@ Benchmark sections must follow the plan phases:
 | P1 | Adapted entrypoints | files | `0` | `5` | pending | `5` | `+5` | `E1-P1A-SRC1` |
 | P1 | Per-capability snapshot roots | roots | `0` | `5` | pending | `5` | `+5` | `E1-P1A-SRC1` |
 | P1 | Full family content loaded during discovery | entrypoints | `0` | `0` | pending | `0` | `0` | `E1-P1A-ROUTE1..E1-P1A-ROUTE4` |
-| P1 | Selected capability entrypoints loaded for one-capability test | entrypoints | `0` | pending | pending | `1` | pending | pending |
-| P1 | Focused test cases | tests | `0` | pending | pending | `12` | pending | pending |
+| P1 | Selected capability entrypoints loaded for one-capability test | entrypoints | `0` | `1` | pending | `1` | `+1` | `E1-P1B-TEST4` |
+| P1 | Focused test cases | tests | `0` | `12` | pending | `12` | `+12` | `E1-P1B-TEST1` |
+| P1 | Anvien graph nodes after final refresh | nodes | `50,011` | `51,347` | pending | fresh current graph | `+1,336` | `E1-P1B-DETECT1` |
+| P1 | Anvien graph relationships after final refresh | relationships | `58,998` | `59,357` | pending | fresh current graph | `+359` | `E1-P1B-DETECT1` |
 
 ## B2 - P2 Benchmarks
 
