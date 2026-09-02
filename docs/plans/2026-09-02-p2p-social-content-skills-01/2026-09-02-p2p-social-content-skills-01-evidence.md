@@ -361,8 +361,42 @@ Matching plan item(s): `P2-A`
 
 No P2 phase is authorized in this Issue #60 workstream. Phase 2 upstream skills remain out of scope.
 
+## E4 - PR and terminal closure evidence
+
+### E4-PnC-PR1 - draft PR without merge
+
+Remote preflight passed again after the reconciled Supervisor review:
+
+```text
+ORIGIN=https://github.com/7roger89-web/P2P-upgrade-github-1.git
+ORIGIN_MAIN=38cfb03a370c47376c91e9dbc9b1b0f725ade71d
+ORIGIN_MAIN_TREE=8972c74525329725ee1f035e2192e76e1c8c26c3
+REMOTE_CANDIDATE_BRANCH=cbb055cd3d454a9415f4e96db9078be2e4944a11
+AUTHENTICATED_IDENTITY=7roger89-web
+REMOTE_PREFLIGHT=PASS
+```
+
+The branch was pushed normally only after the exact remote checks and PR #63
+was created as `OPEN`/`DRAFT` with base `main` at the current main SHA. At PR
+creation/post-check, the remote PR head matched local candidate
+`cbb055cd3d454a9415f4e96db9078be2e4944a11`, tree
+`2065f94154e4f4a933dc6dc3ecd42d12bbdca384`; no merge was performed. The
+subsequent closure commit changes documentation only and is the final PR head
+reported by the closing terminal bind; no source/provenance/test behavior was
+changed after the exact-subject Supervisor review.
+
+```text
+PR_NUMBER=63
+PR_URL=https://github.com/7roger89-web/P2P-upgrade-github-1/pull/63
+PR_STATE=OPEN
+PR_DRAFT=YES
+MERGE_PERFORMED=NO
+PROMOTION_PERFORMED=NO
+```
+
 ## Closure Evidence
 
-Candidate commits, pre-commit detect-changes, current-main reconciliation, and
-the fresh exact-subject Supervisor report are complete. Draft PR identity and
-final stop state remain to be recorded after the exact remote/branch preflight.
+Candidate commits, pre-commit detect-changes, current-main reconciliation, the
+fresh exact-subject Supervisor report, and the unmerged draft PR are complete.
+Issue #60 stops at `OWNER_GATE`; no approval, merge, promotion, release,
+deployment, activation, or Phase 2 action is authorized.

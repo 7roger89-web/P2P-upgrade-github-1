@@ -112,6 +112,7 @@ Record how many files the target is related to before deciding touch mode. A fil
 | R4 | 2026-09-02 | independent Supervisor replacement review of exact pre-reconciliation candidate `0ec02f4fb...` / tree `4d1f417b...` | full Issue #60 invariant family, candidate boundary, and cleanup | social family remains `correct`; historical Supervisor `PASS` retained but superseded after main moved | `E2-PnA-SUP1`, `E2-PnB-CLEAN1` | reconcile the moved main, rerun focused checks, and re-review the new exact subject |
 | R5 | 2026-09-02 | fresh remote main movement and local rebase | origin/main moved to Issue #59 PR #61; Issue #60 candidate rebased with no conflict | no product-status change; current main is bound and focused checks are green; Supervisor re-review pending | `E2-MAIN-RECONCILE1` | run one fresh exact-subject Supervisor review, then remote preflight/PR |
 | R6 | 2026-09-02 | fresh exact-subject Supervisor review after main reconciliation | reconciled candidate `88f043ddd...` / tree `1be9ad1e...` | Supervisor `PASS`; Owner Gate remains pending; technical PASS is not approval/promotion | `E2-PnA-SUP2` | run remote preflight, create one draft PR without merge, then stop at Owner Gate |
+| R7 | 2026-09-02 | final remote preflight and PR #63 creation | remote identity/permission, branch head, draft PR, no merge | candidate is published only as an unmerged draft PR; Owner Gate remains pending | `E4-PnC-PR1` | stop; await Owner Gate decision on the exact unmerged PR subject |
 
 ## Phase Touch Map
 
@@ -308,6 +309,7 @@ Do not bulk-copy upstream trees or execute external/provider/publishing paths.
 | P1-B | Focused suite is `12/12 PASS`; nearest vendor integration is `22/22 PASS`; compile boundary is PASS. | complete; retain the two unrelated foundation baseline failures as documented out of scope |
 | Pn-A | The pre-reconciliation candidate passed Supervisor, remote main moved, and the fresh exact-subject review of the reconciled candidate also passed. | complete; preserve technical PASS as separate from Owner approval/promotion |
 | Pn-B | Candidate diff has no dead or out-of-scope artifact; upstream audit checkout is quarantined under `.tmp`. | complete; no user/concurrent cleanup target exists |
+| Pn-C | PR #63 is OPEN/DRAFT, remote head matches the pushed candidate, and no merge/promotion occurred. | complete; stop at `OWNER_GATE` and do not begin Phase 2 |
 
 ## Implementation Gate
 
@@ -323,23 +325,25 @@ Do not bulk-copy upstream trees or execute external/provider/publishing paths.
 - [x] Next phase status assumptions, next action, and work steps have been updated from this status file when needed.
 - [x] Status Refresh Log has an R0 baseline row.
 - [x] Status Refresh Log includes R1 and R2 implementation refresh rows.
+- [x] Status Refresh Log includes R3-R7 reconciliation, Supervisor, and PR closure rows.
 - [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
 - [x] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
-## Final P0 Decision
+## Final Technical Decision
 
 Choose one:
 
 - [ ] P0 actual-status incomplete. Implementation is blocked.
-- [x] P0 complete. Next phase can proceed unchanged.
-- [x] P0 complete. Next phase status, next action, or work steps must be updated before implementation.
+- [x] P0 and P1 complete. Final technical evidence is recorded; stop at Owner Gate.
+- [ ] P0 complete. Next phase status, next action, or work steps must be updated before implementation.
 - [ ] P0 complete. Target scope is preserve-only.
 - [ ] P0 complete. Implementation is blocked by missing authority or evidence.
 
 Decision note:
 
-P0 is complete and P1 is complete. The exact subjects remain bound, all five
-upstream skills are audited, existing P2P authority is preserved, Humanizer
-compatibility is `NO`, and the selective projection boundary is verified. The
-only remaining action is one independent Supervisor review followed by a
-draft PR and Owner Gate; no merge, promotion, or Phase 2 work is authorized.
+P0 and P1 are complete. The requested original base, the reconciled current
+main, the exact upstream pin, all five audits, existing P2P authority,
+Humanizer compatibility `NO`, selective projection boundary, focused tests,
+fresh exact-subject Supervisor PASS, and draft PR #63 are recorded. The lane
+stops at Owner Gate; no merge, promotion, release, deployment, activation, or
+Phase 2 work is authorized.

@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-09-02`
-- Status: `draft`
+- Status: `complete / READY_FOR_OWNER_GATE`
 - Plan: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-plan.md`
 - Evidence: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-evidence.md`
 - Benchmark: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-benchmark.md`
@@ -248,7 +248,7 @@ content.
   - Implementation Gate: cleanup targets are plan-created and exact; no user or concurrent worktree is a target.
   - Acceptance: final diff has no rejected raw import, stale placeholder, unused helper, or out-of-scope integration.
 
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: record final evidence, benchmark counts, detect-changes, commit identity, PR identity, Supervisor verdict, and stop at `OWNER_GATE`.
   - Work Steps:
     1. Run focused final validation and compile checks; no broad unrelated suite or Docker/Playwright substitution is required for this source-only scope.
