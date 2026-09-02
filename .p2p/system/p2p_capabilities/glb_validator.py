@@ -138,8 +138,14 @@ def _validate_mesh_skin(document: Mapping[str, Any], reachable: set[int], parent
         if not isinstance(joints, list) or not joints:
             raise GlbStructuralError("GLB_SKIN_JOINTS_INVALID")
         joint_indices = {_index(joint, len(nodes), "GLB_joint") for joint in joints}
-        skeleton = _index(skin.get("skeleton"), len(nodes), "GLB_skeleton")
-        if skeleton not in joint_indices or any(parents.get(joint) in joint_indices for joint in joint_indices if joint in parents):
+        if "skeleton" in skin:
+            skeleton = _index(skin["skeleton"], len(nodes), "GLB_skeleton")
+        else:
+            joint_roots = {joint for joint in joint_indices if parents.get(joint) not in joint_indices}
+            if len(joint_roots) != 1:
+                raise GlbStructuralError("GLB_ROOTED_SKELETON_INVALID")
+            skeleton = next(iter(joint_roots))
+        if skeleton not in joint_indices or parents.get(skeleton) in joint_indices:
             raise GlbStructuralError("GLB_ROOTED_SKELETON_INVALID")
 
         connected: set[int] = set()

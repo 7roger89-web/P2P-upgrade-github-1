@@ -52,10 +52,10 @@ Matching plan item(s): `P0-A`
 
 Matching plan item(s): `P1-A`, `P1-B`
 
-- `E1-P1A-SRC1`: Pending until the surgical source edit is applied and inspected.
-- `E1-P1A-SRC2`: Pending until explicit absent/present branch behavior is demonstrated.
-- `E1-P1A-SRC3`: Pending until preserved rooted hierarchy and unrelated structural checks are verified after the edit.
-- `E1-P1A-SRC4`: Pending until Anvien detect-changes and commit scope are recorded.
+- `E1-P1A-SRC1`: `.p2p/system/p2p_capabilities/glb_validator.py:141-149` now distinguishes key presence from omission, uses `_index` for every present skeleton value, derives exactly one joint root for omission, and retains the existing connected-subgraph check.
+- `E1-P1A-SRC2`: `py_compile` passed for `glb_validator.py`; direct candidate invocation with the normalized existing Oak recipe returned `STRUCTURALLY_VALID` with `scene_reachable_nodes=55` and the expected Oak hash.
+- `E1-P1A-SRC3`: Source inspection confirms `GLB_SKIN_JOINTS_INVALID`, all node/mesh/skin/joint index checks, `GLB_skeleton_child` traversal, JOINTS_0/WEIGHTS_0 accessor/component checks, and resource validation remain present and unchanged outside the selected branch.
+- `E1-P1A-SRC4`: Fresh Anvien detect-changes on the capability subtree reports exactly one changed file, the validator hunk at lines 141-148, LOW changed-file risk, and no changed symbols or affected process files; `git diff --check` passed.
 - `E1-P1B-TEST1`: Pending omitted-skeleton and valid-present-skeleton PASS cases.
 - `E1-P1B-TEST2`: Pending explicit null, negative, out-of-range, and non-integer FAIL cases.
 - `E1-P1B-TEST3`: Pending empty-joints and invalid-joint FAIL cases.

@@ -98,7 +98,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
   - P1-A: Make optional `skin.skeleton` handling explicit in the canonical structural validator.
   - P1-B: Add the narrow skeleton/joints structural regression matrix.
 
-- [ ] P1-A: Make optional `skin.skeleton` handling explicit in the canonical structural validator.
+- [x] P1-A: Make optional `skin.skeleton` handling explicit in the canonical structural validator.
   - Goal: accept omission of the optional property while preserving explicit range checks and the rooted-skeleton policy.
   - Scope Boundary:
     - Editable: `.p2p/system/p2p_capabilities/glb_validator.py`, only `_validate_mesh_skin` logic needed for skeleton-root selection.

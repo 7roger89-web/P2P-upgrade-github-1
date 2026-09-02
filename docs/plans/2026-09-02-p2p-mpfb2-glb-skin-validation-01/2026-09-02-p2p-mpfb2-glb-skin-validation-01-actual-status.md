@@ -55,7 +55,7 @@ Out of scope:
 | Existing Oak.glb | 9,093,808-byte GLB with expected SHA; JSON chunk parses as glTF 2 | exact existing artifact remains hash-bound and unmutated through P2-A | correct | external preserve-only artifact | E0-P0A-ARTIFACT1..4 | preserve; validate read-only in P2-A |
 | Oak skin contract | `skins[0].joints` has 53 valid indices; all joints reachable; one inferred root 52; valid inverse-bind/accessor/skinning structure | retain all structural invariants | correct | artifact evidence; no source relationship | E0-P0A-ARTIFACT4, E0-P0A-SPEC1 | preserve; do not weaken |
 | Oak skeleton property | JSON key is omitted; raw value is `ABSENT` | optional omission accepted; explicit malformed values rejected | correct artifact / blocked validator path | artifact-only | E0-P0A-ARTIFACT3 | edit validator branch only |
-| Canonical `_validate_mesh_skin` | line 141 calls `_index(skin.get("skeleton"), ...)`; omitted key becomes `None` and raises blocker | distinguish omitted from present; preserve root policy | wrong | 21 local file relationships; one validation flow | E0-P0A-SRC1..3, E0-P0A-REPRO1, E0-P0A-IMPACT1 | edit P1-A |
+| Canonical `_validate_mesh_skin` | lines 141-149 now distinguish omitted from present, derive one joint root for omission, and allow nested joints while retaining common-root/connectivity validation | distinguish omitted from present; preserve root policy | correct for P1-A; focused matrix pending | 21 local file relationships; one validation flow | E1-P1A-SRC1..4 | proceed to P1-B |
 | Direct GLB test matrix | explicit skeleton PASS exists; missing joints/resource tests exist; omission/null/invalid skeleton and joints edge cases are absent | requested focused pass/fail matrix | partial | 143 local test relationships | E0-P0A-TESTGRAPH1 | edit P1-B |
 | Provenance/recipe | existing sidecar and recipe bind Oak hash and exact recipe; no evidence of defect | remain unchanged and pass candidate validation | correct / preserve-only | inspect-only sibling surface | E0-P0A-ARTIFACT1, E0-P0A-HISTORY1 | preserve; P2-A validates |
 | MPFB adapter/addon/firewall | prior bounded surfaces are proven but not revalidated as part of P0; current source is untouched | unchanged through Issue 55; fresh checks only in one conditional rerun | correct / preserve-only | inspect-only sibling surfaces | E0-P0A-HISTORY1 | do not edit; P2-B only if gated |
@@ -66,6 +66,7 @@ Out of scope:
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-02 | canonical fresh fetch plus direct artifact/source/spec inspection | full Issue 55 scope | initial classifications above | E0-P0A-REMOTE1..HISTORY1 | P1-A may edit only the optional-skeleton branch; P1-B adds direct cases; P2 remains gated |
+| R1 | 2026-09-02 | after P1-A source candidate and exact Oak direct validation | `_validate_mesh_skin` selected branch | wrong -> correct for optional selection and nested rooted hierarchy; test matrix remains partial | E1-P1A-SRC1..4 | continue to P1-B; P2-A remains gated on focused tests |
 
 ## Phase Touch Map
 
@@ -212,7 +213,7 @@ Do not broaden into unrelated suite or change the real artifact in tests.
 - [x] Blockers are recorded, if any.
 - [x] Next phase status assumptions, next action, and work steps have been updated from this status file when needed.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
+- [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
 - [ ] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
 ## Final P0 Decision
@@ -225,4 +226,4 @@ Do not broaden into unrelated suite or change the real artifact in tests.
 
 Decision note:
 
-P0 is complete. Fresh artifact evidence proves the skeleton property is absent, not null, and the artifact's joints/hierarchy/accessor/skinning structure is coherent. Khronos makes `skin.skeleton` optional; the local P2P rooted-skeleton policy is intentional and will be preserved by deriving the unique joint root only when the optional field is omitted. The current source is therefore a validator defect, not an artifact defect. P1-A and P1-B may proceed; P2-A remains a hard gate before any real rerun.
+P0 is complete. Fresh artifact evidence proves the skeleton property is absent, not null, and the artifact's joints/hierarchy/accessor/skinning structure is coherent. Khronos makes `skin.skeleton` optional; the local P2P rooted-skeleton policy is intentional and is preserved by deriving the unique joint root only when the optional field is omitted. P1-A now closes the source branch and direct Oak proof; P1-B must still add the focused matrix before P2-A. P2-A remains a hard gate before any real rerun.
