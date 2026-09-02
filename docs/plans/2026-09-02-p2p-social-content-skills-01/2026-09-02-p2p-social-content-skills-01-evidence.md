@@ -264,12 +264,24 @@ failures are recorded, not silently repaired.
 P1-B focused acceptance passes. The work is ready for the single independent
 Supervisor review; no broad regression or Phase 2 work is authorized.
 
+### E1-P1B-DETECT1 - pre-commit change detection
+
+After a fresh graph refresh under the unique Anvien alias
+`p2p-social-content-skills-01-finalgraph`,
+`anvien detect-changes --repo p2p-social-content-skills-01-finalgraph --scope all`
+reported `changed_files=4`, `affected_files=4`, `risk_level=low`, no affected
+processes, and no resolution-gap changes. The four reported files are the
+intentional plan/evidence/status ledgers; the new untracked test was covered by
+the direct focused test and then committed. Anvien-generated line-ending churn
+was discarded after verification and is not part of the candidate.
+
 ## E2 - Supervisor Evidence
 
-### E2-PnA-SUP1 - independent Supervisor
+### E2-PnA-SUP1 - independent Supervisor (pre-reconciliation subject)
 
-The single effective independent Supervisor replacement reviewed the exact
-candidate source subject `HEAD=0ec02f4fb9082a39469128ccb987930d30de1efa`, tree
+The single effective independent Supervisor replacement reviewed the
+pre-main-reconciliation candidate source subject
+`HEAD=0ec02f4fb9082a39469128ccb987930d30de1efa`, tree
 `4d1f417b4e64c2c6114fb2ea98603f602a7baf62`, and wrote:
 
 `reports/supervisor/rp_supervisor_260902_133000_by_independent-supervisor-replacement_p2p-social-content-skills-01.md`
@@ -289,6 +301,10 @@ TECHNICAL_PROMOTION=NOT_AUTHORIZED
 MERGE=NOT_AUTHORIZED
 ```
 
+This historical PASS is retained for audit but is not the final subject
+authority because `origin/main` moved after this review. The exact current
+main and final candidate are rebound below and require a fresh review.
+
 ### E2-PnB-CLEAN1 - candidate boundary cleanup
 
 The Supervisor found no dead or out-of-scope artifact in the candidate diff.
@@ -296,21 +312,27 @@ The exact upstream audit checkout remains quarantined under the worktree
 `.tmp` only for reproducibility of the recorded audit and is not part of the
 candidate. No cleanup touched a user or concurrent worktree.
 
+### E2-MAIN-RECONCILE1 - fresh main movement and lineage reconciliation
+
+The fresh remote preflight found `origin/main` moved from the requested
+`0ee414147ae308ab1f6035d1e7776292752bd8da` / tree
+`f34719776bee67a731c4049b79165bd3deaa3074` to
+`38cfb03a370c47376c91e9dbc9b1b0f725ade71d` / tree
+`8972c74525329725ee1f035e2192e76e1c8c26c3` through the Issue #59 Character
+Forge PR #61 merge. The main delta is 13 Issue #59 files and does not overlap
+the Issue #60 source/projection/test paths. The candidate branch was rebased
+onto this current main with no conflict and no mutation to the Issue #59
+worktree or source.
+
+The reconciled candidate is now `HEAD=29a273815608231d5ec2916657ca5f29e89dc097`,
+tree `5ae7294fdd9fa8622a50b0eec6861250677c7147`, four commits ahead of current
+`origin/main`. Fresh reconciled-main focused verification returned `12/12`
+for the Issue #60 suite, `22/22` for the nearest vendor integration suite,
+compile PASS, and `git diff --check` PASS. The pre-reconciliation Supervisor
+PASS is superseded for exact-subject purposes; one fresh review of this
+reconciled subject is required and is not an unbounded review loop.
+
 ## E3 - P2 Evidence
-
-### E1-P1B-DETECT1 - pre-commit change detection
-
-After a fresh graph refresh under the unique Anvien alias
-`p2p-social-content-skills-01-finalgraph`,
-`anvien detect-changes --repo p2p-social-content-skills-01-finalgraph --scope all`
-reported `changed_files=4`, `affected_files=4`, `risk_level=low`, no affected
-processes, and no resolution-gap changes. The four reported files are the
-intentional plan/evidence/status ledgers; the new untracked test is covered by
-the direct focused test and will be included in the bounded commit. Anvien
-generated line-ending churn was discarded after verification and is not part
-of the candidate.
-
-## E2 - P2 Evidence
 
 Matching plan item(s): `P2-A`
 
@@ -318,6 +340,7 @@ No P2 phase is authorized in this Issue #60 workstream. Phase 2 upstream skills 
 
 ## Closure Evidence
 
-Candidate commits, pre-commit detect-changes, and the independent Supervisor
-report are complete. Draft PR identity and final stop state remain to be
-recorded after the exact remote/branch preflight.
+Candidate commits, pre-commit detect-changes, and the pre-reconciliation
+Supervisor report are complete. The current-main reconciliation and fresh
+exact-subject Supervisor report are pending. Draft PR identity and final stop
+state remain blocked until those are complete.
