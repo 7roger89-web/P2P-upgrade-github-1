@@ -24,3 +24,37 @@
 - Coder report: `reports/coder/rp_coder_260902_103500_by_gpt-5-codex_p2p-mpfb2-provisioning-root-drift-01.md`.
 - Supervisor report: `reports/supervisor/rp_supervisor_260902_103800_by_gpt-5-codex_p2p-mpfb2-provisioning-root-drift-01.md`; verdict `PASS` for the bounded ISSUE=56 claim.
 - Terminal verdict: `P2P_MPFB2_RUNTIME_SMOKE_PASS`.
+
+## P2P-CHARACTER-FORGE-PRODUCTIZATION-01 / Issue 59
+
+- Fresh canonical main: `0ee414147ae308ab1f6035d1e7776292752bd8da`; tree:
+  `f34719776bee67a731c4049b79165bd3deaa3074`.
+- Existing capability identity preserved: `game.character.generate`; no second
+  capability, router, runtime runner, validator, or service was added.
+- Product seam: `CharacterRequest -> CharacterRecipe -> existing MPFB2 adapter
+  -> CharacterForgeReceipt`; request schema `p2p-character-request/1`, recipe
+  schema `p2p-character-recipe/1`, receipt schema
+  `p2p-character-forge-receipt/1`.
+- Supported fields: `name`, `gender`, `age_class`, `build`, `rig`, and
+  `output_format`; exact height, age-in-years, hair, and clothing intent are
+  explicitly `NOT_CURRENTLY_SUPPORTED` and fail closed.
+- Focused productization tests: `12/12 PASS`; full native Python compile exited
+  0 with one unrelated existing `SyntaxWarning`.
+- Exactly one real product smoke through the new facade: child PID `21596`,
+  Blender/MPFB2/character/rig/skin/GLB/provenance/cleanup all PASS; MPFB2 pin
+  `2.0.17`, release `80919fa4682335c41847f761a4d79dcad4124732`, tree
+  `189a1d6694515ecfbdc40067218c5024389b4e43`.
+- Recipe SHA-256:
+  `7c4fe122da0ddf7569eaa45323037ee27414bcdac04330fcc4e5047f334a8c52`.
+- Output GLB SHA-256:
+  `4e974fb6c6861731f547e3ec3d69f18f01d7ed9073df6bd96bd8ededbde3ae97`;
+  independent validation reported glTF 2.0, 55 reachable nodes,
+  `GAMEENGINE`, `MPFB_BUILT_IN_WEIGHTS`, exactly two output files, and
+  provenance/recipe binding PASS.
+- Post-run: provisioning root hash remained
+  `f6907ef03674ddc995e8b0fdd988e9a003cad61df0d4f707e2a7aaeda4d4e788`, active
+  Blender `0`, `P2P-MPFB-DENY-*` rules `0`, and the managed recipe input was
+  absent. Game Truyen HEAD and 55-entry dirty fingerprint were unchanged.
+- Coder report:
+  `reports/coder/rp_coder_260902_121330_by_gpt-5-codex_p2p-character-forge-productization-01.md`.
+- Terminal implementation verdict before Supervisor: `P2P_CHARACTER_FORGE_PRODUCTIZATION_READY_FOR_SUPERVISOR_REVIEW`.

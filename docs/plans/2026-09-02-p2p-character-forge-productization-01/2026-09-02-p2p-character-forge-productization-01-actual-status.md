@@ -76,6 +76,8 @@ Out of scope:
 | Windows isolation | Exact firewall lifecycle is existing and #56 passed | Reuse unchanged; cleanup PASS in product smoke | correct | 43 local; 4 flows | `E0-P0A-GRAPH5`, `E0-P0A-RUNTIME1` | preserve-only; validate P2 |
 | Focused tests | Separate productization suite covers request, recipe, binding, receipt, fail-closed, cleanup, and injection boundaries; 12/12 pass | Separate focused behavior tests | correct | 12 focused tests; new file | `E1-P1A-TEST1..3`, `E1-P1B-TEST1..3` | preserve; P2 only |
 | Provisioned runtime | Existing manifest/root/Blender/MPFB2 and #56 result are available | One fresh facade-driven run | correct | external | `E0-P0A-RUNTIME1` | validate P2; no reinstall |
+| ISSUE=59 real product smoke | One facade-driven run reached real Blender/MPFB2, character creation, GameEngine rig, built-in skin, GLB, provenance, structural validation, and receipt | All required product flags PASS/YES exactly once | correct | 1 child; 1 GLB; 1 sidecar | `E2-P2A-RUN1`, `E2-P2A-ARTIFACT1`, `E2-P2B-ARTIFACT1` | preserve; Supervisor review |
+| ISSUE=59 post-run cleanup | Facade removed managed recipe input; adapter closed isolation; post-run OS/root checks are clean | Zero residual Blender process/rule and unchanged provisioning root | correct | 0 processes; 0 rules | `E2-P2B-CLEAN1` | preserve; Supervisor review |
 | Game Truyen | Not part of candidate surface | No reads/writes from productization | correct/preserve-only | external | `E0-P0A-SCOPE1` | do-not-touch |
 
 ## Status Refresh Log
@@ -84,6 +86,7 @@ Out of scope:
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-02 | fresh remote/canonical clone, full SPEC/source/runtime inspection | ISSUE=59 baseline | initial classification: existing route correct; facade/receipt missing; cosmetic/height unsupported | `E0-P0A-GIT1..E0-P0A-SCOPE1` | P1-A may add only the new facade/schema/focused tests |
 | R1 | 2026-09-02 | Writer candidate source/schema/tests plus refreshed Anvien capability-system graph and focused proof | P1-A/P1-B implementation | request/recipe/binding/receipt are correct/bound locally; 12/12 focused tests and compile pass; protected route remains preserve-only | `E1-P1A-SRC1..E1-P1-GRAPH1` | P2-A allowed: one real smoke after fresh runtime/output preflight |
+| R2 | 2026-09-02 | One fresh facade smoke plus independent runtime/artifact/OS validation | P2-A/P2-B | all requested product flags PASS/YES; exact output/provenance hashes recorded; 0 residual Blender processes/rules; root hash unchanged; Game Truyen unchanged | `E2-P2A-BUILD1..E2-P2B-STOP1` | implementation PASS; create one independent Supervisor review |
 
 ## Phase Touch Map
 
@@ -267,8 +270,8 @@ Do not silently drop height/hair/clothing intent or claim visual customization.
 |-----------|-----------------------|--------------------------------------|
 | P1-A | New facade/schema/tests implement and prove request normalization and deterministic recipe projection | complete; preserve new contract and proceed to P2 |
 | P1-B | New facade delegates to existing adapter and validators and returns a validated receipt; 12/12 focused tests pass | complete; proceed to P2 without editing protected route |
-| P2-A | Existing runtime is available and previously proven, but ISSUE=59 facade smoke is not run | allow one real smoke only after P1-B tests/build and fresh preflight |
-| P2-B | No ISSUE=59 post-run evidence exists | require independent artifact/process/firewall checks; stop on blocker |
+| P2-A | One ISSUE=59 facade smoke completed with real Blender PID 21596 and all required product flags PASS/YES | complete; no second run |
+| P2-B | Independent artifact, provenance, structural, process, firewall, root, cleanup, and no-retry checks PASS | complete; no rerun or repair |
 | Supervisor | No current ISSUE=59 candidate review exists | create one independent Supervisor review after exact candidate is complete |
 
 ## Implementation Gate
@@ -285,6 +288,8 @@ Do not silently drop height/hair/clothing intent or claim visual customization.
 - [x] Next phase status assumptions and work steps were updated from this status.
 - [x] Status Refresh Log has an R0 baseline row.
 - [x] If implementation has started, affected rows will be refreshed from latest evidence.
+- [x] P1 request/recipe/binding/receipt rows were refreshed after focused proof.
+- [x] P2 smoke/cleanup rows were refreshed after independent runtime proof.
 
 ## Final P0 Decision
 
@@ -301,3 +306,14 @@ productization layer and receipt, with a separate focused test file. Physical
 height, exact age-in-years, hair, and clothing customization are explicitly
 unsupported by the current producer and will fail closed. P1 may proceed; P2 is
 gated on focused proof and a fresh runtime preflight.
+
+## P1/P2 Decision
+
+P1 and P2 are complete with PASS evidence. The candidate adds one
+beginner-facing facade over `game.character.generate`, not a second capability,
+router, runner, validator, or service. The single real smoke used the
+supported male/adult/slim request and produced one structurally valid rigged
+and skinned GLB plus one provenance sidecar. Exact height, age-in-years, hair,
+and clothing intent remain `NOT_CURRENTLY_SUPPORTED` and fail closed. The
+implementation is ready for one independent Supervisor review; no Owner
+approval or merge is inferred.

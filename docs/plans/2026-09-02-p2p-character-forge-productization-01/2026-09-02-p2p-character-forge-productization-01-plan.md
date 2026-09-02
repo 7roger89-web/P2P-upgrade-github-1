@@ -298,7 +298,7 @@ The receipt must validate:
   - P2-A: Build and execute exactly one real product route
   - P2-B: Independent artifact/isolation cleanup evidence
 
-- [ ] P2-A: Build and execute exactly one real product route
+- [x] P2-A: Build and execute exactly one real product route
   - Goal: run the facade, not the lower-level adapter alone, exactly once.
   - Scope Boundary:
     - Editable: repo-local `.tmp` smoke runner and evidence files only; no production runtime/security source.
@@ -346,7 +346,7 @@ The receipt must validate:
   - Actual-status Update: record exact output paths/hashes and required terminal flags; do not generalize from the previous Oak smoke.
   - Commit Boundary: commit only the smoke runner/evidence/report artifacts after the single run result is known; do not commit runtime outputs.
 
-- [ ] P2-B: Independent artifact/isolation cleanup evidence
+- [x] P2-B: Independent artifact/isolation cleanup evidence
   - Goal: independently confirm the output/provenance/GLB receipt and post-run process/firewall state.
   - Scope Boundary:
     - Editable: plan/evidence/report/notes only.

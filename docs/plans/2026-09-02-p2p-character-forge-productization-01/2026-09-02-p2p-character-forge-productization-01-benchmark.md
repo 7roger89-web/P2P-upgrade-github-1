@@ -28,20 +28,20 @@ measurements are a baseline reference; ISSUE=59 must record its own output.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | Beginner request fields accepted | fields | 0 | pending | pending | 6 | pending | E1-P1A-SCHEMA1 |
-| P1 | Duplicate character execution frameworks | frameworks | 0 | pending | pending | 0 | pending | E1-P1B-SRC1 |
-| P1 | Focused productization tests | tests | 0 | pending | pending | focused set passes | pending | E1-P1A-TEST1..E1-P1B-TEST3 |
+| P1 | Beginner request fields accepted | fields | 0 | 6 | 6 | 6 | +6 | E1-P1A-SCHEMA1 |
+| P1 | Duplicate character execution frameworks | frameworks | 0 | 0 | 0 | 0 | 0 | E1-P1B-SRC1 |
+| P1 | Focused productization tests | tests | 0 | 12 | 12 | 12 pass | +12 | E1-P1A-TEST1..E1-P1B-TEST3 |
 
 ## B2 - P2 Benchmarks
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | ISSUE=59 real Blender child spawns | processes | 0 | pending | pending | exactly 1 | pending | E2-P2A-RUN1 |
-| P2 | ISSUE=59 generated GLB outputs | files | 0 | pending | pending | exactly 1 | pending | E2-P2A-ARTIFACT1 |
-| P2 | ISSUE=59 provenance sidecars | files | 0 | pending | pending | exactly 1 | pending | E2-P2A-ARTIFACT1 |
-| P2 | ISSUE=59 output GLB size | bytes | 0 | pending | pending | >0 | pending | E2-P2B-ARTIFACT1 |
-| P2 | Residual Blender processes after smoke | processes | 0 | pending | pending | 0 | pending | E2-P2B-CLEAN1 |
-| P2 | Residual `P2P-MPFB-DENY-*` rules after smoke | rules | 0 | pending | pending | 0 | pending | E2-P2B-CLEAN1 |
+| P2 | ISSUE=59 real Blender child spawns | processes | 0 | 1 | 1 | exactly 1 | +1 | E2-P2A-RUN1 |
+| P2 | ISSUE=59 generated GLB outputs | files | 0 | 1 | 1 | exactly 1 | +1 | E2-P2A-ARTIFACT1 |
+| P2 | ISSUE=59 provenance sidecars | files | 0 | 1 | 1 | exactly 1 | +1 | E2-P2A-ARTIFACT1 |
+| P2 | ISSUE=59 output GLB size | bytes | 0 | 6372972 | 6372972 | >0 | +6372972 | E2-P2B-ARTIFACT1 |
+| P2 | Residual Blender processes after smoke | processes | 0 | 0 | 0 | 0 | 0 | E2-P2B-CLEAN1 |
+| P2 | Residual `P2P-MPFB-DENY-*` rules after smoke | rules | 0 | 0 | 0 | 0 | 0 | E2-P2B-CLEAN1 |
 
 ## Non-Benchmarkable Notes
 

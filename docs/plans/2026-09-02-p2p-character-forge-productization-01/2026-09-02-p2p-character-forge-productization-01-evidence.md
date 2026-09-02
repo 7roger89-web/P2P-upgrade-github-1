@@ -189,13 +189,55 @@ selection surfaces remain unchanged. P2 is now the only implementation phase.
 
 Matching plan item(s): `P2-A`, `P2-B`
 
-- `E2-P2A-BUILD1`: pending focused compile/build output.
-- `E2-P2A-PREFLIGHT1`: pending exact runtime/output preflight.
-- `E2-P2A-RUN1`: pending exactly one facade-driven real run.
-- `E2-P2A-ARTIFACT1`: pending GLB/provenance/receipt artifact proof.
-- `E2-P2B-ARTIFACT1`: pending independent revalidation.
-- `E2-P2B-CLEAN1`: pending process/firewall/root cleanup proof.
-- `E2-P2B-STOP1`: pending exact one-run stop proof.
+- `E2-P2A-BUILD1`: `PYTHONDONTWRITEBYTECODE=1 python -B -m compileall -q
+  .p2p/system tests scripts` exited 0. It emitted only the existing
+  `tests/test_p2p_live_certification.py:179` `SyntaxWarning`; no touched file
+  is that warning's source.
+- `E2-P2A-PREFLIGHT1`: fresh read-only preflight found Blender 4.2.23 present,
+  MPFB2 `2.0.17`, commit `80919fa4682335c41847f761a4d79dcad4124732`, tree
+  `189a1d6694515ecfbdc40067218c5024389b4e43`, provisioning root hash
+  `f6907ef03674ddc995e8b0fdd988e9a003cad61df0d4f707e2a7aaeda4d4e788`
+  matching, a new absent output target, zero Blender processes, and zero
+  `P2P-MPFB-DENY-*` rules. The pre-existing Game Truyen worktree had 55 dirty
+  entries and was not touched.
+- `E2-P2A-RUN1`: the repo-local smoke helper called `forge_character` exactly
+  once with `{name: Issue59, gender: male, age_class: adult, build: slim,
+  rig: true, output_format: glb}`. Real Blender child PID `21596` returned 0;
+  the result is recorded at
+  `D:\AI\P2P_runtime\mpfb2-runtime-01\logs\p2p-issue59-character-forge-productization-01-result.json`.
+  The child stdout contains `MPFB_ADDON_IDENTITY_PRESENT=YES`,
+  `MPFB_GET_PREFERENCE_PASS=YES`, and `MPFB_REGISTER_PASS=YES`.
+- `E2-P2A-ARTIFACT1`: the receipt reports capability
+  `game.character.generate`, recipe SHA-256
+  `7c4fe122da0ddf7569eaa45323037ee27414bcdac04330fcc4e5047f334a8c52`, output
+  `D:\AI\P2P_runtime\mpfb2-runtime-01\output\p2p-character-forge-7c4fe122da0ddf75\Issue59.glb`,
+  output SHA-256
+  `4e974fb6c6861731f547e3ec3d69f18f01d7ed9073df6bd96bd8ededbde3ae97`, and
+  sidecar
+  `D:\AI\P2P_runtime\mpfb2-runtime-01\output\p2p-character-forge-7c4fe122da0ddf75\Issue59.asset-provenance.json`.
+  All requested product flags are PASS/YES in the result record.
+- `E2-P2B-ARTIFACT1`: an independent read-only validator rerun reported
+  exactly two output files (`Issue59.glb` and
+  `Issue59.asset-provenance.json`), GLB size `6372972` bytes, glTF `2.0`, 55
+  scene-reachable nodes, `GAMEENGINE` rig, `MPFB_BUILT_IN_WEIGHTS` skinning,
+  matching output hash, receipt validation PASS, provenance validation PASS,
+  and recipe/asset binding PASS. The independent record is at
+  `D:\AI\P2P_runtime\mpfb2-runtime-01\logs\p2p-issue59-character-forge-productization-01-independent-validation.json`.
+- `E2-P2B-CLEAN1`: post-run OS check found zero Blender processes and zero
+  `P2P-MPFB-DENY-*` rules; provisioning root hash still matches
+  `f6907ef03674ddc995e8b0fdd988e9a003cad61df0d4f707e2a7aaeda4d4e788`; the
+  managed recipe input is absent after facade cleanup.
+- `E2-P2B-STOP1`: exactly one child PID, one GLB, one provenance sidecar, and
+  one receipt record exist for ISSUE=59; no retry or second character was run.
+  Ephemeral repo-local smoke helpers were removed after evidence capture.
+  Game Truyen HEAD and dirty-entry count remained
+  `354203ee7c23a2b349e81a0254b537da4d9c622f` and `55`.
+
+P2 decision: PASS. The complete product route is proven once through the new
+facade; independent artifact, provenance, structural, process, firewall, root,
+and cleanup checks agree. The request did not contain exact height, age-years,
+hair, or clothing intent because those fields are explicitly unsupported and
+fail closed; the receipt makes no visual-customization claim.
 
 ## Closure Evidence
 
