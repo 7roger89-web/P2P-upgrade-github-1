@@ -38,7 +38,7 @@ Record measured numbers only. For this bounded issue, measurements include canon
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P3 | Real canonical continuations | runs | 0 | pending | pending | exactly 1 | pending | pending |
+| P3 | Real canonical continuations | runs | 0 | 1 | 1 | exactly 1 | +1 | `E3-P3A-RUN1` |
 
 ## Non-Benchmarkable Notes
 

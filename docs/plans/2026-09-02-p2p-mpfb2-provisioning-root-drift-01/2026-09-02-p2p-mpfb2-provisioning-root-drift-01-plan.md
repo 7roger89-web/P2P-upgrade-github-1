@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-09-02`
-- Status: `in_progress`
+- Status: `complete`
 - Plan: `docs/plans/2026-09-02-p2p-mpfb2-provisioning-root-drift-01/2026-09-02-p2p-mpfb2-provisioning-root-drift-01-plan.md`
 - Evidence: `docs/plans/2026-09-02-p2p-mpfb2-provisioning-root-drift-01/2026-09-02-p2p-mpfb2-provisioning-root-drift-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-02-p2p-mpfb2-provisioning-root-drift-01/2026-09-02-p2p-mpfb2-provisioning-root-drift-01-benchmark.md`
@@ -315,7 +315,7 @@ The existing runtime root at `D:\AI\P2P_runtime\mpfb2-runtime-01` was reported w
 - Ordered Slice List:
   - P3-A: Exactly one real canonical continuation and first-blocker report.
 
-- [ ] P3-A: Exactly one real canonical continuation and first-blocker report
+- [x] P3-A: Exactly one real canonical continuation and first-blocker report
   - Goal: prove the post-reconciliation runtime boundary and produce the requested terminal fields.
   - Scope Boundary:
     - Editable: runtime-local logs/receipts/provenance/output only as produced by the existing canonical entrypoint; repo-local evidence/status artifacts.
@@ -358,10 +358,10 @@ The existing runtime root at `D:\AI\P2P_runtime\mpfb2-runtime-01` was reported w
     - Evidence IDs: E3-P3A-RUN1, E3-P3A-ARTIFACT1, E3-P3A-CLEAN1.
     - Actual-status rows refreshed: real runtime execution, artifacts, first blocker, final verdict.
   - Evidence Targets: runtime receipt, child PID/logs, output/sha256, GLB structural/provenance result, cleanup result, Game Truyen fingerprint.
-  - Actual-status Update: stop at first blocker; do not add remediation steps for a downstream blocker.
+  - Actual-status Update: exactly one continuation passed all requested gates and reached terminal smoke PASS; no downstream blocker or second attempt was added.
   - Commit Boundary: runtime evidence is not a source commit; write report and status closure only.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.
   - Work Steps:
     1. Call the supervisor skill to review the full completed plan work.
@@ -369,8 +369,8 @@ The existing runtime root at `D:\AI\P2P_runtime\mpfb2-runtime-01` was reported w
     3. Re-run supervisor review after the fix.
     4. Repeat until supervisor passes or records a blocker.
   - Implementation Gate: all planned implementation phases must be completed or explicitly blocked before this review.
-  - Acceptance: supervisor review passes, or the plan records a blocker with evidence and no closure is performed.
-- [ ] Pn-B: Remove dead work created during this plan.
+  - Acceptance: supervisor review passes, or the plan records a blocker with evidence and no closure is performed. Supervisor PASS is recorded in `reports/supervisor/rp_supervisor_260902_103800_by_gpt-5-codex_p2p-mpfb2-provisioning-root-drift-01.md`.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only artifacts that still serve the accepted plan.
   - Work Steps:
     1. Review files, sections, generated output, tests, temp files, and plan artifacts created or modified during this plan.
@@ -379,8 +379,8 @@ The existing runtime root at `D:\AI\P2P_runtime\mpfb2-runtime-01` was reported w
     4. Call supervisor to review the dead-work cleanup.
     5. If supervisor fails the cleanup, return to the responsible implementation workflow/skill for the failed cleanup scope only, then re-run supervisor review.
   - Implementation Gate: only remove artifacts created by this plan unless the user explicitly approves broader cleanup.
-  - Acceptance: final `git diff/status` contains no dead plan-created artifacts, supervisor passes the cleanup, and evidence records what was removed or preserved.
-- [ ] Pn-C: Close the plan.
+  - Acceptance: final `git diff/status` contains no dead plan-created artifacts, supervisor passes the cleanup, and evidence records what was removed or preserved. One-off runner remains only under ignored `.tmp` for traceability; no dead source artifact is in the candidate diff.
+- [x] Pn-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status.
   - Work Steps:
     1. Run the required final validation for the accepted scope, including full build before final runtime validation. For this native runtime route, record Docker as N/A with reason rather than substituting a dev server.
@@ -389,7 +389,7 @@ The existing runtime root at `D:\AI\P2P_runtime\mpfb2-runtime-01` was reported w
     4. Record final validation, detect-changes, benchmark, and commit evidence.
     5. Commit the completed scope and verify the worktree state.
   - Implementation Gate: Pn-A and Pn-B must pass or record blockers.
-  - Acceptance: final evidence is recorded, required commits exist when source changed, and the worktree state is known.
+  - Acceptance: final evidence is recorded, required commits exist when source changed, and the worktree state is known. ISSUE=56 terminal verdict is `P2P_MPFB2_RUNTIME_SMOKE_PASS`.
 
 ## Risk Notes
 

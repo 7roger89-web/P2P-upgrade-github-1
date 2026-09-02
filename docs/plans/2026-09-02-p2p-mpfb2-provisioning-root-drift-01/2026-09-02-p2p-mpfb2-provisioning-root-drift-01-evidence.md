@@ -62,8 +62,11 @@ Matching plan item(s): `P2-A`, `P2-B`
 
 Matching plan item(s): `P3-A`
 
-Pending exactly-one real continuation evidence. P3 may run only after the source checkpoint is bound and the reconciled hash is freshly reverified.
+- `E3-P3A-RUN1`: Exactly one real run used the existing Windows Blender `4.2.23` executable and candidate source checkpoint `79d9526b4401fdd6b0e76eef972ec6ec2186430d`; child PID `27548` was created after root and firewall gates.
+- `E3-P3A-ARTIFACT1`: The run returned `EXECUTED_AND_STRUCTURALLY_VALID`; output directory contains exactly `Oak.glb` (9,093,808 bytes, SHA-256 `5f96f86fbfd4cdc01201e767b0383807ac5e2a7a6365252aee568a91a949c0c4`) and `Oak.asset-provenance.json` (1,488 bytes, SHA-256 `d5d50b0bea9dfb096762e566211df4db62be1ed1f7bb47473919a5f9f672f7b7`). Independent GLB and provenance validation also PASS.
+- `E3-P3A-CLEAN1`: Firewall setup/enforcement/cleanup all PASS; post-run `P2P-MPFB-DENY-*` rule count is `0`, active Blender process count is `0`, root hash remains the manifest hash with 526 generated `.pyc`, all pinned paths remain byte-equal, and Game Truyen HEAD/status fingerprint is unchanged.
+- `E3-P3A-STOP1`: Full requested route passed, so execution stopped. No retry, reinstall, manifest rewrite, downstream repair, or second continuation occurred.
 
 ## Closure Evidence
 
-P2 implementation evidence is complete; final detect-changes, commit hash, coder report, one real continuation, supervisor report, and requested terminal fields remain pending.
+`E3-P3A-RUN1`, `E3-P3A-ARTIFACT1`, `E3-P3A-CLEAN1`, and `E3-P3A-STOP1` close the one allowed real continuation. `E4-CLOSE1`: supervisor report `reports/supervisor/rp_supervisor_260902_103800_by_gpt-5-codex_p2p-mpfb2-provisioning-root-drift-01.md` independently PASSes the exact root/runtime claim. `E4-CLOSE2`: coder report `reports/coder/rp_coder_260902_103500_by_gpt-5-codex_p2p-mpfb2-provisioning-root-drift-01.md`, notes log, final candidate identity, and final status are recorded; no PR/push is claimed. `E4-CLOSE3`: final Anvien detect-changes closure evidence is `.tmp/issue56-detect-changes-closure-20260902.json`; it contains no affected processes and only the five intended tracked closure documents.
