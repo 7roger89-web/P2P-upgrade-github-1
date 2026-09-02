@@ -332,6 +332,29 @@ compile PASS, and `git diff --check` PASS. The pre-reconciliation Supervisor
 PASS is superseded for exact-subject purposes; one fresh review of this
 reconciled subject is required and is not an unbounded review loop.
 
+### E2-PnA-SUP2 - reconciled exact-subject Supervisor
+
+The same independent Supervisor lane performed the required fresh review after
+the main movement and rebase. It reviewed the exact reconciled source subject
+`HEAD=88f043ddd28e9e6620be0c0cf9a8fc359fef60ec`, tree
+`1be9ad1ee5aae5aaeed3a03b5b24fc16dfef66bc`, and wrote:
+
+`reports/supervisor/rp_supervisor_260902_141500_by_independent-supervisor-reconciled-main_p2p-social-content-skills-01.md`
+
+The report independently rebound current `origin/main`, original canonical
+ancestry, upstream commit/tree/license, all five `ADAPT` projections and
+hashes, registry/quorum, loader/router/context boundaries, privacy/offline
+restrictions, Humanizer/copywriting separation, isolation, and fresh focused
+`12/12 PASS` plus nearest vendor `22/22 PASS`. No Issue #59 mutation appears
+in `origin/main..HEAD`.
+
+```text
+SUPERVISOR_VERDICT=PASS
+OWNER_GATE=READY_FOR_OWNER_GATE
+TECHNICAL_PROMOTION=NOT_AUTHORIZED
+MERGE=NOT_AUTHORIZED
+```
+
 ## E3 - P2 Evidence
 
 Matching plan item(s): `P2-A`
@@ -340,7 +363,6 @@ No P2 phase is authorized in this Issue #60 workstream. Phase 2 upstream skills 
 
 ## Closure Evidence
 
-Candidate commits, pre-commit detect-changes, and the pre-reconciliation
-Supervisor report are complete. The current-main reconciliation and fresh
-exact-subject Supervisor report are pending. Draft PR identity and final stop
-state remain blocked until those are complete.
+Candidate commits, pre-commit detect-changes, current-main reconciliation, and
+the fresh exact-subject Supervisor report are complete. Draft PR identity and
+final stop state remain to be recorded after the exact remote/branch preflight.
