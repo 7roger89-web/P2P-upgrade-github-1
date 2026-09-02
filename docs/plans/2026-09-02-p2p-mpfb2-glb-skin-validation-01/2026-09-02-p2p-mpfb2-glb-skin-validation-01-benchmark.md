@@ -36,8 +36,11 @@ This task is a structural correctness repair, not a performance optimization. On
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
 | P2 | Exact existing Oak validation | result | GLB_skeleton blocker | PASS | PASS | PASS | resolved | E2-P2A-ARTIFACT1..3 |
-| P2 | Real MPFB2 reruns | runs | 1 prior Issue 52 run | 0 in Issue 55 | pending | at most 1 | pending | E2-P2B-RUN1..6 |
-| P2 | Game Truyen mutations | files | 0 | 0 | pending | 0 | 0 | E2-P2B-RUN5 |
+| P2 | Real MPFB2 child spawns | runs | 1 prior Issue 52 run | 0 in Issue 55 | 0 | at most 1 | -1 | E2-P2B-RUN1..2 |
+| P2 | Issue 55 pre-spawn attempts | attempts | 0 | 1 | 1 | exactly one maximum | +1 | E2-P2B-RUN1..6 |
+| P2 | New Issue 55 output files | files | 0 | 0 | 0 | no output on pre-spawn block | 0 | E2-P2B-RUN3 |
+| P2 | P2P firewall rules after attempt | rules | 0 | 0 | 0 | 0 | 0 | E2-P2B-RUN4 |
+| P2 | Game Truyen mutations | files | 0 | 0 | 0 | 0 | 0 | E2-P2B-RUN5 |
 
 ## Non-Benchmarkable Notes
 

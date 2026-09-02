@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-09-02`
-- Status: `in_progress`
+- Status: `blocked`
 - Plan: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-plan.md`
 - Evidence: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-benchmark.md`
@@ -258,7 +258,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
   - Actual-status Update: mark P2-B runnable only if every P2-A gate passes.
   - Commit Boundary: no source commit; ledger refresh is recorded with the next implementation checkpoint.
 
-- [ ] P2-B: Run exactly one canonical real MPFB2 continuation and stop at the first different blocker.
+- [x] P2-B: Run exactly one canonical real MPFB2 continuation and stop at the first different blocker.
   - Goal: continue the existing real sequence once after validator proof and capture honest end-to-end evidence.
   - Scope Boundary:
     - Editable: repo-local evidence/actual-status/coder report; runtime output may be produced only by the authorized single rerun.

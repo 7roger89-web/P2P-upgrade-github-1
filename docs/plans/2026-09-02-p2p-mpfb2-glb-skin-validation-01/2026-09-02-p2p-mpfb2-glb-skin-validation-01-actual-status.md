@@ -2,7 +2,7 @@
 
 Title: P2P-MPFB2-GLB-SKIN-VALIDATION-01
 Date: 2026-09-02
-Status: P2-A PASS / P2-B Ready
+Status: P2-B BLOCKED
 Companion plan: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-plan.md`
 Companion evidence: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-benchmark.md`
@@ -58,7 +58,7 @@ Out of scope:
 | Canonical `_validate_mesh_skin` | lines 141-149 now distinguish omitted from present, derive one joint root for omission, and allow nested joints while retaining common-root/connectivity validation | distinguish omitted from present; preserve root policy | correct for P1-A; focused matrix pending | 21 local file relationships; one validation flow | E1-P1A-SRC1..4 | proceed to P1-B |
 | Direct GLB test matrix | explicit and omitted skeleton PASS cases plus null/negative/out-of-range/non-integer skeleton and empty/invalid-joint FAIL cases now pass in focused tests | requested focused pass/fail matrix | correct | 143 local test relationships | E1-P1B-TEST1..4 | proceed to P2-A |
 | Provenance/recipe | existing sidecar and recipe bind Oak hash and exact recipe; no evidence of defect | remain unchanged and pass candidate validation | correct / preserve-only | inspect-only sibling surface | E0-P0A-ARTIFACT1, E0-P0A-HISTORY1 | preserve; P2-A validates |
-| MPFB adapter/addon/firewall | prior bounded surfaces are proven but not revalidated as part of P0; current source is untouched | unchanged through Issue 55; fresh checks only in one conditional rerun | correct / preserve-only | inspect-only sibling surfaces | E0-P0A-HISTORY1 | do not edit; P2-B only if gated |
+| MPFB adapter/addon/firewall | candidate source is untouched; the one Issue 55 runtime attempt failed at existing MPFB provisioning-root integrity before network setup/spawn | unchanged through Issue 55; runtime rerun cannot proceed until the existing environment is reconciled outside this scope | blocked / preserve-only | inspect-only sibling surfaces | E2-P2B-RUN1..4 | do not repair or retry in Issue 55 |
 | Game Truyen | outside this repository/runtime source scope | no read/write/mutation | correct / preserve-only | protected external surface | E0-P0A-HISTORY1 | never touch |
 
 ## Status Refresh Log
@@ -69,6 +69,7 @@ Out of scope:
 | R1 | 2026-09-02 | after P1-A source candidate and exact Oak direct validation | `_validate_mesh_skin` selected branch | wrong -> correct for optional selection and nested rooted hierarchy; test matrix remains partial | E1-P1A-SRC1..4 | continue to P1-B; P2-A remains gated on focused tests |
 | R2 | 2026-09-02 | after P1-B focused structural tests and compileall | GLB fixture/test matrix | partial -> correct; P1 source/test slices complete | E1-P1B-TEST1..4 | P2-A may run read-only against exact Oak; P2-B remains gated on P2-A |
 | R3 | 2026-09-02 | after P2-A exact Oak candidate validation | existing artifact gate | blocked -> PASS; artifact remains byte-identical | E2-P2A-ARTIFACT1..4 | P2-B is runnable exactly once; stop at first new blocker |
+| R4 | 2026-09-02 | after the single Issue 55 runtime attempt | real MPFB2 continuation | ready -> blocked before spawn on provisioning-root mismatch; no child/output/firewall lease | E2-P2B-RUN1..6 | stop; environment integrity reconciliation is out of scope |
 
 ## Phase Touch Map
 
@@ -200,7 +201,7 @@ Do not broaden into unrelated suite or change the real artifact in tests.
 | P1-A | Validator is wrong only for omitted optional skeleton; artifact is structurally coherent and rooted by inference | proceed with surgical source edit; preserve all existing structural checks |
 | P1-B | Direct matrix now covers all requested cases and passes | complete; proceed to exact artifact validation |
 | P2-A | Candidate validator passes the exact existing Oak GLB and hash/size are unchanged | complete; preserve artifact and proceed to one conditional rerun |
-| P2-B | P2-A is PASS; no Issue 55 rerun has occurred | run the existing canonical sequence once and stop at the first different blocker |
+| P2-B | one canonical attempt was made after P2-A and failed before spawn on a different existing-runtime integrity blocker | stop; do not retry or repair the runtime environment in Issue 55 |
 
 ## Implementation Gate
 
@@ -228,4 +229,13 @@ Do not broaden into unrelated suite or change the real artifact in tests.
 
 Decision note:
 
-P2-A is PASS. Fresh artifact evidence proves the skeleton property is absent, not null, and the artifact's joints/hierarchy/accessor/skinning structure is coherent. Khronos makes `skin.skeleton` optional; the local P2P rooted-skeleton policy is intentional and is preserved by deriving the unique joint root only when the optional field is omitted. P1-A/P1-B are complete, and the candidate validator passes the exact existing Oak GLB without changing its bytes or hash. P2-B is now permitted exactly once; the rerun must stop at the first different blocker.
+P2-A is PASS. Fresh artifact evidence proves the skeleton property is absent, not null, and the artifact's joints/hierarchy/accessor/skinning structure is coherent. Khronos makes `skin.skeleton` optional; the local P2P rooted-skeleton policy is intentional and is preserved by deriving the unique joint root only when the optional field is omitted. P1-A/P1-B are complete, and the candidate validator passes the exact existing Oak GLB without changing its bytes or hash. The one permitted canonical continuation was attempted but stopped before spawn because the existing MPFB2 provisioning root does not match its recorded manifest hash. Issue 55 does not repair or retry that different blocker.
+
+## Current Terminal Decision
+
+```text
+EXISTING_OAK_GLB_VALIDATION=PASS
+REAL_RERUN_EXECUTED=NO
+FIRST_DIFFERENT_BLOCKER=MPFB_PROVISIONING_ROOT_HASH_MISMATCH
+TERMINAL_VERDICT=P2P_MPFB2_GLB_SKIN_NEXT_BLOCKER_FOUND
+```

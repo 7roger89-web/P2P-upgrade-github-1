@@ -69,12 +69,12 @@ Matching plan item(s): `P2-A`, `P2-B`
 - `E2-P2A-ARTIFACT2`: Artifact bytes and size were compared before and after validation: both hashes are `5f96f86fbfd4cdc01201e767b0383807ac5e2a7a6365252aee568a91a949c0c4`, size `9,093,808`, and `ARTIFACT_MUTATED_DURING_VALIDATION=NO`.
 - `E2-P2A-ARTIFACT3`: Candidate validation passed the existing provenance schema, recipe binding, rights/assets binding, and GLB hash binding; output is `PROVENANCE_VALIDATION=PASS`.
 - `E2-P2A-ARTIFACT4`: Exact existing-artifact gate is PASS. P2-B is permitted to run exactly once; no Blender execution occurred before this gate.
-- `E2-P2B-RUN1`: Pending preflight bindings and firewall-before-spawn receipt.
-- `E2-P2B-RUN2`: Pending Blender/MPFB2/character/export stage markers.
-- `E2-P2B-RUN3`: Pending new GLB/provenance/hash and structural result.
-- `E2-P2B-RUN4`: Pending firewall cleanup and output cleanup result.
-- `E2-P2B-RUN5`: Pending Game Truyen immutability fingerprint.
-- `E2-P2B-RUN6`: Pending full-PASS or first-different-blocker stop verdict; no second fix.
+- `E2-P2B-RUN1`: Preflight bound candidate source `335ca7ad57b2d51ff456af29427143b5f848a112` / tree `448713c171f107cc821f64db948ff4b7eba8f767`, Blender `4.2.23`, MPFB2 `2.0.17`, exact upstream pin/tree, a new absent output root, and zero active Blender processes. Plan construction failed closed before firewall or spawn on `MPFB_PROVISIONING_ROOT_HASH_MISMATCH`.
+- `E2-P2B-RUN2`: `REAL_BLENDER_CHILD_PID=NOT_CREATED`; no Blender, MPFB2, character, or export stage marker was produced by the Issue 55 attempt.
+- `E2-P2B-RUN3`: `NEW_OUTPUT_PATH=NOT_CREATED`; no new GLB/provenance was created. The existing Oak GLB remains `5f96f86fbfd4cdc01201e767b0383807ac5e2a7a6365252aee568a91a949c0c4`.
+- `E2-P2B-RUN4`: Firewall sequence was not reached and no P2P firewall rule was present afterward (`P2P_FIREWALL_RULE_COUNT_AFTER_PRESPAWN_BLOCK=0`); no isolation lease existed to clean up.
+- `E2-P2B-RUN5`: The failed pre-spawn attempt did not access Game Truyen and made no protected-project mutation; `GAME_TRUYEN_MUTATIONS=NO`.
+- `E2-P2B-RUN6`: First different blocker is `MPFB_PROVISIONING_ROOT_HASH_MISMATCH`: computed root `10ebf09a8b425f6e1081f9624ccf9365e471522b01527820e89d27b20de705bf` versus manifest `f6907ef03674ddc995e8b0fdd988e9a003cad61df0d4f707e2a7aaeda4d4e788`. No retry, runtime-root repair, reinstall, or second fix was performed.
 
 ## Closure Evidence
 
