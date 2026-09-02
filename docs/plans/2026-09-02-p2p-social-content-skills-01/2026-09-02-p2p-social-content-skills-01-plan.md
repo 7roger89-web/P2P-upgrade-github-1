@@ -236,7 +236,7 @@ content.
   - Work Steps:
     1. Provide one independent Supervisor the exact candidate commit/tree, worktree path, plan/evidence, source diff, focused test output, and required return fields.
     2. If Supervisor rejects, create a separate fix slice/commit for the material finding only, rerun direct verification, and request one re-review; do not loop without a material issue.
-  - Implementation Gate: P1-A and P1-B are complete, reports are written, and no unresolved same-invariant surface remains. The first PASS was superseded when remote main moved; the required fresh exact-subject review of the reconciled candidate also passed.
+  - Implementation Gate: P1-A and P1-B are complete, reports are written, and no unresolved same-invariant surface remains. The first PASS was superseded when remote main moved; the late stale rejection is preserved in quarantine; the required fresh exact-subject review of the reconciled candidate also passed.
   - Acceptance: one independent Supervisor returns `PASS` for the reconciled candidate, or a documented blocker stops the work honestly.
 
 - [x] Pn-B: Remove dead work created during this plan.

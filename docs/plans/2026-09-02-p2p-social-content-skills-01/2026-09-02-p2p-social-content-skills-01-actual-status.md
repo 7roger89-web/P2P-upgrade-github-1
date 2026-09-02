@@ -113,6 +113,7 @@ Record how many files the target is related to before deciding touch mode. A fil
 | R5 | 2026-09-02 | fresh remote main movement and local rebase | origin/main moved to Issue #59 PR #61; Issue #60 candidate rebased with no conflict | no product-status change; current main is bound and focused checks are green; Supervisor re-review pending | `E2-MAIN-RECONCILE1` | run one fresh exact-subject Supervisor review, then remote preflight/PR |
 | R6 | 2026-09-02 | fresh exact-subject Supervisor review after main reconciliation | reconciled candidate `88f043ddd...` / tree `1be9ad1e...` | Supervisor `PASS`; Owner Gate remains pending; technical PASS is not approval/promotion | `E2-PnA-SUP2` | run remote preflight, create one draft PR without merge, then stop at Owner Gate |
 | R7 | 2026-09-02 | final remote preflight and PR #63 creation | remote identity/permission, branch head, draft PR, no merge | candidate is published only as an unmerged draft PR; Owner Gate remains pending | `E4-PnC-PR1` | stop; await Owner Gate decision on the exact unmerged PR subject |
+| R8 | 2026-09-02 | late completion of the first Supervisor attempt | stale intermediate `REJECT` report preserved outside candidate under `.tmp` | historical rejection retained; current reconciled `PASS` remains the only final technical verdict | `E2-PnA-REJECT1` | no further Supervisor loop; stop at Owner Gate |
 
 ## Phase Touch Map
 

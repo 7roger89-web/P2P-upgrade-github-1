@@ -291,8 +291,9 @@ five `ADAPT` decisions, sparse projections and hashes, registry/quorum,
 single-router/loader/context boundaries, voice evidence/no-default-author,
 Humanizer/copywriting separation, privacy/offline gates, isolation, and fresh
 focused `12/12 PASS`. It confirmed the two foundation failures predate Issue
-#60 and are untouched. The earlier host-blocked Supervisor attempt produced no
-report or verdict and is not counted as an acceptance result.
+#60 and are untouched. The earlier host-blocked attempt later wrote a `REJECT`
+report after observing an intermediate drifted/dirty subject; that report is
+preserved in quarantine below and is not counted as the final acceptance result.
 
 ```text
 SUPERVISOR_VERDICT=PASS
@@ -304,6 +305,19 @@ MERGE=NOT_AUTHORIZED
 This historical PASS is retained for audit but is not the final subject
 authority because `origin/main` moved after this review. The exact current
 main and final candidate are rebound below and require a fresh review.
+
+### E2-PnA-REJECT1 - late first-attempt rejection preserved
+
+The first Supervisor attempt eventually produced a valid `REJECT` report after
+the candidate moved and the review packet was temporarily dirty:
+
+`.tmp/p2p-social-content-supervisor-history-01/rp_supervisor_260902_132000_by_independent-supervisor_p2p-social-content-skills-01.md`
+
+Its rejection was for immutable subject drift, competing/untracked review
+artifacts, and cleanliness—not for a newly found social-capability defect. It
+is preserved as historical evidence outside the candidate/PR. The exact
+reconciled candidate then received the fresh Supervisor review below; the
+earlier rejection is not silently discarded or reused as a current verdict.
 
 ### E2-PnB-CLEAN1 - candidate boundary cleanup
 
@@ -381,9 +395,10 @@ was created as `OPEN`/`DRAFT` with base `main` at the current main SHA. At PR
 creation/post-check, the remote PR head matched local candidate
 `cbb055cd3d454a9415f4e96db9078be2e4944a11`, tree
 `2065f94154e4f4a933dc6dc3ecd42d12bbdca384`; no merge was performed. The
-subsequent closure commit changes documentation only and is the final PR head
+subsequent closure commits change documentation only and are the final PR head
 reported by the closing terminal bind; no source/provenance/test behavior was
-changed after the exact-subject Supervisor review.
+changed after the exact-subject Supervisor review. The late first-attempt
+`REJECT` report remains preserved outside the candidate under `.tmp`.
 
 ```text
 PR_NUMBER=63
