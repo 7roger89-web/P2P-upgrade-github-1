@@ -185,7 +185,13 @@ def _validate_pinned_manifest(
 
 
 def hash_provisioned_root(root: str | Path, *, exclude: str | Path | None = None) -> str:
-    """Hash every regular file in a provisioned root by stable relative path."""
+    """Hash provisioned files by stable relative path.
+
+    Blender's embedded Python may create deterministic bytecode directly under
+    ``__pycache__`` while loading MPFB2. Those ``*.pyc`` files are execution
+    products, not pinned provisioning bytes, so they are excluded narrowly;
+    every other regular file remains part of the root hash.
+    """
 
     root_path = _safe_local_directory(Path(root), "mpfb_root")
     excluded = Path(exclude).resolve(strict=True) if exclude is not None else None
@@ -201,10 +207,13 @@ def hash_provisioned_root(root: str | Path, *, exclude: str | Path | None = None
     for file_path in sorted(files, key=lambda item: item.relative_to(root_path).as_posix()):
         if excluded is not None and file_path.resolve(strict=True) == excluded:
             continue
+        relative_path = file_path.relative_to(root_path)
+        if relative_path.parent.name == "__pycache__" and relative_path.suffix == ".pyc":
+            continue
         if not file_path.is_file():
             raise MpfbAdapterError("MPFB_ROOT_FILE_INVALID")
         try:
-            relative = file_path.relative_to(root_path).as_posix().encode("utf-8")
+            relative = relative_path.as_posix().encode("utf-8")
             content = file_path.read_bytes()
         except (OSError, UnicodeError) as exc:
             raise MpfbAdapterError("MPFB_ROOT_FILE_UNREADABLE") from exc
