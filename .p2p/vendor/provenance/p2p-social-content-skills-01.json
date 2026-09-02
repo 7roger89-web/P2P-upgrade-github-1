@@ -1,0 +1,210 @@
+{
+  "schema": "p2p-vendor-provenance/1",
+  "workstream": "P2P-SOCIAL-CONTENT-SKILLS-01",
+  "issue": 60,
+  "status": "ADAPTED_PROJECTIONS_ONLY",
+  "upstream": {
+    "repository": "https://github.com/charlie947/social-media-skills.git",
+    "commit": "d2e948719eafc8ed9e2436357ad18489bb371a81",
+    "tree": "f11c2f93bc1ff3d927e36842f0bb40ea1b639650",
+    "license": {
+      "path": "LICENSE",
+      "kind": "MIT",
+      "sha256": "ed17713237d18555a34c208bf0cb1ce347faa937731d509e265ce91be660e218"
+    },
+    "checked_date": "2026-09-02",
+    "source_checkout": ".tmp/p2p-social-content-upstream-audit"
+  },
+  "audit": [
+    {
+      "skill": "voice-builder",
+      "upstream_path": "skills/voice-builder/SKILL.md",
+      "content_sha256": "7f47bd4b5c131331be274abed100d21e4021aa7d90ac29802f18f39891de2b5a",
+      "license_boundary": "MIT; adapted projection retains the upstream notice; starter sample data and third-party content are not copied",
+      "external_dependencies": "None at runtime; the source references an optional starter sample file",
+      "claude_specific_assumptions": [
+        "Cowork project",
+        "Claude",
+        "auto-start on load",
+        "two AskUserQuestion calls",
+        "project-root about-me.md and voice.md writes"
+      ],
+      "p2p_existing_overlap": [
+        "No canonical voice profile",
+        "Humanizer is separate downstream prose polishing",
+        "creative.copywriting is marketing-only"
+      ],
+      "decision": "ADAPT",
+      "proposed_capability_id": "creative.social.voice_profile",
+      "source_vendoring_required": true,
+      "rationale": "Keep the sample-derived voice contract, remove host interaction and file/memory behavior, require user evidence, and project the result through existing context pointers."
+    },
+    {
+      "skill": "post-writer",
+      "upstream_path": "skills/post-writer/SKILL.md",
+      "content_sha256": "a0c91645648df1cb933489fd3ef0c50fed196661c5374d95dadf637407866c1f",
+      "license_boundary": "MIT; adapted projection retains the upstream notice; no upstream examples, references, or output files are copied",
+      "external_dependencies": "None at runtime; the source asks for topic research, which is excluded from this phase",
+      "claude_specific_assumptions": [
+        "Claude/Cowork project files",
+        "AskUserQuestion",
+        "code-block output",
+        "named skill handoff",
+        "automatic save and publish wording"
+      ],
+      "p2p_existing_overlap": [
+        "Marketing/double-semantic creative.copywriting",
+        "Optional creative.prose.humanize",
+        "No general social writer in canonical base"
+      ],
+      "decision": "ADAPT",
+      "proposed_capability_id": "creative.social.post",
+      "source_vendoring_required": true,
+      "rationale": "Provide a distinct freeform social drafting boundary using supplied facts and selected voice context without external research or publication."
+    },
+    {
+      "skill": "hook-generator",
+      "upstream_path": "skills/hook-generator/SKILL.md",
+      "content_sha256": "efe43558494cec04cf3dd1080c0e5560fee8cae1093f3082d2f7f2f1525e6e27",
+      "license_boundary": "MIT; adapted projection retains the upstream notice; no example corpus or other upstream skill is copied",
+      "external_dependencies": "None",
+      "claude_specific_assumptions": [
+        "auto-start on load",
+        "implicit handoff to a named skill"
+      ],
+      "p2p_existing_overlap": [
+        "creative.copywriting has a broad marketing hook trigger",
+        "No standalone social hook capability"
+      ],
+      "decision": "ADAPT",
+      "proposed_capability_id": "creative.social.hook",
+      "source_vendoring_required": true,
+      "rationale": "Keep six bounded social hook angles, narrow line constraints, and truthful evidence use while separating marketing hooks and removing implicit handoffs."
+    },
+    {
+      "skill": "content-matrix",
+      "upstream_path": "skills/content-matrix/SKILL.md",
+      "content_sha256": "dae28fbfc83e66afd2c8f90cb6eb396b0c0aaaddade999820b204dc273161ed6",
+      "license_boundary": "MIT; adapted projection retains the upstream notice; no chart widget, sample content, or unrelated skill is copied",
+      "external_dependencies": "None at runtime; interactive chart support and file editing are excluded host features",
+      "claude_specific_assumptions": [
+        "Claude.ai/Cowork interactive chart",
+        "Claude Code Write/Edit",
+        "AskUserQuestion",
+        "current-working-directory file output",
+        "named skill handoff"
+      ],
+      "p2p_existing_overlap": [
+        "No existing matrix/ideation capability",
+        "creative.copywriting remains marketing-specific"
+      ],
+      "decision": "ADAPT",
+      "proposed_capability_id": "creative.social.content_matrix",
+      "source_vendoring_required": true,
+      "rationale": "Add bounded pillar-by-format ideation as a plain read model using existing context pointers instead of chart, file, or research infrastructure."
+    },
+    {
+      "skill": "post-formatter",
+      "upstream_path": "skills/post-formatter/SKILL.md",
+      "content_sha256": "9af34ac7b8936dce15f6f7076bfcd06cd0bbac16ca35b6eaa81625e665685bc8",
+      "license_boundary": "MIT; adapted projection retains the upstream notice; no graphic/scorer integration or other upstream files are copied",
+      "external_dependencies": "None",
+      "claude_specific_assumptions": [
+        "AskUserQuestion",
+        "auto-start on load",
+        "named graphic/scorer handoffs",
+        "ready-to-publish framing"
+      ],
+      "p2p_existing_overlap": [
+        "creative.social.post is freeform drafting",
+        "creative.prose.humanize is prose polishing",
+        "creative.copywriting is marketing/double-semantic"
+      ],
+      "decision": "ADAPT",
+      "proposed_capability_id": "creative.social.post_format",
+      "source_vendoring_required": true,
+      "rationale": "Keep strict framework formatting as an independently selectable operation while changing publish language to review-only and removing host handoffs."
+    }
+  ],
+  "projection_policy": {
+    "kind": "SPARSE_PROVIDER_NEUTRAL_PROJECTION",
+    "raw_upstream_skill_files_vendored": false,
+    "retained_upstream_files": [
+      "LICENSE"
+    ],
+    "adapted_files": [
+      "SKILL.md"
+    ],
+    "excluded": [
+      "references/sample-content.md",
+      "all other upstream references",
+      "examples",
+      "assets",
+      "scripts",
+      "Phase 2 skills"
+    ],
+    "load_law": "AVAILABLE != LOADED != SELECTED != EXECUTED",
+    "router_count": 1,
+    "orchestrator_count": 0,
+    "network_runtime": false,
+    "credentials": false,
+    "provider_runtime": false,
+    "social_account_access": false,
+    "publication": false,
+    "user_sample_text_in_metadata": false
+  },
+  "vendors": [
+    {
+      "capability_id": "creative.social.voice_profile",
+      "vendor_path": ".p2p/vendor/skill/charlie-social-voice-profile-d2e9487",
+      "upstream_path": "skills/voice-builder/SKILL.md",
+      "snapshot_sha256": "aa46e8010832268ddb4eaae4b10a2b2fe7cc45e2be5ac2ee89f48dda19f3fd39",
+      "entrypoint_sha256": "57038beca3ccfa0fbe834ec742561fa4bbba7cc7fd592e26bdec90c6f6224ab5",
+      "license_sha256": "ed17713237d18555a34c208bf0cb1ce347faa937731d509e265ce91be660e218",
+      "status": "PROJECTED"
+    },
+    {
+      "capability_id": "creative.social.post",
+      "vendor_path": ".p2p/vendor/skill/charlie-social-post-d2e9487",
+      "upstream_path": "skills/post-writer/SKILL.md",
+      "snapshot_sha256": "438828b77045695537edc40be3ebb0284878c36a9f9ddcf097ebb3b77ccd00bf",
+      "entrypoint_sha256": "c4c35b3166fc645686e9481bff1c7a4cfeb894a340e03028c307a8f5476feebc",
+      "license_sha256": "ed17713237d18555a34c208bf0cb1ce347faa937731d509e265ce91be660e218",
+      "status": "PROJECTED"
+    },
+    {
+      "capability_id": "creative.social.hook",
+      "vendor_path": ".p2p/vendor/skill/charlie-social-hook-d2e9487",
+      "upstream_path": "skills/hook-generator/SKILL.md",
+      "snapshot_sha256": "fb38e6c21c8582143fbd16b1ca174b0d13534147da250763392a16082c7efab4",
+      "entrypoint_sha256": "ffb9b138219f462de59421bc8988606a323ce38d8cf97180b95492fa9f5d8e03",
+      "license_sha256": "ed17713237d18555a34c208bf0cb1ce347faa937731d509e265ce91be660e218",
+      "status": "PROJECTED"
+    },
+    {
+      "capability_id": "creative.social.content_matrix",
+      "vendor_path": ".p2p/vendor/skill/charlie-social-content-matrix-d2e9487",
+      "upstream_path": "skills/content-matrix/SKILL.md",
+      "snapshot_sha256": "ed1a83439f2edd254bf37a34276317685b54f718bf0fcaf77dec90dc3106ddff",
+      "entrypoint_sha256": "d6160aec41098982f79eea642d78415f594c38afcfe40a85c8f100e3f488ec06",
+      "license_sha256": "ed17713237d18555a34c208bf0cb1ce347faa937731d509e265ce91be660e218",
+      "status": "PROJECTED"
+    },
+    {
+      "capability_id": "creative.social.post_format",
+      "vendor_path": ".p2p/vendor/skill/charlie-social-post-format-d2e9487",
+      "upstream_path": "skills/post-formatter/SKILL.md",
+      "snapshot_sha256": "1e0fa838dd789598a30b741087b93f43551a9d58c0ef7c715f5937677ae44a45",
+      "entrypoint_sha256": "3959bf1fe540f4df8aa9f5c901dc5c9fcc8a58ec733884aebcd1e01a485d54b2",
+      "license_sha256": "ed17713237d18555a34c208bf0cb1ce347faa937731d509e265ce91be660e218",
+      "status": "PROJECTED"
+    }
+  ],
+  "canonical_source_mutations": {
+    "game_truyen": false,
+    "gia_pha": false,
+    "logistics": false,
+    "issue_59": false,
+    "humanizer_pr_53": false
+  }
+}
