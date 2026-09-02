@@ -308,7 +308,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
   - Actual-status Update: record no second attempt and no remediation for any new blocker.
   - Commit Boundary: commit final evidence/report updates only after the single rerun and detect-changes review.
 
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
   - Goal: independently verify the completed plan work against the exact artifact, source diff, focused tests, runtime receipt, stop law, and preserved boundaries.
   - Work Steps:
     1. Call the supervisor skill to review the full completed plan work.
@@ -317,7 +317,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
     4. Repeat until supervisor passes or records a real blocker.
   - Implementation Gate: all runnable planned slices are completed or explicitly blocked with evidence.
   - Acceptance: supervisor review passes, or the plan records a blocker with no false closure.
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final candidate contains only the validator fix, direct tests, required ledgers/reports, and evidence that still serves Issue 55.
   - Work Steps:
     1. Review the final diff/status and remove only dead artifacts created by this plan.
@@ -325,7 +325,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
     3. Call supervisor to review cleanup.
   - Implementation Gate: only plan-created dead work is considered; no broad cleanup.
   - Acceptance: no second validator, exporter workaround, stale placeholder, or unrelated source change remains.
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status without converting technical PASS into approval/promotion.
   - Work Steps:
     1. Run final non-UI compile and focused validation required for this scope.

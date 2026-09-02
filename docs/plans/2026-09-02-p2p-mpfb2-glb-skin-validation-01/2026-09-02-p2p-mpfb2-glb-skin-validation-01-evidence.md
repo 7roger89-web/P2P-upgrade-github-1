@@ -78,6 +78,6 @@ Matching plan item(s): `P2-A`, `P2-B`
 
 ## Closure Evidence
 
-- `E3-P3A-SUP1`: Pending independent supervisor report for Issue 55.
-- `E3-P3B-CLEAN1`: Pending dead-work review and final diff scope.
-- `E3-P3C-CLOSE1`: Pending final candidate SHA/tree, detect-changes output, commit, and PR metadata if published.
+- `E3-P3A-SUP1`: `reports/supervisor/rp_supervisor_260902_085526_by_gpt-5-codex_p2p-mpfb2-glb-skin-validation-01.md` independently reviews the source, focused tests, exact Oak gate, Anvien impact, preserved surfaces, and the pre-spawn runtime blocker; verdict is PASS for the bounded Issue 55 claim and explicitly not full runtime PASS.
+- `E3-P3B-CLEAN1`: Final candidate diff contains only `.p2p/system/p2p_capabilities/glb_validator.py`, `tests/test_p2p_game_truyen_mpfb_adapter_01.py`, the Issue 55 plan/ledgers, coder/supervisor reports, and the date notes log. No second validator, exporter workaround, generated GLB, or unrelated runtime/security source remains.
+- `E3-P3C-CLOSE1`: Final closure records fresh candidate SHA/tree, detect-changes and diff-scope evidence, focused validation, exact-artifact PASS, the single pre-spawn stop, and the terminal `P2P_MPFB2_GLB_SKIN_NEXT_BLOCKER_FOUND` result. Fresh Anvien compare detection reports 8 candidate files and 7 affected file projections with a high file-risk warning caused by the broad documentation/test topology; direct source scope remains the one validator plus one test file and preserved runtime/security source diff is zero. No PR/promotion is claimed without a separately authorized external publication action.

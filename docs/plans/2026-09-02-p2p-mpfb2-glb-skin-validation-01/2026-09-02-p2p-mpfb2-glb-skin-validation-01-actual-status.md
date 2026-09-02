@@ -2,7 +2,7 @@
 
 Title: P2P-MPFB2-GLB-SKIN-VALIDATION-01
 Date: 2026-09-02
-Status: P2-B BLOCKED
+Status: P2-B BLOCKED / Supervisor PASS (bounded claim)
 Companion plan: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-plan.md`
 Companion evidence: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-benchmark.md`
@@ -70,6 +70,8 @@ Out of scope:
 | R2 | 2026-09-02 | after P1-B focused structural tests and compileall | GLB fixture/test matrix | partial -> correct; P1 source/test slices complete | E1-P1B-TEST1..4 | P2-A may run read-only against exact Oak; P2-B remains gated on P2-A |
 | R3 | 2026-09-02 | after P2-A exact Oak candidate validation | existing artifact gate | blocked -> PASS; artifact remains byte-identical | E2-P2A-ARTIFACT1..4 | P2-B is runnable exactly once; stop at first new blocker |
 | R4 | 2026-09-02 | after the single Issue 55 runtime attempt | real MPFB2 continuation | ready -> blocked before spawn on provisioning-root mismatch; no child/output/firewall lease | E2-P2B-RUN1..6 | stop; environment integrity reconciliation is out of scope |
+| R5 | 2026-09-02 | after independent supervisor review | Issue 55 bounded closure | bounded GLB claim accepted; full runtime remains blocked | E3-P3A-SUP1, E3-P3B-CLEAN1, E3-P3C-CLOSE1 | close with truthful next-blocker verdict; no retry or promotion |
+| R6 | 2026-09-02 | after final Anvien graph refresh and compare detection | final candidate diff | 8 candidate files, 7 affected projections, high file-risk warning; no preserved runtime/security source diff | E3-P3C-CLOSE1 | record warning as scope evidence, not as permission to broaden; close blocked runtime claim |
 
 ## Phase Touch Map
 
