@@ -2,7 +2,7 @@
 
 Title: P2P Social Content Skills Phase 1
 Date: 2026-09-02
-Status: P1 Complete / Supervisor Pending
+Status: P1 Complete / Supervisor PASS / Owner Gate Pending
 Companion plan: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-plan.md`
 Companion evidence: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-evidence.md`
 Companion benchmark: `Docs/plans/2026-09-02-p2p-social-content-skills-01/2026-09-02-p2p-social-content-skills-01-benchmark.md`
@@ -109,6 +109,7 @@ Record how many files the target is related to before deciding touch mode. A fil
 | R1 | 2026-09-02 | P1-A source smoke and exact hash checks | adapted roots, registry, provenance, copywriting boundary | registry/projection `partial/missing -> correct`; social family `missing -> partial` pending behavior tests | `E1-P1A-SRC1..E1-P1A-SRC8`, `E1-P1A-ROUTE1..E1-P1A-ROUTE4` | P1-B remains focused on selected-only loading, context linkage, determinism, and negative gates |
 | R2 | 2026-09-02 | P1-B focused behavior/compile/vendor checks | social capability tests and same-invariant regressions | social family `partial -> correct`; supervisor remains pending | `E1-P1B-TEST1..E1-P1B-TEST9` | move to one independent Supervisor; preserve two unrelated foundation baseline failures as out of scope |
 | R3 | 2026-09-02 | fresh final Anvien graph plus pre-commit detect-changes | plan/evidence/status ledgers and final change boundary | no product-status change; candidate change set is bounded and low-risk | `E1-P1B-DETECT1` | commit only the intentional test and four ledgers, then run one independent Supervisor |
+| R4 | 2026-09-02 | independent Supervisor replacement review of exact candidate `0ec02f4fb...` / tree `4d1f417b...` | full Issue #60 invariant family, candidate boundary, and cleanup | social family remains `correct`; Supervisor `PASS`; Owner Gate remains pending | `E2-PnA-SUP1`, `E2-PnB-CLEAN1` | run remote preflight, create one draft PR without merge, then stop at Owner Gate |
 
 ## Phase Touch Map
 
@@ -303,7 +304,8 @@ Do not bulk-copy upstream trees or execute external/provider/publishing paths.
 |-----------|-----------------------|--------------------------------------|
 | P1-A | Five sparse adapted projections, exact provenance, registry records, and precise copywriting exclusions are committed. | complete; preserve the existing loader/router/context and do not bulk-vendor upstream |
 | P1-B | Focused suite is `12/12 PASS`; nearest vendor integration is `22/22 PASS`; compile boundary is PASS. | complete; retain the two unrelated foundation baseline failures as documented out of scope |
-| Pn-A | Stable implementation candidate is ready; independent Supervisor has not yet run. | call exactly one independent Supervisor; if PASS, prepare one draft PR and stop at `OWNER_GATE` |
+| Pn-A | Exact candidate `0ec02f4fb...` / tree `4d1f417b...` passed one effective independent Supervisor review. | complete; preserve technical PASS as separate from Owner approval/promotion |
+| Pn-B | Candidate diff has no dead or out-of-scope artifact; upstream audit checkout is quarantined under `.tmp`. | complete; no user/concurrent cleanup target exists |
 
 ## Implementation Gate
 

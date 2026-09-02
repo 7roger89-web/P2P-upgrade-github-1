@@ -231,7 +231,7 @@ content.
   - Actual-status Update: append a refresh row with source-to-test status transitions and record any unrelated stale baseline as out of scope.
   - Commit Boundary: commit after all focused tests, compile, hash, and diff checks pass.
 
-- [ ] Pn-A: Call the supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call the supervisor for the implemented-plan acceptance loop.
   - Goal: independently review the stable candidate against Issue #60, the exact base/upstream pins, plan, source, tests, provenance, and isolation boundaries.
   - Work Steps:
     1. Provide one independent Supervisor the exact candidate commit/tree, worktree path, plan/evidence, source diff, focused test output, and required return fields.
@@ -239,7 +239,7 @@ content.
   - Implementation Gate: P1-A and P1-B are complete, reports are written, and no unresolved same-invariant surface remains.
   - Acceptance: one independent Supervisor returns `PASS`, or a documented blocker stops the work honestly.
 
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only artifacts serving the accepted selective intake.
   - Work Steps:
     1. Review every plan-created source, test, provenance entry, report, and temporary output.

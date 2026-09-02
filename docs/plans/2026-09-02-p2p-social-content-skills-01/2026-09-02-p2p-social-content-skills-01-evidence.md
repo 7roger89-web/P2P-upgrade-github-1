@@ -264,6 +264,40 @@ failures are recorded, not silently repaired.
 P1-B focused acceptance passes. The work is ready for the single independent
 Supervisor review; no broad regression or Phase 2 work is authorized.
 
+## E2 - Supervisor Evidence
+
+### E2-PnA-SUP1 - independent Supervisor
+
+The single effective independent Supervisor replacement reviewed the exact
+candidate source subject `HEAD=0ec02f4fb9082a39469128ccb987930d30de1efa`, tree
+`4d1f417b4e64c2c6114fb2ea98603f602a7baf62`, and wrote:
+
+`reports/supervisor/rp_supervisor_260902_133000_by_independent-supervisor-replacement_p2p-social-content-skills-01.md`
+
+The report independently verified the exact canonical/upstream bindings,
+five `ADAPT` decisions, sparse projections and hashes, registry/quorum,
+single-router/loader/context boundaries, voice evidence/no-default-author,
+Humanizer/copywriting separation, privacy/offline gates, isolation, and fresh
+focused `12/12 PASS`. It confirmed the two foundation failures predate Issue
+#60 and are untouched. The earlier host-blocked Supervisor attempt produced no
+report or verdict and is not counted as an acceptance result.
+
+```text
+SUPERVISOR_VERDICT=PASS
+OWNER_GATE=READY_FOR_OWNER_GATE
+TECHNICAL_PROMOTION=NOT_AUTHORIZED
+MERGE=NOT_AUTHORIZED
+```
+
+### E2-PnB-CLEAN1 - candidate boundary cleanup
+
+The Supervisor found no dead or out-of-scope artifact in the candidate diff.
+The exact upstream audit checkout remains quarantined under the worktree
+`.tmp` only for reproducibility of the recorded audit and is not part of the
+candidate. No cleanup touched a user or concurrent worktree.
+
+## E3 - P2 Evidence
+
 ### E1-P1B-DETECT1 - pre-commit change detection
 
 After a fresh graph refresh under the unique Anvien alias
@@ -284,6 +318,6 @@ No P2 phase is authorized in this Issue #60 workstream. Phase 2 upstream skills 
 
 ## Closure Evidence
 
-Pending candidate commit, draft PR, independent Supervisor report, and final
-stop state. The pre-commit detect-changes result is recorded as
-`E1-P1B-DETECT1`.
+Candidate commits, pre-commit detect-changes, and the independent Supervisor
+report are complete. Draft PR identity and final stop state remain to be
+recorded after the exact remote/branch preflight.
