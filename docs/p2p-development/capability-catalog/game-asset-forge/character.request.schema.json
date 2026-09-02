@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p-character-request/1",
+  "title": "P2P beginner character request",
+  "description": "Small structured request for the existing game.character.generate MPFB2 capability. Natural-language interpretation and runtime configuration are outside this contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "p2p-character-request/1"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+      "default": "Character"
+    },
+    "gender": {
+      "enum": ["female", "male", "neutral"],
+      "default": "neutral"
+    },
+    "age_class": {
+      "enum": ["young", "adult", "old"],
+      "default": "adult",
+      "description": "Semantic MPFB2 macro class; not an exact age in years."
+    },
+    "build": {
+      "enum": ["default", "slim", "average", "athletic"],
+      "default": "default"
+    },
+    "rig": {
+      "const": true,
+      "default": true
+    },
+    "output_format": {
+      "const": "glb",
+      "default": "glb"
+    }
+  }
+}
