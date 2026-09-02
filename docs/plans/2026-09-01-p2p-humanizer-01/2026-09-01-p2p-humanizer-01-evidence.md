@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Date: `2026-09-01`
+- Date: `2026-09-02`
 - Plan: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-plan.md`
 - Evidence: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-benchmark.md`
@@ -139,17 +139,6 @@ P1-A implementation evidence:
   corrected to use `Path.cwd()`; the corrected P1-A smoke passed and no source
   was changed by the failed assertion.
 
-The following P1-B evidence IDs are reserved by the plan:
-
-- `E1-P1A-SRC1`: exact two-file vendor snapshot comparison.
-- `E1-P1A-REG1`: manifest parse/provenance/contract metadata.
-- `E1-P1A-HASH1`: snapshot and entrypoint hash binding.
-- `E1-P1A-ROUTE1`: explicit route selection and metadata-only discovery.
-- `E1-P1A-ROUTE2`: unrelated/empty request exclusion and no global default.
-- `E1-P1B-TEST1..E1-P1B-TEST7`: focused A-G value/boundary cases.
-- `E1-P1B-BUILD1`: compile/build-equivalent and nearest-boundary validation.
-- `E1-P1B-DETECT1`: Anvien detect-changes immediately before the slice commit.
-
 P1-B implementation evidence:
 
 - `E1-P1B-TEST1`: Case A passed in
@@ -204,10 +193,6 @@ P1-B implementation evidence:
   warning. It reported no affected production files or execution flows; the
   registry/vendor production changes were already checkpointed in `2c85e855`.
 
-The staged change-detection command will be rerun once after this evidence
-update and recorded in the checkpoint command output immediately before the
-P1-B commit.
-
 ## E2 - P2 Evidence
 
 Matching plan item(s): `P2-A`, `P2-B`, `P2-C`
@@ -216,19 +201,53 @@ Matching plan item(s): `P2-A`, `P2-B`, `P2-C`
   the Writer lane before handoff.
 - `E2-P2C-PR1`: Draft PR #53 is open at
   `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/53`, links Issue
-  #51 with `Refs #51`, uses base `main` at
-  `b65948b00ed2a8969fed70ab59f68b5d9b53858d`, and has remote branch
-  `codex/p2p-humanizer-01` at head
-  `b633548bbc825d7c9b0aceec7d6c0d05af9d4a56` with tree
-  `ed41b51c670f6bea3c3350560143728f05cec928`.
+  #51 with `Refs #51`. The PR head/tree is intentionally fetched externally
+  at review or promotion time; no moving candidate identity is committed.
+
+## E3 - Reconciliation Evidence
+
+- `E3-RECON1`: Fresh `git fetch origin main --prune` verified the current
+  canonical main; fresh PR ref fetch verified the existing PR #53 head. Issue
+  #51 is OPEN, PR #53 is the sole open Humanizer PR, and it remains draft/open.
+- `E3-RECON2`: The old PR base was stale relative to current main. The
+  existing Writer branch was reconciled with a non-rewriting
+  `git merge --no-ff --no-edit origin/main`; no rebase, force-push, or merge to
+  `main` was used.
+- `E3-RECON3`: Candidate registry comparison against current main shows the
+  five social IDs and `creative.copywriting` match current main exactly;
+  `creative.prose.humanize` is the single additional ID.
+- `E3-RECON4`: The direct Content Studio test assertion that required
+  Humanizer to be absent was a stale cross-workstream assumption. It now
+  permits the distinct registry ID; the social records, projections, and
+  Voice Profile downstream wording were not edited.
+- `E3-RECON5`: Current focused/adjacent suite
+  `tests.test_p2p_humanizer_integration`,
+  `tests.test_p2p_social_content_skills`,
+  `tests.test_p2p_vendor_skill_integration`, and
+  `tests.test_p2p_host_skill_projection` ran 73/73 PASS.
+- `E3-RECON6`: The current candidate remains on one Writer branch and one
+  draft PR. No global activation, second router, second registry, second
+  runtime, promotion, or Owner approval execution was added.
+- `E3-RECON7`: Moving PR head/tree claims were removed from committed
+  Humanizer notes, plan evidence, and coder report. Current identity is a
+  review-time external binding, not a self-referential evidence loop.
+- `E3-RECON8`: Post-reconciliation Anvien refresh completed with 1,154 scanned
+  files, 202 parsed code files, and 0 parse failures. File detail recorded the
+  social test at 41 symbols/19 local relationships and the Humanizer test at
+  33 symbols/24 local relationships; both file impacts reported 0 affected
+  production files or flows. Compile sanity exited 0 and `git diff --check`
+  passed.
+- `E3-RECON9`: A final `anvien detect-changes --scope all` run is the only
+  change-detection gate for the reconciliation cleanup commit; its result is
+  terminal validation and is not written as a moving candidate SHA/tree claim.
 
 ## Closure Evidence
 
-Writer closure evidence will contain the final focused results, branch/PR
-identity, exact candidate SHA/tree, `git status`, detect-changes result, and
-the explicit stop at `NEXT_STEP=INDEPENDENT_SUPERVISOR`. Merge, promotion, and
-Owner approval execution are not part of this Writer handoff.
+Final current base/candidate SHA/tree, branch status, and PR state are fetched
+externally immediately before independent review. They are intentionally not
+written back into this evidence file. The Writer lane stops after exactly one
+independent Supervisor: PASS -> Owner Gate; REJECT -> genuine blocker. Merge
+to `main`, promotion, and Owner approval execution remain unperformed.
 
-Current Writer handoff binding: PR #53 is draft/open, remote head matches the
-local candidate at `b633548bbc825d7c9b0aceec7d6c0d05af9d4a56`, and the branch
-was pushed non-force after a fresh remote-main check.
+Current Writer handoff binding: PR #53 remains draft/open and its current
+head/tree are fetched externally when the exact review subject is bound.

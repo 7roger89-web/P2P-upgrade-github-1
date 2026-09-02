@@ -2,6 +2,9 @@
 
 ## E2E Verification
 
+Current reconciled adjacent boundary: the Humanizer, Content Studio,
+vendor-loader, and host-projection command ran 73/73 PASS.
+
   [PASS] Compiled: `python -m compileall -q .p2p/system/p2p_capabilities scripts tests` -> exit 0; one pre-existing SyntaxWarning in `tests/test_p2p_live_certification.py`.
   [N/A] Runtime: no public UI/application runtime exists for this Markdown-skill integration; no model/provider was invoked.
   [PASS] Happy path: explicit `creative.prose.humanize` route -> existing `discover_vendor_skills` -> existing `load_vendor_skill` -> `SKILL.md` only, 9/9 direct cases.
@@ -57,6 +60,10 @@
   failures and the current development doctor/validator drift findings are
   baseline/out-of-scope signals, not Humanizer failures; no unrelated repair
   was folded into this PR.
+- Current canonical main's five Content Studio projections were preserved
+  unchanged. Its one stale assertion that required Humanizer to be absent was
+  narrowed to the five-social-capability inventory; existing Voice Profile /
+  Humanizer separation checks remain active.
 
 ## Legacy Fallback Status
 
@@ -87,6 +94,10 @@ existing vendor loader fails closed.
   Markdown, and technical evidence before/after fixtures.
 - `docs/plans/2026-09-01-p2p-humanizer-01/*`: four standard plan/evidence/
   benchmark/actual-status files.
+- `docs/notes_decisions_log/notes_decisions_log_20260901.md`: reconciled the
+  add/add note conflict and removed moving candidate identity claims.
+- `tests/test_p2p_social_content_skills.py`: one direct stale cross-workstream
+  assertion was reconciled; no social capability record or projection changed.
 
 ## Upstream Pin
 
@@ -122,15 +133,31 @@ existing vendor loader fails closed.
 - No Owner Gate was added per operation. The only declared approval boundary
   is `p2p-integration-candidate-promotion`.
 
+## Reconciliation
+
+- Existing PR #53 was refreshed against current `origin/main` and the branch
+  was reconciled with a non-rewriting merge. No rebase, force-push, or merge to
+  `main` was used.
+- The current registry contains 73 records: the five current
+  `creative.social.*` records and `creative.copywriting` match canonical main
+  exactly; `creative.prose.humanize` is the single additional record.
+- The current Content Studio flow remains `voice_profile -> content draft ->
+  optional downstream humanizer`; Voice Profile is author-context evidence,
+  not a Humanizer alias or global activation.
+- Moving PR head/tree claims were removed from committed evidence. Current
+  candidate identity is fetched externally at review/promotion time.
+
 ## Verify Outputs
 
-- P1-A exact-source/registry smoke: PASS; count 68; explicit selection only;
+- P1-A exact-source/registry smoke: PASS on the prior Humanizer checkpoint;
+  current reconciled registry count is 73; explicit selection only;
   loaded paths `[SKILL.md]`; no network/permission/dependency.
 - P1-B focused module: `python -m unittest -q
   tests.test_p2p_humanizer_integration` -> 9/9 PASS.
-- Nearest boundary: `python -m unittest -q
+- Nearest current boundary: `python -m unittest -q
   tests.test_p2p_humanizer_integration tests.test_p2p_vendor_skill_integration
-  tests.test_p2p_host_skill_projection` -> 61/61 PASS.
+  tests.test_p2p_host_skill_projection` remained green; the current
+  social-inclusive bounded command ran 73/73 PASS.
 - `git diff --check`: PASS before implementation checkpoint.
 - Anvien graph refreshed with 0 parse failures; staged
   `detect-changes --scope all` reported no affected production files or
@@ -164,21 +191,22 @@ integration; this report makes no live-model certification claim.
 - Current development governance drift remains intentionally unpromoted and
   requires a separate governance/Owner workflow if promotion is requested.
 - Existing wider-suite baseline failures remain outside Issue #51.
-- The PR is not merged. Independent Supervisor review is still required.
+- The PR is not merged. Exactly one independent Supervisor review is required;
+  on PASS the next step is the Owner Gate.
 
-## Git Reference
+## Git Reference and Reconciliation
 
 - Repository: `7roger89-web/P2P-upgrade-github-1`
 - Initial fetched base main: `d80934bc0090ef0cc6770f8c7d09b7b4cd4670b7`
-- Current remote base main after fresh re-fetch/rebase: `b65948b00ed2a8969fed70ab59f68b5d9b53858d`; tree `6553b9cb55990f66f6da5b2db83dc6f5ec7e393c`
+- Historical pre-reconciliation base main: `b65948b00ed2a8969fed70ab59f68b5d9b53858d`; tree `6553b9cb55990f66f6da5b2db83dc6f5ec7e393c`
 - Branch: `codex/p2p-humanizer-01`
 - Rebased production integration checkpoint: `9e748bd05d7db6ba1d0b8b2d64aef796f0b5c251`
 - Rebased focused verification checkpoint: `1702c0d437e59b305d0e9de1e39fbdeedac62746`
 - Rebased report checkpoint before this metadata refresh: `e392e0879588f483bbc28a51670554e5737c5db9`
 - Draft PR: #53, `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/53`,
   linked with `Refs #51`.
-- Candidate head/tree at PR creation: `b633548bbc825d7c9b0aceec7d6c0d05af9d4a56` /
-  `ed41b51c670f6bea3c3350560143728f05cec928`; remote branch matches.
+- Current PR head/tree is intentionally not recorded here; fetch it
+  externally when reviewing the exact subject.
 
 ## Handoff
 

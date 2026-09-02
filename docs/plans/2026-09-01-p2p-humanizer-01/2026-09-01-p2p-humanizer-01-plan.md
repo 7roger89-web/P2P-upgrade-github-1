@@ -2,8 +2,8 @@
 
 ## Metadata
 
-- Date: `2026-09-01`
-- Status: `in_progress`
+- Date: `2026-09-02`
+- Status: `reconciled_pending_supervisor`
 - Plan: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-plan.md`
 - Evidence: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-benchmark.md`
@@ -72,6 +72,9 @@ as baseline evidence, not silently repaired as part of this bounded issue.
   existing vendor-skill loader, with `USER_REQUESTED`/explicit selection,
   `ON_DEMAND` loading, no dependencies, no network, and no credentials.
 - Reconcile against `creative.copywriting`; do not alter or duplicate it.
+- Preserve the five current Content Studio capabilities, with
+  `creative.social.voice_profile` distinct from optional downstream
+  `creative.prose.humanize` polishing.
 - Add a small focused test/fixture set proving routing, loading, provenance,
   no-fabrication, voice-sample precedence, Markdown protected spans, and
   technical evidence preservation.
@@ -144,7 +147,8 @@ as baseline evidence, not silently repaired as part of this bounded issue.
 
 ## Acceptance Criteria
 
-- One exact current P2P base is recorded with SHA/tree and a clean worktree.
+- Current base and candidate SHA/tree are fetched externally at review time;
+  committed artifacts do not self-bind to a moving PR head/tree.
 - One exact upstream Humanizer subject is recorded:
   repository `https://github.com/blader/humanizer.git`, commit
   `e2e92e7b4b8229253ed5c8e81dc65463fdeddda5`, tree
@@ -154,17 +158,20 @@ as baseline evidence, not silently repaired as part of this bounded issue.
   from the pinned upstream subject, with a registry snapshot hash matching
   those bytes.
 - Exactly one new ID, `creative.prose.humanize`, is added. Existing
-  `creative.copywriting` remains singular and unchanged; no duplicate ID,
-  router, registry, or skill engine is created.
+  `creative.copywriting` remains singular and its current canonical-main
+  semantics are preserved; no duplicate ID, router, registry, or skill engine
+  is created.
 - Discovery is metadata-only; explicit selection loads only `SKILL.md`; no
   references, assets, scripts, install, network, or credentials are used.
 - Focused tests cover A-G from Issue #51, with fixture evidence clearly marked
   as bounded prompt/value evaluation rather than model-runtime certification.
 - Nearest validation, compile/build-equivalent, JSON/registry validation,
   `git diff --check`, and Anvien `detect-changes` are recorded.
-- One branch and one PR link Issue #51; no merge or promotion is performed.
-- Candidate handoff ends `P2P_HUMANIZER_01_CANDIDATE_READY` with
-  `NEXT_STEP=INDEPENDENT_SUPERVISOR`.
+- One existing branch and one existing PR link Issue #51. Main may be merged
+  into that branch for reconciliation; no merge to `main` or promotion is
+  performed.
+- Writer work stops after exactly one independent Supervisor. A PASS ends at
+  `NEXT_STEP=OWNER_GATE`; a REJECT stops at a genuine blocker.
 
 ## Checklist
 
@@ -313,25 +320,27 @@ as baseline evidence, not silently repaired as part of this bounded issue.
   - Actual-status Update: append R2 with test evidence and keep any unverified model-runtime claim explicitly `NOT_APPLICABLE`.
   - Commit Boundary: commit after this slice when acceptance passes. P1-B focused tests passed 9/9, covering A-G plus exact snapshot/workflow and no-dependency boundaries.
 
-- [ ] P2-A: Call supervisor for the implemented-plan acceptance loop.
+- [ ] P2-A: Run exactly one independent Supervisor review.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.
   - Work Steps:
-    1. Call the supervisor skill in a new independent chat to review the full completed plan work.
-    2. If supervisor fails the work, return to the responsible implementation workflow/skill for the failed scope only.
-    3. Re-run supervisor review after the fix.
-    4. Repeat until supervisor passes or records a blocker.
+    1. Call the supervisor skill in one new independent chat to review the
+       reconciled PR subject, current-main preservation, focused tests, and
+       bounded architecture.
+    2. Do not run a second review in this workstream. A PASS stops at the
+       Owner Gate; a REJECT is reported as a genuine blocker.
   - Implementation Gate: all planned implementation phases must be completed or explicitly blocked before this review.
   - Acceptance: supervisor review passes, or the plan records a blocker with evidence and no closure is performed.
-- [ ] P2-B: Remove dead work created during this plan.
+- [x] P2-B: Remove dead work created during this plan.
   - Goal: ensure the final diff contains only artifacts that still serve the accepted plan.
   - Work Steps:
     1. Review files, sections, generated output, tests, temp files, and plan artifacts created or modified during this plan.
     2. Remove or rewrite any artifact made obsolete by actual-status findings, user corrections, failed approaches, or phase status updates.
     3. Verify no rejected approach, stale placeholder, unused generated output, or dead helper artifact remains in the final diff.
-    4. Call supervisor to review the dead-work cleanup.
-    5. If supervisor fails the cleanup, return to the responsible implementation workflow/skill for the failed cleanup scope only, then re-run supervisor review.
+    4. Record the bounded cleanup in the reconciliation evidence; the single
+       independent Supervisor reviews the resulting stable subject.
   - Implementation Gate: only remove artifacts created by this plan unless the user explicitly approves broader cleanup.
-  - Acceptance: final `git diff/status` contains no dead plan-created artifacts, supervisor passes the cleanup, and evidence records what was removed or preserved.
+  - Acceptance: final `git diff/status` contains no dead plan-created artifacts,
+    and evidence records what was removed or preserved.
 - [ ] P2-C: Close the plan.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status.
   - Work Steps:
@@ -356,6 +365,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
 - The upstream source is prompt content. No test can certify a live model
   rewrite without invoking a provider; the focused fixture tests make that
   limitation explicit rather than fabricating runtime evidence.
-- Creating a PR is authorized by the user; merge, release, promotion, and
-  approval execution remain out of scope. The handoff must remain
-  `NEXT_STEP=INDEPENDENT_SUPERVISOR`.
+- The existing PR is authorized by the user; reconciling `origin/main` into
+  its branch is allowed, while merge to `main`, release, promotion, and
+  approval execution remain out of scope. After one Supervisor PASS, stop at
+  `NEXT_STEP=OWNER_GATE`.

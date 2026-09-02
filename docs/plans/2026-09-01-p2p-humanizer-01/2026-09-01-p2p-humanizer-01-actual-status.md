@@ -1,17 +1,17 @@
 # P2P-HUMANIZER-01 Actual Status
 
 Title: P2P-HUMANIZER-01
-Date: 2026-09-01
-Status: P0 Complete
+Date: 2026-09-02
+Status: R4 Complete — reconciled candidate pending one independent Supervisor
 Companion plan: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-plan.md`
 Companion evidence: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-benchmark.md`
 
 ## Purpose
 
-This file records the real current state before implementation. P0 is complete
-only after the target scope has status rows, evidence IDs, and downstream plan
-decisions. It does not replace the evidence ledger.
+This file records the current state after the bounded main-branch
+reconciliation. R0-R3 remain historical checkpoints; R4 is the active status
+for the candidate and does not replace the evidence ledger.
 
 ## Freshness / Refresh Rules
 
@@ -34,7 +34,8 @@ Out of scope:
 - existing `creative.copywriting` content and semantics;
 - existing vendor loader/router/model/host projection production code;
 - release ZIP/v5/immutable baseline/user projects;
-- upstream execution/install, providers, UI, database, deployment, merge, and promotion.
+- upstream execution/install, providers, UI, database, merge to `main`,
+  deployment, promotion, and Owner approval execution.
 
 ## Relationship / Impact Evidence
 
@@ -63,8 +64,9 @@ Out of scope:
 
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
-| fresh P2P clone / `origin/main` | Exact clean clone rebased onto current remote `b65948b...` / `6553b9c...`; original initial fetch was `d80934b...` / `b2d5d03...` | clean authoritative base | correct | N/A | `E0-P0A-GIT1`, `E0-P0A-REBASE1` | preserve; push only after final remote check |
-| existing `creative.copywriting` | Marketing/double-semantic snapshot; one unique record | remain marketing-only, no duplicate | correct | N/A | `E0-P0A-REG1` | preserve-only in P1-A |
+| fresh P2P clone / `origin/main` | Fresh fetch verified canonical `main`; existing Writer branch now contains it through a non-rewriting merge. Exact current SHA/tree remain external review-time bindings. | clean authoritative base | correct | N/A | `E3-RECON1`, `E3-RECON2` | preserve; fetch again before review |
+| existing `creative.copywriting` | Marketing/double-semantic snapshot; one unique record, with current canonical-main semantics preserved | remain marketing-only, no duplicate | correct | N/A | `E0-P0A-REG1`, `E3-RECON3` | preserve-only |
+| Content Studio social capabilities | `creative.social.voice_profile`, `.post`, `.hook`, `.content_matrix`, and `.post_format` remain exact current-main records and projections | preserve Issue #60 semantics; Voice Profile is not Humanizer | correct | N/A | `E3-RECON3`, `E3-RECON4` | preserve-only |
 | existing `vendor_skill.py` + single router | Generic metadata/JIT loader and one router already exist | reuse existing boundary | correct | N/A hidden path | `E0-P0A-ADAPTER1` | preserve-only in P1-A/B |
 | upstream Humanizer subject | Detached exact commit/tree, not yet vendored | exact source audit record | correct | N/A | `E0-P0A-UP1` | inspect-only input to P1-A |
 | Humanizer vendor snapshot | exact P2P root contains only `SKILL.md` + `LICENSE`, byte-identical to upstream | exactly `SKILL.md` + `LICENSE` | correct | N/A | `E1-P1A-SRC1`, `E1-P1A-HASH1` | preserve-only; P1-B may test it |
@@ -72,7 +74,7 @@ Out of scope:
 | focused Humanizer fixture/test surface | `tests/test_p2p_humanizer_integration.py` and four fixture pairs; direct module passes 9/9; Anvien reports 33 symbols/24 local relationships | A-G focused behavior/value tests | correct | 24 local relationships | `E1-P1B-TEST1..E1-P1B-TEST8`, `E1-P1B-GRAPH1` | preserve; run final detect |
 | wider legacy suite | 104 tests: 97 pass, 7 baseline failures | no new Humanizer regressions; unrelated failures remain disclosed | partial | per test surfaces | `E0-P0A-BASE1` | do not broaden scope; rerun nearest checks |
 | plan/evidence/benchmark/actual-status | newly created P0 standard set | living evidence updated per slice | correct | N/A | `E0-P0A-SCOPE1` | preserve and refresh |
-| release/promotion/Owner gate | not requested at Writer stage | remain unexecuted | correct | N/A | `E0-P0A-SCOPE1` | stop at independent Supervisor |
+| release/promotion/Owner gate | not executed | remain unexecuted | correct | N/A | `E0-P0A-SCOPE1`, `E3-RECON6` | stop at Owner Gate after one Supervisor PASS |
 
 ## Status Refresh Log
 
@@ -82,6 +84,7 @@ Out of scope:
 | R1 | 2026-09-01 | after P1-A exact snapshot/registry smoke | Humanizer vendor root and manifest | Humanizer snapshot `missing -> correct`; manifest `missing -> correct`; focused tests remain missing | `E1-P1A-SRC1`, `E1-P1A-REG1`, `E1-P1A-HASH1`, `E1-P1A-ROUTE1`, `E1-P1A-ROUTE2` | P1-B proceeds with fixtures/tests only; no production adapter/router edits |
 | R2 | 2026-09-01 | after P1-B corrected focused module and graph refresh | Humanizer fixture/test surface | focused tests `missing -> correct`; exact production surfaces remain correct; graph detail now known | `E1-P1B-TEST1`, `E1-P1B-TEST2`, `E1-P1B-TEST3`, `E1-P1B-TEST4`, `E1-P1B-TEST5`, `E1-P1B-TEST6`, `E1-P1B-TEST7`, `E1-P1B-TEST8`, `E1-P1B-GRAPH1`, `E1-P1B-BUILD1`, `E1-P1B-GLOBAL1`, `E1-P1B-GLOBAL2`, `E1-P1B-RETRY1`, `E0-P0A-REBASE1` | final remote main is now bound; rerun nearest checks after rebase, then push only exact candidate |
 | R3 | 2026-09-01 | after Writer push and PR creation | branch/PR handoff | one branch and one draft PR now exist; remote head/tree match local candidate; independent Supervisor remains pending | `E2-P2C-PR1` | stop Writer lane; independent Supervisor reviews exact PR subject; no merge/promotion |
+| R4 | 2026-09-02 | fresh fetch of `origin/main` and PR #53, then non-rewriting merge into the existing branch | current-main reconciliation, direct Content Studio conflict, and stale evidence cleanup | current main is present; five social records are preserved; one direct social-test assertion now permits the separately registered Humanizer; focused/adjacent suite passes 73/73; one Supervisor remains pending | `E3-RECON1`–`E3-RECON7` | push the stable branch once, run exactly one independent Supervisor, then stop at Owner Gate on PASS |
 
 ## Phase Touch Map
 
@@ -218,13 +221,25 @@ Forbidden next action:
 
 Do not vendor unrelated upstream content or implement a rewrite engine.
 
+### Current-main reconciliation
+
+The current canonical main contains the five Issue #60 Content Studio
+capabilities. Their registry objects and vendored projections are preserved
+unchanged in the candidate. The social test's old assertion that Humanizer was
+absent was a direct conflict with the requested downstream relationship; it
+was narrowed to the five-social-capability inventory while the existing
+Voice Profile/Humanizer separation checks remain intact. No production router,
+registry engine, pipeline, or authorization surface was added.
+
 ## Next Phase Status Decisions
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
 | P1-A | Humanizer source is exact and audited; P2P snapshot/manifest now pass exact smoke | preserve the two files and one record; keep loader/router/copywriting preserve-only |
 | P1-B | Focused module now has 9/9 passing cases; P1-A production surfaces are correct; wider baseline remains partial with seven unrelated failures | preserve focused surface; run final compile/build-equivalent and detect-changes; do not use the stale wider failures as Humanizer proof |
-| P2-A/P2-C | Writer handoff has no independent review or PR yet | keep pending until implementation evidence is complete; stop before Supervisor/merge/promotion |
+| P2-A | Reconciled PR #53 is stable and the focused/adjacent suite passes; no independent review has run in this lane | run exactly one independent Supervisor; PASS stops at Owner Gate, REJECT stops at a genuine blocker |
+| P2-B | Stale candidate head/tree claims were removed from committed notes/evidence/report; generated Anvien line-ending churn was excluded | complete; do not create an evidence-binding commit loop |
+| P2-C | Final Writer checks are recorded after the reconciliation merge and cleanup commit | keep Owner approval, merge to `main`, release, and promotion unexecuted |
 
 ## Implementation Gate
 

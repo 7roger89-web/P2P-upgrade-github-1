@@ -2,7 +2,7 @@
 
 ## Metadata
 
-- Date: `2026-09-01`
+- Date: `2026-09-02`
 - Plan: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-plan.md`
 - Evidence: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-evidence.md`
 - Benchmark: `docs/plans/2026-09-01-p2p-humanizer-01/2026-09-01-p2p-humanizer-01-benchmark.md`
@@ -28,10 +28,10 @@ remain in the evidence ledger.
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P0 | Current capability registry records | records | 67 | 68 | 68 | 68 after one new record | +1 | `E0-P0A-REG1`, `E1-P1A-REG1` |
-| P0 | Existing local vendor-snapshot capabilities | records | 15 | 16 | 16 | 16 after one new record | +1 | `E0-P0A-REG1`, `E1-P1A-REG1` |
+| P0 | Current canonical-main capability registry records | records | 72 | 73 | 73 | 73 after one new record | +1 | `E3-RECON3` |
+| P0 | Existing local vendor-snapshot capabilities | records | 21 | 22 | 22 | 22 after one new record | +1 | `E3-RECON3` |
 | P0 | Selected upstream files | files | 2 available (`SKILL.md`, `LICENSE`) | 2 audited | 2 | 2 | 0 | `E0-P0A-UP1`, `E1-P1A-SRC1` |
-| P0 | Anvien parse failures | files | 0 | 0 | pending | 0 | 0 | `E0-P0A-GRAPH1` |
+| P0 | Anvien parse failures | files | 0 | 0 | 0 | 0 | 0 | `E3-RECON8` |
 
 ## B1 - P1 Benchmarks
 
@@ -47,7 +47,7 @@ remain in the evidence ledger.
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
 | P2 | Independent Supervisor verdict | verdict | not run | pending | pending | independent review | pending | `E2-P2A-SUP1` |
-| P2 | One branch / one PR | items | 0 / 0 | 1 / 1 | 1 / 1 | 1 / 1 | +1 / +1 | `E2-P2C-PR1` |
+| P2 | One branch / one PR | items | 0 / 0 | 1 / 1 | 1 / 1 | 1 / 1 | +1 / +1 | `E3-RECON1`, `E3-RECON6` |
 
 ## Non-Benchmarkable Notes
 

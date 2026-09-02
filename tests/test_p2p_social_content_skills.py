@@ -64,7 +64,7 @@ class P2PSocialContentSkillsTests(unittest.TestCase):
         self.assertEqual(self.registry["canonical_denominator"], 8)
         self.assertEqual(self.registry["full_quorum"], "8/8")
         self.assertEqual(set(PROJECTION_ROOTS), set(self.manifests))
-        self.assertNotIn("creative.prose.humanize", self.registry["identities"])
+        self.assertIn("creative.prose.humanize", self.registry["identities"])
         for capability_id, manifest in self.manifests.items():
             with self.subTest(capability_id=capability_id):
                 self.assertEqual(manifest.type, "SKILL")
