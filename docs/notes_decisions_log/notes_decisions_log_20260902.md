@@ -57,4 +57,10 @@
   absent. Game Truyen HEAD and 55-entry dirty fingerprint were unchanged.
 - Coder report:
   `reports/coder/rp_coder_260902_121330_by_gpt-5-codex_p2p-character-forge-productization-01.md`.
-- Terminal implementation verdict before Supervisor: `P2P_CHARACTER_FORGE_PRODUCTIZATION_READY_FOR_SUPERVISOR_REVIEW`.
+- First independent Supervisor report:
+  `reports/supervisor/rp_supervisor_260902_122647_by_gpt-5-codex_p2p-character-forge-productization-01.md`;
+  verdict `REJECT` for the missing `SUPPORTED_DETERMINISTIC` taxonomy and
+  stale actual-status header. The rejected evidence is preserved.
+- Descendant correction uses the minimum taxonomy/test/status fix only; no
+  Blender rerun was made because the runtime source, recipe, and artifact are
+  unchanged. Fresh Supervisor review remains pending on the new exact subject.

@@ -178,12 +178,28 @@ Matching plan item(s): `P1-A`, `P1-B`
   flows, and no inbound callers yet; file risk is a scope warning for a new
   surface, not a reason to touch the protected route. Staged change detection
   reports exactly 3 intended files and `changedFileRisk=low`.
+- `E1-P1A-TAXONOMY1`: after the first Supervisor rejection, the descendant
+  assigns the required categories exactly: `name`, `gender`, `age_class`, and
+  `build` are `SUPPORTED_DETERMINISTIC`; `rig` and `output_format` are
+  `SUPPORTED_BY_SAFE_DEFAULT`; the eight material fields remain
+  `NOT_CURRENTLY_SUPPORTED`. The focused test asserts category membership and
+  disjointness.
 
 P1 decision: PASS. Both contract and binding/receipt are implemented in the
 single coherent `character_forge.py` product seam; splitting that importable
 facade into an incomplete intermediate module would add no safety. The
 existing adapter, entrypoint, provenance, validator, firewall, registry, and
 selection surfaces remain unchanged. P2 is now the only implementation phase.
+
+## Supervisor Correction Record
+
+The first independent review was intentionally preserved as
+`reports/supervisor/rp_supervisor_260902_122647_by_gpt-5-codex_p2p-character-forge-productization-01.md`.
+It returned `REJECT` for two same-scope issues: the support taxonomy did not
+use `SUPPORTED_DETERMINISTIC`, and the actual-status header was stale. No
+runtime or artifact failure was found. The current descendant corrects both,
+does not modify the rejected candidate in place, and does not rerun Blender;
+fresh Supervisor review remains required for the new exact subject.
 
 ## E2 - P2 Evidence
 

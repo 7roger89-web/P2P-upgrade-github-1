@@ -2,7 +2,7 @@
 
 Title: P2P Character Forge Productization ISSUE 59
 Date: 2026-09-02
-Status: P1 Complete; P2 Pending
+Status: P2 Complete; Supervisor Re-review Pending
 Companion plan: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-plan.md`
 Companion evidence: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-benchmark.md`
@@ -63,7 +63,7 @@ Out of scope:
 | Canonical main/tree | Fresh remote main exactly matches expected SHA/tree | Exact expected base for Writer branch | correct | N/A | `E0-P0A-GIT1` | preserve; P1 allowed |
 | Existing capability identity | `game.character.generate` already exists as `KNOWLEDGE_SOURCE`/`MODEL_ROUTABLE` with MPFB2 provenance | Reuse one identity and existing router | correct | registry data | `E0-P0A-CAP1` | preserve; no duplicate |
 | Internal recipe contract | `p2p-character-recipe/1` validates verbose normalized MPFB inputs | Facade must produce it deterministically | correct | 25 local; 2 flows | `E0-P0A-GRAPH1`, `E0-P0A-CATALOG1` | preserve; call from P1-A |
-| Beginner CharacterRequest | `character_forge.py` normalizes six supported fields, defaults, schema metadata, and rejects unknown/unsupported fields | Small JSON-shaped request with defaults and fail-closed unknown keys | correct/bound | 89 symbols; 130 local in new facade | `E1-P1A-SRC1`, `E1-P1A-SCHEMA1`, `E1-P1A-TEST1..3` | preserve; P2 only |
+| Beginner CharacterRequest | `character_forge.py` normalizes six supported fields, applies the explicit three-way support taxonomy, defaults, schema metadata, and rejects unknown/unsupported fields | Small JSON-shaped request with defaults and fail-closed unknown keys | correct/bound | 89 symbols; 130 local in new facade | `E1-P1A-SRC1`, `E1-P1A-SCHEMA1`, `E1-P1A-TAXONOMY1`, `E1-P1A-TEST1..3` | preserve; Supervisor re-review |
 | CharacterRecipe product projection | Facade projects semantic gender/age-class/build into validated `p2p-character-recipe/1` with stable hash | Deterministic semantic projection with exact hash | correct/bound | new facade consumes existing recipe validator | `E1-P1A-SRC1`, `E1-P1A-TEST1..2` | preserve; P2 only |
 | Existing MPFB2 adapter | Runtime plan/execution/security boundary exists and is proven | Facade must delegate without copy | correct | 80 local; 3 flows | `E0-P0A-GRAPH2`, `E0-P0A-RUNTIME1` | preserve-only; bind P1-B |
 | Blender MPFB2 entrypoint | Real addon lifecycle, create, GameEngine rig/skin, export, provenance exist | Product facade must reuse it | correct | 49 local; 5 flows | `E0-P0A-GRAPH3`, `E0-P0A-HISTORY1` | preserve-only |
@@ -74,7 +74,7 @@ Out of scope:
 | Exact height/age-in-years | Current facade/entrypoint does not bind meters or exact years | Explicit unsupported fail-closed classification | partial | entrypoint 49 local | `E0-P0A-ENTRY1`, `E0-P0A-MPFB1` | classify; do not expand |
 | Hair/clothing customization | Recipe slots and core IDs exist but current entrypoint has no hair/clothing calls | Explicit unsupported/deferred classification; no false execution | partial | adapter/entrypoint | `E0-P0A-ENTRY1`, `E0-P0A-CATALOG1` | classify; do not expand |
 | Windows isolation | Exact firewall lifecycle is existing and #56 passed | Reuse unchanged; cleanup PASS in product smoke | correct | 43 local; 4 flows | `E0-P0A-GRAPH5`, `E0-P0A-RUNTIME1` | preserve-only; validate P2 |
-| Focused tests | Separate productization suite covers request, recipe, binding, receipt, fail-closed, cleanup, and injection boundaries; 12/12 pass | Separate focused behavior tests | correct | 12 focused tests; new file | `E1-P1A-TEST1..3`, `E1-P1B-TEST1..3` | preserve; P2 only |
+| Focused tests | Separate productization suite covers request, taxonomy, recipe, binding, receipt, fail-closed, cleanup, and injection boundaries; 12/12 pass | Separate focused behavior tests | correct | 12 focused tests; new file | `E1-P1A-TAXONOMY1`, `E1-P1A-TEST1..3`, `E1-P1B-TEST1..3` | preserve; Supervisor re-review |
 | Provisioned runtime | Existing manifest/root/Blender/MPFB2 and #56 result are available | One fresh facade-driven run | correct | external | `E0-P0A-RUNTIME1` | validate P2; no reinstall |
 | ISSUE=59 real product smoke | One facade-driven run reached real Blender/MPFB2, character creation, GameEngine rig, built-in skin, GLB, provenance, structural validation, and receipt | All required product flags PASS/YES exactly once | correct | 1 child; 1 GLB; 1 sidecar | `E2-P2A-RUN1`, `E2-P2A-ARTIFACT1`, `E2-P2B-ARTIFACT1` | preserve; Supervisor review |
 | ISSUE=59 post-run cleanup | Facade removed managed recipe input; adapter closed isolation; post-run OS/root checks are clean | Zero residual Blender process/rule and unchanged provisioning root | correct | 0 processes; 0 rules | `E2-P2B-CLEAN1` | preserve; Supervisor review |
@@ -87,6 +87,8 @@ Out of scope:
 | R0 | 2026-09-02 | fresh remote/canonical clone, full SPEC/source/runtime inspection | ISSUE=59 baseline | initial classification: existing route correct; facade/receipt missing; cosmetic/height unsupported | `E0-P0A-GIT1..E0-P0A-SCOPE1` | P1-A may add only the new facade/schema/focused tests |
 | R1 | 2026-09-02 | Writer candidate source/schema/tests plus refreshed Anvien capability-system graph and focused proof | P1-A/P1-B implementation | request/recipe/binding/receipt are correct/bound locally; 12/12 focused tests and compile pass; protected route remains preserve-only | `E1-P1A-SRC1..E1-P1-GRAPH1` | P2-A allowed: one real smoke after fresh runtime/output preflight |
 | R2 | 2026-09-02 | One fresh facade smoke plus independent runtime/artifact/OS validation | P2-A/P2-B | all requested product flags PASS/YES; exact output/provenance hashes recorded; 0 residual Blender processes/rules; root hash unchanged; Game Truyen unchanged | `E2-P2A-BUILD1..E2-P2B-STOP1` | implementation PASS; create one independent Supervisor review |
+| R3 | 2026-09-02 | Independent Supervisor review of candidate `8d338c0600d77b0f4fd4f790f6fa1f2422faebe8` | Supervisor review | REJECT limited to missing `SUPPORTED_DETERMINISTIC` taxonomy and stale status header; no runtime blocker; rejected evidence preserved | `reports/supervisor/rp_supervisor_260902_122647_by_gpt-5-codex_p2p-character-forge-productization-01.md` | create one descendant with minimum metadata/test/status correction; do not rerun smoke |
+| R4 | 2026-09-02 | Descendant correction after R3; source/test/status bookkeeping only | Supervisor resubmission preparation | taxonomy now uses `SUPPORTED_DETERMINISTIC` for name/gender/age_class/build and `SUPPORTED_BY_SAFE_DEFAULT` for rig/output_format; status header current; focused tests 12/12 pass | `E1-P1A-TAXONOMY1`, `E1-P1A-TEST1..3` | fresh Supervisor review required on new exact subject |
 
 ## Phase Touch Map
 
@@ -272,7 +274,7 @@ Do not silently drop height/hair/clothing intent or claim visual customization.
 | P1-B | New facade delegates to existing adapter and validators and returns a validated receipt; 12/12 focused tests pass | complete; proceed to P2 without editing protected route |
 | P2-A | One ISSUE=59 facade smoke completed with real Blender PID 21596 and all required product flags PASS/YES | complete; no second run |
 | P2-B | Independent artifact, provenance, structural, process, firewall, root, cleanup, and no-retry checks PASS | complete; no rerun or repair |
-| Supervisor | No current ISSUE=59 candidate review exists | create one independent Supervisor review after exact candidate is complete |
+| Supervisor | First review rejected only two same-scope metadata issues; descendant correction is prepared | create one fresh independent Supervisor review on the new exact subject |
 
 ## Implementation Gate
 

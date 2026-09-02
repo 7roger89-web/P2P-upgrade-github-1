@@ -34,11 +34,13 @@ SUPPORTED_REQUEST_FIELDS: Final = (
     "rig",
     "output_format",
 )
-SAFE_DEFAULT_FIELDS: Final = (
+SUPPORTED_DETERMINISTIC_FIELDS: Final = (
     "name",
     "gender",
     "age_class",
     "build",
+)
+SAFE_DEFAULT_FIELDS: Final = (
     "rig",
     "output_format",
 )
@@ -54,10 +56,10 @@ UNSUPPORTED_DEFERRED_FIELDS: Final = (
 )
 
 FIELD_SUPPORT: Final = {
-    "name": "SUPPORTED_BY_SAFE_DEFAULT",
-    "gender": "SUPPORTED_BY_SAFE_DEFAULT",
-    "age_class": "SUPPORTED_BY_SAFE_DEFAULT",
-    "build": "SUPPORTED_BY_SAFE_DEFAULT",
+    "name": "SUPPORTED_DETERMINISTIC",
+    "gender": "SUPPORTED_DETERMINISTIC",
+    "age_class": "SUPPORTED_DETERMINISTIC",
+    "build": "SUPPORTED_DETERMINISTIC",
     "rig": "SUPPORTED_BY_SAFE_DEFAULT",
     "output_format": "SUPPORTED_BY_SAFE_DEFAULT",
     "height_m": "NOT_CURRENTLY_SUPPORTED",
@@ -532,6 +534,7 @@ __all__ = [
     "REQUEST_SCHEMA",
     "RECEIPT_SCHEMA",
     "SAFE_DEFAULT_FIELDS",
+    "SUPPORTED_DETERMINISTIC_FIELDS",
     "SUPPORTED_REQUEST_FIELDS",
     "UNSUPPORTED_DEFERRED_FIELDS",
     "CharacterForgeError",

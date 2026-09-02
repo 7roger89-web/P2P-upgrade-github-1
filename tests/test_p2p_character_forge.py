@@ -116,8 +116,30 @@ class CharacterRequestTests(unittest.TestCase):
         self.assertEqual(schema["properties"]["schema"]["const"], character_forge.REQUEST_SCHEMA)
         self.assertEqual(
             set(character_forge.SAFE_DEFAULT_FIELDS),
-            set(character_forge.SUPPORTED_REQUEST_FIELDS),
+            {"rig", "output_format"},
         )
+        self.assertEqual(
+            set(character_forge.SUPPORTED_DETERMINISTIC_FIELDS),
+            {"name", "gender", "age_class", "build"},
+        )
+        support_categories = {
+            "SUPPORTED_DETERMINISTIC": set(character_forge.SUPPORTED_DETERMINISTIC_FIELDS),
+            "SUPPORTED_BY_SAFE_DEFAULT": set(character_forge.SAFE_DEFAULT_FIELDS),
+            "NOT_CURRENTLY_SUPPORTED": set(character_forge.UNSUPPORTED_DEFERRED_FIELDS),
+        }
+        self.assertEqual(
+            set(character_forge.FIELD_SUPPORT),
+            set(character_forge.SUPPORTED_REQUEST_FIELDS)
+            | set(character_forge.UNSUPPORTED_DEFERRED_FIELDS),
+        )
+        for category, fields in support_categories.items():
+            self.assertEqual(
+                {field for field, value in character_forge.FIELD_SUPPORT.items() if value == category},
+                fields,
+            )
+        self.assertTrue(set(character_forge.SAFE_DEFAULT_FIELDS).isdisjoint(
+            character_forge.SUPPORTED_DETERMINISTIC_FIELDS
+        ))
         self.assertTrue(set(character_forge.SAFE_DEFAULT_FIELDS).isdisjoint(
             character_forge.UNSUPPORTED_DEFERRED_FIELDS
         ))
