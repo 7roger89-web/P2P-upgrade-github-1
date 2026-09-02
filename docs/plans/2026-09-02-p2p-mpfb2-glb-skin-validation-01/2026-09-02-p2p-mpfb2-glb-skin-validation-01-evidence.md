@@ -56,10 +56,10 @@ Matching plan item(s): `P1-A`, `P1-B`
 - `E1-P1A-SRC2`: `py_compile` passed for `glb_validator.py`; direct candidate invocation with the normalized existing Oak recipe returned `STRUCTURALLY_VALID` with `scene_reachable_nodes=55` and the expected Oak hash.
 - `E1-P1A-SRC3`: Source inspection confirms `GLB_SKIN_JOINTS_INVALID`, all node/mesh/skin/joint index checks, `GLB_skeleton_child` traversal, JOINTS_0/WEIGHTS_0 accessor/component checks, and resource validation remain present and unchanged outside the selected branch.
 - `E1-P1A-SRC4`: Fresh Anvien detect-changes on the capability subtree reports exactly one changed file, the validator hunk at lines 141-148, LOW changed-file risk, and no changed symbols or affected process files; `git diff --check` passed.
-- `E1-P1B-TEST1`: Pending omitted-skeleton and valid-present-skeleton PASS cases.
-- `E1-P1B-TEST2`: Pending explicit null, negative, out-of-range, and non-integer FAIL cases.
-- `E1-P1B-TEST3`: Pending empty-joints and invalid-joint FAIL cases.
-- `E1-P1B-TEST4`: Pending focused compile/test/diff result and temporary-root cleanup proof.
+- `E1-P1B-TEST1`: `GlbValidationTests.test_omitted_skeleton_is_accepted_without_normalizing_absence` and the existing valid-present-skeleton test both pass; the omitted fixture asserts the parsed JSON has no `skeleton` key.
+- `E1-P1B-TEST2`: `test_explicit_invalid_skeleton_values_fail_closed` passes all four subcases: JSON null, negative index, out-of-range index, and non-integer value, each raising `GLB_skeleton: index invalid`.
+- `E1-P1B-TEST3`: `test_empty_or_invalid_joint_indices_fail_closed` passes both subcases: empty joints raises `GLB_SKIN_JOINTS_INVALID`; out-of-range joint raises `GLB_joint: index invalid`.
+- `E1-P1B-TEST4`: Focused `GlbValidationTests` run passes `6/6` methods; `compileall` for the capability subtree and focused test passes; `git diff --check` passes; temporary fixture roots are owned by `TemporaryDirectory` and clean on teardown.
 
 ## E2 - P2 Evidence
 

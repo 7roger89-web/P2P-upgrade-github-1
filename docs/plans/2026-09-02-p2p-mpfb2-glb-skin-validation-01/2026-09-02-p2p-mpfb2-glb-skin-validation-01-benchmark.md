@@ -28,7 +28,8 @@ This task is a structural correctness repair, not a performance optimization. On
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | Focused structural test cases | cases | 3 existing direct GLB cases | pending | pending | requested matrix covered | pending | E1-P1B-TEST1..4 |
+| P1 | Focused structural test methods | methods | 3 existing direct GLB methods | 6 | 6 | all direct GLB methods pass | +3 | E1-P1B-TEST4 |
+| P1 | Skeleton/joints matrix subcases | cases | 3 existing scenarios | 8 | 8 | omitted/valid plus 6 fail-closed cases | +5 | E1-P1B-TEST1..3 |
 
 ## B2 - P2 Benchmarks
 

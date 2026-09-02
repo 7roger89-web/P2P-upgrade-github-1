@@ -23,6 +23,10 @@ sys.path.insert(0, str(SYSTEM_ROOT))
 from p2p_capabilities import asset_provenance, character_recipe, glb_validator, mpfb_adapter, mpfb_blender_entrypoint, windows_network_isolation  # noqa: E402
 
 
+_OMIT_SKELETON = object()
+_DEFAULT_JOINTS = object()
+
+
 def recipe_fixture() -> dict[str, object]:
     return {
         "schema": "p2p-character-recipe/1",
@@ -80,17 +84,26 @@ def provenance_fixture(recipe: dict[str, object], glb_sha256: str) -> dict[str, 
     }
 
 
-def gltf_fixture(*, include_joints: bool = True, external_buffer: bool = False) -> dict[str, object]:
+def gltf_fixture(
+    *,
+    include_joints: bool = True,
+    external_buffer: bool = False,
+    skeleton: object = 1,
+    joints: object = _DEFAULT_JOINTS,
+) -> dict[str, object]:
     attributes: dict[str, int] = {"POSITION": 0, "WEIGHTS_0": 2}
     if include_joints:
         attributes["JOINTS_0"] = 1
+    skin: dict[str, object] = {"joints": [1] if joints is _DEFAULT_JOINTS else joints}
+    if skeleton is not _OMIT_SKELETON:
+        skin["skeleton"] = skeleton
     document: dict[str, object] = {
         "asset": {"version": "2.0"},
         "scene": 0,
         "scenes": [{"nodes": [0]}],
         "nodes": [{"mesh": 0, "skin": 0, "children": [1]}, {"name": "GameEngineRoot"}],
         "meshes": [{"primitives": [{"attributes": attributes}]}],
-        "skins": [{"joints": [1], "skeleton": 1}],
+        "skins": [skin],
         "accessors": [
             {"bufferView": 0, "componentType": 5126, "count": 1, "type": "VEC3"},
             {"bufferView": 1, "componentType": 5123, "count": 1, "type": "VEC4"},
@@ -561,9 +574,24 @@ class GlbValidationTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp.cleanup()
 
-    def _write_valid_output(self, *, include_joints: bool = True, external_buffer: bool = False) -> tuple[Path, Path]:
+    def _write_valid_output(
+        self,
+        *,
+        include_joints: bool = True,
+        external_buffer: bool = False,
+        skeleton: object = 1,
+        joints: object = _DEFAULT_JOINTS,
+    ) -> tuple[Path, Path]:
         glb = self.root / "Oak.glb"
-        write_glb(glb, gltf_fixture(include_joints=include_joints, external_buffer=external_buffer))
+        write_glb(
+            glb,
+            gltf_fixture(
+                include_joints=include_joints,
+                external_buffer=external_buffer,
+                skeleton=skeleton,
+                joints=joints,
+            ),
+        )
         provenance = self.root / "Oak.asset-provenance.json"
         document = provenance_fixture(self.recipe, hashlib.sha256(glb.read_bytes()).hexdigest())
         if external_buffer:
@@ -576,6 +604,37 @@ class GlbValidationTests(unittest.TestCase):
         result = glb_validator.validate_glb_output(glb, provenance, self.recipe)
         self.assertEqual(result["status"], "STRUCTURALLY_VALID")
         self.assertEqual(result["rig_preset"], "GAMEENGINE")
+
+    def test_omitted_skeleton_is_accepted_without_normalizing_absence(self) -> None:
+        glb, provenance = self._write_valid_output(skeleton=_OMIT_SKELETON)
+        document, _ = glb_validator._read_glb(glb)
+        self.assertNotIn("skeleton", document["skins"][0])
+        result = glb_validator.validate_glb_output(glb, provenance, self.recipe)
+        self.assertEqual(result["status"], "STRUCTURALLY_VALID")
+
+    def test_explicit_invalid_skeleton_values_fail_closed(self) -> None:
+        cases = (
+            (None, "GLB_skeleton: index invalid"),
+            (-1, "GLB_skeleton: index invalid"),
+            (2, "GLB_skeleton: index invalid"),
+            (1.5, "GLB_skeleton: index invalid"),
+        )
+        for skeleton, error in cases:
+            with self.subTest(skeleton=skeleton):
+                glb, provenance = self._write_valid_output(skeleton=skeleton)
+                with self.assertRaisesRegex(glb_validator.GlbStructuralError, error):
+                    glb_validator.validate_glb_output(glb, provenance, self.recipe)
+
+    def test_empty_or_invalid_joint_indices_fail_closed(self) -> None:
+        cases = (
+            ([], "GLB_SKIN_JOINTS_INVALID"),
+            ([2], "GLB_joint: index invalid"),
+        )
+        for joints, error in cases:
+            with self.subTest(joints=joints):
+                glb, provenance = self._write_valid_output(joints=joints)
+                with self.assertRaisesRegex(glb_validator.GlbStructuralError, error):
+                    glb_validator.validate_glb_output(glb, provenance, self.recipe)
 
     def test_missing_joints_or_external_resource_binding_is_rejected(self) -> None:
         glb, provenance = self._write_valid_output(include_joints=False)

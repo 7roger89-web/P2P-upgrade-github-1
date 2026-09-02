@@ -148,7 +148,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
   - Actual-status Update: record the source branch and preserve-only sibling surfaces before beginning P1-B.
   - Commit Boundary: commit after P1-A acceptance if the source-only batch is verified.
 
-- [ ] P1-B: Add the narrow skeleton/joints structural regression matrix.
+- [x] P1-B: Add the narrow skeleton/joints structural regression matrix.
   - Goal: prove omitted and valid skeleton acceptance and fail-closed handling for all directly requested invalid cases.
   - Scope Boundary:
     - Editable: `tests/test_p2p_game_truyen_mpfb_adapter_01.py`, only the GLB fixture/test helpers and `GlbValidationTests` cases.
