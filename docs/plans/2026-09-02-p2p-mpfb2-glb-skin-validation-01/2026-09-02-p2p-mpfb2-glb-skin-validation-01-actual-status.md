@@ -2,7 +2,7 @@
 
 Title: P2P-MPFB2-GLB-SKIN-VALIDATION-01
 Date: 2026-09-02
-Status: P1 Complete / P2-A Ready
+Status: P2-A PASS / P2-B Ready
 Companion plan: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-plan.md`
 Companion evidence: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-02-p2p-mpfb2-glb-skin-validation-01/2026-09-02-p2p-mpfb2-glb-skin-validation-01-benchmark.md`
@@ -52,7 +52,7 @@ Out of scope:
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
 | Canonical source base | Fresh fetched `main` at `c8f4449977987a3288717f9a462dae8967f7246d`, tree `c8ce1ec46ed3399341b38817c5b138604fee1ac2` | exact supplied base/tree | correct | fresh clone; Anvien graph bound to same commit | E0-P0A-REMOTE1 | preserve; P1 edits descend from this base |
-| Existing Oak.glb | 9,093,808-byte GLB with expected SHA; JSON chunk parses as glTF 2 | exact existing artifact remains hash-bound and unmutated through P2-A | correct | external preserve-only artifact | E0-P0A-ARTIFACT1..4 | preserve; validate read-only in P2-A |
+| Existing Oak.glb | 9,093,808-byte GLB with expected SHA; candidate validator returns `STRUCTURALLY_VALID`; bytes unchanged during validation | exact existing artifact remains hash-bound and unmutated through P2-A | correct | external preserve-only artifact | E2-P2A-ARTIFACT1..3 | preserve; P2-B may run once |
 | Oak skin contract | `skins[0].joints` has 53 valid indices; all joints reachable; one inferred root 52; valid inverse-bind/accessor/skinning structure | retain all structural invariants | correct | artifact evidence; no source relationship | E0-P0A-ARTIFACT4, E0-P0A-SPEC1 | preserve; do not weaken |
 | Oak skeleton property | JSON key is omitted; raw value is `ABSENT` | optional omission accepted; explicit malformed values rejected | correct artifact / blocked validator path | artifact-only | E0-P0A-ARTIFACT3 | edit validator branch only |
 | Canonical `_validate_mesh_skin` | lines 141-149 now distinguish omitted from present, derive one joint root for omission, and allow nested joints while retaining common-root/connectivity validation | distinguish omitted from present; preserve root policy | correct for P1-A; focused matrix pending | 21 local file relationships; one validation flow | E1-P1A-SRC1..4 | proceed to P1-B |
@@ -68,6 +68,7 @@ Out of scope:
 | R0 | 2026-09-02 | canonical fresh fetch plus direct artifact/source/spec inspection | full Issue 55 scope | initial classifications above | E0-P0A-REMOTE1..HISTORY1 | P1-A may edit only the optional-skeleton branch; P1-B adds direct cases; P2 remains gated |
 | R1 | 2026-09-02 | after P1-A source candidate and exact Oak direct validation | `_validate_mesh_skin` selected branch | wrong -> correct for optional selection and nested rooted hierarchy; test matrix remains partial | E1-P1A-SRC1..4 | continue to P1-B; P2-A remains gated on focused tests |
 | R2 | 2026-09-02 | after P1-B focused structural tests and compileall | GLB fixture/test matrix | partial -> correct; P1 source/test slices complete | E1-P1B-TEST1..4 | P2-A may run read-only against exact Oak; P2-B remains gated on P2-A |
+| R3 | 2026-09-02 | after P2-A exact Oak candidate validation | existing artifact gate | blocked -> PASS; artifact remains byte-identical | E2-P2A-ARTIFACT1..4 | P2-B is runnable exactly once; stop at first new blocker |
 
 ## Phase Touch Map
 
@@ -198,8 +199,8 @@ Do not broaden into unrelated suite or change the real artifact in tests.
 |-----------|-----------------------|--------------------------------------|
 | P1-A | Validator is wrong only for omitted optional skeleton; artifact is structurally coherent and rooted by inference | proceed with surgical source edit; preserve all existing structural checks |
 | P1-B | Direct matrix now covers all requested cases and passes | complete; proceed to exact artifact validation |
-| P2-A | Exact validator gate has not yet been rerun after P1 completion | run candidate validator read-only against existing Oak and require hash unchanged |
-| P2-B | Real rerun is not yet authorized | run only after P2-A PASS and only once |
+| P2-A | Candidate validator passes the exact existing Oak GLB and hash/size are unchanged | complete; preserve artifact and proceed to one conditional rerun |
+| P2-B | P2-A is PASS; no Issue 55 rerun has occurred | run the existing canonical sequence once and stop at the first different blocker |
 
 ## Implementation Gate
 
@@ -227,4 +228,4 @@ Do not broaden into unrelated suite or change the real artifact in tests.
 
 Decision note:
 
-P1 is complete. Fresh artifact evidence proves the skeleton property is absent, not null, and the artifact's joints/hierarchy/accessor/skinning structure is coherent. Khronos makes `skin.skeleton` optional; the local P2P rooted-skeleton policy is intentional and is preserved by deriving the unique joint root only when the optional field is omitted. P1-A and P1-B are complete: the candidate source passes exact Oak direct validation and the focused matrix covers omitted/valid-present/explicit-invalid skeleton values plus empty/invalid joints. P2-A is now the hard read-only gate before any real rerun.
+P2-A is PASS. Fresh artifact evidence proves the skeleton property is absent, not null, and the artifact's joints/hierarchy/accessor/skinning structure is coherent. Khronos makes `skin.skeleton` optional; the local P2P rooted-skeleton policy is intentional and is preserved by deriving the unique joint root only when the optional field is omitted. P1-A/P1-B are complete, and the candidate validator passes the exact existing Oak GLB without changing its bytes or hash. P2-B is now permitted exactly once; the rerun must stop at the first different blocker.

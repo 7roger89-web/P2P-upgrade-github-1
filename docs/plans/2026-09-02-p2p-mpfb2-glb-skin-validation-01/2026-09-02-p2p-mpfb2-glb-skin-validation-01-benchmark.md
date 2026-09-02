@@ -35,7 +35,7 @@ This task is a structural correctness repair, not a performance optimization. On
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | Exact existing Oak validation | result | GLB_skeleton blocker | pending | pending | PASS | pending | E2-P2A-ARTIFACT1 |
+| P2 | Exact existing Oak validation | result | GLB_skeleton blocker | PASS | PASS | PASS | resolved | E2-P2A-ARTIFACT1..3 |
 | P2 | Real MPFB2 reruns | runs | 1 prior Issue 52 run | 0 in Issue 55 | pending | at most 1 | pending | E2-P2B-RUN1..6 |
 | P2 | Game Truyen mutations | files | 0 | 0 | pending | 0 | 0 | E2-P2B-RUN5 |
 

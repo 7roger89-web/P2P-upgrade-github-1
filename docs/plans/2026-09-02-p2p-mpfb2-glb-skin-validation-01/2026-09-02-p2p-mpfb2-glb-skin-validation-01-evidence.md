@@ -65,10 +65,10 @@ Matching plan item(s): `P1-A`, `P1-B`
 
 Matching plan item(s): `P2-A`, `P2-B`
 
-- `E2-P2A-ARTIFACT1`: Pending exact candidate validator run against existing Oak.glb.
-- `E2-P2A-ARTIFACT2`: Pending unchanged Oak.glb size and SHA-256 after validation.
-- `E2-P2A-ARTIFACT3`: Pending exact provenance and recipe/hash validation result.
-- `E2-P2A-ARTIFACT4`: Pending explicit gate decision for the one permitted real rerun.
+- `E2-P2A-ARTIFACT1`: Candidate `validate_glb_output()` run with `load_recipe()` against `D:\AI\P2P_runtime\mpfb2-runtime-01\output\Oak.glb` returned `status=STRUCTURALLY_VALID`, glTF `2.0`, character `Oak`, `scene_reachable_nodes=55`, and the expected GLB SHA-256.
+- `E2-P2A-ARTIFACT2`: Artifact bytes and size were compared before and after validation: both hashes are `5f96f86fbfd4cdc01201e767b0383807ac5e2a7a6365252aee568a91a949c0c4`, size `9,093,808`, and `ARTIFACT_MUTATED_DURING_VALIDATION=NO`.
+- `E2-P2A-ARTIFACT3`: Candidate validation passed the existing provenance schema, recipe binding, rights/assets binding, and GLB hash binding; output is `PROVENANCE_VALIDATION=PASS`.
+- `E2-P2A-ARTIFACT4`: Exact existing-artifact gate is PASS. P2-B is permitted to run exactly once; no Blender execution occurred before this gate.
 - `E2-P2B-RUN1`: Pending preflight bindings and firewall-before-spawn receipt.
 - `E2-P2B-RUN2`: Pending Blender/MPFB2/character/export stage markers.
 - `E2-P2B-RUN3`: Pending new GLB/provenance/hash and structural result.

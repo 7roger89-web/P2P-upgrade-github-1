@@ -209,7 +209,7 @@ The exact existing Oak GLB is a valid glTF 2.0 container with one skin, 53 joint
   - P2-A: Validate the exact existing Oak GLB with the candidate source.
   - P2-B: Run exactly one canonical real MPFB2 continuation and stop at the first different blocker.
 
-- [ ] P2-A: Validate the exact existing Oak GLB with the candidate source.
+- [x] P2-A: Validate the exact existing Oak GLB with the candidate source.
   - Goal: demonstrate `EXISTING_OAK_GLB_VALIDATION=PASS` without changing existing GLB bytes.
   - Scope Boundary:
     - Editable: repo-local evidence/actual-status ledgers only.
