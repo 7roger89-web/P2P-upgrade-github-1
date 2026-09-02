@@ -141,15 +141,49 @@ bounded P1 implementation.
 
 Matching plan item(s): `P1-A`, `P1-B`
 
-- `E1-P1A-SRC1`: pending implementation.
-- `E1-P1A-SCHEMA1`: pending implementation/schema alignment.
-- `E1-P1A-TEST1`: pending focused happy-path tests.
-- `E1-P1A-TEST2`: pending determinism/default tests.
-- `E1-P1A-TEST3`: pending fail-closed request tests.
-- `E1-P1B-SRC1`: pending adapter binding source inspection.
-- `E1-P1B-TEST1`: pending mocked adapter-binding test.
-- `E1-P1B-TEST2`: pending receipt validation test.
-- `E1-P1B-TEST3`: pending cleanup/injection/failure tests.
+- `E1-P1A-SRC1`: `character_forge.py` adds one deterministic facade module. It
+  accepts only the six supported beginner fields, maps age/build to the
+  existing normalized MPFB recipe, rejects unknown/runtime-control fields, and
+  calls the existing recipe validator. No NLP, command construction, or
+  second capability/router was added.
+- `E1-P1A-SCHEMA1`: `character.request.schema.json` declares
+  `p2p-character-request/1`, optional matching `schema` metadata, six beginner
+  properties, `additionalProperties: false`, and the same safe defaults/const
+  values as the module. The focused test checks exact property alignment.
+- `E1-P1A-TEST1`: `PYTHONDONTWRITEBYTECODE=1 python -B -m unittest
+  tests.test_p2p_character_forge -v` passed all 12 tests.
+- `E1-P1A-TEST2`: the same focused run proves `{}` defaults, canonical request
+  round-trip, semantic-order independence, and identical recipe SHA-256.
+- `E1-P1A-TEST3`: the same focused run proves invalid height type/range,
+  unsupported exact age/height/hair/clothing fields, runtime/path/command/
+  network/manifest injection, FBX, and unrigged requests fail closed.
+- `E1-P1B-SRC1`: `forge_character` passes only P2-owned fixed runtime context
+  and `network_access=False` to `mpfb_adapter.build_execution_plan`, then
+  delegates to `mpfb_adapter.execute_plan`; it reuses the existing provenance
+  validator and GLB validation result. It checks the plan recipe/output
+  binding before execution and does not copy adapter, process, firewall, or
+  validator logic.
+- `E1-P1B-TEST1`: the focused binding test observes the exact adapter keyword
+  arguments, fixed MPFB2 relative paths, separate authorization, output shape,
+  and generated recipe-input cleanup using a repo-local temporary workspace.
+- `E1-P1B-TEST2`: receipt tests prove round-trip validation and reject wrong
+  capability identity or structural status; the receipt binds character name,
+  recipe SHA-256, GLB SHA-256, provenance path/status, rig/skin, runtime, and
+  firewall cleanup statuses.
+- `E1-P1B-TEST3`: the focused run proves unsupported input never reaches the
+  adapter, missing execution authorization is rejected, output is not
+  overwritten, and only the managed recipe input is removed.
+- `E1-P1-GRAPH1`: refreshed capability-system Anvien evidence sees the new
+  `character_forge.py` as 89 parsed symbols, 130 local relationships, 2 linked
+  flows, and no inbound callers yet; file risk is a scope warning for a new
+  surface, not a reason to touch the protected route. Staged change detection
+  reports exactly 3 intended files and `changedFileRisk=low`.
+
+P1 decision: PASS. Both contract and binding/receipt are implemented in the
+single coherent `character_forge.py` product seam; splitting that importable
+facade into an incomplete intermediate module would add no safety. The
+existing adapter, entrypoint, provenance, validator, firewall, registry, and
+selection surfaces remain unchanged. P2 is now the only implementation phase.
 
 ## E2 - P2 Evidence
 

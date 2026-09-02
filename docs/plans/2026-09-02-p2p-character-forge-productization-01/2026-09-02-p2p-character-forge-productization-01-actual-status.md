@@ -2,7 +2,7 @@
 
 Title: P2P Character Forge Productization ISSUE 59
 Date: 2026-09-02
-Status: P0 Complete
+Status: P1 Complete; P2 Pending
 Companion plan: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-plan.md`
 Companion evidence: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-evidence.md`
 Companion benchmark: `docs/plans/2026-09-02-p2p-character-forge-productization-01/2026-09-02-p2p-character-forge-productization-01-benchmark.md`
@@ -63,18 +63,18 @@ Out of scope:
 | Canonical main/tree | Fresh remote main exactly matches expected SHA/tree | Exact expected base for Writer branch | correct | N/A | `E0-P0A-GIT1` | preserve; P1 allowed |
 | Existing capability identity | `game.character.generate` already exists as `KNOWLEDGE_SOURCE`/`MODEL_ROUTABLE` with MPFB2 provenance | Reuse one identity and existing router | correct | registry data | `E0-P0A-CAP1` | preserve; no duplicate |
 | Internal recipe contract | `p2p-character-recipe/1` validates verbose normalized MPFB inputs | Facade must produce it deterministically | correct | 25 local; 2 flows | `E0-P0A-GRAPH1`, `E0-P0A-CATALOG1` | preserve; call from P1-A |
-| Beginner CharacterRequest | No beginner request/parser/facade exists | Small JSON-shaped request with defaults and fail-closed unknown keys | missing | new surface | `E0-P0A-CAP1`, `E0-P0A-TEST1` | edit P1-A |
-| CharacterRecipe product projection | No product projection wrapper exists; adapter consumes internal recipe directly | Deterministic semantic projection with exact hash | missing | new surface | `E0-P0A-ADAPTER1` | edit P1-A |
+| Beginner CharacterRequest | `character_forge.py` normalizes six supported fields, defaults, schema metadata, and rejects unknown/unsupported fields | Small JSON-shaped request with defaults and fail-closed unknown keys | correct/bound | 89 symbols; 130 local in new facade | `E1-P1A-SRC1`, `E1-P1A-SCHEMA1`, `E1-P1A-TEST1..3` | preserve; P2 only |
+| CharacterRecipe product projection | Facade projects semantic gender/age-class/build into validated `p2p-character-recipe/1` with stable hash | Deterministic semantic projection with exact hash | correct/bound | new facade consumes existing recipe validator | `E1-P1A-SRC1`, `E1-P1A-TEST1..2` | preserve; P2 only |
 | Existing MPFB2 adapter | Runtime plan/execution/security boundary exists and is proven | Facade must delegate without copy | correct | 80 local; 3 flows | `E0-P0A-GRAPH2`, `E0-P0A-RUNTIME1` | preserve-only; bind P1-B |
 | Blender MPFB2 entrypoint | Real addon lifecycle, create, GameEngine rig/skin, export, provenance exist | Product facade must reuse it | correct | 49 local; 5 flows | `E0-P0A-GRAPH3`, `E0-P0A-HISTORY1` | preserve-only |
 | Provenance model | Existing sidecar schema/hash/rights validation exists | Receipt must report its status/path without duplicating it | correct | 17 local; 1 flow | `E0-P0A-GRAPH4`, `E0-P0A-PROV1` | preserve-only |
 | GLB validator | Existing structural validator passes current #56 artifact and handles optional skeleton | Receipt must report status; no weakening | correct | 21 local; 1 flow | `E0-P0A-GRAPH4`, `E0-P0A-RUNTIME1` | preserve-only |
 | Router/selection | Existing single-router/provider-neutral machinery exists | No second router or selection agent | correct | 4 / 126 local | `E0-P0A-ROUTE1`, `E0-P0A-GRAPH5` | preserve-only |
-| Beginner receipt | No product receipt exists; adapter returns lower-level result only | Validated concise `CharacterForgeReceipt` | missing | new surface | `E0-P0A-ADAPTER1` | edit P1-B |
+| Beginner receipt | Facade returns validated `CharacterForgeReceipt` bound to output/provenance/status/hash fields | Validated concise `CharacterForgeReceipt` | correct/bound | new facade | `E1-P1B-SRC1`, `E1-P1B-TEST1..3` | preserve; P2 only |
 | Exact height/age-in-years | Current facade/entrypoint does not bind meters or exact years | Explicit unsupported fail-closed classification | partial | entrypoint 49 local | `E0-P0A-ENTRY1`, `E0-P0A-MPFB1` | classify; do not expand |
 | Hair/clothing customization | Recipe slots and core IDs exist but current entrypoint has no hair/clothing calls | Explicit unsupported/deferred classification; no false execution | partial | adapter/entrypoint | `E0-P0A-ENTRY1`, `E0-P0A-CATALOG1` | classify; do not expand |
 | Windows isolation | Exact firewall lifecycle is existing and #56 passed | Reuse unchanged; cleanup PASS in product smoke | correct | 43 local; 4 flows | `E0-P0A-GRAPH5`, `E0-P0A-RUNTIME1` | preserve-only; validate P2 |
-| Focused tests | Existing lower-level suite is broad/high-risk but has no product facade coverage | Separate focused behavior tests | partial | 161 local; critical impact | `E0-P0A-GRAPH6`, `E0-P0A-TEST1` | add new test module P1 |
+| Focused tests | Separate productization suite covers request, recipe, binding, receipt, fail-closed, cleanup, and injection boundaries; 12/12 pass | Separate focused behavior tests | correct | 12 focused tests; new file | `E1-P1A-TEST1..3`, `E1-P1B-TEST1..3` | preserve; P2 only |
 | Provisioned runtime | Existing manifest/root/Blender/MPFB2 and #56 result are available | One fresh facade-driven run | correct | external | `E0-P0A-RUNTIME1` | validate P2; no reinstall |
 | Game Truyen | Not part of candidate surface | No reads/writes from productization | correct/preserve-only | external | `E0-P0A-SCOPE1` | do-not-touch |
 
@@ -83,6 +83,7 @@ Out of scope:
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-09-02 | fresh remote/canonical clone, full SPEC/source/runtime inspection | ISSUE=59 baseline | initial classification: existing route correct; facade/receipt missing; cosmetic/height unsupported | `E0-P0A-GIT1..E0-P0A-SCOPE1` | P1-A may add only the new facade/schema/focused tests |
+| R1 | 2026-09-02 | Writer candidate source/schema/tests plus refreshed Anvien capability-system graph and focused proof | P1-A/P1-B implementation | request/recipe/binding/receipt are correct/bound locally; 12/12 focused tests and compile pass; protected route remains preserve-only | `E1-P1A-SRC1..E1-P1-GRAPH1` | P2-A allowed: one real smoke after fresh runtime/output preflight |
 
 ## Phase Touch Map
 
@@ -264,8 +265,8 @@ Do not silently drop height/hair/clothing intent or claim visual customization.
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | Existing recipe is correct but beginner request/projection is missing | edit only the new facade/schema/focused test surfaces |
-| P1-B | Existing adapter/entrypoint/provenance/validator are correct and preserve-only; receipt is missing | bind and report via new facade; do not edit protected route |
+| P1-A | New facade/schema/tests implement and prove request normalization and deterministic recipe projection | complete; preserve new contract and proceed to P2 |
+| P1-B | New facade delegates to existing adapter and validators and returns a validated receipt; 12/12 focused tests pass | complete; proceed to P2 without editing protected route |
 | P2-A | Existing runtime is available and previously proven, but ISSUE=59 facade smoke is not run | allow one real smoke only after P1-B tests/build and fresh preflight |
 | P2-B | No ISSUE=59 post-run evidence exists | require independent artifact/process/firewall checks; stop on blocker |
 | Supervisor | No current ISSUE=59 candidate review exists | create one independent Supervisor review after exact candidate is complete |
@@ -283,7 +284,7 @@ Do not silently drop height/hair/clothing intent or claim visual customization.
 - [x] No unresolved authority blocker affects P1.
 - [x] Next phase status assumptions and work steps were updated from this status.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] If implementation has started, affected rows will be refreshed from latest evidence.
+- [x] If implementation has started, affected rows will be refreshed from latest evidence.
 
 ## Final P0 Decision
 
