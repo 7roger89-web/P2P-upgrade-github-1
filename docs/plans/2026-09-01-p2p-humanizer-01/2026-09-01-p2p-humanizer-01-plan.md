@@ -220,7 +220,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
        - UI flow check: N/A; no UI surface.
        - DB/data flow check: verify only the two intended vendor files exist and registry source remains parseable.
        - Render location check: N/A; no render path.
-       - Mini QA for each completed implementation slice (MUST) 
+       - Mini QA for each completed implementation slice (MUST)
           For Codex: When Mini QA must use plugins
             - Browser: N/A because no browser behavior exists.
             - Chrome: N/A because no browser behavior exists.
@@ -233,7 +233,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
        - UI flow check: N/A; route output is the observable boundary.
        - DB/data flow check: `load_registry` and `discover_vendor_skills` must accept the record without changing canonical 8/8 or the existing registry invariant.
        - Render location check: N/A; no host materialization.
-       - Mini QA for each completed implementation slice (MUST) 
+       - Mini QA for each completed implementation slice (MUST)
           For Codex: When Mini QA must use plugins
             - Browser: N/A because no browser behavior exists.
             - Chrome: N/A because no browser behavior exists.
@@ -283,7 +283,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
        - UI flow check: N/A.
        - DB/data flow check: compare frontmatter, fences, inline commands/hashes, URLs, citations, quoted evidence, and structured tables exactly.
        - Render location check: N/A.
-       - Mini QA for each completed implementation slice (MUST) 
+       - Mini QA for each completed implementation slice (MUST)
           For Codex: When Mini QA must use plugins
             - Browser: N/A because no browser behavior exists.
             - Chrome: N/A because no browser behavior exists.
@@ -296,7 +296,7 @@ as baseline evidence, not silently repaired as part of this bounded issue.
        - UI flow check: N/A; route/load response is the observable flow.
        - DB/data flow check: no persistent writes; temp roots are cleaned/quarantined.
        - Render location check: N/A.
-       - Mini QA for each completed implementation slice (MUST) 
+       - Mini QA for each completed implementation slice (MUST)
           For Codex: When Mini QA must use plugins
             - Browser: N/A because no browser behavior exists.
             - Chrome: N/A because no browser behavior exists.
