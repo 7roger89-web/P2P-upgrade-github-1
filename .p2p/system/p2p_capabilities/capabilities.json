@@ -5256,7 +5256,7 @@
     {
       "CAPABILITY_ID": "video.director.continuity_foundation",
       "TYPE": "KNOWLEDGE_SOURCE",
-      "DESCRIPTION": "Provider-neutral video director spec and visual/performance continuity foundation for consistency-controlled AI-video production, projectable to prompt-limited renderers.",
+      "DESCRIPTION": "Provider-neutral video director spec and visual/performance continuity foundation. Continuity QA is MANUAL_OR_EXTERNAL_EVIDENCE only (no automated media QA). Best-of-N is PLANNING_STATE_ONLY (no renderer invocation). Projection is PRIORITY_AWARE (mandatory constraints preserved intact or fail closed).",
       "TRIGGERS": [
         "video director",
         "director spec",
@@ -5318,9 +5318,10 @@
       ],
       "EVIDENCE_CONTRACT": [
         "director-spec-validated",
-        "continuity-gate-verdict",
-        "provider-projection-within-limit",
-        "re-anchor-drift-gate"
+        "continuity-gate-verdict-manual-external-evidence",
+        "provider-projection-mandatory-preserved-or-fail-closed",
+        "re-anchor-drift-gate",
+        "best-of-n-planning-state-only"
       ],
       "TRUST_LEVEL": "PURE_DATA",
       "UPSTREAM_PROVENANCE": {

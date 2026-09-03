@@ -33,6 +33,16 @@ renderers**, never as a canonical production backend.
    input for the next shot.**
 3. **A failed shot cannot become the source of truth for downstream shots.**
 4. **Provider prompt limits are profile/config data**, not architectural constants.
-5. **Single router / no orcheshestrator** — this catalog only supplies contract
+5. **Continuity QA is manual / external evidence only** — the foundation does not
+   inspect media and has no automated visual drift detection.
+6. **Best-of-N is candidate-planning / state semantics only** — no Arena Video /
+   DesignArena invocation and no real-take scoring by this foundation.
+7. **Single router / no orcheshestrator** — this catalog only supplies contract
    data, readiness facts, and referenced knowledge to the existing route.
-6. **Knowledge-only sources stay knowledge-only**; no runtime adoption is forced.
+8. **Knowledge-only sources stay knowledge-only**; no runtime adoption is forced.
+
+## Readiness
+
+The next proof is a single Golden Video #1 manual pilot
+(`video-continuity/golden-video-01.md`). The readiness question is
+`GOLDEN_VIDEO_01_READY_TO_PILOT=YES/NO`, not a broad Video Studio readiness claim.

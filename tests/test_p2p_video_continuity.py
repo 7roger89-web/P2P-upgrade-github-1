@@ -125,8 +125,20 @@ class PerformanceBibleTests(unittest.TestCase):
 
 
 class ContinuityGateTests(unittest.TestCase):
-    def _gate(self) -> vc.ContinuityVerdict:
-        return vc.evaluate_continuity_gate(
+    def test_gate_is_manual_external_evidence_and_does_not_inspect_media(self) -> None:
+        verdict = vc.evaluate_continuity_gate(
+            shot={"identity": True},
+            canonical=vc.CanonicalVisualContract.from_mapping(_valid_canonical()),
+            start_keyframe={"identity": "canonical"},
+            expected_end_state={"end": "canonical"},
+        )
+        self.assertEqual(verdict.evidence_source, "MANUAL_OR_EXTERNAL_EVIDENCE")
+        self.assertFalse(verdict.inspects_media)
+        self.assertEqual(verdict.to_dict()["evidence_source"], "MANUAL_OR_EXTERNAL_EVIDENCE")
+        self.assertFalse(verdict.to_dict()["inspects_media"])
+
+    def test_passing_shot_propagates_state(self) -> None:
+        verdict = vc.evaluate_continuity_gate(
             shot={
                 "identity": True,
                 "hair_body": True,
@@ -141,9 +153,6 @@ class ContinuityGateTests(unittest.TestCase):
             start_keyframe={"identity": "canonical", "camera": "locked"},
             expected_end_state={"end": "canonical"},
         )
-
-    def test_passing_shot_propagates_state(self) -> None:
-        verdict = self._gate()
         self.assertTrue(verdict.passed)
         self.assertTrue(verdict.propagate_allowed)
         self.assertIsNone(verdict.blocker)
@@ -160,8 +169,6 @@ class ContinuityGateTests(unittest.TestCase):
         self.assertEqual(verdict.blocker, "identity")
 
     def test_failed_shot_cannot_become_source_of_truth(self) -> None:
-        verdict = self._gate()
-        # Substitute a failing verdict into a cycle and confirm it blocks.
         cycle = vc.ReanchorCycle(
             start_keyframe={"identity": "canonical"},
             candidate_takes=[{"id": "t1"}],
@@ -209,10 +216,14 @@ class ReanchorCycleTests(unittest.TestCase):
 
 
 class ProviderProjectionTests(unittest.TestCase):
-    def test_projection_respects_provider_ceiling_and_uses_pointers(self) -> None:
+    def _setup(self):
         spec = vc.VideoDirectorSpec.from_mapping(_valid_director_spec())
         canonical = vc.CanonicalVisualContract.from_mapping(_valid_canonical())
         bible = vc.PerformanceBible.from_mapping(_valid_performance())
+        return spec, canonical, bible
+
+    def test_projection_respects_provider_ceiling_and_uses_pointers(self) -> None:
+        spec, canonical, bible = self._setup()
         profile = vc.ProviderProfile.from_mapping(
             {"provider_id": "arena-video", "max_prompt_chars": 220, "accepts_image_reference": True, "model_identity_stable": False}
         )
@@ -222,26 +233,58 @@ class ProviderProjectionTests(unittest.TestCase):
         self.assertFalse(result["duplicated_master_spec"])
         self.assertTrue(result["reference_pointers_only"])
         self.assertFalse(result["model_identity_stable"])
+        self.assertTrue(result["mandatory_constraints_preserved"])
+        self.assertFalse(result["fails_closed"])
+        self.assertEqual(result["mode"], "PRIORITY_AWARE_PROJECTION")
 
-    def test_projection_forbidden_tokens_are_stripped(self) -> None:
-        spec = vc.VideoDirectorSpec.from_mapping(_valid_director_spec())
-        canonical = vc.CanonicalVisualContract.from_mapping(_valid_canonical())
-        bible = vc.PerformanceBible.from_mapping(_valid_performance())
+    def test_forbidden_token_in_mandatory_constraint_fails_closed(self) -> None:
+        spec, canonical, bible = self._setup()
         profile = vc.ProviderProfile.from_mapping(
             {"provider_id": "designarena", "max_prompt_chars": 4000, "accepts_image_reference": False, "model_identity_stable": False, "forbidden_tokens": ["locked"]}
         )
+        # Mandatory camera segment uses the forbidden token 'locked'; this must
+        # fail closed explicitly rather than silently truncate or strip it.
+        with self.assertRaises(vc.VideoContinuityError) as ctx:
+            vc.project_provider_shot(spec, canonical, bible, profile, shot={})
+        self.assertIn("FAIL_CLOSED", str(ctx.exception))
+        self.assertIn("forbidden token", str(ctx.exception))
+
+    def test_mandatory_constraints_fit_intact_within_limit(self) -> None:
+        spec, canonical, bible = self._setup()
+        profile = vc.ProviderProfile.from_mapping(
+            {"provider_id": "arena-video", "max_prompt_chars": 5000, "accepts_image_reference": True, "model_identity_stable": False}
+        )
         result = vc.project_provider_shot(spec, canonical, bible, profile, shot={})
-        self.assertNotIn("locked", result["provider_prompt"])
+        self.assertTrue(result["mandatory_constraints_preserved"])
+        self.assertFalse(result["fails_closed"])
+        self.assertTrue(result["within_limit"])
+        # Mandatory segments must remain intact (no silent truncation marker).
+        self.assertIn("negative:no extra faces; no costume change", result["provider_prompt"])
+
+    def test_required_constraints_fit_or_fail_closed_with_explicit_reason(self) -> None:
+        spec, canonical, bible = self._setup()
+        # Very tight limit: mandatory constraints cannot fit -> fail closed.
+        profile = vc.ProviderProfile.from_mapping(
+            {"provider_id": "tiny", "max_prompt_chars": 20, "accepts_image_reference": True, "model_identity_stable": False}
+        )
+        with self.assertRaises(vc.VideoContinuityError) as ctx:
+            vc.project_provider_shot(spec, canonical, bible, profile, shot={})
+        self.assertIn("FAIL_CLOSED", str(ctx.exception))
+        self.assertIn("exceed", str(ctx.exception))
 
 
 class CandidateRenderingTests(unittest.TestCase):
-    def test_arena_random_selection_is_best_of_n_not_stable_identity(self) -> None:
+    def test_best_of_n_is_planning_state_not_actual_rendering(self) -> None:
         spec = vc.VideoDirectorSpec.from_mapping(_valid_director_spec())
         rendering = vc.build_candidate_set(spec, 5, seed="seed-1")
         self.assertEqual(len(rendering.candidates), 5)
         self.assertEqual(rendering.state, "BEST_OF_N_CANDIDATE")
+        self.assertEqual(rendering.render_mode, "PLANNING_STATE_ONLY")
         self.assertFalse(rendering.model_identity_stable)
         self.assertTrue(all(c["model_identity_stable"] is False for c in rendering.candidates))
+        d = rendering.to_dict()
+        self.assertFalse(d["invoked_rendering"])
+        self.assertFalse(d["scores_real_takes"])
 
     def test_candidate_set_requires_positive_n(self) -> None:
         spec = vc.VideoDirectorSpec.from_mapping(_valid_director_spec())

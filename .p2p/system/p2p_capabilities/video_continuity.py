@@ -6,6 +6,18 @@ renderer (e.g. Arena Video / DesignArena) never owns identity or continuity;
 those live here in canonical assets, approved keyframes, shot state, and a
 compact continuity gate.
 
+Three facts are stated explicitly so nothing is over-claimed:
+
+- Continuity QA is a **manual / external-evidence** gate.  This code consumes
+  externally supplied PASS/FAIL-like fields; it does NOT inspect image/video
+  media and does not do automated visual drift detection.
+- Best-of-N is **candidate-planning / state semantics**.  It does NOT invoke
+  Arena Video / DesignArena and does not score real takes.
+- Provider prompt projection is **priority-aware**.  Mandatory constraints
+  (anchor/reference, identity, canonical refs, action, camera, negative
+  constraints) are preserved intact or the projection fails closed with an
+  explicit reason.  There is no silent raw character truncation.
+
 Design rules honoured here:
 
 - Single existing P2P router.  This module supplies contract data / readiness
@@ -32,8 +44,8 @@ CONTINUITY_GATE_SCHEMA: str = "p2p-continuity-gate/1"
 REANCHOR_CYCLE_SCHEMA: str = "p2p-reanchor-cycle/1"
 PROVIDER_PROJECTION_SCHEMA: str = "p2p-provider-projection/1"
 
-# The compact continuity dimensions required by the task.  Kept as a contract
-# enumerable, not a broad vision-QA taxonomy.
+# Compact continuity dimensions required by the task (task section E).  This is
+# a contract enumerable, not a broad vision-QA taxonomy.
 CONTINUITY_DIMENSIONS: tuple[str, ...] = (
     "identity",
     "hair_body",
@@ -59,9 +71,28 @@ CANONICAL_ASSET_DIMENSIONS: tuple[str, ...] = (
     "shot_to_shot_continuity",
 )
 
-# Best-of-N candidate rendering semantics (task section G).
+# Best-of-N candidate rendering semantics (task section G).  Explicitly a
+# planning/state mode, NOT actual rendering.
 RENDER_STATE: str = "BEST_OF_N_CANDIDATE"
 RENDER_MODEL_STABILITY: str = "NOT_ASSUMED"
+BEST_OF_N_MODE: str = "PLANNING_STATE_ONLY"
+
+# Continuity QA evidence mode.  Explicitly manual/external, not automated.
+CONTINUITY_QA_EVIDENCE_MODE: str = "MANUAL_OR_EXTERNAL_EVIDENCE"
+
+# Provider projection mode.  Priority-aware: no silent raw truncation.
+PROJECTION_MODE: str = "PRIORITY_AWARE_PROJECTION"
+
+# Mandatory projection constraints.  These must fit intact or the projection
+# fails closed.  They are never silently truncated.
+MANDATORY_CONSTRAINTS: tuple[str, ...] = (
+    "anchor_reference",
+    "identity",
+    "reference_pointers",
+    "action",
+    "camera",
+    "negative_constraints",
+)
 
 
 class VideoContinuityError(ValueError):
@@ -89,6 +120,14 @@ def _string_list(value: object, field: str) -> list[str]:
             raise VideoContinuityError(f"{field}[{index}]: expected non-empty string")
         result.append(item)
     return result
+
+
+def _join(elements: Sequence[str]) -> str:
+    return "; ".join(elem for elem in elements if elem and elem.strip())
+
+
+def _head_str(mapping: Mapping[str, object]) -> str:
+    return str(list(mapping.keys())[0]) if mapping else "canonical"
 
 
 @dataclass(frozen=True)
@@ -289,6 +328,10 @@ class ContinuityVerdict:
 
     `propagate_allowed` gates state propagation to the next shot.  A failed
     shot must not become the source of truth for downstream shots.
+
+    This gate consumes externally supplied PASS/FAIL-like evidence.  It does
+    NOT inspect image/video media and does not perform automated visual drift
+    detection.  `evidence_source` and `inspects_media` make that explicit.
     """
 
     passed: bool
@@ -296,6 +339,8 @@ class ContinuityVerdict:
     results: Mapping[str, Mapping[str, object]]
     blocker: str | None = None
     schema: str = CONTINUITY_GATE_SCHEMA
+    evidence_source: str = CONTINUITY_QA_EVIDENCE_MODE
+    inspects_media: bool = False
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -304,14 +349,15 @@ class ContinuityVerdict:
             "propagate_allowed": self.propagate_allowed,
             "results": {k: dict(v) for k, v in self.results.items()},
             "blocker": self.blocker,
+            "evidence_source": self.evidence_source,
+            "inspects_media": self.inspects_media,
         }
 
 
 def _check_dimension(name: str, value: object, expected_start: object, expected_end: object) -> Mapping[str, object]:
-    # A compact contract.  `value` is either a bool score or a short
-    # status string; we fail closed when the dimension is explicitly known to
-    # diverge from the canonical/expected state.  This is deliberately NOT a
-    # vision model call.
+    # A compact contract.  `value` is either a bool score or a short status
+    # string supplied by the operator/external evidence; we fail closed when it
+    # is explicitly known to diverge.  This is deliberately NOT a vision call.
     if isinstance(value, bool):
         ok = value
     else:
@@ -325,9 +371,13 @@ def evaluate_continuity_gate(
     start_keyframe: Mapping[str, object],
     expected_end_state: Mapping[str, object],
 ) -> ContinuityVerdict:
-    """Evaluate a candidate shot before it can propagate state downstream."""
+    """Evaluate a candidate shot *given supplied external evidence*.
+
+    This does not render or look at media.  The `shot` inputs are externally
+    supplied manual/QA judgments; the gate only decides whether a shot may
+    propagate state to the next shot.
+    """
     checks: dict[str, Mapping[str, object]] = {}
-    # Map the compact gate dimensions onto the shot/canonical inputs.
     plan: tuple[tuple[str, object, object, object], ...] = (
         ("identity", shot.get("identity", True), canonical.identity_face, start_keyframe.get("identity", "canonical")),
         ("hair_body", shot.get("hair_body", True), {"hair": canonical.hair, "body": canonical.body_proportions}, start_keyframe.get("hair_body", "canonical")),
@@ -425,6 +475,12 @@ class ProviderProfile:
         )
 
 
+def _sanitize_optional(text: str, forbidden_tokens: Sequence[str]) -> str:
+    for token in forbidden_tokens:
+        text = text.replace(token, "")
+    return text
+
+
 def project_provider_shot(
     director_spec: VideoDirectorSpec,
     canonical: CanonicalVisualContract,
@@ -434,36 +490,74 @@ def project_provider_shot(
 ) -> Mapping[str, object]:
     """Project a large master spec into a short, provider-specific shot prompt.
 
-    Uses pointer references (canonical ref ids) instead of duplicating the full
-    master spec per shot.  Keeps within the provider's declared character
-    ceiling, stripping forbidden tokens if present.
+    Priority-aware, no silent raw truncation:
+
+    - Mandatory constraints (anchor/reference, identity, canonical refs,
+      action, camera, negative constraints) are always preserved intact.
+    - If a mandatory constraint cannot be expressed within the provider limit,
+      or a mandatory segment uses a provider-forbidden token, the projection
+      fails closed with an explicit reason.
+    - Optional/compaction fields (tempo, style, scene, lighting, duration) are
+      dropped in priority order, never the mandatory constraints.
     """
-    refs = " ".join(f"{key}={value}" for key, value in director_spec.canonical_refs.items())
-    parts = [
-        f"identity:{list(canonical.identity_face.keys())[0] if canonical.identity_face else 'canonical'}",
-        f"scene:{director_spec.camera.get('scene', 'canonical')}",
-        f"camera:{director_spec.camera.get('move', 'locked')}",
-        f"action:{director_spec.action_performance.get('action', shot.get('action', 'canonical'))}",
-        f"tempo:{performance.action_tempo}",
-        f"style:{canonical.visual_style.get('genre', 'canonical')}",
-        f"duration:{director_spec.timeline_duration_seconds}s",
-        f"refs:{refs}",
-    ]
+    mandatory: list[str] = []
     if profile.accepts_image_reference:
-        parts.insert(0, "anchor:<canonical_start_keyframe>")
+        mandatory.append("anchor:<canonical_start_keyframe>")
     else:
-        parts.insert(0, "no-anchor-image")
-    prompt = "; ".join(part for part in parts if part and part != "canonical")
-    for token in profile.forbidden_tokens:
-        prompt = prompt.replace(token, "")
-    if len(prompt) > profile.max_prompt_chars:
-        prompt = prompt[: profile.max_prompt_chars]
+        mandatory.append("no-anchor-image")
+    mandatory.append(f"identity:{_head_str(canonical.identity_face)}")
+    mandatory.append("refs:" + " ".join(f"{key}={value}" for key, value in director_spec.canonical_refs.items()))
+    mandatory.append(f"action:{director_spec.action_performance.get('action', shot.get('action', 'canonical'))}")
+    mandatory.append(f"camera:{director_spec.camera.get('move', 'locked')}")
+    mandatory.append("negative:" + "; ".join(director_spec.negative_constraints))
+
+    for segment in mandatory:
+        for token in profile.forbidden_tokens:
+            if token in segment:
+                raise VideoContinuityError(
+                    f"PROVIDER_PROJECTION_FAIL_CLOSED: forbidden token '{token}' inside mandatory constraint"
+                )
+
+    mandatory_text = _join(mandatory)
+    # No raw truncation.  Mandatory constraints either fit intact or fail closed.
+    if len(mandatory_text) > profile.max_prompt_chars:
+        raise VideoContinuityError(
+            f"PROVIDER_PROJECTION_FAIL_CLOSED: mandatory constraints ({len(mandatory_text)} chars) exceed "
+            f"provider limit ({profile.max_prompt_chars} chars)"
+        )
+
+    optional: list[tuple[str, str]] = [
+        ("tempo", f"tempo:{performance.action_tempo}"),
+        ("style", f"style:{canonical.visual_style.get('genre', 'canonical')}"),
+        ("scene", f"scene:{director_spec.camera.get('scene', 'canonical')}"),
+        ("lighting", f"light:{director_spec.lighting.get('key', 'canonical')}"),
+        ("duration", f"duration:{director_spec.timeline_duration_seconds}s"),
+    ]
+    prompt = mandatory_text
+    dropped: list[str] = []
+    for label, text in optional:
+        cleaned = _sanitize_optional(text, profile.forbidden_tokens)
+        if not cleaned or cleaned.split(":", 1)[-1].strip() == "":
+            dropped.append(label)
+            continue
+        candidate = f"{prompt}; {cleaned}" if prompt else cleaned
+        if len(candidate) <= profile.max_prompt_chars:
+            prompt = candidate
+        else:
+            dropped.append(label)
+
     return {
         "schema": PROVIDER_PROJECTION_SCHEMA,
         "provider_id": profile.provider_id,
         "provider_prompt": prompt,
         "chars": len(prompt),
         "within_limit": len(prompt) <= profile.max_prompt_chars,
+        "mode": PROJECTION_MODE,
+        "mandatory_constraints_preserved": True,
+        "fails_closed": False,
+        "fail_reason": None,
+        "compact_mode": bool(dropped),
+        "dropped_optional_elements": dropped,
         "duplicated_master_spec": False,
         "model_identity_stable": profile.model_identity_stable,
         "reference_pointers_only": True,
@@ -472,7 +566,12 @@ def project_provider_shot(
 
 @dataclass(frozen=True)
 class CandidateRendering:
-    """Best-of-N candidate rendering semantics for Arena/DesignArena (task G)."""
+    """Best-of-N candidate *planning/state* semantics for Arena/DesignArena.
+
+    This is NOT actual rendering.  It does not invoke Arena Video /
+    DesignArena, it does not produce media, and it does not score real takes.
+    It only records candidate-generation state and the manual gate verdict.
+    """
 
     baseline_seed: str
     candidates: Sequence[Mapping[str, object]]
@@ -484,6 +583,10 @@ class CandidateRendering:
     def state(self) -> str:
         return RENDER_STATE
 
+    @property
+    def render_mode(self) -> str:
+        return BEST_OF_N_MODE
+
     def to_dict(self) -> dict[str, object]:
         return {
             "baseline_seed": self.baseline_seed,
@@ -491,17 +594,21 @@ class CandidateRendering:
             "best_take": dict(self.best_take),
             "gate": self.gate.to_dict(),
             "state": self.state,
+            "render_mode": self.render_mode,
+            "invoked_rendering": False,
+            "scores_real_takes": False,
             "model_identity_stable": self.model_identity_stable,
             "renderer": "CANDIDATE_ONLY",
         }
 
 
 def build_candidate_set(director_spec: VideoDirectorSpec, n: int, *, seed: str = "default") -> CandidateRendering:
-    """Represent random renderer selection as best-of-N candidate sampling.
+    """Represent random renderer selection as best-of-N candidate *planning*.
 
     The renderer is treated as a random/candidate motion generator, not a
-    stable provider.  Each candidate is an opaque take bound to the same
-    canonical start keyframe; none of them become canonical by default.
+    stable provider.  Each candidate is an opaque planning token bound to the
+    same canonical start keyframe; none of them become canonical by default and
+    none of them are actually rendered here.
     """
     if n < 1:
         raise VideoContinuityError("candidate_set: n must be >= 1")
@@ -542,15 +649,19 @@ def build_candidate_set(director_spec: VideoDirectorSpec, n: int, *, seed: str =
 
 
 __all__ = [
+    "BEST_OF_N_MODE",
     "CANONICAL_ASSET_DIMENSIONS",
     "CANONICAL_VISUAL_CONTRACT_SCHEMA",
     "CONTINUITY_DIMENSIONS",
     "CONTINUITY_GATE_SCHEMA",
+    "CONTINUITY_QA_EVIDENCE_MODE",
     "CandidateRendering",
     "CanonicalVisualContract",
     "ContinuityVerdict",
     "DIRECTOR_SPEC_SCHEMA",
+    "MANDATORY_CONSTRAINTS",
     "PERFORMANCE_BIBLE_SCHEMA",
+    "PROJECTION_MODE",
     "PROVIDER_PROJECTION_SCHEMA",
     "PerformanceBible",
     "ProviderProfile",

@@ -1,6 +1,7 @@
 # Video Continuity Protocol
 
-Status: CANDIDATE — awaiting owner gate for any video-studio bootstrap
+Status: CANDIDATE — awaiting a single Golden Video #1 manual pilot before any
+Video Studio bootstrap
 Date: 2026-09-03
 Workstream: P2P-VIDEO-CONTINUITY-01
 Parent catalog: `docs/p2p-development/capability-catalog/video-continuity/capability-catalog.json`
@@ -27,6 +28,11 @@ DesignArena) never owns identity.
 2. **A failed shot cannot become the source of truth for downstream shots.**
 3. **Provider prompt limits are profile/config data**, not architecture
    constants.
+4. **Continuity QA is manual / external evidence only.** This foundation does
+   not inspect image/video media and does not perform automated visual drift
+   detection.
+5. **Best-of-N is candidate-planning / state semantics only.** This foundation
+   does not invoke Arena Video / DesignArena and does not score real takes.
 
 ## 1. Video director specification
 
@@ -95,9 +101,10 @@ frame, so a drifted raw final frame can never seed the next shot.
 
 ## 5. Continuity gate
 
-Schema `p2p-continuity-gate/1`. A compact evaluation surface, not a broad
-vision-QA platform. Before a candidate propagates state to the next shot,
-evaluate at minimum:
+Schema `p2p-continuity-gate/1`. **Manual / external-evidence contract.** A
+compact evaluation surface, not a broad vision-QA platform. Before a candidate
+propagates state to the next shot, the operator supplies PASS/FAIL-like
+evidence per dimension:
 
 - identity
 - hair / body
@@ -108,8 +115,10 @@ evaluate at minimum:
 - expected end state
 - action / camera continuity
 
-`propagate_allowed` is true only when every dimension passes. A failed shot
-cannot become the source of truth for downstream shots.
+`propagate_allowed` is true only when every dimension passes. The gate does
+**not** inspect media and does **not** do automated drift detection
+(`inspects_media=False`, `evidence_source=MANUAL_OR_EXTERNAL_EVIDENCE`). A
+failed shot cannot become the source of truth for downstream shots.
 
 ## 6. Provider prompt projection
 
@@ -121,10 +130,28 @@ Provider prompt limits (`max_prompt_chars`, `accepts_image_reference`,
 projection emits a short prompt using canonical pointer references, avoiding
 duplicating the whole master spec per shot.
 
+**Priority-aware, no silent raw truncation:**
+
+- Mandatory constraints (anchor/reference, identity, canonical refs, action,
+  camera, negative constraints) are always preserved intact.
+- If a mandatory constraint cannot fit the provider limit, or uses a
+  provider-forbidden token, the projection **fails closed** with an explicit
+  reason (`PROVIDER_PROJECTION_FAIL_CLOSED`). It never truncates mid-sentence.
+- Optional/compaction fields (tempo, style, scene, lighting, duration) are
+  dropped in priority order, never the mandatory constraints.
+
 Arena Video / DesignArena are initially experimental **random/candidate**
 renderers, not canonical production backends. Random model selection is
-represented as best-of-N candidate rendering (`p2p-reanchor-cycle` /
-`build_candidate_set`), not assumed model continuity.
+represented as best-of-N candidate **planning** (`p2p-reanchor-cycle` /
+`build_candidate_set`), not assumed model continuity and not actual rendering.
+
+## Golden Video #1 pilot
+
+The next proof is a single Golden Path executed manually:
+`canonical -> one approved keyframe -> one provider-ready prompt -> manual
+Arena/DesignArena render -> manual continuity verdict`.
+See `video-continuity/golden-video-01.md` for the concrete executable contract.
+Readiness question is only `GOLDEN_VIDEO_01_READY_TO_PILOT=YES/NO`.
 
 ## Post-production boundary (MoneyPrinterTurbo)
 
@@ -137,5 +164,5 @@ because generation is outside this task's bounded scope.
 ## Out of scope / not implemented
 
 No video model, framework, weight, paid API, credential, secret, database,
-server, daemon, job queue, second router/registry/orchestrator, or standalone
-Video Studio project is introduced.
+server, daemon, job queue, second router/registry/orchestrator, auto media QA,
+renderer API, or standalone Video Studio project is introduced.
