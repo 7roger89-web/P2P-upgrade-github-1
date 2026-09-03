@@ -89,3 +89,67 @@ The following patterns are permanently registered as rejected and appear in char
 ## 6. Provenance notes
 
 RA-EXT-009 (NUI): the 174-faculty count is `PROVENANCE_NOT_RECOVERED` — no repository artifact reproduces the claim. Per machinery (RI-003), this is **not evidence of absence**; it remains NOT_PROVEN, not REJECTED. RA-EXT-012 (Electron) has no durable selection evidence; it is recorded UNKNOWN and must not be silently treated as adopted. RA-EXT-007 (Anvien) and other license-constrained sources remain research-only.
+
+---
+
+## 7. Addendum — P2P-VIDEO-CAPABILITY-INTEGRATION-01 (2026-09-03, GitHub issue #71)
+
+Bounded addendum only. Sections 1–6 above are unchanged and are not regenerated here.
+
+**Machine source of truth:** `governance/research-adoption-ledger.json`, records
+`RA-EXT-070` … `RA-EXT-077` (appended 2026-09-03, append-only; the 69 earlier records
+and the ledger top level are byte-stable). Sections 1–6 of this human projection were
+already stale before this addendum — they enumerate 26 canonical entries while the JSON
+held 69 at base main. Repairing that staleness is outside this goal's bounded scope and
+is declared as a deviation in the goal's evidence file.
+
+### 7.1 New records
+
+| Record | Source | Status | Owner decision | Canonical capability |
+| --- | --- | --- | --- | --- |
+| `RA-EXT-070` | `jacobye2017-afk/jacob-ye-seedance-prompt` | SELECTED | OWNER_SELECTED | `video.prompt.director_spec` |
+| `RA-EXT-071` | `opensource-works/awesome-seedance-prompts` | RESEARCHED | REFERENCE_ONLY | — |
+| `RA-EXT-072` | `Wan-Video/Wan2.2` | DEFERRED | CONDITIONAL | — |
+| `RA-EXT-073` | `ali-vilab/VACE` | SELECTED | REFERENCE_ONLY | — |
+| `RA-EXT-074` | `KlingAIResearch/ReCamMaster` | SELECTED | REFERENCE_ONLY | — |
+| `RA-EXT-075` | `divolleggett/awesome-character-consistency` | SELECTED | REFERENCE_ONLY | — |
+| `RA-EXT-076` | `harry0703/MoneyPrinterTurbo` | DEFERRED | CONDITIONAL | — |
+| `RA-EXT-077` | `SEEDANCE-2.5-SOLO-SKYDIVE-LIVE-TV-JP-01` (session artifact, not a repository) | SELECTED | REFERENCE_ONLY | — |
+
+No record uses `IMPLEMENTED`, `VERIFIED`, or `SHIPPED`: the capability exists on a
+candidate branch only, and promotion needs the Owner merge gate.
+
+### 7.2 New provenance notes
+
+- **Attribution is mandatory for `RA-EXT-070`.** Upstream is CC-BY-4.0. The derived
+  reference at
+  `docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md`
+  reproduces the upstream notice, the pinned revision, and the upstream's own
+  incorporated-source credits. It is a bounded derivation in P2P's own words, not a copy
+  of any upstream file. The full upstream formula document is deliberately not vendored.
+- **`RA-EXT-071` is never vendored.** Its licence is `NOASSERTION`; the same
+  licence gate that keeps `game-asset-forge` reference material knowledge-only keeps
+  third-party community prompt corpus `READ_ONLY`.
+- **`RA-EXT-072` and `RA-EXT-076` are future backends, not present dependencies.**
+  No runtime installation, no vendor, no wrap, no model weights. Each carries an explicit
+  Owner gate for API credentials, paid generation, and infrastructure commitment, and a
+  stated `DEFERRED` reason so the roadmap coverage gate stays satisfied.
+- **`RA-EXT-074` is benchmark-only.** Camera vocabulary is adopted; the checkpoint,
+  dataset, and re-capture runtime are not downloaded.
+- **All seven repositories carry commit and tree pins**, recorded identically in the
+  registry entry, the derived reference, and the adoption records.
+
+### 7.3 Declared bounded-scope deviations
+
+1. No `governance/research-intake-ledger.json` append. Its provenance note `PN-001`
+   already references an `RI-008` that is absent from `intake_records`; assigning `RI-008`
+   would create a duplicate-truth conflict, and assigning `RI-009` would silently imply
+   `RI-008` exists. Repairing that is out of scope. Precedent: `RA-EXT-032` … `RA-EXT-069`
+   were added without intake entries.
+2. No `capability-index.json` or `p2p-development-roadmap.json` record. The most recent
+   capability-addition precedent (`creative.social.*`, 2026-09-02) added none, and
+   regenerating the derived projection plus the roadmap record count would be unrelated
+   stale-projection repair.
+3. No `governance/runtime-manifest.lock.json` regeneration. The lock already drifted on
+   three governance files at base main; regenerating it is release-gated and
+   approval-bound.

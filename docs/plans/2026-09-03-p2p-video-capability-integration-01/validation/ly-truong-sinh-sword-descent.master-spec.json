@@ -1,0 +1,548 @@
+{
+  "artifact": "MASTER_DIRECTOR_SPEC",
+  "spec_id": "VDS-VALIDATION-01-LY-TRUONG-SINH-SWORD-DESCENT",
+  "capability": "video.prompt.director_spec",
+  "protocol_ref": "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md",
+  "workstream": "P2P-VIDEO-CAPABILITY-INTEGRATION-01",
+  "generated_at": "2026-09-03",
+  "provider_neutral": true,
+  "language": "vi",
+  "source_request": {
+    "user_idea_verbatim": "Tạo cảnh Lý Trường Sinh cưỡi kiếm lao xuống Thiên Kiếm Thành, giữ nguyên khuôn mặt, trang phục và thanh kiếm; camera đuổi từ phía sau rồi vòng sang chính diện.",
+    "decomposed_inputs": {
+      "USER_IDEA": "Lý Trường Sinh rides a flying sword and dives down toward Thiên Kiếm Thành.",
+      "CANONICAL_REFERENCES": "character (face, hair, body proportions), costume, symbolic prop (the sword), world/scene (Thiên Kiếm Thành), style/world intent (xianxia cinematic)",
+      "ACTION": "sword-ride descent toward a city",
+      "STYLE_WORLD_INTENT": "xianxia cultivation epic, cinematic, physically plausible high-altitude descent",
+      "CAMERA_INTENT": "two distinct moves: (1) chase from behind, (2) arc to frontal"
+    },
+    "camera_moves_requested": 2,
+    "camera_beats_required": 2,
+    "camera_beats_authored": 3,
+    "third_beat_reason": "A settle/hold beat carries the visible end-state that the next shot in a chain inherits. It adds no second principal move to any beat."
+  },
+  "caller_supplied_controls": {
+    "shot_duration": "12s",
+    "aspect_ratio": "2.35:1",
+    "provenance": "SUPPLIED_BY_CALLER_FOR_THIS_VALIDATION_ONLY",
+    "p2p_hard_coded_constant": false,
+    "verified_provider_profile_used": false,
+    "note": "Duration and aspect ratio are provider controls. They are echoed here as caller input, never as a P2P constant."
+  },
+
+  "identity_constraints": {
+    "subject": "Lý Trường Sinh",
+    "restated_in_words_even_though_references_are_bound": true,
+    "must_survive_generation": {
+      "face": "Same facial geometry, eye/brow/nose/mouth shape, jawline, and skin texture as FACE_REFERENCE. No beautification drift, no age drift, no face melt during motion.",
+      "hair": "Same length, parting, colour, and tie as CHARACTER_REFERENCE full_body views. Hair streams backward and upward under descent airflow; the hairline and silhouette stay identical.",
+      "body_proportions": "Same height, build, shoulder-to-hip ratio, and head-to-body ratio as CHARACTER_REFERENCE full_body_front / full_body_side.",
+      "costume": "Same garment set, cut, length, closure, colour, material, and wear state as COSTUME_REFERENCE. Robe panels and sleeves flutter with a lag behind body movement; the garment never changes design mid-shot.",
+      "symbolic_prop": "One single sword, exactly the geometry, material, colour, guard shape, and identifying marks of SYMBOLIC_PROP_REFERENCE. Never duplicated, never re-coloured, never replaced."
+    },
+    "bound_reference_slots": [
+      "CHARACTER_REFERENCE",
+      "COSTUME_REFERENCE",
+      "SYMBOLIC_PROP_REFERENCE"
+    ],
+    "locked_consistency_concepts": [
+      "IDENTITY_CONSISTENCY",
+      "HAIR_CONSISTENCY",
+      "BODY_PROPORTION_CONSISTENCY",
+      "COSTUME_CONSISTENCY",
+      "PROP_WEAPON_CONSISTENCY"
+    ]
+  },
+
+  "scene": {
+    "location": "High altitude above and descending toward Thiên Kiếm Thành (Heavenly Sword City), a fortified xianxia mountain city.",
+    "time_of_day": "Late afternoon descending into dusk as altitude drops.",
+    "weather": "Broken cloud deck at mid-altitude; clear, cold air above; dense warm air and lantern light below.",
+    "world_rules": "Cultivation-world physics: a ridden sword flies and carries a standing rider. No modern technology, no modern materials, no vehicles, no power lines.",
+    "art_direction_world_intent": "Xianxia cultivation epic. Painted-cinematic realism: real atmospheric perspective, real cloud volume, real stone and timber city mass. Not anime-flat, not glossy game-render.",
+    "scale_and_depth_cues": "Cloud layers at three distinct depths; the city wall and gate grow from a silhouette to legible architecture across the shot; falling debris and mist streaks provide parallax.",
+    "bound_reference_slots": ["WORLD_REFERENCE", "STYLE_REFERENCE"],
+    "locked_consistency_concepts": ["ENVIRONMENT_CONSISTENCY", "STYLE_CONSISTENCY"]
+  },
+
+  "actor_performance": {
+    "per_beat": [
+      {
+        "beat": "BEAT-01",
+        "core_action": "Rides the sword in a committed forward dive, weight pressed down through the balls of the feet, knees bent, torso angled into the descent.",
+        "intention": "He is arriving, not sightseeing — the descent is deliberate and urgent.",
+        "observable_signals": [
+          "robe panels and wide sleeves stream backward with a visible lag behind the body",
+          "hair and ribbons lift and trail upward-backward under airflow",
+          "one hand lowered and slightly back for balance, fingers spread, not clenched",
+          "gaze fixed forward-down toward the city, head steady relative to the torso",
+          "small corrective weight shifts at the ankles as the descent steepens"
+        ],
+        "subtext": "Confidence with a held breath — the city is bigger than he expected.",
+        "not_adjectives_only": true
+      },
+      {
+        "beat": "BEAT-02",
+        "core_action": "Holds the same riding posture while the camera arcs; he does not re-pose for the camera.",
+        "intention": "The descent continues uninterrupted; the reveal is the camera's job, not his.",
+        "observable_signals": [
+          "shoulders stay level, torso still angled into the fall",
+          "eyes track the gate ahead as the frontal view opens",
+          "robe and hair continue streaming in the same airflow direction",
+          "jaw sets slightly as the city becomes legible"
+        ],
+        "subtext": "Recognition — he has found the gate."
+      },
+      {
+        "beat": "BEAT-03",
+        "core_action": "Eases the dive angle and settles into a controlled frontal glide, sword tip angled down toward the gate.",
+        "intention": "Commit to arrival; hand the next shot a stable, legible position.",
+        "observable_signals": [
+          "knees absorb the change of angle, torso rises a few degrees",
+          "robe panels settle from full stream to a slower flutter",
+          "gaze locked on the gate, chin slightly down",
+          "both feet planted, no stepping, no re-balancing scramble"
+        ],
+        "subtext": "Arrival."
+      }
+    ],
+    "one_core_action_per_beat": true
+  },
+
+  "camera": {
+    "rule_applied": "ONE_PRINCIPAL_CAMERA_MOVE_PER_BEAT",
+    "rule_status": "DIRECTOR_RULE_NOT_UNIVERSAL_VALIDATOR",
+    "recorded_deviation": null,
+    "beats": [
+      {
+        "beat": "BEAT-01",
+        "window_fraction_of_shot": [0.0, 0.4],
+        "derived_window_at_caller_duration": "0.0s - 4.8s",
+        "framing": "Rear three-quarter long-to-medium shot. Rider and full sword blade in frame from behind and slightly above; cloud deck filling the lower frame; city a distant silhouette.",
+        "lens_intent_as_visible_effect": "Moderate wide view: the descent reads as fast because cloud and mist streak past the frame edges, and the city stays small enough to feel far away.",
+        "principal_camera_move": "REAR_CHASE_FOLLOW (tracking follow from behind, matching the subject's descent speed and staying at a constant offset)",
+        "principal_camera_move_count": 1,
+        "secondary_moves_forbidden_in_this_beat": ["arc", "orbit", "whip pan", "rack focus", "crane"],
+        "camera_move_psychological_verb": "pursuit / committed forward momentum",
+        "end_state_of_move": "Camera is still directly behind the rider at a constant offset; the city silhouette has grown but is not yet legible."
+      },
+      {
+        "beat": "BEAT-02",
+        "window_fraction_of_shot": [0.4, 0.75],
+        "derived_window_at_caller_duration": "4.8s - 9.0s",
+        "framing": "Arcs from rear three-quarter through profile to frontal medium shot. Rider and sword remain centred; Thiên Kiếm Thành gate swings into the background behind him.",
+        "lens_intent_as_visible_effect": "Slightly tighter view as the arc completes, so the face becomes readable at the same moment the city becomes legible.",
+        "principal_camera_move": "ARC_TO_FRONTAL (single continuous arc from behind to directly in front of the subject, ARC_RIGHT_WITH_ROTATION family)",
+        "principal_camera_move_count": 1,
+        "arc_discipline": "The arc is one continuous rotation about the subject. It is not an orbit loop and it does not reverse. It stops exactly at frontal.",
+        "camera_move_psychological_verb": "reveal / turning to face the audience and the destination at once",
+        "end_state_of_move": "Camera is exactly frontal, level with the rider's face, at a constant distance; the gate is visible over his shoulder."
+      },
+      {
+        "beat": "BEAT-03",
+        "window_fraction_of_shot": [0.75, 1.0],
+        "derived_window_at_caller_duration": "9.0s - 12.0s",
+        "framing": "Frontal medium shot, rider and sword tip in frame, Thiên Kiếm Thành gate and wall legible behind him.",
+        "lens_intent_as_visible_effect": "Focus held on the rider with the city readable but softer behind him.",
+        "principal_camera_move": "LOCKED_OFF_FRONTAL_HOLD (no new principal move; camera matches the subject's residual descent so the frame stays stable)",
+        "principal_camera_move_count": 1,
+        "no_new_move_reason": "Adding a third distinct move here would overload the reveal. The hold beat exists to deliver a stable, chainable visible end-state.",
+        "focus_discipline": "Focus stays locked on the rider through the whole beat. No defocus, no unfinished focus pull.",
+        "camera_move_psychological_verb": "arrival / fate stated plainly",
+        "end_state_of_move": "Stable frontal frame; rider centred; sword tip angled down; gate legible behind. This exact frame is the chain handoff."
+      }
+    ],
+    "moves_requested_vs_beats": {
+      "requested": ["rear chase", "arc to frontal"],
+      "authored_one_per_beat": ["REAR_CHASE_FOLLOW", "ARC_TO_FRONTAL", "LOCKED_OFF_FRONTAL_HOLD"],
+      "collapsed_into_one_overloaded_command": false
+    },
+    "duration_and_aspect_are_provider_controls_not_prompt_text": true
+  },
+
+  "lighting": {
+    "layer_1_source": [
+      "High-altitude late-afternoon sun from above and behind the camera's starting position (hard top-rear key on the rider and the blade's upper edge).",
+      "Warm lantern, forge, and brazier glow rising from Thiên Kiếm Thành as altitude drops (practical motivated uplight on the city and, at the end, on the rider's underside)."
+    ],
+    "layer_2_behaviour": [
+      "Hard top-rear key rakes the hair, the shoulder line, and the sword spine; the face is lit by bounce off the cloud deck below during BEAT-01.",
+      "Cloud shadow bands sweep across the rider during the descent as he passes through broken cloud.",
+      "During the arc the key rotates across his face from rear-rim to three-quarter side light, which is what makes the face readable at frontal.",
+      "By BEAT-03 the city uplight is a visible warm rim on the jaw, the robe's underside, and the sword's lower edge."
+    ],
+    "layer_3_colour_tone": "Colour arc stated once and held: cold blue-grey at altitude, desaturated in the cloud deck, warming to amber-bronze as the city fills the lower frame. The arc progresses with altitude only — it never reverses within the shot.",
+    "unmotivated_light_prohibited": true,
+    "locked_consistency_concepts": ["STYLE_CONSISTENCY", "ENVIRONMENT_CONSISTENCY"]
+  },
+
+  "physics": {
+    "must_obey": [
+      "Descent accelerates then holds a terminal rate; the rider is not hovering and not falling at constant zero speed.",
+      "Rider weight is visibly carried by the blade: ankles and knees compress, the sword dips a few degrees under load.",
+      "Air resistance is continuous: robe, sleeves, sashes, and hair all stream in the same airflow direction with a lag behind body movement.",
+      "Cloud and ground parallax are consistent with a fast descent: near mist streaks fast, distant city moves slowly.",
+      "Sword flight leaves a short, faint disturbed-air wake; no exhaust, no flame, no engine trail.",
+      "Atmospheric perspective increases as altitude drops: the city gains contrast and legibility, the upper sky loses it.",
+      "Any detached debris or mist droplets fall behind and upward relative to the descending subject."
+    ],
+    "must_not_happen": [
+      "frozen or rubbery cloth and hair",
+      "hovering with no descent",
+      "sword bending, warping, or changing length under load",
+      "rider's feet sliding off or through the blade",
+      "camera clipping through the rider, the sword, or the cloud volume",
+      "city scale changing between beats"
+    ],
+    "physics_stated_explicitly_not_left_to_model": true
+  },
+
+  "timeline": {
+    "shot_duration_source": "caller_supplied_controls.shot_duration (not a P2P constant)",
+    "beats": [
+      {
+        "beat": "BEAT-01",
+        "name": "Rear chase descent",
+        "window_fraction": [0.0, 0.4],
+        "derived_window": "0.0s - 4.8s",
+        "min_window_guideline": "A chase move needs enough window to establish constant offset. The upstream-derived guideline of a multi-second minimum window is recorded as a director guideline, not a P2P constant.",
+        "actor_action": "committed forward dive, weight pressed down, gaze forward-down",
+        "camera_framing": "rear three-quarter long-to-medium",
+        "principal_camera_move": "REAR_CHASE_FOLLOW",
+        "environment": "above and inside broken cloud deck; city a distant silhouette",
+        "lighting": "hard top-rear key; face lit by cloud bounce; cold blue-grey tone",
+        "physics": "accelerating descent; cloth and hair streaming with lag; near-mist parallax fast",
+        "dialogue": "none",
+        "audio": "high-altitude wind rush dominant; robe snap; low sword-blade hum; music bed enters low",
+        "visible_end_state": "Camera still directly behind at constant offset; city silhouette grown but not yet legible; rider's posture unchanged.",
+        "continuity": "VIDEO_TEMPORAL_CONSISTENCY within the beat; identity/costume/prop lock restated"
+      },
+      {
+        "beat": "BEAT-02",
+        "name": "Arc to frontal",
+        "window_fraction": [0.4, 0.75],
+        "derived_window": "4.8s - 9.0s",
+        "min_window_guideline": "An arc from rear to frontal is the largest single move in the shot and must not be compressed into the chase window.",
+        "actor_action": "same riding posture held; no re-posing for camera; eyes track the gate",
+        "camera_framing": "rear three-quarter through profile to frontal medium",
+        "principal_camera_move": "ARC_TO_FRONTAL",
+        "environment": "below the cloud deck; city wall and gate swinging into the background",
+        "lighting": "key rotates from rear-rim to three-quarter side; city uplight begins as a warm rim",
+        "physics": "descent continues at terminal rate; airflow direction unchanged through the arc; parallax shifts as the camera changes side",
+        "dialogue": "none",
+        "audio": "wind rush changes character as the camera comes around the subject; blade hum rises; city ambience becomes audible; music bed builds",
+        "visible_end_state": "Camera exactly frontal and level with the rider's face at constant distance; gate visible over his shoulder; face fully readable.",
+        "continuity": "VIDEO_TEMPORAL_CONSISTENCY across the arc — the face must hold identity through the whole rotation, which is the highest-risk moment of the shot"
+      },
+      {
+        "beat": "BEAT-03",
+        "name": "Frontal arrival hold",
+        "window_fraction": [0.75, 1.0],
+        "derived_window": "9.0s - 12.0s",
+        "min_window_guideline": "A hold beat needs enough window for the end-state to be unambiguous and chainable.",
+        "actor_action": "eases dive angle, settles into controlled frontal glide, sword tip angled down",
+        "camera_framing": "frontal medium, city legible behind",
+        "principal_camera_move": "LOCKED_OFF_FRONTAL_HOLD (matches residual descent)",
+        "environment": "approaching the gate of Thiên Kiếm Thành; wall, roofs, and lantern light legible",
+        "lighting": "warm amber-bronze city uplight as rim on jaw, robe underside, and blade lower edge; cold key retained above",
+        "physics": "descent angle eased, not stopped; cloth settles from full stream to slower flutter; no hover",
+        "dialogue": "none",
+        "audio": "city ambience dominant: crowd, bells, forge; wind rush reduced; blade hum settles; music resolves to a held note",
+        "visible_end_state": "Stable frontal frame, rider centred, both feet planted on the sword, sword tip angled down toward the gate, Thiên Kiếm Thành gate and wall legible behind him, warm rim light from below, cold key from above, focus locked on the rider.",
+        "continuity": "SHOT_TO_SHOT_CONTINUITY handoff declared — this exact end-state is the opening condition of the next shot"
+      }
+    ],
+    "every_beat_declares_visible_end_state": true,
+    "beats_are_ordered_and_non_overlapping": true
+  },
+
+  "dialogue": {
+    "status": "NOT_APPLICABLE",
+    "reason": "The user request specifies no spoken line for this shot. Inventing dialogue would add a fact absent from the master input.",
+    "conditional_contract_if_dialogue_is_added_later": {
+      "language_declaration_required": true,
+      "expected_language": "vi (Vietnamese) unless the owner specifies another language or dialect",
+      "tts_friendly_phrasing_required": "short clauses, common syllables, one stressed line plus one broken/strained line where the descent physicality demands it",
+      "must_not_contradict": "actor_performance",
+      "marker_layer": "dialogue is marked separately from music and sound effects"
+    },
+    "locked_consistency_concepts": []
+  },
+
+  "audio": {
+    "layer_music": {
+      "declared": true,
+      "content": "Low sustained orchestral bed entering under BEAT-01, building through BEAT-02, resolving to a held note in BEAT-03.",
+      "explicit_no_default_music_assumption": "Music is declared deliberately. If the owner wants no music, this layer becomes an explicit 'no music' declaration rather than being left to the provider default."
+    },
+    "layer_sound_effects_per_beat": {
+      "BEAT-01": ["high-altitude wind rush (dominant)", "robe and sleeve snap", "low sword-blade hum"],
+      "BEAT-02": ["wind rush changes timbre as the camera comes around the subject", "blade hum rises", "first distant city ambience"],
+      "BEAT-03": ["city ambience dominant: crowd, bells, forge", "wind rush reduced", "blade hum settles"]
+    },
+    "layer_ambience_room_tone": "Continuous open-air altitude tone transitioning to a dense low-city tone. No interior reverb at any point.",
+    "marked_separately_from_dialogue": true,
+    "sound_bridge_used": "City ambience leaks forward into BEAT-02 before the city is visually legible — sound arrives before picture, which sells the descent speed."
+  },
+
+  "continuity": {
+    "concepts_locked_for_this_shot": {
+      "IMAGE_CONSISTENCY": {
+        "applies_to": "the bound reference stills and the BEAT-03 end frame",
+        "requirement": "Any single still taken from this shot must hold face, hair, proportions, costume, sword, and style.",
+        "sufficient_for_shot_acceptance": false
+      },
+      "VIDEO_TEMPORAL_CONSISTENCY": {
+        "applies_to": "the whole generation, especially the BEAT-02 arc",
+        "requirement": "Face, hair, costume, and sword must hold identity while moving, across frames, within this single generation. The arc is the highest-risk window and is called out explicitly.",
+        "sufficient_for_shot_acceptance": false
+      },
+      "SHOT_TO_SHOT_CONTINUITY": {
+        "applies_to": "the join between this shot's BEAT-03 end-state and the next generated shot",
+        "requirement": "The next shot opens on the declared end-state: same position, same pose, same light direction and colour temperature, same costume and sword state, same time of day.",
+        "satisfied_within_one_generation": false
+      }
+    },
+    "inequality_asserted": [
+      "IMAGE_CONSISTENCY != VIDEO_TEMPORAL_CONSISTENCY",
+      "VIDEO_TEMPORAL_CONSISTENCY != SHOT_TO_SHOT_CONTINUITY",
+      "IMAGE_CONSISTENCY != SHOT_TO_SHOT_CONTINUITY"
+    ],
+    "why_the_inequality_matters_here": "A still from BEAT-01 can pass IMAGE_CONSISTENCY while the face melts during the BEAT-02 arc (VIDEO_TEMPORAL_CONSISTENCY failure). And this shot can pass both while still failing to join the next shot if the BEAT-03 end-state is not carried forward (SHOT_TO_SHOT_CONTINUITY failure).",
+    "global_lock_statements_repeated_per_shot": [
+      "Lý Trường Sinh: same face, same hair, same body proportions, same costume, same single sword — identical to the bound references in every beat.",
+      "Exactly one sword in frame at all times.",
+      "Cold blue-grey at altitude warming to amber-bronze at the city; the colour arc never reverses.",
+      "Late afternoon descending to dusk; never night, never midday.",
+      "Xianxia cultivation world; no modern object, material, or structure."
+    ],
+    "prop_and_costume_state_ledger": {
+      "sword": {
+        "BEAT-01": "ridden, blade flat under both feet, tip forward-down, unsheathed-glow faint, intact",
+        "BEAT-02": "ridden, same orientation, same faint glow, intact",
+        "BEAT-03": "ridden, tip angled further down toward the gate, same faint glow, intact",
+        "state_change_without_stated_cause": "PROHIBITED"
+      },
+      "costume": {
+        "BEAT-01": "full airflow stream, robe panels and sleeves trailing backward-upward",
+        "BEAT-02": "same stream direction, unchanged through the arc",
+        "BEAT-03": "settling from full stream to slower flutter; same garments, same wear state",
+        "state_change_without_stated_cause": "PROHIBITED"
+      }
+    },
+    "bound_reference_slots": ["PREVIOUS_SHOT_FINAL_FRAME (NOT_APPLICABLE — this is shot 1 of the sequence)"]
+  },
+
+  "negative_constraints": {
+    "global_layer": [
+      "no face melt, identity drift, or facial feature re-shaping during motion",
+      "no age drift, no beautification drift, no plastic or rubbery skin",
+      "no extra or missing limbs, fingers, or feet",
+      "no second sword, no duplicated prop, no prop re-colouring",
+      "no second rider or passenger on the sword",
+      "no modern object, material, vehicle, wiring, or structure",
+      "no subtitles, no captions, no on-screen text, no logo, no watermark",
+      "no assumed default background music beyond the declared music layer",
+      "no anime-flat shading, no glossy game-render look",
+      "no camera clipping through the subject, the blade, or the cloud volume"
+    ],
+    "scene_specific_layer": [
+      "Thiên Kiếm Thành gate and wall must NOT be legible before BEAT-03; in BEAT-01 it is a distant silhouette only (temporal gating)",
+      "no orbit loop and no reverse arc in BEAT-02 — the arc runs once, rear to frontal, and stops at frontal",
+      "no second principal camera move inside any single beat",
+      "no daylight-to-night flip and no cloud-deck re-brightening after BEAT-01",
+      "no sword glow colour change between beats",
+      "rider must NOT look into the lens in BEAT-01 or BEAT-02; direct lens contact is permitted only in BEAT-03 if the owner asks for it",
+      "no hovering, no zero-speed descent, no frozen cloth or hair",
+      "no defocus or unfinished focus pull in BEAT-03 — the end frame is the chain handoff and must be sharp",
+      "no city scale change between beats"
+    ],
+    "output_purity_declaration": "Clean picture only: no subtitles, no logo, no watermark, no injected text.",
+    "both_layers_present": true,
+    "temporal_gating_used": true
+  },
+
+  "model_specific_projection": {
+    "status": "PROJECTED_SEPARATELY",
+    "projection_artifact": "ly-truong-sinh-sword-descent.provider-projection.json",
+    "direction": "CANONICAL_MASTER_SPEC -> SHORT_PROVIDER_SPECIFIC_PROMPT",
+    "master_spec_remains_provider_neutral": true,
+    "projection_is_one_way_lossy_and_recorded": true,
+    "projections_authored_for_this_validation": 1,
+    "provider_profile_used": "NONE_VERIFIED — all profile fields are UNKNOWN_UNTIL_VERIFIED_PROFILE",
+    "hard_coded_prompt_length_constant_used": false,
+    "budget_source": "SUPPLIED_BY_CALLER_FOR_THIS_VALIDATION_ONLY",
+    "structured_prompt_assumption": "NOT_ASSUMED — projection flattens to natural-language prose because accepts_labelled_structured_prompt is UNKNOWN",
+    "reduction_policy_summary": {
+      "keep_priority_order": [
+        "identity lock (face, hair, proportions, costume, single sword)",
+        "principal action per beat",
+        "one camera move per beat, in order",
+        "light source and colour arc",
+        "scene-specific prohibitions that gate the reveal",
+        "visible end-state"
+      ],
+      "drop_first": [
+        "extended rationale and subtext analysis",
+        "redundant restatements",
+        "the consistency taxonomy labels themselves",
+        "the caller-control provenance block",
+        "audio layering detail beyond the dominant cue per beat"
+      ],
+      "compress_never_invent": true
+    }
+  },
+
+  "chain_handoff": {
+    "shot_index": 1,
+    "handoff_artifact": "the BEAT-03 visible_end_state frame",
+    "conditioning_concept_for_next_shot": "PREVIOUS_SHOT_FINAL_FRAME + CANONICAL_CHARACTER_REFERENCE + NEXT_SHOT_SPEC",
+    "rule": "The canonical character reference stays bound on the next shot. The previous final frame supplies state only (pose, position, light, prop state, framing) and must never replace identity.",
+    "consistency_problem_class": "SHOT_TO_SHOT_CONTINUITY",
+    "execution_status": "KNOWLEDGE_ONLY — no chaining executed, no video generated"
+  },
+
+  "reference_binding": {
+    "rule": "REFERENCE SLOT -> ADOPT -> EXCLUDE",
+    "schema_reused": "p2p-visual-reference-pack/1",
+    "schema_path": "docs/p2p-development/capability-catalog/game-asset-forge/visual-reference-pack.schema.json",
+    "second_character_reference_schema_created": false,
+    "slots": [
+      {
+        "slot": "CHARACTER_REFERENCE",
+        "subject": "Lý Trường Sinh",
+        "bound_to_schema": "p2p-visual-reference-pack/1",
+        "view_ids_used": [
+          "full_body_front",
+          "full_body_three_quarter",
+          "full_body_side",
+          "full_body_back",
+          "face_front",
+          "face_three_quarter"
+        ],
+        "binding_form": "path + sha256 per view, exactly as p2p-visual-reference-pack/1 already requires",
+        "instance_available_at_validation": false,
+        "instance_note": "No reference stills exist for this synthetic validation. The slot declares its binding contract; the validation proves the spec shape, not a real asset.",
+        "ADOPT": [
+          "face",
+          "hair",
+          "body proportions",
+          "outfit"
+        ],
+        "EXCLUDE": [
+          "source background",
+          "unrelated characters",
+          "unrelated props",
+          "source pose lock",
+          "source lighting"
+        ]
+      },
+      {
+        "slot": "COSTUME_REFERENCE",
+        "subject": "Lý Trường Sinh's cultivation robe set",
+        "ADOPT": [
+          "garment cut",
+          "length",
+          "closure",
+          "colour",
+          "material",
+          "wear state",
+          "sash and ribbon placement"
+        ],
+        "EXCLUDE": [
+          "other garments present in the source image",
+          "source background",
+          "source pose",
+          "any second character's clothing"
+        ]
+      },
+      {
+        "slot": "SYMBOLIC_PROP_REFERENCE",
+        "subject": "the sword (canonical story-bearing prop)",
+        "own_slot_reason": "A unique symbolic prop receives its own slot so that prop state stays a visible plot event instead of being hidden inside the character slot.",
+        "ADOPT": [
+          "blade geometry and length",
+          "guard shape",
+          "grip and pommel",
+          "material and finish",
+          "colour",
+          "identifying marks",
+          "declared physical state at each appearance"
+        ],
+        "EXCLUDE": [
+          "other objects in the source image",
+          "unintended duplicate props",
+          "source background",
+          "source hand pose"
+        ]
+      },
+      {
+        "slot": "WORLD_REFERENCE",
+        "subject": "Thiên Kiếm Thành and the mountain region",
+        "ADOPT": [
+          "architecture and wall/gate form",
+          "terrain and mountain mass",
+          "city scale",
+          "roof and lantern vocabulary",
+          "world rules"
+        ],
+        "EXCLUDE": [
+          "any person present in the source image",
+          "source camera angle lock",
+          "source time of day if it conflicts with this shot's stated lighting",
+          "modern intrusions"
+        ]
+      },
+      {
+        "slot": "STYLE_REFERENCE",
+        "subject": "xianxia cinematic art direction",
+        "ADOPT": [
+          "art direction and medium",
+          "palette contract",
+          "grain and optical character",
+          "atmospheric-perspective treatment"
+        ],
+        "EXCLUDE": [
+          "the style source's subject matter",
+          "the style source's characters",
+          "the style source's props",
+          "any watermark or signature"
+        ]
+      },
+      {
+        "slot": "PREVIOUS_SHOT_FINAL_FRAME",
+        "subject": "not applicable — this is shot 1",
+        "status": "NOT_APPLICABLE",
+        "reason": "No prior shot exists. The slot is declared anyway so that shot 2 inherits the contract instead of reinventing it.",
+        "ADOPT": [
+          "end-state pose",
+          "end-state position",
+          "end-state lighting direction and colour temperature",
+          "end-state prop state",
+          "end-state framing"
+        ],
+        "EXCLUDE": [
+          "the previous shot's camera move",
+          "the previous shot's beat structure",
+          "identity replacement — the canonical character reference stays bound"
+        ]
+      }
+    ],
+    "every_slot_declares_ADOPT_and_EXCLUDE": true,
+    "unbound_references_rejected": true
+  },
+
+  "non_goals_verified_for_this_artifact": {
+    "video_rendered": false,
+    "provider_api_called": false,
+    "dependency_installed": false,
+    "model_weights_downloaded": false,
+    "paid_video_generation_used": false,
+    "video_studio_created": false,
+    "second_router_or_registry_or_orchestrator_created": false,
+    "database_server_daemon_or_queue_created": false,
+    "typed_schema_or_validator_framework_created": false,
+    "separate_capabilities_created": [],
+    "third_party_prompt_corpus_vendored": false
+  }
+}
