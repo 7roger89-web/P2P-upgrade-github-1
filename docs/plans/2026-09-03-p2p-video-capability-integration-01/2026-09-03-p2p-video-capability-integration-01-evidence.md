@@ -555,3 +555,23 @@ to close the declared bounded-scope deviations (intake ledger `RI` id collision,
 `capability-index`/roadmap records, release-lock regeneration, human-projection
 staleness), and (d) whether to open a verified provider-profile goal through the
 governed Live Specs path before any real video generation is attempted.
+
+---
+
+## E10 — Commit and pull-request closure evidence
+
+| Field | Value |
+| --- | --- |
+| `BASE_MAIN_SHA` | `c1ddc4fdbc3bf6639a5f3e3f171a7fb5c1df6352` |
+| `BRANCH` | `arena/01a0664a-p2p-upgrade-github-1` (Arena session-fixed; see deviation 1 in the plan) |
+| `IMPLEMENTATION_COMMIT` | `901a7ab0c481132059fede8451aaaa649d6622d9` (11 files: 3 modified, 8 added) |
+| `IMPLEMENTATION_TREE` | `afddcebc65a010098c464a2bfb62f57d4f74d7b2` |
+| `PR_NUMBER` | `73` — `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/73` |
+| `PR_BASE` | `main` |
+| `PR_HEAD` | `arena/01a0664a-p2p-upgrade-github-1` |
+| `PR_STATE` | `OPEN`, not draft |
+| `MERGED` | **`NO`** — not merged, not deployed. `OWNER_GATE_REQUIRED=YES` |
+| Branches created | exactly one |
+| Pull requests opened | exactly one |
+
+`P2P_VIDEO_CAPABILITY_INTEGRATION_01 = READY_FOR_OWNER_MERGE_GATE`
