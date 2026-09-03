@@ -1,0 +1,119 @@
+{
+  "artifact": "PROVIDER_PROJECTION",
+  "projection_id": "VDS-VALIDATION-01-LY-TRUONG-SINH-SWORD-DESCENT-PROJ-01",
+  "capability": "video.prompt.director_spec",
+  "protocol_ref": "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md#5-provider-projection",
+  "derived_from": "ly-truong-sinh-sword-descent.master-spec.json",
+  "derived_from_spec_id": "VDS-VALIDATION-01-LY-TRUONG-SINH-SWORD-DESCENT",
+  "generated_at": "2026-09-03",
+  "projection_number_for_this_validation": 1,
+  "direction": "CANONICAL_MASTER_SPEC -> SHORT_PROVIDER_SPECIFIC_PROMPT",
+  "master_spec_remains_provider_neutral": true,
+  "master_spec_mutated_by_this_projection": false,
+  "one_way_lossy_recorded": true,
+
+  "target_provider_profile": {
+    "profile_slot": "UNNAMED_FLAT_PROSE_VIDEO_PROVIDER",
+    "named_provider": null,
+    "verified_profile_available": false,
+    "profile_fields_used": {
+      "input_prompt_budget": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "reference_image_support": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "reference_image_count": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "first_frame_support": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "last_frame_support": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "first_last_frame_support": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "multi_image_support": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "reference_to_video_support": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "duration_controls": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "aspect_ratio_controls": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "marker_syntax": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+      "accepts_labelled_structured_prompt": "UNKNOWN_UNTIL_VERIFIED_PROFILE"
+    },
+    "hard_coded_prompt_length_constant_applied": false,
+    "hard_coded_duration_or_aspect_constant_applied": false,
+    "providers_with_hard_coded_limits": []
+  },
+
+  "budget": {
+    "budget_used": "SHORT_FORM_FLAT_PROSE_SINGLE_PARAGRAPH_SET",
+    "budget_source": "SUPPLIED_BY_CALLER_FOR_THIS_VALIDATION_ONLY",
+    "budget_is_a_p2p_constant": false,
+    "verified_provider_profile_consulted": false,
+    "reduction_target": "preserve identity lock, both camera beats in order, light source and colour arc, the reveal-gating prohibition, and the visible end-state; drop rationale, taxonomy labels, and per-layer audio detail"
+  },
+
+  "format_decision": {
+    "structured_or_flat": "FLAT_NATURAL_LANGUAGE_PROSE",
+    "reason": "accepts_labelled_structured_prompt is UNKNOWN_UNTIL_VERIFIED_PROFILE, so the projection does not assume the provider parses labelled sections, field names, or marker syntax.",
+    "marker_syntax_used": "NONE",
+    "field_labels_emitted": false,
+    "language": "vi",
+    "language_reason": "matches the language of the user idea; a provider profile may later declare a required prompt language, none is verified now"
+  },
+
+  "prompt_text": "Lý Trường Sinh đứng trên thanh kiếm bay lao xuống Thiên Kiếm Thành; khuôn mặt, tóc, tỉ lệ cơ thể, trang phục và thanh kiếm giữ đúng ảnh tham chiếu, chỉ một thanh kiếm duy nhất trong khung hình. Đầu cảnh quay từ sau lưng chếch ba phần tư, máy quay đuổi sát cùng tốc độ rơi, giữ khoảng cách không đổi, mây sương lướt nhanh qua rìa khung hình, áo và tóc bị gió thổi ngược, thành phố chỉ là bóng mờ xa. Sau đó máy quay vòng cung một vòng liên tục duy nhất từ sau lưng sang chính diện, không vòng tròn, không đảo chiều, dừng đúng chính diện ngang tầm mặt; ánh sáng chủ đạo xoay từ viền sau sang nghiêng ba phần tư làm khuôn mặt rõ dần. Kết cảnh máy quay giữ cố định chính diện, nhân vật giữa khung hình, hai chân vững trên kiếm, mũi kiếm chếch xuống cổng thành, cổng và tường Thiên Kiếm Thành rõ nét phía sau, đèn thành hắt ấm từ dưới lên, ánh lạnh từ trên cao vẫn giữ, tiêu điểm khóa vào nhân vật. Chiều muộn trên cao lạnh xanh xám, ấm dần sang hổ phách khi xuống gần thành, vòng màu không đảo ngược. Rơi có gia tốc rồi giữ tốc ổn định, kiếm chúi nhẹ chịu sức nặng người cưỡi, phối cảnh xa gần đúng, không lơ lửng. Cấm: cổng thành hiện rõ trước khi máy quay vòng sang chính diện; mặt biến dạng hoặc đổi nét khi đang chuyển động; thêm người hoặc thêm kiếm; áo và tóc đứng yên; vật thể hiện đại; phụ đề, chữ, logo, hình mờ.",
+
+  "prompt_text_measurement": {
+    "character_count": 1317,
+    "sentence_count": 7,
+    "sentence_count_definition": "period-terminated sentences in prompt_text",
+    "camera_beats_expressed": 2,
+    "camera_beats_expressed_note": "rear chase follow, then one continuous arc to frontal. The frontal hold is expressed as the end-state clause, not as a third move.",
+    "master_spec_source_bytes": 31111,
+    "projection_is_shorter_than_master_spec": true,
+    "measured_not_a_limit": true,
+    "note": "A property of this output, never a P2P-imposed provider limit. character_count is asserted equal to len(prompt_text) by the focused validation so it cannot drift."
+  },
+
+  "reduction_record": {
+    "kept": {
+      "identity_constraints": "face, hair, body proportions, costume, single sword — restated in words",
+      "camera": "BEAT-01 rear chase follow, then BEAT-02 single continuous arc to frontal, then the frontal hold with locked focus — in order, one principal move each",
+      "lighting": "light source rotation from rear rim to three-quarter side, warm city uplight at the end, cold key retained, colour arc with no reversal",
+      "physics": "acceleration then terminal rate, blade loading, cloth and hair airflow, correct parallax, no hovering",
+      "timeline": "the visible end-state of the shot",
+      "negative_constraints": "the reveal-gating prohibition (city gate not legible before the arc completes) plus the global anti-artifact set compressed into one clause",
+      "continuity": "compressed into the identity-lock clause; taxonomy labels dropped"
+    },
+    "dropped_fields": [
+      "dialogue (NOT_APPLICABLE in the master spec)",
+      "audio three-layer detail (music bed, per-beat effect list, ambience tone, sound bridge)",
+      "consistency taxonomy concept labels",
+      "reference_binding slot table (slots stay bound at the master-spec level; the prompt only carries their effect)",
+      "caller_supplied_controls provenance block",
+      "chain_handoff block",
+      "non_goals_verified_for_this_artifact",
+      "per-beat subtext and intention analysis",
+      "min_window_guideline notes",
+      "camera_move_psychological_verb annotations"
+    ],
+    "compressed_fields": [
+      "three timeline beats -> one ordered sentence chain (chase, arc, hold) with the end-state kept verbatim in effect",
+      "ten global negative constraints -> one compressed prohibition clause",
+      "nine scene-specific negative constraints -> the single one that gates the reveal, kept explicit; the rest are implied by the beat discipline",
+      "three lighting layers -> one clause naming source rotation, uplight, retained cold key, and the colour arc",
+      "seven physics rules -> one clause"
+    ],
+    "invented_facts": [],
+    "compress_never_invent_respected": true,
+    "reversible_to_master_spec": "YES — every clause maps back to a named master-spec field; the dropped fields are enumerated above"
+  },
+
+  "provider_side_controls_not_in_prompt_text": {
+    "duration": "caller_supplied_controls.shot_duration (12s) is set through the provider's own duration control if it has one; it is not written into the prompt text",
+    "aspect_ratio": "caller_supplied_controls.aspect_ratio (2.35:1) is set through the provider's own aspect control if it has one; it is not written into the prompt text",
+    "reference_images": "CHARACTER_REFERENCE, COSTUME_REFERENCE, SYMBOLIC_PROP_REFERENCE, WORLD_REFERENCE, STYLE_REFERENCE are attached through the provider's own reference slots if it has them; none is verified as available at this integration",
+    "reason": "Whether any of these belong in prompt text is a provider-profile decision, and no profile is verified."
+  },
+
+  "execution_status": {
+    "submitted_to_any_provider": false,
+    "provider_api_called": false,
+    "credentials_used": false,
+    "video_rendered": false,
+    "paid_video_generation_used": false,
+    "artifact_returned_by_a_provider": null,
+    "note": "This projection is prompt text only. Submitting it to any provider, and any paid generation, is an OWNER GATE."
+  }
+}

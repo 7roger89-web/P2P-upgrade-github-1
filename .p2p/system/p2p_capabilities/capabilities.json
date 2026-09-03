@@ -5252,6 +5252,434 @@
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "video.prompt.director_spec",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Provider-neutral master video-direction specification. Turns a user idea plus canonical references, action, style/world intent, and camera intent into a reusable 12-field director spec, then projects that spec down to one short provider-specific prompt. Prompt-direction knowledge only: not a video renderer, generator, provider, API client, backend, or runtime.",
+      "TRIGGERS": [
+        "video.prompt.director_spec",
+        "video prompt",
+        "video direction",
+        "video director",
+        "director spec",
+        "master director spec",
+        "ai video",
+        "ai-video",
+        "video generation prompt",
+        "text-to-video prompt",
+        "image-to-video prompt",
+        "cinematic video prompt",
+        "shot spec",
+        "camera beat",
+        "camera choreography",
+        "video beat sheet",
+        "video continuity",
+        "shot chaining",
+        "provider prompt projection",
+        "prompt video",
+        "video ai",
+        "tạo video",
+        "làm video",
+        "quay video",
+        "dựng video",
+        "kịch bản video",
+        "phân cảnh video",
+        "cảnh quay video",
+        "mô tả cảnh quay",
+        "chỉ đạo cảnh quay"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "whiteboard",
+        "whiteboard animation",
+        "srt",
+        "subtitle translation",
+        "image prompt",
+        "image-generation prompt",
+        "style library",
+        "gpt-image-2",
+        "storyboard image",
+        "three.js",
+        "webgl",
+        "browser performance",
+        "marketing",
+        "ad copy",
+        "slogan",
+        "campaign",
+        "brand copy",
+        "install",
+        "npm",
+        "pip",
+        "download",
+        "model weights",
+        "checkpoint",
+        "gpu",
+        "cuda",
+        "api key",
+        "backend",
+        "database",
+        "queue",
+        "daemon",
+        "server",
+        "video api",
+        "execute video generation",
+        "run video generation",
+        "paid video generation",
+        "video hosting",
+        "video upload",
+        "video library",
+        "publish"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "p2p-visual-reference-pack/1",
+        "research-adoption-ledger",
+        "provider-neutral-master-spec",
+        "owner-gate-before-any-video-runtime"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "render-or-generate-video",
+        "execute-external-video-api",
+        "hold-provider-credentials",
+        "install-video-backend-or-runtime",
+        "vendor-third-party-prompt-corpus",
+        "download-model-weights",
+        "create-second-router-registry-or-orchestrator",
+        "create-second-character-reference-schema",
+        "expand-visual.gpt_image_2_style_library-into-video-direction",
+        "route-generic-video-direction-into-media.whiteboard_animation",
+        "hard-code-permanent-provider-prompt-length-or-duration-constant",
+        "execute-shot-chaining",
+        "claim-generation-success-without-durable-returned-artifact",
+        "create-p2p-video-studio"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md",
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md",
+        "docs/p2p-development/capability-catalog/video-director-spec/README.md",
+        "docs/p2p-development/capability-catalog/game-asset-forge/visual-reference-pack.schema.json",
+        "governance/research-adoption-ledger.json"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "owner-gate-before-any-video-runtime",
+        "owner-gate-before-provider-credentials",
+        "owner-gate-before-paid-video-generation",
+        "owner-gate-before-infrastructure-commitment",
+        "license-gate",
+        "model-weight-gate",
+        "p2p-integration-candidate-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "selected-route",
+        "master-spec-twelve-fields-present",
+        "reference-slot-adopt-and-exclude-declared",
+        "one-principal-camera-move-per-beat-or-recorded-deviation",
+        "visible-end-state-per-beat",
+        "consistency-concepts-named-and-distinguished",
+        "single-provider-projection-shorter-than-master-spec",
+        "projection-budget-source-recorded-not-hard-coded",
+        "exact-upstream-pins-and-cc-by-4.0-attribution",
+        "no-render-no-api-no-install-no-weights"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "SEMANTIC_KIND": "SKILL",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "P2P_NATIVE_KNOWLEDGE_DERIVATION",
+        "implementation": "p2p-video-director-spec-bounded-derived-reference",
+        "dual_classification": [
+          "KNOWLEDGE_SOURCE",
+          "MODEL_ROUTABLE_SKILL"
+        ],
+        "source": "P2P-VIDEO-RESEARCH-01 (research-only, complete) + P2P-VIDEO-CAPABILITY-INTEGRATION-01",
+        "owner_authorization": "GitHub Issue #71 (7roger89-web/P2P-upgrade-github-1)",
+        "scope": "ai_video_prompt_direction_knowledge",
+        "catalog_path": "docs/p2p-development/capability-catalog/video-director-spec",
+        "adoption_ledger": "governance/research-adoption-ledger.json",
+        "adoption_record_ids": [
+          "RA-EXT-070",
+          "RA-EXT-071",
+          "RA-EXT-072",
+          "RA-EXT-073",
+          "RA-EXT-074",
+          "RA-EXT-075",
+          "RA-EXT-076",
+          "RA-EXT-077"
+        ],
+        "repos_reviewed": 7,
+        "primary_method_provenance": {
+          "upstream_repository": "https://github.com/jacobye2017-afk/jacob-ye-seedance-prompt",
+          "upstream_commit": "f74d2fcfa803cec4007fdfbeae9cde8831693ee7",
+          "upstream_tree": "883377396a8c945d8d1f9ff4a37cde73a9bca6e6",
+          "upstream_default_branch": "master",
+          "upstream_pushed_at": "2026-08-24T06:18:44Z",
+          "license": {
+            "kind": "CC-BY-4.0",
+            "attribution_required": true,
+            "copyright": "Copyright (c) 2026 Jacob Ye",
+            "notice": "JACOB YE · SEEDANCE PROMPT. Licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0) — https://creativecommons.org/licenses/by/4.0/",
+            "upstream_notice_file": "NOTICE",
+            "incorporated_upstream_credits_preserved": [
+              "ByteDance Seedance 2.5 official prompt guide (2026-07-31)",
+              "Seedance 2.5 production reference by Serge Shima, smixs/visual-skills (CC BY 4.0)",
+              "MapleShaw/seedance2.0-prompt-skill"
+            ]
+          },
+          "attribution_carried_in": "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md",
+          "vendored": false,
+          "copied_files": [],
+          "adoption_record": "RA-EXT-070"
+        },
+        "knowledge_only_sources": [
+          {
+            "upstream_repository": "https://github.com/opensource-works/awesome-seedance-prompts",
+            "upstream_commit": "5ba05bc9849b4502e282fce329ff7ba741bcca18",
+            "upstream_tree": "dc83da241e87d8a95cb980b1241346ef59223a01",
+            "license": "NOASSERTION",
+            "treatment": [
+              "PROMPT_CORPUS",
+              "BENCHMARK_REFERENCE",
+              "READ_ONLY"
+            ],
+            "vendored": false,
+            "reason_not_vendored": "Third-party prompt corpus; NOASSERTION licence blocks executable projection under the existing P2P licence gate.",
+            "adoption_record": "RA-EXT-071"
+          },
+          {
+            "upstream_repository": "https://github.com/Wan-Video/Wan2.2",
+            "upstream_commit": "42bf4cfaa384bc21833865abc2f9e6c0e67233dc",
+            "upstream_tree": "553393a92dbf6ffc81250a237523d3415f607a52",
+            "license": "Apache-2.0",
+            "treatment": [
+              "MODEL_ADAPTER_CANDIDATE",
+              "FUTURE_BACKEND"
+            ],
+            "vendored": false,
+            "runtime_installed": false,
+            "model_weights_downloaded": false,
+            "adoption_record": "RA-EXT-072"
+          },
+          {
+            "upstream_repository": "https://github.com/ali-vilab/VACE",
+            "upstream_commit": "48eb44f1c4be87cc65a98bff985a26976841e9f3",
+            "upstream_tree": "a54245198942cc85989cc22a68adef248bb09727",
+            "license": "Apache-2.0",
+            "treatment": [
+              "KNOWLEDGE_REFERENCE"
+            ],
+            "scope": "conditioning_and_control_slot_vocabulary_only",
+            "vendored": false,
+            "runtime_installed": false,
+            "adoption_record": "RA-EXT-073"
+          },
+          {
+            "upstream_repository": "https://github.com/KlingAIResearch/ReCamMaster",
+            "upstream_commit": "fcf98bc86e876bb534518cd99e8a65b282f0f16e",
+            "upstream_tree": "dc290b5e97f8f2b00da539f3c2459dd73eea2ed5",
+            "license": "MIT",
+            "treatment": [
+              "KNOWLEDGE_REFERENCE",
+              "BENCHMARK_ONLY"
+            ],
+            "scope": "ai_video_camera_vocabulary_only",
+            "vendored": false,
+            "runtime_installed": false,
+            "checkpoint_downloaded": false,
+            "dataset_downloaded": false,
+            "adoption_record": "RA-EXT-074"
+          },
+          {
+            "upstream_repository": "https://github.com/divolleggett/awesome-character-consistency",
+            "upstream_commit": "81ec30770ae70ad2602997f258292a4e6bb3e9d6",
+            "upstream_tree": "a1c380e033e58e3c16023be944002ee158848676",
+            "license": "NOASSERTION",
+            "treatment": [
+              "KNOWLEDGE_REFERENCE"
+            ],
+            "scope": "consistency_taxonomy_only",
+            "vendored": false,
+            "adoption_record": "RA-EXT-075"
+          },
+          {
+            "upstream_repository": "https://github.com/harry0703/MoneyPrinterTurbo",
+            "upstream_commit": "cbbb366393105d5cefc254dc9ed492d43da0711b",
+            "upstream_tree": "2f86fab447e1b438b80f6079961d80a79ca0e385",
+            "license": "MIT",
+            "treatment": [
+              "POST_PRODUCTION_REFERENCE",
+              "FUTURE_BACKEND"
+            ],
+            "vendored": false,
+            "installed": false,
+            "wrapped": false,
+            "adoption_record": "RA-EXT-076"
+          },
+          {
+            "upstream_repository": null,
+            "source_artifact": "SEEDANCE-2.5-SOLO-SKYDIVE-LIVE-TV-JP-01",
+            "source_type": "SESSION_DERIVED_ARTIFACT",
+            "treatment": [
+              "KNOWLEDGE_REFERENCE"
+            ],
+            "scope": "prompt_architecture_only",
+            "vendored": false,
+            "adoption_record": "RA-EXT-077"
+          }
+        ],
+        "reference_binding_schema": "p2p-visual-reference-pack/1",
+        "reference_binding_schema_path": "docs/p2p-development/capability-catalog/game-asset-forge/visual-reference-pack.schema.json",
+        "second_character_reference_schema_created": false,
+        "consistency_taxonomy": [
+          "IDENTITY_CONSISTENCY",
+          "HAIR_CONSISTENCY",
+          "BODY_PROPORTION_CONSISTENCY",
+          "COSTUME_CONSISTENCY",
+          "PROP_WEAPON_CONSISTENCY",
+          "ENVIRONMENT_CONSISTENCY",
+          "STYLE_CONSISTENCY",
+          "IMAGE_CONSISTENCY",
+          "VIDEO_TEMPORAL_CONSISTENCY",
+          "SHOT_TO_SHOT_CONTINUITY"
+        ],
+        "consistency_inequality_asserted": [
+          "IMAGE_CONSISTENCY != VIDEO_TEMPORAL_CONSISTENCY",
+          "VIDEO_TEMPORAL_CONSISTENCY != SHOT_TO_SHOT_CONTINUITY",
+          "IMAGE_CONSISTENCY != SHOT_TO_SHOT_CONTINUITY"
+        ],
+        "consistency_engine_built": false,
+        "master_spec_fields": [
+          "identity_constraints",
+          "scene",
+          "actor_performance",
+          "camera",
+          "lighting",
+          "physics",
+          "timeline",
+          "dialogue",
+          "audio",
+          "continuity",
+          "negative_constraints",
+          "model_specific_projection"
+        ],
+        "typed_schema_or_validator_framework_created": false,
+        "separate_capabilities_created_for": [],
+        "camera_rule": {
+          "rule": "ONE_PRINCIPAL_CAMERA_MOVE_PER_BEAT",
+          "status": "DIRECTOR_RULE_NOT_UNIVERSAL_VALIDATOR",
+          "universal_hard_validator_built": false,
+          "deviation_allowed_with_recorded_reason": true
+        },
+        "provider_projection": {
+          "direction": "CANONICAL_MASTER_SPEC -> SHORT_PROVIDER_SPECIFIC_PROMPT",
+          "master_spec_provider_neutral": true,
+          "provider_api_implemented": false,
+          "profiles_verified_at_integration": 0,
+          "profile_field_status": "UNKNOWN_UNTIL_VERIFIED_PROFILE",
+          "profile_fields": [
+            "input_prompt_budget",
+            "reference_image_support",
+            "reference_image_count",
+            "first_frame_support",
+            "last_frame_support",
+            "first_last_frame_support",
+            "multi_image_support",
+            "reference_to_video_support",
+            "duration_controls",
+            "aspect_ratio_controls",
+            "marker_syntax",
+            "accepts_labelled_structured_prompt"
+          ],
+          "hard_coded_prompt_length_constants": "NONE",
+          "providers_with_hard_coded_limits": [],
+          "runtime_authoritative_provider_data_path": "existing governed FACT_LEDGER -> Live Specs promotion only"
+        },
+        "shot_chaining": {
+          "status": "KNOWLEDGE_ONLY",
+          "pattern": "CANONICAL_CHARACTER_REFERENCE + PREVIOUS_SHOT_FINAL_FRAME + NEXT_SHOT_SPEC -> NEXT_VIDEO_GENERATION",
+          "conditioning_concepts": [
+            "REFERENCE_IMAGE",
+            "FIRST_FRAME",
+            "LAST_FRAME",
+            "FIRST_LAST_FRAME",
+            "MULTI_IMAGE_REFERENCE",
+            "REFERENCE_TO_VIDEO"
+          ],
+          "execution_built": false,
+          "video_generated": false
+        },
+        "post_production_reference": {
+          "source": "harry0703/MoneyPrinterTurbo",
+          "status": "KNOWLEDGE_ONLY",
+          "pipeline": [
+            "SCRIPT",
+            "MATERIAL",
+            "NARRATION",
+            "SUBTITLE",
+            "MUSIC",
+            "RENDER",
+            "FINAL_ARTIFACT"
+          ],
+          "owner_gates": [
+            "API_CREDENTIALS",
+            "PAID_VIDEO_GENERATION",
+            "INFRASTRUCTURE_RUNTIME_COMMITMENT"
+          ],
+          "generation_retry": "BOUNDED",
+          "generation_failure_counts_as_pipeline_advance": false,
+          "final_output_requirement": "DURABLE_RETURNED_ARTIFACT",
+          "executable_integration": false,
+          "installed": false,
+          "vendored": false,
+          "wrapped": false
+        },
+        "video_studio_created": false,
+        "new_router_created": false,
+        "new_registry_created": false,
+        "new_orchestrator_created": false,
+        "new_database_created": false,
+        "new_server_created": false,
+        "new_queue_created": false,
+        "new_daemon_created": false,
+        "network_runtime": false,
+        "credentials": false,
+        "install_mode": "DISABLED",
+        "dependency_mode": "NONE",
+        "model_weights_downloaded": false,
+        "video_runtime_installed": false,
+        "paid_video_generation_used": false,
+        "execution_authorized": false,
+        "integration": {
+          "entrypoint": "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md",
+          "load_mode": "ON_DEMAND",
+          "selection_mode": "ROUTE_SELECTED_ONLY",
+          "dependency_mode": "NONE",
+          "dependency_probe": null,
+          "references": [
+            "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md",
+            "docs/p2p-development/capability-catalog/video-director-spec/README.md"
+          ],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": false,
+          "credentials": false,
+          "install_mode": "DISABLED",
+          "external_render": "NOT_APPLICABLE",
+          "browser_runtime": false,
+          "provider_runtime": false
+        },
+        "CERTIFIED": "P2P-VIDEO-CAPABILITY-INTEGRATION-01",
+        "freshness": "CURRENT",
+        "pins_resolved_at": "2026-09-03",
+        "update_policy": "re-resolve upstream pins and re-record adoption before adopting any new upstream method; no in-place mutation of attribution"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
     }
   ]
 }

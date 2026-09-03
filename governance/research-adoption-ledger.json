@@ -2303,6 +2303,326 @@
       "owner_decision_status": "CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE",
       "last_reviewed_at": "2026-09-01T00:00:00Z",
       "notes": "P2P-IMPECCABLE-01 / issue #44. REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY. AVAILABLE != LOADED != AUTHORIZED != EXECUTED."
+    },
+    {
+      "research_id": "RA-EXT-070",
+      "source_name": "jacobye2017-afk/jacob-ye-seedance-prompt",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/jacobye2017-afk/jacob-ye-seedance-prompt",
+      "source_version_or_commit": "commit f74d2fcfa803cec4007fdfbeae9cde8831693ee7 / tree 883377396a8c945d8d1f9ff4a37cde73a9bca6e6 (default branch master, upstream pushed_at 2026-08-24T06:18:44Z; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "CC-BY-4.0 director-first cinematic AI-video prompt methodology. Primary method provenance for P2P's video direction contract: reference separation with explicit exclusion, one action and one camera move per time window, mandatory visible end-state per beat, three-layer lighting, observable-signal performance, two-layer prohibitions with temporal gating, per-shot continuity lock restatement, camera move as psychological verb, separated sound layers, and bounded repair instead of full re-run.",
+      "selected_ideas": [
+        "director-first-authoring-master-spec-before-prompt",
+        "reference-separation-with-explicit-exclusion-declaration",
+        "one-action-and-one-camera-move-per-time-window",
+        "mandatory-visible-end-state-per-beat",
+        "three-layer-lighting-source-behaviour-colour-tone",
+        "performance-as-observable-physical-signal-with-intention",
+        "two-layer-prohibitions-global-plus-scene-specific-with-temporal-gating",
+        "continuity-lock-statements-repeated-per-shot-and-per-extension",
+        "concrete-costume-and-prop-state-specificity-to-prevent-drift",
+        "identifying-features-restated-in-words-even-when-reference-bound",
+        "camera-move-as-psychological-verb",
+        "sound-as-distinct-marked-layer-with-language-declaration",
+        "bounded-repair-from-known-end-state-instead-of-full-rerun"
+      ],
+      "rejected_ideas": [
+        "provider-specific-marker-syntax-as-p2p-output-format",
+        "any-numeric-prompt-length-constant-as-a-permanent-p2p-limit",
+        "any-provider-slot-count-or-reference-budget-constant",
+        "provider-compliance-and-platform-red-line-lists-as-p2p-facts",
+        "vendoring-or-mirroring-FORMULA.md",
+        "vendoring-upstream-examples-or-story-corpus",
+        "provider-named-assembly-template-as-the-canonical-master-spec"
+      ],
+      "p2p_translation": "PRIMARY_METHOD_PROVENANCE for the single new capability video.prompt.director_spec (KNOWLEDGE_SOURCE + MODEL_ROUTABLE SKILL, PURE_DATA). Restated in P2P's own words as a bounded derived reference; the master spec is provider-neutral and the provider-specific assembly stays a projection step. Attribution, upstream repository identity, and the pinned commit/tree are preserved. Full FORMULA.md deliberately not copied.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "video.prompt.director_spec"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 1 attribution notice, section 3.1 derived concepts)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (sections 1-5, 9)",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.primary_method_provenance",
+        "docs/plans/2026-09-03-p2p-video-capability-integration-01/validation/ly-truong-sinh-sword-descent.master-spec.json",
+        "tests/test_p2p_video_director_spec.py"
+      ],
+      "dependencies": [
+        "existing-p2p-router",
+        "p2p-visual-reference-pack/1"
+      ],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "P2P-VIDEO-CAPABILITY-INTEGRATION-01 / GitHub issue #71. CC-BY-4.0 attribution is mandatory and is carried verbatim in the derived reference and in the registry entry. LICENSE and NOTICE identity preserved, including the upstream NOTICE's own incorporated-source credits. Status is SELECTED, not IMPLEMENTED/VERIFIED: embodiment exists on the candidate branch only and promotion requires the Owner merge gate. No file from this repository was vendored."
+    },
+    {
+      "research_id": "RA-EXT-071",
+      "source_name": "opensource-works/awesome-seedance-prompts",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/opensource-works/awesome-seedance-prompts",
+      "source_version_or_commit": "commit 5ba05bc9849b4502e282fce329ff7ba741bcca18 / tree dc83da241e87d8a95cb980b1241346ef59223a01 (default branch main; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "REPOSITORY_NOT_VENDORED",
+      "research_summary": "Third-party community prompt corpus and video showcase. Licence reported as NOASSERTION at the pin. Empirically demonstrates that real in-the-wild AI-video prompts are short, flat, single-paragraph natural language and usually unstructured.",
+      "selected_ideas": [
+        "prompt-corpus-and-benchmark-reference-value-only",
+        "real-world-prompts-are-flat-unstructured-prose-therefore-a-flattening-projection-step-is-required"
+      ],
+      "rejected_ideas": [
+        "vendoring-any-third-party-prompt-text",
+        "vendoring-the-gallery-or-showcase-corpus",
+        "translating-or-redistributing-corpus-entries",
+        "treating-corpus-entries-as-verified-provider-facts",
+        "executable-projection-under-a-NOASSERTION-licence"
+      ],
+      "p2p_translation": "PROMPT_CORPUS + BENCHMARK_REFERENCE, READ_ONLY. Contributes one design consequence to video.prompt.director_spec: the master spec stays structured while the provider projection must be able to flatten to unstructured prose, because accepts_labelled_structured_prompt is UNKNOWN for every provider at this integration. No corpus content enters P2P.",
+      "capability_family": "RESEARCH_ONLY_REGISTER",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.2)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (section 4.5, section 5.3)",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.knowledge_only_sources[0]",
+        "docs/plans/2026-09-03-p2p-video-capability-integration-01/validation/ly-truong-sinh-sword-descent.provider-projection.json format_decision"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "NOASSERTION licence blocks executable projection under the existing P2P licence gate (same gate as the game-asset-forge catalog). Third-party prompt corpus is explicitly not vendored, per issue #71."
+    },
+    {
+      "research_id": "RA-EXT-072",
+      "source_name": "Wan-Video/Wan2.2",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Wan-Video/Wan2.2",
+      "source_version_or_commit": "commit 42bf4cfaa384bc21833865abc2f9e6c0e67233dc / tree 553393a92dbf6ffc81250a237523d3415f607a52 (Apache-2.0; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "REPOSITORY_NOT_VENDORED",
+      "research_summary": "Open-weight text/image-to-video model family. Recorded as a candidate future backend adapter surface: declared inputs (prompt, conditioning images, duration, resolution/aspect, seed) and declared outputs (artifact path, generation metadata).",
+      "selected_ideas": [
+        "model-adapter-candidate-shape-declared-inputs-and-declared-outputs",
+        "future-backend-candidate-for-an-owner-gated-video-runtime"
+      ],
+      "rejected_ideas": [
+        "runtime-installation",
+        "cloning-or-vendoring-the-repository",
+        "downloading-model-weights",
+        "adding-a-dependency-on-any-inference-stack",
+        "infrastructure-or-runtime-commitment-without-an-owner-gate",
+        "building-a-video-generator-inside-p2p"
+      ],
+      "p2p_translation": "MODEL_ADAPTER_CANDIDATE + FUTURE_BACKEND. No adapter, no runtime, no dependency, no weight. video.prompt.director_spec stays provider-neutral so that a future owner-gated adapter can consume the master spec without changing it. Any adapter work is a separate future goal behind OWNER GATE (infrastructure/runtime commitment) plus the existing licence and model-weight gates.",
+      "capability_family": "RESEARCH_ONLY_REGISTER",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.3)",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.knowledge_only_sources[1]",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec PROHIBITED_ACTIONS"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "deferred",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "DEFERRED with reason recorded, per the roadmap coverage-gate rule that a selected item may be deferred but must say why. Reason: no owner authorization for infrastructure/runtime commitment, and this goal is explicitly knowledge-only. MODEL_WEIGHTS_DOWNLOADED=NO, VIDEO_RUNTIME_INSTALLED=NO. Recorded by P2P-VIDEO-CAPABILITY-INTEGRATION-01 / GitHub issue #71; Owner authorization is issue #71."
+    },
+    {
+      "research_id": "RA-EXT-073",
+      "source_name": "ali-vilab/VACE",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/ali-vilab/VACE",
+      "source_version_or_commit": "commit 48eb44f1c4be87cc65a98bff985a26976841e9f3 / tree a54245198942cc85989cc22a68adef248bb09727 (Apache-2.0; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "All-in-one video creation and editing research model. Publishes task-level conditioning vocabulary: reference-to-video (R2V), video-to-video editing (V2V), masked video-to-video editing (MV2V), with composable control slots (move / swap / reference / expand / animate).",
+      "selected_ideas": [
+        "conditioning-and-control-slot-vocabulary-only",
+        "reference-to-video-as-a-named-conditioning-class",
+        "masked-editing-as-a-distinct-conditioning-class-useful-for-bounded-repair"
+      ],
+      "rejected_ideas": [
+        "runtime-installation",
+        "vendoring-inference-or-preprocess-code",
+        "downloading-model-checkpoints",
+        "running-any-benchmark",
+        "adopting-VACE-as-a-p2p-backend"
+      ],
+      "p2p_translation": "KNOWLEDGE_REFERENCE, conditioning and control-slot vocabulary only. Shapes the conditioning-concept list in video.prompt.director_spec section 6 (shot chaining knowledge) and the provider profile fields first_frame_support, last_frame_support, first_last_frame_support, multi_image_support, reference_to_video_support. Vocabulary only; no execution, no adapter.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "video.prompt.director_spec"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.4)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (section 5.2 profile fields, section 6 conditioning concepts)",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.knowledge_only_sources[3]"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "Vocabulary adopted, implementation not adopted. NO runtime installation, per issue #71."
+    },
+    {
+      "research_id": "RA-EXT-074",
+      "source_name": "KlingAIResearch/ReCamMaster",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/KlingAIResearch/ReCamMaster",
+      "source_version_or_commit": "commit fcf98bc86e876bb534518cd99e8a65b282f0f16e / tree dc290b5e97f8f2b00da539f3c2459dd73eea2ed5 (MIT; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "Camera-controlled generative re-rendering research (ICCV'25). Publishes a basic camera trajectory vocabulary used as neutral naming for a principal move: pan left/right, tilt up/down, zoom in/out, translate up/down with rotation, arc left/right with rotation. Also publishes a multi-camera synchronized dataset.",
+      "selected_ideas": [
+        "ai-video-camera-vocabulary-only-basic-trajectory-naming",
+        "arc-with-rotation-as-a-named-principal-move",
+        "benchmark-only-value-as-a-comparison-point-for-camera-controlled-regeneration"
+      ],
+      "rejected_ideas": [
+        "downloading-the-model-checkpoint",
+        "downloading-or-vendoring-the-MultiCamVideo-dataset",
+        "vendoring-training-or-inference-code",
+        "building-a-re-capture-pipeline",
+        "runtime-installation",
+        "treating-the-open-source-version-as-evidence-of-the-paper-model-performance"
+      ],
+      "p2p_translation": "KNOWLEDGE_REFERENCE + BENCHMARK_ONLY, AI-video camera vocabulary only. Supplies the neutral names used by video.prompt.director_spec section 4.3 so that a principal move such as an arc to frontal is unambiguous, and section 4.2 so that ONE PRINCIPAL CAMERA MOVE PER BEAT can be stated in words a provider profile could later match. No checkpoint, no dataset, no code, no execution.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "video.prompt.director_spec"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.5)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (section 4.2, section 4.3)",
+        "docs/plans/2026-09-03-p2p-video-capability-integration-01/validation/ly-truong-sinh-sword-descent.master-spec.json camera.beats[1].principal_camera_move",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.knowledge_only_sources[4]"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "Upstream itself states the open-source reference implementation may not match the paper model. Recorded as BENCHMARK_ONLY; no P2P performance claim derives from it. Recorded by P2P-VIDEO-CAPABILITY-INTEGRATION-01 / GitHub issue #71; Owner authorization is issue #71."
+    },
+    {
+      "research_id": "RA-EXT-075",
+      "source_name": "divolleggett/awesome-character-consistency",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/divolleggett/awesome-character-consistency",
+      "source_version_or_commit": "commit 81ec30770ae70ad2602997f258292a4e6bb3e9d6 / tree a1c380e033e58e3c16023be944002ee158848676 (licence NOASSERTION; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "Curated list on character consistency. Structurally separates image identity and consistency material from video consistency material and from storyboard/agentic workflow material, which corroborates that character consistency is not one problem.",
+      "selected_ideas": [
+        "consistency-taxonomy-only",
+        "image-identity-consistency-is-a-different-problem-from-video-consistency",
+        "storyboard-and-agentic-workflow-consistency-is-a-third-problem-class"
+      ],
+      "rejected_ideas": [
+        "mirroring-the-link-list-or-paper-list",
+        "vendoring-any-workflow-or-node-graph",
+        "integrating-any-hosted-api",
+        "executable-projection-under-a-NOASSERTION-licence",
+        "building-an-executable-consistency-engine"
+      ],
+      "p2p_translation": "KNOWLEDGE_REFERENCE, consistency taxonomy only. External corroboration for the inequality P2P asserts in video.prompt.director_spec section 3.1: IMAGE_CONSISTENCY != VIDEO_TEMPORAL_CONSISTENCY != SHOT_TO_SHOT_CONTINUITY. P2P's ten-concept enumeration is P2P's own; only the separation insight is taken from this source. Knowledge representation is sufficient - no consistency engine is built.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "video.prompt.director_spec"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.6)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (section 3, section 3.1)",
+        "docs/plans/2026-09-03-p2p-video-capability-integration-01/validation/ly-truong-sinh-sword-descent.master-spec.json continuity",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.consistency_taxonomy"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "NOASSERTION licence - knowledge only, no executable projection. Character multi-view reference vocabulary continues to be owned by p2p-visual-reference-pack/1; this record creates no second character-reference schema. Recorded by P2P-VIDEO-CAPABILITY-INTEGRATION-01 / GitHub issue #71; Owner authorization is issue #71."
+    },
+    {
+      "research_id": "RA-EXT-076",
+      "source_name": "harry0703/MoneyPrinterTurbo",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "source_version_or_commit": "commit cbbb366393105d5cefc254dc9ed492d43da0711b / tree 2f86fab447e1b438b80f6079961d80a79ca0e385 (MIT; pin resolved 2026-09-03 by repository metadata only)",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "One-stop short-video generation tool. Useful only for its post-production stage decomposition and the operational boundaries that fall out of it: script, material, narration, subtitle, music, render, final artifact; credential handling; retry and recovery; durable output.",
+      "selected_ideas": [
+        "post-production-stage-decomposition-SCRIPT-MATERIAL-NARRATION-SUBTITLE-MUSIC-RENDER-FINAL_ARTIFACT",
+        "api-credentials-are-an-owner-gate",
+        "paid-video-generation-is-an-owner-gate",
+        "infrastructure-and-runtime-commitment-is-an-owner-gate",
+        "generation-retry-must-be-bounded",
+        "generation-failure-is-not-a-successful-pipeline-advance",
+        "final-output-must-be-a-durable-returned-artifact"
+      ],
+      "rejected_ideas": [
+        "installation",
+        "vendoring",
+        "wrapping-as-a-p2p-backend",
+        "docker-or-colab-deployment-path",
+        "any-service-or-provider-integration",
+        "any-executable-integration-in-this-goal",
+        "adopting-its-material-sourcing-or-publishing-surface"
+      ],
+      "p2p_translation": "POST_PRODUCTION_REFERENCE + FUTURE_BACKEND. Recorded as the post-production boundaries in video.prompt.director_spec section 7. Stage separation is adopted as knowledge so that a future pipeline cannot collapse narration, subtitle, music, and render into one undifferentiated 'make the video' step with unbounded retry. No executable integration exists.",
+      "capability_family": "RESEARCH_ONLY_REGISTER",
+      "canonical_capability_ids": [
+        "video.prompt.director_spec"
+      ],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.7)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (section 7, section 8)",
+        ".p2p/system/p2p_capabilities/capabilities.json video.prompt.director_spec UPSTREAM_PROVENANCE.post_production_reference"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "deferred",
+      "owner_decision_status": "CONDITIONAL",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "DEFERRED with reason: executable post-production integration requires an Owner gate on credentials, paid generation, and infrastructure/runtime commitment. MIT licence recorded; licence availability is not authorization. PAID_VIDEO_GENERATION_USED=NO. Recorded by P2P-VIDEO-CAPABILITY-INTEGRATION-01 / GitHub issue #71; Owner authorization is issue #71."
+    },
+    {
+      "research_id": "RA-EXT-077",
+      "source_name": "SEEDANCE-2.5-SOLO-SKYDIVE-LIVE-TV-JP-01",
+      "source_type": "INTERNAL_P2P_RESEARCH",
+      "source_reference": "session-derived reference artifact supplied with the P2P-VIDEO-RESEARCH-01 / issue #71 authority; not a repository, not vendored",
+      "source_version_or_commit": "session artifact identity as supplied at task creation (2026-09-03); no repository pin exists",
+      "provenance_status": "CONCEPTS_ADOPTED_SOURCE_NOT_VENDORED",
+      "research_summary": "Prompt-architecture lesson from a single continuous high-motion action shot (solo skydive, live broadcast framing). Demonstrates that one continuous action still benefits from beat decomposition with distinct camera responsibilities, that sustained physical plausibility must be stated explicitly, and that a continuous shot needs a declared visible end-state to be chainable.",
+      "selected_ideas": [
+        "prompt-architecture-only",
+        "single-continuous-high-motion-action-still-decomposes-into-beats",
+        "sustained-physical-plausibility-must-be-stated-not-assumed",
+        "continuous-shot-needs-an-explicit-visible-end-state-to-be-chainable",
+        "live-broadcast-operator-intent-is-a-useful-way-to-express-a-chase-move"
+      ],
+      "rejected_ideas": [
+        "vendoring-the-session-artifact",
+        "treating-any-claim-in-it-as-a-verified-p2p-fact",
+        "using-it-as-provider-profile-data",
+        "deriving-any-numeric-prompt-length-or-duration-constant-from-it"
+      ],
+      "p2p_translation": "KNOWLEDGE_REFERENCE for prompt architecture only. Contributes to video.prompt.director_spec sections 4.1, 4.2, and 6, and is directly exercised by the single representative validation: a one-sentence high-motion idea with a two-move camera request is decomposed into three beats with one principal move each, explicit physics, and a declared chainable end-state.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "video.prompt.director_spec"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/capability-catalog/video-director-spec/research-derived-reference.md (section 3.8)",
+        "docs/p2p-development/capability-catalog/video-director-spec/director-spec-protocol.md (section 4.1, 4.2, 6)",
+        "docs/plans/2026-09-03-p2p-video-capability-integration-01/validation/ly-truong-sinh-sword-descent.master-spec.json",
+        "docs/plans/2026-09-03-p2p-video-capability-integration-01/validation/ly-truong-sinh-sword-descent.provider-projection.json"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "REFERENCE_ONLY",
+      "last_reviewed_at": "2026-09-03T00:00:00Z",
+      "notes": "Not a repository; REPOS_REVIEWED stays 7. Recorded separately so the prompt-architecture lesson has durable provenance instead of living only in chat memory (chat memory is never a source of truth). Recorded by P2P-VIDEO-CAPABILITY-INTEGRATION-01 / GitHub issue #71; Owner authorization is issue #71."
     }
   ],
   "rejected_register_summary": {
@@ -2333,6 +2653,8 @@
   },
   "last_reviewed": "2026-08-21T04:25:23Z",
   "notes": [
-    "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
+    "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins.",
+    "APPEND 2026-09-03 by P2P-VIDEO-CAPABILITY-INTEGRATION-01 (GitHub issue #71): RA-EXT-070..RA-EXT-077 record the seven AI-video repositories audited by P2P-VIDEO-RESEARCH-01 plus the SEEDANCE-2.5-SOLO-SKYDIVE-LIVE-TV-JP-01 prompt-architecture reference. Append-only per this ledger's authority; no historical record was rewritten. Statuses are SELECTED/RESEARCHED/DEFERRED, never IMPLEMENTED/VERIFIED/SHIPPED: the single new capability video.prompt.director_spec exists on candidate branch arena/01a0664a-p2p-upgrade-github-1 only, and promotion requires the Owner merge gate. Top-level generated_at, generated_by, last_reviewed, and baseline_identity are intentionally left untouched because this bounded goal performed no full ledger re-review.",
+    "BOUNDED-SCOPE DEVIATION DECLARED 2026-09-03: this goal appended adoption records here but did NOT append to governance/research-intake-ledger.json, docs/p2p-development/capability-ledger/capability-index.json, docs/p2p-development/current-roadmap.md, or governance/p2p-development-roadmap.json. Reasons recorded rather than left silent: (1) research-intake-ledger provenance note PN-001 already references an RI-008 that is absent from intake_records, so assigning RI-008 would create a duplicate-truth conflict and assigning RI-009 would silently imply RI-008 exists - repairing that is out of this goal's bounded scope; (2) the most recent capability-addition precedent (creative.social.* / P2P-SOCIAL-CONTENT-SKILLS-01, 2026-09-02) added registry, vendor, provenance, plan/evidence, and focused-test artifacts with no capability-index or development-roadmap record; (3) capability-index.json is a declared derived projection whose own validator already reports six pre-existing failures on main (V03, V05, V06, V09, V12, V20), so regenerating it plus the roadmap record count would be unrelated stale-projection repair. Owner authorization for this direction is durably recorded in GitHub issue #71 and cited via owner_decision_status on every new record. Recommended follow-up at the Owner merge gate."
   ]
 }
