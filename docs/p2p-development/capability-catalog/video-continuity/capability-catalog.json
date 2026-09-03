@@ -1,0 +1,166 @@
+{
+  "catalog_id": "video-continuity-capability-catalog",
+  "schema": "p2p-capability-catalog/1",
+  "version": "1.0.0",
+  "generated_at": "2026-09-03T00:00:00Z",
+  "generated_by": "P2P-VIDEO-CONTINUITY-01",
+  "authority": "Reconciles Issue #72 research against the existing P2P capability foundation. Extends capabilities.json and reuses the single existing router. Never creates a second router/registry/orchestrator. No video model, framework, weight, paid API, credential, or infrastructure is introduced.",
+  "parent_catalog": "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
+  "single_router": "p2p_uiux/router.py",
+  "registry": "p2p_capabilities/capabilities.json",
+  "classification_vocabulary": [
+    "NEW",
+    "PARTIAL_OVERLAP",
+    "ALREADY_EXISTS",
+    "NOT_NEEDED"
+  ],
+  "treatments_vocabulary": [
+    "executable capability",
+    "knowledge source/reference",
+    "prompt corpus",
+    "backend/model-adapter candidate",
+    "post-production reference",
+    "defer/reject"
+  ],
+  "research_reference": {
+    "id": "SEEDANCE-2.5-SOLO-SKYDIVE-LIVE-TV-JP-01",
+    "classification": "KNOWLEDGE_REFERENCE",
+    "treatment": "knowledge source/reference",
+    "short_scope": "research evidence only; production-spec structure (identity, scene, performance, camera, physics, timeline, audio, speech, continuity, negative constraints) informs the director spec, performance bible, and continuity gate fields."
+  },
+  "research_sources": [
+    {
+      "candidate_id": "RA-VIDEO-001",
+      "source_name": "jacobye2017-afk/jacob-ye-seedance-prompt",
+      "source_reference": "https://github.com/jacobye2017-afk/jacob-ye-seedance-prompt",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "PARTIAL_OVERLAP",
+      "treatment": "prompt corpus / knowledge source",
+      "global_install": false,
+      "rationale": "Director-first cinematic prompt framework for Seedance 2.5 (Jimeng). Overlaps the provider-neutral director spec concept. Extract the production-spec structure as knowledge evidence; do NOT vendor the provider-specific prompt framework as an executable capability."
+    },
+    {
+      "candidate_id": "RA-VIDEO-002",
+      "source_name": "opensource-works/awesome-seedance-prompts",
+      "source_reference": "https://github.com/opensource-works/awesome-seedance-prompts",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "PARTIAL_OVERLAP",
+      "treatment": "prompt corpus / knowledge source",
+      "global_install": false,
+      "rationale": "Curated Seedance prompt library. Provider-specific prompt-shape evidence only. Do not vendor or install; confirm the projection pattern of short provider prompts."
+    },
+    {
+      "candidate_id": "RA-VIDEO-003",
+      "source_name": "Wan-Video/Wan2.2",
+      "source_reference": "https://github.com/Wan-Video/Wan2.2",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "NOT_NEEDED",
+      "treatment": "backend/model-adapter candidate (deferred)",
+      "global_install": false,
+      "rationale": "Open-source video generation model. For this task it is a research reference only; non-goal explicitly forbids installing Wan2.2. Reinforces the lesson that a model cannot be relied on for identity across shots."
+    },
+    {
+      "candidate_id": "RA-VIDEO-004",
+      "source_name": "ali-vilab/VACE",
+      "source_reference": "https://github.com/ali-vilab/VACE",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "PARTIAL_OVERLAP",
+      "treatment": "backend/model-adapter candidate (deferred) / knowledge reference",
+      "global_install": false,
+      "rationale": "Reference-aware video editing / consistency editing framework. Overlaps canonical visual consistency. Confirms consistency should be canonical and exterior to the renderer; not adopted as a runtime dependency."
+    },
+    {
+      "candidate_id": "RA-VIDEO-005",
+      "source_name": "KlingAIResearch/ReCamMaster",
+      "source_reference": "https://github.com/KlingAIResearch/ReCamMaster",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "PARTIAL_OVERLAP",
+      "treatment": "backend/model-adapter candidate (deferred) / knowledge reference",
+      "global_install": false,
+      "rationale": "Camera/motion re-control for video. Overlaps the performance-bible camera feel/inertia cues. Knowledge reference; no runtime adoption."
+    },
+    {
+      "candidate_id": "RA-VIDEO-006",
+      "source_name": "divolleggett/awesome-character-consistency",
+      "source_reference": "https://github.com/divolleggett/awesome-character-consistency",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "PARTIAL_OVERLAP",
+      "treatment": "knowledge source/reference list",
+      "global_install": false,
+      "rationale": "Curated character-consistency method list. Overlaps the canonical visual / continuity dimensions; used as a reference index only."
+    },
+    {
+      "candidate_id": "RA-VIDEO-007",
+      "source_name": "harry0703/MoneyPrinterTurbo",
+      "source_reference": "https://github.com/harry0703/MoneyPrinterTurbo",
+      "source_type": "GITHUB_REPOSITORY",
+      "classification": "PARTIAL_OVERLAP",
+      "treatment": "post-production reference (architecture lessons only)",
+      "global_install": false,
+      "rationale": "Script/material/narration/subtitle/music/render auto-video pipeline. For this task extract only architecture lessons (staged pipeline, agent execution contract, credential hygiene, paid-generation Owner Gate, bounded retry/recovery, final artifact return). DEFER install/vendor; no video generation runtime is added here."
+    }
+  ],
+  "conceptual_overlap": [
+    {
+      "concept": "video director specification",
+      "classification": "NEW",
+      "existing": "none",
+      "rationale": "No provider-neutral video director/production specification exists in capabilities.json or the capability catalogs."
+    },
+    {
+      "concept": "canonical visual consistency contract",
+      "classification": "PARTIAL_OVERLAP",
+      "existing": "game-asset-forge character recipe (p2p-character-recipe/1) and visual-reference-pack",
+      "rationale": "The 3D asset forge character recipe/visual pack overlap canonical visual identity, but are MPFB2/3D-specific and do not model shot-to-shot or temporal video consistency. Reuse the asset-pointer convention; do not co-opt the MPFB2 schema."
+    },
+    {
+      "concept": "performance bible",
+      "classification": "PARTIAL_OVERLAP",
+      "existing": "game.three.cinematic, ui.motion (KNOWLEDGE_SOURCE)",
+      "rationale": "Both carry motion/camera-feel vocabulary but are Three.js/UI-runtime knowledge, not a provider-neutral video performance bible. Adjacent, not equivalent."
+    },
+    {
+      "concept": "keyframe + re-anchor semantics",
+      "classification": "NEW",
+      "existing": "none",
+      "rationale": "No existing keyframe/re-anchor state contract that enforces a drift-free re-anchor rule."
+    },
+    {
+      "concept": "continuity gate",
+      "classification": "NEW",
+      "existing": "none",
+      "rationale": "No compact provider-neutral continuity gate. No broad vision-QA platform is built; only the required dimension contract."
+    },
+    {
+      "concept": "provider prompt projection",
+      "classification": "NEW",
+      "existing": "none",
+      "rationale": "No existing capability models a short provider-specific prompt projection driven by profile/config limits."
+    }
+  ],
+  "reused_capability_ids": [
+    "p2p-uiux",
+    "media.whiteboard_animation",
+    "game.three.cinematic",
+    "ui.motion",
+    "img2threejs",
+    "game.character.generate"
+  ],
+  "new_capability_ids": [
+    "video.director.continuity_foundation"
+  ],
+  "non_goals_confirmed": [
+    "install Wan2.2",
+    "install VACE",
+    "install ReCamMaster",
+    "install ComfyUI",
+    "install MoneyPrinterTurbo",
+    "download model weights",
+    "add paid video APIs",
+    "add credentials/secrets",
+    "add database/server/daemon/job queue",
+    "create another router/registry/orchestrator",
+    "create a standalone p2p-video-studio project",
+    "deploy anything"
+  ]
+}

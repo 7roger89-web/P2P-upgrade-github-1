@@ -5252,6 +5252,85 @@
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "video.director.continuity_foundation",
+      "TYPE": "KNOWLEDGE_SOURCE",
+      "DESCRIPTION": "Provider-neutral video director spec and visual/performance continuity foundation for consistency-controlled AI-video production, projectable to prompt-limited renderers.",
+      "TRIGGERS": [
+        "video director",
+        "director spec",
+        "video continuity",
+        "character consistency",
+        "continuity gate",
+        "canonical keyframe",
+        "re-anchor",
+        "performance bible",
+        "ai video",
+        "video production",
+        "video prompt",
+        "seedance",
+        "shot continuity",
+        "visual consistency",
+        "best-of-n candidate",
+        "candidate rendering",
+        "shot-to-shot continuity"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "install video model",
+        "download weights",
+        "render video now",
+        "generate paid video",
+        "video api",
+        "api key",
+        "deploy video studio",
+        "video studio project",
+        "money printer",
+        "comfyui"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "provider-neutral-video-continuity-protocol"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "install-video-model",
+        "download-model-weights",
+        "invoke-paid-video-api",
+        "add-credentials",
+        "create-second-router",
+        "auto-propagate-drifted-final-frame-to-canonical",
+        "build-video-framework"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router"
+      ],
+      "CONTEXT_POINTERS": [
+        "docs/p2p-development/capability-catalog/video-continuity/capability-catalog.json",
+        "docs/p2p-development/capability-catalog/protocols/video-continuity-protocol.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "paid-video-generation",
+        "owner-gate-video-studio-bootstrap",
+        "model-installation"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "director-spec-validated",
+        "continuity-gate-verdict",
+        "provider-projection-within-limit",
+        "re-anchor-drift-gate"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "source": "P2P-VIDEO-CONTINUITY-01",
+        "scope": "provider_neutral_video_director_continuity",
+        "CERTIFIED": "video-continuity-protocol",
+        "freshness": "CURRENT"
+      },
+      "VERSION": "1.0.0",
+      "STATUS": "ACTIVE"
     }
   ]
 }
