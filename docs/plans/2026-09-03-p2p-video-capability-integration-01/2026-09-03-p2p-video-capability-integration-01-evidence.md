@@ -539,8 +539,10 @@ code throughout, as directed.
 - `PROVENANCE_STATUS = PINNED_AND_ATTRIBUTED`
 - `SYNTHETIC_DIRECTOR_SPEC_VALIDATION = PASS`
 - `PROVIDER_PROJECTION_VALIDATION = PASS`
-- `VIDEO_STUDIO_READY_TO_BOOTSTRAP = YES` (foundation present; bootstrapping itself
-  remains a separate Owner-gated goal)
+- `VIDEO_STUDIO_READY_TO_BOOTSTRAP = NO` — no P2P VIDEO STUDIO was created or
+  bootstrapped by this goal. The director-spec foundation this goal adds is a bounded
+  knowledge capability, not a studio; bootstrapping a studio would be a separate
+  Owner-gated goal and is explicitly outside issue #71
 - `IMPLEMENTATION_STATUS = COMPLETE_ON_CANDIDATE_BRANCH`
 - `VALIDATION_STATUS = PASS_16_OF_16_NO_REGRESSION`
 - Terminal target: `P2P_VIDEO_CAPABILITY_INTEGRATION_01 = READY_FOR_OWNER_MERGE_GATE`
