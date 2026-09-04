@@ -26,7 +26,7 @@
   "intake_records": [
     {
       "id": "RI-001",
-      "subject": "P2P-FRAMEWORK-00 \u2014 Product Memory Foundation",
+      "subject": "P2P-FRAMEWORK-00 — Product Memory Foundation",
       "classification": "COMPLETED",
       "source": "owner_instruction",
       "instruction_ref": "Owner message 2026-08-18/19 (P2P-FRAMEWORK-00)",
@@ -60,22 +60,22 @@
       "subject": "DeepSeek Harness (DSH) / plugin architecture claims",
       "classification": "PENDING_OWNER_APPROVAL",
       "source": "owner_instruction",
-      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake \u2014 DeepSeek Harness / plugin architecture claims",
-      "scope": "DSH public claims (150k stars / four-day release / Cordis identity): classification NOT_VERIFIED \u2014 no repository or web provenance artifact for the specific claims exists in durable evidence (verified by full-text repository search; no DSH evidence files or decision records present in docs/, governance/, manifest/); the repo's pre-existing research_decisions entry 'DeepSeek Harness (DEFERRED, C11-scoped)' covers the general subject but not these claims. Everything-is-plugin: ADAPT_SELECTIVELY (Owner instruction; map selectively to existing P2P governance rather than wholesale adoption). Hot reload: candidate idea GOVERNED_HOT_SWAP / safe quiescent-boundary activation. Open plugin market: DEFER / SECURITY_GATED.",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — DeepSeek Harness / plugin architecture claims",
+      "scope": "DSH public claims (150k stars / four-day release / Cordis identity): classification NOT_VERIFIED — no repository or web provenance artifact for the specific claims exists in durable evidence (verified by full-text repository search; no DSH evidence files or decision records present in docs/, governance/, manifest/); the repo's pre-existing research_decisions entry 'DeepSeek Harness (DEFERRED, C11-scoped)' covers the general subject but not these claims. Everything-is-plugin: ADAPT_SELECTIVELY (Owner instruction; map selectively to existing P2P governance rather than wholesale adoption). Hot reload: candidate idea GOVERNED_HOT_SWAP / safe quiescent-boundary activation. Open plugin market: DEFER / SECURITY_GATED.",
       "status": "PENDING_OWNER_APPROVAL",
       "evidence_refs": [
         "/home/ubuntu/upload/pasted_content_3.txt (Owner directive section 10)",
         "governance/development-control.json research_decisions 'DeepSeek Harness' (DEFERRED)",
         "docs/p2p-development/reports/P2P-C35R-terminal-report.md (execution-harness audit precedent: P2P stays out of raw execution-harness layer; selective concept adaptation only)"
       ],
-      "machinery_rule": "Specific public claims without repository/web provenance are NOT_VERIFIED by machinery (no evidence-of-absence claim; they remain NOT_PROVEN until provenance is recovered or disproven) \u2014 same provenance discipline as the NUI '174 faculties' reconciliation (RI-003)."
+      "machinery_rule": "Specific public claims without repository/web provenance are NOT_VERIFIED by machinery (no evidence-of-absence claim; they remain NOT_PROVEN until provenance is recovered or disproven) — same provenance discipline as the NUI '174 faculties' reconciliation (RI-003)."
     },
     {
       "id": "RI-005",
       "subject": "Community 13-step Codex efficiency workflow",
       "classification": "PENDING_OWNER_APPROVAL",
       "source": "owner_instruction",
-      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake \u2014 community 13-step Codex efficiency workflow",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — community 13-step Codex efficiency workflow",
       "scope": "Community-derived 13-step Codex efficiency workflow. Per Owner instruction: do NOT copy the workflow literally; instead map its concepts to existing P2P capabilities and framework gaps (concept-to-capability mapping intake). No community source artifact is stored in durable evidence today; intake records the concept-mapping request, not the workflow text.",
       "status": "PENDING_OWNER_APPROVAL",
       "evidence_refs": [
@@ -88,7 +88,7 @@
       "subject": "Capability Intelligence concept (FRAMEWORK-02 product direction)",
       "classification": "PENDING_OWNER_APPROVAL",
       "source": "owner_instruction",
-      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake \u2014 Capability Intelligence concept; set FRAMEWORK-02 likely_next name 'P2P-FRAMEWORK-02 \u2014 PROJECT & SKILL INTELLIGENCE' without starting it",
+      "instruction_ref": "Owner recovery+normalize directive (2026-08-19), section 10 GOVERNANCE/ROADMAP: preserve pending research intake — Capability Intelligence concept; set FRAMEWORK-02 likely_next name 'P2P-FRAMEWORK-02 — PROJECT & SKILL INTELLIGENCE' without starting it",
       "scope": "Accepted product direction for FRAMEWORK-02: TASK -> REQUIRED_CAPABILITIES -> eligible skill/tool/retriever/model/backend/etc. Skill is only ONE capability source. Intake records the direction only; FRAMEWORK-02 remains NOT_STARTED and this directive explicitly forbids starting it.",
       "status": "PENDING_OWNER_APPROVAL",
       "evidence_refs": [
@@ -105,8 +105,32 @@
       "decision_ref": "P2P_Contextual_Rule_Intelligence_Update_2026-08-21 (Owner decision document, intaken by P2P-OWNER-SELECTED-CAPABILITY-INTAKE-CLOSURE-01)",
       "instruction_ref": "Owner decision: ACCEPTED FOR DEVELOPMENT ARCHITECTURE; status PLANNED / NOT_IMPLEMENTED / NOT_CERTIFIED; target FW02 Project & Capability Intelligence extension.",
       "selected_ideas_summary": "DOMAIN_POLICY_PACK, RULE_PACK_DISCOVERY, RULE_APPLICABILITY_EVALUATION, DEPENDENCY_AWARE_RULE_SELECTION, VERSION_BOUND_RULE_SELECTION, TASK_SCOPED_RULE_SELECTION, RULE_CONFLICT_RESOLUTION, RULE_PROVENANCE_BINDING, RULE_FRESHNESS_CLASSIFICATION, RULE_CONFIDENCE_CLASSIFICATION, MINIMUM_SUFFICIENT_RULE_INJECTION, RULE_OUTCOME_EVALUATION, RULE_PACK_HOST_COMPILATION",
-      "notes": "ADOPT THE PATTERN \u2014 DO NOT ADOPT THE CORPUS AS TRUTH. External .mdc corpus remains UNVERIFIED_CANDIDATE_CORPUS. Precedence preserved: Owner/Project Policy > Verified Project Truth > Version-bound Official Upstream > Verified P2P Domain Policy > Generic External Rule Corpus. UNKNOWN applicability -> fail closed. Minimum sufficient context. Provider neutrality preserved (host serialization never canonical authority).",
+      "notes": "ADOPT THE PATTERN — DO NOT ADOPT THE CORPUS AS TRUTH. External .mdc corpus remains UNVERIFIED_CANDIDATE_CORPUS. Precedence preserved: Owner/Project Policy > Verified Project Truth > Version-bound Official Upstream > Verified P2P Domain Policy > Generic External Rule Corpus. UNKNOWN applicability -> fail closed. Minimum sufficient context. Provider neutrality preserved (host serialization never canonical authority).",
       "intaken_at": "2026-08-21T05:42:52Z"
+    },
+    {
+      "id": "RI-009",
+      "subject": "2026-09-04 external tooling intake — GitHub MCP, deterministic video, malware sandboxes, design/render services",
+      "classification": "RESEARCH_ONLY",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner message 2026-09-04: remember/save findings; review GitHub MCP Server, auto-video-gen, ANY.RUN, Hybrid Analysis, Fabrie, ReRender AI, mnml.ai, LookX AI, PromeAI, Midjourney, Equimake; preserve free-first and minimal-user-action policy.",
+      "scope": "Research-only intake. (1) GitHub MCP Server: official GitHub remote/local MCP, toolsets/read-only/lockdown; candidate provider-neutral GitHub adapter where a host lacks equivalent native GitHub tools; do not duplicate working native connectors. (2) Cuongyd196/auto-video-gen: MIT, Node/TypeScript + HyperFrames + Edge TTS + FFmpeg deterministic short-form pipeline; potentially useful for P2P post-production, recap/trailer/Tier C-D hybrid video, but exact execution in Arena is not yet proven because HyperFrames requires Chrome/Chromium. (3) ANY.RUN and Hybrid Analysis: external untrusted-artifact/malware triage only; public/free submissions can expose uploaded samples, so never submit secrets, confidential builds, or private P2P artifacts; not general-purpose compute sandboxes. (4) Fabrie/ReRender/mnml.ai/LookX/PromeAI/Midjourney/Equimake: research-only visual/design tools. ReRender/mnml/LookX/PromeAI may be useful for beauty-reference or architecture/location experiments; free tiers/API/commercial rights vary and must remain TEMPORARY_RESOURCE unless proven. Midjourney is paid on web/Discord and does not provide general authorized automation/API; not a free-first renderer. Equimake offers free browser 3D experiences/GLTF export and may be useful for lightweight collaborative 3D presentation, not a render-compute substitute. (5) Owner UX rule: prefer API/CLI automation and minimal user actions; if stronger free sandbox/GPU is needed, Control Tower should choose one justified provider and give beginner-safe step-by-step setup rather than asking Owner to compare technical options.",
+      "status": "RESEARCH_ONLY",
+      "evidence_refs": [
+        "https://github.com/github/github-mcp-server",
+        "https://github.com/Cuongyd196/auto-video-gen",
+        "https://any.run/",
+        "https://www.hybrid-analysis.com/",
+        "https://www.fabrie.com/",
+        "https://rerenderai.com/",
+        "https://mnml.ai/",
+        "https://www.lookx.ai/",
+        "https://www.promeai.pro/",
+        "https://www.midjourney.com/",
+        "https://equimake.com/"
+      ],
+      "machinery_rule": "Research-only means no vendoring, no new router/orchestrator, no credentials, no paid dependency, and no runtime claim without a bounded execution proof. Prefer exact pinned upstream execution or a thin provider-neutral adapter. Existing native capabilities take precedence over installing duplicate infrastructure.",
+      "intaken_at": "2026-09-04T16:49:00+07:00"
     }
   ],
   "inherited_decisions": {
@@ -124,7 +148,7 @@
     ]
   },
   "intake_rule": "New research intake requests are appended to this ledger before any research work begins. The Owner decides classification. Research-only subjects never become runtime dependencies (no vendoring into .p2p/system without a goal milestone with its own contract).",
-  "last_reviewed": "2026-08-19",
+  "last_reviewed": "2026-09-04",
   "intake_rule_note": "RI-004..RI-006 persisted at FW01 closure normalization per Owner directive section 10; full consolidation delegated to FRAMEWORK-02 opening. Entries are durable pending intake: nothing is executed until the Owner opens and approves the corresponding goal.",
   "provenance_notes": [
     {
