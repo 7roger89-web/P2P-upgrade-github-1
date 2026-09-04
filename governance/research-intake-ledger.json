@@ -131,6 +131,23 @@
       ],
       "machinery_rule": "Research-only means no vendoring, no new router/orchestrator, no credentials, no paid dependency, and no runtime claim without a bounded execution proof. Prefer exact pinned upstream execution or a thin provider-neutral adapter. Existing native capabilities take precedence over installing duplicate infrastructure.",
       "intaken_at": "2026-09-04T16:49:00+07:00"
+    },
+    {
+      "id": "RI-010",
+      "subject": "Google Colab MCP — local-agent bridge to browser Colab session",
+      "classification": "RESEARCH_ONLY",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner message 2026-09-04: https://github.com/googlecolab/colab-mcp",
+      "scope": "Official googlecolab/colab-mcp (main pin b9ab3899e0f1fa493390b1fd6d54aa2e464ecdf1, package 1.0.1, Apache-2.0). It runs an MCP server on the user's local machine, opens a Google Colab browser tab, and bridges the MCP client to tools exposed by that Colab frontend over an authenticated localhost WebSocket. Requires an MCP client that supports notifications/tools/list_changed and runs locally; README names Gemini CLI, Claude Code, and Windsurf. It is NOT a remote Colab API and cannot directly be used by Arena's remote sandbox, because the Colab page connects back to localhost on the user's device. Candidate value for P2P: reduce Owner actions after one-time local setup by letting a supported local agent operate Colab notebooks/runtime instead of manual upload/Run all. Potentially useful for free GPU/network escape-hatch workflows, including IMAGE_BRIDGE, but exact notebook/runtime/GPU control exposed by the live Colab frontend must be bounded-proofed before claiming automation. Do not build a second Colab controller; use exact upstream MCP if adopted.",
+      "status": "RESEARCH_ONLY",
+      "evidence_refs": [
+        "https://github.com/googlecolab/colab-mcp",
+        "https://github.com/googlecolab/colab-mcp/blob/b9ab3899e0f1fa493390b1fd6d54aa2e464ecdf1/README.md",
+        "https://github.com/googlecolab/colab-mcp/blob/b9ab3899e0f1fa493390b1fd6d54aa2e464ecdf1/src/colab_mcp/session.py",
+        "https://github.com/googlecolab/colab-mcp/blob/b9ab3899e0f1fa493390b1fd6d54aa2e464ecdf1/src/colab_mcp/websocket_server.py"
+      ],
+      "machinery_rule": "Treat as a LOCAL_EXECUTION_ADAPTER, not a cloud service or Arena capability. No credential storage or remote tunnelling should be added merely to force Arena compatibility. Prefer one bounded proof on the Owner's Windows machine using one supported local MCP client; only after proof may it replace manual Colab steps.",
+      "intaken_at": "2026-09-04"
     }
   ],
   "inherited_decisions": {
