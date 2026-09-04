@@ -148,6 +148,24 @@
       ],
       "machinery_rule": "Treat as a LOCAL_EXECUTION_ADAPTER, not a cloud service or Arena capability. No credential storage or remote tunnelling should be added merely to force Arena compatibility. Prefer one bounded proof on the Owner's Windows machine using one supported local MCP client; only after proof may it replace manual Colab steps.",
       "intaken_at": "2026-09-04"
+    },
+    {
+      "id": "RI-011",
+      "subject": "Google Colab CLI — headless programmable Colab runtime backend",
+      "classification": "RESEARCH_ONLY",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner message 2026-09-04: https://github.com/googlecolab/google-colab-cli",
+      "scope": "Official googlecolab/google-colab-cli, current release v0.7.0 (2026-09-03), Apache-2.0. Provides headless CLI control of Colab runtimes: provision CPU/GPU/TPU, execute local Python or .ipynb, upload/download files, mount Drive, install dependencies, SSH-over-WebSocket, keep-alive, and one-shot ephemeral jobs via `colab run`. Strong fit for P2P minimal-user-action free execution backend: a local agent can run `colab run --gpu T4 script.py` or CPU jobs without browser notebook interaction after one-time OAuth bootstrap. Current README explicitly supports Linux/macOS only; Windows is not supported directly. On the Owner's Windows PC, WSL2 is a plausible Linux host but remains an inference until bounded proof. Do not treat availability of T4/L4/A100/H100 flags as entitlement: actual allocation obeys the Owner's Colab plan/quota/capacity; current browser evidence shows T4 available on this account, higher GPUs greyed/paid. CLI OAuth2 uses a remote copy-paste authorization flow and caches token locally. It is a cleaner automation primitive than colab-mcp for headless jobs; colab-mcp remains useful for interactive notebook/browser-agent workflows.",
+      "status": "RESEARCH_ONLY",
+      "evidence_refs": [
+        "https://github.com/googlecolab/google-colab-cli",
+        "https://github.com/googlecolab/google-colab-cli/blob/465b941001afa3d804fa2094bed763236b72e654/README.md",
+        "https://github.com/googlecolab/google-colab-cli/blob/465b941001afa3d804fa2094bed763236b72e654/CHANGELOG.md",
+        "https://github.com/googlecolab/google-colab-cli/blob/465b941001afa3d804fa2094bed763236b72e654/docs/04_automation_and_utility.md",
+        "https://github.com/googlecolab/google-colab-cli/blob/465b941001afa3d804fa2094bed763236b72e654/docs/05_run_command.md"
+      ],
+      "machinery_rule": "Prefer exact upstream CLI over custom browser automation or a home-grown Colab controller. Treat it as a LOCAL_EXECUTION_BACKEND. First adoption proof should be bounded and free: install in Linux/WSL, OAuth once, `colab sessions`, one CPU `colab run` smoke, then one T4 smoke only if the Owner explicitly wants to consume free GPU quota. No multi-cloud router, no always-on daemon layer, no paid accelerator assumptions.",
+      "intaken_at": "2026-09-04"
     }
   ],
   "inherited_decisions": {
