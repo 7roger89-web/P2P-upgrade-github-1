@@ -169,6 +169,24 @@
       ],
       "machinery_rule": "Prefer exact upstream CLI over custom browser automation or a home-grown Colab controller. Treat it as a LOCAL_EXECUTION_BACKEND. First adoption proof should be bounded and free: install in Linux/WSL, OAuth once, `colab sessions`, one CPU `colab run` smoke, then one T4 smoke only if the Owner explicitly wants to consume free GPU quota. No multi-cloud router, no always-on daemon layer, no paid accelerator assumptions.",
       "intaken_at": "2026-09-04"
+    },
+    {
+      "id": "RI-012",
+      "subject": "ChatCMD — local machine MCP runtime and optional ChatGPT web DOM bridge",
+      "classification": "RESEARCH_ONLY",
+      "source": "owner_instruction",
+      "instruction_ref": "Owner shared screenshot on 2026-09-04 referencing https://github.com/int04/ChatCmd",
+      "scope": "MIT-licensed local-first Rust/React MCP bridge. Provides tokenized Streamable HTTP MCP endpoints, per-profile tool allowlists, approvals, PTY terminals, bounded filesystem, Git, process controls, task/sub-agent tracking, SQLite persistence, and an optional Chromium extension that drives an already signed-in ChatGPT web tab via DOM. Latest release observed: v.26.09.03. Important boundary: generic MCP-compatible clients can connect to the local runtime; the browser-specific bridge documented by upstream is ChatGPT-only, not proven for Grok/Gemini web. Web-hosted AI access requires an operator-managed HTTPS tunnel/reverse proxy, making endpoint/token exposure a material security concern. P2P candidate value: local execution adapter on Windows with approval/least-privilege controls, especially for tasks needing access to the Owner's machine. It may overlap with existing local-agent/Colab CLI plans, so do not adopt by default. Prefer a bounded disposable-folder proof before any real workspace access. Never expose a broad tool profile publicly; start read-only/non-destructive and narrow allowlists.",
+      "status": "RESEARCH_ONLY",
+      "evidence_refs": [
+        "https://github.com/int04/ChatCmd",
+        "https://github.com/int04/ChatCmd/blob/main/README.md",
+        "https://github.com/int04/ChatCmd/blob/main/SECURITY.md",
+        "https://github.com/int04/ChatCmd/blob/main/docs/PLUGIN_SETUP.md",
+        "https://github.com/int04/ChatCmd/blob/main/docs/ARCHITECTURE.md"
+      ],
+      "machinery_rule": "Treat as LOCAL_EXECUTION_ADAPTER / MCP bridge, not as a replacement orchestrator. No public tunnel or real-project write permissions without an explicit Owner Gate because exposing a local machine endpoint materially changes the threat model. If evaluated, first proof must use a disposable folder, loopback-only connection, smallest tool allowlist, approvals enabled, and no secrets.",
+      "intaken_at": "2026-09-04"
     }
   ],
   "inherited_decisions": {
