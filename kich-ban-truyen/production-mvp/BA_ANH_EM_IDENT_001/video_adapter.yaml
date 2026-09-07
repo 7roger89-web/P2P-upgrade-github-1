@@ -1,0 +1,66 @@
+{
+  "schema": "story-video-adapter/1",
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "shots": [
+    {
+      "id": "S1",
+      "beat_id": "B1_RUA_THEFT",
+      "duration_s": 2.5,
+      "framing": "medium close",
+      "action": "Rùa steals the snack; Sứa notices.",
+      "feasibility_risk": "LOW",
+      "continuity_notes": "Keep all six locked designs consistent.",
+      "generation_notes": "Single clear action; no collision."
+    },
+    {
+      "id": "S2",
+      "beat_id": "B2_SUA_CHASE",
+      "duration_s": 2.5,
+      "framing": "short lateral track",
+      "action": "Sứa chases Rùa playfully.",
+      "feasibility_risk": "MEDIUM",
+      "continuity_notes": "Preserve snack in Rùa's possession until Sam intervenes.",
+      "generation_notes": "Avoid aggressive contact or bite framing."
+    },
+    {
+      "id": "S3",
+      "beat_id": "B3_SAM_CATCH",
+      "duration_s": 2.5,
+      "framing": "three-character medium",
+      "action": "Sam gently intercepts and protects.",
+      "feasibility_risk": "HIGH",
+      "continuity_notes": "Sam's motion must read voluntary and gentle; no impact.",
+      "generation_notes": "Multi-character interaction is high-risk; WARN only, do not rewrite beat."
+    },
+    {
+      "id": "S4",
+      "beat_id": "B4_THREE_BROTHERS",
+      "duration_s": 2.5,
+      "framing": "ensemble wide",
+      "action": "Three brothers deliver distinct micro-reactions.",
+      "feasibility_risk": "HIGH",
+      "continuity_notes": "Distinct personality micro-beats must remain readable.",
+      "generation_notes": "Six-character ensemble is high-risk; consider staged coverage at generation time without altering story order."
+    },
+    {
+      "id": "S5",
+      "beat_id": "B5_FORGIVE_SHARE",
+      "duration_s": 3.0,
+      "framing": "warm group medium",
+      "action": "Đông Vũ shares food; group relaxes into laughter.",
+      "feasibility_risk": "MEDIUM",
+      "continuity_notes": "Rùa no longer monopolizes the snack; Sam relaxes.",
+      "generation_notes": "Favor readable handoff and warm expressions."
+    },
+    {
+      "id": "S6",
+      "beat_id": "B6_LOGO",
+      "duration_s": 2.0,
+      "framing": "camera-flash ident frame",
+      "action": "Shared joy peaks; Sứa reaction motivates logo.",
+      "feasibility_risk": "MEDIUM",
+      "continuity_notes": "Logo only after resolved group emotion.",
+      "generation_notes": "Logo is post/ident payoff; no final video generated in MVP."
+    }
+  ]
+}
