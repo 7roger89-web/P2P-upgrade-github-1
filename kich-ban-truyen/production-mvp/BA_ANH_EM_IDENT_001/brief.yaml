@@ -1,0 +1,12 @@
+{
+  "schema": "story-brief/1",
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "title": "Ba Anh Em Ident — Caught in the Act",
+  "duration_s": 15,
+  "intent": "Fast comedic identity short ending in an earned logo through shared joy.",
+  "safety": [
+    "no bite, injury, punishment, or implied impact",
+    "conflict reads as play or accident, not violence",
+    "logo payoff comes from joy/collaboration, not residual anger"
+  ]
+}
