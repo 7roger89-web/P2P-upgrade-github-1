@@ -1,0 +1,58 @@
+{
+  "schema": "story-locks/1",
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "owner_gate": "APPROVED",
+  "characters": [
+    {
+      "id": "dong_vu",
+      "name": "Đông Vũ",
+      "gender": "male",
+      "age": 9,
+      "personality": "moral/responsible leader"
+    },
+    {
+      "id": "bao_dang",
+      "name": "Bảo Đăng",
+      "gender": "male",
+      "age": 5,
+      "personality": "investigative curiosity"
+    },
+    {
+      "id": "minh_phuc",
+      "name": "Minh Phúc",
+      "gender": "male",
+      "age": 2,
+      "personality": "fearless agent of chaos"
+    },
+    {
+      "id": "rua",
+      "name": "Rùa",
+      "personality": "curious troublemaker",
+      "behavior": "provokes by stealing food"
+    },
+    {
+      "id": "sua",
+      "name": "Sứa",
+      "gender": "male",
+      "personality": "energetic/hot-tempered",
+      "behavior": "hyperactive, not violent"
+    },
+    {
+      "id": "sam",
+      "name": "Sam",
+      "personality": "quiet protector",
+      "behavior": "gentle voluntary protection"
+    }
+  ],
+  "world": {
+    "tone": "playful family comedy",
+    "violence": "none",
+    "logo_rule": "logo must be earned by emotional/comedic resolution"
+  },
+  "canon": {
+    "sua.gender": "male",
+    "sua.conflict_mode": "hyperactive_not_violent",
+    "sam.protection_mode": "gentle_voluntary_choice",
+    "resolution.logo_source": "joy_and_collaboration"
+  }
+}
