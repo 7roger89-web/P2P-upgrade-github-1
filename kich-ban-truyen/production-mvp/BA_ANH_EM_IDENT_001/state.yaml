@@ -1,0 +1,23 @@
+{
+  "schema": "story-state/1",
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "initial": {
+    "time_s": 0.0,
+    "location": "garden_table",
+    "on_screen": [
+      "rua",
+      "sua",
+      "sam",
+      "dong_vu",
+      "bao_dang",
+      "minh_phuc"
+    ],
+    "food_owner": "shared_snack",
+    "rua_has_food": false,
+    "sua_chasing": false,
+    "sam_protecting": false,
+    "brothers_engaged": false,
+    "conflict_resolved": false,
+    "logo_earned": false
+  }
+}
