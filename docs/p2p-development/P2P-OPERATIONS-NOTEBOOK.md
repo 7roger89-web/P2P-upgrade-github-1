@@ -477,6 +477,77 @@ framework, audit service, or verbose per-step narration. It is an
 owner-facing transparency contract over existing Control Tower state,
 ReturnPackets, evidence, and routing decisions.
 
+### RULE 19 — REALITY_FIRST_CAPABILITY_PROBE
+
+P2P must prefer verified reality over a cosmetically successful result.
+
+Canonical law:
+
+```text
+VERIFIED_BLOCKED > UNVERIFIED_PASS
+CONTRADICTORY_EVIDENCE => STOP_AND_RECONCILE
+UNCERTAIN_CAPABILITY => SMALLEST_REPRESENTATIVE_PROBE_FIRST
+PROBE_PASS != PROMOTED_CAPABILITY
+```
+
+Use this rule when success depends materially on an external runtime, model,
+provider, browser, GPU path, file format, third-party tool, or other capability
+that has not yet been proven for the exact bounded use case.
+
+Execution order:
+
+1. **Define the uncertainty.** State the one capability claim that is not yet
+   proven. Do not expand the probe into a general benchmark.
+2. **Choose the smallest representative probe.** Reuse the actual project
+   input/state when safe. Minimize spend, mutations, runtime, dependencies, and
+   setup. A probe must be large enough to answer the capability question but no
+   larger.
+3. **Respect Owner Gates.** Secrets, paid/GPU spend, production mutation,
+   deployment, merge/promotion, destructive actions, and infrastructure
+   commitments still require the existing Owner Gate.
+4. **Fail closed on contradictions.** If logs, hashes, runtime output, visual
+   evidence, reports, or ReturnPackets disagree on a material fact, Control
+   Tower must not select the convenient source and declare PASS. Suspend the
+   affected conclusion until the contradiction is reconciled or classify the
+   task as `BLOCKED`.
+5. **Promote only the proved claim.** A successful probe proves only the tested
+   capability under the tested conditions. It does not silently authorize a
+   framework, production rollout, broad integration, or generalized support.
+6. **Stop when the question is answered.** Do not add a metric stack, second
+   executor, generalized harness, repeated seed ladder, broad benchmark, or
+   architecture layer unless the probe exposes a specific blocker that
+   requires it.
+
+Routing guidance:
+
+- If the capability is already proven for the same bounded conditions, reuse
+  the proven path instead of probing again.
+- If the failure is deterministic and locally reproducible, debug the root
+  cause directly; do not create a capability experiment merely for ceremony.
+- If the uncertainty is external or probabilistic, a one-shot or minimal fixed
+  sample is preferred before full execution. Expand the sample only when the
+  first probe establishes that further evidence will materially change the
+  decision.
+- Test artifacts remain candidate evidence. They do not become production or
+  canonical authority without the normal P2P promotion rules.
+
+Beginner-facing explanation at a material capability probe must say, in plain
+language:
+
+```text
+WHAT_IS_UNPROVEN=
+WHAT_SMALL_TEST_WILL_BE_RUN=
+WHY_THIS_TEST_IS_ENOUGH_FOR_NOW=
+WHAT_IT_COSTS_OR_CHANGES=
+WHAT_COUNTS_AS_PASS_FAIL_BLOCKED=
+WHAT_HAPPENS_AFTER_THE_RESULT=
+OWNER_ACTION_NOW=
+```
+
+This rule is an independent P2P operational abstraction. It does not import an
+external instruction architecture, mandatory per-turn metadata system,
+complexity scoring formula, autonomous baton loop, or monolithic prompt core.
+
 ## 4. RULE_ASSIMILATION_GATE_V1
 
 ### 4.1 Failure mode fixed
