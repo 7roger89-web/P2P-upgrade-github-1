@@ -403,6 +403,80 @@ UPSTREAM_REFERENCE
 → ABSTRACTION_DECISION_LATER
 ```
 
+### RULE 18 — OWNER_OBSERVABILITY_AND_CHALLENGE
+
+P2P may automatically select a technical executor, capability, or verification
+surface so the beginner Owner is not forced to choose internal A/B options.
+That convenience must never become opaque execution.
+
+Canonical law:
+
+```text
+AUTO_ROUTE != OPAQUE_EXECUTION
+AI_IS_TOOL
+OWNER_RETAINS_AUTHORITY
+OWNER_MUST_UNDERSTAND_WHAT_WAS_DONE_AND_WHY
+```
+
+At each material routing or execution decision, Control Tower gives the Owner
+a concise operational explanation in plain language:
+
+- what tool/executor/capability was selected;
+- what it will actually do or observe;
+- why it is appropriate for the current bounded goal;
+- why a smaller/simpler existing path is not sufficient, when that is not
+  obvious;
+- any material permission, privacy, cost, or mutation risk.
+
+This is a decision rationale, not hidden chain-of-thought. Do not expose or
+fabricate private reasoning traces. Give only the concise reasons needed for
+the Owner to understand and challenge the decision.
+
+Routine micro-fixes may still auto-continue under RULE 11
+(OWNER_MICRO_LOOP_SUPPRESSION). Do not interrupt the Owner for every small
+technical adjustment. Instead, consolidate the important decisions in the
+next meaningful update or terminal summary.
+
+Every bounded task terminal summary must include an
+`OWNER_CHALLENGE_SUMMARY` with:
+
+```text
+WHAT_WAS_DONE
+WHY_THIS_PATH
+ALTERNATIVES_CONSIDERED
+WHY_NOT_THE_ALTERNATIVES
+EVIDENCE_THAT_SUPPORTS_THE_RESULT
+WHAT_COULD_STILL_BE_WRONG
+WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT
+OVER_ENGINEERING_CHECK
+OWNER_ACTION_NOW
+```
+
+Rules for that summary:
+
+- `ALTERNATIVES_CONSIDERED` lists at most two genuinely plausible alternatives
+  that materially affected the decision; do not manufacture options merely to
+  fill the field.
+- `WHY_NOT_THE_ALTERNATIVES` states the concrete tradeoff: weaker evidence,
+  more risk, more cost, more architecture, less reversibility, or mismatch with
+  the bounded goal.
+- `WHAT_COULD_STILL_BE_WRONG` must name the important residual uncertainty
+  instead of declaring absolute certainty.
+- `WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT` gives the Owner a practical way to
+  challenge the conclusion.
+- `OWNER_ACTION_NOW` remains exactly one immediate beginner-safe action, or
+  `NONE` when the Owner should not do anything.
+
+The Owner may ask "tại sao làm thế?", "đã cân nhắc cách nào khác?", or "bằng
+chứng đâu?" at any time. P2P must answer from durable evidence and explicit
+decision rationale. It must not answer "vì hệ thống tự route" as if routing
+were authority.
+
+This rule does not require a new router, decision database, explainability
+framework, audit service, or verbose per-step narration. It is an
+owner-facing transparency contract over existing Control Tower state,
+ReturnPackets, evidence, and routing decisions.
+
 ## 4. RULE_ASSIMILATION_GATE_V1
 
 ### 4.1 Failure mode fixed
