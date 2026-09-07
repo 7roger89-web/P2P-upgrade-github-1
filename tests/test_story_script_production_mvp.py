@@ -66,6 +66,16 @@ class StoryScriptProductionMvpTests(unittest.TestCase):
         self.assertTrue(any(e.startswith("PRECONDITION_MISMATCH:B3_SAM_CATCH:sua_chasing") for e in report["errors"]))
         self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B4_THREE_BROTHERS:time_s") for e in report["errors"]))
 
+    def test_location_and_on_screen_transition_drift_fail_closed(self) -> None:
+        bad = deepcopy(self.bundle)
+        beat = bad["beats"]["beats"][3]
+        beat["consequences"]["location"] = "garden_path"
+        beat["consequences"]["on_screen"] = ["dong_vu", "bao_dang", "minh_phuc"]
+        report = validate_story_core(bad)
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B4_THREE_BROTHERS:location") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B4_THREE_BROTHERS:on_screen") for e in report["errors"]))
+
     def test_canon_and_spine_reference_drift_fail_closed(self) -> None:
         bad = deepcopy(self.bundle)
         bad["beats"]["beats"][0]["canon_assertions"]["sua.gender"] = "female"
