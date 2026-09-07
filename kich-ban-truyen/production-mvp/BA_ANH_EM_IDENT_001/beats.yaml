@@ -1,0 +1,89 @@
+{
+  "schema": "story-beats/1",
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "beats": [
+    {
+      "id": "B1_RUA_THEFT",
+      "spine_ref": "N1_RUA_PROVOKES",
+      "actors": ["rua", "sua"],
+      "description": "Rùa snatches the shared snack with a cheeky look; Sứa notices.",
+      "preconditions": {"time_s": 0.0, "rua_has_food": false, "sua_chasing": false},
+      "consequences": {"time_s": 2.5, "rua_has_food": true},
+      "transition": {"time_s": 2.5},
+      "identity_assertions": {"rua": {"personality": "curious troublemaker"}},
+      "canon_assertions": {"sua.gender": "male"}
+    },
+    {
+      "id": "B2_SUA_CHASE",
+      "spine_ref": "N2_SUA_ESCALATES",
+      "actors": ["rua", "sua"],
+      "description": "Sứa bursts into an energetic, clearly playful chase.",
+      "preconditions": {"time_s": 2.5, "rua_has_food": true, "sua_chasing": false},
+      "consequences": {"time_s": 5.0, "sua_chasing": true},
+      "transition": {"time_s": 5.0},
+      "identity_assertions": {
+        "sua": {
+          "gender": "male",
+          "personality": "energetic/hot-tempered",
+          "behavior": "hyperactive, not violent"
+        }
+      },
+      "canon_assertions": {"sua.conflict_mode": "hyperactive_not_violent"}
+    },
+    {
+      "id": "B3_SAM_CATCH",
+      "spine_ref": "N3_SAM_PROTECTS",
+      "actors": ["sam", "rua", "sua"],
+      "description": "Sam gently steps in and catches the situation without impact or punishment.",
+      "preconditions": {"time_s": 5.0, "sua_chasing": true, "sam_protecting": false},
+      "consequences": {"time_s": 7.5, "sam_protecting": true, "sua_chasing": false},
+      "transition": {"time_s": 7.5},
+      "identity_assertions": {
+        "sam": {
+          "personality": "quiet protector",
+          "behavior": "gentle voluntary protection"
+        }
+      },
+      "canon_assertions": {"sam.protection_mode": "gentle_voluntary_choice"}
+    },
+    {
+      "id": "B4_THREE_BROTHERS",
+      "spine_ref": "N4_BROTHERS_RESPOND",
+      "actors": ["dong_vu", "bao_dang", "minh_phuc", "rua", "sua", "sam"],
+      "description": "Đông Vũ gives the responsible 'seriously?' look, Bảo Đăng inspects the clues, Minh Phúc joyfully photobombs the tableau.",
+      "preconditions": {"time_s": 7.5, "sam_protecting": true, "brothers_engaged": false},
+      "consequences": {"time_s": 10.0, "brothers_engaged": true},
+      "transition": {"time_s": 10.0},
+      "identity_assertions": {
+        "dong_vu": {"personality": "moral/responsible leader"},
+        "bao_dang": {"personality": "investigative curiosity"},
+        "minh_phuc": {"personality": "fearless agent of chaos"}
+      }
+    },
+    {
+      "id": "B5_FORGIVE_SHARE",
+      "spine_ref": "N5_RESOLUTION",
+      "actors": ["dong_vu", "rua", "sua", "sam", "bao_dang", "minh_phuc"],
+      "description": "Đông Vũ shares food with both sides; the chase dissolves into forgiveness and laughter.",
+      "preconditions": {"time_s": 10.0, "brothers_engaged": true, "conflict_resolved": false},
+      "consequences": {
+        "time_s": 13.0,
+        "rua_has_food": false,
+        "sam_protecting": false,
+        "conflict_resolved": true
+      },
+      "transition": {"time_s": 13.0},
+      "canon_assertions": {"resolution.logo_source": "joy_and_collaboration"}
+    },
+    {
+      "id": "B6_LOGO",
+      "spine_ref": "N6_EARNED_LOGO",
+      "actors": ["dong_vu", "bao_dang", "minh_phuc", "rua", "sua", "sam"],
+      "description": "A camera flash catches the shared laugh; Sứa's exuberant reaction resolves into the earned logo beat.",
+      "preconditions": {"time_s": 13.0, "conflict_resolved": true, "logo_earned": false},
+      "consequences": {"time_s": 15.0, "logo_earned": true},
+      "transition": {"time_s": 15.0},
+      "canon_assertions": {"resolution.logo_source": "joy_and_collaboration"}
+    }
+  ]
+}
