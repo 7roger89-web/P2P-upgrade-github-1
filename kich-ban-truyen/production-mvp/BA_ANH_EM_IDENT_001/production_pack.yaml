@@ -1,0 +1,115 @@
+{
+  "adapter_boundary": {
+    "feasibility_high": "WARN_ONLY",
+    "final_video_generation": "OUT_OF_SCOPE",
+    "narrative_rewrite": "FORBIDDEN"
+  },
+  "capability_id": "story.script.production_mvp",
+  "generation_authorized": false,
+  "narrative_refs": {
+    "beats": [
+      "B1_RUA_BITES",
+      "B2_SUA_CHARGES",
+      "B3_SUA_RELEASES",
+      "B4_SAM_BLOCKS",
+      "B5_BROTHERS_RESPOND",
+      "B6_DEESCALATE",
+      "B7_EARNED_LOGO"
+    ],
+    "spine_nodes": [
+      "N1_RUA_BITES",
+      "N2_SUA_CHARGES",
+      "N3_SUA_RELEASES",
+      "N4_SAM_PROTECTS",
+      "N5_BROTHERS_RESPOND",
+      "N6_RESOLUTION",
+      "N7_EARNED_LOGO"
+    ]
+  },
+  "narrative_source_fingerprints": {
+    "beats": "a06b51514efc06fe9caf43b67f4000f422495286d0ad10afed1a203ad29aa5a0",
+    "brief": "2e2521e172a560cc38db5940efa4fb456bf0d2921d29d65d84b1fbe0933c656b",
+    "locks": "a864e01a38811b2e18169b97d41d79a01dcb0d7933d0ec58d4138c24787b27f6",
+    "spine": "fa4516718123775153a5f792602e4c6b6e7a4acc9a2cd4ac6b94c02cd72e7e8c",
+    "state": "2a91807b0ec68929cfae09d00ff6c92a7a8bb0e9915a0ebdd245d88d7ff3897c"
+  },
+  "owner_gate": "PENDING",
+  "schema": "story-production-pack/1",
+  "shots": [
+    {
+      "action": "Rùa approaches and gives Sứa one quick comic bite while the brothers are already nearby.",
+      "beat_id": "B1_RUA_BITES",
+      "continuity_notes": "Lock shallow_beach_water, all character designs, and Sứa as male.",
+      "duration_s": 2.0,
+      "feasibility_risk": "MEDIUM",
+      "framing": "medium close at water level",
+      "generation_notes": "Keep the bite readable but brief, stylized, and non-injurious.",
+      "id": "S1"
+    },
+    {
+      "action": "Sứa pauses, shifts surprise to comic anger, and charges blue-violet fantasy energy.",
+      "beat_id": "B2_SUA_CHARGES",
+      "continuity_notes": "Preserve male Sứa design, transparency, and exact blue-violet energy language.",
+      "duration_s": 2.0,
+      "feasibility_risk": "MEDIUM",
+      "framing": "close reaction",
+      "generation_notes": "Character reaction can be AI-generated; energy glow may be layered/composited if needed.",
+      "id": "S2"
+    },
+    {
+      "action": "Sứa releases a brief fantasy-energy burst toward Rùa.",
+      "beat_id": "B3_SUA_RELEASES",
+      "continuity_notes": "Keep trajectory toward Rùa without contact or injury.",
+      "duration_s": 1.5,
+      "feasibility_risk": "MEDIUM",
+      "framing": "two-character action",
+      "generation_notes": "Energy trajectory should remain controllable; deterministic VFX is allowed without rewriting the beat.",
+      "id": "S3"
+    },
+    {
+      "action": "Sam intentionally moves between them and shields with his shell as the energy disperses harmlessly.",
+      "beat_id": "B4_SAM_BLOCKS",
+      "continuity_notes": "Sam's choice must read intentional; Rùa remains behind Sam; no injury or accidental catch.",
+      "duration_s": 1.5,
+      "feasibility_risk": "HIGH",
+      "framing": "three-character medium",
+      "generation_notes": "Three-character timing plus fantasy energy and shallow water is high-risk; WARN only, split/control/composite at production time if required.",
+      "id": "S4"
+    },
+    {
+      "action": "Đông Vũ leads/protects, Bảo Đăng observes curiously, Minh Phúc bonds fearlessly with Sam.",
+      "beat_id": "B5_BROTHERS_RESPOND",
+      "continuity_notes": "Preserve Đông Vũ's glasses, exact ages/roles, and shallow-beach blocking.",
+      "duration_s": 3.0,
+      "feasibility_risk": "HIGH",
+      "framing": "ensemble with readable staged micro-actions",
+      "generation_notes": "Six-character ensemble is high-risk; staged coverage is allowed without changing narrative order.",
+      "id": "S5"
+    },
+    {
+      "action": "Rùa and Sứa land a comic reconciliation while Minh Phúc hugs Sam and the group relaxes.",
+      "beat_id": "B6_DEESCALATE",
+      "continuity_notes": "Energy calms only after the emotional beat is readable.",
+      "duration_s": 2.5,
+      "feasibility_risk": "MEDIUM",
+      "framing": "warm group medium",
+      "generation_notes": "Favor micro-expression and low motion; avoid reintroducing aggression.",
+      "id": "S6"
+    },
+    {
+      "action": "Residual playful blue-violet light hands off from the resolved group moment to the studio logo.",
+      "beat_id": "B7_EARNED_LOGO",
+      "continuity_notes": "Logo begins only after conflict_resolved=true.",
+      "duration_s": 2.5,
+      "feasibility_risk": "MEDIUM",
+      "framing": "resolved group tableau into ident graphic",
+      "generation_notes": "Final logo transition should be deterministic motion graphics; final video generation remains unauthorized in MVP.",
+      "id": "S7"
+    }
+  ],
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "warnings": [
+    "AI_VIDEO_FEASIBILITY_HIGH:S4:B4_SAM_BLOCKS",
+    "AI_VIDEO_FEASIBILITY_HIGH:S5:B5_BROTHERS_RESPOND"
+  ]
+}
