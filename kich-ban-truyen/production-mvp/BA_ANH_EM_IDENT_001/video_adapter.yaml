@@ -4,63 +4,73 @@
   "shots": [
     {
       "id": "S1",
-      "beat_id": "B1_RUA_THEFT",
-      "duration_s": 2.5,
-      "framing": "medium close",
-      "action": "Rùa steals the snack; Sứa notices.",
-      "feasibility_risk": "LOW",
-      "continuity_notes": "Keep all six locked designs consistent.",
-      "generation_notes": "Single clear action; no collision."
+      "beat_id": "B1_RUA_BITES",
+      "duration_s": 2.0,
+      "framing": "medium close at water level",
+      "action": "Rùa approaches and gives Sứa one quick comic bite while the brothers are already nearby.",
+      "feasibility_risk": "MEDIUM",
+      "continuity_notes": "Lock shallow_beach_water, all character designs, and Sứa as male.",
+      "generation_notes": "Keep the bite readable but brief, stylized, and non-injurious."
     },
     {
       "id": "S2",
-      "beat_id": "B2_SUA_CHASE",
-      "duration_s": 2.5,
-      "framing": "short lateral track",
-      "action": "Sứa chases Rùa playfully.",
+      "beat_id": "B2_SUA_CHARGES",
+      "duration_s": 2.0,
+      "framing": "close reaction",
+      "action": "Sứa pauses, shifts surprise to comic anger, and charges blue-violet fantasy energy.",
       "feasibility_risk": "MEDIUM",
-      "continuity_notes": "Preserve snack in Rùa's possession until Sam intervenes.",
-      "generation_notes": "Avoid aggressive contact or bite framing."
+      "continuity_notes": "Preserve male Sứa design, transparency, and exact blue-violet energy language.",
+      "generation_notes": "Character reaction can be AI-generated; energy glow may be layered/composited if needed."
     },
     {
       "id": "S3",
-      "beat_id": "B3_SAM_CATCH",
-      "duration_s": 2.5,
-      "framing": "three-character medium",
-      "action": "Sam gently intercepts and protects.",
-      "feasibility_risk": "HIGH",
-      "continuity_notes": "Sam's motion must read voluntary and gentle; no impact.",
-      "generation_notes": "Multi-character interaction is high-risk; WARN only, do not rewrite beat."
+      "beat_id": "B3_SUA_RELEASES",
+      "duration_s": 1.5,
+      "framing": "two-character action",
+      "action": "Sứa releases a brief fantasy-energy burst toward Rùa.",
+      "feasibility_risk": "MEDIUM",
+      "continuity_notes": "Keep trajectory toward Rùa without contact or injury.",
+      "generation_notes": "Energy trajectory should remain controllable; deterministic VFX is allowed without rewriting the beat."
     },
     {
       "id": "S4",
-      "beat_id": "B4_THREE_BROTHERS",
-      "duration_s": 2.5,
-      "framing": "ensemble wide",
-      "action": "Three brothers deliver distinct micro-reactions.",
+      "beat_id": "B4_SAM_BLOCKS",
+      "duration_s": 1.5,
+      "framing": "three-character medium",
+      "action": "Sam intentionally moves between them and shields with his shell as the energy disperses harmlessly.",
       "feasibility_risk": "HIGH",
-      "continuity_notes": "Distinct personality micro-beats must remain readable.",
-      "generation_notes": "Six-character ensemble is high-risk; consider staged coverage at generation time without altering story order."
+      "continuity_notes": "Sam's choice must read intentional; Rùa remains behind Sam; no injury or accidental catch.",
+      "generation_notes": "Three-character timing plus fantasy energy and shallow water is high-risk; WARN only, split/control/composite at production time if required."
     },
     {
       "id": "S5",
-      "beat_id": "B5_FORGIVE_SHARE",
+      "beat_id": "B5_BROTHERS_RESPOND",
       "duration_s": 3.0,
-      "framing": "warm group medium",
-      "action": "Đông Vũ shares food; group relaxes into laughter.",
-      "feasibility_risk": "MEDIUM",
-      "continuity_notes": "Rùa no longer monopolizes the snack; Sam relaxes.",
-      "generation_notes": "Favor readable handoff and warm expressions."
+      "framing": "ensemble with readable staged micro-actions",
+      "action": "Đông Vũ leads/protects, Bảo Đăng observes curiously, Minh Phúc bonds fearlessly with Sam.",
+      "feasibility_risk": "HIGH",
+      "continuity_notes": "Preserve Đông Vũ's glasses, exact ages/roles, and shallow-beach blocking.",
+      "generation_notes": "Six-character ensemble is high-risk; staged coverage is allowed without changing narrative order."
     },
     {
       "id": "S6",
-      "beat_id": "B6_LOGO",
-      "duration_s": 2.0,
-      "framing": "camera-flash ident frame",
-      "action": "Shared joy peaks; Sứa reaction motivates logo.",
+      "beat_id": "B6_DEESCALATE",
+      "duration_s": 2.5,
+      "framing": "warm group medium",
+      "action": "Rùa and Sứa land a comic reconciliation while Minh Phúc hugs Sam and the group relaxes.",
       "feasibility_risk": "MEDIUM",
-      "continuity_notes": "Logo only after resolved group emotion.",
-      "generation_notes": "Logo is post/ident payoff; no final video generated in MVP."
+      "continuity_notes": "Energy calms only after the emotional beat is readable.",
+      "generation_notes": "Favor micro-expression and low motion; avoid reintroducing aggression."
+    },
+    {
+      "id": "S7",
+      "beat_id": "B7_EARNED_LOGO",
+      "duration_s": 2.5,
+      "framing": "resolved group tableau into ident graphic",
+      "action": "Residual playful blue-violet light hands off from the resolved group moment to the studio logo.",
+      "feasibility_risk": "MEDIUM",
+      "continuity_notes": "Logo begins only after conflict_resolved=true.",
+      "generation_notes": "Final logo transition should be deterministic motion graphics; final video generation remains unauthorized in MVP."
     }
   ]
 }

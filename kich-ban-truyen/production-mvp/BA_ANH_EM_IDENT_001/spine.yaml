@@ -4,44 +4,39 @@
   "owner_gate": "APPROVED",
   "nodes": [
     {
-      "id": "N1_RUA_PROVOKES",
-      "why_now": "Rùa's curiosity spots unattended food and turns into a cheeky theft.",
+      "id": "N1_RUA_BITES",
+      "why_now": "Rùa's locked curiosity and troublemaking turn a close approach to Sứa into one quick mischievous bite.",
       "requires": []
     },
     {
-      "id": "N2_SUA_ESCALATES",
-      "why_now": "Sứa notices Rùa with the food and immediately gives energetic chase.",
-      "requires": [
-        "N1_RUA_PROVOKES"
-      ]
+      "id": "N2_SUA_CHARGES",
+      "why_now": "The bite startles Sứa; his locked hot-tempered personality turns surprise into a visible blue-violet fantasy-energy charge.",
+      "requires": ["N1_RUA_BITES"]
     },
     {
-      "id": "N3_SAM_PROTECTS",
-      "why_now": "The chase converges near Sam, so Sam chooses a gentle protective catch before chaos spreads.",
-      "requires": [
-        "N2_SUA_ESCALATES"
-      ]
+      "id": "N3_SUA_RELEASES",
+      "why_now": "Sứa's charge peaks, so he releases a brief non-injurious fantasy-energy burst toward the fleeing Rùa.",
+      "requires": ["N2_SUA_CHARGES"]
     },
     {
-      "id": "N4_BROTHERS_RESPOND",
-      "why_now": "Sam's intervention freezes the action long enough for all three brothers to react in their distinct ways.",
-      "requires": [
-        "N3_SAM_PROTECTS"
-      ]
+      "id": "N4_SAM_PROTECTS",
+      "why_now": "Sam sees the energy burst crossing toward Rùa and intentionally moves between them, using his shell as a protective shield.",
+      "requires": ["N3_SUA_RELEASES"]
     },
     {
-      "id": "N5_RESOLUTION",
-      "why_now": "The brothers redirect the conflict into forgiveness and shared food, removing the reason for the chase.",
-      "requires": [
-        "N4_BROTHERS_RESPOND"
-      ]
+      "id": "N5_BROTHERS_RESPOND",
+      "why_now": "The brothers are already nearby in the shallow beach water, so Sam's block gives each brother a clear moment to respond according to his locked personality.",
+      "requires": ["N4_SAM_PROTECTS"]
     },
     {
-      "id": "N6_EARNED_LOGO",
-      "why_now": "Shared joy peaks in a camera-flash moment, and Sứa's comic reaction naturally supplies the ident payoff.",
-      "requires": [
-        "N5_RESOLUTION"
-      ]
+      "id": "N6_RESOLUTION",
+      "why_now": "The brothers' responses lower the tension; Rùa and Sứa exchange a readable comic reconciliation while Sam relaxes with Minh Phúc.",
+      "requires": ["N5_BROTHERS_RESPOND"]
+    },
+    {
+      "id": "N7_EARNED_LOGO",
+      "why_now": "Only after the conflict resolves, a harmless residual blue-violet light becomes a deterministic graphic bridge into the studio logo.",
+      "requires": ["N6_RESOLUTION"]
     }
   ]
 }

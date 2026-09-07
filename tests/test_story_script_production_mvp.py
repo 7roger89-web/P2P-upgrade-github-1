@@ -32,20 +32,29 @@ class StoryScriptProductionMvpTests(unittest.TestCase):
         self.bundle = load_story_case(CASE_DIR)
         self.report = validate_story_core(self.bundle)
 
-    def test_acceptance_case_passes_and_preserves_causal_signature(self) -> None:
+    def test_acceptance_case_passes_and_preserves_owner_causal_signature(self) -> None:
         self.assertEqual(CAPABILITY_ID, "story.script.production_mvp")
         self.assertEqual(self.report["status"], "PASS", self.report["errors"])
         self.assertEqual(
             self.report["validated_spine_nodes"],
             [
-                "N1_RUA_PROVOKES",
-                "N2_SUA_ESCALATES",
-                "N3_SAM_PROTECTS",
-                "N4_BROTHERS_RESPOND",
-                "N5_RESOLUTION",
-                "N6_EARNED_LOGO",
+                "N1_RUA_BITES",
+                "N2_SUA_CHARGES",
+                "N3_SUA_RELEASES",
+                "N4_SAM_PROTECTS",
+                "N5_BROTHERS_RESPOND",
+                "N6_RESOLUTION",
+                "N7_EARNED_LOGO",
             ],
         )
+        self.assertEqual(self.bundle["state"]["initial"]["location"], "shallow_beach_water")
+        self.assertEqual(self.bundle["locks"]["canon"]["rua.inciting_action"], "quick_mischievous_bite")
+        self.assertEqual(self.bundle["locks"]["canon"]["sua.energy"], "blue-violet fantasy energy")
+        self.assertEqual(
+            self.bundle["locks"]["canon"]["sam.protection_mode"],
+            "intentional_voluntary_shell_shield",
+        )
+        self.assertEqual(self.report["final_state"]["location"], "shallow_beach_water")
         self.assertTrue(self.report["final_state"]["conflict_resolved"])
         self.assertTrue(self.report["final_state"]["logo_earned"])
         self.assertEqual(self.report["final_state"]["time_s"], 15.0)
@@ -55,35 +64,35 @@ class StoryScriptProductionMvpTests(unittest.TestCase):
         bad["beats"]["beats"][1]["identity_assertions"]["sua"]["gender"] = "female"
         report = validate_story_core(bad)
         self.assertEqual(report["status"], "FAIL")
-        self.assertTrue(any("IDENTITY_LOCK_CONTRADICTION:B2_SUA_CHASE:sua:gender" in e for e in report["errors"]))
+        self.assertTrue(any("IDENTITY_LOCK_CONTRADICTION:B2_SUA_CHARGES:sua:gender" in e for e in report["errors"]))
 
-    def test_precondition_and_transition_drift_fail_closed(self) -> None:
+    def test_precondition_and_time_transition_drift_fail_closed(self) -> None:
         bad = deepcopy(self.bundle)
-        bad["beats"]["beats"][2]["preconditions"]["sua_chasing"] = False
-        del bad["beats"]["beats"][3]["transition"]["time_s"]
+        bad["beats"]["beats"][3]["preconditions"]["sua_energy_released"] = False
+        del bad["beats"]["beats"][4]["transition"]["time_s"]
         report = validate_story_core(bad)
         self.assertEqual(report["status"], "FAIL")
-        self.assertTrue(any(e.startswith("PRECONDITION_MISMATCH:B3_SAM_CATCH:sua_chasing") for e in report["errors"]))
-        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B4_THREE_BROTHERS:time_s") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("PRECONDITION_MISMATCH:B4_SAM_BLOCKS:sua_energy_released") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B5_BROTHERS_RESPOND:time_s") for e in report["errors"]))
 
     def test_location_and_on_screen_transition_drift_fail_closed(self) -> None:
         bad = deepcopy(self.bundle)
-        beat = bad["beats"]["beats"][3]
-        beat["consequences"]["location"] = "garden_path"
+        beat = bad["beats"]["beats"][4]
+        beat["consequences"]["location"] = "dry_sand"
         beat["consequences"]["on_screen"] = ["dong_vu", "bao_dang", "minh_phuc"]
         report = validate_story_core(bad)
         self.assertEqual(report["status"], "FAIL")
-        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B4_THREE_BROTHERS:location") for e in report["errors"]))
-        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B4_THREE_BROTHERS:on_screen") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B5_BROTHERS_RESPOND:location") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("DECLARED_TRANSITION_REQUIRED:B5_BROTHERS_RESPOND:on_screen") for e in report["errors"]))
 
     def test_canon_and_spine_reference_drift_fail_closed(self) -> None:
         bad = deepcopy(self.bundle)
         bad["beats"]["beats"][0]["canon_assertions"]["sua.gender"] = "female"
-        bad["beats"]["beats"][5]["spine_ref"] = "N404"
+        bad["beats"]["beats"][6]["spine_ref"] = "N404"
         report = validate_story_core(bad)
         self.assertEqual(report["status"], "FAIL")
-        self.assertTrue(any(e.startswith("CANON_CONTRADICTION:B1_RUA_THEFT:sua.gender") for e in report["errors"]))
-        self.assertTrue(any(e.startswith("BEAT_SPINE_REF_INVALID:B6_LOGO:N404") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("CANON_CONTRADICTION:B1_RUA_BITES:sua.gender") for e in report["errors"]))
+        self.assertTrue(any(e.startswith("BEAT_SPINE_REF_INVALID:B7_EARNED_LOGO:N404") for e in report["errors"]))
 
     def test_video_adapter_warns_high_risk_without_rewriting_story(self) -> None:
         adapter = load_video_adapter(CASE_DIR / "video_adapter.yaml")
@@ -112,6 +121,7 @@ class StoryScriptProductionMvpTests(unittest.TestCase):
             self.assertEqual(loaded["story_id"], "BA_ANH_EM_IDENT_001")
             self.assertEqual(loaded["owner_gate"], "PENDING")
             self.assertFalse(loaded["generation_authorized"])
+            self.assertEqual(loaded["adapter_boundary"]["final_video_generation"], "OUT_OF_SCOPE")
 
 
 if __name__ == "__main__":

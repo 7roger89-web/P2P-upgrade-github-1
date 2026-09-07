@@ -3,87 +3,101 @@
   "story_id": "BA_ANH_EM_IDENT_001",
   "beats": [
     {
-      "id": "B1_RUA_THEFT",
-      "spine_ref": "N1_RUA_PROVOKES",
-      "actors": ["rua", "sua"],
-      "description": "Rùa snatches the shared snack with a cheeky look; Sứa notices.",
-      "preconditions": {"time_s": 0.0, "rua_has_food": false, "sua_chasing": false},
-      "consequences": {"time_s": 2.5, "rua_has_food": true},
-      "transition": {"time_s": 2.5},
-      "identity_assertions": {"rua": {"personality": "curious troublemaker"}},
-      "canon_assertions": {"sua.gender": "male"}
+      "id": "B1_RUA_BITES",
+      "spine_ref": "N1_RUA_BITES",
+      "actors": ["rua", "sua", "dong_vu", "bao_dang", "minh_phuc", "sam"],
+      "description": "At the shallow beach water, with the brothers already nearby, Rùa curiously approaches Sứa and gives one quick mischievous, non-injurious bite.",
+      "preconditions": {"time_s": 0.0, "rua_near_sua": false, "rua_bite_done": false, "sua_energy_state": "calm"},
+      "consequences": {"time_s": 2.0, "rua_near_sua": true, "rua_bite_done": true},
+      "transition": {"time_s": 2.0},
+      "identity_assertions": {
+        "rua": {"personality": "curious troublemaker", "behavior": "quick mischievous bite, stylized and non-injurious"}
+      },
+      "canon_assertions": {
+        "setting.location": "shallow_beach_water",
+        "rua.inciting_action": "quick_mischievous_bite",
+        "sua.gender": "male"
+      }
     },
     {
-      "id": "B2_SUA_CHASE",
-      "spine_ref": "N2_SUA_ESCALATES",
-      "actors": ["rua", "sua"],
-      "description": "Sứa bursts into an energetic, clearly playful chase.",
-      "preconditions": {"time_s": 2.5, "rua_has_food": true, "sua_chasing": false},
-      "consequences": {"time_s": 5.0, "sua_chasing": true},
-      "transition": {"time_s": 5.0},
+      "id": "B2_SUA_CHARGES",
+      "spine_ref": "N2_SUA_CHARGES",
+      "actors": ["sua", "rua"],
+      "description": "Sứa pauses, shifts from surprise to comic anger, and charges with clearly blue-violet fantasy energy.",
+      "preconditions": {"time_s": 2.0, "rua_bite_done": true, "sua_energy_state": "calm"},
+      "consequences": {"time_s": 4.0, "sua_energy_state": "charged"},
+      "transition": {"time_s": 4.0},
       "identity_assertions": {
         "sua": {
           "gender": "male",
           "personality": "energetic/hot-tempered",
-          "behavior": "hyperactive, not violent"
+          "energy": "blue-violet fantasy energy",
+          "behavior": "reacts hot-tempered with fantasy energy, never injurious"
         }
       },
-      "canon_assertions": {"sua.conflict_mode": "hyperactive_not_violent"}
+      "canon_assertions": {"sua.gender": "male", "sua.energy": "blue-violet fantasy energy"}
     },
     {
-      "id": "B3_SAM_CATCH",
-      "spine_ref": "N3_SAM_PROTECTS",
+      "id": "B3_SUA_RELEASES",
+      "spine_ref": "N3_SUA_RELEASES",
+      "actors": ["sua", "rua"],
+      "description": "Sứa releases one brief stylized blue-violet fantasy-energy burst toward Rùa; the effect reads comic and non-injurious.",
+      "preconditions": {"time_s": 4.0, "sua_energy_state": "charged", "sua_energy_released": false, "energy_blocked": false},
+      "consequences": {"time_s": 5.5, "sua_energy_state": "released", "sua_energy_released": true},
+      "transition": {"time_s": 5.5},
+      "identity_assertions": {"sua": {"gender": "male", "energy": "blue-violet fantasy energy"}},
+      "canon_assertions": {"sua.energy": "blue-violet fantasy energy"}
+    },
+    {
+      "id": "B4_SAM_BLOCKS",
+      "spine_ref": "N4_SAM_PROTECTS",
       "actors": ["sam", "rua", "sua"],
-      "description": "Sam gently steps in and catches the situation without impact or punishment.",
-      "preconditions": {"time_s": 5.0, "sua_chasing": true, "sam_protecting": false},
-      "consequences": {"time_s": 7.5, "sam_protecting": true, "sua_chasing": false},
-      "transition": {"time_s": 7.5},
+      "description": "Sam deliberately moves between Sứa and Rùa and turns his shell into a voluntary shield; the energy disperses harmlessly across the water.",
+      "preconditions": {"time_s": 5.5, "sua_energy_released": true, "energy_blocked": false, "sam_blocking": false},
+      "consequences": {"time_s": 7.0, "energy_blocked": true, "sam_blocking": true},
+      "transition": {"time_s": 7.0},
       "identity_assertions": {
-        "sam": {
-          "personality": "quiet protector",
-          "behavior": "gentle voluntary protection"
-        }
+        "sam": {"personality": "quiet protector", "behavior": "intentional voluntary shell shield, no injury"}
       },
-      "canon_assertions": {"sam.protection_mode": "gentle_voluntary_choice"}
+      "canon_assertions": {"sam.protection_mode": "intentional_voluntary_shell_shield"}
     },
     {
-      "id": "B4_THREE_BROTHERS",
-      "spine_ref": "N4_BROTHERS_RESPOND",
+      "id": "B5_BROTHERS_RESPOND",
+      "spine_ref": "N5_BROTHERS_RESPOND",
       "actors": ["dong_vu", "bao_dang", "minh_phuc", "rua", "sua", "sam"],
-      "description": "Đông Vũ gives the responsible 'seriously?' look, Bảo Đăng inspects the clues, Minh Phúc joyfully photobombs the tableau.",
-      "preconditions": {"time_s": 7.5, "sam_protecting": true, "brothers_engaged": false},
+      "description": "Đông Vũ protects/directs while adjusting his glasses, Bảo Đăng studies the still-glowing Sứa with curious wonder, and fearless Minh Phúc immediately bonds with Sam.",
+      "preconditions": {"time_s": 7.0, "sam_blocking": true, "energy_blocked": true, "brothers_engaged": false},
       "consequences": {"time_s": 10.0, "brothers_engaged": true},
       "transition": {"time_s": 10.0},
       "identity_assertions": {
-        "dong_vu": {"personality": "moral/responsible leader"},
-        "bao_dang": {"personality": "investigative curiosity"},
-        "minh_phuc": {"personality": "fearless agent of chaos"}
-      }
-    },
-    {
-      "id": "B5_FORGIVE_SHARE",
-      "spine_ref": "N5_RESOLUTION",
-      "actors": ["dong_vu", "rua", "sua", "sam", "bao_dang", "minh_phuc"],
-      "description": "Đông Vũ shares food with both sides; the chase dissolves into forgiveness and laughter.",
-      "preconditions": {"time_s": 10.0, "brothers_engaged": true, "conflict_resolved": false},
-      "consequences": {
-        "time_s": 13.0,
-        "rua_has_food": false,
-        "sam_protecting": false,
-        "conflict_resolved": true
+        "dong_vu": {"glasses": true, "personality": "responsible eldest/leader"},
+        "bao_dang": {"personality": "curious explorer"},
+        "minh_phuc": {"personality": "fearless/mischievous toddler"}
       },
-      "transition": {"time_s": 13.0},
-      "canon_assertions": {"resolution.logo_source": "joy_and_collaboration"}
+      "canon_assertions": {"setting.location": "shallow_beach_water"}
     },
     {
-      "id": "B6_LOGO",
-      "spine_ref": "N6_EARNED_LOGO",
+      "id": "B6_DEESCALATE",
+      "spine_ref": "N6_RESOLUTION",
       "actors": ["dong_vu", "bao_dang", "minh_phuc", "rua", "sua", "sam"],
-      "description": "A camera flash catches the shared laugh; Sứa's exuberant reaction resolves into the earned logo beat.",
-      "preconditions": {"time_s": 13.0, "conflict_resolved": true, "logo_earned": false},
+      "description": "Rùa peeks out sheepishly, Sứa's anger melts into a reluctant comic truce, Minh Phúc hugs Sam, and the whole group relaxes into shared laughter.",
+      "preconditions": {"time_s": 10.0, "brothers_engaged": true, "conflict_resolved": false, "sam_blocking": true, "sua_energy_state": "released"},
+      "consequences": {"time_s": 12.5, "conflict_resolved": true, "sam_blocking": false, "sua_energy_state": "calm", "sua_energy_released": false},
+      "transition": {"time_s": 12.5},
+      "canon_assertions": {"resolution.logo_source": "resolved_group_joy_plus_residual_playful_energy"}
+    },
+    {
+      "id": "B7_EARNED_LOGO",
+      "spine_ref": "N7_EARNED_LOGO",
+      "actors": ["dong_vu", "bao_dang", "minh_phuc", "rua", "sua", "sam"],
+      "description": "After the reconciliation, a tiny harmless residual blue-violet light traces through the resolved group moment and hands off to a deterministic studio-logo animation.",
+      "preconditions": {"time_s": 12.5, "conflict_resolved": true, "logo_earned": false, "sua_energy_state": "calm"},
       "consequences": {"time_s": 15.0, "logo_earned": true},
       "transition": {"time_s": 15.0},
-      "canon_assertions": {"resolution.logo_source": "joy_and_collaboration"}
+      "canon_assertions": {
+        "sua.energy": "blue-violet fantasy energy",
+        "resolution.logo_source": "resolved_group_joy_plus_residual_playful_energy"
+      }
     }
   ]
 }

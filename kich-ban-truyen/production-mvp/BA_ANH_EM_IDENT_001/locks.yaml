@@ -8,51 +8,56 @@
       "name": "Đông Vũ",
       "gender": "male",
       "age": 9,
-      "personality": "moral/responsible leader"
+      "glasses": true,
+      "personality": "responsible eldest/leader"
     },
     {
       "id": "bao_dang",
       "name": "Bảo Đăng",
       "gender": "male",
       "age": 5,
-      "personality": "investigative curiosity"
+      "personality": "curious explorer"
     },
     {
       "id": "minh_phuc",
       "name": "Minh Phúc",
       "gender": "male",
       "age": 2,
-      "personality": "fearless agent of chaos"
+      "personality": "fearless/mischievous toddler"
     },
     {
       "id": "rua",
       "name": "Rùa",
       "personality": "curious troublemaker",
-      "behavior": "provokes by stealing food"
+      "behavior": "quick mischievous bite, stylized and non-injurious"
     },
     {
       "id": "sua",
       "name": "Sứa",
       "gender": "male",
       "personality": "energetic/hot-tempered",
-      "behavior": "hyperactive, not violent"
+      "energy": "blue-violet fantasy energy",
+      "behavior": "reacts hot-tempered with fantasy energy, never injurious"
     },
     {
       "id": "sam",
       "name": "Sam",
       "personality": "quiet protector",
-      "behavior": "gentle voluntary protection"
+      "behavior": "intentional voluntary shell shield, no injury"
     }
   ],
   "world": {
     "tone": "playful family comedy",
-    "violence": "none",
+    "location": "shallow_beach_water",
+    "conflict": "stylized non-injurious fantasy comedy",
     "logo_rule": "logo must be earned by emotional/comedic resolution"
   },
   "canon": {
+    "setting.location": "shallow_beach_water",
+    "rua.inciting_action": "quick_mischievous_bite",
     "sua.gender": "male",
-    "sua.conflict_mode": "hyperactive_not_violent",
-    "sam.protection_mode": "gentle_voluntary_choice",
-    "resolution.logo_source": "joy_and_collaboration"
+    "sua.energy": "blue-violet fantasy energy",
+    "sam.protection_mode": "intentional_voluntary_shell_shield",
+    "resolution.logo_source": "resolved_group_joy_plus_residual_playful_energy"
   }
 }
