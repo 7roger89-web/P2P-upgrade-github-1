@@ -138,6 +138,32 @@
         "Tripo separate and not activated"
       ],
       "rights_note": "Apache-2.0 at the pinned release; the P2P snapshot contains contract text only, while executable source remains in a separately verified external checkout."
+    },
+    {
+      "source_id": "P2P-EXT-CANDIDATE-MARKER-COLAB-01",
+      "type": "external_tool_interactive_execution_candidate",
+      "capability_id": "document.marker.convert",
+      "title": "Marker PDF->Markdown via Owner-run Google Colab notebook (V1 interactive)",
+      "url": "https://github.com/datalab-to/marker",
+      "audited_at": "2026-09-07",
+      "license": "GPL-3.0 (marker-pdf upstream; NOT vendored, installed at runtime inside Owner's Colab only)",
+      "execution_model": "INTERACTIVE_COLAB",
+      "automated_lane": false,
+      "stored_path": ".p2p/system/p2p_capabilities/marker_convert_colab.ipynb",
+      "validator_path": ".p2p/system/p2p_capabilities/marker_bundle_validator.py",
+      "test_path": ".p2p/system/p2p_capabilities/tests/test_marker_bundle_validator.py",
+      "bundle_schema": "p2p-document-marker-convert-bundle/1",
+      "vendored": false,
+      "credentials": false,
+      "paid_resources": false,
+      "network_runtime": "COLAB_PIP_INSTALL_ONLY",
+      "external_llm": false,
+      "gpu_policy": "FREE_COLAB_GPU_ONLY_FAIL_CLOSED",
+      "sampling_policy": "FULL_IF_<=20_PAGES_ELSE_DETERMINISTIC_SAMPLE_MAX12",
+      "source_preservation": "source/original.pdf + SHA256 in manifest.json",
+      "integration_status": "REGISTERED_NONCANONICAL_INTERACTIVE_CANDIDATE",
+      "execution_status": "NOT_EXECUTED_HUMAN_COLAB_RUN_REQUIRED",
+      "owner_gate_status": "PENDING_OWNER_COLAB_SMOKE"
     }
   ],
   "security_reverse_catalog_recorded_at": "2026-08-29",
