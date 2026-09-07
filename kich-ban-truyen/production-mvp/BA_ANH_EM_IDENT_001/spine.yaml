@@ -1,0 +1,47 @@
+{
+  "schema": "story-spine/1",
+  "story_id": "BA_ANH_EM_IDENT_001",
+  "owner_gate": "APPROVED",
+  "nodes": [
+    {
+      "id": "N1_RUA_PROVOKES",
+      "why_now": "Rùa's curiosity spots unattended food and turns into a cheeky theft.",
+      "requires": []
+    },
+    {
+      "id": "N2_SUA_ESCALATES",
+      "why_now": "Sứa notices Rùa with the food and immediately gives energetic chase.",
+      "requires": [
+        "N1_RUA_PROVOKES"
+      ]
+    },
+    {
+      "id": "N3_SAM_PROTECTS",
+      "why_now": "The chase converges near Sam, so Sam chooses a gentle protective catch before chaos spreads.",
+      "requires": [
+        "N2_SUA_ESCALATES"
+      ]
+    },
+    {
+      "id": "N4_BROTHERS_RESPOND",
+      "why_now": "Sam's intervention freezes the action long enough for all three brothers to react in their distinct ways.",
+      "requires": [
+        "N3_SAM_PROTECTS"
+      ]
+    },
+    {
+      "id": "N5_RESOLUTION",
+      "why_now": "The brothers redirect the conflict into forgiveness and shared food, removing the reason for the chase.",
+      "requires": [
+        "N4_BROTHERS_RESPOND"
+      ]
+    },
+    {
+      "id": "N6_EARNED_LOGO",
+      "why_now": "Shared joy peaks in a camera-flash moment, and Sứa's comic reaction naturally supplies the ident payoff.",
+      "requires": [
+        "N5_RESOLUTION"
+      ]
+    }
+  ]
+}
