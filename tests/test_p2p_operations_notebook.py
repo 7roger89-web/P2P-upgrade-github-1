@@ -22,6 +22,7 @@ NOTEBOOK = REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
 AGENTS = REPO_ROOT / "AGENTS.md"
 ARENA_PROTOCOL = REPO_ROOT / "docs" / "ARENA_AGENT_MODE_PROTOCOL.md"
 CT_HANDOFF = REPO_ROOT / "docs" / "p2p-development" / "CONTROL-TOWER-SESSION-HANDOFF.md"
+P2P_SKILL = REPO_ROOT / ".agents" / "skills" / "p2p" / "SKILL.md"
 PACKAGE_RELEASE = REPO_ROOT / "scripts" / "package_release.py"
 INSTALL_SH = REPO_ROOT / "install.sh"
 INSTALL_PS1 = REPO_ROOT / "install.ps1"
@@ -58,6 +59,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
         cls.agents_text = AGENTS.read_text(encoding="utf-8")
         cls.arena_text = ARENA_PROTOCOL.read_text(encoding="utf-8")
         cls.ct_text = CT_HANDOFF.read_text(encoding="utf-8")
+        cls.p2p_skill_text = P2P_SKILL.read_text(encoding="utf-8")
         cls.package_text = PACKAGE_RELEASE.read_text(encoding="utf-8")
 
     def test_exactly_one_canonical_notebook_declares_identity(self) -> None:
@@ -65,6 +67,27 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("# P2P_OPERATIONS_NOTEBOOK", self.notebook_text)
         self.assertIn("single canonical operations notebook", self.notebook_text)
         self.assertIn("P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT", self.notebook_text)
+
+    def test_supreme_operating_law_is_mandatory_preflight(self) -> None:
+        self.assertIn("## 2A. P2P_SUPREME_OPERATING_LAW_V1", self.notebook_text)
+        for law in (
+            "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
+            "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
+            "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
+            "RECOVER_ADAPTIVELY; DO NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+            "PRESERVE_CONTINUITY_AND_STOP",
+        ):
+            self.assertIn(law, self.notebook_text, law)
+        self.assertIn("CONTROL_TOWER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1",
+                      self.notebook_text)
+        self.assertIn("EXECUTOR_BEFORE_IMPLEMENTATION => READ_P2P_SUPREME_OPERATING_LAW_V1",
+                      self.notebook_text)
+        self.assertIn("Before Control Tower writes any executor prompt", self.ct_text)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", self.arena_text)
+        self.assertIn("SUPREME_LAW_CAPSULE", self.arena_text)
+        self.assertIn("Before building any P2P prompt", self.p2p_skill_text)
+        self.assertNotIn("The expected normal result is `PASS`", self.notebook_text)
+        self.assertIn("never auto-return `PASS`", self.notebook_text)
 
     def test_beginner_operations_ux_v1_rules_01_to_14_present(self) -> None:
         self.assertIn("## 3. P2P_BEGINNER_OPERATIONS_UX_V1", self.notebook_text)
