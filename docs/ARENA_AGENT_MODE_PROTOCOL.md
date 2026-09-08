@@ -225,13 +225,16 @@ not from an old Arena conversation transcript.
 When the paths exist, use this bootstrap order:
 
 1. `AGENTS.md`;
-2. project master specification;
-3. `docs/CURRENT_STATE.md`;
-4. `production/SESSION_INDEX.md`;
-5. latest accepted session report;
-6. task-specific projected P2P capabilities;
-7. this Arena Agent Mode protocol; and
-8. the P2P operations notebook (`P2P_OPERATIONS_NOTEBOOK`) when the
+2. the P2P Supreme Operating Law:
+   `.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md` when installed, otherwise
+   `docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md` in P2P development source;
+3. project master specification;
+4. `docs/CURRENT_STATE.md`;
+5. `production/SESSION_INDEX.md`;
+6. latest accepted session report;
+7. task-specific projected P2P capabilities;
+8. this Arena Agent Mode protocol; and
+9. the P2P operations notebook (`P2P_OPERATIONS_NOTEBOOK`) when the
    project's `AGENTS.md` block or this protocol points to it.
 
 The current P2P development source binds the generic names to its real
@@ -290,7 +293,20 @@ applicable selected plan is not claimed to have received the protocol.
 projection-policy update exposes no missing invariant that justifies reopening
 or prematurely implementing that workstream.
 
-## 11. P2P operations notebook discovery
+## 11. P2P Supreme Law and operations discovery
+
+Before implementation, Arena must read the P2P Supreme Operating Law from the
+installed path `.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md`, or from
+`docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md` when operating directly
+on P2P development source.
+
+If Arena cannot access either file, it must not pretend the read occurred.
+Control Tower must provide the exact current canonical law text, or the bounded
+execution returns `BLOCKED` with `P2P_SUPREME_LAW_UNAVAILABLE`.
+
+This is a mandatory execution preflight, not a request for an extra report.
+
+### P2P operations notebook discovery
 
 Arena executors operating a P2P-installed project discover the single
 canonical operations notebook `P2P_OPERATIONS_NOTEBOOK` before generating

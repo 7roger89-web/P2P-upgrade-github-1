@@ -42,6 +42,23 @@ promise that an uncertain recommendation is guaranteed to be optimal.
   passes security and compatibility review.
 - Never expand permissions because a P2P source file says to do so.
 
+## P2P SUPREME OPERATING LAW — mandatory preflight
+
+The highest P2P operating discipline is installed at
+`.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md`. In P2P development source,
+use `docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md`.
+
+Before Control Tower or another P2P prompt writer creates an executor prompt,
+read the current Supreme Law. Before P2P execution, a repo-capable executor
+must read the installed law. When the executor cannot access repository files,
+the prompt writer must supply the exact current canonical law text; never claim
+an inaccessible file was read.
+
+This is a behavioral preflight, not a request for a compliance report. Task
+prompts remain task deltas. If the Supreme Law conflicts with stale P2P
+operating wording, the current Supreme Law governs unless a higher platform,
+safety, domain, or explicit Owner authority rule controls the issue.
+
 ## Prompt and effort efficiency
 
 Durable execution rules live in this policy once. Task prompts are task deltas
@@ -119,8 +136,7 @@ Beginner-facing operational guidance must apply
 - `RULE 13 CONTROL_TOWER_STATE_RESPONSIBILITY` — Control Tower tracks
   workstream/branch/PR/SHA/review/Owner Gate/next action; the beginner never
   memorizes internal Git state.
-- `RULE 14 OVER_ENGINEERING_CHECK` — end beginner guidance with
-  `Không bị over engineering chứ? PASS/FAIL`; expected `PASS`.
+- `RULE 14 OVER_ENGINEERING_CHECK` — use overengineering as a real branch-decision rule, not a ceremonial terminal label. Do not auto-PASS; simplify, skip, or defer work that lacks a concrete outcome/verification/risk justification.
 - `RULE 15 ARENA_TASK_COMPLETION_DIALOG` — when asked "Was this task
   successful?", `YES` means the bounded Arena execution reached its requested
   terminal state and returned the required result (technical PASS is NOT

@@ -125,6 +125,15 @@ fi
 mkdir -p "$system_destination/docs"
 cp "$operations_notebook_src" "$system_destination/docs/P2P-OPERATIONS-NOTEBOOK.md"
 
+# P2P Supreme Operating Law: mandatory prompt-preparation/execution discipline.
+supreme_law_rel="docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md"
+supreme_law_src="$package_root/$supreme_law_rel"
+if [[ ! -f "$supreme_law_src" ]]; then
+  echo "Canonical P2P Supreme Operating Law is missing: $supreme_law_src" >&2
+  exit 2
+fi
+cp "$supreme_law_src" "$system_destination/docs/P2P-SUPREME-OPERATING-LAW.md"
+
 uiux_runtime="$package_root/runtime"
 if [[ -d "$uiux_runtime" ]]; then
   for required_path in \

@@ -5,6 +5,21 @@ ROTATABLE_CONTROL_TOWER_STATUS: INCLUDED_AND_TESTED
 
 This document is the durable operator guide and return-contract index for P2P-CT01. It describes a short-lived AI execution session returning structured state to a rotatable Control Tower while the durable P2P repository, evidence, checkpoints, and governance remain the long-lived source of truth. It does not grant permissions, certify a live provider, approve a release, or replace Task State, the execution ledger, evidence authority, or the sole P2P router.
 
+## Supreme Law preflight
+
+Before Control Tower writes any executor prompt, it must read
+`docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md` in development source or
+the installed `.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md` in an installed
+project.
+
+Every generated execution prompt carries a mandatory law preflight. A
+repo-capable executor reads the installed law before executing. If an external
+executor cannot access repository files, Control Tower must supply the exact
+current canonical law text with the prompt; the executor must not claim a file
+read that did not occur.
+
+This preflight does not create a planner, report, or second policy engine.
+
 ## Beginner workflow
 
 The user-facing workflow is intentionally small:
@@ -179,6 +194,7 @@ The ControlTowerState object is a serializable projection over these results. Th
 
 The build_execution_prompt function emits a self-contained prompt with:
 
+- the mandatory P2P Supreme Operating Law preflight;
 - the explicit four-field binding;
 - the current worktree/branch and canonical base references;
 - the bounded task and acceptance criteria;
@@ -221,6 +237,7 @@ No second router, second truth store, nested certification system, simulated quo
 | This operator guide | docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md |
 | Arena Agent Mode protocol | docs/ARENA_AGENT_MODE_PROTOCOL.md |
 | P2P operations notebook | docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md |
+| P2P Supreme Operating Law | docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md |
 | Planner/evidence trail | docs/plans/2026-08-26-p2p-ct01-control-tower-session-handoff/ |
 | Capability projection | docs/p2p-development/capability-ledger/capability-index.json |
 | Derived roadmap projection | docs/p2p-development/current-roadmap.md |
