@@ -36,6 +36,8 @@ SUPREME_LAW_CAPSULE = "\n".join(
         "3. Real state and scoped evidence override assumptions; reconcile UNKNOWN side effects before unsafe retry.",
         "4. Retry by process type and detect stuckness by lack of preserved progress, not a fixed failure count.",
         "5. Preserve only the durable checkpoint needed to continue and STOP when the required outcome is proven.",
+        "6. Before meaningful new work, require a concrete outcome/verification/material-risk reason; choose the simpler valid path and defer premature supporting infrastructure or ceremony.",
+        "7. Keep one active Supreme Law: supersede conflicting old wording instead of stacking parallel rules; cut rules that add ceremony without improving completion, verification, recovery, or Owner control.",
     )
 )
 UNKNOWN = "UNKNOWN"
