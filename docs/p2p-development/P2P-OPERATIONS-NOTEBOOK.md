@@ -19,6 +19,10 @@ any prompt writer must read that law before writing each executor prompt.
 Every P2P executor must read the installed law before execution, or receive
 the exact canonical law text when the executor cannot access repository files.
 This is a read preflight, not a compliance-reporting ceremony.
+If this notebook or an older P2P operating rule conflicts with the current
+Supreme Operating Law, the Supreme Operating Law controls that operating
+decision unless a higher platform/safety/domain rule or explicit Owner
+authority controls it.
 
 ## 1. Canonical status and authority shape
 
