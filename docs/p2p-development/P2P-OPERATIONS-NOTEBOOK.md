@@ -66,6 +66,83 @@ projection mechanism; nothing new is required:
 
 If the installed digest and this notebook ever differ, the notebook wins.
 
+## 2A. P2P_SUPREME_OPERATING_LAW_V1
+
+This section is the highest active P2P operating law for task execution,
+prompt writing, Control Tower routing, and executor preparation. Lower P2P
+operating rules remain active only where they do not conflict with this law.
+Do not create a parallel supreme-law file or duplicate framework.
+
+### Mandatory preflight
+
+```text
+CONTROL_TOWER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1
+P2P_PROMPT_WRITER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1
+EXECUTOR_BEFORE_IMPLEMENTATION => READ_P2P_SUPREME_OPERATING_LAW_V1
+MODEL_SWITCH_OR_SESSION_RESET => READ_P2P_SUPREME_OPERATING_LAW_V1_AGAIN
+```
+
+The canonical text is this section of
+`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`. In an installed project,
+use `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md`.
+
+If an executor cannot read either repository path, the P2P-generated prompt
+must carry the compact `SUPREME_LAW_CAPSULE` inline. The executor must not
+claim that it read a repository file unless it actually did. The prompt writer
+must not copy the whole notebook into ordinary prompts when the compact capsule
+is sufficient.
+
+### Supreme laws
+
+1. **OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS** — Understand the outcome and
+   acceptance that matter to the Owner. The agent decides routine technical
+   details inside approved scope. Ask the Owner only for genuine outcome,
+   authority, material cost, security/privacy/business-impact, production,
+   destructive, infrastructure-commitment, or hard-to-reverse decisions. Never
+   lower acceptance or widen authority to manufacture success.
+2. **SIMPLEST_USEFUL_PATH_TO_COMPLETION** — Choose the next action with the best
+   practical contribution to completion at reasonable complexity, cost, and
+   risk. A useful action directly advances the outcome, changes a meaningful
+   decision, establishes a required execution/recovery condition, produces
+   acceptance evidence, or reduces a material risk. Do not open speculative
+   architecture or infrastructure before the core capability shows a need.
+3. **REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS** — Fresh-check relevant state
+   before mutation when it may have changed. After material actions, verify the
+   real result before relying on it. Evidence proves only its own scope. If a
+   mutation may have happened but acknowledgement is lost, treat the state as
+   `UNKNOWN` and reconcile before an unsafe retry.
+4. **RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS** — Retry policy
+   depends on process type: deterministic repair, stochastic sampling,
+   transient infrastructure, and unknown-side-effect recovery are not the same.
+   Do not use a fixed failure count as a hard stop. A branch is stuck when
+   cost/scope/complexity keep increasing without preserved progress toward
+   acceptance or decision-useful evidence. Stop speculative mutation, preserve
+   evidence, re-diagnose, change route/model/harness when justified, or return
+   `BLOCKED` / `INFEASIBLE` when supported.
+5. **PRESERVE_CONTINUITY_AND_STOP** — For long work, retain only the durable
+   checkpoint needed to continue: active goal/boundaries, current
+   version/state, verified progress/evidence, decisions or blockers that still
+   matter, and the next useful action. Decompose only when it improves
+   execution, verification, recovery, or context. When the required outcome is
+   proven, stop instead of opening optional refactor, benchmark, framework,
+   hardening, or future-phase work.
+
+### Anti-overengineering decision
+
+Before a new branch of work with meaningful cost, require a concrete reason
+that it is needed to reach the outcome, verify the outcome, or control a
+material risk/recovery mechanism. If a simpler valid path has comparable
+acceptable risk, use it. Premature supporting infrastructure is deferred.
+Process or ceremony that does not change a decision or protect a real
+requirement is removed.
+
+### Canonical change rule
+
+There is one active supreme law. When a later evidence-backed change is
+accepted, replace or supersede conflicting wording rather than stacking another
+parallel rule. A rule that adds ceremony without improving completion,
+verification, recovery, or Owner control must be cut.
+
 ## 3. P2P_BEGINNER_OPERATIONS_UX_V1
 
 Canonical beginner-safe operational rules. Every operational instruction
@@ -232,14 +309,19 @@ Do not make the beginner memorize internal Git state.
 
 ### RULE 14 — OVER_ENGINEERING_CHECK
 
-Operational guidance to the beginner should end with:
+Do not use a ceremonial or expected-`PASS` overengineering check.
 
-```text
-Không bị over engineering chứ? PASS/FAIL
-```
+Before opening a new branch of work with meaningful cost, determine:
 
-The expected normal result is `PASS`. `FAIL` means the proposed process
-itself should be simplified before execution.
+- which outcome, boundary, verification need, or material risk it serves;
+- whether a simpler valid path has comparable acceptable risk;
+- what real consequence follows if the branch is omitted; and
+- whether it solves the core capability / necessary execution foundation, or
+  prematurely optimizes supporting infrastructure or process.
+
+The actionable result is `DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`,
+with one concrete reason. If the Owner asks "Không bị over engineering chứ?",
+answer with the actual verdict and reason; never auto-return `PASS`.
 
 ### RULE 15 — ARENA_TASK_COMPLETION_DIALOG
 
@@ -448,7 +530,7 @@ WHY_NOT_THE_ALTERNATIVES
 EVIDENCE_THAT_SUPPORTS_THE_RESULT
 WHAT_COULD_STILL_BE_WRONG
 WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT
-OVER_ENGINEERING_CHECK
+OVER_ENGINEERING_RISK_OR_NONE
 OWNER_ACTION_NOW
 ```
 
