@@ -68,14 +68,25 @@ return fields. Never repeat large canonical policies in an executor prompt.
 ## P2P_OPERATIONS_NOTEBOOK (install-inherited operations memory)
 
 `P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. Every normal P2P
-installation inherits the canonical operations notebook: this block is the
-installed-project digest, and the canonical full notebook is installed in this
-project at `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` (copied by
-`install.sh` / `install.ps1`). The development-source path is
-`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`, shipped in release packages
-via `scripts/package_release.py`; installed-project instructions must use the
-installed path and never depend on access to the original development repo. If
-this digest and the notebook ever differ, the notebook wins.
+installation inherits the operations notebook and must apply
+`P2P_SUPREME_OPERATING_LAW_V1` before P2P-managed prompt writing or
+implementation.
+
+`TASK_BRANCH != LAW_AUTHORITY` and `TARGET_PROJECT != LAW_SOURCE`.
+
+The active canonical law source is
+`7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
+when that source is accessible. This block is the installed-project digest, and
+the full notebook is also projected locally at
+`.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` by `install.sh` /
+`install.ps1`. A stale installed or task-branch copy must not override the
+active canonical law. P2P-generated executor prompts carry
+`SUPREME_LAW_CAPSULE` so the minimum active law survives when canonical
+cross-repository access is unavailable. Never claim the canonical file was read
+unless it actually was.
+
+If this digest and an active canonical notebook differ, the active canonical
+notebook wins.
 
 Beginner-facing operational guidance must apply
 `P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-16 in the notebook):
