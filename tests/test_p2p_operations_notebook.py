@@ -19,6 +19,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOK = REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
+SUPREME_LAW = REPO_ROOT / "docs" / "p2p-development" / "P2P-SUPREME-OPERATING-LAW.md"
 AGENTS = REPO_ROOT / "AGENTS.md"
 ARENA_PROTOCOL = REPO_ROOT / "docs" / "ARENA_AGENT_MODE_PROTOCOL.md"
 CT_HANDOFF = REPO_ROOT / "docs" / "p2p-development" / "CONTROL-TOWER-SESSION-HANDOFF.md"
@@ -28,6 +29,8 @@ INSTALL_PS1 = REPO_ROOT / "install.ps1"
 
 NOTEBOOK_RELATIVE = "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
 INSTALLED_NOTEBOOK_RELATIVE = ".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md"
+SUPREME_LAW_RELATIVE = "docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md"
+INSTALLED_SUPREME_LAW_RELATIVE = ".p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md"
 
 RULE_HEADINGS = (
     "RULE 01 — EXPLICIT_DESTINATION",
@@ -55,6 +58,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.notebook_text = NOTEBOOK.read_text(encoding="utf-8")
+        cls.supreme_law_text = SUPREME_LAW.read_text(encoding="utf-8")
         cls.agents_text = AGENTS.read_text(encoding="utf-8")
         cls.arena_text = ARENA_PROTOCOL.read_text(encoding="utf-8")
         cls.ct_text = CT_HANDOFF.read_text(encoding="utf-8")
@@ -65,6 +69,29 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("# P2P_OPERATIONS_NOTEBOOK", self.notebook_text)
         self.assertIn("single canonical operations notebook", self.notebook_text)
         self.assertIn("P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT", self.notebook_text)
+
+    def test_supreme_operating_law_is_canonical_preflight(self) -> None:
+        self.assertTrue(SUPREME_LAW.is_file(), "Supreme Operating Law must exist")
+        self.assertIn("# P2P SUPREME OPERATING LAW", self.supreme_law_text)
+        self.assertIn("CONTROL_TOWER_OR_PROMPT_WRITER", self.supreme_law_text)
+        self.assertIn("READ THIS LAW BEFORE WRITING EACH EXECUTOR PROMPT", self.supreme_law_text)
+        self.assertIn("REPO_CAPABLE_EXECUTOR", self.supreme_law_text)
+        self.assertIn("AUTO_OVERENGINEERING_PASS => FORBIDDEN", self.supreme_law_text)
+
+    def test_supreme_law_is_inherited_and_discoverable(self) -> None:
+        self.assertIn(INSTALLED_SUPREME_LAW_RELATIVE, self.agents_text)
+        self.assertIn(SUPREME_LAW_RELATIVE, self.package_text)
+        self.assertIn("P2P Supreme Operating Law", self.arena_text)
+        self.assertIn("P2P Supreme Operating Law", self.ct_text)
+        self.assertIn("P2P-SUPREME-OPERATING-LAW.md", self.notebook_text)
+
+    def test_rule14_is_not_ceremonial_auto_pass(self) -> None:
+        start = self.notebook_text.index("### RULE 14 — OVER_ENGINEERING_CHECK")
+        end = self.notebook_text.index("### RULE 15 — ARENA_TASK_COMPLETION_DIALOG", start)
+        rule14 = self.notebook_text[start:end]
+        self.assertIn("AUTO_OVERENGINEERING_PASS => FORBIDDEN", rule14)
+        self.assertIn("Do not end every beginner message", rule14)
+        self.assertNotIn("expected normal result is `PASS`", rule14)
 
     def test_beginner_operations_ux_v1_rules_01_to_14_present(self) -> None:
         self.assertIn("## 3. P2P_BEGINNER_OPERATIONS_UX_V1", self.notebook_text)
@@ -216,6 +243,16 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("RULE_ASSIMILATION_GATE_V1", self.notebook_text)
         self.assertIn("### RULE 15", self.notebook_text)
         self.assertIn("P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT", self.notebook_text)
+
+    def test_installers_copy_supreme_law_fail_closed(self) -> None:
+        sh_text = INSTALL_SH.read_text(encoding="utf-8")
+        ps_text = INSTALL_PS1.read_text(encoding="utf-8")
+        self.assertIn("supreme_law_src", sh_text)
+        self.assertIn("P2P-SUPREME-OPERATING-LAW.md", sh_text)
+        self.assertIn("SupremeLawSource", ps_text)
+        self.assertIn("P2P-SUPREME-OPERATING-LAW.md", ps_text)
+        self.assertIn("Supreme Operating Law is missing", sh_text)
+        self.assertIn("Supreme Operating Law is missing", ps_text)
 
     def test_install_sh_copies_notebook_to_managed_docs(self) -> None:
         # B. install.sh installs .p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md.
