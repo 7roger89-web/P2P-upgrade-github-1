@@ -251,6 +251,12 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
             "NEXT_RECOMMENDED_ACTION",
         ):
             self.assertIn(field_name, prompt)
+        self.assertIn("P2P_SUPREME_LAW_PREFLIGHT", prompt)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", prompt)
+        self.assertIn("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md", prompt)
+        self.assertIn(".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md", prompt)
+        self.assertIn("SUPREME_LAW_CAPSULE", prompt)
+        self.assertIn("Do not claim that a repository file was read unless it actually was.", prompt)
         self.assertIn("PACKET_IS_CANONICAL_TRUTH: NO", prompt)
         self.assertIn(USER_ACTION_BLOCK, prompt)
         self.assertNotIn("previous session transcript", prompt.lower())
