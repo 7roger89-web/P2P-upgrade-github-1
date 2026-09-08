@@ -156,11 +156,15 @@ Before `ASSESS`, every Arena executor must complete the
 
 `TASK_BRANCH != LAW_AUTHORITY`.
 
-The Arena working branch is execution state only. It must never determine which
-Supreme Law version applies. When Arena can access the canonical P2P repository,
-read the law from
+`TARGET_PROJECT != LAW_SOURCE`.
+
+The Arena target repository and working branch are execution state only. They
+must never determine which Supreme Law version applies. A P2P-managed task in
+another repository does not need to switch its working branch or copy P2P
+source into that project merely to obtain the law. When Arena can access the
+canonical P2P repository, read the law directly from
 `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
-regardless of the selected task branch or project branch.
+regardless of the selected target repository or task branch.
 
 A notebook copied into an installed project or old task branch may be used only
 when it contains `P2P_SUPREME_OPERATING_LAW_V1`; a stale branch-local copy does
