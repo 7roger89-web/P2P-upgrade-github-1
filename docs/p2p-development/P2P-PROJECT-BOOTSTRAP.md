@@ -62,12 +62,15 @@ Arena session reconstructs from GitHub project state, not from an earlier
 Arena chat. When the project has the standard paths, read them in this order:
 
 1. `AGENTS.md`;
-2. the project master specification;
-3. `docs/CURRENT_STATE.md`;
-4. `production/SESSION_INDEX.md`;
-5. the latest accepted session report;
-6. task-specific projected P2P capabilities; and
-7. the Arena Agent Mode protocol.
+2. `.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md` (or
+   `docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md` when working directly
+   on the P2P development source);
+3. the project master specification;
+4. `docs/CURRENT_STATE.md`;
+5. `production/SESSION_INDEX.md`;
+6. the latest accepted session report;
+7. task-specific projected P2P capabilities; and
+8. the Arena Agent Mode protocol.
 
 If a project uses different canonical names, bind the order to those actual
 files. Do not create duplicate state documents just to satisfy this list. The
