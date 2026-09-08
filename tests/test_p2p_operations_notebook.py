@@ -143,7 +143,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("RULE_ASSIMILATION_GATE_V1", self.agents_text)
 
     def test_arena_protocol_discovers_notebook(self) -> None:
-        self.assertIn("## 11. P2P operations notebook discovery", self.arena_text)
+        self.assertIn("## 11. P2P Supreme Law and operations discovery", self.arena_text)
         self.assertIn(NOTEBOOK_RELATIVE, self.arena_text)
         self.assertIn("P2P_OPERATIONS_NOTEBOOK", self.arena_text)
 
