@@ -28,6 +28,8 @@ ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
 CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
 UNKNOWN = "UNKNOWN"
+SUPREME_LAW_INSTALLED_PATH = ".p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md"
+SUPREME_LAW_DEVELOPMENT_PATH = "docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md"
 
 TERMINAL_STATES = (
     "COMPLETED",
@@ -2126,6 +2128,14 @@ def build_execution_prompt(
             f"CANONICAL_BASE_SHA: {sha_value}",
             f"CANONICAL_BASE_TREE: {tree_value}",
             "",
+            "P2P_SUPREME_LAW_PREFLIGHT:",
+            "SUPREME_LAW_READ_REQUIRED: YES",
+            f"- Before execution, read {SUPREME_LAW_INSTALLED_PATH}.",
+            f"- If the installed path is absent in a development checkout, read {SUPREME_LAW_DEVELOPMENT_PATH}.",
+            "- If neither file is accessible, do not execute the task; return BLOCKED with blocker P2P_SUPREME_LAW_UNAVAILABLE.",
+            "- An external executor must not claim it read an inaccessible file; Control Tower must supply the exact current law text when repository-file access is unavailable.",
+            "- Apply the law without emitting a separate compliance report.",
+            "",
             "TASK:",
             task,
             "",
@@ -2263,6 +2273,8 @@ __all__ = [
     "ProjectionError",
     "SessionBinding",
     "TERMINAL_STATES",
+    "SUPREME_LAW_INSTALLED_PATH",
+    "SUPREME_LAW_DEVELOPMENT_PATH",
     "UPLOAD_MANIFEST_INSTRUCTION",
     "UPLOAD_REQUIRED_VALUES",
     "USER_ACTION_BLOCK",
