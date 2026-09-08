@@ -254,6 +254,8 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
         self.assertIn("P2P_SUPREME_LAW_PREFLIGHT", prompt)
         self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", prompt)
         self.assertIn("TASK_BRANCH != LAW_AUTHORITY", prompt)
+        self.assertIn("TARGET_PROJECT != LAW_SOURCE", prompt)
+        self.assertIn("even when the task executes in a different repository or branch", prompt)
         self.assertIn("7roger89-web/P2P-upgrade-github-1@main", prompt)
         self.assertIn("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md", prompt)
         self.assertIn(".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md", prompt)
