@@ -87,6 +87,7 @@ DOC_FILES = (
     "docs/QUAN-TRI-FACT-EVAL-RAG.md",
     "docs/SU-DUNG.md",
     "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+    "docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md",
 )
 SCRIPT_FILES = (
     "scripts/doctor.py",
