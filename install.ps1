@@ -169,6 +169,15 @@ if (-not (Test-Path -LiteralPath $OperationsNotebookSource -PathType Leaf)) {
 New-Item -ItemType Directory -Force -Path (Join-Path $SystemDestination "docs") | Out-Null
 Copy-Item -LiteralPath $OperationsNotebookSource -Destination (Join-Path $SystemDestination "docs\P2P-OPERATIONS-NOTEBOOK.md") -Force
 
+# P2P Supreme Operating Law: mandatory prompt-preparation/execution discipline.
+# Install it beside the operations notebook and fail closed if the package omits it.
+$SupremeLawRel = "docs\p2p-development\P2P-SUPREME-OPERATING-LAW.md"
+$SupremeLawSource = Join-Path $PackageRoot $SupremeLawRel
+if (-not (Test-Path -LiteralPath $SupremeLawSource -PathType Leaf)) {
+  throw "Canonical P2P Supreme Operating Law is missing: $SupremeLawSource"
+}
+Copy-Item -LiteralPath $SupremeLawSource -Destination (Join-Path $SystemDestination "docs\P2P-SUPREME-OPERATING-LAW.md") -Force
+
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\approvals\requests") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\approvals\records") | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root ".p2p\gates") | Out-Null
