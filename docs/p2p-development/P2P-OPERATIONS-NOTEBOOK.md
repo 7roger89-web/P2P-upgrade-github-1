@@ -55,7 +55,7 @@ projection mechanism; nothing new is required:
   target project as the `<!-- BEGIN P2P CODEX --> ... <!-- END P2P CODEX -->`
   entrypoint block (`P2P-PROJECT-BOOTSTRAP.md` documents this entry
   contract). The inherited digest in that block names this notebook and the
-  P2P_BEGINNER_OPERATIONS_UX_V1 / RULE_ASSIMILATION_GATE_V1 rule sets, so
+  P2P_SUPREME_OPERATING_LAW_V1 / P2P_BEGINNER_OPERATIONS_UX_V1 / RULE_ASSIMILATION_GATE_V1 rule sets, so
   every installed project discovers them.
 - Release packages ship the full notebook via
   `scripts/package_release.py` (`DOC_FILES`), so the canonical text travels
@@ -118,7 +118,7 @@ is sufficient.
    cost/scope/complexity keep increasing without preserved progress toward
    acceptance or decision-useful evidence. Stop speculative mutation, preserve
    evidence, re-diagnose, change route/model/harness when justified, or return
-   `BLOCKED` / `INFEASIBLE` when supported.
+   `BLOCKED` with an `INFEASIBLE` verdict/reason when current constraints make the outcome impossible.
 5. **PRESERVE_CONTINUITY_AND_STOP** — For long work, retain only the durable
    checkpoint needed to continue: active goal/boundaries, current
    version/state, verified progress/evidence, decisions or blockers that still
