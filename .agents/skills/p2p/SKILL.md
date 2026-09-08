@@ -24,13 +24,17 @@ mechanisms.
 ## Start
 
 0. Before building any P2P prompt or beginning P2P-managed implementation,
-   read `P2P_SUPREME_OPERATING_LAW_V1` from
-   `docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md` in the P2P development
-   repo, or `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` in an installed
-   project. If neither path is readable but the incoming prompt contains
-   `SUPREME_LAW_CAPSULE`, use that capsule for this execution. Never claim a
-   repository file was read unless it actually was. This preflight shapes the
-   work and must not become a separate planning/reporting phase.
+   apply `TASK_BRANCH != LAW_AUTHORITY`. The selected task branch is execution
+   state only. When accessible, read `P2P_SUPREME_OPERATING_LAW_V1` from the
+   canonical P2P source
+   `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`,
+   regardless of the task branch. An installed
+   `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` may be used only when it
+   contains that law. Every generated executor prompt must still carry the
+   `SUPREME_LAW_CAPSULE` fallback so a stale branch or inaccessible canonical
+   repo cannot remove the active minimum law. Never claim a repository file was
+   read unless it actually was. This preflight shapes the work and must not
+   become a separate planning/reporting phase.
 1. Read [references/codex-adaptation.md](references/codex-adaptation.md).
 2. Normalize compatibility prefixes, then parse the first argument as a mode.
    Read
