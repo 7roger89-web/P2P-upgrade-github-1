@@ -97,15 +97,18 @@ session only for the same open PR and healthy context; start a new one for a
 new PR or goal, merged/closed PR, context exhaustion, or persistent tool
 confusion. Prompt count is not a rotation trigger.
 
-Arena executors also discover the single canonical operations notebook
-(`P2P_OPERATIONS_NOTEBOOK` at
-`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`; inherited digest in the
-installed project's `AGENTS.md` P2P block) for
-`P2P_SUPREME_OPERATING_LAW_V1`, `P2P_BEGINNER_OPERATIONS_UX_V1`, and
-`RULE_ASSIMILATION_GATE_V1`.
+Arena executors also discover the single canonical operations notebook.
+For Supreme Law authority,
+`TASK_BRANCH != LAW_AUTHORITY` and `TARGET_PROJECT != LAW_SOURCE`.
+When accessible, the active source is
+`7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`;
+an installed project's `AGENTS.md` and
+`.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` are local projections, not
+independent authority. P2P-generated prompts carry `SUPREME_LAW_CAPSULE` when
+the canonical repository cannot be read.
 
 Before Control Tower writes any executor prompt, it MUST read
-`P2P_SUPREME_OPERATING_LAW_V1` from the canonical notebook and use that law
+`P2P_SUPREME_OPERATING_LAW_V1` from the active canonical notebook and use that law
 to choose the bounded outcome, authority boundary, next useful action,
 verification scope, retry behavior, and stop condition. This is a prompt-write
 preflight, not a new planning phase. If the receiving executor cannot read the

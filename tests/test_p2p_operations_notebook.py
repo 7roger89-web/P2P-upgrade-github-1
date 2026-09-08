@@ -80,6 +80,11 @@ class P2POperationsNotebookTests(unittest.TestCase):
             self.assertIn(law, self.notebook_text, law)
         self.assertIn("CONTROL_TOWER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1",
                       self.notebook_text)
+        self.assertIn("TASK_BRANCH != LAW_AUTHORITY", self.notebook_text)
+        self.assertIn("TARGET_PROJECT != LAW_SOURCE", self.notebook_text)
+        self.assertIn("7roger89-web/P2P-upgrade-github-1@main", self.notebook_text)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", self.agents_text)
+        self.assertIn("SUPREME_LAW_CAPSULE", self.agents_text)
         self.assertIn("EXECUTOR_BEFORE_IMPLEMENTATION => READ_P2P_SUPREME_OPERATING_LAW_V1",
                       self.notebook_text)
         self.assertIn("Before Control Tower writes any executor prompt", self.ct_text)

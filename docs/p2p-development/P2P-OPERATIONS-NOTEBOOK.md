@@ -83,11 +83,19 @@ MODEL_SWITCH_OR_SESSION_RESET => READ_P2P_SUPREME_OPERATING_LAW_V1_AGAIN
 ```
 
 The canonical text is this section of
-`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`. In an installed project,
-use `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md`.
+`7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`.
 
-If an executor cannot read either repository path, the P2P-generated prompt
-must carry the compact `SUPREME_LAW_CAPSULE` inline. The executor must not
+`TASK_BRANCH != LAW_AUTHORITY`.
+`TARGET_PROJECT != LAW_SOURCE`.
+
+The target repository, worktree, and task branch are execution state only and
+must not select the Supreme Law version. In an installed project,
+`.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` is a valid local projection only
+when it contains `P2P_SUPREME_OPERATING_LAW_V1`; a stale local or task-branch
+copy does not outrank the active canonical source or the inline capsule.
+
+If an executor cannot read the canonical P2P repository, the P2P-generated
+prompt must carry the compact `SUPREME_LAW_CAPSULE` inline. The executor must not
 claim that it read a repository file unless it actually did. The prompt writer
 must not copy the whole notebook into ordinary prompts when the compact capsule
 is sufficient.
