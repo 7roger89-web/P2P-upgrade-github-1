@@ -1,6 +1,6 @@
 # P2P SUPREME OPERATING LAW
 
-Status: `OWNER_ADOPTED_CANDIDATE` until merged into the canonical P2P branch.
+Status: `OWNER_ADOPTED_CANONICAL_POLICY`. A branch carrying this file remains unpromoted until merged through the normal Owner Gate; once present on the canonical branch/release, this is the active P2P operating law.
 Authority: highest P2P operating discipline below platform/system safety, explicit Owner decisions, and domain-specific protected-action requirements.
 
 This is the compact canonical law for P2P prompt preparation and execution.
