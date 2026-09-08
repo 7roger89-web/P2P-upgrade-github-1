@@ -13,6 +13,13 @@ permissions, certify a live provider, approve a release, or replace Task
 State, the execution ledger, evidence authority, the sole P2P router, or any
 existing governance surface.
 
+The mandatory execution discipline above this operations memory is the
+[P2P Supreme Operating Law](P2P-SUPREME-OPERATING-LAW.md). Control Tower and
+any prompt writer must read that law before writing each executor prompt.
+Every P2P executor must read the installed law before execution, or receive
+the exact canonical law text when the executor cannot access repository files.
+This is a read preflight, not a compliance-reporting ceremony.
+
 ## 1. Canonical status and authority shape
 
 There is exactly one canonical logical artifact: `P2P_OPERATIONS_NOTEBOOK`.
@@ -60,6 +67,9 @@ projection mechanism; nothing new is required:
 - Release packages ship the full notebook via
   `scripts/package_release.py` (`DOC_FILES`), so the canonical text travels
   with the release.
+- Release packages also ship `P2P-SUPREME-OPERATING-LAW.md`; installers
+  copy it to `.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md`. Missing the law
+  is a fail-closed install condition.
 - Example projects (APP GAME TRUYỆN, LOGISTICS, GIA PHẢ, future projects)
   are examples only. Nothing in this notebook or any runtime hard-codes
   them.
@@ -232,14 +242,22 @@ Do not make the beginner memorize internal Git state.
 
 ### RULE 14 — OVER_ENGINEERING_CHECK
 
-Operational guidance to the beginner should end with:
+Overengineering assessment is a decision rule, not a terminal ritual.
+
+Before opening a new branch of work with meaningful cost, require one concrete
+reason that the branch is needed for the current outcome, adequate verification,
+or a material safety/recovery risk. If a simpler valid route reaches the same
+required outcome with comparable acceptable risk, use the simpler route.
 
 ```text
-Không bị over engineering chứ? PASS/FAIL
+UNPROVEN_SUPPORTING_INFRASTRUCTURE => DEFER
+CEREMONY_THAT_DOES_NOT_CHANGE_A_DECISION_OR_PROTECT_A_REAL_REQUIREMENT => REMOVE
+AUTO_OVERENGINEERING_PASS => FORBIDDEN
 ```
 
-The expected normal result is `PASS`. `FAIL` means the proposed process
-itself should be simplified before execution.
+Do not end every beginner message with `Không bị over engineering chứ? PASS`
+and do not treat `PASS` as the expected answer. If the proposed work is
+unnecessary, say that it is overengineering and skip or simplify it.
 
 ### RULE 15 — ARENA_TASK_COMPLETION_DIALOG
 
@@ -409,73 +427,33 @@ P2P may automatically select a technical executor, capability, or verification
 surface so the beginner Owner is not forced to choose internal A/B options.
 That convenience must never become opaque execution.
 
-Canonical law:
-
 ```text
 AUTO_ROUTE != OPAQUE_EXECUTION
 AI_IS_TOOL
 OWNER_RETAINS_AUTHORITY
-OWNER_MUST_UNDERSTAND_WHAT_WAS_DONE_AND_WHY
 ```
 
-At each material routing or execution decision, Control Tower gives the Owner
-a concise operational explanation in plain language:
+At a material routing, mutation, cost, risk, or terminal decision, explain only
+what the Owner needs to understand and challenge:
 
-- what tool/executor/capability was selected;
-- what it will actually do or observe;
-- why it is appropriate for the current bounded goal;
-- why a smaller/simpler existing path is not sufficient, when that is not
-  obvious;
-- any material permission, privacy, cost, or mutation risk.
+- the result or action that matters;
+- why this path is appropriate when the reason is not obvious;
+- the evidence or important limitation;
+- the one next action or genuine Owner Gate, when one exists.
 
-This is a decision rationale, not hidden chain-of-thought. Do not expose or
-fabricate private reasoning traces. Give only the concise reasons needed for
-the Owner to understand and challenge the decision.
+Do not force a fixed `OWNER_CHALLENGE_SUMMARY`, alternatives list,
+falsifier field, or `OVER_ENGINEERING_CHECK` into every terminal response.
+Those are optional explanatory tools when a disputed or consequential decision
+needs them, not required ceremony.
 
 Routine micro-fixes may still auto-continue under RULE 11
-(OWNER_MICRO_LOOP_SUPPRESSION). Do not interrupt the Owner for every small
-technical adjustment. Instead, consolidate the important decisions in the
-next meaningful update or terminal summary.
+(OWNER_MICRO_LOOP_SUPPRESSION). The Owner may ask "tại sao làm thế?",
+"đã cân nhắc cách nào khác?", or "bằng chứng đâu?" at any time; answer from
+durable evidence and explicit decision rationale without exposing or fabricating
+private chain-of-thought.
 
-Every bounded task terminal summary must include an
-`OWNER_CHALLENGE_SUMMARY` with:
-
-```text
-WHAT_WAS_DONE
-WHY_THIS_PATH
-ALTERNATIVES_CONSIDERED
-WHY_NOT_THE_ALTERNATIVES
-EVIDENCE_THAT_SUPPORTS_THE_RESULT
-WHAT_COULD_STILL_BE_WRONG
-WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT
-OVER_ENGINEERING_CHECK
-OWNER_ACTION_NOW
-```
-
-Rules for that summary:
-
-- `ALTERNATIVES_CONSIDERED` lists at most two genuinely plausible alternatives
-  that materially affected the decision; do not manufacture options merely to
-  fill the field.
-- `WHY_NOT_THE_ALTERNATIVES` states the concrete tradeoff: weaker evidence,
-  more risk, more cost, more architecture, less reversibility, or mismatch with
-  the bounded goal.
-- `WHAT_COULD_STILL_BE_WRONG` must name the important residual uncertainty
-  instead of declaring absolute certainty.
-- `WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT` gives the Owner a practical way to
-  challenge the conclusion.
-- `OWNER_ACTION_NOW` remains exactly one immediate beginner-safe action, or
-  `NONE` when the Owner should not do anything.
-
-The Owner may ask "tại sao làm thế?", "đã cân nhắc cách nào khác?", or "bằng
-chứng đâu?" at any time. P2P must answer from durable evidence and explicit
-decision rationale. It must not answer "vì hệ thống tự route" as if routing
-were authority.
-
-This rule does not require a new router, decision database, explainability
-framework, audit service, or verbose per-step narration. It is an
-owner-facing transparency contract over existing Control Tower state,
-ReturnPackets, evidence, and routing decisions.
+This rule does not create a new router, database, explainability framework,
+audit service, or per-step narration requirement.
 
 ### RULE 19 — REALITY_FIRST_CAPABILITY_PROBE
 
