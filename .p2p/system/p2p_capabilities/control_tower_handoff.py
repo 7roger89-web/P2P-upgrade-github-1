@@ -27,6 +27,17 @@ CONTROL_TOWER_PROJECTION_SCHEMA = "p2p-control-tower-state-projection/2"
 ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
 CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
+SUPREME_LAW_DEVELOPMENT_PATH = "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
+SUPREME_LAW_INSTALLED_PATH = ".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md"
+SUPREME_LAW_CAPSULE = "\n".join(
+    (
+        "1. Preserve the Owner's outcome and authority; decide routine technical details inside approved scope.",
+        "2. Take the simplest useful path to completion; do not build speculative infrastructure before a demonstrated need.",
+        "3. Real state and scoped evidence override assumptions; reconcile UNKNOWN side effects before unsafe retry.",
+        "4. Retry by process type and detect stuckness by lack of preserved progress, not a fixed failure count.",
+        "5. Preserve only the durable checkpoint needed to continue and STOP when the required outcome is proven.",
+    )
+)
 UNKNOWN = "UNKNOWN"
 
 TERMINAL_STATES = (
@@ -2131,6 +2142,15 @@ def build_execution_prompt(
             "",
             "ACCEPTANCE_CRITERIA:",
             criteria_text,
+            "",
+            "P2P_SUPREME_LAW_PREFLIGHT:",
+            f"- Before implementation, read P2P_SUPREME_OPERATING_LAW_V1 from {SUPREME_LAW_DEVELOPMENT_PATH} when that path is accessible.",
+            f"- In an installed project, use {SUPREME_LAW_INSTALLED_PATH}.",
+            "- If neither repository path is readable, the inline SUPREME_LAW_CAPSULE below is authoritative for this execution.",
+            "- Do not claim that a repository file was read unless it actually was.",
+            "- Apply the law to outcome, authority, next useful action, verification, retry/stuckness, and stopping; do not turn preflight into a separate report.",
+            "SUPREME_LAW_CAPSULE:",
+            SUPREME_LAW_CAPSULE,
             "",
             "SESSION_RULES:",
             "- Use the explicit HOST above as authoritative; never infer a host from narrative prose.",
