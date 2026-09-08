@@ -152,11 +152,25 @@ PR_EXPECTATION=
 ```
 
 Before `ASSESS`, every Arena executor must complete the
-`P2P_SUPREME_OPERATING_LAW_V1` preflight. Read the canonical notebook when
-repository access exists. If it does not, use the inline
-`SUPREME_LAW_CAPSULE` supplied by the Control Tower prompt. Do not claim a
-repository file was read unless it actually was. The preflight exists to shape
-execution; it must not expand into a separate planning/reporting phase.
+`P2P_SUPREME_OPERATING_LAW_V1` preflight.
+
+`TASK_BRANCH != LAW_AUTHORITY`.
+
+The Arena working branch is execution state only. It must never determine which
+Supreme Law version applies. When Arena can access the canonical P2P repository,
+read the law from
+`7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
+regardless of the selected task branch or project branch.
+
+A notebook copied into an installed project or old task branch may be used only
+when it contains `P2P_SUPREME_OPERATING_LAW_V1`; a stale branch-local copy does
+not outrank the inline `SUPREME_LAW_CAPSULE`. The Control Tower prompt must
+carry that capsule so Arena still receives the active minimum law when the
+canonical P2P repository cannot be read.
+
+Do not claim a repository file was read unless it actually was. The preflight
+exists to shape execution; it must not expand into a separate planning/reporting
+phase.
 
 The Owner must not infer whether to reuse the current Arena chat or create a
 new one. Within `ASSESS`, expose only:
