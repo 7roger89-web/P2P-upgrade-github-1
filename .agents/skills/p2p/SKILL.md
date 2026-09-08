@@ -2,8 +2,8 @@
 name: p2p
 description: >-
   Route and execute the P2P prompt-engineering system in Codex or ChatGPT: build
-  and optimize prompts, classify task intent and complexity, create a nine-part
-  task contract, scope large work, explore alternatives, maintain ATLAS/CAPSULE
+  and optimize prompts, classify task intent and complexity, create a minimal
+  outcome/boundary/context contract, scope large work, explore alternatives, maintain ATLAS/CAPSULE
   state, evaluate project workflows, turn a rough idea into a grounded recommendation, teach P2P, or run any
   named P2P workflow. Use when the user explicitly
   invokes $p2p or asks for P2P, prompt engineering, prompt optimization,
@@ -20,6 +20,26 @@ description: >-
 Use P2P as a task router and prompt-workflow system. Preserve the useful logic
 of P2P 8.4.6-C while using native OpenAI skill, agent, project, and permission
 mechanisms.
+
+## Supreme Law preflight
+
+Before writing any executor prompt or beginning P2P execution, read the current
+P2P Supreme Operating Law:
+
+- installed project: `.p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md`;
+- development source fallback:
+  `docs/p2p-development/P2P-SUPREME-OPERATING-LAW.md`.
+
+This is mandatory for Control Tower/prompt-writer and executor preparation.
+Do not emit a compliance report just to prove the read happened.
+
+If the destination executor can read repository files, instruct it to read the
+installed law before execution. If it cannot access repository files, include
+or attach the exact current canonical law text with the prompt. Never claim an
+external model read a file it cannot access.
+
+The law is the operating discipline; task prompts remain task deltas and must
+not duplicate unrelated P2P history.
 
 ## Start
 
@@ -92,17 +112,17 @@ invoke the skill with `$p2p <mode>` or use a packaged alias skill.
 
 ## Dispatcher
 
-Build a compact task contract before choosing a route:
+Before choosing a route, keep only the action-relevant contract needed by
+the Supreme Operating Law:
 
-1. Objective
-2. Supplied inputs and trusted sources
-3. User, audience, and experience level
-4. Target environment or model
-5. Deliverable and output format
-6. Constraints, exclusions, and permissions
-7. Evidence and freshness requirements
-8. Success checks and stop conditions
-9. Unknowns that could materially change the result
+1. **KẾT QUẢ** — required outcome and observable acceptance.
+2. **GIỚI HẠN VÀ QUYỀN** — scope, invariants, granted autonomy, Owner Gates,
+   and relevant cost/resource limits.
+3. **NGỮ CẢNH CẦN THIẾT** — current checkpoint, authoritative inputs,
+   verified facts, and unknowns that can materially change the decision.
+
+For a simple direct task these may remain implicit. Do not force the user to
+fill a form or specify routine implementation details.
 
 For evidence-backed work, label each material statement `FACT`, `INFERENCE`,
 `USER_ASSUMPTION`, `DISPUTED`, or `UNKNOWN`. Do not average exact prices or
