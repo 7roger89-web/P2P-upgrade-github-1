@@ -24,8 +24,10 @@ mechanisms.
 ## Start
 
 0. Before building any P2P prompt or beginning P2P-managed implementation,
-   apply `TASK_BRANCH != LAW_AUTHORITY`. The selected task branch is execution
-   state only. When accessible, read `P2P_SUPREME_OPERATING_LAW_V1` from the
+   apply `TASK_BRANCH != LAW_AUTHORITY` and
+   `TARGET_PROJECT != LAW_SOURCE`. The selected target repository and task
+   branch are execution state only. When accessible, read
+   `P2P_SUPREME_OPERATING_LAW_V1` from the
    canonical P2P source
    `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`,
    regardless of the task branch. An installed
