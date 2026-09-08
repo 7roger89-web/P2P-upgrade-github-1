@@ -230,6 +230,10 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
         )
 
         self.assertIn("CONTROL_TOWER_RETURN_PACKET", prompt)
+        self.assertIn("P2P_SUPREME_LAW_PREFLIGHT", prompt)
+        self.assertIn("SUPREME_LAW_READ_REQUIRED: YES", prompt)
+        self.assertIn(".p2p/system/docs/P2P-SUPREME-OPERATING-LAW.md", prompt)
+        self.assertIn("P2P_SUPREME_LAW_UNAVAILABLE", prompt)
         for field_name in (
             "SESSION_ID",
             "HOST",
