@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import shlex
 import sys
-from typing import List
+from typing import List, Union
 
 from pandastack import Sandbox
 
@@ -11,6 +11,12 @@ from pandastack import Sandbox
 TTL_SECONDS = 900
 PORT = 8765
 DEFAULT_CLONE_URL = "https://github.com/octocat/Hello-World.git"
+
+
+def as_text(value: Union[str, bytes]) -> str:
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    return value
 
 
 def fail(message: str, code: int = 1) -> int:
@@ -41,14 +47,16 @@ def main() -> int:
             'python3 -c "import platform; print(platform.system()); print(2 + 2)"',
             timeout_seconds=30,
         )
-        if probe.exit_code != 0 or "4" not in probe.stdout:
+        if probe.exit_code != 0 or "4" not in as_text(probe.stdout):
             return fail("COMMAND_EXECUTION_FAILED")
 
         parent.filesystem.write(
             "/workspace/p2p-spike-marker.txt",
             "parent-prepared-state\n",
         )
-        marker = parent.filesystem.read("/workspace/p2p-spike-marker.txt")
+        marker = as_text(
+            parent.filesystem.read("/workspace/p2p-spike-marker.txt")
+        )
         if "parent-prepared-state" not in marker:
             return fail("FILESYSTEM_ROUNDTRIP_FAILED")
 
@@ -58,7 +66,7 @@ def main() -> int:
             "git -C /workspace/repo rev-parse --is-inside-work-tree"
         )
         clone = parent.exec(clone_cmd, timeout_seconds=120)
-        if clone.exit_code != 0 or "true" not in clone.stdout.lower():
+        if clone.exit_code != 0 or "true" not in as_text(clone.stdout).lower():
             return fail("GIT_CLONE_FAILED")
 
         mkdir = parent.exec("mkdir -p /workspace/preview", timeout_seconds=30)
@@ -91,7 +99,9 @@ def main() -> int:
         sandboxes.append(child)
         print(f"CHILD_SANDBOX_ID={child.id}")
 
-        inherited = child.filesystem.read("/workspace/p2p-spike-marker.txt")
+        inherited = as_text(
+            child.filesystem.read("/workspace/p2p-spike-marker.txt")
+        )
         if "parent-prepared-state" not in inherited:
             return fail("FORK_STATE_INHERITANCE_FAILED")
 
@@ -99,8 +109,12 @@ def main() -> int:
             "/workspace/p2p-spike-marker.txt",
             "child-diverged-state\n",
         )
-        parent_after = parent.filesystem.read("/workspace/p2p-spike-marker.txt")
-        child_after = child.filesystem.read("/workspace/p2p-spike-marker.txt")
+        parent_after = as_text(
+            parent.filesystem.read("/workspace/p2p-spike-marker.txt")
+        )
+        child_after = as_text(
+            child.filesystem.read("/workspace/p2p-spike-marker.txt")
+        )
 
         if "parent-prepared-state" not in parent_after:
             return fail("PARENT_MUTATED_BY_CHILD")
