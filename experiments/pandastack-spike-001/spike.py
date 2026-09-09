@@ -25,6 +25,19 @@ def fail(message: str, code: int = 1) -> int:
     return code
 
 
+def first_child(value):
+    if isinstance(value, (list, tuple)):
+        if not value:
+            raise RuntimeError("FORK_TREE_RETURNED_NO_CHILDREN")
+        return value[0]
+    if hasattr(value, "sandboxes"):
+        children = value.sandboxes
+        if not children:
+            raise RuntimeError("FORK_TREE_RETURNED_NO_CHILDREN")
+        return children[0]
+    return value
+
+
 def main() -> int:
     if not os.getenv("PANDASTACK_API_KEY"):
         print("PANDASTACK_SPIKE_RESULT=BLOCKED")
@@ -93,17 +106,22 @@ def main() -> int:
         preview_url = parent.preview_url(PORT)
         print(f"PREVIEW_URL={preview_url}")
 
-        child = parent.fork(
-            metadata={"purpose": "p2p-pandastack-spike-001", "role": "child"}
+        # P2P's target capability is Branch & Explore. PandaStack documents
+        # fork_tree as the disk+memory fan-out path used for that workflow.
+        fanout = parent.fork_tree(
+            count=1,
+            metadata={"purpose": "p2p-pandastack-spike-001", "role": "branch"},
         )
+        child = first_child(fanout)
         sandboxes.append(child)
-        print(f"CHILD_SANDBOX_ID={child.id}")
+        print(f"FORK_TREE_CHILD_SANDBOX_ID={child.id}")
 
         inherited = as_text(
             child.filesystem.read("/workspace/p2p-spike-marker.txt")
         )
+        print(f"FORK_TREE_INHERITED_MARKER={inherited.strip()!r}")
         if "parent-prepared-state" not in inherited:
-            return fail("FORK_STATE_INHERITANCE_FAILED")
+            return fail("FORK_TREE_STATE_INHERITANCE_FAILED")
 
         child.filesystem.write(
             "/workspace/p2p-spike-marker.txt",
@@ -125,7 +143,8 @@ def main() -> int:
         print("FILESYSTEM_ROUNDTRIP=PASS")
         print("GIT_CLONE=PASS")
         print("PREVIEW_URL_GENERATION=PASS")
-        print("FORK_AND_DIVERGENCE=PASS")
+        print("FORK_TREE_INHERITANCE=PASS")
+        print("FORK_TREE_DIVERGENCE=PASS")
         print("PANDASTACK_SPIKE_RESULT=PASS")
         return 0
 
