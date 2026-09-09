@@ -1,0 +1,20 @@
+name: logistics
+version: 0.1.0
+description: >-
+  Read-only Logistics (logistics-work-desk) integration. Answers "what do I
+  have to do today" (tasks), "shipment status", and freight-rate questions
+  from the Logistics MongoDB. Uses a dedicated read-only credential
+  (LOGISTICS_MONGO_URI_READONLY + LOGISTICS_MONGO_DB_NAME); the connector
+  exposes find/find_one only, with a collection allowlist, and performs no
+  write operations of any kind. Freight-rate lookup currently fails closed
+  with SCHEMA_GAP_RATE_CARD_FIELDS until the rate-card field mapping is
+  verified against the logistics-work-desk source.
+author: 7roger89-web
+kind: backend
+requires_env:
+  - LOGISTICS_MONGO_URI_READONLY
+  - LOGISTICS_MONGO_DB_NAME
+provides_tools:
+  - logistics_today_work
+  - logistics_freight_rate
+  - logistics_shipment_status

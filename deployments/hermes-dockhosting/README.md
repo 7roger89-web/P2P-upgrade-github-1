@@ -57,6 +57,17 @@ Optional:
 HERMES_DEFAULT_MODEL=gemini-3.7-flash
 ```
 
+Logistics read-only integration (see [README-logistics.md](README-logistics.md)):
+
+```text
+LOGISTICS_MONGO_URI_READONLY=<read-only MongoDB URI for the Logistics datastore>
+LOGISTICS_MONGO_DB_NAME=<Logistics database name>
+```
+
+Use a dedicated MongoDB credential with read-only privileges. The three
+Logistics tools (`logistics_today_work`, `logistics_freight_rate`,
+`logistics_shipment_status`) stay hidden until both variables are set.
+
 Do not commit real tokens or API keys to GitHub.
 
 ## DockHosting settings
