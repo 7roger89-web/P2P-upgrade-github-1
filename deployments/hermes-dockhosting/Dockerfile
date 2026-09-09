@@ -17,6 +17,21 @@ RUN set -eux; \
     python3 -c 'import json; d=json.load(open("/tmp/hermes-patches-status.json")); req={"footer","table","db","nostream","clean-think","smart-split","terminal-cwd","state-guard"}; missing=[x for x in sorted(req) if not d["patches"].get(x,{}).get("applied")]; assert not missing, f"hermes-patches missing after build: {missing}"'; \
     rm -f /tmp/hermes-patches-status.json
 
+# --- Read-only Logistics connector dependency -------------------------------
+# The base image does not bundle pymongo. Install it into the Hermes runtime
+# venv (/opt/hermes/.venv) so the hermes-logistics plugin can execute real
+# read-only MongoDB queries. /opt/hermes is sealed read-only at runtime, so
+# this must happen at build time.
+RUN set -eux; \
+    uv pip install --python /opt/hermes/.venv/bin/python --no-cache-dir "pymongo>=4.6,<5" || \
+    /opt/hermes/.venv/bin/python -m pip install --no-cache-dir "pymongo>=4.6,<5"
+
+# --- Copy the read-only Logistics Hermes plugin into the image --------------
+# Placed outside /opt/data (the persistent volume) so the plugin code survives
+# container recreation; the entrypoint copies it into HERMES_HOME/plugins at
+# startup and enables it.
+COPY --chmod=0755 deployments/hermes-dockhosting/plugins /opt/hermes-logistics
+
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
 
 ENV API_SERVER_ENABLED=true \

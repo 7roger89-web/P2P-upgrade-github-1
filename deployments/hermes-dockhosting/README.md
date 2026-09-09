@@ -59,6 +59,41 @@ HERMES_DEFAULT_MODEL=gemini-3.7-flash
 
 Do not commit real tokens or API keys to GitHub.
 
+## Read-only Logistics integration (Hermes plugin)
+
+Hermes ships a native plugin (`plugins/hermes-logistics`) that exposes three
+**read-only** Logistics data tools:
+
+- `logistics_today_work` — "Hôm nay tôi có việc gì?"
+- `logistics_freight_rate_lookup` — "Cước Hải Phòng về Hà Nội container 20' bao nhiêu?"
+- `logistics_shipment_status` — "Lô hàng <ID> hiện thế nào?"
+
+The plugin runs real MongoDB queries via `pymongo` (installed at image build
+time) using a **read-only credential**. It adds no HTTP API, no microservice,
+no queue, no daemon, and no MCP server. It is enabled automatically through
+`plugins.enabled` in the Hermes config.
+
+Required environment variables (read-only credential only — never the
+production write URI):
+
+```text
+LOGISTICS_MONGO_URI_READONLY=<read-only MongoDB connection string>
+LOGISTICS_MONGO_DB_NAME=<Logistics database name>
+```
+
+Optional:
+
+```text
+LOGISTICS_SCHEMA_PATH=<path to a schema.yaml override>
+```
+
+If these are absent, the tools return `status = NOT_CONFIGURED` and name the
+exact variables needed; they never guess a rate, status, or business fact. The
+plugin's schema contract (`schema.yaml`) is `PROVISIONAL_UNVERIFIED` and must be
+confirmed against the real Logistics application before relying on live data.
+See `plugins/hermes-logistics/README.md` for full detail and the focused
+non-secret tests in `tests/test_hermes_logistics_connector.py`.
+
 ## DockHosting settings
 
 ```text

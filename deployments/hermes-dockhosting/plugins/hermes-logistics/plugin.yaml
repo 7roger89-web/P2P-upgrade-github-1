@@ -1,0 +1,9 @@
+name: hermes-logistics
+version: "1.0"
+description: >-
+  Read-only Logistics data connector for Hermes. Adds three tools that run
+  real read-only MongoDB queries against the Logistics datastore: today's work
+  (Việc cần xử lý), freight rate lookup by route/container, and shipment status.
+requires_env:
+  - LOGISTICS_MONGO_URI_READONLY
+  - LOGISTICS_MONGO_DB_NAME
