@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------
+# Logistics read-only schema contract for Hermes
+# ---------------------------------------------------------------------------
+# STATUS: PROVISIONAL_UNVERIFIED
+#
+# This file maps the logical capability concepts (what the user asks) to the
+# physical Logistics MongoDB collection + field names (where the data lives).
+#
+# IMPORTANT — why it is PROVISIONAL:
+#   The authoritative Logistics application repository
+#   (7roger89-web/logistics-work-desk) was NOT accessible from the execution
+#   environment at implementation time, so the exact collection/field names
+#   could not be confirmed by reading the real code. The names below are a
+#   best-effort contract built from the documented domain areas (shipments,
+#   rate_cards, knowledge_base, dashboard review queue / "Việc Cần Xử Lý").
+#
+#   The connector FAILS CLOSED. Field candidates are resolved against a sampled
+#   document and matched by normalized equality in Python. If a candidate name
+#   does not exist in the live data, the capability returns NOT_FOUND or
+#   SCHEMA_UNVERIFIED — it never fabricates a rate, status, or business fact.
+#
+#   Before relying on live Logistics data, confirm every collection + field
+#   name against the real application and update this file (no code change
+#   required; this file is data).
+# ---------------------------------------------------------------------------
+version: 1
+schema_status: PROVISIONAL_UNVERIFIED
+
+collections:
+  shipments:
+    # Logical -> candidate physical field names (first present on the doc wins).
+    id_field: ["shipment_id", "id", "code", "reference", "ma_lohang", "so_lohang", "shipment_ref"]
+    status_field: ["status", "trang_thai", "state", "current_status", "phase"]
+    customer_field: ["customer", "customer_name", "khach_hang", "client", "customer_id"]
+    updated_field: ["updated_at", "updatedAt", "last_updated", "modified_at", "updated"]
+    date_field: ["date", "created_at", "createdAt", "ngay_tao", "created"]
+    title_field: ["title", "name", "mo_ta", "description", "content", "note"]
+
+  rate_cards:
+    origin_field: ["origin", "origin_city", "from", "from_city", "noi_di", "origin_place", "di"]
+    destination_field:
+      ["destination", "destination_city", "to", "to_city", "noi_den", "destination_place", "den"]
+    size_field:
+      ["container_size", "size", "container_type", "loai_container", "vehicle_type", "loai_phuong_tien"]
+    rate_field: ["rate", "price", "gia", "amount", "cost", "don_gia", "freight_rate"]
+    currency_field: ["currency", "currency_code", "tien_te", "ccy", "unit"]
+    effective_date_field: ["effective_date", "effective_from", "valid_from", "updated_at", "updatedAt"]
+
+  review_queue:
+    id_field: ["id", "task_id", "code", "reference", "item_id"]
+    date_field: ["date", "due_date", "deadline", "han_xu_ly", "created_at"]
+    status_field: ["status", "trang_thai", "state"]
+    title_field: ["title", "name", "content", "mo_ta", "description"]
+
+today_work:
+  # Which persisted collections drive "Việc Cần Xử Lý" (today's work).
+  # PROVISIONAL: the real derivation is defined by the Logistics dashboard
+  # render logic ("Việc Cần Xử Lý"). Confirm the exact source(s) + field(s)
+  # against the application before relying on this.
+  max_items: 20
+  sources:
+    - collection: shipments
+      date_field: ["date", "created_at", "createdAt", "ngay_tao", "created"]
+      id_field: ["shipment_id", "id", "code", "reference", "ma_lohang"]
+      title_field: ["title", "name", "mo_ta", "description", "content"]
+      status_field: ["status", "trang_thai", "state", "phase"]
+    - collection: review_queue
+      date_field: ["date", "due_date", "deadline", "han_xu_ly", "created_at"]
+      id_field: ["id", "task_id", "code", "reference"]
+      title_field: ["title", "name", "content", "mo_ta", "description"]
+      status_field: ["status", "trang_thai", "state"]
+
+rate_lookup:
+  collection: rate_cards
+  recent_history: true
+  history_limit: 5
+
+shipment_status:
+  collection: shipments

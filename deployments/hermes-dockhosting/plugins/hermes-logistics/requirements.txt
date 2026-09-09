@@ -1,0 +1,4 @@
+# Read-only Logistics connector dependency.
+# The base Hermes image does not bundle pymongo, so it is added at build time
+# in deployments/hermes-dockhosting/Dockerfile.
+pymongo>=4.6,<5
