@@ -118,6 +118,11 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("routine checkpointing of the already\napproved working branch", self.notebook_text)
         self.assertIn("Before known quota exhaustion", self.notebook_text)
         self.assertIn("Arena/Codex/Manus/another executor", self.notebook_text)
+        self.assertIn("MATERIAL_RECOVERY_VALUE", self.agents_text)
+        self.assertIn("CURRENT approved branch", self.agents_text)
+        self.assertIn("MATERIAL_RECOVERY_VALUE", self.arena_text)
+        self.assertIn("CURRENT working branch", self.arena_text)
+        self.assertIn("DURABLE_CHECKPOINT", self.ct_text)
 
     def test_rule_assimilation_gate_v1_present_with_status_vocabulary(self) -> None:
         self.assertIn("## 4. RULE_ASSIMILATION_GATE_V1", self.notebook_text)
