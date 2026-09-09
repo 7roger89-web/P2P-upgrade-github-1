@@ -6,8 +6,8 @@ classes with REAL Logistics data — no invented facts:
 
 | Question (example) | Tool | Source collection |
 | --- | --- | --- |
-| "Hôm nay tôi có việc gì?" | `logistics_today_work` | `tasks` |
-| "Cước Hải Phòng về Hà Nội container 20' bao nhiêu?" | `logistics_freight_rate` | `rate_cards` (fail-closed, see below) |
+| "Hôm nay tôi có việc gì?" | `logistics_today_work` | `tasks` (explicit ASSIGNEE/TEAM scope) |
+| "Cước Hải Phòng về Hà Nội container 20' bao nhiêu?" | `logistics_freight_rate` | `rate_cards` (fail-closed: verified schema insufficient, see below) |
 | "Lô hàng LK-1024 hiện thế nào?" | `logistics_shipment_status` | `shipments` |
 
 ## Architecture
@@ -66,29 +66,40 @@ Tests assert each of these properties (`tests/test_hermes_logistics_readonly.py`
   `created_at` descending. "Today's work" = open (not deleted, not done) tasks
   whose parseable deadline matches the requested day (Asia/Ho_Chi_Minh,
   UTC+07:00). Open tasks without a parseable deadline are counted and can be
-  included with `include_undated=true`; nothing is invented.
+  included with `include_undated=true`; nothing is invented. Scope is explicit:
+  `ASSIGNEE` (with `scope_value`) when `assignee`/`assignee_user_id` is
+  supplied, otherwise `TEAM` with a note that no personal identity was
+  supplied — TEAM results must never be presented as the user's own personal
+  tasks. There is no identity service in this task; a future bounded task may
+  bind messaging identity (e.g. Telegram user) to Logistics `assignee_user_id`.
 - **shipments** — lookup by stable business id `shipments.id`; exclude
   `is_deleted == true`; exclude `is_archived == true` unless
   `include_archived=true`; `status` falls back to `data["0.0"]["st"]`;
   `customer`/`client` mirror each other; financial section `data["3.4"]` is
   never exposed for status requests. Note: the section key `"0.0"` contains a
   dot, so it is read in Python, never via Mongo dot-notation.
-- **rate_cards** — stable `id`, soft-delete convention, `load_rate_cards()`
-  repository. The route/container/rate/currency/effective-date field names
-  could NOT be proven from the logistics-work-desk source, so
-  `logistics_freight_rate` **fails closed**: it executes a real bounded
-  read-only sample query and returns `SCHEMA_GAP_RATE_CARD_FIELDS` with the
-  observed document keys and the exact missing fields. It never returns a
-  guessed rate. Once the field mapping is verified against the real
-  rate-card model/UI source, set `RATE_CARD_FIELD_MAP` in
-  `plugins/logistics/contracts.py` (single extension point) and implement the
-  conservative matcher in a follow-up task.
+- **rate_cards** — VERIFIED persisted shape (logistics-work-desk
+  `views/sales.py`, independently verified by Control Tower 2026-09-09):
+  `{id, customer, route_name, history[{month, total_cost, total_price,
+  profit, details[{name, cost, price}], updated_at}]}`. **origin, destination,
+  container/equipment and currency are NOT structured fields**; `route_name`
+  is free text (may contain descriptive hints such as "(Cont 40)") and is
+  never heuristically parsed as authoritative structured data. A structured
+  route lookup (X → Y, container Z) therefore cannot be answered from the
+  current schema, so `logistics_freight_rate` **fails closed** with
+  `RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP`: it executes a
+  real bounded read-only sample query (key names only — route_name values are
+  not echoed), reports the verified schema finding, and never returns a rate.
+  No new collection is created to work around this; a follow-up Logistics
+  schema task (structured route/equipment/currency fields or a normalized
+  rate model) is required before a matcher can be implemented.
 
 ## Verification status
 
 - Focused non-secret tests: `python3 -m pytest tests/test_hermes_logistics_readonly.py`
-  (37 tests — today-work, freight fail-closed, shipment status, read-only
-  safety, secret safety, plugin registration contract, real-driver error path).
+  (43 tests — today-work incl. ASSIGNEE/TEAM scope, freight fail-closed with
+  the verified schema finding, shipment status, read-only safety, secret
+  safety, plugin registration contract, real-driver error path).
 - Plugin load verified against the real hermes-agent plugin loader (bundled
   backend auto-load; toolset `logistics` on by default for telegram/api_server;
   tools hidden without env, exposed with env).
@@ -102,10 +113,15 @@ Tests assert each of these properties (`tests/test_hermes_logistics_readonly.py`
    privileges on the Logistics database, then set on DockHosting:
    `LOGISTICS_MONGO_URI_READONLY`, `LOGISTICS_MONGO_DB_NAME`. Then ask Hermes
    the three questions and confirm answers match the Logistics app.
-2. **RATE_CARD_FIELD_VERIFICATION** — verify the rate-card business fields
-   (origin, destination, container/vehicle, rate, currency, effective date)
-   from the logistics-work-desk rate-card model/UI source and supply the
-   mapping so the freight tool can be activated in a follow-up task.
+2. **LOGISTICS_RATE_CARD_SCHEMA_TASK** — the verified rate-card schema has no
+   structured origin/destination/container/currency fields (route_name is free
+   text), so structured freight-rate lookup requires a follow-up bounded task
+   in logistics-work-desk to add structured fields (or a normalized rate
+   model). Only after that schema exists should the freight matcher be
+   implemented in a follow-up Hermes task.
+3. **IDENTITY_BINDING** (future, optional) — bind messaging identity (e.g.
+   Telegram user) to Logistics `assignee_user_id` so "Hôm nay TÔI có việc gì?"
+   can default to ASSIGNEE scope instead of TEAM scope.
 
 ## Out of scope (deliberately)
 

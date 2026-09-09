@@ -4,8 +4,10 @@
 Covers:
   1. TODAY_WORK — relevant item for target date returned, unrelated date
      excluded, done/deleted excluded, no-data case, undated handling.
-  2. FREIGHT_RATE_LOOKUP — fail-closed SCHEMA_GAP_RATE_CARD_FIELDS (never a
-     guessed rate), NOT_FOUND when empty, config-missing envelope.
+  2. FREIGHT_RATE_LOOKUP — fail-closed with the VERIFIED finding
+     RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP (never a
+     guessed rate, no heuristic route_name parsing), NOT_FOUND when empty,
+     config-missing envelope.
   3. SHIPMENT_STATUS — exact id returns correct state, status fallback via
      data["0.0"]["st"], unknown id NOT_FOUND, deleted/archived handling,
      financial payload never exposed, ambiguous multi-match.
@@ -176,6 +178,7 @@ def _tasks_docs() -> list:
             "task_id": "T-001",
             "content": "Chuẩn bị hồ sơ hải quan cho lô LK-1024",
             "assignee": "Minh",
+            "assignee_user_id": "u-1",
             "deadline": dt.datetime(2026, 9, 9, 10, 0),
             "done": False,
             "created_at": dt.datetime(2026, 9, 7, 8, 0),
@@ -280,18 +283,30 @@ def _shipments_docs() -> list:
 
 
 def _rate_cards_docs() -> list:
-    # Plausible but UNVERIFIED field names — the tool must refuse to interpret them.
+    # VERIFIED persisted shape (logistics-work-desk views/sales.py): id,
+    # customer, route_name (free text), history[{month, total_cost,
+    # total_price, profit, details[{name, cost, price}], updated_at}].
+    # Values are realistic, but the tool must refuse to return any of them
+    # as a rate while the schema has no structured route/equipment/currency
+    # fields.
     return [
         {
             "id": "RC-1",
-            "diem_di": "Hải Phòng",
-            "diem_den": "Hà Nội",
-            "container": "20'",
-            "don_gia": 4500000,
+            "customer": "Công ty ABC",
+            "route_name": "Hải Phòng - Hà Nội (Cont 40)",
+            "history": [
+                {
+                    "month": "09/2026",
+                    "total_cost": 3_500_000,
+                    "total_price": 4_500_000,
+                    "profit": 1_000_000,
+                    "details": [{"name": "Vận chuyển", "cost": 3_500_000, "price": 4_500_000}],
+                    "updated_at": "2026-09-01",
+                }
+            ],
             "is_deleted": False,
-            "updated_at": dt.datetime(2026, 9, 1, 8, 0),
         },
-        {"id": "RC-2", "is_deleted": True, "diem_di": "x", "don_gia": 1},
+        {"id": "RC-2", "customer": "x", "route_name": "y", "history": [], "is_deleted": True},
     ]
 
 
@@ -387,6 +402,41 @@ class TestTodayWork:
         result, _ = run_tool("handle_today_work", {"date": "09/09/2026"})
         assert result["error_type"] == "logistics_bad_request"
 
+    # -- explicit ASSIGNEE vs TEAM scope (no identity service in this task) --
+
+    def test_team_scope_by_default(self, run_tool):
+        result, _ = run_tool("handle_today_work", {"date": "2026-09-09"})
+        assert result["scope"] == "TEAM"
+        assert "scope_value" not in result
+        assert "No personal assignee identity was supplied" in result["note"]
+        assert "whole team" in result["note"]
+
+    def test_assignee_scope_when_filtered_by_name(self, run_tool):
+        result, _ = run_tool("handle_today_work", {"date": "2026-09-09", "assignee": "Lan"})
+        assert result["scope"] == "ASSIGNEE"
+        assert result["scope_value"] == "Lan"
+        assert "No personal assignee" not in (result.get("note") or "")
+
+    def test_assignee_scope_when_filtered_by_user_id(self, run_tool):
+        result, _ = run_tool("handle_today_work", {"date": "2026-09-09", "assignee_user_id": "u-1"})
+        assert result["scope"] == "ASSIGNEE"
+        assert result["scope_value"] == "u-1"
+        assert [i["ref"] for i in result["items"]] == ["T-001"]
+
+    def test_assignee_scope_with_both_identity_parts(self, run_tool):
+        result, _ = run_tool("handle_today_work", {
+            "date": "2026-09-09", "assignee": "Minh", "assignee_user_id": "u-1"
+        })
+        assert result["scope"] == "ASSIGNEE"
+        assert result["scope_value"] == "Minh (u-1)"
+
+    def test_team_scope_note_present_also_on_not_found(self, run_tool):
+        result, _ = run_tool("handle_today_work", {"date": "2026-09-09"}, collections={"tasks": []})
+        assert result["scope"] == "TEAM"
+        assert result["status"] == "NOT_FOUND"
+        assert "No personal assignee identity was supplied" in result["note"]
+        assert "Không có việc nào" in result["note"]
+
 
 # ===========================================================================
 # 2. FREIGHT_RATE_LOOKUP (fail closed)
@@ -394,17 +444,42 @@ class TestTodayWork:
 
 
 class TestFreightRate:
-    def test_fail_closed_schema_gap_never_returns_a_rate(self, run_tool):
+    def test_fail_closed_verified_schema_insufficient_never_returns_a_rate(self, run_tool):
         result, _ = run_tool("handle_freight_rate", {
             "origin": "Hải Phòng", "destination": "Hà Nội", "container_size": "20'"
         })
-        assert result["status"] == "SCHEMA_GAP_RATE_CARD_FIELDS"
-        # No guessed monetary value anywhere in the payload.
+        assert result["status"] == "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP"
+        # No guessed monetary value anywhere in the payload: none of the
+        # fixture's realistic money figures may leak out as an answer.
+        text = json.dumps(result)
         assert "rate" not in result
-        assert "4500000" not in json.dumps(result)
-        assert result["sample_size"] == 1  # the is_deleted doc is excluded
-        assert "diem_di" in result["observed_top_level_keys"]
-        assert len(result["missing_fields"]) == 6
+        assert "4500000" not in text
+        assert "3500000" not in text
+        assert "1000000" not in text
+        # Verified schema findings are reported, not guessed-field wording.
+        vs = result["verified_schema"]
+        assert set(vs["structured_fields_absent"]) == {
+            "origin", "destination", "container_or_equipment", "currency"
+        }
+        assert "route_name" in vs["top_level_fields"]
+        assert "history" in vs["top_level_fields"]
+        assert "free text" in vs["route_name"]
+        assert "follow-up Logistics schema task" in result["reason"]
+        assert "Không đoán giá" in result["note"]
+        # Evidence from a real read-only sample query (is_deleted doc excluded).
+        assert result["sample_size"] == 1
+        assert "route_name" in result["observed_top_level_keys"]
+        assert "history" in result["observed_top_level_keys"]
+
+    def test_route_name_descriptive_text_not_parsed_as_structured(self, run_tool):
+        # route_name contains "(Cont 40)" descriptive text — it must NOT be
+        # treated as authoritative structured data, and route_name VALUES are
+        # not even echoed (that would invite heuristic parsing by the model).
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": "Hải Phòng", "destination": "Hà Nội", "container_size": "40"
+        })
+        assert result["status"] == "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP"
+        assert "Hải Phòng - Hà Nội (Cont 40)" not in json.dumps(result)
 
     def test_not_found_when_no_rate_cards(self, run_tool):
         result, _ = run_tool(

@@ -4,9 +4,13 @@ Schema provenance (LOGISTICS_SCHEMA_OBSERVED):
     Observed contracts from 7roger89-web/logistics-work-desk main, supplied by
     the Owner on 2026-09-09 and extracted from the actual repository source
     (core/database.py normalization, add_task()/load_tasks() loaders,
-    load_rate_cards() repository). These constants are NOT guesses from
-    collection names; where a field mapping could not be proven from source
-    (rate_cards business fields) the plugin fails closed instead.
+    load_rate_cards() repository); the rate-card persisted shape was
+    independently re-verified by Control Tower against views/sales.py. These
+    constants are NOT guesses from collection names: the verified rate-card
+    schema has no structured origin/destination/container/currency fields
+    (route_name is free text), so the freight tool fails closed with
+    RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP instead of
+    inventing mappings.
 
 This module is pure Python (stdlib only): no pymongo import, no I/O, so it is
 unit-testable anywhere and safe to import at plugin-registration time.
@@ -45,6 +49,17 @@ ALLOWED_COLLECTIONS = (SHIPMENTS, TASKS, RATE_CARDS)
 TASK_OPEN_FILTER = {"is_deleted": {"$ne": True}, "done": {"$ne": True}}
 TASK_SORT = [("created_at", -1)]
 
+# Personal-scope semantics for TODAY_WORK: tasks documents support assignee /
+# assignee_user_id but there is NO identity binding (e.g. Telegram user ->
+# Logistics assignee_user_id) in this task. When no assignee identity is
+# supplied the result is explicitly TEAM-scoped and the model must not present
+# it as the user's own personal tasks. A future bounded task may bind
+# messaging identity -> Logistics assignee_user_id.
+TODAY_WORK_TEAM_SCOPE_NOTE = (
+    "No personal assignee identity was supplied; results may include open "
+    "tasks for the whole team."
+)
+
 # --------------------------------------------------------------------------
 # shipments (observed from core/database.py normalization)
 # --------------------------------------------------------------------------
@@ -63,29 +78,40 @@ def shipment_active_filter(include_archived: bool = False) -> dict:
 
 
 # --------------------------------------------------------------------------
-# rate_cards — FIELD MAPPING UNRESOLVED (fail closed)
+# rate_cards — VERIFIED persisted shape (logistics-work-desk views/sales.py,
+# independently verified by Control Tower 2026-09-09); schema is INSUFFICIENT
+# for structured route lookup -> freight tool fails closed
 # --------------------------------------------------------------------------
-# Observed facts only: documents have a stable "id", soft-delete convention
-# is_deleted != true, unique id index, load_rate_cards() repository.
+# Persisted shape:
+#   {
+#     "id": rc_id,
+#     "customer": sel_cust,
+#     "route_name": rc_name,   # FREE TEXT (may contain e.g. "(Cont 40)")
+#     "history": [
+#       {"month": "MM/YYYY", "total_cost": ..., "total_price": ...,
+#        "profit": ..., "details": [{"name": ..., "cost": ..., "price": ...}],
+#        "updated_at": "YYYY-MM-DD"}
+#     ]
+#   }
 #
-# The route / container / rate / currency / effective-date field names could
-# NOT be proven from the logistics-work-desk source. Per the fact-integrity
-# rule the freight-rate tool therefore NEVER returns a rate: it reports
-# SCHEMA_GAP_RATE_CARD_FIELDS with the exact missing fields instead. Once the
-# mapping is verified against the real rate-card model/UI source, set
-# RATE_CARD_FIELD_MAP below to the verified field names (this is the single,
-# clearly-marked extension point; no matching logic is shipped unverified).
+# VERIFIED FINDING: origin, destination, container/equipment and currency are
+# NOT structured fields in the persisted rate-card schema. route_name is free
+# text and must NOT be heuristically parsed as authoritative structured data.
+# A structured route lookup ("X -> Y, container Z") therefore cannot be
+# answered from the current schema; it requires a follow-up Logistics schema
+# task (structured route/equipment/currency fields or a normalized rate
+# model). Until such a schema exists, the freight tool returns
+# RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP and never a rate.
+# No new collection is created to work around this.
+
+RATE_CARD_SCHEMA_GAP_STATUS = "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP"
 RATE_CARD_ACTIVE_FILTER = {"is_deleted": {"$ne": True}}
-
-RATE_CARD_FIELD_MAP = None  # e.g. {"origin": ..., "destination": ..., "equipment": ..., "rate": ..., "currency": ..., "effective_date": ...}
-
-RATE_CARD_MISSING_FIELDS = (
-    "origin_field: field holding the route origin (e.g. Hai Phong)",
-    "destination_field: field holding the route destination (e.g. Hanoi)",
-    "equipment_field: field holding container size or vehicle type",
-    "rate_amount_field: field holding the numeric freight rate",
-    "currency_field: field holding the rate currency",
-    "effective_date_field: effective/updated date used to pick the most recent applicable rate",
+RATE_CARD_VERIFIED_TOP_LEVEL_FIELDS = ("id", "customer", "route_name", "history")
+RATE_CARD_VERIFIED_HISTORY_FIELDS = (
+    "month", "total_cost", "total_price", "profit", "details", "updated_at",
+)
+RATE_CARD_STRUCTURED_FIELDS_ABSENT = (
+    "origin", "destination", "container_or_equipment", "currency",
 )
 
 # --------------------------------------------------------------------------

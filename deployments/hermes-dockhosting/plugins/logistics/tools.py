@@ -3,10 +3,13 @@
 Three capability surfaces, all reading the authoritative Logistics MongoDB
 through the find/find_one-only connector:
 
-  logistics_today_work     — "Hôm nay tôi có việc gì?" (tasks collection)
+  logistics_today_work     — "Hôm nay tôi có việc gì?" (tasks collection,
+                             explicit ASSIGNEE vs TEAM scope)
   logistics_freight_rate   — "Cước X về Y container Z?" (rate_cards; fails
-                             closed with SCHEMA_GAP_RATE_CARD_FIELDS until
-                             the rate-card field mapping is verified)
+                             closed with
+                             RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP
+                             because the verified schema has no structured
+                             origin/destination/container/currency fields)
   logistics_shipment_status— "Lô hàng <ID> hiện thế nào?" (shipments by id)
 
 FACT INTEGRITY: results carry provenance (source collection, record id,
@@ -97,9 +100,13 @@ TODAY_WORK_SCHEMA = _schema(
     "logistics_today_work",
     "List actionable Logistics work for one day (default: today, Asia/Ho_Chi_Minh) "
     "from the Logistics tasks collection. Returns bounded items with reference id, "
-    "short action, assignee and deadline, plus provenance. Report status and values "
-    "exactly as returned; never invent tasks, deadlines or statuses. The user may "
-    "ask in Vietnamese, e.g. 'Hôm nay tôi có việc gì?'.",
+    "short action, assignee and deadline, plus provenance. Scope is explicit in the "
+    "result: ASSIGNEE when assignee/assignee_user_id was supplied, otherwise TEAM. "
+    "NEVER present TEAM-scope results as the user's own personal tasks — when no "
+    "identity is bound, say the list is team-wide or ask for the user's assignee "
+    "identity. Report status and values exactly as returned; never invent tasks, "
+    "deadlines or statuses. The user may ask in Vietnamese, e.g. 'Hôm nay tôi có "
+    "việc gì?'.",
     {
         "date": {"type": "string", "description": "Target day as YYYY-MM-DD (default: today in Asia/Ho_Chi_Minh)"},
         "include_undated": {"type": "boolean", "description": "Also include open tasks with no parseable deadline (default false; they are counted either way)"},
@@ -112,12 +119,14 @@ TODAY_WORK_SCHEMA = _schema(
 FREIGHT_RATE_SCHEMA = _schema(
     "logistics_freight_rate",
     "Look up the current/recent freight rate from an origin to a destination for a "
-    "container size or vehicle type, from the Logistics rate_cards collection. "
-    "Only verified field mappings are used; if the rate-card schema cannot be "
-    "established this returns SCHEMA_GAP_RATE_CARD_FIELDS, and if no rate exists it "
-    "returns NOT_FOUND. NEVER invent or estimate a rate, currency or route; report "
-    "the returned status as-is. The user may ask in Vietnamese, e.g. 'Cước Hải "
-    "Phòng về Hà Nội container 20' bao nhiêu?'.",
+    "container size or vehicle type, from the Logistics rate_cards collection. The "
+    "VERIFIED rate-card schema has no structured origin/destination/container/"
+    "currency fields (route_name is free text), so this tool currently returns "
+    "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP and NEVER a rate; "
+    "a follow-up Logistics schema task is required first. If no rate cards exist "
+    "it returns NOT_FOUND. NEVER invent or estimate a rate, currency or route, and "
+    "never parse route_name heuristically. The user may ask in Vietnamese, e.g. "
+    "'Cước Hải Phòng về Hà Nội container 20' bao nhiêu?'.",
     {
         "origin": _STR,
         "destination": _STR,
@@ -232,6 +241,18 @@ def _today_work(client: LogisticsReadOnlyClient, args: dict) -> dict:
     assignee = (args.get("assignee") or "").strip() or None
     assignee_user_id = (args.get("assignee_user_id") or "").strip() or None
 
+    # Explicit personal vs team scope (no identity service in this task: the
+    # caller must supply the Logistics assignee identity, if known).
+    if assignee and assignee_user_id:
+        scope_value = f"{assignee} ({assignee_user_id})"
+    elif assignee_user_id:
+        scope_value = assignee_user_id
+    elif assignee:
+        scope_value = assignee
+    else:
+        scope_value = None
+    scope = "ASSIGNEE" if scope_value else "TEAM"
+
     docs = client.find(
         contracts.TASKS,
         dict(contracts.TASK_OPEN_FILTER),
@@ -260,9 +281,22 @@ def _today_work(client: LogisticsReadOnlyClient, args: dict) -> dict:
         remaining = limit - len(items)
         items = items + undated[: max(0, remaining)]
 
+    notes: List[str] = []
+    if scope == "TEAM":
+        notes.append(contracts.TODAY_WORK_TEAM_SCOPE_NOTE)
+    if not items:
+        notes.append(
+            f"Không có việc nào cho ngày {target.isoformat()} trong dữ liệu Logistics hiện tại."
+        )
+        if not include_undated and undated:
+            notes.append(
+                f"(Có {len(undated)} việc chưa xử lý chưa rõ hạn — dùng include_undated=true để xem.)"
+            )
+
     result: Dict[str, Any] = {
         "date": target.isoformat(),
         "timezone": "Asia/Ho_Chi_Minh (UTC+07:00)",
+        "scope": scope,
         "source": contracts.TASKS,
         "queried_at": iso_now(),
         "counts": {
@@ -273,22 +307,22 @@ def _today_work(client: LogisticsReadOnlyClient, args: dict) -> dict:
             "scan_truncated": scan_truncated,
         },
     }
+    if scope == "ASSIGNEE":
+        result["scope_value"] = scope_value
     if items:
         result["status"] = "OK"
         result["items"] = items
     else:
         result["status"] = "NOT_FOUND"
         result["items"] = []
-        result["note"] = (
-            f"Không có việc nào cho ngày {target.isoformat()} trong dữ liệu Logistics hiện tại."
-        )
-        if not include_undated and undated:
-            result["note"] += f" (Có {len(undated)} việc chưa xử lý chưa rõ hạn — dùng include_undated=true để xem.)"
+    if notes:
+        result["note"] = " ".join(notes)
     return result
 
 
 # --------------------------------------------------------------------------
-# B. FREIGHT_RATE_LOOKUP (fail closed pending verified rate-card fields)
+# B. FREIGHT_RATE_LOOKUP (fail closed: verified schema is insufficient for
+#    structured route lookup; no heuristic route_name parsing)
 # --------------------------------------------------------------------------
 
 
@@ -316,48 +350,56 @@ def _freight_rate(client: LogisticsReadOnlyClient, args: dict) -> dict:
         "queried_at": iso_now(),
     }
 
-    if contracts.RATE_CARD_FIELD_MAP is None:
-        # Read a bounded sample of active rate cards so the schema gap report is
-        # evidence-backed (observed keys) rather than a guess. A real read-only
-        # query is executed; no rate value is ever returned in this state.
-        sample = client.find(
-            contracts.RATE_CARDS,
-            dict(contracts.RATE_CARD_ACTIVE_FILTER),
-            sort=[("updated_at", -1)],
-            limit=_RATE_SAMPLE_LIMIT,
-        )
-        if not sample:
-            return {
-                **base,
-                "status": "NOT_FOUND",
-                "note": "Chưa có rate card nào trong dữ liệu Logistics hiện tại.",
-            }
-        observed: List[str] = []
-        for doc in sample:
-            for key in doc.keys():
-                if key != "_id" and key not in observed:
-                    observed.append(key)
+    # VERIFIED (logistics-work-desk views/sales.py): persisted rate cards carry
+    # route_name as FREE TEXT and have NO structured origin/destination/
+    # container/currency fields. A structured route lookup therefore cannot be
+    # answered from the current schema. Fail closed: run a real bounded
+    # read-only sample query for evidence (key names only — route_name VALUES
+    # are not echoed, to avoid inviting heuristic parsing), and never return a
+    # rate. Resolving this requires a follow-up Logistics schema task; no new
+    # collection is created here.
+    sample = client.find(
+        contracts.RATE_CARDS,
+        dict(contracts.RATE_CARD_ACTIVE_FILTER),
+        limit=_RATE_SAMPLE_LIMIT,
+    )
+    if not sample:
         return {
             **base,
-            "status": "SCHEMA_GAP_RATE_CARD_FIELDS",
-            "missing_fields": list(contracts.RATE_CARD_MISSING_FIELDS),
-            "observed_top_level_keys": observed,
-            "sample_size": len(sample),
-            "note": (
-                "Chưa xác minh được trường dữ liệu cước (tuyến, container/xe, giá, "
-                "tiền tệ, ngày hiệu lực) trong rate_cards nên chưa thể trả mức cước. "
-                "Không đoán giá. Cần xác minh mapping trường từ mã nguồn "
-                "logistics-work-desk."
-            ),
+            "status": "NOT_FOUND",
+            "note": "Chưa có rate card nào trong dữ liệu Logistics hiện tại.",
         }
-
-    # A verified field map is required before any rate can be returned. This
-    # branch intentionally does not exist yet: activating it without a
-    # source-verified mapping would violate the fact-integrity rule.
-    raise LogisticsReadOnlyError(
-        "Verified rate-card field map is set but no matching implementation exists; "
-        "refusing to return unverified rates."
-    )
+    observed: List[str] = []
+    for doc in sample:
+        for key in doc.keys():
+            if key != "_id" and key not in observed:
+                observed.append(key)
+    return {
+        **base,
+        "status": contracts.RATE_CARD_SCHEMA_GAP_STATUS,
+        "verified_schema": {
+            "top_level_fields": list(contracts.RATE_CARD_VERIFIED_TOP_LEVEL_FIELDS),
+            "history_entry_fields": list(contracts.RATE_CARD_VERIFIED_HISTORY_FIELDS),
+            "structured_fields_absent": list(contracts.RATE_CARD_STRUCTURED_FIELDS_ABSENT),
+            "route_name": (
+                "free text; may contain descriptive hints such as '(Cont 40)' but is "
+                "NOT authoritative structured data and is not parsed"
+            ),
+        },
+        "observed_top_level_keys": observed,
+        "sample_size": len(sample),
+        "reason": (
+            "Verified rate-card schema (logistics-work-desk views/sales.py) has no "
+            "structured origin/destination/container/currency fields; route_name is "
+            "free text. A structured freight-rate lookup requires a follow-up "
+            "Logistics schema task; no rate is returned."
+        ),
+        "note": (
+            "Chưa thể trả mức cước: rate card hiện không có trường tuyến / container / "
+            "tiền tệ có cấu trúc (route_name là văn bản tự do). Cần task nâng schema "
+            "Logistics trước. Không đoán giá."
+        ),
+    }
 
 
 # --------------------------------------------------------------------------
