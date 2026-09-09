@@ -130,10 +130,15 @@ is sufficient.
 5. **PRESERVE_CONTINUITY_AND_STOP** — For long work, retain only the durable
    checkpoint needed to continue: active goal/boundaries, current
    version/state, verified progress/evidence, decisions or blockers that still
-   matter, and the next useful action. Decompose only when it improves
-   execution, verification, recovery, or context. When the required outcome is
-   proven, stop instead of opening optional refactor, benchmark, framework,
-   hardening, or future-phase work.
+   matter, and the next useful action. When meaningful verified local progress
+   has material recovery value, preserve it on the CURRENT approved GitHub
+   branch before a session/account switch, known quota exhaustion, long pause,
+   shutdown, or major phase transition when safe to do so. A checkpoint is
+   preservation only: it is not merge, promotion, release, deployment, or
+   production authority. Decompose only when it improves execution,
+   verification, recovery, or context. When the required outcome is proven,
+   stop instead of opening optional refactor, benchmark, framework, hardening,
+   or future-phase work.
 
 ### Anti-overengineering decision
 
@@ -190,7 +195,7 @@ Do not merely say "go back to the old chat".
 
 ### RULE 04 — GITHUB_IS_DURABLE_CHECKPOINT
 
-Chat/session state is temporary. GitHub/durable project state is the
+Chat/session/workspace state is temporary. GitHub/durable project state is the
 execution checkpoint. Work identity is based on:
 
 ```text
@@ -202,15 +207,96 @@ REPOSITORY
 
 Do not use chat position or PR number alone as authority.
 
+#### DURABLE_CHECKPOINT_POLICY
+
+For long or material executor work, the trigger is `MATERIAL_RECOVERY_VALUE`,
+not a fixed number of files, minutes, prompts, or commits.
+
+Operate normally on the approved CURRENT working branch. Do not commit/push
+every tiny edit. When a meaningful stable milestone has been reached and
+sufficiently verified, preserve it as a GitHub checkpoint before continuing
+into work whose loss would be expensive to reconstruct.
+
+Typical checkpoint-worthy states include:
+
+- a working architecture milestone;
+- a completed and verified feature group;
+- a material blocker repair;
+- a completed Phase/Gate;
+- a state expensive to reconstruct;
+- an Owner-reviewed state; or
+- a safe recovery point before a broad next phase.
+
+Normal checkpoint procedure:
+
+```text
+git status
+→ review intended changes
+→ commit
+→ push CURRENT working branch
+→ verify remote HEAD == local HEAD
+```
+
+Checkpointing does NOT create a new branch or PR merely to save progress.
+Same goal + same usable workstream continues the existing branch / existing PR.
+
+```text
+CHECKPOINT != CANDIDATE_PROMOTION
+CHECKPOINT != RELEASE
+CHECKPOINT != PRODUCTION
+CHECKPOINT != MERGE
+```
+
+Before known quota exhaustion, session/account switch, planned handoff,
+executor shutdown, long pause, or major phase transition, preserve meaningful
+verified local progress first when safe. Routine checkpointing of the already
+approved working branch is a non-destructive preservation action and does not
+require asking the beginner Owner "Should I save to GitHub now?".
+
+Risk proportionality:
+
+- FAST/simple task: checkpoint usually only at completion when needed.
+- STANDARD task: checkpoint at meaningful verified milestones.
+- STRICT/CRITICAL or long-running task: checkpoint before risky transitions
+  and whenever losing the local session would materially destroy verified
+  progress.
+
+Never checkpoint secrets, credentials, production database dumps,
+`node_modules`, local virtualenvs, caches, temp files, generated junk, or
+sandbox-only artifacts without durable deliverable value.
+
+If a push cannot be completed, the executor must not claim preservation.
+Return explicitly:
+
+```text
+LOCAL_HEAD=
+REMOTE_HEAD=
+UNPUSHED_COMMITS=
+UNPUSHED_FILES=
+PUSH_BLOCKER=
+```
+
+After push, verify real remote state. Terminal output saying that push
+succeeded is not sufficient evidence by itself.
+
 ### RULE 05 — SESSION_OR_QUOTA_RECOVERY
 
-If Arena/Codex/another executor loses context, resets sandbox, hits quota,
-or a user changes account:
+If Arena/Codex/Manus/another executor loses context, resets sandbox, hits
+quota, or a user changes account:
 
 1. Do NOT restart the task blindly.
 2. Return to Control Tower.
 3. Inspect the current durable branch/PR/head.
 4. Continue from the exact verified checkpoint where possible.
+5. If meaningful verified work existed only locally and was not pushed,
+   report that fact as unrecovered/at-risk state; do not pretend GitHub
+   contains it.
+
+When quota exhaustion, account/session switch, planned handoff, shutdown,
+long pause, or major phase transition is known in advance, apply RULE 04 first:
+preserve any meaningful verified local progress on the CURRENT branch and
+verify remote HEAD before leaving the session, unless a concrete safety,
+permission, secret, or repository blocker prevents the push.
 
 ### RULE 06 — NO_DUPLICATE_PR
 
