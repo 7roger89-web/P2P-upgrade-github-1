@@ -61,6 +61,10 @@ def main() -> int:
         if clone.exit_code != 0 or "true" not in clone.stdout.lower():
             return fail("GIT_CLONE_FAILED")
 
+        mkdir = parent.exec("mkdir -p /workspace/preview", timeout_seconds=30)
+        if mkdir.exit_code != 0:
+            return fail("PREVIEW_DIRECTORY_CREATE_FAILED")
+
         parent.filesystem.write(
             "/workspace/preview/index.html",
             "<!doctype html><meta charset='utf-8'>"
@@ -68,8 +72,8 @@ def main() -> int:
             "<h1>P2P PandaStack Spike 001</h1>"
             "<p>Sandbox preview is alive.</p>",
         )
+
         server = parent.exec(
-            f"mkdir -p /workspace/preview && "
             f"nohup python3 -m http.server {PORT} "
             "--directory /workspace/preview "
             ">/tmp/p2p-preview.log 2>&1 </dev/null & echo $!",
@@ -81,7 +85,9 @@ def main() -> int:
         preview_url = parent.preview_url(PORT)
         print(f"PREVIEW_URL={preview_url}")
 
-        child = parent.fork(metadata={"purpose": "p2p-pandastack-spike-001", "role": "child"})
+        child = parent.fork(
+            metadata={"purpose": "p2p-pandastack-spike-001", "role": "child"}
+        )
         sandboxes.append(child)
         print(f"CHILD_SANDBOX_ID={child.id}")
 
@@ -118,7 +124,9 @@ def main() -> int:
             try:
                 sandbox.kill()
             except Exception as exc:
-                cleanup_errors.append(f"{getattr(sandbox, 'id', 'unknown')}:{type(exc).__name__}")
+                cleanup_errors.append(
+                    f"{getattr(sandbox, 'id', 'unknown')}:{type(exc).__name__}"
+                )
         if cleanup_errors:
             print("CLEANUP_WARNINGS=" + ",".join(cleanup_errors))
         else:
