@@ -1,0 +1,52 @@
+name: PandaStack Spike 001
+
+on:
+  pull_request:
+    paths:
+      - "experiments/pandastack-spike-001/**"
+      - ".github/workflows/pandastack-spike-001.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pandastack-spike:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PANDASTACK_API_KEY: ${{ secrets.PANDASTACK_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PandaStack SDK
+        run: python -m pip install -r experiments/pandastack-spike-001/requirements.txt
+
+      - name: Credential gate
+        id: gate
+        shell: bash
+        run: |
+          if [ -z "$PANDASTACK_API_KEY" ]; then
+            echo "live=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "PANDASTACK_SPIKE_RESULT=BLOCKED"
+              echo "OWNER_GATE=PANDASTACK_API_KEY_REQUIRED"
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "live=true" >> "$GITHUB_OUTPUT"
+            echo "PANDASTACK_CREDENTIAL_PRESENT=YES" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Run live PandaStack probe
+        if: steps.gate.outputs.live == 'true'
+        run: |
+          set -o pipefail
+          python experiments/pandastack-spike-001/spike.py | tee pandastack-spike-result.txt
+          cat pandastack-spike-result.txt >> "$GITHUB_STEP_SUMMARY"
