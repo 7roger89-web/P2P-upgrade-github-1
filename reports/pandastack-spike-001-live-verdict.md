@@ -44,6 +44,15 @@ The PandaStack credential was supplied through the GitHub Actions repository sec
 - Post-run orphan cleanup count: 0.
 - Result: live fork-tree capability remains blocked.
 
+**Run #6 / workflow run 34309356836**
+- This run was unintentionally triggered by the evidence-only PR update because the prior pull_request path filter still matched the PR diff.
+- Basic sandbox capabilities passed again.
+- Direct REST fork-tree timed out again after 120 seconds.
+- Pre-run orphan cleanup count: 0.
+- Post-run orphan cleanup count: 0.
+- Sandbox cleanup: PASS.
+- The workflow was then changed to `workflow_dispatch` only so no further live retry occurs automatically.
+
 ## Verdict
 
 ```text
