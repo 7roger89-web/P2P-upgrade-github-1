@@ -1,0 +1,37 @@
+name: Plum App Audit Retry
+
+on:
+  push:
+    branches:
+      - research/chinese-metaphysics-upstreams-01
+    paths:
+      - '.github/workflows/plum-app-audit-retry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout pinned plum-app
+        uses: actions/checkout@v4
+        with:
+          repository: soom-lupulus/plum-app
+          ref: 5965bdc8e9ca69a3cc7e96be6f1cc585d5032814
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install compatible pnpm
+        run: npm install -g pnpm@9.15.9
+      - name: Install, build, and syntax-check
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm fe:build
+          find apps/backend/src apps/backend/scripts -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
+          echo 'AUDIT_KIND=BUILD_AND_JS_SYNTAX'
