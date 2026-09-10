@@ -18,6 +18,15 @@ RUN set -eux; \
     find /opt/hermes -type f ! -perm -004 -exec chmod a+r,go-w {} +; \
     rm -f /tmp/hermes-patches-status.json
 
+# Hermes Logistics read-only integration. DockHosting currently builds this
+# repository-root Dockerfile, so the runtime image must include the plugin here
+# as well as in deployments/hermes-dockhosting/Dockerfile.
+COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/hermes/plugins/logistics/
+
+# Runtime dependency used by the Logistics read-only MongoDB connector.
+ARG PYMONGO_VERSION=4.18.0
+RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
+
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
 
 ENV API_SERVER_ENABLED=true \
