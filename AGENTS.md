@@ -130,8 +130,13 @@ Beginner-facing operational guidance must apply
 - `RULE 13 CONTROL_TOWER_STATE_RESPONSIBILITY` — Control Tower tracks
   workstream/branch/PR/SHA/review/Owner Gate/next action; the beginner never
   memorizes internal Git state.
-- `RULE 14 OVER_ENGINEERING_CHECK` — end beginner guidance with
-  `Không bị over engineering chứ? PASS/FAIL`; expected `PASS`.
+- `RULE 14 OVER_ENGINEERING_CHECK` — apply the mandatory OE Gate
+  (`SIMPLER_PATH`, `MATERIAL_PROGRESS`, `NECESSITY`,
+  `CORE_BEFORE_SUPPORT`, `SMALLER_VERIFIABLE_SLICE`); ask
+  `Không bị over engineering chứ?` and return `DO_IT`, `SKIP_IT`, or
+  `DEFER_UNTIL_NEEDED` with one concrete reason — never a ceremonial
+  `PASS`; a weak or negative answer means reduce, remove, or defer the
+  step (`DEFERRED_NOT_REQUIRED` when not needed now).
 - `RULE 15 ARENA_TASK_COMPLETION_DIALOG` — when asked "Was this task
   successful?", `YES` means the bounded Arena execution reached its requested
   terminal state and returned the required result (technical PASS is NOT
