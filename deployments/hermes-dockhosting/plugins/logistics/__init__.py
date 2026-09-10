@@ -4,7 +4,7 @@ Bundled backend plugin: answers three Logistics questions from the authoritative
 logistics-work-desk MongoDB using a dedicated read-only credential.
 
   - logistics_today_work      "Hôm nay tôi có việc gì?"        (tasks)
-  - logistics_freight_rate    "Cước X → Y container Z?"        (rate_cards, fail-closed)
+  - logistics_freight_rate    "Cước X → Y container Z?"        (rate_cards, structured lookup)
   - logistics_shipment_status "Lô hàng <ID> hiện thế nào?"     (shipments)
 
 Read-only by design: the connector exposes find/find_one only, over an
