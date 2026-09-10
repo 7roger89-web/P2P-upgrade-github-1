@@ -1,3 +1,33 @@
 [submodule "source/chinese-metaphysics/upstreams/plum-app"]
 	path = source/chinese-metaphysics/upstreams/plum-app
 	url = https://github.com/soom-lupulus/plum-app.git
+[submodule "source/chinese-metaphysics/upstreams/plum-cg"]
+	path = source/chinese-metaphysics/upstreams/plum-cg
+	url = https://github.com/soom-lupulus/plum-cg.git
+[submodule "source/chinese-metaphysics/upstreams/yinyo-liuyao"]
+	path = source/chinese-metaphysics/upstreams/yinyo-liuyao
+	url = https://github.com/xiaoshiyilangzhao1996-droid/yinyo-liuyao.git
+[submodule "source/chinese-metaphysics/upstreams/liuyao-divination"]
+	path = source/chinese-metaphysics/upstreams/liuyao-divination
+	url = https://github.com/Johnson-Jia/liuyao-divination.git
+[submodule "source/chinese-metaphysics/upstreams/meihua-yishu"]
+	path = source/chinese-metaphysics/upstreams/meihua-yishu
+	url = https://github.com/muyen/meihua-yishu.git
+[submodule "source/chinese-metaphysics/upstreams/meihua-divination-skill"]
+	path = source/chinese-metaphysics/upstreams/meihua-divination-skill
+	url = https://github.com/Fyrgo8/meihua-divination-skill.git
+[submodule "source/chinese-metaphysics/upstreams/iztro"]
+	path = source/chinese-metaphysics/upstreams/iztro
+	url = https://github.com/SylarLong/iztro.git
+[submodule "source/chinese-metaphysics/upstreams/ziwei-doushu-skill"]
+	path = source/chinese-metaphysics/upstreams/ziwei-doushu-skill
+	url = https://github.com/Linden-TR/ziwei-doushu-skill.git
+[submodule "source/chinese-metaphysics/upstreams/ziwei-wuandyA"]
+	path = source/chinese-metaphysics/upstreams/ziwei-wuandyA
+	url = https://github.com/wuandyA/ziwei.git
+[submodule "source/chinese-metaphysics/upstreams/ziwei-chart"]
+	path = source/chinese-metaphysics/upstreams/ziwei-chart
+	url = https://github.com/ziweiknows/ziwei-chart.git
+[submodule "source/chinese-metaphysics/upstreams/xu-quanren"]
+	path = source/chinese-metaphysics/upstreams/xu-quanren
+	url = https://github.com/ZhangZangQian/xu-quanren.git
