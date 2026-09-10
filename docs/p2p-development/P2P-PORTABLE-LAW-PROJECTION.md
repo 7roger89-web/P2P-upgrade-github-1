@@ -39,6 +39,7 @@ The projected copy is transport, not authority.
 
 ```text
 reachable active canonical notebook
+    > up-to-date installed projection, when present
     > generated portable project projection
     > explicit SUPREME_LAW_CAPSULE
     > LAW_CONTEXT_BLOCKED
@@ -46,7 +47,7 @@ reachable active canonical notebook
 
 `TASK_BRANCH != LAW_AUTHORITY` and `TARGET_PROJECT != LAW_SOURCE` remain mandatory.
 
-When canonical access is available, compare against canonical and canonical wins. When canonical access is unavailable, the executor may use the generated portable projection and must report that it read the projection, not falsely claim it read the canonical repository.
+When canonical access is available, compare against canonical and canonical wins. When canonical access is unavailable, an installed executor may use its valid installed projection; a fresh remote clone may use the generated portable projection and must report the source it actually read rather than falsely claiming it read the canonical repository.
 
 ## Future project provisioning rule
 
