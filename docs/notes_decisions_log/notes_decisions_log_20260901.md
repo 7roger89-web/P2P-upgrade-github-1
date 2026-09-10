@@ -1,6 +1,10 @@
 # Notes and Decisions Log — 2026-09-01
 
-## P2P-MPFB2-ADDON-INIT-01 / Issue #52
+Workstream: `P2P-MPFB2-ADDON-INIT-01`
+Repository: `7roger89-web/P2P-upgrade-github-1`
+Issue: `52`
+
+## Decisions
 
 1. Fresh subject was bound to canonical main
    `b65948b00ed2a8969fed70ab59f68b5d9b53858d` in a clean branch/worktree.
@@ -23,7 +27,7 @@
    `GLB_skeleton: index invalid` (`skins[0].skeleton=null`). No second fix or
    retry is authorized in this workstream.
 
-### Evidence anchors
+## Evidence anchors
 
 - Source checkpoint: `0e3cc85d3b8ea599a1918be91873d1ef17ba14b1`.
 - Real markers: `MPFB_ADDON_IDENTITY_PRESENT=YES`,
@@ -34,38 +38,9 @@
 - Game Truyen mutation: `NO`; before/after fingerprint unchanged.
 - Detailed packet: `reports/coder/rp_coder_260901_183100_by_gpt-5-codex_p2p-mpfb2-addon-init-01.md`.
 
-### Closure state
+## Closure state
 
 Addon-init scope is technically ready for supervisor review. The terminal
 workstream verdict remains `P2P_MPFB2_ADDON_INIT_NEXT_BLOCKER_FOUND` because
 the first downstream GLB structural blocker is real and deliberately
 unrepaired.
-
-## P2P-HUMANIZER-01 / Issue #51
-
-- Existing `creative.copywriting` remains singular and marketing-only. The
-  distinct prose capability is `creative.prose.humanize`; it reuses the
-  existing router and generic vendor loader.
-- Exact upstream Humanizer subject is
-  `e2e92e7b4b8229253ed5c8e81dc65463fdeddda5` /
-  `b8a8804ed9210e539531fc26c2d84fdb603960f4`, version `2.11.2`, MIT;
-  `SKILL.md` SHA-256 is
-  `14fc8a965b6e0a8dc100ba4dffeab55cb94bbac112abbde7e014d5c15a35c202`.
-- Integration is `ON_DEMAND` and explicitly/profile selected, with no global
-  default. Only the exact upstream `SKILL.md` and `LICENSE` are vendored.
-- Content Studio capabilities are owned by their current canonical main
-  integration. Voice Profile and Humanizer remain distinct: Voice Profile
-  derives author context from user evidence; Humanizer is optional downstream
-  prose polishing.
-- Historical direct and nearest-boundary checks passed 9/9 and 61/61. Current
-  checks are rerun after main reconciliation; unrelated baseline/governance
-  drift remains outside this bounded workstream.
-- Coder report:
-  `reports/coder/rp_coder_260901_175535_by_gpt-5-codex_p2p-humanizer-01.md`.
-- Draft PR #53 is the sole Humanizer PR for Issue #51:
-  `https://github.com/7roger89-web/P2P-upgrade-github-1/pull/53`.
-  The current PR head/tree is intentionally not stored in committed notes;
-  fetch and bind it externally at review or promotion time.
-- Reconciliation uses a non-rewriting merge of current `origin/main` into the
-  existing Writer branch, followed by one bounded cleanup commit. No merge to
-  `main`, promotion, or Owner approval was performed.

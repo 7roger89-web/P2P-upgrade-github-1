@@ -251,6 +251,18 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
             "NEXT_RECOMMENDED_ACTION",
         ):
             self.assertIn(field_name, prompt)
+        self.assertIn("P2P_SUPREME_LAW_PREFLIGHT", prompt)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", prompt)
+        self.assertIn("TASK_BRANCH != LAW_AUTHORITY", prompt)
+        self.assertIn("TARGET_PROJECT != LAW_SOURCE", prompt)
+        self.assertIn("even when the task executes in a different repository or branch", prompt)
+        self.assertIn("7roger89-web/P2P-upgrade-github-1@main", prompt)
+        self.assertIn("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md", prompt)
+        self.assertIn(".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md", prompt)
+        self.assertIn("SUPREME_LAW_CAPSULE", prompt)
+        self.assertIn("defer premature supporting infrastructure or ceremony", prompt)
+        self.assertIn("Keep one active Supreme Law", prompt)
+        self.assertIn("Do not claim that a repository file was read unless it actually was.", prompt)
         self.assertIn("PACKET_IS_CANONICAL_TRUTH: NO", prompt)
         self.assertIn(USER_ACTION_BLOCK, prompt)
         self.assertNotIn("previous session transcript", prompt.lower())

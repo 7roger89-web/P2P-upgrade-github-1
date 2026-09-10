@@ -23,6 +23,20 @@ mechanisms.
 
 ## Start
 
+0. Before building any P2P prompt or beginning P2P-managed implementation,
+   apply `TASK_BRANCH != LAW_AUTHORITY` and
+   `TARGET_PROJECT != LAW_SOURCE`. The selected target repository and task
+   branch are execution state only. When accessible, read
+   `P2P_SUPREME_OPERATING_LAW_V1` from the
+   canonical P2P source
+   `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`,
+   regardless of the task branch. An installed
+   `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` may be used only when it
+   contains that law. Every generated executor prompt must still carry the
+   `SUPREME_LAW_CAPSULE` fallback so a stale branch or inaccessible canonical
+   repo cannot remove the active minimum law. Never claim a repository file was
+   read unless it actually was. This preflight shapes the work and must not
+   become a separate planning/reporting phase.
 1. Read [references/codex-adaptation.md](references/codex-adaptation.md).
 2. Normalize compatibility prefixes, then parse the first argument as a mode.
    Read
@@ -92,17 +106,21 @@ invoke the skill with `$p2p <mode>` or use a packaged alias skill.
 
 ## Dispatcher
 
-Build a compact task contract before choosing a route:
+Build only the minimum task contract needed before choosing a route:
 
-1. Objective
-2. Supplied inputs and trusted sources
-3. User, audience, and experience level
-4. Target environment or model
-5. Deliverable and output format
-6. Constraints, exclusions, and permissions
-7. Evidence and freshness requirements
-8. Success checks and stop conditions
-9. Unknowns that could materially change the result
+1. **OUTCOME** — the result required, acceptance condition, and observable way
+   to know it is achieved.
+2. **BOUNDARIES** — scope, invariants, exclusions, permissions, Owner Gates,
+   and material safety/privacy/business constraints.
+3. **BASELINE** — the relevant verified state/version/source plus unknowns that
+   could materially change the next decision.
+4. **BUDGET** — only material limits that exist for this task: spend,
+   generation/GPU, time/deadline, retry, compute, or blast radius.
+
+For trivial tasks these four items may remain implicit. Do not force the user
+to fill a form or make routine technical choices. Do not invent a budget the
+user did not set; treat absent limits as ordinary bounded execution under the
+active authority and risk rules.
 
 For evidence-backed work, label each material statement `FACT`, `INFERENCE`,
 `USER_ASSUMPTION`, `DISPUTED`, or `UNKNOWN`. Do not average exact prices or

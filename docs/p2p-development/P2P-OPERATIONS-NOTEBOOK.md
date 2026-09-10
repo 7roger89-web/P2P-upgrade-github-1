@@ -55,7 +55,7 @@ projection mechanism; nothing new is required:
   target project as the `<!-- BEGIN P2P CODEX --> ... <!-- END P2P CODEX -->`
   entrypoint block (`P2P-PROJECT-BOOTSTRAP.md` documents this entry
   contract). The inherited digest in that block names this notebook and the
-  P2P_BEGINNER_OPERATIONS_UX_V1 / RULE_ASSIMILATION_GATE_V1 rule sets, so
+  P2P_SUPREME_OPERATING_LAW_V1 / P2P_BEGINNER_OPERATIONS_UX_V1 / RULE_ASSIMILATION_GATE_V1 rule sets, so
   every installed project discovers them.
 - Release packages ship the full notebook via
   `scripts/package_release.py` (`DOC_FILES`), so the canonical text travels
@@ -65,6 +65,181 @@ projection mechanism; nothing new is required:
   them.
 
 If the installed digest and this notebook ever differ, the notebook wins.
+
+## 2A. P2P_SUPREME_OPERATING_LAW_V1
+
+This section is the highest active P2P operating law for task execution,
+prompt writing, Control Tower routing, and executor preparation. Lower P2P
+operating rules remain active only where they do not conflict with this law.
+Do not create a parallel supreme-law file or duplicate framework.
+
+### Mandatory preflight
+
+```text
+CONTROL_TOWER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1
+P2P_PROMPT_WRITER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1
+EXECUTOR_BEFORE_IMPLEMENTATION => READ_P2P_SUPREME_OPERATING_LAW_V1
+MODEL_SWITCH_OR_SESSION_RESET => READ_P2P_SUPREME_OPERATING_LAW_V1_AGAIN
+```
+
+The canonical text is this section of
+`7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`.
+
+`TASK_BRANCH != LAW_AUTHORITY`.
+`TARGET_PROJECT != LAW_SOURCE`.
+
+The target repository, worktree, and task branch are execution state only and
+must not select the Supreme Law version. In an installed project,
+`.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` is a valid local projection only
+when it contains `P2P_SUPREME_OPERATING_LAW_V1`; a stale local or task-branch
+copy does not outrank the active canonical source or the inline capsule.
+
+If an executor cannot read the canonical P2P repository, the P2P-generated
+prompt must carry the compact `SUPREME_LAW_CAPSULE` inline. The executor must not
+claim that it read a repository file unless it actually did. The prompt writer
+must not copy the whole notebook into ordinary prompts when the compact capsule
+is sufficient.
+
+### Supreme laws
+
+1. **OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS** — Understand the outcome and
+   acceptance that matter to the Owner. The agent decides routine technical
+   details inside approved scope. Ask the Owner only for genuine outcome,
+   authority, material cost, security/privacy/business-impact, production,
+   destructive, infrastructure-commitment, or hard-to-reverse decisions. Never
+   lower acceptance or widen authority to manufacture success.
+2. **SIMPLEST_USEFUL_PATH_TO_COMPLETION** — Choose the next action with the best
+   practical contribution to completion at reasonable complexity, cost, and
+   risk. A useful action directly advances the outcome, changes a meaningful
+   decision, establishes a required execution/recovery condition, produces
+   acceptance evidence, or reduces a material risk. Do not open speculative
+   architecture or infrastructure before the core capability shows a need.
+3. **REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS** — Fresh-check relevant state
+   before mutation when it may have changed. After material actions, verify the
+   real result before relying on it. Evidence proves only its own scope. If a
+   mutation may have happened but acknowledgement is lost, treat the state as
+   `UNKNOWN` and reconcile before an unsafe retry.
+4. **RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS** — Retry policy
+   depends on process type: deterministic repair, stochastic sampling,
+   transient infrastructure, and unknown-side-effect recovery are not the same.
+   Do not use a fixed failure count as a hard stop. Do not convert every isolated
+   failure into a permanent rule or new infrastructure. For a repeated or
+   materially consequential failure, identify the failure class/root cause and
+   apply the lightest durable fix that prevents recurrence at acceptable cost.
+   A branch is stuck when cost/scope/complexity keep increasing without
+   preserved progress toward acceptance or decision-useful evidence. Stop
+   speculative mutation, preserve evidence, re-diagnose, change
+   route/model/harness when justified, or return `BLOCKED` with an
+   `INFEASIBLE` verdict/reason when current constraints make the outcome impossible.
+5. **PRESERVE_CONTINUITY_AND_STOP** — For long work, retain only the durable
+   checkpoint needed to continue: active goal/boundaries, current
+   version/state, verified progress/evidence, decisions or blockers that still
+   matter, and the next useful action. Decompose only when it improves
+   execution, verification, recovery, or context. When the required outcome is
+   proven, stop instead of opening optional refactor, benchmark, framework,
+   hardening, or future-phase work.
+
+### Anti-overengineering decision
+
+Canonical principle:
+
+```text
+MINIMUM_SUFFICIENT_DECOMPOSITION
+SMALLEST_USEFUL_VERIFIED_INCREMENT
+MAXIMUM_DECOMPOSITION = FORBIDDEN_AS_A_GOAL
+```
+
+Before a new branch of work with meaningful cost, after planning, and before
+introducing a new abstraction, framework, registry, router, database, service,
+test infrastructure, broad refactor, or other supporting layer, run the
+mandatory OE Gate:
+
+1. **SIMPLER_PATH** — Is there a simpler valid way to reach the same acceptance
+   condition with comparable acceptable risk?
+2. **MATERIAL_PROGRESS** — Does this step create material information, working
+   capability, acceptance evidence, or meaningful progress?
+3. **NECESSITY** — If this step is removed, would any required success condition
+   actually become unmet?
+4. **CORE_BEFORE_SUPPORT** — Are we solving the requested capability / required
+   execution foundation, or prematurely optimizing supporting infrastructure or
+   process?
+5. **SMALLER_VERIFIABLE_SLICE** — Can the current work be reduced to a smaller
+   independently verifiable vertical slice that still creates a useful result?
+
+Decision rule:
+
+- If any answer is negative, weak, or materially uncertain, reduce scope, remove
+  the step, or choose the simpler path before continuing.
+- Do not split work merely to maximize the number of tasks. Decomposition is
+  justified only when it improves execution, verification, recovery, or context.
+- The target is the **smallest useful verified increment**, not the largest plan
+  and not the maximum number of subtasks.
+- Work that may be useful later but is not required for the current bounded goal
+  is marked `DEFERRED_NOT_REQUIRED` and is not implemented now.
+- When acceptance evidence is sufficient, stop. Do not continue with
+  opportunistic refactoring, future-proofing, cleanup, architecture expansion,
+  extra documentation, or broader testing unless the bounded goal requires it.
+- Do not add a new supervisory layer merely to police overengineering when the
+  existing Control Tower / required review surface is sufficient. Add such a
+  layer only after repeated evidence shows the existing guard is insufficient.
+
+Beginner-facing challenge phrase:
+
+```text
+Không bị over engineering chứ?
+```
+
+The answer must be evidence-based, not ceremonial. The actionable verdict is
+`DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`, with one concrete reason.
+
+### Triggered harness rule
+
+Harness concerns are a diagnostic catalog, not a mandatory architecture.
+Guides, sensors, memory/checkpoints, permissions, observability, reviewers,
+routers, registries, shared databases, schemas, background agents, and
+multi-agent coordination may be added only when a concrete task requirement,
+material risk, or observed repeated/material failure shows that the simpler
+existing workflow cannot satisfy the acceptance condition.
+
+Default execution loop:
+
+```text
+TASK CONTRACT -> EXECUTE -> VERIFY -> STOP / ESCALATE
+```
+
+Use the existing application/tool capability before building a new P2P
+component. Do not build supporting infrastructure merely because it is a
+recognized best practice or may become useful at hypothetical future scale.
+
+Typical triggers:
+
+- repeated instruction failure that survives simpler prompt/context repair ->
+  consider a short persistent guide;
+- repeated machine-checkable failure -> consider the narrowest automated check;
+- cross-session state loss causes real rework or acceptance loss -> consider a
+  minimal durable checkpoint;
+- consequential write/send/delete/spend authority is enabled -> enforce the
+  corresponding permission boundary before that authority is exercised;
+- repeated unattended failures cannot be diagnosed from existing evidence ->
+  add the minimum useful logging/alerting;
+- independent workstreams demonstrably gain enough execution or evidence value
+  from parallelism -> consider additional agents;
+- repeated handoff ambiguity breaks continuation -> consider a structured
+  handoff/schema.
+
+The existence of a large project, many documents, many available agents, or a
+popular harness pattern is not itself a trigger.
+
+Before adding any harness component, run the canonical OE Gate. If a simpler
+existing mechanism still satisfies acceptance at acceptable risk, return
+`SKIP_IT` or `DEFER_UNTIL_NEEDED`.
+
+### Canonical change rule
+
+There is one active supreme law. When a later evidence-backed change is
+accepted, replace or supersede conflicting wording rather than stacking another
+parallel rule. A rule that adds ceremony without improving completion,
+verification, recovery, or Owner control must be cut.
 
 ## 3. P2P_BEGINNER_OPERATIONS_UX_V1
 
@@ -232,14 +407,31 @@ Do not make the beginner memorize internal Git state.
 
 ### RULE 14 — OVER_ENGINEERING_CHECK
 
-Operational guidance to the beginner should end with:
+Apply the mandatory OE Gate defined in
+`P2P_SUPREME_OPERATING_LAW_V1 > Anti-overengineering decision`.
+
+Run it:
+
+- after planning when the plan has meaningful execution cost;
+- before opening a new costly branch of work;
+- before adding supporting infrastructure, abstractions, broad refactors, or
+  expanded verification machinery; and
+- when acceptance evidence may already be sufficient, to determine whether work
+  should stop.
+
+Do not use a ceremonial or expected-`PASS` check. Ask:
 
 ```text
-Không bị over engineering chứ? PASS/FAIL
+Không bị over engineering chứ?
 ```
 
-The expected normal result is `PASS`. `FAIL` means the proposed process
-itself should be simplified before execution.
+Evaluate the five canonical questions:
+`SIMPLER_PATH`, `MATERIAL_PROGRESS`, `NECESSITY`,
+`CORE_BEFORE_SUPPORT`, and `SMALLER_VERIFIABLE_SLICE`.
+
+The actionable result is `DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`,
+with one concrete reason. A weak or negative answer to any gate question means
+the proposed step must be reduced, removed, or deferred before continuing.
 
 ### RULE 15 — ARENA_TASK_COMPLETION_DIALOG
 
@@ -320,6 +512,233 @@ Runtime enforcement (existing machinery, no new subsystem):
   `instruction_authority: false`.
 - `orchestration_policy.py` — `classify_owner_escalation` under
   OWNER_MICRO_LOOP_SUPPRESSION (RULE 11).
+
+### RULE 17 — UPSTREAM_FIRST_REFERENCE_PRESERVATION
+
+For a bounded project outcome, P2P is the control-plane orchestrator. Select
+and execute the best working upstream or reference implementation before
+inventing a P2P abstraction, then adapt only the smallest project delta and
+prove the real project result. This is an operating policy over existing P2P
+surfaces; it creates no new runtime, registry, router, or upstream framework.
+
+The durable policy is:
+
+```text
+UPSTREAM_FIRST=YES
+REFERENCE_IMPLEMENTATION_FIRST=YES
+EXECUTION_FIRST=YES
+ABSTRACTION_LATER=YES
+P2P_ROLE=CONTROL_PLANE_ORCHESTRATOR
+```
+
+The core execution law is:
+
+```text
+USER_GOAL
+→ SELECT_BEST_UPSTREAM_OR_REFERENCE
+→ INSPECT_COMPLETE_IMPLEMENTATION_WHERE_RELEVANT
+→ EXECUTE_OR_REUSE_UPSTREAM_NATIVE_FIRST
+→ ADAPT_SMALLEST_PROJECT_DELTA
+→ PROVE_REAL_PROJECT_RESULT
+→ STOP_WHEN_SUFFICIENT
+```
+
+A P2P wrapper, adapter, capability, or registry entry is not a prerequisite
+for using a working upstream. When
+`UPSTREAM_EXECUTABLE=YES` and `P2P_WRAPPER_EXECUTABLE=NO`, the required
+decision is `USE_UPSTREAM_DIRECTLY=YES`.
+
+For rich implementation sources — including Three.js games, cameras, combat,
+enemy systems, VFX, shaders, game feel, UI systems, character systems, and
+visual reference implementations — preserve the complete reference
+implementation and its interactions while adapting it.
+`SOURCE_CLASS=REFERENCE_IMPLEMENTATION` is metadata/semantics only; it must not
+trigger a new capability ID, registry, router, or infrastructure.
+
+`CAPABILITY_REGISTERED=PASS` is not sufficient evidence of success. For game,
+UI, and visual work, acceptance prioritizes:
+
+```text
+PROJECT_RESULT_VISIBLE
+UPSTREAM_NATIVE_EXECUTION (where applicable)
+QUALITY_COMPARABLE_TO_REFERENCE (where applicable)
+INTERACTION_FEELS_GOOD (where applicable)
+```
+
+If P2P abstraction materially degrades upstream quality,
+`P2P_INTEGRATION=FAIL`, even when structural tests pass. Generalization follows
+actual reuse: first success uses the upstream directly; repeated success may
+record a lightweight execution recipe; only multiple real reuses justify a
+generic capability abstraction.
+
+Useful upstream repositories may live in a dedicated local upstream pool or
+cache, preserve-first and effectively read-only. Full upstream repositories do
+not normally enter canonical P2P Git; retain only minimal source
+identity/provenance metadata when useful. Do not rewrite upstream repositories
+for P2P conformity.
+
+This rule does not authorize network access, installation, authentication,
+vendoring, or project mutation by itself. Existing approval, security,
+provenance, scope, and evidence boundaries still apply. It also does not
+authorize a second router, second registry, generic upstream framework,
+repository-ingestion framework, synchronization daemon, universal wrapper, new
+database/service/runtime, bulk capability migration, whole-repository
+vendoring, or additional Game/Three.js capabilities merely because useful
+repositories exist.
+
+For APP GAME TRUYỆN, the default remains:
+
+```text
+UPSTREAM_REFERENCE
+→ PROJECT_EXECUTION
+→ VISUAL_PLAYABLE_PROOF
+→ ABSTRACTION_DECISION_LATER
+```
+
+### RULE 18 — OWNER_OBSERVABILITY_AND_CHALLENGE
+
+P2P may automatically select a technical executor, capability, or verification
+surface so the beginner Owner is not forced to choose internal A/B options.
+That convenience must never become opaque execution.
+
+Canonical law:
+
+```text
+AUTO_ROUTE != OPAQUE_EXECUTION
+AI_IS_TOOL
+OWNER_RETAINS_AUTHORITY
+OWNER_MUST_UNDERSTAND_WHAT_WAS_DONE_AND_WHY
+```
+
+At each material routing or execution decision, Control Tower gives the Owner
+a concise operational explanation in plain language:
+
+- what tool/executor/capability was selected;
+- what it will actually do or observe;
+- why it is appropriate for the current bounded goal;
+- why a smaller/simpler existing path is not sufficient, when that is not
+  obvious;
+- any material permission, privacy, cost, or mutation risk.
+
+This is a decision rationale, not hidden chain-of-thought. Do not expose or
+fabricate private reasoning traces. Give only the concise reasons needed for
+the Owner to understand and challenge the decision.
+
+Routine micro-fixes may still auto-continue under RULE 11
+(OWNER_MICRO_LOOP_SUPPRESSION). Do not interrupt the Owner for every small
+technical adjustment. Instead, consolidate the important decisions in the
+next meaningful update or terminal summary.
+
+Every bounded task terminal summary must include an
+`OWNER_CHALLENGE_SUMMARY` with:
+
+```text
+WHAT_WAS_DONE
+WHY_THIS_PATH
+ALTERNATIVES_CONSIDERED
+WHY_NOT_THE_ALTERNATIVES
+EVIDENCE_THAT_SUPPORTS_THE_RESULT
+WHAT_COULD_STILL_BE_WRONG
+WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT
+OVER_ENGINEERING_RISK_OR_NONE
+OWNER_ACTION_NOW
+```
+
+Rules for that summary:
+
+- `ALTERNATIVES_CONSIDERED` lists at most two genuinely plausible alternatives
+  that materially affected the decision; do not manufacture options merely to
+  fill the field.
+- `WHY_NOT_THE_ALTERNATIVES` states the concrete tradeoff: weaker evidence,
+  more risk, more cost, more architecture, less reversibility, or mismatch with
+  the bounded goal.
+- `WHAT_COULD_STILL_BE_WRONG` must name the important residual uncertainty
+  instead of declaring absolute certainty.
+- `WHAT_WOULD_FALSIFY_OR_REOPEN_THE_RESULT` gives the Owner a practical way to
+  challenge the conclusion.
+- `OWNER_ACTION_NOW` remains exactly one immediate beginner-safe action, or
+  `NONE` when the Owner should not do anything.
+
+The Owner may ask "tại sao làm thế?", "đã cân nhắc cách nào khác?", or "bằng
+chứng đâu?" at any time. P2P must answer from durable evidence and explicit
+decision rationale. It must not answer "vì hệ thống tự route" as if routing
+were authority.
+
+This rule does not require a new router, decision database, explainability
+framework, audit service, or verbose per-step narration. It is an
+owner-facing transparency contract over existing Control Tower state,
+ReturnPackets, evidence, and routing decisions.
+
+### RULE 19 — REALITY_FIRST_CAPABILITY_PROBE
+
+P2P must prefer verified reality over a cosmetically successful result.
+
+Canonical law:
+
+```text
+VERIFIED_BLOCKED > UNVERIFIED_PASS
+CONTRADICTORY_EVIDENCE => STOP_AND_RECONCILE
+UNCERTAIN_CAPABILITY => SMALLEST_REPRESENTATIVE_PROBE_FIRST
+PROBE_PASS != PROMOTED_CAPABILITY
+```
+
+Use this rule when success depends materially on an external runtime, model,
+provider, browser, GPU path, file format, third-party tool, or other capability
+that has not yet been proven for the exact bounded use case.
+
+Execution order:
+
+1. **Define the uncertainty.** State the one capability claim that is not yet
+   proven. Do not expand the probe into a general benchmark.
+2. **Choose the smallest representative probe.** Reuse the actual project
+   input/state when safe. Minimize spend, mutations, runtime, dependencies, and
+   setup. A probe must be large enough to answer the capability question but no
+   larger.
+3. **Respect Owner Gates.** Secrets, paid/GPU spend, production mutation,
+   deployment, merge/promotion, destructive actions, and infrastructure
+   commitments still require the existing Owner Gate.
+4. **Fail closed on contradictions.** If logs, hashes, runtime output, visual
+   evidence, reports, or ReturnPackets disagree on a material fact, Control
+   Tower must not select the convenient source and declare PASS. Suspend the
+   affected conclusion until the contradiction is reconciled or classify the
+   task as `BLOCKED`.
+5. **Promote only the proved claim.** A successful probe proves only the tested
+   capability under the tested conditions. It does not silently authorize a
+   framework, production rollout, broad integration, or generalized support.
+6. **Stop when the question is answered.** Do not add a metric stack, second
+   executor, generalized harness, repeated seed ladder, broad benchmark, or
+   architecture layer unless the probe exposes a specific blocker that
+   requires it.
+
+Routing guidance:
+
+- If the capability is already proven for the same bounded conditions, reuse
+  the proven path instead of probing again.
+- If the failure is deterministic and locally reproducible, debug the root
+  cause directly; do not create a capability experiment merely for ceremony.
+- If the uncertainty is external or probabilistic, a one-shot or minimal fixed
+  sample is preferred before full execution. Expand the sample only when the
+  first probe establishes that further evidence will materially change the
+  decision.
+- Test artifacts remain candidate evidence. They do not become production or
+  canonical authority without the normal P2P promotion rules.
+
+Beginner-facing explanation at a material capability probe must say, in plain
+language:
+
+```text
+WHAT_IS_UNPROVEN=
+WHAT_SMALL_TEST_WILL_BE_RUN=
+WHY_THIS_TEST_IS_ENOUGH_FOR_NOW=
+WHAT_IT_COSTS_OR_CHANGES=
+WHAT_COUNTS_AS_PASS_FAIL_BLOCKED=
+WHAT_HAPPENS_AFTER_THE_RESULT=
+OWNER_ACTION_NOW=
+```
+
+This rule is an independent P2P operational abstraction. It does not import an
+external instruction architecture, mandatory per-turn metadata system,
+complexity scoring formula, autonomous baton loop, or monolithic prompt core.
 
 ## 4. RULE_ASSIMILATION_GATE_V1
 

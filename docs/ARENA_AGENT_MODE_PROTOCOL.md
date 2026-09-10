@@ -151,6 +151,31 @@ SESSION_GOAL=
 PR_EXPECTATION=
 ```
 
+Before `ASSESS`, every Arena executor must complete the
+`P2P_SUPREME_OPERATING_LAW_V1` preflight.
+
+`TASK_BRANCH != LAW_AUTHORITY`.
+
+`TARGET_PROJECT != LAW_SOURCE`.
+
+The Arena target repository and working branch are execution state only. They
+must never determine which Supreme Law version applies. A P2P-managed task in
+another repository does not need to switch its working branch or copy P2P
+source into that project merely to obtain the law. When Arena can access the
+canonical P2P repository, read the law directly from
+`7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
+regardless of the selected target repository or task branch.
+
+A notebook copied into an installed project or old task branch may be used only
+when it contains `P2P_SUPREME_OPERATING_LAW_V1`; a stale branch-local copy does
+not outrank the inline `SUPREME_LAW_CAPSULE`. The Control Tower prompt must
+carry that capsule so Arena still receives the active minimum law when the
+canonical P2P repository cannot be read.
+
+Do not claim a repository file was read unless it actually was. The preflight
+exists to shape execution; it must not expand into a separate planning/reporting
+phase.
+
 The Owner must not infer whether to reuse the current Arena chat or create a
 new one. Within `ASSESS`, expose only:
 
@@ -294,15 +319,15 @@ or prematurely implementing that workstream.
 
 Arena executors operating a P2P-installed project discover the single
 canonical operations notebook `P2P_OPERATIONS_NOTEBOOK` before generating
-beginner-facing operating instructions:
+any P2P execution prompt or beginning implementation:
 
 - P2P development source: `docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`.
 - Installed projects: the inherited digest in the project's `AGENTS.md` P2P
   block (`P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`), which
   points to this protocol for the Arena session contract.
 
-The notebook canonicalizes `P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-15) and
-`RULE_ASSIMILATION_GATE_V1`. This protocol remains the canonical Arena
+The notebook canonicalizes `P2P_SUPREME_OPERATING_LAW_V1`,
+`P2P_BEGINNER_OPERATIONS_UX_V1`, and `RULE_ASSIMILATION_GATE_V1`. This protocol remains the canonical Arena
 session contract (sections 1-10); it references the notebook for general
 operations memory and does not maintain a divergent copy of notebook rules.
 
