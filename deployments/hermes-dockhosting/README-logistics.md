@@ -7,7 +7,7 @@ classes with REAL Logistics data — no invented facts:
 | Question (example) | Tool | Source collection |
 | --- | --- | --- |
 | "Hôm nay tôi có việc gì?" | `logistics_today_work` | `tasks` (explicit ASSIGNEE/TEAM scope) |
-| "Cước Hải Phòng về Hà Nội container 20' bao nhiêu?" | `logistics_freight_rate` | `rate_cards` (fail-closed: verified schema insufficient, see below) |
+| "Cước Hải Phòng về Hà Nội container 20' bao nhiêu?" | `logistics_freight_rate` | `rate_cards` (structured route lookup, see below) |
 | "Lô hàng LK-1024 hiện thế nào?" | `logistics_shipment_status` | `shipments` |
 
 ## Architecture
@@ -78,27 +78,61 @@ Tests assert each of these properties (`tests/test_hermes_logistics_readonly.py`
   `customer`/`client` mirror each other; financial section `data["3.4"]` is
   never exposed for status requests. Note: the section key `"0.0"` contains a
   dot, so it is read in Python, never via Mongo dot-notation.
-- **rate_cards** — VERIFIED persisted shape (logistics-work-desk
-  `views/sales.py`, independently verified by Control Tower 2026-09-09):
-  `{id, customer, route_name, history[{month, total_cost, total_price,
-  profit, details[{name, cost, price}], updated_at}]}`. **origin, destination,
-  container/equipment and currency are NOT structured fields**; `route_name`
-  is free text (may contain descriptive hints such as "(Cont 40)") and is
-  never heuristically parsed as authoritative structured data. A structured
-  route lookup (X → Y, container Z) therefore cannot be answered from the
-  current schema, so `logistics_freight_rate` **fails closed** with
-  `RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP`: it executes a
-  real bounded read-only sample query (key names only — route_name values are
-  not echoed), reports the verified schema finding, and never returns a rate.
-  No new collection is created to work around this; a follow-up Logistics
-  schema task (structured route/equipment/currency fields or a normalized
-  rate model) is required before a matcher can be implemented.
+- **rate_cards** — STRUCTURED Rate Card schema (logistics-work-desk PR #12,
+  merge commit `2eb2c343c10c2f909685f1f83cb77683197572f8`):
+
+  ```text
+  {id, customer, route_name,
+   route: {origin, destination, equipment_type, container_size, transport_mode},
+   currency, structured_lookup_ready,
+   history[{month: "MM/YYYY", total_cost, total_price, profit, details[], updated_at}]}
+  ```
+
+  `logistics_freight_rate` performs a real structured lookup:
+
+  - it queries **only** rate cards with `structured_lookup_ready == true` and
+    `is_deleted != true`, so legacy free-text rate cards (the pre-PR #12
+    shape, where `route_name` was the only route information) are excluded by
+    the query filter itself;
+  - matching uses **only** the structured fields `route.origin` /
+    `route.destination`, plus `route.equipment_type`, `route.container_size`
+    and `route.transport_mode` when the caller supplies them;
+  - `route_name` is a human label: it is **never parsed, echoed, or used for
+    matching**. Text normalization is deterministic only (case, whitespace,
+    accents) — there is no geographic alias table, so `"HP"` never becomes
+    `"Hải Phòng"`;
+  - container sizes use safe deterministic aliases already compatible with the
+    Logistics schema (`20` / `20FT` / `20'` → `20'`; `40HQ` / `40HC` → `40HC`;
+    `40` / `40FT` / `40'` → `40'`). Anything else is compared literally, never
+    mapped.
+
+  **Price semantics are preserved**: `total_price` is the customer quoted rate
+  and is returned as `selling_price` (the answer to "Cước X về Y bao nhiêu?");
+  `total_cost` stays `internal_cost` and `profit` stays `profit` — both are
+  internal and must never be presented as the customer freight rate. Currency
+  is returned exactly as stored.
+
+  **History / month rules**: `history.month` is `MM/YYYY`. With no month
+  requested the **latest valid month** is chosen by *parsing* MM/YYYY (array
+  order is never trusted, unparseable months are skipped). A requested month
+  that is absent, or a rate card with no valid history, returns
+  `RATE_HISTORY_NOT_FOUND` — a historical price is never invented.
+
+  **Status contract**: `OK`, `NOT_FOUND`, `AMBIGUOUS`,
+  `RATE_HISTORY_NOT_FOUND`. Multiple customer-specific rate cards matching the
+  same criteria return `AMBIGUOUS` with bounded candidates (rate_card_id,
+  customer, route, equipment/container, month, selling_price, currency) — one
+  is never silently chosen. The obsolete fail-closed schema-gap status used
+  before PR #12 is gone.
 
 ## Verification status
 
 - Focused non-secret tests: `python3 -m pytest tests/test_hermes_logistics_readonly.py`
-  (43 tests — today-work incl. ASSIGNEE/TEAM scope, freight fail-closed with
-  the verified schema finding, shipment status, read-only safety, secret
+  (today-work incl. ASSIGNEE/TEAM scope, structured freight lookup — route +
+  container match, 20FT/40HQ aliases, legacy and non-ready rate cards
+  excluded, latest MM/YYYY selection, requested/absent month, selling_price vs
+  internal_cost, currency, AMBIGUOUS, route_name never parsed, obsolete
+  schema-gap status removed — plus shipment status, read-only safety, secret
   safety, plugin registration contract, real-driver error path).
 - Plugin load verified against the real hermes-agent plugin loader (bundled
   backend auto-load; toolset `logistics` on by default for telegram/api_server;
@@ -112,16 +146,16 @@ Tests assert each of these properties (`tests/test_hermes_logistics_readonly.py`
 1. **READ_ONLY_MONGO_CREDENTIAL** — create a MongoDB user with read-only
    privileges on the Logistics database, then set on DockHosting:
    `LOGISTICS_MONGO_URI_READONLY`, `LOGISTICS_MONGO_DB_NAME`. Then ask Hermes
-   the three questions and confirm answers match the Logistics app.
-2. **LOGISTICS_RATE_CARD_SCHEMA_TASK** — the verified rate-card schema has no
-   structured origin/destination/container/currency fields (route_name is free
-   text), so structured freight-rate lookup requires a follow-up bounded task
-   in logistics-work-desk to add structured fields (or a normalized rate
-   model). Only after that schema exists should the freight matcher be
-   implemented in a follow-up Hermes task.
-3. **IDENTITY_BINDING** (future, optional) — bind messaging identity (e.g.
+   the three questions and confirm answers match the Logistics app. Freight
+   lookup additionally needs rate cards saved with the structured shape
+   (`structured_lookup_ready == true`); legacy free-text rate cards are
+   deliberately ignored rather than guessed at.
+2. **IDENTITY_BINDING** (future, optional) — bind messaging identity (e.g.
    Telegram user) to Logistics `assignee_user_id` so "Hôm nay TÔI có việc gì?"
    can default to ASSIGNEE scope instead of TEAM scope.
+3. **EQUIPMENT_VOCABULARY** (future, optional) — once the Logistics app uses a
+   fixed equipment/transport vocabulary, it can be reflected in the deterministic
+   normalization table so callers may pass the stored values verbatim.
 
 ## Out of scope (deliberately)
 

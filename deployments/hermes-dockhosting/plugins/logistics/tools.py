@@ -5,18 +5,21 @@ through the find/find_one-only connector:
 
   logistics_today_work     — "Hôm nay tôi có việc gì?" (tasks collection,
                              explicit ASSIGNEE vs TEAM scope)
-  logistics_freight_rate   — "Cước X về Y container Z?" (rate_cards; fails
-                             closed with
-                             RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP
-                             because the verified schema has no structured
-                             origin/destination/container/currency fields)
+  logistics_freight_rate   — "Cước X về Y container Z?" (rate_cards;
+                             structured route lookup on
+                             route.origin/route.destination plus the optional
+                             equipment/container/mode fields; route_name is
+                             never parsed)
   logistics_shipment_status— "Lô hàng <ID> hiện thế nào?" (shipments by id)
 
 FACT INTEGRITY: results carry provenance (source collection, record id,
 queried_at, status). Values are never synthesized; absent data returns
-NOT_FOUND and the rate tool reports its schema gap instead of a plausible
-rate. Natural-language presentation stays with the model; this module only
-returns normalized facts.
+NOT_FOUND, an absent history month returns RATE_HISTORY_NOT_FOUND, and several
+customer-specific matches return AMBIGUOUS instead of one being silently
+chosen. Freight answers expose ``selling_price`` (total_price, the customer
+quoted rate); ``total_cost`` stays ``internal_cost`` and is never returned as
+the customer freight rate. Natural-language presentation stays with the model;
+this module only returns normalized facts.
 
 Module imports are stdlib-only so plugin registration is safe in any Hermes
 runtime (pymongo is imported lazily by the connector).
@@ -118,21 +121,33 @@ TODAY_WORK_SCHEMA = _schema(
 
 FREIGHT_RATE_SCHEMA = _schema(
     "logistics_freight_rate",
-    "Look up the current/recent freight rate from an origin to a destination for a "
-    "container size or vehicle type, from the Logistics rate_cards collection. The "
-    "VERIFIED rate-card schema has no structured origin/destination/container/"
-    "currency fields (route_name is free text), so this tool currently returns "
-    "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP and NEVER a rate; "
-    "a follow-up Logistics schema task is required first. If no rate cards exist "
-    "it returns NOT_FOUND. NEVER invent or estimate a rate, currency or route, and "
-    "never parse route_name heuristically. The user may ask in Vietnamese, e.g. "
-    "'Cước Hải Phòng về Hà Nội container 20' bao nhiêu?'.",
+    "Look up the freight rate from an origin to a destination from the Logistics "
+    "rate_cards collection, using the STRUCTURED route fields (route.origin / "
+    "route.destination, plus equipment_type / container_size / transport_mode when "
+    "supplied) on rate cards marked structured_lookup_ready. Status is one of OK, "
+    "NOT_FOUND, AMBIGUOUS, RATE_HISTORY_NOT_FOUND. selling_price (total_price) is the "
+    "customer quoted rate — that is the answer to 'Cước X về Y bao nhiêu?'. "
+    "internal_cost (total_cost) and profit are internal and must NEVER be presented "
+    "as the customer freight rate. month uses MM/YYYY: when omitted the LATEST valid "
+    "month is used, and a month with no history entry returns RATE_HISTORY_NOT_FOUND. "
+    "Multiple customer-specific rate cards return AMBIGUOUS with bounded candidates — "
+    "never pick one silently. NEVER invent, estimate or round a rate, currency, route "
+    "or month, never parse route_name, and never expand a geographic abbreviation "
+    "(\"HP\" is not \"Hải Phòng\"). The user may ask in Vietnamese, e.g. 'Cước Hải "
+    "Phòng về Hà Nội container 20' bao nhiêu?'.",
     {
-        "origin": _STR,
-        "destination": _STR,
-        "container_size": {"type": "string", "description": "e.g. \"20'\", '40HC'"},
-        "vehicle_type": {"type": "string", "description": "e.g. 'xe tải', 'container'"},
-        "date": {"type": "string", "description": "Optional date as YYYY-MM-DD"},
+        "origin": {"type": "string", "description": "Structured route origin, e.g. 'Hải Phòng'"},
+        "destination": {"type": "string", "description": "Structured route destination, e.g. 'Hà Nội'"},
+        "container_size": {
+            "type": "string",
+            "description": "Container size; deterministic aliases accepted (20 / 20FT / 20' -> 20', 40HQ / 40HC -> 40HC)",
+        },
+        "equipment_type": {"type": "string", "description": "Structured route equipment type, e.g. 'container'"},
+        "transport_mode": {"type": "string", "description": "Structured route transport mode, e.g. 'road', 'sea'"},
+        "vehicle_type": {"type": "string", "description": "Deprecated alias of equipment_type, e.g. 'xe tải', 'container'"},
+        "customer": {"type": "string", "description": "Optional customer name, used to disambiguate multiple rate cards"},
+        "month": {"type": "string", "description": "Requested month as MM/YYYY (default: latest valid month in history)"},
+        "date": {"type": "string", "description": "Optional date as YYYY-MM-DD; its MM/YYYY month is used when 'month' is omitted"},
     },
     required=("origin", "destination"),
 )
@@ -157,7 +172,6 @@ SHIPMENT_STATUS_SCHEMA = _schema(
 
 _DEFAULT_ITEM_LIMIT = 25
 _SCAN_LIMIT = 500  # bounded scan of open tasks (newest first)
-_RATE_SAMPLE_LIMIT = 5  # bounded rate_cards sample for schema-gap reporting
 
 
 def _with_connector(fn: Callable[[LogisticsReadOnlyClient, dict], dict]) -> Callable[[dict], str]:
@@ -321,28 +335,48 @@ def _today_work(client: LogisticsReadOnlyClient, args: dict) -> dict:
 
 
 # --------------------------------------------------------------------------
-# B. FREIGHT_RATE_LOOKUP (fail closed: verified schema is insufficient for
-#    structured route lookup; no heuristic route_name parsing)
+# B. FREIGHT_RATE_LOOKUP (structured route lookup; route_name is never parsed)
 # --------------------------------------------------------------------------
 
 
+def _opt_str(value):
+    text = "" if value is None else str(value).strip()
+    return text or None
+
+
 def _freight_rate(client: LogisticsReadOnlyClient, args: dict) -> dict:
-    origin = (str(args.get("origin") or "").strip())
-    destination = (str(args.get("destination") or "").strip())
+    origin = str(args.get("origin") or "").strip()
+    destination = str(args.get("destination") or "").strip()
     if not origin or not destination:
         raise _BadRequest("origin and destination are required")
-    if args.get("date"):
+    container_size = _opt_str(args.get("container_size"))
+    equipment_type = _opt_str(args.get("equipment_type")) or _opt_str(args.get("vehicle_type"))
+    transport_mode = _opt_str(args.get("transport_mode"))
+    customer = _opt_str(args.get("customer"))
+
+    # month (MM/YYYY) wins; a YYYY-MM-DD date falls back to its own month.
+    month = _opt_str(args.get("month"))
+    date_arg = _opt_str(args.get("date"))
+    if date_arg:
         try:
-            contracts.parse_hcm_date(args.get("date"), field="date")
+            contracts.parse_hcm_date(date_arg, field="date")
         except ValueError as exc:
             raise _BadRequest(str(exc))
+    if month is None and date_arg is not None:
+        month = contracts.month_from_date(date_arg)
+    if month is not None and contracts.parse_month(month) is None:
+        raise _BadRequest("month must be MM/YYYY")
+    month = contracts.canonical_month(month) if month is not None else None
 
     requested = {
         "origin": origin,
         "destination": destination,
-        "container_size": args.get("container_size") or None,
-        "vehicle_type": args.get("vehicle_type") or None,
-        "date": args.get("date") or None,
+        "container_size": container_size,
+        "equipment_type": equipment_type,
+        "transport_mode": transport_mode,
+        "customer": customer,
+        "month": month,
+        "date": date_arg,
     }
     base = {
         "requested": requested,
@@ -350,55 +384,128 @@ def _freight_rate(client: LogisticsReadOnlyClient, args: dict) -> dict:
         "queried_at": iso_now(),
     }
 
-    # VERIFIED (logistics-work-desk views/sales.py): persisted rate cards carry
-    # route_name as FREE TEXT and have NO structured origin/destination/
-    # container/currency fields. A structured route lookup therefore cannot be
-    # answered from the current schema. Fail closed: run a real bounded
-    # read-only sample query for evidence (key names only — route_name VALUES
-    # are not echoed, to avoid inviting heuristic parsing), and never return a
-    # rate. Resolving this requires a follow-up Logistics schema task; no new
-    # collection is created here.
-    sample = client.find(
+    # Bounded read-only query over structured, non-deleted rate cards only.
+    # Legacy free-text rate cards (no structured_lookup_ready) never come back.
+    docs = client.find(
         contracts.RATE_CARDS,
         dict(contracts.RATE_CARD_ACTIVE_FILTER),
-        limit=_RATE_SAMPLE_LIMIT,
+        limit=contracts.RATE_CARD_SCAN_LIMIT,
     )
-    if not sample:
+    matches = [
+        doc
+        for doc in docs
+        if contracts.match_rate_card(
+            doc,
+            origin=origin,
+            destination=destination,
+            container_size=container_size,
+            equipment_type=equipment_type,
+            transport_mode=transport_mode,
+            customer=customer,
+        )
+    ]
+
+    if not matches:
         return {
             **base,
-            "status": "NOT_FOUND",
-            "note": "Chưa có rate card nào trong dữ liệu Logistics hiện tại.",
-        }
-    observed: List[str] = []
-    for doc in sample:
-        for key in doc.keys():
-            if key != "_id" and key not in observed:
-                observed.append(key)
-    return {
-        **base,
-        "status": contracts.RATE_CARD_SCHEMA_GAP_STATUS,
-        "verified_schema": {
-            "top_level_fields": list(contracts.RATE_CARD_VERIFIED_TOP_LEVEL_FIELDS),
-            "history_entry_fields": list(contracts.RATE_CARD_VERIFIED_HISTORY_FIELDS),
-            "structured_fields_absent": list(contracts.RATE_CARD_STRUCTURED_FIELDS_ABSENT),
-            "route_name": (
-                "free text; may contain descriptive hints such as '(Cont 40)' but is "
-                "NOT authoritative structured data and is not parsed"
+            "status": contracts.RATE_CARD_STATUS_NOT_FOUND,
+            "note": (
+                "Không có rate card nào trong dữ liệu Logistics khớp tuyến / thiết bị "
+                "này (chỉ xét rate card có cấu trúc và chưa xóa). Không đoán giá."
             ),
+        }
+
+    if len(matches) > 1:
+        # Multiple customer-specific rate cards: bounded candidates only, never
+        # one silently chosen.
+        candidates = []
+        for doc in matches:
+            entry, entry_month = contracts.select_latest_history(doc)
+            candidates.append(contracts.rate_card_candidate(doc, entry, entry_month))
+        return {
+            **base,
+            "status": contracts.RATE_CARD_STATUS_AMBIGUOUS,
+            "match_count": len(matches),
+            "candidates": candidates,
+            "note": (
+                f"Có {len(matches)} rate card khớp cùng tuyến/thiết bị; cần làm rõ "
+                "(khách hàng, thiết bị, tháng) trước khi trả mức cước."
+            ),
+        }
+
+    doc = matches[0]
+    if month is not None:
+        entry, entry_month = contracts.select_history_for_month(doc, month)
+    else:
+        entry, entry_month = contracts.select_latest_history(doc)
+
+    if entry is None or entry_month is None:
+        missing_history = {
+            **base,
+            "status": contracts.RATE_CARD_STATUS_HISTORY_NOT_FOUND,
+            "rate_card_id": _norm(doc.get("id")),
+            "customer": _norm(doc.get("customer")),
+            "route": _route_view(doc),
+            "currency": _norm(doc.get("currency")),
+            "requested_month": month,  # None means "latest valid month"
+            "available_months": contracts.available_months(doc),
+        }
+        if month is None:
+            missing_history["note"] = (
+                "Rate card khớp tuyến nhưng không có tháng MM/YYYY hợp lệ trong "
+                "lịch sử giá. Không đoán giá."
+            )
+        else:
+            missing_history["note"] = (
+                f"Rate card khớp tuyến nhưng không có giá cho tháng {month}. "
+                "Không đoán giá."
+            )
+        return missing_history
+
+    result = {
+        **base,
+        "status": contracts.RATE_CARD_STATUS_OK,
+        "rate_card_id": _norm(doc.get("id")),
+        "customer": _norm(doc.get("customer")),
+        "route": _route_view(doc),
+        "month": entry_month,
+        "currency": _norm(doc.get("currency")),
+        # total_price = the customer quoted rate (the answer to "Cước ... bao nhiêu?").
+        "selling_price": entry.get("total_price"),
+        # total_cost = internal_cost; profit = profit. Internal figures only.
+        "internal": {
+            "internal_cost": entry.get("total_cost"),
+            "profit": entry.get("profit"),
         },
-        "observed_top_level_keys": observed,
-        "sample_size": len(sample),
-        "reason": (
-            "Verified rate-card schema (logistics-work-desk views/sales.py) has no "
-            "structured origin/destination/container/currency fields; route_name is "
-            "free text. A structured freight-rate lookup requires a follow-up "
-            "Logistics schema task; no rate is returned."
-        ),
-        "note": (
-            "Chưa thể trả mức cước: rate card hiện không có trường tuyến / container / "
-            "tiền tệ có cấu trúc (route_name là văn bản tự do). Cần task nâng schema "
-            "Logistics trước. Không đoán giá."
-        ),
+        "updated_at": _norm(entry.get("updated_at")),
+        "price_semantics": dict(contracts.PRICE_SEMANTICS),
+        "available_months": contracts.available_months(doc),
+    }
+    if month is None:
+        result["month_selection"] = "latest_valid_month"
+    else:
+        result["month_selection"] = "requested_month"
+    result["note"] = (
+        "selling_price là giá bán / cước báo khách (total_price). internal_cost "
+        "(total_cost) và profit là dữ liệu nội bộ, KHÔNG được trình bày như cước "
+        "báo khách."
+    )
+    return result
+
+
+def _norm(value):
+    return None if value is None else str(value)
+
+
+def _route_view(doc: dict) -> dict:
+    """Bounded structured route view (route_name is intentionally absent)."""
+    route = contracts.rate_card_route(doc)
+    return {
+        "origin": _norm(route.get("origin")),
+        "destination": _norm(route.get("destination")),
+        "equipment_type": _norm(route.get("equipment_type")),
+        "container_size": _norm(route.get("container_size")),
+        "transport_mode": _norm(route.get("transport_mode")),
     }
 
 
