@@ -1,0 +1,3 @@
+[submodule "source/chinese-metaphysics/upstreams/plum-app"]
+	path = source/chinese-metaphysics/upstreams/plum-app
+	url = https://github.com/soom-lupulus/plum-app.git
