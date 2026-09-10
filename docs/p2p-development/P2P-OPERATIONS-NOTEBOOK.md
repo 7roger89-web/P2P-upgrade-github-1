@@ -76,11 +76,32 @@ Do not create a parallel supreme-law file or duplicate framework.
 ### Mandatory preflight
 
 ```text
+P2P_MANAGED_PROJECT_OR_TASK_START => READ_P2P_SUPREME_OPERATING_LAW_V1
+ANY_SUBSTANTIVE_ANALYSIS_OR_REASONING => READ_P2P_SUPREME_OPERATING_LAW_V1_FIRST
 CONTROL_TOWER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1
 P2P_PROMPT_WRITER_BEFORE_PROMPT_WRITE => READ_P2P_SUPREME_OPERATING_LAW_V1
 EXECUTOR_BEFORE_IMPLEMENTATION => READ_P2P_SUPREME_OPERATING_LAW_V1
+REVIEWER_OR_SUPERVISOR_BEFORE_REVIEW => READ_P2P_SUPREME_OPERATING_LAW_V1
 MODEL_SWITCH_OR_SESSION_RESET => READ_P2P_SUPREME_OPERATING_LAW_V1_AGAIN
+NO_SUBSTANTIVE_WORK_BEFORE_VALID_LAW_CONTEXT = YES
 ```
+
+This preflight applies to every P2P-managed project and every P2P-managed
+Control Tower, prompt writer, executor, reviewer, supervisor, model, or
+supported tool session. Before substantive operational analysis, decision
+reasoning, planning, prompt construction, implementation, review, testing, or
+release work, the actor must first establish a valid Supreme Law context.
+This requirement concerns the operating law used to make decisions; it does
+not require disclosure, storage, or narration of private chain-of-thought.
+
+A valid law context is, in precedence order: the reachable active canonical
+notebook; an up-to-date installed projection of that notebook; or, when the
+canonical source cannot be reached, the explicit compact
+`SUPREME_LAW_CAPSULE` carried by the P2P prompt. A stale task branch, old chat,
+old plan, remembered summary, or executor-specific convention is not a valid
+replacement for the active law. If none of the valid law contexts is
+available, substantive P2P-managed work must stop at `LAW_CONTEXT_BLOCKED`
+until a valid context is supplied.
 
 The canonical text is this section of
 `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`.
@@ -138,6 +159,107 @@ is sufficient.
    execution, verification, recovery, or context. When the required outcome is
    proven, stop instead of opening optional refactor, benchmark, framework,
    hardening, or future-phase work.
+
+### Executor-aware resource policy
+
+Canonical principle:
+
+```text
+EXECUTOR_CONSTRAINTS_ARE_EXECUTOR_SPECIFIC
+MIN_BURN_IS_EXECUTOR_POLICY_NOT_P2P_PHILOSOPHY
+GLOBAL_GOAL = CORRECT_BOUNDED_OUTCOME_WITH_PROPORTIONATE_RESOURCES
+NO_CROSS_EXECUTOR_CARGO_CULT
+```
+
+P2P must select execution behavior from the real constraints of the selected
+executor. A quota, context, latency, cost, or model limitation observed on one
+executor must not silently become a universal rule for every executor.
+Anti-overengineering, Owner authority, evidence integrity, safety boundaries,
+and stop-when-sufficient remain global; resource tactics below are
+executor-specific.
+
+#### Codex / Astra — quota-sensitive MIN-BURN lane
+
+Current evidence-backed default for ordinary bounded Codex/Astra coding work is
+`REASONING_EFFORT=MEDIUM`. This is an operating default, not an immutable model
+truth, and must be revised when better task evidence appears.
+
+Use `LOW` only for highly mechanical, well-localized, reversible changes where
+the implementation path is already obvious. Escalate to `HIGH` when the task
+materially requires broad repository discovery, cross-cutting reasoning,
+unfamiliar architecture, upstream/external research, migrations,
+security-sensitive reasoning, or substantial ambiguity. Do not select effort by
+habit; optimize `TOTAL_RESOURCE_BURN_TO_ACCEPTED_RESULT`, including repair
+turns, rather than the apparent cost of the first turn alone.
+
+For a normal bounded Codex/Astra task:
+
+- Prefer a fresh Codex task thread rather than carrying unrelated completed task
+  context forward.
+- Control Tower should provide the minimum sufficient code/file pointers already
+  known instead of paying Astra to rediscover known context.
+- Batch known requirements for the same goal into the first task request.
+- When product decisions genuinely block implementation, collect them into one
+  consolidated question batch when practical; do not create a multi-turn
+  question loop for routine technical details.
+- Do not request a plan, progress narration, broad web research, reviewer,
+  supervisor, subagent, exhaustive test pass, full build, or diagnostic logging
+  by default. Use any of these only when the bounded goal, a demonstrated risk,
+  an observed failure, an explicit Owner request, or a higher-priority
+  host/safety/security requirement materially requires it.
+- For low-risk reversible work, implementation may be followed first by
+  Owner/manual validation or the narrowest cheap proof rather than an autonomous
+  broad validation campaign. After an observed failure, investigate and repair
+  the failing path instead of restarting broad analysis.
+- Stop when the bounded result and its required handoff evidence are complete.
+  Do not spend remaining Astra quota on optional cleanup, future work, or
+  ceremonial re-review.
+
+For P2P-managed Codex/Astra work, lower project/tool defaults such as
+`ALWAYS_WRITE_A_PLAN`, `ALWAYS_FULL_BUILD`, or `ALWAYS_USE_SUPERVISOR` do not
+become mandatory merely because they exist in a generic tool profile. When such
+a lower default conflicts with this Supreme Law, use the Supreme Law's
+risk-proportional rule. This does not override explicit user instructions,
+host/system requirements, safety/security controls, or a task-specific
+acceptance condition that genuinely requires the work.
+
+#### Arena — normal-resource OUTCOME-FIRST lane
+
+Arena is not subject to Codex/Astra MIN-BURN restrictions merely because Astra
+quota is expensive. Arena may inspect broader relevant context, plan, test,
+review, or use richer execution loops when doing so materially improves the
+bounded outcome, evidence, or recovery. Arena still obeys minimum sufficient
+decomposition and the OE Gate: inexpensive or abundant execution is not a
+license to create unnecessary agents, tests, reports, abstractions, or
+infrastructure.
+
+Arena's default optimization target is:
+
+```text
+CORRECT_BOUNDED_OUTCOME + SUFFICIENT_EVIDENCE
+```
+
+not minimum token use.
+
+#### Other executors and policy learning
+
+For Manus, Claude, Gemini, future executors, or another execution surface, use
+an observed executor profile when one exists; otherwise start with
+risk-proportional conservative defaults and update from real task evidence.
+Never copy Codex/Astra's skip-test or MIN-BURN tactics to another executor
+without evidence that the same constraint exists, and never copy Arena's richer
+verification loop into Codex merely because it is affordable elsewhere.
+
+Useful evidence for policy revision includes resource/quota use, task duration,
+first-pass acceptance, repair turns, context/tool activity, validation value,
+and task complexity. Do not build a benchmark subsystem solely to collect these
+numbers; real bounded tasks are preferred evidence.
+
+Control Tower must know the selected executor before generating the executor
+packet. The packet should contain only the task delta plus the minimum law
+capsule required by the preflight. Owner-facing rationale and terminal
+challenge summaries remain Control Tower responsibilities and need not be paid
+for again inside a Codex/Astra implementation turn.
 
 ### Anti-overengineering decision
 
@@ -383,13 +505,14 @@ PROGRESS_REPORTING=EXCEPTIONS_ONLY
 STOP_WHEN_EVIDENCE_SUFFICIENT
 ANTI_OVER_ENGINEERING
 CONTEXT_IS_CAPACITY_NOT_BUDGET
+EXECUTOR_CONSTRAINTS_ARE_EXECUTOR_SPECIFIC
 ```
 
 Do not expand a bounded task merely because more investigation is possible.
 These laws are canonically stated in the `AGENTS.md` "Prompt and effort
-efficiency" section and enforced by `orchestration_policy.py`
-(P2P-EFF01); this notebook references them, it does not copy their full
-semantics.
+efficiency" section and `P2P_SUPREME_OPERATING_LAW_V1 > Executor-aware
+resource policy`. Existing runtime policy may enforce a compatible subset;
+this notebook remains the canonical operating authority.
 
 ### RULE 13 — CONTROL_TOWER_STATE_RESPONSIBILITY
 
@@ -934,6 +1057,9 @@ section 4.3.
   Control Tower verifies the exact PR head/tree.
 
 ## 6. Discovery and operator paths
+
+Every P2P-managed row below first establishes `P2P_SUPREME_OPERATING_LAW_V1`
+context before substantive analysis or execution.
 
 | Operator | Discover | Canonical surface |
 | --- | --- | --- |
