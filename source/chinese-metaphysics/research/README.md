@@ -40,4 +40,8 @@ Every dossier must distinguish:
 
 A pass on one axis never promotes another axis.
 
+## Quantitative-output rule
+
+A deterministic score, K-line, percentage, confidence number or energy value is not automatically a calibrated measurement. If a repo assigns hand-picked weights or thresholds without empirical calibration and source provenance, classify that output as `PRODUCT_HEURISTIC`, not objective predictive evidence.
+
 This index is navigation only. It is not a shared rule registry or merged methodology.
