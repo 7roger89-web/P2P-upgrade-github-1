@@ -5,7 +5,10 @@ import sys
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "p2p_portable_law_projection.py"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = REPO_ROOT / "scripts" / "p2p_portable_law_projection.py"
+CANONICAL_NOTEBOOK = REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
+PACKAGE_RELEASE = REPO_ROOT / "scripts" / "package_release.py"
 
 
 def _package(tmp_path: Path) -> Path:
@@ -58,20 +61,40 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "TASK_BRANCH != LAW_AUTHORITY" in agents
 
 
-def test_projection_is_idempotent_and_checkable(tmp_path: Path) -> None:
+def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+
+    first = _run(package, project)
+    assert first.returncode == 0
+    first_agents = (project / "AGENTS.md").read_bytes()
+    first_projection = (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()
+
+    second = _run(package, project)
+    assert second.returncode == 0
+
+    assert (project / "AGENTS.md").read_bytes() == first_agents
+    assert (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes() == first_projection
+
+
+def test_projection_preserves_existing_agents_and_is_checkable(tmp_path: Path) -> None:
     package = _package(tmp_path)
     project = tmp_path / "project"
     project.mkdir()
     (project / "AGENTS.md").write_text("# Existing project rules\n", encoding="utf-8")
 
     first = _run(package, project)
+    assert first.returncode == 0
+    first_agents = (project / "AGENTS.md").read_bytes()
+
     second = _run(package, project)
     check = _run(package, project, "--check")
 
-    assert first.returncode == 0
     assert second.returncode == 0
     assert check.returncode == 0, check.stderr + check.stdout
-    agents = (project / "AGENTS.md").read_text(encoding="utf-8")
+    assert (project / "AGENTS.md").read_bytes() == first_agents
+    agents = first_agents.decode("utf-8")
     assert agents.count("<!-- BEGIN P2P PORTABLE LAW -->") == 1
     assert agents.startswith("# Existing project rules")
 
@@ -89,3 +112,14 @@ def test_check_fails_closed_after_projection_drift(tmp_path: Path) -> None:
 
     assert check.returncode == 2
     assert "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING" in check.stdout
+
+
+def test_canonical_law_and_release_package_recognize_portable_projection() -> None:
+    notebook = CANONICAL_NOTEBOOK.read_text(encoding="utf-8")
+    package_release = PACKAGE_RELEASE.read_text(encoding="utf-8")
+
+    assert ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md" in notebook
+    assert "P2P_PORTABLE_LAW_PROJECTION=YES" in notebook
+    assert "generated portable project projection" in notebook
+    assert '"docs/p2p-development/P2P-PORTABLE-LAW-PROJECTION.md"' in package_release
+    assert '"scripts/p2p_portable_law_projection.py"' in package_release
