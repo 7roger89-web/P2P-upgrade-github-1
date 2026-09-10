@@ -1,0 +1,234 @@
+name: Chinese Metaphysics Upstream Audit
+
+on:
+  push:
+    branches:
+      - research/chinese-metaphysics-upstreams-01
+    paths:
+      - '.github/workflows/chinese-metaphysics-upstream-audit.yml'
+      - 'source/chinese-metaphysics/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: ${{ matrix.id }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: plum-app
+            repository: soom-lupulus/plum-app
+            ref: 5965bdc8e9ca69a3cc7e96be6f1cc585d5032814
+          - id: plum-cg
+            repository: soom-lupulus/plum-cg
+            ref: 509fc43001a503d17a37db07bc56e069b1ff1c4f
+          - id: yinyo-liuyao
+            repository: xiaoshiyilangzhao1996-droid/yinyo-liuyao
+            ref: 1f67eea0ce5a2c49e6851e4eedce507f9c044dd9
+          - id: liuyao-divination
+            repository: Johnson-Jia/liuyao-divination
+            ref: 1a5a78b513c0e7b46dfb29f74043bcf978c32a3e
+          - id: meihua-yishu
+            repository: muyen/meihua-yishu
+            ref: 8a9a5e0f482dd225bfe4a1c52c2ae5546228607a
+          - id: meihua-divination-skill
+            repository: Fyrgo8/meihua-divination-skill
+            ref: d70d73ad620afe39d1555a0386680790cfd09227
+          - id: iztro
+            repository: SylarLong/iztro
+            ref: 2c7ef9be669df7b19d1799f4dce335fed3794f78
+          - id: ziwei-doushu-skill
+            repository: Linden-TR/ziwei-doushu-skill
+            ref: a842dd65dabdc4ce42ec9688b88ae876858a9977
+          - id: ziwei-wuandyA
+            repository: wuandyA/ziwei
+            ref: 4531626403a0c645f1e538a9ed145ffec8799420
+          - id: ziwei-chart
+            repository: ziweiknows/ziwei-chart
+            ref: b172413d85addbe32facd9e20b9179db619f3afb
+          - id: xu-quanren
+            repository: ZhangZangQian/xu-quanren
+            ref: 7b8364bbd79a11e852899893ac5749a83be62836
+
+    steps:
+      - name: Checkout pinned upstream
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repository }}
+          ref: ${{ matrix.ref }}
+          path: upstream
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Audit pinned upstream
+        shell: bash
+        env:
+          REPO_ID: ${{ matrix.id }}
+        run: |
+          set -euo pipefail
+          cd upstream
+          echo "REPO_ID=$REPO_ID"
+          echo "HEAD=$(git rev-parse HEAD)"
+
+          case "$REPO_ID" in
+            plum-app)
+              corepack enable
+              pnpm install --frozen-lockfile
+              pnpm fe:build
+              find apps/backend/src apps/backend/scripts -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
+              echo 'AUDIT_KIND=BUILD_AND_JS_SYNTAX'
+              ;;
+
+            plum-cg)
+              npm ci
+              npx vitest run
+              npm run typecheck
+              npm run build
+              echo 'AUDIT_KIND=UNIT_TYPECHECK_BUILD'
+              ;;
+
+            yinyo-liuyao)
+              python - <<'PY'
+          from pathlib import Path
+          import re
+
+          required = [
+              'SKILL.md', 'docs/rules.md', 'docs/examples.md', 'docs/reference.md',
+              'docs/divination-types.md', 'subskills/pressure-tests.md'
+          ]
+          for p in required:
+              assert Path(p).is_file(), p
+
+          pressure = Path('subskills/pressure-tests.md').read_text(encoding='utf-8')
+          ids = [int(x) for x in re.findall(r'^\|\s*(\d+)\s*\|', pressure, flags=re.M)]
+          unique = sorted(set(ids))
+          print('PRESSURE_TEST_RULE_ROWS=', len(ids))
+          print('PRESSURE_TEST_UNIQUE_RULE_IDS=', len(unique))
+          assert unique == list(range(1, 121)), f'rule id coverage mismatch: {unique[:5]}...{unique[-5:] if unique else []}'
+
+          corpus = '\n'.join(Path(p).read_text(encoding='utf-8') for p in ['docs/examples.md','docs/divination-types.md','docs/reference.md','subskills/pressure-tests.md'])
+          g_ids = sorted(set(re.findall(r'\bG\d{3}\b', corpus)))
+          retrospective = corpus.count('实际应验')
+          print('UNIQUE_G_CASE_IDS=', len(g_ids))
+          print('RETROSPECTIVE_OUTCOME_MARKERS=', retrospective)
+          print('CLAIM_412_CASES_STRUCTURALLY_PROVEN=', 'YES' if len(g_ids) == 412 else 'NO')
+          PY
+              echo 'AUDIT_KIND=CORPUS_STRUCTURE'
+              ;;
+
+            liuyao-divination)
+              python -m pip install -q -e '.[dev]'
+              pytest -q
+              python -m compileall -q src
+              echo 'AUDIT_KIND=PYTEST_AND_COMPILE'
+              ;;
+
+            meihua-yishu)
+              python -m pip install -q pytest
+              pytest -q tests
+              python scripts/meihua_calc.py num 6 8 3 >/tmp/meihua-smoke.txt
+              test -s /tmp/meihua-smoke.txt
+              echo 'AUDIT_KIND=PYTEST_AND_CLI_SMOKE'
+              ;;
+
+            meihua-divination-skill)
+              python -m compileall -q scripts
+              python -m json.tool evals/evals.json >/dev/null
+              python scripts/normalize_case_input.py --input resources/case-input.example.json --format json >/tmp/normalized.json
+              python -m json.tool /tmp/normalized.json >/dev/null
+              python scripts/normalize_case_input.py --input resources/case-input.example.json --format markdown >/tmp/normalized.md
+              test -s /tmp/normalized.md
+              cat > /tmp/invalid.json <<'JSON'
+          {"question_context":"x","upper_trigram":"INVALID","lower_trigram":"坤"}
+          JSON
+              if python scripts/normalize_case_input.py --input /tmp/invalid.json --format json; then
+                echo 'negative validation unexpectedly succeeded' >&2
+                exit 1
+              fi
+              echo 'AUDIT_KIND=HELPER_POSITIVE_NEGATIVE'
+              ;;
+
+            iztro)
+              npm install -g yarn@1.22.22 >/dev/null
+              yarn install --frozen-lockfile
+              yarn test --runInBand
+              yarn build
+              echo 'AUDIT_KIND=JEST_AND_BUILD'
+              ;;
+
+            ziwei-doushu-skill)
+              python - <<'PY'
+          from pathlib import Path
+          import re
+          required = ['SKILL.md','references/xingyao.md','references/gongwei.md','references/sihua.md','references/pattern-library.md','references/shichen.md','references/zhengyan.md']
+          for p in required:
+              assert Path(p).is_file(), p
+          text = Path('references/sihua.md').read_text(encoding='utf-8')
+          stems = re.findall(r'^\|\s*([甲乙丙丁戊己庚辛壬癸])\s*\|', text, flags=re.M)
+          print('SIHUA_TABLE_ROWS=', len(stems))
+          print('SIHUA_TABLE_UNIQUE_STEMS=', len(set(stems)))
+          assert set(stems) == set('甲乙丙丁戊己庚辛壬癸')
+          assert '宫干四化飞渡' in Path('README.md').read_text(encoding='utf-8')
+          PY
+              echo 'AUDIT_KIND=SKILL_STRUCTURE'
+              ;;
+
+            ziwei-wuandyA)
+              cd app
+              if [ -f package-lock.json ]; then npm ci; else npm install; fi
+              npm run build
+              npm run lint
+              echo 'AUDIT_KIND=BUILD_AND_LINT'
+              ;;
+
+            ziwei-chart)
+              cd app
+              if [ -f package-lock.json ]; then npm ci; else npm install; fi
+              npm test
+              npm run build
+              npm run lint
+              echo 'AUDIT_KIND=UNIT_BUILD_LINT'
+              ;;
+
+            xu-quanren)
+              python -m py_compile scripts/paipan.py
+              python - <<'PY'
+          import importlib.util
+          spec = importlib.util.spec_from_file_location('paipan', 'scripts/paipan.py')
+          m = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(m)
+          assert set(m.SIHUA_TABLE) == set('甲乙丙丁戊己庚辛壬癸')
+          assert all(len(v) == 4 for v in m.SIHUA_TABLE.values())
+          assert set(m.classify_palace('命宫')) == {'六内','六阳','六事'}
+          sf = set(m.sanfang_sizheng('命宫'))
+          assert '命宫' in sf and '迁移' in sf and len(sf) == 4
+          mock = {
+              '命宫': {'heavenly_stem':'甲', 'star_names':['廉贞']},
+              '迁移': {'heavenly_stem':'乙', 'star_names':['太阳']},
+          }
+          r = m.calc_flying_sihua(mock, '命宫')
+          assert r['禄']['star'] == '廉贞' and r['禄']['palace'] == '命宫'
+          print('GENG_SIHUA=', '/'.join(m.SIHUA_TABLE['庚']))
+          PY
+              echo 'AUDIT_KIND=PYTHON_LOGIC_SMOKE'
+              ;;
+
+            *)
+              echo "unknown repo id: $REPO_ID" >&2
+              exit 2
+              ;;
+          esac
