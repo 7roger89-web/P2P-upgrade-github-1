@@ -44,4 +44,11 @@ A pass on one axis never promotes another axis.
 
 A deterministic score, K-line, percentage, confidence number or energy value is not automatically a calibrated measurement. If a repo assigns hand-picked weights or thresholds without empirical calibration and source provenance, classify that output as `PRODUCT_HEURISTIC`, not objective predictive evidence.
 
+## Current high-value contradictions / warnings
+
+- `xu-quanren` uses 庚四化 `太阳/武曲/太阴/天同`; the inspected Linden/iztro convention uses `太阳/武曲/天同/天相`. Treat this as a school/convention fork requiring primary-source arbitration.
+- `yinyo-liuyao` structurally confirms 120 rule IDs, but the current packaged corpus audit found 128 unique `Gxxx` IDs rather than independently proving the advertised 412 cases. Its pressure tests expose known outcomes and are retrospective regression, not blind predictive tests.
+- `muyen/meihua-yishu` is the only upstream in this pass with a substantial explicit predictive experiment; its tested operationalization performed around chance and the repo reports that negative result.
+- `wuandyA/ziwei` and `ziweiknows/ziwei-chart` include deterministic-looking 0–100 fortune/K-line scoring built from hand-selected weights; classify these scores as product heuristics until calibrated.
+
 This index is navigation only. It is not a shared rule registry or merged methodology.
