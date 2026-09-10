@@ -9,12 +9,18 @@ separate as clearly-labeled evidence, never as deterministic assertions.
 Covered acceptance conditions (deterministic slice):
   A. DISCOVERY     — searching by stable ID finds exactly the one artifact.
   B. DOMAIN        — a natural logistics/shipment search term finds the artifact.
-  3. STRUCTURE     — exactly one reusable prompt artifact; minimal metadata only.
+  3. STRUCTURE     — the artifact exists and carries only minimal metadata.
   7. NO-FABRICATION— explicit contract forbids inventing operational facts.
   8. MISSING DATA  — missing ETA / status / fee is omitted or disclosed, never guessed.
   9. NO SIDE EFFECT— no external send / contact / mutation / provider call.
  10. NO GATEWAY    — no OpenRouter / model gateway / API-key handling.
   2/4. VERSIONING  — Git is the version-history mechanism; no version DB/service.
+
+Scope note: the bounded goal adds exactly ONE prompt in this PR. "No prompt
+framework / router / registry / service / index / database was introduced" is
+established by PR diff evidence (this PR adds only the prompt artifact and this
+test file), NOT by a permanent runtime invariant on the prompt-artifacts
+directory. Future prompt artifacts may be added without tripping these tests.
 """
 
 from __future__ import annotations
@@ -73,12 +79,6 @@ def _artifact_text() -> str:
 class ReusablePromptArtifactTests(unittest.TestCase):
     def test_01_artifact_exists_at_canonical_path(self) -> None:
         self.assertTrue(ARTIFACT_PATH.is_file(), f"missing {ARTIFACT_PATH}")
-
-    def test_02_exactly_one_reusable_prompt_artifact_no_framework(self) -> None:
-        # The product is ONE prompt. The directory must contain exactly this
-        # one Markdown artifact: no registry, index, router, or service files.
-        files = sorted(p.name for p in ARTIFACT_DIR.iterdir() if p.suffix == ".md")
-        self.assertEqual(files, ["logistics.customer-shipment-update.md"])
 
     def test_03_discovery_by_stable_id_finds_exactly_the_artifact(self) -> None:
         # CASE A — search by stable ID. The ID is *declared* in exactly one
