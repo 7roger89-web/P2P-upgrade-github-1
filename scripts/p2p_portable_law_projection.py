@@ -104,7 +104,9 @@ def _merge_agents(existing: str) -> str:
         if end < start:
             raise ValueError("AGENTS_PORTABLE_LAW_MARKERS_INVALID")
         end += len(AGENTS_END)
-        return existing[:start].rstrip() + "\n\n" + block + existing[end:]
+        prefix = existing[:start].rstrip()
+        separator = "\n\n" if prefix else ""
+        return prefix + separator + block + existing[end:]
     if existing.strip():
         return existing.rstrip() + "\n\n" + block + "\n"
     return block + "\n"
