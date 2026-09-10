@@ -4,10 +4,15 @@
 Covers:
   1. TODAY_WORK — relevant item for target date returned, unrelated date
      excluded, done/deleted excluded, no-data case, undated handling.
-  2. FREIGHT_RATE_LOOKUP — fail-closed with the VERIFIED finding
-     RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP (never a
-     guessed rate, no heuristic route_name parsing), NOT_FOUND when empty,
-     config-missing envelope.
+  2. FREIGHT_RATE_LOOKUP — structured lookup of the logistics-work-desk PR #12
+     rate-card schema: only structured_lookup_ready=true / non-deleted cards,
+     exact route.origin/destination matching plus optional equipment_type /
+     container_size (20/20FT/20' -> 20'; 40HQ/40HC -> 40HC) / transport_mode,
+     latest valid MM/YYYY history by parsing (array order not trusted),
+     requested month and RATE_HISTORY_NOT_FOUND, selling_price = total_price
+     vs internal_cost = total_cost, currency preserved, AMBIGUOUS on multiple
+     customer cards, no route_name parsing, no geographic aliases ("HP" never
+     becomes "Hải Phòng"), NOT_FOUND cases, config-missing envelope.
   3. SHIPMENT_STATUS — exact id returns correct state, status fallback via
      data["0.0"]["st"], unknown id NOT_FOUND, deleted/archived handling,
      financial payload never exposed, ambiguous multi-match.
@@ -78,13 +83,29 @@ class AccessLog:
         self.violations.append(f"{collection}.{attribute}")
 
 
+def _resolve_dotted(doc: dict, key: str) -> Tuple[bool, Any]:
+    """Resolve a Mongo dotted field path (e.g. 'route.origin') like MongoDB.
+
+    Numeric segments are not special-cased here because no filter uses the
+    shipments '0.0' section (that section is read in Python by design).
+    """
+    cur: Any = doc
+    for part in key.split("."):
+        if isinstance(cur, dict) and part in cur:
+            cur = cur[part]
+        else:
+            return False, None
+    return True, cur
+
+
 def _matches(doc: dict, flt: dict) -> bool:
     for key, value in flt.items():
+        present, actual = _resolve_dotted(doc, key)
         if isinstance(value, dict) and "$ne" in value:
-            if key in doc and doc[key] == value["$ne"]:
+            if present and actual == value["$ne"]:
                 return False
         else:
-            if key not in doc or doc[key] != value:
+            if not present or actual != value:
                 return False
     return True
 
@@ -282,31 +303,102 @@ def _shipments_docs() -> list:
     ]
 
 
+def _history_entry(month: str, *, cost: int, price: int, profit=None, updated_at=None):
+    return {
+        "month": month,
+        "total_cost": cost,
+        "total_price": price,
+        "profit": profit if profit is not None else price - cost,
+        "details": [],
+        "updated_at": updated_at or f"2026-{month[:2]}-05",
+    }
+
+
+def _structured_rate_card(
+    card_id: str,
+    *,
+    customer: str = "Công ty ABC",
+    origin: str = "Hải Phòng",
+    destination: str = "Hà Nội",
+    equipment_type: str = "container",
+    container_size: str = "20'",
+    transport_mode: str = "đường bộ",
+    currency: str = "VND",
+    ready: bool = True,
+    is_deleted: bool = False,
+    history=None,
+    route_name: str = "nhãn tự do — KHÔNG dùng để tra cứu",
+) -> dict:
+    """Build one structured (logistics-work-desk PR #12) rate-card document."""
+    doc = {
+        "id": card_id,
+        "customer": customer,
+        # route_name stays free text; the matcher must never read it.
+        "route_name": route_name,
+        "route": {
+            "origin": origin,
+            "destination": destination,
+            "equipment_type": equipment_type,
+            "container_size": container_size,
+            "transport_mode": transport_mode,
+        },
+        "currency": currency,
+        "structured_lookup_ready": ready,
+        "history": [dict(h) for h in history] if history is not None else [],
+        "is_deleted": is_deleted,
+    }
+    return doc
+
+
 def _rate_cards_docs() -> list:
-    # VERIFIED persisted shape (logistics-work-desk views/sales.py): id,
-    # customer, route_name (free text), history[{month, total_cost,
-    # total_price, profit, details[{name, cost, price}], updated_at}].
-    # Values are realistic, but the tool must refuse to return any of them
-    # as a rate while the schema has no structured route/equipment/currency
-    # fields.
+    # STRUCTURED rate-card shape (logistics-work-desk PR #12, merge
+    # 2eb2c343c10c2f909685f1f83cb77683197572f8): id, customer, route_name (free
+    # text), route{origin, destination, equipment_type, container_size,
+    # transport_mode}, currency, structured_lookup_ready, history[{month
+    # MM/YYYY, total_cost, total_price, profit, details, updated_at}].
     return [
+        # 20' card; history is deliberately OUT OF ORDER — latest by parsed
+        # MM/YYYY is 09/2026 regardless of array position.
+        _structured_rate_card(
+            "RC-HP-HN-20",
+            history=[
+                _history_entry("07/2026", cost=3_300_000, price=4_300_000, updated_at="2026-08-01"),
+                _history_entry("09/2026", cost=3_500_000, price=4_500_000, updated_at="2026-10-01"),
+                _history_entry("08/2026", cost=3_400_000, price=4_400_000, updated_at="2026-09-01"),
+            ],
+        ),
+        # 40 high-cube card; the STORED spelling is 40HQ, which must
+        # canonicalize to the Logistics canonical 40HC on both sides.
+        _structured_rate_card(
+            "RC-HP-HN-40HC",
+            container_size="40HQ",
+            history=[
+                _history_entry("09/2026", cost=6_000_000, price=7_500_000, updated_at="2026-10-02"),
+            ],
+        ),
+        # LEGACY card (pre-PR#12): free-text route_name only, no route object
+        # and no structured_lookup_ready flag — must be excluded forever.
         {
-            "id": "RC-1",
+            "id": "RC-LEGACY",
             "customer": "Công ty ABC",
-            "route_name": "Hải Phòng - Hà Nội (Cont 40)",
+            "route_name": "Hải Phòng - Hà Nội (Cont 20)",
             "history": [
-                {
-                    "month": "09/2026",
-                    "total_cost": 3_500_000,
-                    "total_price": 4_500_000,
-                    "profit": 1_000_000,
-                    "details": [{"name": "Vận chuyển", "cost": 3_500_000, "price": 4_500_000}],
-                    "updated_at": "2026-09-01",
-                }
+                _history_entry("09/2026", cost=1, price=2, updated_at="2026-09-01"),
             ],
             "is_deleted": False,
         },
-        {"id": "RC-2", "customer": "x", "route_name": "y", "history": [], "is_deleted": True},
+        # Structured but explicitly not lookup-ready — excluded.
+        _structured_rate_card(
+            "RC-NOT-READY",
+            ready=False,
+            history=[_history_entry("09/2026", cost=9, price=10, updated_at="2026-09-01")],
+        ),
+        # Lookup-ready but soft-deleted — excluded.
+        _structured_rate_card(
+            "RC-DELETED",
+            is_deleted=True,
+            history=[_history_entry("09/2026", cost=9, price=10, updated_at="2026-09-01")],
+        ),
     ]
 
 
@@ -439,58 +531,308 @@ class TestTodayWork:
 
 
 # ===========================================================================
-# 2. FREIGHT_RATE_LOOKUP (fail closed)
+# 2. FREIGHT_RATE_LOOKUP (structured PR #12 rate-card schema)
 # ===========================================================================
 
+HP = "Hải Phòng"
+HN = "Hà Nội"
 
-class TestFreightRate:
-    def test_fail_closed_verified_schema_insufficient_never_returns_a_rate(self, run_tool):
+
+class TestFreightRateStructuredLookup:
+    def test_exact_route_and_container_20_returns_ok(self, run_tool):
         result, _ = run_tool("handle_freight_rate", {
-            "origin": "Hải Phòng", "destination": "Hà Nội", "container_size": "20'"
+            "origin": HP, "destination": HN, "container_size": "20'"
         })
-        assert result["status"] == "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP"
-        # No guessed monetary value anywhere in the payload: none of the
-        # fixture's realistic money figures may leak out as an answer.
-        text = json.dumps(result)
-        assert "rate" not in result
-        assert "4500000" not in text
-        assert "3500000" not in text
-        assert "1000000" not in text
-        # Verified schema findings are reported, not guessed-field wording.
-        vs = result["verified_schema"]
-        assert set(vs["structured_fields_absent"]) == {
-            "origin", "destination", "container_or_equipment", "currency"
+        assert result["status"] == "OK"
+        assert result["rate_card_id"] == "RC-HP-HN-20"
+        assert result["customer"] == "Công ty ABC"
+        assert result["route"]["origin"] == HP
+        assert result["route"]["destination"] == HN
+        assert result["route"]["equipment_type"] == "container"
+        assert result["route"]["container_size"] == "20'"
+        assert result["route"]["transport_mode"] == "đường bộ"
+        assert result["source"] == "rate_cards"
+        assert result["queried_at"]
+        # route_name is never used and never echoed.
+        assert "route_name" not in json.dumps(result, ensure_ascii=False)
+
+    def test_container_20ft_alias_matches_20(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20FT"
+        })
+        assert result["status"] == "OK"
+        assert result["rate_card_id"] == "RC-HP-HN-20"
+        assert result["requested"]["container_size_normalized"] == "20'"
+
+    def test_container_bare_20_alias_matches_20(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": " 20ft "
+        })
+        assert result["status"] == "OK"
+        assert result["rate_card_id"] == "RC-HP-HN-20"
+
+    def test_container_40hq_alias_matches_canonical_40hc(self, run_tool):
+        # Requested 40HQ matches a card whose STORED container_size is 40HQ;
+        # both canonicalize to 40HC.
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "40HQ"
+        })
+        assert result["status"] == "OK"
+        assert result["rate_card_id"] == "RC-HP-HN-40HC"
+        assert result["requested"]["container_size_normalized"] == "40HC"
+
+    def test_container_40hc_matches_stored_40hq_spelling(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "40HC"
+        })
+        assert result["status"] == "OK"
+        assert result["rate_card_id"] == "RC-HP-HN-40HC"
+
+    def test_legacy_free_text_rate_card_is_excluded(self, run_tool):
+        # Collection containing ONLY a legacy card: the free-text route_name
+        # must never produce a hit.
+        legacy = [d for d in _rate_cards_docs() if d["id"] == "RC-LEGACY"]
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": legacy})
+        assert result["status"] == "NOT_FOUND"
+        # And in the full fixture set the legacy card never matches/surfaces.
+        result2, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        })
+        assert result2["status"] == "OK"
+        assert result2["rate_card_id"] != "RC-LEGACY"
+
+    def test_structured_lookup_ready_false_is_excluded(self, run_tool):
+        docs = [d for d in _rate_cards_docs() if d["id"] == "RC-NOT-READY"]
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": docs})
+        assert result["status"] == "NOT_FOUND"
+
+    def test_deleted_rate_card_is_excluded(self, run_tool):
+        docs = [d for d in _rate_cards_docs() if d["id"] == "RC-DELETED"]
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": docs})
+        assert result["status"] == "NOT_FOUND"
+
+    def test_wrong_route_returns_not_found(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": "Đà Nẵng", "destination": HN, "container_size": "20'"
+        })
+        assert result["status"] == "NOT_FOUND"
+
+    def test_wrong_container_returns_not_found(self, run_tool):
+        docs = [d for d in _rate_cards_docs() if d["id"] == "RC-HP-HN-20"]
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "40HC"
+        }, collections={"rate_cards": docs})
+        assert result["status"] == "NOT_FOUND"
+
+    def test_latest_month_chosen_by_parsing_mm_yyyy_not_array_order(self, run_tool):
+        # Fixture history array is [07, 09, 08]; 09/2026 must win by parsing.
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        })
+        assert result["status"] == "OK"
+        assert result["month"] == "09/2026"
+        assert result["history_updated_at"] == "2026-10-01"
+
+    def test_requested_month_returns_that_history_entry(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'", "month": "07/2026"
+        })
+        assert result["status"] == "OK"
+        assert result["month"] == "07/2026"
+        assert result["selling_price"] == 4_300_000
+        assert result["internal_cost"] == 3_300_000
+
+    def test_absent_requested_month_returns_rate_history_not_found(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'", "month": "01/2026"
+        })
+        assert result["status"] == "RATE_HISTORY_NOT_FOUND"
+        assert result["requested_month"] == "01/2026"
+        assert result["available_months"] == ["07/2026", "08/2026", "09/2026"]
+        assert result["rate_card_id"] == "RC-HP-HN-20"
+        # Never invent a historical price.
+        assert "selling_price" not in result
+        assert "internal_cost" not in result
+
+    def test_card_without_valid_history_returns_rate_history_not_found(self, run_tool):
+        card = _structured_rate_card("RC-EMPTY", history=[])
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": [card]})
+        assert result["status"] == "RATE_HISTORY_NOT_FOUND"
+        assert result["available_months"] == []
+
+    def test_invalid_history_months_ignored_when_picking_latest(self, run_tool):
+        card = _structured_rate_card(
+            "RC-BAD-MONTHS",
+            history=[
+                {"month": "not-a-month", "total_cost": 1, "total_price": 2, "profit": 1,
+                 "details": [], "updated_at": "2026-10-01"},
+                _history_entry("08/2026", cost=3_400_000, price=4_400_000, updated_at="2026-09-01"),
+            ],
+        )
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": [card]})
+        assert result["status"] == "OK"
+        assert result["month"] == "08/2026"
+
+    def test_total_price_is_exposed_as_selling_price(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        })
+        assert result["status"] == "OK"
+        assert result["selling_price"] == 4_500_000  # history.total_price
+        assert result["profit"] == 1_000_000
+        assert "selling_price" in result["price_meaning"]
+        assert "customer quoted rate" in result["price_meaning"]["selling_price"]
+
+    def test_total_cost_remains_internal_cost_never_the_customer_rate(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        })
+        assert result["status"] == "OK"
+        assert result["internal_cost"] == 3_500_000  # history.total_cost
+        # The internal figures must not be relabeled as the customer rate.
+        assert "total_cost" not in result
+        assert "total_price" not in result
+        assert result["selling_price"] != result["internal_cost"]
+        assert "KHÔNG PHẢI giá cước" in result["price_meaning"]["internal_cost"]
+
+    def test_currency_preserved_explicitly(self, run_tool):
+        usd_card = _structured_rate_card(
+            "RC-USD", currency="USD",
+            history=[_history_entry("09/2026", cost=150, price=220, updated_at="2026-10-01")],
+        )
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": [usd_card]})
+        assert result["status"] == "OK"
+        assert result["currency"] == "USD"
+        assert result["selling_price"] == 220
+
+    def test_multiple_customer_rate_cards_return_ambiguous(self, run_tool):
+        cards = [
+            _structured_rate_card("RC-CUST-A", customer="Công ty A"),
+            _structured_rate_card("RC-CUST-B", customer="Công ty B",
+                                  history=[_history_entry("09/2026", cost=3.0, price=4.0,
+                                                          updated_at="2026-10-01")]),
+        ]
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": cards})
+        assert result["status"] == "AMBIGUOUS"
+        assert result["match_count"] == 2
+        assert {c["rate_card_id"] for c in result["candidates"]} == {"RC-CUST-A", "RC-CUST-B"}
+        assert {c["customer"] for c in result["candidates"]} == {"Công ty A", "Công ty B"}
+        # Bounded candidate facts only: no monetary quote before disambiguation.
+        assert "selling_price" not in json.dumps(result)
+        assert "internal_cost" not in json.dumps(result)
+        for c in result["candidates"]:
+            assert set(c.keys()) == {"rate_card_id", "customer", "route", "currency"}
+            assert "route_name" not in c
+
+    def test_unspecified_container_with_multiple_containers_is_ambiguous(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {"origin": HP, "destination": HN})
+        assert result["status"] == "AMBIGUOUS"
+        assert {c["rate_card_id"] for c in result["candidates"]} == {
+            "RC-HP-HN-20", "RC-HP-HN-40HC"
         }
-        assert "route_name" in vs["top_level_fields"]
-        assert "history" in vs["top_level_fields"]
-        assert "free text" in vs["route_name"]
-        assert "follow-up Logistics schema task" in result["reason"]
-        assert "Không đoán giá" in result["note"]
-        # Evidence from a real read-only sample query (is_deleted doc excluded).
-        assert result["sample_size"] == 1
-        assert "route_name" in result["observed_top_level_keys"]
-        assert "history" in result["observed_top_level_keys"]
 
-    def test_route_name_descriptive_text_not_parsed_as_structured(self, run_tool):
-        # route_name contains "(Cont 40)" descriptive text — it must NOT be
-        # treated as authoritative structured data, and route_name VALUES are
-        # not even echoed (that would invite heuristic parsing by the model).
+    def test_route_name_is_never_parsed_for_lookup(self, run_tool):
+        # route_name describes the "right" route but the structured route says
+        # something else: structured fields win, route_name cannot create a hit.
+        misleading = _structured_rate_card(
+            "RC-MISLEADING-LABEL",
+            origin="Đà Nẵng", destination=HN,
+            route_name="Hải Phòng - Hà Nội (Cont 20) giá tốt",
+        )
         result, _ = run_tool("handle_freight_rate", {
-            "origin": "Hải Phòng", "destination": "Hà Nội", "container_size": "40"
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": [misleading]})
+        assert result["status"] == "NOT_FOUND"
+        # Conversely an unrelated/garbage route_name must not block a real match.
+        fine = _structured_rate_card(
+            "RC-OK", route_name="zzz zzz",
+            history=[_history_entry("09/2026", cost=3_500_000, price=4_500_000)],
+        )
+        result2, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'"
+        }, collections={"rate_cards": [fine]})
+        assert result2["status"] == "OK"
+        assert result2["rate_card_id"] == "RC-OK"
+
+    def test_no_geographic_alias_hp_does_not_become_hai_phong(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": "HP", "destination": HN, "container_size": "20'"
         })
-        assert result["status"] == "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP"
-        assert "Hải Phòng - Hà Nội (Cont 40)" not in json.dumps(result)
+        assert result["status"] == "NOT_FOUND"
+
+    def test_equipment_type_filtered_exactly(self, run_tool):
+        card = _structured_rate_card(
+            "RC-EQ", equipment_type="container",
+            history=[_history_entry("09/2026", cost=3_500_000, price=4_500_000)],
+        )
+        ok, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'", "equipment_type": "container"
+        }, collections={"rate_cards": [card]})
+        assert ok["status"] == "OK"
+        bad, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'", "equipment_type": "xe tải"
+        }, collections={"rate_cards": [card]})
+        assert bad["status"] == "NOT_FOUND"
+
+    def test_transport_mode_filtered_exactly(self, run_tool):
+        card = _structured_rate_card("RC-MODE", transport_mode="đường bộ")
+        bad, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'", "transport_mode": "đường biển"
+        }, collections={"rate_cards": [card]})
+        assert bad["status"] == "NOT_FOUND"
+
+    def test_month_derived_from_date_when_month_omitted(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'", "date": "2026-07-15"
+        })
+        assert result["status"] == "OK"
+        assert result["month"] == "07/2026"
+
+    def test_explicit_month_wins_over_date_month(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "container_size": "20'",
+            "month": "08/2026", "date": "2026-07-15",
+        })
+        assert result["status"] == "OK"
+        assert result["month"] == "08/2026"
+
+    def test_bad_month_format_is_bad_request(self, run_tool):
+        for bad in ("9/2026", "2026-09", "09-2026", "13/2026"):
+            result, _ = run_tool("handle_freight_rate", {
+                "origin": HP, "destination": HN, "month": bad
+            })
+            assert result["error_type"] == "logistics_bad_request", bad
+
+    def test_bad_date_is_bad_request(self, run_tool):
+        result, _ = run_tool("handle_freight_rate", {
+            "origin": HP, "destination": HN, "date": "09/09/2026"
+        })
+        assert result["error_type"] == "logistics_bad_request"
 
     def test_not_found_when_no_rate_cards(self, run_tool):
         result, _ = run_tool(
             "handle_freight_rate",
-            {"origin": "Hải Phòng", "destination": "Hà Nội"},
+            {"origin": HP, "destination": HN},
             collections={"rate_cards": []},
         )
         assert result["status"] == "NOT_FOUND"
 
     def test_missing_required_args(self, run_tool):
-        result, _ = run_tool("handle_freight_rate", {"origin": "Hải Phòng"})
+        result, _ = run_tool("handle_freight_rate", {"origin": HP})
         assert result["error_type"] == "logistics_bad_request"
 
     def test_config_missing_lists_required_env(self, plugin, monkeypatch):
@@ -502,11 +844,88 @@ class TestFreightRate:
 
     def test_requested_echoed_with_provenance(self, run_tool):
         result, _ = run_tool("handle_freight_rate", {
-            "origin": "Hải Phòng", "destination": "Hà Nội", "vehicle_type": "xe tải"
+            "origin": HP, "destination": HN, "equipment_type": "container",
+            "transport_mode": "đường bộ", "month": "09/2026",
         })
-        assert result["requested"]["origin"] == "Hải Phòng"
+        req = result["requested"]
+        assert req["origin"] == HP
+        assert req["destination"] == HN
+        assert req["equipment_type"] == "container"
+        assert req["transport_mode"] == "đường bộ"
+        assert req["month"] == "09/2026"
         assert result["source"] == "rate_cards"
         assert result["queried_at"]
+
+
+# ===========================================================================
+# 2b. FREIGHT_RATE pure contract helpers (normalization / month selection)
+# ===========================================================================
+
+
+class TestFreightRateContractHelpers:
+    def test_container_size_alias_table(self, plugin):
+        c = plugin.contracts
+        cases = {
+            "20'": "20'", "20FT": "20'", "20": "20'", "20ft": "20'",
+            " 20 " : "20'", "20’": "20'", "20′": "20'",
+            "40HQ": "40HC", "40hq": "40HC", "40HC": "40HC", " 40hc ": "40HC",
+        }
+        for raw, expected in cases.items():
+            assert c.canonical_container_size(raw) == expected, raw
+
+    def test_unknown_container_spelling_passes_through_verbatim_not_guessed(self, plugin):
+        c = plugin.contracts
+        assert c.canonical_container_size("45RF") == "45RF"
+        assert c.canonical_container_size("40") == "40"  # plain 40 is NOT silently 40HC/40'
+        assert c.canonical_container_size(None) is None
+        assert c.canonical_container_size("  ") is None
+
+    def test_parse_rate_month(self, plugin):
+        c = plugin.contracts
+        assert c.parse_rate_month("09/2026") == (2026, 9)
+        assert c.parse_rate_month("12/1999") == (1999, 12)
+        for bad in (None, "", "9/2026", "09/26", "13/2026", "2026-09", "abcd"):
+            assert c.parse_rate_month(bad) is None, bad
+
+    def test_select_history_ignores_array_order_and_invalid_months(self, plugin):
+        c = plugin.contracts
+        history = [
+            {"month": "07/2026", "total_price": 1},
+            {"month": "09/2026", "total_price": 3},
+            {"month": "bad", "total_price": 99},
+            {"month": "08/2026", "total_price": 2},
+        ]
+        latest = c.select_rate_history(history, None)
+        assert latest["total_price"] == 3
+        july = c.select_rate_history(history, (2026, 7))
+        assert july["total_price"] == 1
+        assert c.select_rate_history(history, (2025, 12)) is None
+        assert c.select_rate_history([], None) is None
+        assert c.valid_rate_months(history) == ["07/2026", "08/2026", "09/2026"]
+
+    def test_duplicate_requested_month_uses_latest_updated_at_deterministically(self, plugin):
+        c = plugin.contracts
+        history = [
+            {"month": "09/2026", "total_price": 1, "updated_at": "2026-10-01"},
+            {"month": "09/2026", "total_price": 2, "updated_at": "2026-10-05"},
+        ]
+        entry = c.select_rate_history(history, (2026, 9))
+        assert entry["total_price"] == 2
+
+    def test_active_filter_requires_ready_flag_and_non_deleted(self, plugin):
+        c = plugin.contracts
+        assert c.RATE_CARD_ACTIVE_FILTER == {
+            "structured_lookup_ready": True,
+            "is_deleted": {"$ne": True},
+        }
+
+    def test_obsolete_schema_gap_status_is_removed(self):
+        # The stale status/constants and its wording must not come back.
+        for py_file in sorted(PLUGIN_DIR.glob("*.py")):
+            text = py_file.read_text(encoding="utf-8")
+            assert "RATE_CARD_SCHEMA_INSUFFICIENT" not in text, py_file.name
+        yaml_text = (PLUGIN_DIR / "plugin.yaml").read_text(encoding="utf-8")
+        assert "RATE_CARD_SCHEMA_INSUFFICIENT" not in yaml_text
 
 
 # ===========================================================================

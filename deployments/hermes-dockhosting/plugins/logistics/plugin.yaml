@@ -6,11 +6,13 @@ description: >-
   status", and freight-rate questions from the Logistics MongoDB. Uses a
   dedicated read-only credential (LOGISTICS_MONGO_URI_READONLY +
   LOGISTICS_MONGO_DB_NAME); the connector exposes find/find_one only, with a
-  collection allowlist, and performs no write operations of any kind. The
-  verified rate-card schema has no structured origin/destination/container/
-  currency fields (route_name is free text), so freight-rate lookup fails
-  closed with RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP
-  until a follow-up Logistics schema task provides structured fields.
+  collection allowlist, and performs no write operations of any kind.
+  Freight-rate lookup uses the structured rate-card schema (logistics-work-desk
+  PR #12): only structured_lookup_ready=true, non-deleted cards are matched on
+  route.origin / route.destination plus optional equipment_type /
+  container_size / transport_mode, returning the selling_price with its
+  explicit currency; route_name is never parsed and there are no geographic
+  aliases. Statuses: OK, NOT_FOUND, AMBIGUOUS, RATE_HISTORY_NOT_FOUND.
 author: 7roger89-web
 kind: backend
 requires_env:

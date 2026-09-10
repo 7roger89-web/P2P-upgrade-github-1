@@ -4,13 +4,17 @@ Schema provenance (LOGISTICS_SCHEMA_OBSERVED):
     Observed contracts from 7roger89-web/logistics-work-desk main, supplied by
     the Owner on 2026-09-09 and extracted from the actual repository source
     (core/database.py normalization, add_task()/load_tasks() loaders,
-    load_rate_cards() repository); the rate-card persisted shape was
-    independently re-verified by Control Tower against views/sales.py. These
-    constants are NOT guesses from collection names: the verified rate-card
-    schema has no structured origin/destination/container/currency fields
-    (route_name is free text), so the freight tool fails closed with
-    RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP instead of
-    inventing mappings.
+    load_rate_cards() repository).
+  * Rate cards: the STRUCTURED rate-card schema merged via logistics-work-desk
+    PR #12 (merge commit 2eb2c343c10c2f909685f1f83cb77683197572f8, authoritative
+    shape supplied by the Owner on 2026-09-10) adds ``structured_lookup_ready``
+    plus a structured ``route`` object (origin, destination, equipment_type,
+    container_size, transport_mode) and top-level ``currency``. The freight
+    tool performs a deterministic structured lookup against those fields.
+    ``route_name`` remains free text and is NEVER parsed for machine lookup,
+    and no geographic aliases are invented (e.g. "HP" never becomes
+    "Hải Phòng"). Legacy rate cards without the structured shape are excluded
+    by the ``structured_lookup_ready == true`` filter.
 
 This module is pure Python (stdlib only): no pymongo import, no I/O, so it is
 unit-testable anywhere and safe to import at plugin-registration time.
@@ -78,41 +82,205 @@ def shipment_active_filter(include_archived: bool = False) -> dict:
 
 
 # --------------------------------------------------------------------------
-# rate_cards — VERIFIED persisted shape (logistics-work-desk views/sales.py,
-# independently verified by Control Tower 2026-09-09); schema is INSUFFICIENT
-# for structured route lookup -> freight tool fails closed
-# --------------------------------------------------------------------------
-# Persisted shape:
+# rate_cards — STRUCTURED shape (logistics-work-desk PR #12, merge commit
+# 2eb2c343c10c2f909685f1f83cb77683197572f8; authoritative shape supplied by
+# the Owner on 2026-09-10):
+#
 #   {
-#     "id": rc_id,
-#     "customer": sel_cust,
-#     "route_name": rc_name,   # FREE TEXT (may contain e.g. "(Cont 40)")
+#     "id": str,
+#     "customer": str,
+#     "route_name": str,                      # FREE TEXT — never machine-parsed
+#     "route": {
+#       "origin": str,
+#       "destination": str,
+#       "equipment_type": str,
+#       "container_size": str,
+#       "transport_mode": str,
+#     },
+#     "currency": str,
+#     "structured_lookup_ready": bool,
 #     "history": [
-#       {"month": "MM/YYYY", "total_cost": ..., "total_price": ...,
-#        "profit": ..., "details": [{"name": ..., "cost": ..., "price": ...}],
-#        "updated_at": "YYYY-MM-DD"}
-#     ]
+#       {"month": "MM/YYYY", "total_cost": number, "total_price": number,
+#        "profit": number, "details": list, "updated_at": "YYYY-MM-DD"}
+#     ],
 #   }
 #
-# VERIFIED FINDING: origin, destination, container/equipment and currency are
-# NOT structured fields in the persisted rate-card schema. route_name is free
-# text and must NOT be heuristically parsed as authoritative structured data.
-# A structured route lookup ("X -> Y, container Z") therefore cannot be
-# answered from the current schema; it requires a follow-up Logistics schema
-# task (structured route/equipment/currency fields or a normalized rate
-# model). Until such a schema exists, the freight tool returns
-# RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP and never a rate.
-# No new collection is created to work around this.
+# Lookup contract: only rate cards with structured_lookup_ready == true and
+# is_deleted != true are queried. Matching uses the structured route.* fields
+# only; route_name is descriptive free text and is never read by the matcher.
+# There is deliberately NO geographic alias/normalization: origin/destination
+# compare verbatim (stripped), so "HP" never silently becomes "Hải Phòng".
+# The ONLY normalization permitted is the bounded deterministic container
+# table below.
+# --------------------------------------------------------------------------
 
-RATE_CARD_SCHEMA_GAP_STATUS = "RATE_CARD_SCHEMA_INSUFFICIENT_FOR_STRUCTURED_ROUTE_LOOKUP"
-RATE_CARD_ACTIVE_FILTER = {"is_deleted": {"$ne": True}}
-RATE_CARD_VERIFIED_TOP_LEVEL_FIELDS = ("id", "customer", "route_name", "history")
+RATE_CARD_READY_FLAG = "structured_lookup_ready"
+
+# Active, structured-lookup-ready filter (plain field matches + $ne only, as
+# enforced by the read-only connector's filter validator).
+RATE_CARD_ACTIVE_FILTER = {
+    RATE_CARD_READY_FLAG: True,
+    "is_deleted": {"$ne": True},
+}
+
+# Structured field paths (Mongo dot-notation; every segment is a named key,
+# unlike the shipments "0.0" section whose numeric segment needs Python reads).
+RATE_CARD_ROUTE_ORIGIN = "route.origin"
+RATE_CARD_ROUTE_DESTINATION = "route.destination"
+RATE_CARD_ROUTE_EQUIPMENT_TYPE = "route.equipment_type"
+RATE_CARD_ROUTE_CONTAINER_SIZE = "route.container_size"
+RATE_CARD_ROUTE_TRANSPORT_MODE = "route.transport_mode"
+
+RATE_CARD_VERIFIED_TOP_LEVEL_FIELDS = (
+    "id", "customer", "route_name", "route", "currency",
+    "structured_lookup_ready", "history",
+)
+RATE_CARD_VERIFIED_ROUTE_FIELDS = (
+    "origin", "destination", "equipment_type", "container_size", "transport_mode",
+)
 RATE_CARD_VERIFIED_HISTORY_FIELDS = (
     "month", "total_cost", "total_price", "profit", "details", "updated_at",
 )
-RATE_CARD_STRUCTURED_FIELDS_ABSENT = (
-    "origin", "destination", "container_or_equipment", "currency",
-)
+
+# Freight lookup statuses. The old schema-gap fail-closed status was retired
+# together with the pre-PR#12 free-text schema and must never be emitted;
+# these four are the complete freight status surface.
+FREIGHT_STATUS_OK = "OK"
+FREIGHT_STATUS_NOT_FOUND = "NOT_FOUND"
+FREIGHT_STATUS_AMBIGUOUS = "AMBIGUOUS"
+FREIGHT_STATUS_HISTORY_NOT_FOUND = "RATE_HISTORY_NOT_FOUND"
+
+# --------------------------------------------------------------------------
+# Container-size normalization — the ONLY non-verbatim matcher normalization.
+# Bounded, deterministic, and compatible with the Logistics structured schema.
+# Unknown spellings pass through verbatim (never guessed, never expanded into
+# a different equipment type).
+# --------------------------------------------------------------------------
+
+_CONTAINER_QUOTE_TRANSLATION = str.maketrans({"‘": "'", "’": "'", "′": "'", "´": "'"})
+
+
+def _container_lookup_key(value) -> str:
+    """Case/space/typographic-quote-insensitive container spelling key."""
+    if value is None:
+        return ""
+    return (
+        str(value)
+        .strip()
+        .upper()
+        .translate(_CONTAINER_QUOTE_TRANSLATION)
+        .replace(" ", "")
+    )
+
+
+# Explicit alias table ONLY (sourced from the lookup contract; no guessed
+# variants are added). Canonical spellings are the Logistics schema forms.
+_CONTAINER_SIZE_CANONICAL = {
+    # 20' standard dry: 20 / 20FT / 20' -> 20'
+    "20": "20'",
+    "20FT": "20'",
+    "20'": "20'",
+    # 40' high cube: 40HQ / 40HC -> 40HC
+    "40HQ": "40HC",
+    "40HC": "40HC",
+}
+
+
+def canonical_container_size(value) -> "str | None":
+    """Normalize a container-size spelling to the Logistics canonical form.
+
+    Returns None for empty/None input; an unrecognized but non-empty spelling
+    is returned in its cleaned (upper/trim/quote-unified) form so that equal
+    spellings still match verbatim without inventing an alias.
+    """
+    key = _container_lookup_key(value)
+    if not key:
+        return None
+    return _CONTAINER_SIZE_CANONICAL.get(key, key)
+
+
+# --------------------------------------------------------------------------
+# rate-card history (MM/YYYY months; array order must not be trusted)
+# --------------------------------------------------------------------------
+
+_RATE_MONTH_RE = re.compile(r"^(0[1-9]|1[0-2])/(\d{4})$")
+
+
+def parse_rate_month(value) -> "tuple[int, int] | None":
+    """Parse ``MM/YYYY`` into a comparable ``(year, month)`` tuple; else None."""
+    if value is None:
+        return None
+    m = _RATE_MONTH_RE.fullmatch(str(value).strip())
+    if not m:
+        return None
+    return int(m.group(2)), int(m.group(1))
+
+
+def format_rate_month(year: int, month: int) -> str:
+    return f"{month:02d}/{year:04d}"
+
+
+def _valid_history_entries(history) -> "list[tuple[tuple[int, int], dict]]":
+    """(parsed month, entry) pairs for well-formed history entries only."""
+    out = []
+    if isinstance(history, list):
+        for entry in history:
+            if not isinstance(entry, dict):
+                continue
+            parsed = parse_rate_month(entry.get("month"))
+            if parsed is not None:
+                out.append((parsed, entry))
+    return out
+
+
+def _updated_at_key(entry: dict):
+    # updated_at is YYYY-MM-DD, so lexicographic ordering is chronological;
+    # missing/unparseable values sort first (deterministic, no array trust).
+    updated = entry.get("updated_at")
+    return (str(updated),) if isinstance(updated, str) else ("",)
+
+
+def select_rate_history(history, requested_month: "tuple[int, int] | None") -> "dict | None":
+    """Pick the history entry for the requested month, or the LATEST valid one.
+
+    ``requested_month`` is a parsed (year, month) tuple or None (latest).
+    Latest is computed by parsing MM/YYYY — array order is never trusted.
+    Returns None when no matching/valid entry exists (the tool then reports
+    RATE_HISTORY_NOT_FOUND and never invents a price).
+    """
+    entries = _valid_history_entries(history)
+    if requested_month is not None:
+        matched = [entry for month, entry in entries if month == requested_month]
+        if not matched:
+            return None
+        return max(matched, key=_updated_at_key)
+    if not entries:
+        return None
+    latest_month = max(month for month, _ in entries)
+    matched = [entry for month, entry in entries if month == latest_month]
+    return max(matched, key=_updated_at_key)
+
+
+def valid_rate_months(history) -> "list[str]":
+    """Chronologically sorted, de-duplicated valid MM/YYYY months."""
+    months = sorted({month for month, _ in _valid_history_entries(history)})
+    return [format_rate_month(year, month) for year, month in months]
+
+
+def rate_card_view(doc: dict) -> dict:
+    """Bounded structured facts from a rate_cards document.
+
+    Deliberately excludes route_name (free text, never used for lookup) and
+    every monetary value (prices are attached only by the OK path from the
+    selected history entry).
+    """
+    route = doc.get("route") if isinstance(doc.get("route"), dict) else {}
+    return {
+        "rate_card_id": _norm_str(doc.get("id")),
+        "customer": _norm_str(doc.get("customer")),
+        "route": {field: _norm_str(route.get(field)) for field in RATE_CARD_VERIFIED_ROUTE_FIELDS},
+        "currency": _norm_str(doc.get("currency")),
+    }
 
 # --------------------------------------------------------------------------
 # Timezone
