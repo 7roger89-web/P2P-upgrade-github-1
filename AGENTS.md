@@ -136,7 +136,13 @@ Beginner-facing operational guidance must apply
   `Không bị over engineering chứ?` and return `DO_IT`, `SKIP_IT`, or
   `DEFER_UNTIL_NEEDED` with one concrete reason — never a ceremonial
   `PASS`; a weak or negative answer means reduce, remove, or defer the
-  step (`DEFERRED_NOT_REQUIRED` when not needed now).
+  step (`DEFERRED_NOT_REQUIRED` when not needed now). Harness components are
+  trigger-based, not mandatory architecture: add guides, sensors, memory,
+  permissions, observability, reviewers, routers, registries, shared state,
+  schemas, background agents, or multi-agent coordination only when a concrete
+  requirement, material risk, or repeated/material failure proves the simpler
+  existing workflow insufficient. Do not turn every isolated failure into a
+  permanent rule or new infrastructure.
 - `RULE 15 ARENA_TASK_COMPLETION_DIALOG` — when asked "Was this task
   successful?", `YES` means the bounded Arena execution reached its requested
   terminal state and returned the required result (technical PASS is NOT
