@@ -122,11 +122,15 @@ is sufficient.
 4. **RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS** — Retry policy
    depends on process type: deterministic repair, stochastic sampling,
    transient infrastructure, and unknown-side-effect recovery are not the same.
-   Do not use a fixed failure count as a hard stop. A branch is stuck when
-   cost/scope/complexity keep increasing without preserved progress toward
-   acceptance or decision-useful evidence. Stop speculative mutation, preserve
-   evidence, re-diagnose, change route/model/harness when justified, or return
-   `BLOCKED` with an `INFEASIBLE` verdict/reason when current constraints make the outcome impossible.
+   Do not use a fixed failure count as a hard stop. Do not convert every isolated
+   failure into a permanent rule or new infrastructure. For a repeated or
+   materially consequential failure, identify the failure class/root cause and
+   apply the lightest durable fix that prevents recurrence at acceptable cost.
+   A branch is stuck when cost/scope/complexity keep increasing without
+   preserved progress toward acceptance or decision-useful evidence. Stop
+   speculative mutation, preserve evidence, re-diagnose, change
+   route/model/harness when justified, or return `BLOCKED` with an
+   `INFEASIBLE` verdict/reason when current constraints make the outcome impossible.
 5. **PRESERVE_CONTINUITY_AND_STOP** — For long work, retain only the durable
    checkpoint needed to continue: active goal/boundaries, current
    version/state, verified progress/evidence, decisions or blockers that still
@@ -187,6 +191,48 @@ Không bị over engineering chứ?
 
 The answer must be evidence-based, not ceremonial. The actionable verdict is
 `DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`, with one concrete reason.
+
+### Triggered harness rule
+
+Harness concerns are a diagnostic catalog, not a mandatory architecture.
+Guides, sensors, memory/checkpoints, permissions, observability, reviewers,
+routers, registries, shared databases, schemas, background agents, and
+multi-agent coordination may be added only when a concrete task requirement,
+material risk, or observed repeated/material failure shows that the simpler
+existing workflow cannot satisfy the acceptance condition.
+
+Default execution loop:
+
+```text
+TASK CONTRACT -> EXECUTE -> VERIFY -> STOP / ESCALATE
+```
+
+Use the existing application/tool capability before building a new P2P
+component. Do not build supporting infrastructure merely because it is a
+recognized best practice or may become useful at hypothetical future scale.
+
+Typical triggers:
+
+- repeated instruction failure that survives simpler prompt/context repair ->
+  consider a short persistent guide;
+- repeated machine-checkable failure -> consider the narrowest automated check;
+- cross-session state loss causes real rework or acceptance loss -> consider a
+  minimal durable checkpoint;
+- consequential write/send/delete/spend authority is enabled -> enforce the
+  corresponding permission boundary before that authority is exercised;
+- repeated unattended failures cannot be diagnosed from existing evidence ->
+  add the minimum useful logging/alerting;
+- independent workstreams demonstrably gain enough execution or evidence value
+  from parallelism -> consider additional agents;
+- repeated handoff ambiguity breaks continuation -> consider a structured
+  handoff/schema.
+
+The existence of a large project, many documents, many available agents, or a
+popular harness pattern is not itself a trigger.
+
+Before adding any harness component, run the canonical OE Gate. If a simpler
+existing mechanism still satisfies acceptance at acceptable risk, return
+`SKIP_IT` or `DEFER_UNTIL_NEEDED`.
 
 ### Canonical change rule
 
