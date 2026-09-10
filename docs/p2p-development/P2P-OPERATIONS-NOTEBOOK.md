@@ -137,12 +137,56 @@ is sufficient.
 
 ### Anti-overengineering decision
 
-Before a new branch of work with meaningful cost, require a concrete reason
-that it is needed to reach the outcome, verify the outcome, or control a
-material risk/recovery mechanism. If a simpler valid path has comparable
-acceptable risk, use it. Premature supporting infrastructure is deferred.
-Process or ceremony that does not change a decision or protect a real
-requirement is removed.
+Canonical principle:
+
+```text
+MINIMUM_SUFFICIENT_DECOMPOSITION
+SMALLEST_USEFUL_VERIFIED_INCREMENT
+MAXIMUM_DECOMPOSITION = FORBIDDEN_AS_A_GOAL
+```
+
+Before a new branch of work with meaningful cost, after planning, and before
+introducing a new abstraction, framework, registry, router, database, service,
+test infrastructure, broad refactor, or other supporting layer, run the
+mandatory OE Gate:
+
+1. **SIMPLER_PATH** — Is there a simpler valid way to reach the same acceptance
+   condition with comparable acceptable risk?
+2. **MATERIAL_PROGRESS** — Does this step create material information, working
+   capability, acceptance evidence, or meaningful progress?
+3. **NECESSITY** — If this step is removed, would any required success condition
+   actually become unmet?
+4. **CORE_BEFORE_SUPPORT** — Are we solving the requested capability / required
+   execution foundation, or prematurely optimizing supporting infrastructure or
+   process?
+5. **SMALLER_VERIFIABLE_SLICE** — Can the current work be reduced to a smaller
+   independently verifiable vertical slice that still creates a useful result?
+
+Decision rule:
+
+- If any answer is negative, weak, or materially uncertain, reduce scope, remove
+  the step, or choose the simpler path before continuing.
+- Do not split work merely to maximize the number of tasks. Decomposition is
+  justified only when it improves execution, verification, recovery, or context.
+- The target is the **smallest useful verified increment**, not the largest plan
+  and not the maximum number of subtasks.
+- Work that may be useful later but is not required for the current bounded goal
+  is marked `DEFERRED_NOT_REQUIRED` and is not implemented now.
+- When acceptance evidence is sufficient, stop. Do not continue with
+  opportunistic refactoring, future-proofing, cleanup, architecture expansion,
+  extra documentation, or broader testing unless the bounded goal requires it.
+- Do not add a new supervisory layer merely to police overengineering when the
+  existing Control Tower / required review surface is sufficient. Add such a
+  layer only after repeated evidence shows the existing guard is insufficient.
+
+Beginner-facing challenge phrase:
+
+```text
+Không bị over engineering chứ?
+```
+
+The answer must be evidence-based, not ceremonial. The actionable verdict is
+`DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`, with one concrete reason.
 
 ### Canonical change rule
 
@@ -317,19 +361,31 @@ Do not make the beginner memorize internal Git state.
 
 ### RULE 14 — OVER_ENGINEERING_CHECK
 
-Do not use a ceremonial or expected-`PASS` overengineering check.
+Apply the mandatory OE Gate defined in
+`P2P_SUPREME_OPERATING_LAW_V1 > Anti-overengineering decision`.
 
-Before opening a new branch of work with meaningful cost, determine:
+Run it:
 
-- which outcome, boundary, verification need, or material risk it serves;
-- whether a simpler valid path has comparable acceptable risk;
-- what real consequence follows if the branch is omitted; and
-- whether it solves the core capability / necessary execution foundation, or
-  prematurely optimizes supporting infrastructure or process.
+- after planning when the plan has meaningful execution cost;
+- before opening a new costly branch of work;
+- before adding supporting infrastructure, abstractions, broad refactors, or
+  expanded verification machinery; and
+- when acceptance evidence may already be sufficient, to determine whether work
+  should stop.
+
+Do not use a ceremonial or expected-`PASS` check. Ask:
+
+```text
+Không bị over engineering chứ?
+```
+
+Evaluate the five canonical questions:
+`SIMPLER_PATH`, `MATERIAL_PROGRESS`, `NECESSITY`,
+`CORE_BEFORE_SUPPORT`, and `SMALLER_VERIFIABLE_SLICE`.
 
 The actionable result is `DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`,
-with one concrete reason. If the Owner asks "Không bị over engineering chứ?",
-answer with the actual verdict and reason; never auto-return `PASS`.
+with one concrete reason. A weak or negative answer to any gate question means
+the proposed step must be reduced, removed, or deferred before continuing.
 
 ### RULE 15 — ARENA_TASK_COMPLETION_DIALOG
 
