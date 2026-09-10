@@ -27,4 +27,6 @@ UPSTREAM -> PINNED SHA -> REPO CLAIMS -> CANDIDATE RULES
 -> SOURCE GAPS -> VALIDATION -> CASES -> VERDICT
 ```
 
-Một rule chỉ có giá trị bên trong dossier chứa nó cho tới khi Owner chủ động yêu cầu một nghiên cứu so sánh riêng. Không có “shared rule registry” ở giai đoạn này.
+Một rule chỉ có giá trị bên trong dossier chứa nó cho tới khi Owner chủ động yêu cầu một nghiên cứu so sánh riêng. Không có shared methodology, shared rule registry hay shared casebook ở giai đoạn này.
+
+Ngay cả khi hai repo dùng cùng thuật ngữ như `体用`, `四化`, `河洛`, `飞宫`, `旺衰`, chúng vẫn được coi là hai định nghĩa độc lập cho đến khi có một task so sánh provenance riêng chứng minh quan hệ giữa chúng.
