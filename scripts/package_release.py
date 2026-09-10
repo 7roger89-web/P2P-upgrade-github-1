@@ -87,6 +87,7 @@ DOC_FILES = (
     "docs/QUAN-TRI-FACT-EVAL-RAG.md",
     "docs/SU-DUNG.md",
     "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+    "docs/p2p-development/P2P-PORTABLE-LAW-PROJECTION.md",
 )
 SCRIPT_FILES = (
     "scripts/doctor.py",
@@ -102,6 +103,7 @@ SCRIPT_FILES = (
     "scripts/p2p_task_state.py",
     "scripts/p2p_safe_installer.py",
     "scripts/p2p_bootstrap.py",
+    "scripts/p2p_portable_law_projection.py",
     "scripts/p2p_workflow.py",
     "scripts/p2p_orientation.py",
     "scripts/package.ps1",
