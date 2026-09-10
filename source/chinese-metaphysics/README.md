@@ -1,8 +1,12 @@
 # Chinese Metaphysics Upstreams
 
-Purpose: preserve external upstream repositories for later research on 易经, 梅花易数, 六爻/纳甲, 一卦多断, 紫微斗数, 飞星, 河洛, 四化 and related methods.
+Purpose: preserve external upstream repositories for later independent research on 易经, 梅花易数, 六爻/纳甲, 一卦多断, 紫微斗数, 飞星, 河洛, 四化 and related methods.
 
 These are Git submodules pinned to explicit upstream commits. They are references, not P2P-owned code and not evidence that any metaphysical claim is correct.
+
+## Research isolation
+
+**Mỗi upstream được nghiên cứu độc lập.** Hồ sơ nằm tại `research/<repo-name>/RESEARCH.md`. Không có methodology/rule registry/casebook chung ở giai đoạn này, nhằm tránh trộn rule và attribution giữa các repo/phái.
 
 ## Pinned upstreams
 
@@ -20,14 +24,12 @@ These are Git submodules pinned to explicit upstream commits. They are reference
 | `upstreams/ziwei-chart` | `ziweiknows/ziwei-chart` (redirected from `ruijayfeng/ziwei`) | `main` | `b172413d85addbe32facd9e20b9179db619f3afb` |
 | `upstreams/xu-quanren` | `ZhangZangQian/xu-quanren` | `main` | `7b8364bbd79a11e852899893ac5749a83be62836` |
 
-## Unresolved entries from the discovery pass
+## Unresolved entries from discovery
 
 - `TiongHaiTing/zi-wei-ai`: GitHub returned 404 on 2026-09-11. Not added.
 - `Aquarian-Age/zwds`: GitHub returned 404 on 2026-09-11. Not added.
 
 ## Clone/init
-
-From the P2P repository root:
 
 ```bash
 git submodule update --init --recursive source/chinese-metaphysics/upstreams
