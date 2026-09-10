@@ -24,7 +24,9 @@ RUN set -eux; \
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/hermes/plugins/logistics/
 
 # Runtime dependency used by the Logistics read-only MongoDB connector.
-ARG PYMONGO_VERSION=4.18.0
+# DockHosting's build resolver did not expose the just-released 4.18.0; pin the
+# older stable 4.17.0 release so the build can resolve reproducibly.
+ARG PYMONGO_VERSION=4.17.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
 
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
