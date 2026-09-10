@@ -86,7 +86,7 @@ jobs:
 
           case "$REPO_ID" in
             plum-app)
-              corepack enable
+              npm install -g pnpm@9.15.9
               pnpm install --frozen-lockfile
               pnpm fe:build
               find apps/backend/src apps/backend/scripts -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
