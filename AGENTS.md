@@ -65,12 +65,44 @@ return fields. Never repeat large canonical policies in an executor prompt.
 - When acceptance evidence is sufficient, stop (`STOP_WHEN_EVIDENCE_SUFFICIENT`);
   do not begin optional hardening or follow-on work.
 
+## Executor-aware resource policy
+
+Resource tactics are executor-specific. `MIN_BURN` is a Codex/Astra policy,
+not a universal P2P philosophy. Global P2P law remains: achieve the correct
+bounded outcome with proportionate resources, obey Owner/safety/evidence gates,
+and stop when sufficient.
+
+- `CODEX / ASTRA`: quota-sensitive lane. Current default for ordinary bounded
+  coding work is `MEDIUM`; use `LOW` only for highly mechanical localized
+  reversible changes, and `HIGH` when substantial discovery, cross-cutting
+  reasoning, upstream research, migration, security-sensitive reasoning, or
+  material ambiguity requires it. Prefer a fresh thread per bounded task,
+  minimum sufficient read scope, batched requirements, at most one consolidated
+  blocking-question batch when practical, and no default plan/progress
+  narration/web/reviewer/supervisor/subagent/full-build/broad-test/debug-logging
+  ceremony. For low-risk reversible work, Owner/manual validation or the
+  narrowest cheap proof may precede broad AI validation. Optimize total Astra
+  resource burn to accepted result, including repairs, not first-turn cost.
+- `ARENA`: outcome-first normal-resource lane. Arena may inspect broader
+  relevant context, plan, test, review, or use richer execution loops when they
+  materially improve outcome, evidence, or recovery. Arena is not forced into
+  Codex/Astra MIN-BURN merely because Astra quota is expensive, but it still
+  obeys anti-overengineering and stop-when-sufficient.
+- `OTHER EXECUTORS`: use an observed executor profile when available; do not
+  copy resource tactics across executors without evidence.
+- Control Tower must know the executor before writing its task packet. Lower
+  generic tool defaults such as always-plan, always-full-build, or
+  always-supervisor do not override the canonical Supreme Law merely by
+  existing. Explicit user instructions, host/system requirements,
+  safety/security controls, and genuine task acceptance requirements still win.
+
 ## P2P_OPERATIONS_NOTEBOOK (install-inherited operations memory)
 
 `P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. Every normal P2P
-installation inherits the operations notebook and must apply
-`P2P_SUPREME_OPERATING_LAW_V1` before P2P-managed prompt writing or
-implementation.
+installation inherits the operations notebook and must establish
+`P2P_SUPREME_OPERATING_LAW_V1` context **before any substantive P2P-managed
+analysis/reasoning, planning, prompt writing, implementation, review, testing,
+or release work**.
 
 `TASK_BRANCH != LAW_AUTHORITY` and `TARGET_PROJECT != LAW_SOURCE`.
 
@@ -83,13 +115,14 @@ the full notebook is also projected locally at
 active canonical law. P2P-generated executor prompts carry
 `SUPREME_LAW_CAPSULE` so the minimum active law survives when canonical
 cross-repository access is unavailable. Never claim the canonical file was read
-unless it actually was.
+unless it actually was. If no valid canonical/projected/capsule law context is
+available, stop substantive P2P-managed work at `LAW_CONTEXT_BLOCKED`.
 
 If this digest and an active canonical notebook differ, the active canonical
 notebook wins.
 
 Beginner-facing operational guidance must apply
-`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-16 in the notebook):
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-19 in the notebook):
 
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
@@ -126,7 +159,8 @@ Beginner-facing operational guidance must apply
   above (`MINIMUM_RELEVANT_CONTEXT`, `MINIMUM_SUFFICIENT_WORK`,
   `RISK_PROPORTIONAL_VERIFICATION`, `PROGRESS_REPORTING=EXCEPTIONS_ONLY`,
   `STOP_WHEN_EVIDENCE_SUFFICIENT`, `ANTI_OVER_ENGINEERING`,
-  `CONTEXT_IS_CAPACITY_NOT_BUDGET`).
+  `CONTEXT_IS_CAPACITY_NOT_BUDGET`) plus the canonical executor-aware resource
+  policy above.
 - `RULE 13 CONTROL_TOWER_STATE_RESPONSIBILITY` — Control Tower tracks
   workstream/branch/PR/SHA/review/Owner Gate/next action; the beginner never
   memorizes internal Git state.
@@ -427,7 +461,6 @@ AI agent chooses the skill that fits the work.
 | Use when the user asks to inspect API or MCP surfaces. | `.agents/skills/api-surface/SKILL.md` |
 | Use when the user asks to build or change backend code. | `.agents/skills/backend-development/SKILL.md` |
 | Use when the user asks to implement Better Auth. | `.agents/skills/better-auth/SKILL.md` |
-| Use when the user asks to integrate Bunny.net. | `.agents/skills/bunny/SKILL.md` |
 | Use when the task is to implement code changes from an assigned scope, including bug fixes, follow-ups, rejects, or current-worktree repair. | `.agents/skills/coder/SKILL.md` |
 | Use when creating, changing, or reviewing MongoDB/PostgreSQL database work in a real repository, including schema, models, migrations, queries, indexes, transactions, connection config, backup/restore assumptions, or performance; follow repo-native tooling and meet the production database bar unless the user explicitly asks for a prototype. | `.agents/skills/databases/SKILL.md` |
 | Use when the user asks to debug. | `.agents/skills/debugging/SKILL.md` |
