@@ -35,11 +35,28 @@ from typing import Any, Sequence
 
 SCHEMA = "p2p-shield-provider-mapping/1"
 CONTROL_ID = "SHIELD-SECRET-01"
+# Slice-1 trusted provider identity: exact pin, no registry, no fallback.
+EXPECTED_PROVIDER_NAME = "Gitleaks"
+EXPECTED_PROVIDER_REPOSITORY = "gitleaks/gitleaks"
 EXIT_READY = 0
 EXIT_BLOCKED = 2
 SHA256_LINE = re.compile(r"^([0-9a-f]{64})\s+\*?(?P<name>[^\s]+)\s*$")
+# Standalone semver token with optional leading 'v'; word boundaries so 8.18.40
+# cannot satisfy an 8.18.4 pin, and numeric suffixes are rejected.
+SEMVER_TOKEN = re.compile(r"(?<!\S)v?(\d+\.\d+\.\d+)(?!\S)")
 DOWNLOAD_TIMEOUT_SECONDS = 120
 USER_AGENT = "p2p-shield-slice1-harness"
+
+
+def _expected_download_base(repository: str, version: str) -> str:
+    return f"https://github.com/{repository}/releases/download/v{version}"
+
+
+def _normalize_version(output: str) -> str:
+    """Return the standalone semver token from provider version output, or ''."""
+    flattened = " ".join(output.split())
+    match = SEMVER_TOKEN.search(flattened)
+    return match.group(1) if match else ""
 
 
 class ProviderAcquisitionBlocked(Exception):
@@ -66,17 +83,27 @@ def load_and_validate_mapping(mapping_path: Path, expected_version: str) -> dict
         problems.append(f"MAPPING_SCHEMA_UNSUPPORTED:{mapping.get('schema')}")
     if mapping.get("control_id") != CONTROL_ID:
         problems.append(f"MAPPING_CONTROL_ID_UNEXPECTED:{mapping.get('control_id')}")
+    if mapping.get("provider_name") != EXPECTED_PROVIDER_NAME:
+        problems.append(
+            f"MAPPING_PROVIDER_NAME_UNEXPECTED:{mapping.get('provider_name')}!={EXPECTED_PROVIDER_NAME}"
+        )
     if mapping.get("provider_version") != expected_version:
         problems.append(
             f"MAPPING_PROVIDER_VERSION_NOT_PINNED:{mapping.get('provider_version')}!={expected_version}"
         )
     if source.get("kind") != "official_github_release":
         problems.append(f"MAPPING_SOURCE_UNSUPPORTED:{source.get('kind')}")
+    expected_repository = EXPECTED_PROVIDER_REPOSITORY
+    if source.get("repository") != expected_repository:
+        problems.append(
+            f"MAPPING_SOURCE_REPOSITORY_UNEXPECTED:{source.get('repository')}!={expected_repository}"
+        )
     if source.get("tag") != f"v{expected_version}":
         problems.append(f"MAPPING_SOURCE_TAG_UNEXPECTED:{source.get('tag')}")
+    expected_base = _expected_download_base(expected_repository, expected_version)
     base_url = str(source.get("download_base", ""))
-    if not base_url.startswith("https://github.com/") or not base_url.endswith(f"/v{expected_version}"):
-        problems.append(f"MAPPING_DOWNLOAD_BASE_UNEXPECTED:{base_url}")
+    if base_url != expected_base:
+        problems.append(f"MAPPING_DOWNLOAD_BASE_UNEXPECTED:{base_url}!={expected_base}")
     if "sha256" not in str(source.get("integrity_rule", "")):
         problems.append("MAPPING_INTEGRITY_RULE_MISSING")
     if mapping.get("failure_behavior") != "BLOCKED":
@@ -215,11 +242,12 @@ def acquire(*, mapping_path: Path, provider_dir: Path, expected_version: str, of
             f"PROVIDER_CHECKSUM_MISMATCH:official={expected}:actual={actual}"
         )
     executable = extract(binary_name, archive_path, provider_dir)
-    observed = observed_version(executable, DOWNLOAD_TIMEOUT_SECONDS)
-    if observed.lstrip("v") != expected_version:
+    observed_raw = observed_version(executable, DOWNLOAD_TIMEOUT_SECONDS)
+    observed = _normalize_version(observed_raw)
+    if observed != expected_version:
         executable.unlink(missing_ok=True)
         raise ProviderAcquisitionBlocked(
-            f"PROVIDER_VERSION_MISMATCH:pinned={expected_version}:observed={observed[:120]}"
+            f"PROVIDER_VERSION_MISMATCH:pinned={expected_version}:observed={observed_raw[:120]}"
         )
     summary["PROVIDER_ACQUIRE"] = "VERIFIED_SHA256_VERSION_PINNED"
     summary["PROVIDER_EXECUTABLE"] = str(executable)

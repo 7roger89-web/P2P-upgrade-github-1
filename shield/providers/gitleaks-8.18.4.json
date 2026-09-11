@@ -18,7 +18,7 @@
   },
   "invocation": {
     "version_argv": ["{executable}", "version"],
-    "version_expected_substring": "8.18.4",
+    "version_expected_exact": "8.18.4",
     "detect_argv": [
       "{executable}",
       "detect",

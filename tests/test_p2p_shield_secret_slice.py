@@ -32,7 +32,9 @@ if str(REPO_ROOT) not in sys.path:
 
 from shield import runner as shield_runner  # noqa: E402
 from shield.acquire import (  # noqa: E402
+    EXPECTED_PROVIDER_REPOSITORY,
     ProviderAcquisitionBlocked as BlockedProviderAcquisition,
+    _normalize_version,
     expected_checksum_from as acquire_expected,
     load_and_validate_mapping,
 )
@@ -42,6 +44,7 @@ from shield.runner import (  # noqa: E402
     STATUS_FAIL,
     STATUS_PASS,
     Blocked,
+    _extract_exact_version,
     assess,
     load_control,
     load_provider_mapping,
@@ -81,11 +84,17 @@ def write(text):
 if argv and argv[0] == "version":
     if mode == "VERSION_MISMATCH":
         print("9.9.9")
+    elif mode == "VERSION_NEAR":
+        # 8.18.40 must NOT satisfy an 8.18.4 pin.
+        print("v8.18.40")
+    elif mode == "VERSION_EXTRA_SUFFIX":
+        # Arbitrary trailing text after the semver must be rejected.
+        print("1.2.3-extra")
     elif mode == "VERSION_COMMAND_FAILED":
         print("version probe failed", file=sys.stderr)
         raise SystemExit(1)
     else:
-        print("1.2.3")
+        print("v1.2.3")
     raise SystemExit(0)
 
 finding = {
@@ -119,7 +128,8 @@ raise SystemExit(4)
 ''' % (SECRET_MARKER, SECRET_MARKER)
 
 
-def _stub_mapping(path: Path, *, name: str = "StubScan", version: str = "1.2.3") -> Path:
+def _stub_mapping(path: Path, *, name: str = "StubScan", version: str = "1.2.3",
+                  expected_exact: str = "1.2.3") -> Path:
     path.write_text(
         json.dumps(
             {
@@ -130,7 +140,7 @@ def _stub_mapping(path: Path, *, name: str = "StubScan", version: str = "1.2.3")
                 "source": {"kind": "test_stub", "repository": "local/stub", "tag": "none"},
                 "invocation": {
                     "version_argv": ["{executable}", "version", "--target={target}"],
-                    "version_expected_substring": "1.2.3",
+                    "version_expected_exact": expected_exact,
                     "detect_argv": ["{executable}", "--target={target}", "--report={report}"],
                     "scan_mode_args": {
                         "git_history_scan": [],
@@ -281,6 +291,14 @@ class ShieldSliceTestCase(unittest.TestCase):
             "limitations",
         ):
             self.assertIn(field, control["evidence_fields"])
+        # Objective must not overclaim that a finding proves a credential is
+        # "live" (valid/revocable); credential validity is documented out of scope.
+        objective_lower = control["objective"].lower()
+        self.assertIn("exposed credential material", objective_lower)
+        self.assertNotIn("live credential", objective_lower)
+        self.assertNotIn("valid credential", objective_lower)
+        out_of_scope = " ".join(control.get("out_of_scope", [])).lower()
+        self.assertIn("valid", out_of_scope)
         document = control_path.read_text(encoding="utf-8").lower()
         for provider_word in ("gitleaks", "trufflehog", "8.18.4", "zricethezav"):
             self.assertNotIn(provider_word, document)
@@ -296,9 +314,15 @@ class ShieldSliceTestCase(unittest.TestCase):
         self.assertTrue(mapping["limitations"])
         source = mapping["source"]
         self.assertEqual(source["kind"], "official_github_release")
-        self.assertEqual(source["download_base"], f"https://github.com/gitleaks/gitleaks/releases/download/v{PINNED_PROVIDER_VERSION}")
+        self.assertEqual(source["repository"], EXPECTED_PROVIDER_REPOSITORY)
+        self.assertEqual(
+            source["download_base"],
+            f"https://github.com/{EXPECTED_PROVIDER_REPOSITORY}/releases/download/v{PINNED_PROVIDER_VERSION}",
+        )
         self.assertEqual(source["linux_x64_asset"], f"gitleaks_{PINNED_PROVIDER_VERSION}_linux_x64.tar.gz")
         self.assertEqual(source["checksums_asset"], f"gitleaks_{PINNED_PROVIDER_VERSION}_checksums.txt")
+        self.assertEqual(mapping["invocation"]["version_expected_exact"], PINNED_PROVIDER_VERSION)
+        self.assertNotIn("version_expected_substring", mapping["invocation"])
         self.assertNotIn("latest", json.dumps(source))
         self.assertIn("sha256", source["integrity_rule"])
         self.assertEqual(
@@ -353,6 +377,8 @@ class ShieldSliceTestCase(unittest.TestCase):
             "NO_REPORT": "PROVIDER_REPORT_MISSING",
             "BAD_REPORT": "PROVIDER_REPORT_UNREADABLE",
             "VERSION_MISMATCH": "PROVIDER_VERSION_MISMATCH",
+            "VERSION_NEAR": "PROVIDER_VERSION_MISMATCH",
+            "VERSION_EXTRA_SUFFIX": "PROVIDER_VERSION_MISMATCH",
             "VERSION_COMMAND_FAILED": "PROVIDER_VERSION_COMMAND_FAILED",
         }
         for mode, expected_reason in cases.items():
@@ -456,6 +482,37 @@ class ShieldSliceTestCase(unittest.TestCase):
         with self.assertRaises(Blocked) as many:
             load_provider_mapping(shield_dir, CONTROL_ID, None)
         self.assertIn("matches=2", many.exception.reason)
+
+    def test_runner_version_extract_is_exact(self) -> None:
+        # The runner extracts a standalone semver token and compares it to the
+        # pin by exact equality; substring matches like "8.18.4 appears inside
+        # 8.18.40" cannot satisfy a pin.
+        self.assertEqual(_extract_exact_version("gitleaks v8.18.4"), "8.18.4")
+        self.assertEqual(_extract_exact_version("8.18.4"), "8.18.4")
+        self.assertEqual(_extract_exact_version("  8.18.4  "), "8.18.4")
+        # A higher patch segment tokenises as its own version and therefore
+        # cannot equal the 8.18.4 pin.
+        self.assertEqual(_extract_exact_version("8.18.40"), "8.18.40")
+        self.assertNotEqual(_extract_exact_version("8.18.40"), "8.18.4")
+        # Arbitrary trailing text appended to the token is refused.
+        self.assertEqual(_extract_exact_version("8.18.4-extra"), "")
+        self.assertEqual(_extract_exact_version(""), "")
+
+    def test_malformed_version_pin_in_mapping_is_blocked(self) -> None:
+        shield_dir = self.work_dir / "bad-shield"
+        (shield_dir / "controls").mkdir(parents=True)
+        shutil.copy(SHIELD_DIR / "controls" / f"{CONTROL_ID}.json", shield_dir / "controls")
+        (shield_dir / "providers").mkdir(parents=True)
+        bad = _stub_mapping(
+            shield_dir / "providers" / "bad-pin.json",
+            name="BadPinScan",
+            version="1.2.3",
+            expected_exact="1.2",  # not semver
+        )
+        with self.assertRaises(Blocked) as raised:
+            load_provider_mapping(shield_dir, CONTROL_ID, None)
+        self.assertIn("PROVIDER_VERSION_PIN_MALFORMED", raised.exception.reason)
+        self.assertTrue(bad.is_file())
 
     def test_control_with_a_broken_fail_closed_rule_is_blocked(self) -> None:
         shield_dir = self.work_dir / "broken-shield"
@@ -619,6 +676,67 @@ class ProviderAcquireTests(unittest.TestCase):
                 with self.assertRaises(BlockedProviderAcquisition) as raised:
                     load_and_validate_mapping(self._official_mapping(**overrides), "8.18.4")
                 self.assertIn(expected, raised.exception.reason)
+
+    def test_official_repository_identity_is_pinned_exactly(self) -> None:
+        # The real gitleaks/gitleaks mapping at 8.18.4 validates cleanly.
+        load_and_validate_mapping(self._official_mapping(), "8.18.4")
+
+    def test_attacker_github_repo_is_blocked(self) -> None:
+        # A different GitHub repository serving archives under /v8.18.4 must be
+        # refused even though the hostname and tag suffix look plausible.
+        evil_repo = "attacker/example"
+        evil_base = f"https://github.com/{evil_repo}/releases/download/v8.18.4"
+        with self.assertRaises(BlockedProviderAcquisition) as raised:
+            load_and_validate_mapping(
+                self._official_mapping(
+                    source={
+                        "kind": "official_github_release",
+                        "repository": evil_repo,
+                        "tag": "v8.18.4",
+                        "download_base": evil_base,
+                    },
+                ),
+                "8.18.4",
+            )
+        reason = raised.exception.reason
+        self.assertIn("MAPPING_SOURCE_REPOSITORY_UNEXPECTED", reason)
+        self.assertIn(f"!={EXPECTED_PROVIDER_REPOSITORY}", reason)
+
+    def test_correct_metadata_with_wrong_download_base_is_blocked(self) -> None:
+        # Even when repository/kind/version metadata claim gitleaks/gitleaks, a
+        # download_base pointing elsewhere (wrong path on same host or mirror)
+        # must be refused by exact equality.
+        wrong_base = "https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/"
+        with self.assertRaises(BlockedProviderAcquisition) as raised:
+            load_and_validate_mapping(
+                self._official_mapping(source={"download_base": wrong_base}),
+                "8.18.4",
+            )
+        self.assertIn("MAPPING_DOWNLOAD_BASE_UNEXPECTED", raised.exception.reason)
+
+    def test_wrong_provider_name_is_blocked(self) -> None:
+        # A mapping that pretends to be a different provider cannot silently ride.
+        with self.assertRaises(BlockedProviderAcquisition) as raised:
+            load_and_validate_mapping(
+                self._official_mapping(provider_name="FakeLeaks"),
+                "8.18.4",
+            )
+        self.assertIn("MAPPING_PROVIDER_NAME_UNEXPECTED", raised.exception.reason)
+
+    def test_version_normalization_matches_exactly(self) -> None:
+        # Exact semver token, optional leading 'v', surrounding whitespace OK.
+        self.assertEqual(_normalize_version("8.18.4"), "8.18.4")
+        self.assertEqual(_normalize_version("v8.18.4"), "8.18.4")
+        self.assertEqual(_normalize_version("  v8.18.4\n"), "8.18.4")
+        # 8.18.40 is extracted as its own token; the caller then compares it to
+        # the pin by exact equality, so an 8.18.4 pin refuses 8.18.40.
+        self.assertEqual(_normalize_version("8.18.40"), "8.18.40")
+        self.assertNotEqual(_normalize_version("8.18.40"), "8.18.4")
+        # Arbitrary trailing text appended to the token is refused (the token
+        # must be whitespace-delimited so "X.Y.Z-suffix" is not a match).
+        self.assertEqual(_normalize_version("8.18.4-extra"), "")
+        # A fourth numeric component is also refused; three-part semver only.
+        self.assertEqual(_normalize_version("gitleaks version 8.18.4.1"), "")
 
 
 class ShieldRunnerCliTests(unittest.TestCase):

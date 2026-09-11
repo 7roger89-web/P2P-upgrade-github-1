@@ -149,9 +149,12 @@ def load_provider_mapping(
     if mapping["failure_behavior"] != STATUS_BLOCKED:
         raise Blocked(f"PROVIDER_FAILURE_BEHAVIOR_UNSUPPORTED:{mapping['failure_behavior']}")
     invocation = mapping["invocation"]
-    for field in ("version_argv", "version_expected_substring", "detect_argv", "scan_mode_args"):
+    for field in ("version_argv", "version_expected_exact", "detect_argv", "scan_mode_args"):
         if field not in invocation:
             raise Blocked(f"PROVIDER_INVOCATION_FIELD_MISSING:{field}")
+    expected_version = str(invocation["version_expected_exact"]).strip()
+    if not re.fullmatch(r"\d+\.\d+\.\d+", expected_version):
+        raise Blocked(f"PROVIDER_VERSION_PIN_MALFORMED:{expected_version}")
     return mapping, path
 
 
@@ -235,6 +238,19 @@ def _tail(text: str) -> str:
     return flat[-DIAGNOSTIC_TAIL_CHARS:] if flat else ""
 
 
+# Standalone semver token with optional leading 'v'. Word boundaries so that
+# "8.18.40" does not satisfy a pin for "8.18.4" and arbitrary trailing text is
+# rejected; the extracted version is compared to the pin by exact equality.
+_VERSION_TOKEN = re.compile(r"(?<!\S)v?(\d+\.\d+\.\d+)(?!\S)")
+
+
+def _extract_exact_version(output: str) -> str:
+    """Return the exact semver token from provider version output, or ''."""
+    flattened = " ".join((output or "").split())
+    match = _VERSION_TOKEN.search(flattened)
+    return match.group(1) if match else ""
+
+
 def resolve_provider_version(
     mapping: dict[str, Any],
     executable: Path,
@@ -248,16 +264,17 @@ def resolve_provider_version(
         {"executable": str(executable), "target": str(target)},
     )
     process = _execute(argv, timeout, "version", cwd=_work_directory(target), env=env)
-    observed = (process.stdout + "\n" + process.stderr).strip()
+    observed_raw = (process.stdout + "\n" + process.stderr).strip()
     if process.returncode != 0:
         raise Blocked(f"PROVIDER_VERSION_COMMAND_FAILED:rc={process.returncode}")
-    expected = str(invocation["version_expected_substring"])
-    if expected not in observed:
+    expected = str(invocation["version_expected_exact"]).strip()
+    observed = _extract_exact_version(observed_raw)
+    if observed != expected:
         # A different provider version is a different provider: never silent.
         raise Blocked(
-            f"PROVIDER_VERSION_MISMATCH:pinned={expected}:observed={_tail(observed) or 'EMPTY'}"
+            f"PROVIDER_VERSION_MISMATCH:pinned={expected}:observed={_tail(observed_raw) or 'EMPTY'}"
         )
-    return _tail(observed) or expected, process
+    return observed, process
 
 
 def _read_findings(report_path: Path, returncode: int) -> tuple[str, int, str, list[dict[str, Any]]]:
