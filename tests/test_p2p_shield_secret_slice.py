@@ -15,6 +15,7 @@ runs this file and ``shield.acceptance`` on a GitHub-hosted runner.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -30,6 +31,11 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from shield import runner as shield_runner  # noqa: E402
+from shield.acquire import (  # noqa: E402
+    ProviderAcquisitionBlocked as BlockedProviderAcquisition,
+    expected_checksum_from as acquire_expected,
+    load_and_validate_mapping,
+)
 from shield.runner import (  # noqa: E402
     EXIT_BY_STATUS,
     STATUS_BLOCKED,
@@ -400,6 +406,145 @@ class ShieldSliceTestCase(unittest.TestCase):
         self.assertEqual(evidence["status"], STATUS_BLOCKED)
         self.assertEqual(evidence["reason"], "CONTROL_FAIL_CLOSED_RULE_ABSENT")
         self.assertEqual(evidence["control_version"], "UNRESOLVED")
+
+
+class ProviderAcquireTests(unittest.TestCase):
+    """The harness must refuse to install a provider it cannot verify."""
+
+    def setUp(self) -> None:
+        self.work_dir = Path(tempfile.mkdtemp(prefix="p2p-shield-acquire-"))
+        self.addCleanup(shutil.rmtree, self.work_dir, True)
+        self.asset = "gitleaks_8.18.4_linux_x64.tar.gz"
+        self.checksums = "gitleaks_8.18.4_checksums.txt"
+
+    def _official_mapping(self, **overrides) -> Path:
+        source = {
+            "kind": "official_github_release",
+            "repository": "gitleaks/gitleaks",
+            "tag": "v8.18.4",
+            "download_base": "https://github.com/gitleaks/gitleaks/releases/download/v8.18.4",
+            "linux_x64_asset": self.asset,
+            "checksums_asset": self.checksums,
+            "extracted_binary": "gitleaks",
+            "integrity_rule": "sha256 of the downloaded archive must match the official checksums asset",
+        }
+        source.update(overrides.pop("source", {}))
+        mapping = {
+            "schema": "p2p-shield-provider-mapping/1",
+            "control_id": CONTROL_ID,
+            "provider_name": "Gitleaks",
+            "provider_version": "8.18.4",
+            "source": source,
+            "invocation": {"version_argv": ["{executable}", "version"]},
+            "coverage": {"git_history_scan": ["x"], "worktree_scan": ["y"]},
+            "limitations": ["stub"],
+            "failure_behavior": "BLOCKED",
+        }
+        mapping.update(overrides)
+        path = self.work_dir / f"mapping-{abs(hash(json.dumps(mapping, sort_keys=True)))}.json"
+        path.write_text(json.dumps(mapping, indent=2), encoding="utf-8")
+        return path
+
+    def _release_files(self, *, tamper: bool = False) -> Path:
+        staging = self.work_dir / "release"
+        package = staging / "pkg"
+        package.mkdir(parents=True)
+        (package / "gitleaks").write_text('#!/bin/sh\nprintf "8.18.4\\n"\n', encoding="utf-8")
+        (package / "gitleaks").chmod(0o755)
+        archive = staging / self.asset
+        subprocess.run(
+            ["tar", "-czf", str(archive), "-C", str(package), "gitleaks"],
+            check=True,
+            capture_output=True,
+            timeout=60,
+        )
+        # The official checksums entry describes the untampered archive.
+        digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+        if tamper:
+            with archive.open("ab") as handle:
+                handle.write(b"tampered")
+        (staging / self.checksums).write_text(
+            f"{'0' * 64}  gitleaks_8.18.4_darwin_x64.tar.gz\n{digest}  {self.asset}\n",
+            encoding="utf-8",
+        )
+        return staging
+
+    def _acquire(self, mapping: Path, staging: Path, provider_dir: Path):
+        from shield import acquire as acquire_module
+
+        def fake_download(url: str, destination: Path) -> None:
+            shutil.copyfile(staging / Path(url).name, destination)
+
+        original = acquire_module.download
+        acquire_module.download = fake_download
+        self.addCleanup(setattr, acquire_module, "download", original)
+        return acquire_module.acquire(
+            mapping_path=mapping,
+            provider_dir=provider_dir,
+            expected_version="8.18.4",
+            offline=False,
+        )
+
+    def test_official_checksum_entry_is_selected_for_the_right_asset(self) -> None:
+        staging = self._release_files()
+        text = (staging / self.checksums).read_text(encoding="utf-8")
+        digest = acquire_expected(text, self.asset)
+        self.assertEqual(digest, hashlib.sha256((staging / self.asset).read_bytes()).hexdigest())
+        self.assertNotEqual(digest, "0" * 64)
+        with self.assertRaises(BlockedProviderAcquisition) as missing:
+            acquire_expected(text, "gitleaks_9.9.9_linux_x64.tar.gz")
+        self.assertIn("PROVIDER_CHECKSUM_ENTRY_MISSING", missing.exception.reason)
+
+    def test_verified_provider_is_installed_and_version_checked(self) -> None:
+        provider_dir = self.work_dir / "provider"
+        summary = self._acquire(
+            self._official_mapping(), self._release_files(), provider_dir
+        )
+        self.assertEqual(summary["PROVIDER_ACQUIRE"], "VERIFIED_SHA256_VERSION_PINNED")
+        executable = Path(summary["PROVIDER_EXECUTABLE"])
+        self.assertEqual(executable.name, "gitleaks")
+        self.assertTrue(os.access(executable, os.X_OK))
+
+    def test_tampered_archive_is_blocked_and_not_installed(self) -> None:
+        provider_dir = self.work_dir / "provider-tampered"
+        with self.assertRaises(BlockedProviderAcquisition) as raised:
+            self._acquire(self._official_mapping(), self._release_files(tamper=True), provider_dir)
+        self.assertTrue(raised.exception.reason.startswith("PROVIDER_CHECKSUM_MISMATCH"))
+        self.assertFalse((provider_dir / "gitleaks").exists())
+
+    def test_provider_member_is_found_under_a_directory_prefix(self) -> None:
+        # An official archive may carry one top-level directory; the binary must
+        # still be located instead of silently producing a missing provider.
+        staging = self.work_dir / "nested-release"
+        package = staging / "pkg" / "gitleaks_8.18.4_linux_x64"
+        package.mkdir(parents=True)
+        (package / "gitleaks").write_text('#!/bin/sh\nprintf "8.18.4\\n"\n', encoding="utf-8")
+        (package / "gitleaks").chmod(0o755)
+        (package / "LICENSE").write_text("license\n", encoding="utf-8")
+        archive = staging / self.asset
+        subprocess.run(
+            ["tar", "-czf", str(archive), "-C", str(staging / "pkg"), "gitleaks_8.18.4_linux_x64"],
+            check=True,
+            capture_output=True,
+            timeout=60,
+        )
+        digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+        (staging / self.checksums).write_text(f"{digest}  {self.asset}\n", encoding="utf-8")
+        summary = self._acquire(self._official_mapping(), staging, self.work_dir / "provider-nested")
+        self.assertEqual(summary["PROVIDER_ACQUIRE"], "VERIFIED_SHA256_VERSION_PINNED")
+        self.assertTrue(Path(summary["PROVIDER_EXECUTABLE"]).is_file())
+
+    def test_unpinned_or_mirrored_mapping_is_refused(self) -> None:
+        for overrides, expected in (
+            ({"provider_version": "8.28.0"}, "MAPPING_PROVIDER_VERSION_NOT_PINNED"),
+            ({"source": {"download_base": "https://mirror.example/v8.18.4"}}, "MAPPING_DOWNLOAD_BASE_UNEXPECTED"),
+            ({"source": {"kind": "package_manager"}}, "MAPPING_SOURCE_UNSUPPORTED"),
+            ({"failure_behavior": "IGNORE"}, "MAPPING_FAILURE_BEHAVIOR_UNSUPPORTED"),
+        ):
+            with self.subTest(expected=expected):
+                with self.assertRaises(BlockedProviderAcquisition) as raised:
+                    load_and_validate_mapping(self._official_mapping(**overrides), "8.18.4")
+                self.assertIn(expected, raised.exception.reason)
 
 
 class ShieldRunnerCliTests(unittest.TestCase):

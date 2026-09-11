@@ -274,7 +274,8 @@ def _read_findings(report_path: Path, returncode: int) -> tuple[str, int, str, l
     except (OSError, json.JSONDecodeError) as exc:
         raise Blocked(f"PROVIDER_REPORT_UNREADABLE:{exc}") from exc
     if payload is None:
-        # The pinned provider writes a null JSON document for an empty finding list.
+        # A null document encodes "no finding objects" for the pinned provider.
+        # It still only becomes PASS when the provider also exited cleanly.
         payload = []
     if not isinstance(payload, list):
         raise Blocked(f"PROVIDER_REPORT_SHAPE_UNSUPPORTED:type={type(payload).__name__}")

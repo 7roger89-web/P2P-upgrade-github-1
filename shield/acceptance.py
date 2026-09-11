@@ -230,6 +230,7 @@ def run_cases(
             "observed_status": evidence.get("status"),
             "findings_count": evidence.get("findings_count"),
             "reason": evidence.get("reason"),
+            "provider": evidence.get("provider"),
             "provider_version": evidence.get("provider_version"),
             "evidence_file": str(evidence_path),
         }
@@ -261,6 +262,33 @@ def _contains_secret_value(evidence: dict[str, Any]) -> bool:
     return FAKE_TOKEN_VALUE in json.dumps(evidence)
 
 
+def render_summary(records: Sequence[dict[str, Any]], problems: Sequence[str]) -> list[str]:
+    lines = [
+        "### SHIELD-SECRET-01 slice acceptance",
+        "",
+        "| case | scope | expected | observed | findings | provider | reason |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for record in records:
+        lines.append(
+            "| %s | %s | %s | %s | %s | %s %s | %s |"
+            % (
+                record["case"],
+                record["scan_mode"],
+                record["expected_status"],
+                record["observed_status"],
+                record["findings_count"],
+                record["provider"],
+                record["provider_version"],
+                str(record["reason"])[:80],
+            )
+        )
+    lines.append("")
+    lines.append("Evidence records: %d, printed in full in the job log." % len(records))
+    lines.append("Acceptance problems: %s" % (len(problems) if problems else "none"))
+    return lines
+
+
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--executable", required=True, help="Pinned provider executable path")
@@ -276,6 +304,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--evidence-reference",
         default="UNREFERENCED",
         help="Durable reference stored in each evidence record",
+    )
+    parser.add_argument(
+        "--summary-file",
+        default=None,
+        help="Append a markdown summary table to this file (for example GITHUB_STEP_SUMMARY)",
     )
     parser.add_argument("--timeout-seconds", type=int, default=600)
     parser.add_argument(
@@ -327,6 +360,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         for record in records:
             print("CASE " + json.dumps(record, sort_keys=True))
+        if args.summary_file:
+            summary_path = Path(args.summary_file)
+            summary_path.parent.mkdir(parents=True, exist_ok=True)
+            with summary_path.open("a", encoding="utf-8") as handle:
+                for line in render_summary(records, problems):
+                    handle.write(line + "\n")
         print(f"ACCEPTANCE_CASES={len(records)}")
         print(f"ACCEPTANCE_SECONDS={time.monotonic() - started:.1f}")
         if problems:
