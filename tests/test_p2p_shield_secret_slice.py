@@ -153,6 +153,32 @@ def _stub_mapping(path: Path, *, name: str = "StubScan", version: str = "1.2.3")
     return path
 
 
+def init_test_repo(path: Path) -> None:
+    """The control applies to git repositories, so test targets are repositories.
+
+    Ambient host configuration is neutralized so a fixture cannot depend on it.
+    """
+    env = {
+        **os.environ,
+        "GIT_AUTHOR_NAME": "P2P Shield Test",
+        "GIT_AUTHOR_EMAIL": "p2p-shield-test@example.invalid",
+        "GIT_COMMITTER_NAME": "P2P Shield Test",
+        "GIT_COMMITTER_EMAIL": "p2p-shield-test@example.invalid",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_SYSTEM": os.devnull,
+    }
+    for args in (["init", "-q"], ["add", "-A"], ["commit", "-q", "-m", "fixture"]):
+        subprocess.run(
+            ["git", "-c", "commit.gpgsign=false", *args],
+            cwd=str(path),
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=60,
+        )
+
+
 class ShieldSliceTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.work_dir = Path(tempfile.mkdtemp(prefix="p2p-shield-test-"))
@@ -161,12 +187,60 @@ class ShieldSliceTestCase(unittest.TestCase):
         self.stub.write_text(STUB_SCRIPT, encoding="utf-8")
         self.stub.chmod(self.stub.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
         self.stub_mapping = _stub_mapping(self.work_dir / "stub-mapping.json")
+        self._counter = 0
 
     def _target(self, mode: str) -> Path:
-        target = self.work_dir / f"target-{mode}-{len(self.id())}"
-        target.mkdir(parents=True, exist_ok=True)
+        return self._repo_target(mode, git=True)
+
+    def _repo_target(self, mode: str, *, git: bool) -> Path:
+        self._counter += 1
+        target = self.work_dir / f"target-{mode}-{self._counter}"
+        target.mkdir(parents=True)
         (target / "STUB_MODE").write_text(mode + "\n", encoding="utf-8")
+        if git:
+            init_test_repo(target)
         return target
+
+    def test_non_repository_target_is_blocked_not_pass(self) -> None:
+        # Real hosted evidence: the pinned provider exits clean with no findings
+        # on a non-repository target. The control requires a repository, so
+        # Shield must block instead of recording that empty scan as PASS.
+        plain_target = self._repo_target("CLEAN", git=False)
+        evidence = assess(
+            shield_dir=SHIELD_DIR,
+            control_id=CONTROL_ID,
+            scan_mode="git_history_scan",
+            target=plain_target,
+            executable=str(self.stub),
+            provider_mapping=self.stub_mapping,
+            timeout=60,
+            reference="unit-test",
+        )
+        self.assertEqual(evidence["status"], STATUS_BLOCKED)
+        self.assertEqual(evidence["reason"].split(":")[0], "TARGET_NOT_A_GIT_REPOSITORY")
+        self.assertEqual(evidence["coverage"], ["NONE_ESTABLISHED"])
+        self.assertEqual(evidence["target_ref"], "NO_GIT_HEAD")
+        self.assertEqual(evidence["findings_count"], 0)
+
+    def test_every_scope_of_this_control_blocks_the_same_target_violation(self) -> None:
+        # The control's target requirement is not scope-specific: a worktree
+        # assessment of a non-repository target is blocked too, and the record
+        # states the ref that could not be resolved.
+        plain_target = self._repo_target("CLEAN", git=False)
+        evidence = assess(
+            shield_dir=SHIELD_DIR,
+            control_id=CONTROL_ID,
+            scan_mode="worktree_scan",
+            target=plain_target,
+            executable=str(self.stub),
+            provider_mapping=self.stub_mapping,
+            timeout=60,
+            reference="unit-test",
+        )
+        self.assertEqual(evidence["status"], STATUS_BLOCKED)
+        self.assertEqual(evidence["reason"].split(":")[0], "TARGET_NOT_A_GIT_REPOSITORY")
+        self.assertEqual(evidence["target_ref"], "NO_GIT_HEAD")
+        self.assertEqual(evidence["coverage"], ["NONE_ESTABLISHED"])
 
     def _assess(self, mode: str, *, mapping: Path | None = None, executable: str | None = None):
         return assess(
@@ -558,6 +632,7 @@ class ShieldRunnerCliTests(unittest.TestCase):
         stub.chmod(stub.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
         mapping = _stub_mapping(work_dir / "stub-mapping.json")
         target = work_dir / "target"
+        target.mkdir()
         evidence_path = work_dir / "evidence.json"
         exit_codes = {}
         for mode, expected in (
@@ -565,8 +640,8 @@ class ShieldRunnerCliTests(unittest.TestCase):
             ("LEAK", 10),
             ("PARTIAL", 20),
         ):
-            target.mkdir(parents=True, exist_ok=True)
             (target / "STUB_MODE").write_text(mode + "\n", encoding="utf-8")
+            init_test_repo(target)
             process = subprocess.run(
                 [
                     sys.executable,

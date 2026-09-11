@@ -317,6 +317,9 @@ def _finding_references(findings: Sequence[dict[str, Any]]) -> list[dict[str, st
     return references
 
 
+NO_GIT_HEAD = "NO_GIT_HEAD"
+
+
 def resolve_target_ref(target: Path) -> str:
     try:
         process = subprocess.run(
@@ -327,10 +330,21 @@ def resolve_target_ref(target: Path) -> str:
             check=False,
         )
     except (OSError, subprocess.SubprocessError):
-        return "NO_GIT_HEAD"
+        return NO_GIT_HEAD
     if process.returncode == 0 and process.stdout.strip():
         return process.stdout.strip()
-    return "NO_GIT_HEAD"
+    return NO_GIT_HEAD
+
+
+def requires_git_repository(control: dict[str, Any]) -> bool:
+    """Whether the control declares git repositories as its applicable target.
+
+    The pinned provider does not fail on a non-repository target: it scans
+    nothing and exits cleanly, which would otherwise be recorded as PASS. When
+    the control requires a repository, an unresolvable ref is a BLOCKED
+    assessment instead of a clean one.
+    """
+    return control.get("applies_to", {}).get("target_kind") == "git_repository"
 
 
 def build_evidence(
@@ -345,6 +359,7 @@ def build_evidence(
     findings_count: int,
     findings: Sequence[dict[str, Any]],
     reason: str,
+    target_ref: str,
     provider_version_text: str,
     diagnostics: dict[str, Any],
     reference: str,
@@ -364,7 +379,7 @@ def build_evidence(
         "provider_version": mapping["provider_version"],
         "provider_source": f"{mapping['source'].get('repository', 'UNDECLARED')}@{mapping['source'].get('tag', 'UNDECLARED')}",
         "target": str(target),
-        "target_ref": resolve_target_ref(target),
+        "target_ref": target_ref,
         "timestamp": _utc_timestamp(),
         "status": status,
         "scope": scan_mode,
@@ -404,6 +419,7 @@ def assess(
     control = control_path = mapping = mapping_path = None
     findings: list[dict[str, Any]] = []
     findings_count = 0
+    target_ref = "UNRESOLVED"
     provider_version_text = "UNRESOLVED"
     diagnostics: dict[str, Any] = {"provider_exit_code": None, "provider_stderr_tail": ""}
     try:
@@ -420,6 +436,9 @@ def assess(
             raise Blocked(f"SCAN_MODE_NOT_MAPPED:{scan_mode}")
         if scan_mode not in control["required_scope"]["required_evidence"]:
             raise Blocked(f"SCAN_MODE_NOT_REQUIRED_BY_CONTROL:{scan_mode}")
+        target_ref = resolve_target_ref(target)
+        if requires_git_repository(control) and target_ref == NO_GIT_HEAD:
+            raise Blocked(f"TARGET_NOT_A_GIT_REPOSITORY:{target}")
         with tempfile.TemporaryDirectory(prefix="p2p-shield-run-") as work_dir:
             report_path = Path(work_dir) / "provider-report.json"
             argv = _substitute(
@@ -448,7 +467,7 @@ def assess(
             "provider": "UNRESOLVED",
             "provider_version": "UNRESOLVED",
             "target": str(target),
-            "target_ref": resolve_target_ref(target) if target.exists() else "TARGET_MISSING",
+            "target_ref": NO_GIT_HEAD if target.is_dir() else "TARGET_MISSING",
             "timestamp": _utc_timestamp(),
             "status": STATUS_BLOCKED,
             "scope": scan_mode,
@@ -471,6 +490,7 @@ def assess(
         findings_count=findings_count,
         findings=findings,
         reason=reason,
+        target_ref=target_ref,
         provider_version_text=provider_version_text,
         diagnostics=diagnostics,
         reference=reference,

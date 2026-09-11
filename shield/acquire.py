@@ -284,6 +284,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         return EXIT_BLOCKED
     for key, value in summary.items():
         print(f"{key}={value}")
+    if not args.offline:
+        print(
+            "::notice::SHIELD_PROVIDER %s@%s sha256=%s source=%s"
+            % (
+                summary["PROVIDER"],
+                summary["PROVIDER_PINNED_VERSION"],
+                summary.get("PROVIDER_ARCHIVE_SHA256", "UNVERIFIED"),
+                summary["PROVIDER_SOURCE_URL"],
+            )
+        )
     _write_summary(
         args.summary_file,
         ["### Provider acquisition", ""] + ["%s: `%s`" % (key, value) for key, value in summary.items()],

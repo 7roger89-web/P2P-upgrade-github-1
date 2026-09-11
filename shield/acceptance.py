@@ -128,7 +128,9 @@ CASES = (
         STATUS_BLOCKED,
         executable_key="absent",
     ),
-    # Fail-closed proof: a provider error must never be read as a clean result.
+    # Fail-closed proof for a target the control does not cover. The pinned
+    # provider exits clean with no findings on a non-repository target, so
+    # without the contract check this would be recorded as PASS.
     Case("blocked_target_not_a_repository", "git_history_scan", "plain_directory", STATUS_BLOCKED),
 )
 
@@ -241,6 +243,7 @@ def run_cases(
             "findings_count": evidence.get("findings_count"),
             "reason": evidence.get("reason"),
             "provider": evidence.get("provider"),
+            "target_ref": evidence.get("target_ref"),
             "provider_version": evidence.get("provider_version"),
             "evidence_file": str(evidence_path),
         }
@@ -347,6 +350,28 @@ def _annotate(reason: str) -> None:
     print("::error::SHIELD_ACCEPTANCE_FAILED %s" % reason.replace("%", "%25")[:500])
 
 
+def _note(record: dict[str, Any]) -> None:
+    """Publish a compact evidence digest as a notice annotation.
+
+    Job logs are not reachable from every review environment, so each record is
+    also stated in a channel the review surface can read.
+    """
+    print(
+        "::notice::SHIELD_EVIDENCE %s scope=%s status=%s findings=%s provider=%s@%s "
+        "target_ref=%s contract_problems=%s"
+        % (
+            record["case"],
+            record["scan_mode"],
+            record["observed_status"],
+            record["findings_count"],
+            record["provider"],
+            record["provider_version"],
+            str(record.get("target_ref", ""))[:12],
+            len(record["contract_problems"]),
+        )
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     started = time.monotonic()
@@ -398,6 +423,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         for record in records:
             print("CASE " + json.dumps(record, sort_keys=True))
+            _note(record)
         summary_lines.extend(render_summary(records, problems))
         for record in records:
             try:

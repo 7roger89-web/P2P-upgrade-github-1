@@ -50,6 +50,7 @@
     ]
   },
   "known_exclusions": [
+    "On a target that is not a Git repository this provider does not fail: history mode scans no commits and exits clean, so Shield rejects the target instead of recording that empty result as PASS.",
     "Provider default configuration allowlists (for example binary and lockfile paths) apply unchanged.",
     "Provider rule coverage only; no custom rule set is supplied in this slice."
   ],
