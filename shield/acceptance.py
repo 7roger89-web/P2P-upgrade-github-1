@@ -136,13 +136,23 @@ CONTRACT_EVIDENCE_FIELDS = ("scope", "status", "coverage", "reason")
 
 
 def _run_git(repo: Path, *args: str) -> None:
+    """Run git with no ambient configuration so fixtures are identical anywhere.
+
+    Host-level settings (signing, hooks, templates, includeIf rules) must not be
+    able to change or break the throwaway acceptance repositories.
+    """
     subprocess.run(
-        ["git", *args],
+        ["git", "-c", "commit.gpgsign=false", *args],
         cwd=str(repo),
         check=True,
         capture_output=True,
         text=True,
-        env={**os.environ, **GIT_IDENTITY},
+        env={
+            **os.environ,
+            **GIT_IDENTITY,
+            "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_CONFIG_SYSTEM": os.devnull,
+        },
     )
 
 
@@ -264,8 +274,6 @@ def _contains_secret_value(evidence: dict[str, Any]) -> bool:
 
 def render_summary(records: Sequence[dict[str, Any]], problems: Sequence[str]) -> list[str]:
     lines = [
-        "### SHIELD-SECRET-01 slice acceptance",
-        "",
         "| case | scope | expected | observed | findings | provider | reason |",
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
@@ -284,7 +292,7 @@ def render_summary(records: Sequence[dict[str, Any]], problems: Sequence[str]) -
             )
         )
     lines.append("")
-    lines.append("Evidence records: %d, printed in full in the job log." % len(records))
+    lines.append("Evidence records: %d; full records are embedded below." % len(records))
     lines.append("Acceptance problems: %s" % (len(problems) if problems else "none"))
     return lines
 
@@ -319,6 +327,26 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _write_summary(path: str | None, lines: Sequence[str]) -> None:
+    """Mirror the verdict into a readable channel.
+
+    Runner logs are not reachable from every review environment, so the case
+    table and any failure reason are also written to the step summary.
+    """
+    if not path:
+        return
+    summary_path = Path(path)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    with summary_path.open("a", encoding="utf-8") as handle:
+        for line in lines:
+            handle.write(line + "\n")
+
+
+def _annotate(reason: str) -> None:
+    """Surface a failure reason as an annotation, not only as log text."""
+    print("::error::SHIELD_ACCEPTANCE_FAILED %s" % reason.replace("%", "%25")[:500])
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     started = time.monotonic()
@@ -335,6 +363,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     print("P2P_SHIELD_SLICE=P2P_SHIELD_V0_1_SECRET_CONTROL_VERTICAL_SLICE")
     print(f"CONTROL={args.control} WORK_DIR={work_dir} EVIDENCE_DIR={evidence_dir}")
+    summary_lines: list[str] = ["### SHIELD-SECRET-01 slice acceptance", ""]
+    verdict_text = "SLICE_VERDICT=BLOCKED ACCEPTANCE_DID_NOT_COMPLETE"
     verdict_code = 2
     try:
         try:
@@ -350,22 +380,44 @@ def main(argv: Sequence[str] | None = None) -> int:
                 timeout=args.timeout_seconds,
             )
         except Blocked as exc:
-            print(f"ACCEPTANCE_HARNESS_BLOCKED:{exc.reason}")
-            print("SLICE_VERDICT=BLOCKED")
+            reason = f"ACCEPTANCE_HARNESS_BLOCKED:{exc.reason}"
+            print(reason)
+            _annotate(reason)
+            summary_lines.append("```\n%s\n```" % reason)
             return 2
-        except subprocess.CalledProcessError as exc:
-            detail = (exc.stderr or exc.stdout or "").strip().splitlines()
-            print(f"ACCEPTANCE_FIXTURE_BUILD_FAILED:{exc.cmd[0]}:{detail[-1] if detail else exc}")
-            print("SLICE_VERDICT=BLOCKED")
+        except (subprocess.CalledProcessError, OSError) as exc:
+            detail = (getattr(exc, "stderr", None) or getattr(exc, "stdout", None) or str(exc))
+            last = str(detail).strip().splitlines()
+            reason = "ACCEPTANCE_FIXTURE_BUILD_FAILED:%s:%s" % (
+                type(exc).__name__,
+                last[-1] if last else "NO_DETAIL",
+            )
+            print(reason)
+            _annotate(reason)
+            summary_lines.append("```\n%s\n```" % reason)
             return 2
         for record in records:
             print("CASE " + json.dumps(record, sort_keys=True))
-        if args.summary_file:
-            summary_path = Path(args.summary_file)
-            summary_path.parent.mkdir(parents=True, exist_ok=True)
-            with summary_path.open("a", encoding="utf-8") as handle:
-                for line in render_summary(records, problems):
-                    handle.write(line + "\n")
+        summary_lines.extend(render_summary(records, problems))
+        for record in records:
+            try:
+                text = Path(record["evidence_file"]).read_text(encoding="utf-8")
+            except OSError as exc:
+                problems.append(f"EVIDENCE_FILE_UNREADABLE:{record['case']}:{exc}")
+                continue
+            summary_lines.extend(
+                [
+                    "",
+                    "<details><summary>evidence record: %s (%s)</summary>"
+                    % (record["case"], record["scan_mode"]),
+                    "",
+                    "```json",
+                    text.rstrip(),
+                    "```",
+                    "",
+                    "</details>",
+                ]
+            )
         print(f"ACCEPTANCE_CASES={len(records)}")
         print(f"ACCEPTANCE_SECONDS={time.monotonic() - started:.1f}")
         if problems:
@@ -379,18 +431,25 @@ def main(argv: Sequence[str] | None = None) -> int:
             for problem in problems:
                 print(f"  - {problem}")
             if provider_never_completed:
-                print("SLICE_VERDICT=BLOCKED PROVIDER_NEVER_COMPLETED=YES")
+                verdict_text = "SLICE_VERDICT=BLOCKED PROVIDER_NEVER_COMPLETED=YES"
                 verdict_code = 2
             else:
-                print("SLICE_VERDICT=FAIL")
+                verdict_text = "SLICE_VERDICT=FAIL"
                 verdict_code = 1
+            _annotate("; ".join(problems)[:480])
         else:
-            print(
+            verdict_text = (
                 "SLICE_VERDICT=PASS EVIDENCE_CONTRACT_PROVEN=YES "
                 "PASS_CASE_PROVEN=YES FAIL_CASE_PROVEN=YES BLOCKED_CASE_PROVEN=YES"
             )
             verdict_code = 0
+        for problem in problems:
+            summary_lines.append("- %s" % problem)
+        summary_lines.append("")
+        summary_lines.append(verdict_text)
+        print(verdict_text)
     finally:
+        _write_summary(args.summary_file, summary_lines)
         if args.cleanup and created_base:
             shutil.rmtree(base_dir, ignore_errors=True)
     return verdict_code

@@ -240,11 +240,26 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Provider version this slice is allowed to use; a different mapping is refused",
     )
     parser.add_argument(
+        "--summary-file",
+        default=None,
+        help="Append the acquisition result to this file (for example GITHUB_STEP_SUMMARY)",
+    )
+    parser.add_argument(
         "--offline",
         action="store_true",
         help="Validate the mapping policy only; do not download or run anything",
     )
     return parser.parse_args(argv)
+
+
+def _write_summary(path: str | None, lines: Sequence[str]) -> None:
+    if not path:
+        return
+    summary_path = Path(path)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    with summary_path.open("a", encoding="utf-8") as handle:
+        for line in lines:
+            handle.write(line + "\n")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -257,12 +272,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             offline=args.offline,
         )
     except ProviderAcquisitionBlocked as exc:
-        for line in exc.reason.split("; "):
+        lines = exc.reason.split("; ")
+        for line in lines:
             print(f"::error::{line}")
         print("PROVIDER_ACQUIRE=BLOCKED")
+        _write_summary(
+            args.summary_file,
+            ["### Provider acquisition", "", "PROVIDER_ACQUIRE=BLOCKED", ""]
+            + ["- %s" % line for line in lines],
+        )
         return EXIT_BLOCKED
     for key, value in summary.items():
         print(f"{key}={value}")
+    _write_summary(
+        args.summary_file,
+        ["### Provider acquisition", ""] + ["%s: `%s`" % (key, value) for key, value in summary.items()],
+    )
     return EXIT_READY
 
 
