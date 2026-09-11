@@ -133,10 +133,17 @@ Beginner-facing operational guidance must apply
   exact existing chat, never "the old chat".
 - `RULE 04 GITHUB_IS_DURABLE_CHECKPOINT` — work identity =
   `REPOSITORY + WORKSTREAM + PR_HEAD_SHA + PR_HEAD_TREE`; chat position or PR
-  number alone is not authority.
+  number alone is not authority. For long/material work, checkpoint meaningful
+  verified progress on the CURRENT approved branch when
+  `MATERIAL_RECOVERY_VALUE` is material, then verify remote HEAD == local
+  HEAD. Do not create another branch/PR merely to save progress; checkpoint is
+  not merge/promotion/release/deploy/production.
 - `RULE 05 SESSION_OR_QUOTA_RECOVERY` — after context loss/reset/quota/account
   change, do not blindly restart: return to Control Tower, inspect the durable
-  branch/PR/head, continue from the verified checkpoint.
+  branch/PR/head, continue from the verified checkpoint. Before a known
+  quota/session/account transition, preserve meaningful verified local progress
+  first when safe; if it was not pushed, report it as at-risk/unrecovered
+  instead of pretending GitHub contains it.
 - `RULE 06 NO_DUPLICATE_PR` — same goal + usable open PR => continue it; do
   not create a duplicate PR because the execution chat changed.
 - `RULE 07 WRITER_BOUNDARY` — one Writer unit = 1 bounded goal -> 1 branch ->

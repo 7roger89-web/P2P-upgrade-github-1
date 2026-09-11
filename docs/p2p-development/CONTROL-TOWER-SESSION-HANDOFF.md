@@ -196,6 +196,10 @@ The build_execution_prompt function emits a self-contained prompt with:
 - the current worktree/branch and canonical base references;
 - the bounded task and acceptance criteria;
 - the terminal state vocabulary;
+- the compact `DURABLE_CHECKPOINT` clause: for long / large-goal / multi-phase
+  work, preserve meaningful verified progress on the CURRENT approved branch
+  when `MATERIAL_RECOVERY_VALUE` is material, verify remote HEAD, avoid
+  duplicate branch/PR creation, and report any push blocker truthfully;
 - every CONTROL_TOWER_RETURN_PACKET field;
 - the `UPLOAD_REQUIRED` declaration and `CONTROL_TOWER_ATTACHMENT_MANIFEST` contract;
 - the exact no-upload instruction or the minimum one-to-three-file attachment fields;

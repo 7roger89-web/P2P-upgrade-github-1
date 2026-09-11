@@ -99,6 +99,31 @@ class P2POperationsNotebookTests(unittest.TestCase):
         for heading in RULE_HEADINGS:
             self.assertIn(heading, self.notebook_text, heading)
 
+    def test_durable_checkpoint_policy_is_recovery_value_driven(self) -> None:
+        for marker in (
+            "DURABLE_CHECKPOINT_POLICY",
+            "MATERIAL_RECOVERY_VALUE",
+            "verify remote HEAD == local HEAD",
+            "CHECKPOINT != CANDIDATE_PROMOTION",
+            "LOCAL_HEAD=",
+            "REMOTE_HEAD=",
+            "UNPUSHED_COMMITS=",
+            "UNPUSHED_FILES=",
+            "PUSH_BLOCKER=",
+        ):
+            self.assertIn(marker, self.notebook_text, marker)
+        self.assertIn("Do not commit/push every tiny edit", self.notebook_text)
+        self.assertIn("Same goal + same usable workstream continues the existing branch / existing PR",
+                      self.notebook_text)
+        self.assertIn("routine checkpointing of the already\napproved working branch", self.notebook_text)
+        self.assertIn("Before known quota exhaustion", self.notebook_text)
+        self.assertIn("Arena/Codex/Manus/another executor", self.notebook_text)
+        self.assertIn("MATERIAL_RECOVERY_VALUE", self.agents_text)
+        self.assertIn("CURRENT approved branch", self.agents_text)
+        self.assertIn("MATERIAL_RECOVERY_VALUE", self.arena_text)
+        self.assertIn("CURRENT working branch", self.arena_text)
+        self.assertIn("DURABLE_CHECKPOINT", self.ct_text)
+
     def test_rule_assimilation_gate_v1_present_with_status_vocabulary(self) -> None:
         self.assertIn("## 4. RULE_ASSIMILATION_GATE_V1", self.notebook_text)
         self.assertIn("RULE_ASSIMILATION_STATUS=PENDING", self.notebook_text)

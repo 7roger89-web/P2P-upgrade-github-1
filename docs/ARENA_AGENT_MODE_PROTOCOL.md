@@ -115,6 +115,16 @@ Do not rotate because a guessed prompt allowance was reached. The session
 state decision is based on goal, PR, context health, and product-reported
 limits.
 
+Arena-specific application of notebook RULE 04
+(`GITHUB_IS_DURABLE_CHECKPOINT`): before a known quota/session/account
+transition, planned handoff, shutdown, long pause, or major phase transition,
+preserve meaningful verified local progress on the CURRENT working branch when
+`MATERIAL_RECOVERY_VALUE` is material, then verify remote HEAD equals local
+HEAD. Do not create a new branch/PR merely to checkpoint; do not merge,
+promote, deploy, or push secrets/disposable sandbox artifacts. If the push
+cannot be completed, report the local/remote divergence instead of claiming
+the work is durably preserved.
+
 ## 5. Agent Mode model identity
 
 The standard representation is:

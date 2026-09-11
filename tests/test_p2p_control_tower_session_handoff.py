@@ -265,6 +265,12 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
         self.assertIn("Do not claim that a repository file was read unless it actually was.", prompt)
         self.assertIn("PACKET_IS_CANONICAL_TRUTH: NO", prompt)
         self.assertIn(USER_ACTION_BLOCK, prompt)
+        self.assertIn("DURABLE_CHECKPOINT:", prompt)
+        self.assertIn("MATERIAL_RECOVERY_VALUE", prompt)
+        self.assertIn("CURRENT approved working branch", prompt)
+        self.assertIn("verify remote HEAD equals local HEAD", prompt)
+        self.assertIn("Do not create another branch or PR merely for checkpointing", prompt)
+        self.assertIn("LOCAL_HEAD, REMOTE_HEAD, UNPUSHED_COMMITS, UNPUSHED_FILES, and PUSH_BLOCKER", prompt)
         self.assertNotIn("previous session transcript", prompt.lower())
 
     def test_h_authoritative_host_wins_and_only_its_lane_changes(self):
