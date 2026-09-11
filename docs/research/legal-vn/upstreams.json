@@ -30,8 +30,8 @@
       "role": "VBPL document ingestion and document-level legal relationship corpus",
       "priority": 2,
       "clone_enabled": false,
-      "license_signal": "VERIFY_BEFORE_REUSE",
-      "reuse_policy": "RESEARCH_ONLY_UNTIL_TERMS_VERIFIED",
+      "license_signal": "CC-BY-4.0",
+      "reuse_policy": "RESEARCH_AND_LICENSED_DATA_USE_WITH_ATTRIBUTION",
       "provisional_decision": "RESEARCH_FIRST"
     },
     {
