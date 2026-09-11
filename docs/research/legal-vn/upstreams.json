@@ -1,0 +1,90 @@
+{
+  "schema_version": "p2p-legal-vn/upstreams/1",
+  "reviewed_at": "2026-09-11",
+  "policy": {
+    "default_decision": "RESEARCH_FIRST",
+    "no_clear_license": "RESEARCH_ONLY",
+    "vendor_upstream_code": false,
+    "large_datasets_in_git": false
+  },
+  "sources": [
+    {
+      "id": "luatdo",
+      "kind": "git_repository",
+      "url": "https://github.com/tamnd/luatdo.git",
+      "web": "https://github.com/tamnd/luatdo",
+      "local_dir": "luatdo",
+      "role": "legal structure, amendment events, point-in-time text/version modeling",
+      "priority": 1,
+      "clone_enabled": true,
+      "license_signal": "MIT",
+      "reuse_policy": "RESEARCH_AND_LICENSED_ADAPTATION",
+      "provisional_decision": "RESEARCH_FIRST"
+    },
+    {
+      "id": "vietnamese-legal-documents",
+      "kind": "dataset",
+      "url": "https://huggingface.co/datasets/th1nhng0/vietnamese-legal-documents",
+      "web": "https://huggingface.co/datasets/th1nhng0/vietnamese-legal-documents",
+      "local_dir": "vietnamese-legal-documents",
+      "role": "VBPL document ingestion and document-level legal relationship corpus",
+      "priority": 2,
+      "clone_enabled": false,
+      "license_signal": "VERIFY_BEFORE_REUSE",
+      "reuse_policy": "RESEARCH_ONLY_UNTIL_TERMS_VERIFIED",
+      "provisional_decision": "RESEARCH_FIRST"
+    },
+    {
+      "id": "vietnamese-legal-document-retrieval",
+      "kind": "git_repository",
+      "url": "https://github.com/chisngooo/Vietnamese-Legal-Document-Retrieval.git",
+      "web": "https://github.com/chisngooo/Vietnamese-Legal-Document-Retrieval",
+      "local_dir": "Vietnamese-Legal-Document-Retrieval",
+      "role": "Vietnamese legal retrieval/reranking benchmark reference",
+      "priority": 3,
+      "clone_enabled": true,
+      "license_signal": "NOASSERTION",
+      "reuse_policy": "RESEARCH_ONLY_UNTIL_LICENSE_VERIFIED",
+      "provisional_decision": "RESEARCH_FIRST"
+    },
+    {
+      "id": "vnlegaltext",
+      "kind": "git_repository",
+      "url": "https://github.com/mlalab/VNLegalText.git",
+      "web": "https://github.com/mlalab/VNLegalText",
+      "local_dir": "VNLegalText",
+      "role": "legal document relation-extraction dataset and evaluation reference",
+      "priority": 4,
+      "clone_enabled": true,
+      "license_signal": "NONE_DETECTED_BY_GITHUB",
+      "reuse_policy": "RESEARCH_ONLY_UNTIL_LICENSE_VERIFIED",
+      "provisional_decision": "RESEARCH_FIRST"
+    },
+    {
+      "id": "phapdien-semantic-search",
+      "kind": "git_repository",
+      "url": "https://github.com/saladnga/ISODS-PhapDien-Crawler-Semantic-Search.git",
+      "web": "https://github.com/saladnga/ISODS-PhapDien-Crawler-Semantic-Search",
+      "local_dir": "ISODS-PhapDien-Crawler-Semantic-Search",
+      "role": "Phap Dien crawling and semantic-search reference",
+      "priority": 5,
+      "clone_enabled": true,
+      "license_signal": "NONE_DETECTED_BY_GITHUB",
+      "reuse_policy": "RESEARCH_ONLY_UNTIL_LICENSE_VERIFIED",
+      "provisional_decision": "RESEARCH_FIRST"
+    },
+    {
+      "id": "traffic-law-assistant",
+      "kind": "git_repository",
+      "url": "https://github.com/tangbamiinh/traffic-law-assistant.git",
+      "web": "https://github.com/tangbamiinh/traffic-law-assistant",
+      "local_dir": "traffic-law-assistant",
+      "role": "full-stack Vietnamese legal assistant wiring reference",
+      "priority": 6,
+      "clone_enabled": true,
+      "license_signal": "VERIFY_BEFORE_REUSE",
+      "reuse_policy": "RESEARCH_ONLY_UNTIL_LICENSE_VERIFIED",
+      "provisional_decision": "REFERENCE_CANDIDATE"
+    }
+  ]
+}
