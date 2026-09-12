@@ -149,12 +149,17 @@ Beginner-facing operational guidance must apply
 - `RULE 10 SUCCESS_SIGNAL_AND_RETURN` — every instruction states what success
   looks like and the exact ReturnPacket to paste back to Control Tower.
 - `RULE 11 OWNER_GATE_ONLY_WHEN_REAL` — Owner Gate only for canonical
-  merge/promotion, production deployment, destructive deletion,
+  promotion/release, production deployment, destructive deletion,
   secrets/credentials, major paid spending, hard rollback, or equivalent
-  high-risk authority changes. OWNER_MICRO_LOOP_SUPPRESSION: a bounded
-  finding plus its directly induced fixture/test/evidence-count/remote-sync
-  repairs stays in the SAME Writer repair loop — real Owner Gates are
-  unchanged.
+  high-risk authority changes. A fully validated PR merge covered by the
+  standing `VALIDATED_PR_AUTO_MERGE_AUTHORITY` is not itself a per-PR Owner
+  Gate (exact HEAD fresh-checked, sufficient validation evidence, required
+  checks passed or baseline failures proven unrelated, no unresolved blocker,
+  mergeable, scope unchanged, no separately gated side effect); promotion,
+  release, and deployment stay Owner Gates. OWNER_MICRO_LOOP_SUPPRESSION: a
+  bounded finding plus its directly induced fixture/test/evidence-count/
+  remote-sync repairs stays in the SAME Writer repair loop — real Owner Gates
+  are unchanged.
 - `RULE 12 MINIMUM_SUFFICIENT_WORK` — see "Prompt and effort efficiency"
   above (`MINIMUM_RELEVANT_CONTEXT`, `MINIMUM_SUFFICIENT_WORK`,
   `RISK_PROPORTIONAL_VERIFICATION`, `PROGRESS_REPORTING=EXCEPTIONS_ONLY`,

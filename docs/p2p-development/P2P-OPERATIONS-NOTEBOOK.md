@@ -157,7 +157,11 @@ sufficient.
    details inside approved scope. Ask the Owner only for genuine outcome,
    authority, material cost, security/privacy/business-impact, production,
    destructive, infrastructure-commitment, or hard-to-reverse decisions. Never
-   lower acceptance or widen authority to manufacture success.
+   lower acceptance or widen authority to manufacture success. A fully
+   validated PR merge covered by the standing
+   `VALIDATED_PR_AUTO_MERGE_AUTHORITY` (RULE 11) is a routine integration step
+   inside approved scope, not an authority decision to re-ask; promotion,
+   release, and deployment remain Owner decisions.
 2. **SIMPLEST_USEFUL_PATH_TO_COMPLETION** — Choose the next action with the best
    practical contribution to completion at reasonable complexity, cost, and
    risk. A useful action directly advances the outcome, changes a meaningful
@@ -518,13 +522,50 @@ The return contract fields are canonical in
 Do not ask the Owner for routine technical decisions. Owner Gate is reserved
 for meaningful authority boundaries such as:
 
-- canonical merge/promotion
+- canonical promotion/release
 - production deployment
 - destructive deletion
 - secrets/credentials
 - major paid infrastructure/spending
 - hard rollback
 - equivalent high-risk authority changes
+
+**VALIDATED_PR_AUTO_MERGE_AUTHORITY (standing Owner authorization).** A merge
+is not inherently a per-PR Owner Gate: integrating a reviewed, validated PR
+into canonical main is a routine, evidence-backed step inside approved scope,
+while promotion/release/deployment are not. Control Tower may merge without
+another Owner confirmation only when ALL conditions are true:
+
+```text
+VALIDATED_PR_AUTO_MERGE_AUTHORITY=YES
+AUTO_MERGE=YES only when ALL are true:
+1. the exact current PR HEAD was fresh-checked immediately before the merge
+2. required task validation has PASS / sufficient evidence
+3. required checks for the bounded risk passed, or known baseline failures
+   are explicitly proven unrelated
+4. no unresolved technical/security/data/rollback blocker exists
+5. the PR is mergeable against the current target
+6. scope has not materially changed since validation
+7. the merge itself performs no separately gated action (production
+   deployment/release, secret mutation, destructive action, material paid
+   spend, infrastructure commitment, hard rollback)
+ANY condition false or uncertain => AUTO_MERGE=NO
+=> diagnose / repair / escalate as appropriate
+MERGE != PROMOTION != RELEASE != DEPLOYMENT
+```
+
+This authorization applies to the merge step only. It does not authorize
+promotion, release, or deployment, and it explicitly preserves Owner Gates
+for: production deployment/release; destructive or hard-to-reverse mutation;
+secrets/credentials; material paid spending; infrastructure commitment; hard
+rollback; genuine scope/outcome/authority change; and any PR whose
+validation, HEAD, mergeability, or blocker state is uncertain. If repository
+semantics make a merge itself equivalent to production release or irreversible
+live promotion, that merge fails closed to the Owner Gate unless the
+higher-risk action already holds standing or explicit Owner authorization.
+The Writer of a PR never merges its own PR before independent validation.
+Machine-readable classification: `orchestration_policy.py`
+(`classify_owner_escalation`, action `VALIDATED_PR_MERGE`).
 
 `OWNER_MICRO_LOOP_SUPPRESSION` (assimilated from Issue #42,
 CONTEXT_HYGIENE_01): a bounded finding and the repairs it directly induces —
@@ -862,8 +903,10 @@ Execution order:
    setup. A probe must be large enough to answer the capability question but no
    larger.
 3. **Respect Owner Gates.** Secrets, paid/GPU spend, production mutation,
-   deployment, merge/promotion, destructive actions, and infrastructure
-   commitments still require the existing Owner Gate.
+   deployment, canonical promotion/release, destructive actions, and
+   infrastructure commitments still require the existing Owner Gate. A fully
+   validated PR merge covered by RULE 11
+   `VALIDATED_PR_AUTO_MERGE_AUTHORITY` is not itself an Owner Gate.
 4. **Fail closed on contradictions.** If logs, hashes, runtime output, visual
    evidence, reports, or ReturnPackets disagree on a material fact, Control
    Tower must not select the convenient source and declare PASS. Suspend the
