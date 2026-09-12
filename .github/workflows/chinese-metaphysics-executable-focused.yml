@@ -17,6 +17,7 @@ on:
       - control-tower/ziwei-profile-to-multilane-01
       - control-tower/meihua-private-surface-guard-01
       - control-tower/ziwei-time-basis-01
+      - control-tower/metaphysics-live-road-smoke-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
