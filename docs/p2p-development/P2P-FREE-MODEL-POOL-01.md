@@ -24,23 +24,35 @@ Owner-account live evidence from the v0 probe:
 
 - authentication + `/models` discovery: PASS (`47` models returned);
 - `glm-5.3-flash` via Chat Completions: FAIL on insufficient balance;
-- `mimo-v2.5` via Chat Completions: `CHAT_PASS` equivalent (`P2P_PROBE_OK`);
-- `hy3` via Chat Completions: `CHAT_PASS` equivalent (`P2P_PROBE_OK`).
+- `mimo-v2.5` via Chat Completions: PASS (`P2P_PROBE_OK`);
+- `hy3` via Chat Completions: PASS (`P2P_PROBE_OK`);
+- focused probe tests after Responses support was added: 8/8 PASS;
+- `mimo-v2.5` via `/responses`: FAIL, provider says model is not supported on `/v1/responses` and instructs use of `/v1/chat/completions`;
+- `hy3` via `/responses`: same terminal endpoint incompatibility;
+- `qwen3.8-flash` via `/responses`: same terminal endpoint incompatibility.
 
-The probe allowlist was updated after this evidence and current provider documentation: `glm-5.3-flash` is no longer treated as a free candidate; `mimo-v2.5`, `hy3`, and `qwen3.8-flash` are the current free/promotional candidates for this experiment.
+Terminal direct-free verdict:
+
+```text
+BAI_FREE_CHAT = PASS
+BAI_FREE_RESPONSES = FAIL
+BAI_FREE_CODEX_DIRECT = NOT_SUPPORTED
+```
+
+This is a valid terminal result for the direct B.AI free path. Do not continue trying more B.AI free models merely to manufacture a PASS.
 
 ## Protocol distinction
 
 A successful `/chat/completions` call does **not** prove Codex compatibility.
 
-The probe now separates:
+The probe separates:
 
 ```text
 CHAT_PASS       = provider/model works through /chat/completions
 RESPONSES_PASS  = provider/model works through /responses
 ```
 
-B.AI publishes `/responses` for Codex/agent use, but currently documents that endpoint for supported GPT and DeepSeek model families. The currently free B.AI candidates above are MiMo, Hy3, and Qwen, so direct free Codex compatibility is an open question that must be tested rather than assumed.
+B.AI publishes `/responses` for Codex/agent use, but the free B.AI candidates tested here are explicitly rejected by that endpoint. Therefore direct Codex use is not the path for the proven-free B.AI models.
 
 ## Credential setup on Windows PowerShell
 
@@ -60,21 +72,7 @@ $env:BAI_MODEL="mimo-v2.5"
 $env:RADEON_MODEL="DeepSeek-V4-Flash"
 ```
 
-## Readiness probe
-
-Chat readiness:
-
-```powershell
-python scripts/free_model_probe.py --providers bai --protocol chat --require 1
-```
-
-Responses readiness checks auth/model discovery only. It does not prove endpoint compatibility until `--live` is used:
-
-```powershell
-python scripts/free_model_probe.py --providers bai --protocol responses --require 1
-```
-
-## Tiny live probes
+## Probe commands
 
 Chat Completions:
 
@@ -92,33 +90,19 @@ The live result is explicit: `CHAT_PASS`, `RESPONSES_PASS`, `CHAT_CALL_FAIL`, or
 
 If no explicit `BAI_MODEL` override is set, HTTP 400 model-specific failures can fall through to the next allowlisted free candidate. Auth and network failures are not blindly retried. If `BAI_MODEL` is set, only that model is tested.
 
-## Direct Codex gate
+## Next executor gate: bridge only because evidence requires it
 
-Only a `RESPONSES_PASS` on a free candidate justifies the next direct path:
+Because B.AI free Chat Completions is proven live while free Responses is proven unsupported, a protocol bridge is now justified.
+
+Smallest next path:
 
 ```text
-Codex -> B.AI Responses API -> one tiny disposable repo task
+Codex -> EchoBird local Responses-to-Chat bridge -> B.AI /chat/completions -> MiMo-V2.5
 ```
 
-Provider configuration shape:
+`hy3` remains a backup free B.AI model. New API is still not required.
 
-```toml
-model = "<RESPONSES_PASS model>"
-model_provider = "bai"
-
-[model_providers.bai]
-name = "B.AI"
-base_url = "https://api.b.ai/v1"
-env_key = "BAI_API_KEY"
-wire_api = "responses"
-requires_openai_auth = false
-```
-
-If all free B.AI candidates return `RESPONSES_CALL_FAIL` because the endpoint rejects those model families, that is a valid terminal result for the direct-B.AI-free path. Do not buy credits merely to manufacture a PASS. Move to another free provider and use a protocol bridge only when a live-proven provider actually requires one.
-
-## Real executor acceptance
-
-The eventual executor task must exercise a complete tool loop:
+The bridge is not accepted merely because text generation works. The executor acceptance task must exercise a complete tool loop:
 
 1. receive prompt;
 2. read a file;
@@ -127,14 +111,16 @@ The eventual executor task must exercise a complete tool loop:
 5. consume the tool result;
 6. finish successfully.
 
-Only after that succeeds should P2P consider New API for automatic failover/quota routing.
+If EchoBird cannot preserve this tool loop with the chosen B.AI free model, record that incompatibility and change route rather than building more infrastructure around it.
+
+Only after one real executor tool loop succeeds should P2P consider New API for automatic failover/quota routing.
 
 ## Acceptance for FREE MODEL POOL 01
 
 - At least 2/3 providers Chat-live-probe successfully at test time.
-- No API key is committed to Git.
-- At least one live-proven provider later completes a full executor tool-loop task.
-- Direct Responses is preferred when a free model actually supports it; otherwise a bridge is introduced only for a provider already proven useful.
+- At least one live-proven provider completes a full executor tool-loop task.
+- Direct Responses is preferred when a free model actually supports it; B.AI free does not, based on live evidence.
+- A bridge is introduced only for a provider already proven useful; B.AI now satisfies that trigger.
 - Provider switching requires no P2P project-code change.
 - Any claim of "free" is tied to provider/account state observed at test time.
 
@@ -142,10 +128,10 @@ Only after that succeeds should P2P consider New API for automatic failover/quot
 
 **Không bị over engineering chứ?**
 
-1. Simpler path: yes — protocol probe before installing any bridge/gateway.
-2. Material progress: yes — distinguishes cheap chat inference from actual Codex transport compatibility.
-3. Necessity: without a live Responses test, direct Codex compatibility is an unsupported assumption.
-4. Core before support: yes — test the executor transport before adding routing infrastructure.
-5. Smaller verifiable slice: one B.AI `/responses` request is smaller than installing EchoBird or New API.
+1. Simpler path: direct Responses was tested first and failed terminally; a bridge is now the simplest remaining Codex path for proven-free B.AI.
+2. Material progress: yes — the bridge test will determine whether free B.AI can perform real Codex tool work, not just chat.
+3. Necessity: Codex speaks Responses while the proven-free B.AI models accept Chat Completions only.
+4. Core before support: yes — one local compatibility bridge, no gateway/router stack.
+5. Smaller verifiable slice: one model, one bridge, one disposable tool-loop task.
 
-Verdict: `DO_IT` for the Responses probe; `DEFER_UNTIL_NEEDED` for EchoBird/New API/router/dashboard infrastructure.
+Verdict: `DO_IT` for one EchoBird + B.AI + Codex tool-loop test; `DEFER_UNTIL_NEEDED` for New API/router/dashboard infrastructure.
