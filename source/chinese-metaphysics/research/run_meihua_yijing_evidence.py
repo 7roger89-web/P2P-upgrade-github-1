@@ -18,6 +18,29 @@ TRIGRAM_NORMALIZATION = {
     "兌": "兑",
 }
 
+TI_YONG_SIGNAL_PREFIXES = (
+    ("用生體", "SUPPORT_TO_BODY"),
+    ("用生体", "SUPPORT_TO_BODY"),
+    ("體克用", "BODY_CONTROLS_USE"),
+    ("体克用", "BODY_CONTROLS_USE"),
+    ("比和", "SAME_ELEMENT_BALANCE"),
+    ("用克體", "PRESSURE_ON_BODY"),
+    ("用克体", "PRESSURE_ON_BODY"),
+    ("體生用", "BODY_EXPENDS_TO_USE"),
+    ("体生用", "BODY_EXPENDS_TO_USE"),
+)
+
+TI_YONG_CLASSICAL_SOURCES = [
+    {
+        "work": "梅花易数·卷二·体用总诀",
+        "url": "https://zh.wikisource.org/zh-hant/梅花易數/卷二",
+    },
+    {
+        "work": "梅花易数·卷三·体用生克之诀",
+        "url": "https://zh.wikisource.org/zh-hant/梅花易數/卷三",
+    },
+]
+
 
 def fail(message, code=1):
     print(message, file=sys.stderr)
@@ -41,6 +64,14 @@ def canonical_trigram(name):
     # traditional/simplified normalization needed for 離/兌.
     token = str(name or "").strip().split()[0] if str(name or "").strip() else ""
     return TRIGRAM_NORMALIZATION.get(token, token)
+
+
+def classify_ti_yong_relation(relation):
+    text = str(relation or "").strip()
+    for prefix, signal in TI_YONG_SIGNAL_PREFIXES:
+        if text.startswith(prefix):
+            return signal
+    return "UNCLASSIFIED"
 
 
 def build_meihua_command(args):
@@ -139,6 +170,14 @@ def main():
     if not selected[0].get("text") or not selected[0].get("xiaoxiang"):
         fail("Yi Jing selected line is missing Yao or Xiaoxiang evidence")
 
+    ti_yong_relation = meihua.get("TI_YONG_RELATION")
+    structural_signal = classify_ti_yong_relation(ti_yong_relation)
+    structural_status = (
+        "SOURCE_GROUNDED_STRUCTURAL_READING"
+        if structural_signal != "UNCLASSIFIED"
+        else "UNCLASSIFIED_NO_INFERENCE"
+    )
+
     packet = {
         "DOMAIN": "MEIHUA_YIJING_EVIDENCE",
         "CAPABILITY": "MEIHUA_CAST_TO_SOURCE_GROUNDED_YIJING_EVIDENCE",
@@ -156,6 +195,14 @@ def main():
             "YIJING_CHANGED_HEXAGRAM_STRUCTURAL": yijing.get("CHANGED_HEXAGRAM"),
             "NAME_BRIDGE_POLICY": "TRIGRAM_STRUCTURE_NOT_FULL_TRADITIONAL_SIMPLIFIED_TEXT_CONVERSION",
         },
+        "STRUCTURAL_READING": {
+            "METHOD_SCOPE": "MEIHUA_TI_YONG_WUXING_RELATION_ONLY",
+            "TI_YONG_RELATION_RAW": ti_yong_relation,
+            "INITIAL_SIGNAL": structural_signal,
+            "SOURCE_RULES": TI_YONG_CLASSICAL_SOURCES,
+            "RULE_POLICY": "NORMALIZE_EXISTING_ENGINE_RELATION_WITHOUT_FREE_FORM_DIVINATION",
+            "STATUS": structural_status,
+        },
         "MEIHUA_PACKET": meihua,
         "YIJING_EVIDENCE": yijing,
         "BRIDGE_ASSERTIONS": {
@@ -165,11 +212,16 @@ def main():
             "SELECTED_XIAOXIANG_PRESENT": "PASS",
         },
         "PROVENANCE_POLICY": "MECHANICAL_CROSS_LANE_BRIDGE_KEEP_SOURCE_PACKETS_INDEPENDENT",
-        "INTERPRETATION_STATUS": "NOT_PERFORMED",
-        "PREDICTIVE_STATUS": "NOT_ESTABLISHED",
+        "INTERPRETATION_STATUS": (
+            "BOUNDED_STRUCTURAL_METHOD_ONLY"
+            if structural_signal != "UNCLASSIFIED"
+            else "NOT_PERFORMED_UNCLASSIFIED_RELATION"
+        ),
+        "PREDICTIVE_STATUS": "NOT_ESTABLISHED_NEGATIVE_EVIDENCE_PRESERVED",
         "NONCLAIMS": [
             "NO_CROSS_REPO_DOCTRINE_MERGE",
-            "NO_DIVINATION_JUDGMENT",
+            "NO_PERSONAL_FUTURE_PREDICTION",
+            "NO_OUTCOME_PROBABILITY",
             "NO_CASTING_MODE_EQUIVALENCE_CLAIM",
             "NO_FULL_TRADITIONAL_SIMPLIFIED_NAME_EQUIVALENCE_CLAIM",
             "NO_PREDICTIVE_VALIDITY_CLAIM",
