@@ -14,7 +14,8 @@ def emit(label, record):
     text = label + '\n```json\n' + json.dumps(record, indent=2) + '\n```\n'
     print(text, flush=True)
     annotation = json.dumps(record, separators=(',', ':')).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-    print('::notice title=' + label + '::' + annotation, flush=True)
+    if 'git_history_scan' not in label and 'worktree_scan' not in label:
+        print('::notice title=' + label + '::' + annotation, flush=True)
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
             f.write(text)
@@ -32,7 +33,7 @@ def main():
         except Exception as exc:
             emit('OSV_ACQUISITION=BLOCKED', {'reason': type(exc).__name__})
             failures.append('OSV_ACQUISITION_BLOCKED')
-        for label, requirement, expected in [('pass', 'idna==3.10', 'PASS'),
+        for label, requirement, expected in [('pass', 'idna==3.15', 'PASS'),
                                                 ('fail', 'Django==1.11.29', 'FAIL')]:
             repo = root / label
             repo.mkdir()

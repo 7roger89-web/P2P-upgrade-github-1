@@ -89,7 +89,7 @@ def assess(target, executable, manifests, reference):
             raise ValueError('TARGET_CHANGED_DURING_SCAN')
         e.update(status='FAIL' if findings else 'PASS', findings=findings, findings_count=len(findings),
                  coverage=m['coverage'], reason='DECLARED_INVENTORY_ASSESSED')
-    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, subprocess.SubprocessError) as exc:
         e['reason'] = 'ASSESSMENT_BLOCKED:' + type(exc).__name__
         if isinstance(exc, ValueError) and str(exc).isupper():
             e['reason'] += ':' + str(exc)
