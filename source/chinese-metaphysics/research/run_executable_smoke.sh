@@ -34,7 +34,7 @@ echo 'LIUYAO_LIVE_INPUT_SMOKE=PASS'
 MEIHUA_OUT="$(python "$ROOT/source/chinese-metaphysics/research/meihua-yishu/run_meihua_capability.py" --numbers 7 4 11)"
 grep -Fq '"INPUT_MODE": "CUSTOM"' <<<"$MEIHUA_OUT"
 grep -Fq '"CASTING_MODE": "NUMBER_CASTING"' <<<"$MEIHUA_OUT"
-grep -Fq '"MAIN_HEXAGRAM": "山雷颐"' <<<"$MEIHUA_OUT"
+grep -Fq '"MAIN_HEXAGRAM": "山雷頤"' <<<"$MEIHUA_OUT"
 echo 'MEIHUA_LIVE_INPUT_SMOKE=PASS'
 
 CEGUI_OUT="$(node "$ROOT/source/chinese-metaphysics/research/plum-cg/run_cegui_capability.mjs" \
