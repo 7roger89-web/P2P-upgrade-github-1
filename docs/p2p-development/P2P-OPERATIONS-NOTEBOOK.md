@@ -150,6 +150,69 @@ file it could not access. The prompt writer must not copy the whole notebook
 into ordinary prompts when the generated projection or compact capsule is
 sufficient.
 
+### GitHub connector preflight and failure classification
+
+GitHub-dependent work must distinguish the Owner's ChatGPT GitHub connection
+from the capabilities of one executor, sandbox, chat, model, or product
+surface. A single failed tool call or an executor that lacks GitHub access is
+not evidence that the Owner's connector is disabled.
+
+```text
+EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS
+ONE_FAILED_CALL != GITHUB_CONNECTOR_DISABLED
+SESSION_TOOL_UNAVAILABLE != ACCOUNT_CONNECTION_BROKEN
+```
+
+Before a Control Tower concludes that GitHub access is unavailable for a
+P2P-managed task that materially depends on GitHub, use the smallest direct
+preflight available on the current authoritative ChatGPT/connector surface:
+
+1. confirm an authenticated GitHub identity/installation when that surface is
+   available;
+2. read the target repository or another known private repository covered by
+   the installation; and
+3. read one known branch/ref/file when the task depends on repository content.
+
+Classify the result instead of collapsing every failure into `disabled`:
+
+```text
+GITHUB_CONNECTOR_STATUS=WORKING
+GITHUB_CONNECTOR_STATUS=SESSION_SURFACE_UNAVAILABLE
+GITHUB_CONNECTOR_STATUS=REPO_SCOPE_BROKEN
+GITHUB_CONNECTOR_STATUS=AUTH_CONNECTION_BROKEN
+GITHUB_CONNECTOR_STATUS=PROVIDER_OUTAGE
+```
+
+Interpretation and recovery:
+
+- `WORKING` — direct authenticated repository access succeeds; continue.
+- `SESSION_SURFACE_UNAVAILABLE` — the current executor/chat/model/sandbox lacks
+  the tool or cannot use it, while the Owner connection is not proven broken.
+  Do not disconnect, reinstall, or rewrite credentials. Use another supported
+  surface/fresh session when needed, or continue from durable GitHub state by
+  another authorized route.
+- `REPO_SCOPE_BROKEN` — authentication works but the required repository is not
+  accessible. Check the GitHub App installation/repository selection before
+  changing unrelated network or project settings.
+- `AUTH_CONNECTION_BROKEN` — authenticated identity/installation cannot be
+  established on a supported direct connector surface. Only this class (or
+  equivalent direct evidence) justifies reconnecting/re-authorizing the Owner
+  connection.
+- `PROVIDER_OUTAGE` — fresh direct checks fail consistently and provider-status
+  evidence or equivalent cross-session evidence indicates a service incident.
+  Preserve credentials/configuration and avoid speculative reconnect loops.
+
+An executor may truthfully report
+`EXECUTOR_GITHUB_ACCESS=UNAVAILABLE_IN_THIS_SESSION`, but it must not promote
+that local observation to `OWNER_GITHUB_CONNECTOR=DISABLED` without the direct
+preflight above. Control Tower owns the cross-surface classification and must
+prefer fresh connector evidence over an executor's local capability claim.
+
+Do not create a connector-health daemon, polling service, registry, or
+monitoring framework for this rule. Run the preflight only when GitHub access
+is materially required or when a relevant failure is observed, then stop once
+the failure class is established.
+
 ### Supreme laws
 
 1. **OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS** — Understand the outcome and
