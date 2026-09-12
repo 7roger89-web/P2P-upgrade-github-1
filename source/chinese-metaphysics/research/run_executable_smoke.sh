@@ -70,6 +70,10 @@ echo 'YIJING_LIVE_INPUT_SMOKE=PASS'
 # source-grounded textual evidence. Doctrine and provenance remain separate.
 MEIHUA_YIJING_OUT="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_yijing_evidence.py" --numbers 7 4 11)"
 grep -Fq '"DOMAIN": "MEIHUA_YIJING_EVIDENCE"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"MEIHUA_UPPER_TRIGRAM_RAW": "艮 ☶"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"MEIHUA_LOWER_TRIGRAM_RAW": "震 ☳"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"CANONICAL_UPPER_TRIGRAM": "艮"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"CANONICAL_LOWER_TRIGRAM": "震"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"MEIHUA_MAIN_HEXAGRAM_REPORTED": "山雷頤"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"YIJING_MAIN_HEXAGRAM_CANONICAL": "山雷颐"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"MAIN_HEXAGRAM_MAPPED_FROM_TRIGRAM_STRUCTURE": "PASS"' <<<"$MEIHUA_YIJING_OUT"
