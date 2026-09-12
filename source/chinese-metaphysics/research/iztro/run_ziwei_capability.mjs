@@ -23,11 +23,13 @@ const builtEntry = path.join(upstream, 'lib', 'index.js');
 if (!fs.existsSync(builtEntry)) fail(`Pinned upstream build missing: ${builtEntry}`);
 const require = createRequire(import.meta.url);
 const { astro } = require(builtEntry);
-if (!astro?.bySolar) fail('Pinned iztro API missing: astro.bySolar');
+if (!astro?.withOptions) fail('Pinned iztro API missing: astro.withOptions');
 
 const fixture = arg('--fixture');
 const customRequested = has('--date') || has('--time-index') || has('--gender');
 if (fixture && customRequested) fail('Use either --fixture or custom --date/--time-index/--gender, not both');
+const algorithm = arg('--algorithm') ?? 'default';
+if (!['default', 'zhongzhou'].includes(algorithm)) fail(`Invalid --algorithm: ${algorithm}`);
 
 let input;
 let inputMode;
@@ -39,7 +41,7 @@ if (fixture) {
   const dateStr = arg('--date');
   const timeIndexRaw = arg('--time-index');
   const gender = arg('--gender');
-  if (!dateStr || timeIndexRaw === undefined || !gender) fail('Custom usage: --date YYYY-MM-DD --time-index 0..12 --gender male|female');
+  if (!dateStr || timeIndexRaw === undefined || !gender) fail('Custom usage: --date YYYY-MM-DD --time-index 0..12 --gender male|female [--algorithm default|zhongzhou]');
   if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateStr)) fail(`Invalid --date: ${dateStr}`);
   const timeIndex = Number(timeIndexRaw);
   if (!Number.isInteger(timeIndex) || timeIndex < 0 || timeIndex > 12) fail(`Invalid --time-index: ${timeIndexRaw}`);
@@ -48,9 +50,24 @@ if (fixture) {
   inputMode = 'CUSTOM';
 }
 
+const profileConfig = {
+  yearDivide: 'normal',
+  horoscopeDivide: 'normal',
+  ageDivide: 'normal',
+  dayDivide: 'forward',
+  algorithm,
+};
+
 let chart;
-try { chart = astro.bySolar(input.dateStr, input.timeIndex, input.gender); }
-catch (err) { fail(`iztro rejected input: ${err?.message ?? err}`, 1); }
+try {
+  chart = astro.withOptions({
+    type: 'solar',
+    dateStr: input.dateStr,
+    timeIndex: input.timeIndex,
+    gender: input.gender,
+    config: profileConfig,
+  });
+} catch (err) { fail(`iztro rejected input/profile: ${err?.message ?? err}`, 1); }
 
 const palaces = chart.palaces ?? [];
 const mutagen = {};
@@ -67,7 +84,7 @@ const sixOuter = new Set(['兄弟', '夫妻', '子女', '迁移', '仆役', '交
 const targetClass = jiPalace ? (sixOuter.has(jiPalace) ? 'SIX_OUTER' : 'NOT_SIX_OUTER') : 'NO_JI_TARGET';
 const structuralOutput = targetClass === 'SIX_OUTER' ? 'OUTER/LOSS_INDICATOR' : targetClass;
 
-if (inputMode === 'FIXTURE') {
+if (inputMode === 'FIXTURE' && algorithm === 'default') {
   const expected = { '禄': '太阳', '权': '武曲', '科': '太阴', '忌': '天同' };
   for (const [k, v] of Object.entries(expected)) if (mutagen[k] !== v) fail(`Unexpected Geng mutagen ${k}: expected ${v}, got ${mutagen[k]}`, 1);
   if (structuralOutput !== 'OUTER/LOSS_INDICATOR') fail(`XQR bounded lane fixture drift: ${jiStar} palace=${jiPalace}`, 1);
@@ -75,8 +92,17 @@ if (inputMode === 'FIXTURE') {
 
 console.log(JSON.stringify({
   DOMAIN: 'ZIWEI_DOUSHU', ENGINE_PIN: PIN, INPUT_MODE: inputMode, INPUT: input,
-  PROFILE_ID: 'IZTRO_DEFAULT_001',
-  CHART_FACTS: { five_elements_class: chart.fiveElementsClass, palace_count: palaces.length, palace_names: palaces.map((p) => p.name) },
+  PROFILE_ID: algorithm === 'zhongzhou' ? 'IZTRO_ZHONGZHOU_MECHANICAL_001' : 'IZTRO_DEFAULT_001',
+  PROFILE_CONFIG: profileConfig,
+  CHART_FACTS: {
+    five_elements_class: chart.fiveElementsClass,
+    palace_count: palaces.length,
+    palace_names: palaces.map((p) => p.name),
+    soul: chart.soul,
+    body: chart.body,
+    earthly_branch_of_soul_palace: chart.earthlyBranchOfSoulPalace,
+    earthly_branch_of_body_palace: chart.earthlyBranchOfBodyPalace,
+  },
   BIRTH_YEAR_MUTAGEN: mutagen,
   METHOD_LANE: 'XQR_REPO_DECLARED_6OUT_001',
   RULE_TRACE: ['XQR_R1_PALACE_BEFORE_STAR', 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER'],
