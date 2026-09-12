@@ -50,6 +50,8 @@ assert bridge['CAPABILITY'] == 'PINNED_NORMALIZED_CASE_TO_ANALYSIS_PACKET'
 assert bridge['NORMALIZED_INPUT']['upper_trigram'] == '兑'
 assert bridge['NORMALIZED_INPUT']['lower_trigram'] == '离'
 assert bridge['NORMALIZED_INPUT']['moving_lines'] == [1]
+assert bridge['ANALYZER_INPUT']['upper_trigram_number'] == 2
+assert bridge['ANALYZER_INPUT']['lower_trigram_number'] == 3
 assert bridge['MAIN_HEXAGRAM'] == baseline['MAIN_HEXAGRAM'] == '泽火革'
 assert bridge['CHANGED_HEXAGRAM'] == baseline['CHANGED_HEXAGRAM'] == '泽山咸'
 assert bridge['MOVING_LINE'] == baseline['MOVING_LINE'] == 1
