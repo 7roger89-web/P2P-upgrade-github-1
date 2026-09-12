@@ -24,7 +24,7 @@ class BaseSlice(unittest.TestCase):
         for field in ('control_id', 'control_version', 'objective', 'applies_to', 'required_scope', 'required_evidence', 'limitations'):
             self.assertTrue(c[field])
         self.assertEqual(set(c['status_semantics']), {'PASS','FAIL','BLOCKED'})
-        self.assertEqual(set(PROFILE['required_controls']), {'SHIELD-SECRET-01','SHIELD-DEPENDENCY-01'})
+        self.assertEqual(set(PROFILE['required_controls']), {'SHIELD-SECRET-01','SHIELD-DEPENDENCY-01','SHIELD-CI-01'})
 
     def test_source_and_version_pins(self):
         original = osv.mapping()

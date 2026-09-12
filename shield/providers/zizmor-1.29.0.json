@@ -1,0 +1,66 @@
+{
+  "schema": "p2p-shield-provider-mapping/1",
+  "control_id": "SHIELD-CI-01",
+  "provider_name": "Zizmor",
+  "provider_version": "1.29.0",
+  "source": {
+    "kind": "official_github_release",
+    "repository": "zizmorcore/zizmor",
+    "tag": "v1.29.0",
+    "asset": "zizmor-x86_64-unknown-linux-gnu.tar.gz",
+    "download_base": "https://github.com/zizmorcore/zizmor/releases/download/v1.29.0",
+    "extracted_binary": "zizmor",
+    "asset_digest": "sha256:dd96df044a6e8538d5f423790f453bdd03d49e5b2bcc38214acc41a2f1297839",
+    "asset_digest_value": "dd96df044a6e8538d5f423790f453bdd03d49e5b2bcc38214acc41a2f1297839",
+    "checksums_asset": null,
+    "integrity_rule": "sha256 of downloaded archive must match GitHub release asset digest sha256:dd96df044a6e8538d5f423790f453bdd03d49e5b2bcc38214acc41a2f1297839 before use; no separate checksum file is published for v1.29.0",
+    "version_policy": "PINNED_EXACT_NO_AUTO_UPGRADE_NO_MIRROR_FALLBACK"
+  },
+  "invocation": {
+    "version_argv": [
+      "{executable}",
+      "--version"
+    ],
+    "version_expected_exact": "1.29.0",
+    "detect_argv": [
+      "{executable}",
+      "{target}",
+      "--format=json",
+      "--collect=workflows",
+      "--offline",
+      "--no-config"
+    ],
+    "persona": "Regular",
+    "min_severity": null,
+    "min_confidence": null,
+    "output_format": "json",
+    "environment": {}
+  },
+  "coverage": [
+    "GitHub Actions workflow definitions under .github/workflows/*.yml and *.yaml collected via --collect=workflows, respecting .gitignore; honoring provider's default workflow collection semantics.",
+    "All audits applicable to workflows under the Regular persona and offline mode (template-injection, unpinned-uses, excessive-permissions, etc.); audits requiring online GitHub data are disabled."
+  ],
+  "known_exclusions": [
+    "Composite action definitions (action.yml) are not collected in this slice's workflows-only mode.",
+    "Dependabot, pre-commit, and other non-workflow inputs are not collected in this slice.",
+    "Dockerfiles, Terraform, Kubernetes, application SAST, and dependency scanning are out of scope and belong to other controls.",
+    "Provider's pedantic-only audits and offline-disabled audits are not covered when using Regular persona and --offline."
+  ],
+  "limitations": [
+    "Detection is bounded by the pinned provider's audit rule set and its configuration; absence of findings is not proof that no workflow weakness exists.",
+    "Provider default configuration and ignore comments apply unchanged unless disabled via --no-config; this slice uses --no-config to ensure repository-local configuration does not silently suppress findings.",
+    "Finding severities and confidences are as supplied by the provider; no additional severity remapping is performed.",
+    "Checksum integrity relies on GitHub-provided asset digest, not an independent publisher signature or separate checksum file (no such artifact is published for v1.29.0).",
+    "Workflow inventory certainty is required: zero workflows or indeterminate collection is BLOCKED, not PASS."
+  ],
+  "failure_behavior": "BLOCKED",
+  "failure_cases": [
+    "executable missing or not runnable",
+    "version output does not match the pinned provider version 1.29.0",
+    "downloaded archive sha256 does not match asset digest",
+    "provider exits non-zero without establishing findings, including partial scans",
+    "provider report missing or cannot be parsed as JSON array",
+    "collection yields no workflows (exit 3) or other provider error",
+    "target not a Git repository"
+  ]
+}

@@ -1,0 +1,74 @@
+# P2P Shield v0.2b - CI workflow safety slice acceptance. CANDIDATE infrastructure.
+# Purpose: verify SHIELD-CI-01 via pinned Zizmor 1.29.0 and 3-control SHIELD-BASE composition.
+# This is harness infrastructure on the candidate branch, not a promoted workflow.
+# Provider policy lives in shield/providers/zizmor-1.29.0.json and is enforced by
+# shield/zizmor_acquire.py: official release only, exact pinned version, sha256
+# verified against GitHub release asset digest before any execution.
+# Single workflow, no matrix, no cache, no artifact service, no deployment.
+
+name: P2P Shield - CI workflow safety slice (v0.2b)
+
+on:
+  push:
+    branches:
+      - arena/01a0931c-p2p-upgrade-github-1
+      - docs/p2p-shield-plan
+
+permissions:
+  contents: read
+
+jobs:
+  shield-ci-slice:
+    name: SHIELD-CI-01 via pinned Zizmor and 3-control BASE
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      EVIDENCE_REFERENCE: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      GITLEAKS_MAPPING: shield/providers/gitleaks-8.18.4.json
+      ZIZMOR_MAPPING: shield/providers/zizmor-1.29.0.json
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Acquire and verify Gitleaks 8.18.4
+        continue-on-error: true
+        run: python3 -m shield.acquire --mapping "$GITLEAKS_MAPPING" --provider-dir "$RUNNER_TEMP/gitleaks" --expected-version 8.18.4 --summary-file "$GITHUB_STEP_SUMMARY"
+
+      - name: Acquire and verify Zizmor 1.29.0
+        continue-on-error: true
+        run: python3 -m shield.zizmor_acquire --provider-dir "$RUNNER_TEMP/zizmor" --summary-file "$GITHUB_STEP_SUMMARY"
+
+      - name: Run focused Shield contract tests
+        run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice
+
+      - name: Run Slice 1 acceptance (unchanged)
+        if: always()
+        run: python3 -m shield.acceptance --executable "$RUNNER_TEMP/gitleaks/gitleaks" --work-dir "$RUNNER_TEMP/slice1-work" --evidence-dir "$RUNNER_TEMP/slice1-evidence" --evidence-reference "$EVIDENCE_REFERENCE" --summary-file "$GITHUB_STEP_SUMMARY"
+
+      - name: Run 3-control BASE acceptance (real providers)
+        if: always()
+        env:
+          GITLEAKS_EXECUTABLE: ${{ runner.temp }}/gitleaks/gitleaks
+          ZIZMOR_EXECUTABLE: ${{ runner.temp }}/zizmor/zizmor
+        run: python3 -m shield.base_acceptance
+
+      - name: Run CI slice acceptance (PASS/FAIL/BLOCKED fixtures + diagnostic)
+        if: always()
+        run: |
+          python3 -m shield.ci_acceptance \
+            --executable "$RUNNER_TEMP/zizmor/zizmor" \
+            --work-dir "$RUNNER_TEMP/ci-work" \
+            --evidence-dir "$RUNNER_TEMP/ci-evidence" \
+            --evidence-reference "$EVIDENCE_REFERENCE" \
+            --summary-file "$GITHUB_STEP_SUMMARY"
+
+      - name: Show CI evidence records
+        if: always()
+        run: |
+          echo "--- CI evidence ---"
+          cat "$RUNNER_TEMP/ci-evidence"/*.json 2>/dev/null || echo "NO_CI_EVIDENCE"
+          echo "--- diagnostic ---"
+          python3 -m shield.ci --target . --executable "$RUNNER_TEMP/zizmor/zizmor" --reference "$EVIDENCE_REFERENCE" || true
