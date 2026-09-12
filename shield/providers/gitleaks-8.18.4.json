@@ -1,0 +1,69 @@
+{
+  "schema": "p2p-shield-provider-mapping/1",
+  "control_id": "SHIELD-SECRET-01",
+  "provider_name": "Gitleaks",
+  "provider_version": "8.18.4",
+  "status": "CANDIDATE",
+  "last_reviewed": "2026-09-11",
+  "source": {
+    "kind": "official_github_release",
+    "repository": "gitleaks/gitleaks",
+    "tag": "v8.18.4",
+    "download_base": "https://github.com/gitleaks/gitleaks/releases/download/v8.18.4",
+    "linux_x64_asset": "gitleaks_8.18.4_linux_x64.tar.gz",
+    "checksums_asset": "gitleaks_8.18.4_checksums.txt",
+    "extracted_binary": "gitleaks",
+    "integrity_rule": "sha256 of the downloaded archive must match the matching line of the official checksums asset before the provider may run",
+    "version_policy": "PINNED_EXACT_NO_AUTO_UPGRADE_NO_MIRROR_FALLBACK"
+  },
+  "invocation": {
+    "version_argv": ["{executable}", "version"],
+    "version_expected_exact": "8.18.4",
+    "detect_argv": [
+      "{executable}",
+      "detect",
+      "--no-banner",
+      "--log-level=error",
+      "--redact=100",
+      "--source={target}",
+      "--report-format=json",
+      "--report-path={report}"
+    ],
+    "scan_mode_args": {
+      "git_history_scan": [],
+      "worktree_scan": ["--no-git"]
+    },
+    "environment": {
+      "GITLEAKS_CONFIG": null
+    },
+    "environment_rule": "unset inherited provider config overrides so the pinned provider default rule set is the one actually assessed"
+  },
+  "coverage": {
+    "git_history_scan": [
+      "Commits reachable from the target repository HEAD, assessed from per-commit added lines (provider git log -p mode).",
+      "Other refs, stashes, and content that never appears as an added line (for example some merge resolutions) are not covered.",
+      "Uncommitted working-tree content is not covered by this scope."
+    ],
+    "worktree_scan": [
+      "Regular files present in the target working tree at scan time, assessed as a plain directory (provider --no-git mode).",
+      "The provider's directory mode skips the .git directory, so committed history and other refs are not covered by this scope."
+    ]
+  },
+  "known_exclusions": [
+    "On a target that is not a Git repository this provider does not fail: history mode scans no commits and exits clean, so Shield rejects the target instead of recording that empty result as PASS.",
+    "Provider default configuration allowlists (for example binary and lockfile paths) apply unchanged.",
+    "Provider rule coverage only; no custom rule set is supplied in this slice."
+  ],
+  "limitations": [
+    "Detection is bounded by the pinned provider rule set and its entropy and allowlist behaviour; absence of findings is not proof that no credential exists.",
+    "Secret values are redacted and are not retained in Shield evidence; only rule, file, line, and commit references are kept.",
+    "Runtime secret stores, credential validity, and protected-data access paths are not assessed."
+  ],
+  "failure_behavior": "BLOCKED",
+  "failure_cases": [
+    "executable missing or not runnable",
+    "version output does not match the pinned provider version",
+    "provider exits non-zero without establishing findings, including partial scans",
+    "provider report is missing or cannot be parsed"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "p2p-shield-provider-mapping/1",
+  "control_id": "SHIELD-DEPENDENCY-01",
+  "provider_name": "OSV-Scanner",
+  "provider_version": "2.4.0",
+  "source": {
+    "kind": "official_github_release",
+    "repository": "google/osv-scanner",
+    "tag": "v2.4.0",
+    "asset": "osv-scanner_linux_amd64",
+    "checksums_asset": "osv-scanner_SHA256SUMS"
+  },
+  "coverage": [
+    "Explicit requirements.txt files containing exact PyPI name==version entries; published OSV matching only."
+  ],
+  "known_exclusions": [
+    "Other formats, unpinned requirements, includes, URLs, markers and automatic transitive resolution are not qualified in this slice."
+  ],
+  "limitations": [
+    "Network-dependent OSV data at assessment time; unknown vulnerabilities and runtime exploitability not assessed.",
+    "Checksum fetched from official HTTPS release; not independent publisher signature verification."
+  ],
+  "failure_behavior": "BLOCKED"
+}

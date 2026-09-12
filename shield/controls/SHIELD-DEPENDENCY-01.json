@@ -1,0 +1,23 @@
+{
+  "schema": "p2p-shield-control/1",
+  "control_id": "SHIELD-DEPENDENCY-01",
+  "control_version": "0.1.0",
+  "objective": "Supported declared dependency manifests or lockfiles inside the assessed repository scope must not contain dependencies matched to known published vulnerabilities by the qualified provider.",
+  "applies_to": "Git repositories with explicitly declared supported dependency metadata",
+  "required_scope": [
+    "declared_dependency_scan"
+  ],
+  "required_evidence": [
+    "Readable provider assessment covering every declared inventory entry, bound to target and Git HEAD"
+  ],
+  "status_semantics": {
+    "PASS": "Reliable assessment of declared inventory; zero matched known vulnerabilities.",
+    "FAIL": "Reliable assessment; one or more matched known vulnerabilities.",
+    "BLOCKED": "Provider unavailable, identity/version mismatch, network or execution failure, unreliable inventory or malformed/indeterminate output."
+  },
+  "limitations": [
+    "Other formats, unpinned requirements, includes, URLs, markers and automatic transitive resolution are not qualified in this slice.",
+    "Network-dependent OSV data at assessment time; unknown vulnerabilities and runtime exploitability not assessed.",
+    "Checksum fetched from official HTTPS release; not independent publisher signature verification."
+  ]
+}
