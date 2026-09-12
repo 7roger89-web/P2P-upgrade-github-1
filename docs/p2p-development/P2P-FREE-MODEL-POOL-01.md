@@ -111,7 +111,7 @@ The bridge is not accepted merely because text generation works. The executor ac
 5. consume the tool result;
 6. finish successfully.
 
-If EchoBird cannot preserve this tool loop with the chosen B.AI free model, record that incompatibility and change route rather than building more infrastructure around it.
+EchoBird evidence is mixed across third-party model families, especially around non-function tools and web-search/custom-tool translation, so success must be judged only by this bounded tool-loop test. If the chosen B.AI model fails that loop, record the incompatibility and change route rather than hardening EchoBird or building more infrastructure around it.
 
 Only after one real executor tool loop succeeds should P2P consider New API for automatic failover/quota routing.
 
