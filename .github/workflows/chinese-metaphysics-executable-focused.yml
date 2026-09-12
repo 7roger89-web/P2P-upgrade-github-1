@@ -13,9 +13,11 @@ on:
       - control-tower/plum-case-meihua-assembly-01
       - control-tower/plum-case-cegui-assembly-01
       - control-tower/plum-case-ignition-01
+      - control-tower/ziwei-zhongzhou-profile-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
+      - 'source/chinese-metaphysics/research/**/run_ziwei_algorithm_compare.mjs'
       - 'source/chinese-metaphysics/research/**/run_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/run_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/run_normalized_meihua_case.py'
@@ -24,6 +26,7 @@ on:
       - 'source/chinese-metaphysics/research/**/run_plum_case_ignition.py'
       - 'source/chinese-metaphysics/research/**/test_*_capability.*'
       - 'source/chinese-metaphysics/research/**/test_ziwei_multilane.mjs'
+      - 'source/chinese-metaphysics/research/**/test_ziwei_algorithm_compare.mjs'
       - 'source/chinese-metaphysics/research/**/test_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/test_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/test_normalized_meihua_case.py'
@@ -80,6 +83,7 @@ jobs:
           set -euo pipefail
           node source/chinese-metaphysics/research/iztro/test_ziwei_capability.mjs
           node source/chinese-metaphysics/research/iztro/test_ziwei_multilane.mjs
+          node source/chinese-metaphysics/research/iztro/test_ziwei_algorithm_compare.mjs
           python source/chinese-metaphysics/research/liuyao-divination/test_liuyao_capability.py
           python source/chinese-metaphysics/research/liuyao-divination/test_liuyao_multi_read.py
           python source/chinese-metaphysics/research/yinyo-liuyao/test_yinyo_reasoning_lane.py
