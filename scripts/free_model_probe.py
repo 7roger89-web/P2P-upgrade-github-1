@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Minimal probe for disposable/free OpenAI-compatible model providers.
+"""Minimal probe for disposable/free model providers.
 
 No third-party dependencies. API keys are read only from environment variables
-and are never printed.
+and are never printed. Chat Completions and Responses are tested separately so
+a chat-only success is never mistaken for Codex/Responses compatibility.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ class ProviderPreset:
     key_env: str
     model_env: str
     free_candidates: tuple[str, ...]
+    protocols: tuple[str, ...] = ("chat",)
     supports_model_discovery: bool = True
 
 
@@ -42,7 +44,10 @@ PRESETS: dict[str, ProviderPreset] = {
         base_url="https://api.b.ai/v1",
         key_env="BAI_API_KEY",
         model_env="BAI_MODEL",
-        free_candidates=("glm-5.3-flash", "mimo-v2.5", "hy3"),
+        # Current free/promotional candidates. Order prefers models already
+        # live-proven on the Owner account before documentation-only candidates.
+        free_candidates=("mimo-v2.5", "hy3", "qwen3.8-flash"),
+        protocols=("chat", "responses"),
     ),
     "amd": ProviderPreset(
         name="amd",
@@ -55,7 +60,9 @@ PRESETS: dict[str, ProviderPreset] = {
 
 
 class ProbeError(RuntimeError):
-    pass
+    def __init__(self, message: str, http_status: int | None = None) -> None:
+        super().__init__(message)
+        self.http_status = http_status
 
 
 def _request_json(
@@ -69,7 +76,7 @@ def _request_json(
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Accept": "application/json",
-        "User-Agent": "p2p-free-model-probe/0.1",
+        "User-Agent": "p2p-free-model-probe/0.2",
     }
     if payload is not None:
         data = json.dumps(payload).encode("utf-8")
@@ -86,7 +93,7 @@ def _request_json(
             detail = json.loads(body)
         except json.JSONDecodeError:
             detail = body[:500]
-        raise ProbeError(f"HTTP {exc.code}: {detail}") from exc
+        raise ProbeError(f"HTTP {exc.code}: {detail}", http_status=exc.code) from exc
     except urllib.error.URLError as exc:
         raise ProbeError(f"network error: {exc.reason}") from exc
     except json.JSONDecodeError as exc:
@@ -104,27 +111,37 @@ def extract_model_ids(payload: dict[str, Any]) -> list[str]:
     return ids
 
 
+def candidate_models(
+    preset: ProviderPreset,
+    available_models: list[str] | None,
+    env: dict[str, str] | None = None,
+) -> list[str]:
+    env = os.environ if env is None else env
+    override = env.get(preset.model_env)
+
+    if available_models:
+        by_lower = {item.lower(): item for item in available_models}
+        if override:
+            matched = by_lower.get(override.lower())
+            return [matched] if matched else []
+        return [
+            by_lower[candidate.lower()]
+            for candidate in preset.free_candidates
+            if candidate.lower() in by_lower
+        ]
+
+    if override:
+        return [override]
+    return list(preset.free_candidates)
+
+
 def choose_model(
     preset: ProviderPreset,
     available_models: list[str] | None,
     env: dict[str, str] | None = None,
 ) -> str | None:
-    env = os.environ if env is None else env
-    override = env.get(preset.model_env)
-    if override:
-        if available_models:
-            by_lower = {item.lower(): item for item in available_models}
-            return by_lower.get(override.lower())
-        return override
-
-    if available_models:
-        by_lower = {item.lower(): item for item in available_models}
-        for candidate in preset.free_candidates:
-            if candidate.lower() in by_lower:
-                return by_lower[candidate.lower()]
-        return None
-
-    return preset.free_candidates[0] if preset.free_candidates else None
+    candidates = candidate_models(preset, available_models, env)
+    return candidates[0] if candidates else None
 
 
 def extract_chat_text(payload: dict[str, Any]) -> str:
@@ -141,13 +158,90 @@ def extract_chat_text(payload: dict[str, Any]) -> str:
     return content if isinstance(content, str) else ""
 
 
-def probe_provider(preset: ProviderPreset, live: bool, timeout: float) -> dict[str, Any]:
+def extract_responses_text(payload: dict[str, Any]) -> str:
+    output = payload.get("output")
+    if not isinstance(output, list):
+        return ""
+    chunks: list[str] = []
+    for item in output:
+        if not isinstance(item, dict) or item.get("type") != "message":
+            continue
+        content = item.get("content")
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if (
+                isinstance(block, dict)
+                and block.get("type") == "output_text"
+                and isinstance(block.get("text"), str)
+            ):
+                chunks.append(block["text"])
+    return "".join(chunks)
+
+
+def _live_call(
+    preset: ProviderPreset,
+    model: str,
+    protocol: str,
+    key: str,
+    timeout: float,
+) -> str:
+    if protocol == "chat":
+        payload = _request_json(
+            "POST",
+            f"{preset.base_url.rstrip('/')}/chat/completions",
+            key,
+            payload={
+                "model": model,
+                "messages": [
+                    {"role": "user", "content": "Reply with exactly: P2P_PROBE_OK"}
+                ],
+                "temperature": 0,
+                "max_tokens": 32,
+                "stream": False,
+            },
+            timeout=timeout,
+        )
+        return extract_chat_text(payload).strip()
+
+    if protocol == "responses":
+        payload = _request_json(
+            "POST",
+            f"{preset.base_url.rstrip('/')}/responses",
+            key,
+            payload={
+                "model": model,
+                "input": "Reply with exactly: P2P_PROBE_OK",
+                "max_output_tokens": 32,
+                "stream": False,
+            },
+            timeout=timeout,
+        )
+        return extract_responses_text(payload).strip()
+
+    raise ValueError(f"unknown protocol: {protocol}")
+
+
+def probe_provider(
+    preset: ProviderPreset,
+    live: bool,
+    timeout: float,
+    protocol: str = "chat",
+) -> dict[str, Any]:
     key = os.environ.get(preset.key_env)
     if not key:
         return {
             "provider": preset.name,
+            "protocol": protocol,
             "status": "MISSING_KEY",
             "key_env": preset.key_env,
+        }
+
+    if protocol not in preset.protocols:
+        return {
+            "provider": preset.name,
+            "protocol": protocol,
+            "status": "UNSUPPORTED_PROTOCOL",
         }
 
     started = time.monotonic()
@@ -164,15 +258,17 @@ def probe_provider(preset: ProviderPreset, live: bool, timeout: float) -> dict[s
         except ProbeError as exc:
             return {
                 "provider": preset.name,
+                "protocol": protocol,
                 "status": "DISCOVERY_FAIL",
                 "detail": str(exc),
                 "elapsed_ms": round((time.monotonic() - started) * 1000),
             }
 
-    model = choose_model(preset, available_models)
-    if not model:
+    models = candidate_models(preset, available_models)
+    if not models:
         return {
             "provider": preset.name,
+            "protocol": protocol,
             "status": "NO_ALLOWLISTED_MODEL",
             "discovery": discovery,
             "elapsed_ms": round((time.monotonic() - started) * 1000),
@@ -181,49 +277,50 @@ def probe_provider(preset: ProviderPreset, live: bool, timeout: float) -> dict[s
     if not live:
         return {
             "provider": preset.name,
+            "protocol": protocol,
             "status": "READY",
-            "model": model,
+            "model": models[0],
+            "candidates": models,
             "discovery": discovery,
             "elapsed_ms": round((time.monotonic() - started) * 1000),
         }
 
-    try:
-        payload = _request_json(
-            "POST",
-            f"{preset.base_url.rstrip('/')}/chat/completions",
-            key,
-            payload={
+    explicit_override = bool(os.environ.get(preset.model_env))
+    failures: list[dict[str, Any]] = []
+    for index, model in enumerate(models):
+        try:
+            text = _live_call(preset, model, protocol, key, timeout)
+            status = f"{protocol.upper()}_PASS" if text else "EMPTY_RESPONSE"
+            return {
+                "provider": preset.name,
+                "protocol": protocol,
+                "status": status,
                 "model": model,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Reply with exactly: P2P_PROBE_OK",
-                    }
-                ],
-                "temperature": 0,
-                "max_tokens": 32,
-                "stream": False,
-            },
-            timeout=timeout,
-        )
-        text = extract_chat_text(payload).strip()
-        return {
-            "provider": preset.name,
-            "status": "PASS" if text else "EMPTY_RESPONSE",
-            "model": model,
-            "text": text[:120],
-            "discovery": discovery,
-            "elapsed_ms": round((time.monotonic() - started) * 1000),
-        }
-    except ProbeError as exc:
-        return {
-            "provider": preset.name,
-            "status": "CALL_FAIL",
-            "model": model,
-            "detail": str(exc),
-            "discovery": discovery,
-            "elapsed_ms": round((time.monotonic() - started) * 1000),
-        }
+                "text": text[:120],
+                "discovery": discovery,
+                "attempts": index + 1,
+                "elapsed_ms": round((time.monotonic() - started) * 1000),
+            }
+        except ProbeError as exc:
+            failures.append(
+                {"model": model, "http_status": exc.http_status, "detail": str(exc)}
+            )
+            # A 400 can be model-specific (quota, endpoint incompatibility, or
+            # unsupported parameters). With no explicit override, try the next
+            # allowlisted free candidate. Do not retry auth/network failures.
+            if explicit_override or exc.http_status != 400:
+                break
+
+    return {
+        "provider": preset.name,
+        "protocol": protocol,
+        "status": f"{protocol.upper()}_CALL_FAIL",
+        "model": failures[-1]["model"] if failures else models[0],
+        "failures": failures,
+        "discovery": discovery,
+        "attempts": len(failures),
+        "elapsed_ms": round((time.monotonic() - started) * 1000),
+    }
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -238,18 +335,21 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Providers to probe (default: all).",
     )
     parser.add_argument(
+        "--protocol",
+        choices=("chat", "responses"),
+        default="chat",
+        help="Protocol to probe (default: chat). Responses is currently enabled for B.AI.",
+    )
+    parser.add_argument(
         "--live",
         action="store_true",
-        help=(
-            "Send one tiny chat completion. Without this flag only "
-            "auth/model readiness is checked."
-        ),
+        help="Send one tiny model request. Without this flag only readiness is checked.",
     )
     parser.add_argument(
         "--require",
         type=int,
         default=2,
-        help="Minimum READY/PASS providers required for exit code 0 (default: 2).",
+        help="Minimum READY/live-pass providers required for exit code 0 (default: 2).",
     )
     parser.add_argument("--timeout", type=float, default=25.0)
     return parser.parse_args(argv)
@@ -258,20 +358,27 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     results = [
-        probe_provider(PRESETS[name], live=args.live, timeout=args.timeout)
+        probe_provider(
+            PRESETS[name],
+            live=args.live,
+            timeout=args.timeout,
+            protocol=args.protocol,
+        )
         for name in args.providers
     ]
     for result in results:
         print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 
-    accepted = {"PASS"} if args.live else {"READY"}
+    accepted = (
+        {f"{args.protocol.upper()}_PASS"} if args.live else {"READY"}
+    )
     passed = sum(result.get("status") in accepted for result in results)
     verdict = "PASS" if passed >= args.require else "BLOCKED"
     print(
         json.dumps(
             {
                 "p2p_free_model_pool_01": verdict,
-                "mode": "live" if args.live else "readiness",
+                "mode": f"{'live' if args.live else 'readiness'}:{args.protocol}",
                 "passed": passed,
                 "required": args.require,
             },
