@@ -107,7 +107,8 @@ def acquire(directory):
             staged.chmod(0o755)
             observed = version(staged)
             staged.replace(binary)
-    receipt = dict(source=SOURCE, sha256=digest, observed_version=observed, provider='Zizmor', provider_version=VERSION, repository=REPOSITORY, tag=TAG)
+    binary_sha256 = hashlib.sha256(binary.read_bytes()).hexdigest()
+    receipt = dict(source=SOURCE, sha256=digest, binary_sha256=binary_sha256, observed_version=observed, provider='Zizmor', provider_version=VERSION, repository=REPOSITORY, tag=TAG)
     binary.with_suffix('.verified.json').write_text(json.dumps(receipt))
     return binary, receipt
 
@@ -119,9 +120,12 @@ def verify_executable(binary):
         # Allow direct version check if no receipt (e.g., stub or pre-verified)
         return version(binary)
     receipt = json.loads(receipt_path.read_text())
+    # Verify source and version; binary hash check uses binary_sha256 if present (for tar.gz), otherwise legacy sha256
+    expected_binary_hash = receipt.get('binary_sha256') or receipt.get('sha256')
+    actual_binary_hash = hashlib.sha256(Path(binary).read_bytes()).hexdigest()
     if (receipt.get('source') != SOURCE
             or receipt.get('observed_version') != VERSION
-            or receipt.get('sha256') != hashlib.sha256(Path(binary).read_bytes()).hexdigest()):
+            or (expected_binary_hash and expected_binary_hash != actual_binary_hash)):
         raise ValueError('ZIZMOR_VERIFIED_EXECUTABLE_MISMATCH')
     return version(binary)
 
