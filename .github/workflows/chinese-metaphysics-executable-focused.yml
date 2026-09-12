@@ -10,17 +10,20 @@ on:
       - control-tower/cegui-convention-integrity-01
       - control-tower/liuyao-yinyo-reasoning-01
       - control-tower/meihua-normalized-case-01
+      - control-tower/plum-case-meihua-assembly-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/run_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/run_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/run_normalized_meihua_case.py'
+      - 'source/chinese-metaphysics/research/**/run_plum_case_to_meihua.py'
       - 'source/chinese-metaphysics/research/**/test_*_capability.*'
       - 'source/chinese-metaphysics/research/**/test_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/test_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/test_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/test_normalized_meihua_case.py'
+      - 'source/chinese-metaphysics/research/**/test_plum_case_to_meihua.py'
       - 'source/chinese-metaphysics/research/run_executable_smoke.sh'
       - '.github/workflows/chinese-metaphysics-executable-focused.yml'
   workflow_dispatch:
@@ -51,6 +54,7 @@ jobs:
           test "$(git -C source/chinese-metaphysics/upstreams/meihua-yishu rev-parse HEAD)" = 8a9a5e0f482dd225bfe4a1c52c2ae5546228607a
           test "$(git -C source/chinese-metaphysics/upstreams/meihua-divination-skill rev-parse HEAD)" = d70d73ad620afe39d1555a0386680790cfd09227
           test "$(git -C source/chinese-metaphysics/upstreams/plum-cg rev-parse HEAD)" = 509fc43001a503d17a37db07bc56e069b1ff1c4f
+          test "$(git -C source/chinese-metaphysics/upstreams/plum-app rev-parse HEAD)" = 5965bdc8e9ca69a3cc7e96be6f1cc585d5032814
       - name: Build iztro
         shell: bash
         run: |
@@ -75,5 +79,6 @@ jobs:
           python source/chinese-metaphysics/research/yinyo-liuyao/test_yinyo_reasoning_lane.py
           python source/chinese-metaphysics/research/meihua-yishu/test_meihua_capability.py
           python source/chinese-metaphysics/research/meihua-divination-skill/test_normalized_meihua_case.py
+          python source/chinese-metaphysics/research/plum-app/test_plum_case_to_meihua.py
           node source/chinese-metaphysics/research/plum-cg/test_cegui_capability.mjs
           bash source/chinese-metaphysics/research/run_executable_smoke.sh
