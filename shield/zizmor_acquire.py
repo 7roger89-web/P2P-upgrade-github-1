@@ -115,19 +115,58 @@ def acquire(directory):
 
 def verify_executable(binary):
     mapping()
-    receipt_path = Path(binary).with_suffix('.verified.json')
+    binary_path = Path(binary)
+    if not binary_path.is_file():
+        raise ValueError('ZIZMOR_EXECUTABLE_MISSING')
+    receipt_path = binary_path.with_suffix('.verified.json')
     if not receipt_path.is_file():
-        # Allow direct version check if no receipt (e.g., stub or pre-verified)
-        return version(binary)
-    receipt = json.loads(receipt_path.read_text())
-    # Verify source and version; binary hash check uses binary_sha256 if present (for tar.gz), otherwise legacy sha256
-    expected_binary_hash = receipt.get('binary_sha256') or receipt.get('sha256')
-    actual_binary_hash = hashlib.sha256(Path(binary).read_bytes()).hexdigest()
-    if (receipt.get('source') != SOURCE
-            or receipt.get('observed_version') != VERSION
-            or (expected_binary_hash and expected_binary_hash != actual_binary_hash)):
-        raise ValueError('ZIZMOR_VERIFIED_EXECUTABLE_MISMATCH')
-    return version(binary)
+        raise ValueError('ZIZMOR_RECEIPT_MISSING')
+    try:
+        receipt_text = receipt_path.read_text()
+        receipt = json.loads(receipt_text)
+        if not isinstance(receipt, dict):
+            raise ValueError('ZIZMOR_RECEIPT_NOT_OBJECT')
+    except json.JSONDecodeError as exc:
+        raise ValueError(f'ZIZMOR_RECEIPT_MALFORMED:{exc}') from exc
+    except ValueError:
+        raise
+    except Exception as exc:
+        raise ValueError(f'ZIZMOR_RECEIPT_MALFORMED:{exc}') from exc
+    # Validate source identity strictly
+    src = receipt.get('source')
+    if not isinstance(src, dict):
+        raise ValueError('ZIZMOR_SOURCE_MALFORMED')
+    for key in ('kind', 'repository', 'tag', 'asset', 'download_base', 'extracted_binary', 'asset_digest'):
+        expected = SOURCE.get(key)
+        actual = src.get(key)
+        if actual != expected:
+            raise ValueError(f'ZIZMOR_SOURCE_IDENTITY_MISMATCH:{key}:{actual!r}!={expected!r}')
+    # Validate top-level digest and binary hash
+    if receipt.get('sha256') != DIGEST:
+        raise ValueError(f"ZIZMOR_DIGEST_MISMATCH:expected={DIGEST}:actual={receipt.get('sha256')}")
+    expected_bin_hash = receipt.get('binary_sha256')
+    if not isinstance(expected_bin_hash, str) or not re.fullmatch(r'[0-9a-f]{64}', expected_bin_hash):
+        raise ValueError('ZIZMOR_BINARY_SHA256_MISSING_OR_MALFORMED')
+    try:
+        actual_bin_hash = hashlib.sha256(binary_path.read_bytes()).hexdigest()
+    except Exception as exc:
+        raise ValueError(f'ZIZMOR_BINARY_READ_FAILED:{exc}') from exc
+    if actual_bin_hash != expected_bin_hash:
+        raise ValueError(f'ZIZMOR_BINARY_TAMPERED:expected={expected_bin_hash}:actual={actual_bin_hash}')
+    # Validate observed version and provider identity
+    if receipt.get('observed_version') != VERSION:
+        raise ValueError(f"ZIZMOR_OBSERVED_VERSION_MISMATCH:expected={VERSION}:actual={receipt.get('observed_version')}")
+    if receipt.get('provider') != 'Zizmor' or receipt.get('provider_version') != VERSION:
+        raise ValueError('ZIZMOR_PROVIDER_MISMATCH')
+    if receipt.get('repository') != REPOSITORY or receipt.get('tag') != TAG:
+        raise ValueError('ZIZMOR_REPOSITORY_TAG_MISMATCH')
+    # Finally verify live binary version exactly
+    live = version(binary_path)
+    if live != VERSION:
+        raise ValueError(f'ZIZMOR_LIVE_VERSION_MISMATCH:{live}')
+    if live != receipt.get('observed_version'):
+        raise ValueError('ZIZMOR_LIVE_VERSION_MISMATCH_RECEIPT')
+    return live
 
 
 def _cli_main():
