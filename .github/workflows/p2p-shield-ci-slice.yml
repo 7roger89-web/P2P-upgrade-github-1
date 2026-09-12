@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   shield-ci-slice:
@@ -53,27 +54,51 @@ jobs:
         env:
           GITLEAKS_EXECUTABLE: ${{ runner.temp }}/gitleaks/gitleaks
           ZIZMOR_EXECUTABLE: ${{ runner.temp }}/zizmor/zizmor
-        run: python3 -m shield.base_acceptance
+        run: |
+          set +e
+          python3 -m shield.base_acceptance 2>&1 | tee /tmp/base.log
+          EXIT=${PIPESTATUS[0]}
+          echo "BASE_EXIT=$EXIT" | tee -a /tmp/base.log
+          cat /tmp/base.log >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          exit $EXIT
 
       - name: Run CI slice acceptance (PASS/FAIL/BLOCKED fixtures + diagnostic)
         if: always()
         run: |
+          set +e
           python3 -m shield.ci_acceptance \
             --executable "$RUNNER_TEMP/zizmor/zizmor" \
             --work-dir "$RUNNER_TEMP/ci-work" \
             --evidence-dir "$RUNNER_TEMP/ci-evidence" \
             --evidence-reference "$EVIDENCE_REFERENCE" \
-            --summary-file "$GITHUB_STEP_SUMMARY"
+            --summary-file "$GITHUB_STEP_SUMMARY" 2>&1 | tee /tmp/ci.log
+          EXIT=${PIPESTATUS[0]}
+          echo "CI_EXIT=$EXIT" | tee -a /tmp/ci.log
+          cat /tmp/ci.log >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          exit $EXIT
 
       - name: Show CI evidence records
         if: always()
         run: |
           echo "--- CI evidence ---"
           cat "$RUNNER_TEMP/ci-evidence"/*.json 2>/dev/null || echo "NO_CI_EVIDENCE"
-          echo "--- BASE evidence from summary already ---"
+          echo "--- BASE log tail ---"
+          tail -n 200 /tmp/base.log 2>/dev/null || echo "no base log"
+          tail -n 200 /tmp/ci.log 2>/dev/null || echo "no ci log"
           echo "P2P diagnostic completed"
 
       - name: Run real P2P workflow diagnostic (explicit)
         if: always()
         run: |
           python3 -m shield.ci --target . --executable "$RUNNER_TEMP/zizmor/zizmor" --reference "$EVIDENCE_REFERENCE" || true
+
+      - name: Publish debug comment on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Posting debug comment to PR 103"
+          BODY=$(printf "Debug for run %s\n\nBase log tail:\n\`\`\`\n%s\n\`\`\`\n\nCI log tail:\n\`\`\`\n%s\n\`\`\`\n" "$GITHUB_RUN_ID" "$(tail -n 80 /tmp/base.log 2>/dev/null | head -c 3000)" "$(tail -n 80 /tmp/ci.log 2>/dev/null | head -c 3000)")
+          gh api --method POST "/repos/7roger89-web/P2P-upgrade-github-1/issues/103/comments" -f body="$BODY" || echo "comment failed"
+          # Also post to check via notice
+          echo "::notice::Base tail $(tail -n 30 /tmp/base.log 2>/dev/null | tr '\n' ' ' | cut -c1-400)"
