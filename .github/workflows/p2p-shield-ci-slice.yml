@@ -16,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   shield-ci-slice:
@@ -72,3 +73,12 @@ jobs:
           cat "$RUNNER_TEMP/ci-evidence"/*.json 2>/dev/null || echo "NO_CI_EVIDENCE"
           echo "--- diagnostic ---"
           python3 -m shield.ci --target . --executable "$RUNNER_TEMP/zizmor/zizmor" --reference "$EVIDENCE_REFERENCE" || true
+
+      - name: Post P2P diagnostic to PR
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DIAG=$(python3 -m shield.ci --target . --executable "$RUNNER_TEMP/zizmor/zizmor" --reference "$EVIDENCE_REFERENCE" 2>&1 | head -c 3500)
+          BODY=$(printf "P2P Diagnostic for run %s\n\n\`\`\`json\n%s\n\`\`\`\n" "$GITHUB_RUN_ID" "$DIAG")
+          gh api --method POST "/repos/7roger89-web/P2P-upgrade-github-1/issues/103/comments" -f body="$BODY" || echo "post failed"
