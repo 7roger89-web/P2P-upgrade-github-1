@@ -66,4 +66,18 @@ grep -Fq '"TUAN_TEXT": "解，險以動，動而免乎險，解。' <<<"$YIJING_
 grep -Fq '"DAXIANG_TEXT": "雷雨作，解；君子以赦過宥罪。"' <<<"$YIJING_LABEL_OUT"
 echo 'YIJING_LIVE_INPUT_SMOKE=PASS'
 
+# Mechanical cross-lane assembly only: Meihua casts; Yi Jing supplies the
+# source-grounded textual evidence. Doctrine and provenance remain separate.
+MEIHUA_YIJING_OUT="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_yijing_evidence.py" --numbers 7 4 11)"
+grep -Fq '"DOMAIN": "MEIHUA_YIJING_EVIDENCE"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"MEIHUA_MAIN_HEXAGRAM_REPORTED": "山雷頤"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"YIJING_MAIN_HEXAGRAM_CANONICAL": "山雷颐"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"MAIN_HEXAGRAM_MAPPED_FROM_TRIGRAM_STRUCTURE": "PASS"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"MOVING_LINE_MATCHES_SELECTED_YAO": "PASS"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"SELECTED_YAO_TEXT_PRESENT": "PASS"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"SELECTED_XIAOXIANG_PRESENT": "PASS"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"PROVENANCE_POLICY": "MECHANICAL_CROSS_LANE_BRIDGE_KEEP_SOURCE_PACKETS_INDEPENDENT"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"INTERPRETATION_STATUS": "NOT_PERFORMED"' <<<"$MEIHUA_YIJING_OUT"
+echo 'MEIHUA_YIJING_EVIDENCE_BRIDGE_SMOKE=PASS'
+
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
