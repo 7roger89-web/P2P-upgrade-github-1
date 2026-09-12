@@ -36,6 +36,7 @@ SECTION_RE = re.compile(r"^##\s+《([^》]+)》[^\n]*$", re.MULTILINE)
 MARKER_RE = re.compile(r"《([彖象])》曰[：:]?")
 TAG_RE = re.compile(r"<[^>]+>")
 YAO_RE = re.compile(r"^(初[九六]|[九六][二三四五]|上[九六])[：:](.*)$")
+SPECIAL_YAO_RE = re.compile(r"^(用九|用六)[：:](.*)$")
 
 # These are not new divination rules. They are read-time repairs for two source
 # defects already proven in the pinned Zhouyi corpus and independently sourced.
@@ -134,6 +135,24 @@ def _section_bodies():
     return sections
 
 
+def _top_level_red_indices(lines):
+    return [
+        idx for idx, line in enumerate(lines)
+        if line.startswith("- <font") and 'color="#ff0000"' in line
+    ]
+
+
+def _xiang_candidates_in_block(lines, start, stop):
+    xiang = []
+    for j in range(start + 1, stop):
+        if "《象》曰" not in lines[j]:
+            continue
+        text = _classical_marker_text(lines, j, stop)
+        if text:
+            xiang.append(text)
+    return xiang
+
+
 def load_sections(apply_label_corrections=True):
     """Hexagram-level Tuan and Daxiang records from the 人间道 block."""
     sections = []
@@ -185,10 +204,7 @@ def load_xiaoxiang_records(apply_corrections=True):
 
     for name, raw_lines in _section_bodies():
         lines = _human_lines(raw_lines)
-        top_level_red = [
-            idx for idx, line in enumerate(lines)
-            if line.startswith("- <font") and 'color="#ff0000"' in line
-        ]
+        top_level_red = _top_level_red_indices(lines)
         yao_indices = []
         for idx in top_level_red:
             match = YAO_RE.match(_clean_fragment(_strip_bullet(lines[idx])))
@@ -199,18 +215,11 @@ def load_xiaoxiang_records(apply_corrections=True):
         records = []
         for idx, label, yao_text in yao_indices:
             stop = next((red_idx for red_idx in top_level_red if red_idx > idx), len(lines))
-            xiang = []
-            for j in range(idx + 1, stop):
-                if "《象》曰" not in lines[j]:
-                    continue
-                text = _classical_marker_text(lines, j, stop)
-                if text:
-                    xiang.append(text)
             records.append({
                 "raw_label": label,
                 "label": label,
                 "yao_text": yao_text,
-                "xiaoxiang_candidates": xiang,
+                "xiaoxiang_candidates": _xiang_candidates_in_block(lines, idx, stop),
             })
 
         if apply_corrections and name == "地山谦":
@@ -275,6 +284,53 @@ def load_xiaoxiang_records(apply_corrections=True):
     return sections
 
 
+def load_special_xiaoxiang():
+    """Return the two source-present special lines: 乾用九 and 坤用六."""
+    expected = {"乾为天": "用九", "坤为地": "用六"}
+    special = {}
+
+    for name, raw_lines in _section_bodies():
+        if name not in expected:
+            continue
+        lines = _human_lines(raw_lines)
+        top_level_red = _top_level_red_indices(lines)
+        candidates = []
+        for idx in top_level_red:
+            match = SPECIAL_YAO_RE.match(_clean_fragment(_strip_bullet(lines[idx])))
+            if not match:
+                continue
+            stop = next((red_idx for red_idx in top_level_red if red_idx > idx), len(lines))
+            candidates.append({
+                "label": match.group(1),
+                "source_yao_text": match.group(2).strip(),
+                "xiaoxiang_candidates": _xiang_candidates_in_block(lines, idx, stop),
+            })
+
+        wanted = expected[name]
+        candidates = [item for item in candidates if item["label"] == wanted]
+        if len(candidates) != 1:
+            raise RuntimeError(
+                f"Yi Jing special-line structure invalid for {name} {wanted}: records={len(candidates)}"
+            )
+        record = candidates[0]
+        if len(record["xiaoxiang_candidates"]) != 1 or not record["xiaoxiang_candidates"][0]:
+            raise RuntimeError(
+                f"Yi Jing special-line Xiaoxiang invalid for {name} {wanted}: "
+                f"candidates={len(record['xiaoxiang_candidates'])}"
+            )
+        special[name] = {
+            "label": wanted,
+            "source_yao_text": record["source_yao_text"],
+            "xiaoxiang": record["xiaoxiang_candidates"][0],
+        }
+
+    if set(special) != set(expected):
+        raise RuntimeError(
+            f"Yi Jing special-line coverage invalid: expected={sorted(expected)}, got={sorted(special)}"
+        )
+    return special
+
+
 def load_corrected_commentary():
     corpus = {}
     for section in load_sections(apply_label_corrections=True):
@@ -318,5 +374,5 @@ def source_metadata():
         "label_overlay": LABEL_CORRECTIONS,
         "xiaoxiang_overlay": XIAOXIANG_CORRECTIONS,
         "policy": "READ_TIME_PROVENANCE_OVERLAY_VENDOR_UNMODIFIED",
-        "scope": "HEXAGRAM_LEVEL_TUAN_DAXIANG_AND_SIX_REGULAR_LINE_XIAOXIANG",
+        "scope": "HEXAGRAM_LEVEL_TUAN_DAXIANG_384_REGULAR_XIAOXIANG_AND_QIAN_KUN_SPECIAL_LINES",
     }
