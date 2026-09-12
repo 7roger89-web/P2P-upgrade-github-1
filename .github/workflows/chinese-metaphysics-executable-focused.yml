@@ -21,6 +21,7 @@ on:
       - control-tower/yijing-corpus-integrity-01
       - control-tower/yijing-live-road-smoke-01
       - control-tower/yijing-transformation-01
+      - control-tower/yijing-tuan-xiang-audit-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
@@ -43,6 +44,7 @@ on:
       - 'source/chinese-metaphysics/research/**/test_plum_case_to_cegui.py'
       - 'source/chinese-metaphysics/research/**/test_plum_case_ignition.py'
       - 'source/chinese-metaphysics/research/yijing/test_yijing_corpus_integrity.py'
+      - 'source/chinese-metaphysics/research/yijing/audit_tuan_xiang_source.py'
       - 'source/chinese-metaphysics/research/run_executable_smoke.sh'
       - '.github/workflows/chinese-metaphysics-executable-focused.yml'
   workflow_dispatch:
@@ -105,4 +107,5 @@ jobs:
           python source/chinese-metaphysics/research/plum-app/test_plum_case_ignition.py
           node source/chinese-metaphysics/research/plum-cg/test_cegui_capability.mjs
           python source/chinese-metaphysics/research/yijing/test_yijing_corpus_integrity.py
+          python source/chinese-metaphysics/research/yijing/audit_tuan_xiang_source.py
           bash source/chinese-metaphysics/research/run_executable_smoke.sh
