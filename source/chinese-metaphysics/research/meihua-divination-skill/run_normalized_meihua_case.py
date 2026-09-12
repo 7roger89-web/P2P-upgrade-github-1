@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import importlib.util
+import inspect
 import json
 import subprocess
 import sys
@@ -12,8 +13,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 NORMALIZER_UPSTREAM = (SCRIPT_DIR / '../../upstreams/meihua-divination-skill').resolve()
 CALCULATOR_UPSTREAM = (SCRIPT_DIR / '../../upstreams/meihua-yishu').resolve()
 NORMALIZER = NORMALIZER_UPSTREAM / 'scripts' / 'normalize_case_input.py'
+EXPECTED_PRIVATE_ANALYZER_PARAMS = ['upper_gua', 'lower_gua', 'dong_yao', 'season']
 
-# Fyrgo8 emits normalized trigram names. The pinned muyen analyzer API accepts
+# Fyrgo8 emits normalized trigram names. The pinned muyen analyzer accepts
 # pre-heaven trigram numbers (1..8), not names. This is transport-only; it does
 # not change trigram identity or merge doctrine between the repositories.
 NORMALIZED_TRIGRAM_TO_PREHEAVEN_NUMBER = {
@@ -52,6 +54,24 @@ def load_calculator():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def guarded_private_analyzer(module):
+    analyzer = getattr(module, '_analyze_hexagram', None)
+    if not callable(analyzer):
+        fail('Pinned meihua-yishu private analyzer missing: _analyze_hexagram', 1)
+    signature = inspect.signature(analyzer)
+    params = list(signature.parameters.values())
+    names = [p.name for p in params]
+    if names != EXPECTED_PRIVATE_ANALYZER_PARAMS:
+        fail(
+            f'Pinned meihua-yishu private analyzer signature drift: '
+            f'expected {EXPECTED_PRIVATE_ANALYZER_PARAMS}, got {names}',
+            1,
+        )
+    if params[-1].default is not None:
+        fail('Pinned meihua-yishu private analyzer season default drifted from None', 1)
+    return analyzer, str(signature)
 
 
 def normalize_input(input_path: str):
@@ -104,8 +124,9 @@ def main():
     }
 
     mc = load_calculator()
+    analyzer, analyzer_signature = guarded_private_analyzer(mc)
     try:
-        result = mc._analyze_hexagram(
+        result = analyzer(
             analyzer_input['upper_trigram_number'],
             analyzer_input['lower_trigram_number'],
             analyzer_input['moving_line'],
@@ -120,6 +141,9 @@ def main():
         'CAPABILITY': 'PINNED_NORMALIZED_CASE_TO_ANALYSIS_PACKET',
         'NORMALIZER_PIN': NORMALIZER_PIN,
         'CALCULATOR_PIN': CALCULATOR_PIN,
+        'CALCULATOR_SURFACE': '_analyze_hexagram',
+        'CALCULATOR_SURFACE_KIND': 'PINNED_PRIVATE_FUNCTION_WITH_SIGNATURE_GUARD',
+        'CALCULATOR_SURFACE_SIGNATURE': analyzer_signature,
         'NORMALIZED_INPUT': normalized,
         'ANALYZER_INPUT': analyzer_input,
         'TRANSPORT_MAPPING': 'FYRGO_NORMALIZED_TRIGRAM_NAME_TO_MUYEN_PREHEAVEN_NUMBER',
@@ -140,6 +164,7 @@ def main():
             'NO_EXTERNAL_SIGN_FABRICATION',
             'NO_CROSS_REPO_DOCTRINE_NORMALIZATION',
             'NO_PREDICTIVE_ACCURACY_CLAIM',
+            'PRIVATE_SURFACE_IS_NOT_CLAIMED_AS_PUBLIC_API',
         ],
     }
     print(json.dumps(out, ensure_ascii=False, indent=2))
