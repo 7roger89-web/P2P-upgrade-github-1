@@ -394,3 +394,23 @@ from .static_glb_standardizer import (
     standardize_static_glb,
     validate_static_glb_output,
 )
+
+# Keep the compact execution capsule aligned with the canonical GitHub connector
+# failure-classification law. This runs once at package import, before callers
+# obtain build_execution_prompt from the control_tower_handoff submodule.
+from . import control_tower_handoff as _control_tower_handoff  # noqa: E402
+
+_GITHUB_CONNECTOR_LAW_MARKER = (
+    "EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS"
+)
+_GITHUB_CONNECTOR_LAW_CAPSULE = "\n".join(
+    (
+        "8. For GitHub-dependent work, distinguish executor/session access from Owner connector state: EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS; ONE_FAILED_CALL != GITHUB_CONNECTOR_DISABLED; SESSION_TOOL_UNAVAILABLE != ACCOUNT_CONNECTION_BROKEN.",
+        "9. Classify direct GitHub evidence as WORKING, SESSION_SURFACE_UNAVAILABLE, REPO_SCOPE_BROKEN, AUTH_CONNECTION_BROKEN, or PROVIDER_OUTAGE. Public web search is not proof of private repository, branch, PR, or HEAD state.",
+        "10. If the current executor/session has no GitHub tool, report GITHUB_CONNECTOR_STATUS=SESSION_SURFACE_UNAVAILABLE, EXECUTOR_GITHUB_ACCESS=UNAVAILABLE_IN_THIS_SESSION, and OWNER_GITHUB_CONNECTOR_STATUS=NOT_PROVEN_BROKEN. Do not reconnect, uninstall, or change credentials without direct auth/scope evidence.",
+    )
+)
+if _GITHUB_CONNECTOR_LAW_MARKER not in _control_tower_handoff.SUPREME_LAW_CAPSULE:
+    _control_tower_handoff.SUPREME_LAW_CAPSULE = "\n".join(
+        (_control_tower_handoff.SUPREME_LAW_CAPSULE, _GITHUB_CONNECTOR_LAW_CAPSULE)
+    )
