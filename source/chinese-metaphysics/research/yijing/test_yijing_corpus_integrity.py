@@ -7,6 +7,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from yijing_corpus import PIN, UPSTREAM, load_corrected_corpus, load_raw_corpus  # noqa: E402
+from yijing_commentary import load_corrected_xiaoxiang  # noqa: E402
 
 sys.path.insert(0, str(UPSTREAM / "src"))
 from liuyao import cast_board  # noqa: E402
@@ -72,6 +73,15 @@ assert corrected["地山谦"]["yao"]["六二"] == "鸣谦，贞吉。"
 assert "六三" not in corrected["地山谦"]["yao"]
 assert corrected["地水师"]["yao"]["六四"] == "师左次，无咎。"
 
+xiaoxiang = load_corrected_xiaoxiang()
+assert len(xiaoxiang) == 64
+assert sum(len(lines) for lines in xiaoxiang.values()) == 64 * 6
+assert xiaoxiang["地山谦"]["六二"].startswith("鳴謙貞吉")
+assert xiaoxiang["地水师"]["六三"] == "師或輿尸，凶，大無功也。"
+assert xiaoxiang["地水师"]["六四"].startswith("左次")
+assert "志行正也" in xiaoxiang["水雷屯"]["初九"]
+assert "大得民也" in xiaoxiang["水雷屯"]["初九"]
+
 # Mechanical equivalence: every one-line transformation across all 64 hexagrams
 # must match the pinned upstream's public cast_board() result. The oracle's month/day
 # are irrelevant to hexagram transformation but valid inputs to its broader Liuyao API.
@@ -99,6 +109,8 @@ assert qian["DOMAIN"] == "YIJING"
 assert qian["NORMALIZED_HEXAGRAM"] == "地山谦"
 assert [x["label"] for x in qian["SELECTED_YAO"]] == ["六二", "九三"]
 assert qian["SELECTED_YAO"][0]["text"] == "鸣谦，贞吉。"
+assert qian["SELECTED_YAO"][0]["xiaoxiang"].startswith("鳴謙貞吉")
+assert qian["SELECTED_YAO"][1]["xiaoxiang"].startswith("勞謙君子")
 assert qian["CHANGED_HEXAGRAM"] == "地水师"
 assert qian["CHANGED_UPPER_TRIGRAM"] == "坤"
 assert qian["CHANGED_LOWER_TRIGRAM"] == "坎"
@@ -112,7 +124,16 @@ assert static_qian["CHANGED_GUA_CI"] is None
 
 shi = run(["--hexagram", "师", "--moving", "4"])
 assert shi["NORMALIZED_HEXAGRAM"] == "地水师"
-assert shi["SELECTED_YAO"][0] == {"position": 4, "label": "六四", "text": "师左次，无咎。"}
+assert shi["SELECTED_YAO"][0] == {
+    "position": 4,
+    "label": "六四",
+    "text": "师左次，无咎。",
+    "xiaoxiang": xiaoxiang["地水师"]["六四"],
+}
+
+tun = run(["--hexagram", "屯", "--moving", "1"])
+assert "志行正也" in tun["SELECTED_YAO"][0]["xiaoxiang"]
+assert "大得民也" in tun["SELECTED_YAO"][0]["xiaoxiang"]
 
 bad = subprocess.run([sys.executable, str(runner), "--hexagram", "师", "--moving", "7"], capture_output=True, text=True)
 assert bad.returncode != 0
@@ -123,6 +144,8 @@ print(json.dumps({
     "RAW_KNOWN_ISSUE_COUNT": len(raw_issues),
     "CORRECTED_ISSUE_COUNT": len(corrected_issues),
     "YIJING_LOOKUP": "PASS",
+    "YIJING_XIAOXIANG_COUNT": sum(len(lines) for lines in xiaoxiang.values()),
+    "YIJING_XIAOXIANG": "PASS",
     "YIJING_TRANSFORM_ORACLE_CASES": transform_oracle_cases,
     "YIJING_TRANSFORM": "PASS",
     "STATUS": "PASS",
