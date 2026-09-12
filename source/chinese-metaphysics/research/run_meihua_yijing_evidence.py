@@ -36,7 +36,11 @@ def run_json(command, label):
 
 
 def canonical_trigram(name):
-    return TRIGRAM_NORMALIZATION.get(name, name)
+    # Meihua reports display labels such as "艮 ☶". The Yi Jing runtime keys
+    # by the trigram name only, so strip the decorative symbol before the small
+    # traditional/simplified normalization needed for 離/兌.
+    token = str(name or "").strip().split()[0] if str(name or "").strip() else ""
+    return TRIGRAM_NORMALIZATION.get(token, token)
 
 
 def main():
