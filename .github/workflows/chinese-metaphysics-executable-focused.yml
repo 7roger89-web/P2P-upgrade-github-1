@@ -16,10 +16,12 @@ on:
       - control-tower/ziwei-zhongzhou-profile-01
       - control-tower/ziwei-profile-to-multilane-01
       - control-tower/meihua-private-surface-guard-01
+      - control-tower/ziwei-time-basis-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/run_ziwei_algorithm_compare.mjs'
+      - 'source/chinese-metaphysics/research/**/time_basis.mjs'
       - 'source/chinese-metaphysics/research/**/run_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/run_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/run_normalized_meihua_case.py'
@@ -29,6 +31,7 @@ on:
       - 'source/chinese-metaphysics/research/**/test_*_capability.*'
       - 'source/chinese-metaphysics/research/**/test_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/test_ziwei_algorithm_compare.mjs'
+      - 'source/chinese-metaphysics/research/**/test_ziwei_time_basis.mjs'
       - 'source/chinese-metaphysics/research/**/test_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/test_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/test_normalized_meihua_case.py'
@@ -86,6 +89,7 @@ jobs:
           node source/chinese-metaphysics/research/iztro/test_ziwei_capability.mjs
           node source/chinese-metaphysics/research/iztro/test_ziwei_multilane.mjs
           node source/chinese-metaphysics/research/iztro/test_ziwei_algorithm_compare.mjs
+          node source/chinese-metaphysics/research/iztro/test_ziwei_time_basis.mjs
           python source/chinese-metaphysics/research/liuyao-divination/test_liuyao_capability.py
           python source/chinese-metaphysics/research/liuyao-divination/test_liuyao_multi_read.py
           python source/chinese-metaphysics/research/yinyo-liuyao/test_yinyo_reasoning_lane.py

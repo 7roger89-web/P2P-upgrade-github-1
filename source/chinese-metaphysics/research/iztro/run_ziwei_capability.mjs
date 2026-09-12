@@ -4,6 +4,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { resolveTimeBasis } from './time_basis.mjs';
 
 const PIN = '2c7ef9be669df7b19d1799f4dce335fed3794f78';
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
@@ -12,6 +13,14 @@ const upstream = path.resolve(scriptDir, '../../upstreams/iztro');
 function fail(msg, code = 2) { console.error(msg); process.exit(code); }
 function arg(name) { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : undefined; }
 function has(name) { return process.argv.includes(name); }
+function formatDate({ year, month, day }) {
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+function parseDate(dateStr) {
+  const match = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(dateStr ?? '');
+  if (!match) fail(`Invalid --date: ${dateStr}`);
+  return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+}
 
 if (!fs.existsSync(upstream)) fail(`Pinned upstream missing: ${upstream}`);
 let head;
@@ -26,27 +35,96 @@ const { astro } = require(builtEntry);
 if (!astro?.withOptions) fail('Pinned iztro API missing: astro.withOptions');
 
 const fixture = arg('--fixture');
-const customRequested = has('--date') || has('--time-index') || has('--gender');
-if (fixture && customRequested) fail('Use either --fixture or custom --date/--time-index/--gender, not both');
+const rawClockRequested = has('--civil-hour') || has('--civil-minute') || has('--longitude') || has('--utc-offset') || has('--time-basis');
+const customRequested = has('--date') || has('--time-index') || has('--gender') || rawClockRequested;
+if (fixture && customRequested) fail('Use either --fixture or custom birth input, not both');
 const algorithm = arg('--algorithm') ?? 'default';
 if (!['default', 'zhongzhou'].includes(algorithm)) fail(`Invalid --algorithm: ${algorithm}`);
 
 let input;
+let sourceInput;
+let timeBasis;
 let inputMode;
 if (fixture) {
   if (fixture !== 'default') fail(`Unknown fixture: ${fixture}`);
   input = { dateStr: '2010-10-18', timeIndex: 4, gender: 'female' };
+  sourceInput = { ...input };
+  timeBasis = {
+    basis: 'FIXTURE_EXPLICIT_IZTRO_TIME_INDEX',
+    correction_minutes: 0,
+    time_index: 4,
+    crossed_date: false,
+  };
   inputMode = 'FIXTURE';
 } else {
   const dateStr = arg('--date');
-  const timeIndexRaw = arg('--time-index');
   const gender = arg('--gender');
-  if (!dateStr || timeIndexRaw === undefined || !gender) fail('Custom usage: --date YYYY-MM-DD --time-index 0..12 --gender male|female [--algorithm default|zhongzhou]');
-  if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateStr)) fail(`Invalid --date: ${dateStr}`);
-  const timeIndex = Number(timeIndexRaw);
-  if (!Number.isInteger(timeIndex) || timeIndex < 0 || timeIndex > 12) fail(`Invalid --time-index: ${timeIndexRaw}`);
+  const timeIndexRaw = arg('--time-index');
+  const civilHourRaw = arg('--civil-hour');
+  const civilMinuteRaw = arg('--civil-minute');
+  const requestedBasis = arg('--time-basis') ?? 'civil';
+  const longitudeRaw = arg('--longitude');
+  const utcOffsetRaw = arg('--utc-offset');
+
+  if (!dateStr || !gender) {
+    fail('Custom usage requires --date YYYY-MM-DD and --gender male|female plus either --time-index or --civil-hour');
+  }
   if (!['male', 'female'].includes(gender)) fail(`Invalid --gender: ${gender}`);
-  input = { dateStr, timeIndex, gender };
+  const dateParts = parseDate(dateStr);
+  const hasTimeIndex = timeIndexRaw !== undefined;
+  const hasCivilHour = civilHourRaw !== undefined;
+  if (hasTimeIndex === hasCivilHour) fail('Choose exactly one time input: --time-index OR --civil-hour');
+
+  if (hasTimeIndex) {
+    if (rawClockRequested) fail('Do not combine --time-index with civil-clock/time-basis flags; --time-index is already resolved');
+    const timeIndex = Number(timeIndexRaw);
+    if (!Number.isInteger(timeIndex) || timeIndex < 0 || timeIndex > 12) fail(`Invalid --time-index: ${timeIndexRaw}`);
+    input = { dateStr, timeIndex, gender };
+    sourceInput = { ...input };
+    timeBasis = {
+      basis: 'EXPLICIT_IZTRO_TIME_INDEX',
+      correction_minutes: 0,
+      time_index: timeIndex,
+      crossed_date: false,
+    };
+  } else {
+    const civilHour = Number(civilHourRaw);
+    const civilMinute = civilMinuteRaw === undefined ? 0 : Number(civilMinuteRaw);
+    if (!Number.isInteger(civilHour) || civilHour < 0 || civilHour > 23) fail(`Invalid --civil-hour: ${civilHourRaw}`);
+    if (!Number.isInteger(civilMinute) || civilMinute < 0 || civilMinute > 59) fail(`Invalid --civil-minute: ${civilMinuteRaw}`);
+    if (!['civil', 'true-solar'].includes(requestedBasis)) fail(`Invalid --time-basis: ${requestedBasis}`);
+    if (requestedBasis === 'civil' && (longitudeRaw !== undefined || utcOffsetRaw !== undefined)) {
+      fail('--longitude/--utc-offset are only valid with --time-basis true-solar');
+    }
+    const longitude = longitudeRaw === undefined ? undefined : Number(longitudeRaw);
+    const utcOffset = utcOffsetRaw === undefined ? undefined : Number(utcOffsetRaw);
+    try {
+      timeBasis = resolveTimeBasis({
+        ...dateParts,
+        hour: civilHour,
+        minute: civilMinute,
+        basis: requestedBasis,
+        longitude,
+        utcOffset,
+      });
+    } catch (err) {
+      fail(`Time-basis resolution failed: ${err?.message ?? err}`);
+    }
+    input = {
+      dateStr: formatDate(timeBasis.corrected),
+      timeIndex: timeBasis.time_index,
+      gender,
+    };
+    sourceInput = {
+      dateStr,
+      civilHour,
+      civilMinute,
+      gender,
+      requestedTimeBasis: requestedBasis,
+      longitude: longitude ?? null,
+      utcOffset: utcOffset ?? null,
+    };
+  }
   inputMode = 'CUSTOM';
 }
 
@@ -91,7 +169,10 @@ if (inputMode === 'FIXTURE' && algorithm === 'default') {
 }
 
 console.log(JSON.stringify({
-  DOMAIN: 'ZIWEI_DOUSHU', ENGINE_PIN: PIN, INPUT_MODE: inputMode, INPUT: input,
+  DOMAIN: 'ZIWEI_DOUSHU', ENGINE_PIN: PIN, INPUT_MODE: inputMode,
+  SOURCE_INPUT: sourceInput,
+  INPUT: input,
+  TIME_BASIS: timeBasis,
   PROFILE_ID: algorithm === 'zhongzhou' ? 'IZTRO_ZHONGZHOU_MECHANICAL_001' : 'IZTRO_DEFAULT_001',
   PROFILE_CONFIG: profileConfig,
   CHART_FACTS: {
@@ -108,5 +189,10 @@ console.log(JSON.stringify({
   RULE_TRACE: ['XQR_R1_PALACE_BEFORE_STAR', 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER'],
   TARGET_STAR: jiStar, TARGET_PALACE: jiPalace, BIRTH_YEAR_JI_TARGET_CLASS: targetClass,
   STRUCTURAL_OUTPUT: structuralOutput, PROVENANCE_STATUS: 'PARTIAL', PREDICTIVE_STATUS: 'NOT_TESTED',
-  NONCLAIMS: ['NO_NATAL_EVENT_PREDICTION', 'NO_UNIVERSAL_ZIWEI_METHOD', 'NO_SCHOOL_WINNER']
+  NONCLAIMS: [
+    'NO_NATAL_EVENT_PREDICTION',
+    'NO_UNIVERSAL_ZIWEI_METHOD',
+    'NO_SCHOOL_WINNER',
+    'TRUE_SOLAR_TIME_DOES_NOT_INFER_LONGITUDE_OR_UTC_OFFSET',
+  ]
 }, null, 2));
