@@ -22,6 +22,10 @@ def clean(text):
     return TAG_RE.sub("", text).strip()
 
 
+def clean_bullet(text):
+    return clean(re.sub(r"^\s*-\s+", "", text))
+
+
 def expected_labels(rec):
     bits = BAGUA[rec["lower"]]["yao"] + BAGUA[rec["upper"]]["yao"]
     labels = []
@@ -88,7 +92,7 @@ def main():
         for idx, line in enumerate(lines):
             if not line.startswith("- <font") or 'color="#ff0000"' not in line:
                 continue
-            match = YAO_RE.match(clean(line))
+            match = YAO_RE.match(clean_bullet(line))
             if not match:
                 continue
             label = match.group(1)
