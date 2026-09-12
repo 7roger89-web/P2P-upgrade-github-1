@@ -16,7 +16,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   shield-ci-slice:
@@ -45,23 +44,6 @@ jobs:
       - name: Run focused Shield contract tests
         run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice
 
-      - name: Debug provider paths before acceptance
-        if: always()
-        run: |
-          echo "RUNNER_TEMP=$RUNNER_TEMP" | tee /tmp/provider_debug.txt
-          echo "runner.temp=${{ runner.temp }}" | tee -a /tmp/provider_debug.txt
-          ls -R "$RUNNER_TEMP" 2>&1 | head -n200 | tee -a /tmp/provider_debug.txt
-          echo "--- check gitleaks ---" | tee -a /tmp/provider_debug.txt
-          ls -lh "$RUNNER_TEMP/gitleaks" 2>&1 | head -n50 | tee -a /tmp/provider_debug.txt
-          test -f "$RUNNER_TEMP/gitleaks/gitleaks" && "$RUNNER_TEMP/gitleaks/gitleaks" version 2>&1 | head -n5 | tee -a /tmp/provider_debug.txt || echo "gitleaks missing" | tee -a /tmp/provider_debug.txt
-          echo "--- check zizmor ---" | tee -a /tmp/provider_debug.txt
-          ls -lh "$RUNNER_TEMP/zizmor" 2>&1 | head -n50 | tee -a /tmp/provider_debug.txt
-          test -f "$RUNNER_TEMP/zizmor/zizmor" && "$RUNNER_TEMP/zizmor/zizmor" --version 2>&1 | head -n5 | tee -a /tmp/provider_debug.txt || echo "zizmor missing" | tee -a /tmp/provider_debug.txt
-          echo "--- env ---" | tee -a /tmp/provider_debug.txt
-          env | grep -i runner 2>&1 | tee -a /tmp/provider_debug.txt || true
-          mkdir -p "$RUNNER_TEMP/ci-work" "$RUNNER_TEMP/ci-evidence" 2>&1 | tee -a /tmp/provider_debug.txt
-          ls -ld "$RUNNER_TEMP/ci-work" "$RUNNER_TEMP/ci-evidence" 2>&1 | tee -a /tmp/provider_debug.txt || true
-
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
         run: python3 -m shield.acceptance --executable "$RUNNER_TEMP/gitleaks/gitleaks" --work-dir "$RUNNER_TEMP/slice1-work" --evidence-dir "$RUNNER_TEMP/slice1-evidence" --evidence-reference "$EVIDENCE_REFERENCE" --summary-file "$GITHUB_STEP_SUMMARY"
@@ -71,56 +53,22 @@ jobs:
         env:
           GITLEAKS_EXECUTABLE: ${{ runner.temp }}/gitleaks/gitleaks
           ZIZMOR_EXECUTABLE: ${{ runner.temp }}/zizmor/zizmor
-        run: |
-          set +e
-          python3 -m shield.base_acceptance 2>&1 | tee /tmp/base.log
-          EXIT=${PIPESTATUS[0]}
-          echo "BASE_EXIT=$EXIT" | tee -a /tmp/base.log
-          cat /tmp/base.log >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
-          exit $EXIT
+        run: python3 -m shield.base_acceptance
 
       - name: Run CI slice acceptance (PASS/FAIL/BLOCKED fixtures + diagnostic)
         if: always()
         run: |
-          set +e
           python3 -m shield.ci_acceptance \
             --executable "$RUNNER_TEMP/zizmor/zizmor" \
             --work-dir "$RUNNER_TEMP/ci-work" \
             --evidence-dir "$RUNNER_TEMP/ci-evidence" \
             --evidence-reference "$EVIDENCE_REFERENCE" \
-            --summary-file "$GITHUB_STEP_SUMMARY" 2>&1 | tee /tmp/ci.log
-          EXIT=${PIPESTATUS[0]}
-          echo "CI_EXIT=$EXIT" | tee -a /tmp/ci.log
-          cat /tmp/ci.log >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
-          exit $EXIT
+            --summary-file "$GITHUB_STEP_SUMMARY"
 
       - name: Show CI evidence records
         if: always()
         run: |
           echo "--- CI evidence ---"
           cat "$RUNNER_TEMP/ci-evidence"/*.json 2>/dev/null || echo "NO_CI_EVIDENCE"
-          echo "--- BASE log tail ---"
-          tail -n 200 /tmp/base.log 2>/dev/null || echo "no base log"
-          tail -n 200 /tmp/ci.log 2>/dev/null || echo "no ci log"
-          echo "P2P diagnostic completed"
-
-      - name: Run real P2P workflow diagnostic (explicit)
-        if: always()
-        run: |
+          echo "--- diagnostic ---"
           python3 -m shield.ci --target . --executable "$RUNNER_TEMP/zizmor/zizmor" --reference "$EVIDENCE_REFERENCE" || true
-
-      - name: Publish debug comment on failure
-        if: always()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Posting debug for run $GITHUB_RUN_ID"
-          echo "=== provider debug ==="
-          cat /tmp/provider_debug.txt 2>/dev/null || echo "no provider debug"
-          echo "=== base log ==="
-          cat /tmp/base.log 2>/dev/null | head -c 5000 || echo "no base log"
-          echo "=== ci log ==="
-          cat /tmp/ci.log 2>/dev/null | head -c 5000 || echo "no ci log"
-          # Always try to post a comment with available logs
-          BODY=$(printf "Debug for run %s\n\nProvider debug:\n\`\`\`\n%s\n\`\`\`\n\nBase log (head 4000):\n\`\`\`\n%s\n\`\`\`\n\nCI log (head 4000):\n\`\`\`\n%s\n\`\`\`\n" "$GITHUB_RUN_ID" "$(cat /tmp/provider_debug.txt 2>/dev/null | head -c 2000)" "$(cat /tmp/base.log 2>/dev/null | head -c 4000)" "$(cat /tmp/ci.log 2>/dev/null | head -c 4000)")
-          gh api --method POST "/repos/7roger89-web/P2P-upgrade-github-1/issues/103/comments" -f body="$BODY" || echo "comment failed"
