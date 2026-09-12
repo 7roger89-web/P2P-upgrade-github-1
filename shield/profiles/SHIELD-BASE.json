@@ -1,0 +1,19 @@
+{
+  "profile_id": "SHIELD-BASE",
+  "profile_version": "0.1.0",
+  "required_controls": {
+    "SHIELD-SECRET-01": {
+      "control_version": "0.1.0",
+      "required_scopes": [
+        "git_history_scan",
+        "worktree_scan"
+      ]
+    },
+    "SHIELD-DEPENDENCY-01": {
+      "control_version": "0.1.0",
+      "required_scopes": [
+        "declared_dependency_scan"
+      ]
+    }
+  }
+}
