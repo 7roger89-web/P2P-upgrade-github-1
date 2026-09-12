@@ -1,6 +1,6 @@
 # P2P SHIELD PLAN
 
-Status: `CANDIDATE_UNPROMOTED`
+Status: `CANDIDATE_PROMOTED`
 
 Purpose: durable development plan for a reusable, replaceable, evidence-based
 security layer for P2P-managed projects.
