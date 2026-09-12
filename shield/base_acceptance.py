@@ -67,6 +67,15 @@ def main():
         # Acquire Zizmor
         # Prefer env var if provided (hosted workflow sets it), otherwise acquire
         env_ziz = os.environ.get('ZIZMOR_EXECUTABLE')
+        emit('ZIZMOR_ENV_DEBUG', {'ZIZMOR_EXECUTABLE': env_ziz, 'exists': str(Path(env_ziz).is_file()) if env_ziz else 'no_env', 'RUNNER_TEMP': os.environ.get('RUNNER_TEMP'), 'runner_temp_expanded': str(Path(os.environ.get('RUNNER_TEMP','')) / 'zizmor' / 'zizmor') if os.environ.get('RUNNER_TEMP') else 'none'})
+        # also list temp dir if exists
+        try:
+            rt = Path(os.environ.get('RUNNER_TEMP','/tmp'))
+            if rt.is_dir():
+                listing = [str(p) for p in rt.glob('**/*')][:20]
+                emit('RUNNER_TEMP_LISTING', {'listing': listing})
+        except Exception as exc:
+            emit('RUNNER_TEMP_LISTING_FAILED', {'reason': str(exc)})
         if env_ziz and Path(env_ziz).is_file():
             ziz_binary = Path(env_ziz)
             try:
