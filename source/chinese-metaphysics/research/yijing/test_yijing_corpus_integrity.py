@@ -9,7 +9,9 @@ sys.path.insert(0, str(HERE))
 from yijing_corpus import PIN, UPSTREAM, load_corrected_corpus, load_raw_corpus  # noqa: E402
 
 sys.path.insert(0, str(UPSTREAM / "src"))
+from liuyao import cast_board  # noqa: E402
 from liuyao.data import BAGUA, HEXAGRAMS  # noqa: E402
+from run_yijing_capability import changed_hexagram_name  # noqa: E402
 
 records = {rec["name"]: rec for rec in HEXAGRAMS.values()}
 pos_names = ["初", "二", "三", "四", "五", "上"]
@@ -70,7 +72,20 @@ assert corrected["地山谦"]["yao"]["六二"] == "鸣谦，贞吉。"
 assert "六三" not in corrected["地山谦"]["yao"]
 assert corrected["地水师"]["yao"]["六四"] == "师左次，无咎。"
 
+# Mechanical equivalence: every one-line transformation across all 64 hexagrams
+# must match the pinned upstream's public cast_board() result. The oracle's month/day
+# are irrelevant to hexagram transformation but valid inputs to its broader Liuyao API.
+transform_oracle_cases = 0
+for name, rec in sorted(records.items()):
+    for pos in range(1, 7):
+        expected = cast_board(name, pos, "子", "甲子").changed_hexagram
+        actual = changed_hexagram_name(rec, [pos])
+        assert actual == expected, (name, pos, actual, expected)
+        transform_oracle_cases += 1
+assert transform_oracle_cases == 64 * 6
+
 runner = HERE / "run_yijing_capability.py"
+
 
 def run(args):
     r = subprocess.run([sys.executable, str(runner), *args], capture_output=True, text=True)
@@ -78,12 +93,22 @@ def run(args):
         raise AssertionError(r.stderr)
     return json.loads(r.stdout)
 
+
 qian = run(["--hexagram", "谦", "--moving", "2,3"])
 assert qian["DOMAIN"] == "YIJING"
 assert qian["NORMALIZED_HEXAGRAM"] == "地山谦"
 assert [x["label"] for x in qian["SELECTED_YAO"]] == ["六二", "九三"]
 assert qian["SELECTED_YAO"][0]["text"] == "鸣谦，贞吉。"
+assert qian["CHANGED_HEXAGRAM"] == "地水师"
+assert qian["CHANGED_UPPER_TRIGRAM"] == "坤"
+assert qian["CHANGED_LOWER_TRIGRAM"] == "坎"
+assert qian["CHANGED_GUA_CI"] == corrected["地水师"]["gua_ci"]
+assert qian["TRANSFORMATION_RULE"] == "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS"
 assert qian["INTERPRETATION_STATUS"] == "NOT_PERFORMED"
+
+static_qian = run(["--hexagram", "谦"])
+assert static_qian["CHANGED_HEXAGRAM"] is None
+assert static_qian["CHANGED_GUA_CI"] is None
 
 shi = run(["--hexagram", "师", "--moving", "4"])
 assert shi["NORMALIZED_HEXAGRAM"] == "地水师"
@@ -98,6 +123,8 @@ print(json.dumps({
     "RAW_KNOWN_ISSUE_COUNT": len(raw_issues),
     "CORRECTED_ISSUE_COUNT": len(corrected_issues),
     "YIJING_LOOKUP": "PASS",
+    "YIJING_TRANSFORM_ORACLE_CASES": transform_oracle_cases,
+    "YIJING_TRANSFORM": "PASS",
     "STATUS": "PASS",
     "NONCLAIMS": ["STRUCTURAL_INTEGRITY_ONLY", "NO_TEXTUAL_CRITICAL_EDITION_CLAIM", "NO_INTERPRETATION_ACCURACY_CLAIM"],
 }, ensure_ascii=False, indent=2))
