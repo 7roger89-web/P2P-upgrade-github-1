@@ -60,15 +60,37 @@ The probe never prints API keys. It prints one JSON line per provider plus a fin
 
 ## Real executor acceptance
 
-A text response alone does not prove Codex compatibility. Current Codex custom providers use the Responses protocol while many free providers expose Chat Completions. EchoBird can serve as the local protocol bridge/model switcher.
+A text response alone does not prove Codex compatibility.
 
-After at least two live provider probes pass, the next bounded slice is:
+B.AI currently exposes an OpenAI-compatible **Responses API** and publishes a direct Codex custom-provider configuration. Therefore the smallest useful executor test is B.AI directly, without EchoBird:
 
 ```text
-Codex -> EchoBird local bridge -> one proven free provider -> one tiny disposable repo task
+Codex -> B.AI Responses API -> one tiny disposable repo task
 ```
 
-The task must exercise a complete tool loop:
+Example Codex provider shape:
+
+```toml
+model = "<model returned by B.AI /models>"
+model_provider = "bai"
+
+[model_providers.bai]
+name = "B.AI"
+base_url = "https://api.b.ai/v1"
+env_key = "BAI_API_KEY"
+wire_api = "responses"
+requires_openai_auth = false
+```
+
+For providers that expose only Chat Completions, EchoBird remains a later compatibility bridge if needed:
+
+```text
+Codex -> EchoBird local bridge -> proven chat-only provider
+```
+
+Do not introduce EchoBird merely because it exists. Use it only after a provider has passed the API probe and direct Responses integration is unavailable or fails for a protocol reason.
+
+The real executor task must exercise a complete tool loop:
 
 1. receive prompt;
 2. read a file;
@@ -83,7 +105,8 @@ Only after that succeeds should P2P consider New API for automatic failover/quot
 
 - At least 2/3 providers live-probe successfully at test time.
 - No API key is committed to Git.
-- At least one provider later completes the full Codex/EchoBird tool-loop task.
+- At least one provider completes a full Codex tool-loop task; prefer B.AI direct Responses first.
+- EchoBird is introduced only if a proven provider needs protocol translation.
 - Provider switching requires no P2P project-code change.
 - Any claim of "free" is tied to the provider/account state observed at test time, never treated as permanent infrastructure.
 
@@ -91,10 +114,10 @@ Only after that succeeds should P2P consider New API for automatic failover/quot
 
 **Không bị over engineering chứ?**
 
-1. Simpler path: yes — three providers plus one probe, no gateway yet.
+1. Simpler path: yes — three providers plus one probe, then B.AI direct Codex first.
 2. Material progress: yes — proves usable external compute rather than architecture diagrams.
 3. Necessity: live probe and real executor loop are required evidence; dashboards and smart routing are not.
 4. Core before support: yes — prove execution capability first.
-5. Smaller verifiable slice: this is already smaller than deploying New API or onboarding 10+ providers.
+5. Smaller verifiable slice: direct B.AI Responses is smaller than adding EchoBird, New API, or 10+ providers.
 
-Verdict: `DO_IT` for the probe; `DEFER_UNTIL_NEEDED` for New API/router/dashboard infrastructure.
+Verdict: `DO_IT` for the probe and direct B.AI executor test; `DEFER_UNTIL_NEEDED` for EchoBird on chat-only providers and for New API/router/dashboard infrastructure.
