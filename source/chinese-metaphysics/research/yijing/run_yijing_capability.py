@@ -10,6 +10,7 @@ from yijing_corpus import UPSTREAM, load_corrected_corpus, source_metadata as co
 from yijing_commentary import (  # noqa: E402
     load_corrected_commentary,
     load_corrected_xiaoxiang,
+    load_special_xiaoxiang,
     source_metadata as commentary_source_metadata,
 )
 
@@ -21,6 +22,8 @@ HEXAGRAM_BY_TRIGRAMS = {
     (rec["upper"], rec["lower"]): rec["name"]
     for rec in HEXAGRAMS.values()
 }
+ALL_SIX = {1, 2, 3, 4, 5, 6}
+SPECIAL_LABEL_BY_HEXAGRAM = {"乾为天": "用九", "坤为地": "用六"}
 
 
 def fail(msg, code=2):
@@ -69,7 +72,7 @@ def changed_hexagram_name(rec, positions):
 
 def main():
     p = argparse.ArgumentParser(
-        description="Source-grounded Yi Jing gua/yao text, Tuan/Daxiang/Xiaoxiang, and transformation lookup"
+        description="Source-grounded Yi Jing gua/yao text, Tuan/Daxiang/Xiaoxiang, special-line candidates, and transformation lookup"
     )
     p.add_argument("--hexagram", required=True, help="Full name or upstream alias, e.g. 地山谦 or 谦")
     p.add_argument("--moving", help="Optional line positions, e.g. 2 or 2,3")
@@ -83,6 +86,7 @@ def main():
     corpus = load_corrected_corpus()
     commentary = load_corrected_commentary()
     xiaoxiang = load_corrected_xiaoxiang()
+    special_xiaoxiang = load_special_xiaoxiang()
     name = rec["name"]
     entry = corpus.get(name)
     commentary_entry = commentary.get(name)
@@ -110,6 +114,21 @@ def main():
             "xiaoxiang": line_xiaoxiang,
         })
 
+    special_candidate = None
+    special_label = SPECIAL_LABEL_BY_HEXAGRAM.get(name)
+    if special_label and len(positions) == 6 and set(positions) == ALL_SIX:
+        special_record = special_xiaoxiang.get(name)
+        special_text = entry.get("yao", {}).get(special_label)
+        if not special_record or special_record.get("label") != special_label or not special_text:
+            fail(f"Yi Jing special-line source missing {name} {special_label}", 1)
+        special_candidate = {
+            "label": special_label,
+            "text": special_text,
+            "xiaoxiang": special_record["xiaoxiang"],
+            "exposure_condition": "ALL_SIX_REGULAR_LINES_LISTED_AS_MOVING",
+            "interpretive_priority": "NOT_ASSERTED",
+        }
+
     try:
         changed_name = changed_hexagram_name(rec, positions)
     except Exception as exc:
@@ -123,7 +142,7 @@ def main():
 
     print(json.dumps({
         "DOMAIN": "YIJING",
-        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_XIAOXIANG_AND_CHANGE_LOOKUP",
+        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_XIAOXIANG_SPECIAL_YAO_CANDIDATE_AND_CHANGE_LOOKUP",
         "INPUT": {"hexagram": a.hexagram, "moving": positions},
         "NORMALIZED_HEXAGRAM": name,
         "UPPER_TRIGRAM": rec["upper"],
@@ -132,6 +151,7 @@ def main():
         "TUAN_TEXT": commentary_entry["tuan"],
         "DAXIANG_TEXT": commentary_entry["daxiang"],
         "SELECTED_YAO": selected,
+        "SPECIAL_YAO_CANDIDATE": special_candidate,
         "CHANGED_HEXAGRAM": changed_name,
         "CHANGED_UPPER_TRIGRAM": changed_rec["upper"] if changed_rec else None,
         "CHANGED_LOWER_TRIGRAM": changed_rec["lower"] if changed_rec else None,
@@ -141,11 +161,12 @@ def main():
         "TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
         "CORPUS_SOURCE": corpus_source_metadata(),
         "COMMENTARY_SOURCE": commentary_source_metadata(),
-        "STRUCTURAL_INTEGRITY": "VERIFIED_64_HEXAGRAM_GUA_YAO_TUAN_DAXIANG_384_XIAOXIANG_AND_384_SINGLE_LINE_TRANSFORMS",
+        "STRUCTURAL_INTEGRITY": "VERIFIED_64_HEXAGRAM_GUA_YAO_TUAN_DAXIANG_384_XIAOXIANG_2_SPECIAL_YAO_AND_384_SINGLE_LINE_TRANSFORMS",
         "TEXTUAL_CRITICAL_EDITION_STATUS": "NOT_ESTABLISHED",
         "INTERPRETATION_STATUS": "NOT_PERFORMED",
         "NONCLAIMS": [
             "NO_DIVINATION_JUDGMENT",
+            "NO_SPECIAL_YAO_PRIORITY_RULE",
             "NO_TEN_WINGS_COMPLETENESS_CLAIM",
             "NO_SINGLE_CANONICAL_EDITION_CLAIM",
         ],
