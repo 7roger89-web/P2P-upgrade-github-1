@@ -80,7 +80,7 @@ def main():
 
     out = {
         'DOMAIN': 'CEGUI',
-        'CAPABILITY': 'PLUM_APP_CASE_TO_PINNED_CE​GUI_PIPELINE'.replace('\u200b', ''),
+        'CAPABILITY': 'PLUM_APP_CASE_TO_PINNED_CEGUI_PIPELINE',
         'SOURCE_CASE_FACTS': {
             'problem': case_payload['problem'],
             'origin_trigram': case_payload['origin_trigram'],
