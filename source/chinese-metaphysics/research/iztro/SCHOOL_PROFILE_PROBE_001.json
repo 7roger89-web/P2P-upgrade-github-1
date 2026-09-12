@@ -1,0 +1,104 @@
+{
+  "task_id": "ZIWEI_SCHOOL_PROFILE_001",
+  "domain": "ZIWEI_DOUSHU",
+  "repo": "7roger89-web/P2P-upgrade-github-1",
+  "branch": "research/chinese-metaphysics-upstreams-01",
+  "pr": 98,
+  "base_main_observed": "96b6c1492f1ebdb0bd4c0729b58be22d1bd89a3f",
+  "pr_head_before": "5380780c1a90e809f7ebcd4f36a84eeaec3c32e0",
+  "law_source_used": "7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+  "iztro_pin": "2c7ef9be669df7b19d1799f4dce335fed3794f78",
+  "linden_pin": "a842dd65dabdc4ce42ec9688b88ae876858a9977",
+  "input_role": "REUSED_UPSTREAM_ENGINEERING_FIXTURE",
+  "input": {
+    "type": "solar",
+    "dateStr": "2010-10-18",
+    "timeIndex": 4,
+    "gender": "female"
+  },
+  "execution": {
+    "workflow_run_id": 34686343756,
+    "job_id": 103533868752,
+    "conclusion": "SUCCESS",
+    "profile_process_isolation": "SEPARATE_FRESH_NODE_PROCESSES",
+    "whole_11_repo_matrix_rerun": false
+  },
+  "profile_a": {
+    "profile_id": "IZTRO_DEFAULT_001",
+    "source": "SylarLong/iztro@2c7ef9be669df7b19d1799f4dce335fed3794f78:src/data/heavenlyStems.ts#gengHeavenly.mutagen",
+    "declared_school": "IZTRO_DEFAULT_CONVENTION",
+    "school_attribution": "UNVERIFIED",
+    "source_class": "UPSTREAM_DECLARED",
+    "provenance_status": "UPSTREAM_TABLE_VERIFIED / PRIMARY_SOURCE_UNVERIFIED",
+    "geng_table": {
+      "禄": "太阳",
+      "权": "武曲",
+      "科": "太阴",
+      "忌": "天同"
+    },
+    "observed_output": {
+      "禄": "太阳",
+      "权": "武曲",
+      "科": "太阴",
+      "忌": "天同"
+    },
+    "engineering_verdict": "PASS",
+    "provenance_verdict": "PARTIAL",
+    "predictive_verdict": "NOT_TESTED"
+  },
+  "profile_b": {
+    "profile_id": "IZTRO_OVERRIDE_LINDEN_TABLE_001",
+    "source": "Linden-TR/ziwei-doushu-skill@a842dd65dabdc4ce42ec9688b88ae876858a9977:references/sihua.md#生年天干四化表/庚",
+    "declared_school": "MULTI_SCHOOL_SYNTHESIS",
+    "school_attribution": "UNVERIFIED_BEYOND_MULTI_SCHOOL_SYNTHESIS",
+    "source_class": "REPO_DERIVED",
+    "provenance_status": "REPO_DERIVED_PENDING_PRIMARY_SOURCE",
+    "geng_table": {
+      "禄": "太阳",
+      "权": "武曲",
+      "科": "天同",
+      "忌": "天相"
+    },
+    "observed_output": {
+      "禄": "太阳",
+      "权": "武曲",
+      "科": "天同",
+      "忌": "天相"
+    },
+    "engineering_verdict": "PASS",
+    "provenance_verdict": "PARTIAL",
+    "predictive_verdict": "NOT_TESTED"
+  },
+  "chart_comparison": {
+    "five_elements_class_a": "木三局",
+    "five_elements_class_b": "木三局",
+    "chart_skeleton_same": true,
+    "profile_output_diff_proven": true,
+    "profile_contamination_prevented": true,
+    "skeleton": [
+      {"palace":"财帛","majorStars":["贪狼"],"minorStars":["右弼"]},
+      {"palace":"子女","majorStars":["天机","巨门"],"minorStars":["地劫"]},
+      {"palace":"夫妻","majorStars":["紫微","天相"],"minorStars":[]},
+      {"palace":"兄弟","majorStars":["天梁"],"minorStars":["火星"]},
+      {"palace":"命宫","majorStars":["七杀"],"minorStars":["文昌"]},
+      {"palace":"父母","majorStars":[],"minorStars":["天钺","地空","铃星","陀罗"]},
+      {"palace":"福德","majorStars":["廉贞"],"minorStars":["文曲","禄存","天马"]},
+      {"palace":"田宅","majorStars":[],"minorStars":["擎羊"]},
+      {"palace":"官禄","majorStars":["破军"],"minorStars":[]},
+      {"palace":"仆役","majorStars":["天同"],"minorStars":[]},
+      {"palace":"迁移","majorStars":["武曲","天府"],"minorStars":["左辅"]},
+      {"palace":"疾厄","majorStars":["太阳","太阴"],"minorStars":["天魁"]}
+    ]
+  },
+  "non_claims": {
+    "false_school_attribution_added": false,
+    "winner_or_majority_logic_added": false,
+    "predictive_claim_added": false,
+    "universal_ziwei_engine_created": false,
+    "master_sihua_table_created": false,
+    "interpretation_implemented": false
+  },
+  "overengineering_gate": "PASS / DO_IT",
+  "first_unresolved_provenance_gap": "Primary/authorized textual attribution of the two 庚 tables to specific historical schools remains unresolved.",
+  "next_smallest_slice": "Source-only provenance arbitration for the two 庚 rows using primary/authorized texts and exact locators; no engine behavior change."
+}

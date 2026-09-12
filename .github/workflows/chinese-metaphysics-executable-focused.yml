@@ -1,0 +1,57 @@
+name: Chinese Metaphysics Executable Focused
+on:
+  push:
+    branches: [research/chinese-metaphysics-upstreams-01]
+    paths:
+      - 'source/chinese-metaphysics/research/**/run_*_capability.*'
+      - 'source/chinese-metaphysics/research/**/test_*_capability.*'
+      - 'source/chinese-metaphysics/research/run_executable_smoke.sh'
+      - '.github/workflows/chinese-metaphysics-executable-focused.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert exact upstream pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C source/chinese-metaphysics/upstreams/iztro rev-parse HEAD)" = 2c7ef9be669df7b19d1799f4dce335fed3794f78
+          test "$(git -C source/chinese-metaphysics/upstreams/liuyao-divination rev-parse HEAD)" = 1a5a78b513c0e7b46dfb29f74043bcf978c32a3e
+          test "$(git -C source/chinese-metaphysics/upstreams/meihua-yishu rev-parse HEAD)" = 8a9a5e0f482dd225bfe4a1c52c2ae5546228607a
+          test "$(git -C source/chinese-metaphysics/upstreams/plum-cg rev-parse HEAD)" = 509fc43001a503d17a37db07bc56e069b1ff1c4f
+      - name: Build iztro
+        shell: bash
+        run: |
+          cd source/chinese-metaphysics/upstreams/iztro
+          npm install -g yarn@1.22.22 >/dev/null
+          yarn install --frozen-lockfile
+          yarn build
+      - name: Build plum-cg
+        shell: bash
+        run: |
+          cd source/chinese-metaphysics/upstreams/plum-cg
+          npm ci
+          npm run build
+      - name: Run focused capability tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node source/chinese-metaphysics/research/iztro/test_ziwei_capability.mjs
+          python source/chinese-metaphysics/research/liuyao-divination/test_liuyao_capability.py
+          python source/chinese-metaphysics/research/meihua-yishu/test_meihua_capability.py
+          node source/chinese-metaphysics/research/plum-cg/test_cegui_capability.mjs
+          bash source/chinese-metaphysics/research/run_executable_smoke.sh
