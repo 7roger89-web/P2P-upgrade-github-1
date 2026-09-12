@@ -23,6 +23,7 @@ on:
       - control-tower/yijing-transformation-01
       - control-tower/yijing-tuan-xiang-audit-01
       - control-tower/yijing-xiaoxiang-01
+      - control-tower/yijing-special-lines-01
       - control-tower/meihua-yijing-evidence-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
