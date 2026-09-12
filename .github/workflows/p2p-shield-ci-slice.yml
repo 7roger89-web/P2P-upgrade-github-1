@@ -11,7 +11,7 @@ name: P2P Shield - CI workflow safety slice (v0.2b)
 on:
   push:
     branches:
-      - arena/01a0931c-p2p-upgrade-github-1
+      - arena/01a093c0-p2p-upgrade-github-1
       - docs/p2p-shield-plan
 
 permissions:

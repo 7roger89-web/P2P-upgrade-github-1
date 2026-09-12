@@ -1,6 +1,6 @@
 {
   "profile_id": "SHIELD-BASE",
-  "profile_version": "0.2.0",
+  "profile_version": "0.2.1",
   "required_controls": {
     "SHIELD-SECRET-01": {
       "control_version": "0.1.0",
