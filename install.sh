@@ -274,7 +274,7 @@ if [[ -f "$instructions_path" && "$install_class" != "SAME_VERSION_REINSTALL" ]]
   cp "$instructions_path" "$backup_root/instructions/AGENTS.md"
 fi
 
-python3 - "$instructions_path" "$package_root/AGENTS.md" <<'PY'
+python3 - "$instructions_path" "$package_root/docs/p2p-development/P2P-AGENTS-INSTALL.md" <<'PY'
 from pathlib import Path
 import re
 import sys

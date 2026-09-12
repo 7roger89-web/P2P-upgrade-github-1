@@ -31,15 +31,17 @@ P2P_OPERATIONS_NOTEBOOK (this file)
         |      docs/ARENA_AGENT_MODE_PROTOCOL.md
         |
         +--> installed-project entrypoint
-               AGENTS.md (P2P block projected by installers)
+               target project AGENTS.md P2P block, projected by installers
+               from the thin source docs/p2p-development/P2P-AGENTS-INSTALL.md
 ```
 
 The Arena-specific session contract lives in
 `docs/ARENA_AGENT_MODE_PROTOCOL.md`; the Control Tower return/rotation
 contract lives in `docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md`;
-the installed-project digest lives in the `AGENTS.md` P2P block. This
-notebook is the operations memory above them; it does not duplicate their
-contracts.
+the installed-project entrypoint lives in the `AGENTS.md` P2P block (thin
+content sourced from `docs/p2p-development/P2P-AGENTS-INSTALL.md`, not a
+copy of this notebook). This notebook is the operations memory above them;
+it does not duplicate their contracts.
 
 ## 2. Install inheritance law
 
@@ -51,12 +53,15 @@ Every project receiving a normal P2P installation must receive/discover
 these operating rules automatically. Local installed projections and
 Git-tracked portable projections serve different transport cases:
 
-- `install.sh` / `install.ps1` project the package `AGENTS.md` into the
-  target project as the `<!-- BEGIN P2P CODEX --> ... <!-- END P2P CODEX -->`
-  entrypoint block (`P2P-PROJECT-BOOTSTRAP.md` documents this entry
-  contract). The inherited digest in that block names this notebook and the
-  P2P_SUPREME_OPERATING_LAW_V1 / P2P_BEGINNER_OPERATIONS_UX_V1 / RULE_ASSIMILATION_GATE_V1 rule sets, so
-  every installed project discovers them.
+- `install.sh` / `install.ps1` read the thin package file
+  `docs/p2p-development/P2P-AGENTS-INSTALL.md` and project that content into
+  the target project's `AGENTS.md` as the
+  `<!-- BEGIN P2P CODEX --> ... <!-- END P2P CODEX -->` entrypoint block
+  (`P2P-PROJECT-BOOTSTRAP.md` documents this entry contract). The thin
+  entrypoint preserves progressive disclosure: it names this notebook and the
+  P2P_SUPREME_OPERATING_LAW_V1 / P2P_BEGINNER_OPERATIONS_UX_V1 / RULE_ASSIMILATION_GATE_V1 rule sets and points
+  execution at the canonical/installed notebook instead of copying the full
+  rule bodies, so every installed project discovers them.
 - The installed full notebook is projected locally at
   `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` for executors operating in the
   installed project environment.
@@ -67,9 +72,11 @@ Git-tracked portable projections serve different transport cases:
   a generated transport projection, not a second law authority. For such
   remote-clone projects, project provisioning must generate and commit these
   two artifacts before substantive remote executor work.
-- Release packages ship the full notebook via
-  `scripts/package_release.py` (`DOC_FILES`) and the portable projector via
-  `SCRIPT_FILES`, so the same source can provision later projects without a
+- Release packages ship BOTH the full notebook
+  (`docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`) and the thin installed
+  entrypoint source (`docs/p2p-development/P2P-AGENTS-INSTALL.md`) through
+  `scripts/package_release.py` (`DOC_FILES`), and the portable projector via
+  `SCRIPT_FILES`, so the same sources can provision later projects without a
   manual copy step.
 - Example projects (APP GAME TRUYỆN, LOGISTICS, GIA PHẢ, future projects)
   are examples only. Nothing in this notebook or any runtime hard-codes
@@ -77,7 +84,7 @@ Git-tracked portable projections serve different transport cases:
 
 Do not maintain hand-edited per-project copies of the law. Regenerate a
 portable projection from the current P2P source/release package. If an
-installed digest or generated projection and this reachable canonical notebook
+installed entrypoint or generated projection and this reachable canonical notebook
 ever differ, the reachable canonical notebook wins.
 
 ## 2A. P2P_SUPREME_OPERATING_LAW_V1
@@ -1100,7 +1107,7 @@ context before substantive analysis or execution.
 
 | Operator | Discover | Canonical surface |
 | --- | --- | --- |
-| Beginner | `AGENTS.md` P2P block of the installed/provisioned project | this notebook digest + Control Tower |
+| Beginner | `AGENTS.md` P2P block of the installed/provisioned project (thin content projected from `docs/p2p-development/P2P-AGENTS-INSTALL.md`) | this notebook via the thin entrypoint + Control Tower |
 | Control Tower | this notebook + `CONTROL-TOWER-SESSION-HANDOFF.md` | docs/p2p-development/ |
 | Arena Writer / Supervisor | reachable canonical notebook, otherwise project `AGENTS.md` → `.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md` → `ARENA_AGENT_MODE_PROTOCOL.md` as available | docs/ARENA_AGENT_MODE_PROTOCOL.md + this notebook |
 | Codex / Manus / other executors | reachable canonical notebook; installed `.p2p/system/docs/...`; or generated `.p2p/portable/...` discovered from `AGENTS.md` | this notebook |
@@ -1114,7 +1121,9 @@ context before substantive analysis or execution.
   ticketing system, or second handoff framework.
 - Verification is structural: presence of the canonical rule sets, the
   assimilation gate, the machine-readable ledger, install-inheritance via the
-  `AGENTS.md` entrypoint, generated remote-clone projection via
+  thin `docs/p2p-development/P2P-AGENTS-INSTALL.md` source projected into the
+  target project's `AGENTS.md` entrypoint and shipped in release `DOC_FILES`,
+  generated remote-clone projection via
   `scripts/p2p_portable_law_projection.py`, and Arena/Control Tower linkage.
 - Promotion/deployment of anything in this notebook remains subject to the
   existing Owner Gate and governance surfaces.
