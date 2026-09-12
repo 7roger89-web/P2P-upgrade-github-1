@@ -13,6 +13,8 @@ from shield.runner import assess as secret, resolve_target_ref
 def emit(label, record):
     text = label + '\n```json\n' + json.dumps(record, indent=2) + '\n```\n'
     print(text, flush=True)
+    annotation = json.dumps(record, separators=(',', ':')).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+    print('::notice title=' + label + '::' + annotation, flush=True)
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
             f.write(text)
