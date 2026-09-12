@@ -1,4 +1,5 @@
 import importlib.util
+import sys
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,7 @@ MODULE_PATH = REPO_ROOT / "scripts" / "free_model_probe.py"
 SPEC = importlib.util.spec_from_file_location("free_model_probe", MODULE_PATH)
 assert SPEC and SPEC.loader
 probe = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = probe
 SPEC.loader.exec_module(probe)
 
 
