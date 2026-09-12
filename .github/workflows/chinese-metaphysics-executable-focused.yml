@@ -4,9 +4,12 @@ on:
     branches:
       - research/chinese-metaphysics-upstreams-01
       - control-tower/chinese-metaphysics-live-input-01
+      - control-tower/ziwei-qintian-lane-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
+      - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/test_*_capability.*'
+      - 'source/chinese-metaphysics/research/**/test_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/run_executable_smoke.sh'
       - '.github/workflows/chinese-metaphysics-executable-focused.yml'
   workflow_dispatch:
@@ -53,6 +56,7 @@ jobs:
         run: |
           set -euo pipefail
           node source/chinese-metaphysics/research/iztro/test_ziwei_capability.mjs
+          node source/chinese-metaphysics/research/iztro/test_ziwei_multilane.mjs
           python source/chinese-metaphysics/research/liuyao-divination/test_liuyao_capability.py
           python source/chinese-metaphysics/research/meihua-yishu/test_meihua_capability.py
           node source/chinese-metaphysics/research/plum-cg/test_cegui_capability.mjs
