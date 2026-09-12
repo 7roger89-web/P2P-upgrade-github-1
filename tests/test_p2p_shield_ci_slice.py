@@ -585,5 +585,87 @@ class ZizmorVerifyTests(unittest.TestCase):
         self.assertIn("ZIZMOR_BINARY_SHA256_MISSING", str(ctx2.exception))
 
 
+class DurableWorkflowRoutingContractTest(unittest.TestCase):
+    """Contract for the single durable BASE acceptance workflow.
+
+    Proves promotion-ready routing with no Arena session branch residue:
+    NO_ARENA_BRANCH_TRIGGER=YES, exact push/pull_request branch lists, no
+    pull_request_target/schedule/workflow_run/repository_dispatch, and the
+    read-only permissions + immutable pinned checkout security properties.
+    """
+
+    WORKFLOWS_DIR = REPO_ROOT / ".github" / "workflows"
+    WORKFLOW = WORKFLOWS_DIR / "p2p-shield-ci-slice.yml"
+
+    def test_durable_base_acceptance_routing_contract(self):
+        shield_workflows = sorted(
+            p.name for p in self.WORKFLOWS_DIR.glob("p2p-shield-*.yml")
+        )
+        # Historical session harnesses removed; exactly one durable workflow.
+        self.assertEqual(shield_workflows, ["p2p-shield-ci-slice.yml"])
+        # NO_ARENA_BRANCH_TRIGGER=YES — nowhere in any Shield workflow.
+        for name in shield_workflows:
+            self.assertNotIn(
+                "arena/", (self.WORKFLOWS_DIR / name).read_text(encoding="utf-8")
+            )
+        text = self.WORKFLOW.read_text(encoding="utf-8")
+        on_block = self._trigger_block(text)
+        self.assertEqual(
+            self._branches(on_block, "push"), ["docs/p2p-shield-plan", "main"]
+        )
+        self.assertEqual(
+            self._branches(on_block, "pull_request"), ["docs/p2p-shield-plan", "main"]
+        )
+        for forbidden in (
+            "pull_request_target",
+            "schedule:",
+            "workflow_run",
+            "repository_dispatch",
+        ):
+            self.assertNotIn(forbidden, on_block)
+        # Security properties must remain.
+        self.assertIn("permissions:", text)
+        self.assertIn("contents: read", text)
+        self.assertIn(
+            "actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803", text
+        )
+        self.assertIn("fetch-depth: 0", text)
+        self.assertIn("persist-credentials: false", text)
+
+    def _trigger_block(self, text):
+        lines = text.splitlines()
+        start = None
+        for i, line in enumerate(lines):
+            if line == "on:":
+                start = i + 1
+                break
+        self.assertIsNotNone(start, "workflow has no on: block")
+        block = []
+        for line in lines[start:]:
+            if line and not line[0].isspace():
+                break
+            block.append(line)
+        return "\n".join(block)
+
+    def _branches(self, block, trigger):
+        lines = block.splitlines()
+        try:
+            i = lines.index("  " + trigger + ":")
+        except ValueError:
+            self.fail("missing trigger: " + trigger)
+        branches = []
+        in_branches = False
+        for line in lines[i + 1:]:
+            if in_branches:
+                stripped = line.strip()
+                if stripped.startswith("- "):
+                    branches.append(stripped[2:].strip())
+                    continue
+                break
+            if line.strip() == "branches:":
+                in_branches = True
+        return branches
+
+
 if __name__ == "__main__":
     unittest.main()
