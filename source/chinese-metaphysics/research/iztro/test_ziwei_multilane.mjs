@@ -18,6 +18,7 @@ function run(args) {
 const fixture = run(['--fixture', 'default']);
 if (fixture.DOMAIN !== 'ZIWEI_DOUSHU') throw new Error('wrong domain');
 if (fixture.CAPABILITY !== 'SCHOOL_ISOLATED_MULTILANE') throw new Error('wrong capability');
+if (fixture.PROFILE_ID !== 'IZTRO_DEFAULT_001') throw new Error('default profile drift');
 if (fixture.WINNER !== null || fixture.MAJORITY_VOTE !== null || fixture.SYNTHESIZED_SCHOOL_OUTPUT !== null) throw new Error('school lanes were improperly resolved');
 if (fixture.LANES.XQR.LANE_ID !== 'XQR_REPO_DECLARED_6OUT_001') throw new Error('XQR lane missing');
 if (fixture.LANES.QINTIAN.LANE_ID !== 'QINTIAN_REPO_DECLARED_001') throw new Error('Qintian lane missing');
@@ -29,5 +30,12 @@ const custom = run(['--date', '2011-10-18', '--time-index', '4', '--gender', 'fe
 if (custom.INPUT_MODE !== 'CUSTOM') throw new Error('custom input path missing');
 if (custom.COMPARISON_POLICY !== 'SIDE_BY_SIDE_ONLY') throw new Error('comparison policy drift');
 if (custom.LANES.QINTIAN.SOURCE.pin !== 'ce449c0a190df09ebe2c14be8aecaac4f7cbf194') throw new Error('Qintian pin drift');
+
+const zhongzhou = run(['--fixture', 'default', '--algorithm', 'zhongzhou']);
+if (zhongzhou.PROFILE_ID !== 'IZTRO_ZHONGZHOU_MECHANICAL_001') throw new Error('Zhongzhou profile not propagated');
+if (zhongzhou.LANES.XQR.LANE_ID !== 'XQR_REPO_DECLARED_6OUT_001' || zhongzhou.LANES.QINTIAN.LANE_ID !== 'QINTIAN_REPO_DECLARED_001') throw new Error('method lanes missing under Zhongzhou profile');
+if (zhongzhou.WINNER !== null || zhongzhou.MAJORITY_VOTE !== null || zhongzhou.SYNTHESIZED_SCHOOL_OUTPUT !== null) throw new Error('Zhongzhou profile caused improper school resolution');
+if (zhongzhou.INPUT.dateStr !== fixture.INPUT.dateStr || zhongzhou.INPUT.timeIndex !== fixture.INPUT.timeIndex || zhongzhou.INPUT.gender !== fixture.INPUT.gender) throw new Error('Zhongzhou profile changed birth input');
+if (zhongzhou.DETERMINISTIC_CHART_FACTS.palace_count !== 12) throw new Error('Zhongzhou chart packet incomplete');
 
 console.log('ZIWEI_MULTILANE_TEST=PASS');
