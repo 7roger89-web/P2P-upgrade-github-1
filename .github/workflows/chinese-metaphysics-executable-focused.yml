@@ -6,6 +6,7 @@ on:
       - control-tower/chinese-metaphysics-live-input-01
       - control-tower/ziwei-qintian-lane-01
       - control-tower/liuyao-multi-read-01
+      - control-tower/meihua-number-casting-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
