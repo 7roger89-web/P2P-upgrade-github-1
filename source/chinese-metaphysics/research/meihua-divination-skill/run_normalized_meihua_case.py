@@ -13,6 +13,20 @@ NORMALIZER_UPSTREAM = (SCRIPT_DIR / '../../upstreams/meihua-divination-skill').r
 CALCULATOR_UPSTREAM = (SCRIPT_DIR / '../../upstreams/meihua-yishu').resolve()
 NORMALIZER = NORMALIZER_UPSTREAM / 'scripts' / 'normalize_case_input.py'
 
+# Fyrgo8 normalizer emits simplified forms for 兑/离. The pinned muyen
+# analyzer keys use traditional 兌/離. This table is transport-only; it does
+# not change trigram identity or merge doctrine between the two repositories.
+NORMALIZED_TO_ANALYZER_TRIGRAM = {
+    '乾': '乾',
+    '兑': '兌',
+    '离': '離',
+    '震': '震',
+    '巽': '巽',
+    '坎': '坎',
+    '艮': '艮',
+    '坤': '坤',
+}
+
 
 def fail(msg, code=2):
     print(msg, file=sys.stderr)
@@ -55,8 +69,15 @@ def normalize_input(input_path: str):
         fail(f'Normalizer emitted invalid JSON: {exc}', 1)
 
 
+def analyzer_trigram(value: str) -> str:
+    try:
+        return NORMALIZED_TO_ANALYZER_TRIGRAM[value]
+    except KeyError:
+        fail(f'No transport mapping for normalized trigram: {value}', 1)
+
+
 def simp(value):
-    return str(value).replace('澤', '泽').replace('變', '变').replace('體', '体')
+    return str(value).replace('澤', '泽').replace('兌', '兑').replace('離', '离').replace('變', '变').replace('體', '体')
 
 
 def main():
@@ -75,17 +96,23 @@ def main():
             1,
         )
 
+    analyzer_input = {
+        'upper_trigram': analyzer_trigram(normalized['upper_trigram']),
+        'lower_trigram': analyzer_trigram(normalized['lower_trigram']),
+        'moving_line': moving_lines[0],
+        'month_branch': normalized['month_branch'] or None,
+    }
+
     mc = load_calculator()
-    month_branch = normalized['month_branch'] or None
     try:
         result = mc._analyze_hexagram(
-            normalized['upper_trigram'],
-            normalized['lower_trigram'],
-            moving_lines[0],
-            month_branch,
+            analyzer_input['upper_trigram'],
+            analyzer_input['lower_trigram'],
+            analyzer_input['moving_line'],
+            analyzer_input['month_branch'],
         )
     except Exception as exc:
-        fail(f'Pinned meihua-yishu analyzer rejected normalized case: {exc}', 1)
+        fail(f'Pinned meihua-yishu analyzer rejected transported case: {exc}', 1)
 
     signs = normalized['external_signs']
     out = {
@@ -94,15 +121,17 @@ def main():
         'NORMALIZER_PIN': NORMALIZER_PIN,
         'CALCULATOR_PIN': CALCULATOR_PIN,
         'NORMALIZED_INPUT': normalized,
+        'ANALYZER_INPUT': analyzer_input,
+        'TRANSPORT_MAPPING': 'FYRGO_SIMPLIFIED_TRIGRAM_GLYPHS_TO_MUYEN_TRADITIONAL_KEYS',
         'MAIN_HEXAGRAM': simp(result['本卦']['名稱']),
         'MUTUAL_HEXAGRAM': simp(result['互卦']['名稱']),
         'CHANGED_HEXAGRAM': simp(result['變卦']['名稱']),
         'MOVING_LINE': moving_lines[0],
         'BODY_USE': result['體用'],
-        'SEASON_CONTEXT_STATUS': 'PRESENT' if month_branch else 'ABSENT_NOT_INFERRED',
+        'SEASON_CONTEXT_STATUS': 'PRESENT' if analyzer_input['month_branch'] else 'ABSENT_NOT_INFERRED',
         'EXTERNAL_SIGNS': signs,
         'EXTERNAL_SIGN_STATUS': 'PRESENT_NOT_INTERPRETED' if signs else 'MISSING_DO_NOT_FABRICATE',
-        'TRANSPORT_BOUNDARY': 'FYRGO_NORMALIZES_INPUT__MUYEN_COMPUTES_HEXAGRAM_FACTS__NO_DOCTRINE_MERGE',
+        'TRANSPORT_BOUNDARY': 'FYRGO_NORMALIZES_INPUT__GLYPH_TRANSPORT_ONLY__MUYEN_COMPUTES_HEXAGRAM_FACTS__NO_DOCTRINE_MERGE',
         'FINAL_PREDICTION': 'NOT_EMITTED',
         'PROVENANCE_STATUS': 'TWO_PIN_ENGINEERING_COMPOSITION__DOCTRINES_REMAIN_REPO_LOCAL',
         'PREDICTIVE_STATUS': 'NOT_TESTED',
