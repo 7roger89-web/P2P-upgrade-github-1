@@ -1,18 +1,30 @@
-# P2P Shield v0.2b - CI workflow safety slice acceptance. CANDIDATE infrastructure.
-# Purpose: verify SHIELD-CI-01 via pinned Zizmor 1.29.0 and 3-control SHIELD-BASE composition.
-# This is harness infrastructure on the candidate branch, not a promoted workflow.
+# P2P Shield - BASE acceptance (durable, single live workflow).
+# Role: the live CI gate for the SHIELD-BASE candidate. Executes the
+# consolidated acceptance evidence for the three required controls
+# (SHIELD-SECRET-01, SHIELD-DEPENDENCY-01, SHIELD-CI-01): provider
+# acquisition, focused Shield tests, Slice 1 secret acceptance, 3-control
+# BASE acceptance, CI PASS/FAIL/BLOCKED acceptance, and the
+# current-workflow diagnostic.
+# Supersedes the historical session harnesses p2p-shield-secret-slice.yml
+# and p2p-shield-base-slice.yml, deleted in the v0.2d promotion-hygiene
+# slice after a fresh step-by-step comparison showed no unique required
+# acceptance in either of them.
 # Provider policy lives in shield/providers/zizmor-1.29.0.json and is enforced by
 # shield/zizmor_acquire.py: official release only, exact pinned version, sha256
 # verified against GitHub release asset digest before any execution.
 # Single workflow, no matrix, no cache, no artifact service, no deployment.
 
-name: P2P Shield - CI workflow safety slice (v0.2b)
+name: P2P Shield - BASE acceptance
 
 on:
   push:
     branches:
-      - arena/01a093c0-p2p-upgrade-github-1
       - docs/p2p-shield-plan
+      - main
+  pull_request:
+    branches:
+      - docs/p2p-shield-plan
+      - main
 
 permissions:
   contents: read
@@ -27,7 +39,7 @@ jobs:
       GITLEAKS_MAPPING: shield/providers/gitleaks-8.18.4.json
       ZIZMOR_MAPPING: shield/providers/zizmor-1.29.0.json
     steps:
-      - name: Checkout candidate branch
+      - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
