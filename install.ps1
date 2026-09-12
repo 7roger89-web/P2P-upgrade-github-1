@@ -246,7 +246,7 @@ if (-not $Config.Contains("p2p_host_identity_hook.py") -and $PackageConfig.Conta
 
 $Begin = "<!-- BEGIN P2P CODEX -->"
 $End = "<!-- END P2P CODEX -->"
-$P2PInstructions = Get-Content -LiteralPath (Join-Path $PackageRoot "AGENTS.md") -Raw
+$P2PInstructions = Get-Content -LiteralPath (Join-Path $PackageRoot "docs\p2p-development\P2P-AGENTS-INSTALL.md") -Raw
 $Block = $Begin + $NL + $P2PInstructions.Trim() + $NL + $End
 if (Test-Path -LiteralPath $InstructionsPath) {
   if ($InstallClass -ne "SAME_VERSION_REINSTALL") {
