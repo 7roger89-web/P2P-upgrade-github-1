@@ -81,6 +81,8 @@ assert xiaoxiang["地水师"]["六三"] == "師或輿尸，凶，大無功也。
 assert xiaoxiang["地水师"]["六四"].startswith("左次")
 assert "志行正也" in xiaoxiang["水雷屯"]["初九"]
 assert "大得民也" in xiaoxiang["水雷屯"]["初九"]
+assert xiaoxiang["乾为天"]["上九"].startswith("“亢龍有悔”")
+assert "用九" not in xiaoxiang["乾为天"]
 
 # Mechanical equivalence: every one-line transformation across all 64 hexagrams
 # must match the pinned upstream's public cast_board() result. The oracle's month/day
