@@ -70,6 +70,7 @@ echo 'YIJING_LIVE_INPUT_SMOKE=PASS'
 # source-grounded textual evidence. Doctrine and provenance remain separate.
 MEIHUA_YIJING_OUT="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_yijing_evidence.py" --numbers 7 4 11)"
 grep -Fq '"DOMAIN": "MEIHUA_YIJING_EVIDENCE"' <<<"$MEIHUA_YIJING_OUT"
+grep -Fq '"CASTING_MODE": "NUMBER_CASTING"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"MEIHUA_UPPER_TRIGRAM_RAW": "艮 ☶"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"MEIHUA_LOWER_TRIGRAM_RAW": "震 ☳"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"CANONICAL_UPPER_TRIGRAM": "艮"' <<<"$MEIHUA_YIJING_OUT"
@@ -83,5 +84,20 @@ grep -Fq '"SELECTED_XIAOXIANG_PRESENT": "PASS"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"PROVENANCE_POLICY": "MECHANICAL_CROSS_LANE_BRIDGE_KEEP_SOURCE_PACKETS_INDEPENDENT"' <<<"$MEIHUA_YIJING_OUT"
 grep -Fq '"INTERPRETATION_STATUS": "NOT_PERFORMED"' <<<"$MEIHUA_YIJING_OUT"
 echo 'MEIHUA_YIJING_EVIDENCE_BRIDGE_SMOKE=PASS'
+
+# Same bridge, second already-supported Meihua input mode. This proves the
+# assembly is not accidentally hard-wired to number casting while preserving
+# the upstream time-casting semantics unchanged.
+MEIHUA_YIJING_TIME_OUT="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_yijing_evidence.py" \
+  --lunar-year 2024 --month 8 --day 15 --hour 10)"
+grep -Fq '"DOMAIN": "MEIHUA_YIJING_EVIDENCE"' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"CASTING_MODE": "TRADITIONAL_TIME_CASTING"' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"lunar_year": 2024' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"MAIN_HEXAGRAM_MAPPED_FROM_TRIGRAM_STRUCTURE": "PASS"' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"MOVING_LINE_MATCHES_SELECTED_YAO": "PASS"' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"SELECTED_YAO_TEXT_PRESENT": "PASS"' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"SELECTED_XIAOXIANG_PRESENT": "PASS"' <<<"$MEIHUA_YIJING_TIME_OUT"
+grep -Fq '"INTERPRETATION_STATUS": "NOT_PERFORMED"' <<<"$MEIHUA_YIJING_TIME_OUT"
+echo 'MEIHUA_YIJING_TIME_EVIDENCE_BRIDGE_SMOKE=PASS'
 
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
