@@ -116,4 +116,22 @@ grep -Fq '"INTERPRETATION_STATUS": "BOUNDED_STRUCTURAL_METHOD_ONLY"' <<<"$MEIHUA
 grep -Fq '"PREDICTIVE_STATUS": "NOT_ESTABLISHED_NEGATIVE_EVIDENCE_PRESERVED"' <<<"$MEIHUA_YIJING_CLASSICAL_OUT"
 echo 'MEIHUA_STRUCTURAL_READING_CLASSICAL_SMOKE=PASS'
 
+# Anti-hindsight engineering fixture. Seal the exact question + casting input +
+# evidence packet before any outcome can be supplied. Run twice to prove the
+# canonical SHA-256 lock is deterministic. This fixture is NOT predictive evidence.
+MEIHUA_LOCK_ONE="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_interpretation_lock.py" \
+  --question 'ENGINEERING_FIXTURE_DO_NOT_SCORE' --lunar-year 2024 --month 12 --day 17 --hour 15)"
+MEIHUA_LOCK_TWO="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_interpretation_lock.py" \
+  --question 'ENGINEERING_FIXTURE_DO_NOT_SCORE' --lunar-year 2024 --month 12 --day 17 --hour 15)"
+grep -Fq '"SCHEMA": "MEIHUA_INTERPRETATION_LOCK_V1"' <<<"$MEIHUA_LOCK_ONE"
+grep -Fq '"LOCK_STATUS": "SEALED_BEFORE_OUTCOME"' <<<"$MEIHUA_LOCK_ONE"
+grep -Fq '"OUTCOME_STATUS": "NOT_ACCEPTED_BY_LOCK_COMMAND"' <<<"$MEIHUA_LOCK_ONE"
+grep -Fq '"INITIAL_SIGNAL": "PRESSURE_ON_BODY"' <<<"$MEIHUA_LOCK_ONE"
+grep -Fq '"ENGINEERING_LOCK_FIXTURE_IS_NOT_PREDICTIVE_EVIDENCE"' <<<"$MEIHUA_LOCK_ONE"
+LOCK_HASH_ONE="$(python -c 'import json,sys; print(json.load(sys.stdin)["LOCK_SHA256"])' <<<"$MEIHUA_LOCK_ONE")"
+LOCK_HASH_TWO="$(python -c 'import json,sys; print(json.load(sys.stdin)["LOCK_SHA256"])' <<<"$MEIHUA_LOCK_TWO")"
+[[ "$LOCK_HASH_ONE" =~ ^[0-9a-f]{64}$ ]]
+test "$LOCK_HASH_ONE" = "$LOCK_HASH_TWO"
+echo 'MEIHUA_INTERPRETATION_LOCK_SMOKE=PASS'
+
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
