@@ -13,7 +13,7 @@ CEGUI_FIXTURE="$(node "$ROOT/source/chinese-metaphysics/research/plum-cg/run_ceg
 grep -Fq '"DOMAIN": "CEGUI"' <<<"$CEGUI_FIXTURE"
 echo 'CHINESE_METAPHYSICS_EXECUTABLE_FIXTURE_SMOKE=PASS'
 
-# Live-input road smoke: prove all four active domains still accept non-fixture
+# Live-input road smoke: prove all five active domains still accept non-fixture
 # input in one checkout. Outputs remain independent; there is no routing,
 # voting, shared doctrine, or cross-domain synthesis here.
 ZIWEI_OUT="$(node "$ROOT/source/chinese-metaphysics/research/iztro/run_ziwei_capability.mjs" \
@@ -43,5 +43,13 @@ grep -Fq '"INPUT_MODE": "CUSTOM"' <<<"$CEGUI_OUT"
 grep -Fq '"METHOD_ID": "METHOD_2_CE5_GEN_GUI5_KUN"' <<<"$CEGUI_OUT"
 grep -Fq '"SELECTION_STATUS": "EXPLICITLY_SELECTED"' <<<"$CEGUI_OUT"
 echo 'CEGUI_LIVE_INPUT_SMOKE=PASS'
+
+YIJING_OUT="$(python "$ROOT/source/chinese-metaphysics/research/yijing/run_yijing_capability.py" \
+  --hexagram 谦 --moving 2,3)"
+grep -Fq '"DOMAIN": "YIJING"' <<<"$YIJING_OUT"
+grep -Fq '"NORMALIZED_HEXAGRAM": "地山谦"' <<<"$YIJING_OUT"
+grep -Fq '"label": "六二"' <<<"$YIJING_OUT"
+grep -Fq '"text": "鸣谦，贞吉。"' <<<"$YIJING_OUT"
+echo 'YIJING_LIVE_INPUT_SMOKE=PASS'
 
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
