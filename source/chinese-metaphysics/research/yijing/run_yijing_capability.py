@@ -9,7 +9,13 @@ sys.path.insert(0, str(HERE))
 from yijing_corpus import UPSTREAM, load_corrected_corpus, source_metadata  # noqa: E402
 
 sys.path.insert(0, str(UPSTREAM / "src"))
-from liuyao.data import BAGUA, find_hexagram  # noqa: E402
+from liuyao.data import BAGUA, HEXAGRAMS, find_hexagram  # noqa: E402
+
+TRIGRAM_BY_BITS = {tuple(info["yao"]): name for name, info in BAGUA.items()}
+HEXAGRAM_BY_TRIGRAMS = {
+    (rec["upper"], rec["lower"]): rec["name"]
+    for rec in HEXAGRAMS.values()
+}
 
 
 def fail(msg, code=2):
@@ -39,8 +45,25 @@ def yao_label(rec, position):
     return f"{stem}{['', '', '二', '三', '四', '五'][position]}"
 
 
+def changed_hexagram_name(rec, positions):
+    """Flip moving lines bottom-to-top and map the resulting trigrams to one of the 64 hexagrams."""
+    if not positions:
+        return None
+    bits = list(BAGUA[rec["lower"]]["yao"] + BAGUA[rec["upper"]]["yao"])
+    for pos in positions:
+        bits[pos - 1] = 1 - bits[pos - 1]
+    changed_lower = TRIGRAM_BY_BITS[tuple(bits[:3])]
+    changed_upper = TRIGRAM_BY_BITS[tuple(bits[3:])]
+    name = HEXAGRAM_BY_TRIGRAMS.get((changed_upper, changed_lower))
+    if not name:
+        raise RuntimeError(
+            f"Cannot map transformed trigrams to hexagram: upper={changed_upper}, lower={changed_lower}"
+        )
+    return name
+
+
 def main():
-    p = argparse.ArgumentParser(description="Source-grounded Yi Jing gua/yao text lookup")
+    p = argparse.ArgumentParser(description="Source-grounded Yi Jing gua/yao text and transformation lookup")
     p.add_argument("--hexagram", required=True, help="Full name or upstream alias, e.g. 地山谦 or 谦")
     p.add_argument("--moving", help="Optional line positions, e.g. 2 or 2,3")
     a = p.parse_args()
@@ -63,15 +86,29 @@ def main():
             fail(f"Yi Jing corpus missing {name} {label}", 1)
         selected.append({"position": pos, "label": label, "text": text})
 
+    try:
+        changed_name = changed_hexagram_name(rec, positions)
+    except Exception as exc:
+        fail(f"Yi Jing transformation failed: {exc}", 1)
+    changed_entry = corpus.get(changed_name) if changed_name else None
+    changed_rec = find_hexagram(changed_name) if changed_name else None
+    if changed_name and (not changed_entry or not changed_rec):
+        fail(f"Yi Jing corpus/structure missing changed hexagram: {changed_name}", 1)
+
     print(json.dumps({
         "DOMAIN": "YIJING",
-        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TEXT_LOOKUP",
+        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_AND_CHANGE_LOOKUP",
         "INPUT": {"hexagram": a.hexagram, "moving": positions},
         "NORMALIZED_HEXAGRAM": name,
         "UPPER_TRIGRAM": rec["upper"],
         "LOWER_TRIGRAM": rec["lower"],
         "GUA_CI": entry["gua_ci"],
         "SELECTED_YAO": selected,
+        "CHANGED_HEXAGRAM": changed_name,
+        "CHANGED_UPPER_TRIGRAM": changed_rec["upper"] if changed_rec else None,
+        "CHANGED_LOWER_TRIGRAM": changed_rec["lower"] if changed_rec else None,
+        "CHANGED_GUA_CI": changed_entry["gua_ci"] if changed_entry else None,
+        "TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
         "SOURCE": source_metadata(),
         "STRUCTURAL_INTEGRITY": "VERIFIED_BY_64_HEXAGRAM_LINE_PATTERN_AUDIT",
         "TEXTUAL_CRITICAL_EDITION_STATUS": "NOT_ESTABLISHED",
