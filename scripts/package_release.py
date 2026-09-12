@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Build and verify a clean, reusable P2P Codex release archive."""
 
 from __future__ import annotations
@@ -87,6 +87,7 @@ DOC_FILES = (
     "docs/QUAN-TRI-FACT-EVAL-RAG.md",
     "docs/SU-DUNG.md",
     "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+    "docs/p2p-development/P2P-AGENTS-INSTALL.md",
     "docs/p2p-development/P2P-PORTABLE-LAW-PROJECTION.md",
 )
 SCRIPT_FILES = (

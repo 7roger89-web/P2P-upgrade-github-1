@@ -4,7 +4,9 @@ P2P_OPERATIONS_NOTEBOOK is the single canonical operations-memory artifact
 for P2P-installed projects. These checks are deliberately structural and
 lightweight: exactly one canonical notebook, the beginner rule set, the
 rule-assimilation gate with its machine-readable ledger, install inheritance
-through the AGENTS.md entrypoint, and Arena/Control Tower linkage.
+through the thin docs/p2p-development/P2P-AGENTS-INSTALL.md source that
+install.sh/install.ps1 project into the target project's AGENTS.md P2P
+CODEX block, and Arena/Control Tower linkage.
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOK = REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
 AGENTS = REPO_ROOT / "AGENTS.md"
+INSTALL_SOURCE = REPO_ROOT / "docs" / "p2p-development" / "P2P-AGENTS-INSTALL.md"
 ARENA_PROTOCOL = REPO_ROOT / "docs" / "ARENA_AGENT_MODE_PROTOCOL.md"
 CT_HANDOFF = REPO_ROOT / "docs" / "p2p-development" / "CONTROL-TOWER-SESSION-HANDOFF.md"
 P2P_SKILL = REPO_ROOT / ".agents" / "skills" / "p2p" / "SKILL.md"
@@ -28,6 +31,7 @@ INSTALL_SH = REPO_ROOT / "install.sh"
 INSTALL_PS1 = REPO_ROOT / "install.ps1"
 
 NOTEBOOK_RELATIVE = "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
+INSTALL_SOURCE_RELATIVE = "docs/p2p-development/P2P-AGENTS-INSTALL.md"
 INSTALLED_NOTEBOOK_RELATIVE = ".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md"
 
 RULE_HEADINGS = (
@@ -57,6 +61,10 @@ class P2POperationsNotebookTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.notebook_text = NOTEBOOK.read_text(encoding="utf-8")
         cls.agents_text = AGENTS.read_text(encoding="utf-8")
+        # The installed instruction source projected by install.sh /
+        # install.ps1 is the thin P2P-AGENTS-INSTALL.md file, NOT the
+        # development repository's root AGENTS.md digest.
+        cls.install_text = INSTALL_SOURCE.read_text(encoding="utf-8")
         cls.arena_text = ARENA_PROTOCOL.read_text(encoding="utf-8")
         cls.ct_text = CT_HANDOFF.read_text(encoding="utf-8")
         cls.p2p_skill_text = P2P_SKILL.read_text(encoding="utf-8")
@@ -133,15 +141,18 @@ class P2POperationsNotebookTests(unittest.TestCase):
             self.assertTrue(entry["evidence"], entry["id"])
 
     def test_install_inheritance_through_agents_md_entrypoint(self) -> None:
-        # install.sh / install.ps1 project package AGENTS.md into every
-        # installed project as the BEGIN/END P2P CODEX block; the digest in
-        # that block must declare the notebook and the rule sets.
-        self.assertIn("## P2P_OPERATIONS_NOTEBOOK (install-inherited operations memory)",
-                      self.agents_text)
+        # install.sh / install.ps1 read the thin package file
+        # docs/p2p-development/P2P-AGENTS-INSTALL.md and project its content
+        # into every installed project's AGENTS.md as the BEGIN/END P2P CODEX
+        # block. That thin entrypoint — not the development repo's root
+        # AGENTS.md — is the inherited instruction source, so it must carry
+        # the inheritance identity and the rule-set discovery anchors.
         self.assertIn("P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT",
-                      self.agents_text)
-        self.assertIn(NOTEBOOK_RELATIVE, self.agents_text)
-        self.assertIn("RULE_ASSIMILATION_GATE_V1", self.agents_text)
+                      self.install_text)
+        self.assertIn(NOTEBOOK_RELATIVE, self.install_text)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", self.install_text)
+        self.assertIn("P2P_BEGINNER_OPERATIONS_UX_V1", self.install_text)
+        self.assertIn("RULE_ASSIMILATION_GATE_V1", self.install_text)
 
     def test_arena_protocol_discovers_notebook(self) -> None:
         self.assertIn("## 11. P2P operations notebook discovery", self.arena_text)
@@ -155,7 +166,14 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("RULE_ASSIMILATION_GATE_V1", self.ct_text)
 
     def test_release_projection_includes_notebook(self) -> None:
+        # The release must ship BOTH the full canonical notebook and the thin
+        # installed instruction source that install.sh/install.ps1 read from
+        # the package; omitting the thin source breaks every installed
+        # project's AGENTS.md projection.
         self.assertIn(f'"{NOTEBOOK_RELATIVE}"', self.package_text)
+        self.assertIn(f'"{INSTALL_SOURCE_RELATIVE}"', self.package_text)
+        self.assertTrue(INSTALL_SOURCE.is_file(),
+                        "thin installed instruction source must exist")
 
     def test_rule15_completion_dialog_semantics(self) -> None:
         self.assertIn("### RULE 15 — ARENA_TASK_COMPLETION_DIALOG", self.notebook_text)
@@ -220,7 +238,9 @@ class P2POperationsNotebookTests(unittest.TestCase):
             "NO_BLIND_DELETE_AFTER_MERGE = YES",
         ):
             self.assertIn(law, flat, law)
-        # The installed digest stays consistent with the canonical rule set.
+        # The development repository's own AGENTS.md digest (kept for P2P dev
+        # sessions; NOT the installed-project source — installers project the
+        # thin P2P-AGENTS-INSTALL.md instead) stays consistent with the rule.
         self.assertIn("RULE 16 CONTEXT_HYGIENE_AND_PLAN_LIFECYCLE", self.agents_text)
         self.assertIn("OWNER_MICRO_LOOP_SUPPRESSION", self.agents_text)
 
@@ -238,8 +258,10 @@ class P2POperationsNotebookTests(unittest.TestCase):
     def test_release_package_contains_full_notebook(self) -> None:
         # A. Release package ships the FULL canonical notebook (DOC_FILES
         # entry and the actual file present with the canonical rule set), not a
-        # stub.
+        # stub. It also ships the thin installed instruction source alongside
+        # it, because install.sh/install.ps1 read that file from the package.
         self.assertIn(f'"{NOTEBOOK_RELATIVE}"', self.package_text)
+        self.assertIn(f'"{INSTALL_SOURCE_RELATIVE}"', self.package_text)
         self.assertTrue(NOTEBOOK.is_file(), "canonical notebook file must exist")
         self.assertIn("RULE_ASSIMILATION_GATE_V1", self.notebook_text)
         self.assertIn("### RULE 15", self.notebook_text)
@@ -266,28 +288,46 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("docs\\p2p-development\\P2P-OPERATIONS-NOTEBOOK.md", ps_text)
 
     def test_installed_agents_refers_local_installed_notebook(self) -> None:
-        # D. Installed AGENTS.md digest points to the local installed notebook,
-        # not (only) the development-source path.
-        self.assertIn(INSTALLED_NOTEBOOK_RELATIVE, self.agents_text)
-        self.assertIn("never depend on access to the original development repo",
-                      self.agents_text)
+        # D. The thin installed entrypoint (the content install.sh/install.ps1
+        # project into the target AGENTS.md) points to the local installed
+        # notebook projection, not (only) the development-source path, and
+        # keeps a fallback for installed projects that cannot reach the
+        # original development repository.
+        self.assertIn(INSTALLED_NOTEBOOK_RELATIVE, self.install_text)
+        self.assertIn("SUPREME_LAW_CAPSULE", self.install_text)
         self.assertIn("P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT",
-                      self.agents_text)
+                      self.install_text)
 
-    def test_installed_agents_digest_has_all_rules_01_15(self) -> None:
-        # E. Installed AGENTS.md digest enumerates RULE 01-15 (including 15).
-        match = re.search(
-            r"## P2P_OPERATIONS_NOTEBOOK.*?(?=\n## )", self.agents_text, re.DOTALL
-        )
-        self.assertIsNotNone(match, "digest section must exist")
-        assert match is not None
-        digest = match.group(0)
-        for n in range(1, 16):
-            self.assertRegex(digest, r"`RULE %02d " % n)
-        self.assertIn("RULE 15 ARENA_TASK_COMPLETION_DIALOG", digest)
-        self.assertRegex(digest, r"reached its requested\s+terminal state")
-        self.assertIn("KEEP WORKING", digest)
-        self.assertIn("never merely a technical `BLOCKED`", digest)
+    def test_installed_entrypoint_thin_rule_set_discovery(self) -> None:
+        # E. The thin installed entrypoint is NOT required to enumerate every
+        # RULE 01-19 body. It must instead identify the canonical notebook,
+        # name the three rule-set identities, point execution at the
+        # canonical/installed notebook, and keep the universal invariants,
+        # Owner Gates, and progressive disclosure — without recreating the old
+        # full AGENTS.md digest.
+        self.assertIn("P2P_OPERATIONS_NOTEBOOK", self.install_text)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", self.install_text)
+        self.assertIn("P2P_BEGINNER_OPERATIONS_UX_V1", self.install_text)
+        self.assertIn("RULE_ASSIMILATION_GATE_V1", self.install_text)
+        self.assertIn(NOTEBOOK_RELATIVE, self.install_text)
+        self.assertIn(INSTALLED_NOTEBOOK_RELATIVE, self.install_text)
+        # Full rule bodies remain in the canonical notebook and are loaded
+        # when relevant; they are not copied into the thin entrypoint.
+        self.assertIn("remain in the canonical/installed `P2P-OPERATIONS-NOTEBOOK.md`",
+                      self.install_text)
+        self.assertIn("not copied here", self.install_text)
+        for heading in RULE_HEADINGS:
+            self.assertNotIn(heading, self.install_text, heading)
+        # The projected content must not embed the P2P CODEX delimiters:
+        # installers replace the block by first match, so nested delimiters
+        # would corrupt re-installation.
+        self.assertNotIn("<!-- BEGIN P2P CODEX -->", self.install_text)
+        self.assertNotIn("<!-- END P2P CODEX -->", self.install_text)
+        # Key universal invariants / Owner Gates / progressive disclosure are
+        # preserved in the thin entrypoint itself.
+        self.assertIn("## Owner gates", self.install_text)
+        self.assertIn("## Progressive disclosure", self.install_text)
+        self.assertIn("## Anti-overengineering gate", self.install_text)
 
     def test_installed_notebook_contains_gate_and_rule15(self) -> None:
         # F. The installed canonical notebook contains RULE_ASSIMILATION_GATE_V1
@@ -299,7 +339,9 @@ class P2POperationsNotebookTests(unittest.TestCase):
 
     def test_install_projection_preserves_existing_agents_content(self) -> None:
         # G. The installer merge preserves owner/project pre-existing AGENTS
-        # content (backup + insert/replace of the P2P CODEX block only).
+        # content (backup + insert/replace of the P2P CODEX block only), with
+        # the thin P2P-AGENTS-INSTALL.md as the projected source — exactly
+        # what install.sh/install.ps1 inject.
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "AGENTS.md"
             owner_marker = "# My Project Owner Notes"
@@ -307,7 +349,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
                 owner_marker + "\n\nKeep this.\n<!-- BEGIN P2P CODEX -->\nOLD\n<!-- END P2P CODEX -->\n",
                 encoding="utf-8",
             )
-            source = AGENTS.read_text(encoding="utf-8")
+            source = INSTALL_SOURCE.read_text(encoding="utf-8")
             begin, end = "<!-- BEGIN P2P CODEX -->", "<!-- END P2P CODEX -->"
             block = begin + "\n" + source.strip() + "\n" + end
             text = target.read_text(encoding="utf-8")
@@ -318,10 +360,11 @@ class P2POperationsNotebookTests(unittest.TestCase):
             # Owner content preserved (markers outside the P2P block).
             self.assertIn(owner_marker, merged_text)
             self.assertIn("Keep this.", merged_text)
-            # Old stale block replaced, new digest present.
+            # Old stale block replaced, new thin entrypoint present.
             self.assertNotIn("OLD", merged_text)
+            self.assertIn("# P2P installed-agent entry point", merged_text)
             self.assertIn(INSTALLED_NOTEBOOK_RELATIVE, merged_text)
-            self.assertIn("RULE 15 ARENA_TASK_COMPLETION_DIALOG", merged_text)
+            self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", merged_text)
             # Exactly one P2P block.
             self.assertEqual(merged_text.count(begin), 1)
             self.assertEqual(merged_text.count(end), 1)

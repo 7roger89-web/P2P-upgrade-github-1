@@ -2,6 +2,12 @@
 
 This file is the compact instruction block injected into a project by the P2P installer. It is intentionally a map plus universal invariants, not a copy of the full operating manual. Load deeper material only when the current task requires it.
 
+## Install inheritance
+
+`P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. The P2P installers project this file into the target project's `AGENTS.md` as the managed P2P CODEX entrypoint block (`P2P-PROJECT-BOOTSTRAP.md` documents this entry contract), so every normally installed project discovers these rules automatically. Do not add the P2P CODEX block delimiters to this file: installers replace that block by first match, and nested delimiters would corrupt re-installation.
+
+This entry point stays thin on purpose. The full rule bodies — `P2P_SUPREME_OPERATING_LAW_V1`, `P2P_BEGINNER_OPERATIONS_UX_V1` (RULE 01–19), and `RULE_ASSIMILATION_GATE_V1` with its machine-readable ledger — remain in the canonical/installed `P2P-OPERATIONS-NOTEBOOK.md` and are loaded when the current task requires them; they are not copied here.
+
 ## Authority first
 
 For substantive P2P-managed analysis, planning, prompt writing, implementation, review, testing, or release work, establish `P2P_SUPREME_OPERATING_LAW_V1` context before acting.
