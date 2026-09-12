@@ -185,18 +185,20 @@ def load_xiaoxiang_records(apply_corrections=True):
 
     for name, raw_lines in _section_bodies():
         lines = _human_lines(raw_lines)
+        top_level_red = [
+            idx for idx, line in enumerate(lines)
+            if line.startswith("- <font") and 'color="#ff0000"' in line
+        ]
         yao_indices = []
-        for idx, line in enumerate(lines):
-            if not line.startswith("- <font") or 'color="#ff0000"' not in line:
-                continue
-            match = YAO_RE.match(_clean_fragment(_strip_bullet(line)))
+        for idx in top_level_red:
+            match = YAO_RE.match(_clean_fragment(_strip_bullet(lines[idx])))
             if not match:
                 continue
             yao_indices.append((idx, match.group(1), match.group(2).strip()))
 
         records = []
-        for n, (idx, label, yao_text) in enumerate(yao_indices):
-            stop = yao_indices[n + 1][0] if n + 1 < len(yao_indices) else len(lines)
+        for idx, label, yao_text in yao_indices:
+            stop = next((red_idx for red_idx in top_level_red if red_idx > idx), len(lines))
             xiang = []
             for j in range(idx + 1, stop):
                 if "《象》曰" not in lines[j]:
