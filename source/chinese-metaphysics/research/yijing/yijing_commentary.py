@@ -2,14 +2,13 @@
 import re
 from pathlib import Path
 
-from yijing_corpus import PIN, UPSTREAM, verify_pin
+from yijing_corpus import CORRECTIONS as CORPUS_CORRECTIONS, PIN, UPSTREAM, verify_pin
 
 DOC = UPSTREAM / "docs" / "易经六十四卦.md"
 
 # The pinned markdown mislabels the Tuan marker as Xiang in exactly these two
-# sections. We keep the vendor source untouched and reclassify the marker only
-# when the expected classical text is still present, so upstream drift fails
-# loudly instead of being overwritten silently.
+# sections. Keep vendor bytes untouched and reclassify only under strict text
+# preconditions so upstream drift fails loudly.
 LABEL_CORRECTIONS = {
     "雷水解": {
         "raw_label": "象",
@@ -36,38 +35,90 @@ LABEL_CORRECTIONS = {
 SECTION_RE = re.compile(r"^##\s+《([^》]+)》[^\n]*$", re.MULTILINE)
 MARKER_RE = re.compile(r"《([彖象])》曰[：:]?")
 TAG_RE = re.compile(r"<[^>]+>")
+YAO_RE = re.compile(r"^(初[九六]|[九六][二三四五]|上[九六])[：:](.*)$")
+
+# These are not new divination rules. They are read-time repairs for two source
+# defects already proven in the pinned Zhouyi corpus and independently sourced.
+XIAOXIANG_CORRECTIONS = {
+    "地山谦": {
+        "sources": CORPUS_CORRECTIONS["地山谦"]["sources"],
+        "reason": CORPUS_CORRECTIONS["地山谦"]["reason"],
+        "policy": "RELABEL_RAW_LINE_FOR_COMMENTARY_ALIGNMENT",
+    },
+    "地水师": {
+        "sources": CORPUS_CORRECTIONS["地水师"]["sources"],
+        "reason": (
+            "Pinned markdown omits 六四 and attaches the 六四 Xiaoxiang "
+            "‘左次，无咎，未失常也。’ under the 六三 block."
+        ),
+        "policy": "RESTORE_SIX_THREE_XIAOXIANG_AND_REASSIGN_RAW_SIX_FOUR_XIAOXIANG",
+    },
+}
 
 
 def _clean_fragment(text):
     return TAG_RE.sub("", text).strip()
 
 
-def _classical_marker_text(lines, index):
+def _strip_bullet(text):
+    return re.sub(r"^\s*-\s+", "", text)
+
+
+def _indent_width(line):
+    prefix = line[: len(line) - len(line.lstrip(" \t"))]
+    return sum(4 if ch == "\t" else 1 for ch in prefix)
+
+
+def _classical_marker_text(lines, index, stop=None):
+    """Read an inline marker payload or its direct green child bullets only."""
     line = lines[index]
     marker = MARKER_RE.search(line)
     if not marker:
         return None
 
-    payload = _clean_fragment(line[marker.end():])
-    pieces = [payload] if payload else []
+    payload = _clean_fragment(line[marker.end() :])
+    if payload:
+        return payload
 
-    # Some sections put only "《彖》曰：" on the top-level bullet and split the
-    # classical passage across one-indent green bullets. Collect those direct
-    # children only; two-indent explanatory prose and later line-level 小象 are
-    # deliberately excluded.
-    j = index + 1
-    while j < len(lines) and not lines[j].startswith("- "):
+    end = len(lines) if stop is None else stop
+    base_indent = _indent_width(line)
+    children = []
+    for j in range(index + 1, end):
         child = lines[j]
-        if re.match(r"^(?:\t| {1,4})-\s+<font\b", child):
-            cleaned = _clean_fragment(re.sub(r"^[\t ]+-\s+", "", child))
-            if cleaned and "《象》曰" not in cleaned and "《彖》曰" not in cleaned:
-                pieces.append(cleaned)
-        j += 1
+        if not re.match(r"^\s*-\s+", child):
+            continue
+        if 'color="#00b050"' not in child:
+            continue
+        cleaned = _clean_fragment(_strip_bullet(child))
+        if not cleaned or "《象》曰" in cleaned or "《彖》曰" in cleaned:
+            continue
+        indent = _indent_width(child)
+        if indent > base_indent:
+            children.append((indent, cleaned))
 
-    return "".join(pieces).strip()
+    if not children:
+        return ""
+    direct_indent = min(indent for indent, _ in children)
+    return "".join(text for indent, text in children if indent == direct_indent).strip()
 
 
-def load_sections(apply_label_corrections=True):
+def _human_lines(lines):
+    start = None
+    for i, line in enumerate(lines):
+        if line.startswith("### 人间道"):
+            start = i + 1
+            break
+    if start is None:
+        return []
+    end = len(lines)
+    for i in range(start, len(lines)):
+        if lines[i].startswith("### "):
+            end = i
+            break
+    return lines[start:end]
+
+
+def _section_bodies():
     verify_pin()
     if not DOC.exists():
         raise RuntimeError(f"Pinned Yi Jing commentary source missing: {DOC}")
@@ -75,12 +126,19 @@ def load_sections(apply_label_corrections=True):
     text = DOC.read_text(encoding="utf-8")
     matches = list(SECTION_RE.finditer(text))
     sections = []
-
     for i, match in enumerate(matches):
         name = match.group(1).strip()
         start = match.end()
         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        lines = text[start:end].splitlines()
+        sections.append((name, text[start:end].splitlines()))
+    return sections
+
+
+def load_sections(apply_label_corrections=True):
+    """Hexagram-level Tuan and Daxiang records from the 人间道 block."""
+    sections = []
+    for name, raw_lines in _section_bodies():
+        lines = _human_lines(raw_lines)
         markers = []
 
         for idx, line in enumerate(lines):
@@ -118,6 +176,101 @@ def load_sections(apply_label_corrections=True):
             }
 
         sections.append({"hexagram": name, "markers": markers})
+    return sections
+
+
+def load_xiaoxiang_records(apply_corrections=True):
+    """Line-level Xiaoxiang records; six regular lines only, excluding 用九/用六."""
+    sections = []
+
+    for name, raw_lines in _section_bodies():
+        lines = _human_lines(raw_lines)
+        top_level_red = [
+            idx for idx, line in enumerate(lines)
+            if line.startswith("- <font") and 'color="#ff0000"' in line
+        ]
+        yao_indices = []
+        for idx in top_level_red:
+            match = YAO_RE.match(_clean_fragment(_strip_bullet(lines[idx])))
+            if not match:
+                continue
+            yao_indices.append((idx, match.group(1), match.group(2).strip()))
+
+        records = []
+        for idx, label, yao_text in yao_indices:
+            stop = next((red_idx for red_idx in top_level_red if red_idx > idx), len(lines))
+            xiang = []
+            for j in range(idx + 1, stop):
+                if "《象》曰" not in lines[j]:
+                    continue
+                text = _classical_marker_text(lines, j, stop)
+                if text:
+                    xiang.append(text)
+            records.append({
+                "raw_label": label,
+                "label": label,
+                "yao_text": yao_text,
+                "xiaoxiang_candidates": xiang,
+            })
+
+        if apply_corrections and name == "地山谦":
+            if any(item["label"] == "六二" for item in records):
+                raise RuntimeError("Xiaoxiang correction precondition drift for 地山谦: 六二 already exists")
+            candidates = [
+                item for item in records
+                if item["raw_label"] == "六三"
+                and (item["yao_text"].startswith("嗚謙") or item["yao_text"].startswith("呜谦"))
+            ]
+            if len(candidates) != 1:
+                raise RuntimeError(
+                    "Xiaoxiang correction precondition drift for 地山谦: "
+                    f"expected one mislabeled 嗚謙 line, found {len(candidates)}"
+                )
+            candidates[0]["label"] = "六二"
+            candidates[0]["correction"] = {
+                "action": "RELABEL 六三 -> 六二",
+                "reason": XIAOXIANG_CORRECTIONS[name]["reason"],
+                "sources": XIAOXIANG_CORRECTIONS[name]["sources"],
+            }
+
+        if apply_corrections and name == "地水师":
+            if any(item["label"] == "六四" for item in records):
+                raise RuntimeError("Xiaoxiang correction precondition drift for 地水师: 六四 already exists")
+            candidates = [
+                item for item in records
+                if item["raw_label"] == "六三" and item["yao_text"].startswith("師或輿")
+            ]
+            if len(candidates) != 1:
+                raise RuntimeError(
+                    "Xiaoxiang correction precondition drift for 地水师: "
+                    f"expected one 六三 師或輿 line, found {len(candidates)}"
+                )
+            six_three = candidates[0]
+            if len(six_three["xiaoxiang_candidates"]) != 1 or not six_three["xiaoxiang_candidates"][0].startswith("左次"):
+                raise RuntimeError(
+                    "Xiaoxiang correction precondition drift for 地水师: "
+                    "expected the misattached 左次 Xiaoxiang under 六三"
+                )
+            raw_six_four_xiaoxiang = six_three["xiaoxiang_candidates"][0]
+            six_three["xiaoxiang_candidates"] = ["師或輿尸，凶，大無功也。"]
+            six_three["correction"] = {
+                "action": "RESTORE 六三 XIAOXIANG",
+                "reason": XIAOXIANG_CORRECTIONS[name]["reason"],
+                "sources": XIAOXIANG_CORRECTIONS[name]["sources"],
+            }
+            records.append({
+                "raw_label": None,
+                "label": "六四",
+                "yao_text": CORPUS_CORRECTIONS[name]["set"]["六四"],
+                "xiaoxiang_candidates": [raw_six_four_xiaoxiang],
+                "correction": {
+                    "action": "REASSIGN RAW 左次 XIAOXIANG TO 六四",
+                    "reason": XIAOXIANG_CORRECTIONS[name]["reason"],
+                    "sources": XIAOXIANG_CORRECTIONS[name]["sources"],
+                },
+            })
+
+        sections.append({"hexagram": name, "records": records})
 
     return sections
 
@@ -137,12 +290,33 @@ def load_corrected_commentary():
     return corpus
 
 
+def load_corrected_xiaoxiang():
+    corpus = {}
+    for section in load_xiaoxiang_records(apply_corrections=True):
+        name = section["hexagram"]
+        lines = {}
+        for record in section["records"]:
+            label = record["label"]
+            candidates = record["xiaoxiang_candidates"]
+            if label in lines:
+                raise RuntimeError(f"Duplicate Yi Jing Xiaoxiang label for {name} {label}")
+            if len(candidates) != 1 or not candidates[0]:
+                raise RuntimeError(
+                    f"Yi Jing Xiaoxiang structure invalid for {name} {label}: "
+                    f"candidates={len(candidates)}"
+                )
+            lines[label] = candidates[0]
+        corpus[name] = lines
+    return corpus
+
+
 def source_metadata():
     return {
         "repo": "Johnson-Jia/liuyao-divination",
         "pin": PIN,
         "path": "docs/易经六十四卦.md",
         "label_overlay": LABEL_CORRECTIONS,
-        "policy": "READ_TIME_LABEL_OVERLAY_VENDOR_UNMODIFIED",
-        "scope": "HEXAGRAM_LEVEL_TUAN_AND_DAXIANG_ONLY",
+        "xiaoxiang_overlay": XIAOXIANG_CORRECTIONS,
+        "policy": "READ_TIME_PROVENANCE_OVERLAY_VENDOR_UNMODIFIED",
+        "scope": "HEXAGRAM_LEVEL_TUAN_DAXIANG_AND_SIX_REGULAR_LINE_XIAOXIANG",
     }

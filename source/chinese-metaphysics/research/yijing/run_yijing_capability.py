@@ -7,7 +7,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from yijing_corpus import UPSTREAM, load_corrected_corpus, source_metadata as corpus_source_metadata  # noqa: E402
-from yijing_commentary import load_corrected_commentary, source_metadata as commentary_source_metadata  # noqa: E402
+from yijing_commentary import (  # noqa: E402
+    load_corrected_commentary,
+    load_corrected_xiaoxiang,
+    source_metadata as commentary_source_metadata,
+)
 
 sys.path.insert(0, str(UPSTREAM / "src"))
 from liuyao.data import BAGUA, HEXAGRAMS, find_hexagram  # noqa: E402
@@ -65,7 +69,7 @@ def changed_hexagram_name(rec, positions):
 
 def main():
     p = argparse.ArgumentParser(
-        description="Source-grounded Yi Jing gua/yao text, Tuan/Daxiang, and transformation lookup"
+        description="Source-grounded Yi Jing gua/yao text, Tuan/Daxiang/Xiaoxiang, and transformation lookup"
     )
     p.add_argument("--hexagram", required=True, help="Full name or upstream alias, e.g. 地山谦 or 谦")
     p.add_argument("--moving", help="Optional line positions, e.g. 2 or 2,3")
@@ -78,21 +82,33 @@ def main():
 
     corpus = load_corrected_corpus()
     commentary = load_corrected_commentary()
+    xiaoxiang = load_corrected_xiaoxiang()
     name = rec["name"]
     entry = corpus.get(name)
     commentary_entry = commentary.get(name)
+    xiaoxiang_entry = xiaoxiang.get(name)
     if not entry:
         fail(f"Yi Jing corpus missing normalized hexagram: {name}", 1)
     if not commentary_entry:
         fail(f"Yi Jing commentary missing normalized hexagram: {name}", 1)
+    if not xiaoxiang_entry:
+        fail(f"Yi Jing Xiaoxiang missing normalized hexagram: {name}", 1)
 
     selected = []
     for pos in positions:
         label = yao_label(rec, pos)
         text = entry.get("yao", {}).get(label)
+        line_xiaoxiang = xiaoxiang_entry.get(label)
         if not text:
             fail(f"Yi Jing corpus missing {name} {label}", 1)
-        selected.append({"position": pos, "label": label, "text": text})
+        if not line_xiaoxiang:
+            fail(f"Yi Jing Xiaoxiang missing {name} {label}", 1)
+        selected.append({
+            "position": pos,
+            "label": label,
+            "text": text,
+            "xiaoxiang": line_xiaoxiang,
+        })
 
     try:
         changed_name = changed_hexagram_name(rec, positions)
@@ -107,7 +123,7 @@ def main():
 
     print(json.dumps({
         "DOMAIN": "YIJING",
-        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_AND_CHANGE_LOOKUP",
+        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_XIAOXIANG_AND_CHANGE_LOOKUP",
         "INPUT": {"hexagram": a.hexagram, "moving": positions},
         "NORMALIZED_HEXAGRAM": name,
         "UPPER_TRIGRAM": rec["upper"],
@@ -125,7 +141,7 @@ def main():
         "TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
         "CORPUS_SOURCE": corpus_source_metadata(),
         "COMMENTARY_SOURCE": commentary_source_metadata(),
-        "STRUCTURAL_INTEGRITY": "VERIFIED_64_HEXAGRAM_GUA_YAO_TUAN_DAXIANG_AND_384_SINGLE_LINE_TRANSFORMS",
+        "STRUCTURAL_INTEGRITY": "VERIFIED_64_HEXAGRAM_GUA_YAO_TUAN_DAXIANG_384_XIAOXIANG_AND_384_SINGLE_LINE_TRANSFORMS",
         "TEXTUAL_CRITICAL_EDITION_STATUS": "NOT_ESTABLISHED",
         "INTERPRETATION_STATUS": "NOT_PERFORMED",
         "NONCLAIMS": [
