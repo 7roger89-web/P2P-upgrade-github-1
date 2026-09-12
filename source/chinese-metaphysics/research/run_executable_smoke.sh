@@ -134,4 +134,36 @@ LOCK_HASH_TWO="$(python -c 'import json,sys; print(json.load(sys.stdin)["LOCK_SH
 test "$LOCK_HASH_ONE" = "$LOCK_HASH_TWO"
 echo 'MEIHUA_INTERPRETATION_LOCK_SMOKE=PASS'
 
+# Outcome reveal engineering fixture. The genuine lock must verify, while a
+# post-lock question mutation must fail before any outcome can be attached.
+MEIHUA_LOCK_FILE="$(mktemp)"
+MEIHUA_TAMPERED_LOCK_FILE="$(mktemp)"
+trap 'rm -f "$MEIHUA_LOCK_FILE" "$MEIHUA_TAMPERED_LOCK_FILE"' EXIT
+printf '%s\n' "$MEIHUA_LOCK_ONE" >"$MEIHUA_LOCK_FILE"
+MEIHUA_REVEAL_OUT="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_outcome_reveal.py" \
+  --lock-file "$MEIHUA_LOCK_FILE" --outcome 'ENGINEERING_FIXTURE_OUTCOME_DO_NOT_SCORE')"
+grep -Fq '"SCHEMA": "MEIHUA_OUTCOME_REVEAL_V1"' <<<"$MEIHUA_REVEAL_OUT"
+grep -Fq '"LOCK_VERIFICATION": "PASS"' <<<"$MEIHUA_REVEAL_OUT"
+grep -Fq '"EVIDENCE_VERIFICATION": "PASS"' <<<"$MEIHUA_REVEAL_OUT"
+grep -Fq '"REVEAL_STATUS": "LOCK_VERIFIED_OUTCOME_ATTACHED"' <<<"$MEIHUA_REVEAL_OUT"
+grep -Fq '"SCORING_STATUS": "NOT_PERFORMED"' <<<"$MEIHUA_REVEAL_OUT"
+grep -Fq '"ENGINEERING_REVEAL_FIXTURE_IS_NOT_PREDICTIVE_EVIDENCE"' <<<"$MEIHUA_REVEAL_OUT"
+python - "$MEIHUA_LOCK_FILE" "$MEIHUA_TAMPERED_LOCK_FILE" <<'PY'
+import json
+import sys
+src, dst = sys.argv[1], sys.argv[2]
+with open(src, 'r', encoding='utf-8') as handle:
+    packet = json.load(handle)
+packet['QUESTION'] = 'POST_LOCK_TAMPER_ATTEMPT'
+with open(dst, 'w', encoding='utf-8') as handle:
+    json.dump(packet, handle, ensure_ascii=False, indent=2)
+PY
+if python "$ROOT/source/chinese-metaphysics/research/run_meihua_outcome_reveal.py" \
+  --lock-file "$MEIHUA_TAMPERED_LOCK_FILE" --outcome 'ENGINEERING_FIXTURE_OUTCOME_DO_NOT_SCORE' >/dev/null 2>&1; then
+  echo 'Tampered lock unexpectedly passed reveal verification' >&2
+  exit 1
+fi
+echo 'MEIHUA_OUTCOME_REVEAL_TAMPER_GUARD_SMOKE=PASS'
+echo 'MEIHUA_OUTCOME_REVEAL_SMOKE=PASS'
+
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
