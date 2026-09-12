@@ -20,6 +20,7 @@ on:
       - control-tower/metaphysics-live-road-smoke-01
       - control-tower/yijing-corpus-integrity-01
       - control-tower/yijing-live-road-smoke-01
+      - control-tower/yijing-transformation-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
