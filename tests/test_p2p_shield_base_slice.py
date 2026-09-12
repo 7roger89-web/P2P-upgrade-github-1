@@ -3,6 +3,8 @@ import hashlib
 import json
 from pathlib import Path
 import tempfile
+import subprocess
+from shield.runner import resolve_target_ref
 import unittest
 from unittest.mock import patch
 from shield import osv_acquire as osv
@@ -11,9 +13,21 @@ from shield.profile import evaluate, PROFILE
 
 
 class BaseSlice(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.target = Path(tmp.name)
+        self.git('init', '-q')
+        self.git('-c', 'user.name=Shield Fixture', '-c', 'user.email=fixture@example.invalid',
+                 '-c', 'commit.gpgsign=false', 'commit', '--allow-empty', '-qm', 'HEAD A')
+        self.target_ref = resolve_target_ref(self.target)
+
+    def git(self, *args):
+        subprocess.run(['git', '-C', str(self.target), *args], check=True, capture_output=True)
+
     def records(self):
         return [dict(schema='p2p-shield-evidence/1', control_id=c, control_version='0.1.0',
-                     scope=s, target='/fixture', target_ref='a'*40, timestamp='2026-09-12T00:00:00Z',
+                     scope=s, target=str(self.target), target_ref=self.target_ref, timestamp='2026-09-12T00:00:00Z',
                      status='PASS', findings_count=0, coverage=['assessed'], limitations=[],
                      provider='provider', provider_version='1', provider_source='upstream@tag',
                      reason='assessed', artifact_or_reference='run')
@@ -78,17 +92,45 @@ class BaseSlice(unittest.TestCase):
         for status in ['PASS','FAIL','BLOCKED']:
             records = self.records()
             records[-1].update(status=status, findings_count=1 if status=='FAIL' else 0)
-            result=evaluate(records,'/fixture','a'*40)
+            result=evaluate(records,self.target,self.target_ref)
             self.assertEqual(result['PROFILE_REQUIREMENTS_STATUS'],status)
             self.assertEqual(result['SYSTEM_SECURITY_VERDICT'],'NOT_EVALUATED')
             self.assertNotIn('SYSTEM_SECURE',result)
 
+    def test_mixed_session_profile_blocked(self):
+        for index in range(len(self.records())):
+            with self.subTest(required_record=index):
+                records = self.records()
+                records[index]['artifact_or_reference'] = 'run-B'
+                result = evaluate(records, self.target, self.target_ref)
+                self.assertEqual(result['PROFILE_REQUIREMENTS_STATUS'], 'BLOCKED')
+                self.assertEqual(result['reason'], 'EVIDENCE_SESSION_MISMATCH')
+                self.assertEqual(result['SYSTEM_SECURITY_VERDICT'], 'NOT_EVALUATED')
+
+    def test_target_head_advanced_blocked(self):
+        records = self.records()
+        self.assertEqual(evaluate(records, self.target, self.target_ref)['PROFILE_REQUIREMENTS_STATUS'], 'PASS')
+        (self.target / 'harmless.txt').write_text('HEAD B\n')
+        self.git('add', 'harmless.txt')
+        self.git('-c', 'user.name=Shield Fixture', '-c', 'user.email=fixture@example.invalid',
+                 '-c', 'commit.gpgsign=false', 'commit', '-qm', 'HEAD B')
+        self.assertNotEqual(resolve_target_ref(self.target), self.target_ref)
+        result = evaluate(records, self.target, self.target_ref)
+        self.assertEqual(result['PROFILE_REQUIREMENTS_STATUS'], 'BLOCKED')
+        self.assertEqual(result['reason'], 'TARGET_REF_STALE_OR_CHANGED')
+        self.assertEqual(result['SYSTEM_SECURITY_VERDICT'], 'NOT_EVALUATED')
+
+    def test_target_head_unavailable_blocked(self):
+        result = evaluate(self.records(), self.target / 'absent', self.target_ref)
+        self.assertEqual(result['PROFILE_REQUIREMENTS_STATUS'], 'BLOCKED')
+        self.assertEqual(result['reason'], 'TARGET_REF_STALE_OR_CHANGED')
+
     def test_missing_mismatch_malformed_duplicate_evidence(self):
-        for field,value in [('control_id','OTHER'),('control_version','9'),('target_ref','b'*40),('target','/other'),('schema','x'),('timestamp','bad'),('coverage',[]),('findings_count',True)]:
+        for field,value in [('scope','wrong_scope'),('artifact_or_reference',''),('artifact_or_reference',None),('artifact_or_reference',42),('control_id','OTHER'),('control_version','9'),('target_ref','b'*40),('target','/other'),('schema','x'),('timestamp','bad'),('coverage',[]),('findings_count',True)]:
             records=self.records(); records[-1][field]=value
-            self.assertEqual(evaluate(records,'/fixture','a'*40)['PROFILE_REQUIREMENTS_STATUS'],'BLOCKED')
+            self.assertEqual(evaluate(records,self.target,self.target_ref)['PROFILE_REQUIREMENTS_STATUS'],'BLOCKED')
         for records in [self.records()[:-1],self.records()+[self.records()[0]],[],[{}]]:
-            self.assertEqual(evaluate(records,'/fixture','a'*40)['PROFILE_REQUIREMENTS_STATUS'],'BLOCKED')
+            self.assertEqual(evaluate(records,self.target,self.target_ref)['PROFILE_REQUIREMENTS_STATUS'],'BLOCKED')
 
 
 if __name__ == '__main__': unittest.main()

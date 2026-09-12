@@ -2,6 +2,8 @@
 
 Input evidence is trusted assessment output, not a signed attestation. Caller
 must supply the expected target/ref from the assessment session, not from input.
+UNCOMMITTED_WORKTREE_MUTATION_AFTER_ASSESSMENT is not independently attested
+by profile composition. No universal evidence TTL is imposed.
 Missing/invalid evidence takes precedence over FAIL; valid FAIL over BLOCKED.
 """
 import argparse
@@ -9,6 +11,7 @@ import json
 from pathlib import Path
 import re
 from datetime import datetime
+from shield.runner import resolve_target_ref
 
 PROFILE = json.loads((Path(__file__).parent / 'profiles/SHIELD-BASE.json').read_text())
 
@@ -20,9 +23,12 @@ def evaluate(records, target, target_ref):
     try:
         if not re.fullmatch('[0-9a-f]{40,64}', target_ref) or not isinstance(records, list):
             return result
+        if resolve_target_ref(Path(target)) != target_ref:
+            result['reason'] = 'TARGET_REF_STALE_OR_CHANGED'
+            return result
         expected = {(cid, scope): rule['control_version'] for cid, rule in PROFILE['required_controls'].items()
                     for scope in rule['required_scopes']}
-        seen, statuses = set(), []
+        seen, statuses, references = set(), [], set()
         for e in records:
             key = (e['control_id'], e['scope'])
             if key not in expected or key in seen:
@@ -35,6 +41,7 @@ def evaluate(records, target, target_ref):
             for field in ('provider', 'provider_version', 'provider_source', 'reason', 'artifact_or_reference'):
                 if not isinstance(e[field], str) or not e[field]:
                     return result
+            references.add(e['artifact_or_reference'])
             stamp = datetime.fromisoformat(e['timestamp'].replace('Z', '+00:00'))
             if stamp.tzinfo is None or not isinstance(e['limitations'], list):
                 return result
@@ -49,6 +56,9 @@ def evaluate(records, target, target_ref):
                 return result
             statuses.append(e['status'])
         if seen != set(expected):
+            return result
+        if len(references) != 1:
+            result['reason'] = 'EVIDENCE_SESSION_MISMATCH'
             return result
         result['PROFILE_REQUIREMENTS_STATUS'] = ('FAIL' if 'FAIL' in statuses else
                                                   'BLOCKED' if 'BLOCKED' in statuses else 'PASS')

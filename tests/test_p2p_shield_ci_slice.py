@@ -221,7 +221,7 @@ jobs:
         self.assertEqual(set(control["status_semantics"].keys()), {"PASS", "FAIL", "BLOCKED"})
         self.assertIn("GitHub Actions", control["objective"])
         self.assertEqual(set(PROFILE["required_controls"].keys()), {"SHIELD-SECRET-01", "SHIELD-DEPENDENCY-01", "SHIELD-CI-01"})
-        self.assertEqual(PROFILE["profile_version"], "0.2.0")
+        self.assertEqual(PROFILE["profile_version"], "0.2.1")
 
     def test_source_and_version_pins(self):
         original = ziz.mapping()
@@ -329,7 +329,8 @@ jobs:
         evidence = shield_ci.assess(repo, self.stub, "test-provider-error")
         self.assertEqual(evidence["status"], "BLOCKED")
 
-    def test_profile_3_control_pass(self):
+    @patch("shield.profile.resolve_target_ref", return_value="a"*40)
+    def test_profile_3_control_pass(self, _resolve_ref):
         records = []
         for cid, rule in PROFILE["required_controls"].items():
             for scope in rule["required_scopes"]:
@@ -356,7 +357,8 @@ jobs:
         self.assertEqual(result["PROFILE_REQUIREMENTS_STATUS"], "PASS")
         self.assertEqual(result["SYSTEM_SECURITY_VERDICT"], "NOT_EVALUATED")
 
-    def test_profile_3_control_fail(self):
+    @patch("shield.profile.resolve_target_ref", return_value="a"*40)
+    def test_profile_3_control_fail(self, _resolve_ref):
         records = []
         for cid, rule in PROFILE["required_controls"].items():
             for scope in rule["required_scopes"]:
@@ -388,7 +390,8 @@ jobs:
         self.assertEqual(result["PROFILE_REQUIREMENTS_STATUS"], "FAIL")
         self.assertEqual(result["SYSTEM_SECURITY_VERDICT"], "NOT_EVALUATED")
 
-    def test_profile_3_control_blocked(self):
+    @patch("shield.profile.resolve_target_ref", return_value="a"*40)
+    def test_profile_3_control_blocked(self, _resolve_ref):
         records = []
         for cid, rule in PROFILE["required_controls"].items():
             for scope in rule["required_scopes"]:
@@ -420,7 +423,8 @@ jobs:
         self.assertEqual(result["PROFILE_REQUIREMENTS_STATUS"], "BLOCKED")
         self.assertEqual(result["SYSTEM_SECURITY_VERDICT"], "NOT_EVALUATED")
 
-    def test_no_system_security_overclaim(self):
+    @patch("shield.profile.resolve_target_ref", return_value="a"*40)
+    def test_no_system_security_overclaim(self, _resolve_ref):
         records = []
         for cid, rule in PROFILE["required_controls"].items():
             for scope in rule["required_scopes"]:
