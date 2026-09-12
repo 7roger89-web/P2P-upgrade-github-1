@@ -11,6 +11,7 @@ on:
       - control-tower/liuyao-yinyo-reasoning-01
       - control-tower/meihua-normalized-case-01
       - control-tower/plum-case-meihua-assembly-01
+      - control-tower/plum-case-cegui-assembly-01
     paths:
       - 'source/chinese-metaphysics/research/**/run_*_capability.*'
       - 'source/chinese-metaphysics/research/**/run_ziwei_multilane.mjs'
@@ -18,12 +19,14 @@ on:
       - 'source/chinese-metaphysics/research/**/run_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/run_normalized_meihua_case.py'
       - 'source/chinese-metaphysics/research/**/run_plum_case_to_meihua.py'
+      - 'source/chinese-metaphysics/research/**/run_plum_case_to_cegui.py'
       - 'source/chinese-metaphysics/research/**/test_*_capability.*'
       - 'source/chinese-metaphysics/research/**/test_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/test_liuyao_multi_read.py'
       - 'source/chinese-metaphysics/research/**/test_yinyo_reasoning_lane.py'
       - 'source/chinese-metaphysics/research/**/test_normalized_meihua_case.py'
       - 'source/chinese-metaphysics/research/**/test_plum_case_to_meihua.py'
+      - 'source/chinese-metaphysics/research/**/test_plum_case_to_cegui.py'
       - 'source/chinese-metaphysics/research/run_executable_smoke.sh'
       - '.github/workflows/chinese-metaphysics-executable-focused.yml'
   workflow_dispatch:
@@ -80,5 +83,6 @@ jobs:
           python source/chinese-metaphysics/research/meihua-yishu/test_meihua_capability.py
           python source/chinese-metaphysics/research/meihua-divination-skill/test_normalized_meihua_case.py
           python source/chinese-metaphysics/research/plum-app/test_plum_case_to_meihua.py
+          python source/chinese-metaphysics/research/plum-app/test_plum_case_to_cegui.py
           node source/chinese-metaphysics/research/plum-cg/test_cegui_capability.mjs
           bash source/chinese-metaphysics/research/run_executable_smoke.sh
