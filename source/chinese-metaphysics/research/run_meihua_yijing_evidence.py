@@ -43,22 +43,65 @@ def canonical_trigram(name):
     return TRIGRAM_NORMALIZATION.get(token, token)
 
 
+def build_meihua_command(args):
+    number_custom = args.numbers is not None
+    time_values = [args.lunar_year, args.month, args.day, args.hour]
+    time_custom = any(value is not None for value in time_values)
+
+    if int(number_custom) + int(time_custom) != 1:
+        fail(
+            "Choose exactly one casting mode: --numbers N1 N2 [N3] OR "
+            "--lunar-year YYYY --month M --day D --hour H",
+            2,
+        )
+
+    if number_custom:
+        if len(args.numbers) not in (2, 3):
+            fail("Number casting usage: --numbers N1 N2 [N3]", 2)
+        return (
+            [sys.executable, str(MEIHUA_RUNNER), "--numbers", *[str(x) for x in args.numbers]],
+            "NUMBER_CASTING",
+        )
+
+    if any(value is None for value in time_values):
+        fail("Time casting requires --lunar-year YYYY --month M --day D --hour H", 2)
+    return (
+        [
+            sys.executable,
+            str(MEIHUA_RUNNER),
+            "--lunar-year",
+            str(args.lunar_year),
+            "--month",
+            str(args.month),
+            "--day",
+            str(args.day),
+            "--hour",
+            str(args.hour),
+        ],
+        "TRADITIONAL_TIME_CASTING",
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Mechanical bridge: Meihua number casting -> source-grounded Yi Jing evidence"
+        description="Mechanical bridge: Meihua casting -> source-grounded Yi Jing evidence"
     )
-    parser.add_argument("--numbers", nargs="+", type=int, required=True, help="Two or three Meihua casting numbers")
+    parser.add_argument("--numbers", nargs="+", type=int, help="Two or three Meihua casting numbers")
+    parser.add_argument("--lunar-year", type=int)
+    parser.add_argument("--month", type=int)
+    parser.add_argument("--day", type=int)
+    parser.add_argument("--hour", type=int)
     args = parser.parse_args()
 
-    if len(args.numbers) not in (2, 3):
-        fail("Number casting usage: --numbers N1 N2 [N3]", 2)
-
-    meihua = run_json(
-        [sys.executable, str(MEIHUA_RUNNER), "--numbers", *[str(x) for x in args.numbers]],
-        "Meihua casting",
-    )
-    if meihua.get("DOMAIN") != "MEIHUA_YISHU" or meihua.get("CASTING_MODE") != "NUMBER_CASTING":
-        fail("Unexpected Meihua packet contract")
+    meihua_command, expected_casting_mode = build_meihua_command(args)
+    meihua = run_json(meihua_command, "Meihua casting")
+    if meihua.get("DOMAIN") != "MEIHUA_YISHU":
+        fail("Unexpected Meihua packet domain")
+    if meihua.get("CASTING_MODE") != expected_casting_mode:
+        fail(
+            f"Unexpected Meihua casting mode: expected {expected_casting_mode}, "
+            f"got {meihua.get('CASTING_MODE')}"
+        )
 
     upper = canonical_trigram(meihua.get("UPPER_TRIGRAM"))
     lower = canonical_trigram(meihua.get("LOWER_TRIGRAM"))
@@ -98,8 +141,9 @@ def main():
 
     packet = {
         "DOMAIN": "MEIHUA_YIJING_EVIDENCE",
-        "CAPABILITY": "MEIHUA_NUMBER_CAST_TO_SOURCE_GROUNDED_YIJING_EVIDENCE",
-        "INPUT": {"numbers": args.numbers},
+        "CAPABILITY": "MEIHUA_CAST_TO_SOURCE_GROUNDED_YIJING_EVIDENCE",
+        "CASTING_MODE": expected_casting_mode,
+        "INPUT": meihua.get("INPUT"),
         "BRIDGE": {
             "MEIHUA_UPPER_TRIGRAM_RAW": meihua.get("UPPER_TRIGRAM"),
             "MEIHUA_LOWER_TRIGRAM_RAW": meihua.get("LOWER_TRIGRAM"),
@@ -126,6 +170,7 @@ def main():
         "NONCLAIMS": [
             "NO_CROSS_REPO_DOCTRINE_MERGE",
             "NO_DIVINATION_JUDGMENT",
+            "NO_CASTING_MODE_EQUIVALENCE_CLAIM",
             "NO_FULL_TRADITIONAL_SIMPLIFIED_NAME_EQUIVALENCE_CLAIM",
             "NO_PREDICTIVE_VALIDITY_CLAIM",
         ],
