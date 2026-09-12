@@ -175,6 +175,10 @@ def main(argv=None) -> int:
     parser.add_argument("--evidence-reference", default="local-runtime-test", help="Reference stored with evidence")
     parser.add_argument("--summary-file", default=None, help="GITHUB_STEP_SUMMARY file")
     args = parser.parse_args(argv)
+    if args.work_dir:
+        Path(args.work_dir).mkdir(parents=True, exist_ok=True)
+    if args.evidence_dir:
+        Path(args.evidence_dir).mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=WORK_PREFIX, dir=args.work_dir) as work_dir:
         work_path = Path(work_dir)
         fixtures = build_fixtures(work_path)

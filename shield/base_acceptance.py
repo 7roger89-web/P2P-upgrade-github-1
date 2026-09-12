@@ -65,7 +65,7 @@ def main():
             emit('OSV_ACQUISITION=BLOCKED', {'reason': type(exc).__name__, 'detail': str(exc)[:200]})
             failures.append('OSV_ACQUISITION_BLOCKED')
         # Acquire Zizmor
-        # Prefer env var if provided (hosted workflow sets it), otherwise acquire
+        # Prefer env var if provided (hosted workflow sets it), otherwise try common runner temp locations, otherwise acquire
         env_ziz = os.environ.get('ZIZMOR_EXECUTABLE')
         emit('ZIZMOR_ENV_DEBUG', {'ZIZMOR_EXECUTABLE': env_ziz, 'exists': str(Path(env_ziz).is_file()) if env_ziz else 'no_env', 'RUNNER_TEMP': os.environ.get('RUNNER_TEMP'), 'runner_temp_expanded': str(Path(os.environ.get('RUNNER_TEMP','')) / 'zizmor' / 'zizmor') if os.environ.get('RUNNER_TEMP') else 'none'})
         # also list temp dir if exists
@@ -76,11 +76,24 @@ def main():
                 emit('RUNNER_TEMP_LISTING', {'listing': listing})
         except Exception as exc:
             emit('RUNNER_TEMP_LISTING_FAILED', {'reason': str(exc)})
-        if env_ziz and Path(env_ziz).is_file():
-            ziz_binary = Path(env_ziz)
+        # Try candidates in order: env var, RUNNER_TEMP, common path
+        candidates = []
+        if env_ziz:
+            candidates.append(Path(env_ziz))
+        runner_temp = os.environ.get('RUNNER_TEMP')
+        if runner_temp:
+            candidates.append(Path(runner_temp) / 'zizmor' / 'zizmor')
+        candidates.append(Path('/home/runner/work/_temp/zizmor/zizmor'))
+        found = None
+        for cand in candidates:
+            if cand.is_file():
+                found = cand
+                break
+        if found:
+            ziz_binary = found
             try:
                 observed = zizmor_acquire.verify_executable(ziz_binary)
-                emit('ZIZMOR_ACQUISITION=VERIFIED', {'provider': 'Zizmor', 'observed_version': observed, 'executable': str(ziz_binary)})
+                emit('ZIZMOR_ACQUISITION=VERIFIED', {'provider': 'Zizmor', 'observed_version': observed, 'executable': str(ziz_binary), 'candidate': str(found)})
             except Exception as exc:
                 emit('ZIZMOR_ACQUISITION=BLOCKED', {'reason': type(exc).__name__, 'detail': str(exc)[:200]})
                 failures.append('ZIZMOR_ACQUISITION_BLOCKED')
