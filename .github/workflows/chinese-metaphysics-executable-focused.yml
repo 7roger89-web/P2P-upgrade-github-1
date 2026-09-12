@@ -35,6 +35,7 @@ on:
       - 'source/chinese-metaphysics/research/**/run_plum_case_to_meihua.py'
       - 'source/chinese-metaphysics/research/**/run_plum_case_to_cegui.py'
       - 'source/chinese-metaphysics/research/**/run_plum_case_ignition.py'
+      - 'source/chinese-metaphysics/research/run_meihua_yijing_evidence.py'
       - 'source/chinese-metaphysics/research/**/test_*_capability.*'
       - 'source/chinese-metaphysics/research/**/test_ziwei_multilane.mjs'
       - 'source/chinese-metaphysics/research/**/test_ziwei_algorithm_compare.mjs'
