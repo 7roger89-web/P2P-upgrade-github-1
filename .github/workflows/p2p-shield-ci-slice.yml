@@ -48,17 +48,19 @@ jobs:
       - name: Debug provider paths before acceptance
         if: always()
         run: |
-          echo "RUNNER_TEMP=$RUNNER_TEMP"
-          echo "runner.temp=${{ runner.temp }}"
-          ls -R "$RUNNER_TEMP" 2>&1 | head -n100
-          echo "--- check gitleaks ---"
-          ls -lh "$RUNNER_TEMP/gitleaks" 2>&1 | head -n50
-          test -f "$RUNNER_TEMP/gitleaks/gitleaks" && "$RUNNER_TEMP/gitleaks/gitleaks" version 2>&1 | head -n5 || echo "gitleaks missing"
-          echo "--- check zizmor ---"
-          ls -lh "$RUNNER_TEMP/zizmor" 2>&1 | head -n50
-          test -f "$RUNNER_TEMP/zizmor/zizmor" && "$RUNNER_TEMP/zizmor/zizmor" --version 2>&1 | head -n5 || echo "zizmor missing"
-          echo "--- env ---"
-          env | grep -i runner || true
+          echo "RUNNER_TEMP=$RUNNER_TEMP" | tee /tmp/provider_debug.txt
+          echo "runner.temp=${{ runner.temp }}" | tee -a /tmp/provider_debug.txt
+          ls -R "$RUNNER_TEMP" 2>&1 | head -n200 | tee -a /tmp/provider_debug.txt
+          echo "--- check gitleaks ---" | tee -a /tmp/provider_debug.txt
+          ls -lh "$RUNNER_TEMP/gitleaks" 2>&1 | head -n50 | tee -a /tmp/provider_debug.txt
+          test -f "$RUNNER_TEMP/gitleaks/gitleaks" && "$RUNNER_TEMP/gitleaks/gitleaks" version 2>&1 | head -n5 | tee -a /tmp/provider_debug.txt || echo "gitleaks missing" | tee -a /tmp/provider_debug.txt
+          echo "--- check zizmor ---" | tee -a /tmp/provider_debug.txt
+          ls -lh "$RUNNER_TEMP/zizmor" 2>&1 | head -n50 | tee -a /tmp/provider_debug.txt
+          test -f "$RUNNER_TEMP/zizmor/zizmor" && "$RUNNER_TEMP/zizmor/zizmor" --version 2>&1 | head -n5 | tee -a /tmp/provider_debug.txt || echo "zizmor missing" | tee -a /tmp/provider_debug.txt
+          echo "--- env ---" | tee -a /tmp/provider_debug.txt
+          env | grep -i runner 2>&1 | tee -a /tmp/provider_debug.txt || true
+          mkdir -p "$RUNNER_TEMP/ci-work" "$RUNNER_TEMP/ci-evidence" 2>&1 | tee -a /tmp/provider_debug.txt
+          ls -ld "$RUNNER_TEMP/ci-work" "$RUNNER_TEMP/ci-evidence" 2>&1 | tee -a /tmp/provider_debug.txt || true
 
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
@@ -108,12 +110,17 @@ jobs:
           python3 -m shield.ci --target . --executable "$RUNNER_TEMP/zizmor/zizmor" --reference "$EVIDENCE_REFERENCE" || true
 
       - name: Publish debug comment on failure
-        if: failure()
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Posting debug comment to PR 103"
-          BODY=$(printf "Debug for run %s\n\nBase log tail:\n\`\`\`\n%s\n\`\`\`\n\nCI log tail:\n\`\`\`\n%s\n\`\`\`\n" "$GITHUB_RUN_ID" "$(tail -n 80 /tmp/base.log 2>/dev/null | head -c 3000)" "$(tail -n 80 /tmp/ci.log 2>/dev/null | head -c 3000)")
+          echo "Posting debug for run $GITHUB_RUN_ID"
+          echo "=== provider debug ==="
+          cat /tmp/provider_debug.txt 2>/dev/null || echo "no provider debug"
+          echo "=== base log ==="
+          cat /tmp/base.log 2>/dev/null | head -c 5000 || echo "no base log"
+          echo "=== ci log ==="
+          cat /tmp/ci.log 2>/dev/null | head -c 5000 || echo "no ci log"
+          # Always try to post a comment with available logs
+          BODY=$(printf "Debug for run %s\n\nProvider debug:\n\`\`\`\n%s\n\`\`\`\n\nBase log (head 4000):\n\`\`\`\n%s\n\`\`\`\n\nCI log (head 4000):\n\`\`\`\n%s\n\`\`\`\n" "$GITHUB_RUN_ID" "$(cat /tmp/provider_debug.txt 2>/dev/null | head -c 2000)" "$(cat /tmp/base.log 2>/dev/null | head -c 4000)" "$(cat /tmp/ci.log 2>/dev/null | head -c 4000)")
           gh api --method POST "/repos/7roger89-web/P2P-upgrade-github-1/issues/103/comments" -f body="$BODY" || echo "comment failed"
-          # Also post to check via notice
-          echo "::notice::Base tail $(tail -n 30 /tmp/base.log 2>/dev/null | tr '\n' ' ' | cut -c1-400)"
