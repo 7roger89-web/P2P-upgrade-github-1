@@ -6,7 +6,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from yijing_corpus import UPSTREAM, load_corrected_corpus, source_metadata  # noqa: E402
+from yijing_corpus import UPSTREAM, load_corrected_corpus, source_metadata as corpus_source_metadata  # noqa: E402
+from yijing_commentary import load_corrected_commentary, source_metadata as commentary_source_metadata  # noqa: E402
 
 sys.path.insert(0, str(UPSTREAM / "src"))
 from liuyao.data import BAGUA, HEXAGRAMS, find_hexagram  # noqa: E402
@@ -63,7 +64,9 @@ def changed_hexagram_name(rec, positions):
 
 
 def main():
-    p = argparse.ArgumentParser(description="Source-grounded Yi Jing gua/yao text and transformation lookup")
+    p = argparse.ArgumentParser(
+        description="Source-grounded Yi Jing gua/yao text, Tuan/Daxiang, and transformation lookup"
+    )
     p.add_argument("--hexagram", required=True, help="Full name or upstream alias, e.g. 地山谦 or 谦")
     p.add_argument("--moving", help="Optional line positions, e.g. 2 or 2,3")
     a = p.parse_args()
@@ -72,11 +75,16 @@ def main():
     if not rec:
         fail(f"Unknown hexagram: {a.hexagram}")
     positions = parse_positions(a.moving)
+
     corpus = load_corrected_corpus()
+    commentary = load_corrected_commentary()
     name = rec["name"]
     entry = corpus.get(name)
+    commentary_entry = commentary.get(name)
     if not entry:
         fail(f"Yi Jing corpus missing normalized hexagram: {name}", 1)
+    if not commentary_entry:
+        fail(f"Yi Jing commentary missing normalized hexagram: {name}", 1)
 
     selected = []
     for pos in positions:
@@ -90,27 +98,34 @@ def main():
         changed_name = changed_hexagram_name(rec, positions)
     except Exception as exc:
         fail(f"Yi Jing transformation failed: {exc}", 1)
+
     changed_entry = corpus.get(changed_name) if changed_name else None
+    changed_commentary = commentary.get(changed_name) if changed_name else None
     changed_rec = find_hexagram(changed_name) if changed_name else None
-    if changed_name and (not changed_entry or not changed_rec):
-        fail(f"Yi Jing corpus/structure missing changed hexagram: {changed_name}", 1)
+    if changed_name and (not changed_entry or not changed_commentary or not changed_rec):
+        fail(f"Yi Jing corpus/commentary/structure missing changed hexagram: {changed_name}", 1)
 
     print(json.dumps({
         "DOMAIN": "YIJING",
-        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_AND_CHANGE_LOOKUP",
+        "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_AND_CHANGE_LOOKUP",
         "INPUT": {"hexagram": a.hexagram, "moving": positions},
         "NORMALIZED_HEXAGRAM": name,
         "UPPER_TRIGRAM": rec["upper"],
         "LOWER_TRIGRAM": rec["lower"],
         "GUA_CI": entry["gua_ci"],
+        "TUAN_TEXT": commentary_entry["tuan"],
+        "DAXIANG_TEXT": commentary_entry["daxiang"],
         "SELECTED_YAO": selected,
         "CHANGED_HEXAGRAM": changed_name,
         "CHANGED_UPPER_TRIGRAM": changed_rec["upper"] if changed_rec else None,
         "CHANGED_LOWER_TRIGRAM": changed_rec["lower"] if changed_rec else None,
         "CHANGED_GUA_CI": changed_entry["gua_ci"] if changed_entry else None,
+        "CHANGED_TUAN_TEXT": changed_commentary["tuan"] if changed_commentary else None,
+        "CHANGED_DAXIANG_TEXT": changed_commentary["daxiang"] if changed_commentary else None,
         "TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
-        "SOURCE": source_metadata(),
-        "STRUCTURAL_INTEGRITY": "VERIFIED_BY_64_HEXAGRAM_LINE_PATTERN_AUDIT",
+        "CORPUS_SOURCE": corpus_source_metadata(),
+        "COMMENTARY_SOURCE": commentary_source_metadata(),
+        "STRUCTURAL_INTEGRITY": "VERIFIED_64_HEXAGRAM_GUA_YAO_TUAN_DAXIANG_AND_384_SINGLE_LINE_TRANSFORMS",
         "TEXTUAL_CRITICAL_EDITION_STATUS": "NOT_ESTABLISHED",
         "INTERPRETATION_STATUS": "NOT_PERFORMED",
         "NONCLAIMS": [

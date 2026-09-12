@@ -50,8 +50,20 @@ grep -Fq '"DOMAIN": "YIJING"' <<<"$YIJING_OUT"
 grep -Fq '"NORMALIZED_HEXAGRAM": "地山谦"' <<<"$YIJING_OUT"
 grep -Fq '"label": "六二"' <<<"$YIJING_OUT"
 grep -Fq '"text": "鸣谦，贞吉。"' <<<"$YIJING_OUT"
+grep -Fq '"TUAN_TEXT": "' <<<"$YIJING_OUT"
+grep -Fq '"DAXIANG_TEXT": "' <<<"$YIJING_OUT"
 grep -Fq '"CHANGED_HEXAGRAM": "地水师"' <<<"$YIJING_OUT"
+grep -Fq '"CHANGED_TUAN_TEXT": "' <<<"$YIJING_OUT"
+grep -Fq '"CHANGED_DAXIANG_TEXT": "' <<<"$YIJING_OUT"
 grep -Fq '"TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS"' <<<"$YIJING_OUT"
+
+# Exercise one of the two verified source-label overlays through the public
+# runtime, not merely through the audit helper.
+YIJING_LABEL_OUT="$(python "$ROOT/source/chinese-metaphysics/research/yijing/run_yijing_capability.py" \
+  --hexagram 解)"
+grep -Fq '"NORMALIZED_HEXAGRAM": "雷水解"' <<<"$YIJING_LABEL_OUT"
+grep -Fq '"TUAN_TEXT": "解，險以動，動而免乎險，解。' <<<"$YIJING_LABEL_OUT"
+grep -Fq '"DAXIANG_TEXT": "雷雨作，解；君子以赦過宥罪。"' <<<"$YIJING_LABEL_OUT"
 echo 'YIJING_LIVE_INPUT_SMOKE=PASS'
 
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
