@@ -8,7 +8,7 @@ from pathlib import Path
 YINYO_PIN = '1f67eea0ce5a2c49e6851e4eedce507f9c044dd9'
 SCRIPT_DIR = Path(__file__).resolve().parent
 LAB_ROOT = SCRIPT_DIR.parent
-YINYO_UPSTREAM = (LAB_ROOT / '../../upstreams/yinyo-liuyao').resolve()
+YINYO_UPSTREAM = (SCRIPT_DIR / '../../upstreams/yinyo-liuyao').resolve()
 MULTI_READ = LAB_ROOT / 'liuyao-divination' / 'run_liuyao_multi_read.py'
 
 
