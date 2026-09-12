@@ -1,0 +1,115 @@
+name: Ziwei School Profile Probe 001
+
+on:
+  push:
+    branches:
+      - research/chinese-metaphysics-upstreams-01
+    paths:
+      - '.github/workflows/ziwei-school-profile-probe-001.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout pinned iztro
+        uses: actions/checkout@v4
+        with:
+          repository: SylarLong/iztro
+          ref: 2c7ef9be669df7b19d1799f4dce335fed3794f78
+          path: iztro
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build pinned iztro
+        working-directory: iztro
+        run: |
+          set -euo pipefail
+          npm install -g yarn@1.22.22 >/dev/null
+          yarn install --frozen-lockfile
+          yarn build
+          test "$(git rev-parse HEAD)" = "2c7ef9be669df7b19d1799f4dce335fed3794f78"
+
+      - name: Profile A in fresh process
+        working-directory: iztro
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const { astro } = require('./lib');
+          const input = { type: 'solar', dateStr: '2010-10-18', timeIndex: 4, gender: 'female' };
+          const chart = astro.bySolar(input.dateStr, input.timeIndex, input.gender);
+          const stars = chart.palaces.flatMap((p) => [...p.majorStars, ...p.minorStars]);
+          const observed = Object.fromEntries(['禄','权','科','忌'].map((m) => [m, stars.find((s) => s.mutagen === m)?.name ?? null]));
+          const skeleton = chart.palaces.map((p) => ({
+            name: p.name,
+            majorStars: p.majorStars.map((s) => s.name),
+            minorStars: p.minorStars.map((s) => s.name),
+          }));
+          const result = {
+            profileId: 'IZTRO_DEFAULT_001',
+            iztroPin: '2c7ef9be669df7b19d1799f4dce335fed3794f78',
+            input,
+            mutagenTableGeng: { 禄:'太阳', 权:'武曲', 科:'太阴', 忌:'天同' },
+            observedGengMutagenOutput: observed,
+            fiveElementsClass: chart.fiveElementsClass,
+            skeleton,
+          };
+          fs.writeFileSync('/tmp/profile-a.json', JSON.stringify(result, null, 2));
+          console.log('PROFILE_A_RESULT=' + JSON.stringify(result));
+          NODE
+
+      - name: Profile B in separate fresh process
+        working-directory: iztro
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const { astro } = require('./lib');
+          astro.config({ mutagens: { 庚: ['太阳', '武曲', '天同', '天相'] } });
+          const input = { type: 'solar', dateStr: '2010-10-18', timeIndex: 4, gender: 'female' };
+          const chart = astro.bySolar(input.dateStr, input.timeIndex, input.gender);
+          const stars = chart.palaces.flatMap((p) => [...p.majorStars, ...p.minorStars]);
+          const observed = Object.fromEntries(['禄','权','科','忌'].map((m) => [m, stars.find((s) => s.mutagen === m)?.name ?? null]));
+          const skeleton = chart.palaces.map((p) => ({
+            name: p.name,
+            majorStars: p.majorStars.map((s) => s.name),
+            minorStars: p.minorStars.map((s) => s.name),
+          }));
+          const result = {
+            profileId: 'IZTRO_OVERRIDE_LINDEN_TABLE_001',
+            iztroPin: '2c7ef9be669df7b19d1799f4dce335fed3794f78',
+            input,
+            mutagenTableGeng: { 禄:'太阳', 权:'武曲', 科:'天同', 忌:'天相' },
+            observedGengMutagenOutput: observed,
+            fiveElementsClass: chart.fiveElementsClass,
+            skeleton,
+          };
+          fs.writeFileSync('/tmp/profile-b.json', JSON.stringify(result, null, 2));
+          console.log('PROFILE_B_RESULT=' + JSON.stringify(result));
+          NODE
+
+      - name: Compare profiles and assert bounded claim
+        run: |
+          node <<'NODE'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const a = JSON.parse(fs.readFileSync('/tmp/profile-a.json', 'utf8'));
+          const b = JSON.parse(fs.readFileSync('/tmp/profile-b.json', 'utf8'));
+          assert.deepEqual(a.input, b.input);
+          assert.deepEqual(a.skeleton, b.skeleton);
+          assert.equal(a.fiveElementsClass, b.fiveElementsClass);
+          assert.deepEqual(a.observedGengMutagenOutput, { 禄:'太阳', 权:'武曲', 科:'太阴', 忌:'天同' });
+          assert.deepEqual(b.observedGengMutagenOutput, { 禄:'太阳', 权:'武曲', 科:'天同', 忌:'天相' });
+          assert.notDeepEqual(a.observedGengMutagenOutput, b.observedGengMutagenOutput);
+          console.log('CHART_SKELETON_SAME=YES');
+          console.log('PROFILE_OUTPUT_DIFF_PROVEN=YES');
+          console.log('PROFILE_CONTAMINATION_PREVENTED=YES');
+          console.log('PROFILE_A_OBSERVED=' + JSON.stringify(a.observedGengMutagenOutput));
+          console.log('PROFILE_B_OBSERVED=' + JSON.stringify(b.observedGengMutagenOutput));
+          NODE
