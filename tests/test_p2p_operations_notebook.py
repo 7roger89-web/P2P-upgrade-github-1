@@ -211,9 +211,12 @@ class P2POperationsNotebookTests(unittest.TestCase):
         # The workflow law is assimilated into RULE 11 ...
         self.assertIn("OWNER_MICRO_LOOP_SUPPRESSION", self.notebook_text)
         self.assertIn("SAME bounded Writer repair loop", self.notebook_text)
-        # ... without removing the real Owner Gates.
+        # ... without removing the real Owner Gates. Canonical promotion/
+        # release stays an Owner Gate; only a *validated PR merge* is covered
+        # by the standing VALIDATED_PR_AUTO_MERGE_AUTHORITY (P2P_AUTO_MERGE_
+        # AUTHORITY_01, asserted in tests/test_p2p_validated_auto_merge_authority.py).
         for gate in (
-            "canonical merge/promotion",
+            "canonical promotion/release",
             "production deployment",
             "destructive deletion",
             "secrets/credentials",

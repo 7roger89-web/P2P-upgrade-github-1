@@ -60,6 +60,10 @@ EXECUTION_LANES = (FAST, STANDARD, STRICT, CRITICAL)
 # nothing and removes no real Owner Gate.
 OWNER_MICRO_LOOP_SUPPRESSION = "OWNER_MICRO_LOOP_SUPPRESSION"
 OWNER_GATE_CLASSES = (
+    # MERGE_PROMOTION = a merge that itself constitutes canonical
+    # promotion/release, i.e. the promotion action.  It stays an Owner Gate.
+    # An ordinary code merge into canonical main is classified as
+    # VALIDATED_PR_MERGE instead (see VALIDATED_PR_AUTO_MERGE_AUTHORITY).
     "MERGE_PROMOTION",
     "PRODUCTION_DEPLOY",
     "DESTRUCTIVE_MUTATION",
@@ -74,6 +78,26 @@ OWNER_MICRO_REPAIR_CLASSES = (
     "FOCUSED_TEST_REPAIR",
     "EVIDENCE_COUNT_CORRECTION",
     "REMOTE_SYNC_CORRECTION",
+)
+
+# VALIDATED_PR_AUTO_MERGE_AUTHORITY (notebook RULE 11, standing Owner
+# authorization).  A fully validated PR merge into canonical main is a
+# routine integration step and is not re-asked of the Owner.  Promotion,
+# release, and deployment are NOT authorized by it and stay Owner Gates.
+# This classification grants nothing: every condition must be affirmatively
+# proven `True` by the caller, and anything missing, false, or uncertain
+# routes back to the Owner Gate.
+VALIDATED_PR_AUTO_MERGE_AUTHORITY = "VALIDATED_PR_AUTO_MERGE_AUTHORITY"
+VALIDATED_PR_MERGE = "VALIDATED_PR_MERGE"
+STANDING_AUTHORITY_MERGE = "STANDING_AUTHORITY_MERGE"
+VALIDATED_MERGE_CONDITIONS = (
+    "exact_head_fresh_checked",
+    "validation_evidence_sufficient",
+    "required_checks_passed_or_baseline_unrelated",
+    "no_unresolved_blocker",
+    "mergeable_against_current_target",
+    "scope_unchanged_since_validation",
+    "no_separately_gated_side_effect",
 )
 
 _ENUMS = {
@@ -701,20 +725,95 @@ def derive_requirement(value: Mapping[str, Any] | TaskProfile) -> dict[str, Any]
     }
 
 
-def classify_owner_escalation(action: Any, *, finding_ref: Any = None) -> dict[str, Any]:
-    """Classify one escalation request under OWNER_MICRO_LOOP_SUPPRESSION.
+def _classify_validated_pr_merge(validated_merge: Any) -> dict[str, Any]:
+    """Classify one validated-PR merge under the standing Owner authorization.
 
-    Real Owner Gates (merge/promotion, production deploy, destructive
-    mutation, secrets, major spend/infrastructure, hard rollback, genuine
-    scope-changing blockers) always route to the Owner.  A bounded finding
-    and the repairs it directly induces (fixture repair, focused test
+    Fails closed to the Owner Gate unless every canonical condition in
+    `VALIDATED_MERGE_CONDITIONS` is affirmatively `True`.  Absent or empty
+    evidence, a `False` value, a non-boolean value, and an omitted condition
+    are all treated as unmet.  Unknown condition keys are a caller contract
+    violation and raise, so a typo can never silently narrow the required
+    evidence.
+    """
+
+    result: dict[str, Any] = {
+        "schema": "p2p-owner-escalation-classification/1",
+        "policy": VALIDATED_PR_AUTO_MERGE_AUTHORITY,
+        "action": VALIDATED_PR_MERGE,
+        "real_owner_gates_preserved": True,
+        "owner_gate_classes": list(OWNER_GATE_CLASSES),
+        "standing_authorization_scope": "MERGE_ONLY",
+        "not_authorized_by_standing_authority": [
+            "MERGE_PROMOTION",
+            "PRODUCTION_DEPLOY",
+            "SECRETS",
+            "DESTRUCTIVE_MUTATION",
+            "MAJOR_SPEND_INFRASTRUCTURE",
+            "HARD_ROLLBACK",
+        ],
+    }
+    if not isinstance(validated_merge, Mapping) or not validated_merge:
+        result.update(
+            route="OWNER_GATE",
+            owner_gate_required=True,
+            auto_merge="NO",
+            fail_closed_reason="VALIDATED_MERGE_EVIDENCE_MISSING",
+            unmet_conditions=list(VALIDATED_MERGE_CONDITIONS),
+            conditions={},
+        )
+        return result
+    unknown = sorted(set(validated_merge) - set(VALIDATED_MERGE_CONDITIONS))
+    if unknown:
+        raise OrchestrationPolicyError(
+            "VALIDATED_MERGE_CONDITION_UNKNOWN:" + ",".join(str(key) for key in unknown)
+        )
+    conditions = {name: validated_merge.get(name) for name in VALIDATED_MERGE_CONDITIONS}
+    unmet = [name for name, value in conditions.items() if value is not True]
+    if unmet:
+        result.update(
+            route="OWNER_GATE",
+            owner_gate_required=True,
+            auto_merge="NO",
+            fail_closed_reason="VALIDATED_MERGE_CONDITION_UNMET",
+            unmet_conditions=unmet,
+            conditions=conditions,
+        )
+        return result
+    result.update(
+        route=STANDING_AUTHORITY_MERGE,
+        owner_gate_required=False,
+        auto_merge="YES",
+        conditions=conditions,
+    )
+    return result
+
+
+def classify_owner_escalation(
+    action: Any,
+    *,
+    finding_ref: Any = None,
+    validated_merge: Any = None,
+) -> dict[str, Any]:
+    """Classify one escalation request under the notebook RULE 11 policy.
+
+    Real Owner Gates (canonical promotion/release, production deploy,
+    destructive mutation, secrets, major spend/infrastructure, hard rollback,
+    genuine scope-changing blockers) always route to the Owner.  A bounded
+    finding and the repairs it directly induces (fixture repair, focused test
     repair, evidence-count correction, remote-sync correction) route back
     into the SAME Writer repair loop instead of being relayed to the Owner.
-    Unknown action classes fail closed with an error.  This function grants
-    no permission and removes no real Owner Gate.
+
+    `VALIDATED_PR_MERGE` carries the Owner's standing
+    VALIDATED_PR_AUTO_MERGE_AUTHORITY: it routes to STANDING_AUTHORITY_MERGE
+    with no redundant Owner prompt only when every condition in
+    `VALIDATED_MERGE_CONDITIONS` is affirmatively proven; anything else fails
+    closed to the Owner Gate.  Unknown action classes fail closed with an
+    error.  This function grants no permission and removes no real Owner Gate.
     """
 
     normalized = str(action).upper().strip()
+    if normalized == VALIDATED_PR_MERGE:
+        return _classify_validated_pr_merge(validated_merge)
     if normalized in OWNER_GATE_CLASSES:
         route = "OWNER_GATE"
     elif normalized in OWNER_MICRO_REPAIR_CLASSES:
@@ -759,6 +858,10 @@ __all__ = [
     "OWNER_GATE_CLASSES",
     "OWNER_MICRO_LOOP_SUPPRESSION",
     "OWNER_MICRO_REPAIR_CLASSES",
+    "STANDING_AUTHORITY_MERGE",
+    "VALIDATED_MERGE_CONDITIONS",
+    "VALIDATED_PR_AUTO_MERGE_AUTHORITY",
+    "VALIDATED_PR_MERGE",
     "classify_owner_escalation",
     "POLICY_SCHEMA",
     "OFFENSIVE_HIGH_RISK",

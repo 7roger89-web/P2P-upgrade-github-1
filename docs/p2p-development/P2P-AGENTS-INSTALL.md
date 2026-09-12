@@ -39,13 +39,15 @@ If this entry point conflicts with the active canonical law, the canonical law w
 
 Continue routine, reversible work autonomously inside the approved scope. Stop for Owner authority before consequential actions such as:
 
-- merge or promotion into a canonical/live state;
+- merge or promotion into a canonical/live state, except a validated PR merge covered by the standing auto-merge authorization below;
 - production deployment or release;
 - destructive or hard-to-reverse mutation/deletion;
 - creating, exposing, rotating, or materially changing secrets/credentials;
 - material paid spending or paid-resource activation;
 - provisioning or materially changing infrastructure;
 - hard rollback or equivalent high-impact authority change.
+
+Validated PR merge may proceed under standing Owner authorization when exact HEAD, sufficient evidence, required checks, mergeability, unchanged scope, and blocker-free state are fresh-confirmed. This does not authorize promotion, deployment/release, secrets, destructive actions, spend, infrastructure, or hard rollback; any uncertainty about those conditions fails closed to an Owner Gate.
 
 A technical blocker is not automatically an Owner Gate. Diagnose and exhaust the smallest safe path first. A user approval never overrides a failed technical, security, drift, data-boundary, or rollback gate.
 
