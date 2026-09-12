@@ -181,6 +181,21 @@ sufficient.
    execution, verification, recovery, or context. When the required outcome is
    proven, stop instead of opening optional refactor, benchmark, framework,
    hardening, or future-phase work.
+6. **PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT** — Every P2P-generated
+   operational prompt handed to the beginner Owner for execution in another
+   tool/chat must state the target project/workstream, destination/tool,
+   `CHAT_MODE=NEW_CHAT` or `CHAT_MODE=SAME_CHAT`, the exact existing chat name
+   when continuing (or a recognizable `CHAT_TITLE` when new), and the role where
+   applicable. The same prompt must include a compact fresh project-plan
+   checkpoint anchored to durable state: `PLAN_REFERENCE` (or
+   `NO_FORMAL_PLAN`), what is already completed, the current checkpoint,
+   blocker/Owner Gate if any, and the single next bounded step. Control Tower
+   refreshes this from the active project plan/task state before issuing the
+   prompt; chat memory may supplement but never override durable state. The
+   beginner must never infer where to paste a prompt or reconstruct project
+   progress from old chats. Do not invent a plan when none exists. This compact
+   handoff checkpoint is not continuous progress narration and does not override
+   `PROGRESS_REPORTING=EXCEPTIONS_ONLY`.
 
 ### Executor-aware resource policy
 
