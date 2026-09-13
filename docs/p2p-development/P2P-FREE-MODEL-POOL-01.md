@@ -90,48 +90,70 @@ The live result is explicit: `CHAT_PASS`, `RESPONSES_PASS`, `CHAT_CALL_FAIL`, or
 
 If no explicit `BAI_MODEL` override is set, HTTP 400 model-specific failures can fall through to the next allowlisted free candidate. Auth and network failures are not blindly retried. If `BAI_MODEL` is set, only that model is tested.
 
-## Next executor gate: bridge only because evidence requires it
+## Executor bridge — PASSED; Provider #1 ACCEPTED (2026-09-12)
 
-Because B.AI free Chat Completions is proven live while free Responses is proven unsupported, a protocol bridge is now justified.
-
-Smallest next path:
+Because B.AI free Chat Completions is proven live while free Responses is proven unsupported, one protocol bridge was tested and passed:
 
 ```text
 Codex -> EchoBird local Responses-to-Chat bridge -> B.AI /chat/completions -> MiMo-V2.5
 ```
 
-`hy3` remains a backup free B.AI model. New API is still not required.
+Live evidence (Owner Windows session, 2026-09-12):
 
-The bridge is not accepted merely because text generation works. The executor acceptance task must exercise a complete tool loop:
+- Codex CLI pointed at the local EchoBird bridge (`127.0.0.1:53682/v1`), upstream B.AI `mimo-v2.5`;
+- full tool loop verified: read `README.md` -> created `echobird_probe.py` -> executed it through tool calls -> recovered from shell-quoting errors without user intervention -> exact output `P2P_ECHOBIRD_OK` -> appended the exact line `EchoBird B.AI tool loop PASS` to `README.md`.
 
-1. receive prompt;
-2. read a file;
-3. edit a file;
-4. run one narrow command/test;
-5. consume the tool result;
-6. finish successfully.
+Verdict:
 
-EchoBird evidence is mixed across third-party model families, especially around non-function tools and web-search/custom-tool translation, so success must be judged only by this bounded tool-loop test. If the chosen B.AI model fails that loop, record the incompatibility and change route rather than hardening EchoBird or building more infrastructure around it.
+```text
+ECHOBIRD_BAI_MIMO_BRIDGE = PASS
+P2P_FREE_MODEL_POOL_PROVIDER_1 = ACCEPTED
+```
 
-Only after one real executor tool loop succeeds should P2P consider New API for automatic failover/quota routing.
+`hy3` remains a backup free B.AI model. EchoBird remains a test bridge for this bounded evidence only — it is not accepted as general P2P infrastructure. No gateway adoption; no New API.
 
-## Acceptance for FREE MODEL POOL 01
+## Acceptance — two distinct bars
 
-- At least 2/3 providers Chat-live-probe successfully at test time.
-- At least one live-proven provider completes a full executor tool-loop task.
-- Direct Responses is preferred when a free model actually supports it; B.AI free does not, based on live evidence.
-- A bridge is introduced only for a provider already proven useful; B.AI now satisfies that trigger.
-- Provider switching requires no P2P project-code change.
-- Any claim of "free" is tied to provider/account state observed at test time.
+### Bar 1: probe capability (this slice) — MET
+
+This PR's bounded deliverable is a minimal, credential-safe provider probe that keeps protocol verdicts honest:
+
+- keys read only from environment variables, never printed or committed;
+- Chat Completions and Responses probed separately (`CHAT_PASS` / `RESPONSES_PASS`), so a chat-only success is never mistaken for Codex/Responses compatibility;
+- missing credentials yield explicit `MISSING_KEY` BLOCKED states, never invented failures;
+- provider switching requires no P2P project-code change.
+
+Evidence: focused tests 8/8 PASS; B.AI live Provider #1 accepted; EchoBird + B.AI + Codex real tool loop PASS.
+
+```text
+PROBE_CAPABILITY = READY
+```
+
+### Bar 2: multi-provider pool outcome (workstream) — NOT YET MET, DEFERRED
+
+```text
+PROVIDER_1_BAI_ECHOBIRD  = ACCEPTED
+BAI_DIRECT_RESPONSES     = NOT_SUPPORTED (terminal)
+PROVIDER_2_AMD           = BLOCKED_MISSING_KEY (not rejected)
+PROVIDER_2_CLINE         = BLOCKED_MISSING_KEY (not rejected)
+SECOND_PROVIDER          = NOT_YET_PROVEN
+SECOND_PROVIDER_REQUIRED_FOR_PROBE_CAPABILITY = NO
+SECOND_PROVIDER_DEFERRED_UNTIL_CREDENTIAL_AVAILABLE = YES
+MULTI_PROVIDER_REDUNDANCY = NOT_YET_PROVEN
+```
+
+The full FREE MODEL POOL 01 workstream outcome still requires at least 2/3 providers chat-live-proven at test time, in addition to the already-proven provider tool loop. Provider #1 satisfies the tool-loop half; the second-provider half is blocked only on a credential (`RADEON_API_KEY` for AMD or `CLINE_API_KEY` for Cline) and is deferred — not dropped — until one is available in an executor environment. Do not retest B.AI (terminal result). Do not retry AMD/Cline without credentials. Do not invent Provider #3.
+
+Merging this probe does not claim a resilient multi-provider pool. No auto-failover, no router, no gateway adoption; New API remains `DEFERRED_UNTIL_NEEDED` and may be considered only after a second provider is proven live and a real executor task needs it.
 
 ## OE Gate
 
 **Không bị over engineering chứ?**
 
-1. Simpler path: direct Responses was tested first and failed terminally; a bridge is now the simplest remaining Codex path for proven-free B.AI.
-2. Material progress: yes — the bridge test will determine whether free B.AI can perform real Codex tool work, not just chat.
+1. Simpler path: direct Responses was tested first and failed terminally; the bridge was the simplest remaining Codex path for proven-free B.AI.
+2. Material progress: yes — the bridge test proved free B.AI can perform real Codex tool work, not just chat (tool loop PASSED 2026-09-12).
 3. Necessity: Codex speaks Responses while the proven-free B.AI models accept Chat Completions only.
 4. Core before support: yes — one local compatibility bridge, no gateway/router stack.
-5. Smaller verifiable slice: one model, one bridge, one disposable tool-loop task.
+5. Smaller verifiable slice: one model, one bridge, one disposable tool-loop task (executed 2026-09-12).
 
-Verdict: `DO_IT` for one EchoBird + B.AI + Codex tool-loop test; `DEFER_UNTIL_NEEDED` for New API/router/dashboard infrastructure.
+Verdict: the one EchoBird + B.AI + Codex tool-loop test is DONE and PASSED (Provider #1 accepted). `DEFER_UNTIL_NEEDED` for New API/router/dashboard/failover infrastructure; second-provider testing resumes only when a credential becomes available.
