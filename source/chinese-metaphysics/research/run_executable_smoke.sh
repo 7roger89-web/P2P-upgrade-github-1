@@ -166,4 +166,29 @@ fi
 echo 'MEIHUA_OUTCOME_REVEAL_TAMPER_GUARD_SMOKE=PASS'
 echo 'MEIHUA_OUTCOME_REVEAL_SMOKE=PASS'
 
+# Prediction claim engineering fixture. The claim is explicitly declared,
+# never inferred from PRESSURE_ON_BODY, and its exact-match rule is sealed
+# before outcome. This fixture remains engineering evidence only.
+MEIHUA_CLAIM_ONE="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_prediction_claim_lock.py" \
+  --lock-file "$MEIHUA_LOCK_FILE" --outcome-labels OUTCOME_A OUTCOME_B --predicted-label OUTCOME_A)"
+MEIHUA_CLAIM_TWO="$(python "$ROOT/source/chinese-metaphysics/research/run_meihua_prediction_claim_lock.py" \
+  --lock-file "$MEIHUA_LOCK_FILE" --outcome-labels OUTCOME_B OUTCOME_A --predicted-label OUTCOME_A)"
+grep -Fq '"SCHEMA": "MEIHUA_PREDICTION_CLAIM_LOCK_V1"' <<<"$MEIHUA_CLAIM_ONE"
+grep -Fq '"OUTCOME_LABEL_SET": [' <<<"$MEIHUA_CLAIM_ONE"
+grep -Fq '"PREDICTED_LABEL": "OUTCOME_A"' <<<"$MEIHUA_CLAIM_ONE"
+grep -Fq '"SCORING_RULE": "EXACT_LABEL_MATCH"' <<<"$MEIHUA_CLAIM_ONE"
+grep -Fq '"CLAIM_STATUS": "SEALED_BEFORE_OUTCOME"' <<<"$MEIHUA_CLAIM_ONE"
+grep -Fq '"SCORING_STATUS": "RULE_LOCKED_NOT_PERFORMED"' <<<"$MEIHUA_CLAIM_ONE"
+grep -Fq '"PREDICTED_LABEL_IS_EXPLICITLY_DECLARED_NOT_INFERRED_FROM_STRUCTURAL_SIGNAL"' <<<"$MEIHUA_CLAIM_ONE"
+CLAIM_HASH_ONE="$(python -c 'import json,sys; print(json.load(sys.stdin)["CLAIM_SHA256"])' <<<"$MEIHUA_CLAIM_ONE")"
+CLAIM_HASH_TWO="$(python -c 'import json,sys; print(json.load(sys.stdin)["CLAIM_SHA256"])' <<<"$MEIHUA_CLAIM_TWO")"
+[[ "$CLAIM_HASH_ONE" =~ ^[0-9a-f]{64}$ ]]
+test "$CLAIM_HASH_ONE" = "$CLAIM_HASH_TWO"
+if python "$ROOT/source/chinese-metaphysics/research/run_meihua_prediction_claim_lock.py" \
+  --lock-file "$MEIHUA_LOCK_FILE" --outcome-labels OUTCOME_A OUTCOME_B --predicted-label OUTCOME_C >/dev/null 2>&1; then
+  echo 'Prediction label outside locked outcome set unexpectedly passed' >&2
+  exit 1
+fi
+echo 'MEIHUA_PREDICTION_CLAIM_LOCK_SMOKE=PASS'
+
 echo 'CHINESE_METAPHYSICS_LIVE_INPUT_ROAD_SMOKE=PASS'
