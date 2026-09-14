@@ -302,6 +302,44 @@ the failure class is established.
    sugar-coating; criticism targets the decision/design/work, not the Owner, and
    never overrides safety or audience requirements. The purpose is to increase
    the Owner's intellectual autonomy, not to increase complexity for its own sake.
+8. **TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY** — Before delegating or executing a
+   non-trivial P2P task, bind the Owner outcome to the smallest useful task
+   contract: objective, in-scope and out-of-scope boundaries, real affected
+   surface, representative scenario or quality invariant where relevant,
+   observable acceptance criteria, required evidence class and proof surface,
+   durable artifact identity where applicable, failure/blocker criteria, and
+   stop condition. The active contract remains execution authority until an
+   explicit Owner/Governance decision or durable successor contract revises it;
+   executor findings, local tests, proxy artifacts, screenshots, self-reports,
+   or adjacent improvements must not silently rewrite the objective. For
+   product, business, visual, UX, educational, legal, data, or workflow work,
+   name at least one representative real user/workflow/quality slice when that
+   materially defines value; if no such slice can yet be stated, clarify or run
+   the smallest representative probe before broad implementation. Evidence must
+   be scope-matched: local, static, unit, mock, proxy, preview, synthetic, or
+   sandbox evidence proves only that boundary and must not be promoted to a
+   live, durable, visual, business, user-facing, official-source, persistence,
+   provider, package-transport, or production PASS unless equivalence is
+   explicit in the contract and verified by representative proof. A technical
+   PASS, CI PASS, local test count, screenshot, or executor self-report is not
+   completion when acceptance requires correct branch/base/head or durable PR
+   identity, live runtime, visual likeness or interaction quality, real user or
+   business workflow fit, source fidelity, persistence, release-package
+   transport, provider/host behavior, or Owner-visible acceptance. Reuse-first
+   work must prove reuse/composition of the authoritative existing component
+   before introducing replacement logic; do not rebuild what the task says to
+   assemble unless unusability is established. When repeated repair does not
+   materially improve progress toward acceptance, the next attempt must
+   diagnose whether the contract, prompt, executor capability, environment,
+   evidence class, or acceptance route is wrong; do not issue another
+   same-shape repair prompt unless that diagnosis changes or the task narrows
+   to a representative proof. A newly discovered concern may block completion,
+   but it does not become the new objective unless recorded as an authorized
+   contract revision or successor task; useful out-of-scope work is
+   `DEFERRED_NOT_REQUIRED`. This rule uses existing P2P task state, evidence,
+   handoff, Owner Gate, OE Gate, and routing surfaces and creates no new ledger,
+   framework, prompt-linter, CI gate, database, reviewer service, or supervising
+   agent.
 
 ### Prompt-alignment gate
 
@@ -322,6 +360,28 @@ handoff. This is a prompt-quality check over the existing task contract, not a
 new prompt framework, reviewer service, or extra agent. The check does not
 require exposing hidden chain-of-thought; report only the concise rationale or
 correction needed for the Owner to understand the delegation.
+
+### Task-contract fidelity gate
+
+Before delegating a non-trivial task, or before continuing a repeated repair
+loop, check:
+
+```text
+TASK_CONTRACT_NAMES_OWNER_OUTCOME
+ACCEPTANCE_CRITERIA_ARE_OBSERVABLE_AND_NOT_MISLEADING
+REPRESENTATIVE_REAL_SCENARIO_OR_QUALITY_INVARIANT_IS_NAMED_WHERE_RELEVANT
+EVIDENCE_CLASS_MATCHES_REQUIRED_PROOF_SURFACE
+LOCAL_STATIC_PROXY_OR_MOCK_PASS_IS_NOT_PROMOTED_TO_LIVE_DURABLE_VISUAL_BUSINESS_PASS
+REUSE_EXPECTATION_IS_EXPLICIT_WHEN_EXISTING_COMPONENTS_ARE_AUTHORITATIVE
+RETRY_OR_REPAIR_CHANGES_DIAGNOSIS_BOUNDARY_OR_EVIDENCE_ROUTE
+NEW_CONCERN_DOES_NOT_SILENTLY_REWRITE_OBJECTIVE
+```
+
+If any item is weak, false, or materially uncertain, rewrite the task
+contract/prompt or narrow the task to the smallest representative proof before
+handoff or another repair turn. This is a task/prompt-quality check over
+existing P2P state, not a new framework, automated checker, CI stage, or
+reviewer service.
 
 ### Executor-aware resource policy
 
