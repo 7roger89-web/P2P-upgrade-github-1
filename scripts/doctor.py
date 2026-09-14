@@ -13,6 +13,7 @@ import re
 import subprocess
 import sys
 import tomllib
+import types
 import zlib
 from pathlib import Path
 
@@ -525,6 +526,40 @@ def check_installed_foundation(root: Path, report: Report) -> None:
     check_decision_trace_payload(root, report, installed=True)
 
 
+def _load_installed_project_pin(system: Path):
+    """Load the installed project-pin validator with real package context.
+
+    ``project_pin.py`` uses package-relative imports, so loading it as a
+    top-level module raises ``attempted relative import with no known parent
+    package``.  Bind it to a doctor-private package alias whose ``__path__`` is
+    the installed runtime directory only, so relative imports resolve against
+    ``<target>/.p2p/system/p2p_capabilities`` and can never be satisfied by the
+    P2P source checkout, another ``p2p_capabilities`` earlier on PYTHONPATH, or
+    a module of that name cached from a previous root.
+    """
+
+    package_dir = system / "p2p_capabilities"
+    module_path = package_dir / "project_pin.py"
+    package_name = "p2p_installed_p2p_capabilities"
+    for cached in [
+        name
+        for name in sys.modules
+        if name == package_name or name.startswith(f"{package_name}.")
+    ]:
+        del sys.modules[cached]
+    package = types.ModuleType(package_name)
+    package.__path__ = [str(package_dir)]
+    package.__package__ = package_name
+    sys.modules[package_name] = package
+    spec = importlib.util.spec_from_file_location(f"{package_name}.project_pin", module_path)
+    if spec is None or spec.loader is None:
+        return None, module_path
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module, module_path
+
+
 def check_project_pin(root: Path, report: Report) -> None:
     """Validate the installed project binding through the canonical runtime."""
 
@@ -533,13 +568,22 @@ def check_project_pin(root: Path, report: Report) -> None:
     if not module_path.is_file():
         report.fail("project-pin", f"Missing canonical project-pin validator: {module_path}")
         return
-    spec = importlib.util.spec_from_file_location("p2p_installed_project_pin", module_path)
-    if spec is None or spec.loader is None:
+    try:
+        module, expected_path = _load_installed_project_pin(system)
+    except Exception as exc:
+        report.fail("project-pin", str(exc))
+        return
+    if module is None:
         report.fail("project-pin", "Could not load canonical project-pin validator")
         return
-    module = importlib.util.module_from_spec(spec)
+    loaded = getattr(module, "__file__", "")
+    if not loaded or Path(loaded).resolve() != expected_path.resolve():
+        report.fail(
+            "project-pin",
+            f"project-pin validator did not resolve from the installed runtime: {loaded or '<unknown>'}",
+        )
+        return
     try:
-        spec.loader.exec_module(module)
         result = module.validate_pin(root, metadata_root=system)
     except Exception as exc:
         report.fail("project-pin", str(exc))
