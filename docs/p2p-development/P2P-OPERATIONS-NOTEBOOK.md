@@ -340,6 +340,132 @@ the failure class is established.
    handoff, Owner Gate, OE Gate, and routing surfaces and creates no new ledger,
    framework, prompt-linter, CI gate, database, reviewer service, or supervising
    agent.
+9. **EXECUTOR_INPUT_FORMAT_AND_ARTIFACT_TRANSPORT_FIDELITY** — A P2P-generated
+   prompt must never instruct the beginner Owner (or another executor) to
+   provide an artifact through an input path the destination executor cannot
+   actually consume. When direct transport is impossible, P2P must choose the
+   simplest trustworthy reversible transport and prove that reconstruction
+   preserves the original artifact identity. This law is executor-neutral:
+   Arena is the current representative case, not the architecture.
+
+   **A. Destination capability before handoff.** Before a P2P-generated
+   instruction tells the Owner or another executor to attach, upload, import,
+   open, ingest, reconstruct, or otherwise consume an external artifact, the
+   prompt writer must establish the actual input capability of the destination
+   executor/surface whenever that capability materially affects task
+   completion. Canonical principle: `LOCAL_ARTIFACT_EXISTS !=
+   DESTINATION_CAN_CONSUME_ARTIFACT`. Never assume that because an artifact
+   exists on one machine, chat, workspace, repository, or executor it can be
+   directly transported into another. Use fresh authoritative destination
+   capability information or the smallest representative probe (RULE 19) when
+   material uncertainty remains.
+
+   **B. Direct transport first when actually supported.** If the destination
+   supports the artifact's real media/file type through a trustworthy direct
+   path, prefer transporting the exact artifact without semantic
+   transformation. Possible direct/native paths may include, where actually
+   supported and authorized: native attachment, repository file, executor
+   workspace, connected storage, or another destination-native lossless
+   mechanism. Do not invent extra transport machinery when an existing native
+   path is sufficient. When exact artifact identity materially matters, bind
+   at minimum `ORIGINAL_FILENAME`, `ORIGINAL_BYTE_SIZE`, and
+   `ORIGINAL_SHA256`; record `ORIGINAL_MEDIA_TYPE` when useful for routing or
+   validation.
+
+   **C. Unsupported binary format.** If the original binary format is not
+   supported directly, do not: rename only the extension; spoof the MIME/media
+   type; claim another file type while preserving incompatible bytes; silently
+   convert into a semantically different artifact; tell the beginner Owner to
+   perform an impossible upload; or treat a transport representation as though
+   it were the original artifact. Select the simplest supported, reversible,
+   lossless transport available. For Arena, when no simpler destination-native
+   lossless route is available and supported text input is feasible, the
+   default fallback may be: binary → standard Base64 encoding → supported text
+   transport → destination → concatenate if chunked → strict Base64 decode →
+   reconstructed binary → byte-size verification → SHA-256 verification →
+   artifact may then be used. Canonical invariant: `BASE64_TEXT !=
+   ORIGINAL_BINARY`. Base64 is transport encoding only; it is not encryption,
+   not secrecy, not an integrity proof by itself, not permission to bypass
+   security/privacy/content policy, and not permission to bypass an existing
+   Owner Gate. A reconstructed artifact becomes equivalent to the bound
+   original only after the required identity checks pass.
+
+   **D. Target isolation.** Temporary transport/reconstruction artifacts must
+   be created outside the target project worktree by default. Do not mutate
+   the target repository merely to move a file between executors. Canonical
+   principle: `EPHEMERAL_TRANSPORT != PROJECT_SOURCE`. Only place
+   reconstructed material into the project tree when the actual task contract
+   explicitly requires repository mutation. Do not commit temporary Base64
+   payloads, chunks, decoded transport scratch files, or transport-only
+   material merely for handoff convenience.
+
+   **E. Size-aware fallback.** Do not assume an undocumented upload-size
+   limit. When destination size support materially affects completion, use
+   fresh authoritative product state when available or run the smallest
+   representative probe; do not invent a numeric size limit. If one supported
+   text artifact is accepted, do not chunk it preemptively. If one supported
+   text artifact exceeds the destination's real current limit, the simplest
+   fallback may be deterministic ordered Base64 text chunks. Bind enough
+   information to reconstruct deterministically: `CHUNK_COUNT`,
+   `ORDERED_CHUNK_NAMES`, `ORIGINAL_BYTE_SIZE`, `ORIGINAL_SHA256`; use
+   per-chunk size/hash where materially useful for detecting transport
+   corruption. After ordered concatenation and decoding,
+   `FINAL_BYTE_SIZE == ORIGINAL_BYTE_SIZE` and
+   `FINAL_SHA256 == ORIGINAL_SHA256` are authoritative for byte identity. If
+   they differ, classify `ARTIFACT_IDENTITY_MISMATCH` and the reconstructed
+   artifact must not be treated as the original.
+
+   **F. Current Arena capability snapshot.** Recorded explicitly as bounded
+   evidence, not as a second attachment policy system:
+
+   ```text
+   CURRENT_ARENA_ATTACHMENT_CAPABILITY_SNAPSHOT
+   DATE=2026-09-14
+   CLASSIFICATION=CURRENT_EXECUTOR_CAPABILITY_STATE
+   NOT_ETERNAL_PRODUCT_GUARANTEE=YES
+   OWNER_OBSERVED_ACCEPTED_MEDIA_TYPES:
+     image/png, image/webp, image/jpeg, image/gif,
+     text/plain, text/markdown, text/csv, text/html, text/xml, text/css,
+     text/javascript, application/json, application/xml,
+     application/javascript, application/pdf
+   ARENA_AGENT_MODE_DOCS_CORROBORATE_UPLOAD_EXTENSIONS:
+     PNG, WebP, JPEG, PDF, GIF, TXT, Markdown, CSV, HTML, XML, CSS,
+     JavaScript, JSON
+   CONCLUSION:
+     application/zip = NOT_SUPPORTED_BY_CURRENT_ARENA_DIRECT_ATTACHMENT_INPUT
+   ```
+
+   ZIP is therefore not to be prescribed as a direct Arena attachment under
+   this current capability state. This is a dated capability snapshot, not an
+   eternal product rule. If a later authoritative Arena capability state
+   demonstrates that ZIP or another format is supported, then
+   `FRESH_DESTINATION_CAPABILITY_STATE > STALE_CAPABILITY_SNAPSHOT`; update
+   durable P2P guidance when the changed capability materially affects
+   routing, and do not require continued Base64 transport after a simpler
+   reliable native transport becomes available.
+
+   **G. Failure classification.** Distinguish executor transport failures from
+   artifact/project/provider failures. Transport/input classes:
+   `ARTIFACT_UNSUPPORTED_BY_DESTINATION_FORMAT`,
+   `ARTIFACT_TRANSPORT_SIZE_BLOCKED`, `ARTIFACT_IDENTITY_MISMATCH`,
+   `ARTIFACT_RECONSTRUCTION_FAILED`, `EXECUTOR_INPUT_TRANSPORT_UNAVAILABLE`.
+   Do not collapse these into `ARTIFACT_ITSELF_INVALID`,
+   `TARGET_PROJECT_FAILURE`, `OWNER_GITHUB_CONNECTOR_FAILURE`,
+   `PROVIDER_OUTAGE`, `AUTH_CONNECTION_BROKEN`, or another unrelated failure
+   class without evidence. An executor input limitation does not prove the
+   original artifact is invalid.
+
+   **H. No security/permission bypass.** A transport technique does not expand
+   authority. Encoding a prohibited, secret-bearing, privacy-sensitive,
+   unsupported-for-policy, or otherwise restricted artifact as Base64 does not
+   make its transport authorized. Existing Owner Gates, credential/secret
+   boundaries, privacy rules, destination security/content policy, and
+   repository mutation authority continue to apply.
+
+   This rule uses existing P2P prompt, gate, evidence, and routing surfaces
+   and creates no MIME registry, transport framework, encoder library,
+   attachment service, daemon, artifact bus, router, database, CI framework,
+   automated prompt linter, or additional agent.
 
 ### Prompt-alignment gate
 
@@ -382,6 +508,34 @@ contract/prompt or narrow the task to the smallest representative proof before
 handoff or another repair turn. This is a task/prompt-quality check over
 existing P2P state, not a new framework, automated checker, CI stage, or
 reviewer service.
+
+### Executor input / artifact transport gate
+
+Before any P2P-generated instruction asks the Owner or another executor to
+attach, upload, import, ingest, or reconstruct an external artifact, check
+(Supreme Law #9):
+
+```text
+DESTINATION_INPUT_CAPABILITY_KNOWN_WHEN_MATERIAL
+DIRECT_NATIVE_LOSSLESS_TRANSPORT_USED_WHEN_SUPPORTED_AND_SIMPLE
+  OR REVERSIBLE_SUPPORTED_TRANSPORT_SELECTED_WHEN_DIRECT_UNSUPPORTED
+NO_EXTENSION_OR_MIME_SPOOFING
+NO_SEMANTIC_CONVERSION_DISGUISED_AS_TRANSPORT
+ORIGINAL_ARTIFACT_SIZE_AND_SHA256_BOUND_WHEN_IDENTITY_MATTERS
+BASE64_IS_TRANSPORT_ENCODING_NOT_ENCRYPTION
+RECONSTRUCTION_OUTSIDE_TARGET_WORKTREE_BY_DEFAULT
+RECONSTRUCTED_SIZE_AND_SHA256_MATCH_BEFORE_USE
+EPHEMERAL_TRANSPORT_DOES_NOT_REQUIRE_REPO_MUTATION
+NO_PREEMPTIVE_CHUNKING
+NO_NEW_TRANSPORT_INFRASTRUCTURE_WHEN_EXISTING_NATIVE_PATH_OR_BASE64_TEXT_IS_SUFFICIENT
+FRESH_DESTINATION_CAPABILITY_OVERRIDES_STALE_SNAPSHOT
+```
+
+If the direct format is unsupported and no trustworthy reversible transport is
+available, report `BLOCKED=EXECUTOR_INPUT_TRANSPORT_UNAVAILABLE`; do not
+manufacture `PASS`. This is a compact transport-decision check over existing
+destination capability evidence, not a second attachment policy system, MIME
+registry, encoder library, or transport framework.
 
 ### Executor-aware resource policy
 
