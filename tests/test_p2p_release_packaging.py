@@ -39,6 +39,15 @@ SHIELD_PORTABLE_PAYLOAD = (
     "shield/providers/osv-scanner-2.4.0.json",
     "shield/providers/zizmor-1.29.0.json",
 )
+INSTALLED_SHIELD_SURFACE = (
+    "shield/__init__.py",
+    "shield/profile.py",
+    "shield/runner.py",
+    "shield/profiles/SHIELD-BASE.json",
+)
+# Directories inside the packaged Shield payload; an installer that copies a
+# directory into an existing directory can nest these on upgrade/reinstall.
+SHIELD_SUBDIRECTORIES = ("controls", "profiles", "providers")
 
 
 def sha256(path: Path) -> str:
@@ -109,6 +118,58 @@ def install(installer: Path, project: Path) -> str:
         ]
     )
     return result.stdout + result.stderr
+
+
+def installed_shield_probe(project: Path) -> dict[str, str]:
+    """Import the installed Shield runtime with PYTHONPATH=<project>/.p2p/system."""
+
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(project / ".p2p" / "system")
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import json, shield, shield.profile as profile;"
+            "print(json.dumps({'module': shield.__file__,"
+            " 'profile_id': profile.PROFILE['profile_id'],"
+            " 'profile_version': profile.PROFILE['profile_version']}))",
+        ],
+        cwd=str(project),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=environment,
+        check=False,
+    )
+    if result.returncode:
+        raise AssertionError(
+            f"Installed Shield import failed:\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+        )
+    return json.loads(result.stdout.strip().splitlines()[-1])
+
+
+def assert_installed_shield(case: unittest.TestCase, project: Path) -> dict[str, str]:
+    """Prove a supported install produced a runnable, non-nested Shield payload."""
+
+    system = project / ".p2p" / "system"
+    for relative in INSTALLED_SHIELD_SURFACE:
+        case.assertTrue(
+            (system / Path(relative)).is_file(), f"installed Shield file is missing: {relative}"
+        )
+    nesting_candidates = [system / "shield" / "shield"]
+    nesting_candidates.extend(system / "shield" / name / name for name in SHIELD_SUBDIRECTORIES)
+    nested = [str(path.relative_to(system)) for path in nesting_candidates if path.exists()]
+    case.assertEqual(nested, [], "supported installer nested the Shield payload")
+    probe = installed_shield_probe(project)
+    case.assertEqual(probe["profile_id"], "SHIELD-BASE")
+    case.assertEqual(probe["profile_version"], "0.2.1")
+    case.assertTrue(
+        probe["module"].startswith(str(system)),
+        f"Shield resolved outside the installed system: {probe['module']}",
+    )
+    return probe
 
 
 def file_snapshot(root: Path, relative_roots: tuple[str, ...]) -> dict[str, str]:
@@ -310,6 +371,7 @@ class P2PReleasePackagingTests(unittest.TestCase):
             )
             self.assertTrue((fresh / ".p2p" / "system" / "p2p_uiux" / "recommendation.py").is_file())
             self.assertTrue((fresh / ".p2p" / "system" / "docs" / "evals" / "p2p-uiux-eval-suite.json").is_file())
+            assert_installed_shield(self, fresh)
             fresh_foundation = json.loads(
                 run_command(
                     [
@@ -559,6 +621,7 @@ class P2PReleasePackagingTests(unittest.TestCase):
             upgraded_marker = json.loads((existing / ".p2p" / "system" / "release.json").read_text(encoding="utf-8"))
             self.assertEqual(upgraded_marker["package_version"], package_version)
             self.assertEqual(upgraded_marker["install_class"], "UPGRADE_FROM_8.4.7-C-codex.3")
+            assert_installed_shield(self, existing)
             self.assertEqual(
                 sha256(existing / ".p2p" / "system" / "scripts" / "p2p_workflow.py"),
                 sha256(package_root / "scripts" / "p2p_workflow.py"),
@@ -609,6 +672,7 @@ class P2PReleasePackagingTests(unittest.TestCase):
             reinstall_output = install(package_root / "install.ps1", existing)
             self.assertIn("Install class: SAME_VERSION_REINSTALL", reinstall_output)
             self.assertIn("RESULT: PASS", reinstall_output)
+            assert_installed_shield(self, existing)
             protected_after_reinstall = file_snapshot(existing, (".p2p/project-policy.json", ".p2p/evals", ".p2p/approvals", ".p2p/state", ".p2p/design", "user-file-sentinel.txt"))
             self.assertEqual(protected_after_reinstall, protected_before_reinstall)
             self.assertEqual(file_snapshot(existing, (".p2p/system/p2p_capabilities",)), foundation_before_reinstall)
@@ -657,6 +721,38 @@ class ShieldPortableSurfaceTests(unittest.TestCase):
         self.assertIn("shield/", selected)
         for relative in SHIELD_PORTABLE_PAYLOAD:
             self.assertTrue((REPO_ROOT / relative).is_file(), f"missing Shield source file: {relative}")
+
+    def test_supported_installers_copy_packaged_shield_into_p2p_system(self) -> None:
+        """Both supported installers must land .p2p/system/shield without nesting.
+
+        ``install.sh`` is executed directly by the Linux acceptance evidence.
+        PowerShell is unavailable in this sandbox, so ``install.ps1`` copy
+        semantics are pinned by contract here and executed by the supported
+        installer acceptance test on a PowerShell host.
+        """
+
+        shell = (REPO_ROOT / "install.sh").read_text(encoding="utf-8")
+        self.assertIn('shield_source="$package_root/shield"', shell)
+        self.assertIn('if [[ ! -d "$shield_source" ]]; then', shell)
+        self.assertIn('mkdir -p "$system_destination/shield"', shell)
+        self.assertIn('cp -a "$shield_source/." "$system_destination/shield/"', shell)
+
+        powershell = (REPO_ROOT / "install.ps1").read_text(encoding="utf-8")
+        self.assertIn('$ShieldSource = Join-Path $PackageRoot "shield"', powershell)
+        self.assertIn(
+            "if (-not (Test-Path -LiteralPath $ShieldSource -PathType Container)) {", powershell
+        )
+        self.assertIn('$ShieldDestination = Join-Path $SystemDestination "shield"', powershell)
+        self.assertIn(
+            "Get-ChildItem -LiteralPath $ShieldSource -Recurse -Force -File", powershell
+        )
+        self.assertIn("$_.FullName.Substring($ShieldSource.Length)", powershell)
+        # Copying the packaged directory into an already existing destination
+        # directory is what nests shield/shield on upgrade, so it must not be
+        # the copy form used here.
+        self.assertNotIn(
+            "Copy-Item -LiteralPath $ShieldSource -Destination $ShieldDestination", powershell
+        )
 
     def test_staged_shield_payload_is_complete_and_free_of_transient_files(self) -> None:
         source_files = sorted(
