@@ -120,6 +120,11 @@ DIRECTORIES = (
     "governance",
     "manifest",
     "mapping",
+    # Existing Shield runtime ships unchanged so a target project receives the
+    # already-built controls/profile/providers through the normal release and
+    # safe-install path (target/.p2p/system/shield/**).  COPYTREE_IGNORE keeps
+    # __pycache__ and bytecode out of the candidate payload.
+    "shield",
     "source",
 )
 UIUX_RUNTIME_SCRIPT_MAP = (
