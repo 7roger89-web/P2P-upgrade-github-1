@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 import tempfile
@@ -40,6 +41,44 @@ BASE_SHA = "a" * 64
 BASE_TREE = "b" * 64
 STALE_SHA = "c" * 64
 STALE_TREE = "d" * 64
+
+# Canonical P2P_SUPREME_OPERATING_LAW_V1 supreme law identifiers #1-#9, in
+# canonical order (docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md, section 2A).
+CANONICAL_SUPREME_LAW_IDENTIFIERS = (
+    "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
+    "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
+    "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
+    "RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+    "PRESERVE_CONTINUITY_AND_STOP",
+    "PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT",
+    "ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT",
+    "TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY",
+    "EXECUTOR_INPUT_FORMAT_AND_ARTIFACT_TRANSPORT_FIDELITY",
+)
+
+
+def pristine_supreme_law_capsule() -> str:
+    """Return SUPREME_LAW_CAPSULE exactly as defined in control_tower_handoff.py.
+
+    The p2p_capabilities package __init__ appends the separate GitHub connector
+    law capsule to the module attribute at package-import time (pre-existing
+    package behavior that this test must not change). Loading the module
+    standalone yields the pristine canonical nine-entry constant so its shape
+    can be asserted directly.
+    """
+
+    module_path = SYSTEM_ROOT / "p2p_capabilities" / "control_tower_handoff.py"
+    spec = importlib.util.spec_from_file_location(
+        "_control_tower_handoff_pristine",
+        module_path,
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.modules.pop(spec.name, None)
+    return module.SUPREME_LAW_CAPSULE
 
 
 class ControlTowerSessionHandoffTests(unittest.TestCase):
@@ -260,8 +299,28 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
         self.assertIn("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md", prompt)
         self.assertIn(".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md", prompt)
         self.assertIn("SUPREME_LAW_CAPSULE", prompt)
-        self.assertIn("defer premature supporting infrastructure or ceremony", prompt)
-        self.assertIn("Keep one active Supreme Law", prompt)
+        # The generated prompt must carry every canonical Supreme Law
+        # identifier #1-#9, including laws #8 and #9, as actual prompt text.
+        for law_identifier in CANONICAL_SUPREME_LAW_IDENTIFIERS:
+            with self.subTest(law=law_identifier):
+                self.assertIn(law_identifier, prompt)
+        # The runtime capsule constant must be exactly nine non-empty entries,
+        # each beginning with its exact canonical law identifier.
+        capsule_lines = [
+            line for line in pristine_supreme_law_capsule().splitlines() if line.strip()
+        ]
+        self.assertEqual(len(capsule_lines), 9)
+        for number, (capsule_line, law_identifier) in enumerate(
+            zip(capsule_lines, CANONICAL_SUPREME_LAW_IDENTIFIERS),
+            start=1,
+        ):
+            with self.subTest(law=law_identifier):
+                self.assertTrue(
+                    capsule_line.startswith(f"{number}. {law_identifier}"),
+                    capsule_line,
+                )
+                # Each full capsule entry must appear verbatim in the prompt.
+                self.assertIn(capsule_line, prompt)
         self.assertIn("Do not claim that a repository file was read unless it actually was.", prompt)
         self.assertIn("PACKET_IS_CANONICAL_TRUTH: NO", prompt)
         self.assertIn(USER_ACTION_BLOCK, prompt)

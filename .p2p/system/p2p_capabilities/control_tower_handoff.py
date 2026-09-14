@@ -27,17 +27,27 @@ CONTROL_TOWER_PROJECTION_SCHEMA = "p2p-control-tower-state-projection/2"
 ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
 CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
+SUPREME_LAW_CANONICAL_REPO = "7roger89-web/P2P-upgrade-github-1"
+SUPREME_LAW_CANONICAL_REF = "main"
 SUPREME_LAW_DEVELOPMENT_PATH = "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
 SUPREME_LAW_INSTALLED_PATH = ".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md"
+# Compact fallback capsule aligned with the canonical P2P_SUPREME_OPERATING_LAW_V1
+# supreme laws #1-#9 (docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md, section 2A).
+# Exactly nine entries; each begins with the exact canonical law identifier. This
+# constant must stay self-contained: build_execution_prompt() never reads the
+# canonical notebook at runtime, because the capsule exists for executors that
+# cannot reach it.
 SUPREME_LAW_CAPSULE = "\n".join(
     (
-        "1. Preserve the Owner's outcome and authority; decide routine technical details inside approved scope.",
-        "2. Take the simplest useful path to completion; do not build speculative infrastructure before a demonstrated need.",
-        "3. Real state and scoped evidence override assumptions; reconcile UNKNOWN side effects before unsafe retry.",
-        "4. Retry by process type and detect stuckness by lack of preserved progress, not a fixed failure count.",
-        "5. Preserve only the durable checkpoint needed to continue and STOP when the required outcome is proven.",
-        "6. Before meaningful new work, require a concrete outcome/verification/material-risk reason; choose the simpler valid path and defer premature supporting infrastructure or ceremony.",
-        "7. Keep one active Supreme Law: supersede conflicting old wording instead of stacking parallel rules; cut rules that add ceremony without improving completion, verification, recovery, or Owner control.",
+        "1. OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS — Preserve the Owner's outcome, acceptance, and authority; decide routine technical details inside approved scope; never lower acceptance or widen authority to manufacture success.",
+        "2. SIMPLEST_USEFUL_PATH_TO_COMPLETION — Choose the simplest useful action that materially advances outcome, evidence, recovery, or risk reduction; do not build speculative supporting infrastructure first.",
+        "3. REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS — Fresh-check mutable state; evidence proves only its own scope; reconcile UNKNOWN side effects before unsafe retry.",
+        "4. RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS — Retry according to process/failure type; diagnose root cause; change route when progress stalls; do not use ritual fixed-count retries.",
+        "5. PRESERVE_CONTINUITY_AND_STOP — Retain only the durable checkpoint needed to continue and stop when the required outcome is proven.",
+        "6. PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT — Cross-tool operational prompts state project/workstream, destination, chat mode/title, role where applicable, fresh durable plan checkpoint, and one next bounded step.",
+        "7. ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT — Use analytical scepticism, top-down deconstruction plus bottom-up reconstruction, distinguish evidence/inference when material, prefer root-cause repair, and rewrite delegation prompts that could drift from the Owner outcome.",
+        "8. TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY — Bind objective, scope, representative scenario/quality invariant where relevant, observable acceptance, evidence class, failure/blocker criteria, and stop condition; never promote local/mock/proxy evidence to live/business/visual/official PASS without representative proof; reuse authoritative existing components first.",
+        "9. EXECUTOR_INPUT_FORMAT_AND_ARTIFACT_TRANSPORT_FIDELITY — Verify destination input capability before handoff; prefer direct lossless transport when supported, otherwise the simplest trustworthy reversible transport; never spoof MIME/extensions or disguise semantic conversion; when artifact identity matters verify reconstructed byte size and SHA-256 before use; transport never expands authority or bypasses security/privacy/Owner Gates.",
     )
 )
 UNKNOWN = "UNKNOWN"
