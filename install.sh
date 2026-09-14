@@ -113,6 +113,19 @@ for metadata_name in \
   cp "$package_root/$metadata_name" "$system_destination/$metadata_name"
 done
 
+# Shield runtime: ship the packaged Shield surface into the managed P2P system
+# so an installed target can run it with PYTHONPATH=<root>/.p2p/system.
+# Fail closed if a canonical package that claims this feature is missing it.
+# The "<source>/." form copies contents into the destination, so upgrade and
+# reinstall refresh .p2p/system/shield in place without nested shield/shield.
+shield_source="$package_root/shield"
+if [[ ! -d "$shield_source" ]]; then
+  echo "Packaged Shield runtime is missing: shield/" >&2
+  exit 2
+fi
+mkdir -p "$system_destination/shield"
+cp -a "$shield_source/." "$system_destination/shield/"
+
 # P2P operations notebook: install the canonical full notebook into the
 # managed P2P system so the installed project can discover and follow it.
 # Fail closed if a canonical package that claims this feature is missing it.

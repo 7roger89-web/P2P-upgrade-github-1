@@ -158,6 +158,24 @@ foreach ($MetadataName in @("CANDIDATE-DISTRIBUTION-MANIFEST.json", "SOURCE-BIND
   Copy-Item -LiteralPath $MetadataPath -Destination (Join-Path $SystemDestination $MetadataName) -Force
 }
 
+# Shield runtime: ship the packaged Shield surface into the managed P2P system
+# so an installed target can run it with PYTHONPATH=<Root>\.p2p\system.
+# Fail closed if a canonical package that claims this feature is missing it.
+# Files are copied to computed relative destinations so upgrade and reinstall
+# refresh .p2p\system\shield in place instead of nesting shield\shield.
+$ShieldSource = Join-Path $PackageRoot "shield"
+if (-not (Test-Path -LiteralPath $ShieldSource -PathType Container)) {
+  throw "Packaged Shield runtime is missing: shield\"
+}
+$ShieldDestination = Join-Path $SystemDestination "shield"
+New-Item -ItemType Directory -Force -Path $ShieldDestination | Out-Null
+Get-ChildItem -LiteralPath $ShieldSource -Recurse -Force -File | ForEach-Object {
+  $ShieldRelative = $_.FullName.Substring($ShieldSource.Length).TrimStart('\')
+  $ShieldTarget = Join-Path $ShieldDestination $ShieldRelative
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ShieldTarget) | Out-Null
+  Copy-Item -LiteralPath $_.FullName -Destination $ShieldTarget -Force
+}
+
 # P2P operations notebook: install the canonical full notebook into the
 # managed P2P system so the installed project can discover and follow it.
 # Fail closed if a canonical package that claims this feature is missing it.
