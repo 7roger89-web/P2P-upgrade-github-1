@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import os
 import shutil
@@ -25,6 +26,18 @@ FORBIDDEN_EXTERNAL_PATHS = (
     "/superpowers/",
     "/agent-skills/",
     "/agency-agents/",
+)
+SHIELD_PORTABLE_PAYLOAD = (
+    "shield/__init__.py",
+    "shield/runner.py",
+    "shield/profile.py",
+    "shield/profiles/SHIELD-BASE.json",
+    "shield/controls/SHIELD-SECRET-01.json",
+    "shield/controls/SHIELD-DEPENDENCY-01.json",
+    "shield/controls/SHIELD-CI-01.json",
+    "shield/providers/gitleaks-8.18.4.json",
+    "shield/providers/osv-scanner-2.4.0.json",
+    "shield/providers/zizmor-1.29.0.json",
 )
 
 
@@ -214,6 +227,9 @@ class P2PReleasePackagingTests(unittest.TestCase):
             self.assertIn("runtime/docs/evals/p2p-uiux-eval-suite.json", members)
             self.assertIn("runtime/scripts/p2p_uiux_eval.py", members)
             self.assertIn("runtime/scripts/p2p_uiux_eval_impl.py", members)
+            self.assertIn("shield/__init__.py", members)
+            self.assertIn("shield/profiles/SHIELD-BASE.json", members)
+            self.assertIn("shield/providers/gitleaks-8.18.4.json", members)
             self.assertTrue(all(not any(fragment in f"/{name}" for fragment in FORBIDDEN_ARCHIVE_FRAGMENTS) for name in members))
             self.assertTrue(all(not any(fragment in f"/{name.lower()}" for fragment in FORBIDDEN_EXTERNAL_PATHS) for name in members))
             self.assertTrue(all(not name.endswith((".pyc", ".pyo")) for name in members))
@@ -614,6 +630,58 @@ class P2PReleasePackagingTests(unittest.TestCase):
                 ]
             )
             self.assertIn('"status": "PASS"', drift.stdout)
+
+
+def release_contract():
+    """Load the source-owned release contract exactly like ``doctor.py`` does."""
+
+    script = REPO_ROOT / "scripts" / "package_release.py"
+    scripts_root = str(script.parent)
+    if scripts_root not in sys.path:
+        sys.path.insert(0, scripts_root)
+    spec = importlib.util.spec_from_file_location("p2p_release_packaging_contract", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class ShieldPortableSurfaceTests(unittest.TestCase):
+    """The already-built Shield runtime must travel through the normal release."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.contract = release_contract()
+
+    def test_release_selection_includes_existing_shield_runtime(self) -> None:
+        selected = self.contract.selected_paths(REPO_ROOT)
+        self.assertIn("shield/", selected)
+        for relative in SHIELD_PORTABLE_PAYLOAD:
+            self.assertTrue((REPO_ROOT / relative).is_file(), f"missing Shield source file: {relative}")
+
+    def test_staged_shield_payload_is_complete_and_free_of_transient_files(self) -> None:
+        source_files = sorted(
+            path.relative_to(REPO_ROOT).as_posix()
+            for path in (REPO_ROOT / "shield").rglob("*")
+            if path.is_file() and "__pycache__" not in path.parts
+        )
+        for relative in SHIELD_PORTABLE_PAYLOAD:
+            self.assertIn(relative, source_files)
+        with tempfile.TemporaryDirectory(prefix="p2p-shield-stage-") as raw:
+            stage = Path(raw) / "stage"
+            stage.mkdir()
+            self.contract.copy_selected(REPO_ROOT, stage)
+            staged = sorted(
+                path.relative_to(stage).as_posix()
+                for path in (stage / "shield").rglob("*")
+                if path.is_file()
+            )
+            self.assertEqual(staged, source_files)
+            transient = [
+                name
+                for name in staged
+                if "__pycache__" in name or name.endswith((".pyc", ".pyo", ".coverage"))
+            ]
+            self.assertEqual(transient, [])
 
 
 if __name__ == "__main__":
