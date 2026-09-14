@@ -40,7 +40,7 @@ if y_head != YINYO_PIN:
 sys.path.insert(0, str(UPSTREAM / 'src'))
 from liuyao import cast_board  # noqa: E402
 from liuyao.wuxing import liuqin  # noqa: E402
-from liuyao.data import DIZHI_WUXING  # noqa: E402
+from liuyao.data import DIZHI_WUXING, HEXAGRAMS  # noqa: E402
 
 
 def parse_moving(text):
@@ -111,22 +111,252 @@ def packet_sha(packet):
     return hashlib.sha256(raw).hexdigest()
 
 
+def _johnson_unique_hexagram_records():
+    """
+    Johnson's HEXAGRAMS is an index keyed by BOTH full name and single-char alias
+    (128 keys -> 64 unique records). Dedupe by record name so a structural scan
+    counts each hexagram once. No new mapping is introduced: every record here is
+    Johnson's own dict object from Johnson's own data.py.
+    """
+    unique = {}
+    for rec in HEXAGRAMS.values():
+        unique[rec['name']] = rec
+    return list(unique.values())
+
+
+def _pure_palace_record(palace):
+    """
+    Derive 本宫八纯卦 (palace head / 首卦) from EXISTING Johnson HEXAGRAMS data.
+
+    Structural proof required by Johnson's own record shape
+    (name, alias, upper, lower, palace, palace_wx, world):
+        record.palace == P  AND  record.upper == P  AND  record.lower == P
+
+    No handwritten {"乾": "乾为天", ...} map, no string concatenation.
+    Returns (record_or_None, selection_proof). Fails closed (record None) unless
+    EXACTLY ONE record satisfies the condition.
+    """
+    records = _johnson_unique_hexagram_records()
+    hits = [
+        r for r in records
+        if r['palace'] == palace and r['upper'] == palace and r['lower'] == palace
+    ]
+    proof = {
+        'source': 'Johnson-Jia/liuyao-divination src/liuyao/data.py HEXAGRAMS',
+        'pin': PIN,
+        'condition': 'record.palace == P AND record.upper == P AND record.lower == P',
+        'records_scanned': len(records),
+        'index_keys_scanned': len(HEXAGRAMS),
+        'palace': palace,
+        'hits': [r['name'] for r in hits],
+        'hit_count': len(hits),
+        'unique': len(hits) == 1,
+        'handwritten_palace_map_used': False,
+    }
+    return (hits[0] if len(hits) == 1 else None), proof
+
+
+def _fushen_placement(board, lens):
+    """
+    JOHNSON-NATIVE FUSHEN PLACEMENT (mechanical position only).
+
+    Runs ONLY when the nested missing-yongshen gate has already resolved to
+    FUSHEN_LOOKUP_REQUIRED. Source rule (Johnson references/02-用神取用.md 四):
+        在本宫八纯卦（首卦）中找到该六亲所在之爻，即为伏神
+        飞神 = 主卦上承载伏神的那个爻
+
+    Nothing here is computed by hand:
+      - 本宫八纯卦 comes from Johnson HEXAGRAMS via a structural scan;
+      - the pure-palace board comes from Johnson cast_board() with the minimal
+        legal moving-line input ([] -> static board);
+      - the 伏神 candidates are the pure board's own lines whose qin == lens;
+      - the 飞神 is the MAIN board's own line at the confirmed candidate position.
+
+    All candidates are preserved; none is arbitrarily selected. No strength,
+    生克, 旺衰, 得出, or good/bad judgment is produced here.
+    """
+    pure_rec, proof = _pure_palace_record(board.palace)
+    if pure_rec is None:
+        # FAIL CLOSED: do not guess a palace head.
+        return {
+            'status': 'SOURCE_DATA_INCONSISTENT_PURE_PALACE',
+            'pure_palace_hexagram': None,
+            'pure_palace_unique': False,
+            'pure_palace_selection': proof,
+            'pure_palace_board_built': False,
+            'candidates': [],
+            'candidate_count': 0,
+            'position_source': 'NONE_PURE_PALACE_NOT_UNIQUELY_DERIVABLE_FROM_JOHNSON_DATA',
+            'fail_closed': True,
+            'judgment_emitted': False,
+        }
+
+    pure_name = pure_rec['name']
+    try:
+        # Minimal legal moving-line input verified against real cast_board contract:
+        # moving=[] is accepted and yields a static board (changed_hexagram == itself).
+        pure_board = cast_board(pure_name, [], board.month_zhi, board.day_gz, lens)
+    except Exception as exc:
+        return {
+            'status': 'SOURCE_DATA_INCONSISTENT_PURE_PALACE_BOARD',
+            'pure_palace_hexagram': pure_name,
+            'pure_palace_unique': True,
+            'pure_palace_selection': proof,
+            'pure_palace_board_built': False,
+            'candidates': [],
+            'candidate_count': 0,
+            'position_source': f'NONE_JOHNSON_CAST_BOARD_REJECTED_PURE_PALACE:{exc}',
+            'fail_closed': True,
+            'judgment_emitted': False,
+        }
+
+    # 伏神 candidates = Johnson-generated pure-palace lines carrying the requested qin.
+    candidates = [
+        {
+            'position': ln.position,
+            'gan': ln.gan,
+            'zhi': ln.zhi,
+            'wx': ln.wx,
+            'qin': ln.qin,
+        }
+        for ln in pure_board.lines
+        if ln.qin == lens
+    ]
+
+    if not candidates:
+        # FAIL CLOSED: explicit source/data inconsistency, no fabricated position.
+        return {
+            'status': 'SOURCE_DATA_INCONSISTENT_NO_FUSHEN_CANDIDATE',
+            'pure_palace_hexagram': pure_name,
+            'pure_palace_unique': True,
+            'pure_palace_selection': proof,
+            'pure_palace_board_built': True,
+            'pure_palace_board_qin': [ln.qin for ln in pure_board.lines],
+            'candidates': [],
+            'candidate_count': 0,
+            'position_source': 'NONE_REQUESTED_QIN_ABSENT_FROM_JOHNSON_PURE_PALACE_BOARD',
+            'fail_closed': True,
+            'judgment_emitted': False,
+        }
+
+    return {
+        'status': 'FUSHEN_PLACEMENT_IDENTIFIED',
+        'pure_palace_hexagram': pure_name,
+        'pure_palace_unique': True,
+        'pure_palace_selection': proof,
+        'pure_palace_board_built': True,
+        'pure_palace_board_qin': [ln.qin for ln in pure_board.lines],
+        'pure_palace_board_source': {
+            'engine': 'Johnson-Jia/liuyao-divination cast_board()',
+            'pin': PIN,
+            'call': {
+                'hexagram': pure_name,
+                'moving': [],
+                'month_zhi': board.month_zhi,
+                'day_gz': board.day_gz,
+                'yongshen_qin': lens,
+            },
+            'manual_line_calculation': False,
+        },
+        'candidates': candidates,
+        'candidate_count': len(candidates),
+        'all_candidates_preserved': True,
+        'arbitrary_selection_made': False,
+        'position_source': (
+            'Johnson cast_board() pure-palace board lines where line.qin == requested lens '
+            f'(pure_palace_hexagram={pure_name}; Johnson-Jia/liuyao-divination@{PIN} '
+            'references/02-用神取用.md 四、用神不上卦（伏神）)'
+        ),
+        'fail_closed': False,
+        'judgment_emitted': False,
+    }
+
+
+def _feishen_placement(board, fushen):
+    """
+    飞神 = the MAIN-board line at the SAME position as a confirmed 伏神 candidate.
+
+    Legitimate ONLY because the fushen position has already been mechanically
+    established by Johnson. Emits existing main-board mechanical facts only.
+    Not a global relabeling of all main lines, and no 生克 / suppression judgment.
+    """
+    if fushen.get('status') != 'FUSHEN_PLACEMENT_IDENTIFIED':
+        return {
+            'status': 'FEISHEN_POSITION_NOT_IDENTIFIED',
+            'candidates': [],
+            'candidate_count': 0,
+            'position_source': 'NONE_FUSHEN_POSITION_NOT_ESTABLISHED',
+            'judgment_emitted': False,
+        }
+
+    main_by_pos = {ln.position: ln for ln in board.lines}
+    candidates = []
+    for cand in fushen['candidates']:
+        ln = main_by_pos.get(cand['position'])
+        if ln is None:
+            continue
+        candidates.append({
+            'position': ln.position,
+            'gan': ln.gan,
+            'zhi': ln.zhi,
+            'wx': ln.wx,
+            'qin': ln.qin,
+            'state': ln.state,
+            'void': ln.void,
+            'month_break': ln.month_break,
+            'day_break': ln.day_break,
+            'is_moving': ln.is_moving,
+            'fushen_position': cand['position'],
+        })
+
+    if not candidates:
+        return {
+            'status': 'SOURCE_DATA_INCONSISTENT_NO_FEISHEN_LINE',
+            'candidates': [],
+            'candidate_count': 0,
+            'position_source': 'NONE_MAIN_BOARD_LINE_AT_CONFIRMED_FUSHEN_POSITION_MISSING',
+            'fail_closed': True,
+            'judgment_emitted': False,
+        }
+
+    return {
+        'status': 'FEISHEN_POSITION_IDENTIFIED',
+        'candidates': candidates,
+        'candidate_count': len(candidates),
+        'position_source': (
+            'main-board line at the SAME position as the Johnson-established fushen '
+            'candidate position (Johnson-Jia/liuyao-divination@' + PIN + ' '
+            'references/02-用神取用.md: 飞神 = 主卦上承载伏神的那个爻)'
+        ),
+        'derived_from_confirmed_fushen_position': True,
+        'all_main_lines_called_feishen': False,
+        'judgment_emitted': False,
+    }
+
+
 def _missing_yongshen_resolution(board, lens):
     """
     Source-grounded missing-yongshen decision gate.
-    Uses only mechanical facts already available from Johnson-Jia board
-    plus existing liuqin helper. No fusheng position is fabricated.
-    No feishen position is identified because palace-head hidden placement
-    has not been computed in this slice.
+    Uses only mechanical facts already available from the Johnson-Jia board
+    plus the existing liuqin helper. No fushen position is fabricated.
 
     Rule order from pinned sources:
     - Yinyo 4.3 L1: 先看日月可否代用 -> "凡用神不现，即以日月为用神"
+      => DAY_MONTH_SUBSTITUTION_CANDIDATE (unchanged; no palace-head lookup)
     - Yinyo 4.3 L3: 飞爻变爻俱无用神方寻伏 -> original text "飞爻变爻俱无用神者，始寻伏神"
-      In this slice we check: VISIBLE_MAIN_LINES_ALREADY_CHECKED (main qin) + CHANGED_LINES_CHECK (bian qin)
-      FEISHEN_POSITION_NOT_IDENTIFIED because hidden fusheng placement not computed
-    - Johnson 02 用神不上卦（伏神）: 在本宫八纯卦中找到该六亲所在之爻，即为伏神
-      飞神=主卦上承载伏神的那个爻; 引擎目前以显用神为主，伏神需手工详参
-      FUSHEN_POSITION_NOT_COMPUTED in this slice
+      checked as VISIBLE_MAIN_LINES_ALREADY_CHECKED (main qin) + CHANGED_LINES_CHECK (bian qin)
+      => BIAN_YAO_YONGSHEN_PRESENT (unchanged; no palace-head lookup)
+    - Johnson 02 用神不上卦（伏神）: 在本宫八纯卦（首卦）中找到该六亲所在之爻，即为伏神；
+      飞神 = 主卦上承载伏神的那个爻
+      => the previously terminal FUSHEN_LOOKUP_REQUIRED advances to JOHNSON-NATIVE
+         placement: the palace head is derived structurally from Johnson HEXAGRAMS
+         (record.palace == P AND record.upper == P AND record.lower == P), the
+         pure-palace board is produced by Johnson cast_board(), the fushen
+         candidates are the pure board lines whose qin == the requested lens, and
+         the feishen is the main board line at the confirmed candidate position.
+
+    PLACEMENT ONLY. No fushen strength, 得出, 飞神生克伏神, 旺衰, 吉凶 or 应期
+    judgment is produced here.
     """
     main_qin = [ln.qin for ln in board.lines]
     changed_qin = [ln.change_qin for ln in board.lines if ln.is_moving and ln.change_qin]
@@ -167,13 +397,22 @@ def _missing_yongshen_resolution(board, lens):
     # Determine status using source-supported order
     # L1: day/month substitution candidate
     # L3: bian yao has yongshen
-    # Otherwise: FUSHEN_LOOKUP_REQUIRED (terminal, no fabrication)
+    # Otherwise: palace-head fushen placement (Johnson-native), advancing the
+    #            previously terminal FUSHEN_LOOKUP_REQUIRED.
+    fushen_placement = None
+    feishen_placement = None
+    gate_status_before_placement = None
     if month_match or day_match:
         status = 'DAY_MONTH_SUBSTITUTION_CANDIDATE'
     elif changed_positions:
         status = 'BIAN_YAO_YONGSHEN_PRESENT'
     else:
-        status = 'FUSHEN_LOOKUP_REQUIRED'
+        # ONLY this branch may invoke the palace-head lookup. The DAY_MONTH and
+        # BIAN branches above must remain unchanged and never build a pure board.
+        gate_status_before_placement = 'FUSHEN_LOOKUP_REQUIRED'
+        fushen_placement = _fushen_placement(board, lens)
+        feishen_placement = _feishen_placement(board, fushen_placement)
+        status = fushen_placement['status']
 
     checked_facts = {
         'main_qin': main_qin,
@@ -220,6 +459,8 @@ def _missing_yongshen_resolution(board, lens):
         },
     }
 
+    # DAY_MONTH_SUBSTITUTION_CANDIDATE and BIAN_YAO_YONGSHEN_PRESENT keep their
+    # pre-existing trace wording verbatim: those branches do not advance in this slice.
     rule_trace = [
         'YINYO_L1_DAY_MONTH_AS_YONGSHEN:凡用神不现即以日月为用神 -> check month_qin/day_qin==lens (MECHANICAL_FACT)',
         'YINYO_L3_QUOTE:飞爻变爻俱无用神者，始寻伏神 -> METHOD_RULE original text',
@@ -230,16 +471,61 @@ def _missing_yongshen_resolution(board, lens):
 
     automation_boundary = 'VISIBLE_CHECK_DONE+DAY_MONTH_CHECK_DONE+CHANGED_LINES_CHECK_DONE; FUSHEN_POSITION_NOT_COMPUTED; FEISHEN_POSITION_NOT_IDENTIFIED; RETURN_FUSHEN_LOOKUP_REQUIRED_IF_UNRESOLVED'
 
+    mechanical_vs_method_vs_judgment = 'MECHANICAL_FACT=board lines/month/day/palace/liuqin (Johnson-Jia); METHOD_RULE=Yinyo L1+L3 + Johnson fusheng definition (pinned text); IMPLEMENTATION_INTERPRETATION=VISIBLE_MAIN_LINES_ALREADY_CHECKED+CHANGED_LINES_CHECK+DAY_MONTH_CHECK then FUSHEN_LOOKUP_REQUIRED_IF_UNRESOLVED; INTERPRETIVE_JUDGMENT=NONE (no good/bad verdict, no yingqi); FEISHEN_POSITION_NOT_IDENTIFIED; FUSHEN_POSITION_NOT_COMPUTED'
+
+    if fushen_placement is not None:
+        # Palace-head lookup ran (FUSHEN_LOOKUP_REQUIRED branch only).
+        pure_name = fushen_placement['pure_palace_hexagram']
+        cand_pos = [c['position'] for c in fushen_placement['candidates']]
+        rule_trace = [
+            'YINYO_L1_DAY_MONTH_AS_YONGSHEN:凡用神不现即以日月为用神 -> check month_qin/day_qin==lens (MECHANICAL_FACT)',
+            'YINYO_L3_QUOTE:飞爻变爻俱无用神者，始寻伏神 -> METHOD_RULE original text',
+            'IMPLEMENTATION_INTERPRETATION_L3:VISIBLE_MAIN_LINES_ALREADY_CHECKED=main_qin checked (no visible yongshen) + CHANGED_LINES_CHECK=changed_qin checked; both empty -> FUSHEN_LOOKUP_REQUIRED reached, palace-head lookup now permitted',
+            'JOHNSON_FUSHEN_DEF:在本宫八纯卦（首卦）中找到该六亲所在之爻即为伏神，飞神=主卦上承载伏神的那个爻 -> METHOD_RULE pinned text (references/02-用神取用.md 四)',
+            f'JOHNSON_PURE_PALACE_DERIVATION:本宫八纯卦 selected structurally from Johnson HEXAGRAMS by palace==P AND upper==P AND lower==P (P={board.palace}) -> {pure_name}; unique={fushen_placement["pure_palace_unique"]}; hits={fushen_placement["pure_palace_selection"]["hits"]}; NO handwritten palace map (MECHANICAL_FACT)',
+            f'JOHNSON_PURE_PALACE_BOARD:cast_board({pure_name}, moving=[], month_zhi={board.month_zhi}, day_gz={board.day_gz}, yongshen_qin={lens}) -> pure board built by Johnson engine, NO manual line calculation (MECHANICAL_FACT)',
+            f'FUSHEN_POSITION_COMPUTED:伏神 candidates = pure-palace lines with qin=={lens} -> positions {cand_pos}; all candidates preserved, none arbitrarily selected (MECHANICAL_FACT)',
+            f'FEISHEN_POSITION_IDENTIFIED:飞神 = main-board ({board.hexagram}) line(s) at confirmed fushen position(s) {cand_pos}; identified ONLY because the fushen position is now mechanically established; not a global relabeling of all main lines (MECHANICAL_FACT)',
+            'NO_FABRICATION:伏神position/飞神position/palace-head all derived from Johnson HEXAGRAMS + Johnson cast_board; 纳甲/六亲/八宫 tables NOT duplicated; NO separate fushen doctrine implemented',
+            'AUTOMATION_STOPS_AT_PLACEMENT:NO 伏神得出判断, NO 飞神生克伏神, NO 日月生扶伏神, NO 旺衰, NO 空破利害, NO 吉凶, NO 应期, NO prediction (INTERPRETIVE_JUDGMENT=NONE)',
+        ]
+        automation_boundary = (
+            'VISIBLE_CHECK_DONE+DAY_MONTH_CHECK_DONE+CHANGED_LINES_CHECK_DONE; '
+            'PURE_PALACE_DERIVED_FROM_JOHNSON_HEXAGRAMS; '
+            'PURE_PALACE_BOARD_BUILT_BY_JOHNSON_CAST_BOARD; '
+            'FUSHEN_POSITION_COMPUTED; FEISHEN_POSITION_IDENTIFIED; '
+            'STOP_AFTER_MECHANICAL_PLACEMENT; '
+            'DEFERRED=伏神得出+飞神生克伏神+日月生扶伏神+伏神旺衰+飞神空破利害+吉凶+应期+PREDICTION+BLIND_VALIDATION'
+        )
+        mechanical_vs_method_vs_judgment = (
+            'MECHANICAL_FACT=board lines/month/day/palace/liuqin + Johnson HEXAGRAMS palace-head record '
+            '+ Johnson cast_board pure-palace board lines (Johnson-Jia); '
+            'METHOD_RULE=Yinyo L1+L3 + Johnson 伏神/飞神 definition (references/02-用神取用.md 四, pinned text); '
+            'IMPLEMENTATION_INTERPRETATION=VISIBLE+DAY_MONTH+CHANGED checks then structural palace-head scan '
+            '(palace==upper==lower) then qin==lens scan on the Johnson-built pure board, feishen=main line at same position; '
+            'INTERPRETIVE_JUDGMENT=NONE (no 得出/生克/旺衰/吉凶/应期 verdict); '
+            'FUSHEN_PLACEMENT_IDENTIFIED != FUSHEN_EFFECTIVE; FEISHEN_POSITION_IDENTIFIED != FEISHEN_SUPPRESSES_FUSHEN'
+        )
+
     return {
         'status': status,
+        'gate_status_before_placement': gate_status_before_placement,
         'checked_facts': checked_facts,
         'source_refs': source_refs,
         'rule_trace': rule_trace,
         'automation_boundary': automation_boundary,
-        'mechanical_vs_method_vs_judgment': 'MECHANICAL_FACT=board lines/month/day/palace/liuqin (Johnson-Jia); METHOD_RULE=Yinyo L1+L3 + Johnson fusheng definition (pinned text); IMPLEMENTATION_INTERPRETATION=VISIBLE_MAIN_LINES_ALREADY_CHECKED+CHANGED_LINES_CHECK+DAY_MONTH_CHECK then FUSHEN_LOOKUP_REQUIRED_IF_UNRESOLVED; INTERPRETIVE_JUDGMENT=NONE (no good/bad verdict, no yingqi); FEISHEN_POSITION_NOT_IDENTIFIED; FUSHEN_POSITION_NOT_COMPUTED',
+        'mechanical_vs_method_vs_judgment': mechanical_vs_method_vs_judgment,
         'fabricated_fusheng_position': False,
-        'feishen_position_identified': False,
-        'fusheng_position_computed': False,
+        'fushen_placement': fushen_placement,
+        'feishen_placement': feishen_placement,
+        'fushen_position_computed': bool(
+            fushen_placement and fushen_placement['status'] == 'FUSHEN_PLACEMENT_IDENTIFIED'
+        ),
+        'feishen_position_identified': bool(
+            feishen_placement and feishen_placement['status'] == 'FEISHEN_POSITION_IDENTIFIED'
+        ),
+        'fushen_effectiveness': 'NOT_ASSESSED',
+        'good_bad_judgment': 'NOT_EMITTED',
     }
 
 
@@ -365,8 +651,40 @@ def main():
             'NO_CROSS_TOPIC_CONCLUSION',
             'NO_FORCED_GOOD_BAD_VERDICT',
             'NO_FABRICATED_FUSHEN_POSITION',
+            'NO_FUSHEN_STRENGTH_OR_DECHU_JUDGMENT',
+            'NO_FEISHEN_SHENGKE_FUSHEN_JUDGMENT',
+            'NO_RIYUE_SHENGFU_FUSHEN_JUDGMENT',
+            'NO_FUSHEN_WANGSHUAI',
+            'NO_YINGQI',
+            'FUSHEN_PLACEMENT_IDENTIFIED != FUSHEN_EFFECTIVE',
+            'FEISHEN_POSITION_IDENTIFIED != FEISHEN_SUPPRESSES_FUSHEN',
+            'MECHANICAL_PLACEMENT != GOOD_BAD_JUDGMENT',
+            'ENGINEERING_PASS != METHOD_VALIDITY',
         ],
-        'MISSING_YONGSHEN_GATE': 'SOURCE_GROUNDED_MECHANICAL_FACTS_PLUS_YINYO_L1_L3_PLUS_JOHNSON_DEF__FUSHEN_LOOKUP_REQUIRED_IF_UNRESOLVED',
+        'MISSING_YONGSHEN_GATE': 'SOURCE_GROUNDED_MECHANICAL_FACTS_PLUS_YINYO_L1_L3_PLUS_JOHNSON_DEF__JOHNSON_NATIVE_FUSHEN_PLACEMENT_WHEN_LOOKUP_REQUIRED',
+        'FUSHEN_PLACEMENT_SOURCE': {
+            'PURE_PALACE_LOOKUP': 'Johnson-Jia/liuyao-divination src/liuyao/data.py HEXAGRAMS structural scan (record.palace == P AND record.upper == P AND record.lower == P)',
+            'PURE_PALACE_BOARD': 'Johnson-Jia/liuyao-divination cast_board() with minimal legal moving input []',
+            'FUSHEN_CANDIDATES': 'pure-palace board lines where line.qin == requested lens',
+            'FEISHEN_CANDIDATES': 'main board line at the confirmed fushen candidate position',
+            'HARDCODED_PALACE_MAP': 'NO',
+            'MANUAL_NAJIA': 'NO',
+            'MANUAL_LIUQIN': 'NO',
+            'SEPARATE_FUSHEN_DOCTRINE': 'NO',
+            'PIN': PIN,
+        },
+        'AUTOMATION_BOUNDARY': 'STOPS_AT_MECHANICAL_FUSHEN_FEISHEN_PLACEMENT',
+        'DEFERRED_NOT_IMPLEMENTED': [
+            '伏神得出判断',
+            '飞神生克伏神 judgment',
+            '日月生扶伏神 judgment',
+            '伏神旺衰',
+            '飞神空破是否利于伏神',
+            '吉凶',
+            '应期',
+            'prediction',
+            'blind validation',
+        ],
     }
     print(json.dumps(out, ensure_ascii=False, indent=2))
 
