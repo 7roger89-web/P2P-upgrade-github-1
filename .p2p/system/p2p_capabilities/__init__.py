@@ -414,3 +414,22 @@ if _GITHUB_CONNECTOR_LAW_MARKER not in _control_tower_handoff.SUPREME_LAW_CAPSUL
     _control_tower_handoff.SUPREME_LAW_CAPSULE = "\n".join(
         (_control_tower_handoff.SUPREME_LAW_CAPSULE, _GITHUB_CONNECTOR_LAW_CAPSULE)
     )
+
+# Every cross-tool execution prompt should explicitly surface repository-local
+# project instructions before substantive work. This is intentionally appended
+# to the runtime execution capsule rather than copied into each historical task
+# prompt, so one central change applies to every managed project using the P2P
+# prompt builder. Project AGENTS.md remains subordinate to the valid Supreme Law.
+_PROJECT_AGENT_PREFLIGHT_MARKER = "PROJECT_AGENT_INSTRUCTIONS_PREFLIGHT"
+_PROJECT_AGENT_PREFLIGHT_CAPSULE = (
+    "PROJECT_AGENT_INSTRUCTIONS_PREFLIGHT — Before substantive analysis, planning, "
+    "implementation, review, or merge decisions in a target repository, read the "
+    "repository-root AGENTS.md when present. Treat AGENTS.md as project-specific "
+    "instructions subordinate to the valid P2P Supreme Law source. If AGENTS.md is "
+    "absent, continue under the valid P2P law context without inventing project-specific "
+    "rules. Do not claim AGENTS.md was read unless it actually was."
+)
+if _PROJECT_AGENT_PREFLIGHT_MARKER not in _control_tower_handoff.SUPREME_LAW_CAPSULE:
+    _control_tower_handoff.SUPREME_LAW_CAPSULE = "\n".join(
+        (_control_tower_handoff.SUPREME_LAW_CAPSULE, _PROJECT_AGENT_PREFLIGHT_CAPSULE)
+    )
