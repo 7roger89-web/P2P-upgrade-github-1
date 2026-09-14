@@ -412,7 +412,25 @@ def _missing_yongshen_resolution(board, lens):
         gate_status_before_placement = 'FUSHEN_LOOKUP_REQUIRED'
         fushen_placement = _fushen_placement(board, lens)
         feishen_placement = _feishen_placement(board, fushen_placement)
-        status = fushen_placement['status']
+        if fushen_placement['status'] != 'FUSHEN_PLACEMENT_IDENTIFIED':
+            # Preserve the ACTUAL fushen source failure; never report success.
+            status = fushen_placement['status']
+        elif feishen_placement['status'] != 'FEISHEN_POSITION_IDENTIFIED':
+            # Fushen placed but feishen not established: preserve that failure too.
+            status = feishen_placement['status']
+        else:
+            status = 'FUSHEN_PLACEMENT_IDENTIFIED'
+
+    # Explicit success predicate. A non-None fail-closed packet is NOT success:
+    # both helpers must have reached their identified states before any output
+    # may claim mechanical placement.
+    placement_attempted = fushen_placement is not None
+    placement_success = (
+        placement_attempted
+        and fushen_placement['status'] == 'FUSHEN_PLACEMENT_IDENTIFIED'
+        and feishen_placement is not None
+        and feishen_placement['status'] == 'FEISHEN_POSITION_IDENTIFIED'
+    )
 
     checked_facts = {
         'main_qin': main_qin,
@@ -473,8 +491,8 @@ def _missing_yongshen_resolution(board, lens):
 
     mechanical_vs_method_vs_judgment = 'MECHANICAL_FACT=board lines/month/day/palace/liuqin (Johnson-Jia); METHOD_RULE=Yinyo L1+L3 + Johnson fusheng definition (pinned text); IMPLEMENTATION_INTERPRETATION=VISIBLE_MAIN_LINES_ALREADY_CHECKED+CHANGED_LINES_CHECK+DAY_MONTH_CHECK then FUSHEN_LOOKUP_REQUIRED_IF_UNRESOLVED; INTERPRETIVE_JUDGMENT=NONE (no good/bad verdict, no yingqi); FEISHEN_POSITION_NOT_IDENTIFIED; FUSHEN_POSITION_NOT_COMPUTED'
 
-    if fushen_placement is not None:
-        # Palace-head lookup ran (FUSHEN_LOOKUP_REQUIRED branch only).
+    if placement_success:
+        # Success path ONLY: both helpers reached their identified states.
         pure_name = fushen_placement['pure_palace_hexagram']
         cand_pos = [c['position'] for c in fushen_placement['candidates']]
         rule_trace = [
@@ -506,6 +524,44 @@ def _missing_yongshen_resolution(board, lens):
             'INTERPRETIVE_JUDGMENT=NONE (no 得出/生克/旺衰/吉凶/应期 verdict); '
             'FUSHEN_PLACEMENT_IDENTIFIED != FUSHEN_EFFECTIVE; FEISHEN_POSITION_IDENTIFIED != FEISHEN_SUPPRESSES_FUSHEN'
         )
+    elif placement_attempted:
+        # FAIL CLOSED. The palace-head lookup ran but did NOT establish placement.
+        # A non-None fail-closed packet is not success: emit no computed/identified
+        # claim, no successful-placement wording, and guess no palace head/position.
+        fu_status = fushen_placement['status']
+        fei_status = (
+            feishen_placement['status'] if feishen_placement
+            else 'FEISHEN_POSITION_NOT_IDENTIFIED'
+        )
+        rule_trace = [
+            'YINYO_L1_DAY_MONTH_AS_YONGSHEN:凡用神不现即以日月为用神 -> check month_qin/day_qin==lens (MECHANICAL_FACT)',
+            'YINYO_L3_QUOTE:飞爻变爻俱无用神者，始寻伏神 -> METHOD_RULE original text',
+            'IMPLEMENTATION_INTERPRETATION_L3:VISIBLE_MAIN_LINES_ALREADY_CHECKED=main_qin checked (no visible yongshen) + CHANGED_LINES_CHECK=changed_qin checked; both empty -> FUSHEN_LOOKUP_REQUIRED reached, palace-head lookup attempted',
+            'JOHNSON_FUSHEN_DEF:在本宫八纯卦（首卦）中找到该六亲所在之爻即为伏神，飞神=主卦上承载伏神的那个爻 -> METHOD_RULE pinned text (references/02-用神取用.md 四)',
+            f'PLACEMENT_FAIL_CLOSED:fushen_status={fu_status}; feishen_status={fei_status}; pure_palace_hexagram={fushen_placement.get("pure_palace_hexagram")}; candidate_count={fushen_placement.get("candidate_count", 0)} -> palace-head lookup did NOT establish placement; FUSHEN_POSITION_NOT_COMPUTED; FEISHEN_POSITION_NOT_IDENTIFIED',
+            'NO_GUESSING:NO palace head and NO 伏神/飞神 position guessed or substituted; actual source failure status preserved; NO fallback mapping invented',
+            'NO_FABRICATION:伏神position/飞神position NOT invented; FUSHEN_POSITION_NOT_COMPUTED; FEISHEN_POSITION_NOT_IDENTIFIED',
+            'AUTOMATION_STOPS_AT_PLACEMENT:placement unresolved, so nothing further is attempted; NO 伏神得出判断, NO 飞神生克伏神, NO 日月生扶伏神, NO 旺衰, NO 空破利害, NO 吉凶, NO 应期, NO prediction (INTERPRETIVE_JUDGMENT=NONE)',
+        ]
+        automation_boundary = (
+            'VISIBLE_CHECK_DONE+DAY_MONTH_CHECK_DONE+CHANGED_LINES_CHECK_DONE; '
+            'PALACE_HEAD_LOOKUP_ATTEMPTED; '
+            'PLACEMENT_FAIL_CLOSED; '
+            f'FUSHEN_FAILURE_STATUS={fu_status}; '
+            f'FEISHEN_FAILURE_STATUS={fei_status}; '
+            'FUSHEN_POSITION_NOT_COMPUTED; FEISHEN_POSITION_NOT_IDENTIFIED; '
+            'NO_PALACE_HEAD_OR_POSITION_GUESSED; '
+            'DEFERRED=伏神得出+飞神生克伏神+日月生扶伏神+伏神旺衰+飞神空破利害+吉凶+应期+PREDICTION+BLIND_VALIDATION'
+        )
+        mechanical_vs_method_vs_judgment = (
+            'MECHANICAL_FACT=board lines/month/day/palace/liuqin (Johnson-Jia); '
+            'METHOD_RULE=Yinyo L1+L3 + Johnson 伏神/飞神 definition (references/02-用神取用.md 四, pinned text); '
+            'IMPLEMENTATION_INTERPRETATION=VISIBLE+DAY_MONTH+CHANGED checks then structural palace-head scan; '
+            f'placement attempted and FAILED CLOSED (fushen={fu_status}; feishen={fei_status}); '
+            'INTERPRETIVE_JUDGMENT=NONE (no 得出/生克/旺衰/吉凶/应期 verdict); '
+            'FUSHEN_POSITION_NOT_COMPUTED; FEISHEN_POSITION_NOT_IDENTIFIED'
+        )
+
 
     return {
         'status': status,
@@ -518,12 +574,10 @@ def _missing_yongshen_resolution(board, lens):
         'fabricated_fusheng_position': False,
         'fushen_placement': fushen_placement,
         'feishen_placement': feishen_placement,
-        'fushen_position_computed': bool(
-            fushen_placement and fushen_placement['status'] == 'FUSHEN_PLACEMENT_IDENTIFIED'
-        ),
-        'feishen_position_identified': bool(
-            feishen_placement and feishen_placement['status'] == 'FEISHEN_POSITION_IDENTIFIED'
-        ),
+        # Both claims are coupled to the ONE success predicate: a feishen position
+        # is only legitimate because the fushen position was established.
+        'fushen_position_computed': placement_success,
+        'feishen_position_identified': placement_success,
         'fushen_effectiveness': 'NOT_ASSESSED',
         'good_bad_judgment': 'NOT_EMITTED',
     }

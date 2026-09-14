@@ -324,6 +324,67 @@ _real_hexagrams = mod.HEXAGRAMS
 _real_cast_board = mod.cast_board
 _gate_board = mod.cast_board('地天泰', [1], '寅', '甲子', '父母')
 
+
+def _assert_fail_closed_propagates(res, expected_status):
+    """
+    INTEGRATION-level proof (this is what was missing before).
+
+    A non-None fail-closed helper packet is NOT success. This asserts the failure
+    propagates correctly THROUGH _missing_yongshen_resolution(): the real source
+    failure status is preserved and no successful-placement wording is emitted.
+    Probes may simulate a source failure; production code stays Johnson-native.
+    """
+    # the ACTUAL failure status is preserved, never replaced by a success status
+    assert res['status'] == expected_status
+    assert res['status'] != 'FUSHEN_PLACEMENT_IDENTIFIED'
+    assert res['gate_status_before_placement'] == 'FUSHEN_LOOKUP_REQUIRED'
+    # required flags stay factual
+    assert res['fushen_position_computed'] is False
+    assert res['feishen_position_identified'] is False
+    assert res['fabricated_fusheng_position'] is False
+    # no position leaked from either helper
+    assert res['fushen_placement']['candidates'] == []
+    assert res['feishen_placement']['candidates'] == []
+
+    blob = json.dumps({
+        'trace': res['rule_trace'],
+        'boundary': res['automation_boundary'],
+        'classification': res['mechanical_vs_method_vs_judgment'],
+    }, ensure_ascii=False)
+
+    # NO success claim may appear anywhere in trace / boundary / classification
+    for forbidden in (
+        'FUSHEN_POSITION_COMPUTED',
+        'FEISHEN_POSITION_IDENTIFIED',
+        'STOP_AFTER_MECHANICAL_PLACEMENT',
+        'PURE_PALACE_DERIVED_FROM_JOHNSON_HEXAGRAMS',
+        'PURE_PALACE_BOARD_BUILT_BY_JOHNSON_CAST_BOARD',
+        'JOHNSON_PURE_PALACE_DERIVATION',
+        'JOHNSON_PURE_PALACE_BOARD',
+    ):
+        assert forbidden not in blob, f'fail-closed output still claims {forbidden}'
+
+    # automation boundary must explicitly say fail closed and name the real failure
+    ab = res['automation_boundary']
+    assert 'PLACEMENT_FAIL_CLOSED' in ab
+    assert 'FUSHEN_POSITION_NOT_COMPUTED' in ab
+    assert 'FEISHEN_POSITION_NOT_IDENTIFIED' in ab
+    assert f'FUSHEN_FAILURE_STATUS={expected_status}' in ab
+    assert 'NO_PALACE_HEAD_OR_POSITION_GUESSED' in ab
+    # rule trace carries the same real failure status, plus the no-guessing guarantee
+    assert any('PLACEMENT_FAIL_CLOSED' in x and expected_status in x for x in res['rule_trace'])
+    assert any('NO_GUESSING' in x for x in res['rule_trace'])
+    assert any('NO_FABRICATION' in x for x in res['rule_trace'])
+
+    # judgment remains NONE and the slice still stops at placement
+    assert 'INTERPRETIVE_JUDGMENT=NONE' in res['mechanical_vs_method_vs_judgment']
+    assert res['fushen_effectiveness'] == 'NOT_ASSESSED'
+    assert res['good_bad_judgment'] == 'NOT_EMITTED'
+    assert res['fushen_placement']['judgment_emitted'] is False
+    assert res['feishen_placement']['judgment_emitted'] is False
+
+
+
 # (1) ambiguous palace head -> SOURCE_DATA_INCONSISTENT_PURE_PALACE, no candidates
 try:
     _dup = dict(_real_hexagrams)
@@ -342,6 +403,10 @@ try:
     assert _r['pure_palace_board_built'] is False
     assert _r['judgment_emitted'] is False
     assert mod._feishen_placement(_gate_board, _r)['status'] == 'FEISHEN_POSITION_NOT_IDENTIFIED'
+    _assert_fail_closed_propagates(
+        mod._missing_yongshen_resolution(_gate_board, '父母'),
+        'SOURCE_DATA_INCONSISTENT_PURE_PALACE',
+    )
 finally:
     mod.HEXAGRAMS = _real_hexagrams
 
@@ -360,6 +425,10 @@ try:
     assert _r['candidates'] == [] and _r['candidate_count'] == 0
     assert _r['position_source'].startswith('NONE_JOHNSON_CAST_BOARD_REJECTED_PURE_PALACE')
     assert mod._feishen_placement(_gate_board, _r)['status'] == 'FEISHEN_POSITION_NOT_IDENTIFIED'
+    _assert_fail_closed_propagates(
+        mod._missing_yongshen_resolution(_gate_board, '父母'),
+        'SOURCE_DATA_INCONSISTENT_PURE_PALACE_BOARD',
+    )
 finally:
     mod.cast_board = _real_cast_board
 
@@ -388,11 +457,28 @@ try:
     assert _r['pure_palace_board_qin'] == ['官鬼'] * 6
     assert _r['position_source'] == 'NONE_REQUESTED_QIN_ABSENT_FROM_JOHNSON_PURE_PALACE_BOARD'
     assert mod._feishen_placement(_gate_board, _r)['status'] == 'FEISHEN_POSITION_NOT_IDENTIFIED'
+    _assert_fail_closed_propagates(
+        mod._missing_yongshen_resolution(_gate_board, '父母'),
+        'SOURCE_DATA_INCONSISTENT_NO_FUSHEN_CANDIDATE',
+    )
 finally:
     mod.cast_board = _real_cast_board
 
 # restored: the real gate still places normally after the fail-closed probes
+# restored: the real gate still places normally after the fail-closed probes
 assert mod._fushen_placement(_gate_board, '父母')['status'] == 'FUSHEN_PLACEMENT_IDENTIFIED'
+
+# --- INTEGRATION: success wording appears ONLY on the genuine success path ---
+_ok = mod._missing_yongshen_resolution(_gate_board, '父母')
+assert _ok['status'] == 'FUSHEN_PLACEMENT_IDENTIFIED'
+assert _ok['fushen_position_computed'] is True
+assert _ok['feishen_position_identified'] is True
+assert any('FUSHEN_POSITION_COMPUTED' in x for x in _ok['rule_trace'])
+assert any('FEISHEN_POSITION_IDENTIFIED' in x for x in _ok['rule_trace'])
+assert 'STOP_AFTER_MECHANICAL_PLACEMENT' in _ok['automation_boundary']
+assert 'PLACEMENT_FAIL_CLOSED' not in _ok['automation_boundary']
+assert _ok['fushen_placement']['candidate_count'] >= 1
+assert _ok['feishen_placement']['candidate_count'] == _ok['fushen_placement']['candidate_count']
 
 # --- multi-candidate path: ALL candidates preserved, none arbitrarily selected ---
 # Verified over Johnson's full space (64 hexagrams x all moving subsets x 5 lenses):
