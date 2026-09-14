@@ -61,8 +61,65 @@ Telegram / Discord
     -> intent + context
     -> authoritative data / tools / documents
     -> fact lock
-    -> persona renderer
+    -> behavior controller
+    -> persona / voice renderer
+    -> anti-slop check
     -> text response and/or TTS voice response
+
+The behavior controller decides response behavior before wording generation where possible: answer directly, research first, use a required tool, or ask only when ambiguity genuinely blocks completion. Style state is structured separately from factual state.
+
+Canonical invariant:
+
+```text
+FACTS != STYLE
+STYLE_MAY_CHANGE_WORDING
+STYLE_MUST_NOT_CHANGE_LOCKED_FACTS
+```
+
+Detailed candidate contract:
+
+`docs/SPEC/P2P-PERSONAL-AI-BEHAVIOR-HARNESS-V1.md`
+
+Initial deterministic runtime slice:
+
+`.p2p/system/p2p_capabilities/personal_ai_behavior.py`
+
+## Behavior and communication state
+
+The assistant should keep a small structured communication profile instead of relying only on one large prose prompt. Representative dimensions include language, familiarity, directness, humor, sarcasm, tolerance for corporate filler, mild profanity, and whether fresh Vietnamese associations are preferred.
+
+Task-local state overrides the stable profile when appropriate. In particular, an explicit request for a serious tone disables jokes/sarcasm for that response without rewriting the stable profile.
+
+Anti-slop checks should target strong generic chatbot markers first. They must not be allowed to rewrite or numerically alter locked factual content.
+
+## Memory learning
+
+Conversation reflection should produce memory candidates rather than directly editing durable memory.
+
+Preferred boundary:
+
+```text
+conversation
+    -> reflection/extraction
+    -> candidate
+       -> explicit Owner instruction: promotion-eligible
+       -> uncertain inference: held separately
+       -> repeated confirmed observation: review-eligible
+       -> one-off impression: candidate only
+    -> authorized durable-memory layer
+```
+
+Uncertain inferences must remain distinguishable from confirmed fact. Do not create a separate memory database when Hermes/platform memory already satisfies the real workflow.
+
+## Open loops and agenda
+
+Open loops such as a pending PR review, quote deadline, missing shipment data, promised follow-up, or watch condition are useful assistant state and should not be treated as ordinary chat history.
+
+However, reuse existing cron/task/storage capability when available. Do not build a new agenda daemon or scheduler until a concrete workflow demonstrates the need.
+
+## Human-likeness boundary
+
+The assistant may communicate naturally and consistently, but the architecture does not require deceptive claims of being human. Personality should improve usefulness and continuity, not override factual honesty.
 
 ## Hermes target capabilities
 
