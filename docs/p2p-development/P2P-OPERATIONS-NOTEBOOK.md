@@ -397,7 +397,12 @@ the failure class is established.
    reconstructed material into the project tree when the actual task contract
    explicitly requires repository mutation. Do not commit temporary Base64
    payloads, chunks, decoded transport scratch files, or transport-only
-   material merely for handoff convenience.
+   material merely for handoff convenience. The default
+   `EPHEMERAL_TRANSPORT != PROJECT_SOURCE` prohibition remains absolute; the
+   only narrow exception is the proven last-resort fallback defined in §F
+   (`LAST_RESORT_SAME_REPO_TRANSPORT_BRANCH`), which still requires
+   `TRANSPORT_FILES_EXCLUDED_FROM_ASSESSMENT_TARGET=YES` and
+   `TRANSPORT_BRANCH_NEVER_MERGED=YES` and never mutates `main`.
 
    **E. Size-aware fallback.** Do not assume an undocumented upload-size
    limit. When destination size support materially affects completion, use
@@ -415,7 +420,119 @@ the failure class is established.
    they differ, classify `ARTIFACT_IDENTITY_MISMATCH` and the reconstructed
    artifact must not be treated as the original.
 
-   **F. Current Arena capability snapshot.** Recorded explicitly as bounded
+   **F. Last-resort same-repository ephemeral transport branch
+   (LAST_RESORT_SAME_REPO_TRANSPORT_BRANCH).** This narrow, non-default
+   exception is allowed ONLY when ALL are proven empirically — not assumed —
+   and no simpler trustworthy native route remains:
+
+   ```text
+   DIRECT_ATTACHMENT_ROUTE=UNAVAILABLE_OR_FAILED
+   CROSS_REPO_NATIVE_ROUTE=UNAVAILABLE
+   DESTINATION_SELECTED_REPO_GITHUB_ACCESS=WORKING
+   SUPPORTED_TEXT_TRANSPORT_EXISTS
+   NO_SIMPLER_TRUSTWORTHY_NATIVE_ROUTE=YES
+   ```
+
+   “Empirically proven” means: a fresh direct attempt for the required
+   file type failed or is unsupported under the current capability snapshot
+   (§G); cross-repository native access to the private P2P source (or other
+   required private repository) returned 404 or equivalent while destination
+   selected-repository access succeeded; and no simpler lossless native route
+   (native attachment, outside-target-repo destination-native lossless source,
+   or directly supported text transport) is reachable. Verify
+   `DESTINATION_SELECTED_REPO_GITHUB_ACCESS=WORKING` with a live
+   authenticated check — e.g., `GET /installation/repositories` returns only
+   the selected target repository and a read of that repository succeeds —
+   before using the fallback.
+
+   When the preconditions above hold, the fallback must satisfy ALL of the
+   following invariants (fail closed if any is uncertain):
+
+   ```text
+   TRANSPORT_BRANCH_IS_EPHEMERAL=YES
+   TRANSPORT_BRANCH_NEVER_MERGED=YES
+   TRANSPORT_BRANCH_NOT_TARGET_REF=YES
+
+   ASSESSMENT_TARGET= clean detached checkout/worktree at authoritative target main SHA
+
+   TRANSPORT_FILES_EXCLUDED_FROM_ASSESSMENT_TARGET=YES
+
+   ORIGINAL_SIZE_BOUND=YES
+   ORIGINAL_SHA256_BOUND=YES
+   RECONSTRUCTED_SIZE_VERIFIED=YES
+   RECONSTRUCTED_SHA256_VERIFIED=YES
+
+   NO_TARGET_MAIN_MUTATION=YES
+   NO_PRODUCT_SOURCE_CHANGE=YES
+   NO_PR_REQUIRED=YES
+
+   DELETE_TRANSPORT_BRANCH_AFTER_SUCCESS_OR_TERMINAL_HANDOFF=YES
+   ```
+
+   Normative clarifications:
+
+   - The temporary transport branch is repository transport state, NOT project
+     source, NOT a release, NOT a promotion, and MUST NEVER become part of the
+     assessed target tree. `TRANSPORT_BRANCH_IS_EPHEMERAL=YES` is an
+     invariant, not a naming choice.
+   - `TRANSPORT_BRANCH_NOT_TARGET_REF=YES` — the transport branch is never the
+     assessment target. The scan/validation/OE assessment target is always a
+     clean detached checkout/worktree at the authoritative `origin/main` SHA
+     (or other authoritative target ref). Transport payloads are never on that
+     ref.
+   - `TRANSPORT_FILES_EXCLUDED_FROM_ASSESSMENT_TARGET=YES` — Base64 payloads,
+     chunks, decoded scratch files, and any transport-only material reside only
+     on the ephemeral transport branch and are excluded from the detached
+     assessment worktree; only the clean target tree is scanned/assessed.
+   - `ORIGINAL_SIZE_BOUND=YES` / `ORIGINAL_SHA256_BOUND=YES` must be bound
+     before transport; `RECONSTRUCTED_SIZE_VERIFIED=YES` /
+     `RECONSTRUCTED_SHA256_VERIFIED=YES` must be verified after strict decode
+     outside the assessment target and before any use; on mismatch classify
+     `ARTIFACT_IDENTITY_MISMATCH`.
+   - `NO_TARGET_MAIN_MUTATION=YES` and `NO_PRODUCT_SOURCE_CHANGE=YES` — no file
+     is committed to `main`, no product source is changed, and no transport
+     material is ever merged into any product branch.
+   - `NO_PR_REQUIRED=YES` — the ephemeral branch is not opened as a PR and is
+     never merged; it is an executor-local transport handle whose sole purpose
+     is to make the supported text payload reachable via destination-native
+     GitHub access, then reconstruct outside the target and delete.
+   - `DELETE_TRANSPORT_BRANCH_AFTER_SUCCESS_OR_TERMINAL_HANDOFF=YES` — delete
+     the transport branch immediately after successful reconstruction/use or
+     after terminal handoff/BLOCKED, using the same GitHub access that created
+     it; do not retain it silently.
+
+   Precedence (normative): the default `EPHEMERAL_TRANSPORT != PROJECT_SOURCE`
+   prohibition is preserved and the fallback is never the default. The allowed
+   order is:
+
+   ```text
+   1. trustworthy direct/native attachment
+   2. destination-native lossless source outside target repo when reachable
+   3. reversible supported text transport
+   4. LAST_RESORT_SAME_REPO_TRANSPORT_BRANCH only after the above are empirically unavailable
+   ```
+
+   Do not select (4) without proving (1)-(3) unavailable per §F
+   preconditions.
+
+   Prohibitions (normative — even under fallback, never):
+
+   ```text
+   transport file on main
+   transport file merged into product branch
+   transport file included in scan target
+   permanent transport directory
+   transport service/framework
+   silent transport branch retention
+   ```
+
+   Violation of any MUST/NEVER clause is an isolation failure, not transport
+   convenience. OE gate for this addition: `Không bị over engineering chứ?`
+   → `OE_GATE=DO_IT` — one small exception in the existing Rule #9, based on
+   repeated empirical transport failure; no transport service, MIME registry,
+   artifact server, workflow, daemon, agent, or routing framework is built.
+
+   **G. Current Arena capability snapshot.** Recorded explicitly as bounded
    evidence, not as a second attachment policy system:
 
    ```text
@@ -444,28 +561,58 @@ the failure class is established.
    routing, and do not require continued Base64 transport after a simpler
    reliable native transport becomes available.
 
-   **G. Failure classification.** Distinguish executor transport failures from
+   **H. Failure classification.** Distinguish executor transport failures from
    artifact/project/provider failures. Transport/input classes:
    `ARTIFACT_UNSUPPORTED_BY_DESTINATION_FORMAT`,
    `ARTIFACT_TRANSPORT_SIZE_BLOCKED`, `ARTIFACT_IDENTITY_MISMATCH`,
-   `ARTIFACT_RECONSTRUCTION_FAILED`, `EXECUTOR_INPUT_TRANSPORT_UNAVAILABLE`.
-   Do not collapse these into `ARTIFACT_ITSELF_INVALID`,
+   `ARTIFACT_RECONSTRUCTION_FAILED`, `EXECUTOR_INPUT_TRANSPORT_UNAVAILABLE`,
+   `EXECUTOR_SINGLE_REPO_SCOPE_TRANSPORT_CONSTRAINT`.
+   `EXECUTOR_SINGLE_REPO_SCOPE_TRANSPORT_CONSTRAINT` means authenticated
+   GitHub access works, but the executor token is intentionally/effectively
+   scoped to only the selected repository — e.g., `GET /installation/repositories`
+   returns only the selected target repository and cross-repository access to
+   the private P2P repo returns 404 while destination selected-repo access
+   succeeds. Do not collapse
+   `EXECUTOR_SINGLE_REPO_SCOPE_TRANSPORT_CONSTRAINT` into
+   `OWNER_GITHUB_CONNECTOR_FAILURE`, `ARTIFACT_INVALID`,
+   `TARGET_PROJECT_FAILURE`, `PROVIDER_OUTAGE`, `AUTH_CONNECTION_BROKEN`, or
+   another unrelated failure class without evidence. Likewise, do not collapse
+   the other transport/input classes into `ARTIFACT_ITSELF_INVALID`,
    `TARGET_PROJECT_FAILURE`, `OWNER_GITHUB_CONNECTOR_FAILURE`,
-   `PROVIDER_OUTAGE`, `AUTH_CONNECTION_BROKEN`, or another unrelated failure
-   class without evidence. An executor input limitation does not prove the
-   original artifact is invalid.
+   `PROVIDER_OUTAGE`, `AUTH_CONNECTION_BROKEN` without evidence. An executor
+   input limitation does not prove the original artifact is invalid.
 
-   **H. No security/permission bypass.** A transport technique does not expand
+   **I. No security/permission bypass.** A transport technique does not expand
    authority. Encoding a prohibited, secret-bearing, privacy-sensitive,
    unsupported-for-policy, or otherwise restricted artifact as Base64 does not
    make its transport authorized. Existing Owner Gates, credential/secret
    boundaries, privacy rules, destination security/content policy, and
    repository mutation authority continue to apply.
 
+   **J. Non-normative empirical example (informative only; not normative
+   architecture).** The following illustrates the last-resort branch without
+   hard-coding any repository into normative law:
+
+   ```text
+   Arena selected repository = VNLAW
+   attachment mount unavailable
+   Arena installation token sees only VNLAW  (GET /installation/repositories → [VNLAW])
+   P2P private repo inaccessible (cross-repo 404)
+   → temporary never-merged VNLAW transport branch (e.g., p2p-transport/<sha> ephemeral)
+   → decode outside scan target, verify ORIGINAL_SIZE/SHA256 vs RECONSTRUCTED
+   → scan clean detached origin/main (transport branch excluded)
+   → delete transport branch after success or terminal handoff
+   ```
+
+   Do not hard-code VNLAW, Shield, or any specific repository into normative
+   transport routing; the normative rule is the precondition/invariant set in
+   §F and §H, not the example name.
+
    This rule uses existing P2P prompt, gate, evidence, and routing surfaces
    and creates no MIME registry, transport framework, encoder library,
    attachment service, daemon, artifact bus, router, database, CI framework,
-   automated prompt linter, or additional agent.
+   automated prompt linter, or additional agent. No transport service,
+   permanent transport directory, or retained branch is created by this rule.
 
 ### Prompt-alignment gate
 
