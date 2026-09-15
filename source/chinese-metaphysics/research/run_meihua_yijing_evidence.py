@@ -18,26 +18,75 @@ TRIGRAM_NORMALIZATION = {
     "兌": "兑",
 }
 
-TI_YONG_SIGNAL_PREFIXES = (
-    ("用生體", "SUPPORT_TO_BODY"),
-    ("用生体", "SUPPORT_TO_BODY"),
-    ("體克用", "BODY_CONTROLS_USE"),
-    ("体克用", "BODY_CONTROLS_USE"),
-    ("比和", "SAME_ELEMENT_BALANCE"),
-    ("用克體", "PRESSURE_ON_BODY"),
-    ("用克体", "PRESSURE_ON_BODY"),
-    ("體生用", "BODY_EXPENDS_TO_USE"),
-    ("体生用", "BODY_EXPENDS_TO_USE"),
-)
+# English signal labels are ADAPTER_NORMALIZATION of the five 體用 relations
+# actually emitted by the pinned meihua-yishu engine's analyze_wuxing().
+# They are NOT classical doctrine and are validated against the engine at import
+# time rather than trusted as a free-standing duplicate constant.
+TI_YONG_SIGNAL_BY_ENGINE_PREFIX = {
+    "用生體": "SUPPORT_TO_BODY",
+    "體克用": "BODY_CONTROLS_USE",
+    "比和":   "SAME_ELEMENT_BALANCE",
+    "用克體": "PRESSURE_ON_BODY",
+    "體生用": "BODY_EXPENDS_TO_USE",
+}
+
+# Load-bearing validation: every signal MUST correspond to a relation the pinned
+# engine can actually return. Fail closed if the engine drifts or if an unknown
+# prefix slips in.
+def _validate_signal_prefixes_against_engine():
+    sys.path.insert(0, str((HERE / "meihua-yishu").resolve()))
+    import importlib.util
+    pin_path = (HERE / ".." / "upstreams" / "meihua-yishu").resolve()
+    pin = "8a9a5e0f482dd225bfe4a1c52c2ae5546228607a"
+    try:
+        import subprocess
+        head = subprocess.check_output(
+            ["git", "-C", str(pin_path), "rev-parse", "HEAD"], text=True
+        ).strip()
+    except Exception:
+        fail(f"Cannot verify pinned meihua-yishu at {pin_path}")
+    if head != pin:
+        fail(f"Pinned meihua-yishu SHA mismatch during signal validation: expected {pin}, got {head}")
+    spec = importlib.util.spec_from_file_location(
+        "_verified_mc", pin_path / "scripts" / "meihua_calc.py"
+    )
+    mc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mc)
+    elements = ["金", "木", "水", "火", "土"]
+    reachable = set()
+    for ti in elements:
+        for yong in elements:
+            rel = mc.analyze_wuxing(ti, yong)
+            for pref in TI_YONG_SIGNAL_BY_ENGINE_PREFIX:
+                if rel.startswith(pref):
+                    reachable.add(pref)
+                    break
+            else:
+                fail(f"Pinned engine produced an unrecognized wuxing relation: {rel!r}")
+    missing = set(TI_YONG_SIGNAL_BY_ENGINE_PREFIX) - reachable
+    if missing:
+        fail(f"Declared signal prefixes never produced by pinned engine: {sorted(missing)}")
+    return True
+
+
+TI_YONG_SIGNAL_POLICY = "ADAPTER_NORMALIZATION_OF_PINNED_ENGINE_RELATION"
+TI_YONG_SIGNAL_ENGINE_VOCAB_VALIDATED = _validate_signal_prefixes_against_engine()
 
 TI_YONG_CLASSICAL_SOURCES = [
     {
+        "work": "梅花易数·卷一·年月日時起例",
+        "url": "https://zh.wikisource.org/wiki/梅花易數/卷一",
+        "status": "REFERENCE_POINTER_ONLY_UNVERIFIED",
+    },
+    {
         "work": "梅花易数·卷二·体用总诀",
         "url": "https://zh.wikisource.org/zh-hant/梅花易數/卷二",
+        "status": "REFERENCE_POINTER_ONLY_UNVERIFIED",
     },
     {
         "work": "梅花易数·卷三·体用生克之诀",
         "url": "https://zh.wikisource.org/zh-hant/梅花易數/卷三",
+        "status": "REFERENCE_POINTER_ONLY_UNVERIFIED",
     },
 ]
 
@@ -67,8 +116,11 @@ def canonical_trigram(name):
 
 
 def classify_ti_yong_relation(relation):
+    # The pinned engine returns traditional-script 體 (not simplified 体). Match on
+    # the engine-validated prefix table only. Do not silently accept simplified
+    # variants; that would mask a contract drift at the bridge boundary.
     text = str(relation or "").strip()
-    for prefix, signal in TI_YONG_SIGNAL_PREFIXES:
+    for prefix, signal in TI_YONG_SIGNAL_BY_ENGINE_PREFIX.items():
         if text.startswith(prefix):
             return signal
     return "UNCLASSIFIED"
@@ -173,14 +225,21 @@ def main():
     ti_yong_relation = meihua.get("TI_YONG_RELATION")
     structural_signal = classify_ti_yong_relation(ti_yong_relation)
     structural_status = (
-        "SOURCE_GROUNDED_STRUCTURAL_READING"
+        "ENGINE_SOURCE_BOUND_STRUCTURAL_READING"
         if structural_signal != "UNCLASSIFIED"
         else "UNCLASSIFIED_NO_INFERENCE"
     )
 
+    meihua_provenance = meihua.get("PROVENANCE_STATUS", "")
+    if meihua_provenance != "PINNED_ENGINE_SOURCE_BOUND_SELECTED_SLICE":
+        fail(
+            f"Refusing to seal a bridge on an unexpected Meihua provenance status: "
+            f"{meihua_provenance!r}"
+        )
+
     packet = {
         "DOMAIN": "MEIHUA_YIJING_EVIDENCE",
-        "CAPABILITY": "MEIHUA_CAST_TO_SOURCE_GROUNDED_YIJING_EVIDENCE",
+        "CAPABILITY": "MEIHUA_CAST_TO_ENGINE_BOUND_YIJING_EVIDENCE",
         "CASTING_MODE": expected_casting_mode,
         "INPUT": meihua.get("INPUT"),
         "BRIDGE": {
@@ -199,8 +258,15 @@ def main():
             "METHOD_SCOPE": "MEIHUA_TI_YONG_WUXING_RELATION_ONLY",
             "TI_YONG_RELATION_RAW": ti_yong_relation,
             "INITIAL_SIGNAL": structural_signal,
-            "SOURCE_RULES": TI_YONG_CLASSICAL_SOURCES,
-            "RULE_POLICY": "NORMALIZE_EXISTING_ENGINE_RELATION_WITHOUT_FREE_FORM_DIVINATION",
+            "SIGNAL_POLICY": TI_YONG_SIGNAL_POLICY,
+            "SIGNAL_ENGINE_VOCAB_VALIDATED": TI_YONG_SIGNAL_ENGINE_VOCAB_VALIDATED,
+            "CLASSICAL_REFERENCE_POINTERS": TI_YONG_CLASSICAL_SOURCES,
+            "CLASSICAL_TEXT_GROUNDED": False,
+            "RUNTIME_NETWORK_DEPENDENCY": False,
+            "RULE_POLICY": (
+                "NORMALIZE_EXISTING_PINNED_ENGINE_RELATION; "
+                "ENGLISH_LABELS_ARE_ADAPTER_NOT_DOCTRINE"
+            ),
             "STATUS": structural_status,
         },
         "MEIHUA_PACKET": meihua,
@@ -210,8 +276,12 @@ def main():
             "MOVING_LINE_MATCHES_SELECTED_YAO": "PASS",
             "SELECTED_YAO_TEXT_PRESENT": "PASS",
             "SELECTED_XIAOXIANG_PRESENT": "PASS",
+            "MEIHUA_PROVENANCE_EXPECTED": "PASS",
         },
-        "PROVENANCE_POLICY": "MECHANICAL_CROSS_LANE_BRIDGE_KEEP_SOURCE_PACKETS_INDEPENDENT",
+        "PROVENANCE_POLICY": (
+            "MECHANICAL_CROSS_LANE_BRIDGE_KEEP_SOURCE_PACKETS_INDEPENDENT;"
+            "NO_CLASSICAL_TEXT_GROUNDING_OVERCLAIM"
+        ),
         "INTERPRETATION_STATUS": (
             "BOUNDED_STRUCTURAL_METHOD_ONLY"
             if structural_signal != "UNCLASSIFIED"
@@ -225,6 +295,8 @@ def main():
             "NO_CASTING_MODE_EQUIVALENCE_CLAIM",
             "NO_FULL_TRADITIONAL_SIMPLIFIED_NAME_EQUIVALENCE_CLAIM",
             "NO_PREDICTIVE_VALIDITY_CLAIM",
+            "NO_CLASSICAL_TEXT_GROUNDING_CLAIM",
+            "ENGLISH_SIGNALS_ARE_ADAPTER_NORMALIZATION_NOT_DOCTRINE",
         ],
     }
     print(json.dumps(packet, ensure_ascii=False, indent=2))

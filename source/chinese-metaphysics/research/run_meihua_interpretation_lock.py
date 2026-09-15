@@ -73,8 +73,14 @@ def main():
         fail("Unexpected evidence packet domain")
 
     structural = evidence.get("STRUCTURAL_READING") or {}
-    if structural.get("STATUS") != "SOURCE_GROUNDED_STRUCTURAL_READING":
-        fail("Cannot seal a classified interpretation lock from unclassified structural evidence")
+    accepted_structural_status = "ENGINE_SOURCE_BOUND_STRUCTURAL_READING"
+    if structural.get("STATUS") != accepted_structural_status:
+        fail(
+            "Cannot seal a classified interpretation lock from unclassified structural "
+            f"evidence (expected STATUS={accepted_structural_status})"
+        )
+    if not structural.get("SIGNAL_ENGINE_VOCAB_VALIDATED"):
+        fail("Structural signal vocabulary was not validated against the pinned engine")
 
     evidence_hash = canonical_sha256(evidence)
     lock_material = {
@@ -98,13 +104,14 @@ def main():
         "LOCK_STATUS": "SEALED_BEFORE_OUTCOME",
         "OUTCOME_STATUS": "NOT_ACCEPTED_BY_LOCK_COMMAND",
         "SCORING_STATUS": "NOT_PERFORMED",
-        "PREDICTIVE_STATUS": "NOT_ESTABLISHED",
+        "PREDICTIVE_STATUS": "NOT_ESTABLISHED_NEGATIVE_EVIDENCE_PRESERVED",
         "EVIDENCE_PACKET": evidence,
         "NONCLAIMS": [
             "ENGINEERING_LOCK_FIXTURE_IS_NOT_PREDICTIVE_EVIDENCE",
             "NO_OUTCOME_WAS_AVAILABLE_TO_THIS_COMMAND",
             "NO_POST_OUTCOME_EDIT_IS_VALID_WITHOUT_CHANGING_LOCK_SHA256",
             "NO_PREDICTIVE_ACCURACY_CLAIM",
+            "CLASSICAL_TEXT_GROUNDING_NOT_CLAIMED",
         ],
     }
     print(json.dumps(packet, ensure_ascii=False, indent=2))
