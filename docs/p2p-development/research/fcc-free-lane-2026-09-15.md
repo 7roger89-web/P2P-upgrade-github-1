@@ -8,7 +8,8 @@ Status: `SOURCE_ADAPTER_CANDIDATE_UNPROMOTED`
 - Upstream commit inspected: `22d9d19f5e7a1b31f7d8fccff6fef77cbb19357f`
 - Upstream package version at that commit: `6.2.28`
 - License: MIT
-- P2P base main for this slice: `fc63c4a593da3f9fa7d9b1bb30c3e1ba2bfe63e7`
+- Initial P2P analysis base: `fc63c4a593da3f9fa7d9b1bb30c3e1ba2bfe63e7`
+- Refreshed P2P integration base: `7f2b68b2c1504af6e5810906e56221e916c5acc3`
 
 Upstream FCC exposes multiple coding harness launchers (`fcc-claude`,
 `fcc-codex`, `fcc-hermes`, etc.), maps Claude Code to its local proxy through
