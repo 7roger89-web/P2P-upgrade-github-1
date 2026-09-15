@@ -39,11 +39,19 @@ RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VER
 # Opik is required only by the opt-in local Hermes essential-stack pilot.
 # Keep production/DockHosting's default image unchanged: the dependency is
 # installed only when that build explicitly sets P2P_INSTALL_OPIK=1.
+#
+# Hermes upstream intentionally applies a 14-day uv exclude-newer quarantine.
+# Opik is exact-pinned here, so exempt ONLY the reviewed Opik package from that
+# age cutoff. Do not disable exclude-newer globally: transitive dependencies
+# remain behind Hermes' normal supply-chain quarantine.
 ARG P2P_INSTALL_OPIK=0
 ARG OPIK_VERSION=2.2.59
 RUN set -eux; \
     if [ "$P2P_INSTALL_OPIK" = "1" ]; then \
-      uv pip install --python /opt/hermes/.venv/bin/python "opik==${OPIK_VERSION}"; \
+      uv pip install \
+        --python /opt/hermes/.venv/bin/python \
+        --exclude-newer-package opik=false \
+        "opik==${OPIK_VERSION}"; \
     elif [ "$P2P_INSTALL_OPIK" != "0" ]; then \
       echo "P2P_INSTALL_OPIK must be 0 or 1" >&2; exit 2; \
     fi
