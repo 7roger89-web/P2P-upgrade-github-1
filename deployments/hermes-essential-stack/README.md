@@ -29,10 +29,13 @@ MISSION_CONTROL != SECOND_CONTROL_PLANE
 
 - Hermes Agent: `v0.21.3`, Docker tag `v2026.9.14`
 - Hermes Workspace: annotated tag `v2.3.0` resolved to commit `15fa9cd706f5c04e4db288fb958e21d10fc776da`
+- Workspace build toolchain: `pnpm 9.15.9`
 - Repomix: `v1.18.0`
 - TokScale: `v4.16.0`
 
-The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. The stack therefore builds from the exact full 40-character release commit using Docker's Git-context fragment form. It never falls back to a mutable registry tag.
+The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. Its upstream Dockerfile is also no longer reproducible as written because unpinned Corepack now resolves to pnpm 12, whose build-script policy rejects this older release's Electron/esbuild dependency scripts.
+
+P2P therefore uses `Dockerfile.workspace` as a thin build wrapper. It fetches the exact full 40-character release commit, verifies `git rev-parse HEAD`, pins pnpm `9.15.9` for the lockfile-v9-era build, and then runs the upstream application's ordinary `pnpm install --frozen-lockfile` and `pnpm build`. The application source is not patched and there is no fallback to a mutable registry tag.
 
 The Hermes runtime itself is already compatibility-gated by `.github/workflows/hermes-runtime-compatibility.yml`, including the real P2P Docker build, required CLI flags, TokScale-compatible `state.db`, and the bundled Hindsight provider.
 
@@ -132,4 +135,4 @@ python scripts/hermes_essential_stack_guard.py validate
 python -m unittest -v tests.test_hermes_essential_stack_guard
 ```
 
-Hosted CI additionally renders the compose config, builds the exact Workspace release source, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, and starts the local-only Hermes + Workspace stack for health verification.
+Hosted CI additionally renders the compose config, builds the exact Workspace release source with the pinned wrapper toolchain, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, and starts the local-only Hermes + Workspace stack for health verification.
