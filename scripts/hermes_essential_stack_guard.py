@@ -11,6 +11,7 @@ import argparse
 import json
 import secrets
 from pathlib import Path
+from urllib.parse import urlparse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STACK_DIR = REPO_ROOT / "deployments" / "hermes-essential-stack"
@@ -38,6 +39,12 @@ PLACEHOLDERS = {
     "__GENERATE_DASHBOARD_PASSWORD__",
     "__GENERATE_DASHBOARD_SECRET__",
     "__GENERATE_WORKSPACE_PASSWORD__",
+}
+GENIEX_LOCAL_HOSTS = {
+    "127.0.0.1",
+    "localhost",
+    "::1",
+    "host.docker.internal",
 }
 
 
@@ -73,6 +80,19 @@ def render_env(example_text: str) -> str:
     return rendered
 
 
+def _validate_geniex_local_url(value: str) -> None:
+    try:
+        parsed = urlparse(value)
+    except ValueError as exc:
+        raise StackContractError("ENV_GENIEX_BASE_URL_INVALID") from exc
+    if parsed.scheme != "http" or parsed.hostname not in GENIEX_LOCAL_HOSTS:
+        raise StackContractError("ENV_GENIEX_BASE_URL_MUST_BE_LOCAL_HTTP")
+    if parsed.username or parsed.password or parsed.query or parsed.fragment:
+        raise StackContractError("ENV_GENIEX_BASE_URL_INVALID")
+    if parsed.path.rstrip("/") != "/v1":
+        raise StackContractError("ENV_GENIEX_BASE_URL_MUST_END_IN_V1")
+
+
 def validate_env(text: str, *, allow_placeholders: bool = False) -> dict[str, object]:
     env = parse_env(text)
     missing = [key for key in SECRET_KEYS if key not in env]
@@ -90,6 +110,21 @@ def validate_env(text: str, *, allow_placeholders: bool = False) -> dict[str, ob
         raise StackContractError("ENV_SECRET_NOT_READY")
     if not allow_placeholders and len(set(values)) != len(values):
         raise StackContractError("ENV_SECRETS_MUST_BE_DISTINCT")
+
+    geniex_gate = env.get("P2P_ENABLE_GENIEX", "NO")
+    if geniex_gate not in {"NO", "YES"}:
+        raise StackContractError("ENV_GENIEX_GATE_INVALID")
+    if geniex_gate == "YES":
+        base_url = env.get("GENIEX_BASE_URL", "").strip()
+        model = env.get("GENIEX_MODEL", "").strip()
+        if not base_url:
+            raise StackContractError("ENV_GENIEX_BASE_URL_REQUIRED_WHEN_ENABLED")
+        if not model:
+            raise StackContractError("ENV_GENIEX_MODEL_REQUIRED_WHEN_ENABLED")
+        if any(ch.isspace() for ch in model):
+            raise StackContractError("ENV_GENIEX_MODEL_INVALID")
+        _validate_geniex_local_url(base_url)
+
     if env.get("P2P_ENABLE_HINDSIGHT", "NO") not in {"NO", "YES"}:
         raise StackContractError("ENV_HINDSIGHT_GATE_INVALID")
     if env.get("P2P_ENABLE_HINDSIGHT") == "YES" and not env.get("HINDSIGHT_API_KEY"):
@@ -103,6 +138,7 @@ def validate_env(text: str, *, allow_placeholders: bool = False) -> dict[str, ob
         raise StackContractError("ENV_REPOMIX_BUDGET_OUT_OF_RANGE")
     return {
         "status": "PASS",
+        "geniex_enabled": geniex_gate == "YES",
         "hindsight_enabled": env.get("P2P_ENABLE_HINDSIGHT") == "YES",
         "repomix_token_budget": budget_i,
     }
@@ -124,6 +160,15 @@ def validate_compose(text: str) -> dict[str, object]:
         'profiles: ["hindsight"]',
         'profiles: ["tools"]',
         '/opt/data:ro',
+        'geniex-register:',
+        'profiles: ["geniex"]',
+        'P2P_ENABLE_GENIEX',
+        'GENIEX_CHAT_SMOKE=PASS',
+        'providers.geniex.api',
+        'providers.geniex.transport chat_completions',
+        'providers.geniex.default_model',
+        'providers.geniex.discover_models false',
+        'main_model_unchanged=YES',
     ]
     missing = [item for item in required_fragments if item not in text]
     if missing:
@@ -141,6 +186,8 @@ def validate_compose(text: str) -> dict[str, object]:
         '0.0.0.0:3000:3000',
         '0.0.0.0:8642:8642',
         '0.0.0.0:9119:9119',
+        'model.provider custom;',
+        'model.default "$${GENIEX_MODEL}"',
     ]
     hit = [item for item in forbidden if item in text]
     if hit:
@@ -151,6 +198,7 @@ def validate_compose(text: str) -> dict[str, object]:
         "workspace": EXPECTED["workspace"],
         "repomix": EXPECTED["repomix"],
         "tokscale": EXPECTED["tokscale"],
+        "geniex_named_provider_only": True,
         "mission_control_authority": False,
     }
 
