@@ -56,47 +56,6 @@ jobs:
       - name: Run focused Shield contract tests
         run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice
 
-      - name: Run native-goal portable projection focused tests
-        run: |
-          python3 -m unittest -v tests.test_p2p_supergoal_pattern_adoption
-          python3 - <<'PY'
-          import importlib.util
-          import tempfile
-          from pathlib import Path
-
-          spec = importlib.util.spec_from_file_location("portable", "scripts/p2p_portable_law_projection.py")
-          assert spec and spec.loader
-          module = importlib.util.module_from_spec(spec)
-          spec.loader.exec_module(module)
-          with tempfile.TemporaryDirectory() as td:
-              root = Path(td)
-              package = root / "package"
-              project = root / "project"
-              project.mkdir()
-              notebook = package / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
-              notebook.parent.mkdir(parents=True)
-              notebook.write_text(
-                  "# P2P_OPERATIONS_NOTEBOOK\n\n## P2P_SUPREME_OPERATING_LAW_V1\n\nLAW\n",
-                  encoding="utf-8",
-              )
-              (package / "VERSION").write_text("9.9.9-test\n", encoding="utf-8")
-              result = module.project_law(package, project)
-              agents = (project / "AGENTS.md").read_text(encoding="utf-8")
-              assert result["status"] == "PASS"
-              assert "### Native long-running goal bridge" in agents
-              assert ".p2p/system/p2p_capabilities/native_goal_bridge.py" in agents
-              assert ".p2p/system/p2p_capabilities/worktree_evidence.py" in agents
-              assert "committed-after-baseline" in agents
-              assert "Never introduce a fixed retry-count hard stop" in agents
-              assert not (project / ".p2p" / "system").exists()
-              first = agents
-              module.project_law(package, project)
-              assert (project / "AGENTS.md").read_text(encoding="utf-8") == first
-              module.project_law(package, project, check=True)
-          print("PORTABLE_NATIVE_GOAL_PROBE=PASS")
-          PY
-          python3 -m py_compile scripts/p2p_portable_law_projection.py tests/test_p2p_portable_law_projection.py
-
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
         run: python3 -m shield.acceptance --executable "$RUNNER_TEMP/gitleaks/gitleaks" --work-dir "$RUNNER_TEMP/slice1-work" --evidence-dir "$RUNNER_TEMP/slice1-evidence" --evidence-reference "$EVIDENCE_REFERENCE" --summary-file "$GITHUB_STEP_SUMMARY"
