@@ -87,7 +87,6 @@ jobs:
               test -f /opt/hermes/plugins/p2p-personal-behavior/__init__.py
               test -f /opt/hermes/plugins/p2p-personal-behavior/personal_ai_behavior.py
               /opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior
-              /opt/hermes/.venv/bin/hermes plugins list | grep -F "p2p-personal-behavior"
               grep -F "p2p-personal-behavior" /tmp/hermes-home/config.yaml
               /opt/hermes/.venv/bin/python -c "from hermes_cli.plugins import discover_plugins, get_plugin_manager; discover_plugins(force=True); manager=get_plugin_manager(); loaded=manager._plugins.get(\"p2p-personal-behavior\"); assert loaded is not None, \"plugin missing after discovery\"; assert loaded.enabled is True, \"plugin discovered but not enabled\"; assert loaded.error is None, f\"plugin load error: {loaded.error}\"; assert \"pre_llm_call\" in loaded.hooks_registered; assert \"transform_llm_output\" in loaded.hooks_registered; assert \"p2p-personal-behavior.voice\" in manager._system_prompt_sections; print(\"P2P_PERSONAL_BEHAVIOR_RUNTIME=LOADED\")"
             '
