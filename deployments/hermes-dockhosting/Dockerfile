@@ -41,6 +41,7 @@ ARG PYMONGO_VERSION=4.18.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
 
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
+COPY --chmod=0755 deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh /usr/local/bin/p2p-post-bootstrap-main.sh
 
 ENV API_SERVER_ENABLED=true \
     API_SERVER_HOST=0.0.0.0
