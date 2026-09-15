@@ -1,0 +1,49 @@
+name: temp harden Shield CI applicability
+on:
+  push:
+    branches: [control-tower/shield-ci-applicability-v1]
+permissions:
+  contents: write
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          w="$(mktemp -d)"; trap 'rm -rf "$w"' EXIT
+          git clone -q --branch "$BRANCH" "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$w/repo"
+          cd "$w/repo"
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          p=Path('shield/ci.py'); s=p.read_text()
+          old='''        workflows_root = target / ".github" / "workflows"\n        if workflows_root.exists() and (workflows_root.is_symlink() or not workflows_root.is_dir()):\n            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflows_root_not_regular_directory")\n'''
+          new='''        github_root = target / ".github"\n        workflows_root = github_root / "workflows"\n        if github_root.is_symlink():\n            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:github_root_symlink")\n        if workflows_root.exists() and (workflows_root.is_symlink() or not workflows_root.is_dir()\n                or not workflows_root.resolve().is_relative_to(target)):\n            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflows_root_not_regular_directory")\n'''
+          if old not in s: raise SystemExit('ci hardening anchor missing')
+          p.write_text(s.replace(old,new))
+
+          p=Path('shield/controls/SHIELD-CI-01.json'); d=json.loads(p.read_text())
+          d['required_evidence']=[
+            'For applicable targets: readable provider assessment covering every workflow definition in .github/workflows, bound to target and Git HEAD.',
+            'For NOT_APPLICABLE: deterministic target-shape evidence proving zero .github/workflows/*.yml or *.yaml workflow definitions, with symlink or indeterminate inventory failing closed to BLOCKED.'
+          ]
+          if 'applicability' not in d['evidence_fields']: d['evidence_fields'].append('applicability')
+          p.write_text(json.dumps(d,indent=2)+'\n')
+
+          p=Path('tests/test_p2p_shield_applicability.py'); s=p.read_text()
+          s += '''\n    def test_symlinked_github_root_is_blocked_not_na(self):\n        external=self.root/'outside'; (external/'workflows').mkdir(parents=True)\n        r=self.root/'symlink'; r.mkdir(); (r/'README.md').write_text('x')\n        (r/'.github').symlink_to(external, target_is_directory=True)\n        init(r)\n        e=ci.assess(r,self.root/'missing','run')\n        self.assertEqual(e['status'],'BLOCKED')\n        self.assertIn('github_root_symlink',e['reason'])\n'''
+          p.write_text(s)
+          PY
+          python -m unittest tests.test_p2p_shield_applicability tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice tests.test_p2p_shield_secret_slice
+          git rm .github/workflows/_temp_shield_na_harden.yml
+          git add shield tests
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m 'Shield: harden CI applicability evidence'
+          git push origin HEAD:"$BRANCH"
