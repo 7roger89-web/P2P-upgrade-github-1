@@ -139,7 +139,7 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         self.assertEqual(result["commit"], mod.WORKSPACE_COMMIT)
         self.assertEqual(result["pnpm"], mod.WORKSPACE_PNPM)
 
-    def test_runtime_opik_dependency_is_exact_and_default_off(self) -> None:
+    def test_runtime_opik_dependency_is_exact_default_off_and_reusable(self) -> None:
         text = mod.RUNTIME_DOCKERFILE_PATH.read_text(encoding="utf-8")
         result = mod.validate_runtime_dockerfile(text)
         self.assertEqual(result["status"], "PASS")
@@ -148,12 +148,19 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         self.assertIn("--exclude-newer-package opik=false", text)
         self.assertNotIn("--exclude-newer false", text)
         self.assertNotIn("UV_EXCLUDE_NEWER=false", text)
+        self.assertIn(
+            "deployments/hermes-essential-stack/plugins/p2p-opik-observer/ /opt/hermes/plugins/p2p-opik-observer/",
+            text,
+        )
 
-    def test_post_bootstrap_requires_explicit_opik_gate(self) -> None:
+    def test_post_bootstrap_requires_explicit_opik_gate_and_sdk(self) -> None:
         text = mod.POST_BOOTSTRAP_PATH.read_text(encoding="utf-8")
         result = mod.validate_post_bootstrap(text)
         self.assertEqual(result["status"], "PASS")
         self.assertTrue(result["opik_explicit_gate"])
+        self.assertIn("/opt/hermes/plugins/p2p-opik-observer/plugin.yaml", text)
+        self.assertIn("/opt/data/plugins/p2p-opik-observer/plugin.yaml", text)
+        self.assertIn("OPIK_SDK_MISSING_OR_WRONG_VERSION", text)
 
     def test_compose_rejects_public_workspace_bind(self) -> None:
         text = mod.COMPOSE_PATH.read_text(encoding="utf-8")
