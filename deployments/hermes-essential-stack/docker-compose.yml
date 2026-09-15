@@ -38,7 +38,12 @@ services:
       - "127.0.0.1:9119:9119"
 
   hermes-workspace:
-    image: ghcr.io/outsourc-e/hermes-workspace:v2.3.0
+    # Upstream published release v2.3.0 but did not publish a matching GHCR
+    # manifest. Build from the exact release commit instead of falling back to
+    # mutable :latest. The checksum makes tag movement fail closed.
+    build:
+      context: "https://github.com/outsourc-e/hermes-workspace.git?ref=v2.3.0&checksum=15fa9cd706f5c04e4db288fb958e21d10fc776da"
+    image: p2p-hermes-workspace:v2.3.0-15fa9cd
     depends_on:
       hermes-agent:
         condition: service_healthy
