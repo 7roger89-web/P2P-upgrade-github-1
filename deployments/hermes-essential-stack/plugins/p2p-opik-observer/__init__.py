@@ -1,10 +1,10 @@
-"""Opt-in, fail-open Opik observer for Hermes/P2P.
+"""Opt-in, fail-open Opik observer for the P2P Hermes pilot.
 
-The observer is deliberately not a control plane. It listens to documented
-Hermes lifecycle hooks, buffers one turn in process memory, and sends a
-finalized trace after the turn finishes. By default only operational metadata
-is exported; prompts, tool arguments/results, subagent goals/summaries and
-error-message bodies require the separate P2P_OPIK_CAPTURE_CONTENT=YES gate.
+This plugin is telemetry only. It registers documented Hermes observer hooks,
+buffers one parent turn in bounded process memory, and emits finalized Opik
+trace/span records after the turn. By default it exports operational metadata
+only. Prompt/response/tool/subagent/error bodies require the separate
+P2P_OPIK_CAPTURE_CONTENT=YES privacy gate.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import os
 import threading
 from collections import deque
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,13 @@ logger = logging.getLogger(__name__)
 _TRUE = {"1", "true", "yes", "on"}
 _MAX_CONTENT_CHARS = 20_000
 _SOURCE = "p2p-opik-observer"
+_MAX_OPEN_TURNS = 512
+_MAX_EMITTED_KEYS = 2048
 
 _lock = threading.RLock()
 _turns: dict[tuple[str, str], "TurnRecord"] = {}
 _emitted: set[tuple[str, str]] = set()
-_emitted_order: deque[tuple[str, str]] = deque(maxlen=2048)
+_emitted_order: deque[tuple[str, str]] = deque(maxlen=_MAX_EMITTED_KEYS)
 _client = None
 _client_failed = False
 
@@ -70,23 +72,30 @@ def _enabled() -> bool:
 
 
 def _capture_content() -> bool:
-    return (
-        _enabled()
-        and os.getenv("P2P_OPIK_CAPTURE_CONTENT", "NO").strip().lower() in _TRUE
-    )
+    return _enabled() and os.getenv("P2P_OPIK_CAPTURE_CONTENT", "NO").strip().lower() in _TRUE
 
 
 def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-def _dt(value: Any, fallback: datetime | None = None) -> datetime:
+def _as_datetime(value: Any, fallback: datetime | None = None) -> datetime:
+    """Normalize Hermes timestamps without guessing duration units.
+
+    Current Hermes API hooks expose started_at/ended_at as Unix epoch seconds,
+    while tests/plugins may also pass aware/naive datetimes or ISO strings.
+    """
+
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
-    if isinstance(value, str) and value.strip():
-        text = value.strip().replace("Z", "+00:00")
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
         try:
-            parsed = datetime.fromisoformat(text)
+            return datetime.fromtimestamp(float(value), tz=timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            pass
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
             return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
         except ValueError:
             pass
@@ -130,7 +139,7 @@ def _ensure_turn(
     with _lock:
         record = _turns.get(key)
         if record is None:
-            if len(_turns) >= 512:
+            if len(_turns) >= _MAX_OPEN_TURNS:
                 stale_key = next(iter(_turns))
                 _turns.pop(stale_key, None)
                 logger.warning("Opik observer evicted one unfinished turn buffer")
@@ -149,21 +158,18 @@ def _normalize_usage(value: Any) -> dict[str, int] | None:
     if not isinstance(value, dict):
         return None
 
-    def as_int(key: str) -> int | None:
-        raw = value.get(key)
-        if isinstance(raw, bool):
-            return None
-        if isinstance(raw, (int, float)) and raw >= 0:
-            return int(raw)
+    def integer(*keys: str) -> int | None:
+        for key in keys:
+            raw = value.get(key)
+            if isinstance(raw, bool):
+                continue
+            if isinstance(raw, (int, float)) and raw >= 0:
+                return int(raw)
         return None
 
-    prompt = as_int("prompt_tokens")
-    if prompt is None:
-        prompt = as_int("input_tokens")
-    completion = as_int("completion_tokens")
-    if completion is None:
-        completion = as_int("output_tokens")
-    total = as_int("total_tokens")
+    prompt = integer("prompt_tokens", "input_tokens")
+    completion = integer("completion_tokens", "output_tokens")
+    total = integer("total_tokens")
     if total is None and (prompt is not None or completion is not None):
         total = (prompt or 0) + (completion or 0)
 
@@ -184,7 +190,7 @@ def _get_client():
     if _client_failed or not _enabled():
         return None
     try:
-        import opik  # imported lazily so disabled mode has no SDK side effects
+        import opik
 
         _client = opik.Opik(
             project_name=os.environ["OPIK_PROJECT_NAME"],
@@ -200,9 +206,8 @@ def _get_client():
     return _client
 
 
-def _span_metadata(span: SpanRecord) -> dict[str, Any]:
-    metadata = {"source": _SOURCE, **span.metadata}
-    return {key: value for key, value in metadata.items() if value is not None and value != ""}
+def _clean_metadata(data: dict[str, Any]) -> dict[str, Any]:
+    return {k: v for k, v in data.items() if v not in (None, "")}
 
 
 def _emit(record: TurnRecord) -> bool:
@@ -217,17 +222,19 @@ def _emit(record: TurnRecord) -> bool:
             end_time=ended,
             input=record.input,
             output=record.output,
-            metadata={
-                "source": _SOURCE,
-                "session_id_hash": _opaque(record.session_id),
-                "turn_id_hash": _opaque(record.turn_id),
-                "task_id_hash": _opaque(record.task_id) if record.task_id else "",
-                "platform": record.platform,
-                "model": record.model,
-                "status": record.status,
-                "content_capture": _capture_content(),
-                "authoritative": False,
-            },
+            metadata=_clean_metadata(
+                {
+                    "source": _SOURCE,
+                    "session_id_hash": _opaque(record.session_id),
+                    "turn_id_hash": _opaque(record.turn_id),
+                    "task_id_hash": _opaque(record.task_id) if record.task_id else None,
+                    "platform": record.platform,
+                    "model": record.model,
+                    "status": record.status,
+                    "content_capture": _capture_content(),
+                    "authoritative": False,
+                }
+            ),
             tags=["p2p", "hermes", "opik-pilot"],
             thread_id=_opaque(record.session_id),
             project_name=os.environ["OPIK_PROJECT_NAME"],
@@ -243,7 +250,7 @@ def _emit(record: TurnRecord) -> bool:
                 type=span.kind,
                 start_time=span.started_at,
                 end_time=span_end,
-                metadata=_span_metadata(span),
+                metadata=_clean_metadata({"source": _SOURCE, **span.metadata}),
                 input=span.input,
                 output=span.output,
                 usage=span.usage,
@@ -252,28 +259,29 @@ def _emit(record: TurnRecord) -> bool:
                 project_name=os.environ["OPIK_PROJECT_NAME"],
             )
         return True
-    except Exception as exc:  # tracing is best-effort, never execution authority
+    except Exception as exc:
         logger.warning("Opik observer dropped one Hermes turn: %s", type(exc).__name__)
         return False
 
 
-def _complete_and_emit(key: tuple[str, str], *, status: str, output: dict[str, Any] | None = None) -> None:
+def _complete_and_emit(
+    key: tuple[str, str],
+    *,
+    status: str,
+    output: dict[str, Any] | None = None,
+) -> None:
     with _lock:
         if key in _emitted:
             return
-        record = _turns.pop(key, None)
-        if record is None:
-            record = TurnRecord(session_id=key[0], turn_id=key[1])
+        record = _turns.pop(key, None) or TurnRecord(session_id=key[0], turn_id=key[1])
         record.status = status
         record.ended_at = _utcnow()
         if output is not None:
             record.output = output
-        now = record.ended_at
         for mapping in (record.open_api, record.open_tools, record.open_subagents):
             for span in mapping.values():
-                if span.ended_at is None:
-                    span.ended_at = now
-                    span.metadata.setdefault("status", "incomplete")
+                span.ended_at = span.ended_at or record.ended_at
+                span.metadata.setdefault("status", "incomplete")
             mapping.clear()
         if len(_emitted_order) == _emitted_order.maxlen:
             _emitted.discard(_emitted_order[0])
@@ -328,7 +336,7 @@ def _pre_api_request(
     span = SpanRecord(
         kind="llm",
         name="Hermes LLM request",
-        started_at=_dt(started_at),
+        started_at=_as_datetime(started_at),
         metadata={
             "api_request_id_hash": _opaque(api_request_id),
             "api_call_count": api_call_count,
@@ -351,6 +359,7 @@ def _finish_api(
     session_id: Any = "",
     turn_id: Any = "",
     api_request_id: Any = "",
+    started_at: Any = None,
     ended_at: Any = None,
     api_duration: Any = None,
     finish_reason: Any = None,
@@ -358,34 +367,37 @@ def _finish_api(
     usage: Any = None,
     error_type: Any = None,
     error_message: Any = None,
+    error: Any = None,
+    reason: Any = None,
     model: Any = "",
     provider: Any = "",
     **_kwargs,
 ) -> None:
     record = _ensure_turn(session_id=session_id, turn_id=turn_id, model=model)
     request_key = str(api_request_id or "")
+    end = _as_datetime(ended_at)
     with _lock:
         span = record.open_api.pop(request_key, None)
         if span is None:
-            end = _dt(ended_at)
-            duration_ms = api_duration if isinstance(api_duration, (int, float)) else 0
-            span = SpanRecord(
-                kind="llm",
-                name="Hermes LLM request",
-                started_at=end - timedelta(milliseconds=max(0, duration_ms)),
-            )
+            # If a pre hook was missed, use Hermes' own started_at when present;
+            # otherwise avoid inventing a duration and create a zero-length span.
+            start = _as_datetime(started_at, fallback=end) if started_at is not None else end
+            span = SpanRecord(kind="llm", name="Hermes LLM request", started_at=start)
             record.spans.append(span)
-        span.ended_at = _dt(ended_at)
+        span.ended_at = end
+        error_body = error_message if error_message is not None else error
         span.metadata.update(
             {
                 "status": status,
                 "finish_reason": finish_reason,
+                "api_duration_seconds": api_duration if isinstance(api_duration, (int, float)) else None,
                 "error_type": str(error_type or "") or None,
-                "has_error_message": bool(error_message),
+                "reason": str(reason or "") or None,
+                "has_error_body": bool(error_body),
             }
         )
-        if _capture_content() and error_message:
-            span.metadata["error_message"] = _json_text(error_message)
+        if _capture_content() and error_body:
+            span.metadata["error_body"] = _json_text(error_body)
         span.output = _content("response", response)
         span.usage = _normalize_usage(usage)
         if model:
@@ -448,13 +460,7 @@ def _post_tool_call(
     with _lock:
         span = record.open_tools.pop(call_key, None)
         if span is None:
-            end = _utcnow()
-            duration = duration_ms if isinstance(duration_ms, (int, float)) else 0
-            span = SpanRecord(
-                kind="tool",
-                name=f"Hermes tool: {tool_name or 'unknown'}",
-                started_at=end - timedelta(milliseconds=max(0, duration)),
-            )
+            span = SpanRecord(kind="tool", name=f"Hermes tool: {tool_name or 'unknown'}", started_at=_utcnow())
             record.spans.append(span)
         span.ended_at = _utcnow()
         span.metadata.update(
@@ -473,8 +479,6 @@ def _post_tool_call(
 
 
 def _subagent_start(
-    session_id: Any = "",
-    turn_id: Any = "",
     parent_session_id: Any = "",
     parent_turn_id: Any = "",
     child_session_id: Any = "",
@@ -483,9 +487,7 @@ def _subagent_start(
     child_goal: Any = None,
     **_kwargs,
 ):
-    sid = parent_session_id or session_id
-    tid = parent_turn_id or turn_id
-    record = _ensure_turn(session_id=sid, turn_id=tid)
+    record = _ensure_turn(session_id=parent_session_id, turn_id=parent_turn_id)
     child_key = str(child_session_id or child_subagent_id or f"subagent-{len(record.spans)}")
     span = SpanRecord(
         kind="general",
@@ -506,22 +508,17 @@ def _subagent_start(
 
 
 def _subagent_stop(
-    session_id: Any = "",
-    turn_id: Any = "",
     parent_session_id: Any = "",
     parent_turn_id: Any = "",
     child_session_id: Any = "",
-    child_subagent_id: Any = "",
     child_role: Any = "",
-    summary: Any = None,
-    status: Any = "",
-    duration: Any = None,
+    child_summary: Any = None,
+    child_status: Any = "",
+    duration_ms: Any = None,
     **_kwargs,
 ):
-    sid = parent_session_id or session_id
-    tid = parent_turn_id or turn_id
-    record = _ensure_turn(session_id=sid, turn_id=tid)
-    child_key = str(child_session_id or child_subagent_id or "")
+    record = _ensure_turn(session_id=parent_session_id, turn_id=parent_turn_id)
+    child_key = str(child_session_id or "")
     with _lock:
         span = record.open_subagents.pop(child_key, None)
         if span is None:
@@ -535,13 +532,12 @@ def _subagent_stop(
         span.metadata.update(
             {
                 "child_session_id_hash": _opaque(child_session_id),
-                "child_subagent_id_hash": _opaque(child_subagent_id),
                 "child_role": str(child_role or ""),
-                "status": str(status or "finished"),
-                "duration": duration if isinstance(duration, (int, float)) else None,
+                "status": str(child_status or "finished"),
+                "duration_ms": duration_ms if isinstance(duration_ms, (int, float)) else None,
             }
         )
-        span.output = _content("summary", summary)
+        span.output = _content("summary", child_summary)
     return None
 
 
@@ -551,9 +547,8 @@ def _post_llm_call(
     assistant_response: Any = None,
     **_kwargs,
 ):
-    key = _turn_key(session_id, turn_id)
     _complete_and_emit(
-        key,
+        _turn_key(session_id, turn_id),
         status="completed",
         output=_content("assistant_response", assistant_response),
     )
@@ -565,15 +560,14 @@ def _on_session_end(
     turn_id: Any = "",
     failed: Any = False,
     interrupted: Any = False,
+    completed: Any = False,
     turn_exit_reason: Any = "",
     **_kwargs,
 ):
-    # Successful turns are emitted by post_llm_call so the final response can
-    # be included only when the explicit content gate is on. This hook is the
-    # terminal fallback for failed/interrupted turns.
-    if failed or interrupted:
-        status = "failed" if failed else "interrupted"
-        key = _turn_key(session_id, turn_id)
+    key = _turn_key(session_id, turn_id)
+    if key in _emitted:
+        return None
+    if failed or interrupted or not completed:
         record = _ensure_turn(session_id=session_id, turn_id=turn_id)
         if turn_exit_reason:
             record.output = (
@@ -581,6 +575,7 @@ def _on_session_end(
                 if _capture_content()
                 else {"turn_exit_reason_present": True}
             )
+        status = "interrupted" if interrupted else "failed"
         _complete_and_emit(key, status=status)
     return None
 
@@ -599,11 +594,10 @@ def _on_session_finalize(**_kwargs):
 
 
 def register(ctx) -> None:
-    """Register observer hooks only after the explicit local opt-in gate."""
+    """Register only observer hooks and only behind the explicit local gate."""
 
     if not _enabled():
         return
-
     for hook_name, callback in (
         ("pre_llm_call", _pre_llm_call),
         ("pre_api_request", _pre_api_request),
