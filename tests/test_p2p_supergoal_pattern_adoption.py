@@ -29,7 +29,8 @@ worktree = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(worktree)
 
 BASELINE = "a" * 40
-PACKAGED_BRIDGE = ".agents/skills/p2p/scripts/p2p_native_goal.py"
+RUNTIME_GOAL = ".p2p/system/p2p_capabilities/native_goal_bridge.py"
+RUNTIME_WORKTREE = ".p2p/system/p2p_capabilities/worktree_evidence.py"
 
 
 def sample_goal() -> dict:
@@ -88,7 +89,7 @@ class TestNativeGoalProjection(unittest.TestCase):
         self.assertIsNone(replay["fixed_retry_hard_stop"])
         self.assertEqual(replay["recovery_policy"], "P2P_ADAPTIVE_FAILURE_CLASSIFICATION")
         self.assertIn("do not use a fixed retry count", result["condition"])
-        self.assertIn(f"python {PACKAGED_BRIDGE} worktree summary", result["condition"])
+        self.assertIn(f"python {RUNTIME_WORKTREE} summary", result["condition"])
 
     def test_codex_projection_does_not_invent_claude_semantics(self) -> None:
         result = build_native_goal_projection(CODEX_CLI, sample_goal(), sample_tasks())
@@ -208,36 +209,28 @@ class TestCompleteWorktreeEvidence(unittest.TestCase):
             td.cleanup()
 
 
-class TestPackagedTransport(unittest.TestCase):
-    def test_packaged_skill_wrapper_is_present(self) -> None:
-        self.assertTrue((ROOT / PACKAGED_BRIDGE).is_file())
-        source = (ROOT / "scripts" / "package_release.py").read_text(encoding="utf-8")
-        self.assertIn('"p2p",', source)
-        self.assertIn('".agents/skills",', source)
+class TestRuntimeTransport(unittest.TestCase):
+    def test_release_copy_path_is_existing_foundation_runtime(self) -> None:
+        package_source = (ROOT / "scripts" / "package_release.py").read_text(encoding="utf-8")
+        self.assertIn('runtime_source / "p2p_capabilities"', package_source)
+        self.assertTrue((ROOT / RUNTIME_GOAL).is_file())
+        self.assertTrue((ROOT / RUNTIME_WORKTREE).is_file())
 
-    def test_installed_shape_can_render_goal_without_second_state(self) -> None:
+    def test_installed_shape_can_render_goal_directly_from_runtime(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             project = Path(td)
             runtime = project / ".p2p" / "system" / "p2p_capabilities"
-            skill_scripts = project / ".agents" / "skills" / "p2p" / "scripts"
             state = project / ".p2p" / "state"
             shutil.copytree(SYSTEM / "p2p_capabilities", runtime)
-            skill_scripts.mkdir(parents=True)
-            shutil.copy2(ROOT / PACKAGED_BRIDGE, skill_scripts / "p2p_native_goal.py")
             state.mkdir(parents=True)
-            (state / "autopilot-goal-state.json").write_text(
-                json.dumps(sample_goal()), encoding="utf-8"
-            )
-            (state / "task-state.json").write_text(
-                json.dumps(sample_tasks()), encoding="utf-8"
-            )
+            (state / "autopilot-goal-state.json").write_text(json.dumps(sample_goal()), encoding="utf-8")
+            (state / "task-state.json").write_text(json.dumps(sample_tasks()), encoding="utf-8")
             result = subprocess.run(
                 [
                     sys.executable,
-                    str(skill_scripts / "p2p_native_goal.py"),
+                    str(project / RUNTIME_GOAL),
                     "--root",
                     str(project),
-                    "goal",
                     "--host",
                     CLAUDE_CODE,
                     "--format",
