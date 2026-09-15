@@ -47,11 +47,27 @@ jobs:
           docker compose \
             --env-file deployments/hermes-essential-stack/.env \
             -f deployments/hermes-essential-stack/docker-compose.yml \
-            config > "$RUNNER_TEMP/hermes-essential-stack.rendered.yml"
-          grep -F '127.0.0.1:3000' "$RUNNER_TEMP/hermes-essential-stack.rendered.yml"
-          grep -F '127.0.0.1:8642' "$RUNNER_TEMP/hermes-essential-stack.rendered.yml"
-          grep -F '127.0.0.1:9119' "$RUNNER_TEMP/hermes-essential-stack.rendered.yml"
-          ! grep -F ':latest' "$RUNNER_TEMP/hermes-essential-stack.rendered.yml"
+            config --format json > "$RUNNER_TEMP/hermes-essential-stack.rendered.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          model = json.loads(Path(os.environ['RUNNER_TEMP'], 'hermes-essential-stack.rendered.json').read_text())
+          expected = {
+              'hermes-workspace': {(3000, '127.0.0.1')},
+              'hermes-agent': {(8642, '127.0.0.1'), (9119, '127.0.0.1')},
+          }
+          for service, wanted in expected.items():
+              observed = {
+                  (int(port['published']), port.get('host_ip'))
+                  for port in model['services'][service].get('ports', [])
+              }
+              assert wanted <= observed, (service, observed)
+          rendered = json.dumps(model)
+          assert ':latest' not in rendered
+          assert 'builderz-labs/mission-control' not in rendered
+          print('COMPOSE_RENDERED_SECURITY=PASS')
+          PY
 
       - name: Verify pinned Workspace image exists
         run: docker pull ghcr.io/outsourc-e/hermes-workspace:v2.3.0
