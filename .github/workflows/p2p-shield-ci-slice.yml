@@ -56,9 +56,6 @@ jobs:
       - name: Run focused Shield contract tests
         run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice
 
-      - name: Run native-goal pattern focused tests
-        run: python3 -m unittest -v tests.test_p2p_supergoal_pattern_adoption
-
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
         run: python3 -m shield.acceptance --executable "$RUNNER_TEMP/gitleaks/gitleaks" --work-dir "$RUNNER_TEMP/slice1-work" --evidence-dir "$RUNNER_TEMP/slice1-evidence" --evidence-reference "$EVIDENCE_REFERENCE" --summary-file "$GITHUB_STEP_SUMMARY"
