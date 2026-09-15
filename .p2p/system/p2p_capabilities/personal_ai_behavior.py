@@ -245,14 +245,14 @@ def reflect_assistant_outcome(
     claimed_complete: bool = False,
     unresolved: bool = False,
 ) -> InteractionState:
-    """Reflect only coarse completion/open-loop evidence after a turn."""
+    """Reflect only coarse completion/open-loop evidence after a turn.
 
-    if unresolved:
-        open_loop = True
-    elif claimed_complete:
-        open_loop = False
-    else:
-        open_loop = state.open_loop
+    A normal completed response closes the current turn-level loop unless the
+    response itself contains strong unresolved evidence. A later explicit
+    continuation signal can reopen the task without requiring raw prompt copies.
+    """
+
+    open_loop = bool(unresolved)
 
     return InteractionState(
         mode=state.mode,
