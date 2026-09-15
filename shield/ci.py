@@ -137,8 +137,12 @@ def assess(target, executable, reference):
         e["target_ref"] = resolve_target_ref(target)
         if not re.fullmatch(r"[0-9a-f]{40,64}", e["target_ref"]):
             raise ValueError("TARGET_REF_UNRESOLVED")
-        workflows_root = target / ".github" / "workflows"
-        if workflows_root.exists() and (workflows_root.is_symlink() or not workflows_root.is_dir()):
+        github_root = target / ".github"
+        workflows_root = github_root / "workflows"
+        if github_root.is_symlink():
+            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:github_root_symlink")
+        if workflows_root.exists() and (workflows_root.is_symlink() or not workflows_root.is_dir()
+                or not workflows_root.resolve().is_relative_to(target)):
             raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflows_root_not_regular_directory")
         workflow_files = []
         if workflows_root.is_dir():

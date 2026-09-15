@@ -10,7 +10,8 @@
     "github_actions_workflow_scan"
   ],
   "required_evidence": [
-    "Readable provider assessment covering every workflow definition in .github/workflows, bound to target and Git HEAD"
+    "For applicable targets: readable provider assessment covering every workflow definition in .github/workflows, bound to target and Git HEAD.",
+    "For NOT_APPLICABLE: deterministic target-shape evidence proving zero .github/workflows/*.yml or *.yaml workflow definitions, with symlink or indeterminate inventory failing closed to BLOCKED."
   ],
   "status_semantics": {
     "PASS": "Provider executes successfully, workflow inventory is reliably established, provider output is parseable, and zero findings exist under the explicitly qualified policy/threshold.",
@@ -49,6 +50,7 @@
     "scope",
     "findings_count",
     "limitations",
-    "artifact_or_reference"
+    "artifact_or_reference",
+    "applicability"
   ]
 }

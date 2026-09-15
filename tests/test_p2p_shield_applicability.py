@@ -29,3 +29,12 @@ class T(unittest.TestCase):
    f=copy.deepcopy(e); f.update(m); self.assertEqual(evaluate(self.records(r,f),r,resolve_target_ref(r))['PROFILE_REQUIREMENTS_STATUS'],'BLOCKED')
  def test_applicable_missing_provider_stays_blocked(self):
   r=self.repo(True); e=ci.assess(r,self.root/'missing','run'); self.assertEqual(e['status'],'BLOCKED'); self.assertEqual(evaluate(self.records(r,e),r,resolve_target_ref(r))['PROFILE_REQUIREMENTS_STATUS'],'BLOCKED')
+
+ def test_symlinked_github_root_is_blocked_not_na(self):
+  external=self.root/'outside'; (external/'workflows').mkdir(parents=True)
+  r=self.root/'symlink'; r.mkdir(); (r/'README.md').write_text('x')
+  (r/'.github').symlink_to(external, target_is_directory=True)
+  init(r)
+  e=ci.assess(r,self.root/'missing','run')
+  self.assertEqual(e['status'],'BLOCKED')
+  self.assertIn('github_root_symlink',e['reason'])
