@@ -6,12 +6,28 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from yijing_corpus import UPSTREAM, load_corrected_corpus, source_metadata as corpus_source_metadata  # noqa: E402
+from yijing_corpus import (  # noqa: E402
+    PIN,
+    UPSTREAM,
+    YijingTextEvidenceError,
+    gua_ci_evidence,
+    load_corrected_corpus,
+    source_metadata as corpus_source_metadata,
+    yao_text_evidence,
+    validate_corpus_evidence,
+)
 from yijing_commentary import (  # noqa: E402
+    daxiang_evidence,
     load_corrected_commentary,
     load_corrected_xiaoxiang,
     load_special_xiaoxiang,
     source_metadata as commentary_source_metadata,
+    special_xiaoxiang_evidence,
+    tuan_evidence,
+    validate_marker_evidence,
+    validate_special_xiaoxiang_evidence,
+    validate_xiaoxiang_evidence,
+    xiaoxiang_evidence,
 )
 
 sys.path.insert(0, str(UPSTREAM / "src"))
@@ -29,6 +45,103 @@ SPECIAL_LABEL_BY_HEXAGRAM = {"乾为天": "用九", "坤为地": "用六"}
 def fail(msg, code=2):
     print(msg, file=sys.stderr)
     raise SystemExit(code)
+
+
+# ---------------------------------------------------------------------------
+# Selected-text evidence: exact-coverage, fail-closed validation of the packet.
+# Every textual field actually emitted must carry truthful per-field provenance;
+# evidence for absent fields is rejected, and missing evidence fails the run.
+# ---------------------------------------------------------------------------
+
+def _required_text_evidence(packet):
+    name = packet["NORMALIZED_HEXAGRAM"]
+    required = {
+        ("GUA_CI", name, None),
+        ("TUAN_TEXT", name, None),
+        ("DAXIANG_TEXT", name, None),
+    }
+    for sel in packet["SELECTED_YAO"]:
+        required.add(("SELECTED_YAO[].text", name, sel["label"]))
+        required.add(("SELECTED_YAO[].xiaoxiang", name, sel["label"]))
+    special = packet["SPECIAL_YAO_CANDIDATE"]
+    if special:
+        required.add(("SPECIAL_YAO_CANDIDATE.text", name, special["label"]))
+        required.add(("SPECIAL_YAO_CANDIDATE.xiaoxiang", name, special["label"]))
+    changed = packet["CHANGED_HEXAGRAM"]
+    if changed:
+        required.add(("CHANGED_GUA_CI", changed, None))
+        required.add(("CHANGED_TUAN_TEXT", changed, None))
+        required.add(("CHANGED_DAXIANG_TEXT", changed, None))
+    return required
+
+
+def _selected_yao(packet, label):
+    matches = [s for s in packet["SELECTED_YAO"] if s["label"] == label]
+    if len(matches) != 1:
+        fail(f"Expected exactly one SELECTED_YAO entry for {label!r}, found {len(matches)}")
+    return matches[0]
+
+
+def _emitted_text_and_kind(packet, key):
+    field, _hexagram, label = key
+    if field == "GUA_CI":
+        return packet["GUA_CI"], "corpus"
+    if field == "CHANGED_GUA_CI":
+        return packet["CHANGED_GUA_CI"], "corpus"
+    if field == "TUAN_TEXT":
+        return packet["TUAN_TEXT"], "marker"
+    if field == "DAXIANG_TEXT":
+        return packet["DAXIANG_TEXT"], "marker"
+    if field == "CHANGED_TUAN_TEXT":
+        return packet["CHANGED_TUAN_TEXT"], "marker"
+    if field == "CHANGED_DAXIANG_TEXT":
+        return packet["CHANGED_DAXIANG_TEXT"], "marker"
+    if field == "SELECTED_YAO[].text":
+        return _selected_yao(packet, label)["text"], "corpus"
+    if field == "SELECTED_YAO[].xiaoxiang":
+        return _selected_yao(packet, label)["xiaoxiang"], "xiaoxiang"
+    if field == "SPECIAL_YAO_CANDIDATE.text":
+        return packet["SPECIAL_YAO_CANDIDATE"]["text"], "corpus"
+    if field == "SPECIAL_YAO_CANDIDATE.xiaoxiang":
+        return packet["SPECIAL_YAO_CANDIDATE"]["xiaoxiang"], "special_xiaoxiang"
+    fail(f"Unknown text evidence field: {field!r}")
+
+
+def validate_text_evidence_packet(packet):
+    """Production seam: reject any packet whose TEXT_EVIDENCE is missing,
+    extra, duplicated, or not truthful against the pinned raw sources."""
+    evidence = packet.get("TEXT_EVIDENCE")
+    if not isinstance(evidence, list) or not evidence:
+        fail("TEXT_EVIDENCE must be a non-empty list")
+    required = _required_text_evidence(packet)
+    seen = set()
+    for entry in evidence:
+        if not isinstance(entry, dict):
+            fail(f"TEXT_EVIDENCE entries must be dicts: {entry!r}")
+        key = (entry.get("field"), entry.get("hexagram"), entry.get("line_label"))
+        if key not in required:
+            fail(f"Text evidence for a field absent from this packet: {key!r}")
+        if key in seen:
+            fail(f"Duplicate text evidence for: {key!r}")
+        seen.add(key)
+        emitted, kind = _emitted_text_and_kind(packet, key)
+        try:
+            if kind == "corpus":
+                validate_corpus_evidence(entry, emitted)
+            elif kind == "marker":
+                validate_marker_evidence(entry, emitted)
+            elif kind == "xiaoxiang":
+                validate_xiaoxiang_evidence(entry, emitted)
+            else:
+                validate_special_xiaoxiang_evidence(entry, emitted)
+        except YijingTextEvidenceError as exc:
+            fail(
+                f"Text evidence rejected for {key[0]} {key[1]} {key[2]}: {exc}", 1
+            )
+    missing = sorted(required - seen)
+    if missing:
+        fail(f"Missing text evidence for emitted fields: {missing}", 1)
+    return True
 
 
 def parse_positions(text):
@@ -140,7 +253,33 @@ def main():
     if changed_name and (not changed_entry or not changed_commentary or not changed_rec):
         fail(f"Yi Jing corpus/commentary/structure missing changed hexagram: {changed_name}", 1)
 
-    print(json.dumps({
+    # Per-field text evidence: entries exist only for fields this packet
+    # actually emits. Yao text (data/zhouyi.json) and Xiaoxiang
+    # (docs/易经六十四卦.md) keep independent provenance surfaces.
+    text_evidence = [
+        gua_ci_evidence(name),
+        tuan_evidence(name, commentary_entry["tuan"]),
+        daxiang_evidence(name, commentary_entry["daxiang"]),
+    ]
+    for sel in selected:
+        text_evidence.append(yao_text_evidence(name, sel["label"]))
+        text_evidence.append(xiaoxiang_evidence(name, sel["label"], sel["xiaoxiang"]))
+    if special_candidate:
+        text_evidence.append(
+            yao_text_evidence(name, special_label, field="SPECIAL_YAO_CANDIDATE.text")
+        )
+        text_evidence.append(
+            special_xiaoxiang_evidence(name, special_label, special_candidate["xiaoxiang"])
+        )
+    if changed_name:
+        text_evidence.extend([
+            gua_ci_evidence(changed_name, field="CHANGED_GUA_CI"),
+            tuan_evidence(changed_name, changed_commentary["tuan"], field="CHANGED_TUAN_TEXT"),
+            daxiang_evidence(changed_name, changed_commentary["daxiang"], field="CHANGED_DAXIANG_TEXT"),
+        ])
+
+    packet = {
+        "DOMAIN": "YIJING",
         "DOMAIN": "YIJING",
         "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_XIAOXIANG_SPECIAL_YAO_CANDIDATE_AND_CHANGE_LOOKUP",
         "INPUT": {"hexagram": a.hexagram, "moving": positions},
@@ -158,6 +297,16 @@ def main():
         "CHANGED_GUA_CI": changed_entry["gua_ci"] if changed_entry else None,
         "CHANGED_TUAN_TEXT": changed_commentary["tuan"] if changed_commentary else None,
         "CHANGED_DAXIANG_TEXT": changed_commentary["daxiang"] if changed_commentary else None,
+        "TEXT_EVIDENCE": text_evidence,
+        "TRANSFORMATION_EVIDENCE": {
+            "structure_repo": "Johnson-Jia/liuyao-divination",
+            "structure_pin": PIN,
+            "structure_source_path": "src/liuyao/data.py",
+            "structure_symbols": ["BAGUA", "HEXAGRAMS", "find_hexagram"],
+            "p2p_implementation": "run_yijing_capability.changed_hexagram_name",
+            "rule": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
+            "mechanical_verification": "VERIFIED_AGAINST_384_UPSTREAM_CAST_BOARD_SINGLE_LINE_CASES",
+        },
         "TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
         "CORPUS_SOURCE": corpus_source_metadata(),
         "COMMENTARY_SOURCE": commentary_source_metadata(),
@@ -169,8 +318,23 @@ def main():
             "NO_SPECIAL_YAO_PRIORITY_RULE",
             "NO_TEN_WINGS_COMPLETENESS_CLAIM",
             "NO_SINGLE_CANONICAL_EDITION_CLAIM",
+            "NO_HISTORICAL_PRIMARY_SOURCE_VALIDATION",
         ],
-    }, ensure_ascii=False, indent=2))
+    }
+
+    # Fail closed: the packet is not emitted unless its evidence is exactly
+    # covering and independently re-proven against the pinned raw sources.
+    try:
+        validate_text_evidence_packet(packet)
+    except YijingTextEvidenceError as exc:
+        fail(f"Text evidence validation failed: {exc}", 1)
+    packet["TEXT_EVIDENCE_COVERAGE"] = {
+        "PRESENT_SOURCE_BOUND_TEXT_FIELDS": len(_required_text_evidence(packet)),
+        "TEXT_EVIDENCE_FIELDS": len(packet["TEXT_EVIDENCE"]),
+        "EXACT_COVERAGE": True,
+    }
+
+    print(json.dumps(packet, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
