@@ -73,6 +73,22 @@ class PersonalAIBehaviorHarnessTests(unittest.TestCase):
         self.assertIn("GENERIC_UNDERSTANDING_CLAIM", codes)
         self.assertIn("GENERIC_FOLLOWUP_OFFER", codes)
 
+    def test_followup_offer_detector_does_not_flag_mid_answer_business_conditional(self) -> None:
+        text = (
+            "Nếu bạn muốn tiết kiệm, tôi có thể dùng container 20ft: cước 780 USD, "
+            "thời gian 28-32 ngày. Phương án nhanh hơn là đi đường bộ."
+        )
+        codes = {finding.code for finding in lint_response(text, self.profile)}
+        self.assertNotIn("GENERIC_FOLLOWUP_OFFER", codes)
+
+    def test_sycophantic_opener_detector_is_position_specific(self) -> None:
+        text = (
+            "Phương án A rẻ hơn. Về câu hỏi rất hay của bạn ở tin nhắn trước, "
+            "dữ liệu hiện tại vẫn chưa đủ để kết luận."
+        )
+        codes = {finding.code for finding in lint_response(text, self.profile)}
+        self.assertNotIn("SYCOPHANTIC_OPENER", codes)
+
     def test_linter_does_not_require_a_joke_or_analogy_by_regex(self) -> None:
         self.assertEqual(lint_response("Dữ liệu này chưa đủ để kết luận.", self.profile), ())
 
