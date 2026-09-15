@@ -32,7 +32,7 @@ MISSION_CONTROL != SECOND_CONTROL_PLANE
 - Repomix: `v1.18.0`
 - TokScale: `v4.16.0`
 
-The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. The stack therefore builds from the exact release source commit and uses a tag+checksum remote BuildKit context. It never falls back to mutable `:latest`; if the tag is moved away from that commit, the build fails closed.
+The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. The stack therefore builds from the exact full 40-character release commit using Docker's Git-context fragment form. It never falls back to a mutable registry tag.
 
 The Hermes runtime itself is already compatibility-gated by `.github/workflows/hermes-runtime-compatibility.yml`, including the real P2P Docker build, required CLI flags, TokScale-compatible `state.db`, and the bundled Hindsight provider.
 
