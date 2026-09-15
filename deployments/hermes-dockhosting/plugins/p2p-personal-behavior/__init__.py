@@ -89,7 +89,7 @@ _ACK_ONLY = re.compile(
     re.IGNORECASE,
 )
 _ASSISTANT_COMPLETE = re.compile(
-    r"\b(?:XONG|đã\s+xong|đã\s+hoàn\s+tất|hoàn\s+thành|SUCCESS)\b",
+    r"\b(?:XONG|đã\s+xong|đã\s+hoàn\s+tất|đã\s+hoàn\s+thành)\b",
     re.IGNORECASE,
 )
 _ASSISTANT_UNRESOLVED = re.compile(
