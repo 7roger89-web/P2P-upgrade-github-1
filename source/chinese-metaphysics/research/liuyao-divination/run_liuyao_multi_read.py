@@ -32,13 +32,34 @@ def _evidence(rule_id, repo_key, source_path, source_anchor, supported_claim,
     return entry
 
 
-def _validate_evidence(entries, applied_rule_ids):
-    # Fail closed on identity, locator, and rule/evidence mismatches.
+def _gate_evidence(rule_id, source_anchor, outcome, supported_claim):
+    entry = _evidence(rule_id, 'Yinyo', 'SKILL.md', source_anchor, supported_claim)
+    entry.update({'evidence_kind': 'EVALUATED_PREREQUISITE_GATE', 'observed_outcome': outcome})
+    return entry
+
+
+def _validate_evidence(entries, applied_rule_ids, evaluated_gate_rule_ids=(), checked_facts=None):
+    # Fail closed on identity, locator, rule/evidence, and gate/fact mismatches.
     if not entries:
         return False, 'MISSING_OR_UNAPPLIED_RULE_EVIDENCE'
-    rule_ids = {e.get('rule_id') for e in entries if not e.get('mechanical_authority')}
+    rule_ids = {e.get('rule_id') for e in entries
+                if not e.get('mechanical_authority') and e.get('evidence_kind') != 'EVALUATED_PREREQUISITE_GATE'}
     if set(applied_rule_ids) != rule_ids:
         return False, 'MISSING_OR_UNAPPLIED_RULE_EVIDENCE'
+    gate_entries = {e.get('rule_id'): e for e in entries
+                    if e.get('evidence_kind') == 'EVALUATED_PREREQUISITE_GATE'}
+    if set(evaluated_gate_rule_ids) != set(gate_entries):
+        return False, 'MISSING_OR_UNEVALUATED_GATE_EVIDENCE'
+    if checked_facts is not None:
+        expected = {
+            'YINYO_L1_DAY_MONTH_CHECK': {
+                'DAY_MONTH_MATCH': checked_facts['month']['match'] or checked_facts['day']['match']},
+            'YINYO_L3_CHANGED_LINE_CHECK': {
+                'CHANGED_YONGSHEN_PRESENT': bool(checked_facts['changed_yongshen_positions'])},
+        }
+        for gate_id, entry in gate_entries.items():
+            if gate_id not in expected or entry.get('observed_outcome') != expected[gate_id]:
+                return False, 'GATE_OUTCOME_CONTRADICTS_CHECKED_FACTS'
     for e in entries:
         matches = [k for k, (_, repo, pin) in SOURCE_REPOS.items() if repo == e.get('repo')]
         if len(matches) != 1 or e.get('pin') != SOURCE_REPOS[matches[0]][2]:
@@ -514,17 +535,37 @@ def _missing_yongshen_resolution(board, lens):
 
     applied_rule_ids = []
     rule_evidence = []
+    evaluated_gate_rule_ids = []
+    prerequisite_gate_evidence = []
     if month_match or day_match:
         applied_rule_ids = ['DAY_MONTH_SUBSTITUTION_CANDIDATE']
+        evaluated_gate_rule_ids = ['YINYO_L1_DAY_MONTH_CHECK']
+        prerequisite_gate_evidence = [_gate_evidence(
+            'YINYO_L1_DAY_MONTH_CHECK', '### 4.3 用神不现 -> 伏神取用规则',
+            {'DAY_MONTH_MATCH': True}, '先看日月可否代用 / 凡用神不现，即以日月为用神')]
         rule_evidence = [_evidence('DAY_MONTH_SUBSTITUTION_CANDIDATE', 'Yinyo', 'SKILL.md',
             '### 4.3 用神不现 -> 伏神取用规则',
             'when visible 用神 is absent, day/month may be the bounded substitution candidate')]
     elif changed_positions:
         applied_rule_ids = ['BIAN_YAO_YONGSHEN_PRESENT']
+        evaluated_gate_rule_ids = ['YINYO_L1_DAY_MONTH_CHECK', 'YINYO_L3_CHANGED_LINE_CHECK']
+        prerequisite_gate_evidence = [
+            _gate_evidence('YINYO_L1_DAY_MONTH_CHECK', '### 4.3 用神不现 -> 伏神取用规则',
+                {'DAY_MONTH_MATCH': False}, '先看日月可否代用 / 凡用神不现，即以日月为用神'),
+            _gate_evidence('YINYO_L3_CHANGED_LINE_CHECK', '飞爻、变爻俱无用神,方启动伏神',
+                {'CHANGED_YONGSHEN_PRESENT': True}, '飞爻、变爻俱无用神时才启动伏神检查'),
+        ]
         rule_evidence = [_evidence('BIAN_YAO_YONGSHEN_PRESENT', 'Yinyo', 'SKILL.md',
             '飞爻、变爻俱无用神,方启动伏神',
             'changed-line 用神 presence is checked before fushen lookup')]
     else:
+        evaluated_gate_rule_ids = ['YINYO_L1_DAY_MONTH_CHECK', 'YINYO_L3_CHANGED_LINE_CHECK']
+        prerequisite_gate_evidence = [
+            _gate_evidence('YINYO_L1_DAY_MONTH_CHECK', '### 4.3 用神不现 -> 伏神取用规则',
+                {'DAY_MONTH_MATCH': False}, '先看日月可否代用 / 凡用神不现，即以日月为用神'),
+            _gate_evidence('YINYO_L3_CHANGED_LINE_CHECK', '飞爻、变爻俱无用神,方启动伏神',
+                {'CHANGED_YONGSHEN_PRESENT': False}, '飞爻、变爻俱无用神时才启动伏神检查'),
+        ]
         if placement_success:
             applied_rule_ids = ['FUSHEN_PLACEMENT_IDENTIFIED', 'FEISHEN_POSITION_IDENTIFIED']
             rule_evidence = [
@@ -548,10 +589,13 @@ def _missing_yongshen_resolution(board, lens):
             rule_evidence = [_evidence('FUSHEN_LOOKUP_REQUIRED', 'Johnson-Jia',
                 'references/02-用神取用.md', '## 四、用神不上卦（伏神）',
                 'the unresolved missing-yongshen gate reaches the bounded 伏神 lookup')]
-    evidence_ok, evidence_error = _validate_evidence(rule_evidence, applied_rule_ids)
+    rule_evidence = prerequisite_gate_evidence + rule_evidence
+    evidence_ok, evidence_error = _validate_evidence(
+        rule_evidence, applied_rule_ids, evaluated_gate_rule_ids, checked_facts)
     if not evidence_ok:
         status = 'SOURCE_IDENTITY_INVALID'
         rule_evidence = []
+        prerequisite_gate_evidence = []
 
     # DAY_MONTH_SUBSTITUTION_CANDIDATE and BIAN_YAO_YONGSHEN_PRESENT keep their
     # pre-existing trace wording verbatim: those branches do not advance in this slice.
@@ -645,6 +689,8 @@ def _missing_yongshen_resolution(board, lens):
         'checked_facts': checked_facts,
         'source_refs': source_refs,
         'applied_rule_ids': applied_rule_ids if evidence_ok else [],
+        'evaluated_gate_rule_ids': evaluated_gate_rule_ids if evidence_ok else [],
+        'prerequisite_gate_evidence': prerequisite_gate_evidence,
         'rule_evidence': rule_evidence,
         'source_identity_validated': evidence_ok,
         'source_identity_error': evidence_error,

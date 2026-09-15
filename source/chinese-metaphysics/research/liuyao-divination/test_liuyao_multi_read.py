@@ -554,30 +554,49 @@ assert _ok['applied_rule_ids'] == [
     'FUSHEN_PLACEMENT_IDENTIFIED', 'FEISHEN_POSITION_IDENTIFIED'
 ]
 assert _ok['source_identity_validated'] is True
-assert {e['rule_id'] for e in _ok['rule_evidence'] if not e.get('mechanical_authority')} == set(_ok['applied_rule_ids'])
+assert _ok['evaluated_gate_rule_ids'] == ['YINYO_L1_DAY_MONTH_CHECK', 'YINYO_L3_CHANGED_LINE_CHECK']
+assert {e['rule_id'] for e in _ok['rule_evidence']
+       if not e.get('mechanical_authority') and e.get('evidence_kind') != 'EVALUATED_PREREQUISITE_GATE'} == set(_ok['applied_rule_ids'])
+_gates = {e['rule_id']: e for e in _ok['prerequisite_gate_evidence']}
+assert _gates['YINYO_L1_DAY_MONTH_CHECK']['observed_outcome'] == {'DAY_MONTH_MATCH': False}
+assert _gates['YINYO_L3_CHANGED_LINE_CHECK']['observed_outcome'] == {'CHANGED_YONGSHEN_PRESENT': False}
 assert any(e.get('mechanical_authority') and e['source_path'] == 'src/liuyao/data.py'
            and e['source_anchor'] == 'HEXAGRAMS' for e in _ok['rule_evidence'])
 
 # Test-level mutations prove the packet cannot silently accept bad provenance.
 import copy as _copy
 _evidence = _copy.deepcopy(_ok['rule_evidence'])
+_gate_ids = _ok['evaluated_gate_rule_ids']
+_checked = _ok['checked_facts']
+def _valid_placement(evidence):
+    return mod._validate_evidence(evidence, _ok['applied_rule_ids'], _gate_ids, _checked)[0]
+# Missing either prerequisite gate is not a valid placement packet.
+_missing_l1 = [e for e in _evidence if e['rule_id'] != 'YINYO_L1_DAY_MONTH_CHECK']
+assert _valid_placement(_missing_l1) is False
+_missing_l3 = [e for e in _evidence if e['rule_id'] != 'YINYO_L3_CHANGED_LINE_CHECK']
+assert _valid_placement(_missing_l3) is False
 _bad = _copy.deepcopy(_evidence); _bad[0]['pin'] = 'wrong-pin'
-assert mod._validate_evidence(_bad, _ok['applied_rule_ids'])[0] is False
-# The Yinyo pin is independently validated on the day/month and changed-line branches.
+assert _valid_placement(_bad) is False
+# The Yinyo pin is independently validated on the day/month branch.
 _day_evidence = _copy.deepcopy(daymonth_case['LENSES'][0]['missing_yongshen_resolution']['rule_evidence'])
 _day_evidence[0]['pin'] = 'wrong-yinyo-pin'
-assert mod._validate_evidence(_day_evidence, ['DAY_MONTH_SUBSTITUTION_CANDIDATE'])[0] is False
+assert mod._validate_evidence(_day_evidence, ['DAY_MONTH_SUBSTITUTION_CANDIDATE'], ['YINYO_L1_DAY_MONTH_CHECK'], daymonth_case['LENSES'][0]['missing_yongshen_resolution']['checked_facts'])[0] is False
 _bad = _copy.deepcopy(_evidence); _bad[0]['repo'] = 'wrong/repo'
-assert mod._validate_evidence(_bad, _ok['applied_rule_ids'])[0] is False
+assert _valid_placement(_bad) is False
 _bad = _copy.deepcopy(_evidence); _bad[0]['source_path'] = 'wrong/path.md'
-assert mod._validate_evidence(_bad, _ok['applied_rule_ids'])[0] is False
+assert _valid_placement(_bad) is False
 _bad = _copy.deepcopy(_evidence); _bad[0]['source_anchor'] = 'missing stable anchor'
-assert mod._validate_evidence(_bad, _ok['applied_rule_ids'])[0] is False
+assert _valid_placement(_bad) is False
+_bad = _copy.deepcopy(_evidence); _bad[0]['observed_outcome'] = {'DAY_MONTH_MATCH': True}
+assert _valid_placement(_bad) is False
 _bad = _copy.deepcopy(_evidence); _bad.pop(0)
-assert mod._validate_evidence(_bad, _ok['applied_rule_ids'])[0] is False
+assert _valid_placement(_bad) is False
+# Terminal Johnson evidence without the required Yinyo gates cannot pass.
+_terminal_only = [e for e in _evidence if e.get('evidence_kind') != 'EVALUATED_PREREQUISITE_GATE']
+assert _valid_placement(_terminal_only) is False
 _unapplied = [_copy.deepcopy(_evidence[0]), _copy.deepcopy(_evidence[1])]
 _unapplied[0]['rule_id'] = 'RULE_NOT_APPLIED'
-assert mod._validate_evidence(_unapplied, _ok['applied_rule_ids'])[0] is False
+assert _valid_placement(_unapplied) is False
 
 # A trace/evidence string for a rule not reached is not proof of application.
 assert 'DAY_MONTH_SUBSTITUTION_CANDIDATE' not in _ok['applied_rule_ids']
