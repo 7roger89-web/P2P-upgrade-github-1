@@ -1,14 +1,15 @@
 """Deterministic, read-only auto-activation gate for host-native ``/goal``.
 
 This module decides whether an already-authoritative P2P GoalPlan/TaskPlan is
-large and active enough to benefit from host-native ``/goal``.  It never
+large and active enough to benefit from host-native ``/goal``. It never
 creates state, launches a host, grants permissions, retries work, or replaces
-P2P verification.  The decision is derived only from durable P2P state.
+P2P verification. The decision is derived only from durable P2P state.
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -48,6 +49,11 @@ class NativeGoalActivationError(NativeGoalBridgeError):
     """Raised when durable state is malformed or contradictory."""
 
 
+def _canonical_hash(value: Mapping[str, Any]) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def _unwrap_plan(value: Mapping[str, Any], label: str) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         raise NativeGoalActivationError(f"{label}_MUST_BE_OBJECT")
@@ -56,13 +62,34 @@ def _unwrap_plan(value: Mapping[str, Any], label: str) -> dict[str, Any]:
         return dict(value)
     if not isinstance(nested, Mapping):
         raise NativeGoalActivationError(f"{label}_PLAN_MUST_BE_OBJECT")
-    return dict(nested)
+
+    plan = dict(nested)
+    if label == "GOAL_STATE":
+        if value.get("schema") != "p2p-autopilot-goal/1":
+            raise NativeGoalActivationError("GOAL_STATE_SCHEMA_INVALID")
+        expected = value.get("goal_hash")
+        hash_error = "GOAL_STATE_HASH_MISSING_OR_INVALID"
+        mismatch_error = "GOAL_STATE_HASH_MISMATCH"
+    elif label == "TASK_STATE":
+        if value.get("schema") != "p2p-task-state/1":
+            raise NativeGoalActivationError("TASK_STATE_SCHEMA_INVALID")
+        expected = value.get("plan_hash")
+        hash_error = "TASK_STATE_HASH_MISSING_OR_INVALID"
+        mismatch_error = "TASK_STATE_HASH_MISMATCH"
+    else:
+        raise NativeGoalActivationError("STATE_LABEL_UNSUPPORTED")
+
+    if not isinstance(expected, str) or len(expected) != 64:
+        raise NativeGoalActivationError(hash_error)
+    if expected.lower() != _canonical_hash(plan):
+        raise NativeGoalActivationError(mismatch_error)
+    return plan
 
 
 def detect_host_from_environment(environ: Mapping[str, str] | None = None) -> str | None:
     """Return a host only when the process environment identifies it safely.
 
-    Claude Code exposes stable in-session markers.  Codex CLI does not expose
+    Claude Code exposes stable in-session markers. Codex CLI does not expose
     an equally reliable generic in-session marker, so ``CODEX_HOME`` alone is
     intentionally not treated as proof; a Codex executor should pass its known
     host identity as ``--host codex_cli`` without asking the Owner.
@@ -108,7 +135,11 @@ def decide_native_goal_activation(
     if not isinstance(raw_tasks, list) or not raw_tasks:
         raise NativeGoalActivationError("TASK_PLAN_TASKS_REQUIRED")
 
-    task_statuses = [str(task.get("status", "")).strip().upper() for task in raw_tasks if isinstance(task, Mapping)]
+    task_statuses = [
+        str(task.get("status", "")).strip().upper()
+        for task in raw_tasks
+        if isinstance(task, Mapping)
+    ]
     if len(task_statuses) != len(raw_tasks):
         raise NativeGoalActivationError("TASK_PLAN_TASK_INVALID")
     unfinished_count = sum(status not in TERMINAL_TASK_STATUSES for status in task_statuses)
@@ -131,7 +162,11 @@ def decide_native_goal_activation(
     if plan_lifecycle != "ACTIVE":
         return {**common, "decision": NORMAL, "reason": f"PLAN_NOT_ACTIVE:{plan_lifecycle}"}
     if goal_status not in ACTIVE_GOAL_STATUSES:
-        return {**common, "decision": NORMAL, "reason": f"GOAL_STATUS_NOT_AUTO_ACTIVATABLE:{goal_status or 'MISSING'}"}
+        return {
+            **common,
+            "decision": NORMAL,
+            "reason": f"GOAL_STATUS_NOT_AUTO_ACTIVATABLE:{goal_status or 'MISSING'}",
+        }
     if task_count < 2:
         return {**common, "decision": NORMAL, "reason": "SINGLE_TASK_PLAN"}
     if unfinished_count == 0:
@@ -199,13 +234,19 @@ def main() -> int:
             baseline_ref=args.baseline,
         )
     except (OSError, NativeGoalActivationError) as exc:
-        print(json.dumps({
-            "schema": ACTIVATION_SCHEMA,
-            "status": "BLOCKED",
-            "error": str(exc),
-            "owner_prompt_required": False,
-            "state_mutated": False,
-        }, ensure_ascii=False, sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "schema": ACTIVATION_SCHEMA,
+                    "status": "BLOCKED",
+                    "error": str(exc),
+                    "owner_prompt_required": False,
+                    "state_mutated": False,
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+        )
         return 2
 
     if args.format == "command":
