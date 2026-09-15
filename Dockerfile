@@ -48,10 +48,7 @@ ARG P2P_INSTALL_OPIK=0
 ARG OPIK_VERSION=2.2.59
 RUN set -eux; \
     if [ "$P2P_INSTALL_OPIK" = "1" ]; then \
-      uv pip install \
-        --python /opt/hermes/.venv/bin/python \
-        --exclude-newer-package opik=false \
-        "opik==${OPIK_VERSION}"; \
+      uv pip install --python /opt/hermes/.venv/bin/python "opik==${OPIK_VERSION}" --exclude-newer-package opik=false; \
     elif [ "$P2P_INSTALL_OPIK" != "0" ]; then \
       echo "P2P_INSTALL_OPIK must be 0 or 1" >&2; exit 2; \
     fi
