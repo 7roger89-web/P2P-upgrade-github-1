@@ -1,4 +1,6 @@
-FROM nousresearch/hermes-agent:latest
+# Hermes Agent v0.21.3 release tag published 2026-09-14.
+# Pin the upstream runtime instead of following mutable :latest.
+FROM nousresearch/hermes-agent:v2026.9.14
 
 USER root
 
