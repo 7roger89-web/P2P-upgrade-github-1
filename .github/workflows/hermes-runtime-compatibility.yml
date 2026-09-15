@@ -73,6 +73,11 @@ jobs:
             --entrypoint /opt/hermes/.venv/bin/hermes \
             "$IMAGE" sessions list
           test -f "$RUNNER_TEMP/hermes-home/state.db"
+          # The throwaway container runs as root and creates owner-only SQLite
+          # files. Relax read permission only on this CI scratch copy so the
+          # host-side read-only schema probe can inspect it; production state
+          # permissions are intentionally untouched.
+          chmod a+r "$RUNNER_TEMP/hermes-home"/state.db*
           python3 scripts/hermes_runtime_compatibility.py state-db "$RUNNER_TEMP/hermes-home/state.db"
 
       - name: Verify bundled Hindsight provider exists but remains unconfigured
