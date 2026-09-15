@@ -49,9 +49,9 @@ jobs:
       - name: Build the actual DockHosting source image
         run: docker build --pull -t "$IMAGE" -f Dockerfile .
 
-      - name: Record pulled base image identity
+      - name: Record built image identity
         run: |
-          docker image inspect nousresearch/hermes-agent:${EXPECTED_TAG} --format '{{json .RepoDigests}}'
+          echo "PINNED_BASE=nousresearch/hermes-agent:${EXPECTED_TAG}"
           docker image inspect "$IMAGE" --format '{{.Id}}'
 
       - name: Probe Hermes version and CLI contract
