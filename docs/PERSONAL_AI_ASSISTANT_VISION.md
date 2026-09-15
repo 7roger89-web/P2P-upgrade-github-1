@@ -84,6 +84,20 @@ Initial deterministic runtime slice:
 
 `.p2p/system/p2p_capabilities/personal_ai_behavior.py`
 
+### Hermes runtime integration V1
+
+The first hosted runtime bridge lives at:
+
+`deployments/hermes-dockhosting/plugins/p2p-personal-behavior/`
+
+It composes the deterministic behavior slice into the pinned Hermes gateway using documented plugin surfaces rather than modifying Hermes core:
+
+- cache-safe system-prompt section for the stable communication profile and `FACTS != STYLE` contract;
+- `pre_llm_call` for explicit turn-local serious/short/deep overrides;
+- report-only `transform_llm_output` anti-slop linting before final delivery.
+
+The DockHosting entrypoint enables this bundled plugin idempotently for both fresh and persisted configs. The runtime bridge intentionally does not infer tool/research requirements from keyword guesses, rewrite factual output, or auto-promote durable memory. Those remain controlled by the existing Hermes/P2P tool, authoritative-data, and memory boundaries.
+
 ## Behavior and communication state
 
 The assistant should keep a small structured communication profile instead of relying only on one large prose prompt. Representative dimensions include language, familiarity, directness, humor, sarcasm, tolerance for corporate filler, mild profanity, and whether fresh Vietnamese associations are preferred.
