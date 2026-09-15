@@ -111,7 +111,7 @@ jobs:
             -f deployments/hermes-essential-stack/docker-compose.yml \
             build hermes-agent
 
-      - name: Smoke pinned Opik SDK in the real Hermes image
+      - name: Smoke pinned Opik SDK and call surface in the real Hermes image
         run: |
           docker compose \
             --env-file deployments/hermes-essential-stack/.env \
@@ -119,7 +119,7 @@ jobs:
             run --rm --no-deps \
             --entrypoint /opt/hermes/.venv/bin/python \
             hermes-agent \
-            -c 'import importlib.metadata, opik; v=importlib.metadata.version("opik"); assert v == "2.2.59", v; print("OPIK_SDK_VERSION=2.2.59")'
+            -c 'import importlib.metadata, inspect, opik; v=importlib.metadata.version("opik"); assert v == "2.2.59", v; trace=set(inspect.signature(opik.Opik.trace).parameters); span=set(inspect.signature(opik.Opik.span).parameters); flush=set(inspect.signature(opik.Opik.flush).parameters); assert {"project_name","environment","thread_id"} <= trace, trace; assert {"trace_id","type","usage","model","provider","project_name"} <= span, span; assert "timeout" in flush, flush; print("OPIK_SDK_CONTRACT=PASS:2.2.59")'
 
       - name: Start local-only Hermes and Workspace smoke stack
         run: |
