@@ -38,11 +38,11 @@ services:
       - "127.0.0.1:9119:9119"
 
   hermes-workspace:
-    # Upstream published release v2.3.0 but did not publish a matching GHCR
-    # manifest. Build from the exact 40-character release commit instead of
-    # following a mutable registry tag.
     build:
-      context: "https://github.com/outsourc-e/hermes-workspace.git#15fa9cd706f5c04e4db288fb958e21d10fc776da"
+      context: ../..
+      dockerfile: deployments/hermes-essential-stack/Dockerfile.workspace
+      args:
+        WORKSPACE_COMMIT: 15fa9cd706f5c04e4db288fb958e21d10fc776da
     image: p2p-hermes-workspace:v2.3.0-15fa9cd
     depends_on:
       hermes-agent:
