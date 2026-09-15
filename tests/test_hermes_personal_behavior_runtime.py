@@ -110,7 +110,7 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
         self.assertIn("GENERIC_FOLLOWUP_OFFER", log_text)
         self.assertNotIn("Câu hỏi rất hay", log_text)
 
-    def test_both_hosted_dockerfiles_bundle_plugin_and_canonical_module(self) -> None:
+    def test_both_hosted_dockerfiles_bundle_plugin_and_post_bootstrap_wrapper(self) -> None:
         expected_plugin = (
             "deployments/hermes-dockhosting/plugins/p2p-personal-behavior/ "
             "/opt/hermes/plugins/p2p-personal-behavior/"
@@ -119,21 +119,46 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/personal_ai_behavior.py "
             "/opt/hermes/plugins/p2p-personal-behavior/personal_ai_behavior.py"
         )
+        expected_wrapper = (
+            "deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh "
+            "/usr/local/bin/p2p-post-bootstrap-main.sh"
+        )
         for relative in ("Dockerfile", "deployments/hermes-dockhosting/Dockerfile"):
             text = (REPO_ROOT / relative).read_text(encoding="utf-8")
             self.assertIn(expected_plugin, text, relative)
             self.assertIn(expected_module, text, relative)
+            self.assertIn(expected_wrapper, text, relative)
 
-    def test_entrypoint_enables_plugin_for_new_and_existing_config(self) -> None:
+    def test_plugin_enable_happens_after_bootstrap_as_hermes(self) -> None:
         entrypoint = (
             REPO_ROOT / "deployments" / "hermes-dockhosting" / "dockhosting-entrypoint.sh"
         ).read_text(encoding="utf-8")
-        enable = "/opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior"
+        post_bootstrap = (
+            REPO_ROOT / "deployments" / "hermes-dockhosting" / "p2p-post-bootstrap-main.sh"
+        ).read_text(encoding="utf-8")
+        enable = (
+            "s6-setuidgid hermes /opt/hermes/.venv/bin/hermes "
+            "plugins enable p2p-personal-behavior"
+        )
+
+        # Normal Docker/Podman PID-1 path: s6 runs stage2 first, then invokes
+        # our post-bootstrap main wrapper where plugin enablement is unprivileged.
+        self.assertIn("exec /init /usr/local/bin/p2p-post-bootstrap-main.sh", entrypoint)
+        self.assertIn(enable, post_bootstrap)
+        self.assertLess(post_bootstrap.index(enable), post_bootstrap.index("main-wrapper.sh"))
+
+        # Wrapped-runtime fallback: preserve upstream order explicitly.
+        fallback_stage2 = "/opt/hermes/docker/stage2-hook.sh"
+        self.assertIn(fallback_stage2, entrypoint)
         self.assertIn(enable, entrypoint)
-        # The command must sit after the config-creation `fi`, so an already
-        # persisted config is converged too rather than silently skipping it.
-        self.assertGreater(entrypoint.index(enable), entrypoint.index("\nfi\n", entrypoint.index("config.yaml")))
-        self.assertNotIn(enable + " || true", entrypoint)
+        self.assertLess(entrypoint.index(fallback_stage2), entrypoint.index(enable))
+        self.assertLess(entrypoint.index(enable), entrypoint.index("main-wrapper.sh"))
+
+        # Regression guard: never bypass the upstream privilege model by
+        # invoking the venv CLI as root before stage2/bootstrap.
+        root_enable = "/opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior"
+        before_pid_gate = entrypoint.split('if [ "$$" -eq 1 ]', 1)[0]
+        self.assertNotIn(root_enable, before_pid_gate)
 
 
 if __name__ == "__main__":
