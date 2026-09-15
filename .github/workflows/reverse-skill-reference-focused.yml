@@ -1,0 +1,36 @@
+name: Reverse-Skill reference focused acceptance
+
+on:
+  pull_request:
+    paths:
+      - '.p2p/system/p2p_capabilities/reverse_skill_reference.py'
+      - 'tests/test_p2p_reverse_skill_reference.py'
+      - 'docs/plans/2026-09-15-p2p-reverse-skill-safe-adoption/**'
+      - '.github/workflows/reverse-skill-reference-focused.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Reverse-Skill bounded reference tests
+        run: |
+          python -m unittest -v \
+            tests.test_p2p_reverse_skill_reference \
+            tests.test_p2p_sec01_security_reverse_apkid
+
+      - name: Compile changed runtime module
+        run: |
+          python -m py_compile .p2p/system/p2p_capabilities/reverse_skill_reference.py
