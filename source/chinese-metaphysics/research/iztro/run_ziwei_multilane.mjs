@@ -57,12 +57,18 @@ const qintianLane = {
   ],
 };
 
+const XQR_SOURCE = {
+  repo: 'ZhangZangQian/xu-quanren',
+  pin: '7b8364bbd79a11e852899893ac5749a83be62836',
+  useBoundary: 'RESEARCH_REFERENCE_ONLY',
+  status: 'DIRECT_SOURCE_BOUND_REFERENCE',
+};
+
 const xqrLane = {
   LANE_ID: chart.METHOD_LANE,
-  SOURCE: {
-    repo: 'ZhangZangQian/xu-quanren',
-    status: 'EXISTING_AUDITED_REFERENCE',
-  },
+  SOURCE: XQR_SOURCE,
+  rule_trace: chart.RULE_TRACE,
+  rule_evidence: chart.RULE_EVIDENCE ?? [],
   target_star: chart.TARGET_STAR,
   target_palace: chart.TARGET_PALACE,
   target_class: chart.BIRTH_YEAR_JI_TARGET_CLASS,

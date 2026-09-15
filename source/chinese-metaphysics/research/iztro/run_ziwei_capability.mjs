@@ -28,6 +28,116 @@ try { head = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encodi
 catch { fail(`Cannot verify pinned upstream: ${upstream}`); }
 if (head !== PIN) fail(`Pinned upstream SHA mismatch: expected ${PIN}, got ${head}`);
 
+const XQR_PIN = '7b8364bbd79a11e852899893ac5749a83be62836';
+const XQR_REPO = 'ZhangZangQian/xu-quanren';
+const xqrUpstream = path.resolve(scriptDir, '../../upstreams/xu-quanren');
+
+if (!fs.existsSync(xqrUpstream)) fail(`Pinned xu-quanren upstream missing: ${xqrUpstream}`);
+let xqrHead;
+try { xqrHead = execFileSync('git', ['-C', xqrUpstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); }
+catch { fail(`Cannot verify pinned xu-quanren upstream: ${xqrUpstream}`); }
+if (xqrHead !== XQR_PIN) fail(`Pinned xu-quanren upstream SHA mismatch: expected ${XQR_PIN}, got ${xqrHead}`);
+
+const paipanPath = path.join(xqrUpstream, 'scripts/paipan.py');
+if (!fs.existsSync(paipanPath)) fail(`Pinned paipan.py missing: ${paipanPath}`);
+const paipanContent = fs.readFileSync(paipanPath, 'utf8');
+
+function extractLiuWaiFromSource(content) {
+  const match = /LIU_WAI\s*=\s*\[([^\]]+)\]/.exec(content);
+  if (!match) fail('Cannot extract LIU_WAI definition from scripts/paipan.py');
+  const items = match[1]
+    .split(',')
+    .map((s) => s.trim().replace(/^['"]|['"]$/g, ''))
+    .filter(Boolean);
+  if (items.length !== 6) {
+    fail(`Expected exactly 6 palaces in source LIU_WAI, found ${items.length}: ${items.join(', ')}`);
+  }
+  return items;
+}
+
+// Source authority: extracted directly from pinned scripts/paipan.py:LIU_WAI
+const SOURCE_DERIVED_LIU_WAI = extractLiuWaiFromSource(paipanContent);
+
+// Regression witness: canonical six-outer set expected from Xu Quanren system
+const WITNESS_EXPECTED_LIU_WAI = ['子女', '夫妻', '兄弟', '仆役', '父母', '迁移'];
+if (JSON.stringify(SOURCE_DERIVED_LIU_WAI) !== JSON.stringify(WITNESS_EXPECTED_LIU_WAI)) {
+  fail(`Source-derived LIU_WAI mismatch with regression witness: ${JSON.stringify(SOURCE_DERIVED_LIU_WAI)} vs ${JSON.stringify(WITNESS_EXPECTED_LIU_WAI)}`);
+}
+
+const CANONICAL_LIU_WAI = SOURCE_DERIVED_LIU_WAI;
+
+const XQR_RULE_EVIDENCE = [
+  {
+    rule_id: 'XQR_R1_PALACE_BEFORE_STAR',
+    support_status: 'DIRECT_SOURCE_SUPPORT',
+    repo: XQR_REPO,
+    pin: XQR_PIN,
+    source_repo: XQR_REPO,
+    source_pin: XQR_PIN,
+    source_path: 'SKILL.md',
+    source_anchor: '### 优先级法则（四条铁律）',
+    supported_claim: 'Evaluates palace scope prior to taking mutagen phenomena and star properties (先定宫职范畴，再取象，最后合星).',
+  },
+  {
+    rule_id: 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER',
+    support_status: 'DIRECT_SOURCE_SUPPORT',
+    repo: XQR_REPO,
+    pin: XQR_PIN,
+    source_repo: XQR_REPO,
+    source_pin: XQR_PIN,
+    source_path: 'SKILL.md',
+    source_anchor: '### 解读法则',
+    interpretive_source: {
+      repo: XQR_REPO,
+      pin: XQR_PIN,
+      source_path: 'SKILL.md',
+      source_anchor: '### 解读法则',
+      supported_claim: '忌入六内主得，忌入六外主失',
+    },
+    classification_source: {
+      repo: XQR_REPO,
+      pin: XQR_PIN,
+      source_path: 'scripts/paipan.py',
+      source_anchor: 'LIU_WAI',
+      extraction_method: 'LITERAL_ASSIGNMENT_PARSE',
+      source_derived_set: SOURCE_DERIVED_LIU_WAI,
+      canonical_set: SOURCE_DERIVED_LIU_WAI,
+      canonical_count: SOURCE_DERIVED_LIU_WAI.length,
+    },
+    canonical_six_outer: SOURCE_DERIVED_LIU_WAI,
+    canonical_count: SOURCE_DERIVED_LIU_WAI.length,
+    alias_policy: 'ADAPTER_NAME_NORMALIZATION',
+    adapter_normalization: {
+      raw_alias: '交友',
+      canonical_target: '仆役',
+      purpose: 'CHART_NAMING_COMPATIBILITY_ONLY',
+      seventh_doctrinal_palace: false,
+    },
+    supported_claim: 'Classifies mutagen placement by palace inner/outer boundary where Ji entering six outer palaces indicates loss/dispersion (忌入六内主得，忌入六外主失; canonical LIU_WAI = 子女, 夫妻, 兄弟, 仆役, 父母, 迁移).',
+  },
+];
+
+for (const ev of XQR_RULE_EVIDENCE) {
+  const fullPath = path.join(xqrUpstream, ev.source_path);
+  if (!fs.existsSync(fullPath)) fail(`XQR source path missing: ${fullPath}`);
+  const content = fs.readFileSync(fullPath, 'utf8');
+  if (!content.includes(ev.source_anchor)) fail(`XQR source anchor missing: ${ev.source_anchor}`);
+  if (ev.interpretive_source) {
+    const p = path.join(xqrUpstream, ev.interpretive_source.source_path);
+    if (!fs.existsSync(p)) fail(`XQR interpretive source missing: ${p}`);
+    if (!fs.readFileSync(p, 'utf8').includes(ev.interpretive_source.source_anchor)) {
+      fail(`XQR interpretive anchor missing: ${ev.interpretive_source.source_anchor}`);
+    }
+  }
+  if (ev.classification_source) {
+    const p = path.join(xqrUpstream, ev.classification_source.source_path);
+    if (!fs.existsSync(p)) fail(`XQR classification source missing: ${p}`);
+    if (!fs.readFileSync(p, 'utf8').includes(ev.classification_source.source_anchor)) {
+      fail(`XQR classification anchor missing: ${ev.classification_source.source_anchor}`);
+    }
+  }
+}
+
 const builtEntry = path.join(upstream, 'lib', 'index.js');
 if (!fs.existsSync(builtEntry)) fail(`Pinned upstream build missing: ${builtEntry}`);
 const require = createRequire(import.meta.url);
@@ -158,8 +268,12 @@ for (const palace of palaces) {
 }
 const jiStar = mutagen['忌'] ?? null;
 const jiPalace = jiStar ? (starPalace.get(jiStar) ?? null) : null;
-const sixOuter = new Set(['兄弟', '夫妻', '子女', '迁移', '仆役', '交友', '父母']);
-const targetClass = jiPalace ? (sixOuter.has(jiPalace) ? 'SIX_OUTER' : 'NOT_SIX_OUTER') : 'NO_JI_TARGET';
+// Canonical 六外 set defined by scripts/paipan.py:LIU_WAI (exactly six entries)
+const canonicalSixOuterSet = new Set(CANONICAL_LIU_WAI);
+// Adapter name normalization: 交友 is a chart naming alias for 仆役, not a seventh palace.
+// TARGET_PALACE preserves the original raw chart fact; only comparison uses the canonical alias.
+const classificationPalace = jiPalace === '交友' ? '仆役' : jiPalace;
+const targetClass = classificationPalace ? (canonicalSixOuterSet.has(classificationPalace) ? 'SIX_OUTER' : 'NOT_SIX_OUTER') : 'NO_JI_TARGET';
 const structuralOutput = targetClass === 'SIX_OUTER' ? 'OUTER/LOSS_INDICATOR' : targetClass;
 
 if (inputMode === 'FIXTURE' && algorithm === 'default') {
@@ -187,8 +301,9 @@ console.log(JSON.stringify({
   BIRTH_YEAR_MUTAGEN: mutagen,
   METHOD_LANE: 'XQR_REPO_DECLARED_6OUT_001',
   RULE_TRACE: ['XQR_R1_PALACE_BEFORE_STAR', 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER'],
+  RULE_EVIDENCE: XQR_RULE_EVIDENCE,
   TARGET_STAR: jiStar, TARGET_PALACE: jiPalace, BIRTH_YEAR_JI_TARGET_CLASS: targetClass,
-  STRUCTURAL_OUTPUT: structuralOutput, PROVENANCE_STATUS: 'PARTIAL', PREDICTIVE_STATUS: 'NOT_TESTED',
+  STRUCTURAL_OUTPUT: structuralOutput, PROVENANCE_STATUS: 'DIRECT_SOURCE_BOUND', PREDICTIVE_STATUS: 'NOT_TESTED',
   NONCLAIMS: [
     'NO_NATAL_EVENT_PREDICTION',
     'NO_UNIVERSAL_ZIWEI_METHOD',
