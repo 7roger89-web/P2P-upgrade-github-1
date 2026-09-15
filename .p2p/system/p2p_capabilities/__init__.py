@@ -173,7 +173,7 @@ __all__ = [
     "SecurityArtifactIdentity",
     "SecurityContractError",
     "authorize_security_execution",
-    "normalize_security_execution_class",
+    "normalize_execution_class",
     "ApkidAdapter",
     "normalize_apkid_output",
     "classify_capabilities",
