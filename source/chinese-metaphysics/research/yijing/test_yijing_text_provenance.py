@@ -26,6 +26,7 @@ from yijing_corpus import (  # noqa: E402
     SUPPORT_STATUS_OVERLAY,
     SUPPORT_STATUS_RAW,
     YijingTextEvidenceError,
+    load_raw_corpus,
 )
 from yijing_commentary import COMMENTARY_SOURCE_PATH  # noqa: E402
 from run_yijing_capability import (  # noqa: E402
@@ -288,13 +289,6 @@ check("QIAN23_COVERAGE_10", q23["TEXT_EVIDENCE_COVERAGE"] == {
     "TEXT_EVIDENCE_FIELDS": 10,
     "EXACT_COVERAGE": True,
 })
-check("TRANSFORMATION_EVIDENCE_NARROW_AND_PINNED", (
-    q23["TRANSFORMATION_EVIDENCE"]["structure_pin"] == PIN
-    and q23["TRANSFORMATION_EVIDENCE"]["structure_source_path"] == "src/liuyao/data.py"
-    and q23["TRANSFORMATION_EVIDENCE"]["rule"] == q23["TRANSFORMATION_RULE"]
-    and q23["TRANSFORMATION_EVIDENCE"]["mechanical_verification"]
-    == "VERIFIED_AGAINST_384_UPSTREAM_CAST_BOARD_SINGLE_LINE_CASES"
-))
 check("INTERPRETATION_BOUNDARIES_PRESERVED", (
     q23["TEXTUAL_CRITICAL_EDITION_STATUS"] == "NOT_ESTABLISHED"
     and q23["INTERPRETATION_STATUS"] == "NOT_PERFORMED"
@@ -360,6 +354,38 @@ expect_reject(p, "RAW_VALUE_MISMATCH_NEGATIVE_TEST(yao_text)")
 p = copy.deepcopy(tun)
 p["TUAN_TEXT"] = "tampered"
 expect_reject(p, "RAW_VALUE_MISMATCH_NEGATIVE_TEST(tuan)")
+
+# 6b. Locator role/line binding (PROVENANCE_IDENTITY != TEXT_EQUALITY_ONLY).
+# Each mutation keeps the RESOLVED value plausible by pointing the locator at a
+# different real line and copying that line's true pinned text into the packet,
+# so plain text equality would pass; only role binding can reject these.
+raw_corpus = load_raw_corpus()
+
+# A. Selected yao claims 初九 but the locator names 六二 (plausible value).
+p = copy.deepcopy(tun)
+ev(p, "SELECTED_YAO[].text", "初九")["source_locator"]["label"] = "六二"
+p["SELECTED_YAO"][0]["text"] = raw_corpus["水雷屯"]["yao"]["六二"]
+expect_reject(p, "WRONG_YAO_LINE_LOCATOR_NEGATIVE_TEST")
+
+# B. Special yao claims 用九 but the locator names 上九 (plausible value).
+p = copy.deepcopy(q6)
+ev(p, "SPECIAL_YAO_CANDIDATE.text", "用九")["source_locator"]["label"] = "上九"
+p["SPECIAL_YAO_CANDIDATE"]["text"] = raw_corpus["乾为天"]["yao"]["上九"]
+expect_reject(p, "WRONG_SPECIAL_LINE_LOCATOR_NEGATIVE_TEST")
+
+# C. Gua-ci evidence whose locator targets a yao line (plausible value).
+p = copy.deepcopy(tun)
+ev(p, "GUA_CI")["source_locator"] = {"hexagram": "水雷屯", "field": "yao", "label": "初九"}
+p["GUA_CI"] = raw_corpus["水雷屯"]["yao"]["初九"]
+expect_reject(p, "GUA_AS_YAO_LOCATOR_NEGATIVE_TEST")
+
+# D. Hexagram-level gua evidence carrying a line label.
+p = copy.deepcopy(tun)
+ev(p, "GUA_CI")["line_label"] = "初九"
+expect_reject(p, "GUA_WITH_LINE_LABEL_NEGATIVE_TEST(gua_ci)")
+p = copy.deepcopy(q23)
+ev(p, "CHANGED_GUA_CI")["line_label"] = "六三"
+expect_reject(p, "GUA_WITH_LINE_LABEL_NEGATIVE_TEST(changed_gua_ci)")
 
 # 7. Missing evidence for an emitted GUA_CI.
 p = copy.deepcopy(tun)

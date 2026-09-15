@@ -257,6 +257,40 @@ def validate_corpus_evidence(entry, emitted_text):
         raise YijingTextEvidenceError(
             f"Corpus evidence locator does not match its hexagram: {locator!r}"
         )
+    # PROVENANCE_IDENTITY != TEXT_EQUALITY_ONLY: the locator must describe the
+    # same ROLE and SAME LINE the evidence entry claims, so a wrong line fails
+    # even when another line in the same hexagram carries identical text.
+    field = entry.get("field")
+    line_label = entry.get("line_label")
+    if field in {"GUA_CI", "CHANGED_GUA_CI"}:
+        if line_label is not None:
+            raise YijingTextEvidenceError(
+                f"{field} evidence is hexagram-level and must not carry a line "
+                f"label: {line_label!r}"
+            )
+        if locator.get("field") != "gua_ci":
+            raise YijingTextEvidenceError(
+                f"{field} locator must target field=gua_ci, not "
+                f"{locator.get('field')!r}"
+            )
+        if locator.get("label") is not None:
+            raise YijingTextEvidenceError(
+                f"{field} locator must not carry a yao label: {locator.get('label')!r}"
+            )
+    elif field in {"SELECTED_YAO[].text", "SPECIAL_YAO_CANDIDATE.text"}:
+        if not line_label:
+            raise YijingTextEvidenceError(
+                f"{field} evidence requires a non-empty line label"
+            )
+        if locator.get("field") != "yao":
+            raise YijingTextEvidenceError(
+                f"{field} locator must target field=yao, not {locator.get('field')!r}"
+            )
+        if locator.get("label") != line_label:
+            raise YijingTextEvidenceError(
+                f"{field} locator label {locator.get('label')!r} does not match "
+                f"the evidence line label {line_label!r}"
+            )
     raw = _raw_corpus_cached()
 
     if not overlay_applied:

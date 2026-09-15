@@ -7,7 +7,6 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from yijing_corpus import (  # noqa: E402
-    PIN,
     UPSTREAM,
     YijingTextEvidenceError,
     gua_ci_evidence,
@@ -280,7 +279,6 @@ def main():
 
     packet = {
         "DOMAIN": "YIJING",
-        "DOMAIN": "YIJING",
         "CAPABILITY": "SOURCE_GROUNDED_GUA_YAO_TUAN_DAXIANG_XIAOXIANG_SPECIAL_YAO_CANDIDATE_AND_CHANGE_LOOKUP",
         "INPUT": {"hexagram": a.hexagram, "moving": positions},
         "NORMALIZED_HEXAGRAM": name,
@@ -298,15 +296,6 @@ def main():
         "CHANGED_TUAN_TEXT": changed_commentary["tuan"] if changed_commentary else None,
         "CHANGED_DAXIANG_TEXT": changed_commentary["daxiang"] if changed_commentary else None,
         "TEXT_EVIDENCE": text_evidence,
-        "TRANSFORMATION_EVIDENCE": {
-            "structure_repo": "Johnson-Jia/liuyao-divination",
-            "structure_pin": PIN,
-            "structure_source_path": "src/liuyao/data.py",
-            "structure_symbols": ["BAGUA", "HEXAGRAMS", "find_hexagram"],
-            "p2p_implementation": "run_yijing_capability.changed_hexagram_name",
-            "rule": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
-            "mechanical_verification": "VERIFIED_AGAINST_384_UPSTREAM_CAST_BOARD_SINGLE_LINE_CASES",
-        },
         "TRANSFORMATION_RULE": "FLIP_MOVING_LINES_BOTTOM_TO_TOP_THEN_MAP_TRIGRAMS",
         "CORPUS_SOURCE": corpus_source_metadata(),
         "COMMENTARY_SOURCE": commentary_source_metadata(),
