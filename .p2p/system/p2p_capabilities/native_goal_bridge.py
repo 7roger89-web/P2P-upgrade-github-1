@@ -1,24 +1,18 @@
 """Read-only projection from canonical P2P goal/task state to host-native /goal.
 
-This module adopts only the useful execution pattern from Supergoal: use a
-host's native goal primitive as a session driver. It does NOT create another
-goal/roadmap/state authority. Canonical P2P GoalPlan/TaskPlan + verifier
-evidence remain authoritative.
-
-Important host distinction:
-- Claude Code documents an evaluator-driven automatic turn loop for /goal.
-- Codex CLI documents a persistent goal attached to the active chat. Do not
-  infer Claude-style automatic continuation or an independent evaluator there.
-
-The projection is intentionally pure: no filesystem writes, no process launch,
-no retries, no permission changes, no provider routing.
+Adopts only Supergoal's useful host-native goal pattern. Canonical P2P
+GoalPlan/TaskPlan and independent verifier evidence remain authoritative.
+No parallel state, process, retry policy, permission change, or provider route
+is created here.
 """
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import re
+from pathlib import Path
 from typing import Any, Mapping
 
 BRIDGE_SCHEMA = "p2p-native-goal-projection/1"
@@ -28,6 +22,9 @@ CODEX_CLI = "codex_cli"
 HOST_KINDS = (CLAUDE_CODE, CODEX_CLI)
 _GOAL_MAX_CHARS = 4000
 _GIT_OID_RE = re.compile(r"^[0-9a-f]{40}$")
+_PACKAGED_WORKTREE_COMMAND = (
+    "python .p2p/system/p2p_capabilities/worktree_evidence.py summary"
+)
 
 _TASK_REPLAY_FIELDS = (
     "task_id",
@@ -47,6 +44,21 @@ _TASK_REPLAY_FIELDS = (
     "requirement_refs",
     "decision_refs",
 )
+_LIST_FIELDS = {
+    "dependencies",
+    "scope",
+    "non_scope",
+    "acceptance_requirements",
+    "required_evidence",
+    "permission_needs",
+    "required_capabilities",
+    "optional_capabilities",
+    "context_refs",
+    "output_refs",
+    "requirement_refs",
+    "decision_refs",
+}
+_REQUIRED_LIST_FIELDS = {"scope", "acceptance_requirements", "required_evidence"}
 
 _HOST_SEMANTICS: dict[str, dict[str, Any]] = {
     CLAUDE_CODE: {
@@ -100,7 +112,9 @@ def _goal_identity(goal_plan: Mapping[str, Any]) -> tuple[str, str, tuple[str, .
         raise NativeGoalBridgeError("GOAL_PLAN_MUST_BE_OBJECT")
     goal_id = _required_text(goal_plan.get("goal_id"), "goal_id", max_length=128)
     goal_version = _required_text(goal_plan.get("goal_version"), "goal_version", max_length=32)
-    task_order = _unique_text_list(goal_plan.get("plan_task_ids"), "plan_task_ids", required=True)
+    task_order = _unique_text_list(
+        goal_plan.get("plan_task_ids"), "plan_task_ids", required=True
+    )
     return goal_id, goal_version, task_order
 
 
@@ -126,15 +140,9 @@ def _task_records(task_plan: Mapping[str, Any], goal_id: str) -> dict[str, Mappi
 
 
 def build_contract_replay_manifest(
-    goal_plan: Mapping[str, Any],
-    task_plan: Mapping[str, Any],
+    goal_plan: Mapping[str, Any], task_plan: Mapping[str, Any]
 ) -> dict[str, Any]:
-    """Project original immutable task contracts for final replay.
-
-    This is a non-authoritative projection only. It preserves exact task order
-    and acceptance/evidence boundaries from canonical state so a host-native
-    /goal session can replay them without inventing a second ROADMAP/STATE tree.
-    """
+    """Project original task contracts for final replay without new authority."""
 
     goal_id, goal_version, task_order = _goal_identity(goal_plan)
     tasks = _task_records(task_plan, goal_id)
@@ -147,29 +155,28 @@ def build_contract_replay_manifest(
         immutable: dict[str, Any] = {}
         for field in _TASK_REPLAY_FIELDS:
             value = source.get(field)
-            if field in {
-                "dependencies", "scope", "non_scope", "acceptance_requirements",
-                "required_evidence", "permission_needs", "required_capabilities",
-                "optional_capabilities", "context_refs", "output_refs",
-                "requirement_refs", "decision_refs",
-            }:
-                value = list(_unique_text_list(
-                    value or [],
-                    f"{task_id}.{field}",
-                    required=field in {"scope", "acceptance_requirements", "required_evidence"},
-                ))
-            elif field in {"task_id", "goal_id", "title", "purpose"}:
+            if field in _LIST_FIELDS:
+                value = list(
+                    _unique_text_list(
+                        value or [],
+                        f"{task_id}.{field}",
+                        required=field in _REQUIRED_LIST_FIELDS,
+                    )
+                )
+            else:
                 value = _required_text(value, f"{task_id}.{field}", max_length=8192)
             immutable[field] = value
-        replay_tasks.append({
-            "task_id": task_id,
-            "contract_fingerprint": _canonical_hash(immutable),
-            "scope": immutable["scope"],
-            "non_scope": immutable["non_scope"],
-            "acceptance_requirements": immutable["acceptance_requirements"],
-            "required_evidence": immutable["required_evidence"],
-            "permission_needs": immutable["permission_needs"],
-        })
+        replay_tasks.append(
+            {
+                "task_id": task_id,
+                "contract_fingerprint": _canonical_hash(immutable),
+                "scope": immutable["scope"],
+                "non_scope": immutable["non_scope"],
+                "acceptance_requirements": immutable["acceptance_requirements"],
+                "required_evidence": immutable["required_evidence"],
+                "permission_needs": immutable["permission_needs"],
+            }
+        )
 
     manifest = {
         "schema": REPLAY_SCHEMA,
@@ -208,7 +215,7 @@ def build_native_goal_projection(
     *,
     baseline_ref: str | None = None,
 ) -> dict[str, Any]:
-    """Return one ready-to-paste native /goal command plus bounded metadata."""
+    """Return one ready-to-paste host-native `/goal` command."""
 
     if host_kind not in HOST_KINDS:
         raise NativeGoalBridgeError("HOST_KIND_UNSUPPORTED")
@@ -226,13 +233,14 @@ def build_native_goal_projection(
     if baseline is not None:
         clauses.append(
             f"Re-check the complete working tree against baseline {baseline} with "
-            "`python scripts/p2p_worktree_evidence.py summary --baseline "
-            f"{baseline}` and surface the JSON result."
+            f"`{_PACKAGED_WORKTREE_COMMAND} --baseline {baseline}` and surface the JSON result."
         )
-    clauses.extend([
-        "Completion holds only when canonical goal state is GOAL_DONE and every canonical task is DONE with independent current evidence.",
-        "On Owner Gate/BLOCKED or failures, follow P2P adaptive failure classification; do not use a fixed retry count, widen scope, grant permissions, promote, release, or deploy.",
-    ])
+    clauses.extend(
+        [
+            "Completion holds only when canonical goal state is GOAL_DONE and every canonical task is DONE with independent current evidence.",
+            "On Owner Gate/BLOCKED or failures, follow P2P adaptive failure classification; do not use a fixed retry count, widen scope, grant permissions, promote, release, or deploy.",
+        ]
+    )
     condition = " ".join(clauses)
     if len(condition) > _GOAL_MAX_CHARS:
         raise NativeGoalBridgeError("NATIVE_GOAL_CONDITION_TOO_LONG")
@@ -251,3 +259,44 @@ def build_native_goal_projection(
         "permission_mode_changed": False,
         "native_goal_evaluator_is_acceptance_authority": False,
     }
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise NativeGoalBridgeError(f"JSON_READ_FAILED:{path}:{exc}") from exc
+    if not isinstance(value, dict):
+        raise NativeGoalBridgeError(f"JSON_OBJECT_REQUIRED:{path}")
+    return value
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", default=".")
+    parser.add_argument("--host", required=True, choices=HOST_KINDS)
+    parser.add_argument("--goal-state", default=".p2p/state/autopilot-goal-state.json")
+    parser.add_argument("--task-state", default=".p2p/state/task-state.json")
+    parser.add_argument("--baseline")
+    parser.add_argument("--format", choices=("json", "command"), default="json")
+    args = parser.parse_args()
+    root = Path(args.root).expanduser().resolve()
+    try:
+        result = build_native_goal_projection(
+            args.host,
+            _read_json(root / args.goal_state),
+            _read_json(root / args.task_state),
+            baseline_ref=args.baseline,
+        )
+    except (OSError, NativeGoalBridgeError) as exc:
+        print(json.dumps({"schema": BRIDGE_SCHEMA, "status": "BLOCKED", "error": str(exc)}, ensure_ascii=False))
+        return 2
+    if args.format == "command":
+        print(result["command"])
+    else:
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
