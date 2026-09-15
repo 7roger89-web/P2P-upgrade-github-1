@@ -452,3 +452,29 @@ if _RUNTIME_PROMPT_SERIALIZATION_MARKER not in _control_tower_handoff.SUPREME_LA
             _RUNTIME_PROMPT_SERIALIZATION_CAPSULE,
         )
     )
+
+# Prompt-writing work reuses the existing Supreme Law/task-contract/destination
+# surfaces. This is a bounded authoring discipline, not a second prompt framework,
+# prompt-review service, model folklore registry, or extra planning phase.
+_PROMPT_AUTHORING_DISCIPLINE_MARKER = "PROMPT_AUTHORING_DISCIPLINE_V1"
+_PROMPT_AUTHORING_DISCIPLINE_CAPSULE = "\n".join(
+    (
+        "PROMPT_AUTHORING_DISCIPLINE_V1 — Apply this section only when the active task writes, improves, revises, or delegates a prompt. Reuse the existing P2P task contract, destination, durable state, evidence, and stop rules. This is not a second prompt framework; do not create a parallel prompt framework.",
+        "PROMPT_INPUT_MATURITY — Internally classify the supplied material as READY_PROMPT, PARTIAL_DRAFT, CLEAR_SIMPLE_REQUEST, or AMBIGUOUS_HIGH_IMPACT. READY_PROMPT: preserve known task/output/constraints and clarify only real weak points. PARTIAL_DRAFT: fill only material gaps. CLEAR_SIMPLE_REQUEST: compose immediately with the smallest reasonable assumptions. AMBIGUOUS_HIGH_IMPACT: ask only questions whose answers can materially change correctness, authority, acceptance, or destination execution.",
+        "CLARIFICATION_DISCIPLINE — Never re-ask facts already explicit in the Owner request, durable project state, or active task contract. Group genuinely blocking clarifications compactly, normally 2-4 at a time. After one useful clarification round, do not enter an interview loop for non-blocking gaps: state reasonable assumptions and proceed. Ask the Owner only when the uncertainty is genuinely outcome-, authority-, risk-, or execution-blocking.",
+        "DESTINATION_RESOLUTION — Resolve target model/executor from the Owner request and fresh durable routing state when already known; never ask again merely because a generic prompt recipe says to. If the destination is truly unknown and materially changes execution, clarify it. Otherwise use destination-neutral instructions until a concrete destination is resolved by existing P2P routing.",
+        "CAPABILITY_OVER_FOLKLORE — Adapt structure and transport to verified/current destination capabilities or authoritative instructions when that materially changes execution. Do not hard-code model-specific prompting stereotypes as law. Fresh destination capability evidence outranks stale prompting folklore.",
+        "PROPORTIONAL_PROMPT_COMPLEXITY — Prompt structure must be proportional to task complexity. A simple one-purpose task gets a concise executable prompt; a genuinely multi-part or high-risk task may use additional sections, placeholders, examples, edge-case rules, or strict output schemas only when they materially improve acceptance or recovery. No decorative roles, duplicated constraints, or checklist inflation.",
+        "NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST — Do not instruct an executor to reveal private chain-of-thought, hidden scratchpad, or step-by-step internal reasoning. Request the final answer, concise decision rationale, assumptions, evidence, calculations, verification results, or an auditable action summary when those are needed.",
+        "REVISION_CONTINUITY — When the Owner asks to change an existing prompt, revise that prompt rather than restarting requirements collection. Preserve unaffected constraints and return the complete revised prompt unless the Owner explicitly requests only a diff or fragment.",
+        "OUTPUT_SURFACE_FIDELITY — Use the output form best supported by the destination and Owner workflow. Do not require Markdown code blocks, files, XML, JSON, tables, or another wrapper by default; require a format only when the task contract, destination capability, machine parsing, or copy/paste workflow materially benefits from it.",
+        "PROMPT_AUTHORING_STOP — Stop when the prompt is executable, aligned to the Owner outcome, destination, scope, acceptance, evidence, authority boundaries, and stop condition. Do not add optional prompt theory, explanations, examples, or future-proofing after those conditions are satisfied unless explicitly requested.",
+    )
+)
+if _PROMPT_AUTHORING_DISCIPLINE_MARKER not in _control_tower_handoff.SUPREME_LAW_CAPSULE:
+    _control_tower_handoff.SUPREME_LAW_CAPSULE = "\n".join(
+        (
+            _control_tower_handoff.SUPREME_LAW_CAPSULE,
+            _PROMPT_AUTHORING_DISCIPLINE_CAPSULE,
+        )
+    )

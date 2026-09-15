@@ -35,6 +35,21 @@ If this entry point conflicts with the active canonical law, the canonical law w
 - Task prompts are deltas: destination, bounded goal, exact subject/base when needed, task-specific constraints, completion criteria, and compact return fields. Do not paste the whole P2P law into every executor prompt.
 - Apply executor-specific resource policy from the active law. In particular, do not copy Codex/Astra quota tactics onto Arena by default.
 
+## Prompt authoring discipline
+
+`PROMPT_AUTHORING_DISCIPLINE_V1` applies only when the active task writes, improves, revises, or delegates a prompt. It reuses the existing P2P task contract, destination, durable state, evidence, Owner Gates, and stop conditions; it is not a second prompt framework.
+
+- Internally classify the supplied material as `READY_PROMPT`, `PARTIAL_DRAFT`, `CLEAR_SIMPLE_REQUEST`, or `AMBIGUOUS_HIGH_IMPACT`. Do not narrate the classification unless it helps the Owner.
+- Existing ready prompt -> preserve known task/output/constraints and clarify only material weak points. Partial draft -> fill only material gaps. Clear simple request -> compose immediately with the smallest reasonable assumptions. Ambiguous/high-impact request -> ask only questions that can materially change correctness, authority, acceptance, risk, or destination execution.
+- Never re-ask facts already explicit in the Owner request, durable state, or active task contract. Group genuinely blocking questions compactly, normally 2–4 at a time. After one useful clarification round, state reasonable assumptions and proceed for non-blocking gaps instead of creating an interview loop.
+- Resolve the destination/model/executor from the Owner request and fresh durable routing state when already known. Ask only when the destination is truly unknown and materially changes execution. Do not ask again merely because a generic prompt recipe says to.
+- Adapt structure and transport to verified/current destination capabilities or authoritative instructions when that materially changes execution. Do not encode model folklore such as “Claude likes XML” as P2P law; fresh capability evidence outranks stale prompting stereotypes.
+- Keep prompt complexity proportional to task complexity. Simple task -> concise executable prompt. Multi-part/high-risk task -> add only sections, placeholders, examples, edge-case rules, or strict schemas that materially improve acceptance or recovery. No decorative roles, duplicated constraints, or checklist inflation.
+- Never request private chain-of-thought, hidden scratchpad, or step-by-step internal reasoning. Request concise rationale, assumptions, evidence, calculations, verification results, or an auditable action summary when needed.
+- When revising an existing prompt, edit that prompt rather than restarting requirements collection. Preserve unaffected constraints and return the complete revised prompt unless the Owner explicitly asks for only a diff/fragment.
+- Use the output surface that fits the destination and workflow. Markdown code blocks, files, XML, JSON, tables, or another wrapper are required only when the destination capability, task contract, machine parsing, or copy/paste workflow materially benefits.
+- Stop when the prompt is executable and aligned to outcome, destination, scope, acceptance, evidence, authority boundaries, and stop condition. Do not append optional prompt theory, examples, explanation, or future-proofing after that point unless requested.
+
 ## Native `/goal` auto-activation
 
 After valid law preflight and after durable P2P GoalPlan/TaskPlan state exists, but before the first substantive execution turn for that goal, decide native `/goal` activation automatically. Do not ask the Owner whether to use `/goal`.
