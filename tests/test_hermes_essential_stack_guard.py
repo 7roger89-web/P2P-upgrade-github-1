@@ -145,6 +145,9 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertEqual(result["opik"], "opik==2.2.59")
         self.assertFalse(result["default_installed"])
+        self.assertIn("--exclude-newer-package opik=false", text)
+        self.assertNotIn("--exclude-newer false", text)
+        self.assertNotIn("UV_EXCLUDE_NEWER=false", text)
 
     def test_post_bootstrap_requires_explicit_opik_gate(self) -> None:
         text = mod.POST_BOOTSTRAP_PATH.read_text(encoding="utf-8")
