@@ -7,6 +7,8 @@ verification but are not acceptance authority by themselves.
 
 from __future__ import annotations
 
+import argparse
+import json
 import re
 import subprocess
 from pathlib import Path
@@ -58,8 +60,6 @@ def _nul_paths(text: str) -> tuple[str, ...]:
 
 
 def _tracked_changed(root: Path, baseline: str) -> tuple[str, ...]:
-    # One revision is load-bearing: compare complete working tree vs baseline,
-    # not baseline..HEAD which would miss staged/unstaged changes.
     result = _run_git(root, ["diff", "--name-only", "-z", baseline, "--"])
     return tuple(sorted(set(_nul_paths(result.stdout))))
 
@@ -129,25 +129,17 @@ def deliverable_evidence(root: str | Path, baseline: str, path: str) -> dict[str
     ).returncode == 0
 
     if relative in untracked:
-        state = "UNTRACKED_NEW"
-        present = True
-        produced = True
+        state, present, produced = "UNTRACKED_NEW", True, True
     elif relative in tracked:
         if present_on_disk:
-            state = "CHANGED_VS_BASELINE"
-            present = True
+            state, present = "CHANGED_VS_BASELINE", True
         else:
-            state = "DELETED_VS_BASELINE"
-            present = False
+            state, present = "DELETED_VS_BASELINE", False
         produced = True
     elif present_on_disk or tracked_now:
-        state = "EXISTS_UNCHANGED"
-        present = present_on_disk
-        produced = False
+        state, present, produced = "EXISTS_UNCHANGED", present_on_disk, False
     else:
-        state = "MISSING"
-        present = False
-        produced = False
+        state, present, produced = "MISSING", False, False
 
     return {
         "schema": SCHEMA,
@@ -161,3 +153,34 @@ def deliverable_evidence(root: str | Path, baseline: str, path: str) -> dict[str
         "repository_mutated": False,
         "acceptance_authority": False,
     }
+
+
+def _print(value: Any) -> None:
+    print(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", default=".")
+    sub = parser.add_subparsers(dest="command", required=True)
+    summary = sub.add_parser("summary")
+    summary.add_argument("--baseline", required=True)
+    deliverable = sub.add_parser("deliverable")
+    deliverable.add_argument("--baseline", required=True)
+    deliverable.add_argument("--path", required=True)
+    args = parser.parse_args()
+
+    try:
+        if args.command == "summary":
+            result = complete_worktree_summary(args.root, args.baseline)
+        else:
+            result = deliverable_evidence(args.root, args.baseline, args.path)
+    except (OSError, WorktreeEvidenceError) as exc:
+        _print({"schema": SCHEMA, "status": "BLOCKED", "error": str(exc)})
+        return 2
+    _print(result)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
