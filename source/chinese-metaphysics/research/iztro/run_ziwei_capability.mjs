@@ -38,6 +38,8 @@ try { xqrHead = execFileSync('git', ['-C', xqrUpstream, 'rev-parse', 'HEAD'], { 
 catch { fail(`Cannot verify pinned xu-quanren upstream: ${xqrUpstream}`); }
 if (xqrHead !== XQR_PIN) fail(`Pinned xu-quanren upstream SHA mismatch: expected ${XQR_PIN}, got ${xqrHead}`);
 
+const CANONICAL_LIU_WAI = ['子女', '夫妻', '兄弟', '仆役', '父母', '迁移'];
+
 const XQR_RULE_EVIDENCE = [
   {
     rule_id: 'XQR_R1_PALACE_BEFORE_STAR',
@@ -59,7 +61,31 @@ const XQR_RULE_EVIDENCE = [
     source_pin: XQR_PIN,
     source_path: 'SKILL.md',
     source_anchor: '### 解读法则',
-    supported_claim: 'Classifies mutagen placement by palace inner/outer boundary where Ji entering six outer palaces indicates loss/dispersion (忌入六内主得，忌入六外主失; 六内/六外分得失聚散).',
+    interpretive_source: {
+      repo: XQR_REPO,
+      pin: XQR_PIN,
+      source_path: 'SKILL.md',
+      source_anchor: '### 解读法则',
+      supported_claim: '忌入六内主得，忌入六外主失',
+    },
+    classification_source: {
+      repo: XQR_REPO,
+      pin: XQR_PIN,
+      source_path: 'scripts/paipan.py',
+      source_anchor: 'LIU_WAI',
+      canonical_set: CANONICAL_LIU_WAI,
+      canonical_count: 6,
+    },
+    canonical_six_outer: CANONICAL_LIU_WAI,
+    canonical_count: 6,
+    alias_policy: 'ADAPTER_NAME_NORMALIZATION',
+    adapter_normalization: {
+      raw_alias: '交友',
+      canonical_target: '仆役',
+      purpose: 'CHART_NAMING_COMPATIBILITY_ONLY',
+      seventh_doctrinal_palace: false,
+    },
+    supported_claim: 'Classifies mutagen placement by palace inner/outer boundary where Ji entering six outer palaces indicates loss/dispersion (忌入六内主得，忌入六外主失; canonical LIU_WAI = 子女, 夫妻, 兄弟, 仆役, 父母, 迁移).',
   },
 ];
 
@@ -68,6 +94,20 @@ for (const ev of XQR_RULE_EVIDENCE) {
   if (!fs.existsSync(fullPath)) fail(`XQR source path missing: ${fullPath}`);
   const content = fs.readFileSync(fullPath, 'utf8');
   if (!content.includes(ev.source_anchor)) fail(`XQR source anchor missing: ${ev.source_anchor}`);
+  if (ev.interpretive_source) {
+    const p = path.join(xqrUpstream, ev.interpretive_source.source_path);
+    if (!fs.existsSync(p)) fail(`XQR interpretive source missing: ${p}`);
+    if (!fs.readFileSync(p, 'utf8').includes(ev.interpretive_source.source_anchor)) {
+      fail(`XQR interpretive anchor missing: ${ev.interpretive_source.source_anchor}`);
+    }
+  }
+  if (ev.classification_source) {
+    const p = path.join(xqrUpstream, ev.classification_source.source_path);
+    if (!fs.existsSync(p)) fail(`XQR classification source missing: ${p}`);
+    if (!fs.readFileSync(p, 'utf8').includes(ev.classification_source.source_anchor)) {
+      fail(`XQR classification anchor missing: ${ev.classification_source.source_anchor}`);
+    }
+  }
 }
 
 const builtEntry = path.join(upstream, 'lib', 'index.js');
@@ -200,8 +240,12 @@ for (const palace of palaces) {
 }
 const jiStar = mutagen['忌'] ?? null;
 const jiPalace = jiStar ? (starPalace.get(jiStar) ?? null) : null;
-const sixOuter = new Set(['兄弟', '夫妻', '子女', '迁移', '仆役', '交友', '父母']);
-const targetClass = jiPalace ? (sixOuter.has(jiPalace) ? 'SIX_OUTER' : 'NOT_SIX_OUTER') : 'NO_JI_TARGET';
+// Canonical 六外 set defined by scripts/paipan.py:LIU_WAI (exactly six entries)
+const canonicalSixOuterSet = new Set(CANONICAL_LIU_WAI);
+// Adapter name normalization: 交友 is a chart naming alias for 仆役, not a seventh palace.
+// TARGET_PALACE preserves the original raw chart fact; only comparison uses the canonical alias.
+const classificationPalace = jiPalace === '交友' ? '仆役' : jiPalace;
+const targetClass = classificationPalace ? (canonicalSixOuterSet.has(classificationPalace) ? 'SIX_OUTER' : 'NOT_SIX_OUTER') : 'NO_JI_TARGET';
 const structuralOutput = targetClass === 'SIX_OUTER' ? 'OUTER/LOSS_INDICATOR' : targetClass;
 
 if (inputMode === 'FIXTURE' && algorithm === 'default') {

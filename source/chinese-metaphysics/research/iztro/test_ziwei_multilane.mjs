@@ -31,6 +31,23 @@ for (const ev of fixture.LANES.XQR.rule_evidence) {
   if (ev.repo !== 'ZhangZangQian/xu-quanren' || ev.pin !== EXPECTED_XQR_PIN || ev.support_status !== 'DIRECT_SOURCE_SUPPORT') {
     throw new Error(`XQR rule evidence drift for ${ev.rule_id}`);
   }
+  if (ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER') {
+    if (!ev.interpretive_source || ev.interpretive_source.source_path !== 'SKILL.md') {
+      throw new Error('XQR_R2 interpretive source drift');
+    }
+    if (!ev.classification_source || ev.classification_source.source_path !== 'scripts/paipan.py') {
+      throw new Error('XQR_R2 classification source drift');
+    }
+    if (ev.canonical_count !== 6 || ev.canonical_six_outer.length !== 6) {
+      throw new Error('XQR_R2 canonical count must be exactly 6');
+    }
+    if (ev.canonical_six_outer.includes('交友')) {
+      throw new Error('XQR_R2 canonical set must not include 交友 as 7th palace');
+    }
+    if (ev.alias_policy !== 'ADAPTER_NAME_NORMALIZATION') {
+      throw new Error('XQR_R2 alias policy drift');
+    }
+  }
 }
 
 if (fixture.LANES.QINTIAN.LANE_ID !== 'QINTIAN_REPO_DECLARED_001') throw new Error('Qintian lane missing');

@@ -57,6 +57,60 @@ function validateRuleProvenance(ruleTrace, ruleEvidence, upstreamDir = xqrUpstre
     if (!ev.supported_claim || typeof ev.supported_claim !== 'string') {
       throw new Error(`Rule ${ruleId} missing supported_claim paraphrase`);
     }
+
+    // Specific dual-source verification for R2
+    if (ruleId === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER') {
+      // 1. Interpretive source
+      if (!ev.interpretive_source) {
+        throw new Error('XQR_R2 missing interpretive_source');
+      }
+      if (ev.interpretive_source.repo !== EXPECTED_XQR_REPO || ev.interpretive_source.pin !== expectedPin) {
+        throw new Error('XQR_R2 interpretive_source repo/pin mismatch');
+      }
+      const interpPath = path.join(upstreamDir, ev.interpretive_source.source_path);
+      if (!fs.existsSync(interpPath)) {
+        throw new Error(`XQR_R2 interpretive_source file not found: ${interpPath}`);
+      }
+      const interpContent = fs.readFileSync(interpPath, 'utf8');
+      if (!ev.interpretive_source.source_anchor || !interpContent.includes(ev.interpretive_source.source_anchor)) {
+        throw new Error(`XQR_R2 interpretive_source anchor not found: ${ev.interpretive_source.source_anchor}`);
+      }
+
+      // 2. Classification source
+      if (!ev.classification_source) {
+        throw new Error('XQR_R2 missing classification_source');
+      }
+      if (ev.classification_source.repo !== EXPECTED_XQR_REPO || ev.classification_source.pin !== expectedPin) {
+        throw new Error('XQR_R2 classification_source repo/pin mismatch');
+      }
+      const classPath = path.join(upstreamDir, ev.classification_source.source_path);
+      if (!fs.existsSync(classPath)) {
+        throw new Error(`XQR_R2 classification_source file not found: ${classPath}`);
+      }
+      const classContent = fs.readFileSync(classPath, 'utf8');
+      if (!ev.classification_source.source_anchor || !classContent.includes(ev.classification_source.source_anchor)) {
+        throw new Error(`XQR_R2 classification_source anchor not found: ${ev.classification_source.source_anchor}`);
+      }
+
+      // 3. Canonical conceptual count is exactly 6
+      if (!Array.isArray(ev.canonical_six_outer) || ev.canonical_six_outer.length !== 6) {
+        throw new Error(`canonical_six_outer must have exactly 6 entries, got: ${ev.canonical_six_outer?.length}`);
+      }
+      if (ev.canonical_count !== 6) {
+        throw new Error(`canonical_count must be 6, got: ${ev.canonical_count}`);
+      }
+
+      // 4. 交友 must NOT be a seventh doctrinal palace
+      if (ev.canonical_six_outer.includes('交友')) {
+        throw new Error('交友 must not be in canonical_six_outer (it is an adapter compatibility alias only)');
+      }
+      if (ev.alias_policy !== 'ADAPTER_NAME_NORMALIZATION') {
+        throw new Error(`Invalid alias_policy: ${ev.alias_policy}`);
+      }
+      if (ev.adapter_normalization?.seventh_doctrinal_palace !== false) {
+        throw new Error('seventh_doctrinal_palace must be false');
+      }
+    }
   }
   return true;
 }
@@ -138,6 +192,77 @@ validateRuleProvenance(fixture.RULE_TRACE, fixture.RULE_EVIDENCE);
     failed = true;
   }
   if (!failed) throw new Error('Negative proof failed: unsupported status was silently accepted');
+}
+
+// Mutation F1: R2 classification source with wrong pin
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  r2.classification_source.pin = 'badpin0000000000000000000000000000000000';
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: classification_source wrong pin was silently accepted');
+}
+
+// Mutation F2: R2 classification source with wrong path
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  r2.classification_source.source_path = 'scripts/nonexistent_paipan.py';
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: classification_source wrong path was silently accepted');
+}
+
+// Mutation F3: R2 classification source with wrong anchor
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  r2.classification_source.source_anchor = 'NONEXISTENT_CONSTANT';
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: classification_source wrong anchor was silently accepted');
+}
+
+// Mutation F4: R2 missing classification source
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  delete r2.classification_source;
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: missing classification_source was silently accepted');
+}
+
+// Mutation F5: R2 attempting to add a 7th doctrinal palace to canonical set
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  r2.canonical_six_outer = [...r2.canonical_six_outer, '交友'];
+  r2.canonical_count = 7;
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: 7th doctrinal palace was silently accepted');
 }
 
 // 3. Custom input test
