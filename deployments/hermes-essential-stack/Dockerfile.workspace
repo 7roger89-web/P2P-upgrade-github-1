@@ -1,0 +1,60 @@
+# syntax=docker/dockerfile:1.6
+# P2P wrapper for Hermes Workspace v2.3.0.
+#
+# Upstream's v2.3.0 Dockerfile calls an unpinned `pnpm install`. In 2026 that
+# resolves to pnpm 12, whose stricter build-script policy rejects this older
+# lockfile's Electron/esbuild dependencies. Keep upstream application source
+# untouched; pin the build toolchain here and verify the source commit before
+# installing dependencies.
+
+ARG NODE_IMAGE=node:22-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5
+
+FROM ${NODE_IMAGE} AS build
+ARG WORKSPACE_COMMIT=15fa9cd706f5c04e4db288fb958e21d10fc776da
+ENV ELECTRON_SKIP_BINARY_DOWNLOAD=1 \
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+RUN corepack enable \
+    && corepack prepare pnpm@9.15.9 --activate \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+RUN git init . \
+    && git remote add origin https://github.com/outsourc-e/hermes-workspace.git \
+    && git fetch --depth=1 origin "${WORKSPACE_COMMIT}" \
+    && git checkout --detach FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "${WORKSPACE_COMMIT}" \
+    && rm -rf .git
+
+RUN pnpm --version | grep -Fx '9.15.9' \
+    && pnpm install --frozen-lockfile \
+    && pnpm build
+
+FROM ${NODE_IMAGE}
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl tini python3 \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r workspace \
+    && useradd -r -g workspace -u 10010 workspace
+
+WORKDIR /app
+COPY --from=build --chown=workspace:workspace /app/dist ./dist
+COPY --from=build --chown=workspace:workspace /app/node_modules ./node_modules
+COPY --from=build --chown=workspace:workspace /app/package.json ./package.json
+COPY --from=build --chown=workspace:workspace /app/server-entry.js ./server-entry.js
+COPY --from=build --chown=workspace:workspace /app/skills ./skills
+
+USER workspace
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOST=0.0.0.0 \
+    HERMES_API_URL=http://hermes-agent:8642
+
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:3000/ >/dev/null || exit 1
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["node", "--max-old-space-size=2048", "server-entry.js"]

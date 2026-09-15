@@ -4,12 +4,16 @@ This package runs Hermes Agent core on DockHosting Free with persistent state an
 
 ## Build source
 
-- Base image: `nousresearch/hermes-agent:latest`
+- Base image: `nousresearch/hermes-agent:v2026.9.14` (Hermes Agent v0.21.3)
 - Dockerfile path: `deployments/hermes-dockhosting/Dockerfile`
 - Persistent volume mount: `/opt/data`
 - Health check path: `/health`
 - Runtime target: 1 GB RAM Free tier
 - Keep Hermes Dashboard and local Chromium/browser automation off on this tier.
+
+The mutable `:latest` tag is intentionally not used. Runtime compatibility for the pinned image is verified by `.github/workflows/hermes-runtime-compatibility.yml`.
+
+For the richer local-only stack that adds Hermes Workspace, bounded Repomix/TokScale tooling, and opt-in Hindsight, use `deployments/hermes-essential-stack/` instead of widening this 1 GB hosted deployment.
 
 ## Hermes patches
 
@@ -109,5 +113,6 @@ Deferred until a host with at least 2 GB RAM is available:
 
 - local Playwright/Chromium
 - Hermes Dashboard
+- Hermes Workspace
 - heavy sidecars
 - generalized observability

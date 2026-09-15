@@ -1,0 +1,139 @@
+name: Hermes essential stack
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - deployments/hermes-essential-stack/**
+      - deployments/hermes-dockhosting/README.md
+      - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
+      - scripts/hermes_essential_stack_guard.py
+      - tests/test_hermes_essential_stack_guard.py
+      - .github/workflows/hermes-essential-stack.yml
+  push:
+    branches: [main]
+    paths:
+      - deployments/hermes-essential-stack/**
+      - deployments/hermes-dockhosting/README.md
+      - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
+      - scripts/hermes_essential_stack_guard.py
+      - tests/test_hermes_essential_stack_guard.py
+      - .github/workflows/hermes-essential-stack.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  essential-stack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Run deterministic stack tests
+        run: python3 -m unittest -v tests.test_hermes_essential_stack_guard
+
+      - name: Generate throwaway local secrets and validate contract
+        run: |
+          python3 scripts/hermes_essential_stack_guard.py init
+          python3 scripts/hermes_essential_stack_guard.py validate
+
+      - name: Render compose model
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            config --format json > "$RUNNER_TEMP/hermes-essential-stack.rendered.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          model = json.loads(Path(os.environ['RUNNER_TEMP'], 'hermes-essential-stack.rendered.json').read_text())
+          expected = {
+              'hermes-workspace': {(3000, '127.0.0.1')},
+              'hermes-agent': {(8642, '127.0.0.1'), (9119, '127.0.0.1')},
+          }
+          for service, wanted in expected.items():
+              observed = {
+                  (int(port['published']), port.get('host_ip'))
+                  for port in model['services'][service].get('ports', [])
+              }
+              assert wanted <= observed, (service, observed)
+          rendered = json.dumps(model)
+          assert ':latest' not in rendered
+          assert 'ghcr.io/outsourc-e/hermes-workspace' not in rendered
+          assert '15fa9cd706f5c04e4db288fb958e21d10fc776da' in rendered
+          assert 'builderz-labs/mission-control' not in rendered
+          print('COMPOSE_RENDERED_SECURITY=PASS')
+          PY
+
+      - name: Build pinned Workspace release source
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            build hermes-workspace
+          docker image inspect p2p-hermes-workspace:v2.3.0-15fa9cd --format '{{.Id}}'
+
+      - name: Smoke pinned Repomix package
+        run: |
+          docker run --rm node:22-bookworm-slim \
+            npx -y repomix@1.18.0 --version | tee "$RUNNER_TEMP/repomix-version.txt"
+          grep -F '1.18.0' "$RUNNER_TEMP/repomix-version.txt"
+
+      - name: Smoke pinned TokScale package
+        run: |
+          docker run --rm node:22-bookworm-slim \
+            npx -y tokscale@4.16.0 --version | tee "$RUNNER_TEMP/tokscale-version.txt"
+          grep -F '4.16.0' "$RUNNER_TEMP/tokscale-version.txt"
+
+      - name: Build the real P2P Hermes service
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            build hermes-agent
+
+      - name: Start local-only Hermes and Workspace smoke stack
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            up -d hermes-agent hermes-workspace
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8642/health >/dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:8642/health
+          for i in $(seq 1 30); do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/ || true)"
+            if [ "$code" = "200" ] || [ "$code" = "302" ] || [ "$code" = "303" ]; then break; fi
+            sleep 2
+          done
+          code="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/)"
+          test "$code" = "200" -o "$code" = "302" -o "$code" = "303"
+          echo "WORKSPACE_HTTP_STATUS=$code"
+
+      - name: Show service state on failure
+        if: failure()
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            ps || true
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            logs --no-color --tail=200 || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            down -v --remove-orphans || true
