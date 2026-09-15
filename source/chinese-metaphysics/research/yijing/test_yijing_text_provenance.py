@@ -27,6 +27,7 @@ from yijing_corpus import (  # noqa: E402
     SUPPORT_STATUS_RAW,
     YijingTextEvidenceError,
     load_raw_corpus,
+    validate_corpus_evidence,
 )
 from yijing_commentary import COMMENTARY_SOURCE_PATH  # noqa: E402
 from run_yijing_capability import (  # noqa: E402
@@ -386,6 +387,24 @@ expect_reject(p, "GUA_WITH_LINE_LABEL_NEGATIVE_TEST(gua_ci)")
 p = copy.deepcopy(q23)
 ev(p, "CHANGED_GUA_CI")["line_label"] = "六三"
 expect_reject(p, "GUA_WITH_LINE_LABEL_NEGATIVE_TEST(changed_gua_ci)")
+
+# D-deep. The packet coverage seam rejects the mutations above first; prove the
+# corpus-level role binding itself fires by calling the same production corpus
+# validator the runtime dispatches to, on the mutated entries directly.
+for deep_hex, deep_field, deep_text in [
+    ("水雷屯", "GUA_CI", tun["GUA_CI"]),
+    ("地水师", "CHANGED_GUA_CI", q23["CHANGED_GUA_CI"]),
+]:
+    deep_entry = copy.deepcopy(ev(tun if deep_field == "GUA_CI" else q23, deep_field))
+    deep_entry["line_label"] = "初九"
+    try:
+        validate_corpus_evidence(deep_entry, deep_text)
+    except YijingTextEvidenceError:
+        negative.append(f"GUA_WITH_LINE_LABEL_CORPUS_SEAM({deep_field})")
+    else:
+        raise AssertionError(
+            f"corpus role binding accepted a line-labeled {deep_field} entry"
+        )
 
 # 7. Missing evidence for an emitted GUA_CI.
 p = copy.deepcopy(tun)
