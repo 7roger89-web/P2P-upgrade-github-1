@@ -4,6 +4,7 @@ import importlib.util
 import os
 import sys
 import unittest
+from datetime import timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -111,8 +112,7 @@ class TestP2POpikObserver(unittest.TestCase):
             "tool_result": "SECRET_TOOL_RESULT_DEF",
             "assistant": "SECRET_ASSISTANT_GHI",
         }
-        env = self._enabled_env(capture="NO")
-        with patch.dict(os.environ, env, clear=False):
+        with patch.dict(os.environ, self._enabled_env(capture="NO"), clear=False):
             mod._pre_llm_call(
                 session_id="session-raw-private",
                 turn_id="turn-raw-private",
@@ -157,11 +157,8 @@ class TestP2POpikObserver(unittest.TestCase):
                 duration_ms=12,
                 status="ok",
             )
-
-            # No Opik writes occur on model/tool hot-path observer callbacks.
             self.assertEqual(fake.traces, [])
             self.assertEqual(fake.spans, [])
-
             mod._post_llm_call(
                 session_id="session-raw-private",
                 turn_id="turn-raw-private",
@@ -183,16 +180,75 @@ class TestP2POpikObserver(unittest.TestCase):
         )
         self.assertFalse(fake.traces[0]["metadata"]["content_capture"])
 
+    def test_api_hook_uses_hermes_epoch_timestamps_and_seconds_duration(self) -> None:
+        fake = FakeClient()
+        mod._client = fake
+        started = 1_756_000_000.0
+        ended = 1_756_000_001.234
+        with patch.dict(os.environ, self._enabled_env(), clear=False):
+            mod._pre_llm_call(session_id="s-api", turn_id="t-api")
+            mod._pre_api_request(
+                session_id="s-api",
+                turn_id="t-api",
+                api_request_id="api-1",
+                started_at=started,
+                api_call_count=1,
+                model="m",
+                provider="p",
+            )
+            mod._post_api_request(
+                session_id="s-api",
+                turn_id="t-api",
+                api_request_id="api-1",
+                started_at=started,
+                ended_at=ended,
+                api_duration=1.234,
+                finish_reason="stop",
+                usage={"input_tokens": 2, "output_tokens": 3},
+            )
+            mod._post_llm_call(session_id="s-api", turn_id="t-api")
+
+        span = next(item for item in fake.spans if item["type"] == "llm")
+        self.assertEqual(span["start_time"].timestamp(), started)
+        self.assertAlmostEqual(span["end_time"].timestamp(), ended, places=3)
+        self.assertEqual(span["start_time"].tzinfo, timezone.utc)
+        self.assertEqual(span["metadata"]["api_duration_seconds"], 1.234)
+
+    def test_subagent_stop_uses_current_hermes_field_names(self) -> None:
+        fake = FakeClient()
+        mod._client = fake
+        with patch.dict(os.environ, self._enabled_env(capture="YES"), clear=False):
+            mod._pre_llm_call(session_id="parent", turn_id="turn")
+            mod._subagent_start(
+                parent_session_id="parent",
+                parent_turn_id="turn",
+                child_session_id="child-session",
+                child_subagent_id="child-id",
+                child_role="leaf",
+                child_goal="PRIVATE_GOAL",
+            )
+            mod._subagent_stop(
+                parent_session_id="parent",
+                parent_turn_id="turn",
+                child_session_id="child-session",
+                child_role="leaf",
+                child_summary="PRIVATE_SUMMARY",
+                child_status="completed",
+                duration_ms=1234,
+            )
+            mod._post_llm_call(session_id="parent", turn_id="turn")
+
+        subagent = next(item for item in fake.spans if item["type"] == "general")
+        self.assertEqual(subagent["metadata"]["status"], "completed")
+        self.assertEqual(subagent["metadata"]["duration_ms"], 1234)
+        self.assertIn("PRIVATE_SUMMARY", subagent["output"]["summary"])
+
     def test_content_capture_is_explicit_and_bounded(self) -> None:
         fake = FakeClient()
         mod._client = fake
         long_prompt = "x" * (mod._MAX_CONTENT_CHARS + 100)
         with patch.dict(os.environ, self._enabled_env(capture="YES"), clear=False):
-            mod._pre_llm_call(
-                session_id="s2",
-                turn_id="t2",
-                user_message=long_prompt,
-            )
+            mod._pre_llm_call(session_id="s2", turn_id="t2", user_message=long_prompt)
             mod._post_llm_call(
                 session_id="s2",
                 turn_id="t2",
@@ -211,6 +267,7 @@ class TestP2POpikObserver(unittest.TestCase):
             mod._on_session_end(
                 session_id="s3",
                 turn_id="t3",
+                completed=False,
                 failed=True,
                 turn_exit_reason="provider_error",
             )
