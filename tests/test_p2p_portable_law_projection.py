@@ -61,6 +61,10 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "TASK_BRANCH != LAW_AUTHORITY" in agents
     assert "### Native long-running goal bridge" in agents
     assert ".p2p/system/p2p_capabilities/native_goal_bridge.py" in agents
+    assert ".p2p/system/p2p_capabilities/native_goal_activation.py" in agents
+    assert "ACTIVATE_NATIVE_GOAL" in agents
+    assert "NORMAL_P2P_PATH" in agents
+    assert "Goal status must be `APPROVED` or `IN_PROGRESS`" in agents
     assert ".p2p/system/p2p_capabilities/worktree_evidence.py" in agents
     assert "committed-after-baseline" in agents
     assert "executor self-report are never P2P acceptance authority" in agents
