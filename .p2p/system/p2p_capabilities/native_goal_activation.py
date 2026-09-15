@@ -76,6 +76,13 @@ def detect_host_from_environment(environ: Mapping[str, str] | None = None) -> st
     return None
 
 
+def _validated_replay(goal_plan: Mapping[str, Any], task_plan: Mapping[str, Any]) -> dict[str, Any]:
+    try:
+        return build_contract_replay_manifest(goal_plan, task_plan)
+    except NativeGoalBridgeError as exc:
+        raise NativeGoalActivationError(str(exc)) from exc
+
+
 def decide_native_goal_activation(
     host_kind: str,
     goal_state: Mapping[str, Any],
@@ -93,7 +100,7 @@ def decide_native_goal_activation(
 
     # Replay validation is deliberately first: malformed durable state must not
     # be converted into a benign SKIP that hides a control-plane problem.
-    replay = build_contract_replay_manifest(goal_plan, task_plan)
+    replay = _validated_replay(goal_plan, task_plan)
 
     goal_status = str(goal_plan.get("status", "")).strip().upper()
     plan_lifecycle = str(task_plan.get("plan_lifecycle", "ACTIVE")).strip().upper()
@@ -130,12 +137,15 @@ def decide_native_goal_activation(
     if unfinished_count == 0:
         return {**common, "decision": NORMAL, "reason": "ALL_TASKS_TERMINAL"}
 
-    projection = build_native_goal_projection(
-        host_kind,
-        goal_plan,
-        task_plan,
-        baseline_ref=baseline_ref,
-    )
+    try:
+        projection = build_native_goal_projection(
+            host_kind,
+            goal_plan,
+            task_plan,
+            baseline_ref=baseline_ref,
+        )
+    except NativeGoalBridgeError as exc:
+        raise NativeGoalActivationError(str(exc)) from exc
     return {
         **common,
         "decision": ACTIVATE,
@@ -188,7 +198,7 @@ def main() -> int:
             _read_json(root / args.task_state),
             baseline_ref=args.baseline,
         )
-    except (OSError, NativeGoalActivationError, NativeGoalBridgeError) as exc:
+    except (OSError, NativeGoalActivationError) as exc:
         print(json.dumps({
             "schema": ACTIVATION_SCHEMA,
             "status": "BLOCKED",
