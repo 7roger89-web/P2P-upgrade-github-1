@@ -18,6 +18,8 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         result = mod.validate_env(text, allow_placeholders=True)
         self.assertEqual(result["status"], "PASS")
         self.assertFalse(result["geniex_enabled"])
+        self.assertFalse(result["opik_enabled"])
+        self.assertFalse(result["opik_capture_content"])
         with self.assertRaises(mod.StackContractError):
             mod.validate_env(text, allow_placeholders=False)
 
@@ -74,6 +76,45 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         enabled = enabled_without_key.replace("HINDSIGHT_API_KEY=", "HINDSIGHT_API_KEY=test-key")
         self.assertTrue(mod.validate_env(enabled)["hindsight_enabled"])
 
+    def test_opik_requires_explicit_gate_and_cloud_identity(self) -> None:
+        rendered = mod.render_env(mod.ENV_EXAMPLE_PATH.read_text(encoding="utf-8"))
+        enabled = rendered.replace("P2P_ENABLE_OPIK=NO", "P2P_ENABLE_OPIK=YES")
+        with self.assertRaisesRegex(mod.StackContractError, "ENV_OPIK_KEY_REQUIRED_WHEN_ENABLED"):
+            mod.validate_env(enabled)
+
+        with_key = enabled.replace("OPIK_API_KEY=", "OPIK_API_KEY=test-opik-key")
+        with self.assertRaisesRegex(mod.StackContractError, "ENV_OPIK_WORKSPACE_REQUIRED_WHEN_ENABLED"):
+            mod.validate_env(with_key)
+
+        ready = with_key.replace("OPIK_WORKSPACE=", "OPIK_WORKSPACE=test-workspace")
+        result = mod.validate_env(ready)
+        self.assertTrue(result["opik_enabled"])
+        self.assertFalse(result["opik_capture_content"])
+
+    def test_opik_content_capture_requires_enabled_observer(self) -> None:
+        rendered = mod.render_env(mod.ENV_EXAMPLE_PATH.read_text(encoding="utf-8"))
+        bad = rendered.replace("P2P_OPIK_CAPTURE_CONTENT=NO", "P2P_OPIK_CAPTURE_CONTENT=YES")
+        with self.assertRaisesRegex(mod.StackContractError, "ENV_OPIK_CONTENT_CAPTURE_REQUIRES_ENABLE"):
+            mod.validate_env(bad)
+
+    def test_opik_pilot_rejects_custom_endpoint_and_analytics(self) -> None:
+        rendered = mod.render_env(mod.ENV_EXAMPLE_PATH.read_text(encoding="utf-8"))
+        ready = (
+            rendered.replace("P2P_ENABLE_OPIK=NO", "P2P_ENABLE_OPIK=YES")
+            .replace("OPIK_API_KEY=", "OPIK_API_KEY=test-opik-key")
+            .replace("OPIK_WORKSPACE=", "OPIK_WORKSPACE=test-workspace")
+        )
+        custom = ready.replace(
+            "OPIK_URL_OVERRIDE=https://www.comet.com/opik/api",
+            "OPIK_URL_OVERRIDE=https://example.com/opik/api",
+        )
+        with self.assertRaisesRegex(mod.StackContractError, "ENV_OPIK_PILOT_URL_MUST_BE_COMET_CLOUD"):
+            mod.validate_env(custom)
+
+        analytics = ready.replace("OPIK_ANALYTICS_ENABLE=false", "OPIK_ANALYTICS_ENABLE=true")
+        with self.assertRaisesRegex(mod.StackContractError, "ENV_OPIK_ANALYTICS_MUST_BE_DISABLED"):
+            mod.validate_env(analytics)
+
     def test_init_refuses_to_overwrite_by_default(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / ".env"
@@ -87,6 +128,8 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         result = mod.validate_compose(text)
         self.assertEqual(result["status"], "PASS")
         self.assertTrue(result["geniex_named_provider_only"])
+        self.assertTrue(result["opik_cloud_only"])
+        self.assertFalse(result["opik_second_control_plane"])
         self.assertFalse(result["mission_control_authority"])
 
     def test_workspace_wrapper_is_exact_commit_and_pnpm_pinned(self) -> None:
@@ -95,6 +138,29 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertEqual(result["commit"], mod.WORKSPACE_COMMIT)
         self.assertEqual(result["pnpm"], mod.WORKSPACE_PNPM)
+
+    def test_runtime_opik_dependency_is_exact_default_off_and_reusable(self) -> None:
+        text = mod.RUNTIME_DOCKERFILE_PATH.read_text(encoding="utf-8")
+        result = mod.validate_runtime_dockerfile(text)
+        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(result["opik"], "opik==2.2.59")
+        self.assertFalse(result["default_installed"])
+        self.assertIn("--exclude-newer-package opik=false", text)
+        self.assertNotIn("--exclude-newer false", text)
+        self.assertNotIn("UV_EXCLUDE_NEWER=false", text)
+        self.assertIn(
+            "deployments/hermes-essential-stack/plugins/p2p-opik-observer/ /opt/hermes/plugins/p2p-opik-observer/",
+            text,
+        )
+
+    def test_post_bootstrap_requires_explicit_opik_gate_and_sdk(self) -> None:
+        text = mod.POST_BOOTSTRAP_PATH.read_text(encoding="utf-8")
+        result = mod.validate_post_bootstrap(text)
+        self.assertEqual(result["status"], "PASS")
+        self.assertTrue(result["opik_explicit_gate"])
+        self.assertIn("/opt/hermes/plugins/p2p-opik-observer/plugin.yaml", text)
+        self.assertIn("/opt/data/plugins/p2p-opik-observer/plugin.yaml", text)
+        self.assertIn("OPIK_SDK_MISSING_OR_WRONG_VERSION", text)
 
     def test_compose_rejects_public_workspace_bind(self) -> None:
         text = mod.COMPOSE_PATH.read_text(encoding="utf-8")
@@ -115,6 +181,12 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
             '/opt/hermes/.venv/bin/hermes config set model.provider custom;',
         )
         with self.assertRaises(mod.StackContractError):
+            mod.validate_compose(bad)
+
+    def test_compose_rejects_full_opik_self_host_infrastructure(self) -> None:
+        text = mod.COMPOSE_PATH.read_text(encoding="utf-8")
+        bad = text + "\nservices:\n  clickhouse:\n    image: clickhouse/clickhouse-server\n"
+        with self.assertRaisesRegex(mod.StackContractError, "COMPOSE_FORBIDDEN_FRAGMENT:clickhouse:"):
             mod.validate_compose(bad)
 
 
