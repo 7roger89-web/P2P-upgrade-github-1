@@ -4,20 +4,26 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - Dockerfile
       - deployments/hermes-essential-stack/**
       - deployments/hermes-dockhosting/README.md
       - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
+      - deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh
       - scripts/hermes_essential_stack_guard.py
       - tests/test_hermes_essential_stack_guard.py
+      - tests/test_p2p_opik_observer.py
       - .github/workflows/hermes-essential-stack.yml
   push:
     branches: [main]
     paths:
+      - Dockerfile
       - deployments/hermes-essential-stack/**
       - deployments/hermes-dockhosting/README.md
       - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
+      - deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh
       - scripts/hermes_essential_stack_guard.py
       - tests/test_hermes_essential_stack_guard.py
+      - tests/test_p2p_opik_observer.py
       - .github/workflows/hermes-essential-stack.yml
   workflow_dispatch:
 
@@ -35,7 +41,10 @@ jobs:
           persist-credentials: false
 
       - name: Run deterministic stack tests
-        run: python3 -m unittest -v tests.test_hermes_essential_stack_guard
+        run: >-
+          python3 -m unittest -v
+          tests.test_hermes_essential_stack_guard
+          tests.test_p2p_opik_observer
 
       - name: Generate throwaway local secrets and validate contract
         run: |
@@ -68,6 +77,10 @@ jobs:
           assert 'ghcr.io/outsourc-e/hermes-workspace' not in rendered
           assert '15fa9cd706f5c04e4db288fb958e21d10fc776da' in rendered
           assert 'builderz-labs/mission-control' not in rendered
+          assert 'clickhouse' not in model['services']
+          assert 'mysql' not in model['services']
+          assert 'redis' not in model['services']
+          assert 'minio' not in model['services']
           print('COMPOSE_RENDERED_SECURITY=PASS')
           PY
 
@@ -97,6 +110,16 @@ jobs:
             --env-file deployments/hermes-essential-stack/.env \
             -f deployments/hermes-essential-stack/docker-compose.yml \
             build hermes-agent
+
+      - name: Smoke pinned Opik SDK in the real Hermes image
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            run --rm --no-deps \
+            --entrypoint /opt/hermes/.venv/bin/python \
+            hermes-agent \
+            -c 'import importlib.metadata, opik; v=importlib.metadata.version("opik"); assert v == "2.2.59", v; print("OPIK_SDK_VERSION=2.2.59")'
 
       - name: Start local-only Hermes and Workspace smoke stack
         run: |
