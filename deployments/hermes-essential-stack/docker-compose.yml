@@ -5,6 +5,8 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
+      args:
+        P2P_INSTALL_OPIK: "1"
     command: ["gateway", "run"]
     env_file:
       - .env
@@ -24,9 +26,18 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       HINDSIGHT_API_KEY: ${HINDSIGHT_API_KEY:-}
+      P2P_ENABLE_OPIK: ${P2P_ENABLE_OPIK:-NO}
+      P2P_OPIK_CAPTURE_CONTENT: ${P2P_OPIK_CAPTURE_CONTENT:-NO}
+      OPIK_URL_OVERRIDE: ${OPIK_URL_OVERRIDE:-https://www.comet.com/opik/api}
+      OPIK_API_KEY: ${OPIK_API_KEY:-}
+      OPIK_WORKSPACE: ${OPIK_WORKSPACE:-}
+      OPIK_PROJECT_NAME: ${OPIK_PROJECT_NAME:-p2p-hermes}
+      OPIK_ENVIRONMENT: ${OPIK_ENVIRONMENT:-development}
+      OPIK_ANALYTICS_ENABLE: "false"
     volumes:
       - hermes-data:/opt/data
       - ../hermes-dockhosting/hindsight-p2p-safe.example.json:/opt/p2p/hindsight-safe.json:ro
+      - ./plugins/p2p-opik-observer:/opt/data/plugins/p2p-opik-observer:ro
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8642/health >/dev/null || exit 1"]
       interval: 10s
