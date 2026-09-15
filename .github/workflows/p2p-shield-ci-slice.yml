@@ -54,7 +54,7 @@ jobs:
         run: python3 -m shield.zizmor_acquire --provider-dir "$RUNNER_TEMP/zizmor" --summary-file "$GITHUB_STEP_SUMMARY"
 
       - name: Run focused Shield contract tests
-        run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice tests.test_p2p_shield_applicability
+        run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice tests.test_p2p_shield_applicability tests.test_p2p_prompt_authoring_discipline
 
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
