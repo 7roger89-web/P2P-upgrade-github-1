@@ -26,7 +26,7 @@ class BaseSlice(unittest.TestCase):
         subprocess.run(['git', '-C', str(self.target), *args], check=True, capture_output=True)
 
     def records(self):
-        return [dict(schema='p2p-shield-evidence/1', control_id=c, control_version='0.1.0',
+        return [dict(schema='p2p-shield-evidence/1', control_id=c, control_version=rule['control_version'],
                      scope=s, target=str(self.target), target_ref=self.target_ref, timestamp='2026-09-12T00:00:00Z',
                      status='PASS', findings_count=0, coverage=['assessed'], limitations=[],
                      provider='provider', provider_version='1', provider_source='upstream@tag',

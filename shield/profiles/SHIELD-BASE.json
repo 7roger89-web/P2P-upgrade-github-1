@@ -1,6 +1,6 @@
 {
   "profile_id": "SHIELD-BASE",
-  "profile_version": "0.2.1",
+  "profile_version": "0.3.0",
   "required_controls": {
     "SHIELD-SECRET-01": {
       "control_version": "0.1.0",
@@ -16,10 +16,11 @@
       ]
     },
     "SHIELD-CI-01": {
-      "control_version": "0.1.0",
+      "control_version": "0.2.0",
       "required_scopes": [
         "github_actions_workflow_scan"
-      ]
+      ],
+      "allow_not_applicable_by_target_shape": true
     }
   }
 }

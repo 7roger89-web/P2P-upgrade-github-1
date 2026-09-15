@@ -12,7 +12,7 @@ from shield.runner import resolve_target_ref
 
 
 CONTROL_ID = "SHIELD-CI-01"
-CONTROL_VERSION = "0.1.0"
+CONTROL_VERSION = "0.2.0"
 PROVIDER = "Zizmor"
 VERSION = "1.29.0"
 SCOPE = "github_actions_workflow_scan"
@@ -50,7 +50,6 @@ def _normalize_findings(raw_findings):
         determinations = finding.get("determinations", {}) if isinstance(finding.get("determinations"), dict) else {}
         severity = determinations.get("severity", "")
         confidence = determinations.get("confidence", "")
-        # Find primary location or first
         locations = finding.get("locations", []) if isinstance(finding.get("locations"), list) else []
         primary = None
         for loc in locations:
@@ -67,7 +66,6 @@ def _normalize_findings(raw_findings):
         col = None
         if primary:
             try:
-                # symbolic.key.Local.verbatim_path
                 sym_key = primary.get("symbolic", {}).get("key", {})
                 if isinstance(sym_key, dict) and "Local" in sym_key:
                     file_path = sym_key["Local"].get("verbatim_path", "")
@@ -96,7 +94,6 @@ def _normalize_findings(raw_findings):
             entry["line"] = row
         if col is not None:
             entry["column"] = col
-        # url for reference
         url = finding.get("url")
         if isinstance(url, str) and url:
             entry["url"] = url
@@ -125,110 +122,137 @@ def assess(target, executable, reference):
         limitations=[],
         reason="NOT_ASSESSED",
         artifact_or_reference=reference,
+        applicability={
+            "basis": "NOT_ESTABLISHED",
+            "path": ".github/workflows",
+            "workflow_count": None,
+        },
     )
     try:
         m = zizmor_acquire.mapping()
         control = _load_control()
-        # limitations from mapping
         e["limitations"] = list(m.get("limitations", []))
-        # also record known_exclusions as part of limitations for transparency
-        # but keep as separate field? For now append
-        # target_ref
         e["target_ref"] = resolve_target_ref(target)
         if not re.fullmatch(r"[0-9a-f]{40,64}", e["target_ref"]):
             raise ValueError("TARGET_REF_UNRESOLVED")
-        # Verify executable version (also checks pin)
-        try:
-            observed = zizmor_acquire.verify_executable(executable)
-        except Exception as exc:
-            # If verify_executable fails due to missing receipt but version still checkable, try direct version
-            # zizmor_acquire.version already raises appropriate error
-            raise
+
+        # Establish applicability from the immutable target shape before provider execution.
+        github_root = target / ".github"
+        workflows_root = github_root / "workflows"
+        if github_root.is_symlink():
+            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:github_root_symlink")
+        if workflows_root.exists() and (workflows_root.is_symlink() or not workflows_root.is_dir()
+                or not workflows_root.resolve().is_relative_to(target)):
+            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflows_root_not_regular_directory")
+        workflow_files = []
+        if workflows_root.is_dir():
+            for pattern in ("*.yml", "*.yaml"):
+                for candidate in workflows_root.glob(pattern):
+                    if candidate.is_symlink() or not candidate.is_file():
+                        raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflow_not_regular_file")
+                    workflow_files.append(candidate)
+        if not workflow_files:
+            e.update(
+                status="NOT_APPLICABLE",
+                findings_count=0,
+                findings=[],
+                coverage=["NOT_APPLICABLE_BY_TARGET_SHAPE"],
+                reason="TARGET_SHAPE_HAS_NO_GITHUB_ACTIONS_WORKFLOWS",
+                applicability={
+                    "basis": "DETERMINISTIC_EMPTY_WORKFLOW_INVENTORY",
+                    "path": ".github/workflows",
+                    "workflow_count": 0,
+                },
+            )
+            return e
+        e["applicability"] = {
+            "basis": "WORKFLOW_INVENTORY_PRESENT",
+            "path": ".github/workflows",
+            "workflow_count": len(workflow_files),
+        }
+
+        observed = zizmor_acquire.verify_executable(executable)
         e["provider_version_observed"] = observed
-        # Build invocation from mapping
         invocation = m.get("invocation", {})
         detect_argv_templates = invocation.get("detect_argv")
         if not isinstance(detect_argv_templates, list) or not detect_argv_templates:
             raise ValueError("PROVIDER_INVOCATION_MISSING")
-        # Substitute placeholders
         argv = []
         for tmpl in detect_argv_templates:
             token = tmpl.replace("{executable}", str(executable)).replace("{target}", str(target))
-            # {report} not used for zizmor; leave as is if present (should not be)
             if "{report}" in token:
                 raise ValueError("UNRESOLVED_TOKEN_IN_ARGV")
             argv.append(token)
-        # Quick check for unresolved tokens
         for token in argv:
             if re.search(r"\{[A-Za-z_][A-Za-z0-9_]*\}", token):
                 raise ValueError(f"PROVIDER_ARGV_UNRESOLVED:{token}")
-        # Execute provider; cwd = target directory to ensure config discovery consistent with repo root
         cwd = str(target) if target.is_dir() else None
-        # Isolate from any GitHub token to ensure offline deterministic run; but not required
         proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, timeout=120)
-        diagnostics = dict(provider_exit_code=proc.returncode, provider_stderr_tail=(proc.stderr or "")[-400:], provider_stdout_len=len(proc.stdout or ""))
+        diagnostics = dict(
+            provider_exit_code=proc.returncode,
+            provider_stderr_tail=(proc.stderr or "")[-400:],
+            provider_stdout_len=len(proc.stdout or ""),
+        )
         e["diagnostics"] = diagnostics
-        # Handle no inputs case: exit 3
         if proc.returncode == 3:
             raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:provider_exit_3_no_workflows_or_no_auditable_inputs")
-        # Parse report: zizmor JSON goes to stdout
         stdout = (proc.stdout or "").strip()
         if not stdout:
-            # Empty stdout with non-zero? Could be error without JSON
             if proc.returncode != 0:
                 raise ValueError(f"PROVIDER_EXECUTION_OR_OUTPUT_FAILURE:empty_stdout_rc={proc.returncode}")
-            else:
-                # Empty stdout with rc0 but should be [] for no findings; treat as malformed
-                raise ValueError("PROVIDER_OUTPUT_EMPTY")
+            raise ValueError("PROVIDER_OUTPUT_EMPTY")
         try:
             report = json.loads(stdout)
         except json.JSONDecodeError as exc:
             raise ValueError(f"PROVIDER_OUTPUT_MALFORMED:{exc}") from exc
         raw_findings = _extract_findings(report)
         normalized = _normalize_findings(raw_findings)
-        # Determine status by findings and exit code
-        # Zizmor exit codes: 0 no findings, 11-14 findings by severity, 1 error, 2 arg parse, 3 no inputs
-        # We already handled 3
         if proc.returncode == 0:
             if len(raw_findings) == 0:
-                # PASS: ensure inventory was actually established
-                # If raw_findings 0 but provider completed, we need to ensure workflow files existed
-                # The provider would have returned 3 if none; so 0 findings here means at least one workflow was scanned
-                e.update(status="PASS", findings_count=0, findings=[], coverage=list(m.get("coverage", [])), reason="WORKFLOW_SCAN_COMPLETED_WITHOUT_FINDINGS")
+                e.update(
+                    status="PASS",
+                    findings_count=0,
+                    findings=[],
+                    coverage=list(m.get("coverage", [])),
+                    reason="WORKFLOW_SCAN_COMPLETED_WITHOUT_FINDINGS",
+                )
             else:
-                # Non-zero findings but exit 0: should not happen normally but treat as FAIL if findings present
-                e.update(status="FAIL", findings_count=len(raw_findings), findings=normalized[:25], coverage=list(m.get("coverage", [])), reason="WORKFLOW_SCAN_COMPLETED_WITH_FINDINGS_RC0")
+                e.update(
+                    status="FAIL",
+                    findings_count=len(raw_findings),
+                    findings=normalized[:25],
+                    coverage=list(m.get("coverage", [])),
+                    reason="WORKFLOW_SCAN_COMPLETED_WITH_FINDINGS_RC0",
+                )
         elif proc.returncode in (11, 12, 13, 14):
             if len(raw_findings) == 0:
                 raise ValueError(f"EXIT_CODE_FINDINGS_MISMATCH:rc={proc.returncode}:findings=0")
-            e.update(status="FAIL", findings_count=len(raw_findings), findings=normalized[:25], coverage=list(m.get("coverage", [])), reason="WORKFLOW_SCAN_COMPLETED_WITH_FINDINGS")
+            e.update(
+                status="FAIL",
+                findings_count=len(raw_findings),
+                findings=normalized[:25],
+                coverage=list(m.get("coverage", [])),
+                reason="WORKFLOW_SCAN_COMPLETED_WITH_FINDINGS",
+            )
         else:
-            # Any other exit (1,2 etc) is provider failure => BLOCKED
             raise ValueError(f"PROVIDER_EXIT_UNEXPECTED:rc={proc.returncode}")
-        # Verify target hasn't changed during scan
         if resolve_target_ref(target) != e["target_ref"]:
             raise ValueError("TARGET_CHANGED_DURING_SCAN")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, subprocess.SubprocessError) as exc:
-        # Preserve existing diagnostics if any, else set minimal
         if "diagnostics" not in e:
             e["diagnostics"] = dict(provider_exit_code=None, provider_stderr_tail=str(exc)[:200])
-        # Ensure coverage is NONE_ESTABLISHED for BLOCKED
         if e.get("status") != "BLOCKED":
             e["status"] = "BLOCKED"
             e["coverage"] = ["NONE_ESTABLISHED"]
-        # Build reason
         base = type(exc).__name__
         msg = str(exc)
-        # If exc is ValueError with uppercase token, include it
         if isinstance(exc, ValueError) and msg and msg.split(":")[0].isupper():
             base = base + ":" + msg.split(":")[0]
-            # include full msg up to 200 chars
             e["reason"] = f"ASSESSMENT_BLOCKED:{base}:{msg[:200]}"
         else:
             e["reason"] = f"ASSESSMENT_BLOCKED:{base}:{msg[:200]}" if msg else f"ASSESSMENT_BLOCKED:{base}"
         e["findings_count"] = 0
         e["findings"] = []
-        # Ensure limitations still declared
         try:
             if not e.get("limitations"):
                 m = zizmor_acquire.mapping()
@@ -247,4 +271,4 @@ if __name__ == "__main__":
     a = p.parse_args()
     evidence = assess(a.target, a.executable, a.reference)
     print(json.dumps(evidence, indent=2))
-    raise SystemExit({"PASS": 0, "FAIL": 1, "BLOCKED": 2}[evidence["status"]])
+    raise SystemExit({"PASS": 0, "NOT_APPLICABLE": 0, "FAIL": 1, "BLOCKED": 2}[evidence["status"]])
