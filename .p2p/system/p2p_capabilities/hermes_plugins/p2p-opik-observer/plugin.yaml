@@ -1,0 +1,14 @@
+name: p2p-opik-observer
+version: 0.1.0
+description: >-
+  Opt-in, fail-open Opik observability bridge for Hermes turns. Buffers
+  documented lifecycle-hook metadata and emits finalized traces after a turn;
+  default mode excludes prompts, responses, tool args/results, subagent
+  goals/summaries, and raw correlation ids. This plugin is telemetry only and
+  never becomes P2P task, evidence, memory, verification, or control authority.
+author: 7roger89-web
+kind: backend
+requires_env:
+  - OPIK_API_KEY
+  - OPIK_WORKSPACE
+  - OPIK_PROJECT_NAME

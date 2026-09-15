@@ -9,9 +9,11 @@ on:
       - deployments/hermes-dockhosting/README.md
       - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
       - deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh
+      - .p2p/system/p2p_capabilities/hermes_plugins/p2p-opik-observer/**
       - scripts/hermes_essential_stack_guard.py
       - tests/test_hermes_essential_stack_guard.py
       - tests/test_p2p_opik_observer.py
+      - tests/test_p2p_opik_distribution.py
       - .github/workflows/hermes-essential-stack.yml
   push:
     branches: [main]
@@ -21,9 +23,11 @@ on:
       - deployments/hermes-dockhosting/README.md
       - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
       - deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh
+      - .p2p/system/p2p_capabilities/hermes_plugins/p2p-opik-observer/**
       - scripts/hermes_essential_stack_guard.py
       - tests/test_hermes_essential_stack_guard.py
       - tests/test_p2p_opik_observer.py
+      - tests/test_p2p_opik_distribution.py
       - .github/workflows/hermes-essential-stack.yml
   workflow_dispatch:
 
@@ -45,6 +49,7 @@ jobs:
           python3 -m unittest -v
           tests.test_hermes_essential_stack_guard
           tests.test_p2p_opik_observer
+          tests.test_p2p_opik_distribution
 
       - name: Generate throwaway local secrets and validate contract
         run: |
