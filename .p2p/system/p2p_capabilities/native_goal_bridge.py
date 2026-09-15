@@ -8,9 +8,11 @@ is created here.
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import re
+from pathlib import Path
 from typing import Any, Mapping
 
 BRIDGE_SCHEMA = "p2p-native-goal-projection/1"
@@ -21,7 +23,7 @@ HOST_KINDS = (CLAUDE_CODE, CODEX_CLI)
 _GOAL_MAX_CHARS = 4000
 _GIT_OID_RE = re.compile(r"^[0-9a-f]{40}$")
 _PACKAGED_WORKTREE_COMMAND = (
-    "python .agents/skills/p2p/scripts/p2p_native_goal.py worktree summary"
+    "python .p2p/system/p2p_capabilities/worktree_evidence.py summary"
 )
 
 _TASK_REPLAY_FIELDS = (
@@ -257,3 +259,44 @@ def build_native_goal_projection(
         "permission_mode_changed": False,
         "native_goal_evaluator_is_acceptance_authority": False,
     }
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise NativeGoalBridgeError(f"JSON_READ_FAILED:{path}:{exc}") from exc
+    if not isinstance(value, dict):
+        raise NativeGoalBridgeError(f"JSON_OBJECT_REQUIRED:{path}")
+    return value
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", default=".")
+    parser.add_argument("--host", required=True, choices=HOST_KINDS)
+    parser.add_argument("--goal-state", default=".p2p/state/autopilot-goal-state.json")
+    parser.add_argument("--task-state", default=".p2p/state/task-state.json")
+    parser.add_argument("--baseline")
+    parser.add_argument("--format", choices=("json", "command"), default="json")
+    args = parser.parse_args()
+    root = Path(args.root).expanduser().resolve()
+    try:
+        result = build_native_goal_projection(
+            args.host,
+            _read_json(root / args.goal_state),
+            _read_json(root / args.task_state),
+            baseline_ref=args.baseline,
+        )
+    except (OSError, NativeGoalBridgeError) as exc:
+        print(json.dumps({"schema": BRIDGE_SCHEMA, "status": "BLOCKED", "error": str(exc)}, ensure_ascii=False))
+        return 2
+    if args.format == "command":
+        print(result["command"])
+    else:
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
