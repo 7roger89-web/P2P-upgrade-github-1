@@ -37,7 +37,7 @@ jobs:
           p.write_text(json.dumps(d,indent=2)+'\n')
 
           p=Path('tests/test_p2p_shield_applicability.py'); s=p.read_text()
-          s += '''\n    def test_symlinked_github_root_is_blocked_not_na(self):\n        external=self.root/'outside'; (external/'workflows').mkdir(parents=True)\n        r=self.root/'symlink'; r.mkdir(); (r/'README.md').write_text('x')\n        (r/'.github').symlink_to(external, target_is_directory=True)\n        init(r)\n        e=ci.assess(r,self.root/'missing','run')\n        self.assertEqual(e['status'],'BLOCKED')\n        self.assertIn('github_root_symlink',e['reason'])\n'''
+          s += '''\n def test_symlinked_github_root_is_blocked_not_na(self):\n  external=self.root/'outside'; (external/'workflows').mkdir(parents=True)\n  r=self.root/'symlink'; r.mkdir(); (r/'README.md').write_text('x')\n  (r/'.github').symlink_to(external, target_is_directory=True)\n  init(r)\n  e=ci.assess(r,self.root/'missing','run')\n  self.assertEqual(e['status'],'BLOCKED')\n  self.assertIn('github_root_symlink',e['reason'])\n'''
           p.write_text(s)
           PY
           python -m unittest tests.test_p2p_shield_applicability tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice tests.test_p2p_shield_secret_slice
