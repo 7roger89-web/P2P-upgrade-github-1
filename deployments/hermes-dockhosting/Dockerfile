@@ -29,6 +29,11 @@ RUN set -eux; \
 # only, over a collection allowlist. See README-logistics.md.
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/hermes/plugins/logistics/
 
+# P2P Personal AI behavior runtime bridge. Reuse the canonical behavior module
+# rather than carrying a second implementation inside the deployment plugin.
+COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/p2p-personal-behavior/ /opt/hermes/plugins/p2p-personal-behavior/
+COPY --chmod=a+r,go-w .p2p/system/p2p_capabilities/personal_ai_behavior.py /opt/hermes/plugins/p2p-personal-behavior/personal_ai_behavior.py
+
 # pymongo is the MongoDB client for the Logistics plugin and is not part of the
 # upstream hermes-agent dependency set. Exact pin, installed into the sealed
 # image venv at build time so the Free-tier runtime never needs PyPI access.
