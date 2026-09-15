@@ -30,15 +30,20 @@ COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/he
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/p2p-personal-behavior/ /opt/hermes/plugins/p2p-personal-behavior/
 COPY --chmod=a+r,go-w .p2p/system/p2p_capabilities/personal_ai_behavior.py /opt/hermes/plugins/p2p-personal-behavior/personal_ai_behavior.py
 
+# Bundle the passive Opik observer in the reusable P2P Hermes image so local,
+# DockHosting, and future project-specific builds share one plugin artifact.
+# Bundling code does NOT enable telemetry and does NOT install the SDK by itself.
+COPY --chmod=a+rX,go-w deployments/hermes-essential-stack/plugins/p2p-opik-observer/ /opt/hermes/plugins/p2p-opik-observer/
+
 # Runtime dependency used by the Logistics read-only MongoDB connector.
 # DockHosting's build resolver did not expose the just-released 4.18.0; pin the
 # older stable 4.17.0 release so the build can resolve reproducibly.
 ARG PYMONGO_VERSION=4.17.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
 
-# Opik is required only by the opt-in local Hermes essential-stack pilot.
-# Keep production/DockHosting's default image unchanged: the dependency is
-# installed only when that build explicitly sets P2P_INSTALL_OPIK=1.
+# Opik is required only by explicitly opted-in Hermes builds.
+# Keep production/DockHosting's default image dependency set unchanged: the
+# SDK is installed only when that build explicitly sets P2P_INSTALL_OPIK=1.
 #
 # Hermes upstream intentionally applies a 14-day uv exclude-newer quarantine.
 # Opik is exact-pinned here, so exempt ONLY the reviewed Opik package from that
