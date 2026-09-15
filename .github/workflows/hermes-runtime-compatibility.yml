@@ -1,0 +1,90 @@
+name: Hermes runtime compatibility
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - deployments/hermes-dockhosting/Dockerfile
+      - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
+      - scripts/hermes_runtime_compatibility.py
+      - tests/test_p2p_hermes_runtime_compatibility.py
+      - .github/workflows/hermes-runtime-compatibility.yml
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - deployments/hermes-dockhosting/Dockerfile
+      - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
+      - scripts/hermes_runtime_compatibility.py
+      - tests/test_p2p_hermes_runtime_compatibility.py
+      - .github/workflows/hermes-runtime-compatibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hermes-compat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      IMAGE: p2p-hermes-compat:${{ github.sha }}
+      EXPECTED_TAG: v2026.9.14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Run deterministic compatibility tests
+        run: python3 -m unittest -v tests.test_p2p_hermes_runtime_compatibility tests.test_p2p_hermes_tool_bridges
+
+      - name: Verify both Dockerfiles pin the same release tag
+        run: |
+          test "$(head -n 3 Dockerfile | tail -n 1)" = "FROM nousresearch/hermes-agent:${EXPECTED_TAG}"
+          test "$(head -n 3 deployments/hermes-dockhosting/Dockerfile | tail -n 1)" = "FROM nousresearch/hermes-agent:${EXPECTED_TAG}"
+          ! grep -R '^FROM nousresearch/hermes-agent:latest$' Dockerfile deployments/hermes-dockhosting/Dockerfile
+
+      - name: Build the actual DockHosting source image
+        run: docker build --pull -t "$IMAGE" -f Dockerfile .
+
+      - name: Record pulled base image identity
+        run: |
+          docker image inspect nousresearch/hermes-agent:${EXPECTED_TAG} --format '{{json .RepoDigests}}'
+          docker image inspect "$IMAGE" --format '{{.Id}}'
+
+      - name: Probe Hermes version and CLI contract
+        run: |
+          docker run --rm --entrypoint /opt/hermes/.venv/bin/hermes "$IMAGE" --version > "$RUNNER_TEMP/hermes-version.txt"
+          docker run --rm --entrypoint /opt/hermes/.venv/bin/hermes "$IMAGE" --help > "$RUNNER_TEMP/hermes-help.txt"
+          cat "$RUNNER_TEMP/hermes-version.txt"
+          python3 scripts/hermes_runtime_compatibility.py cli \
+            --version-file "$RUNNER_TEMP/hermes-version.txt" \
+            --help-file "$RUNNER_TEMP/hermes-help.txt"
+
+      - name: Probe Hermes state.db for TokScale read-only compatibility
+        run: |
+          mkdir -p "$RUNNER_TEMP/hermes-home"
+          chmod 0777 "$RUNNER_TEMP/hermes-home"
+          docker run --rm --user 0:0 \
+            -e HERMES_HOME=/tmp/hermes-home \
+            -v "$RUNNER_TEMP/hermes-home:/tmp/hermes-home" \
+            --entrypoint /opt/hermes/.venv/bin/hermes \
+            "$IMAGE" sessions list
+          test -f "$RUNNER_TEMP/hermes-home/state.db"
+          python3 scripts/hermes_runtime_compatibility.py state-db "$RUNNER_TEMP/hermes-home/state.db"
+
+      - name: Verify bundled Hindsight provider exists but remains unconfigured
+        run: |
+          docker run --rm --entrypoint /bin/sh "$IMAGE" -lc 'test -f /opt/hermes/plugins/memory/hindsight/README.md'
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          cfg = json.loads(Path('deployments/hermes-dockhosting/hindsight-p2p-safe.example.json').read_text())
+          assert cfg['auto_retain'] is False
+          assert cfg['auto_recall'] is False
+          assert cfg['memory_mode'] == 'tools'
+          assert cfg['recall_types'] == 'observation'
+          print('HINDSIGHT_SAFE_PROFILE=PASS')
+          PY
