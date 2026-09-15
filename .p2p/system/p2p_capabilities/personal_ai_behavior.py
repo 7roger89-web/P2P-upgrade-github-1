@@ -153,7 +153,7 @@ def select_response_policy(
 _SLOP_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "SYCOPHANTIC_OPENER",
-        re.compile(r"\b(câu hỏi (?:rất )?hay|ý tưởng (?:rất )?hay)\b", re.IGNORECASE),
+        re.compile(r"^\s*(câu hỏi (?:rất )?hay|ý tưởng (?:rất )?hay)\b", re.IGNORECASE),
     ),
     (
         "GENERIC_UNDERSTANDING_CLAIM",
@@ -162,7 +162,7 @@ _SLOP_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "GENERIC_FOLLOWUP_OFFER",
         re.compile(
-            r"\bnếu (?:bạn|anh|mày) muốn[^.!?\n]{0,80}\b(?:tôi|mình|tao) có thể\b",
+            r"\bnếu (?:bạn|anh|mày) muốn[^.!?\n]{0,80}\b(?:tôi|mình|tao) có thể\b[^.!?\n]{0,120}(?:[.!?…]+)?\s*$",
             re.IGNORECASE,
         ),
     ),
@@ -177,7 +177,9 @@ def lint_response(text: str, profile: VoiceProfile) -> tuple[StyleFinding, ...]:
     """Return strong anti-slop findings; never rewrite the answer.
 
     Deliberately conservative: semantic qualities such as whether a joke is
-    useful or an analogy is genuinely fresh are not guessed by regex.
+    useful or an analogy is genuinely fresh are not guessed by regex. Position-
+    specific rules stay position-specific: opener findings are anchored to the
+    start and generic follow-up offers are anchored to the response tail.
     """
 
     findings: list[StyleFinding] = []
