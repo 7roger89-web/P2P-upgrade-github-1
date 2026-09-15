@@ -65,12 +65,19 @@ jobs:
               assert wanted <= observed, (service, observed)
           rendered = json.dumps(model)
           assert ':latest' not in rendered
+          assert 'ghcr.io/outsourc-e/hermes-workspace' not in rendered
+          assert '15fa9cd706f5c04e4db288fb958e21d10fc776da' in rendered
           assert 'builderz-labs/mission-control' not in rendered
           print('COMPOSE_RENDERED_SECURITY=PASS')
           PY
 
-      - name: Verify pinned Workspace image exists
-        run: docker pull ghcr.io/outsourc-e/hermes-workspace:v2.3.0
+      - name: Build pinned Workspace release source
+        run: |
+          docker compose \
+            --env-file deployments/hermes-essential-stack/.env \
+            -f deployments/hermes-essential-stack/docker-compose.yml \
+            build hermes-workspace
+          docker image inspect p2p-hermes-workspace:v2.3.0-15fa9cd --format '{{.Id}}'
 
       - name: Smoke pinned Repomix package
         run: |
