@@ -38,7 +38,33 @@ try { xqrHead = execFileSync('git', ['-C', xqrUpstream, 'rev-parse', 'HEAD'], { 
 catch { fail(`Cannot verify pinned xu-quanren upstream: ${xqrUpstream}`); }
 if (xqrHead !== XQR_PIN) fail(`Pinned xu-quanren upstream SHA mismatch: expected ${XQR_PIN}, got ${xqrHead}`);
 
-const CANONICAL_LIU_WAI = ['子女', '夫妻', '兄弟', '仆役', '父母', '迁移'];
+const paipanPath = path.join(xqrUpstream, 'scripts/paipan.py');
+if (!fs.existsSync(paipanPath)) fail(`Pinned paipan.py missing: ${paipanPath}`);
+const paipanContent = fs.readFileSync(paipanPath, 'utf8');
+
+function extractLiuWaiFromSource(content) {
+  const match = /LIU_WAI\s*=\s*\[([^\]]+)\]/.exec(content);
+  if (!match) fail('Cannot extract LIU_WAI definition from scripts/paipan.py');
+  const items = match[1]
+    .split(',')
+    .map((s) => s.trim().replace(/^['"]|['"]$/g, ''))
+    .filter(Boolean);
+  if (items.length !== 6) {
+    fail(`Expected exactly 6 palaces in source LIU_WAI, found ${items.length}: ${items.join(', ')}`);
+  }
+  return items;
+}
+
+// Source authority: extracted directly from pinned scripts/paipan.py:LIU_WAI
+const SOURCE_DERIVED_LIU_WAI = extractLiuWaiFromSource(paipanContent);
+
+// Regression witness: canonical six-outer set expected from Xu Quanren system
+const WITNESS_EXPECTED_LIU_WAI = ['子女', '夫妻', '兄弟', '仆役', '父母', '迁移'];
+if (JSON.stringify(SOURCE_DERIVED_LIU_WAI) !== JSON.stringify(WITNESS_EXPECTED_LIU_WAI)) {
+  fail(`Source-derived LIU_WAI mismatch with regression witness: ${JSON.stringify(SOURCE_DERIVED_LIU_WAI)} vs ${JSON.stringify(WITNESS_EXPECTED_LIU_WAI)}`);
+}
+
+const CANONICAL_LIU_WAI = SOURCE_DERIVED_LIU_WAI;
 
 const XQR_RULE_EVIDENCE = [
   {
@@ -73,11 +99,13 @@ const XQR_RULE_EVIDENCE = [
       pin: XQR_PIN,
       source_path: 'scripts/paipan.py',
       source_anchor: 'LIU_WAI',
-      canonical_set: CANONICAL_LIU_WAI,
-      canonical_count: 6,
+      extraction_method: 'LITERAL_ASSIGNMENT_PARSE',
+      source_derived_set: SOURCE_DERIVED_LIU_WAI,
+      canonical_set: SOURCE_DERIVED_LIU_WAI,
+      canonical_count: SOURCE_DERIVED_LIU_WAI.length,
     },
-    canonical_six_outer: CANONICAL_LIU_WAI,
-    canonical_count: 6,
+    canonical_six_outer: SOURCE_DERIVED_LIU_WAI,
+    canonical_count: SOURCE_DERIVED_LIU_WAI.length,
     alias_policy: 'ADAPTER_NAME_NORMALIZATION',
     adapter_normalization: {
       raw_alias: '交友',

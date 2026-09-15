@@ -19,6 +19,13 @@ function run(args) {
   return JSON.parse(r.stdout);
 }
 
+function extractSourceLiuWai(paipanPath) {
+  const content = fs.readFileSync(paipanPath, 'utf8');
+  const match = /LIU_WAI\s*=\s*\[([^\]]+)\]/.exec(content);
+  if (!match) throw new Error('Cannot extract LIU_WAI from scripts/paipan.py');
+  return match[1].split(',').map((s) => s.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean);
+}
+
 function validateRuleProvenance(ruleTrace, ruleEvidence, upstreamDir = xqrUpstream, expectedPin = EXPECTED_XQR_PIN) {
   if (!Array.isArray(ruleTrace) || ruleTrace.length === 0) {
     throw new Error('RULE_TRACE must be a non-empty array');
@@ -92,9 +99,16 @@ function validateRuleProvenance(ruleTrace, ruleEvidence, upstreamDir = xqrUpstre
         throw new Error(`XQR_R2 classification_source anchor not found: ${ev.classification_source.source_anchor}`);
       }
 
-      // 3. Canonical conceptual count is exactly 6
-      if (!Array.isArray(ev.canonical_six_outer) || ev.canonical_six_outer.length !== 6) {
-        throw new Error(`canonical_six_outer must have exactly 6 entries, got: ${ev.canonical_six_outer?.length}`);
+      // 3. Mechanically verify that canonical set is exactly equal to the source-derived set
+      const sourceDerivedSet = extractSourceLiuWai(classPath);
+      if (sourceDerivedSet.length !== 6) {
+        throw new Error(`Source-derived LIU_WAI must have exactly 6 entries, got: ${sourceDerivedSet.length}`);
+      }
+      if (JSON.stringify(ev.canonical_six_outer) !== JSON.stringify(sourceDerivedSet)) {
+        throw new Error(`canonical_six_outer does not match source-derived set from ${classPath}: expected ${JSON.stringify(sourceDerivedSet)}, got ${JSON.stringify(ev.canonical_six_outer)}`);
+      }
+      if (JSON.stringify(ev.classification_source.canonical_set) !== JSON.stringify(sourceDerivedSet)) {
+        throw new Error('classification_source.canonical_set does not match source-derived set');
       }
       if (ev.canonical_count !== 6) {
         throw new Error(`canonical_count must be 6, got: ${ev.canonical_count}`);
@@ -263,6 +277,35 @@ validateRuleProvenance(fixture.RULE_TRACE, fixture.RULE_EVIDENCE);
     failed = true;
   }
   if (!failed) throw new Error('Negative proof failed: 7th doctrinal palace was silently accepted');
+}
+
+// Mutation F6: R2 with a 6-element set that replaces a canonical palace (keeping count=6)
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  // Replace '仆役' with '疾厄' (an inner palace) while count remains 6
+  r2.canonical_six_outer = ['子女', '夫妻', '兄弟', '疾厄', '父母', '迁移'];
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: wrong 6-element canonical set was silently accepted');
+}
+
+// Mutation F7: R2 classification_source.canonical_set divergence from source authority
+{
+  let failed = false;
+  const mutated = JSON.parse(JSON.stringify(fixture.RULE_EVIDENCE));
+  const r2 = mutated.find((ev) => ev.rule_id === 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER');
+  r2.classification_source.canonical_set = ['子女', '夫妻', '兄弟', '疾厄', '父母', '迁移'];
+  try {
+    validateRuleProvenance(fixture.RULE_TRACE, mutated);
+  } catch {
+    failed = true;
+  }
+  if (!failed) throw new Error('Negative proof failed: divergent classification_source.canonical_set was silently accepted');
 }
 
 // 3. Custom input test

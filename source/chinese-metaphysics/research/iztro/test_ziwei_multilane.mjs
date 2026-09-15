@@ -41,6 +41,13 @@ for (const ev of fixture.LANES.XQR.rule_evidence) {
     if (ev.canonical_count !== 6 || ev.canonical_six_outer.length !== 6) {
       throw new Error('XQR_R2 canonical count must be exactly 6');
     }
+    const expectedCanonicalSet = ['子女', '夫妻', '兄弟', '仆役', '父母', '迁移'];
+    if (JSON.stringify(ev.canonical_six_outer) !== JSON.stringify(expectedCanonicalSet)) {
+      throw new Error('XQR_R2 canonical set mismatch with expected canonical set');
+    }
+    if (JSON.stringify(ev.classification_source.canonical_set) !== JSON.stringify(expectedCanonicalSet)) {
+      throw new Error('XQR_R2 classification_source canonical_set mismatch');
+    }
     if (ev.canonical_six_outer.includes('交友')) {
       throw new Error('XQR_R2 canonical set must not include 交友 as 7th palace');
     }
