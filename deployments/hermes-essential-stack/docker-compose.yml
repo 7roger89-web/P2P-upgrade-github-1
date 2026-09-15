@@ -86,6 +86,41 @@ services:
       /opt/hermes/.venv/bin/hermes config set memory.provider hindsight;
       echo 'HINDSIGHT_ENABLED_SAFE_PROFILE:auto_retain=false:auto_recall=false:memory_mode=tools'
 
+  geniex-register:
+    profiles: ["geniex"]
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    depends_on:
+      hermes-agent:
+        condition: service_healthy
+    user: "hermes"
+    env_file:
+      - .env
+    environment:
+      HERMES_HOME: /opt/data
+      P2P_ENABLE_GENIEX: ${P2P_ENABLE_GENIEX:-NO}
+      GENIEX_BASE_URL: ${GENIEX_BASE_URL:-}
+      GENIEX_MODEL: ${GENIEX_MODEL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - hermes-data:/opt/data
+    entrypoint: ["/bin/sh", "-lc"]
+    command: >-
+      test "$${P2P_ENABLE_GENIEX}" = "YES" ||
+      { echo 'GENIEX_NOT_ENABLED: set P2P_ENABLE_GENIEX=YES explicitly'; exit 2; };
+      test -n "$${GENIEX_BASE_URL}" ||
+      { echo 'GENIEX_BASE_URL_REQUIRED'; exit 3; };
+      test -n "$${GENIEX_MODEL}" ||
+      { echo 'GENIEX_MODEL_REQUIRED'; exit 4; };
+      /opt/hermes/.venv/bin/python -c 'import json,os,urllib.request; base=os.environ["GENIEX_BASE_URL"].rstrip("/"); model=os.environ["GENIEX_MODEL"]; payload={"model":model,"messages":[{"role":"system","content":"Reply briefly and accurately."},{"role":"user","content":"Reply with OK."}],"max_tokens":8}; req=urllib.request.Request(base+"/chat/completions",data=json.dumps(payload).encode("utf-8"),headers={"Content-Type":"application/json"},method="POST"); body=json.load(urllib.request.urlopen(req,timeout=90)); assert body.get("choices"), body; print("GENIEX_CHAT_SMOKE=PASS")';
+      /opt/hermes/.venv/bin/hermes config set providers.geniex.api "$${GENIEX_BASE_URL}";
+      /opt/hermes/.venv/bin/hermes config set providers.geniex.transport chat_completions;
+      /opt/hermes/.venv/bin/hermes config set providers.geniex.default_model "$${GENIEX_MODEL}";
+      /opt/hermes/.venv/bin/hermes config set providers.geniex.discover_models false;
+      echo "GENIEX_PROVIDER_REGISTERED:model=$${GENIEX_MODEL}:main_model_unchanged=YES"
+
   repomix:
     profiles: ["tools"]
     image: node:22-bookworm-slim

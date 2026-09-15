@@ -3,7 +3,7 @@
 Status: `LOCAL_OPT_IN_STACK_READY`  
 Production / public deployment: `NOT_PERFORMED`
 
-This stack completes the bounded integration path for the five Hermes-adjacent tools reviewed on 2026-09-15 without creating a second P2P control plane.
+This stack completes the bounded integration path for the Hermes-adjacent tools reviewed on 2026-09-15 without creating a second P2P control plane.
 
 ## What is integrated
 
@@ -13,6 +13,7 @@ This stack completes the bounded integration path for the five Hermes-adjacent t
 | TokScale `4.16.0` | read-only token/cost telemetry | opt-in `tools` profile; Hermes data volume mounted read-only; only `--json`; no `submit` path |
 | Hermes Workspace `2.3.0` | local web UI | built from exact release commit `15fa9cd706f5c04e4db288fb958e21d10fc776da`; host bind is `127.0.0.1:3000`; HermesWorld link disabled |
 | Hindsight | optional non-authoritative memory | bundled Hermes provider; enabling requires an explicit `YES` gate plus API key; safe config keeps `auto_retain=false`, `auto_recall=false`, `memory_mode=tools` |
+| GenieX `v0.3.17` | optional local inference provider | **not bundled**; Snapdragon-only host prerequisite; registered as a named Hermes custom provider only after a real `/v1/chat/completions` smoke test; main model is not changed |
 | Mission Control | not a P2P authority | intentionally absent from runtime compose; P2P already owns task state, approvals, orchestration and governance |
 
 Hard invariants:
@@ -22,6 +23,8 @@ THIRD_PARTY_TOOL != P2P_AUTHORITY
 TOKSCALE_TELEMETRY != BILLING_TRUTH
 HINDSIGHT_RECALL != DURABLE_PROJECT_TRUTH
 WORKSPACE_UI != CONTROL_TOWER_AUTHORITY
+GENIEX_PROVIDER != P2P_EXECUTOR_AUTHORITY
+GENIEX_REGISTER != DEFAULT_MODEL_SWITCH
 MISSION_CONTROL != SECOND_CONTROL_PLANE
 ```
 
@@ -32,6 +35,7 @@ MISSION_CONTROL != SECOND_CONTROL_PLANE
 - Workspace build toolchain: `pnpm 9.15.9`
 - Repomix: `v1.18.0`
 - TokScale: `v4.16.0`
+- GenieX host-side integration target: stable `v0.3.17` (BSD-3-Clause); alpha/newer upstream builds are not silently selected
 
 The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. Its upstream Dockerfile is also no longer reproducible as written because unpinned Corepack now resolves to pnpm 12, whose build-script policy rejects this older release's Electron/esbuild dependency scripts.
 
@@ -57,7 +61,7 @@ http://127.0.0.1:3000
 
 The bootstrap creates random local secrets and refuses to overwrite an existing `.env` unless `--force` is explicitly supplied. `.env` is already ignored by repository policy.
 
-Before startup you still need to place at least one model-provider key in the generated `.env` (for example `GEMINI_API_KEY`). Do not commit the file.
+Before startup you still need to place at least one model-provider key in the generated `.env` (for example `GEMINI_API_KEY`) unless you already have another persisted Hermes provider configured. Do not commit the file.
 
 ## Security topology
 
@@ -116,6 +120,95 @@ This copies `hindsight-p2p-safe.example.json` into persistent Hermes state and s
 
 Enabling Hindsight with a real secret is an Owner Gate because it introduces an external memory service and persistent data flow. The repository is ready; no secret has been created or stored here.
 
+## GenieX local inference
+
+GenieX is integrated **under Hermes**, not as a new P2P backend or router. Hermes already has a native named-custom-provider surface for OpenAI-compatible endpoints, while GenieX exposes `/v1/chat/completions`. Adding a second P2P adapter would duplicate an existing seam for no useful gain.
+
+Upstream facts used by this integration:
+
+- source: `https://github.com/qualcomm/GenieX`
+- license: BSD-3-Clause
+- pinned stable target: `v0.3.17`
+- supported hardware is Qualcomm Snapdragon only: Windows ARM64 Snapdragon X/X Elite, supported Snapdragon Android devices, or supported Qualcomm Linux ARM64 targets
+- GenieX can serve an OpenAI-compatible endpoint, normally on port `18181`
+- GitHub-hosted P2P CI is **not** Snapdragon device evidence; it can validate the integration contract but cannot certify NPU/GPU/CPU inference on the Owner's machine
+
+### Why registration is bounded
+
+The `geniex-register` profile does four things only:
+
+1. requires the explicit `P2P_ENABLE_GENIEX=YES` gate;
+2. requires a local HTTP `/v1` endpoint plus an explicit model id;
+3. sends a real chat-completions probe containing both a `system` and `user` message;
+4. registers a named Hermes provider `geniex` only if the probe returns a real `choices` result.
+
+It deliberately sets:
+
+```text
+providers.geniex.transport=chat_completions
+providers.geniex.discover_models=false
+```
+
+The explicit model id + disabled discovery is intentional. GenieX has had OpenAI-compatibility regressions where `/v1/models` returned a precision-suffixed id that `/v1/chat/completions` did not accept. Registration therefore trusts the explicit model id that actually passed the chat probe, not a catalog guess.
+
+Registration **does not** modify `model.provider` or `model.default`. GenieX enters Hermes as an optional named provider; it does not hijack the current cloud/default model.
+
+### Host-side prerequisite
+
+Install and run the pinned GenieX release on a supported Snapdragon machine first. Example upstream flow:
+
+```text
+geniex pull ai-hub-models/Qwen3-4B-Instruct-2507
+geniex serve
+```
+
+Use a model whose license and hardware/runtime path are acceptable for your use case. Model licenses are independent from the BSD-3-Clause GenieX runtime license.
+
+The exact URL placed in `GENIEX_BASE_URL` must be reachable **from the Hermes container**. On Docker Desktop a common candidate is:
+
+```text
+http://host.docker.internal:18181/v1
+```
+
+Do not weaken a local GenieX bind to a public `0.0.0.0` listener merely to make the container reach it. If the local bridge is not reachable, leave registration blocked and fix the local transport deliberately instead of silently widening exposure.
+
+### Register without replacing the current model
+
+Set the generated `.env` values:
+
+```text
+P2P_ENABLE_GENIEX=YES
+GENIEX_BASE_URL=http://host.docker.internal:18181/v1
+GENIEX_MODEL=ai-hub-models/Qwen3-4B-Instruct-2507
+```
+
+Then run:
+
+```bash
+python scripts/hermes_essential_stack_guard.py validate
+cd deployments/hermes-essential-stack
+docker compose --profile geniex run --rm geniex-register
+```
+
+Expected terminal evidence after the real request succeeds:
+
+```text
+GENIEX_CHAT_SMOKE=PASS
+GENIEX_PROVIDER_REGISTERED:model=<model-id>:main_model_unchanged=YES
+```
+
+After that, GenieX remains opt-in. In an active Hermes session, switch deliberately with the named custom-provider syntax supported by Hermes, for example:
+
+```text
+/model custom:geniex:ai-hub-models/Qwen3-4B-Instruct-2507
+```
+
+A successful registration proves only the bounded OpenAI-compatible chat route. It does **not** certify full P2P agent/tool execution, large-context reliability, VLM behavior, NPU performance, or long-horizon autonomy. Those capabilities need their own representative device proof before promotion.
+
+### Octopus V4 decision
+
+Nexa/Octopus V4 is **not** integrated into the P2P commercial/runtime path. Its published GGUF model card uses `CC BY-NC 4.0`, so it is suitable for research/non-commercial experiments but is a bad default dependency for a stack that may later be used commercially. The architecture idea (small local routing/function-calling models) remains useful; the model artifact itself stays out of the commercial lane unless its license changes or a separately licensed replacement is selected.
+
 ## Hermes Workspace
 
 Workspace connects to the same single Hermes container used by the gateway. Hermes v0.21.3 supervises its dashboard alongside the gateway in that same container. Do **not** run a second Hermes gateway against the same `/opt/data` volume.
@@ -135,4 +228,4 @@ python scripts/hermes_essential_stack_guard.py validate
 python -m unittest -v tests.test_hermes_essential_stack_guard
 ```
 
-Hosted CI additionally renders the compose config, builds the exact Workspace release source with the pinned wrapper toolchain, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, and starts the local-only Hermes + Workspace stack for health verification.
+Hosted CI additionally renders the compose config, builds the exact Workspace release source with the pinned wrapper toolchain, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, and starts the local-only Hermes + Workspace stack for health verification. Hosted CI validates the GenieX registration contract statically; live GenieX inference remains a Snapdragon-device proof and is never inferred from ordinary GitHub runners.
