@@ -2,7 +2,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const dir=path.dirname(fileURLToPath(import.meta.url));
 const runner=path.join(dir,'run_cegui_capability.mjs');
@@ -47,10 +47,18 @@ const method2=run(['--format-string','444','--five-method','method2']);
 if(method2.NUMBER_5_CONVENTION.SELECTED.METHOD_ID!=='METHOD_2_CE5_GEN_GUI5_KUN') throw new Error('method2 selection mismatch');
 if(JSON.stringify(method2.NUMBER_5_CONVENTION.SELECTED.CE_TRIGRAMS)!==JSON.stringify(['离','艮','离','离'])) throw new Error('method2 selected CE mapping mismatch');
 
+// ---- Import production validators (real production logic) ----
+const prod = await import(pathToFileURL(runner).href);
+
+// Verify production validators are testable
+if(typeof prod.validateEvidenceEntry!=='function') throw new Error('PRODUCTION_EVIDENCE_VALIDATOR not testable');
+if(typeof prod.validateCoverage!=='function') throw new Error('PRODUCTION_COVERAGE_VALIDATOR not testable');
+if(typeof prod.validateWitnessAgainstSourceDerived!=='function') throw new Error('PRODUCTION_YANG_WITNESS_VALIDATOR not testable');
+
 // ---- Provenance 05 checks ----
 
-// Yang-line authority
 const expectedYangMap={1:3,2:2,3:2,4:1,5:2,6:1,7:1,8:0};
+
 function assertYangAuthority(packet){
   const ya=packet.YANG_LINE_AUTHORITY;
   if(!ya) throw new Error('Missing YANG_LINE_AUTHORITY');
@@ -62,10 +70,8 @@ function assertYangAuthority(packet){
   if(JSON.stringify(ya.witness_map)!==JSON.stringify(expectedYangMap)) throw new Error('YANG_LINE_AUTHORITY witness map mismatch');
   if(ya.witness_validation!=='PASS_EXACT_MATCH_FAIL_CLOSED_ON_MISMATCH') throw new Error('witness validation status mismatch');
   if(!ya.duplicated_table_second_authority_removed.includes('YES')) throw new Error('duplicated table second authority not marked removed');
-  // Verify extraction from actual pinned file
   const trigramContent=fs.readFileSync(path.join(upstream,'src/trigram.ts'),'utf8');
   if(!trigramContent.includes(ya.source_anchor)) throw new Error('trigram anchor not literally present');
-  // Validate derived map from file via same regex
   const regex=/pre_num:\s*(\d+)[\s\S]*?yao_yang_num:\s*(\d+)/g;
   const derived={};
   let m;
@@ -73,28 +79,12 @@ function assertYangAuthority(packet){
     derived[Number(m[1])]=Number(m[2]);
   }
   if(JSON.stringify(derived)!==JSON.stringify(expectedYangMap)) throw new Error('source-derived yang map from file does not match expected');
+  // Use production yang validator
+  prod.validateWitnessAgainstSourceDerived(ya.source_derived_map, ya.witness_map);
 }
 assertYangAuthority(fixture);
 assertYangAuthority(method2);
 assertYangAuthority(method1Yin);
-
-// Formula evidence load-bearing
-function validateEvidenceEntry(entry){
-  if(entry.repo!==REPO) throw new Error(`wrong repo for ${entry.id}`);
-  if(entry.pin!==PIN) throw new Error(`wrong pin for ${entry.id}`);
-  if(typeof entry.source_path!=='string'||entry.source_path.length===0) throw new Error(`missing source_path for ${entry.id}`);
-  if(entry.source_path.includes('..')) throw new Error(`path escape for ${entry.id}`);
-  if(path.isAbsolute(entry.source_path)) throw new Error(`absolute path for ${entry.id}`);
-  const resolved=path.resolve(upstream, entry.source_path);
-  if(!resolved.startsWith(upstream+path.sep) && resolved!==upstream) throw new Error(`path resolves outside upstream for ${entry.id}`);
-  if(!fs.existsSync(resolved)) throw new Error(`file not found for ${entry.id}: ${entry.source_path}`);
-  if(typeof entry.source_anchor!=='string'||entry.source_anchor.length===0) throw new Error(`missing anchor for ${entry.id}`);
-  const content=fs.readFileSync(resolved,'utf8');
-  if(!content.includes(entry.source_anchor)) throw new Error(`anchor not found for ${entry.id}: ${entry.source_anchor}`);
-  if(typeof entry.bounded_supported_claim!=='string'||entry.bounded_supported_claim.trim().length===0) throw new Error(`missing bounded claim for ${entry.id}`);
-  if(typeof entry.support_status!=='string'||entry.support_status.length===0) throw new Error(`missing support_status for ${entry.id}`);
-  if(typeof entry.authority_type!=='string'||entry.authority_type.length===0) throw new Error(`missing authority_type for ${entry.id}`);
-}
 
 function assertProvenancePacket(packet, expectSelected){
   if(!packet.FORMULA_EVIDENCE||!Array.isArray(packet.FORMULA_EVIDENCE)) throw new Error('Missing FORMULA_EVIDENCE');
@@ -107,35 +97,26 @@ function assertProvenancePacket(packet, expectSelected){
   if(!packet.NONCLAIMS.includes('NO_HISTORICAL_METHOD_WINNER')) throw new Error('NONCLAIMS missing NO_HISTORICAL_METHOD_WINNER');
   if(!packet.NONCLAIMS.includes('NO_SILENT_NUMBER_5_NORMALIZATION')) throw new Error('NONCLAIMS missing NO_SILENT_NUMBER_5_NORMALIZATION');
 
-  // Exact coverage
-  const evIds=packet.FORMULA_EVIDENCE.map(e=>e.id).sort();
-  const appliedSorted=[...packet.APPLIED_FORMULA_IDS].sort();
-  const traceSorted=[...packet.FORMULA_TRACE_IDS].sort();
-  if(JSON.stringify(evIds)!==JSON.stringify(appliedSorted)) throw new Error(`Evidence / applied coverage mismatch: ${JSON.stringify(evIds)} vs ${JSON.stringify(appliedSorted)}`);
-  if(JSON.stringify(evIds)!==JSON.stringify(traceSorted)) throw new Error(`Evidence / trace coverage mismatch`);
+  // Exact coverage using production coverage validator
+  prod.validateCoverage(packet.FORMULA_EVIDENCE, packet.APPLIED_FORMULA_IDS, packet.FORMULA_TRACE_IDS);
 
-  // Validate each evidence entry
+  // Validate each evidence entry using production validator
   for(const ev of packet.FORMULA_EVIDENCE){
-    validateEvidenceEntry(ev);
+    prod.validateEvidenceEntry(ev, upstream);
   }
 
-  // Base IDs always present
   const baseIds=['CEGUI_YANG_LINE_COUNT_FROM_TRIGRAM_SOURCE','CEGUI_ORIGIN_C_FIGURE','CEGUI_C_FIGURE','CEGUI_ORIGIN_G_FIGURE','CEGUI_G_FIGURE'];
   for(const bid of baseIds){
     if(!packet.APPLIED_FORMULA_IDS.includes(bid)) throw new Error(`Missing base formula ${bid}`);
   }
 
-  // Number-5 handling
   if(!expectSelected){
-    // Unselected: no number-5 evidence
     const hasNum5=packet.FORMULA_EVIDENCE.some(e=>e.id.includes('NUMBER5'));
     if(hasNum5) throw new Error('Unselected packet must not contain NUMBER5 evidence');
     if(packet.APPLIED_FORMULA_IDS.length!==5) throw new Error(`Unselected should have 5 applied IDs, got ${packet.APPLIED_FORMULA_IDS.length}`);
   }else{
-    // Selected: must have C and G number5 mapping
     if(!packet.APPLIED_FORMULA_IDS.includes('CEGUI_C_NUMBER5_MAPPING')) throw new Error('Selected packet missing CEGUI_C_NUMBER5_MAPPING');
     if(!packet.APPLIED_FORMULA_IDS.includes('CEGUI_G_NUMBER5_MAPPING')) throw new Error('Selected packet missing CEGUI_G_NUMBER5_MAPPING');
-    // Repo-declared must be present for selected method
     if(expectSelected==='method2'){
       if(!packet.APPLIED_FORMULA_IDS.includes('CEGUI_C_NUMBER5_MAPPING_REPO_METHOD2')) throw new Error('method2 missing repo method2 CE');
       if(!packet.APPLIED_FORMULA_IDS.includes('CEGUI_G_NUMBER5_MAPPING_REPO_METHOD2')) throw new Error('method2 missing repo method2 GUI');
@@ -147,7 +128,6 @@ function assertProvenancePacket(packet, expectSelected){
     }
   }
 
-  // Check specific formula evidence sources
   const originC=packet.FORMULA_EVIDENCE.find(e=>e.id==='CEGUI_ORIGIN_C_FIGURE');
   if(originC.source_path!=='src/index.ts'||originC.source_anchor!=='export const calcOriginCFigure') throw new Error('ORIGIN_C evidence source mismatch');
   const cFig=packet.FORMULA_EVIDENCE.find(e=>e.id==='CEGUI_C_FIGURE');
@@ -157,12 +137,10 @@ function assertProvenancePacket(packet, expectSelected){
   const gFig=packet.FORMULA_EVIDENCE.find(e=>e.id==='CEGUI_G_FIGURE');
   if(gFig.source_anchor!=='export const calcGFigure') throw new Error('G_FIGURE anchor mismatch');
 
-  // Method repo declared sources
   const m1=packet.NUMBER_5_CONVENTION.METHOD_1_REPO_DECLARED_SOURCE;
   const m2=packet.NUMBER_5_CONVENTION.METHOD_2_REPO_DECLARED_SOURCE;
   if(!m1||m1.source_path!=='README_Tutorial.md'||!m1.source_anchor.includes('法一')) throw new Error('METHOD1 repo declared source mismatch');
   if(!m2||m2.source_path!=='README_Tutorial.md'||!m2.source_anchor.includes('法二')) throw new Error('METHOD2 repo declared source mismatch');
-  // Verify anchors literally present
   const readme=fs.readFileSync(path.join(upstream,'README_Tutorial.md'),'utf8');
   if(!readme.includes(m1.source_anchor)) throw new Error(`METHOD1 anchor not found in README: ${m1.source_anchor}`);
   if(!readme.includes(m2.source_anchor)) throw new Error(`METHOD2 anchor not found in README: ${m2.source_anchor}`);
@@ -180,7 +158,7 @@ assertProvenancePacket(method1Yin, 'method1');
 const method1Yang=run(['--format-string','444','--five-method','method1','--day-stem','yang']);
 assertProvenancePacket(method1Yang, 'method1');
 
-// ---- Load-bearing negative tests ----
+// ---- Load-bearing negative tests using REAL production validators ----
 
 function testMutation(name, fn){
   try{
@@ -188,63 +166,75 @@ function testMutation(name, fn){
     throw new Error(`Mutation test ${name} did not fail as expected`);
   }catch(e){
     if(e.message.startsWith(`Mutation test ${name} did not fail`)) throw e;
-    // Expected failure - mutation correctly rejected
+    // Expected: production validator threw
   }
 }
 
 // Wrong repo
 testMutation('WRONG_REPO', ()=>{
   const bad={...fixture.FORMULA_EVIDENCE[0], repo:'wrong/repo'};
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
 // Wrong pin
 testMutation('WRONG_PIN', ()=>{
   const bad={...fixture.FORMULA_EVIDENCE[0], pin:'0000000000000000000000000000000000000000'};
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
 // Wrong source path
 testMutation('WRONG_PATH', ()=>{
   const bad={...fixture.FORMULA_EVIDENCE[0], source_path:'src/nonexistent.ts'};
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
 // Path escape
 testMutation('PATH_ESCAPE', ()=>{
   const bad={...fixture.FORMULA_EVIDENCE[0], source_path:'../../etc/passwd'};
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
 // Wrong anchor
 testMutation('WRONG_ANCHOR', ()=>{
   const bad={...fixture.FORMULA_EVIDENCE[0], source_anchor:'THIS_ANCHOR_DOES_NOT_EXIST_IN_FILE'};
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
 // Missing bounded claim
 testMutation('MISSING_CLAIM', ()=>{
   const bad={...fixture.FORMULA_EVIDENCE[0], bounded_supported_claim:''};
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
-// Missing formula evidence for an applied formula
+// Wrong support_status
+testMutation('WRONG_SUPPORT_STATUS', ()=>{
+  const bad={...fixture.FORMULA_EVIDENCE[0], support_status:'UNKNOWN_STATUS'};
+  prod.validateEvidenceEntry(bad, upstream);
+});
+
+// Wrong authority_type
+testMutation('WRONG_AUTHORITY_TYPE', ()=>{
+  const bad={...fixture.FORMULA_EVIDENCE[0], authority_type:'UNKNOWN_AUTHORITY'};
+  prod.validateEvidenceEntry(bad, upstream);
+});
+
+// Support/authority mismatch
+testMutation('SUPPORT_AUTHORITY_MISMATCH', ()=>{
+  const bad={...fixture.FORMULA_EVIDENCE[0], support_status:'PINNED_ENGINE_FORMULA_SUPPORT', authority_type:'REPO_DECLARED_METHOD_SUPPORT'};
+  prod.validateEvidenceEntry(bad, upstream);
+});
+
+// Missing formula evidence for an applied formula -> production coverage validator must reject
 testMutation('MISSING_FORMULA_EVIDENCE', ()=>{
   const packet=JSON.parse(JSON.stringify(fixture));
-  // Remove one applied evidence but keep ID in APPLIED list -> coverage mismatch
-  packet.FORMULA_EVIDENCE=packet.FORMULA_EVIDENCE.slice(1);
-  const evIds=packet.FORMULA_EVIDENCE.map(e=>e.id).sort();
-  const appliedSorted=[...packet.APPLIED_FORMULA_IDS].sort();
-  if(JSON.stringify(evIds)===JSON.stringify(appliedSorted)) throw new Error('should mismatch');
-  // Simulate runner validation that would fail on coverage
-  throw new Error('missing evidence detected');
+  const truncatedEvidence=packet.FORMULA_EVIDENCE.slice(1);
+  prod.validateCoverage(truncatedEvidence, packet.APPLIED_FORMULA_IDS, packet.APPLIED_FORMULA_IDS);
 });
 
-// Evidence for unapplied formula
+// Evidence for unapplied formula -> production coverage validator must reject
 testMutation('UNAPPLIED_FORMULA_EVIDENCE', ()=>{
   const packet=JSON.parse(JSON.stringify(fixture));
-  // fixture is unselected, adding number5 evidence should be considered unapplied
-  packet.FORMULA_EVIDENCE.push({
+  const extendedEvidence=[...packet.FORMULA_EVIDENCE, {
     id:'CEGUI_C_NUMBER5_MAPPING',
     support_status:'PINNED_ENGINE_FORMULA_SUPPORT',
     repo:REPO,
@@ -253,29 +243,17 @@ testMutation('UNAPPLIED_FORMULA_EVIDENCE', ()=>{
     source_anchor:'export function getTrigramFromCFigure',
     authority_type:'PINNED_ENGINE_FORMULA_SUPPORT',
     bounded_supported_claim:'fake'
-  });
-  // Now evidence contains number5 but applied does not -> should fail coverage check
-  const evIds=packet.FORMULA_EVIDENCE.map(e=>e.id).sort();
-  const appliedSorted=[...packet.APPLIED_FORMULA_IDS].sort();
-  if(JSON.stringify(evIds)===JSON.stringify(appliedSorted)) throw new Error('should mismatch for unapplied');
-  throw new Error('unapplied evidence detected');
+  }];
+  prod.validateCoverage(extendedEvidence, packet.APPLIED_FORMULA_IDS, packet.APPLIED_FORMULA_IDS);
 });
 
-// Source-derived trigram/yang table mismatch
+// Source-derived trigram/yang table mismatch - use production yang validator with mutated witness
 testMutation('YANG_LINE_SOURCE_MISMATCH', ()=>{
-  // Simulate witness mismatch: mutate one value while keeping all eight keys
-  const witness={1:3,2:2,3:2,4:1,5:2,6:1,7:1,8:1}; // last changed from 0 to 1
-  const derived=expectedYangMap;
-  for(const k of Object.keys(derived)){
-    if(derived[k]!==witness[k]){
-      throw new Error(`witness mismatch for ${k}`);
-    }
-  }
-  // If we reach here, mismatch not detected
-  throw new Error('mismatch not detected - should have failed');
+  const witnessMutated={1:3,2:2,3:2,4:1,5:2,6:1,7:1,8:1}; // 8 keys, one wrong value (8:0->1)
+  prod.validateWitnessAgainstSourceDerived(expectedYangMap, witnessMutated);
 });
 
-// Wrong number-5 source locator
+// Wrong number-5 source locator - executable anchor wrong
 testMutation('NUMBER5_LOCATOR_NEGATIVE', ()=>{
   const bad={
     id:'CEGUI_C_NUMBER5_MAPPING',
@@ -287,10 +265,10 @@ testMutation('NUMBER5_LOCATOR_NEGATIVE', ()=>{
     authority_type:'PINNED_ENGINE_FORMULA_SUPPORT',
     bounded_supported_claim:'CE 5 mapping'
   };
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
-// Additional: verify that method2 repo anchor is exactly present
+// Wrong number-5 repo locator
 testMutation('NUMBER5_REPO_LOCATOR', ()=>{
   const bad={
     id:'CEGUI_C_NUMBER5_MAPPING_REPO_METHOD2',
@@ -302,7 +280,7 @@ testMutation('NUMBER5_REPO_LOCATOR', ()=>{
     authority_type:'REPO_DECLARED_METHOD_SUPPORT',
     bounded_supported_claim:'fake'
   };
-  validateEvidenceEntry(bad);
+  prod.validateEvidenceEntry(bad, upstream);
 });
 
 console.log('CEGUI_CAPABILITY_TEST=PASS');
@@ -313,7 +291,17 @@ console.log('WRONG_PATH_MUTATION_TEST=PASS');
 console.log('PATH_ESCAPE_MUTATION_TEST=PASS');
 console.log('WRONG_ANCHOR_MUTATION_TEST=PASS');
 console.log('MISSING_CLAIM_MUTATION_TEST=PASS');
+console.log('WRONG_SUPPORT_STATUS_MUTATION_TEST=PASS');
+console.log('WRONG_AUTHORITY_TYPE_MUTATION_TEST=PASS');
+console.log('SUPPORT_AUTHORITY_MISMATCH_MUTATION_TEST=PASS');
 console.log('MISSING_FORMULA_EVIDENCE_TEST=PASS');
 console.log('UNAPPLIED_FORMULA_EVIDENCE_TEST=PASS');
 console.log('YANG_LINE_SOURCE_MISMATCH_TEST=PASS');
 console.log('NUMBER5_LOCATOR_NEGATIVE_TEST=PASS');
+console.log('PRODUCTION_EVIDENCE_VALIDATOR_TESTABLE=YES');
+console.log('PRODUCTION_COVERAGE_VALIDATOR_TESTABLE=YES');
+console.log('PRODUCTION_YANG_WITNESS_VALIDATOR_TESTABLE=YES');
+console.log('SUPPORT_STATUS_VOCAB_ENFORCED=YES');
+console.log('AUTHORITY_TYPE_VOCAB_ENFORCED=YES');
+console.log('SUPPORT_AUTHORITY_PAIR_ENFORCED=YES');
+console.log('ALL_NEGATIVE_TESTS_USE_PRODUCTION_VALIDATION=YES');
