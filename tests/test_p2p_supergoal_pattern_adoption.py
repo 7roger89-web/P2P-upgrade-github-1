@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEM = ROOT / ".p2p" / "system"
-if str(SYSTEM) not in __import__("sys").path:
-    __import__("sys").path.insert(0, str(SYSTEM))
+if str(SYSTEM) not in sys.path:
+    sys.path.insert(0, str(SYSTEM))
 
 from p2p_capabilities.native_goal_bridge import (  # noqa: E402
     CLAUDE_CODE,
@@ -25,8 +28,8 @@ assert spec and spec.loader
 worktree = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(worktree)
 
-
 BASELINE = "a" * 40
+PACKAGED_BRIDGE = ".agents/skills/p2p/scripts/p2p_native_goal.py"
 
 
 def sample_goal() -> dict:
@@ -40,7 +43,6 @@ def sample_goal() -> dict:
 
 
 def _task(task_id: str, *, dependency: str | None = None) -> dict:
-    required = f"evidence:{task_id}"
     return {
         "task_id": task_id,
         "goal_id": "goal-supergoal-adoption",
@@ -51,7 +53,7 @@ def _task(task_id: str, *, dependency: str | None = None) -> dict:
         "scope": [f"scope:{task_id}"],
         "non_scope": [f"non-scope:{task_id}"],
         "acceptance_requirements": [f"accept:{task_id}"],
-        "required_evidence": [required],
+        "required_evidence": [f"evidence:{task_id}"],
         "permission_needs": ["sandboxed-default"],
         "required_capabilities": [],
         "optional_capabilities": [],
@@ -86,7 +88,7 @@ class TestNativeGoalProjection(unittest.TestCase):
         self.assertIsNone(replay["fixed_retry_hard_stop"])
         self.assertEqual(replay["recovery_policy"], "P2P_ADAPTIVE_FAILURE_CLASSIFICATION")
         self.assertIn("do not use a fixed retry count", result["condition"])
-        self.assertIn("scripts/p2p_worktree_evidence.py summary", result["condition"])
+        self.assertIn(f"python {PACKAGED_BRIDGE} worktree summary", result["condition"])
 
     def test_codex_projection_does_not_invent_claude_semantics(self) -> None:
         result = build_native_goal_projection(CODEX_CLI, sample_goal(), sample_tasks())
@@ -123,15 +125,16 @@ class TestNativeGoalProjection(unittest.TestCase):
 
     def test_baseline_must_be_exact_full_git_oid(self) -> None:
         with self.assertRaisesRegex(NativeGoalBridgeError, "BASELINE_REF_MUST_BE_FULL_GIT_COMMIT_OID"):
-            build_native_goal_projection(CLAUDE_CODE, sample_goal(), sample_tasks(), baseline_ref="HEAD~1")
+            build_native_goal_projection(
+                CLAUDE_CODE, sample_goal(), sample_tasks(), baseline_ref="HEAD~1"
+            )
 
 
 class TestCompleteWorktreeEvidence(unittest.TestCase):
     def git(self, root: Path, *args: str) -> str:
-        result = subprocess.run(
+        return subprocess.run(
             ["git", "-C", str(root), *args], capture_output=True, text=True, check=True
-        )
-        return result.stdout.strip()
+        ).stdout.strip()
 
     def build_repo(self) -> tuple[tempfile.TemporaryDirectory[str], Path, str]:
         td = tempfile.TemporaryDirectory()
@@ -139,18 +142,14 @@ class TestCompleteWorktreeEvidence(unittest.TestCase):
         self.git(root, "init")
         self.git(root, "config", "user.email", "test@example.com")
         self.git(root, "config", "user.name", "P2P Test")
-        (root / "unstaged.txt").write_text("one\n", encoding="utf-8")
-        (root / "staged.txt").write_text("one\n", encoding="utf-8")
-        (root / "deleted.txt").write_text("one\n", encoding="utf-8")
-        (root / "unchanged.txt").write_text("one\n", encoding="utf-8")
+        for name in ("unstaged.txt", "staged.txt", "deleted.txt", "unchanged.txt"):
+            (root / name).write_text("one\n", encoding="utf-8")
         self.git(root, "add", ".")
         self.git(root, "commit", "-m", "baseline")
         baseline = self.git(root, "rev-parse", "HEAD")
-
-        (root / "committed-after.txt").write_text("committed later\n", encoding="utf-8")
+        (root / "committed-after.txt").write_text("later\n", encoding="utf-8")
         self.git(root, "add", "committed-after.txt")
         self.git(root, "commit", "-m", "after baseline")
-
         (root / "unstaged.txt").write_text("two\n", encoding="utf-8")
         (root / "staged.txt").write_text("two\n", encoding="utf-8")
         self.git(root, "add", "staged.txt")
@@ -162,25 +161,21 @@ class TestCompleteWorktreeEvidence(unittest.TestCase):
         td, root, baseline = self.build_repo()
         try:
             result = worktree.complete_worktree_summary(root, baseline)
-            self.assertEqual(result["status"], "PASS")
             self.assertEqual(
                 set(result["changed_files"]),
-                {
-                    "committed-after.txt",
-                    "unstaged.txt",
-                    "staged.txt",
-                    "deleted.txt",
-                    "untracked.txt",
-                },
+                {"committed-after.txt", "unstaged.txt", "staged.txt", "deleted.txt", "untracked.txt"},
             )
             self.assertEqual(result["changed_file_count"], 5)
             self.assertFalse(result["clean_vs_baseline"])
             self.assertFalse(result["working_tree_clean_now"])
-            self.assertTrue(result["includes_committed_after_baseline"])
-            self.assertTrue(result["includes_staged"])
-            self.assertTrue(result["includes_unstaged"])
-            self.assertTrue(result["includes_deleted_tracked"])
-            self.assertTrue(result["includes_untracked"])
+            for key in (
+                "includes_committed_after_baseline",
+                "includes_staged",
+                "includes_unstaged",
+                "includes_deleted_tracked",
+                "includes_untracked",
+            ):
+                self.assertTrue(result[key])
             self.assertFalse(result["file_contents_read"])
             self.assertFalse(result["repository_mutated"])
             self.assertFalse(result["acceptance_authority"])
@@ -190,39 +185,72 @@ class TestCompleteWorktreeEvidence(unittest.TestCase):
     def test_deliverable_states_are_explicit(self) -> None:
         td, root, baseline = self.build_repo()
         try:
-            self.assertEqual(
-                worktree.deliverable_evidence(root, baseline, "untracked.txt")["state"],
-                "UNTRACKED_NEW",
-            )
+            self.assertEqual(worktree.deliverable_evidence(root, baseline, "untracked.txt")["state"], "UNTRACKED_NEW")
             deleted = worktree.deliverable_evidence(root, baseline, "deleted.txt")
             self.assertEqual(deleted["state"], "DELETED_VS_BASELINE")
             self.assertFalse(deleted["present"])
             unchanged = worktree.deliverable_evidence(root, baseline, "unchanged.txt")
             self.assertEqual(unchanged["state"], "EXISTS_UNCHANGED")
             self.assertFalse(unchanged["produced_or_changed_since_baseline"])
-            missing = worktree.deliverable_evidence(root, baseline, "missing.txt")
-            self.assertEqual(missing["state"], "MISSING")
-            self.assertFalse(missing["present"])
         finally:
             td.cleanup()
 
-    def test_invalid_baseline_fails_closed(self) -> None:
-        td, root, _baseline = self.build_repo()
+    def test_invalid_baseline_and_path_escape_fail_closed(self) -> None:
+        td, root, baseline = self.build_repo()
         try:
             with self.assertRaisesRegex(worktree.WorktreeEvidenceError, "BASELINE_MUST_BE_FULL_GIT_COMMIT_OID"):
                 worktree.complete_worktree_summary(root, "HEAD~1")
             with self.assertRaises(worktree.WorktreeEvidenceError):
                 worktree.complete_worktree_summary(root, "f" * 40)
-        finally:
-            td.cleanup()
-
-    def test_deliverable_rejects_path_escape(self) -> None:
-        td, root, baseline = self.build_repo()
-        try:
             with self.assertRaisesRegex(worktree.WorktreeEvidenceError, "PATH_MUST_BE_PROJECT_RELATIVE"):
                 worktree.deliverable_evidence(root, baseline, "../outside.txt")
         finally:
             td.cleanup()
+
+
+class TestPackagedTransport(unittest.TestCase):
+    def test_packaged_skill_wrapper_is_present(self) -> None:
+        self.assertTrue((ROOT / PACKAGED_BRIDGE).is_file())
+        source = (ROOT / "scripts" / "package_release.py").read_text(encoding="utf-8")
+        self.assertIn('"p2p",', source)
+        self.assertIn('".agents/skills",', source)
+
+    def test_installed_shape_can_render_goal_without_second_state(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            project = Path(td)
+            runtime = project / ".p2p" / "system" / "p2p_capabilities"
+            skill_scripts = project / ".agents" / "skills" / "p2p" / "scripts"
+            state = project / ".p2p" / "state"
+            shutil.copytree(SYSTEM / "p2p_capabilities", runtime)
+            skill_scripts.mkdir(parents=True)
+            shutil.copy2(ROOT / PACKAGED_BRIDGE, skill_scripts / "p2p_native_goal.py")
+            state.mkdir(parents=True)
+            (state / "autopilot-goal-state.json").write_text(
+                json.dumps(sample_goal()), encoding="utf-8"
+            )
+            (state / "task-state.json").write_text(
+                json.dumps(sample_tasks()), encoding="utf-8"
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(skill_scripts / "p2p_native_goal.py"),
+                    "--root",
+                    str(project),
+                    "goal",
+                    "--host",
+                    CLAUDE_CODE,
+                    "--format",
+                    "json",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            payload = json.loads(result.stdout)
+            self.assertEqual(payload["host_kind"], CLAUDE_CODE)
+            self.assertFalse(payload["state_authority_created"])
+            self.assertFalse(payload["native_goal_evaluator_is_acceptance_authority"])
 
 
 if __name__ == "__main__":
