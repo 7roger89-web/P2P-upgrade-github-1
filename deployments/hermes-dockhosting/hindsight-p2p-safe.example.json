@@ -1,0 +1,14 @@
+{
+  "mode": "cloud",
+  "bank_id_template": "p2p-{workspace}",
+  "recall_budget": "low",
+  "recall_max_tokens": 1200,
+  "recall_types": "observation",
+  "auto_recall": false,
+  "recall_sync": false,
+  "auto_retain": false,
+  "retain_async": true,
+  "retain_every_n_turns": 1,
+  "retain_source": "p2p-hermes",
+  "memory_mode": "tools"
+}
