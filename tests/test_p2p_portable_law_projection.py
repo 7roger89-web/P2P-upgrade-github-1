@@ -59,6 +59,13 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "<!-- BEGIN P2P PORTABLE LAW -->" in agents
     assert ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md" in agents
     assert "TASK_BRANCH != LAW_AUTHORITY" in agents
+    assert "### Native long-running goal bridge" in agents
+    assert ".p2p/system/p2p_capabilities/native_goal_bridge.py" in agents
+    assert ".p2p/system/p2p_capabilities/worktree_evidence.py" in agents
+    assert "committed-after-baseline" in agents
+    assert "executor self-report are never P2P acceptance authority" in agents
+    assert "Never introduce a fixed retry-count hard stop" in agents
+    assert "do not assume Codex CLI has Claude Code's evaluator semantics" in agents
 
 
 def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None:
@@ -96,6 +103,7 @@ def test_projection_preserves_existing_agents_and_is_checkable(tmp_path: Path) -
     assert (project / "AGENTS.md").read_bytes() == first_agents
     agents = first_agents.decode("utf-8")
     assert agents.count("<!-- BEGIN P2P PORTABLE LAW -->") == 1
+    assert agents.count("### Native long-running goal bridge") == 1
     assert agents.startswith("# Existing project rules")
 
 
