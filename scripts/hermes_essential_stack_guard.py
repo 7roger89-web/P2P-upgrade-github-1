@@ -15,11 +15,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STACK_DIR = REPO_ROOT / "deployments" / "hermes-essential-stack"
 COMPOSE_PATH = STACK_DIR / "docker-compose.yml"
+WORKSPACE_DOCKERFILE_PATH = STACK_DIR / "Dockerfile.workspace"
 ENV_EXAMPLE_PATH = STACK_DIR / ".env.example"
 DEFAULT_ENV_PATH = STACK_DIR / ".env"
 
 WORKSPACE_COMMIT = "15fa9cd706f5c04e4db288fb958e21d10fc776da"
-WORKSPACE_SOURCE = f"https://github.com/outsourc-e/hermes-workspace.git#{WORKSPACE_COMMIT}"
+WORKSPACE_PNPM = "9.15.9"
 EXPECTED = {
     "hermes": "nousresearch/hermes-agent:v2026.9.14",
     "workspace": f"hermes-workspace:v2.3.0@{WORKSPACE_COMMIT}",
@@ -109,7 +110,8 @@ def validate_env(text: str, *, allow_placeholders: bool = False) -> dict[str, ob
 
 def validate_compose(text: str) -> dict[str, object]:
     required_fragments = [
-        WORKSPACE_SOURCE,
+        "dockerfile: deployments/hermes-essential-stack/Dockerfile.workspace",
+        f"WORKSPACE_COMMIT: {WORKSPACE_COMMIT}",
         "image: p2p-hermes-workspace:v2.3.0-15fa9cd",
         "repomix@1.18.0",
         "tokscale@4.16.0",
@@ -147,18 +149,53 @@ def validate_compose(text: str) -> dict[str, object]:
     return {
         "status": "PASS",
         "workspace": EXPECTED["workspace"],
-        "workspace_source": WORKSPACE_SOURCE,
         "repomix": EXPECTED["repomix"],
         "tokscale": EXPECTED["tokscale"],
         "mission_control_authority": False,
     }
 
 
+def validate_workspace_dockerfile(text: str) -> dict[str, object]:
+    required = [
+        f"ARG WORKSPACE_COMMIT={WORKSPACE_COMMIT}",
+        f"corepack prepare pnpm@{WORKSPACE_PNPM} --activate",
+        'git remote add origin https://github.com/outsourc-e/hermes-workspace.git',
+        'git fetch --depth=1 origin "${WORKSPACE_COMMIT}"',
+        'test "$(git rev-parse HEAD)" = "${WORKSPACE_COMMIT}"',
+        "pnpm install --frozen-lockfile",
+        "pnpm build",
+    ]
+    missing = [item for item in required if item not in text]
+    if missing:
+        raise StackContractError(f"WORKSPACE_DOCKERFILE_REQUIRED_FRAGMENT_MISSING:{missing[0]}")
+    forbidden = [
+        "git checkout main",
+        "git checkout master",
+        "pnpm@latest",
+        "ghcr.io/outsourc-e/hermes-workspace",
+    ]
+    hit = [item for item in forbidden if item in text]
+    if hit:
+        raise StackContractError(f"WORKSPACE_DOCKERFILE_FORBIDDEN_FRAGMENT:{hit[0]}")
+    return {
+        "status": "PASS",
+        "commit": WORKSPACE_COMMIT,
+        "pnpm": WORKSPACE_PNPM,
+    }
+
+
 def validate_stack(*, env_path: Path | None = None, allow_placeholders: bool = False) -> dict[str, object]:
     compose_result = validate_compose(COMPOSE_PATH.read_text(encoding="utf-8"))
+    workspace_build_result = validate_workspace_dockerfile(
+        WORKSPACE_DOCKERFILE_PATH.read_text(encoding="utf-8")
+    )
     target_env = env_path or DEFAULT_ENV_PATH
     env_result = validate_env(target_env.read_text(encoding="utf-8"), allow_placeholders=allow_placeholders)
-    return {"compose": compose_result, "env": env_result}
+    return {
+        "compose": compose_result,
+        "workspace_build": workspace_build_result,
+        "env": env_result,
+    }
 
 
 def init_env(output: Path, *, force: bool = False) -> dict[str, object]:
