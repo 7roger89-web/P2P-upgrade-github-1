@@ -1,0 +1,42 @@
+name: P2P security/reverse adapters
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".p2p/system/p2p_capabilities/security_contract.py"
+      - ".p2p/system/p2p_capabilities/apkid_adapter.py"
+      - ".p2p/system/p2p_capabilities/reverse_skill_bridge.py"
+      - "tests/test_p2p_sec01_security_reverse_apkid.py"
+      - "tests/test_p2p_reverse_skill_bridge.py"
+      - ".github/workflows/p2p-security-reverse-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - ".p2p/system/p2p_capabilities/security_contract.py"
+      - ".p2p/system/p2p_capabilities/apkid_adapter.py"
+      - ".p2p/system/p2p_capabilities/reverse_skill_bridge.py"
+      - "tests/test_p2p_sec01_security_reverse_apkid.py"
+      - "tests/test_p2p_reverse_skill_bridge.py"
+      - ".github/workflows/p2p-security-reverse-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  security-reverse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Run bounded security/reverse tests
+        run: >-
+          python3 -m unittest -v
+          tests.test_p2p_sec01_security_reverse_apkid
+          tests.test_p2p_reverse_skill_bridge
