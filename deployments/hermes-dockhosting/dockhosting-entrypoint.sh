@@ -54,10 +54,17 @@ telegram:
 EOF
 fi
 
-# This image is the P2P Personal AI deployment, so the bundled behavior bridge
-# is an intentional part of the runtime contract. Use Hermes' own idempotent
-# enable command so fresh and already-persisted config.yaml files converge on
-# the same plugin state without hand-editing or replacing unrelated settings.
-/opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior >/dev/null
+# Hermes' upstream stage2 lifecycle owns volume chown/config migration. Never
+# run the plugin CLI here as root: doing so can leave root-owned logs/backups in
+# an already-persisted /opt/data volume. On the normal PID-1 path, hand s6 our
+# tiny post-bootstrap wrapper; it enables the plugin as `hermes` and then
+# delegates to the upstream main-wrapper. Wrapped runtimes run stage2 directly,
+# then perform the same unprivileged enable before entering main-wrapper.
+if [ "$$" -eq 1 ]; then
+  exec /init /usr/local/bin/p2p-post-bootstrap-main.sh "$@"
+fi
 
-exec /opt/hermes/docker/entrypoint-dispatch.sh "$@"
+export PATH="/command:/package/admin/s6/command:${PATH}"
+/opt/hermes/docker/stage2-hook.sh
+s6-setuidgid hermes /opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior >/dev/null
+exec /opt/hermes/docker/main-wrapper.sh "$@"
