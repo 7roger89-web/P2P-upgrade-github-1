@@ -54,4 +54,10 @@ telegram:
 EOF
 fi
 
+# This image is the P2P Personal AI deployment, so the bundled behavior bridge
+# is an intentional part of the runtime contract. Use Hermes' own idempotent
+# enable command so fresh and already-persisted config.yaml files converge on
+# the same plugin state without hand-editing or replacing unrelated settings.
+/opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior >/dev/null
+
 exec /opt/hermes/docker/entrypoint-dispatch.sh "$@"
