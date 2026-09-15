@@ -51,6 +51,13 @@ class TestHermesEssentialStackGuard(unittest.TestCase):
         self.assertEqual(result["status"], "PASS")
         self.assertFalse(result["mission_control_authority"])
 
+    def test_workspace_wrapper_is_exact_commit_and_pnpm_pinned(self) -> None:
+        text = mod.WORKSPACE_DOCKERFILE_PATH.read_text(encoding="utf-8")
+        result = mod.validate_workspace_dockerfile(text)
+        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(result["commit"], mod.WORKSPACE_COMMIT)
+        self.assertEqual(result["pnpm"], mod.WORKSPACE_PNPM)
+
     def test_compose_rejects_public_workspace_bind(self) -> None:
         text = mod.COMPOSE_PATH.read_text(encoding="utf-8")
         bad = text.replace("127.0.0.1:3000:3000", "0.0.0.0:3000:3000")
