@@ -13,6 +13,7 @@ This stack completes the bounded integration path for the Hermes-adjacent tools 
 | TokScale `4.16.0` | read-only token/cost telemetry | opt-in `tools` profile; Hermes data volume mounted read-only; only `--json`; no `submit` path |
 | Hermes Workspace `2.3.0` | local web UI | built from exact release commit `15fa9cd706f5c04e4db288fb958e21d10fc776da`; host bind is `127.0.0.1:3000`; HermesWorld link disabled |
 | Hindsight | optional non-authoritative memory | bundled Hermes provider; enabling requires an explicit `YES` gate plus API key; safe config keeps `auto_retain=false`, `auto_recall=false`, `memory_mode=tools` |
+| Opik `2.2.59` | optional non-authoritative observability | local-stack-only hook observer; disabled by default; metadata-only by default; exact SDK pin; Cloud pilot only; no self-host Opik infrastructure |
 | GenieX `v0.3.17` | optional local inference provider | **not bundled**; Snapdragon-only host prerequisite; registered as a named Hermes custom provider only after a real `/v1/chat/completions` smoke test; main model is not changed |
 | Mission Control | not a P2P authority | intentionally absent from runtime compose; P2P already owns task state, approvals, orchestration and governance |
 
@@ -22,6 +23,8 @@ Hard invariants:
 THIRD_PARTY_TOOL != P2P_AUTHORITY
 TOKSCALE_TELEMETRY != BILLING_TRUTH
 HINDSIGHT_RECALL != DURABLE_PROJECT_TRUTH
+OPIK_TRACE != P2P_EVIDENCE_AUTHORITY
+OPIK_OBSERVABILITY != CONTROL_TOWER_AUTHORITY
 WORKSPACE_UI != CONTROL_TOWER_AUTHORITY
 GENIEX_PROVIDER != P2P_EXECUTOR_AUTHORITY
 GENIEX_REGISTER != DEFAULT_MODEL_SWITCH
@@ -35,6 +38,7 @@ MISSION_CONTROL != SECOND_CONTROL_PLANE
 - Workspace build toolchain: `pnpm 9.15.9`
 - Repomix: `v1.18.0`
 - TokScale: `v4.16.0`
+- Opik Python SDK: `2.2.59`
 - GenieX host-side integration target: stable `v0.3.17` (BSD-3-Clause); alpha/newer upstream builds are not silently selected
 
 The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. Its upstream Dockerfile is also no longer reproducible as written because unpinned Corepack now resolves to pnpm 12, whose build-script policy rejects this older release's Electron/esbuild dependency scripts.
@@ -119,6 +123,53 @@ docker compose --profile hindsight run --rm hindsight-enable
 This copies `hindsight-p2p-safe.example.json` into persistent Hermes state and sets `memory.provider=hindsight`. The safe profile intentionally keeps automatic retain and recall off. Memory must be invoked through tools and remains non-authoritative context.
 
 Enabling Hindsight with a real secret is an Owner Gate because it introduces an external memory service and persistent data flow. The repository is ready; no secret has been created or stored here.
+
+## Opik observability pilot
+
+Opik is integrated only into this richer local essential stack. The ordinary root-image build keeps `P2P_INSTALL_OPIK=0`; this stack explicitly builds the same image with `P2P_INSTALL_OPIK=1` and the exact `opik==2.2.59` SDK.
+
+The integration uses Hermes' documented plugin observer hooks around provider requests, tools, subagents and turn/session completion. It does **not** replace Hermes' native OTLP health/lifecycle telemetry and it does not add a model-visible tool. Native Hermes OTLP stays the operational health plane; Opik is the optional LLM/agent trace view.
+
+Safe defaults in the generated `.env` are:
+
+```text
+P2P_ENABLE_OPIK=NO
+P2P_OPIK_CAPTURE_CONTENT=NO
+OPIK_URL_OVERRIDE=https://www.comet.com/opik/api
+OPIK_API_KEY=
+OPIK_WORKSPACE=
+OPIK_PROJECT_NAME=p2p-hermes
+OPIK_ENVIRONMENT=development
+OPIK_ANALYTICS_ENABLE=false
+```
+
+With `P2P_OPIK_CAPTURE_CONTENT=NO`, the observer exports only bounded operational metadata such as model/provider/tool names, timing, status, token usage and opaque hashed correlation identifiers. It does **not** export user prompts, assistant responses, provider request/response bodies, tool arguments/results, subagent goals/summaries or error-message bodies.
+
+`P2P_OPIK_CAPTURE_CONTENT=YES` is a separate privacy-sensitive Owner Gate. Do not enable it merely to make traces look richer.
+
+The observer buffers the hot path in memory and creates finalized trace/span records after turn completion. A tracing failure is logged and does not become Hermes execution authority or a false P2P failure. A bounded session-finalize flush is best-effort.
+
+The pilot deliberately rejects arbitrary ingestion URLs and does not add ClickHouse, MySQL, Redis, MinIO, Kubernetes or a second Opik control plane. If self-hosting later becomes a real requirement, evaluate it as a separate infrastructure decision rather than silently expanding this pilot.
+
+To activate the Cloud pilot after the explicit external-secret/privacy Owner Gate, set local `.env` values without committing them:
+
+```text
+P2P_ENABLE_OPIK=YES
+P2P_OPIK_CAPTURE_CONTENT=NO
+OPIK_API_KEY=<your Opik API key>
+OPIK_WORKSPACE=<your Opik workspace>
+OPIK_PROJECT_NAME=p2p-hermes
+```
+
+Then validate before restart:
+
+```bash
+python scripts/hermes_essential_stack_guard.py validate
+cd deployments/hermes-essential-stack
+docker compose up -d --build hermes-agent
+```
+
+Until that real credentialed round-trip is performed, repository/CI evidence proves the build, hook contract and privacy defaults only. It must not be reported as `LIVE_OPIK_TRACE=PASS`.
 
 ## GenieX local inference
 
@@ -225,7 +276,7 @@ If a future bounded feature is uniquely valuable, integrate that feature read-on
 
 ```bash
 python scripts/hermes_essential_stack_guard.py validate
-python -m unittest -v tests.test_hermes_essential_stack_guard
+python -m unittest -v tests.test_hermes_essential_stack_guard tests.test_p2p_opik_observer
 ```
 
-Hosted CI additionally renders the compose config, builds the exact Workspace release source with the pinned wrapper toolchain, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, and starts the local-only Hermes + Workspace stack for health verification. Hosted CI validates the GenieX registration contract statically; live GenieX inference remains a Snapdragon-device proof and is never inferred from ordinary GitHub runners.
+Hosted CI additionally renders the compose config, builds the exact Workspace release source with the pinned wrapper toolchain, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, verifies exact `opik==2.2.59` importability in that image, proves the metadata-only observer privacy/hook contract, and starts the local-only Hermes + Workspace stack for health verification. Hosted CI validates the GenieX registration contract statically; live GenieX inference remains a Snapdragon-device proof and is never inferred from ordinary GitHub runners. Live Opik Cloud delivery likewise remains unclaimed until the explicit external-credential pilot is run.
