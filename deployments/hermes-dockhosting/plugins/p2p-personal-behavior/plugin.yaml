@@ -1,11 +1,15 @@
 name: p2p-personal-behavior
-version: 0.1.0
+version: 0.2.0
 description: >-
   P2P Personal AI runtime bridge. Adds a cache-safe communication contract,
-  conservative per-turn serious/short/deep overrides, and report-only
-  anti-slop linting to Hermes CLI and gateway sessions without modifying
-  Hermes core or rewriting factual content.
+  conservative per-turn overrides, bounded per-session interaction adaptation,
+  open-loop continuation handling, and report-only anti-slop linting to Hermes
+  CLI and gateway sessions without modifying Hermes core, rewriting factual
+  content, or simulating human emotion/relationships.
 author: 7roger89-web
 provides_hooks:
   - pre_llm_call
+  - post_llm_call
   - transform_llm_output
+  - on_session_finalize
+  - on_session_reset

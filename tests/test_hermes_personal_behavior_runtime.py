@@ -54,8 +54,15 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
     def test_manifest_declares_runtime_hooks(self) -> None:
         manifest = (PLUGIN_DIR / "plugin.yaml").read_text(encoding="utf-8")
         self.assertIn("name: p2p-personal-behavior", manifest)
-        self.assertIn("- pre_llm_call", manifest)
-        self.assertIn("- transform_llm_output", manifest)
+        self.assertIn("version: 0.2.0", manifest)
+        for hook in (
+            "pre_llm_call",
+            "post_llm_call",
+            "transform_llm_output",
+            "on_session_finalize",
+            "on_session_reset",
+        ):
+            self.assertIn(f"- {hook}", manifest)
 
     def test_register_uses_documented_plugin_surfaces(self) -> None:
         ctx = FakePluginContext()
@@ -65,7 +72,16 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
         self.assertEqual(args[0], "p2p-personal-behavior.voice")
         self.assertEqual(kwargs["position"], "after_memory")
         self.assertLessEqual(kwargs["max_chars"], 4000)
-        self.assertEqual(set(ctx.hooks), {"pre_llm_call", "transform_llm_output"})
+        self.assertEqual(
+            set(ctx.hooks),
+            {
+                "pre_llm_call",
+                "post_llm_call",
+                "transform_llm_output",
+                "on_session_finalize",
+                "on_session_reset",
+            },
+        )
 
     def test_system_section_keeps_facts_above_style(self) -> None:
         text = plugin._system_prompt_section({"platform": "telegram"})
@@ -73,6 +89,7 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
         self.assertIn("Never change amounts, currencies, units, routes, dates", text)
         self.assertIn("Do not claim research, tool use", text)
         self.assertIn("Do not end with a generic offer", text)
+        self.assertIn("must never be described as human emotion", text)
 
     def test_normal_turn_adds_no_ephemeral_context_tax(self) -> None:
         self.assertIsNone(plugin._pre_llm_call("Hôm nay có gì cần làm?"))
@@ -84,6 +101,7 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
         self.assertIn("seriousness=1.00", context)
         self.assertIn("humor_allowed=false", context)
         self.assertIn("Serious-mode override", context)
+        self.assertIn("Session mode=serious", context)
 
     def test_short_and_deep_requests_map_to_existing_controller(self) -> None:
         short = plugin._pre_llm_call("Trả lời ngắn gọn giúp tao.")
@@ -96,6 +114,46 @@ class HermesPersonalBehaviorRuntimeTests(unittest.TestCase):
             "Tóm tắt ngắn gọn trước, rồi nghiên cứu sâu phần nguyên nhân."
         )
         self.assertIn("depth=deep", result["context"])
+
+    def test_continuation_carries_unresolved_open_loop_without_reasking_context(self) -> None:
+        session_id = "continuation-session"
+        plugin._clear_session_state(session_id=session_id)
+        self.assertIsNone(
+            plugin._pre_llm_call(
+                "Triển khai migration này cho tao.",
+                session_id=session_id,
+            )
+        )
+        plugin._post_llm_call(
+            "Chưa xong, đang chờ healthcheck.",
+            session_id=session_id,
+        )
+        result = plugin._pre_llm_call("Tiếp tục đi.", session_id=session_id)
+        context = result["context"]
+        self.assertIn("continues the active task", context)
+        self.assertIn("do not restart from scratch", context)
+        self.assertIn("Carry the unresolved open loop forward", context)
+
+    def test_failure_feedback_after_done_claim_requires_fresh_evidence(self) -> None:
+        session_id = "contradicted-completion"
+        plugin._clear_session_state(session_id=session_id)
+        plugin._pre_llm_call("Sửa bot này.", session_id=session_id)
+        plugin._post_llm_call("XONG.", session_id=session_id)
+        result = plugin._pre_llm_call("Lại fail rồi, xem đi.", session_id=session_id)
+        context = result["context"]
+        self.assertIn("Session mode=focused", context)
+        self.assertIn("contradicted a previous completion claim", context)
+        self.assertIn("fresh evidence", context)
+        self.assertEqual(plugin._get_session_state(session_id).friction, 1)
+
+    def test_session_reset_clears_ephemeral_adaptation(self) -> None:
+        session_id = "reset-session"
+        plugin._clear_session_state(session_id=session_id)
+        plugin._pre_llm_call("Lại fail rồi.", session_id=session_id)
+        self.assertEqual(plugin._get_session_state(session_id).friction, 1)
+        plugin._clear_session_state(old_session_id=session_id, new_session_id="new-session")
+        self.assertEqual(plugin._get_session_state(session_id).friction, 0)
+        self.assertEqual(plugin._get_session_state("new-session").friction, 0)
 
     def test_output_lint_is_report_only_and_logs_codes_not_excerpt(self) -> None:
         response = (

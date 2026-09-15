@@ -1,11 +1,12 @@
 """Minimal personal-AI behavior harness primitives.
 
-This module intentionally owns only four small, deterministic concerns:
+This module intentionally owns small deterministic concerns:
 
 1. structured voice/profile state;
 2. response-policy selection before generation;
-3. post-generation anti-slop linting without rewriting factual content; and
-4. memory-candidate classification without performing persistence.
+3. ephemeral interaction-state adaptation inside one active session;
+4. post-generation anti-slop linting without rewriting factual content; and
+5. memory-candidate classification without performing persistence.
 
 It does not own persona simulation, factual retrieval, durable memory storage,
 LLM calls, scheduling, TTS, relationship simulation, or autonomous mutation.
@@ -21,6 +22,7 @@ from typing import Literal, Mapping, Sequence
 
 
 ResponseDepth = Literal["short", "normal", "deep"]
+InteractionMode = Literal["balanced", "playful", "focused", "serious"]
 MemoryDisposition = Literal[
     "CANDIDATE",
     "HOLD_UNCERTAIN",
@@ -69,6 +71,32 @@ class ResponsePolicy:
 
 
 @dataclass(frozen=True)
+class InteractionSignals:
+    """Bounded conversational signals used only for ephemeral session adaptation."""
+
+    explicit_serious: bool = False
+    correction: bool = False
+    positive: bool = False
+    playful: bool = False
+    continuation: bool = False
+    substantive: bool = True
+
+
+@dataclass(frozen=True)
+class InteractionState:
+    """Ephemeral session state; never a claim about human emotion or relationship."""
+
+    mode: InteractionMode = "balanced"
+    friction: int = 0
+    turn_count: int = 0
+    continuation_count: int = 0
+    correction_count: int = 0
+    open_loop: bool = False
+    last_response_claimed_complete: bool = False
+    completion_claim_contradicted: bool = False
+
+
+@dataclass(frozen=True)
 class StyleFinding:
     code: str
     excerpt: str
@@ -88,6 +116,10 @@ class MemoryCandidate:
 
 def _clamp01(value: float) -> float:
     return max(0.0, min(1.0, float(value)))
+
+
+def _clamp_friction(value: int) -> int:
+    return max(0, min(3, int(value)))
 
 
 def select_response_policy(
@@ -131,15 +163,25 @@ def select_response_policy(
     if signals.explicit_serious:
         directives.append("Serious-mode override: no jokes, sarcasm, or decorative banter.")
     else:
-        directives.append(f"Humor={_clamp01(profile.humor):.2f}; sarcasm={_clamp01(profile.sarcasm):.2f}.")
+        directives.append(
+            f"Humor={_clamp01(profile.humor):.2f}; "
+            f"sarcasm={_clamp01(profile.sarcasm):.2f}."
+        )
         if profile.fresh_vietnamese_association:
-            directives.append("Use a fresh Vietnamese association only when it clarifies the point; do not echo the user's metaphor.")
+            directives.append(
+                "Use a fresh Vietnamese association only when it clarifies the point; "
+                "do not echo the user's metaphor."
+            )
     if profile.mild_profanity and not signals.explicit_serious:
         directives.append("Mild profanity is allowed when natural; never target the user.")
     if profile.no_sycophantic_opener:
-        directives.append("Do not open with generic praise, agreement-seeking, or customer-service filler.")
+        directives.append(
+            "Do not open with generic praise, agreement-seeking, or customer-service filler."
+        )
     if profile.no_generic_offer_at_end:
-        directives.append("Do not end with a generic offer to do more work when the requested outcome is already complete.")
+        directives.append(
+            "Do not end with a generic offer to do more work when the requested outcome is already complete."
+        )
 
     return ResponsePolicy(
         pre_actions=pre_actions,
@@ -148,6 +190,127 @@ def select_response_policy(
         humor_allowed=humor_allowed,
         style_directives=tuple(directives),
     )
+
+
+def advance_interaction_state(
+    state: InteractionState,
+    signals: InteractionSignals,
+) -> InteractionState:
+    """Advance bounded session state from explicit conversational evidence.
+
+    This state models interaction handling only. It must not be presented as
+    the assistant having feelings, a relationship score, biological needs, or
+    a hidden inner life.
+    """
+
+    friction = state.friction
+    contradicted = False
+
+    if signals.correction:
+        friction = _clamp_friction(friction + 1)
+        contradicted = state.last_response_claimed_complete
+    elif signals.positive:
+        friction = _clamp_friction(friction - 1)
+
+    if signals.explicit_serious:
+        mode: InteractionMode = "serious"
+    elif signals.correction or friction > 0:
+        mode = "focused"
+    elif signals.playful:
+        mode = "playful"
+    else:
+        mode = "balanced"
+
+    open_loop = state.open_loop
+    if signals.substantive:
+        open_loop = True
+    if signals.continuation:
+        open_loop = True
+
+    return InteractionState(
+        mode=mode,
+        friction=friction,
+        turn_count=state.turn_count + 1,
+        continuation_count=state.continuation_count + int(signals.continuation),
+        correction_count=state.correction_count + int(signals.correction),
+        open_loop=open_loop,
+        last_response_claimed_complete=state.last_response_claimed_complete,
+        completion_claim_contradicted=contradicted,
+    )
+
+
+def reflect_assistant_outcome(
+    state: InteractionState,
+    *,
+    claimed_complete: bool = False,
+    unresolved: bool = False,
+) -> InteractionState:
+    """Reflect only coarse completion/open-loop evidence after a turn.
+
+    A normal completed response closes the current turn-level loop unless the
+    response itself contains strong unresolved evidence. A later explicit
+    continuation signal can reopen the task without requiring raw prompt copies.
+    """
+
+    open_loop = bool(unresolved)
+
+    return InteractionState(
+        mode=state.mode,
+        friction=state.friction,
+        turn_count=state.turn_count,
+        continuation_count=state.continuation_count,
+        correction_count=state.correction_count,
+        open_loop=open_loop,
+        last_response_claimed_complete=claimed_complete,
+        completion_claim_contradicted=False,
+    )
+
+
+def build_interaction_directives(
+    state: InteractionState,
+    *,
+    continuation: bool = False,
+) -> tuple[str, ...]:
+    """Return bounded rendering directives for non-default session conditions."""
+
+    directives: list[str] = []
+
+    if state.mode == "serious":
+        directives.append(
+            "Session mode=serious: be deliberately plain, precise, and free of decorative banter."
+        )
+    elif state.mode == "focused":
+        directives.append(
+            "Session mode=focused: prioritize root-cause repair and verification; reduce decorative banter."
+        )
+    elif state.mode == "playful":
+        directives.append(
+            "Session mode=playful: use a relaxed conversational rhythm and wit without weakening factual precision."
+        )
+
+    if continuation:
+        directives.append(
+            "This turn explicitly continues the active task. Use the existing conversation history; "
+            "do not restart from scratch or ask the user to reconstruct context already present."
+        )
+
+    if state.completion_claim_contradicted:
+        directives.append(
+            "The user just contradicted a previous completion claim. Correct the record and require "
+            "fresh evidence before claiming completion again."
+        )
+    elif state.friction > 0:
+        directives.append(
+            "Recent correction/failure feedback is active. Verify the concrete result before saying "
+            "the task is done."
+        )
+
+    if state.open_loop and continuation:
+        directives.append(
+            "Carry the unresolved open loop forward until the requested outcome is actually evidenced."
+        )
+
+    return tuple(directives)
 
 
 _SLOP_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
@@ -162,7 +325,8 @@ _SLOP_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "GENERIC_FOLLOWUP_OFFER",
         re.compile(
-            r"\bnếu (?:bạn|anh|mày) muốn[^.!?\n]{0,80}\b(?:tôi|mình|tao) có thể\b[^.!?\n]{0,120}(?:[.!?…]+)?\s*$",
+            r"\bnếu (?:bạn|anh|mày) muốn[^.!?\n]{0,80}\b(?:tôi|mình|tao) có thể\b"
+            r"[^.!?\n]{0,120}(?:[.!?…]+)?\s*$",
             re.IGNORECASE,
         ),
     ),
