@@ -16,7 +16,6 @@ import argparse
 import json
 import re
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -116,8 +115,10 @@ def _relative_path(value: str) -> str:
     path = Path(raw)
     if path.is_absolute() or ".." in path.parts:
         raise WorktreeEvidenceError("PATH_MUST_BE_PROJECT_RELATIVE")
-    normalized = path.as_posix().lstrip("./")
-    if not normalized:
+    normalized = path.as_posix()
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    if not normalized or normalized == ".":
         raise WorktreeEvidenceError("PATH_REQUIRED")
     return normalized
 
@@ -129,23 +130,25 @@ def deliverable_evidence(root: str | Path, baseline: str, path: str) -> dict[str
     tracked = set(_tracked_changed(repo, base))
     untracked = set(_untracked(repo))
     target = repo / relative
-    tracked_now = bool(_run_git(repo, ["ls-files", "--error-unmatch", "--", relative], allow_nonzero=True).returncode == 0)
+    tracked_now = _run_git(
+        repo, ["ls-files", "--error-unmatch", "--", relative], allow_nonzero=True
+    ).returncode == 0
 
     if relative in untracked:
         state = "UNTRACKED_NEW"
         present = True
         produced = True
     elif relative in tracked:
-        if target.exists() or tracked_now:
+        if target.exists():
             state = "CHANGED_VS_BASELINE"
-            present = target.exists()
+            present = True
         else:
             state = "DELETED_VS_BASELINE"
             present = False
         produced = True
     elif target.exists() or tracked_now:
         state = "EXISTS_UNCHANGED"
-        present = True
+        present = target.exists()
         produced = False
     else:
         state = "MISSING"
