@@ -471,10 +471,7 @@ the failure class is established.
 
    Normative clarifications:
 
-   - The temporary transport branch is repository transport state, NOT project
-     source, NOT a release, NOT a promotion, and MUST NEVER become part of the
-     assessed target tree. `TRANSPORT_BRANCH_IS_EPHEMERAL=YES` is an
-     invariant, not a naming choice.
+   - The temporary transport branch is repository transport state, NOT project source, NOT a release, NOT a promotion, and MUST NEVER become part of the assessed target tree. `TRANSPORT_BRANCH_IS_EPHEMERAL=YES` is an invariant, not a naming choice.
    - `TRANSPORT_BRANCH_NOT_TARGET_REF=YES` — the transport branch is never the
      assessment target. The scan/validation/OE assessment target is always a
      clean detached checkout/worktree at the authoritative `origin/main` SHA
