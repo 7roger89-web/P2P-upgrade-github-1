@@ -11,13 +11,18 @@ if str(SYSTEM_ROOT) not in sys.path:
     sys.path.insert(0, str(SYSTEM_ROOT))
 
 from p2p_capabilities.personal_ai_behavior import (  # noqa: E402
+    InteractionSignals,
+    InteractionState,
     MemoryCandidate,
     ResponseSignals,
     VoiceProfile,
+    advance_interaction_state,
+    build_interaction_directives,
     build_render_packet,
     classify_memory_candidate,
     lint_response,
     locked_facts_unchanged,
+    reflect_assistant_outcome,
     select_response_policy,
 )
 
@@ -62,6 +67,50 @@ class PersonalAIBehaviorHarnessTests(unittest.TestCase):
         )
         self.assertEqual(short.depth, "short")
         self.assertEqual(deep.depth, "deep")
+
+    def test_session_correction_after_completion_forces_focused_evidence_mode(self) -> None:
+        state = reflect_assistant_outcome(
+            InteractionState(open_loop=True),
+            claimed_complete=True,
+        )
+        state = advance_interaction_state(
+            state,
+            InteractionSignals(correction=True),
+        )
+        self.assertEqual(state.mode, "focused")
+        self.assertEqual(state.friction, 1)
+        self.assertTrue(state.completion_claim_contradicted)
+        directives = build_interaction_directives(state)
+        self.assertTrue(any("fresh evidence" in item for item in directives))
+
+    def test_positive_feedback_reduces_bounded_friction(self) -> None:
+        state = InteractionState(mode="focused", friction=2)
+        state = advance_interaction_state(
+            state,
+            InteractionSignals(positive=True, substantive=False),
+        )
+        self.assertEqual(state.friction, 1)
+        self.assertEqual(state.mode, "focused")
+
+    def test_continuation_keeps_open_loop_and_reuses_session_history(self) -> None:
+        state = InteractionState(open_loop=True)
+        state = advance_interaction_state(
+            state,
+            InteractionSignals(continuation=True, substantive=False),
+        )
+        self.assertTrue(state.open_loop)
+        self.assertEqual(state.continuation_count, 1)
+        directives = build_interaction_directives(state, continuation=True)
+        text = " ".join(directives)
+        self.assertIn("continues the active task", text)
+        self.assertIn("do not restart from scratch", text)
+
+    def test_reflection_closes_completed_loop_and_preserves_unresolved_loop(self) -> None:
+        active = InteractionState(open_loop=True)
+        completed = reflect_assistant_outcome(active, claimed_complete=True)
+        blocked = reflect_assistant_outcome(completed, unresolved=True)
+        self.assertFalse(completed.open_loop)
+        self.assertTrue(blocked.open_loop)
 
     def test_anti_slop_linter_catches_strong_generic_markers(self) -> None:
         text = (
