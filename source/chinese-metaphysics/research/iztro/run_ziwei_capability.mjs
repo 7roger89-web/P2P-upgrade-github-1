@@ -28,6 +28,48 @@ try { head = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encodi
 catch { fail(`Cannot verify pinned upstream: ${upstream}`); }
 if (head !== PIN) fail(`Pinned upstream SHA mismatch: expected ${PIN}, got ${head}`);
 
+const XQR_PIN = '7b8364bbd79a11e852899893ac5749a83be62836';
+const XQR_REPO = 'ZhangZangQian/xu-quanren';
+const xqrUpstream = path.resolve(scriptDir, '../../upstreams/xu-quanren');
+
+if (!fs.existsSync(xqrUpstream)) fail(`Pinned xu-quanren upstream missing: ${xqrUpstream}`);
+let xqrHead;
+try { xqrHead = execFileSync('git', ['-C', xqrUpstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); }
+catch { fail(`Cannot verify pinned xu-quanren upstream: ${xqrUpstream}`); }
+if (xqrHead !== XQR_PIN) fail(`Pinned xu-quanren upstream SHA mismatch: expected ${XQR_PIN}, got ${xqrHead}`);
+
+const XQR_RULE_EVIDENCE = [
+  {
+    rule_id: 'XQR_R1_PALACE_BEFORE_STAR',
+    support_status: 'DIRECT_SOURCE_SUPPORT',
+    repo: XQR_REPO,
+    pin: XQR_PIN,
+    source_repo: XQR_REPO,
+    source_pin: XQR_PIN,
+    source_path: 'SKILL.md',
+    source_anchor: '### 优先级法则（四条铁律）',
+    supported_claim: 'Evaluates palace scope prior to taking mutagen phenomena and star properties (先定宫职范畴，再取象，最后合星).',
+  },
+  {
+    rule_id: 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER',
+    support_status: 'DIRECT_SOURCE_SUPPORT',
+    repo: XQR_REPO,
+    pin: XQR_PIN,
+    source_repo: XQR_REPO,
+    source_pin: XQR_PIN,
+    source_path: 'SKILL.md',
+    source_anchor: '### 解读法则',
+    supported_claim: 'Classifies mutagen placement by palace inner/outer boundary where Ji entering six outer palaces indicates loss/dispersion (忌入六内主得，忌入六外主失; 六内/六外分得失聚散).',
+  },
+];
+
+for (const ev of XQR_RULE_EVIDENCE) {
+  const fullPath = path.join(xqrUpstream, ev.source_path);
+  if (!fs.existsSync(fullPath)) fail(`XQR source path missing: ${fullPath}`);
+  const content = fs.readFileSync(fullPath, 'utf8');
+  if (!content.includes(ev.source_anchor)) fail(`XQR source anchor missing: ${ev.source_anchor}`);
+}
+
 const builtEntry = path.join(upstream, 'lib', 'index.js');
 if (!fs.existsSync(builtEntry)) fail(`Pinned upstream build missing: ${builtEntry}`);
 const require = createRequire(import.meta.url);
@@ -187,8 +229,9 @@ console.log(JSON.stringify({
   BIRTH_YEAR_MUTAGEN: mutagen,
   METHOD_LANE: 'XQR_REPO_DECLARED_6OUT_001',
   RULE_TRACE: ['XQR_R1_PALACE_BEFORE_STAR', 'XQR_R2_BIRTH_YEAR_JI_SIX_OUTER'],
+  RULE_EVIDENCE: XQR_RULE_EVIDENCE,
   TARGET_STAR: jiStar, TARGET_PALACE: jiPalace, BIRTH_YEAR_JI_TARGET_CLASS: targetClass,
-  STRUCTURAL_OUTPUT: structuralOutput, PROVENANCE_STATUS: 'PARTIAL', PREDICTIVE_STATUS: 'NOT_TESTED',
+  STRUCTURAL_OUTPUT: structuralOutput, PROVENANCE_STATUS: 'DIRECT_SOURCE_BOUND', PREDICTIVE_STATUS: 'NOT_TESTED',
   NONCLAIMS: [
     'NO_NATAL_EVENT_PREDICTION',
     'NO_UNIVERSAL_ZIWEI_METHOD',
