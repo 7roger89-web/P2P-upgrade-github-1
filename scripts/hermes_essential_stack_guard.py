@@ -19,10 +19,7 @@ ENV_EXAMPLE_PATH = STACK_DIR / ".env.example"
 DEFAULT_ENV_PATH = STACK_DIR / ".env"
 
 WORKSPACE_COMMIT = "15fa9cd706f5c04e4db288fb958e21d10fc776da"
-WORKSPACE_SOURCE = (
-    "https://github.com/outsourc-e/hermes-workspace.git"
-    f"?ref=v2.3.0&checksum={WORKSPACE_COMMIT}"
-)
+WORKSPACE_SOURCE = f"https://github.com/outsourc-e/hermes-workspace.git#{WORKSPACE_COMMIT}"
 EXPECTED = {
     "hermes": "nousresearch/hermes-agent:v2026.9.14",
     "workspace": f"hermes-workspace:v2.3.0@{WORKSPACE_COMMIT}",
