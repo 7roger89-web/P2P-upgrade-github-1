@@ -216,12 +216,12 @@ jobs:
         for field in ("control_id", "control_version", "objective", "applies_to", "required_scope", "required_evidence", "status_semantics", "limitations"):
             self.assertTrue(control.get(field), f"missing {field}")
         self.assertEqual(control["control_id"], CONTROL_ID)
-        self.assertEqual(control["control_version"], "0.1.0")
+        self.assertEqual(control["control_version"], "0.2.0")
         self.assertIn("github_actions_workflow_scan", str(control["required_scope"]))
-        self.assertEqual(set(control["status_semantics"].keys()), {"PASS", "FAIL", "BLOCKED"})
+        self.assertEqual(set(control["status_semantics"].keys()), {"PASS", "FAIL", "BLOCKED", "NOT_APPLICABLE"})
         self.assertIn("GitHub Actions", control["objective"])
         self.assertEqual(set(PROFILE["required_controls"].keys()), {"SHIELD-SECRET-01", "SHIELD-DEPENDENCY-01", "SHIELD-CI-01"})
-        self.assertEqual(PROFILE["profile_version"], "0.2.1")
+        self.assertEqual(PROFILE["profile_version"], "0.3.0")
 
     def test_source_and_version_pins(self):
         original = ziz.mapping()
@@ -337,7 +337,7 @@ jobs:
                 rec = dict(
                     schema="p2p-shield-evidence/1",
                     control_id=cid,
-                    control_version="0.1.0",
+                    control_version=rule["control_version"],
                     scope=scope,
                     target="/fixture",
                     target_ref="a"*40,
@@ -365,7 +365,7 @@ jobs:
                 rec = dict(
                     schema="p2p-shield-evidence/1",
                     control_id=cid,
-                    control_version="0.1.0",
+                    control_version=rule["control_version"],
                     scope=scope,
                     target="/fixture",
                     target_ref="a"*40,
@@ -398,7 +398,7 @@ jobs:
                 rec = dict(
                     schema="p2p-shield-evidence/1",
                     control_id=cid,
-                    control_version="0.1.0",
+                    control_version=rule["control_version"],
                     scope=scope,
                     target="/fixture",
                     target_ref="a"*40,
@@ -431,7 +431,7 @@ jobs:
                 rec = dict(
                     schema="p2p-shield-evidence/1",
                     control_id=cid,
-                    control_version="0.1.0",
+                    control_version=rule["control_version"],
                     scope=scope,
                     target="/fixture",
                     target_ref="a"*40,

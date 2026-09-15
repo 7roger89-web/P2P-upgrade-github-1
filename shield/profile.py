@@ -36,7 +36,7 @@ def evaluate(records, target, target_ref):
             seen.add(key)
             if (e['schema'] != 'p2p-shield-evidence/1' or e['control_version'] != expected[key]
                     or e['target'] != str(target) or e['target_ref'] != target_ref
-                    or e['status'] not in ('PASS', 'FAIL', 'BLOCKED')):
+                    or e['status'] not in ('PASS', 'FAIL', 'BLOCKED', 'NOT_APPLICABLE')):
                 return result
             for field in ('provider', 'provider_version', 'provider_source', 'reason', 'artifact_or_reference'):
                 if not isinstance(e[field], str) or not e[field]:
@@ -54,6 +54,15 @@ def evaluate(records, target, target_ref):
                 return result
             if (e['status'] == 'PASS' and count != 0) or (e['status'] == 'FAIL' and count < 1):
                 return result
+            if e['status'] == 'NOT_APPLICABLE':
+                rule = PROFILE['required_controls'][e['control_id']]
+                if rule.get('allow_not_applicable_by_target_shape') is not True:
+                    return result
+                if count != 0 or e['coverage'] != ['NOT_APPLICABLE_BY_TARGET_SHAPE'] or e['reason'] != 'TARGET_SHAPE_HAS_NO_GITHUB_ACTIONS_WORKFLOWS':
+                    return result
+                a=e.get('applicability')
+                if not isinstance(a,dict) or a.get('basis')!='DETERMINISTIC_EMPTY_WORKFLOW_INVENTORY' or a.get('path')!='.github/workflows' or a.get('workflow_count')!=0:
+                    return result
             statuses.append(e['status'])
         if seen != set(expected):
             return result
@@ -62,7 +71,8 @@ def evaluate(records, target, target_ref):
             return result
         result['PROFILE_REQUIREMENTS_STATUS'] = ('FAIL' if 'FAIL' in statuses else
                                                   'BLOCKED' if 'BLOCKED' in statuses else 'PASS')
-        result['reason'] = 'REQUIRED_SCOPED_EVIDENCE_COMPOSED_ONLY'
+        result['NOT_APPLICABLE_CONTROLS'] = sorted({e['control_id'] for e in records if e.get('status') == 'NOT_APPLICABLE'})
+        result['reason'] = ('REQUIRED_APPLICABLE_SCOPED_EVIDENCE_COMPOSED' if result['NOT_APPLICABLE_CONTROLS'] else 'REQUIRED_SCOPED_EVIDENCE_COMPOSED_ONLY')
     except (KeyError, TypeError, ValueError, AttributeError):
         pass
     return result

@@ -164,7 +164,7 @@ def assert_installed_shield(case: unittest.TestCase, project: Path) -> dict[str,
     case.assertEqual(nested, [], "supported installer nested the Shield payload")
     probe = installed_shield_probe(project)
     case.assertEqual(probe["profile_id"], "SHIELD-BASE")
-    case.assertEqual(probe["profile_version"], "0.2.1")
+    case.assertEqual(probe["profile_version"], "0.3.0")
     case.assertTrue(
         probe["module"].startswith(str(system)),
         f"Shield resolved outside the installed system: {probe['module']}",

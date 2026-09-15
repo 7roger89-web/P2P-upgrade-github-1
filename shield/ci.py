@@ -12,7 +12,7 @@ from shield.runner import resolve_target_ref
 
 
 CONTROL_ID = "SHIELD-CI-01"
-CONTROL_VERSION = "0.1.0"
+CONTROL_VERSION = "0.2.0"
 PROVIDER = "Zizmor"
 VERSION = "1.29.0"
 SCOPE = "github_actions_workflow_scan"
@@ -137,13 +137,20 @@ def assess(target, executable, reference):
         e["target_ref"] = resolve_target_ref(target)
         if not re.fullmatch(r"[0-9a-f]{40,64}", e["target_ref"]):
             raise ValueError("TARGET_REF_UNRESOLVED")
-        # Verify executable version (also checks pin)
-        try:
-            observed = zizmor_acquire.verify_executable(executable)
-        except Exception as exc:
-            # If verify_executable fails due to missing receipt but version still checkable, try direct version
-            # zizmor_acquire.version already raises appropriate error
-            raise
+        workflows_root = target / ".github" / "workflows"
+        if workflows_root.exists() and (workflows_root.is_symlink() or not workflows_root.is_dir()):
+            raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflows_root_not_regular_directory")
+        workflow_files = []
+        if workflows_root.is_dir():
+            for pattern in ("*.yml", "*.yaml"):
+                for candidate in workflows_root.glob(pattern):
+                    if candidate.is_symlink() or not candidate.is_file():
+                        raise ValueError("WORKFLOW_INVENTORY_INDETERMINATE:workflow_not_regular_file")
+                    workflow_files.append(candidate)
+        if not workflow_files:
+            e.update(status="NOT_APPLICABLE", findings_count=0, findings=[], coverage=["NOT_APPLICABLE_BY_TARGET_SHAPE"], reason="TARGET_SHAPE_HAS_NO_GITHUB_ACTIONS_WORKFLOWS", applicability={"basis":"DETERMINISTIC_EMPTY_WORKFLOW_INVENTORY","path":".github/workflows","workflow_count":0})
+            return e
+        observed = zizmor_acquire.verify_executable(executable)
         e["provider_version_observed"] = observed
         # Build invocation from mapping
         invocation = m.get("invocation", {})

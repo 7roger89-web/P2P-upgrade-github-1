@@ -1,7 +1,7 @@
 {
   "schema": "p2p-shield-control/1",
   "control_id": "SHIELD-CI-01",
-  "control_version": "0.1.0",
+  "control_version": "0.2.0",
   "promotion_status": "CANDIDATE_UNPROMOTED",
   "plan_ref": "docs/p2p-development/P2P-SHIELD-PLAN.md",
   "objective": "GitHub Actions workflow definitions inside the assessed repository scope must not contain known workflow patterns that materially weaken CI trust boundaries according to the qualified provider and declared coverage.",
@@ -15,20 +15,22 @@
   "status_semantics": {
     "PASS": "Provider executes successfully, workflow inventory is reliably established, provider output is parseable, and zero findings exist under the explicitly qualified policy/threshold.",
     "FAIL": "Provider executes successfully and one or more qualified findings exist.",
-    "BLOCKED": "Provider unavailable, source/version identity mismatch, workflow inventory indeterminate, provider execution/output malformed, or target cannot be reliably assessed."
+    "BLOCKED": "Provider unavailable, source/version identity mismatch, workflow inventory indeterminate, provider execution/output malformed, or target cannot be reliably assessed.",
+    "NOT_APPLICABLE": "Target has no GitHub Actions workflow definitions in .github/workflows; deterministic target-shape applicability is established before provider execution. This is not PASS."
   },
   "limitations": [
     "Only workflow patterns covered by the pinned Zizmor 1.29.0 provider and its default Regular persona are assessed; absence of findings is not proof that CI is secure.",
     "Assessment is limited to .github/workflows/*.yml and *.yaml collected via the provider's workflows-only mode; other CI configuration (Dockerfiles, Terraform, Kubernetes, application SAST, dependency scanning) is out of scope and belongs to other controls.",
     "Network-dependent online audits are disabled (offline mode); findings requiring live GitHub data are not assessed in this slice.",
-    "Workflow inventory certainty is required: zero workflows, indeterminate collection, or provider error is BLOCKED, not PASS.",
+    "Workflow inventory certainty is required when workflows exist. Deterministically empty .github/workflows inventory is NOT_APPLICABLE, never PASS; indeterminate inventory or provider error remains BLOCKED.",
     "Checksum integrity for this release relies on GitHub-provided asset digest (no separate checksum file is published for v1.29.0); not independent publisher signature verification."
   ],
   "non_negotiable": {
     "provider_failure_must_never_become_pass": true,
     "evidence_must_declare_actual_scope_and_limitations": true,
     "evidence_must_record_provider_identity_and_version": true,
-    "no_boolean_only_provider_interface": true
+    "no_boolean_only_provider_interface": true,
+    "not_applicable_requires_deterministic_empty_target_inventory": true
   },
   "out_of_scope": [
     "Whether a discovered workflow weakness is currently exploitable or already remediated.",
