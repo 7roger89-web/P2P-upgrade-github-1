@@ -18,9 +18,14 @@ COMPOSE_PATH = STACK_DIR / "docker-compose.yml"
 ENV_EXAMPLE_PATH = STACK_DIR / ".env.example"
 DEFAULT_ENV_PATH = STACK_DIR / ".env"
 
+WORKSPACE_COMMIT = "15fa9cd706f5c04e4db288fb958e21d10fc776da"
+WORKSPACE_SOURCE = (
+    "https://github.com/outsourc-e/hermes-workspace.git"
+    f"?ref=v2.3.0&checksum={WORKSPACE_COMMIT}"
+)
 EXPECTED = {
     "hermes": "nousresearch/hermes-agent:v2026.9.14",
-    "workspace": "ghcr.io/outsourc-e/hermes-workspace:v2.3.0",
+    "workspace": f"hermes-workspace:v2.3.0@{WORKSPACE_COMMIT}",
     "repomix": "repomix@1.18.0",
     "tokscale": "tokscale@4.16.0",
 }
@@ -107,7 +112,8 @@ def validate_env(text: str, *, allow_placeholders: bool = False) -> dict[str, ob
 
 def validate_compose(text: str) -> dict[str, object]:
     required_fragments = [
-        "ghcr.io/outsourc-e/hermes-workspace:v2.3.0",
+        WORKSPACE_SOURCE,
+        "image: p2p-hermes-workspace:v2.3.0-15fa9cd",
         "repomix@1.18.0",
         "tokscale@4.16.0",
         '127.0.0.1:3000:3000',
@@ -126,6 +132,7 @@ def validate_compose(text: str) -> dict[str, object]:
 
     forbidden = [
         ":latest",
+        "ghcr.io/outsourc-e/hermes-workspace",
         "tokscale@latest",
         "repomix@latest",
         "tokscale@4.16.0 submit",
@@ -143,6 +150,7 @@ def validate_compose(text: str) -> dict[str, object]:
     return {
         "status": "PASS",
         "workspace": EXPECTED["workspace"],
+        "workspace_source": WORKSPACE_SOURCE,
         "repomix": EXPECTED["repomix"],
         "tokscale": EXPECTED["tokscale"],
         "mission_control_authority": False,
