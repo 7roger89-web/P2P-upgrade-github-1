@@ -162,6 +162,8 @@ def validate_compose(text: str) -> dict[str, object]:
         '/opt/data:ro',
         'geniex-register:',
         'profiles: ["geniex"]',
+        'user: "hermes"',
+        'host.docker.internal:host-gateway',
         'P2P_ENABLE_GENIEX',
         'GENIEX_CHAT_SMOKE=PASS',
         'providers.geniex.api',
@@ -199,6 +201,7 @@ def validate_compose(text: str) -> dict[str, object]:
         "repomix": EXPECTED["repomix"],
         "tokscale": EXPECTED["tokscale"],
         "geniex_named_provider_only": True,
+        "geniex_registration_user": "hermes",
         "mission_control_authority": False,
     }
 
