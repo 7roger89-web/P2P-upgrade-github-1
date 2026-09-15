@@ -37,6 +37,20 @@ Intentionally excluded initially:
 
 This keeps durability, Telegram formatting, anti-429 behavior, long-message splitting, terminal recovery, token footer, thinking-output cleanup, and state-database protection without weakening the approval boundary.
 
+## Personal AI behavior runtime
+
+This P2P-specific image bundles and enables the `p2p-personal-behavior` Hermes plugin. It reuses the canonical behavior primitives from `.p2p/system/p2p_capabilities/personal_ai_behavior.py` rather than carrying a second behavior implementation.
+
+The runtime bridge uses only documented Hermes plugin surfaces:
+
+- `register_system_prompt_section(...)` for a cache-safe stable communication contract;
+- `pre_llm_call` for explicit turn-local `serious`, `short`, and `deep` requests;
+- `transform_llm_output` for report-only anti-slop detection before final delivery.
+
+The bridge intentionally does **not** guess that a message requires research/tool use from keywords, rewrite final answers, auto-promote durable memory, or replace authoritative tool/data values. Existing Hermes/P2P tool, memory, and data layers keep those responsibilities.
+
+The startup wrapper runs Hermes' idempotent `plugins enable p2p-personal-behavior`, so both a fresh config and an already-persisted `/opt/data/config.yaml` converge on the enabled plugin state.
+
 ## Required runtime secrets / variables
 
 Telegram:
@@ -108,6 +122,7 @@ Targeted here:
 - terminal/files
 - MCP where supported
 - selected hermes-patches above
+- P2P Personal AI behavior runtime bridge
 
 Deferred until a host with at least 2 GB RAM is available:
 
