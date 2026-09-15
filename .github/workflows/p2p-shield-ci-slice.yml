@@ -3,7 +3,7 @@
 # consolidated acceptance evidence for the three required controls
 # (SHIELD-SECRET-01, SHIELD-DEPENDENCY-01, SHIELD-CI-01): provider
 # acquisition, focused Shield tests, Slice 1 secret acceptance, 3-control
-# BASE acceptance, CI PASS/FAIL/BLOCKED acceptance, and the
+# BASE acceptance, CI PASS/FAIL/BLOCKED/NOT_APPLICABLE acceptance, and the
 # current-workflow diagnostic.
 # Supersedes the historical session harnesses p2p-shield-secret-slice.yml
 # and p2p-shield-base-slice.yml, deleted in the v0.2d promotion-hygiene
@@ -54,7 +54,7 @@ jobs:
         run: python3 -m shield.zizmor_acquire --provider-dir "$RUNNER_TEMP/zizmor" --summary-file "$GITHUB_STEP_SUMMARY"
 
       - name: Run focused Shield contract tests
-        run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice
+        run: python3 -m unittest -v tests.test_p2p_shield_secret_slice tests.test_p2p_shield_base_slice tests.test_p2p_shield_ci_slice tests.test_p2p_shield_applicability
 
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
