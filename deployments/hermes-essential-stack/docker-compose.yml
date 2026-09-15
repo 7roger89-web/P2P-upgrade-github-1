@@ -91,6 +91,10 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
+    depends_on:
+      hermes-agent:
+        condition: service_healthy
+    user: "hermes"
     env_file:
       - .env
     environment:
@@ -98,6 +102,8 @@ services:
       P2P_ENABLE_GENIEX: ${P2P_ENABLE_GENIEX:-NO}
       GENIEX_BASE_URL: ${GENIEX_BASE_URL:-}
       GENIEX_MODEL: ${GENIEX_MODEL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - hermes-data:/opt/data
     entrypoint: ["/bin/sh", "-lc"]
