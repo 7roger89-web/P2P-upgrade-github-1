@@ -25,6 +25,11 @@ RUN set -eux; \
 # as well as in deployments/hermes-dockhosting/Dockerfile.
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/hermes/plugins/logistics/
 
+# P2P Personal AI behavior runtime bridge. Keep the harness logic single-source
+# in .p2p; the image receives that exact module beside the thin Hermes plugin.
+COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/p2p-personal-behavior/ /opt/hermes/plugins/p2p-personal-behavior/
+COPY --chmod=a+r,go-w .p2p/system/p2p_capabilities/personal_ai_behavior.py /opt/hermes/plugins/p2p-personal-behavior/personal_ai_behavior.py
+
 # Runtime dependency used by the Logistics read-only MongoDB connector.
 # DockHosting's build resolver did not expose the just-released 4.18.0; pin the
 # older stable 4.17.0 release so the build can resolve reproducibly.
@@ -32,6 +37,7 @@ ARG PYMONGO_VERSION=4.17.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
 
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
+COPY --chmod=0755 deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh /usr/local/bin/p2p-post-bootstrap-main.sh
 
 ENV API_SERVER_ENABLED=true \
     API_SERVER_HOST=0.0.0.0
