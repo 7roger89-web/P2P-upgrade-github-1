@@ -1,0 +1,28 @@
+name: P2P FCC adapter acceptance
+
+on:
+  pull_request:
+    paths:
+      - '.p2p/system/p2p_capabilities/fcc_claude_adapter.py'
+      - 'tests/test_p2p_fcc_claude_adapter.py'
+      - '.github/workflows/p2p-fcc-adapter-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Compile bounded adapter
+        run: python -m py_compile .p2p/system/p2p_capabilities/fcc_claude_adapter.py
+      - name: Run FCC adapter contract tests
+        run: python -m pytest -q tests/test_p2p_fcc_claude_adapter.py
