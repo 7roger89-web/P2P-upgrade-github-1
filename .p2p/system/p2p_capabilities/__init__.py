@@ -433,3 +433,22 @@ if _PROJECT_AGENT_PREFLIGHT_MARKER not in _control_tower_handoff.SUPREME_LAW_CAP
     _control_tower_handoff.SUPREME_LAW_CAPSULE = "\n".join(
         (_control_tower_handoff.SUPREME_LAW_CAPSULE, _PROJECT_AGENT_PREFLIGHT_CAPSULE)
     )
+
+# Runtime prompt serialization must carry the two operational gates explicitly.
+# This closes the gap where an executor could receive the law capsule but no
+# visible instruction to report its real law source or run the canonical OE gate.
+_RUNTIME_PROMPT_SERIALIZATION_MARKER = "P2P_RUNTIME_PROMPT_SERIALIZATION_CONTRACT"
+_RUNTIME_PROMPT_SERIALIZATION_CAPSULE = "\n".join(
+    (
+        "P2P_RUNTIME_PROMPT_SERIALIZATION_CONTRACT — Every generated operational prompt must carry P2P_LAW_PREFLIGHT and OE_GATE explicitly; never rely on chat memory or an implicit prior read.",
+        "P2P_LAW_PREFLIGHT — Read repository-root AGENTS.md before substantive work when present; establish the actual valid law source using canonical > installed > portable > inline capsule > blocked; report exactly one P2P_LAW_SOURCE=<actual source>; never claim a source was read when it was not.",
+        "OE_GATE — Ask exactly: Không bị over engineering chứ? Evaluate SIMPLER_PATH, MATERIAL_PROGRESS, NECESSITY, CORE_BEFORE_SUPPORT, SMALLER_VERIFIABLE_SLICE. Return OE_VERDICT=DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED with one concrete reason. A weak or negative answer means reduce, remove, or defer the step; never return a ceremonial PASS.",
+    )
+)
+if _RUNTIME_PROMPT_SERIALIZATION_MARKER not in _control_tower_handoff.SUPREME_LAW_CAPSULE:
+    _control_tower_handoff.SUPREME_LAW_CAPSULE = "\n".join(
+        (
+            _control_tower_handoff.SUPREME_LAW_CAPSULE,
+            _RUNTIME_PROMPT_SERIALIZATION_CAPSULE,
+        )
+    )

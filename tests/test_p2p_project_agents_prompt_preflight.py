@@ -50,6 +50,20 @@ class ProjectAgentsPromptPreflightTests(unittest.TestCase):
         self.assertIn("TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY", prompt)
         self.assertIn("EXECUTOR_INPUT_FORMAT_AND_ARTIFACT_TRANSPORT_FIDELITY", prompt)
 
+        # Runtime-generated prompts must serialize the law-source and OE gates
+        # themselves; the executor must not need chat memory to infer them.
+        self.assertIn("P2P_RUNTIME_PROMPT_SERIALIZATION_CONTRACT", prompt)
+        self.assertIn("P2P_LAW_PREFLIGHT", prompt)
+        self.assertIn("P2P_LAW_SOURCE=<actual source>", prompt)
+        self.assertIn("OE_GATE", prompt)
+        self.assertIn("Không bị over engineering chứ?", prompt)
+        self.assertIn("SIMPLER_PATH", prompt)
+        self.assertIn("MATERIAL_PROGRESS", prompt)
+        self.assertIn("NECESSITY", prompt)
+        self.assertIn("CORE_BEFORE_SUPPORT", prompt)
+        self.assertIn("SMALLER_VERIFIABLE_SLICE", prompt)
+        self.assertIn("OE_VERDICT=DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED", prompt)
+
 
 if __name__ == "__main__":
     unittest.main()
