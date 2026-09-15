@@ -11,7 +11,7 @@ This stack completes the bounded integration path for the five Hermes-adjacent t
 |---|---|---|
 | Repomix `1.18.0` | bounded context packer | opt-in `tools` profile; repository mounted read-only; output goes to a disposable volume; token budget required |
 | TokScale `4.16.0` | read-only token/cost telemetry | opt-in `tools` profile; Hermes data volume mounted read-only; only `--json`; no `submit` path |
-| Hermes Workspace `2.3.0` | local web UI | starts with the default stack; host bind is `127.0.0.1:3000`; HermesWorld link disabled |
+| Hermes Workspace `2.3.0` | local web UI | built from exact release commit `15fa9cd706f5c04e4db288fb958e21d10fc776da`; host bind is `127.0.0.1:3000`; HermesWorld link disabled |
 | Hindsight | optional non-authoritative memory | bundled Hermes provider; enabling requires an explicit `YES` gate plus API key; safe config keeps `auto_retain=false`, `auto_recall=false`, `memory_mode=tools` |
 | Mission Control | not a P2P authority | intentionally absent from runtime compose; P2P already owns task state, approvals, orchestration and governance |
 
@@ -28,9 +28,11 @@ MISSION_CONTROL != SECOND_CONTROL_PLANE
 ## Pinned upstreams
 
 - Hermes Agent: `v0.21.3`, Docker tag `v2026.9.14`
-- Hermes Workspace: `v2.3.0`
+- Hermes Workspace: annotated tag `v2.3.0` resolved to commit `15fa9cd706f5c04e4db288fb958e21d10fc776da`
 - Repomix: `v1.18.0`
 - TokScale: `v4.16.0`
+
+The Workspace `v2.3.0` GitHub release does **not** currently have a pullable matching GHCR manifest. The stack therefore builds from the exact release source commit and uses a tag+checksum remote BuildKit context. It never falls back to mutable `:latest`; if the tag is moved away from that commit, the build fails closed.
 
 The Hermes runtime itself is already compatibility-gated by `.github/workflows/hermes-runtime-compatibility.yml`, including the real P2P Docker build, required CLI flags, TokScale-compatible `state.db`, and the bundled Hindsight provider.
 
@@ -130,4 +132,4 @@ python scripts/hermes_essential_stack_guard.py validate
 python -m unittest -v tests.test_hermes_essential_stack_guard
 ```
 
-Hosted CI additionally renders the compose config, builds the real P2P Hermes image, verifies the exact Workspace image tag is pullable, and smoke-checks the pinned Repomix/TokScale package versions.
+Hosted CI additionally renders the compose config, builds the exact Workspace release source, smoke-checks the pinned Repomix/TokScale package versions, builds the real P2P Hermes image, and starts the local-only Hermes + Workspace stack for health verification.
