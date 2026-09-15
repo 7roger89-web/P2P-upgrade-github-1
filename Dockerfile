@@ -36,6 +36,18 @@ COPY --chmod=a+r,go-w .p2p/system/p2p_capabilities/personal_ai_behavior.py /opt/
 ARG PYMONGO_VERSION=4.17.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
 
+# Opik is required only by the opt-in local Hermes essential-stack pilot.
+# Keep production/DockHosting's default image unchanged: the dependency is
+# installed only when that build explicitly sets P2P_INSTALL_OPIK=1.
+ARG P2P_INSTALL_OPIK=0
+ARG OPIK_VERSION=2.2.59
+RUN set -eux; \
+    case "$P2P_INSTALL_OPIK" in \
+      0) ;; \
+      1) uv pip install --python /opt/hermes/.venv/bin/python "opik==${OPIK_VERSION}" ;; \
+      *) echo "P2P_INSTALL_OPIK must be 0 or 1" >&2; exit 2 ;; \
+    esac
+
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
 COPY --chmod=0755 deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh /usr/local/bin/p2p-post-bootstrap-main.sh
 
