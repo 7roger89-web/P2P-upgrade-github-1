@@ -125,7 +125,7 @@
       "roadmap_slot": "family:roles",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter \u00a77 never-reintroduce list."
+      "notes": "The role-vs-skill separation is architecturally embedded; rejection of agentized skill catalogs is in charter §7 never-reintroduce list."
     },
     {
       "research_id": "RA-EXT-004",
@@ -198,7 +198,7 @@
         "fail-closed state semantics"
       ],
       "rejected_ideas": [
-        "none \u2014 concepts fully consistent with fail-closed architecture"
+        "none — concepts fully consistent with fail-closed architecture"
       ],
       "p2p_translation": "Implemented as C11 durable task state (fail-closed state machine) and FW06 lease/interruption lifecycle.",
       "capability_family": "EXECUTION_AND_ORCHESTRATION",
@@ -309,7 +309,7 @@
       "evidence_pointers": [
         "RI-003 (research-intake-ledger.json)",
         "capability-skill-map.md NUI row",
-        "charter \u00a77 174_NUI_FACULTIES_AS_AGENTS REJECTED"
+        "charter §7 174_NUI_FACULTIES_AS_AGENTS REJECTED"
       ],
       "dependencies": [
         "RA-EXT-008",
@@ -394,7 +394,7 @@
       "roadmap_slot": "family:isolation",
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' \u2014 fully embedded in C17/FW06."
+      "notes": "The Orca lesson is 'bounded, justified, revocable parallelism' — fully embedded in C17/FW06."
     },
     {
       "research_id": "RA-EXT-012",
@@ -412,7 +412,7 @@
       "canonical_capability_ids": [],
       "status": "UNKNOWN",
       "evidence_pointers": [
-        "this ledger (no matching evidence found in docs/ governance/ \u2014 verified by full-text search 2026-08-21)"
+        "this ledger (no matching evidence found in docs/ governance/ — verified by full-text search 2026-08-21)"
       ],
       "dependencies": [],
       "roadmap_slot": "not_adopted",
@@ -715,7 +715,7 @@
       "research_id": "RA-EXT-021",
       "source_name": "Large Goal autonomous execution research",
       "source_type": "OWNER_IDEA",
-      "source_reference": "Owner goal specifications (C12/C15 lineage; spec \u00a710 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
+      "source_reference": "Owner goal specifications (C12/C15 lineage; spec §10 of P2P-CAPABILITY-RESEARCH-CONSOLIDATION-01)",
       "source_version_or_commit": "Owner goal documents",
       "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
       "research_summary": "One Owner goal -> internal task graph -> automatic safe continuation -> checkpoint/resume -> bounded foreground execution -> Owner Gate only when necessary -> no per-task nagging.",
@@ -753,7 +753,7 @@
       "research_id": "RA-EXT-022",
       "source_name": "Beginner-first experience research",
       "source_type": "OWNER_IDEA",
-      "source_reference": "charter \u00a71 North Star; beginner lifecycle plans 2026-08-10/13*",
+      "source_reference": "charter §1 North Star; beginner lifecycle plans 2026-08-10/13*",
       "source_version_or_commit": "charter",
       "provenance_status": "IMPLEMENTED_AND_NORTH_STAR",
       "research_summary": "Progressive disclosure, minimal technical questions, Owner asked only product/business/material decisions, technical choices made by P2P when safely inferable, accessibility where the project requires it.",
@@ -774,7 +774,7 @@
       ],
       "status": "VERIFIED",
       "evidence_pointers": [
-        "charter \u00a71/\u00a74/\u00a76",
+        "charter §1/§4/§6",
         "docs/plans 2026-08-10-p2p-beginner-*",
         "FW05 owner summary modules"
       ],
@@ -901,7 +901,7 @@
       "research_id": "RA-EXT-026",
       "source_name": "Safety boundaries deliberately rejected (Z register)",
       "source_type": "OWNER_IDEA",
-      "source_reference": "charter \u00a77 never-reintroduce list; capability-index REJECTED entries",
+      "source_reference": "charter §7 never-reintroduce list; capability-index REJECTED entries",
       "source_version_or_commit": "charter + capability-index",
       "provenance_status": "REGISTER_MAINTAINED",
       "research_summary": "Permission bypass, auto-approve-all, unbounded fanout, unbounded background autonomy, automatic dependency-chain autonomy, unofficial scraping as core, GitHub Actions as brain/control plane, single-vendor lock-in, AI self-report as evidence.",
@@ -927,15 +927,15 @@
         "BLIND_RETRY",
         "HOST_OUTPUT_AS_FINAL_EVIDENCE"
       ],
-      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter \u00a77 and the capability ledger with status REJECTED and preserved reasons.",
+      "p2p_translation": "Maintained as an explicit rejected-pattern register so future goals cannot rediscover and reintroduce them. Appears in charter §7 and the capability ledger with status REJECTED and preserved reasons.",
       "capability_family": "SAFETY_AUTHORITY_PERMISSIONS",
       "canonical_capability_ids": [
         "15 REJECTED entries in capability-index.json",
-        "charter \u00a77 never-reintroduce list"
+        "charter §7 never-reintroduce list"
       ],
       "status": "VERIFIED",
       "evidence_pointers": [
-        "charter \u00a77",
+        "charter §7",
         "capability-index.json REJECTED entries (15)"
       ],
       "dependencies": [],
@@ -951,7 +951,7 @@
       "source_reference": "reports/P2P-GT-MUTATION-PILOT-02-REPORT.md (and Pilot-02 harness/commit history)",
       "source_version_or_commit": "P2P-C40-PILOT approval 2026-08-18; integrated in artifact .40/.41",
       "provenance_status": "INTERNAL_PILOT_EVIDENCE",
-      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truy\u1ec7n clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
+      "research_summary": "Controlled non-production documentation mutation pilot on an isolated Game Truyện clone: bounded mutation, canonical authority chain, receipt verification, rollback M2 == M0 byte-identical.",
       "selected_ideas": [
         "bounded documentation mutation with pre-write authorization binding",
         "second-path pre-write block (B_BYTES_WRITTEN = 0)",
@@ -988,7 +988,7 @@
       "source_reference": "docs/p2p-development/research/c43/evidence/ (16 evidence JSONs, harness c43_gametruyen_activation.py)",
       "source_version_or_commit": "recorded 2026-08-19 on branch p2p-framework-00-product-memory, commit a9764ab9",
       "provenance_status": "INTERNAL_RESEARCH_EVIDENCE",
-      "research_summary": "Production-install evidence pack for Game Truy\u1ec7n and Gia Ph\u1ea3 (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
+      "research_summary": "Production-install evidence pack for Game Truyện and Gia Phả (acceptance bars, pre-install snapshots, installs, activation messages, live-council smoke, production-install evidence pack, reconciliation). Reconciliation unresolved: live-role identity conflicting (ROLE_ID p2p_axiom handwritten vs participant p2p_datos; dispatch role-agnostic).",
       "selected_ideas": [
         "installation lifecycle evidence on authoritative projects",
         "acceptance-bar-driven install/activation",
@@ -1065,7 +1065,7 @@
       ],
       "roadmap_relation": "composition into RM-PRIORITY-CONTEXT (B)",
       "appended_at": "2026-08-21T05:42:58Z",
-      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, \u00a79 Serialization, \u00a717 Contract, \u00a718 Permission Boundary. Verified via Candidate .45."
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
     },
     {
       "research_id": "RA-EXT-030",
@@ -1080,7 +1080,7 @@
       "provenance": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
       "lineage_note": "CRI adoption lineage: RA-EXT-029 (bound to RI-008 during INTAKE-CLOSURE-01) and this record (bound to RI-007) refer to the same Owner-accepted CRI direction. Roadmap consideration exists via RM-PRIORITY-CONTEXT composition entry (intake_record RI-008) and source_research_ids; this record adds the missing explicit RI-007 binding.",
       "roadmap_relation": "composed-in-RM-PRIORITY-CONTEXT",
-      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, \u00a79 Serialization, \u00a717 Contract, \u00a718 Permission Boundary. Verified via Candidate .45."
+      "notes": "Semantic closure verified via RM-CONTEXT-01A/B/C. Includes 26/26 A-Z Matrix, 2/2 Real Repo Proofs, §9 Serialization, §17 Contract, §18 Permission Boundary. Verified via Candidate .45."
     },
     {
       "research_id": "RA-EXT-031",
@@ -1122,7 +1122,7 @@
       ],
       "roadmap_relation": "composition into RM-PRIORITY-RELEASE-LIFECYCLE",
       "appended_at": "2026-08-21T11:05:00Z",
-      "notes": "Verified via Pilot installation on Game Truy\u1ec7n (desktop) and Manus ExecutionTarget certification."
+      "notes": "Verified via Pilot installation on Game Truyện (desktop) and Manus ExecutionTarget certification."
     },
     {
       "research_id": "RA-EXT-032",
@@ -2303,6 +2303,60 @@
       "owner_decision_status": "CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE",
       "last_reviewed_at": "2026-09-01T00:00:00Z",
       "notes": "P2P-IMPECCABLE-01 / issue #44. REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY. AVAILABLE != LOADED != AUTHORIZED != EXECUTED."
+    },
+    {
+      "research_id": "RA-EXT-070",
+      "source_name": "zhaoxuya520/reverse-skill",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/zhaoxuya520/reverse-skill",
+      "source_version_or_commit": "7e2097fd90d25c2f976f6eba26d6c00aa88051df",
+      "provenance_status": "PINNED_METHODOLOGY_REFERENCE_NOT_VENDORED",
+      "research_summary": "Security/reverse-engineering skill-router methodology with a single routing source, scope-before-ACT gate, selective skill loading, tool inventory/bootstrap mechanics, evidence workflow and supply-chain controls. Upstream also contains host-mutating bootstrap instructions and offensive execution modules, so P2P adopts only bounded methodology references.",
+      "selected_ideas": [
+        "post-route methodology cross-reference",
+        "scope-before-ACT hard-gate pattern",
+        "selective skill loading",
+        "exact upstream commit provenance",
+        "external skill and MCP supply-chain suspicion"
+      ],
+      "rejected_ideas": [
+        "second security router",
+        "README_AI or RULES as executable P2P authority",
+        "automatic dependency or tool installation",
+        "silent MCP registration or global host configuration",
+        "automatic network or target interaction",
+        "automatic loading of attack-chain, EDR-bypass, patch-diff exploit, pentest-tools, pwn-chain, or CTF execution surfaces",
+        "external content granting authorization"
+      ],
+      "p2p_translation": "IMPLEMENTED as a data-only post-route reference bridge over the existing SEC01 security/reverse capability IDs. P2P remains the sole router and authority; no upstream code is imported or executed, and the bridge explicitly denies bootstrap, auto-install, MCP registration, network runtime and external execution.",
+      "capability_family": "SECURITY_REVERSE_ENGINEERING",
+      "canonical_capability_ids": [
+        "android.protection.detect",
+        "android.artifact.decode",
+        "security.mobile.static.assess",
+        "android.runtime.instrument",
+        "android.network.inspect",
+        "reverse.identify",
+        "reverse.decompile.managed",
+        "reverse.decompile.native",
+        "reverse.deobfuscate",
+        "reverse.callgraph",
+        "reverse.semantic_reconstruct"
+      ],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/reverse_skill_reference.py",
+        "tests/test_p2p_reverse_skill_reference.py",
+        "docs/plans/2026-09-15-p2p-reverse-skill-safe-adoption/README.md",
+        "PR #173 focused Reverse-Skill acceptance + P2P Shield"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE",
+      "last_reviewed_at": "2026-09-15T16:20:00+07:00",
+      "notes": "MIT license verified. Upstream is provenance/methodology, never authority. No release, deploy, dependency install or target execution authorized by this record."
     }
   ],
   "rejected_register_summary": {
@@ -2331,7 +2385,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-08-21T04:25:23Z",
+  "last_reviewed": "2026-09-15T16:20:00+07:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]
