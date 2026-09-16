@@ -1,64 +1,70 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
-if str(SYSTEM_ROOT) not in sys.path:
-    sys.path.insert(0, str(SYSTEM_ROOT))
+for candidate in (REPO_ROOT / "scripts", REPO_ROOT / ".p2p" / "system", REPO_ROOT):
+    value = str(candidate)
+    if value not in sys.path:
+        sys.path.insert(0, value)
 
-from p2p_capabilities.control_tower_handoff import (  # noqa: E402
-    bind_session,
-    build_execution_prompt,
-)
-
-
-EXPECTED_GITHUB_CONNECTOR_MARKERS = (
-    "EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS",
-    "ONE_FAILED_CALL != GITHUB_CONNECTOR_DISABLED",
-    "SESSION_TOOL_UNAVAILABLE != ACCOUNT_CONNECTION_BROKEN",
-    "GITHUB_CONNECTOR_STATUS=SESSION_SURFACE_UNAVAILABLE",
-    "REPO_SCOPE_BROKEN",
-    "AUTH_CONNECTION_BROKEN",
-    "PROVIDER_OUTAGE",
-    "EXECUTOR_GITHUB_ACCESS=UNAVAILABLE_IN_THIS_SESSION",
-    "OWNER_GITHUB_CONNECTOR_STATUS=NOT_PROVEN_BROKEN",
-)
+import p2p_control_tower as control_tower  # noqa: E402
+from p2p_capabilities.control_tower_handoff import SessionBinding, build_execution_prompt  # noqa: E402
 
 
 class GitHubConnectorCapsulePropagationTests(unittest.TestCase):
-    def test_generated_prompt_carries_github_failure_classification(self):
-        binding = bind_session(
+    def _prompt(self, task: str) -> str:
+        binding = SessionBinding(
             session_id="github-capsule-propagation",
             host="CODEX",
             goal_id="P2P-GITHUB-CONNECTOR-PROPAGATION",
-            goal="Propagate GitHub connector failure classification",
+            goal="Bounded GitHub task",
         )
-        prompt = build_execution_prompt(
-            binding,
-            "Verify generated prompt carries connector failure classification.",
-        )
+        with tempfile.TemporaryDirectory() as directory:
+            contextual = control_tower._contextual_task_for_session(
+                Path(directory),
+                binding,
+                task,
+            )
+        return build_execution_prompt(binding, contextual)
 
-        for marker in EXPECTED_GITHUB_CONNECTOR_MARKERS:
-            with self.subTest(marker=marker):
-                self.assertIn(marker, prompt)
+    def test_github_guidance_is_present_for_github_work(self):
+        prompt = self._prompt("Review GitHub PR, branch, repository and exact HEAD before merge.")
 
-    def test_capsule_forbids_public_web_as_private_github_proof(self):
-        binding = bind_session(
-            session_id="github-private-proof",
-            host="ARENA",
-            goal_id="P2P-GITHUB-CONNECTOR-PROPAGATION",
-            goal="Keep private GitHub claims fail-closed",
-        )
-        prompt = build_execution_prompt(binding, "Check a private PR.")
+        self.assertIn("GITHUB_GUIDANCE=", prompt)
+        self.assertIn("EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS", prompt)
+        self.assertIn("direct repo/PR/HEAD evidence wins", prompt)
+        self.assertIn("do not infer account breakage from one unavailable session", prompt)
+        self.assertLessEqual(len(prompt), control_tower.PROMPT_GUARD_CHARS)
 
-        self.assertIn(
-            "Public web search is not proof of private repository, branch, PR, or HEAD state.",
-            prompt,
+    def test_github_guidance_is_not_global_supreme_law(self):
+        ordinary = self._prompt("Analyze shipment totals and report discrepancies.")
+        self.assertNotIn("GITHUB_GUIDANCE=", ordinary)
+        self.assertNotIn(
+            "EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS",
+            control_tower._handoff.SUPREME_LAW_CAPSULE,
         )
+        lines = tuple(
+            line for line in control_tower._handoff.SUPREME_LAW_CAPSULE.splitlines() if line.strip()
+        )
+        self.assertEqual(9, len(lines))
+
+    def test_full_connector_rules_remain_in_canonical_notebook(self):
+        notebook = (
+            REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "EXECUTOR_GITHUB_ACCESS=UNAVAILABLE_IN_THIS_SESSION",
+            "OWNER_GITHUB_CONNECTOR_STATUS=NOT_PROVEN_BROKEN",
+            "REPO_SCOPE_BROKEN",
+            "AUTH_CONNECTION_BROKEN",
+            "PROVIDER_OUTAGE",
+        ):
+            self.assertIn(marker, notebook)
 
 
 if __name__ == "__main__":
