@@ -7,7 +7,7 @@ Current regression groups:
 - concierge engine: 20 committed tests;
 - route-alias provenance: 2 committed tests;
 - conditional commercial terms: 3 tests;
-- charge semantics guard: 6 committed tests;
+- charge semantics guard: 9 committed tests;
 - multi-equipment FCL portfolio semantics: 5 committed tests;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
@@ -39,6 +39,9 @@ Charge-semantics regressions prove that:
 - the same code in different scopes is not misclassified as a duplicate;
 - an evidenced all-in bundle expands into traceable included component coverage without charging those components again;
 - a priced bundle plus a separately priced overlapping component is blocked as a double-count risk;
+- an unselected optional add-on is removed from both price and required coverage while remaining visible in semantic audit;
+- a selected optional add-on remains in the quote;
+- an optional add-on without explicit `selected=true|false` blocks the quote instead of guessing;
 - unresolved semantic errors return an empty ranking and `UNRESOLVED_CHARGE_SEMANTICS`.
 
 Multi-equipment FCL portfolio regressions prove that:
@@ -51,7 +54,7 @@ Multi-equipment FCL portfolio regressions prove that:
 
 Fresh isolated harness results for this slice:
 
-- charge semantics guard: **6/6 PASS** using the repo-style `src.*` import layout;
+- charge semantics guard: **9/9 PASS** using the repo-style `src.*` import layout;
 - multi-equipment FCL portfolio semantics: **5/5 PASS** against focused dependency stubs that preserve the pricing/basis contracts exercised by this module.
 
 These focused results do not claim that the entire repository regression inventory was rerun in one local harness. GitHub Shield remains a separate exact-head acceptance surface.
