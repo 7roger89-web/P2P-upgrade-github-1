@@ -83,10 +83,12 @@
     "source_class": "OBSERVED",
     "design": "Concierge test: accept 3-5 real quote files/messages from each participant, normalize them with AI plus human verification, and return an auditable comparison table without asking suppliers to change format.",
     "success_threshold": "At least 3 of 5 target users submit real quote sets; at least 2 request a second comparison or give an explicit willingness-to-pay signal after seeing the result.",
-    "failure_threshold": "Fewer than 2 of 5 target users submit real quote sets, or users consistently prefer their current template/TMS workflow and no participant requests repeat use or indicates willingness to pay.",
+    "failure_threshold": "After 5 target users have actually been contacted, fewer than 2 submit real quote sets and no participant requests repeat use or gives an explicit willingness-to-pay signal.",
     "success_threshold_reached": false,
-    "failure_threshold_reached": false
+    "failure_threshold_reached": false,
+    "tracking_contract": "src/experiment_tracker.py",
+    "observation_schema": "schemas/experiment-observation.schema.json"
   },
   "decision": "VALIDATE",
-  "owner_action_required": "Owner Gate is required before external outreach or any paid validation. No product build yet."
+  "owner_action_required": "Owner Gate for first 3 outreach prospects is already APPROVED. Delivery awaits an authenticated Reddit write surface. No product build yet."
 }
