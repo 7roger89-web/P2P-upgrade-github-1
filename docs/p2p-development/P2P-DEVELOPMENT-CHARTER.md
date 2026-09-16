@@ -30,6 +30,9 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `TRANSPORT_NOT_PERMISSION` | A transport channel never grants permissions by itself. |
 | `TASK_NOT_AGENT` | A bounded task is not a capability identity and never becomes an agent by naming. |
 | `OUTPUT_NOT_EVIDENCE` | A worker's output is proposed until verified against authoritative evidence. |
+| `AGENT_CLAIM_NOT_EVIDENCE` | A worker's assertion of correctness/readiness is never acceptance authority by itself; correctness claims require evidence appropriate to the boundary claimed. |
+| `TEST_PASS_SCOPE_BOUND` | A passing test/build/lint/coverage/static check proves only the behavior and property it actually challenged; lower-boundary PASS never silently becomes a higher-boundary claim. |
+| `PROOF_CARRYING_CHANGE` | A non-trivial change carries recoverable intent, behavior/regression evidence, test-quality challenge, relevant environment/risk proof, provenance, and a truthful verdict using existing P2P evidence stores rather than a second truth store. |
 | `INVENTORY_NOT_BEHAVIOR` | A file, class, registry entry, or skill existing is not proof of behavior. |
 | `GENERATION_NOT_RUNTIME_USE` | Files generated as reference differ from runtime-executed code. |
 | `DETERMINISTIC_FIRST` | Deterministic checks come before AI inference wherever sufficient. |
@@ -102,11 +105,15 @@ The product-development framework keeps two loops distinct:
 The state progression is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
 SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. Human acceptance should state an
 observable outcome where possible, such as an Owner determining the item
-needing attention within 30 seconds. Assurance scales with risk: a preview or
-focused check for low risk; targeted functional checks for normal risk;
-stronger persistence/data checks for durable state; and independent
-verification plus Owner approval for auth, migration, destructive, canonical,
-or release claims.
+needing attention within 30 seconds. Assurance scales with risk using the
+existing `FAST`, `STANDARD`, `STRICT`, `CRITICAL` execution lanes. The
+Evidence-First profile requires proof appropriate to the claimed boundary:
+focused nearest-boundary checks for low risk, explicit acceptance/regression
+proof for normal work, independent challenge (for example targeted mutation,
+negative/property/adversarial testing) for stricter work when decision-useful,
+and independent verifier plus explicit security/data/migration/destructive and
+representative real-path evidence for critical claims. Coverage and worker
+self-report are supportive inputs, never semantic acceptance authority.
 
 OXP is a read-only orientation projection. It answers what P2P is doing,
 finished, next, blocked by, needs decided, safe to do nothing about, or safe to
