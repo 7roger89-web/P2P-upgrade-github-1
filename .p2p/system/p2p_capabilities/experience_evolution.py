@@ -13,9 +13,19 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
+
+# The installed entrypoint intentionally supports direct-file execution. Give
+# that mode a real package context so lazy federation imports behave exactly as
+# they do when Control Tower imports this module normally.
+if not __package__:
+    _runtime_root = Path(__file__).resolve().parents[1]
+    if str(_runtime_root) not in sys.path:
+        sys.path.insert(0, str(_runtime_root))
+    __package__ = "p2p_capabilities"
 
 SCHEMA = "p2p-experience-evolution/1"
 LEDGER_SCHEMA = "p2p-execution-event/1"
