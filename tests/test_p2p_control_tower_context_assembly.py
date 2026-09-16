@@ -166,6 +166,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertNotIn(lesson, block)
             self.assertNotIn("GITHUB_GUIDANCE=", block)
             self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1=", block)
+            self.assertNotIn("OPEN_CODE_REVIEW_DELEGATION=", block)
 
     def test_task_specific_guidance_is_trigger_scoped(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -186,6 +187,16 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
                 "Analyze shipment totals",
                 max_chars=1300,
             )
+            generic_review_block = control_tower._render_context_block(
+                empty,
+                "Review this code for correctness",
+                max_chars=1300,
+            )
+            gap_block = control_tower._render_context_block(
+                empty,
+                "Second repair round: review coverage gap after an omitted changed file",
+                max_chars=1600,
+            )
 
             self.assertIn("GITHUB_GUIDANCE=", github_block)
             self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1=", github_block)
@@ -193,6 +204,22 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertNotIn("GITHUB_GUIDANCE=", prompt_block)
             self.assertNotIn("GITHUB_GUIDANCE=", ordinary_block)
             self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1=", ordinary_block)
+            self.assertNotIn("OPEN_CODE_REVIEW_DELEGATION=", generic_review_block)
+            self.assertIn("OPEN_CODE_REVIEW_DELEGATION=USE_IF_AVAILABLE", gap_block)
+            self.assertIn("GAP=MISSED_FILE,COVERAGE_GAP,REPEATED_REPAIR", gap_block)
+            self.assertIn("NATIVE_REVIEW_FALLBACK", gap_block)
+            self.assertIn("NONAUTHORITATIVE", gap_block)
+            self.assertIn("Shield/native-code-impact/tests/task acceptance still required", gap_block)
+
+    def test_identified_review_gap_cannot_be_silently_dropped_for_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            empty = control_tower._experience_summary(root, "ordinary task")
+            task = "Large diff with review coverage uncertainty"
+            full = control_tower._render_context_block(empty, task, max_chars=1600)
+            self.assertIn("OPEN_CODE_REVIEW_DELEGATION=", full)
+            too_small = control_tower._render_context_block(empty, task, max_chars=650)
+            self.assertEqual("", too_small)
 
     def test_start_command_preserves_law_and_persists_bounded_context(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -248,6 +275,28 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             second_result = json.loads(second.getvalue())
             self.assertTrue(second_result["idempotent"])
             self.assertEqual(prompt, second_result["recommendation"]["PROMPT"])
+
+    def test_review_gap_is_present_in_persisted_executor_prompt(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                code = control_tower.main(
+                    [
+                        "--root", str(root),
+                        "start",
+                        "--host", "ARENA",
+                        "--goal-id", "OCR-GAP",
+                        "--goal", "Second repair round after omitted files caused review coverage uncertainty",
+                        "--task-id", "TASK-OCR-GAP",
+                        "--json",
+                    ]
+                )
+            self.assertEqual(0, code)
+            prompt = json.loads(output.getvalue())["recommendation"]["PROMPT"]
+            self.assertIn("OPEN_CODE_REVIEW_DELEGATION=USE_IF_AVAILABLE", prompt)
+            self.assertIn("NATIVE_REVIEW_FALLBACK", prompt)
+            self.assertLessEqual(len(prompt), control_tower.PROMPT_GUARD_CHARS)
 
     def test_three_long_active_experiences_cannot_break_prompt_guard(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -72,6 +72,7 @@ from p2p_capabilities.experience_evolution import (  # noqa: E402
     ExperienceEvolutionError,
     activation_summary,
 )
+from p2p_capabilities.review_extension_activation import render_review_guidance  # noqa: E402
 
 
 CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT:"
@@ -162,6 +163,10 @@ def _render_context_block(
             "PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.",
             max_chars,
         )
+
+    review_guidance = render_review_guidance(task)
+    if review_guidance and not _append_if_fits(parts, review_guidance, max_chars):
+        return ""
 
     decision = _compact_text(summary.get("decision", "UNAVAILABLE"), 32)
     _append_if_fits(
