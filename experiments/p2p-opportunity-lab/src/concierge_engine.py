@@ -37,6 +37,25 @@ CHARGE_ALIASES = {
     "DELIVERY ORDER": "DO",
 }
 
+EQUIPMENT_ALIASES = {
+    "20GP": "20GP",
+    "20DC": "20GP",
+    "20DV": "20GP",
+    "20DRY": "20GP",
+    "20GENERALPURPOSE": "20GP",
+    "40GP": "40GP",
+    "40DC": "40GP",
+    "40DV": "40GP",
+    "40DRY": "40GP",
+    "40GENERALPURPOSE": "40GP",
+    "40HC": "40HC",
+    "40HQ": "40HC",
+    "40HIGHCUBE": "40HC",
+    "45HC": "45HC",
+    "45HQ": "45HC",
+    "45HIGHCUBE": "45HC",
+}
+
 
 def _clean_text(value: Any) -> str:
     return " ".join(str(value or "").strip().upper().replace("_", " ").split())
@@ -51,6 +70,14 @@ def canonical_charge_code(name: Any) -> str:
     if not cleaned:
         return "UNKNOWN"
     return CHARGE_ALIASES.get(cleaned, cleaned.replace(" ", "_"))
+
+
+def canonical_equipment(value: Any) -> str:
+    cleaned = _clean_text(value)
+    if not cleaned:
+        return "UNKNOWN"
+    compact = cleaned.replace("'", "").replace('"', "").replace(" ", "")
+    return EQUIPMENT_ALIASES.get(compact, cleaned)
 
 
 def _decimal(value: Any) -> Decimal | None:
@@ -75,7 +102,8 @@ def normalize_quote(raw: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("quote currency must be a 3-letter code")
 
     route = raw.get("route") if isinstance(raw.get("route"), dict) else {}
-    equipment = _clean_text(raw.get("equipment")) or "UNKNOWN"
+    equipment_raw = str(raw.get("equipment") or "").strip()
+    equipment = canonical_equipment(equipment_raw)
     charges = raw.get("charges")
     if not isinstance(charges, list) or not charges:
         raise ValueError("at least one charge is required")
@@ -151,6 +179,7 @@ def normalize_quote(raw: dict[str, Any]) -> dict[str, Any]:
             "destination": _clean_text(route.get("destination")),
         },
         "equipment": equipment,
+        "equipment_raw": equipment_raw,
         "valid_from": raw.get("valid_from"),
         "valid_to": raw.get("valid_to"),
         "charges": normalized_charges,
@@ -298,28 +327,111 @@ def _coverage_resolution(
     return {"status": status, "source_ref": source_ref}
 
 
+def _comparison_key(quote: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        quote["route"]["origin"],
+        quote["route"]["destination"],
+        quote["equipment"],
+        quote["currency"],
+    )
+
+
+def _target_key(context: dict[str, Any]) -> tuple[str, str, str, str] | None:
+    target = context.get("comparison_target")
+    if target is None:
+        return None
+    if not isinstance(target, dict):
+        raise ValueError("comparison_target must be an object")
+    route = target.get("route") if isinstance(target.get("route"), dict) else {}
+    origin = _clean_text(route.get("origin"))
+    destination = _clean_text(route.get("destination"))
+    equipment = canonical_equipment(target.get("equipment"))
+    currency = _clean_text(target.get("currency"))
+    if not origin or not destination or equipment == "UNKNOWN" or len(currency) != 3:
+        raise ValueError("comparison_target requires route.origin, route.destination, equipment, and 3-letter currency")
+    return (origin, destination, equipment, currency)
+
+
+def _mismatch_reasons(key: tuple[str, str, str, str], target: tuple[str, str, str, str]) -> list[str]:
+    reasons = []
+    if key[0:2] != target[0:2]:
+        reasons.append("ROUTE_MISMATCH")
+    if key[2] != target[2]:
+        reasons.append("EQUIPMENT_MISMATCH")
+    if key[3] != target[3]:
+        reasons.append("CURRENCY_MISMATCH")
+    return reasons
+
+
+def _key_dict(key: tuple[str, str, str, str]) -> dict[str, Any]:
+    return {
+        "route": {"origin": key[0], "destination": key[1]},
+        "equipment": key[2],
+        "currency": key[3],
+    }
+
+
 def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(raw_quotes, list) or len(raw_quotes) < 2:
         raise ValueError("at least two quotes are required")
 
     quotes = [normalize_quote(q) for q in raw_quotes]
-    baseline = quotes[0]
-    comparable_group = []
     excluded = []
+    eligible = []
 
     for quote in quotes:
-        reasons = []
-        if quote["route"] != baseline["route"]:
-            reasons.append("ROUTE_MISMATCH")
-        if quote["equipment"] != baseline["equipment"]:
-            reasons.append("EQUIPMENT_MISMATCH")
-        if quote["currency"] != baseline["currency"]:
-            reasons.append("CURRENCY_MISMATCH")
-        reasons.extend(_validity_reasons(quote, context))
+        reasons = _validity_reasons(quote, context)
         if reasons:
             excluded.append({"quote_id": quote["quote_id"], "reasons": reasons})
         else:
-            comparable_group.append(quote)
+            eligible.append(quote)
+
+    groups: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
+    for quote in eligible:
+        groups.setdefault(_comparison_key(quote), []).append(quote)
+
+    group_summaries = [
+        {**_key_dict(key), "count": len(items), "quote_ids": [item["quote_id"] for item in items]}
+        for key, items in groups.items()
+    ]
+
+    requested_key = _target_key(context)
+    selection_mode = "AUTO_LARGEST_GROUP"
+    selected_key: tuple[str, str, str, str] | None = None
+    comparable_group: list[dict[str, Any]] = []
+    group_warning: str | None = None
+
+    if requested_key is not None:
+        selection_mode = "EXPLICIT_TARGET"
+        selected_key = requested_key
+        comparable_group = groups.get(requested_key, [])
+        if not comparable_group:
+            group_warning = "NO_QUOTES_MATCH_COMPARISON_TARGET"
+    elif groups:
+        max_size = max(len(items) for items in groups.values())
+        largest_keys = [key for key, items in groups.items() if len(items) == max_size]
+        if len(largest_keys) > 1 and max_size >= 2:
+            selection_mode = "AMBIGUOUS_GROUPS"
+            group_warning = "AMBIGUOUS_COMPARISON_GROUP"
+        else:
+            selected_key = largest_keys[0]
+            comparable_group = groups[selected_key]
+            if len(largest_keys) > 1:
+                selection_mode = "FIRST_SEEN_SINGLETON_FALLBACK"
+
+    if selected_key is not None:
+        selected_ids = {quote["quote_id"] for quote in comparable_group}
+        for quote in eligible:
+            if quote["quote_id"] in selected_ids:
+                continue
+            reasons = _mismatch_reasons(_comparison_key(quote), selected_key)
+            excluded.append({
+                "quote_id": quote["quote_id"],
+                "reasons": reasons or ["COMPARISON_GROUP_MISMATCH"],
+            })
+    elif group_warning == "AMBIGUOUS_COMPARISON_GROUP":
+        for quote in eligible:
+            excluded.append({"quote_id": quote["quote_id"], "reasons": ["AMBIGUOUS_COMPARISON_GROUP"]})
 
     required_codes: set[str] = set()
     for quote in comparable_group:
@@ -387,19 +499,32 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
         for index, item in enumerate(rankable, start=1)
     ]
 
+    if group_warning is not None:
+        decision_warning = group_warning
+    elif len(rankable) < 2:
+        decision_warning = "INSUFFICIENT_COMPLETE_COMPARABLE_QUOTES"
+    else:
+        decision_warning = None
+
+    basis = _key_dict(selected_key) if selected_key is not None else {
+        "route": None,
+        "equipment": None,
+        "currency": None,
+    }
+    basis.update({
+        "context": deepcopy(context),
+        "as_of_date": context.get("as_of_date"),
+        "fx_applied": False,
+        "selection_mode": selection_mode,
+    })
+
     return {
-        "comparison_basis": {
-            "route": baseline["route"],
-            "equipment": baseline["equipment"],
-            "currency": baseline["currency"],
-            "context": deepcopy(context),
-            "as_of_date": context.get("as_of_date"),
-            "fx_applied": False,
-        },
+        "comparison_basis": basis,
+        "comparison_groups": group_summaries,
         "required_charge_codes": sorted(required_codes),
         "coverage_matrix": coverage_matrix,
         "priced_quotes": priced,
         "ranking": ranking,
         "excluded": excluded,
-        "decision_warning": None if len(rankable) >= 2 else "INSUFFICIENT_COMPLETE_COMPARABLE_QUOTES",
+        "decision_warning": decision_warning,
     }
