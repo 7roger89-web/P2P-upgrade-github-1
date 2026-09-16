@@ -16,6 +16,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -55,6 +56,21 @@ def _run_git(root: Path, args: list[str]) -> str | None:
     return result.stdout.strip()
 
 
+def _argv_root() -> Path | None:
+    """Reuse the host CLI's ``--root`` without coupling to Control Tower code."""
+    args = list(sys.argv[1:])
+    for index, value in enumerate(args):
+        if value == "--root" and index + 1 < len(args):
+            candidate = args[index + 1].strip()
+            if candidate and candidate.upper() != "UNKNOWN":
+                return Path(candidate).expanduser()
+        if value.startswith("--root="):
+            candidate = value.split("=", 1)[1].strip()
+            if candidate and candidate.upper() != "UNKNOWN":
+                return Path(candidate).expanduser()
+    return None
+
+
 def _discover_root(explicit_root: str | Path | None = None) -> Path | None:
     candidates: list[Path] = []
     if explicit_root not in (None, "", "UNKNOWN"):
@@ -62,6 +78,9 @@ def _discover_root(explicit_root: str | Path | None = None) -> Path | None:
     env_root = os.environ.get("P2P_PROJECT_ROOT")
     if env_root:
         candidates.append(Path(env_root).expanduser())
+    argv_root = _argv_root()
+    if argv_root is not None:
+        candidates.append(argv_root)
     candidates.append(Path.cwd())
 
     for candidate in candidates:
