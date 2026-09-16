@@ -68,12 +68,13 @@ Implemented:
 - equal multi-quote groups are treated as ambiguous and produce no ranking until an explicit `comparison_target` is supplied;
 - conservative equipment aliases normalize equivalent forms such as `40HQ` / `40HC` while keeping materially different types such as `40GP` separate;
 - route/location aliases such as `CNSHA -> SHANGHAI` are accepted only when an explicit alias mapping carries a non-empty source reference; applied aliases are preserved in `route_alias_audit`;
-- `src.charge_semantics.compare_quotes_guarded` is now the required real-validation entrypoint before the core comparison engine;
-- scoped charge coverage distinguishes `ORIGIN`, `MAIN`, `DESTINATION`, `OTHER`, and `UNSPECIFIED` instead of conflating identical charge labels across commercial stages;
+- `src.charge_semantics.compare_quotes_guarded` is the required real-validation entrypoint before the core comparison engine;
+- scoped charge coverage distinguishes `ORIGIN`, `MAIN`, `DESTINATION`, `OTHER`, and `UNSPECIFIED` instead of conflating identical labels across commercial stages;
 - exact duplicate priced charge signatures are blocked before ranking;
 - evidenced all-in/bundled charges may expand into zero-contribution included coverage rows while one primary component carries the bundle price;
 - priced standalone components that overlap the same priced bundle are blocked as a double-count risk;
-- quote-intake schema now carries `scope`, `bundle_includes`, and `bundle_primary_code` explicitly.
+- optional/add-on charges require explicit `selected=true|false`: unselected add-ons are excluded from price and required coverage but preserved in audit; selected add-ons remain priced; missing selection blocks ranking;
+- quote-intake schema carries `scope`, `bundle_includes`, `bundle_primary_code`, `optional`, and `selected` explicitly.
 
 ## Multi-equipment FCL validation
 
@@ -91,9 +92,9 @@ Verification at this slice:
 - group-selection/equipment-alias probes: 5/5 PASS;
 - route-alias provenance probes: 4/4 PASS;
 - conditional commercial terms: 3/3 PASS from the prior slice;
-- charge semantics isolated harness: 6/6 PASS using repo-style `src.*` imports;
+- charge semantics isolated harness: 9/9 PASS using repo-style `src.*` imports;
 - multi-equipment FCL portfolio focused harness: 5/5 PASS;
-- current committed inventory includes 20 concierge-engine tests, 2 route-alias tests, 6 charge-semantics tests and 5 portfolio-semantics tests;
+- current committed inventory includes 20 concierge-engine tests, 2 route-alias tests, 9 charge-semantics tests and 5 portfolio-semantics tests;
 - representative synthetic fixture remains the deterministic acceptance fixture (`SYN-B USD 2010 < SYN-A USD 2060`; CNY excluded without FX);
 - experiment tracker: 5/5 PASS;
 - experiment states remain distinct: `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, `PAID`.
@@ -102,13 +103,13 @@ Focused harnesses prove only their stated slices. They do not claim that the ent
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + GUARDED_CHARGE_SEMANTICS_READY + OPTIONAL_ADDON_GUARD_READY + MULTI_EQUIPMENT_FCL_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane is blocked only on Reddit delivery capability. The internal lane can now reject stale, incomplete, conditionally priced, duplicate, double-counted, scope-confused, comparison-incompatible, and incomplete multi-equipment provider quote sets rather than manufacturing a false cheapest option.
+The external lane is blocked only on Reddit delivery capability. The internal lane can now reject stale, incomplete, conditionally priced, duplicate, double-counted, scope-confused, optional-service-ambiguous, comparison-incompatible, and incomplete multi-equipment provider quote sets rather than manufacturing a false cheapest option.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Continue validation-only hardening only where representative FCL quote semantics justify it. The next useful candidates are explicit provider-level surcharges expressed as percentages/tier rules and evidence-safe handling of optional/add-on services; do not drift into product UI/login/billing/deployment.
+2. Continue validation-only hardening only where representative FCL quote semantics justify it. The next useful candidate is explicit provider-level percentage surcharge handling with a named/evidenced calculation base; do not drift into product UI/login/billing/deployment.
 3. On opt-in, run the real concierge test through guarded semantics, record corrections/trust objections/repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
