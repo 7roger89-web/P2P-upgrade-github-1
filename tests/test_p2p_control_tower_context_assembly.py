@@ -130,7 +130,17 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn("NONAUTHORITATIVE", block)
             self.assertIn(experience_id, block)
             self.assertIn("PRIMARY_RISK_WRAPPER=", block)
-            self.assertIn(correction, block)
+            risk_line = next(
+                line for line in block.splitlines() if line.startswith("PRIMARY_RISK_WRAPPER=")
+            )
+            rendered_risk = risk_line.split("=", 1)[1]
+            semantic_prefix = rendered_risk.removesuffix("…")
+            self.assertTrue(semantic_prefix)
+            self.assertTrue(correction.startswith(semantic_prefix))
+            self.assertLessEqual(
+                len(rendered_risk),
+                control_tower.MAX_PRIMARY_RISK_WRAPPER_CHARS,
+            )
             self.assertLessEqual(len(block), 900)
 
     def test_unrelated_experience_and_guidance_are_not_injected(self) -> None:
