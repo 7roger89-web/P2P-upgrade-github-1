@@ -67,27 +67,48 @@ Implemented:
 - comparison-group selection no longer trusts the first input quote as the baseline: eligible quotes are grouped by normalized route + equipment + currency and the unique largest group is selected automatically;
 - equal multi-quote groups are treated as ambiguous and produce no ranking until an explicit `comparison_target` is supplied;
 - conservative equipment aliases normalize equivalent forms such as `40HQ` / `40HC` while keeping materially different types such as `40GP` separate;
-- route/location aliases such as `CNSHA -> SHANGHAI` are accepted only when an explicit alias mapping carries a non-empty source reference; applied aliases are preserved in `route_alias_audit`.
+- route/location aliases such as `CNSHA -> SHANGHAI` are accepted only when an explicit alias mapping carries a non-empty source reference; applied aliases are preserved in `route_alias_audit`;
+- `src.charge_semantics.compare_quotes_guarded` is now the required real-validation entrypoint before the core comparison engine;
+- scoped charge coverage distinguishes `ORIGIN`, `MAIN`, `DESTINATION`, `OTHER`, and `UNSPECIFIED` instead of conflating identical charge labels across commercial stages;
+- exact duplicate priced charge signatures are blocked before ranking;
+- evidenced all-in/bundled charges may expand into zero-contribution included coverage rows while one primary component carries the bundle price;
+- priced standalone components that overlap the same priced bundle are blocked as a double-count risk;
+- quote-intake schema now carries `scope`, `bundle_includes`, and `bundle_primary_code` explicitly.
+
+## Multi-equipment FCL validation
+
+Implemented:
+- `src.portfolio_semantics.compare_fcl_portfolios` for one RFQ requiring multiple container equipment types;
+- requirements canonicalize aliases such as `40HQ -> 40HC` and combine quantities;
+- provider quote sets must cover every required equipment type exactly once; missing or ambiguous equipment offers are excluded rather than guessed;
+- equipment-level offers are deliberately restricted to `PER_CONTAINER` / `INCLUDED` in this pilot slice;
+- `PER_SHIPMENT` / `PER_BL` charges live at provider shared-charge level and are priced once, preventing accidental multiplication across equipment rows;
+- portfolio total is the sum of complete required equipment offers plus complete shared charges in one currency/route;
+- incomplete provider portfolios are excluded from ranking.
 
 Verification at this slice:
 - prior base concierge engine suite: 15/15 PASS before the group-selection slice;
-- new group-selection/equipment-alias probes: 5/5 PASS;
+- group-selection/equipment-alias probes: 5/5 PASS;
 - route-alias provenance probes: 4/4 PASS;
 - conditional commercial terms: 3/3 PASS from the prior slice;
-- current committed regression inventory: 20 concierge-engine tests + 2 route-alias tests;
+- charge semantics isolated harness: 6/6 PASS using repo-style `src.*` imports;
+- multi-equipment FCL portfolio focused harness: 5/5 PASS;
+- current committed inventory includes 20 concierge-engine tests, 2 route-alias tests, 6 charge-semantics tests and 5 portfolio-semantics tests;
 - representative synthetic fixture remains the deterministic acceptance fixture (`SYN-B USD 2010 < SYN-A USD 2060`; CNY excluded without FX);
 - experiment tracker: 5/5 PASS;
 - experiment states remain distinct: `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, `PAID`.
 
+Focused harnesses prove only their stated slices. They do not claim that the entire repository regression inventory was rerun together on one local source-tree runner. GitHub Shield is verified separately on exact heads.
+
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY + EXPERIMENT_TRACKER_READY + CHARGE_COVERAGE_GUARD_READY + VALIDITY_GUARD_READY + MINIMUM_CHARGE_READY + CONDITIONAL_TERMS_READY + UNBIASED_GROUP_SELECTION_READY + ROUTE_ALIAS_PROVENANCE_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane is blocked only on Reddit delivery capability. The internal lane continues independently and is ready to reject stale, incomplete, conditionally priced, or comparison-incompatible quote groups rather than manufacturing a false cheapest option.
+The external lane is blocked only on Reddit delivery capability. The internal lane can now reject stale, incomplete, conditionally priced, duplicate, double-counted, scope-confused, comparison-incompatible, and incomplete multi-equipment provider quote sets rather than manufacturing a false cheapest option.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Continue validation-only hardening only where representative quote semantics justify it; next useful candidates are tiered/percentage pricing and LCL/air chargeable-weight semantics. Do not drift into product UI/login/billing/deployment.
-3. On opt-in, run the real concierge test and record corrections, trust objections, repeat use and explicit WTP/payment signals.
+2. Continue validation-only hardening only where representative FCL quote semantics justify it. The next useful candidates are explicit provider-level surcharges expressed as percentages/tier rules and evidence-safe handling of optional/add-on services; do not drift into product UI/login/billing/deployment.
+3. On opt-in, run the real concierge test through guarded semantics, record corrections/trust objections/repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
