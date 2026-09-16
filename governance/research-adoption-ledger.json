@@ -2357,6 +2357,53 @@
       "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE",
       "last_reviewed_at": "2026-09-15T16:20:00+07:00",
       "notes": "MIT license verified. Upstream is provenance/methodology, never authority. No release, deploy, dependency install or target execution authorized by this record."
+    },
+    {
+      "research_id": "RA-EXT-071",
+      "source_name": "Evidence-Grounded Agent Evolution (multi-source 2024-2026 research synthesis)",
+      "source_type": "CROSS_SOURCE_RESEARCH",
+      "source_reference": "docs/p2p-development/research/evidence-grounded-evolution-2026-09-16.md",
+      "source_version_or_commit": "Owner-selected implementation 2026-09-16",
+      "provenance_status": "MULTI_SOURCE_RESEARCH_OWNER_SELECTED",
+      "research_summary": "Evidence-grounded experience lifecycle: execution lessons become reusable only after independent behavior/regression/challenge proof; active experience remains non-authoritative and utility-measured.",
+      "selected_ideas": [
+        "evidence-grounded experience distillation",
+        "candidate -> verified -> active lifecycle",
+        "bounded trigger-scoped reuse",
+        "utility feedback HELPED/NEUTRAL/HARMED",
+        "append-only quarantine/supersession",
+        "native-first reuse of existing execution ledger"
+      ],
+      "rejected_ideas": [
+        "raw chat/transcript as memory authority",
+        "model self-reflection as proof",
+        "automatic law/skill/source/deployment self-modification",
+        "second memory database/router/control plane",
+        "automatic deletion after one harmful use"
+      ],
+      "p2p_translation": "Implemented as p2p-experience-evolution/1 on the existing execution ledger and installed runtime path. Only ACTIVE verified experience may enter bounded task context; current law/task/current state always wins.",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [
+        "evidence_retrieval"
+      ],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/experience_evolution.py",
+        "tests/test_p2p_experience_evolution.py",
+        "tests/test_p2p_experience_evolution_distribution.py",
+        "docs/p2p-development/P2P-AGENTS-INSTALL.md",
+        "docs/p2p-development/research/evidence-grounded-evolution-2026-09-16.md",
+        "PR #188 P2P Shield + native Code-Impact exact-worktree evidence"
+      ],
+      "dependencies": [
+        "P2P_EVIDENCE_FIRST_VERIFICATION_V1",
+        "p2p-execution-event/1",
+        "existing release/runtime distribution"
+      ],
+      "roadmap_slot": "family:context",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-09-16T13:35:00+07:00",
+      "notes": "First bounded slice only. Workflow/skill/architecture self-mutation remains deferred until a measured native gap and separate authority gate."
     }
   ],
   "rejected_register_summary": {
@@ -2385,7 +2432,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-09-15T16:20:00+07:00",
+  "last_reviewed": "2026-09-16T13:35:00+07:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]
