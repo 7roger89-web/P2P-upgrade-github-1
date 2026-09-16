@@ -1,16 +1,19 @@
 """Foreground P2P Control Tower coordinator.
 
-The Control Tower coordinates durable task state, bounded delegation, evidence
-reconciliation, and the next safe action. It is not a law authority, executor,
-or second truth store. Before starting a new executor session this CLI composes
-only the relevant ACTIVE verified experience into the existing self-contained
-Control Tower prompt, without weakening its prompt-size safety guard.
+Control Tower coordinates durable task state, bounded delegation, evidence
+reconciliation, and the next safe action. It is not the law authority, the
+executor, a second router, or a second truth store.
+
+The runtime prompt keeps exactly the nine canonical Supreme-Law capsule entries.
+Operational guidance (project preflight, OE, GitHub handling, prompt-authoring)
+and verified experience are task-scoped context, not extra Supreme Laws.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -27,6 +30,33 @@ SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 for candidate in (str(REPO_ROOT), str(SYSTEM_ROOT), str(REPO_ROOT / "scripts")):
     if candidate not in sys.path:
         sys.path.insert(0, candidate)
+
+# Importing the package executes legacy compatibility projections that append
+# operational guidance to control_tower_handoff.SUPREME_LAW_CAPSULE. For the
+# canonical foreground Control Tower CLI we immediately restore the pristine
+# nine-law capsule. Those appended texts remain available in installed/project
+# instructions; they are not independent Supreme Laws and must not ride in every
+# executor prompt.
+from p2p_capabilities import control_tower_handoff as _handoff  # noqa: E402
+
+_CANONICAL_LAW_IDENTIFIERS = (
+    "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
+    "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
+    "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
+    "RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+    "PRESERVE_CONTINUITY_AND_STOP",
+    "PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT",
+    "ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT",
+    "TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY",
+    "EXECUTOR_INPUT_FORMAT_AND_ARTIFACT_TRANSPORT_FIDELITY",
+)
+_law_lines = tuple(line for line in _handoff.SUPREME_LAW_CAPSULE.splitlines() if line.strip())
+if len(_law_lines) < 9 or any(
+    identifier not in _law_lines[index]
+    for index, identifier in enumerate(_CANONICAL_LAW_IDENTIFIERS)
+):
+    raise RuntimeError("CONTROL_TOWER_CANONICAL_SUPREME_LAW_CAPSULE_INVALID")
+_handoff.SUPREME_LAW_CAPSULE = "\n".join(_law_lines[:9])
 
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     UNKNOWN,
@@ -47,6 +77,9 @@ from p2p_capabilities.experience_evolution import (  # noqa: E402
 CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT:"
 MAX_ACTIVE_EXPERIENCES = 3
 PROMPT_GUARD_CHARS = 8192
+MIN_CONTEXT_BUDGET = 380
+_GITHUB_TASK = re.compile(r"\b(github|pull request|\bpr\b|merge|branch|commit|repository|repo|head sha)\b", re.I)
+_PROMPT_TASK = re.compile(r"\b(prompt|instruction|delegate|delegation|handoff|executor prompt|rewrite prompt)\b", re.I)
 
 
 def _root(args: argparse.Namespace) -> Path:
@@ -59,9 +92,6 @@ def _experience_summary(root: Path, task_text: str) -> dict[str, Any]:
     try:
         return activation_summary(root, task_text, max_results=MAX_ACTIVE_EXPERIENCES)
     except (ExperienceEvolutionError, OSError):
-        # Prior experience is useful context, never a prerequisite for executing
-        # the current authoritative task. Surface unavailability without turning
-        # the experience subsystem into a new blocker/control plane.
         return {
             "schema": "p2p-experience-evolution/1",
             "decision": "UNAVAILABLE",
@@ -86,15 +116,53 @@ def _compact_text(value: Any, limit: int) -> str:
     return normalized[: limit - 1].rstrip() + "…"
 
 
-def _render_context_block(summary: Mapping[str, Any], *, max_chars: int) -> str:
-    """Render one budgeted risk wrapper; full experience stays in the ledger."""
+def _append_if_fits(parts: list[str], value: str, max_chars: int) -> bool:
+    candidate = "\n".join((*parts, value))
+    if len(candidate) > max_chars:
+        return False
+    parts.append(value)
+    return True
 
-    if max_chars <= len(CONTEXT_MARKER) + 16:
-        return ""
-    decision = _compact_text(summary.get("decision", "UNAVAILABLE"), 32)
-    block = f"{CONTEXT_MARKER} XP={decision}; NONAUTH"
+
+def _render_context_block(
+    summary: Mapping[str, Any],
+    task_text: str,
+    *,
+    max_chars: int,
+) -> str:
+    """Render mandatory runtime gates plus trigger-scoped guidance and experience."""
+
+    mandatory = [
+        CONTEXT_MARKER,
+        "LAW_AUTHORITY=ONE; Supreme Law=canonical 9-law capsule; projections/fallbacks/subordinate profiles are not independent laws.",
+        "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; resolve canonical>installed>portable>inline; report actual P2P_LAW_SOURCE; never fake a read.",
+        "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
+    ]
+    block = "\n".join(mandatory)
     if len(block) > max_chars:
         return ""
+    parts = list(mandatory)
+
+    task = str(task_text or "")
+    if _GITHUB_TASK.search(task):
+        _append_if_fits(
+            parts,
+            "GITHUB_GUIDANCE=EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS; direct repo/PR/HEAD evidence wins; do not infer account breakage from one unavailable session.",
+            max_chars,
+        )
+    if _PROMPT_TASK.search(task):
+        _append_if_fits(
+            parts,
+            "PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.",
+            max_chars,
+        )
+
+    decision = _compact_text(summary.get("decision", "UNAVAILABLE"), 32)
+    _append_if_fits(
+        parts,
+        f"EXPERIENCE=XP={decision}; ACTIVE_ONLY; MAX={MAX_ACTIVE_EXPERIENCES}; NONAUTHORITATIVE; current law/task/state/permissions/evidence win.",
+        max_chars,
+    )
 
     experiences = summary.get("experiences")
     active_items = [
@@ -103,29 +171,21 @@ def _render_context_block(summary: Mapping[str, Any], *, max_chars: int) -> str:
         if isinstance(item, Mapping)
     ]
     if not active_items:
-        return block
+        return "\n".join(parts)
 
-    count_piece = f"; N={len(active_items)}"
-    if len(block) + len(count_piece) <= max_chars:
-        block += count_piece
+    refs = ",".join(_compact_text(item.get("experience_id") or UNKNOWN, 80) for item in active_items)
+    _append_if_fits(parts, f"ACTIVE_EXPERIENCE_REFS={refs}", max_chars)
 
     primary = active_items[0]
-    ref = _compact_text(primary.get("experience_id") or UNKNOWN, 96)
-    ref_piece = f"; REF={ref}"
-    if len(block) + len(ref_piece) <= max_chars:
-        block += ref_piece
-
-    # The operational correction is more useful than verbose history. Only the
-    # top-ranked correction/lesson is injected; all verified details and other
-    # matching experience IDs remain discoverable in the existing ledger.
     risk_source = primary.get("correction") or primary.get("lesson")
-    risk_prefix = "; RISK="
-    remaining = max_chars - len(block) - len(risk_prefix)
-    if remaining >= 24:
+    prefix = "PRIMARY_RISK_WRAPPER="
+    used = len("\n".join(parts)) + 1 + len(prefix)
+    remaining = max_chars - used
+    if remaining >= 32:
         risk = _compact_text(risk_source, remaining)
         if risk:
-            block += risk_prefix + risk
-    return block
+            _append_if_fits(parts, prefix + risk, max_chars)
+    return "\n".join(parts)
 
 
 def _contextual_task_for_session(
@@ -139,7 +199,7 @@ def _contextual_task_for_session(
     canonical_base_tree: str = UNKNOWN,
     acceptance_criteria: Sequence[str] = (),
 ) -> str:
-    """Fit relevant experience into the exact final prompt budget, fail-soft."""
+    """Fit runtime guidance + relevant experience into the exact prompt budget."""
 
     task = str(task_text or "").strip()
     if not task:
@@ -147,9 +207,6 @@ def _contextual_task_for_session(
     if CONTEXT_MARKER in task:
         return task
 
-    # Build the exact prompt shape first. The existing handoff module already
-    # serializes the canonical Supreme-Law hierarchy, so this layer must not
-    # duplicate the law text. It only uses the remaining safe prompt slack.
     base_prompt = build_execution_prompt(
         binding,
         task,
@@ -159,14 +216,33 @@ def _contextual_task_for_session(
         canonical_base_tree=canonical_base_tree,
         acceptance_criteria=acceptance_criteria,
     )
-    remaining = PROMPT_GUARD_CHARS - len(base_prompt) - 2  # two newlines before context
-    if remaining <= 0:
-        return task
+    remaining = PROMPT_GUARD_CHARS - len(base_prompt) - 2
+    if remaining < MIN_CONTEXT_BUDGET:
+        raise BindingError(
+            f"CONTROL_TOWER_PROMPT_BUDGET_EXHAUSTED:base={len(base_prompt)}:remaining={remaining}"
+        )
 
-    block = _render_context_block(_experience_summary(root, task), max_chars=remaining)
+    block = _render_context_block(
+        _experience_summary(root, task),
+        task,
+        max_chars=remaining,
+    )
     if not block:
-        return task
-    return f"{task}\n\n{block}"
+        raise BindingError("CONTROL_TOWER_REQUIRED_CONTEXT_DID_NOT_FIT")
+    contextual = f"{task}\n\n{block}"
+
+    final_prompt = build_execution_prompt(
+        binding,
+        contextual,
+        worktree=worktree,
+        branch=branch,
+        canonical_base_sha=canonical_base_sha,
+        canonical_base_tree=canonical_base_tree,
+        acceptance_criteria=acceptance_criteria,
+    )
+    if len(final_prompt) > PROMPT_GUARD_CHARS:
+        raise BindingError(f"CONTROL_TOWER_FINAL_PROMPT_TOO_LARGE:{len(final_prompt)}")
+    return contextual
 
 
 def _extract_task_text(prompt: str) -> str:
@@ -207,7 +283,7 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Coordinate durable P2P task state, assemble bounded ACTIVE experience context, "
+            "Coordinate durable P2P task state, assemble bounded runtime/experience context, "
             "start executor sessions, and reconcile their evidence."
         )
     )
