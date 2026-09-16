@@ -34,9 +34,21 @@ The guard keeps exactly one priced bundle line and derives zero-contribution `IN
 
 If a priced standalone component overlaps a priced bundle in the same scope, the quote is blocked as `BUNDLE_COMPONENT_DOUBLE_COUNT_RISK`.
 
+## Optional / add-on services
+
+A charge with `optional: true` must also state `selected: true` or `selected: false` explicitly.
+
+- `selected: false` removes the add-on from both price and required coverage while preserving it in the semantic audit as `optional_excluded`.
+- `selected: true` keeps the charge as an ordinary priced/included line.
+- omitted selection blocks the quote as `OPTIONAL_SELECTION_REQUIRED`.
+
+The guard never infers selection from wording, price, or presence in one provider's rate sheet. This prevents optional insurance, trucking, customs, or other add-ons from making one provider look falsely expensive or from being silently added to a customer's requested scope.
+
 ## Evidence boundary
 
 Bundle expansion is a deterministic representation of supplied evidence. It does not infer that a fee is included merely because a quote says `all-in` in casual prose. The component list must be explicit in structured intake and must preserve a source reference.
+
+Likewise, optional selection is an explicit experiment/comparison input, not an inference made by the model.
 
 ## Failure behavior
 
@@ -44,4 +56,4 @@ Any unresolved semantic error yields:
 
 `decision_warning = UNRESOLVED_CHARGE_SEMANTICS`
 
-and an empty ranking. The semantic audit is returned with per-quote errors. The system prefers no winner over a winner produced by duplicate charges, scope conflation, or bundle double counting.
+and an empty ranking. The semantic audit is returned with per-quote errors. The system prefers no winner over a winner produced by duplicate charges, scope conflation, bundle double counting, or guessed optional-service selection.
