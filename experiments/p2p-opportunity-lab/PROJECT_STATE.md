@@ -93,30 +93,27 @@ The validated portfolio pipeline now:
 
 ## Verification state
 
-Verified focused harness evidence preserved:
-- market gate: 5/5 PASS;
-- prospect bridge: 5/5 PASS;
-- shortlist fixture: 6/6 PASS;
-- prior base concierge suite: 15/15 PASS before later grouping additions;
-- group/equipment probes: 5/5 PASS;
-- route-alias helper probes: 4/4 PASS;
-- conditional-term probes: 3/3 PASS;
-- charge semantics: 9/9 PASS using repo-style `src.*` imports;
-- percentage core resolver: 5/5 PASS in isolated deterministic harness;
-- original FCL portfolio focused slice: 5/5 PASS;
-- experiment tracker: 5/5 PASS.
+Full source-tree deterministic acceptance now exists through `.github/workflows/p2p-opportunity-lab-focused.yml`.
 
-Committed acceptance contracts additionally cover FX, optional-percentage delegation, atomic FX/percentage pipelines, expanded portfolio semantics, and FX/percentage-aware portfolio validation. Those newer tests are not falsely labeled full source-tree PASS without an actual runner executing them. GitHub Shield is verified separately on exact heads.
+Exact accepted evidence on head `4dfd6ba5168bac14e1bafc3ad70ef22f41192a05`:
+- source compile: **PASS**;
+- full Opportunity Lab pytest suite: **86/86 PASS** (`86 passed in 0.08s`);
+- focused workflow run `35072232369`: **SUCCESS**;
+- P2P Shield run `35072232306`: **SUCCESS**.
+
+The 86-test total is reconciled with `docs/TEST_MATRIX.md`; the design-partner fixture is 4 tests exercising 6 candidates, not 6 tests.
+
+Focused historical harness evidence remains useful for diagnosis, but the exact-head GitHub Actions run above is now the authoritative deterministic regression evidence for that head. Any later branch mutation requires fresh focused-CI evidence before the new head inherits PASS status.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane is blocked only on Reddit delivery capability. Internal validation can now normalize explicitly evidenced mixed-currency fixed charges before percentage and comparison semantics instead of either silently converting or rejecting every mixed-currency quote.
+The external lane is blocked only on Reddit delivery capability. Internal validation now has a reproducible exact-head domain-test surface rather than fragmented local probe evidence.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Continue validation-only hardening where representative freight quote semantics justify it; candidate next slice is tiered/bracket pricing, but do not implement speculative breadth before checking the exact-head state and acceptance evidence.
+2. Before adding pricing breadth, use the full focused CI as the gate for any internal hardening; prefer fixing integration/bypass inconsistencies over speculative new semantics.
 3. On opt-in, run the real concierge test through the top-level validated entrypoint, record corrections/trust objections/repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
