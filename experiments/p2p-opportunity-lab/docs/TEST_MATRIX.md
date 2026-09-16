@@ -43,21 +43,18 @@ Top-level atomic pipeline order is:
 
 `FX -> percentage -> charge semantics -> core comparison`
 
-A missing FX rate blocks before percentage resolution or ranking. A bad percentage reference blocks before charge semantics or ranking.
+Top-level FCL portfolio pipeline applies the same order independently to every required equipment offer and shared provider bucket.
 
-Top-level FCL portfolio pipeline applies the same order independently to every required equipment offer and shared provider bucket. Equipment-level percentage totals are quantity-aware and rebased to `PER_CONTAINER`; provider-level shared percentage/FX adjustments are applied once.
+## Focused CI acceptance surface
 
-## Exact-head CI evidence
+Workflow: `.github/workflows/p2p-opportunity-lab-focused.yml`.
 
-Focused workflow: `.github/workflows/p2p-opportunity-lab-focused.yml`.
+The workflow intentionally uses only the Python standard library test runner:
 
-On branch head `4dfd6ba5168bac14e1bafc3ad70ef22f41192a05`:
+`python -m unittest discover -s tests -p 'test_*.py' -v`
 
-- Python source compile: **PASS**;
-- `python -m pytest -q tests`: **86/86 PASS** in 0.08s;
-- workflow `P2P Opportunity Lab acceptance` run `35072232369`: **SUCCESS**;
-- P2P Shield run `35072232306`: **SUCCESS**.
+No external pytest installation is required. This reduces network/supply-chain drift while preserving the same 86-test deterministic contract inventory.
 
-This replaces the earlier fragmented evidence boundary for the current committed inventory: the full source-tree Opportunity Lab regression suite has now run successfully on GitHub Actions. Future branch mutations must obtain fresh exact-head focused-CI evidence before claiming the new head has the same acceptance status.
+Every substantive branch mutation must obtain fresh exact-head focused-CI evidence plus P2P Shield evidence before the new head inherits PASS status. Exact accepted head/run IDs are maintained in PR #180 and Issue #181 so this file does not need a self-referential commit just to record its own SHA.
 
 The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic, shortlist, and regression fixtures are not market evidence; they protect deterministic behavior before real participant data arrives.
