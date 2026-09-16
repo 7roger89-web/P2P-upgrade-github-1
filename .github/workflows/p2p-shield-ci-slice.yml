@@ -69,6 +69,7 @@ jobs:
           tests.test_p2p_native_code_impact
           tests.test_p2p_experience_evolution
           tests.test_p2p_experience_federation
+          tests.test_p2p_experience_federation_operational
           tests.test_p2p_experience_evolution_distribution
           tests.test_p2p_control_tower_context_assembly
 
