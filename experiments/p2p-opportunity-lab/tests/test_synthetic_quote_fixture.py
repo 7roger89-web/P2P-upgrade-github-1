@@ -21,6 +21,8 @@ class SyntheticQuoteFixtureTests(unittest.TestCase):
             [(item["quote_id"], item["total"]) for item in result["ranking"]],
             [(item["quote_id"], item["total"]) for item in data["expected"]["ranking"]],
         )
+        self.assertEqual(result["required_charge_codes"], data["expected"]["required_charge_codes"])
+        self.assertTrue(all(not row["unresolved_missing_codes"] for row in result["coverage_matrix"]))
         self.assertFalse(result["comparison_basis"]["fx_applied"])
         self.assertEqual(result["excluded"][0]["quote_id"], data["expected"]["excluded"]["quote_id"])
         self.assertIn(data["expected"]["excluded"]["reason"], result["excluded"][0]["reasons"])

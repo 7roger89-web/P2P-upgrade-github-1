@@ -203,6 +203,35 @@ def price_quote(quote: dict[str, Any], context: dict[str, Any]) -> dict[str, Any
     }
 
 
+COVERAGE_RESOLUTION_STATUSES = {"INCLUDED", "NOT_APPLICABLE"}
+
+
+def _charge_code_set(quote: dict[str, Any]) -> set[str]:
+    return {charge["code"] for charge in quote["charges"] if charge["code"] != "UNKNOWN"}
+
+
+def _coverage_resolution(
+    quote_id: str,
+    code: str,
+    context: dict[str, Any],
+) -> dict[str, Any] | None:
+    all_resolutions = context.get("coverage_resolutions")
+    if not isinstance(all_resolutions, dict):
+        return None
+    quote_resolutions = all_resolutions.get(quote_id)
+    if not isinstance(quote_resolutions, dict):
+        return None
+    resolution = quote_resolutions.get(code)
+    if not isinstance(resolution, dict):
+        return None
+
+    status = _enum(resolution.get("status"))
+    source_ref = str(resolution.get("source_ref") or "").strip()
+    if status not in COVERAGE_RESOLUTION_STATUSES or not source_ref:
+        return None
+    return {"status": status, "source_ref": source_ref}
+
+
 def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(raw_quotes, list) or len(raw_quotes) < 2:
         raise ValueError("at least two quotes are required")
@@ -225,7 +254,44 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
         else:
             comparable_group.append(quote)
 
-    priced = [price_quote(q, context) for q in comparable_group]
+    required_codes: set[str] = set()
+    for quote in comparable_group:
+        required_codes.update(_charge_code_set(quote))
+
+    priced = []
+    coverage_matrix = []
+    for quote in comparable_group:
+        priced_quote = price_quote(quote, context)
+        present_codes = _charge_code_set(quote)
+        missing_codes = sorted(required_codes - present_codes)
+        unresolved = []
+        resolved = []
+
+        for code in missing_codes:
+            resolution = _coverage_resolution(quote["quote_id"], code, context)
+            if resolution is None:
+                unresolved.append(code)
+            else:
+                resolved.append({"code": code, **resolution})
+
+        if unresolved:
+            priced_quote["complete"] = False
+            priced_quote["warnings"] = sorted(set(
+                priced_quote["warnings"]
+                + [f"coverage gap: unresolved missing charge {code}" for code in unresolved]
+            ))
+
+        priced_quote["coverage_gaps"] = unresolved
+        priced_quote["coverage_resolutions"] = resolved
+        priced.append(priced_quote)
+        coverage_matrix.append({
+            "quote_id": quote["quote_id"],
+            "present_codes": sorted(present_codes),
+            "missing_codes": missing_codes,
+            "unresolved_missing_codes": unresolved,
+            "resolved_missing_codes": [item["code"] for item in resolved],
+        })
+
     rankable = [p for p in priced if p["complete"]]
     rankable.sort(key=lambda x: Decimal(x["total"]))
 
@@ -242,6 +308,8 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
             "context": deepcopy(context),
             "fx_applied": False,
         },
+        "required_charge_codes": sorted(required_codes),
+        "coverage_matrix": coverage_matrix,
         "priced_quotes": priced,
         "ranking": ranking,
         "excluded": excluded,

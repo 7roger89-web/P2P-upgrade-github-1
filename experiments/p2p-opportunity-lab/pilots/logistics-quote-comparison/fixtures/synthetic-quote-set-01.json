@@ -16,7 +16,8 @@
       "charges": [
         {"name": "Ocean Freight", "amount": 950, "basis": "PER_CONTAINER", "source_ref": "a:p1:r1"},
         {"name": "Terminal Handling Charge", "amount": 120, "basis": "PER_SHIPMENT", "source_ref": "a:p1:r2"},
-        {"name": "Documentation Fee", "amount": 40, "basis": "PER_BL", "source_ref": "a:p1:r3"}
+        {"name": "Documentation Fee", "amount": 40, "basis": "PER_BL", "source_ref": "a:p1:r3"},
+        {"name": "PSS", "included": true, "basis": "INCLUDED", "source_ref": "a:p1:r4"}
       ]
     },
     {
@@ -49,6 +50,7 @@
       {"quote_id": "SYN-A", "total": "2060"}
     ],
     "excluded": {"quote_id": "SYN-C", "reason": "CURRENCY_MISMATCH"},
+    "required_charge_codes": ["DOC", "FREIGHT", "PSS", "THC"],
     "fx_applied": false
   }
 }
