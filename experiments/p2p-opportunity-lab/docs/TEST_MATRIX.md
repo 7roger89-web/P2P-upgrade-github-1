@@ -15,10 +15,10 @@ Current committed regression inventory:
 - validated FCL portfolio pipeline: 3 percentage integration contracts + 2 FX-first integration contracts;
 - experiment tracker: 5 tests;
 - legacy synthetic quote fixture: 1 deterministic core-engine fixture test;
-- validated golden quote fixture: 1 end-to-end top-level pipeline test;
+- validated golden quote fixture: 2 top-level tests (end-to-end evidence/ranking + input-order invariance);
 - design-partner shortlist fixture: 4 tests exercising 6 evidence-backed candidates against qualification/stage/score/no-money-signal invariants.
 
-**Exact collected total: 87 tests.**
+**Exact collected total: 88 tests.**
 
 Coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
 
@@ -48,7 +48,7 @@ Top-level FCL portfolio pipeline applies the same order independently to every r
 
 ## Validated golden fixture
 
-`pilots/logistics-quote-comparison/fixtures/synthetic-validated-quote-set-02.json` is the top-level integration fixture. It exercises the real atomic entrypoint with one scenario containing all of the following at once:
+`pilots/logistics-quote-comparison/fixtures/synthetic-validated-quote-set-02.json` is the top-level integration fixture. It exercises the real atomic entrypoint with one scenario containing:
 
 - evidenced `CNY -> USD` conversion;
 - `BAF = 5% of FREIGHT` using an explicit named base line;
@@ -58,7 +58,9 @@ Top-level FCL portfolio pipeline applies the same order independently to every r
 - canonical `40HQ -> 40HC` equipment normalization;
 - apples-to-apples scoped coverage and final ranking.
 
-Expected deterministic ranking is `VAL-B USD 1940 < VAL-A USD 2028`. The fixture additionally asserts FX audit, percentage audit, route-alias audit, optional exclusion, and no unresolved coverage gaps. This fixture protects the whole validated pipeline rather than testing only the core comparison engine.
+Expected deterministic ranking is `VAL-B USD 1940 < VAL-A USD 2028`. The primary golden test asserts FX audit, percentage audit, route-alias audit, optional exclusion, no unresolved coverage gaps and final ranking.
+
+A second adversarial golden test reverses both the quote order and every quote's charge-line order. Ranking, required coverage, FX application and the core evidence resolutions must remain identical. This protects the validated pipeline from accidental first-seen/order-dependent behavior.
 
 ## Focused CI acceptance surface
 
