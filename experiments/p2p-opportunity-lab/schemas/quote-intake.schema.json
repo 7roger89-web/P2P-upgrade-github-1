@@ -44,6 +44,8 @@
             "items": {"type": "string", "minLength": 1}
           },
           "bundle_primary_code": {"type": "string", "minLength": 1},
+          "optional": {"type": "boolean"},
+          "selected": {"type": "boolean"},
           "included": {"type": "boolean"},
           "uncertain": {"type": "boolean"},
           "source_ref": {"type": "string", "minLength": 1},
