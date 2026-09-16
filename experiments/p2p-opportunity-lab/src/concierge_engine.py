@@ -121,6 +121,27 @@ def normalize_quote(raw: dict[str, Any]) -> dict[str, Any]:
             "note": str(charge.get("note") or "").strip(),
         })
 
+    raw_conditions = raw.get("conditions") or []
+    if not isinstance(raw_conditions, list):
+        raise ValueError("conditions must be an array")
+
+    normalized_conditions = []
+    for index, condition in enumerate(raw_conditions, start=1):
+        if not isinstance(condition, dict):
+            raise ValueError(f"condition {index} must be an object")
+        text = str(condition.get("text") or "").strip()
+        source_ref = str(condition.get("source_ref") or "").strip()
+        requested_resolved = bool(condition.get("resolved"))
+        resolution_source_ref = str(condition.get("resolution_source_ref") or "").strip()
+        effective_resolved = bool(text and source_ref and requested_resolved and resolution_source_ref)
+        normalized_conditions.append({
+            "text": text,
+            "source_ref": source_ref,
+            "resolved": effective_resolved,
+            "resolution_source_ref": resolution_source_ref,
+            "resolution_note": str(condition.get("resolution_note") or "").strip(),
+        })
+
     return {
         "quote_id": quote_id,
         "provider": str(raw.get("provider") or "").strip(),
@@ -133,6 +154,7 @@ def normalize_quote(raw: dict[str, Any]) -> dict[str, Any]:
         "valid_from": raw.get("valid_from"),
         "valid_to": raw.get("valid_to"),
         "charges": normalized_charges,
+        "conditions": normalized_conditions,
         "source": deepcopy(raw.get("source") or {}),
     }
 
@@ -307,6 +329,26 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
     coverage_matrix = []
     for quote in comparable_group:
         priced_quote = price_quote(quote, context)
+        unresolved_conditions = [
+            condition for condition in quote.get("conditions", [])
+            if not condition["resolved"]
+        ]
+        resolved_conditions = [
+            condition for condition in quote.get("conditions", [])
+            if condition["resolved"]
+        ]
+        if unresolved_conditions:
+            priced_quote["complete"] = False
+            priced_quote["warnings"] = sorted(set(
+                priced_quote["warnings"]
+                + [
+                    f"unresolved commercial term: {condition['text'] or 'missing term text'}"
+                    for condition in unresolved_conditions
+                ]
+            ))
+        priced_quote["unresolved_conditions"] = unresolved_conditions
+        priced_quote["resolved_conditions"] = resolved_conditions
+
         present_codes = _charge_code_set(quote)
         missing_codes = sorted(required_codes - present_codes)
         unresolved = []

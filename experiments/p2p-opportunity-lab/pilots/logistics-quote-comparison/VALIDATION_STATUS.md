@@ -18,10 +18,11 @@
 - Missing/uncertain charge data blocks ranking rather than creating a fake cheapest quote.
 - Charge-coverage parity prevents a quote winning by omission; evidenced `INCLUDED` / `NOT_APPLICABLE` resolutions are allowed.
 - Explicit `as_of_date` excludes expired/not-yet-valid quotes and malformed validity cannot silently rank.
-- `minimum_amount` is now supported for pricing bases such as per-kg/per-cbm charges. The engine calculates `max(rate × quantity, minimum_amount)` and preserves raw contribution, minimum, whether the floor applied, and source reference in the audit trail.
-- Negative minimums and `INCLUDED + minimum_amount` contradictions are rejected.
-- Concierge engine exact regression: **15/15 PASS**; representative synthetic fixture: **PASS**.
-- Experiment tracker separates `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, and `PAID`; praise/repeat use cannot become money evidence.
+- `minimum_amount` is supported; the engine calculates `max(rate × quantity, minimum_amount)` and preserves raw contribution, floor application and source reference.
+- Quote-level commercial conditions are supported for phrases such as `subject to PSS`, `subject to local charges`, or `subject to confirmation`. Any unresolved condition makes the quote incomplete and non-rankable.
+- A condition becomes resolved only when the original term has provenance and the resolution carries its own non-empty `resolution_source_ref`; a naked `resolved=true` flag is not trusted.
+- Base concierge regression: **15/15 PASS**; conditional-term probes: **3/3 PASS**; representative synthetic fixture: **PASS**.
+- Experiment tracker keeps `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, and `PAID` distinct; praise/repeat use cannot become money evidence.
 
 ## Promotion boundary
 

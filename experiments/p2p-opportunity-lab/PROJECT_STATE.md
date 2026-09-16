@@ -42,46 +42,44 @@ Owner authorized contact for exactly the first three shortlisted prospects on 20
 Durable batch: `pilots/logistics-quote-comparison/outreach-batch-01.json`.
 
 Current delivery state:
-
 - `sent_count=0`
 - `reply_count=0`
 - `opt_in_count=0`
 - `READY_BUT_NOT_SENT`
-- blocker: the current ChatGPT surface has no authenticated Reddit write/post action.
+- blocker: current ChatGPT surface has no authenticated Reddit write/post action.
 
-The outreach copy is research-first, public, low-volume, no sales pitch, no private enrichment, and requires opt-in before data exchange. A six-hour reply watch is active, but an unsent outreach comment cannot receive a direct reply.
+A six-hour reply watch is active, but an unsent outreach comment cannot receive a direct reply. Authorization does not need to be requested again when a valid Reddit write surface appears.
 
 ## Concierge validation engine
 
 Implemented:
-
 - anonymized quote-intake contract with provenance;
 - deterministic quote normalization and audit trail;
 - route/equipment/currency comparability checks;
 - no silent FX conversion;
 - unknown/uncertain pricing basis blocks ranking;
-- charge-coverage parity: a quote cannot win by silently omitting a charge present in another otherwise-comparable quote;
-- coverage gaps require evidenced `INCLUDED` or `NOT_APPLICABLE` resolution;
-- validity-window guard using explicit `as_of_date`; expired/not-yet-valid quotes are excluded and malformed dates cannot silently rank;
-- minimum-charge support: contribution is `max(rate × quantity, minimum_amount)` with raw calculation, floor application, and source reference preserved in audit output;
-- negative minimums and `INCLUDED + minimum_amount` contradictions are rejected.
+- charge-coverage parity so a quote cannot win by silently omitting charges;
+- evidenced `INCLUDED` / `NOT_APPLICABLE` resolution for coverage gaps;
+- validity-window guard using explicit `as_of_date`;
+- minimum-charge support: `max(rate × quantity, minimum_amount)` with raw calculation, floor application and provenance preserved;
+- conditional-commercial-term guard: unresolved `subject to` / exclusion / confirmation terms make a quote incomplete and non-rankable; resolution requires independent source evidence.
 
 Verification at this slice:
-
-- concierge engine: 15/15 PASS in exact local regression;
+- base concierge engine: 15/15 PASS;
+- conditional commercial terms: 3/3 PASS;
 - representative synthetic fixture: PASS (`SYN-B USD 2010 < SYN-A USD 2060`; CNY quote excluded without FX);
 - experiment tracker: 5/5 PASS;
-- experiment stages remain distinct: `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, `PAID`.
+- experiment states remain distinct: `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, `PAID`.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY + EXPERIMENT_TRACKER_READY + CHARGE_COVERAGE_GUARD_READY + VALIDITY_GUARD_READY + MINIMUM_CHARGE_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY + EXPERIMENT_TRACKER_READY + CHARGE_COVERAGE_GUARD_READY + VALIDITY_GUARD_READY + MINIMUM_CHARGE_READY + CONDITIONAL_TERMS_READY`
 
-The external lane is blocked only on Reddit delivery capability. The internal lane continues independently and is ready to accept anonymized opted-in quote sets.
+The external lane is blocked only on Reddit delivery capability. The internal lane continues independently and is ready to accept anonymized opted-in quote sets without pretending incomplete commercial terms are final prices.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Continue validation-only hardening for real quote semantics: conditional/subject-to exclusions and ambiguous pricing bases. Do not build product UI/login/billing/deployment.
+2. Continue validation-only hardening only where representative quote semantics justify it; do not drift into product UI/login/billing/deployment.
 3. On opt-in, run the real concierge test and record corrections, trust objections, repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.

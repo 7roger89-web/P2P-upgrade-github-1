@@ -43,6 +43,21 @@
         },
         "additionalProperties": true
       }
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "source_ref"],
+        "properties": {
+          "text": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1},
+          "resolved": {"type": "boolean"},
+          "resolution_source_ref": {"type": "string"},
+          "resolution_note": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
     }
   },
   "additionalProperties": true
