@@ -14,9 +14,17 @@ import json
 import re
 import shutil
 import subprocess
+import sys
+from pathlib import Path
 from typing import Any, Callable, Sequence
 
-from .native_goal_bridge import CLAUDE_CODE, CODEX_CLI, HOST_KINDS
+try:
+    from .native_goal_bridge import CLAUDE_CODE, CODEX_CLI, HOST_KINDS
+except ImportError:  # Support direct execution from the installed module path.
+    runtime_root = Path(__file__).resolve().parents[1]
+    if str(runtime_root) not in sys.path:
+        sys.path.insert(0, str(runtime_root))
+    from p2p_capabilities.native_goal_bridge import CLAUDE_CODE, CODEX_CLI, HOST_KINDS  # type: ignore[no-redef]
 
 PROBE_SCHEMA = "p2p-native-goal-host-probe/1"
 READY = "READY_TO_INVOKE"
