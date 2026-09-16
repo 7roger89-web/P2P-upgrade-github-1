@@ -35,6 +35,8 @@ class GitHubConnectorCapsulePropagationTests(unittest.TestCase):
     def test_github_guidance_is_present_for_github_work(self):
         prompt = self._prompt("Review GitHub PR, branch, repository and exact HEAD before merge.")
 
+        self.assertIn("CONTROL_TOWER_FLOW=", prompt)
+        self.assertIn("SELECT_EXISTING_CAPABILITY_OR_HOST", prompt)
         self.assertIn("GITHUB_GUIDANCE=", prompt)
         self.assertIn("EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS", prompt)
         self.assertIn("direct repo/PR/HEAD evidence wins", prompt)
@@ -43,6 +45,7 @@ class GitHubConnectorCapsulePropagationTests(unittest.TestCase):
 
     def test_github_guidance_is_not_global_supreme_law(self):
         ordinary = self._prompt("Analyze shipment totals and report discrepancies.")
+        self.assertIn("CONTROL_TOWER_FLOW=", ordinary)
         self.assertNotIn("GITHUB_GUIDANCE=", ordinary)
         self.assertNotIn(
             "EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS",
@@ -59,7 +62,8 @@ class GitHubConnectorCapsulePropagationTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         for marker in (
             "EXECUTOR_GITHUB_ACCESS=UNAVAILABLE_IN_THIS_SESSION",
-            "OWNER_GITHUB_CONNECTOR_STATUS=NOT_PROVEN_BROKEN",
+            "EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS",
+            "ONE_FAILED_CALL != GITHUB_CONNECTOR_DISABLED",
             "REPO_SCOPE_BROKEN",
             "AUTH_CONNECTION_BROKEN",
             "PROVIDER_OUTAGE",
