@@ -22,6 +22,7 @@ class ExperienceEvolutionDistributionTests(unittest.TestCase):
             runtime = stage / "runtime" / "p2p_capabilities"
             self.assertTrue((runtime / "experience_evolution.py").is_file())
             self.assertTrue((runtime / "experience_federation.py").is_file())
+            self.assertTrue((runtime / "experience_promotion.py").is_file())
             self.assertTrue((runtime / "shared_experience_catalog.json").is_file())
             self.assertTrue((runtime / "capability_intelligence.py").is_file())
             self.assertFalse(any(runtime.glob("test_*.py")))
