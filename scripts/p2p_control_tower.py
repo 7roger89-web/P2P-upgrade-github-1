@@ -3,8 +3,8 @@
 The Control Tower coordinates durable task state, bounded delegation, evidence
 reconciliation, and the next safe action. It is not a law authority, executor,
 or second truth store. Before starting a new executor session this CLI composes
-a compact task context from the single canonical Supreme Law hierarchy and only
-matching ACTIVE verified experience from the existing execution ledger.
+only the relevant ACTIVE verified experience into the existing self-contained
+Control Tower prompt, without weakening its prompt-size safety guard.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -34,6 +34,7 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     ControlTower,
     ControlTowerHandoffError,
     SessionBinding,
+    build_execution_prompt,
     new_session_id,
     render_snapshot,
 )
@@ -43,9 +44,9 @@ from p2p_capabilities.experience_evolution import (  # noqa: E402
 )
 
 
-CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT_ASSEMBLY:"
+CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT:"
 MAX_ACTIVE_EXPERIENCES = 3
-PRIMARY_WRAPPER_CHARS = 220
+PROMPT_GUARD_CHARS = 8192
 
 
 def _root(args: argparse.Namespace) -> Path:
@@ -76,54 +77,96 @@ def _experience_summary(root: Path, task_text: str) -> dict[str, Any]:
 
 def _compact_text(value: Any, limit: int) -> str:
     normalized = " ".join(str(value or "").split())
+    if limit <= 0:
+        return ""
     if len(normalized) <= limit:
         return normalized
-    return normalized[: max(1, limit - 1)].rstrip() + "…"
+    if limit == 1:
+        return "…"
+    return normalized[: limit - 1].rstrip() + "…"
 
 
-def _render_context_block(summary: Mapping[str, Any]) -> str:
-    """Render a deliberately thin delegation wrapper, not another policy bundle."""
+def _render_context_block(summary: Mapping[str, Any], *, max_chars: int) -> str:
+    """Render one budgeted risk wrapper; full experience stays in the ledger."""
 
-    decision = str(summary.get("decision", "UNAVAILABLE"))
-    lines = [
-        CONTEXT_MARKER,
-        "- LAW_AUTHORITY=ONE; canonical Supreme Law wins; installed/portable/capsule copies are projection/fallback only; subordinate profiles are trigger-only.",
-        f"- EXPERIENCE={decision}; ACTIVE_ONLY; MAX={MAX_ACTIVE_EXPERIENCES}; NON_AUTHORITATIVE; current law/task/state/permissions/evidence win.",
-    ]
+    if max_chars <= len(CONTEXT_MARKER) + 16:
+        return ""
+    decision = _compact_text(summary.get("decision", "UNAVAILABLE"), 32)
+    block = f"{CONTEXT_MARKER} XP={decision}; NONAUTH"
+    if len(block) > max_chars:
+        return ""
 
     experiences = summary.get("experiences")
-    active_items = [item for item in experiences[:MAX_ACTIVE_EXPERIENCES] if isinstance(item, Mapping)] if isinstance(experiences, list) else []
+    active_items = [
+        item
+        for item in (experiences[:MAX_ACTIVE_EXPERIENCES] if isinstance(experiences, list) else [])
+        if isinstance(item, Mapping)
+    ]
     if not active_items:
-        return "\n".join(lines)
+        return block
 
-    refs: list[str] = []
-    for item in active_items:
-        eid = _compact_text(item.get("experience_id") or UNKNOWN, 96)
-        kind = _compact_text(item.get("kind") or UNKNOWN, 24)
-        matched = ",".join(_compact_text(value, 32) for value in (item.get("matched_triggers") or ())) or "UNKNOWN"
-        refs.append(f"{eid}:{kind}:{matched}")
-    lines.append("- ACTIVE_EXPERIENCE_REFS=" + ";".join(refs))
+    count_piece = f"; N={len(active_items)}"
+    if len(block) + len(count_piece) <= max_chars:
+        block += count_piece
 
-    # Put only the best matching correction into the operational prompt. The
-    # complete verified lesson stays in the durable ledger and is addressable by
-    # the refs above. This preserves the existing prompt-size safety guard rather
-    # than weakening it just to carry more context.
     primary = active_items[0]
-    wrapper = _compact_text(primary.get("correction") or primary.get("lesson"), PRIMARY_WRAPPER_CHARS)
-    if wrapper:
-        lines.append(f"- PRIMARY_RISK_WRAPPER={wrapper}")
-    return "\n".join(lines)
+    ref = _compact_text(primary.get("experience_id") or UNKNOWN, 96)
+    ref_piece = f"; REF={ref}"
+    if len(block) + len(ref_piece) <= max_chars:
+        block += ref_piece
+
+    # The operational correction is more useful than verbose history. Only the
+    # top-ranked correction/lesson is injected; all verified details and other
+    # matching experience IDs remain discoverable in the existing ledger.
+    risk_source = primary.get("correction") or primary.get("lesson")
+    risk_prefix = "; RISK="
+    remaining = max_chars - len(block) - len(risk_prefix)
+    if remaining >= 24:
+        risk = _compact_text(risk_source, remaining)
+        if risk:
+            block += risk_prefix + risk
+    return block
 
 
-def _contextual_task(root: Path, task_text: str) -> str:
-    """Compose the task with bounded law hierarchy + relevant ACTIVE experience."""
+def _contextual_task_for_session(
+    root: Path,
+    binding: SessionBinding,
+    task_text: str,
+    *,
+    worktree: str = UNKNOWN,
+    branch: str = UNKNOWN,
+    canonical_base_sha: str = UNKNOWN,
+    canonical_base_tree: str = UNKNOWN,
+    acceptance_criteria: Sequence[str] = (),
+) -> str:
+    """Fit relevant experience into the exact final prompt budget, fail-soft."""
 
     task = str(task_text or "").strip()
     if not task:
         raise BindingError("CONTROL_TOWER_TASK_REQUIRED")
     if CONTEXT_MARKER in task:
         return task
-    return f"{task}\n\n{_render_context_block(_experience_summary(root, task))}"
+
+    # Build the exact prompt shape first. The existing handoff module already
+    # serializes the canonical Supreme-Law hierarchy, so this layer must not
+    # duplicate the law text. It only uses the remaining safe prompt slack.
+    base_prompt = build_execution_prompt(
+        binding,
+        task,
+        worktree=worktree,
+        branch=branch,
+        canonical_base_sha=canonical_base_sha,
+        canonical_base_tree=canonical_base_tree,
+        acceptance_criteria=acceptance_criteria,
+    )
+    remaining = PROMPT_GUARD_CHARS - len(base_prompt) - 2  # two newlines before context
+    if remaining <= 0:
+        return task
+
+    block = _render_context_block(_experience_summary(root, task), max_chars=remaining)
+    if not block:
+        return task
+    return f"{task}\n\n{block}"
 
 
 def _extract_task_text(prompt: str) -> str:
@@ -164,7 +207,7 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Coordinate durable P2P task state, assemble bounded law/experience context, "
+            "Coordinate durable P2P task state, assemble bounded ACTIVE experience context, "
             "start executor sessions, and reconcile their evidence."
         )
     )
@@ -238,13 +281,22 @@ def _start_next_with_context(
     if not isinstance(prompt, str):
         raise BindingError("CONTROL_TOWER_NEXT_PROMPT_INVALID")
     binding = SessionBinding.from_mapping(binding_mapping)
+    task_id = str(planned.get("task_id", UNKNOWN))
+    criteria = tuple(planned.get("acceptance_criteria") or ())
     result = tower.start_session(
         binding,
-        task_id=str(planned.get("task_id", UNKNOWN)),
-        task_prompt=_contextual_task(root, _extract_task_text(prompt)),
+        task_id=task_id,
+        task_prompt=_contextual_task_for_session(
+            root,
+            binding,
+            _extract_task_text(prompt),
+            worktree=worktree,
+            branch=branch,
+            acceptance_criteria=criteria,
+        ),
         worktree=worktree,
         branch=branch,
-        acceptance_criteria=tuple(planned.get("acceptance_criteria") or ()),
+        acceptance_criteria=criteria,
     )
     result.update(
         {
@@ -272,15 +324,25 @@ def main(argv: list[str] | None = None) -> int:
                 goal_id=args.goal_id,
                 goal=args.goal,
             )
+            criteria = tuple(args.acceptance_criterion)
             result = tower.start_session(
                 binding,
                 task_id=args.task_id,
-                task_prompt=_contextual_task(root, args.goal),
+                task_prompt=_contextual_task_for_session(
+                    root,
+                    binding,
+                    args.goal,
+                    worktree=args.worktree,
+                    branch=args.branch,
+                    canonical_base_sha=args.canonical_base_sha,
+                    canonical_base_tree=args.canonical_base_tree,
+                    acceptance_criteria=criteria,
+                ),
                 canonical_base_sha=args.canonical_base_sha,
                 canonical_base_tree=args.canonical_base_tree,
                 worktree=args.worktree,
                 branch=args.branch,
-                acceptance_criteria=args.acceptance_criterion,
+                acceptance_criteria=criteria,
             )
         elif args.command == "snapshot":
             result = {"status": "PASS", "snapshot": tower.snapshot()}
