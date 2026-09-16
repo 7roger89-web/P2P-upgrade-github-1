@@ -327,13 +327,40 @@ def _coverage_resolution(
     return {"status": status, "source_ref": source_ref}
 
 
-def _comparison_key(quote: dict[str, Any]) -> tuple[str, str, str, str]:
-    return (
-        quote["route"]["origin"],
-        quote["route"]["destination"],
-        quote["equipment"],
-        quote["currency"],
-    )
+def _resolve_location(value: Any, context: dict[str, Any]) -> tuple[str, dict[str, str] | None]:
+    cleaned = _clean_text(value)
+    aliases = context.get("location_aliases")
+    if not isinstance(aliases, dict):
+        return cleaned, None
+
+    candidate = None
+    for raw_alias, resolution in aliases.items():
+        if _clean_text(raw_alias) == cleaned:
+            candidate = resolution
+            break
+    if not isinstance(candidate, dict):
+        return cleaned, None
+
+    canonical = _clean_text(candidate.get("canonical"))
+    source_ref = str(candidate.get("source_ref") or "").strip()
+    if not canonical or not source_ref:
+        return cleaned, None
+    return canonical, {"raw": cleaned, "canonical": canonical, "source_ref": source_ref}
+
+
+def _comparison_key(quote: dict[str, Any], context: dict[str, Any]) -> tuple[str, str, str, str]:
+    origin, _ = _resolve_location(quote["route"]["origin"], context)
+    destination, _ = _resolve_location(quote["route"]["destination"], context)
+    return (origin, destination, quote["equipment"], quote["currency"])
+
+
+def _route_alias_audit(quote: dict[str, Any], context: dict[str, Any]) -> list[dict[str, str]]:
+    audit = []
+    for field in ("origin", "destination"):
+        _, resolution = _resolve_location(quote["route"][field], context)
+        if resolution is not None:
+            audit.append({"field": field, **resolution})
+    return audit
 
 
 def _target_key(context: dict[str, Any]) -> tuple[str, str, str, str] | None:
@@ -343,8 +370,8 @@ def _target_key(context: dict[str, Any]) -> tuple[str, str, str, str] | None:
     if not isinstance(target, dict):
         raise ValueError("comparison_target must be an object")
     route = target.get("route") if isinstance(target.get("route"), dict) else {}
-    origin = _clean_text(route.get("origin"))
-    destination = _clean_text(route.get("destination"))
+    origin, _ = _resolve_location(route.get("origin"), context)
+    destination, _ = _resolve_location(route.get("destination"), context)
     equipment = canonical_equipment(target.get("equipment"))
     currency = _clean_text(target.get("currency"))
     if not origin or not destination or equipment == "UNKNOWN" or len(currency) != 3:
@@ -388,7 +415,7 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
 
     groups: dict[tuple[str, str, str, str], list[dict[str, Any]]] = {}
     for quote in eligible:
-        groups.setdefault(_comparison_key(quote), []).append(quote)
+        groups.setdefault(_comparison_key(quote, context), []).append(quote)
 
     group_summaries = [
         {**_key_dict(key), "count": len(items), "quote_ids": [item["quote_id"] for item in items]}
@@ -424,7 +451,7 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
         for quote in eligible:
             if quote["quote_id"] in selected_ids:
                 continue
-            reasons = _mismatch_reasons(_comparison_key(quote), selected_key)
+            reasons = _mismatch_reasons(_comparison_key(quote, context), selected_key)
             excluded.append({
                 "quote_id": quote["quote_id"],
                 "reasons": reasons or ["COMPARISON_GROUP_MISMATCH"],
@@ -521,6 +548,11 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
     return {
         "comparison_basis": basis,
         "comparison_groups": group_summaries,
+        "route_alias_audit": [
+            {"quote_id": quote["quote_id"], "resolutions": _route_alias_audit(quote, context)}
+            for quote in quotes
+            if _route_alias_audit(quote, context)
+        ],
         "required_charge_codes": sorted(required_codes),
         "coverage_matrix": coverage_matrix,
         "priced_quotes": priced,
