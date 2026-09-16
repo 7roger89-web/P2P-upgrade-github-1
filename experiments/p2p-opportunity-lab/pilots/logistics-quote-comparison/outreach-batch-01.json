@@ -13,6 +13,14 @@
   },
   "delivery_state": "READY_BUT_NOT_SENT",
   "delivery_blocker": "No authenticated Reddit write/action surface is available in the current ChatGPT tool session. Web access is read-only and plugin discovery found no Reddit messaging/posting connector.",
+  "reply_watch": {
+    "status": "ACTIVE",
+    "cadence": "every 6 hours",
+    "notify_on": ["NEW_DIRECT_REPLY", "CLEAR_OPT_IN"],
+    "silent_when_none": true,
+    "matching_strategy": "match distinctive outreach opening text on the three source threads; no Reddit username assumption",
+    "precondition": "the authorized public outreach comment must actually exist before any direct reply can be observed"
+  },
   "market_gate_effect": "NONE_UNTIL_REAL_USER_BEHAVIOR_OR_PAYMENT_WTP_IS_OBSERVED",
   "prospects": [
     {
