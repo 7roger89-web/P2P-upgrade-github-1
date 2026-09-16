@@ -36,6 +36,14 @@
           "minimum_amount": {"type": ["number", "string", "null"]},
           "currency": {"type": ["string", "null"]},
           "basis": {"enum": ["PER_SHIPMENT", "PER_CONTAINER", "PER_BL", "PER_KG", "PER_CBM", "INCLUDED", "UNKNOWN"]},
+          "scope": {"enum": ["UNSPECIFIED", "ORIGIN", "MAIN", "DESTINATION", "OTHER"]},
+          "bundle_includes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "bundle_primary_code": {"type": "string", "minLength": 1},
           "included": {"type": "boolean"},
           "uncertain": {"type": "boolean"},
           "source_ref": {"type": "string", "minLength": 1},
