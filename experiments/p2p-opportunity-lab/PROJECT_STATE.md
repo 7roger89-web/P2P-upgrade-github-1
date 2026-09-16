@@ -93,13 +93,7 @@ Expected ranking:
 
 `VAL-B USD 1940 < VAL-A USD 2028`
 
-The contract also verifies:
-- FX is actually reported as applied;
-- the CNY THC conversion is preserved in audit;
-- BAF resolves from an explicit freight line base;
-- the `CNSHA -> SHANGHAI` alias is audited;
-- unselected insurance is excluded rather than silently priced;
-- required scoped coverage has no unresolved gaps.
+The golden suite includes a normal end-to-end assertion and an adversarial permutation assertion that reverses both quote order and charge-line order. Ranking, scoped coverage, FX application, percentage resolution and relevant audits must remain invariant under that reordering.
 
 ## Schemas and documentation
 
@@ -111,15 +105,15 @@ The contract also verifies:
 
 Full source-tree deterministic acceptance is provided by `.github/workflows/p2p-opportunity-lab-focused.yml` using Python stdlib `unittest` only; it does not install pytest or another external test runner.
 
-The committed regression inventory is now **87 tests**, including one top-level validated golden fixture. The exact accepted branch SHA, current-main merge ref, workflow run IDs and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation so this file does not create a self-referential SHA-update loop.
+The committed regression inventory is now **88 tests**, including two top-level validated golden tests. Exact accepted branch SHA, current-main merge ref, focused workflow run ID and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation so this file does not create a self-referential SHA-update loop.
 
 A branch mutation does not inherit prior PASS automatically. Fresh focused CI plus P2P Shield are required for the new exact head.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + ORDER_INVARIANCE_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane remains blocked only on Reddit delivery capability. Internal validation now has both full source-tree CI and a realistic top-level golden fixture that proves the main atomic layers compose correctly.
+The external lane remains blocked only on Reddit delivery capability. Internal validation now has full source-tree CI, a realistic top-level golden fixture, and an adversarial order-invariance contract proving that input ordering does not change the economic decision.
 
 ## Next bounded step
 
