@@ -52,6 +52,8 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 - Deterministic quote normalization/comparison engine added at `src/concierge_engine.py`.
 - Engine refuses silent FX conversion, excludes route/equipment/currency mismatches from ranking, preserves source references, and refuses to rank incomplete/uncertain quotes as a fake winner.
 - Concierge engine regression suite: 5/5 PASS in isolated local execution after catching and fixing a pricing-basis normalization bug before commit.
+- Representative synthetic quote fixture added at `pilots/logistics-quote-comparison/fixtures/synthetic-quote-set-01.json`; expected behavior is Carrier B = USD 2010, Carrier A = USD 2060, CNY quote excluded without FX.
+- Synthetic fixture behavior was independently re-run locally and matched the expected ranking/exclusion exactly.
 - Validation procedure is durable at `docs/CONCIERGE-VALIDATION-PROTOCOL.md`.
 
 ## Current checkpoint
