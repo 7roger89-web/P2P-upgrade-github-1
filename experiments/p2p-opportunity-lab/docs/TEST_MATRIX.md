@@ -17,9 +17,10 @@ Current committed regression inventory:
 - legacy synthetic quote fixture: 1 deterministic core-engine fixture test;
 - validated golden quote fixture: 2 top-level tests (end-to-end evidence/ranking + input-order invariance);
 - dirty quote adversarial lane: 4 top-level validated-pipeline tests;
+- dirty commercial/validity adversarial lane: 4 top-level validated-pipeline tests;
 - design-partner shortlist fixture: 4 tests exercising 6 evidence-backed candidates against qualification/stage/score/no-money-signal invariants.
 
-**Exact collected total: 92 tests.**
+**Exact collected total: 96 tests.**
 
 Coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
 
@@ -74,7 +75,18 @@ The four contracts prove:
 - supplying two evidenced direct `CNY -> USD` rates for the same comparison context is treated as `AMBIGUOUS_FX_RATE`; the pipeline does not pick one arbitrarily;
 - removing provenance from the freight line used as the named base for BAF prevents percentage resolution and produces `UNRESOLVED_PERCENTAGE_SEMANTICS` rather than pricing from an unproven base.
 
-These tests intentionally reward refusal when evidence is incomplete or contradictory. A safe `no decision` is preferable to a fabricated winner.
+## Dirty commercial and validity contracts
+
+`tests/test_dirty_commercial_adversarial.py` drives the same top-level validated entrypoint with commercially unsafe quote state.
+
+The four contracts prove:
+
+- a quote whose `valid_to` is before the comparison date is excluded as `EXPIRED` and cannot be ranked as a current offer;
+- a malformed validity date such as `30/09/2026` is excluded as `INVALID_VALIDITY_DATE` instead of being guessed or locale-parsed;
+- an unresolved `Subject to carrier space and final approval` term makes that quote incomplete and therefore unrankable;
+- setting `resolved=true` without a non-empty `resolution_source_ref` does not manufacture a resolution; the term remains unresolved.
+
+These adversarial lanes intentionally reward refusal when evidence is incomplete, contradictory, stale, malformed or conditionally unresolved. A safe `no decision` is preferable to a fabricated winner.
 
 ## Focused CI acceptance surface
 
