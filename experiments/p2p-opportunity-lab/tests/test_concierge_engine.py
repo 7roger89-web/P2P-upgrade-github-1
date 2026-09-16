@@ -181,6 +181,73 @@ class ConciergeEngineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "minimum_amount cannot be negative"):
             normalize_quote(q)
 
+    def test_first_quote_outlier_does_not_become_baseline(self):
+        outlier = quote("CNY-OUTLIER", currency="CNY")
+        a = quote("A")
+        b = quote("B", charges=[
+            {"name": "Ocean Freight", "amount": 900, "basis": "PER_CONTAINER", "source_ref": "b:1"},
+            {"name": "THC", "amount": 100, "basis": "PER_SHIPMENT", "source_ref": "b:2"},
+        ])
+        result = compare_quotes([outlier, a, b], {"containers": 1, "shipments": 1})
+        self.assertEqual(result["comparison_basis"]["currency"], "USD")
+        self.assertEqual(result["comparison_basis"]["selection_mode"], "AUTO_LARGEST_GROUP")
+        self.assertEqual([item["quote_id"] for item in result["ranking"]], ["B", "A"])
+        self.assertEqual(result["excluded"][0]["quote_id"], "CNY-OUTLIER")
+        self.assertIn("CURRENCY_MISMATCH", result["excluded"][0]["reasons"])
+
+    def test_equal_multi_quote_groups_require_explicit_target(self):
+        a1 = quote("A1")
+        a2 = quote("A2")
+        b1 = quote("B1")
+        b2 = quote("B2")
+        b1["route"] = {"origin": "Ningbo", "destination": "Hai Phong"}
+        b2["route"] = {"origin": "Ningbo", "destination": "Hai Phong"}
+        result = compare_quotes([a1, a2, b1, b2], {"containers": 1, "shipments": 1})
+        self.assertEqual(result["decision_warning"], "AMBIGUOUS_COMPARISON_GROUP")
+        self.assertEqual(result["ranking"], [])
+        self.assertEqual(result["comparison_basis"]["selection_mode"], "AMBIGUOUS_GROUPS")
+
+    def test_explicit_target_selects_group(self):
+        a1 = quote("A1")
+        a2 = quote("A2")
+        b1 = quote("B1")
+        b2 = quote("B2")
+        b1["route"] = {"origin": "Ningbo", "destination": "Hai Phong"}
+        b2["route"] = {"origin": "Ningbo", "destination": "Hai Phong"}
+        b2["charges"] = [
+            {"name": "Ocean Freight", "amount": 900, "basis": "PER_CONTAINER", "source_ref": "b2:1"},
+            {"name": "THC", "amount": 100, "basis": "PER_SHIPMENT", "source_ref": "b2:2"},
+        ]
+        result = compare_quotes(
+            [a1, a2, b1, b2],
+            {
+                "containers": 1,
+                "shipments": 1,
+                "comparison_target": {
+                    "route": {"origin": "Ningbo", "destination": "Hai Phong"},
+                    "equipment": "40HC",
+                    "currency": "USD",
+                },
+            },
+        )
+        self.assertEqual(result["comparison_basis"]["route"]["origin"], "NINGBO")
+        self.assertEqual(result["comparison_basis"]["selection_mode"], "EXPLICIT_TARGET")
+        self.assertEqual([item["quote_id"] for item in result["ranking"]], ["B2", "B1"])
+
+    def test_equipment_alias_40hq_matches_40hc(self):
+        a = quote("A", equipment="40HC")
+        b = quote("B", equipment="40HQ")
+        result = compare_quotes([a, b], {"containers": 1, "shipments": 1})
+        self.assertEqual(result["comparison_basis"]["equipment"], "40HC")
+        self.assertEqual(len(result["ranking"]), 2)
+
+    def test_equipment_type_difference_is_not_aliased_away(self):
+        a = quote("A", equipment="40HC")
+        b = quote("B", equipment="40GP")
+        result = compare_quotes([a, b], {"containers": 1, "shipments": 1})
+        self.assertEqual(result["decision_warning"], "INSUFFICIENT_COMPLETE_COMPARABLE_QUOTES")
+        self.assertIn("EQUIPMENT_MISMATCH", result["excluded"][0]["reasons"])
+
 
 if __name__ == "__main__":
     unittest.main()
