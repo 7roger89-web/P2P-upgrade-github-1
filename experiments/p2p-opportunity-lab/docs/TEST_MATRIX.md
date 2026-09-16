@@ -15,7 +15,9 @@ Current committed regression inventory:
 - validated FCL portfolio pipeline: 3 percentage integration contracts + 2 FX-first integration contracts;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
-- design-partner shortlist fixture: 6 candidates re-qualified against expected stage/score/no-money-signal invariants.
+- design-partner shortlist fixture: 4 tests exercising 6 evidence-backed candidates against qualification/stage/score/no-money-signal invariants.
+
+**Exact collected total: 86 tests.**
 
 Coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
 
@@ -37,23 +39,25 @@ Percentage-surcharge contracts cover named bases, quantity-adjusted bases, multi
 
 FX contracts cover direct evidenced conversion, minimum-amount conversion, missing-rate refusal, missing-source refusal, future-rate refusal, and skipping unnecessary FX for an explicitly unselected optional add-on.
 
-Top-level atomic pipeline order is now:
+Top-level atomic pipeline order is:
 
 `FX -> percentage -> charge semantics -> core comparison`
 
-A missing FX rate must block before percentage resolution or ranking. A bad percentage reference must block before charge semantics or ranking.
+A missing FX rate blocks before percentage resolution or ranking. A bad percentage reference blocks before charge semantics or ranking.
 
 Top-level FCL portfolio pipeline applies the same order independently to every required equipment offer and shared provider bucket. Equipment-level percentage totals are quantity-aware and rebased to `PER_CONTAINER`; provider-level shared percentage/FX adjustments are applied once.
 
-Verified focused harness evidence currently preserved:
+## Exact-head CI evidence
 
-- charge semantics guard: **9/9 PASS** using repo-style `src.*` imports;
-- percentage surcharge core resolver: **5/5 PASS** in its isolated deterministic harness;
-- original multi-equipment FCL focused slice: **5/5 PASS**;
-- group-selection/equipment probes: **5/5 PASS**;
-- route-alias helper probes: **4/4 PASS**;
-- conditional-term probes: **3/3 PASS**.
+Focused workflow: `.github/workflows/p2p-opportunity-lab-focused.yml`.
 
-The new FX tests, optional-percentage delegation tests, atomic pipeline integration tests, expanded portfolio inventory, and percentage/FX-aware portfolio pipeline tests are committed acceptance contracts but have not been promoted to full source-tree PASS in this tool session. GitHub Shield is a separate exact-head acceptance surface and does not substitute for domain regression execution.
+On branch head `4dfd6ba5168bac14e1bafc3ad70ef22f41192a05`:
+
+- Python source compile: **PASS**;
+- `python -m pytest -q tests`: **86/86 PASS** in 0.08s;
+- workflow `P2P Opportunity Lab acceptance` run `35072232369`: **SUCCESS**;
+- P2P Shield run `35072232306`: **SUCCESS**.
+
+This replaces the earlier fragmented evidence boundary for the current committed inventory: the full source-tree Opportunity Lab regression suite has now run successfully on GitHub Actions. Future branch mutations must obtain fresh exact-head focused-CI evidence before claiming the new head has the same acceptance status.
 
 The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic, shortlist, and regression fixtures are not market evidence; they protect deterministic behavior before real participant data arrives.
