@@ -117,6 +117,46 @@ class ConciergeEngineTests(unittest.TestCase):
         self.assertEqual(result["priced_quotes"][1]["coverage_gaps"], ["PSS"])
         self.assertFalse(result["priced_quotes"][1]["complete"])
 
+    def test_expired_quote_is_excluded_at_comparison_date(self):
+        active = quote("A")
+        active["valid_from"] = "2026-09-01"
+        active["valid_to"] = "2026-09-30"
+        expired = quote("B")
+        expired["valid_to"] = "2026-08-31"
+        result = compare_quotes(
+            [active, expired],
+            {"containers": 1, "shipments": 1, "as_of_date": "2026-09-16"},
+        )
+        self.assertEqual(result["excluded"][0]["quote_id"], "B")
+        self.assertIn("EXPIRED", result["excluded"][0]["reasons"])
+
+    def test_future_quote_is_excluded_at_comparison_date(self):
+        active = quote("A")
+        future = quote("B")
+        future["valid_from"] = "2026-10-01"
+        result = compare_quotes(
+            [active, future],
+            {"containers": 1, "shipments": 1, "as_of_date": "2026-09-16"},
+        )
+        self.assertIn("NOT_YET_VALID", result["excluded"][0]["reasons"])
+
+    def test_invalid_quote_validity_date_is_excluded_not_silently_ranked(self):
+        a = quote("A")
+        b = quote("B")
+        b["valid_to"] = "16/09/2026"
+        result = compare_quotes(
+            [a, b],
+            {"containers": 1, "shipments": 1, "as_of_date": "2026-09-16"},
+        )
+        self.assertIn("INVALID_VALIDITY_DATE", result["excluded"][0]["reasons"])
+
+    def test_invalid_context_as_of_date_fails_loudly(self):
+        with self.assertRaisesRegex(ValueError, "context.as_of_date"):
+            compare_quotes(
+                [quote("A"), quote("B")],
+                {"containers": 1, "shipments": 1, "as_of_date": "16/09/2026"},
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

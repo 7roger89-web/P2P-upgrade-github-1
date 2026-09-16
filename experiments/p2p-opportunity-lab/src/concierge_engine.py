@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -203,6 +204,34 @@ def price_quote(quote: dict[str, Any], context: dict[str, Any]) -> dict[str, Any
     }
 
 
+def _parse_iso_date(value: Any, field_name: str) -> date | None:
+    if value is None or value == "":
+        return None
+    try:
+        return date.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        raise ValueError(f"{field_name} must be ISO date YYYY-MM-DD")
+
+
+def _validity_reasons(quote: dict[str, Any], context: dict[str, Any]) -> list[str]:
+    as_of_raw = context.get("as_of_date")
+    if as_of_raw in (None, ""):
+        return []
+    as_of = _parse_iso_date(as_of_raw, "context.as_of_date")
+    reasons = []
+    try:
+        valid_from = _parse_iso_date(quote.get("valid_from"), f"{quote['quote_id']}.valid_from")
+        valid_to = _parse_iso_date(quote.get("valid_to"), f"{quote['quote_id']}.valid_to")
+    except ValueError:
+        return ["INVALID_VALIDITY_DATE"]
+
+    if valid_from is not None and as_of < valid_from:
+        reasons.append("NOT_YET_VALID")
+    if valid_to is not None and as_of > valid_to:
+        reasons.append("EXPIRED")
+    return reasons
+
+
 COVERAGE_RESOLUTION_STATUSES = {"INCLUDED", "NOT_APPLICABLE"}
 
 
@@ -249,6 +278,7 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
             reasons.append("EQUIPMENT_MISMATCH")
         if quote["currency"] != baseline["currency"]:
             reasons.append("CURRENCY_MISMATCH")
+        reasons.extend(_validity_reasons(quote, context))
         if reasons:
             excluded.append({"quote_id": quote["quote_id"], "reasons": reasons})
         else:
@@ -306,6 +336,7 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
             "equipment": baseline["equipment"],
             "currency": baseline["currency"],
             "context": deepcopy(context),
+            "as_of_date": context.get("as_of_date"),
             "fx_applied": False,
         },
         "required_charge_codes": sorted(required_codes),
