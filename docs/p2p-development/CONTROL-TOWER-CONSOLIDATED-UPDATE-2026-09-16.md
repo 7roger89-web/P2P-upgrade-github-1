@@ -8,6 +8,7 @@ Purpose: one-time reconciliation of recent P2P chat work against current durable
 - Canonical repository: `7roger89-web/P2P-upgrade-github-1`
 - Canonical branch: `main`
 - Main at this update start: `cb17bda20a4a1a230a3c21f04f301bda27136039`
+- Latest main rechecked for this addendum: `f61e9884c1d1fbfa9f4736d1425740dee11017e7`
 - Canonical Supreme Law: `docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`, section `P2P_SUPREME_OPERATING_LAW_V1`
 - Durable GitHub state and canonical ledgers override chat recollection.
 - Do not ask Owner to reconstruct old chat history. Fresh-check GitHub first.
@@ -154,10 +155,12 @@ No further Experience Evolution work is required unless real future use exposes 
 
 ### 2.1 PR #187 — evidence-bound native `/goal` invocation
 
-State at reconciliation: OPEN / UNMERGED.
+State at latest reconciliation: OPEN / UNMERGED.
 
 Current head observed:
 `5995f2c07615ceea59b7e03eb26eeaecd4bc866e`
+
+Fresh PR listing on 2026-09-16 reports `mergeable=false`; this must be reconciled against current main before any integration action.
 
 Purpose:
 - read-only Claude/Codex host capability probe;
@@ -166,31 +169,107 @@ Purpose:
 - host-native status proof required before an INVOKED receipt;
 - no nested host launch merely to fake same-session activation.
 
-Important: PR #187 was opened against an older main before PR #188 merged. Control Tower must fresh-check drift/mergeability and exact-head evidence against current main before any merge. Do not infer readiness from its earlier branch state.
+Do not infer readiness from earlier branch evidence. Fresh exact-head reconciliation remains required.
 
 ### 2.2 PR #180 — Opportunity Lab market-validation pilot
 
-State at reconciliation: OPEN / UNMERGED.
+State at latest reconciliation: OPEN / UNMERGED / CLEAN / MERGEABLE.
 
-Current PR head observed:
-`4dfd6ba5168bac14e1bafc3ad70ef22f41192a05`
+Current exact PR head:
+`5ca5f6b042a16f261b2f0d351e41b1dd844111d8`
+
+Current-main merge ref tested:
+`e4f1e0a1f3f5187f6c2c8726743a8cc94e82b708`
+
+Current main used by exact-head acceptance:
+`f61e9884c1d1fbfa9f4736d1425740dee11017e7`
 
 Market gate:
 `VALIDATE`, not `BUILD`.
 
-Owner authorization from chat:
+Opportunity Lab purpose:
+- answer `SHOULD WE BUILD?` before normal P2P answers `HOW DO WE BUILD?`;
+- preserve `BUILDABLE != VIABLE` and `GOAL PASS != MARKET PASS`;
+- produce `KILL | RESEARCH_MORE | VALIDATE | BUILD` from evidence rather than Owner enthusiasm or agent optimism.
+
+Current logistics pilot validation entrypoints:
+- atomic quote: `src.validation_pipeline.compare_quotes_validated`;
+- multi-equipment FCL: `src.portfolio_validation_pipeline.compare_fcl_portfolios_validated`.
+
+Atomic order:
+`explicit FX -> named-base percentage -> charge semantics -> deterministic core comparison`.
+
+Current deterministic/internal checkpoint:
+`FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + ORDER_INVARIANCE_READY + DIRTY_QUOTE_ADVERSARIAL_READY + DIRTY_COMMERCIAL_VALIDITY_READY + IDENTITY_INTEGRITY_READY`.
+
+Exact-head acceptance:
+- source compile: PASS;
+- Opportunity Lab stdlib suite: **98/98 PASS** (`Ran 98 tests in 0.036s`, `OK`);
+- focused run `35079951558`: SUCCESS;
+- P2P Shield run `35079951531`: SUCCESS;
+- PR #180 remains unmerged despite deterministic success because deterministic success is not market evidence.
+
+Validated refusal/hardening coverage includes:
+- mixed-currency direct FX with provenance/date and no silent inverse/triangulation;
+- named-base percentage surcharges;
+- minimum charge;
+- scoped origin/main/destination charges;
+- bundle/all-in semantics and double-count protection;
+- explicit optional/add-on selection;
+- multi-equipment FCL completeness;
+- route/equipment alias provenance;
+- charge-coverage completeness;
+- quote validity and malformed-date refusal;
+- unresolved `subject to` commercial terms;
+- contradictory FX evidence refusal;
+- missing percentage-base provenance refusal;
+- input-order invariance;
+- duplicate `quote_id` rejection before grouping/FX in both core and validated entrypoints.
+
+Internal stop condition:
+- do not broaden speculative pricing semantics merely to add features;
+- further deterministic hardening should be triggered by real participant/real quote evidence exposing a concrete missing semantic.
+
+Owner authorization from chat remains valid:
 - outreach may target only the first three approved candidates.
 
-Durable outreach truth at reconciliation:
-- authenticated Reddit write/post action has not been available in the working session;
-- `sent=0`
-- `reply=0`
-- `opt_in=0`
+Durable outreach truth:
+- authenticated Reddit write/post action has still not been available in the working session;
+- `sent=0`;
+- `reply=0`;
+- `opt_in=0`;
 - therefore no candidate reply may be claimed yet.
 
-Do not convert prospect interest, praise, desk research or repeat use into payment/WTP evidence. BUILD still requires observed real-world experiment success plus observed willingness-to-pay/payment evidence.
+External validation is now the highest-value next evidence:
+`authorized outreach -> real quote set -> concierge comparison -> corrections/trust objections -> repeat use -> explicit WTP/payment -> market-gate re-evaluation`.
+
+Do not convert prospect interest, praise, desk research, synthetic fixtures, deterministic tests, or repeat use alone into payment/WTP evidence. BUILD still requires observed real-world experiment success plus observed willingness-to-pay/payment evidence.
 
 Do not merge PR #180 merely to compensate for the missing standalone-repository or Reddit-write capability. Standalone `p2p-opportunity-lab` remains tracked separately in Issue #181.
+
+### 2.3 Project visibility into Control Tower
+
+Projects MAY inspect durable Control Tower artifacts when those artifacts are available through the canonical P2P repository or an explicitly supplied handoff packet. This is a coordination/read-context capability, not authority inheritance.
+
+Allowed:
+- read durable Control Tower reconciliation files, successor packets, ReturnPackets, execution-ledger references and project-relevant routing context;
+- use them to discover current project status, known blockers, pending Owner Gates and durable evidence references;
+- use them to avoid asking the Owner to reconstruct previous chat history.
+
+Not allowed:
+- treating a Control Tower chat transcript, hidden conversation state or narrative recollection as canonical truth;
+- using Control Tower state to override fresh project repository state, the Supreme Law, evidence authority, task state or existing ledgers;
+- inheriting another project's permissions, Owner approvals, secrets, host lane or execution state merely because Control Tower mentions them;
+- allowing a project to become a second Control Tower, second router, second ledger or second authority;
+- mutating canonical Control Tower/project state through ad-hoc chat memory rather than the existing bounded return/ingest/ledger paths.
+
+Required read rule for project executors:
+`CONTROL_TOWER_CONTEXT -> REFERENCE_ONLY_UNTIL_RECONCILED`.
+
+Before acting on material Control Tower information, a project must fresh-check its own durable repo/project state and the applicable canonical P2P law/evidence. If the Control Tower statement and fresh durable project truth differ, fresh durable truth wins and the mismatch is returned for reconciliation.
+
+This preserves the intended direction:
+`PROJECTS <-> CONTROL TOWER for coordination`, while `CANONICAL REPO + PROJECT STATE + EVIDENCE + GOVERNANCE` remain authority.
 
 ## 3. Control Tower instructions after this update
 
@@ -198,16 +277,20 @@ Do not merge PR #180 merely to compensate for the missing standalone-repository 
 2. Treat this file as a reconciliation pointer, not a replacement for canonical ledgers or live GitHub state.
 3. Do not reopen or duplicate work already completed in Section 1 unless fresh evidence shows a regression or measured gap.
 4. Do not silently activate deferred/research-only/project-candidate tools merely because they appear in `github research.txt` or this update.
-5. For PR #187, reconcile it with current main and require exact-head Evidence-First proof before merge.
-6. For PR #180, continue validation without pretending outreach happened; preserve the `VALIDATE` gate until real-world evidence changes it.
-7. Preserve native-first capability selection, single-router/single-ledger/single-authority rules, and Owner Gates.
-8. Do not ask the Owner to reconstruct old chat history; use durable GitHub state and this reconciliation as the starting map.
+5. For PR #187, reconcile current mergeability/drift with current main and require exact-head Evidence-First proof before merge.
+6. For PR #180, preserve `VALIDATE`; internal deterministic hardening is sufficient for the current pilot and the next valuable evidence should come from real users/real quote sets rather than speculative feature breadth.
+7. Keep Opportunity Lab separate from normal product implementation: Opportunity Lab decides `SHOULD WE BUILD?`; normal P2P build begins only after market evidence supports `BUILD`.
+8. Project executors may read durable Control Tower artifacts for coordination, but must reconcile them with fresh project/canonical truth and may never inherit authority from Control Tower chat state.
+9. Preserve native-first capability selection, single-router/single-ledger/single-authority rules, and Owner Gates.
+10. Do not ask the Owner to reconstruct old chat history; use durable GitHub state and this reconciliation as the starting map.
 
 ## 4. Reconciliation markers
 
 `CONTROL_TOWER_UPDATE_DATE=2026-09-16`
 
-`CONTROL_TOWER_UPDATE_SCOPE=RECENT_P2P_RESEARCH_RUNTIME_EVIDENCE_EVOLUTION`
+`CONTROL_TOWER_UPDATE_SCOPE=RECENT_P2P_RESEARCH_RUNTIME_EVIDENCE_EVOLUTION_PLUS_OPPORTUNITY_LAB`
+
+`CONTROL_TOWER_LATEST_MAIN_CHECK=f61e9884c1d1fbfa9f4736d1425740dee11017e7`
 
 `EXPERIENCE_EVOLUTION=MERGED_COMPLETE`
 
@@ -223,12 +306,24 @@ Do not merge PR #180 merely to compensate for the missing standalone-repository 
 
 `MISSION_CONTROL=REJECTED_AS_SECOND_AUTHORITY`
 
-`PR_187=OPEN_UNMERGED_REVERIFY_AGAINST_CURRENT_MAIN`
+`PR_187=OPEN_UNMERGED_RECONCILE_MERGEABILITY`
 
 `PR_180=OPEN_UNMERGED_VALIDATE_NOT_BUILD`
+
+`OPPORTUNITY_LAB_HEAD=5ca5f6b042a16f261b2f0d351e41b1dd844111d8`
+
+`OPPORTUNITY_LAB_TESTS=98_OF_98_PASS`
+
+`OPPORTUNITY_LAB_SHIELD=SUCCESS`
+
+`OPPORTUNITY_INTERNAL_STOP=WAIT_FOR_REAL_EVIDENCE`
 
 `OPPORTUNITY_OUTREACH_SENT=0`
 
 `OPPORTUNITY_REPLY=0`
+
+`PROJECT_CONTROL_TOWER_VISIBILITY=READ_DURABLE_CONTEXT_ALLOWED_RECONCILE_REQUIRED`
+
+`CONTROL_TOWER_CHAT_IS_AUTHORITY=NO`
 
 `OWNER_RECONSTRUCTION_REQUIRED=NO`
