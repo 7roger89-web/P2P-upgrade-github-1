@@ -16,6 +16,7 @@ for candidate in (ROOT / "scripts", ROOT / ".p2p" / "system", ROOT):
         sys.path.insert(0, value)
 
 import p2p_control_tower as control_tower  # noqa: E402
+from p2p_capabilities import control_tower_handoff as handoff  # noqa: E402
 from p2p_capabilities.control_tower_handoff import SessionBinding  # noqa: E402
 from p2p_capabilities.experience_evolution import (  # noqa: E402
     LEDGER_RELATIVE_PATH,
@@ -90,33 +91,49 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             goal=goal,
         )
 
+    def test_control_tower_runtime_has_exactly_one_nine_law_capsule(self) -> None:
+        lines = tuple(line for line in handoff.SUPREME_LAW_CAPSULE.splitlines() if line.strip())
+        self.assertEqual(9, len(lines))
+        for index, identifier in enumerate(control_tower._CANONICAL_LAW_IDENTIFIERS):
+            self.assertIn(identifier, lines[index])
+        joined = "\n".join(lines)
+        self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1", joined)
+        self.assertNotIn("PROJECT_AGENT_INSTRUCTIONS_PREFLIGHT", joined)
+        self.assertNotIn("EXECUTOR_GITHUB_ACCESS != OWNER_GITHUB_CONNECTOR_STATUS", joined)
+
     def test_matching_retrieval_is_read_only_and_block_is_bounded(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            lesson = "Verify destination pristineness and BSON round-trip fidelity before a MongoDB pilot snapshot mutation."
             correction = "Run destination preflight, canonical Extended JSON round-trip proof, dry-run, then source-immutability verification."
             experience_id = self._activate_experience(
                 root,
                 triggers=("mongodb", "pilot", "snapshot"),
-                lesson=lesson,
+                lesson="Verify destination pristineness and BSON round-trip fidelity before a MongoDB pilot snapshot mutation.",
                 correction=correction,
             )
             ledger = root / LEDGER_RELATIVE_PATH
             before = ledger.read_bytes()
 
             summary = control_tower._experience_summary(root, "Clone MongoDB pilot snapshot safely")
-            block = control_tower._render_context_block(summary, max_chars=512)
+            block = control_tower._render_context_block(
+                summary,
+                "Clone MongoDB pilot snapshot safely",
+                max_chars=900,
+            )
 
             self.assertEqual(before, ledger.read_bytes())
             self.assertIn(control_tower.CONTEXT_MARKER, block)
+            self.assertIn("LAW_AUTHORITY=ONE", block)
+            self.assertIn("P2P_LAW_PREFLIGHT=", block)
+            self.assertIn("OE_GATE=", block)
             self.assertIn("XP=USE_ACTIVE_EXPERIENCE", block)
-            self.assertIn("NONAUTH", block)
+            self.assertIn("NONAUTHORITATIVE", block)
             self.assertIn(experience_id, block)
-            self.assertIn("RISK=", block)
+            self.assertIn("PRIMARY_RISK_WRAPPER=", block)
             self.assertIn(correction, block)
-            self.assertLessEqual(len(block), 512)
+            self.assertLessEqual(len(block), 900)
 
-    def test_unrelated_experience_is_not_injected_as_risk(self) -> None:
+    def test_unrelated_experience_and_guidance_are_not_injected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             lesson = "Require official provision-level provenance before claiming Vietnamese legal text correctness."
@@ -124,17 +141,50 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
                 root,
                 triggers=("vnlaw", "official", "provenance"),
                 lesson=lesson,
-                correction="Compare the parsed provision against the official source and preserve provenance refs.",
+                correction="Compare parsed text against the official source and preserve provenance refs.",
             )
 
             summary = control_tower._experience_summary(root, "Fix MongoDB shipment import pagination")
-            block = control_tower._render_context_block(summary, max_chars=512)
+            block = control_tower._render_context_block(
+                summary,
+                "Fix MongoDB shipment import pagination",
+                max_chars=900,
+            )
 
             self.assertIn("XP=NO_MATCH", block)
-            self.assertNotIn("RISK=", block)
+            self.assertNotIn("PRIMARY_RISK_WRAPPER=", block)
             self.assertNotIn(lesson, block)
+            self.assertNotIn("GITHUB_GUIDANCE=", block)
+            self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1=", block)
 
-    def test_start_command_preserves_supreme_law_and_persists_budgeted_context(self) -> None:
+    def test_task_specific_guidance_is_trigger_scoped(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            empty = control_tower._experience_summary(root, "ordinary task")
+            github_block = control_tower._render_context_block(
+                empty,
+                "Review GitHub PR and exact HEAD before merge",
+                max_chars=1300,
+            )
+            prompt_block = control_tower._render_context_block(
+                empty,
+                "Revise the executor prompt for Arena",
+                max_chars=1500,
+            )
+            ordinary_block = control_tower._render_context_block(
+                empty,
+                "Analyze shipment totals",
+                max_chars=1300,
+            )
+
+            self.assertIn("GITHUB_GUIDANCE=", github_block)
+            self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1=", github_block)
+            self.assertIn("PROMPT_AUTHORING_DISCIPLINE_V1=", prompt_block)
+            self.assertNotIn("GITHUB_GUIDANCE=", prompt_block)
+            self.assertNotIn("GITHUB_GUIDANCE=", ordinary_block)
+            self.assertNotIn("PROMPT_AUTHORING_DISCIPLINE_V1=", ordinary_block)
+
+    def test_start_command_preserves_law_and_persists_bounded_context(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             correction = "Compare current main, exact candidate head, mergeability, and exact-head checks before merge."
@@ -148,17 +198,12 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             with contextlib.redirect_stdout(output):
                 code = control_tower.main(
                     [
-                        "--root",
-                        str(root),
+                        "--root", str(root),
                         "start",
-                        "--host",
-                        "CODEX",
-                        "--goal-id",
-                        "CTX-ASSEMBLY",
-                        "--goal",
-                        "GitHub merge exact head",
-                        "--task-id",
-                        "TASK-1",
+                        "--host", "CODEX",
+                        "--goal-id", "CTX-ASSEMBLY",
+                        "--goal", "GitHub merge exact head",
+                        "--task-id", "TASK-1",
                         "--json",
                     ]
                 )
@@ -168,30 +213,24 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn("P2P_SUPREME_LAW_PREFLIGHT:", prompt)
             self.assertIn("Canonical law source:", prompt)
             self.assertIn("SUPREME_LAW_CAPSULE:", prompt)
+            self.assertIn(control_tower.CONTEXT_MARKER, prompt)
+            self.assertIn("P2P_LAW_PREFLIGHT=", prompt)
+            self.assertIn("OE_GATE=", prompt)
+            self.assertIn("GITHUB_GUIDANCE=", prompt)
+            self.assertIn("XP=USE_ACTIVE_EXPERIENCE", prompt)
+            self.assertIn(experience_id, prompt)
             self.assertLessEqual(len(prompt), control_tower.PROMPT_GUARD_CHARS)
-
-            # The experience wrapper is optional when the existing prompt has no
-            # safe slack. If included, it must stay non-authoritative and bounded.
-            if control_tower.CONTEXT_MARKER in prompt:
-                self.assertIn("XP=USE_ACTIVE_EXPERIENCE", prompt)
-                self.assertIn("NONAUTH", prompt)
-                self.assertIn(experience_id, prompt)
 
             second = io.StringIO()
             with contextlib.redirect_stdout(second):
                 second_code = control_tower.main(
                     [
-                        "--root",
-                        str(root),
+                        "--root", str(root),
                         "start",
-                        "--host",
-                        "CODEX",
-                        "--goal-id",
-                        "CTX-ASSEMBLY",
-                        "--goal",
-                        "GitHub merge exact head",
-                        "--task-id",
-                        "TASK-1",
+                        "--host", "CODEX",
+                        "--goal-id", "CTX-ASSEMBLY",
+                        "--goal", "GitHub merge exact head",
+                        "--task-id", "TASK-1",
                         "--json",
                     ]
                 )
@@ -216,17 +255,12 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             with contextlib.redirect_stdout(output):
                 code = control_tower.main(
                     [
-                        "--root",
-                        str(root),
+                        "--root", str(root),
                         "start",
-                        "--host",
-                        "ARENA",
-                        "--goal-id",
-                        "BOUNDED-CONTEXT",
-                        "--goal",
-                        "MongoDB pilot snapshot",
-                        "--task-id",
-                        "TASK-LONG",
+                        "--host", "ARENA",
+                        "--goal-id", "BOUNDED-CONTEXT",
+                        "--goal", "MongoDB pilot snapshot",
+                        "--task-id", "TASK-LONG",
                         "--json",
                     ]
                 )
@@ -236,12 +270,11 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             prompt = result["recommendation"]["PROMPT"]
             self.assertLessEqual(len(prompt), control_tower.PROMPT_GUARD_CHARS)
             self.assertIn("P2P_SUPREME_LAW_PREFLIGHT:", prompt)
+            self.assertIn(control_tower.CONTEXT_MARKER, prompt)
+            self.assertIn("XP=USE_ACTIVE_EXPERIENCE", prompt)
             self.assertNotIn("C" * 500, prompt)
-            if control_tower.CONTEXT_MARKER in prompt:
-                self.assertIn("XP=USE_ACTIVE_EXPERIENCE", prompt)
-                self.assertIn("NONAUTH", prompt)
 
-    def test_exact_prompt_budget_never_weakens_existing_guard(self) -> None:
+    def test_exact_final_prompt_budget_never_weakens_guard(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self._activate_experience(
@@ -256,11 +289,11 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
                 binding,
                 "MongoDB pilot snapshot",
             )
-            from p2p_capabilities.control_tower_handoff import build_execution_prompt
-
-            final_prompt = build_execution_prompt(binding, contextual)
+            final_prompt = handoff.build_execution_prompt(binding, contextual)
             self.assertLessEqual(len(final_prompt), control_tower.PROMPT_GUARD_CHARS)
             self.assertIn("P2P_SUPREME_LAW_PREFLIGHT:", final_prompt)
+            self.assertIn("P2P_LAW_PREFLIGHT=", final_prompt)
+            self.assertIn("OE_GATE=", final_prompt)
 
 
 if __name__ == "__main__":
