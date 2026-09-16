@@ -4,23 +4,17 @@ Current isolated regression groups:
 
 - market gate: 5 tests;
 - prospect bridge: 5 tests;
-- concierge engine: 12 tests;
+- concierge engine: 15 tests;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
 - design-partner shortlist fixture: 6 candidates re-qualified against expected stage/score/no-money-signal invariants.
 
-Concierge-engine coverage regressions now prove:
+Concierge-engine coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
 
-- a quote missing a charge code seen in another otherwise-comparable quote is not allowed to win merely because the omitted charge makes its visible total lower;
-- an unresolved coverage gap marks that quote incomplete and removes it from ranking;
-- a missing charge can be resolved only with an explicit `INCLUDED` or `NOT_APPLICABLE` resolution carrying a non-empty source reference;
-- an unevidenced waiver does not restore comparability.
+Validity-window regressions prove that expired/not-yet-valid quotes are excluded when an explicit comparison date is supplied; malformed quote dates are excluded and a malformed comparison date fails loudly.
 
-Validity-window regressions also prove:
+Minimum-charge regressions prove that `rate × quantity` is floored by an evidenced `minimum_amount`, the floor is not applied when usage pricing already exceeds it, and invalid negative minimums are rejected.
 
-- a quote expired at the explicit comparison date is excluded;
-- a quote not yet valid at the comparison date is excluded;
-- an invalid quote validity date is excluded rather than silently ranked;
-- an invalid comparison `as_of_date` fails loudly instead of guessing.
+Local exact-engine verification at the current development slice: concierge engine **15/15 PASS**; representative synthetic fixture **PASS**.
 
-The synthetic and shortlist fixtures are not market evidence. They only protect deterministic behavior before real participant data arrives.
+Synthetic and shortlist fixtures are not market evidence. They only protect deterministic behavior before real participant data arrives.

@@ -33,6 +33,7 @@
         "properties": {
           "name": {"type": "string", "minLength": 1},
           "amount": {"type": ["number", "string", "null"]},
+          "minimum_amount": {"type": ["number", "string", "null"]},
           "currency": {"type": ["string", "null"]},
           "basis": {"enum": ["PER_SHIPMENT", "PER_CONTAINER", "PER_BL", "PER_KG", "PER_CBM", "INCLUDED", "UNKNOWN"]},
           "included": {"type": "boolean"},

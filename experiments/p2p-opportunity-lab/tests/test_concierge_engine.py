@@ -157,6 +157,30 @@ class ConciergeEngineTests(unittest.TestCase):
                 {"containers": 1, "shipments": 1, "as_of_date": "16/09/2026"},
             )
 
+    def test_minimum_charge_floor_is_applied(self):
+        q = quote("A", charges=[
+            {"name": "Freight", "amount": 0.5, "minimum_amount": 120, "basis": "PER_KG", "source_ref": "a:min1"},
+        ])
+        priced = price_quote(normalize_quote(q), {"weight_kg": 100})
+        self.assertEqual(priced["total"], "120")
+        self.assertEqual(priced["audit"][0]["raw_contribution"], "50.0")
+        self.assertTrue(priced["audit"][0]["minimum_applied"])
+
+    def test_minimum_charge_floor_is_not_applied_when_usage_is_higher(self):
+        q = quote("A", charges=[
+            {"name": "Freight", "amount": 0.5, "minimum_amount": 120, "basis": "PER_KG", "source_ref": "a:min1"},
+        ])
+        priced = price_quote(normalize_quote(q), {"weight_kg": 300})
+        self.assertEqual(priced["total"], "150.0")
+        self.assertFalse(priced["audit"][0]["minimum_applied"])
+
+    def test_invalid_minimum_charge_is_rejected(self):
+        q = quote("A", charges=[
+            {"name": "Freight", "amount": 0.5, "minimum_amount": -1, "basis": "PER_KG", "source_ref": "a:min1"},
+        ])
+        with self.assertRaisesRegex(ValueError, "minimum_amount cannot be negative"):
+            normalize_quote(q)
+
 
 if __name__ == "__main__":
     unittest.main()

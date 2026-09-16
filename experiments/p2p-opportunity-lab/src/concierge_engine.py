@@ -91,6 +91,11 @@ def normalize_quote(raw: dict[str, Any]) -> dict[str, Any]:
 
         included = bool(charge.get("included")) or basis == "INCLUDED"
         amount = _decimal(charge.get("amount"))
+        minimum_amount = _decimal(charge.get("minimum_amount"))
+        if minimum_amount is not None and minimum_amount < 0:
+            raise ValueError(f"charge {index} minimum_amount cannot be negative")
+        if included and minimum_amount is not None:
+            raise ValueError(f"charge {index} cannot be INCLUDED and have minimum_amount")
         charge_currency = _clean_text(charge.get("currency")) or currency
 
         uncertain = bool(charge.get("uncertain"))
@@ -107,6 +112,7 @@ def normalize_quote(raw: dict[str, Any]) -> dict[str, Any]:
             "code": canonical_charge_code(charge.get("name") or charge.get("code")),
             "raw_name": str(charge.get("name") or charge.get("code") or "").strip(),
             "amount": None if amount is None else str(amount),
+            "minimum_amount": None if minimum_amount is None else str(minimum_amount),
             "currency": charge_currency,
             "basis": "INCLUDED" if included else basis,
             "included": included,
@@ -176,19 +182,28 @@ def price_quote(quote: dict[str, Any], context: dict[str, Any]) -> dict[str, Any
             warnings.append(f"{charge['code']}: uncertain extraction/provenance")
 
         amount = _decimal(charge["amount"])
+        minimum_amount = _decimal(charge.get("minimum_amount"))
         multiplier = _basis_multiplier(charge["basis"], context)
         if amount is None or multiplier is None:
             complete = False
             warnings.append(f"{charge['code']}: cannot price basis {charge['basis']}")
             continue
 
-        contribution = amount * multiplier
+        raw_contribution = amount * multiplier
+        contribution = raw_contribution
+        minimum_applied = False
+        if minimum_amount is not None and raw_contribution < minimum_amount:
+            contribution = minimum_amount
+            minimum_applied = True
         total += contribution
         audit.append({
             "code": charge["code"],
             "amount": str(amount),
             "basis": charge["basis"],
             "multiplier": str(multiplier),
+            "raw_contribution": str(raw_contribution),
+            "minimum_amount": None if minimum_amount is None else str(minimum_amount),
+            "minimum_applied": minimum_applied,
             "contribution": str(contribution),
             "source_ref": charge["source_ref"],
             "status": "UNCERTAIN" if charge["uncertain"] else "PRICED",
