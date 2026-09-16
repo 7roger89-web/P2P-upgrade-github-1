@@ -1,0 +1,34 @@
+name: P2P export portable law
+
+on:
+  push:
+    branches:
+      - p2p/export-portable-law-20260916
+    paths:
+      - .github/workflows/p2p-export-portable-law.yml
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: p2p/export-portable-law-20260916
+      - name: Generate exact portable law
+        run: |
+          rm -rf .tmp-p2p-law-target
+          mkdir -p .tmp-p2p-law-target
+          python scripts/p2p_portable_law_projection.py .tmp-p2p-law-target
+          mkdir -p .p2p/export
+          cp .tmp-p2p-law-target/.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md .p2p/export/P2P-OPERATIONS-NOTEBOOK.md
+          rm -rf .tmp-p2p-law-target
+      - name: Commit generated artifact
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .p2p/export/P2P-OPERATIONS-NOTEBOOK.md
+          git diff --cached --quiet || git commit -m "chore: export exact portable Supreme Law"
+          git push origin HEAD:p2p/export-portable-law-20260916
