@@ -46,7 +46,7 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 - Owner authorized external contact for exactly the first three candidates on 2026-09-16 at 09:27 +07:00.
 - Authorized batch is durable at `pilots/logistics-quote-comparison/outreach-batch-01.json`.
 - Outreach wording was adapted to r/freightforwarding's No Promoting culture: research-first, public, low-volume, opt-in before any data exchange, and no request to post files publicly.
-- A reply watch is active for the three source threads and is configured to notify only on a new direct reply or clear opt-in; absence of a posted outreach comment produces no notification.
+- A reply watch is active for the three source threads every 6 hours and notifies only on a new direct reply or clear opt-in; an unsent outreach comment cannot produce a reply.
 - Real quote intake contract added at `schemas/quote-intake.schema.json`; intake requires anonymization confirmation and per-field/charge provenance.
 - Concierge validation observation contract added at `schemas/experiment-observation.schema.json`.
 - Deterministic quote normalization/comparison engine added at `src/concierge_engine.py`.
@@ -57,6 +57,7 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 - Observed experiment tracker added at `src/experiment_tracker.py`.
 - Tracker regression suite: 5/5 PASS; contact/praise/repeat-use cannot create money evidence, `WTP_SIGNAL` requires an explicit amount, and failure is not declared until the configured contact target is actually reached.
 - Validation procedure is durable at `docs/CONCIERGE-VALIDATION-PROTOCOL.md`.
+- Parallel internal/external development boundaries are durable at `docs/DEVELOPMENT_LANES.md`.
 - Live pilot status is durable at `pilots/logistics-quote-comparison/VALIDATION_STATUS.md`.
 
 ## Current checkpoint
@@ -65,13 +66,13 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 
 The first three design-partner contacts are authorized. No message has been sent yet because the current ChatGPT tool surface has no authenticated Reddit write/post action: web access is read-only and plugin discovery found no Reddit messaging/posting connector.
 
-This delivery limitation does not reopen the Owner Gate and does not stop internal validation development. Authorization is already recorded. Once an authenticated Reddit write surface is available, send only the three preserved public replies in `outreach-batch-01.json`, then the reply watch can surface direct responses/opt-ins.
+This delivery limitation does not reopen the Owner Gate and does not stop internal validation development. Authorization is already recorded. Once an authenticated Reddit write surface is available, send only the three preserved public replies in `outreach-batch-01.json`; the reply watch then surfaces direct responses/opt-ins without requiring the Owner to manually poll Reddit.
 
-The internal validation lane is now ready to accept an opted-in participant's anonymized real quote set, normalize charges with provenance, compute comparable totals only when the comparison basis is valid, surface uncertainty rather than hiding it, and record observed experiment behavior separately from payment/WTP evidence. Experiment aggregation is deterministic and can feed the existing market gate without converting engagement into money evidence.
+The internal validation lane is ready to accept an opted-in participant's anonymized real quote set, normalize charges with provenance, compute comparable totals only when the comparison basis is valid, surface uncertainty rather than hiding it, and record observed experiment behavior separately from payment/WTP evidence. Experiment aggregation is deterministic and can feed the existing market gate without converting engagement into money evidence.
 
 ## Next bounded step
 
 1. Deliver the three authorized public research replies through an authenticated Reddit account when a write surface is available.
-2. Continue hardening the concierge validation engine with representative synthetic/fixture quote sets while waiting; do not build product UI/login/billing/deployment.
+2. Continue hardening validation-only infrastructure and representative fixtures while waiting; do not build product UI/login/billing/deployment.
 3. On any opt-in, request anonymized quote/ratecard data through a mutually agreed safe channel, run the concierge engine, return an auditable comparison, and record corrections, trust objections, repeat-use, and explicit payment/WTP signals.
 4. Feed only observed tracker output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`; do not broaden into generic lead generation and do not build the product before the market gate changes on real evidence.
