@@ -39,7 +39,7 @@ Current delivery state remains:
 - `READY_BUT_NOT_SENT`
 - blocker: current ChatGPT surface has no authenticated Reddit write/post action.
 
-A six-hour reply watch is active, but an unsent outreach comment cannot receive a direct reply. Authorization does not need to be requested again when a valid Reddit write surface appears.
+Authorization does not need to be requested again when a valid Reddit write surface appears.
 
 ## Atomic quote validation pipeline
 
@@ -51,19 +51,7 @@ Pipeline order:
 
 `explicit FX -> named-base percentage -> charge semantics -> deterministic core comparison`
 
-Implemented protections include:
-- evidence-backed direct FX only; no inferred inverse/triangulation;
-- FX rate requires positive rate, source reference and date;
-- future-dated FX relative to explicit comparison date is rejected;
-- original cross-currency amount/minimum are preserved in audit;
-- percentage resolution occurs after FX so converted named bases are calculated in quote currency;
-- named-base percentage rules never guess their base;
-- scoped charges distinguish `ORIGIN | MAIN | DESTINATION | OTHER | UNSPECIFIED`;
-- exact duplicate priced charges block ranking;
-- evidenced all-in bundles expand to included coverage while blocking bundle/component double counting;
-- optional/add-on selection is explicit; unselected items leave price/coverage but remain auditable;
-- optional percentage charges that are unselected or still selection-ambiguous are deferred to the optional-service guard instead of triggering unnecessary percentage resolution;
-- route/equipment/currency grouping, charge coverage, validity, minimum charge, conditional terms, equipment aliases and evidence-backed route aliases remain active.
+Implemented protections include evidenced direct FX, percentage-base provenance, scoped charge identity, duplicate blocking, bundle/double-count guards, explicit optional selection, coverage parity, quote validity, minimum charges, conditional commercial terms, equipment aliases and evidence-backed route aliases.
 
 ## Multi-equipment FCL validation pipeline
 
@@ -71,73 +59,57 @@ Real-world provider-portfolio entrypoint:
 
 `src.portfolio_validation_pipeline.compare_fcl_portfolios_validated`
 
-The validated portfolio pipeline:
-- resolves FX independently for every required equipment offer and shared provider bucket;
-- resolves percentage surcharges only after FX;
-- uses required equipment quantity when resolving offer-level percentage charges;
-- rebases resolved percentage totals to `PER_CONTAINER` without changing the total contribution;
-- resolves shared FX/percentage charges once at provider level, not once per equipment row;
-- excludes only providers with unresolved FX or percentage semantics while allowing other complete providers to remain rankable;
-- preserves apples-to-apples coverage per equipment bucket and shared bucket;
-- rejects missing or ambiguous required equipment rather than guessing.
+The validated portfolio pipeline resolves FX/percentage semantics per required equipment/shared bucket, preserves apples-to-apples coverage, applies shared charges once and refuses missing or ambiguous required equipment.
 
 ## Validated golden fixture
 
-Golden integration fixture:
-
 `pilots/logistics-quote-comparison/fixtures/synthetic-validated-quote-set-02.json`
-
-It exercises the top-level atomic pipeline end to end with evidenced FX, named-base percentage surcharge, all-in bundle coverage, optional exclusion, route alias provenance and equipment alias normalization in one deterministic quote set.
 
 Expected ranking:
 
 `VAL-B USD 1940 < VAL-A USD 2028`
 
-The golden suite includes a normal end-to-end assertion and an adversarial permutation assertion that reverses both quote order and charge-line order. Ranking, scoped coverage, FX application, percentage resolution and relevant audits must remain invariant under that reordering.
+The golden suite verifies full top-level composition plus quote/charge-order invariance.
 
-## Dirty quote adversarial lane
+## Adversarial refusal lanes
 
-Top-level adversarial contracts mutate the validated golden fixture to prove the engine refuses unsafe conclusions when real-world quote data is incomplete or contradictory.
+Dirty quote contracts prove refusal for missing required coverage, alias-equivalent duplicate freight, contradictory direct FX evidence and missing provenance on a percentage base.
 
-Covered dirty-input behaviors:
-- a missing required charge creates a coverage gap and cannot manufacture a false cheapest quote;
-- alias-equivalent duplicate freight lines are blocked before ranking;
-- conflicting direct FX sources for the same currency pair are treated as ambiguous instead of choosing one;
-- missing provenance on a freight line used as a percentage base blocks BAF resolution rather than calculating from an unproven base.
+Dirty commercial/validity contracts prove expired and malformed-dated quotes are excluded, unresolved `subject to` terms remain incomplete, and `resolved=true` without resolution evidence does not manufacture certainty.
 
-## Dirty commercial and validity lane
+## Identity integrity
 
-Top-level commercial-state adversarial contracts now prove:
-- expired quotes are excluded instead of being ranked as current offers;
-- malformed validity dates are rejected rather than guessed;
-- unresolved `subject to` commercial terms make a quote incomplete;
-- a claimed resolution without evidence remains unresolved even when `resolved=true` is supplied.
+Fresh review found a real identity gap: quote IDs were required but not unique, while downstream coverage resolution and grouping use `quote_id` as identity.
 
-These are refusal contracts, not feature breadth. The intended success condition is often `no safe ranking` or `insufficient complete comparable quotes` with an explicit reason.
+The gap is now closed in both layers:
+- `src.concierge_engine.compare_quotes` rejects duplicate non-empty `quote_id` values before normalization/grouping;
+- `src.validation_pipeline.compare_quotes_validated` rejects the same ambiguity before FX/percentage resolution.
+
+Duplicate quote identity now fails loudly instead of allowing separate quotations to share audit, coverage or ranking identity. Duplicate non-empty charge `line_id` was already guarded by percentage semantics, so no redundant parallel line-ID mechanism was added.
 
 ## Schemas and documentation
 
 - quote intake carries charge scope, bundle fields, optional selection, stable `line_id`, percentage rate and named base line IDs;
 - comparison context carries explicit direct `fx_rates` with `from`, `to`, positive `rate`, `source_ref` and `as_of_date`;
-- `docs/CHARGE-SEMANTICS.md`, `docs/PERCENTAGE-SEMANTICS.md`, `docs/FX-SEMANTICS.md`, and `docs/TEST_MATRIX.md` define the evidence boundaries and deterministic acceptance contracts.
+- `docs/CHARGE-SEMANTICS.md`, `docs/PERCENTAGE-SEMANTICS.md`, `docs/FX-SEMANTICS.md`, and `docs/TEST_MATRIX.md` define evidence boundaries and deterministic acceptance contracts.
 
 ## Verification state
 
-Full source-tree deterministic acceptance is provided by `.github/workflows/p2p-opportunity-lab-focused.yml` using Python stdlib `unittest` only; it does not install pytest or another external test runner.
+Full source-tree deterministic acceptance is provided by `.github/workflows/p2p-opportunity-lab-focused.yml` using Python stdlib `unittest` only.
 
-The committed regression inventory is now **96 tests**: two validated golden tests, four dirty-quote adversarial tests, four dirty commercial/validity adversarial tests, plus the earlier deterministic contracts. Exact accepted branch SHA, current-main merge ref, focused workflow run ID and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation so this file does not create a self-referential SHA-update loop.
+The committed regression inventory is now **98 tests**: two validated golden tests, four dirty-quote tests, four dirty commercial/validity tests, two quote-identity integrity tests, plus the earlier deterministic contracts.
 
-A branch mutation does not inherit prior PASS automatically. Fresh focused CI plus P2P Shield are required for the new exact head.
+Exact accepted branch SHA, current-main merge ref, focused workflow run ID and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation. A branch mutation never inherits prior PASS automatically.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + ORDER_INVARIANCE_READY + DIRTY_QUOTE_ADVERSARIAL_READY + DIRTY_COMMERCIAL_VALIDITY_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + ORDER_INVARIANCE_READY + DIRTY_QUOTE_ADVERSARIAL_READY + DIRTY_COMMERCIAL_VALIDITY_READY + IDENTITY_INTEGRITY_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane remains blocked only on Reddit delivery capability. Internal validation now has full source-tree CI, a realistic golden fixture, order invariance, and top-level refusal contracts for missing coverage, duplicate aliases, contradictory FX evidence, missing percentage-base provenance, expiry, malformed validity dates and unresolved commercial terms.
+The external lane remains blocked only on Reddit delivery capability. Internal deterministic hardening is now sufficiently broad for the pilot: full source-tree CI, golden integration, order invariance, dirty-data refusal, commercial/validity refusal and unique quote identity are all covered.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Do not broaden pricing semantics without real quote evidence. The next internal hardening candidate is input-identity/provenance integrity (duplicate quote IDs, duplicate line IDs, malformed source identity) only if fresh acceptance review shows a real gap.
-3. On opt-in, run the real concierge test through the top-level validated entrypoint, record corrections/trust objections/repeat use and explicit WTP/payment signals.
+2. Stop speculative deterministic expansion unless real participant/quote data reveals a concrete missing semantic. Do not add pricing breadth merely to grow the suite.
+3. On opt-in, run real concierge comparisons through the top-level validated entrypoint and record corrections, trust objections, repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
