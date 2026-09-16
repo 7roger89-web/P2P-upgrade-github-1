@@ -4,7 +4,7 @@ Current isolated regression groups:
 
 - market gate: 5 tests;
 - prospect bridge: 5 tests;
-- concierge engine: 15 tests;
+- concierge engine: 20 tests;
 - conditional commercial terms: 3 tests;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
@@ -18,6 +18,13 @@ Minimum-charge regressions prove that `rate × quantity` is floored by an eviden
 
 Conditional-term regressions prove that unresolved `subject to` / conditional commercial terms block ranking, an evidenced resolution restores rankability, and merely claiming a term is resolved without a resolution source does not.
 
-Verification for this slice: base concierge engine **15/15 PASS**, conditional-term probes **3/3 PASS**, representative synthetic fixture **PASS**.
+Comparison-group regressions prove that:
 
-Synthetic and shortlist fixtures are not market evidence. They only protect deterministic behavior before real participant data arrives.
+- a first-position outlier cannot become the baseline merely because it was first;
+- the unique largest route/equipment/currency group is selected automatically;
+- equal multi-quote groups refuse to guess and require an explicit comparison target;
+- an explicit target selects only the matching comparison group;
+- equivalent equipment forms such as `40HQ` and `40HC` normalize together;
+- materially different equipment types such as `40GP` and `40HC` remain separate.
+
+The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic and shortlist fixtures are not market evidence; they only protect deterministic behavior before real participant data arrives.
