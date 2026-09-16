@@ -31,6 +31,7 @@
         "type": "object",
         "required": ["name", "basis", "source_ref"],
         "properties": {
+          "line_id": {"type": "string", "minLength": 1},
           "name": {"type": "string", "minLength": 1},
           "amount": {"type": ["number", "string", "null"]},
           "minimum_amount": {"type": ["number", "string", "null"]},
@@ -44,6 +45,13 @@
             "items": {"type": "string", "minLength": 1}
           },
           "bundle_primary_code": {"type": "string", "minLength": 1},
+          "percentage_rate": {"type": ["number", "string", "null"]},
+          "percentage_of_line_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
           "optional": {"type": "boolean"},
           "selected": {"type": "boolean"},
           "included": {"type": "boolean"},
