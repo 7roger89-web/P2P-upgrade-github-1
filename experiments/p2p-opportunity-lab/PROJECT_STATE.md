@@ -38,19 +38,17 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 - Integration mode: `REUSE_WITH_THIN_ADAPTER`; no fork and no unpinned `@latest` install.
 - Prospect bridge regression suite: 5/5 PASS in isolated local execution.
 - Prospect bridge forbids private/sensitive enrichment, requires a public source and direct signal, keeps outreach `DRAFT_ONLY`, and never upgrades pain into payment/WTP.
+- Public design-partner research completed for the first pilot.
+- Six primary candidates are preserved in `pilots/logistics-quote-comparison/design-partner-shortlist.json` with direct public evidence, weighted qualification dimensions, source-grounded draft openers, and `send_authorized=false`.
+- Competitor/peer records such as QuoteFast are explicitly excluded from the primary customer shortlist.
+- The shortlist does not alter the market-gate result: prospect discovery remains validation input, not proof of payment/WTP.
 
 ## Current checkpoint
 
-`VALIDATE` — evidence supports a cheap real-world experiment, not product implementation.
+`VALIDATE — DESIGN_PARTNER_SHORTLIST_READY`
 
-The new first-customer capability may be used to identify evidence-backed design
-partners for that experiment, but prospect discovery alone cannot change the
-market-gate decision.
+The first-customer capability has now produced a bounded, evidence-backed design-partner shortlist. The project still lacks observed behavior from the concierge experiment and observed payment/WTP evidence, so `BUILD` remains prohibited.
 
 ## Next bounded step
 
-Use the pinned first-customer-finder workflow plus the local prospect bridge to
-produce a small evidence-backed shortlist of candidate design partners for the
-logistics quote-comparison concierge test. External contact remains an Owner
-Gate. Until real target-user behavior and money/WTP evidence are observed, do
-not build the product.
+External contact is now the blocking boundary. Under the current project law it requires Owner authorization. Once authorized, contact only a small initial batch of the strongest public-signal candidates, ask for one real quote/rate-card set, execute the existing concierge test, and record observed submission, repeat-use, accuracy objections, and payment/WTP signals. Do not broaden into generic lead generation and do not build the product before the market gate changes on real evidence.
