@@ -1,0 +1,108 @@
+{
+  "generated_at": "2026-09-16",
+  "mode": "design-partners",
+  "pilot": "logistics-quote-comparison",
+  "decision_before_shortlist": "VALIDATE",
+  "score_note": "Scores prioritize who to speak with first; they are not probabilities of purchase or conversion.",
+  "send_authorized": false,
+  "prospects": [
+    {
+      "display_name": "Remote-Class8414",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1s7ub8u/shipping_line_ocean_freight_ratecards/",
+      "signal_date": "2026-03-30",
+      "signal_type": "PAIN",
+      "evidence_class": "USER_SAID",
+      "signal_text": "Australia-based freight forwarder receives multiple ocean-freight ratecards weekly, manually reformats inconsistent Excel sheets, cleans POL/POD/surcharge/validity fields, then re-enters the data into CargoWise; explicitly asks whether end-to-end ingestion can be automated.",
+      "score_dimensions": {"pain_strength": 5, "product_fit": 5, "timing": 4, "public_reachability": 5, "evidence_quality": 5},
+      "expected_score": 96,
+      "expected_stage": "PRIMARY_STRONG",
+      "public_channel": "Reply in the original Reddit discussion",
+      "outreach_opener": "Saw your post about repeatedly cleaning carrier ratecards before loading them into CargoWise. We are testing a very small concierge workflow that takes the files as-is, normalizes the rate/surcharge fields, and returns an auditable comparison instead of asking carriers to change format. Would you be open to testing it on one real ratecard batch and telling us where it breaks?",
+      "caution": "Do not imply automation accuracy is proven. Their workflow is ratecard ingestion plus TMS import, which is slightly broader than quote comparison."
+    },
+    {
+      "display_name": "3d1th8",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1rkex5u/is_anyone_else_losing_their_mind_comparing/",
+      "signal_date": "2026-03-04",
+      "signal_type": "EXPLICIT_DEMAND",
+      "evidence_class": "USER_SAID",
+      "signal_text": "Reports spending about two hours per day retyping 3-5 carrier quotes from WhatsApp, long PDFs, and messy Excel files into one comparison table and explicitly asks for a non-enterprise tool.",
+      "score_dimensions": {"pain_strength": 5, "product_fit": 5, "timing": 4, "public_reachability": 4, "evidence_quality": 5},
+      "expected_score": 93,
+      "expected_stage": "PRIMARY_STRONG",
+      "public_channel": "Reply in the original Reddit discussion",
+      "outreach_opener": "Your post about spending roughly two hours a day turning 3-5 mixed-format carrier quotes into one comparison table is almost exactly the workflow we are trying to validate. We are not asking you to buy software; we want to take one real batch, normalize it manually+AI, return the comparison, and see whether it actually saves you time. Interested in trying one batch?",
+      "caution": "Anonymous handle and geography are unknown; confirm the workflow is still current before any validation request."
+    },
+    {
+      "display_name": "Negative-Fox3868",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1sr1ovp/carrier_forwarder_rates_hassle/",
+      "signal_date": "2026-04-20",
+      "signal_type": "PAIN",
+      "evidence_class": "USER_SAID",
+      "signal_text": "Says RFQs/tenders require opening many carrier rate sheets, finding routes and surcharges, and that the process consumes substantial quoting time; asks how others optimize it.",
+      "score_dimensions": {"pain_strength": 5, "product_fit": 5, "timing": 4, "public_reachability": 4, "evidence_quality": 5},
+      "expected_score": 93,
+      "expected_stage": "PRIMARY_STRONG",
+      "public_channel": "Reply in the original Reddit discussion",
+      "outreach_opener": "You described the exact rate-sheet problem we are testing: opening multiple carrier sheets for each RFQ/tender, finding routes and surcharges, then comparing them manually. We have a concierge prototype rather than a finished product. If you give us one real quote set, we will normalize it and return a traceable comparison so you can tell us what is missing or wrong. Worth a test?",
+      "caution": "The thread contains competing vendors; keep the validation request neutral and do not pitch a finished product."
+    },
+    {
+      "display_name": "MedicalUse9714",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1td9lrf/how_do_you_verify_carrier_quotes_dont_have_hidden/",
+      "signal_date": "2026-05-14",
+      "signal_type": "PAIN",
+      "evidence_class": "USER_SAID",
+      "signal_text": "Ten-year freight forwarder says manually parsing carrier PDFs at 20+ shipments/week is where errors creep in and reports catching about $12k of surprise charges by checking quotes line-by-line.",
+      "score_dimensions": {"pain_strength": 5, "product_fit": 4, "timing": 5, "public_reachability": 4, "evidence_quality": 5},
+      "expected_score": 92,
+      "expected_stage": "PRIMARY_STRONG",
+      "public_channel": "Reply in the original Reddit discussion",
+      "outreach_opener": "Your hidden-charge example is useful because it is not just a speed problem; it is a margin-risk problem. We are testing whether a quote-normalization workflow can surface included/excluded surcharges and uncertain line items before someone relies on the total. If you are open to it, one anonymized real quote set would be enough for us to test the workflow and let you tear the result apart.",
+      "caution": "Their strongest pain is charge completeness and interpretation, not merely cheapest-rate comparison; treat this as a high-value adjacent validation case."
+    },
+    {
+      "display_name": "Comfortable-Pop-9050",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1q0irvk/how_much_time_does_your_team_spend_on_quote/",
+      "signal_date": "2025-12-31",
+      "signal_type": "EXPLICIT_DEMAND",
+      "evidence_class": "USER_SAID",
+      "signal_text": "Small/mid shipper emails five forwarders, waits for replies, manually enters quotes into a spreadsheet, and needs an audit trail of 4-5 quotes for every container; estimates roughly $500 in labor to save $50 on a container.",
+      "score_dimensions": {"pain_strength": 5, "product_fit": 5, "timing": 3, "public_reachability": 4, "evidence_quality": 5},
+      "expected_score": 89,
+      "expected_stage": "PRIMARY_STRONG",
+      "public_channel": "Reply in the original Reddit discussion",
+      "outreach_opener": "Your audit-trail constraint is interesting because simply telling the team to request fewer quotes is not an option. We are testing a concierge workflow that accepts the 4-5 quotes you already receive, normalizes them, and preserves the comparison evidence for approval. If that process is still painful, would you test it on one shipment and tell us whether the output is good enough for your manager?",
+      "caution": "Signal is older and shipper-side rather than forwarder-side; first confirm the audit-trail process is still active."
+    },
+    {
+      "display_name": "UnderstandingFast395",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1t2cd2u/is_it_just_my_company_or_is_freight_forwarding/",
+      "signal_date": "2026-05-03",
+      "signal_type": "PAIN",
+      "evidence_class": "USER_SAID",
+      "signal_text": "Netherlands-based air-freight operator describes repeated manual extraction from email/PDF into several systems and Excel trackers, explicitly asks for approaches that improve the workflow rather than another TMS, and publicly indicates willingness to chat about adjacent tooling.",
+      "score_dimensions": {"pain_strength": 4, "product_fit": 3, "timing": 4, "public_reachability": 5, "evidence_quality": 5},
+      "expected_score": 81,
+      "expected_stage": "PRIMARY_STRONG",
+      "public_channel": "Reply in the original Reddit discussion",
+      "outreach_opener": "You mentioned wanting something that reduces the email/PDF/Excel copy-paste without simply adding another TMS. Our test is narrower: take a real set of freight quotations, normalize the structured fields, and return a traceable comparison. It may or may not fit your air-freight workflow, which is exactly what we need to learn. Would you be open to pressure-testing one sample?",
+      "caution": "Adjacent ICP: broader operations-data pain and air freight, so use primarily to test transferability rather than to prove the core ocean/forwarder hypothesis."
+    }
+  ],
+  "excluded_or_peer_only": [
+    {
+      "display_name": "yeh_tejateja_kya_hai",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1re7s2e/i_was_tired_of_missing_rfqs_having_limited/",
+      "reason": "Strong pain signal but already building their own solution; useful peer/competitor learning, not a primary design-partner target for this pilot."
+    },
+    {
+      "display_name": "mardingca / QuoteFast",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1sr1ovp/carrier_forwarder_rates_hassle/",
+      "reason": "Vendor/competitor offering rate-sheet and RFQ tooling; preserve as competitor evidence, not customer evidence."
+    }
+  ],
+  "next_gate": "OWNER_AUTHORIZATION_REQUIRED_FOR_EXTERNAL_CONTACT",
+  "market_gate_effect": "NONE_UNTIL_REAL_BEHAVIOR_OR_MONEY_SIGNAL_IS_OBSERVED"
+}
