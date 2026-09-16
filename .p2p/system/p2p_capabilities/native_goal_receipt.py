@@ -13,11 +13,18 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from .native_goal_bridge import CLAUDE_CODE, CODEX_CLI, HOST_KINDS
+try:
+    from .native_goal_bridge import CLAUDE_CODE, CODEX_CLI, HOST_KINDS
+except ImportError:  # Support direct execution from the installed module path.
+    runtime_root = Path(__file__).resolve().parents[1]
+    if str(runtime_root) not in sys.path:
+        sys.path.insert(0, str(runtime_root))
+    from p2p_capabilities.native_goal_bridge import CLAUDE_CODE, CODEX_CLI, HOST_KINDS  # type: ignore[no-redef]
 
 RECEIPT_SCHEMA = "p2p-native-goal-invocation/1"
 LEDGER_SCHEMA = "p2p-execution-event/1"
