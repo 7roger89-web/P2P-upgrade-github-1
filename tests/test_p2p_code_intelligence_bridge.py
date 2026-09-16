@@ -15,9 +15,13 @@ from p2p_capabilities.code_intelligence_bridge import (  # noqa: E402
     CodeIntelligenceExecutionFailed,
     CodeIntelligenceUnavailable,
     CodebaseMemoryEvidenceBridge,
+    NATIVE_FIRST_FALLBACK,
     NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE,
     UnsafeCodeIntelligenceRequest,
 )
+
+
+GAP = "native AST evidence cannot trace this cross-language call path"
 
 
 def _completed(stdout: str, *, returncode: int = 0, stderr: str = "") -> subprocess.CompletedProcess[str]:
@@ -35,6 +39,7 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
         invocation = bridge.build_invocation(
             tool="search_graph",
             arguments={"project": "p2p", "name_pattern": ".*Bridge.*", "label": "Function"},
+            native_gap_reason=GAP,
         )
 
         self.assertEqual(
@@ -52,6 +57,18 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
             json.loads(invocation.stdin_json),
             {"project": "p2p", "name_pattern": ".*Bridge.*", "label": "Function"},
         )
+        self.assertEqual(invocation.native_gap_reason, GAP)
+
+    def test_bridge_requires_a_material_native_gap_reason(self) -> None:
+        bridge = CodebaseMemoryEvidenceBridge()
+        for reason in ("", "tiny gap"):
+            with self.subTest(reason=reason):
+                with self.assertRaisesRegex(UnsafeCodeIntelligenceRequest, "NATIVE_GAP_REASON_REQUIRED"):
+                    bridge.build_invocation(
+                        tool="get_architecture",
+                        arguments={"project": "p2p"},
+                        native_gap_reason=reason,
+                    )
 
     def test_bridge_rejects_mutating_or_control_plane_tools(self) -> None:
         bridge = CodebaseMemoryEvidenceBridge()
@@ -65,16 +82,25 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
         ):
             with self.subTest(tool=tool):
                 with self.assertRaises(UnsafeCodeIntelligenceRequest):
-                    bridge.build_invocation(tool=tool, arguments={"project": "p2p"})
+                    bridge.build_invocation(
+                        tool=tool,
+                        arguments={"project": "p2p"},
+                        native_gap_reason=GAP,
+                    )
 
     def test_bridge_requires_project_and_bounded_timeout(self) -> None:
         bridge = CodebaseMemoryEvidenceBridge()
         with self.assertRaisesRegex(UnsafeCodeIntelligenceRequest, "PROJECT_REQUIRED"):
-            bridge.build_invocation(tool="get_architecture", arguments={"project": ""})
+            bridge.build_invocation(
+                tool="get_architecture",
+                arguments={"project": ""},
+                native_gap_reason=GAP,
+            )
         with self.assertRaisesRegex(UnsafeCodeIntelligenceRequest, "TIMEOUT_OUT_OF_RANGE"):
             bridge.build_invocation(
                 tool="get_architecture",
                 arguments={"project": "p2p"},
+                native_gap_reason=GAP,
                 timeout_seconds=301,
             )
 
@@ -92,9 +118,12 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
         result = bridge.query(
             tool="get_architecture",
             arguments={"project": "p2p"},
+            native_gap_reason=GAP,
         )
 
         self.assertEqual(result["classification"], NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE)
+        self.assertEqual(result["activation_policy"], NATIVE_FIRST_FALLBACK)
+        self.assertEqual(result["native_gap_reason"], GAP)
         self.assertIs(result["authoritative_state"], False)
         self.assertIs(result["standing_process_started_by_bridge"], False)
         self.assertIs(result["index_created_by_bridge"], False)
@@ -104,7 +133,11 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
     def test_query_fails_closed_when_binary_is_missing(self) -> None:
         bridge = CodebaseMemoryEvidenceBridge(which=lambda _: None)
         with self.assertRaisesRegex(CodeIntelligenceUnavailable, "NOT_INSTALLED"):
-            bridge.query(tool="get_architecture", arguments={"project": "p2p"})
+            bridge.query(
+                tool="get_architecture",
+                arguments={"project": "p2p"},
+                native_gap_reason=GAP,
+            )
 
     def test_query_fails_closed_on_invalid_json_or_command_failure(self) -> None:
         invalid = CodebaseMemoryEvidenceBridge(
@@ -112,7 +145,11 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
             which=lambda _: "/usr/bin/codebase-memory-mcp",
         )
         with self.assertRaisesRegex(CodeIntelligenceExecutionFailed, "JSON_INVALID"):
-            invalid.query(tool="get_architecture", arguments={"project": "p2p"})
+            invalid.query(
+                tool="get_architecture",
+                arguments={"project": "p2p"},
+                native_gap_reason=GAP,
+            )
 
         failed = CodebaseMemoryEvidenceBridge(
             runner=lambda _: _completed("", returncode=2, stderr="bad request"),
@@ -122,6 +159,7 @@ class CodeIntelligenceBridgeTests(unittest.TestCase):
             failed.query(
                 tool="trace_path",
                 arguments={"project": "p2p", "function_name": "run"},
+                native_gap_reason=GAP,
             )
 
 
