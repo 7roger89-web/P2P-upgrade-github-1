@@ -57,6 +57,7 @@ def prepare_quote(raw_quote: dict[str, Any]) -> tuple[dict[str, Any], dict[str, 
     transformed: list[dict[str, Any]] = []
     bundles: list[dict[str, Any]] = []
     explicit_priced: list[dict[str, Any]] = []
+    optional_excluded: list[dict[str, Any]] = []
     duplicate_index: dict[tuple[str, str, str, str], list[int]] = {}
 
     for index, raw_charge in enumerate(charges, start=1):
@@ -80,6 +81,21 @@ def prepare_quote(raw_quote: dict[str, Any]) -> tuple[dict[str, Any], dict[str, 
         currency = str(charge.get("currency") or quote_currency).strip().upper()
         included = bool(charge.get("included")) or basis == "INCLUDED"
         source_ref = str(charge.get("source_ref") or "").strip()
+
+        optional = bool(charge.get("optional"))
+        if optional:
+            selected = charge.get("selected")
+            if not isinstance(selected, bool):
+                errors.append({"type": "OPTIONAL_SELECTION_REQUIRED", "line": index})
+                continue
+            if not selected:
+                optional_excluded.append({
+                    "line": index,
+                    "scope": scope,
+                    "code": code,
+                    "source_ref": source_ref,
+                })
+                continue
 
         bundle_values = charge.get("bundle_includes")
         if bundle_values is not None:
@@ -186,6 +202,7 @@ def prepare_quote(raw_quote: dict[str, Any]) -> tuple[dict[str, Any], dict[str, 
         "duplicate_groups": duplicates,
         "bundle_overlaps": overlaps,
         "bundles": bundles,
+        "optional_excluded": optional_excluded,
         "transformed_charge_count": len(transformed),
     }
     return quote, audit
