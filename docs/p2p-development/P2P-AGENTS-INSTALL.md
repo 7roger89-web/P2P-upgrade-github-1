@@ -71,6 +71,20 @@ The deterministic activation rule is intentionally narrow: auto-activate only wh
 
 Native `/goal` is session continuation only. It creates no new P2P authority, does not widen permissions, does not bypass Owner Gates, and never makes host evaluator/self-report an acceptance authority. Canonical P2P GoalPlan/TaskPlan, durable task state, evidence, and verifier remain authoritative. Claude Code and Codex CLI host semantics must remain distinct; never claim Codex has Claude's evaluator/automatic-turn behavior unless directly documented and verified.
 
+## Evidence-grounded experience auto-reuse
+
+For a non-trivial P2P-managed task, after valid law/task-state preflight and before substantive execution, use the installed experience helper when present:
+
+`python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<bounded current task>"`
+
+This lookup is read-only. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
+
+After a task, do not manufacture memory from routine success. Create an experience `CANDIDATE` only when a repeated/material failure or clearly reusable correction has independent evidence. Model self-report, chat summary, or verbal confidence alone is not proof. A candidate is inert until verification supplies `BEHAVIOR_PROOF + REGRESSION_PROOF + CHALLENGE_PROOF`; only then may it transition `VERIFIED -> ACTIVE`.
+
+The same helper exposes bounded lifecycle commands: `candidate`, `verify`, `activate`, `use`, `quarantine`, and `supersede`. Record whether an ACTIVE experience `HELPED`, was `NEUTRAL`, or `HARMED` using evidence from the new run. One harmful run recommends review but does not automatically erase history. Quarantine or supersession requires evidence and remains append-only.
+
+`NON_AUTHORITATIVE_VERIFIED_EXPERIENCE` never changes law, permissions, acceptance, promotion, provider choice, deployment, source, or skills by itself. Reuse the existing `.p2p/state/execution-ledger.jsonl`; do not create a second memory database, router, daemon, or external memory service merely to support this lifecycle.
+
 ## Owner gates
 
 Continue routine, reversible work autonomously inside the approved scope. Stop for Owner authority before consequential actions such as:
