@@ -1,16 +1,23 @@
-"""Bounded read-only bridge for optional codebase structural evidence.
+"""Native-first bridge for optional external code-structure evidence.
+
+P2P already has a canonical native code-impact evidence contract in
+``quality_intelligence.py`` based on stdlib AST/import analysis. That native
+path remains first choice. This bridge exists only for a *documented residual
+gap* that native analysis cannot establish well enough, for example a
+cross-language call path or a richer semantic/architecture query.
 
 The bridge intentionally does not install, configure, index, watch, daemonize,
 serve UI, manage ADRs, or grant authority to codebase-memory-mcp. It can query
 an already-existing local index through the upstream one-shot CLI mode and
-returns non-authoritative structural evidence for P2P Evidence-First review.
+returns non-authoritative supplemental structural evidence.
 
 Upstream research pin for this contract:
 DeusData/codebase-memory-mcp v0.11.0
 commit 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798
 
-P2P project files, tests, task state, FACT/evidence and canonical governance
-remain authoritative. External graph output is evidence candidate only.
+P2P project files, native impact evidence, tests, task state, FACT/evidence and
+canonical governance remain authoritative. External graph output is evidence
+candidate only.
 """
 
 from __future__ import annotations
@@ -23,13 +30,15 @@ from typing import Any, Callable, Mapping
 
 
 NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE = "NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE"
+NATIVE_FIRST_FALLBACK = "NATIVE_FIRST_FALLBACK"
 UPSTREAM_RESEARCH_PIN = "DeusData/codebase-memory-mcp@8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798"
 DEFAULT_BINARY = "codebase-memory-mcp"
 MAX_OUTPUT_BYTES = 2_000_000
+MIN_NATIVE_GAP_REASON_CHARS = 12
 
-# Only query surfaces that are useful for structural/impact evidence and are
-# documented as query/analysis operations. Deliberately absent: install,
-# update, config, index_repository, manage_adr, daemon, UI and arbitrary Cypher.
+# Only query surfaces that can add structural/impact evidence beyond the
+# existing native contract. Deliberately absent: install, update, config,
+# index_repository, manage_adr, daemon, UI and arbitrary Cypher.
 READ_ONLY_TOOLS = frozenset(
     {
         "get_architecture",
@@ -60,6 +69,7 @@ class CodeIntelligenceInvocation:
     argv: tuple[str, ...]
     stdin_json: str
     timeout_seconds: int
+    native_gap_reason: str
 
 
 Runner = Callable[[CodeIntelligenceInvocation], subprocess.CompletedProcess[str]]
@@ -81,13 +91,25 @@ def _json_size(value: Any) -> int:
     return len(json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
-class CodebaseMemoryEvidenceBridge:
-    """Query an existing codebase-memory-mcp index without gaining authority.
+def _validated_gap_reason(native_gap_reason: str) -> str:
+    reason = str(native_gap_reason or "").strip()
+    if len(reason) < MIN_NATIVE_GAP_REASON_CHARS:
+        raise UnsafeCodeIntelligenceRequest("CODE_INTEL_NATIVE_GAP_REASON_REQUIRED")
+    return reason
 
-    The upstream README documents one-shot CLI mode as independent from its
-    standing coordination daemon. P2P uses only that shape here. The bridge
-    never calls ``index_repository``; provisioning/index creation remains an
-    explicit external setup decision rather than a side effect of verification.
+
+class CodebaseMemoryEvidenceBridge:
+    """Query an existing external index only after native evidence is insufficient.
+
+    ``quality_intelligence.affected_surface`` and related native code-impact
+    evidence are the default. The caller must state the concrete residual gap
+    before this bridge can build or execute an external query. This keeps the
+    external graph a supplemental evidence provider rather than a competing
+    index/truth authority.
+
+    The bridge never calls ``index_repository``; provisioning/index creation
+    remains an explicit external setup decision rather than a side effect of
+    verification.
     """
 
     def __init__(
@@ -106,8 +128,10 @@ class CodebaseMemoryEvidenceBridge:
         *,
         tool: str,
         arguments: Mapping[str, Any],
+        native_gap_reason: str,
         timeout_seconds: int = 60,
     ) -> CodeIntelligenceInvocation:
+        gap_reason = _validated_gap_reason(native_gap_reason)
         if tool not in READ_ONLY_TOOLS:
             raise UnsafeCodeIntelligenceRequest(f"CODE_INTEL_TOOL_NOT_ALLOWED:{tool}")
         if not isinstance(arguments, Mapping) or not arguments:
@@ -118,8 +142,6 @@ class CodebaseMemoryEvidenceBridge:
         if not isinstance(timeout_seconds, int) or not 1 <= timeout_seconds <= 300:
             raise UnsafeCodeIntelligenceRequest("CODE_INTEL_TIMEOUT_OUT_OF_RANGE")
 
-        # P2P never needs megabytes of request parameters. This also prevents a
-        # caller from abusing the bridge as a generic payload transport.
         payload = dict(arguments)
         if _json_size(payload) > 64_000:
             raise UnsafeCodeIntelligenceRequest("CODE_INTEL_ARGUMENTS_TOO_LARGE")
@@ -133,13 +155,14 @@ class CodebaseMemoryEvidenceBridge:
             "--format",
             "json",
         )
-        return CodeIntelligenceInvocation(argv, stdin_json, timeout_seconds)
+        return CodeIntelligenceInvocation(argv, stdin_json, timeout_seconds, gap_reason)
 
     def query(
         self,
         *,
         tool: str,
         arguments: Mapping[str, Any],
+        native_gap_reason: str,
         timeout_seconds: int = 60,
     ) -> dict[str, Any]:
         if not self._which(self.binary):
@@ -148,6 +171,7 @@ class CodebaseMemoryEvidenceBridge:
         invocation = self.build_invocation(
             tool=tool,
             arguments=arguments,
+            native_gap_reason=native_gap_reason,
             timeout_seconds=timeout_seconds,
         )
         result = self._runner(invocation)
@@ -167,6 +191,8 @@ class CodebaseMemoryEvidenceBridge:
 
         return {
             "classification": NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE,
+            "activation_policy": NATIVE_FIRST_FALLBACK,
+            "native_gap_reason": invocation.native_gap_reason,
             "authoritative_state": False,
             "source": "codebase-memory-mcp-cli",
             "upstream_research_pin": UPSTREAM_RESEARCH_PIN,
