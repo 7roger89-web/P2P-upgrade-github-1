@@ -1,0 +1,2225 @@
+Moonshine Voice, một dự án mã nguồn mở nhằm tạo ra các trợ lý và giao diện AI hỗ trợ giọng nói, đã được ra mắt.
+Nền tảng này kết hợp nhận dạng giọng nói, tổng hợp giọng nói và phân tích ý định người dùng vào một hệ thống duy nhất.
+ # 
+🧠 Ý chính là:
+Moonshine Voice được thiết kế cho các tình huống thoại có độ trễ thấp.
+Hệ thống nhanh chóng chuyển đổi giọng nói thành văn bản, phân tích yêu cầu của người dùng và tạo ra phản hồi bằng giọng nói.
+ # 
+📊 Đặc điểm dự án:
+Nhận dạng giọng nói thời gian thực,
+xử lý độ trễ thấp,
+tạo giọng nói từ văn bản,
+nhận dạng ý định người dùng,
+công cụ cho giao diện AI giọng nói,
+kiến ​​trúc mã nguồn mở.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Giao diện giọng nói đang trở thành một lĩnh vực phát triển trọng điểm cho các trợ lý AI và hệ thống tác nhân.
+Các nền tảng như vậy giúp tạo ra các ứng dụng AI ưu tiên giọng nói, có thể tùy chỉnh và hoạt động cục bộ mà không cần dựa vào các dịch vụ đám mây độc quyền.
+ # 
+🔗 Liên kết:
+https://github.com/moonshine-ai/moonshine
+--------
+ByteDance đã phát hành dự án mã nguồn mở Deer-Flow, một tác nhân AI hỗ trợ kiến ​​trúc đa tác nhân và các quy trình tự động phức tạp.
+Nền tảng này được thiết kế để điều phối nhiều tác nhân con AI trong một hệ thống duy nhất.
+ # 
+🧠 Ý chính là:
+Deer-Flow cho phép bạn phân phối nhiệm vụ giữa các tác nhân khác nhau, có thể thực hiện nghiên cứu, viết mã, tạo báo cáo và tương tác với các công cụ bên ngoài song song.
+Hệ thống hỗ trợ ngữ cảnh dài hạn và tích hợp với nhiều máy chủ LLM và MCP khác nhau.
+ # 
+📊 Đặc điểm dự án:
+Vận hành song song nhiều tác nhân phụ
+Nghiên cứu AI và nghiên cứu chuyên sâu
+Tạo báo cáo, bài thuyết trình và trang web
+Viết và phân tích mã
+Làm việc với tệp và hình ảnh
+Thực thi các lệnh hệ thống
+Bộ nhớ giữa các phiên Tích
+hợp với Telegram và Slack
+Hỗ trợ máy chủ MCP
+Khả năng tương thích với các LLM khác nhau
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các tác nhân AI đang ngày càng chuyển từ vai trò trợ lý đơn lẻ sang các hệ thống đa tác nhân hoàn chỉnh với sự phân chia vai trò và phối hợp nhiệm vụ.
+Những nền tảng như vậy thể hiện sự phát triển của tự động hóa ưu tiên AI và đưa đến gần hơn với sự xuất hiện của những người lao động kỹ thuật số hoàn toàn tự chủ.
+ # 
+🔗 Liên kết:
+https://github.com/bytedance/deer-flow
+--------
+ToonCrafterAI ngày càng trở nên phổ biến như một công cụ tạo hoạt hình giữa hai hình ảnh.
+Mạng thần kinh hoàn thiện các khung hình trung gian và tạo ra chuyển động theo phong cách anime hoàn chỉnh.
+ # 
+🧠 Ý chính là:
+Người dùng tải lên khung hình bắt đầu và kết thúc, sau đó mô hình sẽ tự động tạo ra các hoạt ảnh trung gian.
+Hệ thống được huấn luyện trên hoạt ảnh anime và có thể tái tạo các đặc điểm vật lý chuyển động và chuyển tiếp mượt mà.
+ # 
+📊 Các tính năng của ToonCrafterAI:
+Tạo hoạt hình từ hai khung hình;
+Tạo khung hình trung gian
+; Nội suy chuyển động theo phong cách anime
+; Tô màu khung hình
+; Hoạt hình từ bản phác thảo và bản nháp;
+Làm việc với Hugging Face Space
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí tuệ nhân tạo (AI) đang dần tự động hóa không chỉ việc tạo ra các hình ảnh riêng lẻ mà còn cả toàn bộ hoạt hình.
+Những mô hình như vậy có thể tăng tốc đáng kể quá trình tạo ra phim hoạt hình, kịch bản phân cảnh, ý tưởng chuyển động và video ngắn.
+ # 
+🔗 Liên kết:
+https://huggingface.co/spaces/Doubiiu/tooncrafter
+------
+Một trong những người sáng lập OpenAI đã trình diễn công cụ Codex Complexity Optimizer để phân tích độ phức tạp của mã nguồn bằng trí tuệ nhân tạo.
+Hệ thống này giúp xác định các vấn đề trong dự án mà không cần sự can thiệp tự động.
+ # 
+🧠 Ý chính là:
+Công cụ này quét cấu trúc dự án và xác định các điểm nghẽn tiềm ẩn ảnh hưởng đến hiệu suất và khả năng bảo trì mã nguồn.
+Trí tuệ nhân tạo không tự viết lại mã mà chỉ làm nổi bật các khu vực có vấn đề và đề xuất các tùy chọn tối ưu hóa an toàn.
+ # 
+📊 Hệ thống phân tích những gì:
+Các thao tác lặp đi lặp lại,
+vòng lặp sâu,
+truy vấn nặng nề,
+các tính năng cồng kềnh
+, độ phức tạp kiến ​​trúc quá mức,
+các nút thắt cổ chai về hiệu năng.
+ # 
+📊 Thông tin chi tiết bổ sung:
+Codex Complexity Optimizer được thiết kế cho các dự án lớn, mã nguồn cũ và phát triển có sự hỗ trợ của trí tuệ nhân tạo.
+Công cụ này có thể được sử dụng như một phần của quá trình kiểm tra kỹ thuật và phân tích mã nguồn sơ bộ.
+ # 
+🔗 Liên kết:
+https://github.com/Kappaemme-git/codex-complexity-optimizer
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các công cụ AI đang dần trở thành một phần của quy trình phát triển và hỗ trợ các dự án lớn.
+Phân tích độ phức tạp tự động giúp nhanh chóng xác định các vấn đề khó phát hiện và giảm chi phí tối ưu hóa các codebase lớn.
+-----
+Một bộ sưu tập lớn các công cụ API dành cho phát triển, tự động hóa và phân tích đã được phát hành trên GitHub.
+Kho lưu trữ này chứa hàng ngàn dịch vụ готовые để tích hợp vào các dự án của riêng bạn.
+ # 
+🧠 Ý chính là:
+Dự án API Mega List tập hợp một bộ sưu tập lớn các API cho nhiều trường hợp khác nhau—từ quản lý dữ liệu và thương mại điện tử đến phân tích và tích hợp trí tuệ nhân tạo.
+Điều này cho phép bạn nhanh chóng tìm thấy các công cụ có sẵn thay vì phải phát triển từng thành phần riêng lẻ từ đầu.
+ # 
+📊 Bên trong có gì:
+Các công cụ tự động hóa quy trình và luồng công việc thường ngày;
+API để thu thập và xử lý dữ liệu từ các trang web và dịch vụ
+; Giải pháp phân tích thị trường, kinh doanh và đối thủ cạnh tranh
+; Công cụ theo dõi thương mại điện tử, giá cả và sản phẩm
+; Dịch vụ làm việc với mạng xã hội và các chỉ số tương tác
+; Tích hợp với các mô hình AI và tạo nội dung;
+Công cụ phân tích vị trí tuyển dụng, tiền lương và thị trường lao động;
+Dịch vụ theo dõi và phân tích bất động sản.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các danh mục API mở lớn giúp giảm thời gian tìm kiếm các dịch vụ phù hợp và đẩy nhanh quá trình ra mắt sản phẩm mới.
+Đối với các nhà phát triển, điều này cho phép họ nhanh chóng lắp ráp các giải pháp hoạt động từ các thành phần có sẵn.
+ # 
+🔗 Liên kết:
+https://github.com/cporter202/API-mega-list
+----
+Supertonic 3, một công cụ tạo giọng nói với khả năng thực thi cục bộ dành cho việc lồng tiếng trong nhiều dự án kỹ thuật số khác nhau, đang ngày càng được ưa chuộng trên mạng.
+Công cụ này miễn phí và không yêu cầu cơ sở hạ tầng đám mây.
+ # 
+🧠 Ý chính là:
+Hệ thống được thiết kế để tổng hợp giọng nói và có thể được sử dụng trong video, ứng dụng và các dự án trí tuệ nhân tạo.
+Hoạt động cục bộ cho phép làm việc mà không phụ thuộc vào các dịch vụ bên ngoài hoặc bị giới hạn về số lượng thế hệ.
+ # 
+📊 Tính năng:
+Hoạt động cục bộ mà không cần kết nối với dịch vụ đám mây.
+Không yêu cầu phần cứng mạnh để chạy.
+Hỗ trợ 31 ngôn ngữ, bao gồm tiếng Nga.
+Thích hợp cho việc lồng tiếng video, ứng dụng và công cụ AI.
+Phân phối miễn phí không có hạn chế sử dụng.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các công cụ tạo giọng nói cục bộ đang ngày càng trở nên phổ biến trong bối cảnh những hạn chế của dịch vụ đám mây, chi phí đăng ký và lo ngại về quyền riêng tư.
+Những giải pháp này mang đến nhiều cơ hội hơn cho các nhà phát triển độc lập và người tạo nội dung.
+ # 
+🔗 Liên kết:
+https://github.com/supertone-inc/supertonic
+-----
+Nhóm HeyGen đã phát hành Hyperframes, một khung phần mềm mã nguồn mở dành cho việc tạo và dựng video tự động.
+Công cụ này được thiết kế để tạo nội dung video tự động và tích hợp với các tác nhân trí tuệ nhân tạo (AI).
+ # 
+🧠 Ý chính là:
+Thay vì sử dụng các trình chỉnh sửa video truyền thống hoặc các giải pháp dựa trên React, Hyperframes sử dụng HTML, CSS và JavaScript thông thường để xây dựng các cảnh.
+Quá trình kết xuất được thực hiện cục bộ bằng cách kết hợp Headless Chrome và FFmpeg, mà không cần dựa vào các dịch vụ đám mây.
+ # 
+📊 Tính năng:
+Tạo video ở định dạng MP4, MOV và WebM.
+Kết xuất cục bộ mà không cần cơ sở hạ tầng đám mây.
+Tích hợp với Claude Code, Cursor và Gemini CLI.
+Điều khiển dòng thời gian thông qua thuộc tính HTML.
+Hỗ trợ hoạt ảnh CSS, Lottie, GSAP và Three.js.
+Hơn 50 thành phần và hiệu ứng hình ảnh tích hợp sẵn.
+Tạo video hàng loạt cho các kịch bản tự động.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các tác nhân AI đang ngày càng vượt ra khỏi việc chỉ tạo văn bản và mã lập trình để tạo ra nội dung đa phương tiện hoàn chỉnh.
+Những công cụ này mở đường cho việc lắp ráp video theo lập trình như một phần của quy trình làm việc tự động và các kịch bản CI/CD.
+ # 
+🔗 Liên kết:
+https://github.com/heygen-com/hyperframes
+---
+Deep-eye, một công cụ mã nguồn mở用于 phân tích và kiểm thử bảo mật ứng dụng tự động, hiện đã có trên GitHub.
+Dự án này kết hợp các cơ chế xác thực cổ điển với khả năng của các mô hình ngôn ngữ hiện đại.
+ # 
+🧠 Ý chính là:
+Deep-eye hoạt động như một trợ lý AI hỗ trợ các tác vụ phân tích bảo mật, kết hợp nhiều nhà cung cấp LLM với một bộ mô-đun xác minh tích hợp sẵn.
+Công cụ này được thiết kế để tự động hóa một số quy trình thường nhật liên quan đến phân tích ứng dụng web và API.
+ # 
+📊 Tính năng:
+
+Hỗ trợ phân tích ứng dụng web và API của OpenAI, Claude, Grok, Mistral, OLLAMA và OpenRouter;
+xác thực kịch bản GraphQL và WebSocket;
+công cụ thu thập thông tin kỹ thuật và trinh sát
+; tự động hóa báo cáo có cấu trúc;
+thực thi mô hình cục bộ và trên đám mây.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí tuệ nhân tạo (AI) ngày càng được tích hợp vào các công cụ chuyên nghiệp dành cho cơ sở hạ tầng, phát triển và phân tích hệ thống.
+Các dự án như thế này cho thấy các mô hình ngôn ngữ đang bắt đầu được sử dụng không chỉ như trợ lý trò chuyện mà còn là một phần của quy trình kỹ thuật chuyên biệt.
+ # 
+🔗 Liên kết:
+https://github.com/zakirkun/deep-eye
+----
+Dự án WebUI ForgeAI đã được phát hành—một phiên bản tối ưu hóa giao diện cho Stable Diffusion.
+Nó được thiết kế để chạy quá trình tạo ảnh ngay cả trên các máy tính có cấu hình yếu hơn.
+ # 
+🧠 Ý chính là:
+Tính năng chính của giao diện người dùng web ForgeAI là sử dụng hiệu quả hơn tài nguyên card đồ họa và hệ thống.
+Các tối ưu hóa cho phép quá trình tạo ảnh diễn ra nhanh hơn, đặc biệt là trên phần cứng cấu hình thấp.
+ # 
+📊 Những gì dự án có thể làm được:
+Chạy Stable Diffusion thông qua giao diện WebUI tiện lợi
+Giảm tải tài nguyên máy tính
+Tăng tốc tạo ảnh lên đến 75%
+Tăng tốc đáng kể trên các card đồ họa yếu
+Hoạt động như một công cụ mã nguồn mở
+Phù hợp cho việc tạo ảnh cục bộ
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Việc tạo ảnh thường đòi hỏi phần cứng mạnh mẽ, hạn chế khả năng tiếp cận các công cụ như vậy.
+Giao diện webUI của ForgeAI minh họa cách tối ưu hóa có thể giúp các mô hình AI cục bộ dễ tiếp cận hơn với người dùng có phần cứng yếu hơn hoặc cũ hơn.
+ # 
+🔗 Liên kết:
+https://github.com/lllyasviel/stable-diffusion-webui-forge
+----------
+Các nhà phát triển tiếp tục phát triển TabbyAI, một trợ lý AI mã nguồn mở, chạy cục bộ dành cho lập trình.
+Dự án tự định vị mình như một giải pháp thay thế tự lưu trữ cho GitHub Copilot, mà không cần đến các dịch vụ đám mây.
+ # 
+🧠 Ý chính là:
+TabbyAI hoạt động cục bộ và cung cấp các công cụ tự động hoàn thành mã thông qua cơ sở hạ tầng của người dùng.
+Hệ thống không yêu cầu điện toán đám mây bên ngoài hoặc hệ thống quản lý cơ sở dữ liệu riêng biệt và có thể hoạt động hoàn toàn tự động.
+ # 
+📊 Tính năng:
+Hỗ trợ khởi chạy cục bộ tự lưu trữ.
+Không cần cơ sở hạ tầng đám mây hoặc cơ sở dữ liệu riêng biệt.
+Có giao diện OpenAPI để tích hợp với các IDE và dịch vụ nội bộ.
+Hỗ trợ làm việc với các IDE trên đám mây.
+Hệ thống có thể chạy trên GPU tầm trung.
+Dự án được phân phối dưới dạng giải pháp mã nguồn mở.
+ # 
+⚙️ Thông tin chi tiết bổ sung:
+TabbyAI hướng đến các công ty và nhà phát triển coi trọng quyền kiểm soát mã nguồn và cơ sở hạ tầng của họ.
+Việc triển khai cục bộ giúp loại bỏ nhu cầu chia sẻ mã nguồn với các nền tảng AI của bên thứ ba.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Thị trường công cụ lập trình AI đang dần chuyển sang các giải pháp tự lưu trữ và cơ sở hạ tầng riêng.
+Những dự án như vậy cho phép sử dụng lập trình AI mà không cần phụ thuộc vào các nhà cung cấp dịch vụ đám mây lớn.
+ # 
+🔗 Liên kết:
+https://github.com/TabbyML/tabby
+----------
+TerifAI, một dịch vụ sao chép giọng nói bằng trí tuệ nhân tạo, đã chính thức ra mắt.
+Nền tảng này cho phép người dùng tạo ra bản sao kỹ thuật số giọng nói của mình thông qua một đoạn hội thoại ngắn với bot.
+ # 
+🧠 Ý chính là:
+Người dùng trả lời câu hỏi thông qua micro, sau đó mạng lưới thần kinh sẽ phân tích âm sắc, ngữ điệu và cách nói.
+Hệ thống cố gắng tái tạo không chỉ giọng nói của người dùng mà còn cả phong cách giao tiếp của họ.
+ # 
+📊 Tính năng:
+Ứng dụng hỗ trợ sao chép giọng nói nhanh chóng. Trí tuệ
+nhân tạo (AI) phân tích âm sắc và đặc điểm giọng nói.
+Dịch vụ sao chép cách giao tiếp của người dùng.
+Bạn có thể kiểm tra kết quả ngay lập tức dưới dạng hội thoại.
+Nền tảng hoạt động thông qua giao diện web.
+ # 
+⚙️ Thông tin chi tiết bổ sung:
+TerifAI thuộc phân khúc dịch vụ sao chép giọng nói bằng trí tuệ nhân tạo đang phát triển.
+Các công nghệ tương tự đang ngày càng được sử dụng cho hình đại diện kỹ thuật số, trợ lý AI, lồng tiếng và nội dung cá nhân hóa.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Công nghệ sao chép giọng nói đang ngày càng trở nên nhanh chóng và dễ tiếp cận hơn với đại chúng.
+Sự phát triển của các hệ thống này đang thúc đẩy sự xuất hiện của các avatar AI cá nhân và các hình thức tương tác người-AI mới.
+ # 
+🔗 Liên kết:
+https://www.terif.ai/
+------
+AntAngelMed, một mô hình ngôn ngữ y tế mã nguồn mở với kích thước mã 103B-6A, đã được ra mắt tại Trung Quốc.
+Sản phẩm này được phát triển bởi sự hợp tác giữa Trung tâm Thông tin Y tế tỉnh Chiết Giang, Ant Healthcare và Công ty Công nghệ Trí tuệ Nhân tạo Y tế Anzhen'er tỉnh Chiết Giang.
+ # 
+🧠 Ý chính là:
+AntAngelMed được định vị là hệ thống quản lý học tập pháp lý (LLM) y tế mã nguồn mở lớn nhất và mạnh mẽ nhất hiện có.
+Mô hình này tập trung vào các tình huống y tế, xử lý các yêu cầu chuyên nghiệp và làm việc với dữ liệu chăm sóc sức khỏe.
+ # 
+📊 Chi tiết:
+Kích thước mô hình là 103B-6A.
+Giao diện trò chuyện, API và kho lưu trữ mã nguồn mở đều có sẵn.
+Mô hình được công bố trên Hugging Face.
+Các phiên bản GGUF có sẵn để chạy cục bộ.
+Dự án cho thấy kết quả cao trong các bài kiểm tra hiệu năng AI y tế.
+ # 
+📊 Kết quả xét nghiệm:
+AntAngelMed đã giành vị trí đầu tiên trong bảng xếp hạng đánh giá năng lực y tế MedAIBench của Trung Quốc.
+Các nhà phát triển cũng tuyên bố rằng mô hình này vượt trội hơn so với các mô hình mã nguồn mở và một số hệ thống độc quyền trong bảng xếp hạng HealthBench của OpenAI.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các mô hình AI y tế đang trở thành một trong những lĩnh vực phát triển nhanh nhất của ngành công nghiệp AI.
+Sự xuất hiện của các mô hình chăm sóc sức khỏe mã nguồn mở mạnh mẽ có thể thúc đẩy sự phát triển của các công cụ AI cho y học, nghiên cứu và thực hành lâm sàng.
+ # 
+🔗 Liên kết:
+https://antangelmed.tbox.cn/chat
+https://huggingface.co/MedAIBase/AntAngelMed
+https://huggingface.co/mradermacher/AntAngelMed-GGUF
+https://github.com/MedAIBase/AntAngelMed
+--------
+Huobao Drama, một nền tảng trí tuệ nhân tạo (AI) tự động tạo ra các phim ngắn và video, đã được đưa vào sử dụng rộng rãi.
+Dự án này cho phép tạo ra video gần như không cần sự can thiệp của con người, từ khâu viết kịch bản đến khâu chỉnh sửa cuối cùng.
+ # 
+🧠 Ý chính là:
+Người dùng tải lên kịch bản, sau đó hệ thống tự động tạo ra các nhân vật, cảnh quay, bảng phân cảnh và video cuối cùng.
+Nền tảng này sử dụng các tác nhân AI và mô hình tạo sinh để tự động hóa hoàn toàn quy trình sản xuất.
+ # 
+📊 Những gì nó có thể làm:
+Tự động tạo video dựa trên kịch bản
+; Tạo nhân vật và cảnh quay bằng trí tuệ nhân tạo (AI)
+; Tạo bảng phân cảnh và chỉnh sửa
+; Sử dụng các tác nhân AI cho quy trình sản xuất;
+Hoạt động như một dây chuyền sản xuất phim ngắn hoàn chỉnh.
+ # 
+📊 Thông tin kỹ thuật:
+Dự án được viết bằng TypeScript.
+Giao diện người dùng (frontend) được xây dựng trên Nuxt 3 và Vue 3.
+Phần máy chủ (backend) sử dụng Hono, Drizzle ORM và Mastra AI Agents.
+SQLite được sử dụng để lưu trữ dữ liệu.
+Kho lưu trữ được công bố trên GitHub với mã nguồn mở.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí tuệ nhân tạo (AI) ngày càng tự động hóa quá trình sản xuất nội dung video và dần thay thế một số giai đoạn của quy trình sản xuất truyền thống.
+Những nền tảng như vậy có thể làm thay đổi đáng kể thị trường nội dung ngắn và giảm bớt nhu cầu về các đội ngũ sản xuất lớn.
+ # 
+🔗 Liên kết:
+https://github.com/chatfire-AI/huobao-drama
+-------
+Hugging Face đã cho ra mắt Sulphur-2, một mô hình mã nguồn mở để tạo video mà không có các hạn chế nội dung tích hợp sẵn.
+Hệ thống này hỗ trợ tạo video từ văn bản và hình ảnh.
+ # 
+🧠 Ý chính là:
+Sulphur-2 có thể chạy cục bộ, không cần máy chủ đám mây hoặc truyền dữ liệu đến các dịch vụ của bên thứ ba.
+Mô hình này tích hợp với ComfyUI và được thiết kế dành cho người dùng cần kiểm soát hoàn toàn quá trình tạo video.
+ # 
+📊 Những gì nó có thể làm:
+Tạo video dựa trên truy vấn văn bản;
+Làm việc với hình ảnh đã tải lên
+; Chạy cục bộ trên phần cứng của riêng bạn
+; Tích hợp với ComfyUI;
+Tạo video mà không cần xử lý dữ liệu đám mây.
+ # 
+📊 Thông tin chi tiết bổ sung:
+Mô hình này được phát hành miễn phí trên Hugging Face.
+Các nhà phát triển khẳng định chất lượng tạo ra mô hình này ngang tầm với các mô hình video hàng đầu hiện nay.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí tuệ nhân tạo video mã nguồn mở tiếp tục phát triển nhanh chóng và đang dần trở thành một lựa chọn thay thế cho các nền tảng tạo nội dung khép kín.
+Các mô hình cục bộ cung cấp cho người dùng nhiều quyền kiểm soát hơn đối với nội dung, quyền riêng tư và quy trình tạo video.
+ # 
+🔗 Liên kết:
+https://huggingface.co/SulphurAI/Sulphur-2-base
+-----
+Dự án mã nguồn mở AgentMemory, cho phép các tác nhân AI duy trì ngữ cảnh giữa các lần chạy, đang ngày càng phổ biến trong cộng đồng nhà phát triển.
+
+Giải pháp này loại bỏ sự cần thiết phải giải thích lại cấu trúc dự án, các hành động trước đó và các nhiệm vụ hiện tại cho tác nhân sau mỗi phiên làm việc mới.
+ # 
+🧠 Ý chính là:
+AgentMemory lưu trữ lịch sử tương tác và chuyển đổi dữ liệu tích lũy thành các "bộ nhớ" nhỏ gọn có thể được truy xuất nhanh chóng khi cần.
+
+Điều này cho phép tác nhân truy cập kiến ​​thức dự án, các quyết định trước đó và các thay đổi, ngay cả khi đã có một khoảng thời gian đáng kể trôi qua giữa các phiên làm việc.
+ # 
+📊 Đặc điểm dự án:
+Plugin này bảo lưu ngữ cảnh và lịch sử làm việc giữa các phiên.
+
+Hệ thống tự động nén dữ liệu cũ và tạo bộ nhớ dài hạn.
+
+Các tác nhân có thể ghi nhớ nhiệm vụ, quyết định và thay đổi dự án.
+
+Claude Code, Codex, Cursor và các công cụ AI khác được hỗ trợ.
+
+Việc sử dụng bộ nhớ giúp giảm lượng ngữ cảnh được truyền lại và có khả năng giảm mức tiêu thụ token.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Một trong những hạn chế chính của các tác nhân AI hiện đại vẫn là việc mất ngữ cảnh giữa các lần khởi chạy.
+
+Những giải pháp như vậy giúp hệ thống tác nhân tiến gần hơn đến hoạt động tự chủ, cho phép chúng giữ lại kinh nghiệm tích lũy và tham gia hiệu quả hơn vào các dự án dài hạn mà không cần liên tục lặp lại các chỉ dẫn.
+ # 
+🔗 Liên kết:
+[https://github.com/rohitg00/agentmemory ( https://github.com/rohitg00/agentmemory[/url )]
+-------
+SkillsGate, một nền tảng quản lý kỹ năng của tác nhân AI thông qua một giao diện duy nhất, đã xuất hiện trên GitHub.
+
+Các nhà phát triển cung cấp một danh mục kỹ năng với trình quản lý trực quan, chức năng tìm kiếm và cài đặt tập trung.
+ # 
+🧠 Ý chính là:
+SkillsGate hoạt động như một kho lưu trữ và quản lý kỹ năng cho hệ thống agent.
+
+Người dùng có thể tìm thấy các kỹ năng cần thiết, cài đặt chúng thông qua giao diện và quản lý chúng cả trên máy tính để bàn lẫn thiết bị đầu cuối.
+ # 
+📊 Tính năng:
+Dự án bao gồm một trình quản lý kỹ năng trực quan dành cho các tác nhân AI.
+
+Cả giao diện đồ họa và giao diện dòng lệnh đều được hỗ trợ. Dự
+
+án tuyên bố hỗ trợ hơn 20 loại hệ thống tác nhân khác nhau.
+
+Danh mục chứa hơn 91.000 kỹ năng.
+
+Thư viện kỹ năng có thể được tìm kiếm và cài đặt trực tiếp từ giao diện.
+
+Dự án hỗ trợ cả thư viện kỹ năng cục bộ và từ xa.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi số lượng tác nhân AI tăng lên, việc quản lý các kỹ năng và công cụ mà chúng sử dụng trở nên phức tạp hơn.
+
+Các nền tảng như SkillsGate có thể đơn giản hóa việc phân phối, tìm kiếm và triển khai khả năng của tác nhân, giảm thời gian dành cho việc cấu hình thủ công và học từng kho lưu trữ riêng lẻ.
+ # 
+🔗 Liên kết:
+https://github.com/skillsgate/skillsgate
+-------
+Deja Vu hoạt động như một lớp bộ nhớ trung gian giữa người dùng và các công cụ AI.
+
+Hệ thống lưu trữ kiến ​​thức cục bộ và cho phép nhiều ứng dụng truy cập cùng một cơ sở bộ nhớ, đảm bảo ngữ cảnh không bị mất khi chuyển đổi giữa các công cụ.
+ # 
+📊 Tính năng:
+Bộ nhớ được lưu trữ cục bộ trong SQLite.
+
+Không yêu cầu dịch vụ đám mây và đăng ký tài khoản.
+
+Hỗ trợ Python SDK, CLI, REST API và MCP.
+
+Các ứng dụng khác nhau có thể truy cập vào cơ sở dữ liệu bộ nhớ dùng chung.
+
+LLM chỉ được sử dụng để tìm kiếm và truy xuất thông tin liên quan từ bộ nhớ.
+
+Quá trình xử lý chính được thực hiện cục bộ trên thiết bị của người dùng.
+
+Kiến trúc được xây dựng dựa trên nguyên tắc một lớp bộ nhớ duy nhất cho nhiều công cụ AI.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Một trong những vấn đề chính của các công cụ AI hiện đại vẫn là sự mất mát ngữ cảnh giữa các cuộc trò chuyện, tác nhân và ứng dụng.
+
+Deja Vu cung cấp một phương pháp cục bộ cho bộ nhớ dài hạn, cho phép tạo ra một kho kiến ​​thức thống nhất có thể truy cập được bởi nhiều hệ thống AI mà không cần truyền dữ liệu lên đám mây.
+ # 
+🔗 Liên kết:
+https://github.com/JSingletonAI/dejavu
+----
+Plain App là một ứng dụng mã nguồn mở cung cấp quyền truy cập vào các chức năng của điện thoại thông minh thông qua giao diện web.
+
+Người dùng có thể quản lý thiết bị từ máy tính, truy cập các tập tin, tin nhắn, danh bạ và dữ liệu khác trực tiếp từ trình duyệt.
+ # 
+🧠 Ý chính là:
+Ứng dụng này tạo ra một giao diện quản lý điện thoại cục bộ mà không cần sử dụng các nền tảng đám mây của bên thứ ba.
+
+Tất cả dữ liệu vẫn nằm trên thiết bị của người dùng và tương tác diễn ra trực tiếp giữa điện thoại thông minh và trình duyệt.
+ # 
+📊 Tính năng:
+Bạn có thể xem và quản lý các tệp trên điện thoại thông minh của mình.
+
+Bạn có thể làm việc với ảnh, video và các nội dung đa phương tiện khác.
+
+Bạn có thể xem và quản lý danh bạ thông qua trình duyệt.
+
+Ứng dụng hỗ trợ nhắn tin SMS.
+
+Bạn có thể xem lịch sử cuộc gọi và quản lý cuộc gọi.
+
+Chức năng phản chiếu màn hình cũng có sẵn.
+
+Trình đọc RSS và trình phát đa phương tiện được tích hợp sẵn.
+
+Ứng dụng hỗ trợ nhiều ngôn ngữ giao diện.
+
+Bạn có thể tùy chỉnh giao diện.
+ # 
+📊 Thông tin kỹ thuật:
+Ứng dụng được phát triển bằng Kotlin
+
+và là mã nguồn mở.
+
+Kiến trúc của nó không yêu cầu dịch vụ đám mây hoặc lưu trữ dữ liệu của bên thứ ba.
+
+Trọng tâm chính là bảo mật thông tin và lưu trữ cục bộ.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Nhiều công cụ truy cập từ xa bằng điện thoại thông minh dựa vào nền tảng đám mây để quản lý thông tin người dùng.
+
+Plain App cung cấp một phương pháp thay thế, cho phép bạn quản lý thiết bị của mình thông qua trình duyệt và duy trì toàn quyền kiểm soát dữ liệu mà không cần chia sẻ với các dịch vụ của bên thứ ba.
+ # 
+🔗 Liên kết:
+https://github.com/plainhub/plain-app
+-------
+Dự án mobai-mcp, một máy chủ MCP để tự động hóa các thiết bị di động sử dụng trợ lý AI, đã được công bố trên GitHub.
+
+Giải pháp này cho phép kết nối điện thoại thông minh và trình giả lập với các tác nhân hỗ trợ Giao thức Ngữ cảnh Mô hình (MCP).
+ # 
+🧠 Ý chính là:
+MobAI MCP đóng vai trò trung gian giữa trợ lý AI và thiết bị di động.
+
+MCP cho phép trợ lý tương tác với giao diện điện thoại thông minh, khởi tạo các hành động, làm việc với các ứng dụng và thực hiện các kịch bản tự động mà không cần sự can thiệp trực tiếp của người dùng.
+ # 
+📊 Tính năng:
+Hỗ trợ tích hợp với trợ lý AI sử dụng MCP.
+
+Có thể tự động hóa các ứng dụng và kịch bản người dùng trên thiết bị di động.
+
+Hỗ trợ cả Android và iOS.
+
+Có thể sử dụng thiết bị thực, trình giả lập và mô phỏng.
+
+Các tác nhân AI có thể thực thi lệnh và tương tác với các phần tử giao diện.
+
+Thích hợp cho việc kiểm thử ứng dụng, tự động hóa các tác vụ thường ngày và các kịch bản dựa trên tác nhân.
+ # 
+📊 Thông tin kỹ thuật:
+Dự án được phát triển bằng TypeScript
+
+và sử dụng Giao thức Ngữ cảnh Mô hình (Model Context Protocol) để tương tác với các hệ thống AI.
+
+Kiến trúc tập trung vào việc tích hợp các thiết bị di động vào hệ sinh thái dựa trên tác nhân.
+
+Dự án là mã nguồn mở.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi các tác nhân AI phát triển, nhu cầu về các công cụ cho phép chúng tương tác không chỉ với máy tính mà còn với thiết bị di động cũng tăng lên.
+
+MobAI MCP mở rộng khả năng của hệ thống tác nhân, mở đường cho việc tự động hóa các tác vụ trên điện thoại thông minh và tạo ra các trợ lý kỹ thuật số đa năng hơn.
+ # 
+🔗 Liên kết:
+https://github.com/MobAI-App/mobai-mcp
+--------
+SadTalker vẫn là một trong những dự án mã nguồn mở phổ biến nhất để tạo ra các avatar biết nói bằng trí tuệ nhân tạo.
+
+Công cụ này cho phép bạn tạo ra các video chân thực từ một bức ảnh và bản ghi âm duy nhất mà không cần đến các hệ thống ghi hình chuyển động phức tạp.
+ # 
+🧠 Ý chính là:
+Người dùng tải lên hình ảnh khuôn mặt và đoạn âm thanh, sau đó mạng lưới thần kinh sẽ đồng bộ hóa chuyển động môi với lời nói.
+
+Hệ thống cũng tạo ra các biểu cảm khuôn mặt, nháy mắt và chuyển động đầu, giúp kết quả trở nên tự nhiên và chân thực hơn.
+ # 
+📊 Tính năng:
+Chỉ cần một hình ảnh và một tệp âm thanh là đủ để tạo video.
+
+Hỗ trợ đồng bộ hóa môi với giọng nói chính xác.
+
+Tạo ra các biểu cảm khuôn mặt và chuyển động đầu tự nhiên.
+
+Tốc độ chớp mắt có thể điều chỉnh.
+
+Có nhiều kiểu hoạt ảnh đầu khác nhau.
+
+Hỗ trợ nhiều ngôn ngữ và loại lồng tiếng.
+
+Dự án là mã nguồn mở và được viết bằng Python.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các công nghệ tạo hình đại diện kỹ thuật số đang ngày càng phổ biến trong giáo dục, tiếp thị, bản địa hóa nội dung và phát triển trợ lý ảo.
+
+Các giải pháp mã nguồn mở như SadTalker cho phép tạo ra các nhân vật biết nói chân thực mà không cần thiết bị đắt tiền hoặc các công cụ chuyên dụng trong studio.
+ # 
+🔗 Liên kết:
+https://github.com/OpenTalker/SadTalker
+-----
+Dự án Unbrowse, một công cụ tương tác với các trang web mà không cần sử dụng các trình duyệt tự động truyền thống, đã xuất hiện trên GitHub.
+
+Các nhà phát triển tuyên bố phương pháp này cho phép thực hiện các tác vụ nhanh hơn và tiết kiệm chi phí hơn đáng kể so với các trình duyệt truyền thống.
+ # 
+🧠 Ý chính là:
+Unbrowse trước tiên phân tích cách người dùng tương tác với một trang web thông qua trình duyệt thông thường.
+
+Sau đó, hệ thống chuyển đổi các hành động lặp đi lặp lại thành các lệnh gọi API trực tiếp và các kỹ năng có thể tái sử dụng mà tác nhân có thể thực thi mà không cần liên tục quản lý trình duyệt.
+ # 
+📊 Tính năng:
+Nền tảng này hỗ trợ làm việc với hầu hết mọi trang web.
+
+Các thao tác lặp đi lặp lại được chuyển đổi thành các kỹ năng sẵn có cho các tác nhân AI.
+
+Tự động hóa trình duyệt được thay thế bằng các lệnh gọi trực tiếp đến giao diện nội bộ của trang web.
+
+Tốc độ thực thi tác vụ được cho là nhanh hơn tới 100 lần so với các tác nhân trình duyệt truyền thống.
+
+Các nhà phát triển báo cáo giảm chi phí thực thi tác vụ lên đến 80%.
+
+Nền tảng hỗ trợ tích hợp thông qua Giao thức Ngữ cảnh Mô hình (Model Context Protocol).
+
+Việc làm việc với Claude Code và các nền tảng tương thích MCP khác cũng khả thi.
+ # 
+📊 Thông số kỹ thuật:
+Dự án này là mã nguồn mở.
+
+Giao thức MCP đóng vai trò là nền tảng cho việc tích hợp.
+
+Nó hỗ trợ việc tạo và tái sử dụng các kỹ năng của tác nhân để tự động hóa các tác vụ web.
+
+Trọng tâm chính là giảm thiểu các thao tác trên trình duyệt và tăng tốc độ thực thi kịch bản.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Hầu hết các tác nhân AI hiện đại hoạt động thông qua tự động hóa dựa trên trình duyệt, điều này đòi hỏi tài nguyên máy tính đáng kể và thường chậm.
+
+Unbrowse cung cấp một cách tiếp cận thay thế, trong đó các tác nhân được huấn luyện để tương tác trực tiếp với các dịch vụ web, có khả năng cho phép các hệ thống tự động hóa nhanh hơn và hiệu quả hơn.
+ # 
+🔗 Liên kết:
+https://github.com/unbrowse-ai/unbrowse
+----------
+Dự án X-Voice, một mạng lưới thần kinh dùng để sao chép giọng nói và tổng hợp giọng nói đa ngôn ngữ, đã được công khai mã nguồn.
+
+Hệ thống này cho phép người dùng sử dụng một đoạn giọng nói ngắn để tạo ra các bản lồng tiếng bằng nhiều ngôn ngữ khác nhau trong khi vẫn giữ được đặc điểm giọng nói gốc của người nói.
+ # 
+🧠 Ý chính là:
+Người dùng tải lên một đoạn hội thoại ngắn, sau đó mạng nơ-ron sẽ phân tích âm sắc, ngữ điệu và đặc điểm phát âm.
+
+Mô hình sau đó sẽ tạo ra giọng nói mới dựa trên văn bản đã cho, giữ nguyên các đặc điểm của giọng nói gốc ngay cả khi thay đổi ngôn ngữ âm thanh.
+ # 
+📊 Tính năng:
+Chỉ cần một đoạn ghi âm ngắn là đủ để nhân bản giọng nói.
+
+Phần mềm hỗ trợ tổng hợp giọng nói hơn 30 ngôn ngữ.
+
+Cùng một giọng nói có thể được sử dụng cho lồng tiếng đa ngôn ngữ.
+
+Âm sắc, ngữ điệu và cách nói của người nói gốc được giữ nguyên.
+
+Tiếng Nga được hỗ trợ.
+
+Việc nhân bản giọng nói có thể thực hiện mà không cần ghi âm riêng cho từng ngôn ngữ.
+
+Dự án là mã nguồn mở.
+
+Có thể xem bản demo trực tuyến trên Hugging Face.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Công nghệ sao chép giọng nói đa ngôn ngữ được coi là một trong những công nghệ được yêu cầu nhiều nhất trong lĩnh vực bản địa hóa nội dung, lồng tiếng, tạo hình đại diện kỹ thuật số và trợ lý giọng nói.
+
+Các giải pháp mã nguồn mở như X-Voice giúp các nhà phát triển và người tạo nội dung dễ dàng tiếp cận hơn với các khả năng này, cho phép lồng tiếng bằng nhiều ngôn ngữ mà vẫn giữ được giọng nói dễ nhận biết.
+ # 
+🔗 Liên kết:
+https://github.com/sunnyxrxrx/X-Voice
+
+https://huggingface.co/spaces/chenxie95/X-Voice
+---------
+AI Quant Researcher, một nền tảng mã nguồn mở để tự động hóa nghiên cứu tài chính định lượng, đã được công bố trên GitHub.
+
+Hệ thống này sử dụng các tác nhân AI để tìm kiếm ý tưởng đầu tư, phân tích dữ liệu và tạo ra các báo cáo nghiên cứu.
+ # 
+🧠 Ý chính là:
+Dự án này tạo ra một môi trường dựa trên tác nhân, trong đó nhiều thành phần trí tuệ nhân tạo (AI) có thể hợp tác để phân tích thị trường, xử lý dữ liệu tài chính và đưa ra kết luận để thử nghiệm chiến lược tiếp theo.
+
+Mục tiêu chính là đẩy nhanh công việc nghiên cứu của các nhà phân tích và nhà phát triển hệ thống giao dịch thuật toán.
+ # 
+📊 Tính năng:
+Dự án hỗ trợ tự động hóa nghiên cứu tài chính.
+
+Các tác nhân AI có thể phân tích dữ liệu thị trường và xác định các mô hình.
+
+Có thể tạo ra các báo cáo nghiên cứu và tóm tắt phân tích.
+
+Các chiến lược định lượng được hỗ trợ.
+
+Có thể tích hợp với nhiều mô hình và nguồn dữ liệu khác nhau.
+
+Dự án là mã nguồn mở.
+
+Kiến trúc tập trung vào phương pháp dựa trên tác nhân để phân tích thị trường tài chính.
+ # 
+📊 Thông số kỹ thuật:
+Dự án được xây dựng dựa trên sự tương tác của nhiều tác nhân AI.
+
+Trọng tâm chính là tự động hóa các giai đoạn nghiên cứu và hình thành giả thuyết.
+
+Chức năng có thể được mở rộng bằng cách kết nối thêm các công cụ và nguồn dữ liệu.
+
+Nền tảng này được thiết kế để triển khai cục bộ và có thể tùy chỉnh thêm để phù hợp với các nhu cầu cụ thể.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Phân tích tài chính vẫn là lĩnh vực đòi hỏi lượng thời gian đáng kể để thu thập dữ liệu, kiểm tra giả thuyết và lập báo cáo.
+
+Sự xuất hiện của các nền tảng dựa trên tác nhân như AI Quant Researcher cho thấy trí tuệ nhân tạo đang bắt đầu tự động hóa không chỉ lập trình mà còn cả các quy trình nghiên cứu phức tạp trong lĩnh vực tài chính và giao dịch thuật toán.
+ # 
+🔗 Liên kết:
+https://github.com/zostaff/ai-quant-researcher
+-------
+Các tùy chọn của người dùng được lưu lại.
+
+Hệ thống có thể xem xét các lựa chọn trước đó khi tạo ra các đề xuất.
+
+Có sẵn tính năng cá nhân hóa phản hồi và các kịch bản tương tác.
+
+Hỗ trợ tích hợp vào hệ thống của các tác nhân.
+
+Kỹ năng này có thể được sử dụng để đề xuất nội dung, sản phẩm và dịch vụ.
+
+Dự án là mã nguồn mở và
+
+có thể được mở rộng để phù hợp với các trường hợp sử dụng của riêng bạn.
+ # 
+📊 Có thể sử dụng ở đâu:
+Trong các trợ lý AI cá nhân.
+
+Trong các hệ thống đề xuất.
+
+Trong các nền tảng tác nhân có bộ nhớ dài hạn.
+
+Trong các hệ thống cá nhân hóa nội dung.
+
+Trong các dịch vụ đề xuất sản phẩm, phim, nhạc và các dịch vụ khác.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Một trong những thách thức chính đối với các tác nhân AI hiện đại là duy trì ngữ cảnh và hiểu sở thích của người dùng theo thời gian.
+
+Các công cụ như Taste Skill giúp tạo ra các hệ thống tác nhân cá nhân hóa hơn, có thể hiểu rõ hơn sở thích của một người và dần dần thích ứng với nhu cầu của họ.
+ # 
+🔗 Liên kết:
+https://github.com/Leonxlnx/taste-skill
+-----
+Salesforce đã công bố dự án SF Skills trên GitHub – một khung phần mềm mã nguồn mở để tạo, quản lý và tích hợp các kỹ năng cho các tác nhân AI.
+
+Dự án này được thiết kế để đơn giản hóa việc phát triển các hệ thống tác nhân và mở rộng khả năng của chúng thông qua các thành phần có thể tái sử dụng.
+ # 
+🧠 Ý chính là:
+SF Skills cho phép đóng gói các hành động và quy trình kinh doanh riêng lẻ thành các kỹ năng mà các tác nhân AI có thể sử dụng trong quá trình thực thi nhiệm vụ.
+
+Cách tiếp cận này giúp hệ thống tác nhân trở nên linh hoạt hơn và đơn giản hóa việc tái sử dụng logic hiện có giữa các dự án.
+ # 
+📊 Tính năng:
+Hệ thống hỗ trợ các kỹ năng tùy chỉnh cho tác nhân AI.
+
+Có sẵn các thành phần có thể tái sử dụng.
+
+Các kỹ năng có thể được kết hợp để xây dựng các quy trình làm việc phức tạp.
+
+Hỗ trợ tích hợp với nền tảng tác nhân Salesforce.
+
+Chức năng có thể được mở rộng cho các kịch bản doanh nghiệp.
+
+Dự án là mã nguồn mở.
+
+Kiến trúc tập trung vào phương pháp tiếp cận theo mô-đun trong phát triển hệ thống tác nhân.
+ # 
+📊 Sản phẩm này phù hợp với những mục đích nào:
+Để tự động hóa các quy trình kinh doanh.
+
+Để phát triển các trợ lý AI doanh nghiệp.
+
+Để tạo ra các kịch bản chuyên biệt dựa trên tác nhân.
+
+Để xây dựng các hệ thống với số lượng lớn các hành động và công cụ có thể tái sử dụng.
+
+Để tích hợp AI vào cơ sở hạ tầng Salesforce hiện có.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Thị trường đang dần chuyển từ các mô hình ngôn ngữ riêng lẻ sang các hệ sinh thái tác nhân hoàn chỉnh, nơi các công cụ, kỹ năng và quy trình làm việc tự động đóng vai trò quan trọng.
+
+Sự xuất hiện của các dự án mã nguồn mở như SF Skills cho thấy mong muốn của các công ty lớn trong việc chuẩn hóa quá trình phát triển hệ thống tác nhân và đẩy nhanh việc ứng dụng trí tuệ nhân tạo trong doanh nghiệp.
+ # 
+🔗 Liên kết:
+https://github.com/forcedotcom/sf-skills
+-------
+Nền tảng Transitions.dev, một bộ sưu tập các hiệu ứng hoạt hình và chuyển tiếp hiện đại dành cho giao diện, hiện đã được cung cấp miễn phí.
+
+Dịch vụ này cho phép bạn nhanh chóng xem trước các hiệu ứng có sẵn và sử dụng chúng trong các dự án web của riêng bạn.
+ # 
+🧠 Ý chính là:
+Transitions.dev đóng vai trò như một thư viện các hiệu ứng chuyển tiếp giao diện người dùng (UI) có sẵn, cho phép người dùng khám phá, thử nghiệm và tích hợp chúng vào giao diện mà không cần phải tạo ra các hoạt ảnh phức tạp từ đầu.
+
+Nền tảng này hướng đến các nhà thiết kế, nhà phát triển giao diện người dùng và các nhà phát triển làm việc trên các ứng dụng web hiện đại.
+ # 
+📊 Tính năng:
+Nền tảng này cung cấp một bộ sưu tập lớn các hiệu ứng chuyển tiếp giao diện người dùng (UI) có sẵn.
+
+Tất cả các hiệu ứng hoạt hình đều có thể được xem trước và kiểm tra trực tiếp trên trình duyệt.
+
+Nhanh chóng tích hợp các hiệu ứng vào dự án của riêng bạn.
+
+Bạn có thể khám phá việc triển khai nhiều loại hiệu ứng chuyển tiếp và hoạt hình khác nhau.
+
+Phù hợp cho các ứng dụng web, trang đích và giao diện tương tác.
+
+Có thể tích hợp với các kỹ năng của tác nhân AI.
+
+Nền tảng này giúp tăng tốc quá trình phát triển và tìm kiếm các giải pháp trực quan.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các hiệu ứng chuyển động và hoạt ảnh nhỏ chất lượng cao có tác động đáng kể đến trải nghiệm người dùng, nhưng việc tạo ra chúng thường đòi hỏi thêm thời gian và chuyên môn.
+
+Các thư viện như Transitions.dev cho phép bạn nhanh chóng tìm thấy các giải pháp có sẵn, cải thiện trải nghiệm người dùng và đẩy nhanh quá trình phát triển giao diện web hiện đại.
+ # 
+🔗 Liên kết:
+https://transitions.dev/
+--------
+Dự án Headroom, một công cụ để quản lý ngữ cảnh và bộ nhớ của các tác nhân AI, đã được công bố trên GitHub.
+
+Giải pháp này được thiết kế cho các phiên hoạt động dài hạn của tác nhân, nơi các mô hình dần mất đi thông tin quan trọng do những hạn chế của cửa sổ ngữ cảnh.
+ # 
+🧠 Ý chính là:
+Khi cuộc hội thoại kéo dài hoặc một tác vụ phức tạp được thực hiện, AI buộc phải loại bỏ một số ngữ cảnh trước đó.
+
+Headroom giúp các tác nhân giữ lại thông tin quan trọng nhất, tự động nén lịch sử tương tác và duy trì bộ nhớ dài hạn mà không cần liên tục tăng kích thước ngữ cảnh.
+ # 
+📊 Tính năng:
+Hỗ trợ quản lý bộ nhớ cho các tác nhân AI.
+
+Hệ thống giúp bảo toàn ngữ cảnh quan trọng trong các phiên làm việc dài.
+
+Có sẵn tính năng nén và cấu trúc lại lịch sử tự động.
+
+Nguy cơ mất dữ liệu quan trọng trong các cuộc hội thoại dài được giảm thiểu.
+
+Thích hợp cho các hệ thống dựa trên tác nhân, các nhiệm vụ nghiên cứu và quy trình làm việc phức tạp.
+
+Dự án là mã nguồn mở và
+
+có thể được sử dụng như một lớp bộ nhớ bổ sung trên các mô hình hiện có.
+ # 
+📊 Trường hợp có thể hữu ích:
+Trong các tác nhân AI tự động.
+
+Trong nghiên cứu chuyên sâu và các nghiên cứu nhiều bước.
+
+Trong các trợ lý cá nhân có bộ nhớ dài hạn.
+
+Trong các hệ thống tác nhân thực hiện nhiệm vụ trong nhiều giờ hoặc nhiều ngày.
+
+Trong các dự án với khối lượng lớn tài liệu và dữ liệu vận hành.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Những hạn chế của cửa sổ ngữ cảnh vẫn là một trong những thách thức chính đối với các hệ thống AI hiện đại.
+
+Các công cụ như Headroom giúp các tác nhân duy trì sự hiểu biết về nhiệm vụ và khả năng suy luận mạch lạc lâu hơn, điều này đặc biệt quan trọng đối với tự động hóa phức tạp và các dự án dài hạn.
+ # 
+🔗 Liên kết:
+https://github.com/chopratejas/headroom
+-------
+Dự án Awesome Claude Code Paper Proofreading đã xuất hiện trên GitHub—một bộ sưu tập các gợi ý và quy trình làm việc để kiểm tra các ấn phẩm khoa học bằng Claude Code.
+
+Kho lưu trữ này hướng đến các nhà nghiên cứu, sinh viên, giáo viên và tác giả của các bài báo khoa học.
+ # 
+🧠 Ý chính là:
+Dự án cung cấp các hướng dẫn được soạn thảo sẵn cho Claude Code, cho phép tự động hóa các giai đoạn khác nhau của quá trình xem xét và xác minh khoa học.
+
+Thay vì phải tự viết các truy vấn phức tạp, người dùng sẽ nhận được một bộ mẫu được tạo sẵn để phân tích chất lượng bài báo.
+ # 
+📊 Những gì nó có thể làm:
+Xem xét cấu trúc của các bài báo khoa học.
+
+Phân tích chất lượng lập luận và logic trình bày.
+
+Xác định các lỗi về văn phong và ngôn ngữ.
+
+Xem xét định dạng của tài liệu tham khảo và trích dẫn.
+
+Xác định các điểm không nhất quán và điểm yếu tiềm ẩn trong văn bản.
+
+Hỗ trợ chuẩn bị bài báo để xuất bản.
+
+Tự động hóa một số công việc của biên tập viên và người đánh giá khoa học.
+ # 
+📊 Ai sẽ được hưởng lợi từ điều này:
+Dành cho sinh viên đại học và sau đại học.
+
+Dành cho các nhà nghiên cứu và cán bộ giảng dạy.
+
+Dành cho giáo viên và người đánh giá.
+
+Dành cho các tác giả chuẩn bị tài liệu cho tạp chí và hội nghị.
+
+Dành cho người dùng Claude Code làm việc với các văn bản học thuật.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các mô hình ngôn ngữ hiện đại ngày càng được sử dụng rộng rãi không chỉ trong lập trình mà còn trong công việc khoa học.
+
+Những bộ sưu tập này giúp chuẩn hóa quy trình đánh giá bài báo và cho phép phản hồi nhanh chóng, chất lượng cao trước khi gửi bài để đánh giá chính thức.
+ # 
+🔗 Liên kết:
+https://github.com/LimHyungTae/awesome-claudecode-paper-proofreading
+------------
+Dự án Supermemory, một nền tảng bộ nhớ dành cho các ứng dụng trí tuệ nhân tạo và hệ thống dựa trên tác nhân, đã được công bố trên GitHub.
+
+Giải pháp này cho phép bảo toàn kiến ​​thức, ngữ cảnh và dữ liệu người dùng trong các tương tác riêng biệt với mô hình.
+ # 
+🧠 Ý chính là:
+Hầu hết các mô hình ngôn ngữ đều quên thông tin sau khi cuộc hội thoại kết thúc hoặc cửa sổ ngữ cảnh được đóng lại.
+
+Siêu bộ nhớ hoạt động như một bộ nhớ dài hạn bên ngoài, cho phép các tác nhân giữ lại thông tin quan trọng và sử dụng nó trong các nhiệm vụ tương lai.
+ # 
+📊 Tính năng:
+Hệ thống hỗ trợ lưu trữ kiến ​​thức và ngữ cảnh dài hạn.
+
+Các tác nhân có thể ghi nhớ thông tin giữa các phiên làm việc.
+
+Chức năng tìm kiếm dữ liệu đã lưu trước đó cũng được hỗ
+
+trợ. Hệ thống hỗ trợ làm việc với tài liệu, ghi chú và kiến ​​thức người dùng.
+
+Hệ thống có thể được sử dụng như một bộ nhớ cho trợ lý cá nhân.
+
+Nó phù hợp với các nền tảng tác nhân và hệ thống AI doanh nghiệp.
+
+Dự án này là mã nguồn mở.
+ # 
+📊 Có thể sử dụng ở đâu:
+Trong các trợ lý AI cá nhân.
+
+Trong các hệ thống tác nhân có bộ nhớ dài hạn.
+
+Trong các cơ sở tri thức doanh nghiệp.
+
+Trong các hệ thống nghiên cứu chuyên sâu.
+
+Trong các dự án yêu cầu tích lũy ngữ cảnh và sở thích của người dùng.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí nhớ dài hạn được coi là một trong những thách thức chính đối với các hệ thống AI hiện đại.
+
+Các công cụ như Supermemory cho phép các tác nhân tích lũy kiến ​​thức theo thời gian, hiểu người dùng tốt hơn và thực hiện các tác vụ đa bước phức tạp hơn mà không bị mất ngữ cảnh liên tục.
+ # 
+🔗 Liên kết:
+https://github.com/supermemoryai/supermemory
+---------
+Các nhà nghiên cứu tại Harvard đã phát hiện ra một hiệu ứng mới trong hành vi của các mô hình ngôn ngữ hiện đại.
+
+Khi số lượng ảo giác giảm đi, trí tuệ nhân tạo càng có xu hướng thể hiện sự tự tin thái quá vào câu trả lời của mình và càng ít thừa nhận sự không chắc chắn của bản thân.
+ # 
+🧠 Ý chính là:
+Trong khi các phiên bản chatbot đời đầu thường trả lời bằng "Tôi không biết" hoặc chỉ ra những hạn chế về kiến ​​thức của chúng, các mô hình hiện đại thường cố gắng duy trì logic nội tại của phản hồi ngay cả khi có lỗi.
+
+Kết quả là, AI có thể bỏ qua những sự thật bất tiện, điều chỉnh lập luận để phù hợp với quan điểm hiện có, hoặc đồng ý với người dùng thay vì phân tích tình huống một cách khách quan.
+ # 
+📊 Nghiên cứu đã chỉ ra điều gì:
+Theo nghiên cứu, trong khoảng 66% trường hợp, mô hình có khả năng bỏ sót thông tin quan trọng nếu sự hiện diện của thông tin đó làm suy yếu tính toàn vẹn của câu trả lời đã được hình thành.
+
+Hành vi này làm cho câu trả lời có vẻ thuyết phục hơn, nhưng không phải lúc nào cũng chính xác hơn về mặt thực tế.
+ # 
+💡 Cách để nhận được nhiều câu trả lời hữu ích hơn:
+Các nhà nghiên cứu khuyến nghị nên cung cấp thêm hướng dẫn cho mô hình ngay từ đầu cuộc đối thoại.
+
+Ví dụ:
+
+"Nếu bạn không chắc chắn, cứ nói thẳng. Nếu tôi sai, hãy sửa cho tôi và chỉ ra những điểm yếu trong lập luận của tôi. Đừng quá lời khen ngợi."
+
+Các tác giả nhận thấy rằng sau những hướng dẫn như vậy, các phản hồi trở nên mang tính phê phán, trực tiếp và hữu ích hơn cho việc phân tích.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Việc phát triển trí tuệ nhân tạo thường được đánh giá dựa trên mức độ giảm lỗi, nhưng một thông số quan trọng không kém là khả năng nhận biết sự không chắc chắn của chính mô hình.
+
+Đối với người dùng, rủi ro không chỉ nằm ở sự hiện diện của lỗi, mà còn ở việc hệ thống duy trì lỗi đó một cách thuyết phục đến mức nào. Do đó, tư duy phản biện và kiểm chứng thông tin vẫn rất cần thiết ngay cả đối với các mô hình tiên tiến nhất.
+ # 
+🔗 Liên kết:
+https://www.axios.com/2026/05/30/ai-accuracy-chatbots-hallucinations
+--------
+Dự án ứng dụng mã nguồn mở AI Text Humanizer đã xuất hiện trên GitHub.
+
+Ứng dụng này được thiết kế để xử lý các văn bản được tạo ra bởi mạng nơ-ron nhằm làm cho chúng trở nên tự nhiên hơn và giống với phong cách của một tác giả là con người.
+ # 
+🧠 Ý chính là:
+Dịch vụ này phân tích văn bản và tái cấu trúc nó trong khi vẫn giữ nguyên ý nghĩa và sự kiện ban đầu.
+
+Thuật toán sẽ chỉnh sửa lại cách diễn đạt, thêm các chuyển tiếp tự nhiên hơn giữa các ý tưởng và làm cho bài trình bày bớt rập khuôn hơn.
+ # 
+📊 Tính năng:
+Các nhà phát triển định vị công cụ này như một cách để cải thiện khả năng đọc hiểu của các văn bản do AI tạo ra.
+
+Sau khi xử lý, văn bản vẫn giữ nguyên nội dung cốt lõi nhưng trở nên gần gũi hơn với phong cách viết quen thuộc của con người.
+
+Dự án này là mã nguồn mở và được cung cấp cho mục đích nghiên cứu và phát triển độc lập.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi trí tuệ nhân tạo tạo sinh (generative AI) ngày càng phổ biến, nhiều người dùng đang tìm cách để làm cho các văn bản được tạo tự động trở nên tự nhiên hơn khi đọc.
+
+Những công cụ này thể hiện sự phát triển của lĩnh vực xử lý hậu kỳ nội dung được tạo ra bởi các mô hình ngôn ngữ.
+ # 
+🔗 Liên kết:
+https://github.com/DadaNanjesha/AI-Text-Humanizer-App
+------
+Microsoft đã công bố SkillOpt, một dự án mã nguồn mở được thiết kế để cải thiện hiệu suất của các tác nhân AI mà không cần huấn luyện lại mô hình.
+
+Công cụ này tự động phân tích các nhiệm vụ và tối ưu hóa kỹ năng của các tác nhân như Claude Code, Codex và các hệ thống tương tự khác.
+ # 
+🧠 Ý chính là:
+SkillOpt không sửa đổi mô hình và không yêu cầu cấu hình phức tạp.
+
+Hệ thống tự động phân tích hành vi của tác nhân, cải thiện hướng dẫn, điều chỉnh phương pháp giải quyết vấn đề và giúp đạt được kết quả chất lượng cao hơn.
+ # 
+📊 Kết quả xét nghiệm cho thấy:
+Theo Microsoft, SkillOpt đã chứng minh hiệu suất được cải thiện trong tất cả 52 bài kiểm tra đã thực hiện.
+
+Công ty báo cáo rằng sau khi tối ưu hóa, các tác nhân hoạt động tốt hơn trong nhiều nhiệm vụ khác nhau, bao gồm lập trình và xử lý văn bản.
+
+Ví dụ, Microsoft ghi nhận sự gia tăng đáng kể về chất lượng phản hồi và mã hóa đối với GPT-5.5.
+ # 
+⚙️ Những nội dung khác được trình bày:
+Cùng với SkillOpt, công ty đã phát hành AI Engineer Coach.
+
+Công cụ này được định vị là trợ lý AI dành cho các nhà phát triển, giúp cải thiện quy trình làm việc và chất lượng công việc kỹ thuật.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi các tác nhân AI trở nên phổ biến hơn, người ta không chỉ chú trọng đến chất lượng của các mô hình mà còn cả các phương pháp để cải thiện hiệu suất của chúng.
+
+Các hệ thống như vậy cho phép đạt được kết quả tốt hơn mà không cần đào tạo lại tốn kém, giúp các tác nhân trở nên hữu ích hơn cho các nhiệm vụ thực tế.
+ # 
+🔗 Liên kết:
+https://huggingface.co/papers/2605.23904
+--------
+Nhóm tinyfish-io đã công khai mã nguồn dự án BigSet.
+
+Công cụ này được thiết kế để lưu trữ, tìm kiếm và xử lý khối lượng lớn dữ liệu được sử dụng bởi các tác nhân AI và các hệ thống dựa trên mô hình ngôn ngữ.
+ # 
+🧠 Ý chính là:
+Khi khối lượng tài liệu và dữ liệu ngày càng tăng, các phương pháp truy xuất thông tin truyền thống trở nên ngày càng chậm và phức tạp.
+
+BigSet cung cấp cơ sở hạ tầng để tổ chức các tập dữ liệu lớn và truy cập chúng nhanh chóng cho các ứng dụng trí tuệ nhân tạo và hệ thống dựa trên tác nhân.
+ # 
+📊 Tính năng:
+Nền tảng này được thiết kế để làm việc với các bộ sưu tập tài liệu và kiến ​​thức lớn.
+
+Nó giúp lập chỉ mục và tìm kiếm dữ liệu, đồng thời cung cấp cho các tác nhân ngữ cảnh cần thiết để giải quyết vấn đề.
+
+Dự án này là mã nguồn mở và có thể được sử dụng làm nền tảng cho các cơ sở kiến ​​thức doanh nghiệp, hệ thống RAG và các nền tảng AI khác.
+ # 
+⚙️ Có thể sử dụng ở đâu:
+BigSet phù hợp để tạo ra các công cụ tìm kiếm nội bộ, trợ lý AI và các dịch vụ xử lý khối lượng lớn tài liệu.
+
+Công cụ này có thể được sử dụng trong các công ty, dự án nghiên cứu và các trường hợp khác mà việc nhanh chóng tìm kiếm thông tin cần thiết trong số hàng triệu hồ sơ là vô cùng quan trọng.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Chất lượng của các tác nhân AI hiện đại ngày càng phụ thuộc vào tốc độ và hiệu quả truy cập dữ liệu của chúng.
+
+Các công cụ quản lý tập dữ liệu lớn đang trở thành một phần thiết yếu của cơ sở hạ tầng hệ thống tác nhân và AI doanh nghiệp.
+ # 
+🔗 Liên kết:
+https://github.com/tinyfish-io/bigset
+-------
+Công ty phát triển phần mềm muvon đã ra mắt OctoMind, một nền tảng mã nguồn mở để vận hành và điều phối nhiều tác nhân AI.
+
+Dự án này cho phép tạo ra các nhóm tác nhân cộng tác trong việc giải quyết vấn đề và tương tác.
+ # 
+🧠 Ý chính là:
+OctoMind sử dụng phương pháp đa tác tử, với các tác tử khác nhau được giao vai trò và chuyên môn riêng.
+
+Thay vì một trợ lý duy nhất, đa năng, người dùng nhận được một hệ thống gồm nhiều trí tuệ nhân tạo có khả năng phân phối nhiệm vụ, chia sẻ kết quả và hoạt động song song.
+ # 
+📊 Tính năng:
+Nền tảng này hỗ trợ thực thi và quản lý đồng thời nhiều tác nhân cục bộ.
+
+Các tác nhân có thể cộng tác trong nghiên cứu, phân tích dữ liệu, viết mã và tự động hóa quy trình làm việc.
+
+Dự án cung cấp các công cụ để điều phối tương tác giữa các tác nhân và xây dựng các kịch bản tự động hóa phức tạp.
+ # 
+⚙️ Điều quan trọng:
+OctoMind là phần mềm mã nguồn mở và có thể được cài đặt trên máy tính cá nhân của bạn.
+
+Cách tiếp cận này cho phép bạn giữ quyền kiểm soát dữ liệu của mình và sử dụng các hệ thống dựa trên tác nhân mà không cần phụ thuộc vào dịch vụ đám mây.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Hệ thống đa tác tử đang trở thành một lĩnh vực trọng điểm trong phát triển trí tuệ nhân tạo.
+
+Thay vì một mô hình đơn lẻ, các nhóm tác tử chuyên biệt ngày càng được sử dụng rộng rãi, cùng nhau làm việc hiệu quả hơn để giải quyết các nhiệm vụ phức tạp đòi hỏi nhiều giai đoạn phân tích và ra quyết định.
+ # 
+🔗 Liên kết:
+https://github.com/muvon/octomind
+
+https://octomind.run/#installation
+--------
+Nền tảng YouMind vừa ra mắt các kỹ năng AI mới lấy cảm hứng từ phong cách của họa sĩ Ian Xiaohei.
+
+Những công cụ này cho phép bạn tạo ra các nhân vật và hình minh họa trong khi vẫn giữ được phong cách đặc trưng dễ nhận biết của họa sĩ.
+ # 
+🧠 Ý chính là:
+Thay vì phải tự chọn các câu lệnh dài dòng, người dùng có thể sử dụng các kỹ năng được xây dựng sẵn.
+
+Hệ thống tự động áp dụng một bộ cài đặt và kỹ thuật nghệ thuật đặc trưng trong tác phẩm của Ian Xiaohei.
+ # 
+📊 Những sản phẩm hiện có:
+Một kỹ năng được thiết kế để tạo ra những hình minh họa hoàn chỉnh theo phong cách đặc trưng của nghệ sĩ. Kỹ
+
+năng thứ hai được thiết kế để tạo ra các nhân vật trong khi vẫn giữ được những đặc điểm hình ảnh đặc trưng của tác phẩm của tác giả.
+
+Cả hai công cụ đều có sẵn trên nền tảng YouMind và có thể được sử dụng như các mẫu có sẵn để tạo hình ảnh.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các kỹ năng AI có sẵn giúp đơn giản hóa quá trình đạt được kết quả hình ảnh chất lượng cao mà không cần kiến ​​thức chuyên sâu về thiết kế công nghiệp.
+
+Các mẫu này giúp bạn nhanh chóng tái tạo các phong cách nghệ thuật cụ thể và tạo nội dung với kết quả dễ dự đoán hơn.
+ # 
+🔗 Liên kết:
+https://youmind.com/skills/ian-xiaohei-illustrations-jVXVOfzKk7IyAY
+
+https://youmind.com/en-US/skills/ian-xiaohei-style-character-M40Zx1sXoz1d6r
+--------
+Dự án mã nguồn mở GenLearn, sử dụng mô hình ngôn ngữ để tạo ra sách giáo khoa tương tác cá nhân hóa, đã được ra mắt.
+
+Hệ thống này tạo ra tài liệu theo thời gian thực dựa trên sở thích và câu hỏi của người dùng.
+ # 
+🧠 Ý chính là:
+Thay vì một khóa học tuyến tính, GenLearn tạo ra một cấu trúc kiến ​​thức dạng cây.
+
+Người dùng có thể khám phá một chủ đề, điều hướng đến các chủ đề phụ, quay lại các cấp độ trước đó và tạo các nhánh nghiên cứu mới tại bất kỳ điểm nào trong cây.
+ # 
+📊 Cách thức hoạt động:
+Ứng dụng tạo ra các bài học bằng cách sử dụng API của Gemini và lưu trữ chúng trong cơ sở dữ liệu PostgreSQL cục bộ.
+
+Mỗi chủ đề trở thành một phần của biểu đồ phân cấp, lưu trữ các kết nối giữa các phần và lịch sử học tập.
+
+Người dùng có thể quay lại các tài liệu đã học trước đó bất cứ lúc nào và tiếp tục việc học từ nơi họ đã dừng lại.
+ # 
+⚙️ Điều thú vị:
+Dự án hỗ trợ khám phá chủ đề đệ quy, trong đó mỗi chủ đề phụ có thể tạo ra các hướng nghiên cứu mới.
+
+Tác giả cũng trình bày cách làm việc với các mô hình cục bộ như Gemma 4 27B, có thể tạo ra các nhánh học tập mới trong nền.
+
+Tất cả các bài học được tạo ra đều được tự động lưu và luôn sẵn sàng cho việc học tập tiếp theo.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Các nền tảng giáo dục hiện đại thường cung cấp cấu trúc khóa học được xác định trước.
+
+GenLearn mang đến một cách tiếp cận khác, trong đó tài liệu học tập được xây dựng một cách năng động dựa trên sở thích của từng người dùng và có thể được mở rộng vô hạn khi chủ đề tiến triển.
+ # 
+🔗 Liên kết:
+https://github.com/ryoiki-tokuiten/Generative-Recursive-Education
+-----
+CopilotKit tiếp tục phát triển và trở thành một trong những nền tảng mã nguồn mở phổ biến nhất để tạo ra các tác nhân AI trong các ứng dụng web.
+
+Dự án cung cấp cơ sở hạ tầng sẵn có để tích hợp hệ thống AI Copilot và các hệ thống tác nhân vào sản phẩm của riêng bạn.
+ # 
+🧠 Ý chính là:
+Thay vì phải tạo giao diện AI từ đầu, các nhà phát triển sẽ nhận được một bộ thành phần, công cụ và SDK được làm sẵn.
+
+CopilotKit cho phép bạn nhanh chóng thêm tính năng trò chuyện, trợ lý ảo, thực thi hành động, cộng tác giao diện và các tính năng AI khác vào ứng dụng của mình.
+ # 
+📊 Những gì nó có thể làm:
+Nền tảng này hỗ trợ việc tạo giao diện tác nhân cho các ứng dụng React.
+
+Các tác nhân có thể tương tác với giao diện người dùng, kích hoạt hành động, làm việc với dữ liệu ứng dụng và thực thi các kịch bản nhiều bước.
+
+Các thành phần giao diện người dùng có sẵn, tích hợp với các hệ thống quản lý học tập (LLM) phổ biến và các công cụ để xây dựng quy trình làm việc phức tạp cho tác nhân cũng được cung cấp.
+ # 
+⚙️ Sản phẩm này phù hợp với ai:
+CopilotKit hướng đến các nhà phát triển dịch vụ SaaS, nền tảng doanh nghiệp và sản phẩm trí tuệ nhân tạo (AI).
+
+Dự án này giúp chuyển đổi các ứng dụng web thông thường thành các hệ thống tích hợp trợ lý AI mà không cần phải tự phát triển toàn bộ cơ sở hạ tầng trợ lý.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi trí tuệ nhân tạo (AI) ngày càng phổ biến, người dùng kỳ vọng sẽ thấy các trợ lý thông minh xuất hiện trực tiếp trong các ứng dụng.
+
+Những nền tảng như vậy giúp đơn giản hóa đáng kể việc tạo giao diện cho trợ lý ảo và đẩy nhanh quá trình triển khai các tính năng AI vào các sản phẩm thực tế.
+ # 
+🔗 Liên kết:
+https://github.com/CopilotKit/CopilotKit
+-----
+Các nhà phát triển từ Nolly Studio đã cho ra mắt dự án Cult UI.
+
+Đây là một thư viện các thành phần giao diện và hiệu ứng có sẵn để tạo ra các ứng dụng web hiện đại bằng React và Next.js.
+ # 
+🧠 Ý chính là:
+Thay vì phải tự phát triển các yếu tố giao diện phức tạp từ đầu, các nhà phát triển có thể sử dụng các thành phần có sẵn.
+
+Dự án tập trung vào việc tạo ra các trang web, trang đích và sản phẩm AI có giao diện hấp dẫn với thiết kế hiện đại.
+ # 
+📊 Bao gồm những gì:
+Thư viện này chứa hàng chục thành phần giao diện người dùng (UI) có sẵn, các khối hoạt ảnh, thẻ, nút, biểu mẫu và hiệu ứng hình ảnh.
+
+Các thành phần được tối ưu hóa cho React và Next.js và có thể được tích hợp nhanh chóng vào các dự án hiện có.
+
+Thư viện đặc biệt chú trọng đến các xu hướng thiết kế web hiện đại và hoạt ảnh giao diện chất lượng cao.
+ # 
+⚙️ Ai sẽ được hưởng lợi từ điều này:
+Dự án này sẽ hữu ích cho các nhà phát triển giao diện người dùng, nhà thiết kế và những người tạo ra dịch vụ SaaS.
+
+Các thành phần có sẵn giúp tăng tốc đáng kể quá trình phát triển giao diện và giảm thời gian cần thiết để triển khai các giải pháp trực quan phức tạp.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi lập trình dựa trên cảm nhận và phát triển trí tuệ nhân tạo ngày càng phổ biến, ngày càng nhiều dự án được tạo ra bởi các nhóm nhỏ hoặc thậm chí là cá nhân.
+
+Các thư viện như thế này giúp tạo ra giao diện chuyên nghiệp nhanh hơn mà không cần mất hàng tuần để phát triển một hệ thống thiết kế tùy chỉnh.
+ # 
+🔗 Liên kết:
+https://github.com/nolly-studio/cult-ui
+-------
+Nhà phát triển FujiwaraChoki đã công khai mã nguồn dự án SupoClip.
+
+Công cụ này tự động tạo các đoạn video ngắn định dạng dọc từ các video dài hơn để sử dụng trên TikTok, YouTube Shorts và Reels.
+ # 
+🧠 Ý chính là:
+Thay vì chỉnh sửa thủ công, người dùng tải lên một video dài, và hệ thống sẽ tự động tìm ra những khoảnh khắc thú vị nhất.
+
+Sau khi phân tích, trí tuệ nhân tạo sẽ tự động tạo ra các đoạn video ngắn sẵn sàng để đăng tải lên mạng xã hội.
+ # 
+📊 Những gì nó có thể làm:
+Dự án này làm nổi bật các đoạn video quan trọng và cắt chúng thành các đoạn ngắn riêng lẻ.
+
+Nó hỗ trợ tạo phụ đề tự động, cắt dọc và chuẩn bị nội dung cho các định dạng video ngắn phổ biến.
+
+Công cụ này được thiết kế cho podcast, phỏng vấn, phát trực tuyến, bài giảng và các nội dung dài khác.
+ # 
+⚙️ Điều quan trọng:
+SupoClip là phần mềm mã nguồn mở và tự lưu trữ.
+
+Cách tiếp cận này cho phép sản xuất nội dung tự động mà không cần đến các dịch vụ đám mây trả phí để cắt video.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Nhu cầu về video ngắn định dạng dọc tiếp tục tăng trưởng, và việc tạo ra các video ngắn chất lượng cao rất tốn thời gian.
+
+Các công cụ như thế này tự động hóa các thao tác chỉnh sửa thường ngày và tăng tốc đáng kể quá trình chuẩn bị nội dung cho các nền tảng mạng xã hội.
+ # 
+🔗 Liên kết:
+https://github.com/FujiwaraChoki/supoclip
+-------
+Awesome AI Hacking Agents, một danh mục các dự án chuyên về việc sử dụng các tác nhân AI trong an ninh thông tin, đã xuất hiện trên GitHub.
+
+Kho lưu trữ này tập hợp các công cụ dành cho kiểm thử xâm nhập, phân tích lỗ hổng, nghiên cứu tự động và các nhiệm vụ tấn công mô phỏng (red team).
+ # 
+🧠 Ý chính là:
+Số lượng công cụ AI dành cho an ninh mạng đang tăng lên nhanh chóng đến mức việc theo dõi chúng ngày càng trở nên khó khăn.
+
+Dự án này đóng vai trò như một người dẫn đường trong hệ sinh thái an ninh AI và giúp xác định các giải pháp dựa trên tác nhân (agent-based) thú vị nhất.
+ # 
+📊 Bên trong có gì:
+Bộ sưu tập bao gồm các tác nhân quét lỗ hổng bảo mật, phân tích mã, kiểm toán bảo mật và các tác vụ nghiên cứu tự động.
+
+Nó cũng bao gồm các nền tảng cho hoạt động Red Team, các công cụ kiểm thử mô hình và các dự án sử dụng LLM hiện đại trong các nhiệm vụ an ninh thông tin.
+
+Danh mục được cập nhật thường xuyên với các giải pháp mới từ cộng đồng.
+ # 
+⚙️ Ai sẽ được hưởng lợi từ điều này:
+Kho lưu trữ này sẽ hữu ích cho các chuyên gia an ninh mạng, nhà nghiên cứu, chuyên viên kiểm thử xâm nhập và nhà phát triển hệ thống tác nhân.
+
+Nó cho phép nhanh chóng nắm bắt tình trạng hiện tại của thị trường an ninh AI và lựa chọn các công cụ cho các nhiệm vụ cụ thể.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí tuệ nhân tạo (AI) ngày càng được cả bên phòng thủ và bên tấn công sử dụng.
+
+Những danh mục như vậy giúp theo dõi sự phát triển của ngành và chứng minh tốc độ thay đổi nhanh chóng của các hệ thống dựa trên tác nhân trong việc tiếp cận an ninh thông tin.
+ # 
+🔗 Liên kết:
+https://github.com/EvanThomasLuke/Awesome-AI-Hacking-Agents
+--------
+Nhóm Rednote HiLab đã công bố một bộ sưu tập các mô hình DotsTTS trên Hugging Face.
+
+Dự án này tập trung vào việc tạo ra giọng nói chân thực và phát triển các công nghệ tổng hợp giọng nói thế hệ mới, mã nguồn mở.
+ # 
+🧠 Ý chính là:
+Các hệ thống chuyển văn bản thành giọng nói hiện đại ngày càng nỗ lực không chỉ để đọc văn bản mà còn để truyền tải ngữ điệu, cảm xúc và những đặc điểm tự nhiên của giọng nói con người.
+
+DotsTTS là một mô hình như vậy, nhấn mạnh vào chất lượng âm thanh và khả năng biểu cảm của giọng nói.
+ # 
+📊 Những gì nó có thể làm:
+Các mô hình được thiết kế để chuyển đổi giọng nói thành văn bản và có thể được sử dụng trong trợ lý giọng nói, sản phẩm giáo dục, lồng tiếng nội dung và hệ thống dựa trên tác nhân.
+
+Các nhà phát triển tập trung vào phát âm tự nhiên, chất lượng ngữ điệu và khả năng truyền tải nội dung cảm xúc của lời nói.
+
+Dự án được phát hành mã nguồn mở thông qua Hugging Face.
+ # 
+⚙️ Trường hợp có thể hữu ích:
+DotsTTS có thể được sử dụng để tạo giao diện giọng nói, tác nhân AI, nội dung video, podcast và các ứng dụng đa phương tiện.
+
+Giấy phép mở của nó làm cho dự án trở nên hấp dẫn đối với cả các nhà nghiên cứu và các nhà phát triển thương mại.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Giọng nói đang trở thành một trong những giao diện quan trọng giữa con người và trí tuệ nhân tạo.
+
+Sự xuất hiện của các mô hình chuyển văn bản thành giọng nói (TTS) mã nguồn mở mới đang giúp đẩy nhanh sự phát triển của trợ lý giọng nói và làm cho việc tổng hợp giọng nói chất lượng cao trở nên dễ tiếp cận hơn với cộng đồng.
+ # 
+🔗 Liên kết:
+https://huggingface.co/collections/rednote-hilab/dotstts
+-------
+Nhóm BrowserAct đã mở một kho lưu trữ kỹ năng dành cho các hệ thống tác nhân.
+
+Dự án này chứa các kỹ năng được xây dựng sẵn giúp các tác nhân AI tương tác hiệu quả hơn với các trang web và giao diện trình duyệt.
+ # 
+🧠 Ý chính là:
+Ngay cả những chuyên viên hiện đại cũng thường mắc lỗi khi làm việc với giao diện web, vì mỗi trang web có cấu trúc và logic tương tác riêng.
+
+Kỹ năng cho phép bạn xác định trước các quy trình làm việc đã được chứng minh và cung cấp chúng cho chuyên viên dưới dạng đã được chuẩn bị sẵn.
+ # 
+📊 Bên trong có gì:
+Bộ sưu tập này chứa một tập hợp các kỹ năng chuyên biệt dành cho tự động hóa trình duyệt.
+
+Những kỹ năng này giúp các tác nhân điều hướng giao diện tốt hơn, thực hiện các thao tác nhiều bước và làm việc với các biểu mẫu, điều hướng và nhiều dịch vụ web khác nhau.
+
+Cách tiếp cận này giúp giảm thiểu lỗi và cải thiện độ tin cậy của tác vụ.
+ # 
+⚙️ Trường hợp có thể hữu ích:
+Dự án này sẽ hữu ích cho người dùng BrowserAct, OpenClaw, Claude Code, Cursor và các nền tảng tác nhân khác sử dụng khái niệm Kỹ năng.
+
+Các kỹ năng được xây dựng sẵn cho phép mở rộng khả năng của tác nhân nhanh hơn mà không cần cấu hình thủ công cho từng kịch bản.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Hệ sinh thái kỹ năng của tác nhân đang trở thành một trong những lĩnh vực chính trong phát triển tác nhân AI.
+
+Thay vì liên tục huấn luyện các mô hình cho các kịch bản mới, các nhà phát triển ngày càng tạo ra các thư viện kỹ năng cho phép các tác nhân nhanh chóng tiếp thu các khả năng và kinh nghiệm mới.
+ # 
+🔗 Liên kết:
+https://github.com/browser-act/skills
+--------
+Nhà phát triển JCodesMore đã cho ra mắt dự án AI ​​Website Cloner Template.
+
+Mẫu này được dùng để tạo các ứng dụng có khả năng tự động sao chép giao diện và cấu trúc của các trang web hiện có bằng trí tuệ nhân tạo (AI).
+ # 
+🧠 Ý chính là:
+Người dùng nhập liên kết trang web, sau đó hệ thống sẽ phân tích trang và cố gắng tái tạo thiết kế, cấu trúc và các yếu tố giao diện chính của nó.
+
+Quá trình này được tự động hóa cao và tận dụng các công cụ phát triển trí tuệ nhân tạo hiện đại.
+ # 
+📊 Những gì nó có thể làm:
+Mẫu này cho phép bạn tạo bản sao của các trang đích, giao diện và trang web dựa trên phân tích các trang web hiện có.
+
+Dự án tận dụng các mô hình ngôn ngữ hiện đại để tạo ra các thành phần, cấu trúc trang và giao diện người dùng.
+
+Mẫu kết quả có thể được sử dụng làm cơ sở cho việc phát triển và tùy chỉnh tiếp theo.
+ # 
+⚙️ Trường hợp có thể hữu ích:
+Công cụ này sẽ hữu ích cho các nhà phát triển giao diện người dùng, nhà thiết kế và người dùng của Cursor, Claude Code, và các công cụ phát triển AI khác.
+
+Những giải pháp như vậy giúp nhanh chóng khám phá các thiết kế giao diện thành công và tăng tốc quá trình tạo mẫu thử nghiệm.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Lập trình dựa trên cảm nhận (Vibe coding) đang dần thay đổi cách tiếp cận phát triển giao diện.
+
+Các công cụ như AI Website Cloner chứng minh tốc độ AI đang bắt đầu tự động hóa việc tạo ứng dụng web và rút ngắn thời gian từ ý tưởng đến nguyên mẫu hoạt động.
+ # 
+🔗 Liên kết:
+https://github.com/JCodesMore/ai-website-cloner-template
+-------
+Công ty phát triển phần mềm Midudev đã cho ra mắt dự án AutoSkills.
+
+Công cụ này cho phép các nhân viên tự động tạo và lưu các kỹ năng mới dựa trên các nhiệm vụ đã hoàn thành và kinh nghiệm tích lũy.
+ # 
+🧠 Ý chính là:
+Thông thường, kỹ năng dành cho các tác nhân phải được viết thủ công.
+
+AutoSkills cung cấp một cách tiếp cận khác: tác nhân phân tích các nhiệm vụ đã hoàn thành thành công và chuyển đổi kinh nghiệm thu được thành một kỹ năng sẵn sàng sử dụng.
+ # 
+📊 Những gì nó có thể làm:
+Hệ thống theo dõi các hành động của tác nhân trong quá trình làm việc.
+
+Nếu một nhiệm vụ được hoàn thành thành công, AutoSkills có thể lưu chuỗi hành động, hướng dẫn và các kỹ thuật hữu ích dưới dạng một kỹ năng riêng biệt.
+
+Sau đó, tác nhân có thể sử dụng lại kỹ năng này mà không cần phải tìm kiếm giải pháp lần nữa.
+ # 
+⚙️ Trường hợp có thể hữu ích:
+Dự án này được thiết kế cho Claude Code, OpenClaw, Cursor và các hệ thống tác nhân khác sử dụng khái niệm Kỹ năng.
+
+Cách tiếp cận này đặc biệt hữu ích cho các dự án dài hạn, nơi tác nhân thường xuyên gặp phải các nhiệm vụ tương tự.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Một trong những hạn chế chính của các tác nhân hiện đại vẫn là thiếu khả năng tích lũy kinh nghiệm lâu dài.
+
+AutoSkills thể hiện hướng phát triển của các hệ thống tác nhân, nơi trí tuệ nhân tạo dần dần bắt đầu tự xây dựng thư viện kỹ năng của riêng mình và trở nên hiệu quả hơn với mỗi nhiệm vụ hoàn thành.
+ # 
+🔗 Liên kết:
+https://github.com/midudev/autoskills
+-----------
+RuVector, một cơ sở dữ liệu vector mở thế hệ tiếp theo, đang được phát triển trên GitHub.
+
+Các nhà phát triển đang tập trung vào sự kết hợp giữa tìm kiếm vector, truy vấn đồ thị và máy học tích hợp ngay tại cấp độ cơ sở dữ liệu.
+ # 
+🧠 Ý chính là:
+Hầu hết các cơ sở dữ liệu vector hiện đại đều ở dạng tĩnh: dữ liệu được lập chỉ mục, sau đó hệ thống chỉ đơn giản thực hiện tìm kiếm.
+
+RuVector cung cấp một cách tiếp cận khác: cơ sở dữ liệu có thể thích ứng với việc sử dụng thực tế và cải thiện hiệu suất dựa trên các truy vấn của người dùng.
+ # 
+📊 Những gì nó có thể làm:
+Dự án kết hợp nhiều công nghệ cùng lúc:
+
+• tìm kiếm vector cho các ứng dụng AI và hệ thống RAG;
+
+• truy vấn đồ thị tương tự như Neo4j;
+
+• sử dụng GNN (Mạng thần kinh đồ thị) để học dựa trên kinh nghiệm tích lũy;
+
+• khởi chạy LLM cục bộ mà không cần truy cập bắt buộc vào dịch vụ đám mây;
+
+• mở rộng theo chiều ngang trên nhiều nút.
+
+Ngoài ra, hệ thống được triển khai dưới dạng một tệp tự chạy duy nhất và được thiết kế để khởi chạy nhanh chóng.
+ # 
+⚙️ Tại sao điều này lại thú vị:
+Thị trường trí tuệ nhân tạo ngày càng đòi hỏi cơ sở hạ tầng có thể xử lý không chỉ các nhúng văn bản mà còn cả các mối quan hệ phức tạp giữa các đối tượng.
+
+Sự kết hợp giữa cấu trúc đồ thị, mô hình cục bộ và cơ chế tự học làm cho các giải pháp như vậy trở nên đặc biệt hấp dẫn đối với các hệ thống dựa trên tác nhân và cơ sở tri thức doanh nghiệp.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Khi cơ sở hạ tầng AI phát triển, ranh giới giữa cơ sở dữ liệu, công cụ tìm kiếm và nền tảng tác nhân đang dần mờ đi.
+
+RuVector minh họa một xu hướng trong đó cơ sở dữ liệu đang vượt ra ngoài vai trò lưu trữ thông tin đơn thuần và bắt đầu tích cực tham gia vào việc phân tích, tìm kiếm và xử lý thông minh.
+ # 
+🔗 Liên kết:
+https://github.com/ruvnet/ruvector
+-------
+HappySeeds, một nền tảng trí tuệ nhân tạo giúp phát triển thói quen lành mạnh và khám phá các chủ đề mới một cách hấp dẫn hơn, đã chính thức ra mắt.
+
+Dự án tập trung vào các hoạt động ngắn hàng ngày và các đề xuất được cá nhân hóa.
+ # 
+🧠 Ý chính là:
+Thay vì các khóa học dài hạn và chương trình đào tạo phức tạp, dịch vụ này cung cấp các bước nhỏ dễ dàng tích hợp vào cuộc sống hàng ngày.
+
+Trí tuệ nhân tạo (AI) điều chỉnh quy trình phù hợp với người dùng và giúp họ từng bước tiến tới mục tiêu của mình.
+ # 
+📊 Những gì nó có thể làm:
+Nền tảng này sử dụng trí tuệ nhân tạo để cá nhân hóa việc học và tạo ra trải nghiệm phù hợp.
+
+Cách tiếp cận này giúp duy trì sự tham gia và làm cho các lớp học thường xuyên trở nên thoải mái và tự nhiên hơn.
+ # 
+⚙️ Tại sao điều này lại thú vị:
+Ngày nay, ngày càng nhiều dịch vụ AI đang cố gắng hoạt động không chỉ như chatbot mà còn như trợ lý cá nhân hỗ trợ phát triển bản thân.
+
+Chúng giúp hình thành thói quen, học hỏi và duy trì động lực mà không cần thiết lập phức tạp.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Cá nhân hóa được coi là một trong những ứng dụng triển vọng nhất của trí tuệ nhân tạo.
+
+Những dự án như thế này chứng minh cách mạng lưới thần kinh đang dần trở thành một phần của cuộc sống hàng ngày, giúp mọi người thường xuyên nắm vững các kỹ năng mới.
+ # 
+🔗 Liên kết:
+https://happyseeds.ai/
+-----
+Fylm.ai, một dịch vụ dựa trên điện toán đám mây để hiệu chỉnh màu sắc hình ảnh và video bằng trí tuệ nhân tạo, đã thu hút sự chú ý của người dùng.
+
+Nền tảng này hướng đến cả các chuyên gia và những người muốn trở thành nhà sáng tạo nội dung.
+ # 
+🧠 Ý chính là:
+Việc hiệu chỉnh màu sắc chất lượng cao thường đòi hỏi kinh nghiệm sâu rộng với các công cụ chuyên nghiệp và hiểu biết về lý thuyết màu sắc.
+
+fylm.ai sử dụng các mô hình mạng thần kinh để giúp tự động hóa một phần đáng kể của quy trình này.
+ # 
+📊 Những gì nó có thể làm:
+Dịch vụ này cho phép bạn:
+
+• tự động phân tích hình ảnh và video;
+
+• thực hiện hiệu chỉnh màu sắc bằng trí tuệ nhân tạo (AI);
+
+• chuyển đổi phong cách màu sắc giữa các khung hình;
+
+• nhanh chóng tạo bảng màu điện ảnh;
+
+• làm việc thông qua trình duyệt mà không cần thiết lập cục bộ phức tạp.
+
+Nền tảng này giúp đạt được kết quả chuyên nghiệp ngay cả đối với người dùng không có nhiều kinh nghiệm chỉnh sửa và xử lý hậu kỳ.
+ # 
+⚙️ Tại sao điều này lại thú vị:
+Trí tuệ nhân tạo tạo sinh (Generative AI) ngày càng được sử dụng rộng rãi không chỉ để tạo nội dung từ đầu mà còn để đẩy nhanh các quy trình sáng tạo truyền thống.
+
+Chỉnh màu vẫn là một trong những giai đoạn tốn nhiều công sức nhất trong sản xuất ảnh và video, vì vậy việc tự động hóa trong lĩnh vực này rất được các nhà sáng tạo nội dung quan tâm.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Cùng với sự phát triển của trí tuệ nhân tạo, các công cụ xử lý hình ảnh chuyên nghiệp ngày càng trở nên dễ tiếp cận hơn với công chúng.
+
+Những dịch vụ này cho phép các nhóm nhỏ và những người sáng tạo độc lập đạt được những kết quả mà trước đây đòi hỏi các chuyên gia chỉnh màu giàu kinh nghiệm và phần mềm đắt tiền.
+ # 
+🔗 Liên kết:
+https://easywithai.com/tools/fylm
+-------
+Noodl AI cung cấp một nền tảng để phát triển các ứng dụng sử dụng công nghệ trí tuệ nhân tạo.
+
+Công cụ này giúp tự động hóa và đơn giản hóa việc tạo ứng dụng web, giảm sự phụ thuộc vào lập trình thủ công và cấu hình phức tạp.
+ # 
+🧠 Ý chính là:
+Nền tảng này nhấn mạnh giao diện trực quan cho phép người dùng xây dựng ứng dụng và nhanh chóng biến ý tưởng thành sản phẩm hoạt động.
+
+Noodl AI được thiết kế không chỉ dành cho các nhà phát triển mà còn cho người dùng không có kỹ năng lập trình nâng cao nhưng cần tạo ra các giải pháp kỹ thuật số phức tạp.
+ # 
+⚙️ Những gì dịch vụ có thể làm:
+Noodl AI giúp bạn thiết kế, xây dựng và cải tiến các loại ứng dụng web khác nhau nhanh hơn.
+
+Nền tảng này được thiết kế cho các giải pháp cấp doanh nghiệp và có thể rút ngắn thời gian đưa sản phẩm ra thị trường thông qua phát triển trực quan và tự động hóa bằng AI.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Những công cụ như thế này mở rộng khả năng tiếp cận phát triển ứng dụng cho các nhóm, công ty khởi nghiệp và các chuyên gia không có nền tảng kỹ thuật truyền thống.
+
+Trí tuệ nhân tạo (AI) và giao diện trực quan đang dần thay đổi cách tiếp cận việc tạo phần mềm: thay vì các chu kỳ phát triển thủ công kéo dài, người dùng có thể nhanh chóng thử nghiệm ý tưởng, xây dựng nguyên mẫu và tinh chỉnh chúng thành sản phẩm hoạt động.
+ # 
+🔗 Liên kết:
+https://github.com/noodlapp/noodl
+
+https://www.noodl.net/
+-------
+Supergoal, một công cụ dành cho Claude Code và Codex CLI, đã được công bố trên GitHub. Nó biến một tác vụ lớn thành một kế hoạch thực thi chi tiết.
+
+Công cụ này phân tích dự án, chuẩn bị các thông số kỹ thuật từng giai đoạn, sau đó cung cấp cho người dùng lệnh /goal đã được cấu hình sẵn để tự động khởi chạy tác nhân.
+ # 
+🧠 Ý chính là:
+Supergoal trước tiên lập kế hoạch công việc một cách chi tiết rồi mới bắt đầu thực thi.
+
+Nó xem xét mã nguồn, các công cụ có sẵn, bộ nhớ dự án và mục tiêu của người dùng, sau đó chia nhỏ nhiệm vụ thành số giai đoạn cần thiết.
+
+Đối với mỗi giai đoạn, các tệp riêng biệt được tạo ra với ngữ cảnh, đặc tả, trạng thái, rủi ro và tiêu chí xác minh.
+ # 
+⚙️ Cách thức hoạt động:
+Người dùng chạy lệnh /supergoal <task>.
+
+Sau khi phân tích, Supergoal tạo thư mục .supergoal/<run-id>/, nơi lưu trữ các tệp ROADMAP.md, STATE.md, THINKING.md, PROTOCOL.md, context.md, tools.md và các tệp phase-N.md riêng lẻ cho mỗi giai đoạn của quy trình.
+
+Sau khi xác nhận, công cụ sẽ in ra một lệnh /goal duy nhất, đã được tạo sẵn, chỉ cần chèn một lần. Sau đó, tác nhân sẽ thực thi các giai đoạn theo trình tự và tiến tới hoàn thành.
+ # 
+📊 Bước tiếp theo mà người môi giới thực hiện là gì:
+Sau khi khởi chạy thông qua /goal, tác nhân sẽ đọc đặc tả giai đoạn, thực hiện công việc, xác minh kết quả, ghi lại trạng thái và chuyển sang giai đoạn tiếp theo.
+
+Nếu xảy ra lỗi, Supergoal sử dụng cơ chế phục hồi tích hợp: lỗi đầu tiên sẽ kích hoạt quá trình thử lại kèm theo chẩn đoán, lỗi thứ hai sẽ tạo ra đặc tả sửa lỗi tập trung, và lỗi thứ ba sẽ dừng quá trình thực thi với thông báo chuyển giao chi tiết.
+
+Sau giai đoạn cuối cùng, tác nhân sẽ thực hiện kiểm toán cuối cùng, xác minh lại kết quả so với LỘ TRÌNH, chạy các kiểm tra bắt buộc, và chỉ sau đó mới kết thúc quá trình chạy.
+ # 
+🧠 Bộ nhớ dự án:
+Supergoal lưu trữ những phát hiện quan trọng vào bộ nhớ dự án để ngăn tác nhân lặp lại những lỗi tương tự trong các tác vụ sau này.
+
+Bộ nhớ có thể bao gồm các tính năng API tinh tế, tùy chọn người dùng, thông tin thiết kế và các mẫu lỗi -> sửa lỗi.
+
+Kỹ năng này hoạt động mà không cần bộ nhớ, nhưng khi có bộ nhớ, các lần chạy sau sẽ thông minh hơn.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Công việc điển hình với một tác nhân AI thường trở thành một chuỗi các thao tác thủ công: người dùng yêu cầu một kế hoạch, sau đó chạy các bước riêng lẻ, rồi sửa lỗi, và sau đó lại hướng dẫn tác nhân.
+
+Supergoal cố gắng loại bỏ việc giám sát liên tục này: người dùng xác nhận kế hoạch và nhập /goal một lần, sau đó tác nhân tự động thực hiện các giai đoạn, sửa chữa mọi trục trặc và thực hiện kiểm tra cuối cùng.
+
+Điều này làm cho Claude Code và Codex phù hợp hơn cho các nhiệm vụ quy mô lớn, nơi câu trả lời đơn lẻ không phải là điều thiết yếu, mà là một quá trình được kiểm soát từ mục tiêu đến kết quả hoàn thành.
+ # 
+🔗 Liên kết:
+https://github.com/robzilla1738/supergoal
+---
+NetEase Youdao đã công bố Confucius4-TTS, một hệ thống tổng hợp giọng nói và dịch giọng nói đa ngôn ngữ không cần huấn luyện (zero-shot TTS).
+
+Mô hình này giữ nguyên giọng nói của người nói khi tạo ra giọng nói bằng ngôn ngữ khác và hiện có sẵn để thử nghiệm thông qua bản demo trực tuyến.
+ # 
+🧠 Ý chính là:
+Confucius4-TTS được xây dựng trên kiến ​​trúc bộ mã hóa giọng nói + LLM.
+
+Hệ thống nhận một đoạn âm thanh tham chiếu, trích xuất các đặc điểm giọng nói và tạo ra giọng nói bằng ngôn ngữ đã chọn mà không cần huấn luyện thêm cho một người nói cụ thể.
+
+Ý tưởng chính của dự án là sử dụng một giọng nói duy nhất trong nhiều ngôn ngữ khác nhau trong khi vẫn giữ được âm sắc, ngữ điệu và nội dung cảm xúc.
+ # 
+🌐 Các ngôn ngữ được hỗ trợ:
+Confucius4-TTS hỗ trợ 14 ngôn ngữ.
+
+Bao gồm tiếng Trung, tiếng Anh, tiếng Nhật, tiếng Hàn, tiếng Đức, tiếng Pháp, tiếng Tây Ban Nha, tiếng Indonesia, tiếng Ý, tiếng Thái, tiếng Bồ Đào Nha, tiếng Nga, tiếng Mã Lai và tiếng Việt.
+
+Các nhà phát triển hứa sẽ mở rộng danh sách ngôn ngữ trong tương lai.
+ # 
+⚙️ Những điều nó có thể làm:
+Mô hình này hỗ trợ sao chép giọng nói không giới hạn mà không cần bản ghi văn bản tham chiếu.
+
+Nó cũng có các tính năng như chuyển giọng nói đa ngôn ngữ, chuyển giọng nói không cần dữ liệu huấn luyện, chuyển cảm xúc và hoạt động ổn định trong các tình huống đa ngôn ngữ thực tế.
+
+Điều này cho phép không chỉ sao chép giọng nói mà còn bảo toàn tính biểu cảm của lời nói khi chuyển đổi giữa các ngôn ngữ.
+ # 
+📊 Công nghệ:
+Hệ thống Confucius4-TTS được chia thành hai mô-đun chính. Mô-đun
+
+Text2Semantic tạo ra các token ngữ nghĩa dựa trên văn bản và giọng nói đầu vào.
+
+Sau đó, mô-đun Semantic2Acoustic chuyển đổi các token này thành phổ mel bằng cách sử dụng mô hình khớp luồng, từ đó tạo ra âm thanh cuối cùng.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Công nghệ chuyển văn bản thành giọng nói đa ngôn ngữ đang dần phát triển từ việc lồng tiếng văn bản đơn giản sang chuyển đổi giọng nói hoàn chỉnh giữa các ngôn ngữ.
+
+Confucius4-TTS rất thú vị vì nó kết hợp tổng hợp đa ngôn ngữ, sao chép giọng nói và chuyển đổi cảm xúc trong một hệ thống duy nhất.
+
+Cách tiếp cận này có thể hữu ích cho việc lồng tiếng, tài liệu giáo dục, bản địa hóa video, trợ lý giọng nói và nội dung mà việc giữ được giọng nói dễ nhận biết khi dịch sang ngôn ngữ khác là rất quan trọng.
+ # 
+🔗 Liên kết:
+https://github.com/netease-youdao/Confucius4-TTS
+
+https://confucius4-tts.youdao.com/gradio/
+--------
+Công cụ Android Reverse Engineering & API Extraction, một kỹ năng của Claude Code, đã được công bố trên GitHub.
+
+Công cụ này giúp giải mã các tệp APK, XAPK, JAR và AAR của Android, phân tích cấu trúc ứng dụng và tìm ra các API HTTP được sử dụng bên trong.
+ # 
+🧠 Ý chính là:
+Skill biến Claude Code thành một trợ lý đắc lực cho việc phân tích ngược mã nguồn ứng dụng Android một cách hợp pháp.
+
+Nó giúp trích xuất các điểm cuối Retrofit, các lệnh gọi OkHttp, URL được mã hóa cứng, lược đồ ủy quyền, mã thông báo, tiêu đề và các mẫu chữ ký yêu cầu.
+
+Điều này có thể hữu ích cho việc lập tài liệu API, phân tích hành vi ứng dụng, nghiên cứu bảo mật, phân tích phần mềm độc hại, CTF và kiểm tra khả năng tương thích mà không cần truy cập vào mã nguồn.
+ # 
+⚙️ Những điều nó có thể làm:
+Trước khi dịch ngược hoàn toàn, Skill có thể nhanh chóng nhận dạng mã nguồn của tệp APK hoặc XAPK.
+
+Nó xác định khung ứng dụng (ví dụ: Flutter, React Native, Cordova, Xamarin hoặc Kotlin gốc), cũng như ngăn xếp HTTP, mức độ làm mờ mã, sự hiện diện của các thư viện gốc và các SDK đáng chú ý.
+
+Sau đó, bạn có thể chạy dịch ngược bằng jadx, Fernflower hoặc Vineflower và phân tích các tệp nguồn thu được.
+ # 
+📊 Phân tích API:
+Skill có thể tìm kiếm các lệnh gọi API không chỉ trong ngăn xếp Android cổ điển (Retrofit, OkHttp và Volley).
+
+Nó cũng hỗ trợ các dự án Kotlin và KMP hiện đại: Ktor, Apollo GraphQL và Koin DI.
+
+Nó cũng phân tích các tiêu đề xác thực, URL được mã hóa cứng, mã thông báo, lược đồ ký yêu cầu HMAC và trích xuất đường dẫn/URL chống lại R8.
+ # 
+🧩 Kotlin và kỹ thuật làm rối mã:
+Một trong những điểm mạnh của dự án là khả năng khôi phục tên lớp Kotlin gốc sau khi bị làm mờ bởi R8.
+
+Skill sử dụng siêu dữ liệu Kotlin, thứ mà R8 không thể loại bỏ hoàn toàn, và xây dựng một bản đồ tương ứng giữa tên lớp bị làm mờ và tên lớp thực.
+
+Điều này giúp tìm ra các lớp Repository, ViewModel, UseCase và Impl, đặc biệt quan trọng khi phân tích logic nghiệp vụ và các cuộc gọi mạng.
+ # 
+🖥 Nền tảng và yêu cầu:
+Cần có Java JDK 17 trở lên và jadx.
+
+Vineflower hoặc Fernflower cũng được khuyến nghị cho mã Java phức tạp, cũng như dex2jar cho các script Fernflower.
+
+Dự án bao gồm các script Bash và hỗ trợ Windows thử nghiệm thông qua các script PowerShell.
+ # 
+⚠️ Lưu ý quan trọng:
+Dự án này chỉ dành cho các trường hợp sử dụng hợp pháp: nghiên cứu bảo mật, kiểm thử xâm nhập được ủy quyền, phân tích khả năng tương tác, phân tích phần mềm độc hại, ứng phó sự cố, đào tạo và CTF.
+
+Việc sử dụng nó để phân tích trái phép các ứng dụng của người khác, vượt qua các hạn chế hoặc vi phạm điều khoản dịch vụ có thể vi phạm pháp luật và chính sách của nền tảng.
+
+Trước khi sử dụng, hãy đảm bảo bạn có quyền phân tích ứng dụng cụ thể đó.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Phân tích ngược mã nguồn Android thường yêu cầu nhiều công cụ, tìm kiếm API thủ công và hiểu mã bị làm mờ.
+
+Kỹ năng này được gói gọn trong Claude Code, bao gồm quy trình làm việc điển hình: nhận dạng dấu vân tay, dịch ngược mã, khôi phục tên Kotlin, phát hiện cuộc gọi mạng và theo dõi luồng cuộc gọi.
+
+Đối với các nhà nghiên cứu bảo mật và nhà phát triển, điều này có thể giảm thời gian dành cho việc phân tích APK ban đầu và giúp việc làm việc với các ứng dụng Android bị làm mờ trở nên có hệ thống hơn.
+ # 
+🔗 Liên kết:
+https://github.com/SimoneAvogadro/android-reverse-engineering-skill
+-------
+Hai bộ sưu tập hữu ích để tìm kiếm ý tưởng thiết kế trực quan đã được ra mắt: Best Designs On X.com và Recent Design.
+
+Cả hai nền tảng này đều có thể được sử dụng như một nguồn tham khảo nhanh chóng cho giao diện, thiết kế web, trang đích, trang sản phẩm và các giải pháp trực quan.
+ # 
+🧠 Ý chính là:
+Khi cần nhanh chóng tạo giao diện cho trang web, ứng dụng, bảng điều khiển hoặc trang quảng cáo, tìm kiếm thông thường thường cho ra quá nhiều kết quả không cần thiết.
+
+Các danh mục này giúp bạn duyệt qua các ví dụ đã được chọn sẵn và nhanh chóng tìm ra hướng đi đúng đắn: bố cục, lưới, kiểu chữ, bảng màu, thẻ, điều hướng, khối nổi bật và các chi tiết nhỏ của giao diện.
+ # 
+📌 Những mẫu thiết kế đẹp nhất trên X.com:
+Best Designs On X.com tập hợp những thiết kế đẹp nhất từ ​​X.com.
+
+Điều này rất tiện lợi nếu bạn muốn xem không chỉ những portfolio kinh điển mà còn cả những ý tưởng giao diện mới mẻ mà các nhà thiết kế và nhà sáng lập đăng tải trực tiếp trên mạng xã hội.
+
+Trang web này có thể được sử dụng như một nguồn cảm hứng cho giao diện người dùng (UI), trang SaaS, màn hình di động, các thành phần và định vị sản phẩm trực quan.
+ # 
+📌 Thiết kế mới nhất:
+Recent Design hoạt động như một bộ sưu tập được tuyển chọn các nguồn cảm hứng thiết kế hiện đại.
+
+Nó hữu ích để nhanh chóng xem qua các giải pháp hình ảnh mới mẻ và tìm các ví dụ phù hợp với phong cách của một dự án cụ thể.
+
+Đây là một công cụ tuyệt vời để có sẵn khi bạn cần định hướng và cảm hứng cho giao diện của riêng mình, thay vì một mẫu có sẵn.
+ # 
+⚙️ Cách sử dụng:
+Đầu tiên, bạn có thể thu thập một vài ví dụ yêu thích cho nhiệm vụ đang thực hiện: một trang đích, một trang web cá nhân, một sản phẩm SaaS, một màn hình di động, một sản phẩm AI hoặc một bảng điều khiển quản trị.
+
+Sau đó, thay vì tập trung vào "vẻ đẹp" tổng thể, bạn nên phân tích các giải pháp cụ thể: cấu trúc của màn hình đầu tiên như thế nào, nút kêu gọi hành động (CTA) ở đâu, các thẻ được thiết kế ra sao, lề được sử dụng như thế nào, ảnh chụp màn hình sản phẩm được trình bày như thế nào và thứ tự ưu tiên trực quan được xây dựng ra sao.
+
+Sau đó, các tài liệu tham khảo có thể được chuyển cho nhà thiết kế, sử dụng cho bảng ý tưởng (mood board) hoặc cung cấp cho tác nhân AI như một hướng dẫn để tạo giao diện.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Một giao diện tốt hiếm khi được tạo ra từ đầu.
+
+Một con mắt thẩm mỹ tốt, các nguồn tham khảo và sự hiểu biết về các mẫu thiết kế thành công sẽ giúp tăng tốc đáng kể công việc thiết kế, đặc biệt khi bạn cần nhanh chóng tạo ra một sản phẩm tối thiểu khả thi (MVP), trang đích, bài thuyết trình sản phẩm hoặc phong cách hình ảnh cho một dịch vụ AI.
+
+Best Designs On X.com và Recent Design đáp ứng chính nhu cầu này: chúng cung cấp quyền truy cập nhanh vào các ví dụ thực tế giúp bạn tránh sao chép thiết kế của người khác và nhanh chóng tìm ra hướng đi đúng đắn cho riêng mình.
+ # 
+🔗 Liên kết:
+https://bestdesignsonx.com/
+https://recent.design/
+-----
+"Free AI Models", một hướng dẫn thực tiễn về cách truy cập miễn phí vào các mô hình AI quy mô lớn mà không cần đăng ký và, nếu có thể, không cần thẻ tín dụng, đã được xuất bản trên GitHub.
+
+Tác giả đã biên soạn các phương pháp hoạt động để chạy các mô hình tiên tiến và mô hình trọng số mở, đồng thời nêu rõ những hạn chế của mỗi lựa chọn.
+ # 
+🧠 Ý chính là:
+Dự án này không hứa hẹn "truy cập miễn phí vào mọi thứ", mà chỉ ra các lộ trình thực tế để thử nghiệm các mô hình thông qua các gói miễn phí chính thức, tín dụng dùng thử, triển khai cục bộ hoặc các chương trình chuyên dụng.
+
+Nó bao gồm hướng dẫn từng bước, ví dụ về yêu cầu API và cảnh báo giới hạn.
+
+Hướng dẫn được cập nhật đến tháng 6 năm 2026, nhưng tác giả đặc biệt nhấn mạnh rằng các điều khoản của gói miễn phí có thể thay đổi thường xuyên.
+ # 
+📊 Bên trong có gì:
+Bộ sưu tập bao gồm các mô hình GitHub, chương trình dành cho sinh viên, NVIDIA NIM, OpenRouter, tín dụng dùng thử, Groq, Ollama, Hugging Face, OpenAI Codex dành cho phần mềm mã nguồn mở và Claude Code Trick.
+
+Mỗi phương pháp đều giải thích chính xác những gì người dùng nhận được, cách kết nối và bất kỳ hạn chế nào.
+
+Ví dụ, một số giới hạn gắn liền với cấp độ Copilot, một số yêu cầu xác minh điện thoại, một số luân phiên các mô hình miễn phí và việc khởi chạy cục bộ yêu cầu phần cứng tùy chỉnh.
+ # 
+⚙️ Dành cho nhà phát triển:
+Hầu hết các tùy chọn đều hỗ trợ API tương thích với OpenAI hoặc dễ dàng kết nối với các framework tác nhân.
+
+Tệp README bao gồm các ví dụ cho GitHub Models, NVIDIA NIM, OpenRouter, Groq, Ollama và Hugging Face.
+
+Điều này rất tiện lợi nếu bạn cần nhanh chóng kiểm tra một mô hình trong mã, kết nối nó với một tác nhân, thử một nhà cung cấp dự phòng hoặc thay thế một backend trả phí bằng một backend miễn phí.
+ # 
+🧩 Mẹo mã Claude:
+Một phần riêng biệt được dành cho việc chạy giao diện Claude Code thông qua bất kỳ backend miễn phí nào.
+
+Ý tưởng là hướng Claude Code không phải đến API của Anthropic, mà đến một endpoint tương thích như Groq, NVIDIA NIM, OpenRouter hoặc Cerebras.
+
+Điều quan trọng cần hiểu là điều này được cung cấp bởi giao diện Claude Code, chứ không phải bởi các mô hình Claude miễn phí: chất lượng phụ thuộc hoàn toàn vào mô hình cơ bản của backend được chọn.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Nhiều người muốn thử nghiệm với các tác nhân AI, lập trình, RAG và các mô hình đa phương thức, nhưng phí đăng ký và API nhanh chóng trở nên đắt đỏ.
+
+Free AI Models giúp bạn xây dựng một bộ lộ trình khởi đầu miễn phí: nơi để thử nghiệm các mô hình tiên tiến, nơi để có được suy luận trọng số mở, nơi để chạy mọi thứ cục bộ và nơi để nhận tín dụng dùng thử.
+
+Đối với các nhà phát triển, sinh viên và những người đam mê, đây là một bản đồ hữu ích để tránh phải tìm kiếm qua hàng tá trang web riêng biệt để tìm các tùy chọn miễn phí.
+ # 
+🔗 Liên kết:
+https://github.com/Moh4696/free-ai-models
+------
+GitHub hiện đã có Mẫu sao chép trang web bằng AI — một mẫu dựa trên tác nhân dành cho Claude Code, Codex CLI và các công cụ AI khác, có thể tái tạo các trang web công cộng thành các dự án Next.js 16 hiện đại.
+
+Chỉ cần chỉ định URL và chạy lệnh sao chép.
+ # 
+🧠 Ý chính là:
+Dự án này không chỉ dừng lại ở việc xem mã nguồn HTML của một trang.
+
+Trong quá trình hoạt động, hệ thống chụp ảnh màn hình trang web ở các độ phân giải khác nhau, phân tích các kiểu định dạng được tính toán bằng hàm getComputedStyle, thu thập các phần tử tương tác bằng cách tự động hóa trình duyệt và tái tạo cấu trúc giao diện.
+
+Mục tiêu là tái tạo không chỉ giao diện của trang mà còn cả hành vi của nó.
+ # 
+⚙️ Những điều nó có thể làm:
+AI Website Cloner tự động trích xuất các mã màu, phông chữ, biểu tượng trang web (favicon), siêu dữ liệu OG và các tài nguyên khác của trang web.
+
+Sau khi phân tích, nhiều tác nhân AI có thể đồng thời lắp ráp các phần khác nhau của dự án thành các cây thư mục Git riêng biệt, sau đó tự động hợp nhất các kết quả thành một dự án mã duy nhất. Chức
+
+năng kiểm soát chất lượng cũng được tích hợp thông qua so sánh từng pixel – so sánh mã kết quả với trang web gốc ở cấp độ pixel.
+ # 
+🤖 Hỗ trợ đại lý:
+Ứng dụng chính là Claude Code với tiện ích mở rộng trình duyệt Chrome.
+
+Dự án cũng hỗ trợ Codex CLI, OpenCode và các công cụ phát triển dựa trên tác nhân khác.
+
+Điều này cho phép tích hợp việc sao chép trang web vào các quy trình làm việc AI hiện có.
+ # 
+📌 Trường hợp có thể hữu ích:
+Công cụ này có thể được sử dụng để tạo mẫu giao diện nhanh chóng, phân tích đối thủ cạnh tranh, chuyển đổi các dự án cũ sang nền tảng hiện đại và nghiên cứu thiết kế các ứng dụng web phức tạp.
+
+Nó cũng phù hợp để tạo kho lưu trữ trang web cục bộ và khôi phục giao diện khi việc chỉ xem xét mã nguồn là không đủ.
+ # 
+🎯 Tại sao điều này lại quan trọng:
+Trí tuệ nhân tạo (AI) đang dần tự động hóa không chỉ việc viết các thành phần riêng lẻ mà còn cả việc chuyển giao toàn bộ giao diện giữa các công nghệ.
+
+AI Website Cloner cho thấy hướng đi của phát triển dựa trên tác nhân, trong đó hệ thống tự động khám phá một trang web, trích xuất hệ thống thiết kế, lắp ráp dự án và kiểm tra chất lượng kết quả mà hầu như không cần sự can thiệp của con người.
+ # 
+🔗 Liên kết:
+https://github.com/JCodesMore/ai-website-cloner-template
+---------
+YouTube Fetcher to Markdown, một công cụ đơn giản chuyển đổi video YouTube thành các tệp Markdown có cấu trúc, đã được phát hành trên GitHub.
+
+Dự án này cho phép bạn nhanh chóng tạo ra phiên bản văn bản của video để sử dụng tiếp với ghi chú, công cụ AI và cơ sở tri thức.
+ # 
+🧠 Ý chính là:
+Thay vì xem một video dài, người dùng nhận được một tài liệu văn bản hoàn chỉnh ở định dạng Markdown.
+
+Định dạng này dễ dàng lưu trữ, chỉnh sửa, lập chỉ mục và tải vào các hệ thống như Obsidian, Notion hoặc bất kỳ mô hình ngôn ngữ hiện đại nào.
+ # 
+⚙️ Những điều nó có thể làm:
+Công cụ này tự động trích xuất nội dung video và tạo ra tài liệu Markdown có cấu trúc.
+
+Các tệp kết quả có thể được sử dụng để tạo tóm tắt, tìm kiếm trong kho lưu trữ video, chuẩn bị ghi chú, đào tạo và phân tích AI sau đó.
+ # 
+📌 Trường hợp có thể hữu ích:
+Dự án này sẽ hữu ích cho sinh viên, nhà nghiên cứu, nhà phát triển, người tạo nội dung và bất kỳ ai thường xuyên làm việc với video giáo dục.
+
+Thay vì xem lại video, bạn có thể nhanh chóng tìm thấy các đoạn cần thiết bằng cách tìm kiếm văn bản hoặc sử dụng tài liệu như một phần kiến ​​thức của riêng mình.
+ # 
+📈 Tại sao điều này lại thú vị:
+Khi lượng nội dung video ngày càng tăng, các công cụ chuyển đổi video thành nguồn kiến ​​thức có thể tìm kiếm ngày càng trở nên có giá trị.
+
+Các tệp Markdown dễ dàng được phân tích cú pháp, lập chỉ mục và xử lý bằng AI hơn nhiều so với việc chỉ lưu trữ thông tin dưới dạng bản ghi video.
+
+Về cơ bản, các công cụ này giúp chuyển đổi YouTube từ một kho lưu trữ video thành một cơ sở kiến ​​thức văn bản hoàn chỉnh.
+ # 
+🔗 Liên kết:
+https://github.com/JimmySadek/youtube-fetcher-to-markdown
+-----
+ Graphiti + Opik: Bộ nhớ và khả năng theo dõi cho các tác nhân AI hiện đại
+ # 
+Chuyện gì đã xảy ra thế?
+Ngày càng nhiều nhà phát triển hệ thống tác nhân sử dụng sự kết hợp giữa Graphiti và Opik.
+
+Graphiti chịu trách nhiệm về bộ nhớ dài hạn của tác nhân dưới dạng đồ thị tri thức, trong khi Opik cho phép theo dõi toàn bộ quy trình làm việc: công cụ nào đã được gọi, quyết định nào đã được đưa ra và lỗi xảy ra ở đâu.
+
+Cùng nhau, chúng giúp xây dựng các tác nhân AI đáng tin cậy và dễ giải thích hơn.
+ # 
+Graphiti - bộ nhớ
+Graphiti xây dựng đồ thị tri thức theo thời gian thực.
+
+Thay vì lưu trữ các tài liệu riêng lẻ, tác nhân nhận được một mạng lưới các thực thể được kết nối với nhau: con người, sự kiện, đối tượng và sự thật. Khi thông tin mới được cung cấp, đồ thị sẽ tự động được cập nhật, bảo toàn lịch sử thay đổi và ngữ cảnh.
+
+Cách tiếp cận này cho phép các tác nhân hoạt động đáng tin cậy hơn nhiều với bộ nhớ dài hạn.
+ # 
+Opik — khả năng quan sát
+Opik là một nền tảng dành cho LLMOps.
+
+Nó hiển thị toàn bộ nhật ký hoạt động của tác nhân: các truy vấn nào đã được gửi đến mô hình, công cụ nào đã được sử dụng, mỗi thao tác mất bao lâu và lỗi xảy ra ở giai đoạn nào.
+
+Các đánh giá chất lượng tự động, so sánh kết quả thử nghiệm và bảng điều khiển sản xuất cũng có sẵn.
+ # 
+📖 Bài viết: Kỹ thuật vòng lặp — Tại sao lời nhắc không còn là yếu tố chính nữa
+Tác giả bài viết giải thích lý do tại sao ngành công nghiệp đang dần từ bỏ ý tưởng "viết lời nhắc hoàn hảo".
+
+Boris Cherny, một trong những người tạo ra Claude Code, đã nói rất đơn giản:
+
+"Tôi không còn viết lời nhắc cho Claude nữa. Tôi viết các vòng lặp."
+
+Nói cách khác, thay vì tự tay hướng dẫn mô hình phải làm gì tiếp theo, nhà phát triển thiết kế một hệ thống tự động thực hiện một vòng lặp: phân tích nhiệm vụ, gọi các công cụ, lấy kết quả, cập nhật ngữ cảnh và tiếp tục hoạt động.
+
+Nhưng một tác nhân tốt không phải là một vòng lặp vô hạn.
+
+Quy tắc đầu tiên là giữ cho ngữ cảnh sạch sẽ. Kết luận lỗi thời, lập luận bế tắc và phản hồi dài sẽ dần làm giảm chất lượng của mô hình. Do đó, kết quả nên được nén thường xuyên, dữ liệu lớn nên được chuyển sang các tệp riêng biệt và các nhiệm vụ phức tạp nên được giao cho các tác nhân con.
+
+Quy tắc thứ hai là tác nhân phải biết khi nào nên dừng lại. Không phải "khi nó nghĩ" nhiệm vụ đã hoàn thành, mà dựa trên các tiêu chí khách quan: giới hạn số lần lặp, thời gian, ngân sách hoặc xác minh kết quả tự động.
+
+Quy tắc thứ ba là tác nhân không nên tự kiểm tra chính nó. Tốt hơn hết là sử dụng mô hình Người tạo + Người kiểm tra: một người tạo ra giải pháp, người kia cố gắng tìm lỗi và có thể bác bỏ kết quả.
+
+Cuối cùng, số lượng công cụ nên ít. Càng nhiều chức năng tương tự nhau, tác nhân càng thường xuyên chọn những chức năng không phù hợp. Một bộ công cụ nhỏ gọn, được thiết kế kỹ lưỡng tốt hơn hàng trăm khả năng chồng chéo.
+
+Kết luận chính của bài viết là: các mô hình đang dần trở thành một thành phần tiêu chuẩn của hệ thống. Kỹ thuật thực sự hiện nay nằm xung quanh chúng—trong bộ nhớ, vòng lặp, kiểm tra, ràng buộc, công cụ đo lường và khả năng quan sát.
+
+Do đó, các nhà phát triển giỏi nhất ngày nay không còn hỏi, "Tôi nên viết lời nhắc nào?"
+
+Họ hỏi, "Tôi nên xây dựng hệ thống nào để xử lý việc này mà không cần sự can thiệp của tôi?"
+ # 
+Tại sao điều này lại quan trọng?
+Graphiti và Opik minh họa cho sự chuyển đổi này.
+
+Graphiti chịu trách nhiệm về bộ nhớ của tác nhân, trong khi Opik giúp hiểu được những gì đã xảy ra trong vòng lặp.
+
+Những thành phần này đang dần trở thành nền tảng của các hệ thống dựa trên tác nhân hiện đại, nơi không chỉ sức mạnh của mô hình mà cả kiến ​​trúc của toàn bộ hệ thống xung quanh nó cũng rất quan trọng.
+ # 
+Liên kết
+https://github.com/getzep/graphiti
+
+https://github.com/comet-ml/opik
+
+https://x.com/i/status/2069118430582866051
+------
+Hội đồng Trí tuệ Cao cấp, một dự án tập hợp một hội đồng ảo gồm 18 cá nhân với các phương pháp tiếp cận khác nhau đối với việc ra quyết định hợp tác, đã chính thức ra mắt trên GitHub.
+
+Các thành viên tham gia bao gồm Marcus Aurelius, Aristotle, Socrates, Sun Tzu và nhiều người khác.
+ # 
+⚙️ Cách thức hoạt động
+Mỗi nhân vật phân tích vấn đề từ góc nhìn riêng của họ.
+
+Một số xác định rủi ro, số khác xem xét tính khả thi.
+
+Cuối cùng, trí tuệ nhân tạo (AI) sẽ tập hợp một giải pháp thống nhất dựa trên tất cả các thông tin đầu vào.
+
+Nó có thể được khởi chạy chỉ bằng một lệnh duy nhất trong Claude Code hoặc Codex và hoàn toàn miễn phí.
+ # 
+📌 Trường hợp có thể hữu ích
+Phù hợp với những người cần đưa ra quyết định phức tạp mà không chỉ dựa vào một nguồn thông tin duy nhất.
+
+Thay vì chỉ nhận được một câu trả lời từ AI, người dùng sẽ nhận được nhiều góc nhìn khác nhau, sau đó hệ thống sẽ tổng hợp chúng thành một khuyến nghị cuối cùng.
+ # 
+🎯 Tại sao điều này lại quan trọng?
+Dự án này thể hiện một cách tiếp cận thú vị trong việc sử dụng LLM: thay vì một câu trả lời duy nhất, đó là sự hợp tác giữa nhiều "nhà tư tưởng" với các triết lý và phương pháp phân tích khác nhau.
+ # 
+🔗 Liên kết
+https://github.com/0xNyk/council-of-high-intelligence
+-------
+Gmail Account Creator, một đoạn mã được thiết kế để tự động hóa hoàn toàn quá trình tạo hộp thư mới trên nền tảng Gmail, hiện đã được phát hành rộng rãi.
+ # 
+🧠 Vậy thì có ích gì?
+Công cụ này đảm nhiệm toàn bộ quy trình đăng ký Google gồm nhiều bước. Sử dụng các phương pháp mô phỏng hành vi duyệt web của người dùng thực, kịch bản này tự động điền vào các biểu mẫu, bỏ qua các bước kiểm tra bảo mật và xác nhận việc tạo tài khoản.
+ # 
+⚙️ Nó có thể làm được gì?
+Tiện ích này hoạt động dựa trên nguyên tắc tự động hóa không giao diện người dùng và hỗ trợ: tích hợp với các dịch vụ của bên thứ ba để giải mã captcha; tạo hoặc nhập dữ liệu người dùng; và hoạt động thông qua máy chủ proxy để thay đổi địa chỉ IP trong các giao dịch hàng loạt.
+ # 
+📊 Những trường hợp có thể hữu ích
+Dành cho các kỹ sư QA cần nhanh chóng tạo ra một nhóm tài khoản thử nghiệm.
+
+Dành cho các công ty tiếp thị cần mở rộng quy mô dự án.
+
+Dành cho các nhà nghiên cứu bảo mật nghiên cứu các cơ chế bảo vệ và chống gian lận.
+ # 
+🔗 Liên kết
+https://github.com/ShadowHackrs/gmail-account-creator
+--------
+ai-video-generator-claude, một kịch bản sử dụng mô hình Claude làm công cụ điều phối trung tâm để tạo video tự động, hiện đã được cung cấp cho công chúng.
+ # 
+🧠 Vậy thì có ích gì?
+Claude đóng vai trò như một "đạo diễn": nó phân tích yêu cầu của người dùng, viết kịch bản, chia nhỏ thành các cảnh, tạo mô tả cho hình ảnh và đưa ra các lệnh cho các công cụ bên ngoài để lắp ráp các nút video thành một tệp duy nhất.
+ # 
+⚙️ Nó có thể làm được gì?
+Xây dựng kịch bản — tạo một câu chuyện mạch lạc với phần mở đầu, cao trào và kết thúc.
+
+Tạo các thành phần hình ảnh — tạo các cảnh quay hoặc gợi ý cho mỗi phân cảnh.
+
+Lắp ráp dự án — tự động gọi các tiện ích dòng lệnh để ghép ảnh, thêm văn bản, phụ đề và nhạc nền.
+ # 
+📊 Những trường hợp có thể hữu ích
+Dùng để tạo mẫu nội dung nhanh và dựng video nháp cho mạng xã hội.
+
+Làm nền tảng để xây dựng các quy trình đa phương thức phức tạp hơn.
+
+Tự động hóa việc sản xuất video đào tạo hoặc thuyết trình dựa trên mô tả văn bản.
+ # 
+🔗 Liên kết
+https://github.com/rediumvex/ai-video-generator-claude
+-------
+Một kỹ năng tự học dành cho các tác nhân AI đã được phát hành trên GitHub, cho phép chúng ghi nhớ các quyết định thành công và tránh lặp lại các lần thử không thành công trong các phiên làm việc sau này.
+ # 
+🧠 Vậy thì có ích gì?
+Sau khi giải quyết thành công một vấn đề lần đầu tiên, tác nhân sẽ lưu phương pháp làm việc của mình vào bộ nhớ. Lần sau, nó sẽ truy cập kinh nghiệm đã lưu này thay vì phải thử lại tất cả các phương án, giúp tăng tốc đáng kể việc thực hiện các tác vụ lặp đi lặp lại hoặc tương tự.
+ # 
+⚙️ Nó có thể làm được gì?
+Kỹ năng này lưu lại các quyết định thành công, ghi nhớ những phương pháp nào đã thất bại và tăng tốc công việc trong các phiên làm việc tiếp theo. Nó tương thích với hầu hết các tác nhân AI hiện đại và dễ dàng tích hợp vào các quy trình làm việc hiện có.
+ # 
+📌 Trường hợp có thể hữu ích
+Đối với các tác nhân thực hiện các nhiệm vụ lặp đi lặp lại: xử lý dữ liệu, lập trình, phân tích tài liệu. Điều này đặc biệt hữu ích khi có các mẫu lặp lại, giúp tác nhân không lãng phí thời gian tìm kiếm giải pháp nhiều lần.
+ # 
+🎯 Tại sao điều này lại quan trọng?
+Đây là một bước tiến hướng tới việc tạo ra các tác nhân thực sự biết học hỏi—các hệ thống không chỉ thực thi các lệnh mà còn tích lũy kinh nghiệm. Cách tiếp cận này giúp giảm thiểu việc tiêu thụ token và cải thiện hiệu quả của hệ thống tác nhân về lâu dài.
+ # 
+🔗 Liên kết
+https://github.com/Kulaxyz/self-learning-skills
+=======
+Reverse-Skill, một bộ kỹ năng mạnh mẽ dành cho các tác nhân AI chuyên về phân tích ngược, kiểm thử xâm nhập và nghiên cứu bảo mật, đã được phát hành.
+ # 
+🧠 Vậy thì có ích gì?
+Công cụ "định tuyến kỹ năng" này tích hợp tính năng tự động định tuyến bằng trí tuệ nhân tạo, tự động tải các công cụ cần thiết và cơ sở kiến ​​thức tự phát triển. Nó giúp các chuyên viên lựa chọn phương pháp và công cụ phù hợp cho các nhiệm vụ phức tạp.
+ # 
+⚙️ Nó có thể làm được gì?
+Định tuyến tác vụ tự động (APK, tệp nhị phân, JS, CTF, kiểm thử xâm nhập, v.v.). Khởi tạo công cụ theo yêu cầu (IDA, Ghidra, radare2, Frida, Burp, v.v.). Hỗ trợ Claude Code, Cursor, Kiro, Cline và các tác nhân khác.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các tác nhân AI tham gia vào các hoạt động đảo ngược kỹ thuật, phân tích nhị phân, đảo ngược kỹ thuật trên thiết bị di động, kiểm thử xâm nhập và CTF.
+ # 
+🔗 Liên kết
+https://github.com/zhaoxuya520/reverse-skill
+------
+codebase-memory-mcp, một máy chủ MCP hiệu năng cao dùng để lập chỉ mục mã nguồn, đã được phát hành.
+ # 
+🧠 Vậy thì có ích gì?
+Nó lập chỉ mục mã nguồn vào một đồ thị tri thức bền vững. Nó hoạt động rất nhanh và hiệu quả bằng cách sử dụng các token.
+ # 
+⚙️ Nó có thể làm được gì?
+Lập chỉ mục kho lưu trữ trong mili giây. Hỗ trợ 158 ngôn ngữ. Truy vấn dưới mili giây. Tiết kiệm 99% token. Một tệp nhị phân tĩnh duy nhất không có phụ thuộc.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các tác nhân AI và các nhà phát triển làm việc với các cơ sở mã nguồn lớn.
+ # 
+🔗 Liên kết
+https://github.com/DeusData/codebase-memory-mcp
+-------
+GPT-SoVITS là một công cụ mã nguồn mở mạnh mẽ dành cho việc sao chép giọng nói và tổng hợp giọng nói với số lượng mẫu ít.
+ # 
+🧠 Vậy thì có ích gì?
+TTS không cần huấn luyện (Zero-shot TTS): Chỉ cần một mẫu giọng nói 5 giây là đủ để tổng hợp tức thì. TTS cần huấn luyện thêm (Few-shot TTS): Huấn luyện thêm trên 1 phút dữ liệu để cải thiện độ tương đồng. Hỗ trợ đa ngôn ngữ: Tiếng Anh, tiếng Nhật, tiếng Hàn, tiếng Quảng Đông và tiếng Trung Quốc.
+ # 
+⚙️ Nó có thể làm được gì?
+Tốc độ suy luận v2 ProPlus: RTF 0.028 trên 4060Ti, 0.014 trên 4090. Các công cụ tích hợp: tách giọng hát và nhạc đệm, phân đoạn tự động, nhận dạng giọng nói tự động (ASR) và đánh dấu văn bản.
+ # 
+📌 Trường hợp có thể hữu ích
+Dùng để tạo sách nói, lồng tiếng, thuyết minh và mọi tác vụ tổng hợp giọng nói bằng cách sao chép giọng nói.
+ # 
+🔗 Liên kết
+https://github.com/RVC-Boss/GPT-SoVITS
+--------
+Kỹ năng Seedance2 đã được thêm vào — một kỹ năng dành cho các tác nhân AI, dạy chúng cách viết các lời nhắc hiệu quả để tạo video bằng Jimeng Seedance 2.0 của ByteDance.
+ # 
+🧠 Vậy thì có ích gì?
+Kỹ năng này bao gồm mọi thứ: các hạn chế về dữ liệu đầu vào, cú pháp liên kết @, ngôn ngữ máy quay, cấu trúc lời nhắc và các mẫu có sẵn cho quảng cáo, video ngắn, phim truyền hình và nội dung giáo dục.
+ # 
+⚙️ Nó có thể làm được gì?
+Tương thích với Claude Code, Cursor, Cline và các agent khác. Việc cài đặt được thực hiện thông qua giao diện dòng lệnh (CLI) hoặc bằng cách sao chép tệp vào thư mục skills. Có phiên bản tiếng Anh và tiếng Trung.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho những người sáng tạo nội dung và nhà tiếp thị muốn tạo ra các video chất lượng cao thông qua Seedance 2.0 bằng cách sử dụng các tác nhân AI.
+ # 
+🔗 Liên kết
+https://github.com/dexhunter/seedance2-skill
+--------
+FckSignups, một công cụ mã nguồn mở giúp bỏ qua bước đăng ký bắt buộc trên các trang web, đã được phát hành.
+ # 
+🧠 Vậy thì có ích gì?
+Công cụ này tự động hóa quy trình tạo tài khoản trên các trang web yêu cầu đăng ký để truy cập nội dung. Điều này giúp tiết kiệm thời gian khi làm việc với nhiều dịch vụ khác nhau.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà phát triển và nhà nghiên cứu cần truy cập nhanh vào nhiều dịch vụ khác nhau mà không cần đăng ký thủ công cho từng dịch vụ.
+ # 
+🔗 Liên kết
+https://github.com/BraveOPotato/FckSignups
+-------
+Một cơ sở dữ liệu gồm 3.000 tài liệu về cách vượt qua kiểm duyệt bằng mạng thần kinh và các phương pháp bẻ khóa thiết bị đã được biên soạn trên GitHub.
+ # 
+⚙️ Bên trong có gì?
+Ví dụ về việc tiêm mã nhanh và các kịch bản AI phi tiêu chuẩn. Nghiên cứu về cơ chế phòng thủ của ChatGPT, Claude và Gemini. Tập hợp các hướng dẫn hệ thống và phân tích kiến ​​trúc tác nhân AI. Tài liệu về kiểm tra khả năng chống lại sự thao túng của các mô hình.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà nghiên cứu bảo mật, chuyên gia tấn công mô phỏng (red team) và bất kỳ ai nghiên cứu về các lỗ hổng của hệ thống trí tuệ nhân tạo.
+ # 
+🔗 Liên kết
+https://github.com/CyberAlbSecOP/Awesome_GPT_Super_Prompting
+---------
+Kỹ năng "Thẩm mỹ" đã ra mắt – một kỹ năng dành cho Fable 5 giúp loại bỏ hoàn toàn những câu lệnh lặp đi lặp lại vô nghĩa của AI và cung cấp cho mô hình các công cụ và hướng dẫn để tạo ra những thiết kế tuyệt đẹp.
+ # 
+🧠 Vậy thì có ích gì?
+Đây là một thủ thuật UI và UX cực kỳ độc đáo dành cho Fable 5. Theo tác giả, đây có thể là kỹ năng trí tuệ nhân tạo tốt nhất mà anh ấy từng sử dụng.
+ # 
+⚙️ Nó có thể làm được gì?
+Giúp Fable 5 tạo ra những thiết kế độc đáo, chất lượng cao. Nó cung cấp cho người dùng các công cụ và hướng dẫn rõ ràng để làm việc với hình ảnh.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà thiết kế và nhà phát triển sử dụng Fable 5, những người muốn có hình ảnh chất lượng cao thay vì "thiết kế AI" thông thường.
+ # 
+🔗 Liên kết
+https://tasteskill.dev
+--------
+Seedance 2.0 Skill OS đang được phát triển trên GitHub. Đây là một hệ thống kỹ năng điều khiển Seedance 2.0 như một đạo diễn, biến ý định của người dùng thành video hoàn chỉnh.
+ # 
+🧠 Vậy thì có ích gì?
+Hệ thống này bao gồm một số kỹ năng chuyên biệt: seedance-vfx dành cho hiệu ứng hình ảnh, seedance-prompt để viết và cải thiện kịch bản, seedance-interview để định hướng sáng tạo và phát triển ý tưởng.
+ # 
+⚙️ Nó có thể làm được gì?
+Viết, chỉnh sửa, dịch thuật và sửa lỗi các lời nhắc cho Seedance 2.0. Tạo hiệu ứng hình ảnh. Chỉ đạo sáng tạo trong việc phát triển ý tưởng video. Làm việc trên các nền tảng Dreamina, Jimeng và CapCut.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho những người sáng tạo video AI muốn có kết quả chất lượng cao từ Seedance 2.0 mà không cần phải trải qua quá trình thử và sai.
+ # 
+🔗 Liên kết
+https://github.com/Emily2040/seedance-2.0
+------
+Agrici Daniel sở hữu một hệ sinh thái lớn các công cụ AI mã nguồn mở trên GitHub, bao gồm các tác nhân, "bộ não thứ hai", video, SEO và MCP.
+ # 
+🧠 Vậy thì có ích gì?
+Tác giả thu thập các nguồn tài liệu gốc, biến chúng thành một cơ sở tri thức mạch lạc, bổ sung thêm lớp tác nhân và các kịch bản xác định cho các hoạt động mà việc hoàn toàn tin tưởng vào LLM là rất nguy hiểm.
+ # 
+⚙️ Các dự án trọng điểm
+Claude SEO — 25 kỹ năng và 18 tác nhân để kiểm tra SEO. Claude Obsidian — một "bộ não thứ hai" tự tổ chức dựa trên Obsidian. Claude Video — chỉnh sửa và xử lý video từ thiết bị đầu cuối. Claude Shorts — một quy trình tự động chuyển đổi video dài thành video ngắn và video tổng hợp. Skill Forge — một công cụ xây dựng kỹ năng cho các tác nhân AI. WP MCP Ultimate — một máy chủ MCP dành cho WordPress với 58 chức năng. Bản đồ đối thủ cạnh tranh địa phương — bản đồ 3D về các đối thủ cạnh tranh địa phương thông qua Google Places.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà phát triển, nhà tiếp thị và người tạo nội dung muốn sử dụng các hệ thống tác nhân có sẵn thay vì xây dựng chúng từ đầu.
+ # 
+🔗 Liên kết
+https://github.com/AgriciDaniel
+-------
+Cho phép các tác nhân AI quản lý an toàn các quy trình phân tích tệp nhị phân, bao gồm phân tích mã nguồn, dịch ngược mã và tìm kiếm chữ ký.
+ # 
+⚙️ Nó có thể làm được gì?
+Phân tích và dịch ngược mã nhị phân. Tìm kiếm chữ ký bằng YARA. Quản lý quy trình phân tích an toàn thông qua MCP. Tích hợp với Ghidra và Radare2.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà nghiên cứu bảo mật, chuyên gia phân tích phần mềm độc hại và kỹ sư đảo ngược muốn tự động hóa phân tích nhị phân bằng trí tuệ nhân tạo.
+ # 
+🔗 Liên kết
+https://github.com/sjkim1127/Reversecore_MCP
+-------
+Kho kỹ năng của David Ondrej, một bộ sưu tập các kỹ năng có sẵn dành cho các tác nhân AI, đang được phát triển trên GitHub.
+ # 
+🧠 Vậy thì có ích gì?
+Bộ công cụ này bao gồm các hướng dẫn và quy trình làm việc đã được chứng minh hiệu quả, giúp các nhân viên thực hiện các nhiệm vụ thông thường một cách hiệu quả hơn.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà phát triển sử dụng Claude Code, Codex, Cursor và các môi trường AI khác, những người cần các kỹ năng có sẵn thay vì phải tự viết từ đầu.
+ # 
+🔗 Liên kết
+https://github.com/davidondrej/skills
+--------
+Tencent đã phát hành CubeSandbox, một môi trường thử nghiệm hiệu năng cao dành cho các tác nhân AI được xây dựng trên RustVMM và KVM.
+ # 
+🧠 Vậy thì có ích gì?
+Tạo môi trường sandbox cách ly phần cứng trong chưa đến 60 ms với dung lượng bộ nhớ dưới 5 MB. Tương thích với SDK E2B. Hỗ trợ cả triển khai đơn lẻ và mở rộng quy mô cụm.
+ # 
+⚙️ Nó có thể làm được gì?
+Khởi động chỉ trong vài chục mili giây. Cách ly phần cứng ở cấp độ nhân hệ điều hành. Khả năng xử lý đồng thời và mật độ triển khai cao. Giấy phép Apache 2.0.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà phát triển tác nhân AI cần một môi trường thực thi mã an toàn và nhanh chóng mà không làm ảnh hưởng đến hệ thống nền tảng.
+ # 
+🔗 Liên kết
+https://github.com/TencentCloud/CubeSandbox
+-------
+Nhà nghiên cứu về bẻ khóa AI, Pliny, đã phát hành T3MP3ST, một hệ thống đa tác tử để tìm kiếm các lỗ hổng trong các dịch vụ, ra công chúng.
+ # 
+🧠 Vậy thì có ích gì?
+Bạn chỉ cần chỉ định mục tiêu, và các tác nhân sẽ tự phân tích, tìm ra sơ hở và tấn công. Trong số 104 nhiệm vụ, AI giải quyết được 90% ngay lần thử đầu tiên.
+ # 
+📌 Trường hợp có thể hữu ích
+Hoàn hảo để học về an ninh mạng và kiểm thử xâm nhập.
+ # 
+🔗 Liên kết
+https://github.com/elder-plinius/T3MP3ST
+--------
+ông vua xóa phông nền
+https://github.com/Suvink/cut-it-out
+-----
+GitHub hiện đã có finding-unknown-skills, một kỹ năng dành cho các tác nhân AI giúp tìm ra các phụ thuộc chưa biết, các kết nối ẩn và các phần chưa được ghi chép trong mã nguồn.
+ # 
+🧠 Vậy thì có ích gì?
+Kỹ năng này phân tích dự án và xác định các khu vực có thể tiềm ẩn rủi ro hoặc không rõ ràng: mã không được sử dụng, các phụ thuộc ẩn, API không được ghi chép lại.
+ # 
+📌 Trường hợp có thể hữu ích
+Dành cho các nhà phát triển muốn hiểu rõ hơn về kiến ​​trúc dự án và tìm ra các vấn đề tiềm ẩn trước khi chúng trở nên nghiêm trọng.
+ # 
+🔗 Liên kết
+https://github.com/bozhouDev/finding-unknowns-skills
+-----
+HanaAgent là một trợ lý AI mã nguồn mở dành cho máy tính để bàn, được thiết kế không chỉ cho lập trình viên mà còn cho việc sử dụng máy tính hàng ngày. Trợ lý này ghi nhớ các cuộc hội thoại trước đó, có cá tính riêng, quản lý tập tin và trình duyệt, thực thi các lệnh và quản lý lịch trình của bạn.
+ # 
+🧠 Vậy thì có ích gì?
+HanaAgent mang đến khả năng của các tác nhân đầu cuối cho một ứng dụng đồ họa hoàn chỉnh. Người dùng kết nối mô hình, tạo một hoặc nhiều trợ lý và tương tác với chúng thông qua trò chuyện thông thường, giao diện máy tính để bàn, giao diện di động hoặc các ứng dụng nhắn tin bên ngoài.
+ # 
+⚙️ Nó có thể làm được gì?
+Mỗi tác nhân đều có bộ nhớ, tính cách và logic hành vi riêng. Nó đọc và chỉnh sửa tập tin, thực thi lệnh, chụp ảnh màn hình, quản lý trình duyệt và tìm kiếm thông tin. Tương thích với hệ sinh thái Kỹ năng. Hỗ trợ các tác vụ Cron và kiểm tra định kỳ. Kết nối với Telegram, Feishu, QQ và WeChat.
+ # 
+🛡 Bảo mật
+Có hai cấp độ cách ly: PathGuard ở cấp độ ứng dụng và Seatbelt/Bubblewrap/mã thông báo bị hạn chế ở cấp độ hệ điều hành. Theo mặc định, tác nhân có thể đọc tệp, nhưng việc ghi và xóa bị hạn chế.
+ # 
+🔗 Liên kết
+https://github.com/liliMozi/openhanako https://openhanako.com/
+-------
+Wigolo là một máy chủ MCP cục bộ cung cấp cho Claude Code, Codex, Cursor, Gemini CLI và các tác nhân khác một bộ công cụ thống nhất để làm việc với internet. Nó có thể tìm kiếm trang web, tải xuống trang, thu thập dữ liệu từ các phần, trích xuất dữ liệu và tiến hành nghiên cứu.
+ # 
+🧠 Vậy thì có ích gì?
+Wigolo hoạt động trên máy tính của người dùng. Các công cụ cốt lõi không yêu cầu khóa API, và các trang được tìm thấy, chỉ mục và bộ nhớ đệm được lưu trữ cục bộ. Chi phí cho mỗi truy vấn tìm kiếm vẫn bằng không.
+ # 
+🔎 Nó có thể làm được gì?
+Tìm kiếm tích hợp 18 bộ điều hợp trực tiếp với xếp hạng ML cục bộ. Tự động tải dữ liệu từ HTTP lên trình duyệt không giao diện người dùng với tính năng chống bot. Thu thập dữ liệu thông qua BFS, DFS hoặc sơ đồ trang web. Trích xuất bảng, siêu dữ liệu, JSON-LD và đối tượng. Bộ nhớ cục bộ với BM25 và tìm kiếm lai.
+ # 
+📦 Lắp đặt
+Wigolo yêu cầu Node.js phiên bản 20 trở lên và khoảng 1,5 GB dung lượng ổ đĩa. Một lệnh duy nhất sẽ cài đặt mọi thứ và kích hoạt tác nhân đã chọn: `npx wigolo init --non-interactive --agents=codex`
+ # 
+🔗 Liên kết
+https://github.com/KnockOutEZ/wigolo
+--------
+SpiderFoot là một nền tảng mở dành cho hoạt động trinh sát OSINT tự động, phân tích mối đe dọa và lập bản đồ bề mặt tấn công bên ngoài. Nó tích hợp hơn 200 mô-đun thu thập dữ liệu từ các công cụ tìm kiếm, DNS, mạng xã hội, rò rỉ thông tin, blockchain và các dịch vụ tình báo mạng.
+ # 
+🧠 Vậy thì có ích gì?
+Người dùng chỉ định thực thể nguồn: tên miền, địa chỉ IP, email, tên, số điện thoại, biệt danh hoặc địa chỉ mã hóa. Các mô-đun trao đổi các sự kiện mà chúng tìm thấy bằng mô hình nhà xuất bản/người đăng ký. Kết quả từ một nguồn tự động trở thành đầu vào cho các lần kiểm tra tiếp theo.
+ # 
+⚙️ Nó có thể làm được gì?
+Tìm kiếm tên miền và tên miền phụ, email, số điện thoại, lưu trữ đám mây, cổng mở và siêu dữ liệu tài liệu. Kiểm tra rò rỉ dữ liệu, chuyển vùng DNS, danh sách đen, định vị địa lý IP và dữ liệu darknet. Tích hợp với Shodan, Have I Been Pwned, GreyNoise và các công cụ khác.
+ # 
+🔗 Tương quan
+Công cụ tương quan tích hợp sử dụng 37 quy tắc YAML để tìm ra các mối quan hệ quan trọng giữa các sự kiện đã thu thập. Kết quả được xuất ra dưới dạng CSV, JSON hoặc GEXF.
+ # 
+🔗 Liên kết
+https://github.com/smicallef/spiderfoot https://www.spiderfoot.net/
+---------
+Sokuji là một studio AI chuyên về sao chép giọng nói và dịch thuật giọng nói tức thì. Người đối thoại của bạn sẽ ngay lập tức nghe thấy bạn bằng ngôn ngữ của họ.
+ # 
+🧠 Vậy thì có ích gì?
+Hoạt động với Zoom, Google Meet, Teams, Discord và các dịch vụ khác. Có thể hoạt động hoàn toàn ngoại tuyến—không cần internet hoặc API. Hỗ trợ các mô hình đám mây từ OpenAI, Gemini và các API tương thích khác.
+ # 
+⚙️ Nó có thể làm được gì?
+Nhận diện hơn 99 ngôn ngữ, dịch giữa hơn 55 hướng ngôn ngữ và cung cấp thuyết minh bằng 136 giọng nói. Dịch lời nói của những người tham gia cuộc họp khác và hiển thị phụ đề. Có tính năng giảm tiếng ồn và micro ảo.
+ # 
+💻 Các nền tảng
+Windows, macOS, Linux, Chrome và Edge.
+ # 
+🔗 Liên kết
+https://github.com/kizuna-ai-lab/sokuji
+----------
+Tuyển chọn 6 dịch vụ hỗ trợ bởi trí tuệ nhân tạo giúp dạy ngôn ngữ và các môn học khác – gia sư cá nhân trong hầu hết mọi lĩnh vực.
+ # 
+1️⃣ CHỦ NGHĨA SOCRATIC
+Một gia sư bỏ túi cho mọi môn học. Hướng camera vào bài toán trong sách giáo khoa và nhận được phân tích từng bước kèm lời giải thích cho mỗi bước. Hoạt động với toán học, vật lý, hóa học, lịch sử và văn học.
+ # 
+2️⃣ NẮM BẮT TÂM TRÍ
+Tải lên file PDF, đường dẫn đến bài giảng hoặc video YouTube—và bạn sẽ nhận được ghi chú có cấu trúc, các điểm chính và bài kiểm tra để tự đánh giá.
+ # 
+3️⃣ CURIPOD
+Tạo một bài học hoàn chỉnh về bất kỳ chủ đề nào chỉ trong 2 phút: slide, bài tập tương tác, khảo sát và câu hỏi trắc nghiệm nhỏ.
+ # 
+4️⃣ STUDYFETCH
+Biến ghi chú thành tài liệu luyện thi: thẻ ghi nhớ, tóm tắt, ngân hàng câu hỏi và kế hoạch ôn tập.
+ # 
+5️⃣ GIẢI THÍCH BẰNG TRÍ TUỆ NHÂN TẠO
+Chuyển đổi những định nghĩa phức tạp thành ngôn ngữ dễ hiểu thông qua các phép ẩn dụ và ví dụ đời thường.
+ # 
+6️⃣ KHANMIGO
+Phương pháp này sử dụng tài liệu của Khan Academy để luyện tập. Nó không cung cấp câu trả lời có sẵn, mà thay vào đó dẫn dắt bạn đến giải pháp thông qua các câu hỏi gợi mở.
+ # 
+🔗 Liên kết
+Socratic MindGrasp Curipod StudyFetch AI Explainer Khanmigo
+------
+Bộ sưu tập "Tự xây dựng X" nổi tiếng, có sẵn trên GitHub, cung cấp hướng dẫn từng bước để tái tạo các công nghệ yêu thích của bạn từ đầu.
+ # 
+🧠 Vậy thì có ích gì?
+Như Richard Feynman từng nói, "Những gì tôi không thể tạo ra, tôi không hiểu." Đó là một cách học tuyệt vời - hiểu công nghệ bằng cách tự mình tạo ra nó.
+ # 
+⚙️ Bên trong có gì?
+Trình dựng hình 3D, mô hình AI, trình khách BitTorrent, blockchain, bot, cơ sở dữ liệu, Docker, trình giả lập, khung giao diện người dùng, trò chơi, Git, mạng thần kinh, hệ điều hành, công cụ tìm kiếm, shell, máy chủ web và nhiều hơn nữa.
+ # 
+🔗 Liên kết
+https://github.com/codecrafters-io/build-your-own-x
+---------
+Một kỹ năng mã nguồn mở mới xuất hiện từ Greg Brockman, đồng sáng lập OpenAI, giúp tìm kiếm người dùng tiềm năng cho các công ty khởi nghiệp.
+ # 
+⚙️ Nó có thể làm được gì?
+Phân tích dự án của bạn thông qua liên kết. Tạo hồ sơ khách hàng lý tưởng. Xác định các vấn đề và nhu cầu của đối tượng mục tiêu thông qua các cuộc thảo luận mở. Đánh giá các khách hàng tiềm năng. Tạo ra các ưu đãi cá nhân hóa.
+ # 
+📊 Kết quả
+Tổng hợp mọi thứ vào một báo cáo HTML với các liên kết đến nguồn. Cài đặt chỉ bằng một lệnh duy nhất.
+ # 
+🔗 Liên kết
+https://github.com/Kappaemme-git/codex-first-customer-finder-skill
+--------
+Một hệ thống trí tuệ nhân tạo (AI) đã được ra mắt, có khả năng tự động theo dõi thị trường việc làm, chỉnh sửa sơ yếu lý lịch, gửi phản hồi và thậm chí lên lịch phỏng vấn.
+ # 
+⚙️ Nó có thể làm được gì?
+Hệ thống giám sát liên tục sẽ chọn lọc những vị trí tuyển dụng phù hợp với kỹ năng và kinh nghiệm của bạn. Nó sẽ điều chỉnh sơ yếu lý lịch và viết thư xin việc riêng biệt cho từng vị trí. Hệ thống cũng thêm tất cả các từ khóa cần thiết để vượt qua trình tuyển dụng AI và gửi sơ yếu lý lịch của bạn đến đúng người đại diện nhân sự.
+ # 
+📌 Còn gì nữa?
+Bạn có thể kết nối với bot Telegram và nhận lời mời phỏng vấn.
+ # 
+🔗 Liên kết
+https://github.com/fikstt2/hh-ai-agent
+------
+Người dùng Twitter đã biên soạn một tập tin .md khổng lồ gồm 724.000 ký tự có tên là Shipper — một bộ quy tắc loại bỏ mọi yếu tố không cần thiết của AI trong thiết kế.
+ # 
+🧠 Vậy thì có ích gì?
+Các tác giả đã biên soạn các quy tắc buộc mạng nơ-ron phải thiết kế như những chuyên gia: không sử dụng đổ bóng, biểu tượng cảm xúc, huy hiệu, hiệu ứng chuyển màu từ tím sang xanh lam, và nhiều hơn nữa. Nó cũng loại bỏ khoảng 220 từ mà AI liên tục sử dụng.
+ # 
+🔗 Liên kết
+https://shipper.now/
+-------
+Storyboard Reference Studio là một ứng dụng máy tính để bàn mã nguồn mở dùng để tạo tài liệu tham khảo trực quan, bảng phân cảnh và gợi ý. Tải lên một đoạn phim, chọn bố cục và nhận được một tập hợp các khung hình kèm theo mô tả về góc máy quay, ánh sáng và không khí.
+ # 
+🧠 Vậy thì có ích gì?
+Các gợi ý có thể được điều chỉnh cho phù hợp với Midjourney, Flux, GPT-Image, Nano Banana, SDXL hoặc trình tạo ảnh đa năng. Ứng dụng sử dụng Claude Vision để phân tích các khung hình và tạo ra các mô tả có cấu trúc.
+ # 
+⚙️ Nó có thể làm được gì?
+Tự động trích xuất khung hình thông qua FFmpeg. Tái định dạng khung hình theo yêu cầu. Chú thích chuyển động máy quay. Tạo animatic với khả năng xuất MP4. Máy chủ MCP để điều khiển thông qua Claude Code và Codex. Chế độ hoàn toàn ngoại tuyến, không cần kết nối internet.
+ # 
+🔗 Liên kết
+https://github.com/wassermanproductions/storyboard-reference-studio
+------
+Firecrawl vừa phát hành một trình phân tích PDF có khả năng xử lý một trang trong 0,002 giây. Nó xử lý 200 tài liệu trong 2,8 giây.
+ # 
+⚙️ Nó có thể làm được gì?
+Chuyển đổi nội dung sang định dạng Markdown, bảo toàn cấu trúc tài liệu và bảng. Được viết bằng ngôn ngữ Rust, dịch vụ này nhẹ và dễ cài đặt. Không có hạn chế, hoàn toàn mã nguồn mở.
+ # 
+🔗 Liên kết
+https://github.com/firecrawl/pdf-inspector
+-------
+
+-------
+
+--------
+
+-------
+
+-------
+
+--------
+
+-------
+
+-------
+
+--------
