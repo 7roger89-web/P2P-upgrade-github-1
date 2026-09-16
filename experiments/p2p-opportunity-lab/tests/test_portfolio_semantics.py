@@ -94,6 +94,80 @@ class PortfolioSemanticsTests(unittest.TestCase):
         self.assertEqual(result["requirements"], {"40HC": 2})
         self.assertEqual(result["ranking"][0]["total"], "1850")
 
+    def test_missing_charge_coverage_blocks_false_cheapest_provider(self):
+        a = provider("A", 500, 900)
+        b = provider("B", 480, 850)
+        a["offers"][1]["charges"].append({
+            "name": "THC", "amount": 100, "basis": "PER_CONTAINER", "scope": "MAIN", "source_ref": "A:40:thc"
+        })
+        result = compare_fcl_portfolios([a, b], self.context())
+        self.assertEqual([row["quote_set_id"] for row in result["ranking"]], ["A"])
+        b_excluded = next(row for row in result["excluded"] if row["quote_set_id"] == "B")
+        self.assertIn("COVERAGE_GAP:40HC:MAIN::THC", b_excluded["reasons"])
+        self.assertEqual(result["decision_warning"], "INSUFFICIENT_COMPLETE_PROVIDER_PORTFOLIOS")
+
+    def test_evidenced_bundle_restores_equipment_coverage(self):
+        a = provider("A", 500, 900)
+        b = provider("B", 480, 930)
+        a["offers"][1]["charges"].append({
+            "name": "THC", "included": True, "basis": "INCLUDED", "scope": "MAIN", "source_ref": "A:40:thc-included"
+        })
+        b["offers"][1]["charges"] = [{
+            "name": "All-in freight",
+            "amount": 930,
+            "basis": "PER_CONTAINER",
+            "scope": "MAIN",
+            "source_ref": "B:40:all-in",
+            "bundle_includes": ["Freight", "THC"],
+            "bundle_primary_code": "Freight",
+        }]
+        result = compare_fcl_portfolios([a, b], self.context())
+        self.assertEqual(len(result["ranking"]), 2)
+        self.assertIn("MAIN::THC", result["required_coverage"]["40HC"])
+
+    def test_unresolved_offer_condition_blocks_provider_ranking(self):
+        a = provider("A", 500, 900)
+        b = provider("B", 480, 850)
+        b["offers"][1]["conditions"] = [{
+            "text": "subject to PSS confirmation",
+            "source_ref": "B:40:terms",
+            "resolved": False,
+        }]
+        result = compare_fcl_portfolios([a, b], self.context())
+        self.assertEqual([row["quote_set_id"] for row in result["ranking"]], ["A"])
+        b_excluded = next(row for row in result["excluded"] if row["quote_set_id"] == "B")
+        self.assertIn("40HC:INCOMPLETE_OFFER", b_excluded["reasons"])
+
+    def test_expired_required_equipment_offer_excludes_provider(self):
+        a = provider("A", 500, 900)
+        b = provider("B", 480, 850)
+        b["offers"][1]["valid_to"] = "2026-08-31"
+        result = compare_fcl_portfolios([a, b], self.context())
+        self.assertEqual([row["quote_set_id"] for row in result["ranking"]], ["A"])
+        b_excluded = next(row for row in result["excluded"] if row["quote_set_id"] == "B")
+        self.assertIn("40HC:EXPIRED", b_excluded["reasons"])
+
+    def test_evidenced_portfolio_coverage_resolution_restores_provider(self):
+        a = provider("A", 500, 900)
+        b = provider("B", 480, 850)
+        a["offers"][1]["charges"].append({
+            "name": "THC", "amount": 100, "basis": "PER_CONTAINER", "scope": "MAIN", "source_ref": "A:40:thc"
+        })
+        context = self.context()
+        context["portfolio_coverage_resolutions"] = {
+            "B": {
+                "40HC": {
+                    "MAIN::THC": {"status": "INCLUDED", "source_ref": "B:40:terms:thc-included"}
+                }
+            }
+        }
+        result = compare_fcl_portfolios([a, b], context)
+        self.assertEqual(len(result["ranking"]), 2)
+        b_row = next(row for row in result["coverage_matrix"] if row["quote_set_id"] == "B")
+        b_40 = next(row for row in b_row["buckets"] if row["bucket"] == "40HC")
+        self.assertEqual(b_40["unresolved_missing_codes"], [])
+        self.assertEqual(b_40["resolved_missing_codes"][0]["status"], "INCLUDED")
+
 
 if __name__ == "__main__":
     unittest.main()
