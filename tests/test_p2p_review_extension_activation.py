@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +49,19 @@ class ReviewExtensionActivationTests(unittest.TestCase):
             self.assertEqual("USE_OCR_DELEGATION", decision["decision"])
             self.assertIn("RECENT_FAILED_OR_BLOCKED_SESSION", decision["matched_signals"])
             self.assertTrue(decision["runtime_evidence"]["read_only"])
+
+    def test_host_cli_root_is_discovered_without_control_tower_coupling(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / ".git").mkdir()
+            ledger = root / activation.LEDGER_RELATIVE_PATH
+            ledger.parent.mkdir(parents=True)
+            ledger.write_text('{"SESSION_STATE":"BLOCKED"}\n', encoding="utf-8")
+            argv = ["p2p_control_tower.py", "--root", str(root), "start", "--host", "ARENA"]
+            with mock.patch.object(sys, "argv", argv):
+                decision = activation.review_gap_decision("Review code")
+            self.assertEqual(root.resolve().as_posix(), decision["runtime_evidence"]["repo_root"])
+            self.assertIn("RECENT_FAILED_OR_BLOCKED_SESSION", decision["matched_signals"])
 
     def test_large_real_worktree_diff_activates_from_git_state(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
