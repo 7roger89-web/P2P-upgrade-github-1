@@ -14,10 +14,11 @@ Current committed regression inventory:
 - atomic validated pipeline: 2 percentage integration contracts + 2 FX-first integration contracts;
 - validated FCL portfolio pipeline: 3 percentage integration contracts + 2 FX-first integration contracts;
 - experiment tracker: 5 tests;
-- synthetic quote fixture: 1 deterministic fixture test;
+- legacy synthetic quote fixture: 1 deterministic core-engine fixture test;
+- validated golden quote fixture: 1 end-to-end top-level pipeline test;
 - design-partner shortlist fixture: 4 tests exercising 6 evidence-backed candidates against qualification/stage/score/no-money-signal invariants.
 
-**Exact collected total: 86 tests.**
+**Exact collected total: 87 tests.**
 
 Coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
 
@@ -45,6 +46,20 @@ Top-level atomic pipeline order is:
 
 Top-level FCL portfolio pipeline applies the same order independently to every required equipment offer and shared provider bucket.
 
+## Validated golden fixture
+
+`pilots/logistics-quote-comparison/fixtures/synthetic-validated-quote-set-02.json` is the top-level integration fixture. It exercises the real atomic entrypoint with one scenario containing all of the following at once:
+
+- evidenced `CNY -> USD` conversion;
+- `BAF = 5% of FREIGHT` using an explicit named base line;
+- an evidenced all-in bundle covering freight + THC;
+- an unselected optional insurance add-on that must not contaminate price or required coverage;
+- evidence-backed `CNSHA -> SHANGHAI` route aliasing;
+- canonical `40HQ -> 40HC` equipment normalization;
+- apples-to-apples scoped coverage and final ranking.
+
+Expected deterministic ranking is `VAL-B USD 1940 < VAL-A USD 2028`. The fixture additionally asserts FX audit, percentage audit, route-alias audit, optional exclusion, and no unresolved coverage gaps. This fixture protects the whole validated pipeline rather than testing only the core comparison engine.
+
 ## Focused CI acceptance surface
 
 Workflow: `.github/workflows/p2p-opportunity-lab-focused.yml`.
@@ -53,8 +68,8 @@ The workflow intentionally uses only the Python standard library test runner:
 
 `python -m unittest discover -s tests -p 'test_*.py' -v`
 
-No external pytest installation is required. This reduces network/supply-chain drift while preserving the same 86-test deterministic contract inventory.
+No external pytest installation is required. This reduces network/supply-chain drift while preserving the deterministic contract inventory.
 
-Every substantive branch mutation must obtain fresh exact-head focused-CI evidence plus P2P Shield evidence before the new head inherits PASS status. Exact accepted head/run IDs are maintained in PR #180 and Issue #181 so this file does not need a self-referential commit just to record its own SHA.
+Every substantive branch mutation must obtain fresh exact-head focused-CI evidence plus P2P Shield evidence before the new head inherits PASS status. Exact accepted head/run IDs are maintained in PR #180 and Issue #181 rather than committed here, avoiding a self-referential commit loop.
 
-The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic, shortlist, and regression fixtures are not market evidence; they protect deterministic behavior before real participant data arrives.
+Synthetic, shortlist, and regression fixtures are not market evidence; they protect deterministic behavior before real participant data arrives.
