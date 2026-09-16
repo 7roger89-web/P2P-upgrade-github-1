@@ -43,7 +43,7 @@ A six-hour reply watch is active, but an unsent outreach comment cannot receive 
 
 ## Atomic quote validation pipeline
 
-Raw real-world atomic comparison entrypoint:
+Real-world atomic comparison entrypoint:
 
 `src.validation_pipeline.compare_quotes_validated`
 
@@ -67,53 +67,63 @@ Implemented protections include:
 
 ## Multi-equipment FCL validation pipeline
 
-Raw provider-portfolio entrypoint:
+Real-world provider-portfolio entrypoint:
 
 `src.portfolio_validation_pipeline.compare_fcl_portfolios_validated`
 
-Base portfolio engine remains:
-
-`src.portfolio_semantics.compare_fcl_portfolios`
-
-The validated portfolio pipeline now:
+The validated portfolio pipeline:
 - resolves FX independently for every required equipment offer and shared provider bucket;
 - resolves percentage surcharges only after FX;
-- uses the required equipment quantity when resolving an offer-level percentage;
-- rebases the resolved percentage total to a `PER_CONTAINER` amount that reconstructs the same offer total in the existing engine;
+- uses required equipment quantity when resolving offer-level percentage charges;
+- rebases resolved percentage totals to `PER_CONTAINER` without changing the total contribution;
 - resolves shared FX/percentage charges once at provider level, not once per equipment row;
-- excludes a provider whose FX or percentage semantics are unresolved while allowing other complete providers to remain rankable;
+- excludes only providers with unresolved FX or percentage semantics while allowing other complete providers to remain rankable;
 - preserves apples-to-apples coverage per equipment bucket and shared bucket;
 - rejects missing or ambiguous required equipment rather than guessing.
+
+## Validated golden fixture
+
+Golden integration fixture:
+
+`pilots/logistics-quote-comparison/fixtures/synthetic-validated-quote-set-02.json`
+
+It exercises the top-level atomic pipeline end to end with evidenced FX, named-base percentage surcharge, all-in bundle coverage, optional exclusion, route alias provenance and equipment alias normalization in one deterministic quote set.
+
+Expected ranking:
+
+`VAL-B USD 1940 < VAL-A USD 2028`
+
+The contract also verifies:
+- FX is actually reported as applied;
+- the CNY THC conversion is preserved in audit;
+- BAF resolves from an explicit freight line base;
+- the `CNSHA -> SHANGHAI` alias is audited;
+- unselected insurance is excluded rather than silently priced;
+- required scoped coverage has no unresolved gaps.
 
 ## Schemas and documentation
 
 - quote intake carries charge scope, bundle fields, optional selection, stable `line_id`, percentage rate and named base line IDs;
 - comparison context carries explicit direct `fx_rates` with `from`, `to`, positive `rate`, `source_ref` and `as_of_date`;
-- `docs/CHARGE-SEMANTICS.md`, `docs/PERCENTAGE-SEMANTICS.md`, and `docs/FX-SEMANTICS.md` define the entrypoint hierarchy and evidence boundaries.
+- `docs/CHARGE-SEMANTICS.md`, `docs/PERCENTAGE-SEMANTICS.md`, `docs/FX-SEMANTICS.md`, and `docs/TEST_MATRIX.md` define the evidence boundaries and deterministic acceptance contracts.
 
 ## Verification state
 
-Full source-tree deterministic acceptance now exists through `.github/workflows/p2p-opportunity-lab-focused.yml`.
+Full source-tree deterministic acceptance is provided by `.github/workflows/p2p-opportunity-lab-focused.yml` using Python stdlib `unittest` only; it does not install pytest or another external test runner.
 
-Exact accepted evidence on head `4dfd6ba5168bac14e1bafc3ad70ef22f41192a05`:
-- source compile: **PASS**;
-- full Opportunity Lab pytest suite: **86/86 PASS** (`86 passed in 0.08s`);
-- focused workflow run `35072232369`: **SUCCESS**;
-- P2P Shield run `35072232306`: **SUCCESS**.
+The committed regression inventory is now **87 tests**, including one top-level validated golden fixture. The exact accepted branch SHA, current-main merge ref, workflow run IDs and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation so this file does not create a self-referential SHA-update loop.
 
-The 86-test total is reconciled with `docs/TEST_MATRIX.md`; the design-partner fixture is 4 tests exercising 6 candidates, not 6 tests.
-
-Focused historical harness evidence remains useful for diagnosis, but the exact-head GitHub Actions run above is now the authoritative deterministic regression evidence for that head. Any later branch mutation requires fresh focused-CI evidence before the new head inherits PASS status.
+A branch mutation does not inherit prior PASS automatically. Fresh focused CI plus P2P Shield are required for the new exact head.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane is blocked only on Reddit delivery capability. Internal validation now has a reproducible exact-head domain-test surface rather than fragmented local probe evidence.
+The external lane remains blocked only on Reddit delivery capability. Internal validation now has both full source-tree CI and a realistic top-level golden fixture that proves the main atomic layers compose correctly.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Before adding pricing breadth, use the full focused CI as the gate for any internal hardening; prefer fixing integration/bypass inconsistencies over speculative new semantics.
+2. Prefer adversarial/realistic fixture hardening over speculative pricing breadth until real quote data justifies a new semantic.
 3. On opt-in, run the real concierge test through the top-level validated entrypoint, record corrections/trust objections/repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
