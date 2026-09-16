@@ -16,9 +16,10 @@ Current committed regression inventory:
 - experiment tracker: 5 tests;
 - legacy synthetic quote fixture: 1 deterministic core-engine fixture test;
 - validated golden quote fixture: 2 top-level tests (end-to-end evidence/ranking + input-order invariance);
+- dirty quote adversarial lane: 4 top-level validated-pipeline tests;
 - design-partner shortlist fixture: 4 tests exercising 6 evidence-backed candidates against qualification/stage/score/no-money-signal invariants.
 
-**Exact collected total: 88 tests.**
+**Exact collected total: 92 tests.**
 
 Coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
 
@@ -61,6 +62,19 @@ Top-level FCL portfolio pipeline applies the same order independently to every r
 Expected deterministic ranking is `VAL-B USD 1940 < VAL-A USD 2028`. The primary golden test asserts FX audit, percentage audit, route-alias audit, optional exclusion, no unresolved coverage gaps and final ranking.
 
 A second adversarial golden test reverses both the quote order and every quote's charge-line order. Ranking, required coverage, FX application and the core evidence resolutions must remain identical. This protects the validated pipeline from accidental first-seen/order-dependent behavior.
+
+## Dirty quote adversarial contracts
+
+`tests/test_dirty_quote_adversarial.py` mutates the validated golden quote set at the top-level entrypoint rather than testing isolated helpers.
+
+The four contracts prove:
+
+- deleting a required `DOC` charge cannot manufacture a false cheapest quote; the incomplete quote is not rankable and the result warns that fewer than two complete comparable quotes remain;
+- adding `Sea Freight` beside `Ocean Freight` in the same scope/basis/currency is canonicalized to the same `FREIGHT` identity and blocked as `DUPLICATE_PRICED_CHARGE` before ranking;
+- supplying two evidenced direct `CNY -> USD` rates for the same comparison context is treated as `AMBIGUOUS_FX_RATE`; the pipeline does not pick one arbitrarily;
+- removing provenance from the freight line used as the named base for BAF prevents percentage resolution and produces `UNRESOLVED_PERCENTAGE_SEMANTICS` rather than pricing from an unproven base.
+
+These tests intentionally reward refusal when evidence is incomplete or contradictory. A safe `no decision` is preferable to a fabricated winner.
 
 ## Focused CI acceptance surface
 
