@@ -33,6 +33,13 @@ jobs:
           count=$(find .p2p/export-v2/chunks -type f -name 'chunk-*' | wc -l)
           printf 'SOURCE_MAIN_SHA=2f8ec22b755c7d591abcb0abe859056fdc7b90ee\nORIGINAL_BYTE_SIZE=%s\nORIGINAL_SHA256=%s\nORIGINAL_GIT_BLOB_SHA=%s\nBASE64_CHAR_COUNT=%s\nCHUNK_SIZE=12000\nCHUNK_COUNT=%s\n' "$bytes" "$sha256" "$blob" "$chars" "$count" > .p2p/export-v2/MANIFEST.txt
           rm -rf .tmp-p2p-law-target /tmp/p2p-law.b64
+      - name: Upload exact portable law artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2p-portable-law-exact
+          path: .p2p/export-v2/P2P-OPERATIONS-NOTEBOOK.md
+          if-no-files-found: error
+          retention-days: 1
       - name: Commit generated transport evidence
         run: |
           git config user.name "github-actions[bot]"
