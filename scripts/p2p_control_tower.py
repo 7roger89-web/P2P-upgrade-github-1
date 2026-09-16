@@ -43,7 +43,7 @@ _CANONICAL_LAW_IDENTIFIERS = (
     "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
     "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
     "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
-    "RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+    "RECOVER_ADAPTIVELY; DO NOT_ENTER_SPECULATIVE_FIX_LOOPS",
     "PRESERVE_CONTINUITY_AND_STOP",
     "PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT",
     "ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT",
@@ -78,6 +78,11 @@ CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT:"
 MAX_ACTIVE_EXPERIENCES = 3
 PROMPT_GUARD_CHARS = 8192
 MIN_CONTEXT_BUDGET = 380
+MAX_PRIMARY_RISK_WRAPPER_CHARS = 360
+CONTROL_TOWER_FLOW = (
+    "OUTCOME>FRESH_STATE>ONE_LAW>TASK_CONTRACT>SELECT_EXISTING_CAPABILITY_OR_HOST>"
+    "BOUNDED_CONTEXT>EXECUTE>EVIDENCE>RECONCILE>DONE|NEXT|BLOCKED|OWNER_GATE"
+)
 _GITHUB_TASK = re.compile(r"\b(github|pull request|\bpr\b|merge|branch|commit|repository|repo|head sha)\b", re.I)
 _PROMPT_TASK = re.compile(r"\b(prompt|instruction|delegate|delegation|handoff|executor prompt|rewrite prompt)\b", re.I)
 
@@ -135,6 +140,7 @@ def _render_context_block(
     mandatory = [
         CONTEXT_MARKER,
         "LAW_AUTHORITY=ONE; Supreme Law=canonical 9-law capsule; projections/fallbacks/subordinate profiles are not independent laws.",
+        f"CONTROL_TOWER_FLOW={CONTROL_TOWER_FLOW}",
         "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; resolve canonical>installed>portable>inline; report actual P2P_LAW_SOURCE; never fake a read.",
         "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
     ]
@@ -182,7 +188,7 @@ def _render_context_block(
     used = len("\n".join(parts)) + 1 + len(prefix)
     remaining = max_chars - used
     if remaining >= 32:
-        risk = _compact_text(risk_source, remaining)
+        risk = _compact_text(risk_source, min(remaining, MAX_PRIMARY_RISK_WRAPPER_CHARS))
         if risk:
             _append_if_fits(parts, prefix + risk, max_chars)
     return "\n".join(parts)
