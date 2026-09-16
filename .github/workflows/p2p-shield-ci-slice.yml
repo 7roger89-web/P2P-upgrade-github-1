@@ -64,6 +64,7 @@ jobs:
           tests.test_p2p_code_intelligence_bridge
           tests.test_p2p_github_research_appendix
           tests.test_p2p_native_code_impact
+          tests.test_p2p_experience_evolution
 
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
