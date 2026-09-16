@@ -17,6 +17,8 @@
 - Route/equipment/currency mismatches are excluded from comparable ranking.
 - Missing source references, unknown pricing bases, missing amounts, and cross-currency line items make a quote incomplete rather than silently rankable.
 - Synthetic fixture verifies a deterministic example: `SYN-B USD 2010 < SYN-A USD 2060`; `SYN-C CNY` is excluded without FX.
+- Experiment tracker separates `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, and `PAID`.
+- Praise/repeat use cannot become money evidence; explicit WTP amount or observed payment is required.
 
 ## Promotion boundary
 
