@@ -5,6 +5,7 @@ Current isolated regression groups:
 - market gate: 5 tests;
 - prospect bridge: 5 tests;
 - concierge engine: 20 tests;
+- route-alias provenance: 2 committed tests;
 - conditional commercial terms: 3 tests;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
@@ -26,5 +27,9 @@ Comparison-group regressions prove that:
 - an explicit target selects only the matching comparison group;
 - equivalent equipment forms such as `40HQ` and `40HC` normalize together;
 - materially different equipment types such as `40GP` and `40HC` remain separate.
+
+Route-alias regressions prove that an explicit alias such as `CNSHA -> SHANGHAI` restores comparability only when it carries a non-empty source reference; an unproven alias is ignored and cannot silently merge routes. Applied alias evidence is exposed through `route_alias_audit`.
+
+Fresh targeted probes for the new grouping/equipment slice are 5/5 PASS; route-alias provenance helper probes are 4/4 PASS. These targeted probes do not pretend the entire committed regression inventory was rerun in the same local harness.
 
 The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic and shortlist fixtures are not market evidence; they only protect deterministic behavior before real participant data arrives.
