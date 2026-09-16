@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import os
 import subprocess
 import sys
@@ -129,6 +130,25 @@ class NativeCodeImpactRealWorktreeTests(unittest.TestCase):
             self.assertEqual(evidence["native_scope_status"], "NOT_APPLICABLE")
             self.assertIsNone(evidence["impact"])
             self.assertFalse(evidence["external_extension_recommended"])
+
+    def test_release_runtime_transports_native_and_optional_code_intelligence(self) -> None:
+        package_path = REPO_ROOT / "scripts" / "package_release.py"
+        spec = importlib.util.spec_from_file_location("p2p_package_release", package_path)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        package = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(package)
+
+        with tempfile.TemporaryDirectory() as temp:
+            stage = Path(temp) / "stage"
+            stage.mkdir()
+            package.copy_foundation_runtime(REPO_ROOT, stage)
+            runtime = stage / "runtime" / "p2p_capabilities"
+
+            self.assertTrue((runtime / "quality_intelligence.py").is_file())
+            self.assertTrue((runtime / "native_code_impact.py").is_file())
+            self.assertTrue((runtime / "code_intelligence_bridge.py").is_file())
+            self.assertFalse((runtime / "tests").exists())
 
 
 if __name__ == "__main__":
