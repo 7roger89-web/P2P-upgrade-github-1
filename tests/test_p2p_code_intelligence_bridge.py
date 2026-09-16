@@ -1,9 +1,16 @@
 import json
+import os
 import subprocess
+import sys
 
 import pytest
 
-from p2p_capabilities.code_intelligence_bridge import (
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SYSTEM_ROOT = os.path.join(REPO_ROOT, ".p2p", "system")
+if SYSTEM_ROOT not in sys.path:
+    sys.path.insert(0, SYSTEM_ROOT)
+
+from p2p_capabilities.code_intelligence_bridge import (  # noqa: E402
     CodeIntelligenceExecutionFailed,
     CodeIntelligenceUnavailable,
     CodebaseMemoryEvidenceBridge,
