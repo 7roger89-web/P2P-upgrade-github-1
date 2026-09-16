@@ -71,6 +71,7 @@ jobs:
           tests.test_p2p_experience_federation
           tests.test_p2p_experience_federation_operational
           tests.test_p2p_experience_evolution_distribution
+          tests.test_p2p_open_code_review_bridge
           tests.test_p2p_control_tower_context_assembly
 
       - name: Measure native code impact on exact PR worktree
