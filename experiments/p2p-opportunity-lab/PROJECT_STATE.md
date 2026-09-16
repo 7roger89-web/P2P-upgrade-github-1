@@ -54,21 +54,24 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 - Concierge engine regression suite: 5/5 PASS in isolated local execution after catching and fixing a pricing-basis normalization bug before commit.
 - Representative synthetic quote fixture added at `pilots/logistics-quote-comparison/fixtures/synthetic-quote-set-01.json`; expected behavior is Carrier B = USD 2010, Carrier A = USD 2060, CNY quote excluded without FX.
 - Synthetic fixture behavior was independently re-run locally and matched the expected ranking/exclusion exactly.
+- Observed experiment tracker added at `src/experiment_tracker.py`.
+- Tracker regression suite: 5/5 PASS; contact/praise/repeat-use cannot create money evidence, `WTP_SIGNAL` requires an explicit amount, and failure is not declared until the configured contact target is actually reached.
 - Validation procedure is durable at `docs/CONCIERGE-VALIDATION-PROTOCOL.md`.
+- Live pilot status is durable at `pilots/logistics-quote-comparison/VALIDATION_STATUS.md`.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY + EXPERIMENT_TRACKER_READY`
 
 The first three design-partner contacts are authorized. No message has been sent yet because the current ChatGPT tool surface has no authenticated Reddit write/post action: web access is read-only and plugin discovery found no Reddit messaging/posting connector.
 
 This delivery limitation does not reopen the Owner Gate and does not stop internal validation development. Authorization is already recorded. Once an authenticated Reddit write surface is available, send only the three preserved public replies in `outreach-batch-01.json`, then the reply watch can surface direct responses/opt-ins.
 
-The internal validation lane is now ready to accept an opted-in participant's anonymized real quote set, normalize charges with provenance, compute comparable totals only when the comparison basis is valid, surface uncertainty rather than hiding it, and record observed experiment behavior separately from payment/WTP evidence.
+The internal validation lane is now ready to accept an opted-in participant's anonymized real quote set, normalize charges with provenance, compute comparable totals only when the comparison basis is valid, surface uncertainty rather than hiding it, and record observed experiment behavior separately from payment/WTP evidence. Experiment aggregation is deterministic and can feed the existing market gate without converting engagement into money evidence.
 
 ## Next bounded step
 
 1. Deliver the three authorized public research replies through an authenticated Reddit account when a write surface is available.
 2. Continue hardening the concierge validation engine with representative synthetic/fixture quote sets while waiting; do not build product UI/login/billing/deployment.
 3. On any opt-in, request anonymized quote/ratecard data through a mutually agreed safe channel, run the concierge engine, return an auditable comparison, and record corrections, trust objections, repeat-use, and explicit payment/WTP signals.
-4. Re-evaluate the market gate only from observed experiment evidence; do not broaden into generic lead generation and do not build the product before the market gate changes on real evidence.
+4. Feed only observed tracker output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`; do not broaden into generic lead generation and do not build the product before the market gate changes on real evidence.
