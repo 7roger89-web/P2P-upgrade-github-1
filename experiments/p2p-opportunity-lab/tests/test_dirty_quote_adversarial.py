@@ -89,7 +89,7 @@ class DirtyQuoteAdversarialTests(unittest.TestCase):
             error_types = {item["type"] for item in audit["errors"]}
             self.assertIn("AMBIGUOUS_FX_RATE", error_types)
 
-    def test_missing_freight_provenance_makes_quote_unrankable(self):
+    def test_missing_freight_provenance_blocks_dependent_percentage_resolution(self):
         def mutate(data):
             val_a = next(q for q in data["quotes"] if q["quote_id"] == "VAL-A")
             freight = next(charge for charge in val_a["charges"] if charge.get("line_id") == "A-FRT")
@@ -97,14 +97,11 @@ class DirtyQuoteAdversarialTests(unittest.TestCase):
 
         result = self._run(mutate)
 
-        self.assertEqual(
-            [(item["quote_id"], item["total"]) for item in result["ranking"]],
-            [("VAL-B", "1940")],
-        )
-        self.assertEqual(result["decision_warning"], "INSUFFICIENT_COMPLETE_COMPARABLE_QUOTES")
-        val_a = next(item for item in result["priced_quotes"] if item["quote_id"] == "VAL-A")
-        self.assertFalse(val_a["complete"])
-        self.assertTrue(any("uncertain extraction/provenance" in warning for warning in val_a["warnings"]))
+        self.assertEqual(result["ranking"], [])
+        self.assertEqual(result["decision_warning"], "UNRESOLVED_PERCENTAGE_SEMANTICS")
+        val_a = next(item for item in result["percentage_audit"] if item["quote_id"] == "VAL-A")
+        failure = next(error for error in val_a["errors"] if error["type"] == "PERCENTAGE_RESOLUTION_FAILED")
+        self.assertIn("percentage base line requires source_ref", failure["reason"])
 
 
 if __name__ == "__main__":
