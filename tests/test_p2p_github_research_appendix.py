@@ -5,6 +5,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 APPENDIX = ROOT / "docs" / "p2p-development" / "GITHUB-RESEARCH-APPENDIX.md"
 BRIDGE = ROOT / ".p2p" / "system" / "p2p_capabilities" / "code_intelligence_bridge.py"
+NATIVE_QUALITY = ROOT / ".p2p" / "system" / "p2p_capabilities" / "quality_intelligence.py"
 
 
 class GithubResearchAppendixTests(unittest.TestCase):
@@ -34,15 +35,23 @@ class GithubResearchAppendixTests(unittest.TestCase):
         self.assertIn("second router", text)
         self.assertIn("second truth", text)
 
-    def test_appendix_prioritizes_only_remaining_gap(self) -> None:
+    def test_appendix_reconciles_external_graph_against_native_code_impact(self) -> None:
         text = APPENDIX.read_text(encoding="utf-8")
-        self.assertIn("NEXT_CORE_SLICE=CODE_INTELLIGENCE_STRUCTURAL_EVIDENCE", text)
+        native = NATIVE_QUALITY.read_text(encoding="utf-8")
+        self.assertIn("NATIVE_CAPABILITY_FIRST=YES", text)
+        self.assertIn("EXTERNAL_CODE_INTELLIGENCE_ROLE=OPTIONAL_EXTENSION", text)
+        self.assertIn("NEXT_CORE_SLICE=MEASURE_NATIVE_CODE_IMPACT_BEFORE_MORE_INFRASTRUCTURE", text)
         self.assertIn("DeusData/codebase-memory-mcp", text)
         self.assertIn("v0.11.0", text)
         self.assertIn("8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798", text)
+        self.assertIn("Code-impact evidence contract", native)
+        self.assertIn("def affected_surface", native)
+        self.assertIn("impact_unknown", native)
 
-    def test_code_intelligence_bridge_keeps_external_graph_non_authoritative(self) -> None:
+    def test_code_intelligence_bridge_keeps_external_graph_native_first_non_authoritative(self) -> None:
         text = BRIDGE.read_text(encoding="utf-8")
+        self.assertIn("NATIVE_FIRST_FALLBACK", text)
+        self.assertIn("native_gap_reason", text)
         self.assertIn("NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE", text)
         self.assertIn("index_repository", text)
         self.assertIn("manage_adr", text)
