@@ -50,66 +50,82 @@ Current delivery state:
 
 A six-hour reply watch is active, but an unsent outreach comment cannot receive a direct reply. Authorization does not need to be requested again when a valid Reddit write surface appears.
 
-## Concierge validation engine
+## Atomic quote validation pipeline
 
-Implemented:
-- anonymized quote-intake contract with provenance;
-- comparison-context schema covering quantities, explicit target, coverage resolutions and evidence-backed location aliases;
-- deterministic quote normalization and audit trail;
-- route/equipment/currency comparability checks;
+Raw real-world quote comparison entrypoint:
+
+`src.validation_pipeline.compare_quotes_validated`
+
+Pipeline order:
+
+1. evidenced percentage-surcharge resolution;
+2. scoped/bundle/duplicate/optional charge semantics via `src.charge_semantics.compare_quotes_guarded`;
+3. deterministic core comparison.
+
+Implemented atomic protections include:
+- route/equipment/currency grouping with no first-input baseline bias;
 - no silent FX conversion;
-- unknown/uncertain pricing basis blocks ranking;
-- charge-coverage parity so a quote cannot win by silently omitting charges;
-- evidenced `INCLUDED` / `NOT_APPLICABLE` resolution for coverage gaps;
-- validity-window guard using explicit `as_of_date`;
-- minimum-charge support: `max(rate × quantity, minimum_amount)` with raw calculation, floor application and provenance preserved;
-- conditional-commercial-term guard: unresolved `subject to` / exclusion / confirmation terms make a quote incomplete and non-rankable; resolution requires independent source evidence;
-- comparison-group selection no longer trusts the first input quote as the baseline: eligible quotes are grouped by normalized route + equipment + currency and the unique largest group is selected automatically;
-- equal multi-quote groups are treated as ambiguous and produce no ranking until an explicit `comparison_target` is supplied;
-- conservative equipment aliases normalize equivalent forms such as `40HQ` / `40HC` while keeping materially different types such as `40GP` separate;
-- route/location aliases such as `CNSHA -> SHANGHAI` are accepted only when an explicit alias mapping carries a non-empty source reference; applied aliases are preserved in `route_alias_audit`;
-- `src.charge_semantics.compare_quotes_guarded` is the required real-validation entrypoint before the core comparison engine;
-- scoped charge coverage distinguishes `ORIGIN`, `MAIN`, `DESTINATION`, `OTHER`, and `UNSPECIFIED` instead of conflating identical labels across commercial stages;
-- exact duplicate priced charge signatures are blocked before ranking;
-- evidenced all-in/bundled charges may expand into zero-contribution included coverage rows while one primary component carries the bundle price;
-- priced standalone components that overlap the same priced bundle are blocked as a double-count risk;
-- optional/add-on charges require explicit `selected=true|false`: unselected add-ons are excluded from price and required coverage but preserved in audit; selected add-ons remain priced; missing selection blocks ranking;
-- quote-intake schema carries `scope`, `bundle_includes`, `bundle_primary_code`, `optional`, and `selected` explicitly.
+- charge-coverage parity;
+- validity window using explicit `as_of_date`;
+- minimum charge floors;
+- unresolved conditional-term blocking;
+- conservative equipment aliases;
+- evidence-backed route aliases;
+- scoped charges (`ORIGIN | MAIN | DESTINATION | OTHER | UNSPECIFIED`);
+- duplicate priced-charge blocking;
+- evidenced all-in bundle expansion and bundle/component double-count blocking;
+- explicit optional/add-on selection;
+- named-base percentage surcharges using `line_id`, `percentage_rate`, `percentage_of_line_ids`, and source provenance.
+
+Percentage rules are never guessed. Missing/invalid base references, self-reference, percentage-on-percentage, cross-currency bases without an explicit FX layer, or a manually supplied fixed amount conflicting with percentage pricing block resolution before ranking.
 
 ## Multi-equipment FCL validation
 
+Base portfolio engine:
+
+`src.portfolio_semantics.compare_fcl_portfolios`
+
+Raw percentage-aware portfolio entrypoint:
+
+`src.portfolio_validation_pipeline.compare_fcl_portfolios_validated`
+
 Implemented:
-- `src.portfolio_semantics.compare_fcl_portfolios` for one RFQ requiring multiple container equipment types;
-- requirements canonicalize aliases such as `40HQ -> 40HC` and combine quantities;
-- provider quote sets must cover every required equipment type exactly once; missing or ambiguous equipment offers are excluded rather than guessed;
-- equipment-level offers are deliberately restricted to `PER_CONTAINER` / `INCLUDED` in this pilot slice;
-- `PER_SHIPMENT` / `PER_BL` charges live at provider shared-charge level and are priced once, preventing accidental multiplication across equipment rows;
-- portfolio total is the sum of complete required equipment offers plus complete shared charges in one currency/route;
-- incomplete provider portfolios are excluded from ranking.
+- one RFQ may require multiple equipment types and quantities;
+- equivalent equipment aliases combine quantities, e.g. `40HQ -> 40HC`;
+- each provider must cover every required equipment type exactly once;
+- apples-to-apples coverage is checked per equipment bucket and shared bucket;
+- shared `PER_SHIPMENT | PER_BL` charges are priced once per provider;
+- equipment-level pricing remains conservative and quantity-aware;
+- percentage surcharges on an equipment offer are resolved against that equipment's required quantity, then rebased to a `PER_CONTAINER` amount that reconstructs the same total in the existing portfolio engine;
+- provider-level shared percentage surcharges are resolved once and are not multiplied by equipment rows;
+- unresolved percentage semantics exclude that provider while other complete providers may remain rankable.
 
-Verification at this slice:
-- prior base concierge engine suite: 15/15 PASS before the group-selection slice;
-- group-selection/equipment-alias probes: 5/5 PASS;
-- route-alias provenance probes: 4/4 PASS;
-- conditional commercial terms: 3/3 PASS from the prior slice;
-- charge semantics isolated harness: 9/9 PASS using repo-style `src.*` imports;
-- multi-equipment FCL portfolio focused harness: 5/5 PASS;
-- current committed inventory includes 20 concierge-engine tests, 2 route-alias tests, 9 charge-semantics tests and 5 portfolio-semantics tests;
-- representative synthetic fixture remains the deterministic acceptance fixture (`SYN-B USD 2010 < SYN-A USD 2060`; CNY excluded without FX);
-- experiment tracker: 5/5 PASS;
-- experiment states remain distinct: `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, `PAID`.
+## Verification state
 
-Focused harnesses prove only their stated slices. They do not claim that the entire repository regression inventory was rerun together on one local source-tree runner. GitHub Shield is verified separately on exact heads.
+Verified focused harness evidence preserved:
+- market gate: 5/5 PASS;
+- prospect bridge: 5/5 PASS;
+- shortlist fixture: 6/6 PASS;
+- prior base concierge suite: 15/15 PASS before later grouping additions;
+- group/equipment probes: 5/5 PASS;
+- route-alias helper probes: 4/4 PASS;
+- conditional-term probes: 3/3 PASS;
+- charge semantics: 9/9 PASS using repo-style `src.*` imports;
+- percentage resolver: 5/5 PASS in isolated deterministic harness;
+- original FCL portfolio focused slice: 5/5 PASS;
+- experiment tracker: 5/5 PASS.
+
+Committed acceptance inventory now also includes expanded portfolio semantics, atomic validation-pipeline integration tests, and percentage-aware FCL portfolio integration tests. Those newer committed contracts are not falsely promoted to full source-tree PASS without an actual runner executing them. GitHub Shield remains a separate exact-head acceptance surface.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + GUARDED_CHARGE_SEMANTICS_READY + OPTIONAL_ADDON_GUARD_READY + MULTI_EQUIPMENT_FCL_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + ATOMIC_VALIDATION_PIPELINE_READY + GUARDED_CHARGE_SEMANTICS_READY + PERCENTAGE_SURCHARGE_READY + OPTIONAL_ADDON_GUARD_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane is blocked only on Reddit delivery capability. The internal lane can now reject stale, incomplete, conditionally priced, duplicate, double-counted, scope-confused, optional-service-ambiguous, comparison-incompatible, and incomplete multi-equipment provider quote sets rather than manufacturing a false cheapest option.
+The external lane is blocked only on Reddit delivery capability. The internal lane can reject or explicitly normalize many common false-comparison traps without manufacturing a cheapest option.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Continue validation-only hardening only where representative FCL quote semantics justify it. The next useful candidate is explicit provider-level percentage surcharge handling with a named/evidenced calculation base; do not drift into product UI/login/billing/deployment.
-3. On opt-in, run the real concierge test through guarded semantics, record corrections/trust objections/repeat use and explicit WTP/payment signals.
+2. Add explicit FX resolution with provenance/date before percentage semantics so mixed-currency quote lines can be compared without silent conversion.
+3. On opt-in, run the real concierge test through the top-level validated entrypoint, record corrections/trust objections/repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
