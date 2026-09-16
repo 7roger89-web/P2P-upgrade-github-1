@@ -30,7 +30,6 @@ from .experience_evolution import (
     activate_verified,
     create_candidate,
     derive_experiences,
-    retrieve_active_experiences,
     verify_candidate,
 )
 
@@ -346,6 +345,10 @@ def apply_promotion(
 
 def _sync_record(root: str | Path, record: Mapping[str, object]) -> str:
     source_task_id = _clean(record.get("source_task_id"), 256) or "shared-experience-sync"
+    source_eid = _clean(record.get("source_experience_id"), 128)
+    existing = derive_experiences(root).get(source_eid) if source_eid else None
+    if existing and existing.get("state") in {"QUARANTINED", "SUPERSEDED"}:
+        return str(existing.get("state"))
     created = create_candidate(
         root,
         task_id=source_task_id,
