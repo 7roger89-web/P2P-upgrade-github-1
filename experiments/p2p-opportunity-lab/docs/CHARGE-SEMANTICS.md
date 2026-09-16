@@ -1,8 +1,24 @@
 # Charge semantics guard
 
-The real concierge-validation entrypoint is `src.charge_semantics.compare_quotes_guarded`, not a direct call to `src.concierge_engine.compare_quotes`.
+## Entrypoint hierarchy
 
-This is a validation guard, not a new pricing engine. It transforms evidence-preserving charge semantics into the existing deterministic comparison engine and refuses ranking when the input can create a false total.
+Raw atomic quote comparison MUST enter through:
+
+`src.validation_pipeline.compare_quotes_validated`
+
+That pipeline resolves evidenced percentage surcharges first, then calls:
+
+`src.charge_semantics.compare_quotes_guarded`
+
+which applies scope, duplicate, bundle and optional-service semantics before the existing deterministic core comparison engine.
+
+Raw multi-equipment FCL provider quote sets MUST enter through:
+
+`src.portfolio_validation_pipeline.compare_fcl_portfolios_validated`
+
+which resolves percentage semantics for each required equipment offer and provider-level shared charges before delegating to `src.portfolio_semantics.compare_fcl_portfolios`.
+
+Calling lower-level engines directly is appropriate only for their isolated regression/unit contracts, not for real concierge-validation intake.
 
 ## Scope
 
