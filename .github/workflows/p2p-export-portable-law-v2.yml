@@ -1,0 +1,42 @@
+name: P2P export portable law v2
+
+on:
+  push:
+    branches:
+      - p2p/export-portable-law-20260916-v2
+    paths:
+      - .github/workflows/p2p-export-portable-law-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: p2p/export-portable-law-20260916-v2
+      - name: Generate exact portable law and bounded transport chunks
+        run: |
+          rm -rf .tmp-p2p-law-target .p2p/export-v2
+          mkdir -p .tmp-p2p-law-target .p2p/export-v2/chunks
+          python scripts/p2p_portable_law_projection.py .tmp-p2p-law-target
+          artifact=.tmp-p2p-law-target/.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md
+          cp "$artifact" .p2p/export-v2/P2P-OPERATIONS-NOTEBOOK.md
+          base64 -w 0 "$artifact" > /tmp/p2p-law.b64
+          split -b 12000 -d -a 3 /tmp/p2p-law.b64 .p2p/export-v2/chunks/chunk-
+          bytes=$(wc -c < "$artifact")
+          sha256=$(sha256sum "$artifact" | cut -d' ' -f1)
+          blob=$(git hash-object "$artifact")
+          chars=$(wc -c < /tmp/p2p-law.b64)
+          count=$(find .p2p/export-v2/chunks -type f -name 'chunk-*' | wc -l)
+          printf 'SOURCE_MAIN_SHA=2f8ec22b755c7d591abcb0abe859056fdc7b90ee\nORIGINAL_BYTE_SIZE=%s\nORIGINAL_SHA256=%s\nORIGINAL_GIT_BLOB_SHA=%s\nBASE64_CHAR_COUNT=%s\nCHUNK_SIZE=12000\nCHUNK_COUNT=%s\n' "$bytes" "$sha256" "$blob" "$chars" "$count" > .p2p/export-v2/MANIFEST.txt
+          rm -rf .tmp-p2p-law-target /tmp/p2p-law.b64
+      - name: Commit generated transport evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .p2p/export-v2
+          git diff --cached --quiet || git commit -m "chore: export current portable law with transport chunks"
+          git push origin HEAD:p2p/export-portable-law-20260916-v2
