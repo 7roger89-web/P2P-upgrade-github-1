@@ -1,0 +1,396 @@
+"""Evidence-grounded reusable experience for P2P.
+
+Lifecycle: CANDIDATE -> VERIFIED -> ACTIVE -> SUPERSEDED | QUARANTINED.
+The existing .p2p/state/execution-ledger.jsonl is the only durable store.
+ACTIVE experience is non-authoritative context: it never grants permission,
+acceptance, promotion, provider choice, law change, or skill mutation.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Iterable, Mapping, Sequence
+
+SCHEMA = "p2p-experience-evolution/1"
+LEDGER_SCHEMA = "p2p-execution-event/1"
+LEDGER_RELATIVE_PATH = Path(".p2p") / "state" / "execution-ledger.jsonl"
+KINDS = ("STRATEGIC", "PROCEDURAL", "TOOL")
+USE_OUTCOMES = ("HELPED", "NEUTRAL", "HARMED")
+EVENT_CANDIDATE = "EXPERIENCE_CANDIDATE_CREATED"
+EVENT_VERIFIED = "EXPERIENCE_VERIFIED"
+EVENT_ACTIVATED = "EXPERIENCE_ACTIVATED"
+EVENT_QUARANTINED = "EXPERIENCE_QUARANTINED"
+EVENT_SUPERSEDED = "EXPERIENCE_SUPERSEDED"
+EVENT_USE = "EXPERIENCE_USE_RECORDED"
+EXPERIENCE_EVENTS = frozenset({EVENT_CANDIDATE, EVENT_VERIFIED, EVENT_ACTIVATED,
+                               EVENT_QUARANTINED, EVENT_SUPERSEDED, EVENT_USE})
+NON_PROVING_EVIDENCE_KINDS = frozenset({
+    "MODEL_SELF_REPORT", "MODEL_CLAIM", "AGENT_CLAIM",
+    "AGENT_VERBAL_ASSERTION", "CHAT_SUMMARY_ONLY", "PRIVATE_CHAIN_OF_THOUGHT",
+})
+REQUIRED_VERIFICATION_ROLES = ("BEHAVIOR_PROOF", "REGRESSION_PROOF", "CHALLENGE_PROOF")
+MAX_TRIGGER_TOKENS = 24
+MAX_RESULTS = 5
+MAX_TEXT = 4096
+_SECRET_RE = re.compile(
+    r"(?i)(?:api[_-]?key|password|token|secret|authorization|private[_-]?key)"
+    r"\s*[:=]\s*[^\s,;]+|(?:sk|ghp|github_pat|xox[bp])-[A-Za-z0-9_-]{12,}"
+)
+_TOKEN_RE = re.compile(r"[a-z0-9_.:/+-]{2,64}")
+
+
+class ExperienceEvolutionError(ValueError):
+    """Fail-closed lifecycle contract error."""
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def _clean(value: object, limit: int = MAX_TEXT) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    if _SECRET_RE.search(text):
+        raise ExperienceEvolutionError("SECRET_LIKE_VALUE_REJECTED")
+    return text[:limit]
+
+
+def _stable(value: object) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def _ledger(root: str | Path) -> Path:
+    path = Path(root).expanduser().resolve()
+    return path if path.suffix.lower() == ".jsonl" else path / LEDGER_RELATIVE_PATH
+
+
+def _triggers(values: Iterable[object]) -> tuple[str, ...]:
+    out: list[str] = []
+    for raw in values:
+        for token in _TOKEN_RE.findall(_clean(raw, 128).lower()):
+            if token not in out:
+                out.append(token)
+            if len(out) >= MAX_TRIGGER_TOKENS:
+                return tuple(out)
+    if not out:
+        raise ExperienceEvolutionError("TRIGGER_TOKENS_REQUIRED")
+    return tuple(out)
+
+
+def _evidence(items: Iterable[Mapping[str, object]], roles: Sequence[str] = ()) -> tuple[dict[str, str], ...]:
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for item in items:
+        if not isinstance(item, Mapping):
+            raise ExperienceEvolutionError("EVIDENCE_ITEM_INVALID")
+        kind = _clean(item.get("kind"), 96).upper()
+        ref = _clean(item.get("ref"), 1024)
+        role = _clean(item.get("role"), 96).upper()
+        verdict = _clean(item.get("verdict", "PROVEN"), 32).upper()
+        if not kind or not ref:
+            raise ExperienceEvolutionError("EVIDENCE_KIND_AND_REF_REQUIRED")
+        if kind in NON_PROVING_EVIDENCE_KINDS or verdict not in {"PROVEN", "PASS", "VERIFIED"}:
+            continue
+        if role:
+            seen.add(role)
+        out.append({"kind": kind, "ref": ref, "role": role, "verdict": verdict})
+    if not out:
+        raise ExperienceEvolutionError("INDEPENDENT_EVIDENCE_REQUIRED")
+    missing = [role for role in roles if role not in seen]
+    if missing:
+        raise ExperienceEvolutionError("VERIFICATION_ROLE_MISSING:" + ",".join(missing))
+    return tuple(out)
+
+
+def _event(event_type: str, eid: str, payload: Mapping[str, object], task_id: str = "") -> dict[str, Any]:
+    return {
+        "schema_version": LEDGER_SCHEMA, "event_type": event_type, "at": utc_now(),
+        "task_id": _clean(task_id, 256),
+        "experience": {"schema": SCHEMA, "experience_id": eid, **dict(payload)},
+    }
+
+
+def _append(root: str | Path, event: Mapping[str, object]) -> None:
+    path = _ledger(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(_stable(dict(event)) + "\n")
+
+
+def _events(root: str | Path) -> list[dict[str, Any]]:
+    path = _ledger(root)
+    if not path.is_file():
+        return []
+    out: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        try:
+            value = json.loads(line)
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if (isinstance(value, dict) and value.get("schema_version") == LEDGER_SCHEMA
+                and value.get("event_type") in EXPERIENCE_EVENTS
+                and isinstance(value.get("experience"), Mapping)):
+            out.append(value)
+    return out
+
+
+def derive_experiences(root: str | Path) -> dict[str, dict[str, Any]]:
+    state: dict[str, dict[str, Any]] = {}
+    for event in _events(root):
+        exp = dict(event["experience"])
+        eid = str(exp.get("experience_id") or "")
+        et = event["event_type"]
+        if not eid:
+            continue
+        if et == EVENT_CANDIDATE:
+            state[eid] = dict(exp)
+            state[eid].update(history=[et], created_at=event.get("at"), last_event_at=event.get("at"))
+            continue
+        if eid not in state:
+            continue
+        cur = state[eid]
+        cur.setdefault("history", []).append(et)
+        cur["last_event_at"] = event.get("at")
+        if et == EVENT_VERIFIED:
+            cur.update(state="VERIFIED", verification_evidence=exp.get("verification_evidence", []))
+        elif et == EVENT_ACTIVATED:
+            cur.update(state="ACTIVE", activated_at=event.get("at"))
+        elif et == EVENT_QUARANTINED:
+            cur.update(state="QUARANTINED", quarantine_reason=exp.get("reason", ""),
+                       quarantine_evidence=exp.get("evidence", []))
+        elif et == EVENT_SUPERSEDED:
+            cur.update(state="SUPERSEDED", superseded_by=exp.get("superseded_by", ""),
+                       supersede_evidence=exp.get("evidence", []))
+        elif et == EVENT_USE:
+            cur.setdefault("use_history", []).append({
+                "outcome": exp.get("use_outcome"), "task_id": event.get("task_id"),
+                "evidence_ref": exp.get("evidence_ref"), "at": event.get("at"),
+            })
+    return state
+
+
+def create_candidate(root: str | Path, *, task_id: str, kind: str,
+                     trigger_tokens: Iterable[object], lesson: str,
+                     evidence: Iterable[Mapping[str, object]], outcome: str,
+                     failure_class: str = "", correction: str = "",
+                     source_revision: str = "") -> dict[str, Any]:
+    kind = _clean(kind, 32).upper()
+    task_id = _clean(task_id, 256)
+    if kind not in KINDS:
+        raise ExperienceEvolutionError("EXPERIENCE_KIND_INVALID")
+    if not task_id:
+        raise ExperienceEvolutionError("TASK_ID_REQUIRED")
+    trigger_tokens = _triggers(trigger_tokens)
+    lesson = _clean(lesson)
+    if len(lesson) < 12:
+        raise ExperienceEvolutionError("LESSON_TOO_VAGUE")
+    proof = _evidence(evidence)
+    outcome = _clean(outcome, 128).upper()
+    if not outcome:
+        raise ExperienceEvolutionError("OUTCOME_REQUIRED")
+    eid = "exp-" + hashlib.sha256(_stable({
+        "kind": kind, "trigger_tokens": trigger_tokens, "lesson": lesson,
+    }).encode("utf-8")).hexdigest()[:24]
+    current = derive_experiences(root).get(eid)
+    if current and current.get("state") not in {"SUPERSEDED", "QUARANTINED"}:
+        return {"status": "EXISTS", **current}
+    record = {
+        "kind": kind, "state": "CANDIDATE", "trigger_tokens": list(trigger_tokens),
+        "lesson": lesson, "outcome": outcome, "failure_class": _clean(failure_class, 256),
+        "correction": _clean(correction), "source_task_id": task_id,
+        "source_revision": _clean(source_revision, 256), "evidence": list(proof),
+        "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+        "permission_effect": "NONE", "acceptance_authority": False,
+    }
+    _append(root, _event(EVENT_CANDIDATE, eid, record, task_id))
+    return {"status": "CREATED", "experience_id": eid, **record}
+
+
+def verify_candidate(root: str | Path, experience_id: str, *, task_id: str,
+                     verification_evidence: Iterable[Mapping[str, object]]) -> dict[str, Any]:
+    eid = _clean(experience_id, 128)
+    current = derive_experiences(root).get(eid)
+    if not current:
+        raise ExperienceEvolutionError("EXPERIENCE_NOT_FOUND")
+    if current.get("state") != "CANDIDATE":
+        raise ExperienceEvolutionError("VERIFY_REQUIRES_CANDIDATE")
+    proof = _evidence(verification_evidence, REQUIRED_VERIFICATION_ROLES)
+    payload = {"state": "VERIFIED", "verification_evidence": list(proof),
+               "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+               "permission_effect": "NONE", "acceptance_authority": False}
+    _append(root, _event(EVENT_VERIFIED, eid, payload, task_id))
+    return {"status": "VERIFIED", "experience_id": eid, **payload}
+
+
+def activate_verified(root: str | Path, experience_id: str, *, task_id: str = "") -> dict[str, Any]:
+    eid = _clean(experience_id, 128)
+    current = derive_experiences(root).get(eid)
+    if not current:
+        raise ExperienceEvolutionError("EXPERIENCE_NOT_FOUND")
+    if current.get("state") != "VERIFIED":
+        raise ExperienceEvolutionError("ACTIVATE_REQUIRES_VERIFIED")
+    payload = {"state": "ACTIVE", "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+               "permission_effect": "NONE", "acceptance_authority": False,
+               "may_modify_law_or_skill": False}
+    _append(root, _event(EVENT_ACTIVATED, eid, payload, task_id))
+    return {"status": "ACTIVE", "experience_id": eid, **payload}
+
+
+def quarantine_experience(root: str | Path, experience_id: str, *, reason: str,
+                          evidence: Iterable[Mapping[str, object]], task_id: str = "") -> dict[str, Any]:
+    eid = _clean(experience_id, 128)
+    current = derive_experiences(root).get(eid)
+    if not current:
+        raise ExperienceEvolutionError("EXPERIENCE_NOT_FOUND")
+    if current.get("state") not in {"CANDIDATE", "VERIFIED", "ACTIVE"}:
+        raise ExperienceEvolutionError("QUARANTINE_STATE_INVALID")
+    reason = _clean(reason)
+    if len(reason) < 8:
+        raise ExperienceEvolutionError("QUARANTINE_REASON_TOO_VAGUE")
+    payload = {"state": "QUARANTINED", "reason": reason, "evidence": list(_evidence(evidence)),
+               "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE"}
+    _append(root, _event(EVENT_QUARANTINED, eid, payload, task_id))
+    return {"status": "QUARANTINED", "experience_id": eid, **payload}
+
+
+def supersede_experience(root: str | Path, old_experience_id: str, new_experience_id: str,
+                         *, evidence: Iterable[Mapping[str, object]], task_id: str = "") -> dict[str, Any]:
+    states = derive_experiences(root)
+    old_id, new_id = _clean(old_experience_id, 128), _clean(new_experience_id, 128)
+    if old_id not in states or new_id not in states:
+        raise ExperienceEvolutionError("EXPERIENCE_NOT_FOUND")
+    if states[old_id].get("state") != "ACTIVE" or states[new_id].get("state") != "ACTIVE":
+        raise ExperienceEvolutionError("SUPERSEDE_REQUIRES_ACTIVE_PAIR")
+    payload = {"state": "SUPERSEDED", "superseded_by": new_id,
+               "evidence": list(_evidence(evidence)),
+               "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE"}
+    _append(root, _event(EVENT_SUPERSEDED, old_id, payload, task_id))
+    return {"status": "SUPERSEDED", "experience_id": old_id, "superseded_by": new_id}
+
+
+def _task_tokens(task: Mapping[str, object] | str) -> set[str]:
+    if isinstance(task, Mapping):
+        text = " ".join(str(v) for v in (
+            task.get("task_id", ""), task.get("title", ""), task.get("purpose", ""),
+            " ".join(str(x) for x in (task.get("scope", ()) or ())),
+            " ".join(str(x) for x in (task.get("tags", ()) or ())),
+        ))
+    else:
+        text = str(task)
+    return set(_TOKEN_RE.findall(text.lower()))
+
+
+def retrieve_active_experiences(root: str | Path, task: Mapping[str, object] | str,
+                                *, max_results: int = 3) -> tuple[dict[str, Any], ...]:
+    limit = max(0, min(int(max_results), MAX_RESULTS))
+    tokens = _task_tokens(task)
+    ranked: list[tuple[int, str, dict[str, Any]]] = []
+    for eid, exp in derive_experiences(root).items():
+        if exp.get("state") != "ACTIVE":
+            continue
+        matched = tokens.intersection(str(x).lower() for x in exp.get("trigger_tokens", ()))
+        if matched:
+            ranked.append((len(matched), eid, exp))
+    ranked.sort(key=lambda item: (-item[0], item[1]))
+    out: list[dict[str, Any]] = []
+    for score, eid, exp in ranked[:limit]:
+        triggers = set(str(x).lower() for x in exp.get("trigger_tokens", ()))
+        out.append({
+            "schema": SCHEMA, "experience_id": eid, "kind": exp.get("kind"), "state": "ACTIVE",
+            "match_score": score, "matched_triggers": sorted(tokens.intersection(triggers)),
+            "lesson": exp.get("lesson"), "correction": exp.get("correction"),
+            "failure_class": exp.get("failure_class"), "source_task_id": exp.get("source_task_id"),
+            "source_revision": exp.get("source_revision"),
+            "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+            "permission_effect": "NONE", "acceptance_authority": False,
+            "must_revalidate_against_current_state": True,
+        })
+    return tuple(out)
+
+
+def record_use_result(root: str | Path, experience_id: str, *, task_id: str,
+                      outcome: str, evidence_ref: str) -> dict[str, Any]:
+    eid = _clean(experience_id, 128)
+    current = derive_experiences(root).get(eid)
+    if not current or current.get("state") != "ACTIVE":
+        raise ExperienceEvolutionError("USE_REQUIRES_ACTIVE_EXPERIENCE")
+    outcome = _clean(outcome, 32).upper()
+    if outcome not in USE_OUTCOMES:
+        raise ExperienceEvolutionError("USE_OUTCOME_INVALID")
+    ref = _clean(evidence_ref, 1024)
+    if not ref:
+        raise ExperienceEvolutionError("USE_EVIDENCE_REQUIRED")
+    _append(root, _event(EVENT_USE, eid, {"state": "ACTIVE", "use_outcome": outcome,
+             "evidence_ref": ref, "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE"}, task_id))
+    return {"status": "RECORDED", "experience_id": eid, "use_outcome": outcome,
+            "review_recommended": outcome == "HARMED", "auto_quarantined": False}
+
+
+def activation_summary(root: str | Path, task: Mapping[str, object] | str,
+                       *, max_results: int = 3) -> dict[str, Any]:
+    matches = retrieve_active_experiences(root, task, max_results=max_results)
+    return {"schema": SCHEMA, "decision": "USE_ACTIVE_EXPERIENCE" if matches else "NO_MATCH",
+            "experiences": list(matches), "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+            "current_state_wins": True, "law_and_task_contract_win": True,
+            "permission_effect": "NONE", "acceptance_authority": False, "mutated": False}
+
+
+def _json(value: str) -> Any:
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise ExperienceEvolutionError("JSON_ARGUMENT_INVALID") from exc
+
+
+def _evidence_json(value: str) -> tuple[Mapping[str, object], ...]:
+    parsed = _json(value)
+    if not isinstance(parsed, list) or not all(isinstance(x, Mapping) for x in parsed):
+        raise ExperienceEvolutionError("EVIDENCE_JSON_ARRAY_REQUIRED")
+    return tuple(parsed)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", default=".")
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("retrieve"); p.add_argument("--task-text", default=""); p.add_argument("--task-json", default=""); p.add_argument("--max-results", type=int, default=3)
+    p = sub.add_parser("status"); p.add_argument("--experience-id", default="")
+    p = sub.add_parser("candidate"); p.add_argument("--task-id", required=True); p.add_argument("--kind", choices=KINDS, required=True); p.add_argument("--trigger", action="append", required=True); p.add_argument("--lesson", required=True); p.add_argument("--evidence-json", required=True); p.add_argument("--outcome", required=True); p.add_argument("--failure-class", default=""); p.add_argument("--correction", default=""); p.add_argument("--source-revision", default="")
+    p = sub.add_parser("verify"); p.add_argument("--experience-id", required=True); p.add_argument("--task-id", required=True); p.add_argument("--evidence-json", required=True)
+    p = sub.add_parser("activate"); p.add_argument("--experience-id", required=True); p.add_argument("--task-id", default="")
+    p = sub.add_parser("use"); p.add_argument("--experience-id", required=True); p.add_argument("--task-id", required=True); p.add_argument("--outcome", choices=USE_OUTCOMES, required=True); p.add_argument("--evidence-ref", required=True)
+    p = sub.add_parser("quarantine"); p.add_argument("--experience-id", required=True); p.add_argument("--task-id", default=""); p.add_argument("--reason", required=True); p.add_argument("--evidence-json", required=True)
+    p = sub.add_parser("supersede"); p.add_argument("--old-experience-id", required=True); p.add_argument("--new-experience-id", required=True); p.add_argument("--task-id", default=""); p.add_argument("--evidence-json", required=True)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "retrieve":
+            task: Mapping[str, object] | str = args.task_text
+            if args.task_json:
+                task = _json(args.task_json)
+                if not isinstance(task, Mapping):
+                    raise ExperienceEvolutionError("TASK_JSON_OBJECT_REQUIRED")
+            value = activation_summary(args.root, task, max_results=args.max_results)
+        elif args.command == "status":
+            states = derive_experiences(args.root); value = states.get(args.experience_id, {}) if args.experience_id else {"schema": SCHEMA, "experiences": states}
+        elif args.command == "candidate":
+            value = create_candidate(args.root, task_id=args.task_id, kind=args.kind, trigger_tokens=args.trigger, lesson=args.lesson, evidence=_evidence_json(args.evidence_json), outcome=args.outcome, failure_class=args.failure_class, correction=args.correction, source_revision=args.source_revision)
+        elif args.command == "verify":
+            value = verify_candidate(args.root, args.experience_id, task_id=args.task_id, verification_evidence=_evidence_json(args.evidence_json))
+        elif args.command == "activate":
+            value = activate_verified(args.root, args.experience_id, task_id=args.task_id)
+        elif args.command == "use":
+            value = record_use_result(args.root, args.experience_id, task_id=args.task_id, outcome=args.outcome, evidence_ref=args.evidence_ref)
+        elif args.command == "quarantine":
+            value = quarantine_experience(args.root, args.experience_id, reason=args.reason, evidence=_evidence_json(args.evidence_json), task_id=args.task_id)
+        else:
+            value = supersede_experience(args.root, args.old_experience_id, args.new_experience_id, evidence=_evidence_json(args.evidence_json), task_id=args.task_id)
+        print(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2)); return 0
+    except (OSError, ExperienceEvolutionError) as exc:
+        print(json.dumps({"schema": SCHEMA, "status": "BLOCKED", "error": str(exc)}, ensure_ascii=False, sort_keys=True)); return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
