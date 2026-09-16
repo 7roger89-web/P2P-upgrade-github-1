@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Any
 
 from src.concierge_engine import canonical_equipment
+from src.fx_semantics import resolve_fx
 from src.percentage_semantics import resolve_percentage_charges
 from src.portfolio_semantics import compare_fcl_portfolios
 
@@ -26,27 +27,24 @@ def _requirements(context: dict[str, Any]) -> dict[str, int]:
     return result
 
 
-def _pseudo_quote(
-    *,
-    quote_id: str,
-    currency: str,
-    charges: list[dict[str, Any]],
-) -> dict[str, Any]:
-    return {
-        "quote_id": quote_id,
-        "currency": currency,
-        "charges": deepcopy(charges),
-    }
+def _pseudo_quote(*, quote_id: str, currency: str, charges: list[dict[str, Any]]) -> dict[str, Any]:
+    return {"quote_id": quote_id, "currency": currency, "charges": deepcopy(charges)}
+
+
+def _layer_context(context: dict[str, Any], **quantities: Any) -> dict[str, Any]:
+    layered = deepcopy(context)
+    layered.update(quantities)
+    return layered
 
 
 def _rebase_offer_percentages(
     resolved_charges: list[dict[str, Any]],
     audit: dict[str, Any],
     quantity: int,
+    equipment: str,
 ) -> list[dict[str, Any]]:
     if quantity <= 0:
         raise ValueError("equipment quantity must be positive")
-
     resolved_totals = {
         item["line_id"]: Decimal(item["resolved_total"])
         for item in audit.get("resolutions", [])
@@ -59,7 +57,7 @@ def _rebase_offer_percentages(
         charge["amount"] = str(resolved_totals[line_id] / Decimal(quantity))
         charge["basis"] = "PER_CONTAINER"
         existing_note = str(charge.get("note") or "").strip()
-        suffix = f"portfolio rebased across {quantity} x {canonical_equipment(charge.get('equipment') or '')}".strip()
+        suffix = f"portfolio rebased across {quantity} x {equipment}"
         charge["note"] = f"{existing_note}; {suffix}" if existing_note else suffix
     return result
 
@@ -80,7 +78,7 @@ def compare_fcl_portfolios_validated(
 
     requirements = _requirements(context)
     resolved_sets: list[dict[str, Any]] = []
-    percentage_audit: list[dict[str, Any]] = []
+    provider_audits: list[dict[str, Any]] = []
     blocked_provider_ids: set[str] = set()
     blocked_reasons: dict[str, list[str]] = {}
 
@@ -98,12 +96,13 @@ def compare_fcl_portfolios_validated(
             "status": "READY",
             "offers": [],
             "shared": None,
+            "shared_fx": None,
             "errors": [],
         }
 
         offers = provider_set.get("offers")
         if isinstance(offers, list):
-            for offer_index, offer in enumerate(offers, start=1):
+            for offer in offers:
                 if not isinstance(offer, dict):
                     continue
                 equipment = canonical_equipment(offer.get("equipment"))
@@ -115,65 +114,86 @@ def compare_fcl_portfolios_validated(
                     continue
 
                 offer_id = str(offer.get("offer_id") or equipment)
-                resolved, audit = resolve_percentage_charges(
-                    _pseudo_quote(
-                        quote_id=f"{quote_set_id}::{offer_id}",
-                        currency=currency,
-                        charges=charges,
-                    ),
-                    {
-                        "containers": quantity,
-                        "shipments": 1,
-                        "bl_count": 1,
-                        "weight_kg": context.get("weight_kg", 0),
-                        "cbm": context.get("cbm", 0),
-                    },
+                layer_context = _layer_context(
+                    context,
+                    containers=quantity,
+                    shipments=1,
+                    bl_count=1,
+                    weight_kg=context.get("weight_kg", 0),
+                    cbm=context.get("cbm", 0),
                 )
-                provider_audit["offers"].append({
+                pseudo = _pseudo_quote(
+                    quote_id=f"{quote_set_id}::{offer_id}",
+                    currency=currency,
+                    charges=charges,
+                )
+                fx_resolved, fx_audit = resolve_fx(pseudo, layer_context)
+                offer_audit = {
                     "offer_id": offer_id,
                     "equipment": equipment,
                     "quantity": quantity,
-                    "audit": audit,
-                })
-                if audit["status"] == "BLOCKED":
+                    "fx_audit": fx_audit,
+                    "audit": None,
+                }
+                provider_audit["offers"].append(offer_audit)
+
+                if fx_audit["status"] == "BLOCKED":
                     provider_audit["status"] = "BLOCKED"
                     provider_audit["errors"].extend(
-                        f"{equipment}:PERCENTAGE:{item['type']}" for item in audit["errors"]
+                        f"{equipment}:FX:{item['type']}" for item in fx_audit["errors"]
+                    )
+                    continue
+
+                resolved, percentage_audit = resolve_percentage_charges(fx_resolved, layer_context)
+                offer_audit["audit"] = percentage_audit
+                if percentage_audit["status"] == "BLOCKED":
+                    provider_audit["status"] = "BLOCKED"
+                    provider_audit["errors"].extend(
+                        f"{equipment}:PERCENTAGE:{item['type']}" for item in percentage_audit["errors"]
                     )
                     continue
 
                 offer["charges"] = _rebase_offer_percentages(
                     resolved["charges"],
-                    audit,
+                    percentage_audit,
                     quantity,
+                    equipment,
                 )
 
         shared_charges = provider_set.get("shared_charges")
         if isinstance(shared_charges, list) and shared_charges:
-            resolved, audit = resolve_percentage_charges(
-                _pseudo_quote(
-                    quote_id=f"{quote_set_id}::SHARED",
-                    currency=currency,
-                    charges=shared_charges,
-                ),
-                {
-                    "containers": sum(requirements.values()),
-                    "shipments": int(context.get("shipments", 1)),
-                    "bl_count": int(context.get("bl_count", 1)),
-                    "weight_kg": context.get("weight_kg", 0),
-                    "cbm": context.get("cbm", 0),
-                },
+            shared_context = _layer_context(
+                context,
+                containers=sum(requirements.values()),
+                shipments=int(context.get("shipments", 1)),
+                bl_count=int(context.get("bl_count", 1)),
+                weight_kg=context.get("weight_kg", 0),
+                cbm=context.get("cbm", 0),
             )
-            provider_audit["shared"] = audit
-            if audit["status"] == "BLOCKED":
+            pseudo = _pseudo_quote(
+                quote_id=f"{quote_set_id}::SHARED",
+                currency=currency,
+                charges=shared_charges,
+            )
+            fx_resolved, fx_audit = resolve_fx(pseudo, shared_context)
+            provider_audit["shared_fx"] = fx_audit
+            if fx_audit["status"] == "BLOCKED":
                 provider_audit["status"] = "BLOCKED"
                 provider_audit["errors"].extend(
-                    f"SHARED:PERCENTAGE:{item['type']}" for item in audit["errors"]
+                    f"SHARED:FX:{item['type']}" for item in fx_audit["errors"]
                 )
             else:
-                provider_set["shared_charges"] = resolved["charges"]
+                resolved, percentage_audit = resolve_percentage_charges(fx_resolved, shared_context)
+                provider_audit["shared"] = percentage_audit
+                if percentage_audit["status"] == "BLOCKED":
+                    provider_audit["status"] = "BLOCKED"
+                    provider_audit["errors"].extend(
+                        f"SHARED:PERCENTAGE:{item['type']}" for item in percentage_audit["errors"]
+                    )
+                else:
+                    provider_set["shared_charges"] = resolved["charges"]
 
-        percentage_audit.append(provider_audit)
+        provider_audits.append(provider_audit)
         if provider_audit["status"] == "BLOCKED":
             blocked_provider_ids.add(quote_set_id)
             blocked_reasons[quote_set_id] = sorted(set(provider_audit["errors"]))
@@ -191,6 +211,13 @@ def compare_fcl_portfolios_validated(
             existing.update(blocked_reasons.get(quote_set_id, []))
             row["reasons"] = sorted(existing)
 
-    result["percentage_audit"] = percentage_audit
+    result["resolution_audit"] = provider_audits
+    # Compatibility with the prior percentage-only wrapper contract.
+    result["percentage_audit"] = provider_audits
+    result["fx_applied"] = any(
+        any(offer["fx_audit"]["conversions"] for offer in provider_audit["offers"])
+        or bool(provider_audit.get("shared_fx") and provider_audit["shared_fx"]["conversions"])
+        for provider_audit in provider_audits
+    )
     result["validated_portfolio_pipeline"] = True
     return result
