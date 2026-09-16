@@ -323,9 +323,12 @@ def _retrieve_promoted_shared_experiences(
     """Read matching promoted shared experience without mutating project state."""
 
     try:
-        from .experience_federation import ExperienceFederationError, load_catalog
-        catalog = load_catalog()
-    except (ImportError, OSError, ExperienceFederationError):
+        from . import experience_federation as federation
+    except ImportError:
+        return (), "UNAVAILABLE"
+    try:
+        catalog = federation.load_catalog()
+    except (OSError, federation.ExperienceFederationError):
         return (), "UNAVAILABLE"
 
     limit = max(0, min(int(max_results), MAX_RESULTS))
