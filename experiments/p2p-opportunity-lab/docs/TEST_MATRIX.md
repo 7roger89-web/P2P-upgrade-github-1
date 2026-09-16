@@ -1,14 +1,17 @@
 # Validation test matrix
 
-Current regression groups:
+Current committed regression inventory:
 
 - market gate: 5 tests;
 - prospect bridge: 5 tests;
-- concierge engine: 20 committed tests;
-- route-alias provenance: 2 committed tests;
+- concierge engine: 20 tests;
+- route-alias provenance: 2 tests;
 - conditional commercial terms: 3 tests;
-- charge semantics guard: 9 committed tests;
-- multi-equipment FCL portfolio semantics: 5 committed tests;
+- charge semantics guard: 9 tests;
+- multi-equipment FCL portfolio semantics: 10 tests;
+- percentage surcharge resolver: 5 tests;
+- atomic validated pipeline: 2 integration-contract tests;
+- percentage-aware FCL portfolio pipeline: 3 integration-contract tests;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
 - design-partner shortlist fixture: 6 candidates re-qualified against expected stage/score/no-money-signal invariants.
@@ -21,42 +24,39 @@ Minimum-charge regressions prove that `rate × quantity` is floored by an eviden
 
 Conditional-term regressions prove that unresolved `subject to` / conditional commercial terms block ranking, an evidenced resolution restores rankability, and merely claiming a term is resolved without a resolution source does not.
 
-Comparison-group regressions prove that:
+Comparison-group regressions prove that a first-position outlier cannot become the baseline, ambiguous equal groups require an explicit target, equivalent equipment aliases normalize together, and materially different equipment remains separate.
 
-- a first-position outlier cannot become the baseline merely because it was first;
-- the unique largest route/equipment/currency group is selected automatically;
-- equal multi-quote groups refuse to guess and require an explicit comparison target;
-- an explicit target selects only the matching comparison group;
-- equivalent equipment forms such as `40HQ` and `40HC` normalize together;
-- materially different equipment types such as `40GP` and `40HC` remain separate.
+Route-alias regressions require an explicit alias plus non-empty source evidence before routes may be merged. Applied aliases are exposed through `route_alias_audit`.
 
-Route-alias regressions prove that an explicit alias such as `CNSHA -> SHANGHAI` restores comparability only when it carries a non-empty source reference; an unproven alias is ignored and cannot silently merge routes. Applied alias evidence is exposed through `route_alias_audit`.
+Charge-semantics regressions cover scoped charge identity, duplicate blocking, all-in bundle expansion, bundle/component double-count blocking, and explicit optional/add-on selection.
 
-Charge-semantics regressions prove that:
+Multi-equipment FCL regressions cover required-equipment completeness, canonical equipment aliases, shared-charge single application, apples-to-apples charge coverage, evidenced coverage resolutions, bundle coverage, conditions, and validity at equipment-offer level.
 
-- origin/main/destination scope is preserved in coverage keys rather than conflated;
-- exact duplicate priced charge signatures are blocked before ranking;
-- the same code in different scopes is not misclassified as a duplicate;
-- an evidenced all-in bundle expands into traceable included component coverage without charging those components again;
-- a priced bundle plus a separately priced overlapping component is blocked as a double-count risk;
-- an unselected optional add-on is removed from both price and required coverage while remaining visible in semantic audit;
-- a selected optional add-on remains in the quote;
-- an optional add-on without explicit `selected=true|false` blocks the quote instead of guessing;
-- unresolved semantic errors return an empty ranking and `UNRESOLVED_CHARGE_SEMANTICS`.
+Percentage-surcharge regressions cover:
 
-Multi-equipment FCL portfolio regressions prove that:
+- percentage of one named freight line;
+- quantity-adjusted named bases;
+- multiple named bases;
+- missing named base refusal;
+- percentage-on-percentage refusal.
 
-- one provider total can be built from multiple required equipment types plus shared per-shipment/per-BL charges;
-- a provider missing required equipment is excluded;
-- multiple offers for one canonical required equipment type are treated as ambiguous rather than guessed;
-- per-shipment charges placed inside an equipment-level offer are blocked to avoid multiplying them across containers/equipment rows;
-- equivalent requirement labels such as `40HQ` and `40HC` combine into one canonical equipment quantity.
+Atomic validation-pipeline contracts require percentage resolution to occur before the scoped/bundle/duplicate/optional charge guard. A bad percentage reference must block ranking as `UNRESOLVED_PERCENTAGE_SEMANTICS`.
 
-Fresh isolated harness results for this slice:
+Percentage-aware FCL portfolio contracts require:
 
-- charge semantics guard: **9/9 PASS** using the repo-style `src.*` import layout;
-- multi-equipment FCL portfolio semantics: **5/5 PASS** against focused dependency stubs that preserve the pricing/basis contracts exercised by this module.
+- equipment-level percentage surcharges to use the required equipment quantity and preserve the same resolved total after rebasing to `PER_CONTAINER`;
+- shared percentage surcharges to be priced once at provider level rather than once per equipment row;
+- a provider with an unresolved named percentage base to be excluded while other complete providers may remain rankable.
 
-These focused results do not claim that the entire repository regression inventory was rerun in one local harness. GitHub Shield remains a separate exact-head acceptance surface.
+Verified focused harness evidence currently preserved:
 
-The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic and shortlist fixtures are not market evidence; they only protect deterministic behavior before real participant data arrives.
+- charge semantics guard: **9/9 PASS** using repo-style `src.*` imports;
+- percentage surcharge resolver: **5/5 PASS** in its isolated deterministic harness;
+- original multi-equipment FCL focused slice: **5/5 PASS**;
+- group-selection/equipment probes: **5/5 PASS**;
+- route-alias helper probes: **4/4 PASS**;
+- conditional-term probes: **3/3 PASS**.
+
+The newer atomic pipeline tests, expanded portfolio regression inventory, and percentage-aware portfolio pipeline tests are committed acceptance contracts but have not been claimed as full source-tree PASS in this tool session. GitHub Shield is a separate exact-head acceptance surface and does not substitute for domain regression execution.
+
+The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic, shortlist, and regression fixtures are not market evidence; they protect deterministic behavior before real participant data arrives.
