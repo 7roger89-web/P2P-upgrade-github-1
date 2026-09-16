@@ -226,7 +226,8 @@ def compare_fcl_portfolios(provider_sets: list[dict[str, Any]], context: dict[st
     excluded = []
     candidates = []
 
-    # Pass 1: structural, validity and semantic preparation. No ranking yet.
+    # Pass 1: structural, validity, semantic and intrinsic completeness gates.
+    # Invalid providers must not define the peer-coverage baseline.
     for index, provider_set in enumerate(provider_sets, start=1):
         provider = str(provider_set.get("provider") or f"provider-{index}").strip()
         quote_set_id = str(provider_set.get("quote_set_id") or provider).strip()
@@ -333,21 +334,65 @@ def compare_fcl_portfolios(provider_sets: list[dict[str, Any]], context: dict[st
             excluded.append({"quote_set_id": quote_set_id, "provider": provider, "reasons": sorted(set(reasons))})
             continue
 
+        # Intrinsic pricing/condition completeness is independent of peer coverage.
+        offer_breakdown = []
+        intrinsic_total = Decimal("0")
+        for equipment, quantity in requirements.items():
+            priced = _price_prepared(
+                prepared_offers[equipment],
+                offer_audits[equipment],
+                {"containers": quantity, "shipments": 1, "bl_count": 1},
+            )
+            if not priced["complete"]:
+                reasons.append(f"{equipment}:INCOMPLETE_OFFER")
+            else:
+                intrinsic_total += Decimal(priced["total"])
+            offer_breakdown.append({
+                "equipment": equipment,
+                "quantity": quantity,
+                "priced": priced,
+            })
+
+        if prepared_shared is None:
+            shared_priced = _zero_shared(quote_set_id, shared_conditions)
+        else:
+            shared_priced = _price_prepared(
+                prepared_shared,
+                shared_audit,
+                {
+                    "containers": sum(requirements.values()),
+                    "shipments": int(context.get("shipments", 1)),
+                    "bl_count": int(context.get("bl_count", 1)),
+                },
+            )
+        if not shared_priced["complete"]:
+            reasons.append("INCOMPLETE_SHARED_CHARGES")
+        else:
+            intrinsic_total += Decimal(shared_priced["total"])
+
+        if reasons:
+            excluded.append({
+                "quote_set_id": quote_set_id,
+                "provider": provider,
+                "reasons": sorted(set(reasons)),
+                "offer_breakdown": offer_breakdown,
+                "shared_priced": shared_priced,
+            })
+            continue
+
         candidates.append({
             "quote_set_id": quote_set_id,
             "provider": provider,
             "currency": currency,
             "route": route,
-            "shared_conditions": shared_conditions,
-            "prepared_offers": prepared_offers,
-            "offer_audits": offer_audits,
             "coverage_by_equipment": coverage_by_equipment,
-            "prepared_shared": prepared_shared,
-            "shared_audit": shared_audit,
             "shared_codes": shared_codes,
+            "offer_breakdown": offer_breakdown,
+            "shared_priced": shared_priced,
+            "intrinsic_total": intrinsic_total,
         })
 
-    # Pass 2: establish apples-to-apples coverage across structurally valid providers.
+    # Pass 2: establish apples-to-apples coverage only from intrinsically complete providers.
     required_coverage: dict[str, set[str]] = {equipment: set() for equipment in requirements}
     required_coverage["SHARED"] = set()
     for candidate in candidates:
@@ -396,66 +441,18 @@ def compare_fcl_portfolios(provider_sets: list[dict[str, Any]], context: dict[st
         else:
             coverage_valid_candidates.append(candidate)
 
-    # Pass 3: only complete, coverage-aligned providers may be priced/ranked.
-    results = []
-    for candidate in coverage_valid_candidates:
-        quote_set_id = candidate["quote_set_id"]
-        provider = candidate["provider"]
-        reasons = []
-        offer_breakdown = []
-        portfolio_total = Decimal("0")
-
-        for equipment, quantity in requirements.items():
-            priced = _price_prepared(
-                candidate["prepared_offers"][equipment],
-                candidate["offer_audits"][equipment],
-                {"containers": quantity, "shipments": 1, "bl_count": 1},
-            )
-            if not priced["complete"]:
-                reasons.append(f"{equipment}:INCOMPLETE_OFFER")
-            else:
-                portfolio_total += Decimal(priced["total"])
-            offer_breakdown.append({
-                "equipment": equipment,
-                "quantity": quantity,
-                "priced": priced,
-            })
-
-        if candidate["prepared_shared"] is None:
-            shared_priced = _zero_shared(quote_set_id, candidate["shared_conditions"])
-        else:
-            shared_priced = _price_prepared(
-                candidate["prepared_shared"],
-                candidate["shared_audit"],
-                {
-                    "containers": sum(requirements.values()),
-                    "shipments": int(context.get("shipments", 1)),
-                    "bl_count": int(context.get("bl_count", 1)),
-                },
-            )
-        if not shared_priced["complete"]:
-            reasons.append("INCOMPLETE_SHARED_CHARGES")
-        else:
-            portfolio_total += Decimal(shared_priced["total"])
-
-        if reasons:
-            excluded.append({
-                "quote_set_id": quote_set_id,
-                "provider": provider,
-                "reasons": sorted(set(reasons)),
-                "offer_breakdown": offer_breakdown,
-                "shared_priced": shared_priced,
-            })
-            continue
-
-        results.append({
-            "quote_set_id": quote_set_id,
-            "provider": provider,
+    # Pass 3: ranking is now a pure operation over complete, coverage-aligned portfolios.
+    results = [
+        {
+            "quote_set_id": candidate["quote_set_id"],
+            "provider": candidate["provider"],
             "currency": candidate["currency"],
-            "total": str(portfolio_total),
-            "offer_breakdown": offer_breakdown,
-            "shared_priced": shared_priced,
-        })
+            "total": str(candidate["intrinsic_total"]),
+            "offer_breakdown": candidate["offer_breakdown"],
+            "shared_priced": candidate["shared_priced"],
+        }
+        for candidate in coverage_valid_candidates
+    ]
 
     results.sort(key=lambda item: Decimal(item["total"]))
     ranking = [
