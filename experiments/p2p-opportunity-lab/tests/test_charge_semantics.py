@@ -73,6 +73,30 @@ class ChargeSemanticsTests(unittest.TestCase):
         self.assertEqual(audit["status"], "BLOCKED")
         self.assertTrue(any(x["type"] == "BUNDLE_COMPONENT_DOUBLE_COUNT_RISK" for x in audit["errors"]))
 
+    def test_unselected_optional_charge_is_excluded_from_pricing_and_coverage(self):
+        prepared, audit = prepare_quote(quote("A", [
+            {"name": "Freight", "amount": 1000, "basis": "PER_SHIPMENT", "source_ref": "a:f"},
+            {"name": "Insurance", "amount": 50, "basis": "PER_SHIPMENT", "optional": True, "selected": False, "source_ref": "a:ins"},
+        ]))
+        self.assertEqual(audit["status"], "READY")
+        self.assertEqual(len(prepared["charges"]), 1)
+        self.assertEqual(audit["optional_excluded"][0]["code"], "INSURANCE")
+
+    def test_selected_optional_charge_remains_priced(self):
+        prepared, audit = prepare_quote(quote("A", [
+            {"name": "Freight", "amount": 1000, "basis": "PER_SHIPMENT", "source_ref": "a:f"},
+            {"name": "Insurance", "amount": 50, "basis": "PER_SHIPMENT", "optional": True, "selected": True, "source_ref": "a:ins"},
+        ]))
+        self.assertEqual(audit["status"], "READY")
+        self.assertEqual(len(prepared["charges"]), 2)
+
+    def test_optional_charge_requires_explicit_selection(self):
+        _, audit = prepare_quote(quote("A", [
+            {"name": "Insurance", "amount": 50, "basis": "PER_SHIPMENT", "optional": True, "source_ref": "a:ins"},
+        ]))
+        self.assertEqual(audit["status"], "BLOCKED")
+        self.assertTrue(any(x["type"] == "OPTIONAL_SELECTION_REQUIRED" for x in audit["errors"]))
+
     def test_guard_blocks_before_ranking_when_semantics_are_unresolved(self):
         bad = quote("A", [
             {"name": "THC", "amount": 100, "basis": "PER_SHIPMENT", "source_ref": "a:1"},
