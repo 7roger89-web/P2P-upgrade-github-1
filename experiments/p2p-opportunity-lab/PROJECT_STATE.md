@@ -62,24 +62,27 @@ Implemented:
 - evidenced `INCLUDED` / `NOT_APPLICABLE` resolution for coverage gaps;
 - validity-window guard using explicit `as_of_date`;
 - minimum-charge support: `max(rate × quantity, minimum_amount)` with raw calculation, floor application and provenance preserved;
-- conditional-commercial-term guard: unresolved `subject to` / exclusion / confirmation terms make a quote incomplete and non-rankable; resolution requires independent source evidence.
+- conditional-commercial-term guard: unresolved `subject to` / exclusion / confirmation terms make a quote incomplete and non-rankable; resolution requires independent source evidence;
+- comparison-group selection no longer trusts the first input quote as the baseline: eligible quotes are grouped by normalized route + equipment + currency and the unique largest group is selected automatically;
+- equal multi-quote groups are treated as ambiguous and produce no ranking until an explicit `comparison_target` is supplied;
+- conservative equipment aliases normalize equivalent forms such as `40HQ` / `40HC` while keeping materially different types such as `40GP` separate.
 
 Verification at this slice:
-- base concierge engine: 15/15 PASS;
-- conditional commercial terms: 3/3 PASS;
-- representative synthetic fixture: PASS (`SYN-B USD 2010 < SYN-A USD 2060`; CNY quote excluded without FX);
+- base concierge engine regression inventory: 20 tests;
+- conditional commercial terms: 3 tests;
+- representative synthetic fixture remains the deterministic acceptance fixture (`SYN-B USD 2010 < SYN-A USD 2060`; CNY excluded without FX);
 - experiment tracker: 5/5 PASS;
 - experiment states remain distinct: `CONTACTED`, `SUBMITTED`, `REPEAT_REQUEST`, `WTP_SIGNAL`, `PAID`.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY + EXPERIMENT_TRACKER_READY + CHARGE_COVERAGE_GUARD_READY + VALIDITY_GUARD_READY + MINIMUM_CHARGE_READY + CONDITIONAL_TERMS_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY + EXPERIMENT_TRACKER_READY + CHARGE_COVERAGE_GUARD_READY + VALIDITY_GUARD_READY + MINIMUM_CHARGE_READY + CONDITIONAL_TERMS_READY + UNBIASED_GROUP_SELECTION_READY`
 
-The external lane is blocked only on Reddit delivery capability. The internal lane continues independently and is ready to accept anonymized opted-in quote sets without pretending incomplete commercial terms are final prices.
+The external lane is blocked only on Reddit delivery capability. The internal lane continues independently and is ready to reject stale, incomplete, conditionally priced, or comparison-incompatible quote groups rather than manufacturing a false cheapest option.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Continue validation-only hardening only where representative quote semantics justify it; do not drift into product UI/login/billing/deployment.
+2. Continue validation-only hardening only where representative quote semantics justify it; next useful candidates are explicit route/location alias evidence, tiered/percentage pricing, and LCL/air chargeable-weight semantics. Do not drift into product UI/login/billing/deployment.
 3. On opt-in, run the real concierge test and record corrections, trust objections, repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
