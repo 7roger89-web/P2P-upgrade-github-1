@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,6 +12,7 @@ MODULE = Path(__file__).resolve().parents[1] / ".p2p" / "system" / "p2p_capabili
 spec = importlib.util.spec_from_file_location("open_code_review_bridge", MODULE)
 ocr = importlib.util.module_from_spec(spec)
 assert spec and spec.loader
+sys.modules[spec.name] = ocr
 spec.loader.exec_module(ocr)
 
 
