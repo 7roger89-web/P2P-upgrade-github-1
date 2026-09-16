@@ -3,7 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any
 
-from concierge_engine import canonical_charge_code, compare_quotes
+from src.concierge_engine import canonical_charge_code, compare_quotes
 
 SUPPORTED_SCOPES = {"UNSPECIFIED", "ORIGIN", "MAIN", "DESTINATION", "OTHER"}
 
