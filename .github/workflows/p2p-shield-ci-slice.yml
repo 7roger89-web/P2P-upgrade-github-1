@@ -63,6 +63,13 @@ jobs:
           tests.test_p2p_prompt_authoring_discipline
           tests.test_p2p_code_intelligence_bridge
           tests.test_p2p_github_research_appendix
+          tests.test_p2p_native_code_impact
+
+      - name: Measure native code impact on exact PR worktree
+        if: github.event_name == 'pull_request'
+        env:
+          P2P_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: PYTHONPATH=".p2p/system" python3 -m p2p_capabilities.native_code_impact --root . --baseline "$P2P_BASE_SHA"
 
       - name: Run Slice 1 acceptance (unchanged)
         if: always()
