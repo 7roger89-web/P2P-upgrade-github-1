@@ -1,0 +1,92 @@
+{
+  "problem": "Logistics teams and freight forwarders spend material time normalizing and comparing inconsistent freight quotations and carrier rate sheets across PDF, Excel, email, WhatsApp, and other formats.",
+  "target_user": "SME import/export logistics teams and small-to-mid freight forwarders that compare multiple carrier/forwarder quotes without a fully adopted enterprise rate-management workflow.",
+  "hypothesis": "A lightweight workflow that accepts existing quote files/messages and produces an auditable apples-to-apples comparison will attract repeat use and willingness-to-pay from target users before a full TMS-style product is needed.",
+  "evidence": [
+    {
+      "class": "USER_SAID",
+      "signal": "PAIN",
+      "direction": "SUPPORTS",
+      "source": "https://www.reddit.com/r/logistics/comments/1q0ipep/am_i_the_only_one/",
+      "note": "User reports getting 3-5 quotes per shipment in PDF/Excel/WhatsApp and spending about an hour per day retyping them into a master spreadsheet to compare surcharges. Published 2025-12-31."
+    },
+    {
+      "class": "USER_SAID",
+      "signal": "DEMAND",
+      "direction": "SUPPORTS",
+      "source": "https://www.reddit.com/r/freightforwarding/comments/1rkex5u/is_anyone_else_losing_their_mind_comparing/",
+      "note": "User reports roughly two hours/day retyping 3-5 carrier quotes and explicitly asks for a tool that is not an expensive enterprise TMS. Published 2026-03-04."
+    },
+    {
+      "class": "USER_SAID",
+      "signal": "PAIN",
+      "direction": "SUPPORTS",
+      "source": "https://www.reddit.com/r/freightforwarding/comments/1sr1ovp/carrier_forwarder_rates_hassle/",
+      "note": "Forwarder reports carrier rate sheets, routes, and surcharges consume substantial quoting time; replies describe the problem as common and warn generic quote parsers can fail as formats change. Published 2026-04-20."
+    },
+    {
+      "class": "USER_SAID",
+      "signal": "WORKAROUND",
+      "direction": "SUPPORTS",
+      "source": "https://www.reddit.com/r/logistics/comments/1q0ipep/am_i_the_only_one/",
+      "note": "Suggested workarounds include standardized Excel templates and Google Forms; one user reports forwarders refused the form and kept emailing PDFs, indicating workflow-change friction."
+    },
+    {
+      "class": "OBSERVED",
+      "signal": "COMPETITOR",
+      "direction": "CONTRADICTS",
+      "severity": "MEDIUM",
+      "resolved": false,
+      "source": "https://gofreight.com/product/rate-management-quoting/",
+      "note": "GoFreight already markets AI rate ingestion from PDF/Excel/email plus side-by-side rate comparison and quoting, so the broad feature idea is not unique."
+    },
+    {
+      "class": "OBSERVED",
+      "signal": "COMPETITOR",
+      "direction": "CONTRADICTS",
+      "severity": "MEDIUM",
+      "resolved": false,
+      "source": "https://freightify.com/products/core-platform/rate-procurement-software",
+      "note": "Freightify already centralizes and standardizes carrier rates and compares them in one view."
+    },
+    {
+      "class": "OBSERVED",
+      "signal": "PRICING",
+      "direction": "NEUTRAL",
+      "source": "https://freightify.com/pricing",
+      "note": "Freightify pricing is sales-led/contact-sales rather than a simple public low-cost self-serve price, leaving a hypothesis—not proof—of a lighter-weight SME wedge."
+    },
+    {
+      "class": "OBSERVED",
+      "signal": "COMPETITOR",
+      "direction": "CONTRADICTS",
+      "severity": "LOW",
+      "resolved": false,
+      "source": "https://www.reddit.com/r/supplychainIndia/comments/1v56jfj/built_a_tool_at_work_to_stop_comparing/",
+      "note": "A 2026 builder post describes FreightCompare, a live B2B quote-comparison product. This is competitor evidence, not independent proof of customer adoption."
+    }
+  ],
+  "contradicting_evidence": [
+    "Multiple existing products already offer rate ingestion/comparison, so a generic 'AI freight quote comparison' product has weak differentiation.",
+    "Some teams successfully force standardized supplier templates or use macros, reducing pain where procurement power and process discipline are strong.",
+    "Current evidence does not establish willingness-to-pay for a lightweight standalone tool versus bundled TMS/rate-management software."
+  ],
+  "unknowns": [
+    "How often target Vietnamese/China-Vietnam logistics teams perform this comparison per week.",
+    "Which quote fields and surcharge semantics create the highest error cost.",
+    "Whether users prefer a standalone comparison tool, email/Excel plugin, or feature inside an existing operations app.",
+    "Observed willingness-to-pay and repeat-use rate.",
+    "Required accuracy threshold before users trust automated normalization."
+  ],
+  "experiment": {
+    "status": "DESIGNED",
+    "source_class": "OBSERVED",
+    "design": "Concierge test: accept 3-5 real quote files/messages from each participant, normalize them with AI plus human verification, and return an auditable comparison table without asking suppliers to change format.",
+    "success_threshold": "At least 3 of 5 target users submit real quote sets; at least 2 request a second comparison or give an explicit willingness-to-pay signal after seeing the result.",
+    "failure_threshold": "Fewer than 2 of 5 target users submit real quote sets, or users consistently prefer their current template/TMS workflow and no participant requests repeat use or indicates willingness to pay.",
+    "success_threshold_reached": false,
+    "failure_threshold_reached": false
+  },
+  "decision": "VALIDATE",
+  "owner_action_required": "Owner Gate is required before external outreach or any paid validation. No product build yet."
+}
