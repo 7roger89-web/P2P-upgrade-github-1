@@ -4,6 +4,7 @@ from copy import deepcopy
 from typing import Any
 
 from src.charge_semantics import compare_quotes_guarded
+from src.concierge_engine import validate_unique_quote_ids
 from src.fx_semantics import resolve_fx
 from src.percentage_semantics import resolve_percentage_charges
 
@@ -47,6 +48,8 @@ def _blocked_result(
 def compare_quotes_validated(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(raw_quotes, list) or len(raw_quotes) < 2:
         raise ValueError("at least two quotes are required")
+
+    validate_unique_quote_ids(raw_quotes)
 
     fx_resolved_quotes = []
     fx_audit = []
