@@ -1,12 +1,14 @@
 # Validation test matrix
 
-Current isolated regression groups:
+Current regression groups:
 
 - market gate: 5 tests;
 - prospect bridge: 5 tests;
-- concierge engine: 20 tests;
+- concierge engine: 20 committed tests;
 - route-alias provenance: 2 committed tests;
 - conditional commercial terms: 3 tests;
+- charge semantics guard: 6 committed tests;
+- multi-equipment FCL portfolio semantics: 5 committed tests;
 - experiment tracker: 5 tests;
 - synthetic quote fixture: 1 deterministic fixture test;
 - design-partner shortlist fixture: 6 candidates re-qualified against expected stage/score/no-money-signal invariants.
@@ -30,6 +32,28 @@ Comparison-group regressions prove that:
 
 Route-alias regressions prove that an explicit alias such as `CNSHA -> SHANGHAI` restores comparability only when it carries a non-empty source reference; an unproven alias is ignored and cannot silently merge routes. Applied alias evidence is exposed through `route_alias_audit`.
 
-Fresh targeted probes for the new grouping/equipment slice are 5/5 PASS; route-alias provenance helper probes are 4/4 PASS. These targeted probes do not pretend the entire committed regression inventory was rerun in the same local harness.
+Charge-semantics regressions prove that:
+
+- origin/main/destination scope is preserved in coverage keys rather than conflated;
+- exact duplicate priced charge signatures are blocked before ranking;
+- the same code in different scopes is not misclassified as a duplicate;
+- an evidenced all-in bundle expands into traceable included component coverage without charging those components again;
+- a priced bundle plus a separately priced overlapping component is blocked as a double-count risk;
+- unresolved semantic errors return an empty ranking and `UNRESOLVED_CHARGE_SEMANTICS`.
+
+Multi-equipment FCL portfolio regressions prove that:
+
+- one provider total can be built from multiple required equipment types plus shared per-shipment/per-BL charges;
+- a provider missing required equipment is excluded;
+- multiple offers for one canonical required equipment type are treated as ambiguous rather than guessed;
+- per-shipment charges placed inside an equipment-level offer are blocked to avoid multiplying them across containers/equipment rows;
+- equivalent requirement labels such as `40HQ` and `40HC` combine into one canonical equipment quantity.
+
+Fresh isolated harness results for this slice:
+
+- charge semantics guard: **6/6 PASS** using the repo-style `src.*` import layout;
+- multi-equipment FCL portfolio semantics: **5/5 PASS** against focused dependency stubs that preserve the pricing/basis contracts exercised by this module.
+
+These focused results do not claim that the entire repository regression inventory was rerun in one local harness. GitHub Shield remains a separate exact-head acceptance surface.
 
 The representative synthetic quote fixture remains the deterministic acceptance case. Synthetic and shortlist fixtures are not market evidence; they only protect deterministic behavior before real participant data arrives.
