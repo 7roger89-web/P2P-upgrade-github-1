@@ -81,9 +81,10 @@ def resolve_percentage_charges(raw_quote: dict[str, Any], context: dict[str, Any
     quote_currency = str(quote.get("currency") or "").strip().upper()
     errors: list[dict[str, Any]] = []
     resolutions: list[dict[str, Any]] = []
+    deferred_optional: list[dict[str, Any]] = []
 
     line_index: dict[str, dict[str, Any]] = {}
-    for index, charge in enumerate(charges, start=1):
+    for charge in charges:
         if not isinstance(charge, dict):
             continue
         line_id = str(charge.get("line_id") or "").strip()
@@ -106,6 +107,16 @@ def resolve_percentage_charges(raw_quote: dict[str, Any], context: dict[str, Any
         rate_value = charge.get("percentage_rate")
         if rate_value is None:
             transformed.append(deepcopy(charge))
+            continue
+
+        if charge.get("optional") is True and charge.get("selected") is not True:
+            transformed.append(deepcopy(charge))
+            deferred_optional.append({
+                "line": index,
+                "line_id": str(charge.get("line_id") or "").strip() or None,
+                "selected": charge.get("selected"),
+                "reason": "optional selection is handled by the downstream charge-semantics guard",
+            })
             continue
 
         line_id = str(charge.get("line_id") or "").strip()
@@ -178,4 +189,5 @@ def resolve_percentage_charges(raw_quote: dict[str, Any], context: dict[str, Any
         "status": "BLOCKED" if errors else "READY",
         "errors": errors,
         "resolutions": resolutions,
+        "deferred_optional": deferred_optional,
     }
