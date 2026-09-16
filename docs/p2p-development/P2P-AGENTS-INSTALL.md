@@ -57,17 +57,23 @@ If this entry point conflicts with the active canonical law, the canonical law w
 
 After valid law preflight and after durable P2P GoalPlan/TaskPlan state exists, but before the first substantive execution turn for that goal, decide native `/goal` activation automatically. Do not ask the Owner whether to use `/goal`.
 
-When installed runtime is present, run the read-only gate:
+When installed runtime is present, prefer the capability handshake:
 
-`python .p2p/system/p2p_capabilities/native_goal_activation.py --host <claude_code|codex_cli> --format json`
+`python .p2p/system/p2p_capabilities/native_goal_gate.py --host <claude_code|codex_cli>`
+
+`native_goal_gate.py` composes the existing deterministic eligibility decision with a read-only host-capability probe. `native_goal_activation.py` remains the lower-level eligibility primitive and `native_goal_bridge.py` remains the command projection primitive.
 
 Choose the host from the current executor identity; this is a technical detail, not an Owner question. Claude Code may be detected from its stable in-session environment markers. Because Codex CLI does not expose an equally reliable generic environment marker, a Codex executor passes `--host codex_cli` from its known executor identity rather than guessing from `CODEX_HOME`.
 
-- `decision=ACTIVATE_NATIVE_GOAL` -> if the same goal is not already active in the current host session, immediately invoke the returned `command` once, then continue the same P2P task under existing P2P authority.
-- `decision=NORMAL_P2P_PATH` -> continue the normal P2P execution path without native `/goal`.
-- helper `status=BLOCKED` -> treat it as a durable-state/control-plane blocker; do not fabricate a `/goal` condition.
+- `status=NOT_NEEDED` -> continue the normal P2P path; native goal is not warranted by the durable plan.
+- `status=READY_TO_INVOKE` -> the goal is eligible and the local host probe is ready, but **invocation is not yet proven**. A generated `/goal ...` string or an assistant message containing it is not a host invocation.
+- Invoke the returned command only through the current host's native command boundary. Never launch a nested Claude/Codex process merely to fake same-session activation. If the current surface exposes no usable native command boundary, native goal is unavailable for that session and the normal P2P path remains valid.
+- After the host accepts the command, run/view host-native `/goal` status in that same session. Only an observed active-goal status may produce an `INVOKED` receipt.
+- Record actual invocation with `.p2p/system/p2p_capabilities/native_goal_receipt.py` into the existing `.p2p/state/execution-ledger.jsonl`. The receipt stores host, goal id, state, proof kind, reason, time, and a fingerprint; it never stores the raw goal or command and is never P2P acceptance authority.
+- `status=UNAVAILABLE` or a native command rejection -> record `UNAVAILABLE` when the receipt helper is installed, then continue the normal P2P path unless the task contract explicitly requires native goal mode. Never claim `/goal` was used from an eligibility decision, a generated command, or executor self-report alone.
+- Claude Code readiness requires a version that supports `/goal` (v2.1.139+); workspace trust and managed hook policy can still make it unavailable at runtime. Codex CLI readiness requires the `goals` feature enabled. `codex features enable goals` is the official remediation command, but enabling it persistently is a config mutation and remains subject to the current task authority.
 
-The deterministic activation rule is intentionally narrow: auto-activate only when the Goal status is `APPROVED` or `IN_PROGRESS`, TaskPlan lifecycle is `ACTIVE`, the canonical plan has at least two tasks, and at least one task is not terminal. `PLANNED`, `OWNER_GATE`, `BLOCKED`, `BUDGET_BOUNDARY`, `VERIFIED`, terminal goals, closed/superseded plans, and single-task plans stay on the normal P2P path. If the installed helper is absent but the authoritative durable state is readable, apply exactly this same rule directly; do not invent a second detector or state machine.
+The deterministic eligibility rule remains intentionally narrow: auto-activate only when the Goal status is `APPROVED` or `IN_PROGRESS`, TaskPlan lifecycle is `ACTIVE`, the canonical plan has at least two tasks, and at least one task is not terminal. `PLANNED`, `OWNER_GATE`, `BLOCKED`, `BUDGET_BOUNDARY`, `VERIFIED`, terminal goals, closed/superseded plans, and single-task plans stay on the normal P2P path. If the installed helper is absent but authoritative durable state is readable, apply exactly this same eligibility rule directly; do not invent a second detector or state machine, and do not claim native invocation without host evidence.
 
 Native `/goal` is session continuation only. It creates no new P2P authority, does not widen permissions, does not bypass Owner Gates, and never makes host evaluator/self-report an acceptance authority. Canonical P2P GoalPlan/TaskPlan, durable task state, evidence, and verifier remain authoritative. Claude Code and Codex CLI host semantics must remain distinct; never claim Codex has Claude's evaluator/automatic-turn behavior unless directly documented and verified.
 
