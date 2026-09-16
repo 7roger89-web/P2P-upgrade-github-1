@@ -77,13 +77,24 @@ For a non-trivial P2P-managed task, after valid law/task-state preflight and bef
 
 `python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<bounded current task>"`
 
-This lookup is read-only. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
+This lookup is read-only. It considers project-local `ACTIVE` experience and, when the packaged federation runtime/catalog is present, matching promoted shared experience. Local `QUARANTINED` or `SUPERSEDED` state wins over shared catalog content. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
 
 After a task, do not manufacture memory from routine success. Create an experience `CANDIDATE` only when a repeated/material failure or clearly reusable correction has independent evidence. Model self-report, chat summary, or verbal confidence alone is not proof. A candidate is inert until verification supplies `BEHAVIOR_PROOF + REGRESSION_PROOF + CHALLENGE_PROOF`; only then may it transition `VERIFIED -> ACTIVE`.
 
 The same helper exposes bounded lifecycle commands: `candidate`, `verify`, `activate`, `use`, `quarantine`, and `supersede`. Record whether an ACTIVE experience `HELPED`, was `NEUTRAL`, or `HARMED` using evidence from the new run. One harmful run recommends review but does not automatically erase history. Quarantine or supersession requires evidence and remains append-only.
 
-`NON_AUTHORITATIVE_VERIFIED_EXPERIENCE` never changes law, permissions, acceptance, promotion, provider choice, deployment, source, or skills by itself. Reuse the existing `.p2p/state/execution-ledger.jsonl`; do not create a second memory database, router, daemon, or external memory service merely to support this lifecycle.
+### Cross-project promotion and skill distillation
+
+At normal task reconciliation, if an `ACTIVE` project experience has evidence that the same lesson applies outside its source project, classify it as exactly one of `PROJECT_ONLY | DOMAIN | CROSS_PROJECT`. The Owner must not have to request periodic experience harvesting.
+
+- `PROJECT_ONLY` stays in the project execution ledger. Do not promote it merely because it was useful once.
+- `DOMAIN` or `CROSS_PROJECT` requires independent out-of-project scope evidence. When that proof exists, the project executor may export a non-authoritative promotion proposal with `.p2p/system/p2p_capabilities/experience_promotion.py`; it must not edit the P2P shared catalog or P2P main directly.
+- Control Tower/canonical P2P validates provenance, verification evidence, scope evidence, conflict state, and current usefulness before applying a proposal to the curated `shared_experience_catalog.json`. Shared promotion is a validated canonical integration step, never an executor self-promotion right.
+- Matching promoted shared experience is consumed through the ordinary read-only `experience_evolution.py ... retrieve` path. Project-local ACTIVE experience is preferred; local `QUARANTINED`/`SUPERSEDED` state blocks a shared record from being reintroduced.
+- Only a `CROSS_PROJECT` + `PROCEDURAL` promoted experience with multi-project proof and stable inputs, outputs, and procedure may produce a `SKILL_CANDIDATE`. A candidate is not a skill: it creates no `SKILL.md`, changes no registry, and has no activation authority. It must pass the existing P2P skill eligibility path and receive the normal activation receipt before any later activation.
+- Do not create a second memory database, global vector store, skill registry, router, daemon, or evolution agent for this flow. Local experience remains in the existing execution ledger; the shared catalog is a curated package projection only.
+
+`NON_AUTHORITATIVE_VERIFIED_EXPERIENCE` never changes law, permissions, acceptance, promotion, provider choice, deployment, source, or skills by itself.
 
 ## Owner gates
 
@@ -118,44 +129,3 @@ Use these entry points only when their trigger applies:
 | Domain-specific implementation | only the relevant domain skill/docs for the touched surface |
 
 Historical `source/8.4.6-C/`, legacy Claude material, old plans, and closed reports are references only unless the active task explicitly needs them. They do not override current law or permissions.
-
-## Completion and verification
-
-Define `done` as observable state, not as “implementation attempted”. Unless a real Owner Gate or blocker is reached, continue through the necessary implementation, inspection, repair, and verification until the bounded completion criteria are satisfied.
-
-`P2P_EVIDENCE_FIRST_VERIFICATION_V1` applies to correctness/readiness claims. The worker is not acceptance authority merely because it authored the code and the tests. Ask what the evidence actually challenged, then scale independent challenge with the existing execution lane:
-
-- `FAST` -> nearest-boundary deterministic check; focused regression when behavior changed; real-path smoke when the claim crosses runtime/UI/API.
-- `STANDARD` -> FAST + explicit acceptance scenario(s) + relevant regression + evidence the changed behavior was actually exercised.
-- `STRICT` -> STANDARD + independent challenge of the changed behavioral surface (targeted mutation, adversarial/negative/property check, or equivalent) + integration/E2E and structural review where applicable.
-- `CRITICAL` -> STRICT + independent reviewer/verifier + explicit security/data/migration/destructive checks as applicable + representative real-path/production-like verification before readiness claims; Owner Gates remain unchanged.
-
-Mutation testing is targeted evidence, not compulsory theatre. Prefer changed-surface mutation when it can reveal whether tests distinguish correct from plausible-wrong behavior. If mutation is not decision-useful for the surface, use the smallest equivalent adversarial challenge and record why. Coverage is supportive evidence, not semantic proof.
-
-Verification remains proportional to the changed risk:
-
-- small/local change -> narrow nearest-boundary check;
-- cross-cutting or higher-risk change -> broader affected-path verification;
-- release/security/migration work -> the explicit canonical gates required by the active law.
-
-A suite that never exercised the claimed boundary cannot prove that boundary. UI, API integration, connector/provider, migration, deployment-health, and other environment-crossing claims require representative real-path evidence when practical; otherwise downgrade the verdict to the strongest truthful unverified/incomplete state.
-
-Do not run broad tests, reviewers, full builds, web research, mutation campaigns, or hardening by ritual. Do not skip the evidence needed to support the actual claim either.
-
-## Anti-overengineering gate
-
-Always challenge a proposed step with: **“Không bị over engineering chứ?”**
-
-1. Có cách đơn giản hơn đạt cùng mục tiêu không?
-2. Bước này có tạo thêm thông tin, capability, hoặc tiến triển đáng kể không?
-3. Nếu bỏ bước này, điều kiện thành công có thực sự bị thiếu không?
-4. Chúng ta đang giải capability chính hay đang tối ưu hạ tầng phụ trước capability?
-5. Task có thể thu nhỏ thành một slice nhỏ hơn nhưng vẫn kiểm chứng độc lập hay không?
-
-One bad answer means reconsider, reduce, remove, or defer the step. Return `DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED` with a concrete reason; never use the gate as ceremonial paperwork.
-
-Before delegating to another model or executor, check that the prompt preserves the real target and cannot redirect the worker toward support infrastructure, unrelated refactors, or broader goals.
-
-## Beginner-facing handoff
-
-When handing work to another model/tool, make the destination explicit, including `NEW CHAT` or `SAME CHAT` when relevant. State the bounded goal, why this executor is being used, the real completion/evidence criteria, protected boundaries, and the compact result that must return. The Owner should not have to reconstruct Git state or infer where a prompt belongs.
