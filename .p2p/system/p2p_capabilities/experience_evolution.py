@@ -1,9 +1,11 @@
 """Evidence-grounded reusable experience for P2P.
 
 Lifecycle: CANDIDATE -> VERIFIED -> ACTIVE -> SUPERSEDED | QUARANTINED.
-The existing .p2p/state/execution-ledger.jsonl is the only durable store.
+The existing .p2p/state/execution-ledger.jsonl is the only durable local store.
 ACTIVE experience is non-authoritative context: it never grants permission,
 acceptance, promotion, provider choice, law change, or skill mutation.
+Promoted shared experience may be read from the packaged curated catalog, but
+retrieval remains read-only and local quarantine/supersession always wins.
 """
 from __future__ import annotations
 
@@ -11,9 +13,19 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
+
+# The installed entrypoint intentionally supports direct-file execution. Give
+# that mode a real package context so lazy federation imports behave exactly as
+# they do when Control Tower imports this module normally.
+if not __package__:
+    _runtime_root = Path(__file__).resolve().parents[1]
+    if str(_runtime_root) not in sys.path:
+        sys.path.insert(0, str(_runtime_root))
+    __package__ = "p2p_capabilities"
 
 SCHEMA = "p2p-experience-evolution/1"
 LEDGER_SCHEMA = "p2p-execution-event/1"
@@ -304,11 +316,80 @@ def retrieve_active_experiences(root: str | Path, task: Mapping[str, object] | s
             "lesson": exp.get("lesson"), "correction": exp.get("correction"),
             "failure_class": exp.get("failure_class"), "source_task_id": exp.get("source_task_id"),
             "source_revision": exp.get("source_revision"),
+            "source": "PROJECT_LOCAL_LEDGER",
             "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
             "permission_effect": "NONE", "acceptance_authority": False,
             "must_revalidate_against_current_state": True,
         })
     return tuple(out)
+
+
+def _retrieve_promoted_shared_experiences(
+    root: str | Path,
+    task: Mapping[str, object] | str,
+    *,
+    max_results: int = 3,
+) -> tuple[tuple[dict[str, Any], ...], str]:
+    """Read matching promoted shared experience without mutating project state."""
+
+    try:
+        from . import experience_federation as federation
+    except ImportError:
+        return (), "UNAVAILABLE"
+    try:
+        catalog = federation.load_catalog()
+    except (OSError, federation.ExperienceFederationError):
+        return (), "UNAVAILABLE"
+
+    limit = max(0, min(int(max_results), MAX_RESULTS))
+    tokens = _task_tokens(task)
+    local = derive_experiences(root)
+    ranked: list[tuple[int, str, Mapping[str, object]]] = []
+    for record in catalog.get("records") or ():
+        if not isinstance(record, Mapping) or record.get("state") != "ACTIVE":
+            continue
+        scope = str(record.get("scope") or "").upper()
+        if scope == "DOMAIN":
+            domain = str(record.get("domain") or "").lower()
+            if not domain or domain not in tokens:
+                continue
+        elif scope != "CROSS_PROJECT":
+            continue
+        source_eid = str(record.get("source_experience_id") or "")
+        local_state = local.get(source_eid, {}).get("state") if source_eid else None
+        if local_state in {"ACTIVE", "QUARANTINED", "SUPERSEDED"}:
+            continue
+        triggers = {str(x).lower() for x in (record.get("trigger_tokens") or ())}
+        matched = tokens.intersection(triggers)
+        if matched:
+            ranked.append((len(matched), str(record.get("record_id") or source_eid), record))
+    ranked.sort(key=lambda item: (-item[0], item[1]))
+
+    out: list[dict[str, Any]] = []
+    for score, record_id, record in ranked[:limit]:
+        triggers = {str(x).lower() for x in (record.get("trigger_tokens") or ())}
+        out.append({
+            "schema": SCHEMA,
+            "experience_id": str(record.get("source_experience_id") or record_id),
+            "shared_record_id": record_id,
+            "kind": record.get("kind"),
+            "state": "ACTIVE",
+            "scope": record.get("scope"),
+            "domain": record.get("domain"),
+            "match_score": score,
+            "matched_triggers": sorted(tokens.intersection(triggers)),
+            "lesson": record.get("lesson"),
+            "correction": record.get("correction"),
+            "failure_class": record.get("failure_class"),
+            "source_task_id": record.get("source_task_id"),
+            "source_revision": record.get("source_revision"),
+            "source": "P2P_SHARED_PROMOTED_CATALOG",
+            "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+            "permission_effect": "NONE",
+            "acceptance_authority": False,
+            "must_revalidate_against_current_state": True,
+        })
+    return tuple(out), "AVAILABLE"
 
 
 def record_use_result(root: str | Path, experience_id: str, *, task_id: str,
@@ -331,11 +412,31 @@ def record_use_result(root: str | Path, experience_id: str, *, task_id: str,
 
 def activation_summary(root: str | Path, task: Mapping[str, object] | str,
                        *, max_results: int = 3) -> dict[str, Any]:
-    matches = retrieve_active_experiences(root, task, max_results=max_results)
-    return {"schema": SCHEMA, "decision": "USE_ACTIVE_EXPERIENCE" if matches else "NO_MATCH",
-            "experiences": list(matches), "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
-            "current_state_wins": True, "law_and_task_contract_win": True,
-            "permission_effect": "NONE", "acceptance_authority": False, "mutated": False}
+    limit = max(0, min(int(max_results), MAX_RESULTS))
+    local_matches = list(retrieve_active_experiences(root, task, max_results=limit))
+    remaining = max(0, limit - len(local_matches))
+    shared_matches: list[dict[str, Any]] = []
+    shared_status = "AVAILABLE"
+    if remaining:
+        shared, shared_status = _retrieve_promoted_shared_experiences(
+            root, task, max_results=remaining
+        )
+        shared_matches = list(shared)
+    matches = local_matches + shared_matches
+    return {
+        "schema": SCHEMA,
+        "decision": "USE_ACTIVE_EXPERIENCE" if matches else "NO_MATCH",
+        "experiences": matches,
+        "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+        "current_state_wins": True,
+        "law_and_task_contract_win": True,
+        "permission_effect": "NONE",
+        "acceptance_authority": False,
+        "mutated": False,
+        "local_match_count": len(local_matches),
+        "shared_match_count": len(shared_matches),
+        "shared_catalog_status": shared_status,
+    }
 
 
 def _json(value: str) -> Any:
