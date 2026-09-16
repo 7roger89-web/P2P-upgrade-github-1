@@ -1,0 +1,54 @@
+from pathlib import Path
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+APPENDIX = ROOT / "docs" / "p2p-development" / "GITHUB-RESEARCH-APPENDIX.md"
+BRIDGE = ROOT / ".p2p" / "system" / "p2p_capabilities" / "code_intelligence_bridge.py"
+
+
+class GithubResearchAppendixTests(unittest.TestCase):
+    def test_appendix_reconciles_already_implemented_research(self) -> None:
+        text = APPENDIX.read_text(encoding="utf-8")
+        for durable_marker in (
+            "PR #169",
+            "PR #170",
+            "PR #171",
+            "PR #175",
+            "PR #173",
+            "PR #153",
+            "PR #159",
+            "PR #152",
+            "PR #162",
+            "PR #178",
+            "PR #182",
+        ):
+            with self.subTest(durable_marker=durable_marker):
+                self.assertIn(durable_marker, text)
+
+    def test_appendix_does_not_promote_research_inbox_to_authority(self) -> None:
+        text = APPENDIX.read_text(encoding="utf-8")
+        self.assertIn("discovery inbox, not an adoption ledger", text)
+        self.assertIn("durable GitHub state wins", text)
+        self.assertIn("not a replacement ledger", text)
+        self.assertIn("second router", text)
+        self.assertIn("second truth", text)
+
+    def test_appendix_prioritizes_only_remaining_gap(self) -> None:
+        text = APPENDIX.read_text(encoding="utf-8")
+        self.assertIn("NEXT_CORE_SLICE=CODE_INTELLIGENCE_STRUCTURAL_EVIDENCE", text)
+        self.assertIn("DeusData/codebase-memory-mcp", text)
+        self.assertIn("v0.11.0", text)
+        self.assertIn("8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798", text)
+
+    def test_code_intelligence_bridge_keeps_external_graph_non_authoritative(self) -> None:
+        text = BRIDGE.read_text(encoding="utf-8")
+        self.assertIn("NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE", text)
+        self.assertIn("index_repository", text)
+        self.assertIn("manage_adr", text)
+        self.assertIn("standing_process_started_by_bridge", text)
+        self.assertIn("index_created_by_bridge", text)
+
+
+if __name__ == "__main__":
+    unittest.main()
