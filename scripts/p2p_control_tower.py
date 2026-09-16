@@ -44,10 +44,8 @@ from p2p_capabilities.experience_evolution import (  # noqa: E402
 
 
 CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT_ASSEMBLY:"
-CANONICAL_LAW_SOURCE = (
-    "7roger89-web/P2P-upgrade-github-1@main:"
-    "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md#P2P_SUPREME_OPERATING_LAW_V1"
-)
+MAX_ACTIVE_EXPERIENCES = 3
+PRIMARY_WRAPPER_CHARS = 220
 
 
 def _root(args: argparse.Namespace) -> Path:
@@ -58,7 +56,7 @@ def _experience_summary(root: Path, task_text: str) -> dict[str, Any]:
     """Retrieve bounded ACTIVE experience without making it execution authority."""
 
     try:
-        return activation_summary(root, task_text, max_results=3)
+        return activation_summary(root, task_text, max_results=MAX_ACTIVE_EXPERIENCES)
     except (ExperienceEvolutionError, OSError):
         # Prior experience is useful context, never a prerequisite for executing
         # the current authoritative task. Surface unavailability without turning
@@ -76,32 +74,44 @@ def _experience_summary(root: Path, task_text: str) -> dict[str, Any]:
         }
 
 
+def _compact_text(value: Any, limit: int) -> str:
+    normalized = " ".join(str(value or "").split())
+    if len(normalized) <= limit:
+        return normalized
+    return normalized[: max(1, limit - 1)].rstrip() + "…"
+
+
 def _render_context_block(summary: Mapping[str, Any]) -> str:
+    """Render a deliberately thin delegation wrapper, not another policy bundle."""
+
+    decision = str(summary.get("decision", "UNAVAILABLE"))
     lines = [
         CONTEXT_MARKER,
-        "- CONTROL_TOWER_ROLE: coordinate durable state, bounded delegation, evidence reconciliation, and the next safe action; Control Tower is not law authority and is not the executor.",
-        f"- CANONICAL_SUPREME_LAW: {CANONICAL_LAW_SOURCE}",
-        "- LAW_AUTHORITY_COUNT: ONE. Installed/portable notebooks and SUPREME_LAW_CAPSULE are projections or fallback transport, not independent laws.",
-        "- SUBORDINATE_CONTEXT: Evidence-First, security, UI/UX, domain, research, and historical documents are loaded only when their task trigger applies; do not scan or preload every file containing law/rule/policy.",
-        f"- EXPERIENCE_DECISION: {summary.get('decision', 'UNAVAILABLE')}",
-        "- EXPERIENCE_AUTHORITY: NON_AUTHORITATIVE_VERIFIED_EXPERIENCE; current Supreme Law, current task contract, fresh project state, permissions, and evidence always win.",
-        "- EXPERIENCE_LIMIT: at most 3 trigger-matched ACTIVE lessons; never preload the full experience history.",
+        "- LAW_AUTHORITY=ONE; canonical Supreme Law wins; installed/portable/capsule copies are projection/fallback only; subordinate profiles are trigger-only.",
+        f"- EXPERIENCE={decision}; ACTIVE_ONLY; MAX={MAX_ACTIVE_EXPERIENCES}; NON_AUTHORITATIVE; current law/task/state/permissions/evidence win.",
     ]
+
     experiences = summary.get("experiences")
-    if isinstance(experiences, list):
-        for item in experiences[:3]:
-            if not isinstance(item, Mapping):
-                continue
-            eid = str(item.get("experience_id") or UNKNOWN)
-            kind = str(item.get("kind") or UNKNOWN)
-            matched = ",".join(str(value) for value in (item.get("matched_triggers") or ())) or "UNKNOWN"
-            lesson = " ".join(str(item.get("lesson") or "").split())[:1200]
-            correction = " ".join(str(item.get("correction") or "").split())[:1200]
-            lines.append(f"- ACTIVE_EXPERIENCE: {eid} | KIND={kind} | MATCHED={matched}")
-            if lesson:
-                lines.append(f"  LESSON: {lesson}")
-            if correction:
-                lines.append(f"  CORRECTION: {correction}")
+    active_items = [item for item in experiences[:MAX_ACTIVE_EXPERIENCES] if isinstance(item, Mapping)] if isinstance(experiences, list) else []
+    if not active_items:
+        return "\n".join(lines)
+
+    refs: list[str] = []
+    for item in active_items:
+        eid = _compact_text(item.get("experience_id") or UNKNOWN, 96)
+        kind = _compact_text(item.get("kind") or UNKNOWN, 24)
+        matched = ",".join(_compact_text(value, 32) for value in (item.get("matched_triggers") or ())) or "UNKNOWN"
+        refs.append(f"{eid}:{kind}:{matched}")
+    lines.append("- ACTIVE_EXPERIENCE_REFS=" + ";".join(refs))
+
+    # Put only the best matching correction into the operational prompt. The
+    # complete verified lesson stays in the durable ledger and is addressable by
+    # the refs above. This preserves the existing prompt-size safety guard rather
+    # than weakening it just to carry more context.
+    primary = active_items[0]
+    wrapper = _compact_text(primary.get("correction") or primary.get("lesson"), PRIMARY_WRAPPER_CHARS)
+    if wrapper:
+        lines.append(f"- PRIMARY_RISK_WRAPPER={wrapper}")
     return "\n".join(lines)
 
 
