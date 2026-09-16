@@ -42,7 +42,7 @@ This file does not create a second router, capability registry, truth store, roa
 | `AnnenkovLabs/girl-agent` | `MERGED_IMPLEMENTED` (clean-room concepts only) | PR #152 created Personal AI Behavior Harness V1 without copying restrictive upstream code/prompts; PR #162 integrated it into Hermes; PR #178 added bounded per-session adaptation. | Do not re-introduce relationship/hormone/presence simulation or autonomous memory authority. |
 | `Kappaemme-git/codex-first-customer-finder-skill` | `PILOT_ACTIVE_UNMERGED` | PR #180 contains the Opportunity Lab validation pilot, pinned upstream adapter, evidence gate, shortlist and Owner-authorized outreach batch. | Do not build a duplicate lead-generation framework in P2P core. |
 | Evidence-first / Uncle Bob acceptance idea | `MERGED_IMPLEMENTED` | PR #182 added `P2P_EVIDENCE_FIRST_VERIFICATION_V1` with proof-carrying change, scoped PASS claims and risk-proportional independent challenge. | Do not create a parallel verification framework. |
-| Native Code-Impact Evidence Contract | `MERGED_IMPLEMENTED` | `.p2p/system/p2p_capabilities/quality_intelligence.py` already implements AST-only symbol/import impact, reverse dependents, affected tests, two-hop affected surface and fail-closed `IMPACT_UNKNOWN`; RA-EXT-023 records Code-Impact Evidence lineage. | External graph tooling must not replace this native-first path. |
+| Native Code-Impact Evidence Contract | `MERGED_IMPLEMENTED` | `.p2p/system/p2p_capabilities/quality_intelligence.py` provides AST symbol/import impact; PR #185 added the real Git-worktree adapter with baseline+current graph union, deletion-safe dependents, changed-symbol evidence and PR-path Shield execution. Its first real PR proof returned `impact_unknown=false` and `external_extension_recommended=false`. RA-EXT-023 records Code-Impact Evidence lineage. | External graph tooling must not replace this native-first path. |
 
 ## B. Catalog by capability family
 
@@ -69,20 +69,26 @@ This file does not create a second router, capability registry, truth store, roa
 
 ### C1. Code intelligence external graph — `OPTIONAL_EXTENSION / NATIVE_FIRST`
 
-A fresh reconciliation found that P2P already has the native Code-Impact Evidence Contract in `quality_intelligence.py`; therefore `codebase-memory-mcp` is **not a missing P2P-core capability**.
+P2P already has the native Code-Impact Evidence Contract in `quality_intelligence.py`, and PR #185 proved it on a real PR worktree. Therefore `codebase-memory-mcp` is **not a missing P2P-core capability**.
+
+The PR #185 proof was deliberately self-referential: the existing Shield workflow ran the native adapter against the PR's real base/worktree, while deterministic temporary-Git fixtures challenged modification, deletion, unsupported-language, and docs-only cases. The measured P2P repository graph moved from 679 baseline modules to 681 current/combined modules, selected the new impact test as affected, returned `impact_unknown=false`, and did not recommend the external extension. A passing test count alone was not used as the proof.
+
+The native adapter also preserves prior dependents for deleted/renamed Python modules by conservatively unioning exact-baseline and current import graphs. This closes a practical blind spot of current-tree-only analysis without adding a new parser, index, service, or truth store.
 
 Upstream reviewed: `DeusData/codebase-memory-mcp` release `v0.11.0`, target commit `8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798`, MIT.
 
-Useful supplemental properties:
+Useful supplemental properties remain:
 
 - Tree-sitter / hybrid semantic code graph across more languages than P2P's native Python AST path.
 - Architecture and path queries that can provide evidence when the native import graph cannot establish a cross-language or richer semantic/call path.
 - One-shot `cli` mode can invoke MCP tools without starting/connecting to its standing coordination daemon.
 - JSON output is suitable for a bounded evidence adapter.
 
-The P2P bridge is therefore constrained to `NATIVE_FIRST_FALLBACK`: a caller must state the concrete native evidence gap before any external query. It exposes only `get_architecture`, `search_graph`, and `trace_path` over an already-existing index. It does not auto-install, create an index, mutate client configuration, start daemon/watch/UI surfaces, manage ADRs, or expose arbitrary graph queries.
+The P2P bridge remains constrained to `NATIVE_FIRST_FALLBACK`: a caller must state the concrete native evidence gap before any external query. It exposes only `get_architecture`, `search_graph`, and `trace_path` over an already-existing index. It does not auto-install, create an index, mutate client configuration, start daemon/watch/UI surfaces, manage ADRs, or expose arbitrary graph queries.
 
 Returned facts remain `NON_AUTHORITATIVE_STRUCTURAL_EVIDENCE`; P2P source code, native impact contract, tests, task state and canonical evidence win.
+
+Release distribution also remains native: `scripts/package_release.py` copies the installed `p2p_capabilities` runtime tree (excluding test fixtures), so the native adapter and optional fallback bridge travel through the existing P2P release/runtime path. A regression test must keep that transport true; no second installer is justified.
 
 ### C2. Complexity Optimizer — `ADAPT_PRINCIPLE_ONLY`
 
@@ -132,15 +138,17 @@ When a future item from `github research.txt` is proposed:
 
 ## F. Current development order
 
-1. **Use the existing native Code-Impact Evidence Contract first** on real cross-cutting P2P tasks.
-2. Invoke the external code-intelligence bridge only when native evidence leaves a documented material gap; measure whether the extension adds decision value.
-3. Do not register `codebase-memory-mcp` as a new P2P capability merely because adapter support exists; provider availability is not adoption or authority.
-4. Only if measured evidence justifies it, evaluate a complexity scanner/skill as an optional provider.
-5. Run HyperFrames as a separate Video Lab pilot, not a P2P core dependency.
-6. Evaluate Unbrowse/Wigolo only when browser/search cost or reliability becomes a measured bottleneck.
+1. **Native Code-Impact real-path proof is complete** via PR #185; use it as the default structural-impact evidence for Python code changes where the runtime is available.
+2. Treat `PARTIAL`, `impact_unknown=true`, or a concrete unsupported-code residual as the only reasons to consider the external code-intelligence bridge; never activate it merely because it exists.
+3. Keep distribution on the existing P2P release/runtime path and regression-test that `native_code_impact.py`, `quality_intelligence.py`, and `code_intelligence_bridge.py` are transported together.
+4. Do not register `codebase-memory-mcp` as a new P2P capability merely because adapter support exists; provider availability is not adoption or authority.
+5. Only if measured evidence justifies it, evaluate a complexity scanner/skill as an optional provider.
+6. Run HyperFrames as a separate Video Lab pilot, not a P2P core dependency.
+7. Evaluate Unbrowse/Wigolo only when browser/search cost or reliability becomes a measured bottleneck.
 
 `CATALOG_COMPLETE_ENOUGH_FOR_ACTION=YES`
 `DUPLICATE_RESEARCH_SHOULD_BE_RECONCILED_FIRST=YES`
 `NATIVE_CAPABILITY_FIRST=YES`
+`NATIVE_CODE_IMPACT_REALPATH_PROVEN=YES`
 `EXTERNAL_CODE_INTELLIGENCE_ROLE=OPTIONAL_EXTENSION`
-`NEXT_CORE_SLICE=MEASURE_NATIVE_CODE_IMPACT_BEFORE_MORE_INFRASTRUCTURE`
+`NEXT_CORE_SLICE=NO_NEW_CODE_INTELLIGENCE_INFRASTRUCTURE_UNTIL_NATIVE_GAP_OBSERVED`
