@@ -23,9 +23,27 @@
     "equipment_requirements": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": {
-        "type": "integer",
-        "minimum": 1
+      "additionalProperties": {"type": "integer", "minimum": 1}
+    },
+    "fx_rates": {
+      "type": "array",
+      "description": "Explicit direct FX rates only. No inverse or triangulated conversion is inferred.",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "rate", "source_ref", "as_of_date"],
+        "properties": {
+          "from": {"type": "string", "pattern": "^[A-Za-z]{3}$"},
+          "to": {"type": "string", "pattern": "^[A-Za-z]{3}$"},
+          "rate": {
+            "oneOf": [
+              {"type": "number", "exclusiveMinimum": 0},
+              {"type": "string", "pattern": "^(?:0*[1-9][0-9]*(?:\\.[0-9]+)?|0*\\.[0-9]*[1-9][0-9]*)$"}
+            ]
+          },
+          "source_ref": {"type": "string", "minLength": 1},
+          "as_of_date": {"type": "string", "format": "date"}
+        },
+        "additionalProperties": false
       }
     },
     "comparison_target": {
