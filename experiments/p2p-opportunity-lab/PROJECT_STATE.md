@@ -95,6 +95,18 @@ Expected ranking:
 
 The golden suite includes a normal end-to-end assertion and an adversarial permutation assertion that reverses both quote order and charge-line order. Ranking, scoped coverage, FX application, percentage resolution and relevant audits must remain invariant under that reordering.
 
+## Dirty quote adversarial lane
+
+Top-level adversarial contracts now mutate the validated golden fixture to prove the engine refuses unsafe conclusions when real-world quote data is incomplete or contradictory.
+
+Covered dirty-input behaviors:
+- a missing required charge creates a coverage gap and cannot manufacture a false cheapest quote;
+- alias-equivalent duplicate freight lines are blocked before ranking;
+- conflicting direct FX sources for the same currency pair are treated as ambiguous instead of choosing one;
+- missing provenance on a freight line used as a percentage base blocks BAF resolution rather than calculating from an unproven base.
+
+These are refusal contracts, not feature breadth. The intended success condition is often `no safe ranking` with an explicit reason.
+
 ## Schemas and documentation
 
 - quote intake carries charge scope, bundle fields, optional selection, stable `line_id`, percentage rate and named base line IDs;
@@ -105,19 +117,19 @@ The golden suite includes a normal end-to-end assertion and an adversarial permu
 
 Full source-tree deterministic acceptance is provided by `.github/workflows/p2p-opportunity-lab-focused.yml` using Python stdlib `unittest` only; it does not install pytest or another external test runner.
 
-The committed regression inventory is now **88 tests**, including two top-level validated golden tests. Exact accepted branch SHA, current-main merge ref, focused workflow run ID and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation so this file does not create a self-referential SHA-update loop.
+The committed regression inventory is now **92 tests**, including two validated golden tests plus four dirty-quote top-level adversarial contracts. Exact accepted branch SHA, current-main merge ref, focused workflow run ID and Shield run ID are maintained in PR #180 and Issue #181 after each final mutation so this file does not create a self-referential SHA-update loop.
 
 A branch mutation does not inherit prior PASS automatically. Fresh focused CI plus P2P Shield are required for the new exact head.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + ORDER_INVARIANCE_READY + EXPERIMENT_TRACKER_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + FX_NORMALIZATION_READY + ATOMIC_VALIDATION_PIPELINE_READY + PERCENTAGE_SURCHARGE_READY + GUARDED_CHARGE_SEMANTICS_READY + MULTI_EQUIPMENT_FCL_PIPELINE_READY + FULL_DOMAIN_CI_READY + VALIDATED_GOLDEN_FIXTURE_READY + ORDER_INVARIANCE_READY + DIRTY_QUOTE_ADVERSARIAL_READY + EXPERIMENT_TRACKER_READY`
 
-The external lane remains blocked only on Reddit delivery capability. Internal validation now has full source-tree CI, a realistic top-level golden fixture, and an adversarial order-invariance contract proving that input ordering does not change the economic decision.
+The external lane remains blocked only on Reddit delivery capability. Internal validation now has full source-tree CI, a realistic top-level golden fixture, order invariance, and adversarial refusal contracts for missing coverage, duplicate aliases, contradictory FX evidence and missing percentage-base provenance.
 
 ## Next bounded step
 
 1. Deliver only the three already-authorized Reddit research replies when an authenticated write surface exists.
-2. Prefer adversarial/realistic fixture hardening over speculative pricing breadth until real quote data justifies a new semantic.
+2. Prefer adversarial/realistic fixture hardening over speculative pricing breadth until real quote data justifies a new semantic; the next useful class is malformed or conflicting commercial terms/validity at the top-level pipeline, not new pricing features.
 3. On opt-in, run the real concierge test through the top-level validated entrypoint, record corrections/trust objections/repeat use and explicit WTP/payment signals.
 4. Feed only observed experiment output into the market gate and re-evaluate `VALIDATE | BUILD | KILL`.
