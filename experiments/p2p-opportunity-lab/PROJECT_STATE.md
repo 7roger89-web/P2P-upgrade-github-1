@@ -46,15 +46,27 @@ Logistics quote-comparison: normalize and compare inconsistent freight quotation
 - Owner authorized external contact for exactly the first three candidates on 2026-09-16 at 09:27 +07:00.
 - Authorized batch is durable at `pilots/logistics-quote-comparison/outreach-batch-01.json`.
 - Outreach wording was adapted to r/freightforwarding's No Promoting culture: research-first, public, low-volume, opt-in before any data exchange, and no request to post files publicly.
+- A reply watch is active for the three source threads and is configured to notify only on a new direct reply or clear opt-in; absence of a posted outreach comment produces no notification.
+- Real quote intake contract added at `schemas/quote-intake.schema.json`; intake requires anonymization confirmation and per-field/charge provenance.
+- Concierge validation observation contract added at `schemas/experiment-observation.schema.json`.
+- Deterministic quote normalization/comparison engine added at `src/concierge_engine.py`.
+- Engine refuses silent FX conversion, excludes route/equipment/currency mismatches from ranking, preserves source references, and refuses to rank incomplete/uncertain quotes as a fake winner.
+- Concierge engine regression suite: 5/5 PASS in isolated local execution after catching and fixing a pricing-basis normalization bug before commit.
+- Validation procedure is durable at `docs/CONCIERGE-VALIDATION-PROTOCOL.md`.
 
 ## Current checkpoint
 
-`VALIDATE — OUTREACH_BATCH_01_AUTHORIZED_READY`
+`VALIDATE — OUTREACH_AUTHORIZED + CONCIERGE_ENGINE_READY`
 
 The first three design-partner contacts are authorized. No message has been sent yet because the current ChatGPT tool surface has no authenticated Reddit write/post action: web access is read-only and plugin discovery found no Reddit messaging/posting connector.
 
-This delivery limitation does not reopen the Owner Gate; authorization is already recorded. Once an authenticated Reddit write surface is available, send only the three preserved public replies in `outreach-batch-01.json`, then record observed replies and opt-ins. Do not expand the batch without a new authorization.
+This delivery limitation does not reopen the Owner Gate and does not stop internal validation development. Authorization is already recorded. Once an authenticated Reddit write surface is available, send only the three preserved public replies in `outreach-batch-01.json`, then the reply watch can surface direct responses/opt-ins.
+
+The internal validation lane is now ready to accept an opted-in participant's anonymized real quote set, normalize charges with provenance, compute comparable totals only when the comparison basis is valid, surface uncertainty rather than hiding it, and record observed experiment behavior separately from payment/WTP evidence.
 
 ## Next bounded step
 
-Deliver the three authorized public research replies through an authenticated Reddit account. On any opt-in, request anonymized quote/ratecard data through a mutually agreed safe channel, execute the existing concierge test, and record observed submission, repeat-use, accuracy objections, and payment/WTP signals. Do not broaden into generic lead generation and do not build the product before the market gate changes on real evidence.
+1. Deliver the three authorized public research replies through an authenticated Reddit account when a write surface is available.
+2. Continue hardening the concierge validation engine with representative synthetic/fixture quote sets while waiting; do not build product UI/login/billing/deployment.
+3. On any opt-in, request anonymized quote/ratecard data through a mutually agreed safe channel, run the concierge engine, return an auditable comparison, and record corrections, trust objections, repeat-use, and explicit payment/WTP signals.
+4. Re-evaluate the market gate only from observed experiment evidence; do not broaden into generic lead generation and do not build the product before the market gate changes on real evidence.
