@@ -19,15 +19,20 @@ The lab answers a narrower question than a normal coding agent: **should we buil
 - `src/market_gate.py` — deterministic `KILL | RESEARCH_MORE | VALIDATE | BUILD` evidence gate.
 - `src/prospect_bridge.py` — thin adapter for evidence-backed first-customer/design-partner discovery.
 - `src/concierge_engine.py` — deterministic quote normalization, pricing, audit trail, and safe comparison boundary.
-- `tests/` — anti-confirmation-bias, prospect, concierge, and fixture regressions.
+- `src/experiment_tracker.py` — aggregates observed validation behavior without hallucinating money evidence.
+- `tests/` — anti-confirmation-bias, prospect, concierge, fixture, and experiment-tracker regressions.
 - `docs/P2P-LAW-BINDING.md` — binding to canonical P2P law without duplicating it.
 - `docs/CONCIERGE-VALIDATION-PROTOCOL.md` — real-user validation procedure.
-- `pilots/logistics-quote-comparison/` — first real market-validation pilot, shortlist, outreach batch, and synthetic quote fixture.
+- `pilots/logistics-quote-comparison/` — first real market-validation pilot, shortlist, outreach batch, validation status, and synthetic quote fixture.
 - `PROJECT_STATE.md` — durable checkpoint.
 
 ## Comparison safety
 
 The concierge engine does not silently convert currencies or fabricate missing charge semantics. A route/equipment/currency mismatch is excluded from the comparable ranking. Missing provenance, unknown pricing basis, missing amount, or cross-currency line item marks a quote incomplete. If fewer than two complete quotes remain, the engine returns `INSUFFICIENT_COMPLETE_COMPARABLE_QUOTES` instead of inventing a winner.
+
+## Validation evidence safety
+
+`CONTACTED`, `OPTED_IN`, `SUBMITTED`, `COMPLETED`, and `REPEAT_REQUEST` are behavior evidence, not payment evidence. `WTP_SIGNAL` requires an explicit amount. `PAID` requires an observed paid experiment. Praise, engagement, or repeat use must never be converted into willingness-to-pay by inference.
 
 ## Non-goals for v0
 
