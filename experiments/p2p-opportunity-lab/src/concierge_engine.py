@@ -80,6 +80,19 @@ def canonical_equipment(value: Any) -> str:
     return EQUIPMENT_ALIASES.get(compact, cleaned)
 
 
+def validate_unique_quote_ids(raw_quotes: list[dict[str, Any]]) -> None:
+    seen: set[str] = set()
+    for index, raw in enumerate(raw_quotes, start=1):
+        if not isinstance(raw, dict):
+            continue
+        quote_id = str(raw.get("quote_id") or "").strip()
+        if not quote_id:
+            continue
+        if quote_id in seen:
+            raise ValueError(f"duplicate quote_id {quote_id!r}")
+        seen.add(quote_id)
+
+
 def _decimal(value: Any) -> Decimal | None:
     if value is None or value == "":
         return None
@@ -402,6 +415,7 @@ def compare_quotes(raw_quotes: list[dict[str, Any]], context: dict[str, Any]) ->
     if not isinstance(raw_quotes, list) or len(raw_quotes) < 2:
         raise ValueError("at least two quotes are required")
 
+    validate_unique_quote_ids(raw_quotes)
     quotes = [normalize_quote(q) for q in raw_quotes]
     excluded = []
     eligible = []
