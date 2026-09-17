@@ -24,6 +24,16 @@ If canonical access is unavailable, use a valid installed projection or `SUPREME
 `TARGET_PROJECT != LAW_SOURCE`.
 If this entry point conflicts with the active canonical law, the canonical law wins.
 
+## Actor separation and self-law preflight
+
+Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool session) must establish its own valid Supreme Law context before substantive work. A law context valid for one actor does not satisfy another actor's preflight.
+
+- `PARENT_SELF_LAW_PREFLIGHT != EXECUTOR_LAW_PREFLIGHT`
+- `EXECUTOR_P2P_LAW_SOURCE` cannot satisfy a parent/prompt-writer/control-tower preflight
+- `CONTROL_TOWER_SELF_LAW_RECEIPT=PASS` (when serialized by Control Tower) proves only the parent Control Tower's own preflight; it never proves executor preflight and never substitutes for `P2P_LAW_PREFLIGHT`
+- No actor may fake, infer, or copy another actor's receipt/source. Only an actually performed read counts
+- If no valid law source can be established for the current actor, stop at `LAW_CONTEXT_BLOCKED`
+
 ## Universal invariants
 
 - Real durable state beats chat assumptions, stale summaries, or intended state.
