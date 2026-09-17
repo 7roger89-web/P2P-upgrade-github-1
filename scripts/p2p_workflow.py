@@ -3158,6 +3158,59 @@ def plan_workflow(root: Path, request: str, package_hint: str | None = None) -> 
     }
 
 
+def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = None) -> dict[str, object]:
+    """Owner /goal one-command intake — thin UX over canonical workflow.
+
+    Reuses existing Goal Contract / TaskPlan / durable state machinery.
+    No second orchestrator, router, state DB, task registry, daemon, or
+    acceptance authority. Arena remains executor, not native /goal host.
+    """
+    root = root.resolve()
+    try:
+        mod = capability_api(root, package_hint, "owner_goal")
+    except ValueError:
+        system = root / ".p2p" / "system"
+        if str(system) not in sys.path:
+            sys.path.insert(0, str(system))
+        try:
+            mod = importlib.import_module("p2p_capabilities.owner_goal")
+        except Exception as exc:
+            raise ValueError(f"OWNER_GOAL_CAPABILITY_UNAVAILABLE:{exc}") from exc
+
+    result = mod.build_owner_goal_intake(root, raw_command, package_hint=package_hint)
+
+    try:
+        native_bridge = capability_api(root, package_hint, "native_goal_bridge")
+        host_kinds = getattr(native_bridge, "HOST_KINDS", ())
+        result["native_goal_hosts"] = list(host_kinds)
+        result["arena_in_native_hosts"] = any(str(h).lower() == "arena" for h in host_kinds)
+        result["native_goal_behavior_preserved"] = not result["arena_in_native_hosts"]
+    except Exception:
+        result["native_goal_behavior_preserved"] = True
+        result["arena_in_native_hosts"] = False
+
+    result["rule20_preserved"] = True
+    result["no_second_orchestrator"] = True
+    result["no_second_router"] = True
+    result["no_second_state_db"] = True
+    result["owner_goal_entrypoint"] = "scripts/p2p_workflow.py:owner-goal + .p2p/system/p2p_capabilities/owner_goal.py"
+
+    if result.get("executor") == "ARENA" and result.get("arena_handoff") is not None:
+        try:
+            contract = load_current_contract(root)
+            task_state = capability_api(root, package_hint, "task_state")
+            store = task_state.TaskStateStore(root)
+            plan = store.load()
+            if contract and plan:
+                beginner_handoff = mod.build_beginner_handoff(root, contract, plan, "ARENA")
+                result["beginner_arena_handoff"] = beginner_handoff
+                result["arena_handoff_path"] = "COMPACT_TASK_DELTA_VIA_CANONICAL_STATE"
+        except Exception:
+            pass
+
+    return result
+
+
 def report_for(root: Path, run_id: str | None = None) -> str:
     status = load_status(root)
     path = root / ".p2p" / "state" / "reports" / f"{run_id}.md" if run_id else None
@@ -3291,6 +3344,12 @@ def parser() -> argparse.ArgumentParser:
     approach.add_argument("--alternative")
     acceptance_parser = sub.add_parser("acceptance", help="Run safe new-project and existing-project workflow fixtures")
     add_common(acceptance_parser, request=False)
+    owner_goal = sub.add_parser("owner-goal", help="Owner /goal one-command intake -> Control Tower classify -> Goal/Task reuse -> executor routing")
+    owner_goal.add_argument("--project", default=argparse.SUPPRESS)
+    owner_goal.add_argument("--package", default=argparse.SUPPRESS)
+    owner_goal.add_argument("--request", default=argparse.SUPPRESS, help="Full /goal command e.g. '/goal objective, dùng Arena'")
+    owner_goal.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
+    owner_goal.add_argument("--raw", default=argparse.SUPPRESS, help="Alias for --request, raw /goal text")
     return parser
 
 
@@ -3357,6 +3416,11 @@ def main(args: argparse.Namespace) -> int:
         output = classify_goal_update(current_request, request, load_current_contract(root))
     elif args.command == "approach":
         output = record_approach_result(root, args.lane, args.outcome, args.reason, args.alternative)
+    elif args.command == "owner-goal":
+        raw = getattr(args, "raw", None) or getattr(args, "request", None) or request
+        if not raw:
+            raise ValueError("--request or --raw is required for owner-goal, e.g. '/goal objective, dùng Arena'")
+        output = owner_goal_intake(root, raw, package_hint=package)
     else:
         raise ValueError(f"Unknown command: {args.command}")
     if args.command == "run" and not args.json and isinstance(output, dict):

@@ -165,6 +165,7 @@ FOUNDATION_RUNTIME_MODULES = (
     "project_pin.py",
     "project_context.py",
     "project_map.py",
+    "owner_goal.py",
 )
 FOUNDATION_RUNTIME_FILES = ("p2p_capabilities/capabilities.json",)
 FOUNDATION_RUNTIME_SCRIPTS = (
