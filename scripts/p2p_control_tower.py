@@ -230,14 +230,19 @@ def _normalize_github_repo(value: str | None) -> str | None:
     return "/".join(parts[:2]).lower()
 
 
-def _is_canonical_checkout(package: Path) -> bool:
+def _checkout_root(package: Path) -> Path | None:
     top = _run_git(package, "rev-parse", "--show-toplevel")
     if not top:
-        return False
+        return None
     try:
-        if Path(top).resolve() != package.resolve():
-            return False
+        resolved = Path(top).resolve()
+        return resolved if resolved == package.resolve() else None
     except OSError:
+        return None
+
+
+def _is_canonical_checkout(package: Path) -> bool:
+    if _checkout_root(package) is None:
         return False
     origin = _run_git(package, "remote", "get-url", "origin")
     return _normalize_github_repo(origin) == CANONICAL_REPO_SLUG
@@ -319,14 +324,18 @@ def _establish_control_tower_law_context(
     installed = project_root / INSTALLED_NOTEBOOK_REL
     portable = project_root / PORTABLE_NOTEBOOK_REL
 
+    # A release archive may carry the canonical notebook as a local freshness
+    # witness for generated projections. It is not itself an extra authority
+    # tier. A non-canonical Git checkout is never allowed to impersonate that
+    # release witness merely by carrying a file at the canonical path.
     packaged_sha: str | None = None
-    package_receipt: dict[str, Any] | None = None
-    try:
-        package_receipt = _read_law_text(package_source, source_type="PACKAGED_LAW_SOURCE")
-    except BindingError:
-        package_receipt = None
-    if package_receipt is not None:
-        packaged_sha = str(package_receipt.get("content_sha256") or "")
+    if _checkout_root(package) is None:
+        try:
+            package_receipt = _read_law_text(package_source, source_type="PACKAGED_FRESHNESS_WITNESS")
+        except BindingError:
+            package_receipt = None
+        if package_receipt is not None:
+            packaged_sha = str(package_receipt.get("content_sha256") or "")
 
     rejected: list[str] = []
     for path, source_type, portable_source in (
@@ -353,9 +362,6 @@ def _establish_control_tower_law_context(
                 rejected.append("PORTABLE_PROJECTION:KNOWN_STALE_VS_PACKAGE")
                 continue
         return receipt
-
-    if package_receipt is not None:
-        return package_receipt
 
     try:
         return _inline_capsule_receipt()
@@ -436,7 +442,7 @@ def _render_context_block(
         mandatory.append(_law_receipt_line(law_receipt))
     mandatory.extend(
         (
-            "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; resolve canonical>installed>portable>inline; report actual P2P_LAW_SOURCE; never fake a read. Executor receipt cannot substitute for parent/Control Tower self-read.",
+            "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; resolve canonical>installed>portable>inline; report P2P_LAW_SOURCE; never fake a read; executor receipt != Control Tower self-read.",
             "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
         )
     )
