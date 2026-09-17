@@ -111,8 +111,17 @@ guidance was harmonized to a 0.96–0.98 band (never below 0.95).
 - `python3 -m json.tool governance/research-adoption-ledger.json` — valid
   JSON, 81 records, no duplicate research_id, all statuses inside the
   ledger's own status vocabulary.
-- `scripts/check_instruction_contract.py` — unchanged thin-entrypoint/manifest
-  contract still satisfied (skill change touches no governed phrase).
+- `scripts/check_instruction_contract.py` — **FAILS at this PR head
+  (exit code 1)**: 9 findings, all concerning
+  `docs/p2p-development/P2P-AGENTS-INSTALL.md` (byte size over cap and missing
+  required phrases). This file is NOT modified by this PR. The identical
+  failure was reproduced on unmodified main via a stash round-trip, and
+  re-observed at PR head `7d0fca7` after the supervisor review. Therefore:
+  `PRE_EXISTING / NOT_INTRODUCED_BY_THIS_PR`; repairing the script or its
+  underlying main failure remains `OUT_OF_SCOPE` for this PR and requires its
+  own bounded goal if later justified. This supersedes the earlier draft
+  wording that claimed the contract check was "still satisfied", which was
+  contradicted by the actual command output.
 - Skill diff scope: only `redesign-skill/SKILL.md` (plus its two projection
   copies); router table, other sub-skills, and all other skills untouched.
 - Skill manifests (`.agents`, `.claude`, `.p2p/system` copies): the per-file
