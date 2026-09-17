@@ -1423,6 +1423,255 @@ This rule is an independent P2P operational abstraction. It does not import an
 external instruction architecture, mandatory per-turn metadata system,
 complexity scoring formula, autonomous baton loop, or monolithic prompt core.
 
+### RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION
+
+The beginner Owner selects an executor with one natural command. The project
+Control Tower owns routing and drives the approved mission to a terminal
+state. The Owner must never become the message bus between Control Tower
+and executor.
+
+```text
+CONTROL_TOWER_OWNS_EXECUTOR_ROUTING=YES
+OWNER_IS_NOT_MESSAGE_BUS=YES
+```
+
+Canonical Owner commands (matched by intent; the Owner does not have to
+remember exact capitalization or syntax):
+
+```text
+"Tiếp tục công việc, dùng CatDesk"
+"Tiếp tục công việc, dùng Arena"
+"Tiếp tục công việc, dùng Auto"
+```
+
+The Owner is a beginner and must not write executor technical prompts.
+Owner-facing language default is Vietnamese unless the Owner requests
+otherwise (Supreme Law #7).
+
+#### A. Control Tower responsibility
+
+When such a command is received, the active project Control Tower must
+itself:
+
+```text
+FRESH_CHECK
+→ RECOVER_DURABLE_MISSION_STATE
+→ READ_ACTIVE_SUPREME_LAW
+→ READ_PROJECT_AGENTS_SPEC_STATE
+→ RESOLVE_UNFINISHED_BOUNDED_GOAL
+→ SELECT_OR_CONFIRM_EXECUTOR
+→ CREATE_INTERNAL_EXECUTION_CONTRACT
+→ INVOKE_EXECUTOR_WHEN_DIRECTLY_AVAILABLE
+→ SUPERVISE_EXECUTION
+→ VERIFY_EVIDENCE
+→ CONTINUE_UNTIL_TERMINAL
+```
+
+Internal executor instructions are implementation detail. Do NOT expose a
+large executor prompt to the Owner when the executor is directly callable
+in the same project conversation. The Owner sees the mission result, not
+the prompt plumbing. `PROMPT_IS_TASK_DELTA` is preserved: task prompts
+carry the task-specific delta, not the whole Supreme Law.
+
+#### B. Common autonomous execution contract
+
+```text
+EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL
+TERMINAL_STATES = MISSION_COMPLETE | HARD_OWNER_GATE | HARD_BLOCK
+```
+
+These are NOT terminal by themselves: subtask PASS, test PASS, one repair
+PASS, one file completed, one commit completed, one validation-lane PASS,
+one intermediate goal PASS.
+
+```text
+INTERMEDIATE_PASS != MISSION_COMPLETE
+```
+
+Required loop:
+
+```text
+FRESH_CHECK
+→ PLAN_MINIMUM_NEXT_STEP
+→ EXECUTE
+→ VERIFY
+→ REVIEW
+→ if FAIL and safely repairable within approved scope:
+    DIAGNOSE → REPAIR → RETEST
+→ if PASS but mission incomplete:
+    CONTINUE automatically
+→ FINAL_VERIFY
+→ terminal
+```
+
+Do not ask "Do you want me to continue?", "Should I fix this?", or "Would
+you like me to run the next test?" when the next action is clear,
+reversible/safe, remains inside approved scope, and crosses no real Owner
+Gate.
+
+#### C. CATDESK executor profile
+
+When the Owner says "Tiếp tục công việc, dùng CatDesk", Control Tower
+first determines:
+
+```text
+CATDESK_AVAILABLE_IN_CURRENT_CONVERSATION=<YES|NO>
+```
+
+If `YES`, DIRECT invocation is required. The same project ChatGPT remains
+the brain/control tower and CatDesk becomes the local execution backend:
+
+```text
+CONTROL_TOWER=YES
+LOCAL_EXECUTION_BACKEND=YES
+```
+
+Do NOT instruct the Owner to open a separate CatDesk chat. Do NOT output a
+CatDesk relay prompt for the Owner. The Owner is not required to relay
+CatDesk prompts when direct invocation exists. Control Tower internally
+supplies CatDesk with all required execution context, including as needed:
+
+```text
+PROJECT
+MISSION
+LOCAL_REPO
+CANONICAL_LAW
+DURABLE_BASE
+APPROVED_SCOPE
+DEFINITION_OF_DONE
+VALIDATION_REQUIREMENTS
+HARD_OWNER_GATES
+RETURN_CONTRACT
+```
+
+Within approved scope, CatDesk execution may: clone/bootstrap an approved
+project repo if absent locally; fetch/sync safely; create a task branch;
+read project files; edit; run commands; run tests; lint/typecheck/static
+checks; diagnose failures; repair; retest; inspect status/diff; produce
+evidence; create local commits when policy allows.
+
+Prohibitions: no destructive reset/stash/overwrite; no secret harvesting;
+no scope expansion.
+
+Preferred Windows workspace when applicable:
+
+```text
+D:\P2P_WORKSPACE\<repo>
+```
+
+Canonical P2P law local authority when available:
+
+```text
+D:\P2P_WORKSPACE\P2P-upgrade-github-1
+```
+
+If the target repo is GitHub-only and not local, CatDesk may bootstrap it
+safely: clone if absent; verify remote; fetch; require clean worktree
+before sync; checkout correct base; pull --ff-only; never overwrite
+unrelated local work. GitHub remains durable authority; the local machine
+is execution workspace, not a replacement durable authority.
+
+If `CATDESK_AVAILABLE_IN_CURRENT_CONVERSATION=NO`, fail closed at:
+
+```text
+CATDESK_CAPABILITY_REQUIRED
+```
+
+Return only the minimum beginner action needed to attach/select/enable
+CatDesk for THIS project conversation. Do NOT generate a large relay
+prompt by default. After CatDesk becomes available, the same mission
+resumes from durable state. Never claim cross-chat automatic dispatch if
+the platform does not actually provide it.
+
+#### D. ARENA executor profile
+
+When the Owner says "Tiếp tục công việc, dùng Arena", use the existing
+Arena protocol (`docs/ARENA_AGENT_MODE_PROTOCOL.md`). This rule extends
+RULE 15 (`ARENA_TASK_COMPLETION_DIALOG`); it does not duplicate it.
+
+If the Arena execution unit is still capable of continuing and the mission
+is not terminal: `KEEP WORKING`. If a terminal ReturnPacket has been
+produced: `YES`. A technical `BLOCKED` may still be a successfully
+completed execution unit per RULE 15. If Arena can be invoked directly by
+the current environment, prefer direct execution. If the platform
+genuinely requires an external Arena handoff, Control Tower may generate
+ONE complete Arena execution packet, not a chain of Owner-relayed
+micro-prompts.
+
+#### E. AUTO routing policy
+
+When the Owner says "Tiếp tục công việc, dùng Auto", `AUTO` is a routing
+policy, not a new executor, service, or daemon:
+
+```text
+AUTO_IS_ROUTING_POLICY_NOT_EXECUTOR=YES
+```
+
+Control Tower chooses among ACTUALLY AVAILABLE executors/capabilities
+using evidence such as: task requirements; environment suitability; local
+repo availability; durable-state accessibility; risk; security;
+cost/quota; need for isolated environment; need for GUI/device access;
+validation needs; direct executor availability. AUTO must not invent
+unavailable executors.
+
+Examples: ordinary local coding + local repo + CatDesk available →
+`CATDESK`; clean isolated sandbox required → `ARENA` when suitable;
+public/current research required → authorized research/web capability;
+GitHub durable mutation → GitHub-capable lane.
+
+Record compactly:
+
+```text
+EXECUTOR_SELECTED=<executor>
+SELECTION_REASON=<one concise factual reason>
+```
+
+AUTO may combine capabilities within one mission when necessary, but must
+not build orchestration for its own sake. Do not ask the Owner to choose
+between technically equivalent lanes unless the decision materially
+changes risk, cost, or outcome. Routing transparency follows RULE 18
+(`AUTO_ROUTE != OPAQUE_EXECUTION`): the terminal summary carries the
+`OWNER_CHALLENGE_SUMMARY`, not hidden routing authority.
+
+#### F. No silent executor drift
+
+After substantive execution begins with one executor, do not silently
+move the mission to another executor. If switching is materially
+necessary, record:
+
+```text
+EXECUTOR_SWITCH_FROM=
+EXECUTOR_SWITCH_TO=
+REASON=
+DURABLE_CHECKPOINT=
+```
+
+Then continue only if the switch is within approved scope and no Owner
+Gate is crossed; otherwise return `HARD_OWNER_GATE`.
+
+#### G. Owner Gates and merge authority preserved
+
+Autonomous execution does NOT grant blanket authority. RULE 11 Owner
+Gates and `VALIDATED_PR_AUTO_MERGE_AUTHORITY` semantics apply exactly as
+canonical main defines them: release/promotion, production deploy,
+production data mutation, destructive deletion, secrets/credentials,
+major paid spending, hard rollback, force push/reset, external
+communication, and other existing protected actions stay gated. This rule
+neither weakens nor strengthens them and invents no merge policy.
+
+Beginner mnemonic:
+
+```text
+TIẾP TỤC + DÙNG CATDESK → CONTROL TOWER TỰ GỌI CATDESK, OWNER KHÔNG CHUYỂN PROMPT
+TIẾP TỤC + DÙNG ARENA   → ARENA LÀM TỚI NƠI TỚI CHỐN (RULE 15)
+TIẾP TỤC + DÙNG AUTO    → CONTROL TOWER TỰ CHỌN NGƯỜI LÀM PHÙ HỢP
+```
+
+This rule is policy/protocol over existing Control Tower
+prompt-generation semantics and project inheritance. It creates no
+daemon, server, orchestration service, agent framework, routing
+subsystem, persistent background process, registry, or database.
+
 ## 4. RULE_ASSIMILATION_GATE_V1
 
 ### 4.1 Failure mode fixed
