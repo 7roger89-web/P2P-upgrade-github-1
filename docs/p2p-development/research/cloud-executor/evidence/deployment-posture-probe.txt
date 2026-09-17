@@ -1,0 +1,18 @@
+=== A. authentication ===
+  [PASS] anonymous MCP POST rejected (expected 401)
+  [PASS] invalid bearer rejected (expected 401)
+  [PASS] valid bearer accepted (expected 200)
+  [PASS] server card public without credentials (expected 200)
+=== B. browser Origin policy (CSRF / DNS-rebinding defence) ===
+  [PASS] server-to-server request (no Origin) accepted (expected 200)
+  [PASS] loopback browser Origin accepted by default (expected 200)
+  [PASS] unallowlisted remote browser Origin denied (expected 403)
+  [PASS] Origin with embedded userinfo denied (expected 403)
+=== C. reverse-proxy hardening ===
+  [PASS] pinned SERVER_URL yields stable public issuer (expected https://mcp.clouddesk.example)
+  [PASS] spoofed Host header cannot move the issuer (expected https://mcp.clouddesk.example)
+  [PASS] spoofed X-Forwarded-Host ignored when proxy headers untrusted (issuer stayed http://127.0.0.1:8767)
+=== D. public HTTPS origin (only when PUBLIC_URL is supplied) ===
+  [SKIP] set PUBLIC_URL to probe the public HTTPS origin
+
+POSTURE_PROBE=PASS

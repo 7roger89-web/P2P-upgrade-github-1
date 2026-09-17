@@ -1,0 +1,91 @@
+# CloudDesk pilot — minimum safe cloud deployment shape.
+#
+#   regular ChatGPT Web
+#           |  HTTPS + Streamable HTTP (OAuth 2.1 + PKCE + RFC 7591 DCR)
+#           v
+#   reverse proxy (Caddy/nginx)  <-- terminates TLS, sets Host, adds NO Origin
+#           |  http://127.0.0.1:8765
+#           v
+#   this container: upstream coding-tools-mcp, non-root, ONE workspace volume
+#           |
+#           v
+#       Git repository (inside the workspace volume)
+#
+# Deliberate omissions for this pilot: no GitHub Actions compute, no ChatGPT
+# Work, no Codex Cloud, no production secrets, no production database, no broad
+# host filesystem mount, no root MCP process, no public unauthenticated shell.
+
+services:
+  clouddesk-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.clouddesk
+      args:
+        CODING_TOOLS_MCP_VERSION: ${CODING_TOOLS_MCP_VERSION:-0.3.0}
+    image: clouddesk-mcp:pilot
+    # PID 1 zombie reaping for exec_command child processes.
+    init: true
+    restart: unless-stopped
+
+    # Loopback only. The reverse proxy is the sole public surface.
+    ports:
+      - "127.0.0.1:${CODING_TOOLS_MCP_PORT:-8765}:${CODING_TOOLS_MCP_PORT:-8765}"
+
+    environment:
+      CODING_TOOLS_MCP_PORT: ${CODING_TOOLS_MCP_PORT:-8765}
+      # OAuth is what regular ChatGPT Web can actually complete: it cannot paste
+      # a static Authorization header, it self-registers and runs PKCE.
+      CODING_TOOLS_MCP_AUTH_MODE: ${CODING_TOOLS_MCP_AUTH_MODE:-oauth}
+      # Pin the stable public origin (no /mcp) so issuer, audience, resource and
+      # discovery URLs survive the proxy and cannot be moved by a spoofed Host.
+      CODING_TOOLS_MCP_SERVER_URL: ${CODING_TOOLS_MCP_SERVER_URL:?set CODING_TOOLS_MCP_SERVER_URL in .env}
+      # Operator-entered password on the authorize page. Keep it out of Git.
+      CODING_TOOLS_MCP_OAUTH_PASSWORD: ${CODING_TOOLS_MCP_OAUTH_PASSWORD:?set in .env, never commit}
+      # Stable HS256 signing key (hex). Without it, tokens do not survive restart.
+      CODING_TOOLS_MCP_OAUTH_TOKEN_SECRET: ${CODING_TOOLS_MCP_OAUTH_TOKEN_SECRET:-}
+      CODING_TOOLS_MCP_OAUTH_TOKEN_TTL: ${CODING_TOOLS_MCP_OAUTH_TOKEN_TTL:-86400}
+      # trusted = local-development posture: network-looking commands, shell
+      # expansion and inline scripts allowed; secret filtering and
+      # destructive-command checks stay on. Use `safe` for a stricter default.
+      CODING_TOOLS_MCP_PERMISSION_MODE: ${CODING_TOOLS_MCP_PERMISSION_MODE:-trusted}
+      # The proxy sets Host; do not let it also forge X-Forwarded-* trust.
+      CODING_TOOLS_MCP_TRUST_PROXY_HEADERS: "0"
+      # Only needed if a browser-based MCP client must reach this endpoint.
+      # A server-to-server connector runtime sends no Origin and needs none.
+      CODING_TOOLS_MCP_ALLOWED_ORIGINS: ${CODING_TOOLS_MCP_ALLOWED_ORIGINS:-}
+      CODING_TOOLS_MCP_TELEMETRY: "off"
+      DO_NOT_TRACK: "1"
+
+    volumes:
+      # ONE approved workspace. Nothing else from the host is mounted.
+      - clouddesk-workspace:/workspace
+      - clouddesk-runtime:/runtime
+
+    # Hardening. Note: Docker's default seccomp profile does not allow the
+    # landlock_* syscalls, so upstream Landlock reports unavailable inside a
+    # container. That is expected and acceptable here -- the container
+    # namespace, read-only rootfs and dropped capabilities ARE the boundary.
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 512
+    mem_limit: ${CLOUDDESK_MEM_LIMIT:-2g}
+    cpus: ${CLOUDDESK_CPUS:-1.5}
+
+    healthcheck:
+      # Probes /.well-known/mcp.json (200 without credentials in both bearer and
+      # oauth modes, verified live against 0.3.0). /mcp is NOT probed: it answers
+      # 401 by design. Port comes from the container's own CODING_TOOLS_MCP_PORT.
+      test: ["CMD", "python", "/opt/clouddesk/healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  clouddesk-workspace:
+  clouddesk-runtime:
