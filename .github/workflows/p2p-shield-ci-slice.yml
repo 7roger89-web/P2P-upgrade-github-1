@@ -74,6 +74,7 @@ jobs:
           tests.test_p2p_open_code_review_bridge
           tests.test_p2p_review_extension_activation
           tests.test_p2p_control_tower_context_assembly
+          tests.test_p2p_control_tower_self_law_gate
 
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
