@@ -57,7 +57,7 @@ class ControlTowerSelfLawGateTests(unittest.TestCase):
                 "-->",
                 "",
             )
-        )
+        ) + "\n"
         path = root / control_tower.PORTABLE_NOTEBOOK_REL
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(header + law, encoding="utf-8")
@@ -169,6 +169,22 @@ class ControlTowerSelfLawGateTests(unittest.TestCase):
             )
 
             self.assertEqual("INSTALLED_PROJECTION", receipt["source_type"])
+
+    def test_release_package_notebook_is_freshness_witness_not_extra_authority_tier(self) -> None:
+        with tempfile.TemporaryDirectory() as project_dir, tempfile.TemporaryDirectory() as package_dir:
+            project = Path(project_dir)
+            package = Path(package_dir)
+            package_source = package / control_tower.CANONICAL_NOTEBOOK_REL
+            package_source.parent.mkdir(parents=True, exist_ok=True)
+            package_source.write_text(self._law_text(" package"), encoding="utf-8")
+
+            receipt = control_tower._establish_control_tower_law_context(
+                project,
+                package_root=package,
+            )
+
+            self.assertEqual("INLINE_SUPREME_LAW_CAPSULE", receipt["source_type"])
+            self.assertNotEqual("PACKAGED_LAW_SOURCE", receipt["source_type"])
 
     def test_inline_capsule_is_last_valid_fallback_for_noncanonical_package(self) -> None:
         with tempfile.TemporaryDirectory() as project_dir, tempfile.TemporaryDirectory() as package_dir:
