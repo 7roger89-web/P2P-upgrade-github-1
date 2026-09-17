@@ -15,6 +15,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -44,7 +45,7 @@ _CANONICAL_LAW_IDENTIFIERS = (
     "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
     "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
     "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
-    "RECOVER_ADAPTIVELY; DO NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+    "RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS",
     "PRESERVE_CONTINUITY_AND_STOP",
     "PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT",
     "ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT",
@@ -85,6 +86,7 @@ CANONICAL_NOTEBOOK_REL = Path("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md")
 INSTALLED_NOTEBOOK_REL = Path(".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md")
 PORTABLE_NOTEBOOK_REL = Path(".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md")
 PORTABLE_PROJECTION_MARKER = "P2P_PORTABLE_LAW_PROJECTION=YES"
+CANONICAL_REPO_SLUG = "7roger89-web/p2p-upgrade-github-1"
 PORTABLE_CANONICAL_SOURCE = (
     "7roger89-web/P2P-upgrade-github-1@main:"
     "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
@@ -111,19 +113,16 @@ def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
-def _read_law_text(path: Path, *, source_type: str, portable: bool = False) -> dict[str, Any] | None:
-    """Read and validate one law source; never infer a read from a marker alone."""
-
-    if not path.exists():
-        return None
-    if path.is_symlink() or not path.is_file():
-        raise BindingError(f"LAW_CONTEXT_INVALID_PATH:{source_type}:{path}")
-    try:
-        text = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeError) as exc:
-        raise BindingError(f"LAW_CONTEXT_UNREADABLE:{source_type}:{path}") from exc
+def _validate_law_text(
+    text: str,
+    *,
+    source_type: str,
+    source: str,
+    portable: bool = False,
+    source_revision: str = UNKNOWN,
+) -> dict[str, Any]:
     if not text.strip():
-        raise BindingError(f"LAW_CONTEXT_EMPTY:{source_type}:{path}")
+        raise BindingError(f"LAW_CONTEXT_EMPTY:{source_type}:{source}")
     required = (LAW_MARKER, NO_WORK_MARKER, *_CANONICAL_LAW_IDENTIFIERS)
     missing = [marker for marker in required if marker not in text]
     if missing:
@@ -163,7 +162,8 @@ def _read_law_text(path: Path, *, source_type: str, portable: bool = False) -> d
         "status": "PASS",
         "actor": "CONTROL_TOWER_SELF",
         "source_type": source_type,
-        "source": path.as_posix(),
+        "source": source,
+        "source_revision": source_revision,
         "content_sha256": content_sha256,
         "supreme_law_marker": LAW_MARKER,
         "no_substantive_work_marker": True,
@@ -174,68 +174,172 @@ def _read_law_text(path: Path, *, source_type: str, portable: bool = False) -> d
     }
 
 
+def _read_law_text(path: Path, *, source_type: str, portable: bool = False) -> dict[str, Any] | None:
+    """Read and validate one law source; never infer a read from a marker alone."""
+
+    if not path.exists():
+        return None
+    if path.is_symlink() or not path.is_file():
+        raise BindingError(f"LAW_CONTEXT_INVALID_PATH:{source_type}:{path}")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise BindingError(f"LAW_CONTEXT_UNREADABLE:{source_type}:{path}") from exc
+    return _validate_law_text(
+        text,
+        source_type=source_type,
+        source=path.as_posix(),
+        portable=portable,
+    )
+
+
+def _run_git(package: Path, *args: str) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(package), *args],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=8,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode:
+        return None
+    return result.stdout.strip()
+
+
+def _normalize_github_repo(value: str | None) -> str | None:
+    if not value:
+        return None
+    normalized = value.strip().replace("\\", "/")
+    lowered = normalized.lower()
+    if lowered.startswith("git@github.com:"):
+        slug = normalized.split(":", 1)[1]
+    elif "github.com/" in lowered:
+        index = lowered.find("github.com/") + len("github.com/")
+        slug = normalized[index:]
+    else:
+        return None
+    slug = slug.split("?", 1)[0].split("#", 1)[0].strip("/")
+    if slug.lower().endswith(".git"):
+        slug = slug[:-4]
+    parts = slug.split("/")
+    if len(parts) < 2:
+        return None
+    return "/".join(parts[:2]).lower()
+
+
+def _is_canonical_checkout(package: Path) -> bool:
+    top = _run_git(package, "rev-parse", "--show-toplevel")
+    if not top:
+        return False
+    try:
+        if Path(top).resolve() != package.resolve():
+            return False
+    except OSError:
+        return False
+    origin = _run_git(package, "remote", "get-url", "origin")
+    return _normalize_github_repo(origin) == CANONICAL_REPO_SLUG
+
+
+def _read_canonical_main_ref(package: Path) -> dict[str, Any]:
+    """Read Supreme Law from canonical main Git object, never task working tree."""
+
+    checked_refs: list[str] = []
+    for ref in ("refs/remotes/origin/main", "refs/heads/main"):
+        revision = _run_git(package, "rev-parse", "--verify", f"{ref}^{{commit}}")
+        if not revision:
+            continue
+        checked_refs.append(ref)
+        text = _run_git(package, "show", f"{ref}:{CANONICAL_NOTEBOOK_REL.as_posix()}")
+        if text is None:
+            raise BindingError(f"CANONICAL_MAIN_LAW_UNREADABLE:{ref}")
+        receipt = _validate_law_text(
+            text + ("\n" if text and not text.endswith("\n") else ""),
+            source_type="CANONICAL_MAIN_REF",
+            source=f"git:{ref}:{CANONICAL_NOTEBOOK_REL.as_posix()}",
+            source_revision=revision,
+        )
+        receipt["task_branch_law_authority"] = False
+        return receipt
+    raise BindingError(
+        "LAW_CONTEXT_BLOCKED:CANONICAL_MAIN_REF_UNAVAILABLE:"
+        + (",".join(checked_refs) if checked_refs else "NO_MAIN_REF")
+    )
+
+
+def _inline_capsule_receipt() -> dict[str, Any]:
+    lines = tuple(line for line in _handoff.SUPREME_LAW_CAPSULE.splitlines() if line.strip())
+    if len(lines) != 9 or any(
+        identifier not in lines[index]
+        for index, identifier in enumerate(_CANONICAL_LAW_IDENTIFIERS)
+    ):
+        raise BindingError("INLINE_SUPREME_LAW_CAPSULE_INVALID")
+    text = "\n".join(lines)
+    return {
+        "schema": LAW_RECEIPT_SCHEMA,
+        "status": "PASS",
+        "actor": "CONTROL_TOWER_SELF",
+        "source_type": "INLINE_SUPREME_LAW_CAPSULE",
+        "source": "p2p_capabilities.control_tower_handoff:SUPREME_LAW_CAPSULE",
+        "source_revision": UNKNOWN,
+        "content_sha256": _sha256_text(text),
+        "supreme_law_marker": LAW_MARKER,
+        "no_substantive_work_marker": True,
+        "executor_receipt_substitute": False,
+        "model_or_session_reset_requires_reread": True,
+        "authority_effect": "NONE",
+        "mutated": False,
+        "capsule_fallback": True,
+    }
+
+
 def _establish_control_tower_law_context(
     root: Path,
     *,
     package_root: Path | None = None,
 ) -> dict[str, Any]:
-    """Establish the Control Tower actor's own law receipt before any CT reasoning.
+    """Establish the Control Tower actor's own law receipt before CT reasoning.
 
-    An executor/project receipt cannot satisfy this function. It reads a real law
-    source itself and fails closed when no valid source is available.
+    A task/executor claim cannot satisfy this function. In the canonical source
+    checkout the only canonical file authority is main's Git object. The current
+    task branch/working tree is execution state and can never select its own law.
     """
 
     project_root = root.expanduser().resolve()
     package = (package_root or REPO_ROOT).expanduser().resolve()
-    candidates: list[tuple[Path, str, bool, bool]] = []
+
+    if _is_canonical_checkout(package):
+        # Strict by design: a canonical checkout must prove canonical main. Never
+        # downgrade to a task-branch working-tree law or branch-edited projection.
+        return _read_canonical_main_ref(package)
 
     package_source = package / CANONICAL_NOTEBOOK_REL
-    package_is_checkout = (package / ".git").exists()
-    if package_is_checkout:
-        # A reachable canonical checkout outranks every projection. Corruption of
-        # that source is a blocker, not a reason to silently downgrade authority.
-        candidates.append((package_source, "CANONICAL_LOCAL_CHECKOUT", False, True))
-
     installed = project_root / INSTALLED_NOTEBOOK_REL
     portable = project_root / PORTABLE_NOTEBOOK_REL
-    candidates.append((installed, "INSTALLED_PROJECTION", False, False))
-    candidates.append((portable, "PORTABLE_PROJECTION", True, False))
-
-    # Release/package execution can legitimately carry the exact notebook source
-    # without a .git directory. It is treated as packaged law context, not as a
-    # claim that GitHub main was freshly read.
-    if not package_is_checkout:
-        candidates.append((package_source, "PACKAGED_LAW_SOURCE", False, False))
 
     packaged_sha: str | None = None
-    if not package_is_checkout and package_source.is_file() and not package_source.is_symlink():
-        try:
-            package_text = package_source.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
-            package_text = ""
-        if package_text:
-            packaged_sha = _sha256_text(package_text)
+    package_receipt: dict[str, Any] | None = None
+    try:
+        package_receipt = _read_law_text(package_source, source_type="PACKAGED_LAW_SOURCE")
+    except BindingError:
+        package_receipt = None
+    if package_receipt is not None:
+        packaged_sha = str(package_receipt.get("content_sha256") or "")
 
-    seen: set[Path] = set()
     rejected: list[str] = []
-    for path, source_type, portable_source, strict in candidates:
-        resolved = path.resolve(strict=False)
-        if resolved in seen:
-            continue
-        seen.add(resolved)
+    for path, source_type, portable_source in (
+        (installed, "INSTALLED_PROJECTION", False),
+        (portable, "PORTABLE_PROJECTION", True),
+    ):
         try:
             receipt = _read_law_text(path, source_type=source_type, portable=portable_source)
         except BindingError as exc:
-            if strict:
-                raise
             rejected.append(f"{source_type}:{exc}")
             continue
         if receipt is None:
             continue
-
-        # When the release/package notebook is available, it is the best local
-        # freshness witness for installed/portable projections. Reject a known
-        # stale projection instead of calling it up-to-date.
         if packaged_sha and source_type == "INSTALLED_PROJECTION":
             if receipt.get("content_sha256") != packaged_sha:
                 rejected.append("INSTALLED_PROJECTION:KNOWN_STALE_VS_PACKAGE")
@@ -250,10 +354,15 @@ def _establish_control_tower_law_context(
                 continue
         return receipt
 
-    reason = ";".join(rejected[:3]) if rejected else "NO_VALID_SOURCE"
-    raise BindingError(
-        f"LAW_CONTEXT_BLOCKED:CONTROL_TOWER_SELF_READ_REQUIRED:{reason}"
-    )
+    if package_receipt is not None:
+        return package_receipt
+
+    try:
+        return _inline_capsule_receipt()
+    except BindingError as exc:
+        rejected.append(f"INLINE_CAPSULE:{exc}")
+    reason = ";".join(rejected[:4]) if rejected else "NO_VALID_SOURCE"
+    raise BindingError(f"LAW_CONTEXT_BLOCKED:CONTROL_TOWER_SELF_READ_REQUIRED:{reason}")
 
 
 def _law_receipt_line(receipt: Mapping[str, Any]) -> str:
