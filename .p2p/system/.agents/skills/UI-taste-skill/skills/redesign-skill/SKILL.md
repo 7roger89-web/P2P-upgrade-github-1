@@ -63,8 +63,11 @@ Check for these problems and fix them:
 ### Interactivity and States
 
 - **No hover states on buttons.** Add background shift, slight scale, or translate on hover.
-- **No active/pressed feedback.** Add a subtle `scale(0.98)` or `translateY(1px)` on press to simulate a physical click.
+- **No active/pressed feedback.** Add a subtle press scale in the `0.96`–`0.98` band (or `translateY(1px)`) to simulate a physical click. Never go below `0.95` — anything smaller feels exaggerated.
 - **Instant transitions with zero duration.** Add smooth transitions (200-300ms) to all interactive elements.
+- **Keyframe animations on interactive elements.** Keyframes run on a fixed timeline and restart when interrupted, which reads as broken when a user changes intent mid-animation. Use CSS transitions for interactive state changes (hover, toggle, open/close); reserve keyframes for one-shot staged sequences. See the Interaction Polish Gate below.
+- **`transition: all` on high-frequency controls.** On interactive states, name the exact properties (`transition: transform 200ms ease-out, opacity 200ms ease-out`). `transition: all` animates unrelated properties and is the common cause of first-frame stutter.
+- **Custom animation on every hover/keystroke.** High-frequency interactions get instant feedback or a short (≤150ms) opacity/color transition. Every animated state change also needs a static cue (color, icon, or label) so motion is never the only feedback channel.
 - **Missing focus ring.** Ensure visible focus indicators for keyboard navigation. This is an accessibility requirement, not optional.
 - **No loading states.** Replace generic circular spinners with skeleton loaders that match the layout shape.
 - **No empty states.** An empty dashboard showing nothing is a missed opportunity. Design a composed "getting started" view.
@@ -128,6 +131,124 @@ Check for these problems and fix them:
 - **No form validation.** Add client-side validation for emails, required fields, and format checks.
 - **No "skip to content" link.** Essential for keyboard users. Add a hidden skip-link.
 - **No cookie consent.** If required by jurisdiction, add a compliant consent banner.
+
+## Interaction Polish Gate
+
+Apply this gate after the audit fixes, as the verification layer for how the
+interface *feels* during use. It complements the design audit: the audit finds
+generic-looking surfaces; this gate finds broken interaction detail.
+
+These are working heuristics and defaults, not universal laws. Always express
+fixes in the project's existing styling system (Tailwind in a Tailwind
+project, vanilla CSS in a CSS project); never introduce a second styling
+system to apply a polish fix. When a project's design language deliberately
+breaks one of these defaults, keep the project's choice.
+
+### Motion discipline
+
+- **Interruptible by default.** Interactive state changes (hover, focus,
+  toggle, open/close, expand) use CSS transitions, because they retarget
+  mid-flight when the user changes intent. CSS keyframes restart from the
+  beginning and belong only to one-shot staged sequences (entrances,
+  loading loops).
+- **Name the transition properties.** On interactive elements, declare exact
+  properties (`transition-property: transform, opacity`) instead of
+  `transition: all`. Use `will-change` only for `transform`/`opacity`/`filter`
+  and only when first-frame stutter is observed.
+- **Restrain motion by frequency.** No custom animation on high-frequency
+  interactions (row hovers, keystrokes, repeated tab switches): the attention
+  cost repeats on every trigger. Reserve split/stagger entrances (roughly
+  80–100ms steps) for infrequent staged entrances such as first page load or
+  a success state. Skip entrance animation on first render when it competes
+  with content (e.g. `initial={false}` on `AnimatePresence`).
+- **Softer exits than entrances.** Small fixed `translateY` instead of full
+  height collapse; `ease-out` for both enter and exit.
+- **Static cue always.** Motion is never the only feedback channel: every
+  animated state change also carries a color, icon, or label change.
+
+### Surfaces
+
+- **Concentric border radius.** When rounded surfaces nest, the outer radius
+  should equal the inner radius plus the padding between them
+  (`outer = inner + padding`), e.g. a `20px` card with `8px` padding wraps a
+  `12px` inner surface. Equal radii on nested layers make the inner surface
+  look pinched. When the padding is large (more than ~24px), treat the layers
+  as separate surfaces and choose each radius independently.
+- **Shadows for elevation, borders for structure.** A border that exists only
+  to fake depth is better expressed as a layered low-opacity shadow; keep real
+  borders where they communicate structure or state (dividers, selection,
+  focus).
+- **Press feedback.** Subtle `scale(0.96)`–`scale(0.98)` on press for
+  tactile feedback; never below `0.95`. Provide an opt-out (e.g. a `static`
+  variant) where motion would distract.
+
+### Icons
+
+- **Match icon stroke to text weight (heuristic).** An icon next to text
+  carries the text's optical weight: ~`1.5px` stroke beside regular (400)
+  text, ~`2px` beside semibold (600). Keep one stroke weight per icon set and
+  do not mix icon libraries on one surface.
+- **One SVG, recolored per state.** Icons use `currentColor`; hover, selected,
+  and disabled states come from CSS color/opacity, not separate assets.
+  Outline is the default variant; fill marks the active state.
+
+### Hit areas
+
+- Interactive elements prefer a `44×44px` hit area in touch/mobile contexts
+  and at least `40×40px` in dense desktop interfaces. Extend a smaller visible
+  control with a pseudo-element or padding rather than enlarging its visuals.
+  Hit areas of two controls must never overlap.
+
+### Numbers and text
+
+- Dynamically updating numbers (counters, timers, prices, metrics) use
+  `font-variant-numeric: tabular-nums` to prevent layout shift.
+- Headings use `text-wrap: balance`; body copy uses `text-wrap: pretty` to
+  avoid orphans.
+
+### State walk verification
+
+Before declaring polish complete, verify in an actual browser/runtime, not by
+reading code alone:
+
+1. Walk every relevant state of each changed component: hover, focus, active,
+   disabled, loading, empty, error.
+2. Where animation is involved, slow it down: replay at ~10% speed (browser
+   Animations panel or equivalent) and watch for snapping, restarts, and
+   mistimed staggers. What feels off at 10% speed is what is subtly wrong at
+   full speed.
+3. Check both light and dark mode when the project supports them.
+4. Record what was actually inspected; label anything not inspected as
+   `Not verified` rather than implying coverage.
+
+### Polish review output
+
+When this skill is used to *review* an existing UI (rather than to rewrite
+it), report findings in this shape:
+
+- One table per principle group with **Severity** (`HIGH` = inaccessible,
+  misleading, or repeatedly disruptive; `MEDIUM` = noticeable usability or
+  consistency problem; `LOW` = isolated polish), **Location**
+  (`path/to/file:line` or exact screen/component), **Before**, **After**, and
+  **Why** (the violated principle and its user impact). Consolidate a repeated
+  systemic issue into one row listing every affected location.
+- A short "Considered but rejected" list of real borderline candidates, so
+  restraint is visible, not silent.
+- A **Verification** list of the exact checks run and their observed results,
+  with unperformed checks labeled `Not verified`.
+- A **Verdict**: `Block` while any `HIGH` finding remains, `Needs changes`
+  with only `MEDIUM`/`LOW` findings, `Approve` when no actionable finding
+  remains.
+
+Do not pad findings to look thorough and do not claim an uninspected surface
+was reviewed.
+
+> **Provenance.** This gate adapts interaction-detail mechanics researched from
+> the MIT-licensed upstream skill `jakubkrehel/make-interfaces-feel-better`
+> (commit `35545ea`, observed 2026-09-17). Concepts were adapted into P2P's
+> existing redesign surface; upstream constants are kept as defaults/heuristics
+> rather than universal laws, and no upstream code was vendored. See
+> `governance/research-adoption-ledger.json` record RA-EXT-072.
 
 ## Upgrade Techniques
 
