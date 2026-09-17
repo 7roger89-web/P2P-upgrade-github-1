@@ -403,3 +403,359 @@ def test_parser_supports_vietnamese_and_english():
     for raw, expected_executor in cases:
         parsed = owner_goal.parse_owner_goal_command(raw)
         assert parsed["executor"] == expected_executor, f"Failed for {raw}"
+
+
+# ---- New regressions for Control Tower review findings ----
+
+def test_terminal_goal_not_reused():
+    """Finding 1: terminal contracts must never be reused as active."""
+    terminal_contracts = [
+        {"terminal_state": "PASS", "objective": "Hoàn thiện workflow logistics", "status": "GOAL_DONE"},
+        {"terminal_state": "BLOCKED", "objective": "Hoàn thiện workflow logistics", "status": "BLOCKED"},
+        {"terminal_state": "REJECT", "objective": "Hoàn thiện workflow logistics", "status": "REJECT"},
+        {"status": "DONE", "objective": "Hoàn thiện workflow logistics"},
+        {"status": "VERIFIED", "objective": "Hoàn thiện workflow logistics"},
+        {"status": "CLOSED", "objective": "Hoàn thiện workflow logistics"},
+        {"status": "SUPERSEDED", "objective": "Hoàn thiện workflow logistics"},
+        {"status": "GOAL_DONE", "objective": "Hoàn thiện workflow logistics"},
+        {"status": "TERMINAL", "objective": "Hoàn thiện workflow logistics"},
+        {"status": "CANCELLED", "objective": "Hoàn thiện workflow logistics"},
+    ]
+    for contract in terminal_contracts:
+        assert owner_goal.is_compatible(contract, "Hoàn thiện workflow logistics cho kho bãi") is False, f"Should not reuse terminal {contract}"
+
+
+def test_blocked_not_eligible():
+    """Finding 2: BLOCKED must not be selected as executable work."""
+    tmp = _make_temp_project()
+    try:
+        raw = "/goal Test blocked eligibility, dùng Auto"
+        owner_goal.build_owner_goal_intake(tmp, raw)
+        store = task_state.TaskStateStore(tmp)
+        plan = store.load()
+        assert plan is not None
+        # Find READY task and keep one READY, make another BLOCKED
+        # First, ensure we have at least 2 tasks (beginner_gateway creates 3)
+        tids = list(plan.tasks.keys())
+        assert len(tids) >= 2
+        # Make first task BLOCKED
+        first_id = tids[0]
+        task = plan.tasks[first_id]
+        # Transition to BLOCKED via store? Use plan.transition
+        # Need to make it BLOCKED with blocker reason
+        try:
+            plan = plan.transition(first_id, "BLOCKED", blocker={"reason": "TEST_BLOCKED"})
+            store.save(plan)
+        except Exception:
+            # Fallback manual
+            new_task = task_state.TaskRecord(
+                task_id=task.task_id,
+                goal_id=task.goal_id,
+                title=task.title,
+                purpose=task.purpose,
+                status="BLOCKED",
+                dependencies=task.dependencies,
+                scope=task.scope,
+                non_scope=task.non_scope,
+                acceptance_requirements=task.acceptance_requirements,
+                required_evidence=task.required_evidence,
+                blocker={"reason": "TEST_BLOCKED"},
+            )
+            plan.tasks[first_id] = new_task
+            store.save(plan)
+
+        plan = store.load()
+        next_task = owner_goal._next_eligible_task(plan)
+        # next_task should NOT be BLOCKED
+        if next_task is not None:
+            assert next_task.status != "BLOCKED", f"BLOCKED task incorrectly selected: {next_task.task_id}"
+        # If only BLOCKED tasks remain, should return None
+        # Make all tasks BLOCKED
+        for tid in list(plan.tasks.keys()):
+            t = plan.tasks[tid]
+            if t.status != "BLOCKED":
+                try:
+                    plan = plan.transition(tid, "BLOCKED", blocker={"reason": "ALL_BLOCKED"})
+                except Exception:
+                    # manual
+                    plan.tasks[tid] = task_state.TaskRecord(
+                        task_id=t.task_id,
+                        goal_id=t.goal_id,
+                        title=t.title,
+                        purpose=t.purpose,
+                        status="BLOCKED",
+                        dependencies=t.dependencies,
+                        scope=t.scope,
+                        non_scope=t.non_scope,
+                        acceptance_requirements=t.acceptance_requirements,
+                        required_evidence=t.required_evidence,
+                        blocker={"reason": "ALL_BLOCKED"},
+                    )
+        store.save(plan)
+        plan = store.load()
+        next_task_all_blocked = owner_goal._next_eligible_task(plan)
+        assert next_task_all_blocked is None, "When all BLOCKED, next eligible should be None, not BLOCKED"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_owner_gate_end_to_end_via_intake():
+    """Finding 3: Owner Gate integrated into actual /goal intake/handoff path."""
+    tmp = _make_temp_project()
+    try:
+        raw = "/goal Dự án cần quyết định vật liệu cho Arena, dùng Arena"
+        result1 = owner_goal.build_owner_goal_intake(tmp, raw)
+        store = task_state.TaskStateStore(tmp)
+        plan = store.load()
+        assert plan is not None
+        # Mutate to WAITING_OWNER
+        for tid, task in plan.tasks.items():
+            if task.status == "READY":
+                new_task = task_state.TaskRecord(
+                    task_id=task.task_id,
+                    goal_id=task.goal_id,
+                    title=task.title,
+                    purpose=task.purpose,
+                    status="WAITING_OWNER",
+                    dependencies=task.dependencies,
+                    scope=task.scope,
+                    non_scope=task.non_scope,
+                    acceptance_requirements=task.acceptance_requirements,
+                    required_evidence=task.required_evidence,
+                    owner_decision={"status": "PENDING", "question": "Chọn vật liệu X hay Y?"},
+                )
+                plan.tasks[tid] = new_task
+                store.save(plan)
+                break
+
+        # Second intake with compatible objective should detect gate end-to-end
+        raw2 = "/goal Dự án cần quyết định vật liệu cho kho, dùng Arena"
+        result2 = owner_goal.build_owner_goal_intake(tmp, raw2)
+        # Must be HARD_OWNER_GATE, no Arena task handoff, no completion claim
+        assert result2["has_owner_gate"] is True or result2["terminal_type"] == "HARD_OWNER_GATE"
+        assert result2["terminal_type"] == "HARD_OWNER_GATE"
+        assert result2["has_gate"] is True
+        assert result2["stop_honestly"] is True
+        assert result2.get("claim_complete") is False or result2.get("claim_complete") is None
+        # Arena handoff must be None when gate
+        assert result2["arena_handoff"] is None
+        assert result2["arena_handoff_path"] == "HARD_OWNER_GATE_NO_HANDOFF"
+        # Also check via check_terminal_state directly
+        plan = store.load()
+        terminal = owner_goal.check_terminal_state(plan, evidence_claims=[])
+        assert terminal["terminal_type"] == "HARD_OWNER_GATE"
+        assert terminal["is_terminal"] is True
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_native_activation_multi_vs_single_and_arena_non_native():
+    """Finding 4: Wire real activation seam — multi-task ACTIVATE, single-task NORMAL, Arena non-native."""
+    tmp = _make_temp_project()
+    try:
+        # Multi-task path via real intake (beginner_gateway creates 3 tasks)
+        raw = "/goal Test native activation multi-task, dùng Auto"
+        owner_goal.build_owner_goal_intake(tmp, raw)
+        store = task_state.TaskStateStore(tmp)
+        plan = store.load()
+        assert plan is not None
+        assert len(plan.tasks) >= 2, "Need multi-task for ACTIVATE test"
+
+        # Create autopilot goal state
+        from p2p_capabilities import autopilot_state
+        goal_id = json.loads((tmp / ".p2p" / "state" / "goal-contract.json").read_text(encoding="utf-8")).get("goal_id")
+        goal_plan_planned = autopilot_state.GoalPlan(
+            goal_id=goal_id,
+            goal_version="v1",
+            title="Test native activation",
+            purpose="Test native activation",
+            owner_approval_ref="test-approval",
+            scope=(raw,),
+            non_scope=(),
+            plan_task_ids=tuple(plan.tasks.keys()),
+            status="PLANNED",
+        )
+        autopilot_store = autopilot_state.GoalStateStore(tmp)
+        autopilot_store.initialize(goal_plan_planned)
+        autopilot_store.transition("APPROVED")
+
+        # Evaluate for claude_code — should be ACTIVATE_NATIVE_GOAL (multi-task, active, unfinished)
+        res_claude = owner_goal.evaluate_native_activation(tmp, "claude_code")
+        assert res_claude["decision"] == "ACTIVATE_NATIVE_GOAL", f"Expected ACTIVATE for multi-task, got {res_claude}"
+        assert res_claude["native_goal_behavior_preserved"] is True
+
+        # Single-task path
+        tmp2 = _make_temp_project()
+        try:
+            # Create single-task plan manually
+            from p2p_capabilities import task_state as ts_mod
+            single_contract = {
+                "goal_id": "goal-single-test",
+                "objective": "Single task test",
+                "scope": ["test"],
+                "out_of_scope": [],
+                "completion_criteria": [],
+            }
+            single_spec = {
+                "task_id": "task-single",
+                "goal_id": "goal-single-test",
+                "title": "Single task",
+                "purpose": "Single task purpose",
+                "status": "READY",
+                "dependencies": [],
+                "scope": ["test"],
+                "non_scope": [],
+                "acceptance_requirements": ["done"],
+                "required_evidence": [".p2p/state/execution-ledger.jsonl"],
+            }
+            task_plan = ts_mod.TaskPlan.from_goal(single_contract, [single_spec])
+            ts_store = ts_mod.TaskStateStore(tmp2)
+            ts_store.initialize(task_plan)
+
+            goal_plan_single_planned = autopilot_state.GoalPlan(
+                goal_id="goal-single-test",
+                goal_version="v1",
+                title="Single task test",
+                purpose="Single task purpose",
+                owner_approval_ref="test-approval",
+                scope=("test",),
+                non_scope=(),
+                plan_task_ids=("task-single",),
+                status="PLANNED",
+            )
+            # Need to import autopilot_state for tmp2 as well
+            from p2p_capabilities import autopilot_state as ap2
+            ap_store2 = ap2.GoalStateStore(tmp2)
+            ap_store2.initialize(goal_plan_single_planned)
+            ap_store2.transition("APPROVED")
+
+            res_single = owner_goal.evaluate_native_activation(tmp2, "claude_code")
+            assert res_single["decision"] == "NORMAL_P2P_PATH", f"Expected NORMAL for single-task, got {res_single}"
+            assert "SINGLE_TASK_PLAN" in res_single.get("reason", "")
+        finally:
+            shutil.rmtree(tmp2, ignore_errors=True)
+
+        # Arena remains non-native
+        res_arena = owner_goal.evaluate_native_activation(tmp, "arena")
+        assert res_arena["decision"] == "HOST_KIND_UNSUPPORTED"
+        assert res_arena["native_goal_behavior_preserved"] is True
+        assert res_arena.get("arena_in_native_hosts") is False or "arena" not in [h.lower() for h in native_goal_bridge.HOST_KINDS]
+
+        # Also via intake CLI
+        cli_res = owner_goal.owner_goal_intake_cli(tmp, raw)
+        assert cli_res["arena_in_native_hosts"] is False
+        assert cli_res["native_goal_behavior_preserved"] is True
+        assert "native_activation_evaluations" in cli_res
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_reuse_metadata_session_action():
+    """Finding 5: handoff derives from current intake truth, not stale contract metadata."""
+    tmp = _make_temp_project()
+    try:
+        raw1 = "/goal Test reuse metadata, dùng Arena"
+        result1 = owner_goal.build_owner_goal_intake(tmp, raw1)
+        assert result1["reuse"] is False
+        contract1 = json.loads((tmp / ".p2p" / "state" / "goal-contract.json").read_text(encoding="utf-8"))
+        store = task_state.TaskStateStore(tmp)
+        plan = store.load()
+        # Handoff for first intake should be START_NEW_SESSION and reuse_existing_goal False
+        handoff1 = owner_goal.build_arena_handoff(tmp, contract1, plan, "ARENA", reuse=result1["reuse"])
+        assert handoff1["reuse_existing_goal"] is False
+        assert handoff1["session_action"] == "START_NEW_SESSION"
+
+        # Second intake compatible reuse
+        raw2 = "/goal Test reuse metadata cho kho bãi, dùng Arena"
+        result2 = owner_goal.build_owner_goal_intake(tmp, raw2)
+        assert result2["reuse"] is True
+        contract2 = json.loads((tmp / ".p2p" / "state" / "goal-contract.json").read_text(encoding="utf-8"))
+        plan2 = store.load()
+        handoff2 = owner_goal.build_arena_handoff(tmp, contract2, plan2, "ARENA", reuse=result2["reuse"])
+        # Now should be CONTINUE and reuse True — derived from current intake, not stale contract
+        assert handoff2["reuse_existing_goal"] is True, f"Expected reuse True, got {handoff2['reuse_existing_goal']} with contract reuse field {contract2.get('owner_goal_intake',{}).get('reuse')}"
+        assert handoff2["session_action"] == "CONTINUE_CURRENT_SESSION"
+
+        # Also check result2 itself has correct handoff if executor Arena
+        # result2's arena_handoff should already have correct reuse flag
+        if result2.get("arena_handoff"):
+            assert result2["arena_handoff"]["reuse_existing_goal"] is True
+            assert result2["arena_handoff"]["session_action"] == "CONTINUE_CURRENT_SESSION"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_bare_executor_name_not_hijack():
+    """Finding 6: bare occurrence of arena/auto in objective must not select executor."""
+    cases = [
+        ("/goal sửa lỗi arena rendering", "AUTO"),
+        ("/goal fix auto save feature", "AUTO"),
+        ("/goal cải thiện tính năng arena cho game", "AUTO"),
+        ("/goal sửa lỗi auto complete", "AUTO"),
+        ("/goal arena", "AUTO"),  # bare arena without explicit directive should be AUTO
+        ("/goal auto", "AUTO"),
+        ("/goal Sửa lỗi đăng nhập", "AUTO"),
+        # Explicit directives must still work
+        ("/goal sửa lỗi arena rendering, dùng Arena", "ARENA"),
+        ("/goal sửa lỗi arena rendering, use Arena", "ARENA"),
+        ("/goal sửa lỗi arena rendering, dùng Auto", "AUTO"),  # explicit Auto still Auto
+        ("/goal Hoàn thiện workflow, dùng Arena", "ARENA"),
+        ("/goal Hoàn thiện workflow, dung Arena", "ARENA"),
+        ("/goal Do feature, using Arena", "ARENA"),
+        ("/goal Do feature, with Arena", "ARENA"),
+    ]
+    for raw, expected in cases:
+        parsed = owner_goal.parse_owner_goal_command(raw)
+        assert parsed["executor"] == expected, f"Failed for '{raw}': expected {expected}, got {parsed['executor']}"
+        assert owner_goal.resolve_executor(raw) == expected, f"resolve_executor failed for '{raw}'"
+
+
+def test_durable_git_identity_not_fabricated():
+    """Finding 7: REPO and BRANCH must not be fabricated, use fresh Git identity or UNKNOWN."""
+    tmp = _make_temp_project()
+    try:
+        raw = "/goal Test git identity, dùng Arena"
+        result = owner_goal.build_owner_goal_intake(tmp, raw)
+        contract = json.loads((tmp / ".p2p" / "state" / "goal-contract.json").read_text(encoding="utf-8"))
+        store = task_state.TaskStateStore(tmp)
+        plan = store.load()
+
+        # In temp project (not a git repo), branch should be UNKNOWN, not fabricated arena/<goal_id>
+        handoff = owner_goal.build_arena_handoff(tmp, contract, plan, "ARENA", reuse=False)
+        # Branch must be UNKNOWN because temp project is not git repo
+        assert handoff["branch"] == "UNKNOWN", f"Expected UNKNOWN branch for non-git temp project, got {handoff['branch']}"
+        # Repo should be tmp.name, not fabricated
+        assert handoff["repo"] == tmp.name
+        # Packet text must instruct Arena to fresh-check and not assume fabricated branch
+        assert "BRANCH=UNKNOWN" in handoff["packet_text"] or "If BRANCH=UNKNOWN" in handoff["packet_text"]
+        assert "git fetch origin main" in handoff["packet_text"]
+        assert "git branch -a --list 'arena/*'" in handoff["packet_text"]
+        # Must NOT contain fabricated arena/<goal_id> when UNKNOWN
+        # If branch is UNKNOWN, packet should not claim arena/<goal_id> as existing
+        # Check git_identity present
+        assert "git_identity" in handoff
+        assert handoff["git_identity"]["branch"] == "UNKNOWN"
+
+        # In real repo (this repo is git), branch should be current branch, not fabricated
+        real_root = ROOT
+        real_contract = {"goal_id": "goal-test-real", "objective": "Test real repo", "scope": [], "out_of_scope": []}
+        # Create minimal plan with one READY task for real repo test
+        from p2p_capabilities import task_state as ts_mod
+        # Use existing plan if available? Just create dummy plan with READY task
+        # For this test we can reuse _next_eligible_task logic with None plan -> empty delta
+        # But we want to test git identity in real repo
+        git_id = owner_goal._get_git_identity(real_root)
+        # git_id branch should be current branch (arena/...) not UNKNOWN
+        assert git_id["branch"] != "UNKNOWN", "Real repo should have branch"
+        # handoff in real repo should use current branch if it starts with arena/
+        handoff_real = owner_goal.build_arena_handoff(real_root, real_contract, None, "ARENA", reuse=False)
+        if git_id["branch"].startswith("arena/"):
+            assert handoff_real["branch"] == git_id["branch"], f"Should reuse current arena branch {git_id['branch']}, got {handoff_real['branch']}"
+        else:
+            assert handoff_real["branch"] == "UNKNOWN"
+        # Repo should be owner/repo if remote exists, else root.name
+        # In this repo, remote exists, so repo should contain '/'
+        if git_id["remote_url"]:
+            assert "/" in handoff_real["repo"] or handoff_real["repo"] == real_root.name
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
