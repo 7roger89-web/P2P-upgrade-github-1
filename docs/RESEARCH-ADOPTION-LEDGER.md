@@ -69,6 +69,25 @@ The vocabulary enforces strict distinctions: **RESEARCHED ≠ SELECTED ≠ IMPLE
 | REJECTED | 1 | RA-EXT-007 |
 | UNKNOWN | 1 | RA-EXT-012 |
 
+### 4.3 External capability assimilation batch 2026-09-17 (RA-EXT-072 .. RA-EXT-081)
+
+Appended projection of the ten records added by
+`P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01`. The JSON ledger remains
+the authority; this table is its derived view for this batch.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-072 | jakubkrehel/make-interfaces-feel-better | IMPLEMENTED | interruptible motion, transition-property discipline, frequency-based motion restraint, concentric-radius formula, hit-area heuristics, stroke-to-text-weight matching, 10% speed state-walk review format | Interaction Polish Gate inside existing UI-taste-skill redesign-skill (no parallel skill; constants kept as defaults) |
+| RA-EXT-073 | pgrundev/pgbot | DEFERRED | read-only deterministic Postgres diagnostics behind the existing MCP path | external tool candidate with activation conditions; register via mcp-management only when a P2P project actually uses PostgreSQL |
+| RA-EXT-074 | rlaope/oh-my-hermes | DEFERRED | none selected | duplication verified against task_state/evidence/orchestration_policy/C17 worktrees/DURABLE_PROJECT_INTELLIGENCE/doctor.py; no bounded gap |
+| RA-EXT-075 | vercel-labs/fx | DEFERRED | future optional ACP-capable host candidate | reference only; entry would be through existing HOST_* capability surfaces; upstream experimental |
+| RA-EXT-076 | MDX-Tom/gpt-instruct | REJECTED | confirmation of PASS/PROMOTE/RELEASE/OWNER_DECISION separation | P2P eval registry + release gates + GOAL_PASS_NOT_PROMOTION already cover; Owner Codex prompts untouched |
+| RA-EXT-077 | larashero3-dotcom/lieflat-less-ai-tone | DEFERRED | corpus-contrast methodology only | future Vietnamese corpus research candidate; no Chinese regexes ported; no humanizer created |
+| RA-EXT-078 | lynote-ai/humanize-text | REJECTED | none | multi-hop translation drift incompatible with precision-sensitive P2P writing paths |
+| RA-EXT-079 | TencentCloud/Octop | REJECTED | none (reference only) | second orchestration platform rejected; patterns already represented natively |
+| RA-EXT-080 | danny-avila/LibreChat | REJECTED | none (reference only) | chat-UI platform does not map to a bounded P2P gap; no duplication of P2P runtime for UI |
+| RA-EXT-081 | zjwzcx/Awesome-Astra-Embodied-AI | RESEARCHED | none (radar source) | catalog only, no executable code; no LICENSE file — rights-unspecified, cite do not copy |
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:

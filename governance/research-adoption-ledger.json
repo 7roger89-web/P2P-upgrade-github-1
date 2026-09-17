@@ -2404,6 +2404,304 @@
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-09-16T13:35:00+07:00",
       "notes": "First bounded slice only. Workflow/skill/architecture self-mutation remains deferred until a measured native gap and separate authority gate."
+    },
+    {
+      "research_id": "RA-EXT-072",
+      "source_name": "jakubkrehel/make-interfaces-feel-better",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/jakubkrehel/make-interfaces-feel-better",
+      "source_version_or_commit": "35545ea1512ad59fa463e6b1f95ca9c052981fe6",
+      "provenance_status": "CONCEPT_ADAPTED_NOT_VENDORED",
+      "research_summary": "MIT-licensed design-engineering skill: 19 interaction-detail principles plus a structured polish-review output format (severity table, considered-but-rejected, verification list, verdict). Verified by source read of SKILL.md and five reference files; real content, not README-only.",
+      "selected_ideas": [
+        "interruptible-motion rule (CSS transitions for interactive states, keyframes only for one-shot sequences)",
+        "explicit transition-property discipline on interactive controls",
+        "frequency-based motion restraint with mandatory static cue",
+        "concentric border-radius formula (outer = inner + padding) with >24px escape hatch",
+        "hit-area heuristics (44px touch, 40px dense desktop, pseudo-element extension, no overlap)",
+        "icon-stroke-to-text-weight matching heuristic",
+        "press-scale band 0.96-0.98, never below 0.95",
+        "10%-speed motion inspection plus hover/focus/active/loading/empty state walk",
+        "evidence-shaped review output format (severity, before/after, verdict, Not-verified labeling)"
+      ],
+      "rejected_ideas": [
+        "verbatim copy of the upstream skill as a parallel UI-polish skill",
+        "upstream magic constants as universal laws (kept as defaults/heuristics)",
+        "framer-motion-specific prescriptions as P2P defaults",
+        "second styling system to apply polish fixes"
+      ],
+      "p2p_translation": "IMPLEMENTED as an 'Interaction Polish Gate' section inside the existing UI-taste-skill redesign-skill surface (.agents/skills/UI-taste-skill/skills/redesign-skill/SKILL.md), kept byte-identical across the .agents, .claude, and .p2p/system projection copies. Gap analysis against existing P2P skills: optical alignment, tabular numerals, 44px touch targets, empty-state composition and stroke standardization already existed; interruptibility, transition-property discipline, frequency-based motion restraint, concentric-radius formula, stroke-to-text-weight matching, 10% speed inspection and the review output format were absent or materially weaker.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        ".agents/skills/UI-taste-skill/skills/redesign-skill/SKILL.md (Interaction Polish Gate section)",
+        "tests/test_p2p_external_capability_assimilation_01.py",
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [
+        "UI-taste-skill router (existing)"
+      ],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT license (c) 2026 Jakub Krehel verified at observed commit. Concept adaptation only; no upstream file vendored; attribution preserved in the skill file provenance note."
+    },
+    {
+      "research_id": "RA-EXT-073",
+      "source_name": "pgrundev/pgbot",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pgrundev/pgbot",
+      "source_version_or_commit": "08882b558f20a22ab141f7c8566da18f0be9fda4",
+      "provenance_status": "REPOSITORY_EVIDENCED_EXTERNAL_TOOL_CANDIDATE",
+      "research_summary": "Apache-2.0 Go tool: single static binary, read-only PostgreSQL diagnostics over the database's own statistics views, findings-first health report, versioned --json contract (1.2.0 with published JSON Schema) and a stdio MCP server exposing deterministic tools only (inspect, unused_indexes, top_queries, vacuum_health, suggest_indexes, explain_plan, schema_of, compare_to_baseline). Deterministic findings first, model explanation second, matches the P2P DETERMINISTIC_FIRST principle. Verified by source read of README, MCP section, repo layout (cmd/internal/schema); beta status declared upstream.",
+      "selected_ideas": [
+        "read-only deterministic database diagnostics as an external tool behind the existing MCP path",
+        "versioned JSON contract as the stable interface (parse --json, not terminal output)"
+      ],
+      "rejected_ideas": [
+        "vendoring or copying pgbot code into P2P",
+        "introducing PostgreSQL-specific infrastructure into projects that do not use PostgreSQL"
+      ],
+      "p2p_translation": "RECORDED AS EXTERNAL CAPABILITY WITH ACTIVATION CONDITIONS. Activation path when a P2P-managed project actually runs PostgreSQL: register pgbot through the existing mcp-management surface (.claude/.mcp.json mcpServers entry, 'pgbot mcp' stdio command) with a read-only pg_monitor role; no new P2P machinery required. Until then no binding is created, because no P2P project currently uses PostgreSQL.",
+      "capability_family": "MULTI_AI_INTEROPERABILITY",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [
+        "mcp-management skill (existing)",
+        "a PostgreSQL-using P2P project (does not exist yet)"
+      ],
+      "roadmap_slot": "none (external tool candidate, activation-conditioned)",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. Apache-2.0 verified at observed commit. Upstream beta; human-readable report is not a stable interface. No credentials, no write privilege, no execution performed during assessment."
+    },
+    {
+      "research_id": "RA-EXT-074",
+      "source_name": "rlaope/oh-my-hermes",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/rlaope/oh-my-hermes",
+      "source_version_or_commit": "964ddc10b83d465b9a30942859e7ce71f9a14ec0",
+      "provenance_status": "REPOSITORY_EVIDENCED_NO_ADOPTION",
+      "research_summary": "MIT-licensed Python operating layer on top of Hermes Agent: planning/research/coding workflows, typed artifacts, orchestration patterns (clarify-then-plan, plan-execute-verify, worktree isolation guidance worktree_session_isolation/v1), evidence gates, per-model material. Verified by source read of README, docs/CAPABILITIES.md and repo layout (omh/, src/, skills/, roles/).",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "installing OMH into P2P or creating a second operating layer",
+        "per-model calibration prompts (conflicts with P2P executor/model neutrality and FACT_LEDGER/live-specs handling of volatile model claims)",
+        "OMH worktree machinery (P2P already shipped worktree/session isolation via RA-EXT-011 Orca: C17 DONE, FW06 lease)",
+        "OMH evidence/typed-state machinery duplicates of P2P task_state/evidence/decision_trace surfaces"
+      ],
+      "p2p_translation": "NO IMPLEMENTATION. Duplication mapping verified: typed execution/evidence states -> .p2p/system/p2p_capabilities/task_state.py + evidence.py; routing chains -> orchestration_policy.py + control_tower_handoff.py; safe parallel worktree execution -> RA-EXT-011 SHIPPED (C17/FW06); long-term project memory boundaries -> DURABLE_PROJECT_INTELLIGENCE family (12 capabilities); deterministic doctor/update -> scripts/doctor.py; cost/token provenance and per-model calibration showed no bounded gap that justifies new P2P code in this goal.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT verified at observed commit. Re-open only with a measured gap on an existing P2P surface, not with an architecture comparison."
+    },
+    {
+      "research_id": "RA-EXT-075",
+      "source_name": "vercel-labs/fx",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/vercel-labs/fx",
+      "source_version_or_commit": "a1e3265dd7ce9c00d14702d2789146af4596cb3f",
+      "provenance_status": "REPOSITORY_EVIDENCED_ARCHITECTURE_REFERENCE",
+      "research_summary": "Apache-2.0 Zig coding-agent CLI (~6 MiB native binary), self-declared experimental. Verified by source read of README/AGENTS.md at observed commit: model-agnostic connections, 'fx acp' Agent Client Protocol server mode, MCP support, skills, automatic tool review, long-context compaction with checkpoints, WASM SDK (experimental).",
+      "selected_ideas": [
+        "keep fx as a future optional ACP-capable external host candidate for the existing HOST_* capability surfaces"
+      ],
+      "rejected_ideas": [
+        "replacing any verified P2P executor with fx in this task",
+        "a new executor framework or host-discovery system (HOST_CAPABILITY_DISCOVERY/HOST_SELECTION/MINIMUM_SUFFICIENT_HOST already exist in the capability ledger)",
+        "native/WASM embedding of fx into P2P"
+      ],
+      "p2p_translation": "REFERENCE ONLY. If later justified by a separate goal, fx would enter through the existing host-discovery/selection abstractions (HOST_CAPABILITY_DISCOVERY, HOST_SELECTION, HOST_EXECUTOR_NEUTRALITY, SECURE_HOST_CONNECTION_ONBOARDING) as an optional ACP-capable host, minimally and reversibly. No executable integration in this goal.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [
+        "HOST_CAPABILITY_DISCOVERY",
+        "HOST_SELECTION"
+      ],
+      "roadmap_slot": "none (architecture reference / future host candidate)",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. Apache-2.0 verified at observed commit. Upstream status banner: 'Experimental. Use at your own risk.'"
+    },
+    {
+      "research_id": "RA-EXT-076",
+      "source_name": "MDX-Tom/gpt-instruct",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/MDX-Tom/gpt-instruct",
+      "source_version_or_commit": "0ad8ec58e1989f4a058e01ce4e15cf226e8067bf",
+      "provenance_status": "REPOSITORY_EVIDENCED_NO_ADOPTION",
+      "research_summary": "MIT-licensed Codex prompt-engineering project with a reproducible evaluation toolchain: epoch/version naming, A/B/C staged gates, isolated HOME/CODEX_HOME/TMPDIR evaluation runs, prompt regression corpus, failure attribution, artifact gates, rollback. Verified by source read of README/README_EN, codex-instruct.py, scripts/, unit-tests/ layout at observed commit.",
+      "selected_ideas": [
+        "confirmation that P2P's existing separation PASS != PROMOTE != RELEASE != OWNER_DECISION matches upstream's stated-vs-actual gate distinction"
+      ],
+      "rejected_ideas": [
+        "deploying upstream production prompt files into Owner Codex configuration",
+        "mutating Owner Codex instructions",
+        "importing the A/B/C harness: P2P already covers deterministic-first evaluation via .p2p/system/p2p_capabilities/eval_registry.json (p2p-eval-registry/1), PROJECT_EVALS/RELEASE_ACCEPTANCE/REGRESSION_CLASSIFICATION capabilities, governance/release-gates.schema.json and the GOAL_PASS_NOT_PROMOTION invariant (capability AUTO_PROMOTION_AFTER_GOAL_PASS status REJECTED)"
+      ],
+      "p2p_translation": "NO IMPLEMENTATION. Covered-by mapping recorded; P2P evaluation machinery already provides deterministic-first gates, artifact/evidence requirements and release-gate separation. Upstream prompt artifacts remain external and are not distributed with P2P.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "REJECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT verified at observed commit. Upstream itself warns of account risk around custom model instructions; P2P does not adopt that surface."
+    },
+    {
+      "research_id": "RA-EXT-077",
+      "source_name": "larashero3-dotcom/lieflat-less-ai-tone",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/larashero3-dotcom/lieflat-less-ai-tone",
+      "source_version_or_commit": "27d29232f10124db904ca9c0536d0b67cb3b2833",
+      "provenance_status": "REPOSITORY_EVIDENCED_METHODOLOGY_ONLY",
+      "research_summary": "MIT-licensed Chinese AI-tone research skill grounded in a contrastive corpus study (629 articles, 2.83M characters): 26 candidate features tested, 11 pass, several popular heuristics falsified or reversed; whitelist-only rewriting with information conservation; documented operator/measurement errors. Verified by source read of README.en.md, RESEARCH.en.md, SKILL.md and scripts/ at observed commit.",
+      "selected_ideas": [
+        "methodology only: corpus-based contrast, measurable features, falsifying popular heuristics, whitelist-only rewriting, preserving unmatched text, inspecting operator hits before trusting aggregate metrics"
+      ],
+      "rejected_ideas": [
+        "porting Chinese-specific regexes into Vietnamese",
+        "creating a Vietnamese detector/humanizer in this task (no existing P2P capability has a bounded gap requiring it)",
+        "vendoring the Chinese rule set"
+      ],
+      "p2p_translation": "RESEARCH DECISION ONLY. The methodology is recorded for a possible future Vietnamese corpus research program; it requires its own corpus and its own goal before any implementation.",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none (future research candidate)",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT (c) 2026 shiujan verified at observed commit. Corpus itself cannot be independently verified (upstream-stated limit)."
+    },
+    {
+      "research_id": "RA-EXT-078",
+      "source_name": "lynote-ai/humanize-text",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/lynote-ai/humanize-text",
+      "source_version_or_commit": "51eb2bb1794646a6ba10e766d20fc8921646e7d0",
+      "provenance_status": "REPOSITORY_EVIDENCED_NO_ADOPTION",
+      "research_summary": "MIT-licensed pipeline that rewrites AI-generated text via a 4-hop chain (LLM rewrite to Chinese, LLM rewrite to Japanese, Google Translate to Finnish, Niutrans to English) designed to destroy statistical fingerprints. Verified by source read of README and src/ layout at observed commit.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "integration into any legal, logistics, research, specification, governance or other precision-sensitive P2P writing path (multi-hop translation causes semantic drift, terminology drift and citation drift)",
+        "use as a detection-evasion mechanism"
+      ],
+      "p2p_translation": "REJECTED. The drift profile is incompatible with P2P evidence-sensitive writing; the fingerprint-evasion purpose conflicts with P2P truth/verification culture. Retained only as a negative research decision.",
+      "capability_family": "CONTEXT_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "REJECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT (c) 2026 Lynote.ai verified at observed commit."
+    },
+    {
+      "research_id": "RA-EXT-079",
+      "source_name": "TencentCloud/Octop",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/TencentCloud/Octop",
+      "source_version_or_commit": "ae65fe4e26854d2eaf751cee89341ec5d71569f0",
+      "provenance_status": "REPOSITORY_EVIDENCED_ARCHITECTURE_REFERENCE",
+      "research_summary": "MIT-licensed self-hosted multi-user multi-agent assistant: single-process control plane, web dashboard plus IM integrations (Feishu/DingTalk/QQ/Discord/WeCom), expert library, OAuth+MCP connectors, ACP integration, skill packages with permission gating. Verified by source read of README and repo layout (src/, dashboard/, plugins/) at observed commit; 3300+ files of implemented code.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "adding Octop as a second orchestration platform or replacing P2P/Hermes",
+        "importing its multi-user control plane (P2P is single-Owner governed; SECOND_EXECUTOR/COMPETING_ROUTER are registered rejected patterns)",
+        "treating roadmap items as implemented capabilities"
+      ],
+      "p2p_translation": "REFERENCE ONLY. No missing primitive was identified that P2P lacks and that requires Octop code; its tool-approval/workspace-isolation/portable-memory patterns are already represented natively (approval-policy.json, RA-EXT-011 worktree isolation, DURABLE_PROJECT_INTELLIGENCE).",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "REJECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none (architecture reference)",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT (c) 2026 Octop verified at observed commit."
+    },
+    {
+      "research_id": "RA-EXT-080",
+      "source_name": "danny-avila/LibreChat",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/danny-avila/LibreChat",
+      "source_version_or_commit": "12d78909d3f5247a8d40a47f0ef5c3ac771d9c5a",
+      "provenance_status": "REPOSITORY_EVIDENCED_ARCHITECTURE_REFERENCE",
+      "research_summary": "MIT-licensed multi-provider chat platform (Node/React client + API server + docker deployment): provider UX, MCP integration, roles/permissions, RAG config. Verified by top-level source read at observed commit (README, api/, client/, docker-compose surfaces).",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "adding LibreChat as P2P core or as P2P's UI",
+        "duplicating existing P2P runtime/governance to obtain its UI",
+        "deploying its service/daemon surface in this goal"
+      ],
+      "p2p_translation": "REFERENCE ONLY for multi-provider UX patterns. P2P's execution surface is executor/host-neutral by law (HOST_EXECUTOR_NEUTRALITY VERIFIED_IMPLEMENTED); a chat UI platform does not map onto a bounded P2P gap in this goal.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "REJECTED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none (UI/control-plane reference)",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. MIT (c) 2026 LibreChat verified at observed commit."
+    },
+    {
+      "research_id": "RA-EXT-081",
+      "source_name": "zjwzcx/Awesome-Astra-Embodied-AI",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/zjwzcx/Awesome-Astra-Embodied-AI",
+      "source_version_or_commit": "6777fc8d0c9a5ae1c0fc3cf7acbae6662093cd54",
+      "provenance_status": "RESEARCHED_RADAR_SOURCE_ONLY",
+      "research_summary": "Curated catalog of GPT-6 Astra embodied-AI/robotics demos (zero-shot control, agentic policy calls, real-to-sim replay, RL environment building) plus public benchmark links. Verified by source read of README at observed commit: README + assets only, no executable code.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "integrating catalog content as runtime capability",
+        "treating individual demos as independent proof of generalized capability (several entries explicitly disclose replay/ideal-grasp assumptions)"
+      ],
+      "p2p_translation": "RADAR SOURCE ONLY. Relevant solely if the Owner later opens an embodied-AI research direction; it would enter through the normal research-intake path with its own goal.",
+      "capability_family": "RESEARCH_ONLY_REGISTER",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/reports/P2P-EXTERNAL-CAPABILITY-ASSIMILATION-20260917-01-terminal-report.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-17T07:30:00+00:00",
+      "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. No LICENSE file at observed commit; repository self-describes as a non-commercial compilation. Treat content as rights-unspecified; cite, do not copy."
     }
   ],
   "rejected_register_summary": {
