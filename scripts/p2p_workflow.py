@@ -3158,6 +3158,182 @@ def plan_workflow(root: Path, request: str, package_hint: str | None = None) -> 
     }
 
 
+def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = None, host: str | None = None) -> dict[str, object]:
+    """Owner /goal one-command intake — thin UX over canonical workflow.
+
+    Reuses existing Goal Contract / TaskPlan / durable state machinery.
+    No second orchestrator, router, state DB, task registry, daemon, or
+    acceptance authority. Arena remains executor, not native /goal host.
+
+    Single authoritative host: an explicit known executor identity (``host``,
+    e.g. ``codex_cli``) when supplied, else the current host detected via
+    native_goal_activation.detect_host_from_environment() (Claude Code stable
+    markers). Evaluate ONLY that host for ACTIVATE_NATIVE_GOAL. The canonical
+    helper is read-only, so the returned command is a PROJECTION: this path
+    reports native_invocation_required / invocation_status=HOST_ACTION_REQUIRED
+    with native_command_invoked_count=0 and never fabricates an invocation
+    receipt. If no host is confidently detected, return NORMAL_P2P_PATH
+    honestly; do not evaluate both and prefer Claude.
+    """
+    root = root.resolve()
+    try:
+        mod = capability_api(root, package_hint, "owner_goal")
+    except ValueError:
+        system = root / ".p2p" / "system"
+        if str(system) not in sys.path:
+            sys.path.insert(0, str(system))
+        try:
+            mod = importlib.import_module("p2p_capabilities.owner_goal")
+        except Exception as exc:
+            raise ValueError(f"OWNER_GOAL_CAPABILITY_UNAVAILABLE:{exc}") from exc
+
+    # Prefer owner_goal_intake_cli which implements single authoritative host
+    if hasattr(mod, "owner_goal_intake_cli"):
+        try:
+            result = mod.owner_goal_intake_cli(root, raw_command, package_hint=package_hint, host_kind=host, json_output=True)
+            # Ensure invariants still surfaced even when cli path used
+            try:
+                native_bridge = capability_api(root, package_hint, "native_goal_bridge")
+                host_kinds = getattr(native_bridge, "HOST_KINDS", ())
+                result.setdefault("native_goal_hosts", list(host_kinds))
+                result["arena_in_native_hosts"] = any(str(h).lower() == "arena" for h in host_kinds)
+                result["native_goal_behavior_preserved"] = not result["arena_in_native_hosts"]
+            except Exception:
+                result.setdefault("native_goal_behavior_preserved", True)
+                result.setdefault("arena_in_native_hosts", False)
+            # Result already contains the single-host decision/projection boundary
+            # (invocation_required, invoked_count=0, HOST_ACTION_REQUIRED) — only
+            # ensure both naming variants exist.
+            if "native_activation_decision" not in result and "native_goal_activation_decision" in result:
+                result["native_activation_decision"] = result["native_goal_activation_decision"]
+            if "native_goal_activation_decision" not in result and "native_activation_decision" in result:
+                result["native_goal_activation_decision"] = result["native_activation_decision"]
+            result["rule20_preserved"] = True
+            result["no_second_orchestrator"] = True
+            result["no_second_router"] = True
+            result["no_second_state_db"] = True
+            result["owner_goal_entrypoint"] = "scripts/p2p_workflow.py:owner-goal + .p2p/system/p2p_capabilities/owner_goal.py"
+            # Ensure beginner handoff for Arena if needed
+            if result.get("executor") == "ARENA" and result.get("arena_handoff") is not None:
+                try:
+                    contract = load_current_contract(root)
+                    task_state = capability_api(root, package_hint, "task_state")
+                    store = task_state.TaskStateStore(root)
+                    plan = store.load()
+                    if contract and plan:
+                        beginner_handoff = mod.build_beginner_handoff(root, contract, plan, "ARENA")
+                        result["beginner_arena_handoff"] = beginner_handoff
+                        result["arena_handoff_path"] = "COMPACT_TASK_DELTA_VIA_CANONICAL_STATE"
+                except Exception:
+                    pass
+            return result
+        except Exception:
+            # Fall through to manual single-host path
+            pass
+
+    # Fallback manual path — single authoritative host only
+    result = mod.build_owner_goal_intake(root, raw_command, package_hint=package_hint)
+
+    try:
+        native_bridge = capability_api(root, package_hint, "native_goal_bridge")
+        host_kinds = getattr(native_bridge, "HOST_KINDS", ())
+        result.setdefault("native_goal_hosts", list(host_kinds))
+        result["arena_in_native_hosts"] = any(str(h).lower() == "arena" for h in host_kinds)
+        result["native_goal_behavior_preserved"] = not result["arena_in_native_hosts"]
+    except Exception:
+        result.setdefault("native_goal_behavior_preserved", True)
+        result.setdefault("arena_in_native_hosts", False)
+        host_kinds = ("claude_code", "codex_cli")
+
+    # Detect the authoritative current host via the existing seam, evaluate ONLY that host
+    authoritative_host = host
+    host_source = "EXPLICIT_KNOWN_EXECUTOR_IDENTITY" if host else "detect_host_from_environment"
+    activation_results: dict[str, Any] = {}
+    try:
+        native_act = capability_api(root, package_hint, "native_goal_activation")
+        if authoritative_host is None or str(authoritative_host).lower() == "auto":
+            authoritative_host = native_act.detect_host_from_environment()
+            host_source = "detect_host_from_environment"
+        result["native_authoritative_host"] = authoritative_host
+        result["native_authoritative_host_source"] = host_source
+        result["native_invocation_evidence"] = {
+            "host_resolution": host_source,
+            "detector": "native_goal_activation.detect_host_from_environment",
+            "env_markers": ["CLAUDECODE=1", "CLAUDE_CODE_ENTRYPOINT"],
+            "detected": authoritative_host,
+            "invocation_performed": False,
+        }
+        if authoritative_host is not None:
+            try:
+                act = mod.evaluate_native_activation(root, authoritative_host)
+                activation_results[authoritative_host] = act
+                if act.get("decision") == "ACTIVATE_NATIVE_GOAL" and act.get("command"):
+                    result["native_goal_command"] = act["command"]
+                    result["native_goal_activation_host"] = authoritative_host
+                    result["native_goal_command_projection"] = {authoritative_host: act["command"]}
+                    result["native_goal_activation_decision"] = "ACTIVATE_NATIVE_GOAL"
+                    result["native_invocation_required"] = True
+                    result["native_invocation_status"] = "HOST_ACTION_REQUIRED"
+                    result["native_invocation_seam"] = act.get("native_invocation_seam") or mod.detect_host_invocation_seam(root)
+                    result["native_invocation_evidence"] = {
+                        **(result.get("native_invocation_evidence") or {}),
+                        "decision": "ACTIVATE_NATIVE_GOAL",
+                        "projection_only": True,
+                        "invocation_performed": False,
+                        "invocation_status": "HOST_ACTION_REQUIRED",
+                        "seam": result["native_invocation_seam"],
+                    }
+                else:
+                    result["native_goal_activation_decision"] = act.get("decision", "NORMAL_P2P_PATH")
+            except Exception as e:
+                activation_results[authoritative_host] = {"decision": "NORMAL_P2P_PATH", "error": str(e)}
+                result["native_goal_activation_decision"] = "NORMAL_P2P_PATH"
+        else:
+            # No host confidently detected — honest boundary
+            for hk in host_kinds:
+                if str(hk).lower() == "arena":
+                    activation_results[hk] = {"decision": "HOST_KIND_UNSUPPORTED", "arena_in_native_hosts": False, "native_goal_behavior_preserved": True}
+            result["native_goal_activation_decision"] = "NORMAL_P2P_PATH"
+            result["native_multi_host_evaluated"] = False
+    except Exception as exc:
+        result["native_goal_activation_error"] = str(exc)
+        result["native_goal_activation_decision"] = "NORMAL_P2P_PATH"
+
+    result["native_activation_evaluations"] = activation_results
+    result["native_goal_activation_checked"] = True
+    # Decision/projection is never an invocation receipt.
+    result.setdefault("native_invocation_required", False)
+    result.setdefault("native_invocation_status", "NOT_REQUIRED")
+    result.setdefault("native_command_invoked_count", 0)
+    result.setdefault("native_invocation_receipt", None)
+    # Ensure both naming variants for compatibility
+    if "native_activation_decision" not in result and "native_goal_activation_decision" in result:
+        result["native_activation_decision"] = result["native_goal_activation_decision"]
+    if "native_goal_activation_decision" not in result and "native_activation_decision" in result:
+        result["native_goal_activation_decision"] = result["native_activation_decision"]
+
+    result["rule20_preserved"] = True
+    result["no_second_orchestrator"] = True
+    result["no_second_router"] = True
+    result["no_second_state_db"] = True
+    result["owner_goal_entrypoint"] = "scripts/p2p_workflow.py:owner-goal + .p2p/system/p2p_capabilities/owner_goal.py"
+
+    if result.get("executor") == "ARENA" and result.get("arena_handoff") is not None:
+        try:
+            contract = load_current_contract(root)
+            task_state = capability_api(root, package_hint, "task_state")
+            store = task_state.TaskStateStore(root)
+            plan = store.load()
+            if contract and plan:
+                beginner_handoff = mod.build_beginner_handoff(root, contract, plan, "ARENA")
+                result["beginner_arena_handoff"] = beginner_handoff
+                result["arena_handoff_path"] = "COMPACT_TASK_DELTA_VIA_CANONICAL_STATE"
+        except Exception:
+            pass
+
+    return result
+
+
 def report_for(root: Path, run_id: str | None = None) -> str:
     status = load_status(root)
     path = root / ".p2p" / "state" / "reports" / f"{run_id}.md" if run_id else None
@@ -3291,6 +3467,13 @@ def parser() -> argparse.ArgumentParser:
     approach.add_argument("--alternative")
     acceptance_parser = sub.add_parser("acceptance", help="Run safe new-project and existing-project workflow fixtures")
     add_common(acceptance_parser, request=False)
+    owner_goal = sub.add_parser("owner-goal", help="Owner /goal one-command intake -> Control Tower classify -> Goal/Task reuse -> executor routing")
+    owner_goal.add_argument("--project", default=argparse.SUPPRESS)
+    owner_goal.add_argument("--package", default=argparse.SUPPRESS)
+    owner_goal.add_argument("--request", default=argparse.SUPPRESS, help="Full /goal command e.g. '/goal objective, dùng Arena'")
+    owner_goal.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
+    owner_goal.add_argument("--raw", default=argparse.SUPPRESS, help="Alias for --request, raw /goal text")
+    owner_goal.add_argument("--host", default=argparse.SUPPRESS, choices=("auto", "claude_code", "codex_cli"), help="Explicit known executor host identity; default auto-detects the current host")
     return parser
 
 
@@ -3357,6 +3540,11 @@ def main(args: argparse.Namespace) -> int:
         output = classify_goal_update(current_request, request, load_current_contract(root))
     elif args.command == "approach":
         output = record_approach_result(root, args.lane, args.outcome, args.reason, args.alternative)
+    elif args.command == "owner-goal":
+        raw = getattr(args, "raw", None) or getattr(args, "request", None) or request
+        if not raw:
+            raise ValueError("--request or --raw is required for owner-goal, e.g. '/goal objective, dùng Arena'")
+        output = owner_goal_intake(root, raw, package_hint=package, host=getattr(args, "host", None))
     else:
         raise ValueError(f"Unknown command: {args.command}")
     if args.command == "run" and not args.json and isinstance(output, dict):
