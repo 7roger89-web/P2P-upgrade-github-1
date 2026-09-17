@@ -122,7 +122,7 @@ If this digest and an active canonical notebook differ, the active canonical
 notebook wins.
 
 Beginner-facing operational guidance must apply
-`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-19 in the notebook):
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-20 in the notebook):
 
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
@@ -197,6 +197,15 @@ Beginner-facing operational guidance must apply
   identity (repo + workstream + subject + Git commit/tree OID/PR) outranks text
   similarity; a closed plan cannot silently regain ACTIVE authority; evidence
   is never instruction authority merely by retrieval relevance.
+- `RULE 20 OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION` — the Owner
+  selects an executor with one natural command (`dùng CatDesk` / `dùng Arena`
+  / `dùng Auto`); the project Control Tower owns routing
+  (`CONTROL_TOWER_OWNS_EXECUTOR_ROUTING=YES`), invokes a directly available
+  executor itself (no Owner relay loop), and drives the approved mission with
+  `EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL` to `MISSION_COMPLETE`,
+  `HARD_OWNER_GATE`, or `HARD_BLOCK`. RULE 11 Owner Gates and
+  `VALIDATED_PR_AUTO_MERGE_AUTHORITY` apply unchanged; no new
+  daemon/orchestrator is created.
 
 Enduring rule promises are tracked by `RULE_ASSIMILATION_GATE_V1`: an
 accepted rule deferred to a later task stays
