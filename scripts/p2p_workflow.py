@@ -3158,19 +3158,22 @@ def plan_workflow(root: Path, request: str, package_hint: str | None = None) -> 
     }
 
 
-def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = None) -> dict[str, object]:
+def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = None, host: str | None = None) -> dict[str, object]:
     """Owner /goal one-command intake — thin UX over canonical workflow.
 
     Reuses existing Goal Contract / TaskPlan / durable state machinery.
     No second orchestrator, router, state DB, task registry, daemon, or
     acceptance authority. Arena remains executor, not native /goal host.
 
-    Single authoritative host: detect current host via
+    Single authoritative host: an explicit known executor identity (``host``,
+    e.g. ``codex_cli``) when supplied, else the current host detected via
     native_goal_activation.detect_host_from_environment() (Claude Code stable
-    markers). Evaluate ONLY that host for ACTIVATE_NATIVE_GOAL and invoke its
-    returned command EXACTLY ONCE via existing seam. If no host confidently
-    detected, return NORMAL_P2P_PATH honestly, do not evaluate both and prefer
-    Claude.
+    markers). Evaluate ONLY that host for ACTIVATE_NATIVE_GOAL. The canonical
+    helper is read-only, so the returned command is a PROJECTION: this path
+    reports native_invocation_required / invocation_status=HOST_ACTION_REQUIRED
+    with native_command_invoked_count=0 and never fabricates an invocation
+    receipt. If no host is confidently detected, return NORMAL_P2P_PATH
+    honestly; do not evaluate both and prefer Claude.
     """
     root = root.resolve()
     try:
@@ -3184,10 +3187,10 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
         except Exception as exc:
             raise ValueError(f"OWNER_GOAL_CAPABILITY_UNAVAILABLE:{exc}") from exc
 
-    # Prefer owner_goal_intake_cli which now implements single authoritative host
+    # Prefer owner_goal_intake_cli which implements single authoritative host
     if hasattr(mod, "owner_goal_intake_cli"):
         try:
-            result = mod.owner_goal_intake_cli(root, raw_command, package_hint=package_hint, json_output=True)
+            result = mod.owner_goal_intake_cli(root, raw_command, package_hint=package_hint, host_kind=host, json_output=True)
             # Ensure invariants still surfaced even when cli path used
             try:
                 native_bridge = capability_api(root, package_hint, "native_goal_bridge")
@@ -3198,7 +3201,9 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
             except Exception:
                 result.setdefault("native_goal_behavior_preserved", True)
                 result.setdefault("arena_in_native_hosts", False)
-            # Result already contains single-host activation with count 1 — ensure both key variants
+            # Result already contains the single-host decision/projection boundary
+            # (invocation_required, invoked_count=0, HOST_ACTION_REQUIRED) — only
+            # ensure both naming variants exist.
             if "native_activation_decision" not in result and "native_goal_activation_decision" in result:
                 result["native_activation_decision"] = result["native_goal_activation_decision"]
             if "native_goal_activation_decision" not in result and "native_activation_decision" in result:
@@ -3240,18 +3245,23 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
         result.setdefault("arena_in_native_hosts", False)
         host_kinds = ("claude_code", "codex_cli")
 
-    # Detect authoritative current host via existing seam, evaluate ONLY that host
-    authoritative_host = None
+    # Detect the authoritative current host via the existing seam, evaluate ONLY that host
+    authoritative_host = host
+    host_source = "EXPLICIT_KNOWN_EXECUTOR_IDENTITY" if host else "detect_host_from_environment"
     activation_results: dict[str, Any] = {}
-    native_command_invoked_count = 0
     try:
         native_act = capability_api(root, package_hint, "native_goal_activation")
-        authoritative_host = native_act.detect_host_from_environment()
+        if authoritative_host is None or str(authoritative_host).lower() == "auto":
+            authoritative_host = native_act.detect_host_from_environment()
+            host_source = "detect_host_from_environment"
         result["native_authoritative_host"] = authoritative_host
+        result["native_authoritative_host_source"] = host_source
         result["native_invocation_evidence"] = {
+            "host_resolution": host_source,
             "detector": "native_goal_activation.detect_host_from_environment",
             "env_markers": ["CLAUDECODE=1", "CLAUDE_CODE_ENTRYPOINT"],
             "detected": authoritative_host,
+            "invocation_performed": False,
         }
         if authoritative_host is not None:
             try:
@@ -3260,9 +3270,19 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
                 if act.get("decision") == "ACTIVATE_NATIVE_GOAL" and act.get("command"):
                     result["native_goal_command"] = act["command"]
                     result["native_goal_activation_host"] = authoritative_host
-                    result["native_goal_command_propagated"] = {authoritative_host: act["command"]}
+                    result["native_goal_command_projection"] = {authoritative_host: act["command"]}
                     result["native_goal_activation_decision"] = "ACTIVATE_NATIVE_GOAL"
-                    native_command_invoked_count = 1
+                    result["native_invocation_required"] = True
+                    result["native_invocation_status"] = "HOST_ACTION_REQUIRED"
+                    result["native_invocation_seam"] = act.get("native_invocation_seam") or mod.detect_host_invocation_seam(root)
+                    result["native_invocation_evidence"] = {
+                        **(result.get("native_invocation_evidence") or {}),
+                        "decision": "ACTIVATE_NATIVE_GOAL",
+                        "projection_only": True,
+                        "invocation_performed": False,
+                        "invocation_status": "HOST_ACTION_REQUIRED",
+                        "seam": result["native_invocation_seam"],
+                    }
                 else:
                     result["native_goal_activation_decision"] = act.get("decision", "NORMAL_P2P_PATH")
             except Exception as e:
@@ -3281,7 +3301,11 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
 
     result["native_activation_evaluations"] = activation_results
     result["native_goal_activation_checked"] = True
-    result["native_command_invoked_count"] = native_command_invoked_count
+    # Decision/projection is never an invocation receipt.
+    result.setdefault("native_invocation_required", False)
+    result.setdefault("native_invocation_status", "NOT_REQUIRED")
+    result.setdefault("native_command_invoked_count", 0)
+    result.setdefault("native_invocation_receipt", None)
     # Ensure both naming variants for compatibility
     if "native_activation_decision" not in result and "native_goal_activation_decision" in result:
         result["native_activation_decision"] = result["native_goal_activation_decision"]
@@ -3449,6 +3473,7 @@ def parser() -> argparse.ArgumentParser:
     owner_goal.add_argument("--request", default=argparse.SUPPRESS, help="Full /goal command e.g. '/goal objective, dùng Arena'")
     owner_goal.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
     owner_goal.add_argument("--raw", default=argparse.SUPPRESS, help="Alias for --request, raw /goal text")
+    owner_goal.add_argument("--host", default=argparse.SUPPRESS, choices=("auto", "claude_code", "codex_cli"), help="Explicit known executor host identity; default auto-detects the current host")
     return parser
 
 
@@ -3519,7 +3544,7 @@ def main(args: argparse.Namespace) -> int:
         raw = getattr(args, "raw", None) or getattr(args, "request", None) or request
         if not raw:
             raise ValueError("--request or --raw is required for owner-goal, e.g. '/goal objective, dùng Arena'")
-        output = owner_goal_intake(root, raw, package_hint=package)
+        output = owner_goal_intake(root, raw, package_hint=package, host=getattr(args, "host", None))
     else:
         raise ValueError(f"Unknown command: {args.command}")
     if args.command == "run" and not args.json and isinstance(output, dict):

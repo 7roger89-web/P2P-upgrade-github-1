@@ -10,13 +10,26 @@ in ChatGPT/Control Tower surface nor P2P runtime (only protocol docs). Therefore
 exactly ONE beginner-safe handoff packet, no gateway/bridge/daemon/scheduler.
 Arena remains absent from native_goal_bridge.HOST_KINDS.
 
-Terminal semantics reuse canonical task_state authority:
+Terminal semantics reuse canonical task_state authority only:
 - WAITING_OWNER -> HARD_OWNER_GATE
 - BLOCKED -> HARD_BLOCK
 - unfinished eligible work -> CONTINUE_TASK/NOT_TERMINAL via next_safe_task
-- all DONE but completion missing/invalid -> NOT MISSION_COMPLETE fail-closed
+- canonical plan that fails TaskPlan/TaskStateStore load/revalidation -> fail closed
 - Arena self-report alone -> NOT evidence
-- all canonical DONE + VERIFIED independent evidence -> MISSION_COMPLETE
+- every task DONE on a successfully loaded/revalidated canonical plan -> MISSION_COMPLETE
+
+This module owns NO completion validator. DONE validity is enforced by the
+canonical ``task_state`` TaskPlan/TaskStateStore boundary
+(``DONE_REQUIRES_CURRENT_EVIDENCE`` plus plan-hash revalidation on load), which
+is the single completion authority. owner_goal.py never reproduces completion
+schema/fingerprint/evidence rules.
+
+Native ``/goal`` boundary: ``native_goal_activation`` is a read-only decision
+/projection seam and never launches a host, so this module never reports a
+native invocation it did not perform. An eligible authoritative host yields
+``decision=ACTIVATE_NATIVE_GOAL`` with ``native_goal_command`` projected,
+``native_invocation_required=True``, ``native_command_invoked_count=0`` and
+``native_invocation_status=HOST_ACTION_REQUIRED``.
 """
 
 from __future__ import annotations
@@ -45,7 +58,26 @@ _STRIP_PATTERNS: list[re.Pattern[str]] = [
 
 TERMINAL_STATES = {"PASS", "BLOCKED", "REJECT", "DONE", "VERIFIED", "CLOSED", "SUPERSEDED", "GOAL_DONE", "TERMINAL", "CANCELLED"}
 
-_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+# Canonical completion authority: p2p_capabilities.task_state TaskPlan /
+# TaskStateStore. Reported for evidence only; never re-implemented here.
+CANONICAL_COMPLETION_AUTHORITY = "p2p_capabilities.task_state.TaskPlan.DONE_REQUIRES_CURRENT_EVIDENCE"
+
+# Native /goal truthful boundary: decision/projection is not invocation.
+NATIVE_INVOCATION_HOST_ACTION_REQUIRED = "HOST_ACTION_REQUIRED"
+NATIVE_INVOCATION_NOT_REQUIRED = "NOT_REQUIRED"
+HOST_INVOCATION_SEAM_CANDIDATES = (
+    "invoke_native_goal",
+    "invoke_host_command",
+    "launch_host",
+    "dispatch_host_command",
+    "execute_host_command",
+)
+HOST_INVOCATION_SEAM_MODULES = (
+    "native_goal_bridge",
+    "native_goal_activation",
+    "host_executor",
+    "host_projection",
+)
 
 # Evidence for Control Tower: Arena direct invocation capability absent
 ARENA_DIRECT_INVOCATION = "NOT_AVAILABLE"
@@ -399,61 +431,20 @@ def detect_owner_gate(task_plan: Any) -> dict[str, Any]:
     return {"has_gate": False, "gate_type": "NONE", "tasks": []}
 
 
-def _is_canonical_completion_valid(task: Any) -> bool:
-    """Reuse canonical TaskRecord completion authority.
-
-    Mirrors task_state._completion_is_structurally_valid but without importing
-    private symbol: status VERIFIED, evidence_refs exactly matching
-    required_evidence, valid fingerprints, candidate_state_fingerprint SHA256,
-    independent_check True. Arena self-report alone never qualifies.
-    """
-    try:
-        completion = getattr(task, "completion", None)
-        if not isinstance(completion, Mapping):
-            return False
-        if completion.get("status") != "VERIFIED":
-            return False
-        if completion.get("independent_check") is not True:
-            return False
-        evidence_refs = completion.get("evidence_refs")
-        if not isinstance(evidence_refs, list) or not evidence_refs:
-            return False
-        if len(evidence_refs) != len(set(evidence_refs)):
-            return False
-        required = getattr(task, "required_evidence", None)
-        if required is None:
-            return False
-        if set(evidence_refs) != set(required):
-            return False
-        done_when = completion.get("done_when")
-        if done_when is not None:
-            if not isinstance(done_when, list) or set(done_when) != set(required):
-                return False
-        candidate = completion.get("candidate_state_fingerprint")
-        if not isinstance(candidate, str) or not _SHA256_RE.fullmatch(candidate.lower()):
-            return False
-        fingerprints = completion.get("evidence_fingerprints")
-        if not isinstance(fingerprints, Mapping):
-            return False
-        if set(fingerprints.keys()) != set(evidence_refs):
-            return False
-        for fp in fingerprints.values():
-            if not isinstance(fp, str) or not _SHA256_RE.fullmatch(fp.lower()):
-                return False
-        return True
-    except Exception:
-        return False
-
-
 def check_terminal_state(task_plan: Any, evidence_claims: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any]:
-    """Terminal semantics reusing canonical task_state authority.
+    """Terminal semantics reusing canonical task_state authority only.
 
     - WAITING_OWNER -> HARD_OWNER_GATE
     - BLOCKED -> HARD_BLOCK
     - unfinished eligible work -> CONTINUE_TASK via next_safe_task else NOT_TERMINAL
-    - all DONE but completion missing/invalid -> NOT MISSION_COMPLETE fail-closed
+    - every task DONE -> MISSION_COMPLETE, reachable only for a plan that the
+      canonical TaskPlan/TaskStateStore boundary already accepted, because
+      constructing/loading a DONE task without current evidence raises
+      DONE_REQUIRES_CURRENT_EVIDENCE there
     - Arena self-report alone -> NOT evidence
-    - all canonical DONE + VERIFIED independent evidence -> MISSION_COMPLETE
+
+    No completion-schema, fingerprint, or evidence rule is re-implemented here:
+    canonical ``task_state`` is the single DONE authority.
     """
     if task_plan is None:
         return {"is_terminal": False, "terminal_type": "NOT_TERMINAL", "arena_claim_is_evidence": False}
@@ -467,7 +458,8 @@ def check_terminal_state(task_plan: Any, evidence_claims: Sequence[Mapping[str, 
     except Exception:
         pass
     try:
-        all_done = all(getattr(t, "status", None) == "DONE" for t in getattr(task_plan, "tasks", {}).values())
+        tasks = getattr(task_plan, "tasks", {})
+        all_done = bool(tasks) and all(getattr(t, "status", None) == "DONE" for t in tasks.values())
         if not all_done:
             nxt = _next_eligible_task(task_plan)
             if nxt is not None:
@@ -480,46 +472,85 @@ def check_terminal_state(task_plan: Any, evidence_claims: Sequence[Mapping[str, 
                 }
             return {"is_terminal": False, "terminal_type": "NOT_TERMINAL", "arena_claim_is_evidence": False}
 
-        invalid_tasks: list[str] = []
-        for tid, task in getattr(task_plan, "tasks", {}).items():
-            if not _is_canonical_completion_valid(task):
-                invalid_tasks.append(tid)
-
-        if invalid_tasks:
-            return {
-                "is_terminal": False,
-                "terminal_type": "NOT_MISSION_COMPLETE",
-                "reason": f"CANONICAL_COMPLETION_MISSING_OR_INVALID {invalid_tasks}",
-                "arena_claim_is_evidence": False,
-                "must_not_promote": True,
-                "invalid_tasks": invalid_tasks,
-            }
-
         return {
             "is_terminal": True,
             "terminal_type": "MISSION_COMPLETE",
             "arena_claim_is_evidence": False,
             "canonical_state_plus_evidence": True,
             "independent_check": True,
+            "completion_authority": CANONICAL_COMPLETION_AUTHORITY,
+            "canonical_state_revalidated": True,
         }
     except Exception as exc:
         return {"is_terminal": False, "terminal_type": "CHECK_FAILED", "reason": str(exc), "arena_claim_is_evidence": False}
 
 
-def evaluate_native_activation(project_root: Path | str, host_kind: str) -> dict[str, Any]:
-    """Wire real existing activation seam — single authoritative host.
+def detect_host_invocation_seam(project_root: Path | str) -> dict[str, Any]:
+    """Read-only probe for an EXISTING host/controller invocation seam.
 
-    If host_kind is explicit (claude_code/codex_cli), evaluate that host directly
-    (used by unit tests and explicit --host). If host_kind == 'auto', detect
-    current host from environment via detect_host_from_environment and evaluate
-    only that one. Never evaluate both and arbitrarily prefer Claude.
+    Repository authority (native_goal_activation/native_goal_bridge docstrings,
+    host_executor/control_tower_handoff contracts) exposes decision + projection
+    only; no invocation API exists. This probe never executes anything, never
+    invents a receipt, and never becomes a router/bridge.
+    """
+    root = Path(project_root).expanduser().resolve()
+    found: list[str] = []
+    for module_name in HOST_INVOCATION_SEAM_MODULES:
+        try:
+            module = _import_capability(root, module_name)
+        except Exception:
+            continue
+        for attribute in HOST_INVOCATION_SEAM_CANDIDATES:
+            if callable(getattr(module, attribute, None)):
+                found.append(f"{module_name}.{attribute}")
+    return {
+        "schema": "p2p-host-invocation-seam-probe/1",
+        "read_only": True,
+        "state_mutated": False,
+        "searched_modules": list(HOST_INVOCATION_SEAM_MODULES),
+        "searched_symbols": list(HOST_INVOCATION_SEAM_CANDIDATES),
+        "invocation_apis_found": found,
+        "conclusion": "NO_EXISTING_HOST_INVOCATION_SEAM" if not found else "EXISTING_HOST_INVOCATION_SEAM_FOUND",
+    }
+
+
+def _native_invocation_boundary(decision: str, root: Path) -> dict[str, Any]:
+    """Truthful projection-vs-invocation boundary; never fabricates a receipt."""
+    if decision == "ACTIVATE_NATIVE_GOAL":
+        return {
+            "native_invocation_required": True,
+            "native_invocation_status": NATIVE_INVOCATION_HOST_ACTION_REQUIRED,
+            "native_command_invoked_count": 0,
+            "native_invocation_receipt": None,
+            "native_invocation_seam": detect_host_invocation_seam(root),
+        }
+    return {
+        "native_invocation_required": False,
+        "native_invocation_status": NATIVE_INVOCATION_NOT_REQUIRED,
+        "native_command_invoked_count": 0,
+        "native_invocation_receipt": None,
+    }
+
+
+def evaluate_native_activation(project_root: Path | str, host_kind: str) -> dict[str, Any]:
+    """Single-authoritative-host activation DECISION through the existing seam.
+
+    If host_kind is explicit (claude_code/codex_cli — known executor identity),
+    evaluate that host directly. If host_kind == 'auto', detect the current host
+    from the environment via detect_host_from_environment and evaluate only that
+    one. Never evaluate both and arbitrarily prefer Claude.
+
+    The canonical activation helper is read-only and does not launch a host, so
+    an ACTIVATE_NATIVE_GOAL result is a decision plus command projection, never
+    an invocation receipt: ``native_invocation_status=HOST_ACTION_REQUIRED`` and
+    ``native_command_invoked_count=0``.
     """
     root = Path(project_root).expanduser().resolve()
     try:
         native_bridge = _import_capability(root, "native_goal_bridge")
         host_kinds = getattr(native_bridge, "HOST_KINDS", ())
         if host_kind not in host_kinds and host_kind != "auto":
-            return {"host_kind": host_kind, "decision": "HOST_KIND_UNSUPPORTED", "arena_in_native_hosts": "arena" in [h.lower() for h in host_kinds], "native_goal_behavior_preserved": "arena" not in [h.lower() for h in host_kinds]}
+            return {"host_kind": host_kind, "decision": "HOST_KIND_UNSUPPORTED", "arena_in_native_hosts": "arena" in [h.lower() for h in host_kinds], "native_goal_behavior_preserved": "arena" not in [h.lower() for h in host_kinds], "authoritative_host": None, "native_invocation_required": False, "native_invocation_status": NATIVE_INVOCATION_NOT_REQUIRED, "native_command_invoked_count": 0, "native_invocation_receipt": None}
     except Exception:
         host_kinds = ()
     try:
@@ -540,6 +571,10 @@ def evaluate_native_activation(project_root: Path | str, host_kind: str) -> dict
                     "native_goal_behavior_preserved": True,
                     "arena_in_native_hosts": False,
                     "authoritative_host": None,
+                    "native_invocation_required": False,
+                    "native_invocation_status": NATIVE_INVOCATION_NOT_REQUIRED,
+                    "native_command_invoked_count": 0,
+                    "native_invocation_receipt": None,
                 }
             resolved_host = detected
         except Exception:
@@ -563,10 +598,11 @@ def evaluate_native_activation(project_root: Path | str, host_kind: str) -> dict
         result["arena_in_native_hosts"] = False
         result["native_goal_behavior_preserved"] = True
         result["authoritative_host"] = resolved_host
-        result["native_command_invoked_count"] = 1 if result.get("decision") == "ACTIVATE_NATIVE_GOAL" else 0
+        result["decision_source"] = "native_goal_activation.decide_native_goal_activation (read-only projection)"
+        result.update(_native_invocation_boundary(str(result.get("decision")), root))
         return result
     except Exception as exc:
-        return {"decision": "NORMAL_P2P_PATH", "reason": f"ACTIVATION_FAILED:{exc}", "host_kind": resolved_host, "native_goal_behavior_preserved": True, "authoritative_host": resolved_host}
+        return {"decision": "NORMAL_P2P_PATH", "reason": f"ACTIVATION_FAILED:{exc}", "host_kind": resolved_host, "native_goal_behavior_preserved": True, "authoritative_host": resolved_host, "native_invocation_required": False, "native_invocation_status": NATIVE_INVOCATION_NOT_REQUIRED, "native_command_invoked_count": 0, "native_invocation_receipt": None}
 
 
 def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, package_hint: str | None = None) -> dict[str, Any]:
@@ -614,18 +650,71 @@ def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, packa
 
     task_state_mod = None
     existing_plan = None
+    canonical_state_error: str | None = None
     try:
         task_state_mod = _import_capability(root, "task_state")
+        # Public canonical boundary: a durable task-state that exists but fails
+        # revalidation (schema/hash/DONE evidence) raises here and is NEVER
+        # silently replaced or reinterpreted by this module.
         existing_plan = task_state_mod.TaskStateStore(root).load()
-    except Exception:
+    except Exception as exc:
         existing_plan = None
+        canonical_state_error = str(exc)
+
+    if canonical_state_error:
+        # Canonical durable state exists (or the canonical authority cannot be
+        # loaded) but failed TaskPlan/TaskStateStore revalidation. Fail closed
+        # WITHOUT creating, reinitializing, or overwriting any durable state.
+        return {
+            "schema": "p2p-owner-goal-result/1",
+            "raw_command": raw_command,
+            "objective": objective,
+            "executor": executor,
+            "executor_selection_reason": f"Owner explicitly said '{executor}'" if executor != EXECUTOR_AUTO else "Auto routing - no explicit executor directive",
+            "goal_id": str((existing_contract or {}).get("goal_id", "")),
+            "goal_contract_path": ".p2p/state/goal-contract.json",
+            "task_state_path": ".p2p/state/task-state.json",
+            "reuse": False,
+            "state_status": f"BLOCKED:{canonical_state_error}",
+            "canonical_state_error": canonical_state_error,
+            "canonical_state_fail_closed": True,
+            "must_not_promote": True,
+            "completion_authority": CANONICAL_COMPLETION_AUTHORITY,
+            "bootstrap": None,
+            "plan": None,
+            "plan_hash": None,
+            "project": root.name,
+            "project_root": str(root),
+            "no_second_orchestrator": True,
+            "no_second_router": True,
+            "no_second_state_db": True,
+            "native_goal_behavior_preserved": True,
+            "rule20_preserved": True,
+            "terminal_type": "NOT_MISSION_COMPLETE",
+            "has_owner_gate": False,
+            "owner_gate": {"has_gate": False, "gate_type": "NONE", "tasks": []},
+            "has_gate": False,
+            "stop_honestly": False,
+            "claim_complete": False,
+            "arena_handoff": None,
+            "arena_handoff_path": "CANONICAL_STATE_FAIL_CLOSED",
+            "execution_mode": "STOP_AT_CANONICAL_STATE_FAILURE",
+            "arena_direct_invocation": ARENA_DIRECT_INVOCATION,
+            "direct_invocation_evidence": DIRECT_INVOCATION_EVIDENCE,
+            "current_owner_goal_flow": "parse -> canonical task_state revalidation FAILED -> fail closed, no new state",
+        }
 
     reuse = False
     if existing_contract and existing_plan:
         try:
             if is_compatible(existing_contract, objective) and existing_plan.plan_lifecycle == "ACTIVE":
                 unfinished = [t for t in existing_plan.tasks.values() if t.status not in {"DONE", "CANCELLED"}]
-                if unfinished:
+                if not unfinished:
+                    # Fully completed canonical plan for the same compatible goal:
+                    # reuse it so the canonical terminal check reports
+                    # MISSION_COMPLETE instead of attempting conflicting new state.
+                    reuse = True
+                elif unfinished:
                     try:
                         cur_req = str(existing_contract.get("request") or existing_contract.get("objective") or "")
                         if cur_req:
@@ -701,14 +790,28 @@ def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, packa
                 plan = None
                 state_status = f"BLOCKED:{inner}"
 
+    # Revalidate the durable plan through the canonical store before any
+    # terminal claim; corruption at this boundary stays fail-closed.
+    if plan is not None and task_state_mod is not None:
+        try:
+            plan = task_state_mod.TaskStateStore(root).require()
+        except Exception as exc:
+            plan = None
+            canonical_state_error = str(exc)
+
     gate = detect_owner_gate(plan)
     terminal = check_terminal_state(plan, evidence_claims=[])
+
+    canonical_state_fail_closed = plan is None and bool(canonical_state_error)
 
     if gate["has_gate"]:
         terminal_type = "HARD_OWNER_GATE"
         has_owner_gate = True
     elif terminal["terminal_type"] == "HARD_BLOCK":
         terminal_type = "HARD_BLOCK"
+        has_owner_gate = False
+    elif canonical_state_fail_closed:
+        terminal_type = "NOT_MISSION_COMPLETE"
         has_owner_gate = False
     else:
         terminal_type = terminal["terminal_type"]
@@ -725,6 +828,10 @@ def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, packa
         "task_state_path": ".p2p/state/task-state.json",
         "reuse": reuse,
         "state_status": state_status,
+        "canonical_state_error": canonical_state_error,
+        "canonical_state_fail_closed": canonical_state_fail_closed,
+        "must_not_promote": canonical_state_fail_closed,
+        "completion_authority": CANONICAL_COMPLETION_AUTHORITY,
         "bootstrap": bootstrap,
         "plan": plan.to_dict() if plan and hasattr(plan, "to_dict") else None,
         "plan_hash": plan.canonical_hash() if plan and hasattr(plan, "canonical_hash") else None,
@@ -751,6 +858,11 @@ def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, packa
             result["arena_handoff"] = None
             result["arena_handoff_path"] = "HARD_OWNER_GATE_NO_HANDOFF"
             result["execution_mode"] = "STOP_AT_OWNER_GATE"
+        elif terminal_type == "MISSION_COMPLETE":
+            result["arena_handoff"] = None
+            result["arena_handoff_path"] = "MISSION_COMPLETE_NO_HANDOFF"
+            result["execution_mode"] = "TERMINAL_NO_HANDOFF"
+            result["claim_complete"] = True
         else:
             try:
                 handoff = build_arena_handoff(root, contract, plan, executor, reuse=reuse)
@@ -772,14 +884,28 @@ def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, packa
     return result
 
 
-def owner_goal_intake_cli(project_root: Path | str, raw_command: str, *, package_hint: str | None = None, json_output: bool = True) -> dict[str, Any]:
-    """Real CLI path that wires single authoritative native host activation.
+def owner_goal_intake_cli(
+    project_root: Path | str,
+    raw_command: str,
+    *,
+    package_hint: str | None = None,
+    host_kind: str | None = None,
+    json_output: bool = True,
+) -> dict[str, Any]:
+    """Real CLI path wiring single authoritative native host activation.
 
-    Detects current host via native_goal_activation.detect_host_from_environment()
-    (Claude Code stable markers). If detected, evaluates ONLY that host for
-    ACTIVATE_NATIVE_GOAL and propagates its command exactly once via existing seam.
-    If not detected, returns NORMAL_P2P_PATH honestly, no arbitrary preference.
-    Arena remains HOST_KIND_UNSUPPORTED.
+    Authoritative host = explicit known executor identity (``host_kind`` such as
+    ``codex_cli``) when supplied, else the current host detected via
+    native_goal_activation.detect_host_from_environment() (Claude Code stable
+    markers). Exactly one host is evaluated. If none is detected, returns
+    NORMAL_P2P_PATH honestly, with no arbitrary preference and no multi-host
+    evaluation. Arena remains HOST_KIND_UNSUPPORTED.
+
+    The activation helper returns a DECISION plus ``/goal`` command PROJECTION.
+    It never launches the host, so the result reports
+    ``native_invocation_required=True`` with ``native_command_invoked_count=0``
+    and ``native_invocation_status=HOST_ACTION_REQUIRED`` — never a fabricated
+    invocation receipt.
     """
     result = build_owner_goal_intake(project_root, raw_command, package_hint=package_hint)
     try:
@@ -795,15 +921,27 @@ def owner_goal_intake_cli(project_root: Path | str, raw_command: str, *, package
             result["arena_in_native_hosts"] = False
             host_kinds = ["claude_code", "codex_cli"]
 
-        # Detect authoritative current host via existing seam
+        # Resolve the SINGLE authoritative host: explicit known executor
+        # identity wins, otherwise detect from the current environment.
         try:
             native_act = _import_capability(root, "native_goal_activation")
-            authoritative_host = native_act.detect_host_from_environment()
+            if host_kind:
+                authoritative_host = host_kind
+                host_source = "EXPLICIT_KNOWN_EXECUTOR_IDENTITY"
+            else:
+                authoritative_host = native_act.detect_host_from_environment()
+                host_source = "detect_host_from_environment"
+            if isinstance(authoritative_host, str) and authoritative_host.lower() == "auto":
+                authoritative_host = native_act.detect_host_from_environment()
+                host_source = "detect_host_from_environment"
             result["native_authoritative_host"] = authoritative_host
+            result["native_authoritative_host_source"] = host_source
             result["native_invocation_evidence"] = {
+                "host_resolution": host_source,
                 "detector": "native_goal_activation.detect_host_from_environment",
                 "env_markers": ["CLAUDECODE=1", "CLAUDE_CODE_ENTRYPOINT"],
                 "detected": authoritative_host,
+                "invocation_performed": False,
             }
         except Exception as exc:
             authoritative_host = None
@@ -811,41 +949,58 @@ def owner_goal_intake_cli(project_root: Path | str, raw_command: str, *, package
             result["native_detection_error"] = str(exc)
 
         activation_results: dict[str, Any] = {}
-        native_command_invoked_count = 0
         primary_command = None
         primary_host = None
         primary_decision = "NORMAL_P2P_PATH"
 
         if authoritative_host is not None:
-            # Evaluate ONLY authoritative host — single ACTIVATE, single invoke
+            # Evaluate ONLY the authoritative host; decision/projection only —
+            # no host invocation receipt is claimed.
             try:
                 act = evaluate_native_activation(root, authoritative_host)
                 activation_results[authoritative_host] = act
                 if act.get("decision") == "ACTIVATE_NATIVE_GOAL" and act.get("command"):
-                    native_command_invoked_count = 1
                     primary_command = act["command"]
                     primary_host = authoritative_host
                     primary_decision = "ACTIVATE_NATIVE_GOAL"
                     result["native_goal_command"] = primary_command
                     result["native_goal_activation_host"] = primary_host
-                    result["native_goal_command_propagated"] = {primary_host: primary_command}
+                    result["native_goal_command_projection"] = {primary_host: primary_command}
+                    result["native_invocation_required"] = True
+                    result["native_invocation_status"] = NATIVE_INVOCATION_HOST_ACTION_REQUIRED
+                    result["native_command_invoked_count"] = 0
+                    result["native_invocation_receipt"] = None
+                    result["native_invocation_seam"] = act.get("native_invocation_seam") or detect_host_invocation_seam(root)
+                    result["native_invocation_evidence"] = {
+                        **(result.get("native_invocation_evidence") or {}),
+                        "decision": primary_decision,
+                        "projection_only": True,
+                        "invocation_performed": False,
+                        "invocation_status": NATIVE_INVOCATION_HOST_ACTION_REQUIRED,
+                        "seam": result["native_invocation_seam"],
+                    }
+                else:
+                    primary_decision = str(act.get("decision") or "NORMAL_P2P_PATH")
             except Exception as e:
                 activation_results[authoritative_host] = {"error": str(e), "decision": "NORMAL_P2P_PATH"}
         else:
-            # No authoritative host detected — honest boundary, no arbitrary multi-host eval
-            # For diagnostic purposes, we still surface that we checked and found none,
-            # and we do NOT fabricate ACTIVATE by evaluating both.
+            # No authoritative host detected — honest boundary, no arbitrary
+            # multi-host eval and no fabricated ACTIVATE by evaluating both.
             for hk in host_kinds:
                 if hk.lower() == "arena":
                     activation_results[hk] = {"decision": "HOST_KIND_UNSUPPORTED", "arena_in_native_hosts": False, "native_goal_behavior_preserved": True}
-            # Explicitly record that we did NOT evaluate both Claude and Codex
             result["native_multi_host_evaluated"] = False
 
         result["native_activation_evaluations"] = activation_results
         result["native_goal_activation_checked"] = True
         result["native_activation_decision"] = primary_decision
         result["native_goal_activation_decision"] = primary_decision
-        result["native_command_invoked_count"] = native_command_invoked_count
+        result["native_multi_host_evaluated"] = False
+        # Invocation counters are never inferred from a decision/projection.
+        result.setdefault("native_invocation_required", False)
+        result.setdefault("native_invocation_status", NATIVE_INVOCATION_NOT_REQUIRED)
+        result.setdefault("native_command_invoked_count", 0)
+        result.setdefault("native_invocation_receipt", None)
         if primary_command is None:
             result.setdefault("native_goal_activation_decision", "NORMAL_P2P_PATH")
             result.setdefault("native_activation_decision", "NORMAL_P2P_PATH")
@@ -853,7 +1008,10 @@ def owner_goal_intake_cli(project_root: Path | str, raw_command: str, *, package
         result["native_goal_activation_error"] = str(exc)
         result["native_goal_activation_checked"] = False
         result["native_goal_behavior_preserved"] = True
+        result["native_invocation_required"] = False
+        result["native_invocation_status"] = NATIVE_INVOCATION_NOT_REQUIRED
         result["native_command_invoked_count"] = 0
+        result["native_invocation_receipt"] = None
 
     return result
 
@@ -871,6 +1029,9 @@ __all__ = [
     "build_beginner_handoff",
     "detect_owner_gate",
     "check_terminal_state",
+    "CANONICAL_COMPLETION_AUTHORITY",
+    "NATIVE_INVOCATION_HOST_ACTION_REQUIRED",
+    "detect_host_invocation_seam",
     "evaluate_native_activation",
     "owner_goal_intake_cli",
 ]

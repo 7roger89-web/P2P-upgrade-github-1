@@ -5,9 +5,10 @@ A executor=ARENA NOT_AVAILABLE one packet
 B Auto routing no Owner question
 C NOT_AVAILABLE one packet owner_is_not_message_bus preserved no gateway
 D WAITING_OWNER HARD_OWNER_GATE no handoff no false completion
-E all DONE but canonical completion/evidence absent/malformed/stale/invalid NOT MISSION_COMPLETE fail-closed
-F all canonical DONE via normal path VERIFIED -> MISSION_COMPLETE
+E corrupt/malformed durable DONE task-state fails canonical task_state load/revalidation fail-closed
+F all canonical DONE via normal path VERIFIED -> MISSION_COMPLETE (canonical revalidation, no second verifier)
 G Claude/Codex separate Arena NOT in HOST_KINDS single-task NORMAL_P2P_PATH eligible host ACTIVATE_NATIVE_GOAL
+  (decision/projection only: native_invocation_required + HOST_ACTION_REQUIRED + invoked_count 0)
 
 Plus invariants: native_goal_behavior preserved, RULE20 preserved, single authoritative host.
 """
@@ -62,6 +63,57 @@ def _make_temp_project() -> Path:
     (manifest_dir / "package.json").write_text(json.dumps({"version": "0.0.0-test"}), encoding="utf-8")
     (tmp / "VERSION").write_text("0.0.0-test", encoding="utf-8")
     return tmp
+
+
+def _complete_all_tasks(store, plan):
+    """Complete every task through the canonical store so durable DONE state is real."""
+    import hashlib
+    from datetime import datetime, timezone
+
+    for tid in plan.topological_order():
+        task = store.load().tasks[tid]
+        if task.status == "DONE":
+            continue
+        required = list(task.required_evidence) or [f"{tid}-evidence"]
+        claims = []
+        for ref in required:
+            fp = hashlib.sha256(ref.encode("utf-8")).hexdigest()
+            actual_item = {
+                "source": ref,
+                "evidence_ref": ref,
+                "origin": "RUNTIME_EVIDENCE",
+                "observed_at": datetime.now(timezone.utc).isoformat(),
+                "freshness": "CURRENT",
+                "scope": [task.title],
+                "source_binding": "test-binding",
+                "fingerprint": fp,
+            }
+            claims.append(
+                task_state.EvidenceClaim(
+                    claim=f"{task.title} done via {ref}",
+                    required_evidence=(ref,),
+                    actual_evidence=(actual_item,),
+                    status="VERIFIED",
+                )
+            )
+        candidate_state = {"task_id": tid, "status": "done", "evidence": required}
+        current = store.load()
+        if current.tasks[tid].status == "PLANNED" and current.dependencies_are_done(tid):
+            current = store.transition(tid, "READY")
+        current = store.load()
+        if current.tasks[tid].status == "READY":
+            current = store.transition(tid, "ACTIVE")
+        store.complete(tid, claims, candidate_state)
+    return store.load()
+
+
+def _canonical_reload_error(project_root):
+    """Return the canonical task_state load failure message, or fail the test if it loaded."""
+    try:
+        task_state.TaskStateStore(project_root).load()
+    except task_state.TaskStateError as exc:
+        return str(exc)
+    raise AssertionError("corrupt durable task-state must fail canonical load/revalidation")
 
 
 def test_case1_arena_parse():
@@ -278,174 +330,126 @@ def test_case_D_waiting_owner_hard_gate():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-def test_case_E_all_done_but_invalid_not_mission_complete():
-    """Case E: all DONE but canonical completion/evidence absent/malformed/stale/invalid NOT MISSION_COMPLETE fail-closed."""
-    import hashlib
-    from datetime import datetime, timezone
+def test_case_E_corrupt_durable_completion_fails_closed():
+    """Case E: corrupt/malformed durable DONE completion fails canonical task_state load/revalidation.
 
+    Nearest-real-boundary regression: finish canonical state normally, mutate the
+    DURABLE task-state file, then reload/revalidate through canonical task_state.
+    owner_goal.py has no completion validator, so it must not be able to promote
+    a corrupt durable DONE state either.
+    """
     tmp = _make_temp_project()
     try:
         raw = "/goal Hoàn thiện tính năng thanh toán, dùng Arena"
         owner_goal.build_owner_goal_intake(tmp, raw)
         store = task_state.TaskStateStore(tmp)
-        plan = store.load()
-        assert plan is not None
+        plan = _complete_all_tasks(store, store.load())
+        assert plan is not None and all(t.status == "DONE" for t in plan.tasks.values())
 
-        # Complete all tasks properly first
-        for tid in plan.topological_order():
-            task = store.load().tasks[tid]
-            if task.status == "DONE":
-                continue
-            required = list(task.required_evidence) or [f"{tid}-evidence"]
-            claims = []
-            for ref in required:
-                fp = hashlib.sha256(ref.encode("utf-8")).hexdigest()
-                actual_item = {
-                    "source": ref,
-                    "evidence_ref": ref,
-                    "origin": "RUNTIME_EVIDENCE",
-                    "observed_at": datetime.now(timezone.utc).isoformat(),
-                    "freshness": "CURRENT",
-                    "scope": [task.title],
-                    "source_binding": "test-binding",
-                    "fingerprint": fp,
-                }
-                c = task_state.EvidenceClaim(
-                    claim=f"{task.title} done via {ref}",
-                    required_evidence=(ref,),
-                    actual_evidence=(actual_item,),
-                    status="VERIFIED",
-                )
-                claims.append(c)
-            candidate_state = {"task_id": tid, "status": "done", "evidence": required}
-            current = store.load()
-            cur_task = current.tasks[tid]
-            if cur_task.status == "PLANNED" and current.dependencies_are_done(tid):
-                current = store.transition(tid, "READY")
-            current = store.load()
-            cur_task = current.tasks[tid]
-            if cur_task.status == "READY":
-                current = store.transition(tid, "ACTIVE")
-            store.complete(tid, claims, candidate_state)
+        state_path = tmp / ".p2p" / "state" / "task-state.json"
+        contract_path = tmp / ".p2p" / "state" / "goal-contract.json"
+        good_payload = json.loads(state_path.read_text(encoding="utf-8"))
 
-        plan = store.load()
-        assert all(t.status == "DONE" for t in plan.tasks.values())
+        # Sanity: uncorrupted durable state loads and is MISSION_COMPLETE.
+        reloaded = task_state.TaskStateStore(tmp).load()
+        assert reloaded is not None and reloaded.canonical_hash() == good_payload["plan_hash"]
+        assert owner_goal.check_terminal_state(reloaded)["terminal_type"] == "MISSION_COMPLETE"
 
-        # Now corrupt one task's completion to be invalid — but without corrupting TaskPlan invariant
-        # Use nearest safe fixture: create a copy of plan with invalid completion via direct dict manipulation
-        # that bypasses TaskPlan validation, to simulate stale/malformed evidence
-        first_tid = next(iter(plan.tasks))
-        task = plan.tasks[first_tid]
-        # Create invalid completion: missing independent_check, wrong fingerprint
-        invalid_completion = {
-            "status": "VERIFIED",
-            "evidence_refs": list(task.required_evidence),
-            "evidence_fingerprints": {ref: "0"*64 for ref in task.required_evidence},
-            "candidate_state_fingerprint": "0"*64,
-            # independent_check missing -> should be invalid per our check
-        }
-        # Build a fake plan that has invalid completion but still DONE status
-        # We use a simple object mimicking TaskPlan with tasks dict containing invalid task
-        class FakeTask:
-            def __init__(self, real_task, completion):
-                self.task_id = real_task.task_id
-                self.status = real_task.status
-                self.required_evidence = real_task.required_evidence
-                self.completion = completion
+        first_tid = sorted(plan.tasks)[0]
 
-        class FakePlan:
-            def __init__(self, real_plan, fake_tasks):
-                self.tasks = fake_tasks
-                # need topological_order and dependencies_are_done for _next_eligible_task but all DONE so not needed
-                self._real = real_plan
-            def __getattr__(self, name):
-                return getattr(self._real, name)
+        def _first_task(payload):
+            for raw_task in payload["plan"]["tasks"]:
+                if raw_task["task_id"] == first_tid:
+                    return raw_task
+            raise AssertionError("task missing from durable payload")
 
-        fake_tasks = {}
-        for tid, t in plan.tasks.items():
-            if tid == first_tid:
-                fake_tasks[tid] = FakeTask(t, invalid_completion)
-            else:
-                fake_tasks[tid] = t
-        fake_plan = FakePlan(plan, fake_tasks)
+        def _corrupt(mutator):
+            payload = json.loads(json.dumps(good_payload))
+            mutator(payload)
+            state_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-        terminal = owner_goal.check_terminal_state(fake_plan, evidence_claims=[])
-        assert terminal["terminal_type"] == "NOT_MISSION_COMPLETE"
-        assert terminal["is_terminal"] is False
-        assert terminal.get("must_not_promote") is True
-        assert terminal["arena_claim_is_evidence"] is False
+        # (a) DONE task with malformed completion evidence (non-sha256 fingerprints, dropped ref)
+        def _bad_evidence(payload):
+            task = _first_task(payload)
+            completion = task["completion"]
+            completion["evidence_fingerprints"] = {ref: "not-a-sha256" for ref in completion["evidence_refs"]}
+            completion["evidence_refs"] = completion["evidence_refs"][:-1]
 
-        # Also test with completely missing completion
-        fake_tasks2 = {}
-        for tid, t in plan.tasks.items():
-            if tid == first_tid:
-                fake_tasks2[tid] = FakeTask(t, None)
-            else:
-                fake_tasks2[tid] = t
-        fake_plan2 = FakePlan(plan, fake_tasks2)
-        terminal2 = owner_goal.check_terminal_state(fake_plan2, evidence_claims=[])
-        assert terminal2["terminal_type"] == "NOT_MISSION_COMPLETE"
-        assert terminal2["is_terminal"] is False
+        _corrupt(_bad_evidence)
+        message = _canonical_reload_error(tmp)
+        assert "TASK_STATE_PLAN_INVALID" in message
+        assert "DONE_REQUIRES_CURRENT_EVIDENCE" in message
+
+        state_bytes = state_path.read_bytes()
+        contract_bytes = contract_path.read_bytes()
+        blocked = owner_goal.build_owner_goal_intake(tmp, raw)
+        assert blocked["terminal_type"] == "NOT_MISSION_COMPLETE"
+        assert blocked["canonical_state_fail_closed"] is True
+        assert blocked["must_not_promote"] is True
+        assert blocked["claim_complete"] is False
+        assert blocked["plan"] is None
+        assert blocked["arena_handoff"] is None
+        assert state_path.read_bytes() == state_bytes, "fail-closed path must not rewrite durable task-state"
+        assert contract_path.read_bytes() == contract_bytes, "fail-closed path must not create a new goal contract"
+
+        # (b) DONE task whose completion wrapper is missing entirely
+        def _missing_completion(payload):
+            _first_task(payload)["completion"] = None
+
+        _corrupt(_missing_completion)
+        message = _canonical_reload_error(tmp)
+        assert "DONE_REQUIRES_CURRENT_EVIDENCE" in message
+        assert owner_goal.build_owner_goal_intake(tmp, raw)["terminal_type"] == "NOT_MISSION_COMPLETE"
+
+        # (c) valid plan content with a stale wrapper plan_hash
+        def _stale_hash(payload):
+            payload["plan"]["plan_scope"] = list(payload["plan"]["plan_scope"]) + ["tampered-scope"]
+
+        _corrupt(_stale_hash)
+        message = _canonical_reload_error(tmp)
+        assert "TASK_STATE_PLAN_HASH_MISMATCH" in message
+
+        # (d) malformed wrapper schema
+        def _bad_wrapper(payload):
+            payload["schema"] = "p2p-task-state/tampered"
+
+        _corrupt(_bad_wrapper)
+        message = _canonical_reload_error(tmp)
+        assert "TASK_STATE_SCHEMA_INVALID" in message
+
+        # Restoring the good durable payload restores the canonical boundary exactly.
+        state_path.write_text(json.dumps(good_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        restored = task_state.TaskStateStore(tmp).load()
+        assert owner_goal.check_terminal_state(restored)["terminal_type"] == "MISSION_COMPLETE"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
 def test_case_F_all_done_verified_mission_complete():
-    """Case F: all canonical DONE via normal path VERIFIED -> MISSION_COMPLETE."""
-    import hashlib
-    from datetime import datetime, timezone
-
+    """Case F: all canonical DONE via the normal path -> MISSION_COMPLETE (canonical revalidation only)."""
     tmp = _make_temp_project()
     try:
         raw = "/goal Hoàn thiện tính năng thanh toán, dùng Arena"
         owner_goal.build_owner_goal_intake(tmp, raw)
         store = task_state.TaskStateStore(tmp)
-        plan = store.load()
-        assert plan is not None
+        plan = _complete_all_tasks(store, store.load())
+        assert plan is not None and all(t.status == "DONE" for t in plan.tasks.values())
 
-        for tid in plan.topological_order():
-            task = store.load().tasks[tid]
-            if task.status == "DONE":
-                continue
-            required = list(task.required_evidence) or [f"{tid}-evidence"]
-            claims = []
-            for ref in required:
-                fp = hashlib.sha256(ref.encode("utf-8")).hexdigest()
-                actual_item = {
-                    "source": ref,
-                    "evidence_ref": ref,
-                    "origin": "RUNTIME_EVIDENCE",
-                    "observed_at": datetime.now(timezone.utc).isoformat(),
-                    "freshness": "CURRENT",
-                    "scope": [task.title],
-                    "source_binding": "test-binding",
-                    "fingerprint": fp,
-                }
-                c = task_state.EvidenceClaim(
-                    claim=f"{task.title} done via {ref}",
-                    required_evidence=(ref,),
-                    actual_evidence=(actual_item,),
-                    status="VERIFIED",
-                )
-                claims.append(c)
-            candidate_state = {"task_id": tid, "status": "done", "evidence": required}
-            current = store.load()
-            cur_task = current.tasks[tid]
-            if cur_task.status == "PLANNED" and current.dependencies_are_done(tid):
-                current = store.transition(tid, "READY")
-            current = store.load()
-            cur_task = current.tasks[tid]
-            if cur_task.status == "READY":
-                current = store.transition(tid, "ACTIVE")
-            store.complete(tid, claims, candidate_state)
-
-        plan = store.load()
-        assert all(t.status == "DONE" for t in plan.tasks.values())
-        terminal = owner_goal.check_terminal_state(plan, evidence_claims=[])
+        # Reload/revalidate through the canonical boundary, then check terminality.
+        reloaded = task_state.TaskStateStore(tmp).load()
+        assert reloaded is not None and reloaded.canonical_hash() == plan.canonical_hash()
+        terminal = owner_goal.check_terminal_state(reloaded, evidence_claims=[])
         assert terminal["terminal_type"] == "MISSION_COMPLETE"
         assert terminal["is_terminal"] is True
         assert terminal["arena_claim_is_evidence"] is False
         assert terminal.get("canonical_state_plus_evidence") is True
+        assert terminal.get("canonical_state_revalidated") is True
+        assert "task_state" in terminal.get("completion_authority", "")
+
+        # The owner-goal intake path reaches MISSION_COMPLETE from durable state too.
+        intake = owner_goal.build_owner_goal_intake(tmp, raw)
+        assert intake["terminal_type"] == "MISSION_COMPLETE"
+        assert intake["canonical_state_fail_closed"] is False
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -478,17 +482,30 @@ def test_case_G_single_task_normal_and_multi_activate():
         autopilot_store.initialize(goal_plan_planned)
         autopilot_store.transition("APPROVED")
 
-        # Explicit host evaluation should ACTIVATE for multi-task
+        # Explicit authoritative host should DECIDE ACTIVATE for multi-task,
+        # returning the projected /goal command without claiming invocation.
         res_claude = owner_goal.evaluate_native_activation(tmp, "claude_code")
         assert res_claude["decision"] == "ACTIVATE_NATIVE_GOAL"
         assert res_claude["native_goal_behavior_preserved"] is True
         assert res_claude["authoritative_host"] == "claude_code"
-        assert res_claude["native_command_invoked_count"] == 1
+        assert res_claude["command"]
+        assert res_claude["native_invocation_required"] is True
+        assert res_claude["native_invocation_status"] == "HOST_ACTION_REQUIRED"
+        assert res_claude["native_command_invoked_count"] == 0
+        assert res_claude["native_invocation_receipt"] is None
+        seam = res_claude["native_invocation_seam"]
+        assert seam["read_only"] is True and seam["state_mutated"] is False
+        assert seam["invocation_apis_found"] == []
+        assert seam["conclusion"] == "NO_EXISTING_HOST_INVOCATION_SEAM"
 
+        # Explicit Codex host identity remains supported from known executor identity.
         res_codex = owner_goal.evaluate_native_activation(tmp, "codex_cli")
         assert res_codex["decision"] == "ACTIVATE_NATIVE_GOAL"
         assert res_codex["authoritative_host"] == "codex_cli"
-        assert res_codex["native_command_invoked_count"] == 1
+        assert res_codex["command"]
+        assert res_codex["native_invocation_required"] is True
+        assert res_codex["native_invocation_status"] == "HOST_ACTION_REQUIRED"
+        assert res_codex["native_command_invoked_count"] == 0
 
         # Single-task path
         tmp2 = _make_temp_project()
@@ -536,6 +553,9 @@ def test_case_G_single_task_normal_and_multi_activate():
             res_single = owner_goal.evaluate_native_activation(tmp2, "claude_code")
             assert res_single["decision"] == "NORMAL_P2P_PATH"
             assert "SINGLE_TASK_PLAN" in res_single.get("reason", "")
+            assert res_single["native_invocation_required"] is False
+            assert res_single["native_invocation_status"] == "NOT_REQUIRED"
+            assert res_single["native_command_invoked_count"] == 0
         finally:
             shutil.rmtree(tmp2, ignore_errors=True)
 
@@ -543,13 +563,17 @@ def test_case_G_single_task_normal_and_multi_activate():
         res_arena = owner_goal.evaluate_native_activation(tmp, "arena")
         assert res_arena["decision"] == "HOST_KIND_UNSUPPORTED"
         assert res_arena["native_goal_behavior_preserved"] is True
+        assert res_arena["native_command_invoked_count"] == 0
+        assert res_arena["native_invocation_required"] is False
         assert res_arena.get("arena_in_native_hosts") is False or "arena" not in [h.lower() for h in native_goal_bridge.HOST_KINDS]
 
-        # Auto detection when no env markers -> NORMAL_P2P_PATH honestly
+        # Auto detection when no env markers -> NORMAL_P2P_PATH honestly, count 0
         res_auto = owner_goal.evaluate_native_activation(tmp, "auto")
         assert res_auto["decision"] == "NORMAL_P2P_PATH"
         assert res_auto["reason"] == "HOST_NOT_CONFIDENTLY_DETECTED"
         assert res_auto["authoritative_host"] is None
+        assert res_auto["native_command_invoked_count"] == 0
+        assert res_auto["native_invocation_status"] == "NOT_REQUIRED"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -872,7 +896,7 @@ def test_durable_git_identity_not_fabricated():
 
 
 def test_cli_native_activation_single_authoritative_host():
-    """Verify single authoritative host: ONE ACTIVATE_NATIVE_GOAL invoke exactly once via existing seam."""
+    """Single authoritative host: decision/projection only, never a fake invocation receipt."""
     import subprocess
 
     tmp = _make_temp_project()
@@ -906,14 +930,16 @@ def test_cli_native_activation_single_authoritative_host():
         ap_store.initialize(goal_plan_planned)
         ap_store.transition("APPROVED")
 
-        # Without env markers, authoritative host is None -> NORMAL_P2P_PATH honestly, no multi-host eval
+        # Without an authoritative host: NORMAL_P2P_PATH honestly, count 0, no multi-host eval
         result2 = wf.owner_goal_intake(tmp, raw)
         assert result2.get("native_authoritative_host") is None
         assert result2.get("native_goal_activation_decision") == "NORMAL_P2P_PATH"
         assert result2.get("native_command_invoked_count") == 0
+        assert result2.get("native_invocation_status") == "NOT_REQUIRED"
         assert result2.get("native_multi_host_evaluated") is False
 
-        # With env marker CLAUDECODE=1, authoritative host should be claude_code and ACTIVATE once
+        # With env marker CLAUDECODE=1: one authoritative host, ACTIVATE decision,
+        # command projected, host action still required, invoked count 0.
         env = os.environ.copy()
         env["CLAUDECODE"] = "1"
         cli_cmd = [
@@ -932,21 +958,91 @@ def test_cli_native_activation_single_authoritative_host():
         assert out.get("native_authoritative_host") == "claude_code"
         assert out.get("native_goal_activation_checked") is True
         assert out.get("native_goal_activation_decision") == "ACTIVATE_NATIVE_GOAL"
-        assert out.get("native_command_invoked_count") == 1
         assert "native_goal_command" in out
+        assert out.get("native_goal_command_projection") == {"claude_code": out.get("native_goal_command")}
+        assert out.get("native_invocation_required") is True
+        assert out.get("native_invocation_status") == "HOST_ACTION_REQUIRED"
+        assert out.get("native_command_invoked_count") == 0
+        assert out.get("native_invocation_receipt") is None
+        assert out.get("native_invocation_seam", {}).get("conclusion") == "NO_EXISTING_HOST_INVOCATION_SEAM"
         assert out.get("native_goal_activation_host") == "claude_code"
-        # Ensure only one host evaluated, not both
+        # Only one host evaluated, never both
         evals = out.get("native_activation_evaluations", {})
         assert "claude_code" in evals
         assert evals["claude_code"]["decision"] == "ACTIVATE_NATIVE_GOAL"
-        # codex_cli should NOT be evaluated when authoritative host is claude_code
-        assert "codex_cli" not in evals or evals.get("codex_cli", {}).get("decision") != "ACTIVATE_NATIVE_GOAL" or out.get("native_multi_host_evaluated") is False
+        assert "codex_cli" not in evals
 
         # Arena remains non-native
         res_arena = owner_goal.evaluate_native_activation(tmp, "arena")
         assert res_arena["decision"] == "HOST_KIND_UNSUPPORTED"
         assert res_arena["native_goal_behavior_preserved"] is True
         assert result2.get("arena_in_native_hosts") is False
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_cli_explicit_codex_host_identity_decision_only():
+    """Explicit known Codex executor identity is supported; still decision/projection only."""
+    import subprocess
+
+    tmp = _make_temp_project()
+    try:
+        raw = "/goal Test explicit codex host identity, dùng Auto"
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import p2p_workflow as wf  # type: ignore
+        from p2p_capabilities import autopilot_state
+
+        wf.owner_goal_intake(tmp, raw)
+        goal_id = json.loads((tmp / ".p2p" / "state" / "goal-contract.json").read_text(encoding="utf-8")).get("goal_id")
+        plan = task_state.TaskStateStore(tmp).load()
+        goal_plan = autopilot_state.GoalPlan(
+            goal_id=goal_id,
+            goal_version="v1",
+            title="Explicit codex host",
+            purpose="Explicit codex host",
+            owner_approval_ref="test-approval",
+            scope=(raw,),
+            non_scope=(),
+            plan_task_ids=tuple(plan.tasks.keys()),
+            status="PLANNED",
+        )
+        ap_store = autopilot_state.GoalStateStore(tmp)
+        ap_store.initialize(goal_plan)
+        ap_store.transition("APPROVED")
+
+        # API path: explicit known executor identity wins without env markers.
+        api_out = wf.owner_goal_intake(tmp, raw, host="codex_cli")
+        assert api_out.get("native_authoritative_host") == "codex_cli"
+        assert api_out.get("native_authoritative_host_source") == "EXPLICIT_KNOWN_EXECUTOR_IDENTITY"
+        assert api_out.get("native_goal_activation_decision") == "ACTIVATE_NATIVE_GOAL"
+        assert api_out.get("native_invocation_status") == "HOST_ACTION_REQUIRED"
+        assert api_out.get("native_command_invoked_count") == 0
+        assert "codex_cli" in api_out.get("native_activation_evaluations", {})
+
+        # CLI path: --host codex_cli
+        cli_cmd = [
+            sys.executable,
+            str(ROOT / "scripts" / "p2p_workflow.py"),
+            "--project",
+            str(tmp),
+            "owner-goal",
+            "--request",
+            raw,
+            "--host",
+            "codex_cli",
+            "--json",
+        ]
+        proc = subprocess.run(cli_cmd, capture_output=True, text=True, timeout=15)
+        assert proc.returncode == 0, f"CLI failed: {proc.stderr}"
+        out = json.loads(proc.stdout)
+        assert out.get("native_authoritative_host") == "codex_cli"
+        assert out.get("native_goal_activation_decision") == "ACTIVATE_NATIVE_GOAL"
+        assert out.get("native_goal_command")
+        assert out.get("native_invocation_required") is True
+        assert out.get("native_invocation_status") == "HOST_ACTION_REQUIRED"
+        assert out.get("native_command_invoked_count") == 0
+        assert out.get("native_invocation_receipt") is None
+        assert "claude_code" not in out.get("native_activation_evaluations", {})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -1000,7 +1096,30 @@ def test_cli_owner_goal_main_entrypoint_single_host():
         evals = out.get("native_activation_evaluations", {})
         assert evals.get("claude_code", {}).get("decision") == "ACTIVATE_NATIVE_GOAL"
         assert "command" in evals.get("claude_code", {})
-        assert out.get("native_command_invoked_count") == 1
+        assert out.get("native_invocation_required") is True
+        assert out.get("native_invocation_status") == "HOST_ACTION_REQUIRED"
+        assert out.get("native_command_invoked_count") == 0
         assert out.get("arena_in_native_hosts") is False
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_no_second_completion_verifier_and_no_fabricated_invocation_count():
+    """Single completion authority + no invocation counter can be set without an action."""
+    import inspect
+
+    owner_src = Path(inspect.getsourcefile(owner_goal)).read_text(encoding="utf-8")
+    wf_src = (ROOT / "scripts" / "p2p_workflow.py").read_text(encoding="utf-8")
+
+    # No second completion verifier in owner_goal.py
+    assert not hasattr(owner_goal, "_is_canonical_completion_valid")
+    assert "_is_canonical_completion_valid" not in owner_src
+    assert "def _completion_is_structurally_valid" not in owner_src
+    assert "evidence_fingerprints" not in owner_src
+    assert owner_goal.CANONICAL_COMPLETION_AUTHORITY.startswith("p2p_capabilities.task_state")
+
+    # A decision/projection must never increment the invocation counter
+    assert 'native_command_invoked_count"] = 1' not in owner_src
+    assert 'native_command_invoked_count"] = 1' not in wf_src
+    assert "native_command_invoked_count = 1" not in owner_src
+    assert "native_command_invoked_count = 1" not in wf_src
