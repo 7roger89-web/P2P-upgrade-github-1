@@ -12,6 +12,7 @@ and verified experience are task-scoped context, not extra Supreme Laws.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -43,7 +44,7 @@ _CANONICAL_LAW_IDENTIFIERS = (
     "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
     "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
     "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
-    "RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+    "RECOVER_ADAPTIVELY; DO NOT_ENTER_SPECULATIVE_FIX_LOOPS",
     "PRESERVE_CONTINUITY_AND_STOP",
     "PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT",
     "ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT",
@@ -76,13 +77,27 @@ from p2p_capabilities.review_extension_activation import render_review_guidance 
 
 
 CONTEXT_MARKER = "CONTROL_TOWER_CONTEXT:"
+SELF_LAW_RECEIPT_MARKER = "CONTROL_TOWER_SELF_LAW_RECEIPT="
+LAW_RECEIPT_SCHEMA = "p2p-control-tower-self-law-receipt/1"
+LAW_MARKER = "P2P_SUPREME_OPERATING_LAW_V1"
+NO_WORK_MARKER = "NO_SUBSTANTIVE_WORK_BEFORE_VALID_LAW_CONTEXT = YES"
+CANONICAL_NOTEBOOK_REL = Path("docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md")
+INSTALLED_NOTEBOOK_REL = Path(".p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md")
+PORTABLE_NOTEBOOK_REL = Path(".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md")
+PORTABLE_PROJECTION_MARKER = "P2P_PORTABLE_LAW_PROJECTION=YES"
+PORTABLE_CANONICAL_SOURCE = (
+    "7roger89-web/P2P-upgrade-github-1@main:"
+    "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
+)
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 MAX_ACTIVE_EXPERIENCES = 3
 PROMPT_GUARD_CHARS = 8192
 MIN_CONTEXT_BUDGET = 380
 MAX_PRIMARY_RISK_WRAPPER_CHARS = 360
 CONTROL_TOWER_FLOW = (
-    "OUTCOME>FRESH_STATE>ONE_LAW>TASK_CONTRACT>SELECT_EXISTING_CAPABILITY_OR_HOST>"
-    "BOUNDED_CONTEXT>EXECUTE>EVIDENCE>RECONCILE>DONE|NEXT|BLOCKED|OWNER_GATE"
+    "OUTCOME>SELF_LAW_RECEIPT>FRESH_STATE>ONE_LAW>TASK_CONTRACT>"
+    "SELECT_EXISTING_CAPABILITY_OR_HOST>BOUNDED_CONTEXT>EXECUTE>EVIDENCE>"
+    "RECONCILE>DONE|NEXT|BLOCKED|OWNER_GATE"
 )
 _GITHUB_TASK = re.compile(r"\b(github|pull request|\bpr\b|merge|branch|commit|repository|repo|head sha)\b", re.I)
 _PROMPT_TASK = re.compile(r"\b(prompt|instruction|delegate|delegation|handoff|executor prompt|rewrite prompt)\b", re.I)
@@ -90,6 +105,170 @@ _PROMPT_TASK = re.compile(r"\b(prompt|instruction|delegate|delegation|handoff|ex
 
 def _root(args: argparse.Namespace) -> Path:
     return Path(args.root).expanduser().resolve() if args.root else REPO_ROOT
+
+
+def _sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _read_law_text(path: Path, *, source_type: str, portable: bool = False) -> dict[str, Any] | None:
+    """Read and validate one law source; never infer a read from a marker alone."""
+
+    if not path.exists():
+        return None
+    if path.is_symlink() or not path.is_file():
+        raise BindingError(f"LAW_CONTEXT_INVALID_PATH:{source_type}:{path}")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        raise BindingError(f"LAW_CONTEXT_UNREADABLE:{source_type}:{path}") from exc
+    if not text.strip():
+        raise BindingError(f"LAW_CONTEXT_EMPTY:{source_type}:{path}")
+    required = (LAW_MARKER, NO_WORK_MARKER, *_CANONICAL_LAW_IDENTIFIERS)
+    missing = [marker for marker in required if marker not in text]
+    if missing:
+        raise BindingError(
+            f"LAW_CONTEXT_CONTRACT_INCOMPLETE:{source_type}:{','.join(missing[:3])}"
+        )
+
+    content_sha256 = _sha256_text(text)
+    if portable:
+        header_end = text.find("-->\n\n")
+        if not text.startswith("<!--\n") or header_end < 0:
+            raise BindingError("PORTABLE_LAW_HEADER_INVALID")
+        header = text[: header_end + 3]
+        body = text[header_end + 5 :]
+        fields: dict[str, str] = {}
+        for line in header.splitlines():
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            fields[key.strip()] = value.strip()
+        if fields.get("P2P_PORTABLE_LAW_PROJECTION") != "YES":
+            raise BindingError("PORTABLE_LAW_PROJECTION_MARKER_INVALID")
+        if fields.get("CANONICAL_SOURCE") != PORTABLE_CANONICAL_SOURCE:
+            raise BindingError("PORTABLE_LAW_CANONICAL_SOURCE_INVALID")
+        expected_sha = fields.get("SOURCE_CONTENT_SHA256", "").lower()
+        if not _SHA256_RE.fullmatch(expected_sha):
+            raise BindingError("PORTABLE_LAW_SOURCE_SHA256_INVALID")
+        if _sha256_text(body) != expected_sha:
+            raise BindingError("PORTABLE_LAW_CONTENT_HASH_MISMATCH")
+        if fields.get("PROJECTION_DO_NOT_EDIT") != "YES":
+            raise BindingError("PORTABLE_LAW_EDIT_GUARD_INVALID")
+        if fields.get("CANONICAL_WINS_WHEN_REACHABLE") != "YES":
+            raise BindingError("PORTABLE_LAW_PRECEDENCE_INVALID")
+
+    return {
+        "schema": LAW_RECEIPT_SCHEMA,
+        "status": "PASS",
+        "actor": "CONTROL_TOWER_SELF",
+        "source_type": source_type,
+        "source": path.as_posix(),
+        "content_sha256": content_sha256,
+        "supreme_law_marker": LAW_MARKER,
+        "no_substantive_work_marker": True,
+        "executor_receipt_substitute": False,
+        "model_or_session_reset_requires_reread": True,
+        "authority_effect": "NONE",
+        "mutated": False,
+    }
+
+
+def _establish_control_tower_law_context(
+    root: Path,
+    *,
+    package_root: Path | None = None,
+) -> dict[str, Any]:
+    """Establish the Control Tower actor's own law receipt before any CT reasoning.
+
+    An executor/project receipt cannot satisfy this function. It reads a real law
+    source itself and fails closed when no valid source is available.
+    """
+
+    project_root = root.expanduser().resolve()
+    package = (package_root or REPO_ROOT).expanduser().resolve()
+    candidates: list[tuple[Path, str, bool, bool]] = []
+
+    package_source = package / CANONICAL_NOTEBOOK_REL
+    package_is_checkout = (package / ".git").exists()
+    if package_is_checkout:
+        # A reachable canonical checkout outranks every projection. Corruption of
+        # that source is a blocker, not a reason to silently downgrade authority.
+        candidates.append((package_source, "CANONICAL_LOCAL_CHECKOUT", False, True))
+
+    installed = project_root / INSTALLED_NOTEBOOK_REL
+    portable = project_root / PORTABLE_NOTEBOOK_REL
+    candidates.append((installed, "INSTALLED_PROJECTION", False, False))
+    candidates.append((portable, "PORTABLE_PROJECTION", True, False))
+
+    # Release/package execution can legitimately carry the exact notebook source
+    # without a .git directory. It is treated as packaged law context, not as a
+    # claim that GitHub main was freshly read.
+    if not package_is_checkout:
+        candidates.append((package_source, "PACKAGED_LAW_SOURCE", False, False))
+
+    packaged_sha: str | None = None
+    if not package_is_checkout and package_source.is_file() and not package_source.is_symlink():
+        try:
+            package_text = package_source.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            package_text = ""
+        if package_text:
+            packaged_sha = _sha256_text(package_text)
+
+    seen: set[Path] = set()
+    rejected: list[str] = []
+    for path, source_type, portable_source, strict in candidates:
+        resolved = path.resolve(strict=False)
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        try:
+            receipt = _read_law_text(path, source_type=source_type, portable=portable_source)
+        except BindingError as exc:
+            if strict:
+                raise
+            rejected.append(f"{source_type}:{exc}")
+            continue
+        if receipt is None:
+            continue
+
+        # When the release/package notebook is available, it is the best local
+        # freshness witness for installed/portable projections. Reject a known
+        # stale projection instead of calling it up-to-date.
+        if packaged_sha and source_type == "INSTALLED_PROJECTION":
+            if receipt.get("content_sha256") != packaged_sha:
+                rejected.append("INSTALLED_PROJECTION:KNOWN_STALE_VS_PACKAGE")
+                continue
+        if packaged_sha and source_type == "PORTABLE_PROJECTION":
+            portable_text = path.read_text(encoding="utf-8")
+            header_end = portable_text.find("-->\n\n")
+            header = portable_text[: header_end + 3] if header_end >= 0 else ""
+            match = re.search(r"(?m)^SOURCE_CONTENT_SHA256=([0-9a-fA-F]{64})$", header)
+            if match and match.group(1).lower() != packaged_sha:
+                rejected.append("PORTABLE_PROJECTION:KNOWN_STALE_VS_PACKAGE")
+                continue
+        return receipt
+
+    reason = ";".join(rejected[:3]) if rejected else "NO_VALID_SOURCE"
+    raise BindingError(
+        f"LAW_CONTEXT_BLOCKED:CONTROL_TOWER_SELF_READ_REQUIRED:{reason}"
+    )
+
+
+def _law_receipt_line(receipt: Mapping[str, Any]) -> str:
+    if receipt.get("status") != "PASS" or receipt.get("actor") != "CONTROL_TOWER_SELF":
+        raise BindingError("CONTROL_TOWER_SELF_LAW_RECEIPT_INVALID")
+    source_type = _compact_text(receipt.get("source_type"), 64)
+    source = _compact_text(receipt.get("source"), 180)
+    sha256 = str(receipt.get("content_sha256") or "").lower()
+    if not _SHA256_RE.fullmatch(sha256):
+        raise BindingError("CONTROL_TOWER_SELF_LAW_RECEIPT_SHA256_INVALID")
+    return (
+        f"{SELF_LAW_RECEIPT_MARKER}PASS; ACTOR=CONTROL_TOWER_SELF; "
+        f"SOURCE_TYPE={source_type}; SOURCE={source}; SHA256={sha256}; "
+        "EXECUTOR_RECEIPT_SUBSTITUTE=NO; AUTHORITY_EFFECT=NONE"
+    )
 
 
 def _experience_summary(root: Path, task_text: str) -> dict[str, Any]:
@@ -135,6 +314,7 @@ def _render_context_block(
     task_text: str,
     *,
     max_chars: int,
+    law_receipt: Mapping[str, Any] | None = None,
 ) -> str:
     """Render mandatory runtime gates plus trigger-scoped guidance and experience."""
 
@@ -142,9 +322,15 @@ def _render_context_block(
         CONTEXT_MARKER,
         "LAW_AUTHORITY=ONE; Supreme Law=canonical 9-law capsule; projections/fallbacks/subordinate profiles are not independent laws.",
         f"CONTROL_TOWER_FLOW={CONTROL_TOWER_FLOW}",
-        "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; resolve canonical>installed>portable>inline; report actual P2P_LAW_SOURCE; never fake a read.",
-        "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
     ]
+    if law_receipt is not None:
+        mandatory.append(_law_receipt_line(law_receipt))
+    mandatory.extend(
+        (
+            "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; resolve canonical>installed>portable>inline; report actual P2P_LAW_SOURCE; never fake a read. Executor receipt cannot substitute for parent/Control Tower self-read.",
+            "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
+        )
+    )
     block = "\n".join(mandatory)
     if len(block) > max_chars:
         return ""
@@ -209,15 +395,17 @@ def _contextual_task_for_session(
     canonical_base_sha: str = UNKNOWN,
     canonical_base_tree: str = UNKNOWN,
     acceptance_criteria: Sequence[str] = (),
+    law_receipt: Mapping[str, Any] | None = None,
 ) -> str:
     """Fit runtime guidance + relevant experience into the exact prompt budget."""
 
     task = str(task_text or "").strip()
     if not task:
         raise BindingError("CONTROL_TOWER_TASK_REQUIRED")
-    if CONTEXT_MARKER in task:
-        return task
+    if CONTEXT_MARKER in task or SELF_LAW_RECEIPT_MARKER in task:
+        raise BindingError("CONTROL_TOWER_RESERVED_CONTEXT_IN_TASK")
 
+    receipt = law_receipt or _establish_control_tower_law_context(root)
     base_prompt = build_execution_prompt(
         binding,
         task,
@@ -237,6 +425,7 @@ def _contextual_task_for_session(
         _experience_summary(root, task),
         task,
         max_chars=remaining,
+        law_receipt=receipt,
     )
     if not block:
         raise BindingError("CONTROL_TOWER_REQUIRED_CONTEXT_DID_NOT_FIT")
@@ -276,6 +465,10 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
     if as_json:
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
         return
+    receipt = result.get("control_tower_self_law_receipt")
+    if isinstance(receipt, Mapping):
+        print("CONTROL TOWER SELF LAW RECEIPT")
+        print(_law_receipt_line(receipt))
     snapshot = result.get("snapshot")
     if isinstance(snapshot, dict):
         print(render_snapshot(snapshot))
@@ -344,6 +537,7 @@ def _start_next_with_context(
     session_id: str | None,
     worktree: str,
     branch: str,
+    law_receipt: Mapping[str, Any],
 ) -> dict[str, Any]:
     planned = tower.recommend_next_session(
         host,
@@ -380,6 +574,7 @@ def _start_next_with_context(
             worktree=worktree,
             branch=branch,
             acceptance_criteria=criteria,
+            law_receipt=law_receipt,
         ),
         worktree=worktree,
         branch=branch,
@@ -399,6 +594,9 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         root = _root(args)
+        # Supreme Law self-preflight is deliberately before ControlTower construction,
+        # fresh-state projection, prompt planning, or any other substantive CT action.
+        law_receipt = _establish_control_tower_law_context(root)
         tower = ControlTower(
             root,
             current_canonical_base_sha=args.current_canonical_base_sha,
@@ -424,6 +622,7 @@ def main(argv: list[str] | None = None) -> int:
                     canonical_base_sha=args.canonical_base_sha,
                     canonical_base_tree=args.canonical_base_tree,
                     acceptance_criteria=criteria,
+                    law_receipt=law_receipt,
                 ),
                 canonical_base_sha=args.canonical_base_sha,
                 canonical_base_tree=args.canonical_base_tree,
@@ -448,9 +647,13 @@ def main(argv: list[str] | None = None) -> int:
                 session_id=args.session_id,
                 worktree=args.worktree,
                 branch=args.branch,
+                law_receipt=law_receipt,
             )
         else:  # pragma: no cover - argparse constrains this branch.
             raise BindingError(f"UNSUPPORTED_COMMAND:{args.command}")
+        if not isinstance(result, dict):
+            raise BindingError("CONTROL_TOWER_RESULT_MUST_BE_OBJECT")
+        result["control_tower_self_law_receipt"] = dict(law_receipt)
         _print_result(result, as_json=args.as_json)
         return 0
     except (ControlTowerHandoffError, OSError, UnicodeError) as exc:
