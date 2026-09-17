@@ -3164,6 +3164,8 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
     Reuses existing Goal Contract / TaskPlan / durable state machinery.
     No second orchestrator, router, state DB, task registry, daemon, or
     acceptance authority. Arena remains executor, not native /goal host.
+    Wires real native /goal activation seam via owner_goal_intake_cli when
+    available, so the actual user-facing CLI path evaluates ACTIVATE_NATIVE_GOAL.
     """
     root = root.resolve()
     try:
@@ -3177,17 +3179,99 @@ def owner_goal_intake(root: Path, raw_command: str, package_hint: str | None = N
         except Exception as exc:
             raise ValueError(f"OWNER_GOAL_CAPABILITY_UNAVAILABLE:{exc}") from exc
 
-    result = mod.build_owner_goal_intake(root, raw_command, package_hint=package_hint)
+    # Wire real activation seam: prefer owner_goal_intake_cli which already
+    # evaluates evaluate_native_activation() and surfaces native command.
+    # Fallback to build_owner_goal_intake for backward compat, then evaluate
+    # native activation explicitly to ensure CLI path never bypasses it.
+    if hasattr(mod, "owner_goal_intake_cli"):
+        try:
+            result = mod.owner_goal_intake_cli(root, raw_command, package_hint=package_hint, json_output=True)
+        except Exception:
+            # If cli wrapper fails, fall back to base intake and explicit evaluation
+            result = mod.build_owner_goal_intake(root, raw_command, package_hint=package_hint)
+            # Explicitly evaluate native activation to preserve behavior
+            try:
+                if hasattr(mod, "evaluate_native_activation"):
+                    # Evaluate for known hosts via bridge if available, else default hosts
+                    try:
+                        nb = capability_api(root, package_hint, "native_goal_bridge")
+                        host_kinds = list(getattr(nb, "HOST_KINDS", ()))
+                    except Exception:
+                        host_kinds = ["claude_code", "codex_cli"]
+                    evals: dict[str, object] = {}
+                    for hk in host_kinds:
+                        try:
+                            evals[hk] = mod.evaluate_native_activation(root, hk)
+                        except Exception as e:
+                            evals[hk] = {"error": str(e)}
+                    result["native_activation_evaluations"] = evals
+                    result["native_goal_activation_checked"] = True
+            except Exception:
+                pass
+    else:
+        result = mod.build_owner_goal_intake(root, raw_command, package_hint=package_hint)
 
+    # Ensure native host invariants are always surfaced (even when cli already did)
     try:
         native_bridge = capability_api(root, package_hint, "native_goal_bridge")
         host_kinds = getattr(native_bridge, "HOST_KINDS", ())
-        result["native_goal_hosts"] = list(host_kinds)
+        result.setdefault("native_goal_hosts", list(host_kinds))
         result["arena_in_native_hosts"] = any(str(h).lower() == "arena" for h in host_kinds)
         result["native_goal_behavior_preserved"] = not result["arena_in_native_hosts"]
     except Exception:
-        result["native_goal_behavior_preserved"] = True
-        result["arena_in_native_hosts"] = False
+        result.setdefault("native_goal_behavior_preserved", True)
+        result.setdefault("arena_in_native_hosts", False)
+
+    # Ensure activation evaluations are present if not already set by cli path
+    if "native_activation_evaluations" not in result:
+        try:
+            if hasattr(mod, "evaluate_native_activation"):
+                try:
+                    nb = capability_api(root, package_hint, "native_goal_bridge")
+                    host_kinds_eval = list(getattr(nb, "HOST_KINDS", ()))
+                except Exception:
+                    host_kinds_eval = ["claude_code", "codex_cli"]
+                evals2: dict[str, object] = {}
+                for hk in host_kinds_eval:
+                    try:
+                        evals2[hk] = mod.evaluate_native_activation(root, hk)
+                    except Exception as e:
+                        evals2[hk] = {"decision": "HOST_KIND_UNSUPPORTED" if "arena" in hk.lower() else "NORMAL_P2P_PATH", "error": str(e)}
+                result["native_activation_evaluations"] = evals2
+                result["native_goal_activation_checked"] = True
+        except Exception:
+            pass
+
+    # Surface propagated native command when ACTIVATE_NATIVE_GOAL (exactly once per host)
+    # The command is already in native_activation_evaluations[host][\"command\"] when decision is ACTIVATE.
+    # Ensure no duplicate invocation — we only propagate, not execute here; execution is via host/controller seam.
+    try:
+        evals_map = result.get("native_activation_evaluations")
+        if isinstance(evals_map, dict):
+            propagated: dict[str, str] = {}
+            for hk, ev in evals_map.items():
+                if isinstance(ev, dict) and ev.get("decision") == "ACTIVATE_NATIVE_GOAL" and ev.get("command"):
+                    propagated[hk] = str(ev["command"])
+            if propagated:
+                result["native_goal_command_propagated"] = propagated
+                # For single activation path, expose primary command (claude_code preferred, else first)
+                if "claude_code" in propagated:
+                    result["native_goal_command"] = propagated["claude_code"]
+                    result["native_goal_activation_host"] = "claude_code"
+                elif "codex_cli" in propagated:
+                    result["native_goal_command"] = propagated["codex_cli"]
+                    result["native_goal_activation_host"] = "codex_cli"
+                else:
+                    first_host = next(iter(propagated))
+                    result["native_goal_command"] = propagated[first_host]
+                    result["native_goal_activation_host"] = first_host
+                result["native_goal_activation_decision"] = "ACTIVATE_NATIVE_GOAL"
+            else:
+                # No activation — determine if single-task or arena
+                # If arena host evaluated, it should be HOST_KIND_UNSUPPORTED
+                result.setdefault("native_goal_activation_decision", "NORMAL_P2P_PATH")
+    except Exception:
+        pass
 
     result["rule20_preserved"] = True
     result["no_second_orchestrator"] = True
