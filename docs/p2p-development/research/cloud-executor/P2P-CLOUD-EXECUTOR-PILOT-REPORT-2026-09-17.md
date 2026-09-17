@@ -424,22 +424,77 @@ GITHUB_ACTIONS_TRIGGERED          = ONE REQUIRED REPO GATE, UNAVOIDABLE
                                   including a docs-and-deployment-config PR that
                                   touches none of its subject matter. Recorded
                                   per task §18 rather than suppressed: it was not
-                                  re-run by hand, no matrix/cache/artifact
-                                  service was added, and it is left to report its
-                                  own result. The other six workflows in the repo
-                                  are path- or branch-scoped and are NOT
+                                  re-run by hand and no matrix/cache/artifact
+                                  service was added. The other six workflows in
+                                  the repo are path- or branch-scoped and are NOT
                                   triggered by this change set (verified by
                                   reading each `on:` block; in particular
                                   hermes-essential-stack and
                                   hermes-runtime-compatibility match only
                                   deployments/hermes-*/** and the root
                                   Dockerfile, none of which this task touched).
+GATE_OBSERVED_RESULT              = FAIL, PRE-EXISTING BASELINE, PROVEN
+                                  UNRELATED (see §8.1). PR #201 run 35205364862.
+                                  Not fixed here: repairing it means editing
+                                  workflow files, which is a different lane and
+                                  outside this task's scope.
+MERGE_STATUS                      = NOT_MERGED (Owner Gate / validated-merge
+                                  authority respected; a red required gate is
+                                  never merged over silently)
 PAID_RESOURCE_PROVISIONED         = NO
 OWNER_PAT_OR_CREDENTIALS_USED     = NO
 OWNER_PC_REQUIRED                 = NO
 UPSTREAM_CLOUD_SANDBOX_MECHANISM  = NOT_ADOPTED (infra/cloudflare/sandbox-control
                                   + .github/workflows/start-sandbox.yml exist
                                   upstream; explicitly excluded per task §6)
+```
+
+### 8.1 The one required gate is red on `main` already — baseline proof
+
+The predicted gate did run and did fail. Because a red required gate is never
+merged over on assumption, it was traced to root cause rather than dismissed.
+
+```text
+PR #201 run 35205364862, job 105149698840
+  step 5 "Run focused Shield contract tests" -> failure
+  steps 1-4 success, step 6 skipped, steps 7-10 success
+
+CAUSE  SHIELD-CI-01 (Zizmor 1.29.0, --no-config, offline Regular persona) scans
+       .github/workflows/*.yml and reports status=FAIL, findings_count=16 on the
+       real repository target. Every finding is in a PRE-EXISTING workflow file:
+         chinese-metaphysics-executable-focused.yml  unpinned-uses, artipacked,
+                                                     adhoc-packages
+         chinese-metaphysics-upstream-audit.yml      unpinned-uses, adhoc-packages
+         p2p-fcc-adapter-ci.yml                      unpinned-uses, artipacked
+       (plus the remainder of the same 16, all under .github/workflows/)
+
+WHY IT IS NOT THIS TASK'S
+  1. `git diff --name-only a479e621 HEAD | grep -c '^\.github/workflows/'` = 0.
+     This change set touches ZERO workflow files. Its only two top-level paths
+     are deployments/clouddesk-pilot and docs/p2p-development.
+  2. The SAME workflow, on branch main, at head_sha a479e621 - the exact
+     CANONICAL_BASE_SHA this branch was cut from, containing none of this task's
+     files - fails identically: run 35200293474, step 5
+     "Run focused Shield contract tests" = failure, with the identical
+     surrounding step pattern.
+  3. main was GREEN at fcaf63aa (07:47:10Z) and RED at 52fae352 (07:49:46Z) and
+     a479e621 (08:33:19Z). The regression landed on main BEFORE this branch
+     existed.
+  4. Unrelated branches fail the same gate in the same window
+     (fix/control-tower-self-law-gate repeatedly; the prior arena/01a0ae43 PR).
+
+VERDICT  PRE_EXISTING_BASELINE_FAILURE, PROVEN UNRELATED (RULE 11 condition 3).
+         Reproducing it is a workflow-hardening lane of its own (pin 16 `uses:`
+         references to commit SHAs, replace artipacked patterns, declare
+         packages explicitly). It is deliberately NOT folded into this pilot:
+         that would expand scope into CI files this task was told to leave alone
+         and would spend Actions quota on an unrelated repair.
+
+NOTE ON FIXTURES  The same job also emits PASS/BLOCKED/FAIL evidence records
+         against synthetic targets under /tmp/shield-base-* (e.g.
+         fail_leaked_worktree, blocked_unavailable_provider). Those are the
+         harness's own self-test fixtures exercising its verdict logic, not
+         findings about this repository, and are not evidence against this PR.
 ```
 
 ---
@@ -559,4 +614,16 @@ NEXT_OWNER_ACTION = approve provisioning ONE small Linux VPS (1 vCPU / 1-2 GB /
   This is the only Owner Gate in the task: it is an infrastructure commitment
   and a material spend decision (notebook RULE 11), and nothing was purchased
   autonomously.
+
+DELIVERY_STATE
+  BRANCH  = arena/01a0ae84-p2p-upgrade-github-1 (one bounded task branch, never
+            main; base a479e62192f6912e037ee0861e45c1799e9461e2)
+  PR      = #201 -> main, OPEN
+  MERGED  = NO. Owner Gate / validated-merge authority respected; this task does
+            not self-merge.
+  GATES   = the one required gate that any PR to main triggers
+            (p2p-shield-ci-slice.yml) reports FAIL, PROVEN a pre-existing
+            baseline failure on main at the base SHA and unrelated to this
+            change set - see §8.1. All six other workflows are path/branch-
+            scoped and correctly did not trigger.
 ```
