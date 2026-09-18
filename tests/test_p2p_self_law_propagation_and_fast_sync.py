@@ -145,6 +145,45 @@ def test_batch_write_updates_only_stale(tmp_path: Path):
     print("batch --write updates only stale and second is no-op: PASS")
 
 
+
+def test_batch_write_migrates_legacy_preflight(tmp_path: Path):
+    package = _package(tmp_path, law_body="LAW v1")
+    project = tmp_path / "legacy-project"
+    project.mkdir()
+    legacy = """# AGENTS.md
+
+## P2P law preflight
+
+1. Prefer canonical:
+   `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
+2. Portable:
+   `.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`
+3. `P2P_LAW_SOURCE=CANONICAL_AUTHENTICATED|LOCAL_PORTABLE|LAW_CONTEXT_BLOCKED`
+
+## Repository role
+
+Project-specific role remains.
+"""
+    (project / "AGENTS.md").write_text(legacy, encoding="utf-8")
+    _run_proj(package, project)
+
+    # Re-introduce the legacy section to simulate an older managed repository.
+    agents = (project / "AGENTS.md").read_text(encoding="utf-8")
+    managed_start = agents.index("<!-- BEGIN P2P PORTABLE LAW -->")
+    (project / "AGENTS.md").write_text(
+        legacy.rstrip() + "\n\n" + agents[managed_start:],
+        encoding="utf-8",
+    )
+
+    result = _run_sync("--project", str(project), "--package-root", str(package), "--write")
+    assert result.returncode == 0
+    assert "CHANGED=1" in result.stdout
+    migrated = (project / "AGENTS.md").read_text(encoding="utf-8")
+    assert "## P2P law preflight" not in migrated
+    assert migrated.count("<!-- BEGIN P2P PORTABLE LAW -->") == 1
+    assert "Project-specific role remains." in migrated
+    print("batch legacy-preflight migration: PASS")
+
 def test_dirty_and_unsafe_blocked(tmp_path: Path):
     package = _package(tmp_path)
     ws = tmp_path / "ws"
@@ -199,6 +238,7 @@ if __name__ == "__main__":
         test_projector_idempotent_and_preserves_content(tmp_path / "t1")
         test_batch_check_detects_current_stale(tmp_path / "t2")
         test_batch_write_updates_only_stale(tmp_path / "t3")
+        test_batch_write_migrates_legacy_preflight(tmp_path / "t3b")
         test_dirty_and_unsafe_blocked(tmp_path / "t4")
         test_no_new_authority_or_registry()
     print("ALL TESTS PASS")

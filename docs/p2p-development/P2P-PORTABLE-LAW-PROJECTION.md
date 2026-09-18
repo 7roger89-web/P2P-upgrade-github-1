@@ -57,6 +57,14 @@ Do not copy the notebook manually. Regenerate it from the P2P package/source usi
 
 When the canonical notebook changes, refresh the projection with the same command. The operation is idempotent and replaces only the managed P2P portable-law block inside `AGENTS.md` while preserving unrelated project instructions.
 
+For legacy repositories created before the managed portable-law block existed,
+the projector also migrates a recognized standalone `## P2P law preflight`
+section when that section carries the canonical P2P notebook path, portable
+projection path, and `P2P_LAW_SOURCE=` marker. This prevents a stale
+"probe canonical first" instruction from running before the current managed
+block. Similar project-specific sections that do not carry all of those P2P
+markers are preserved.
+
 ### GitHub-only / repo-scoped workflow
 
 A local clone is not required when the Owner operates projects directly on
