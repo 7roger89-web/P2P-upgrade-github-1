@@ -222,6 +222,16 @@ criterion needs a concrete verification oracle before execution begins.
   project state for auditability.
 - Separate facts, source-backed claims, inferences, assumptions, and unknowns.
 - Adapt terminology to the user's experience and language.
+- For prose that P2P writes or rewrites, apply one bounded clarity pass from
+  [references/prose-clarity.md](references/prose-clarity.md) after semantic
+  correctness is established. Preserve acceptance criteria, authority,
+  evidence, exceptions, warnings, rollback details, exact identifiers, and
+  machine-readable surfaces. Do not run a second rewrite loop merely to chase
+  style.
+- Use Diataxis-style reader-job classification only for actual documentation
+  when it materially improves structure. Do not classify executor prompts,
+  schemas, packets, or ordinary control-plane messages as Tutorial/How-to/
+  Reference/Explanation.
 - End with one concrete next action only when further action is necessary.
 
 ## State
