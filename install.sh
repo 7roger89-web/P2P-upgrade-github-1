@@ -96,6 +96,7 @@ cp \
   "$package_root/scripts/p2p_decision_trace.py" \
   "$package_root/scripts/p2p_task_state.py" \
   "$package_root/scripts/p2p_safe_installer.py" \
+  "$package_root/scripts/p2p_skill_profile.py" \
   "$package_root/scripts/doctor.py" \
   "$system_destination/scripts/"
 
@@ -219,8 +220,27 @@ fi
 
 mkdir -p "$skills_destination" "$agents_destination" "$(dirname "$config_path")"
 
-for source in "$package_root"/.agents/skills/*; do
-  name="$(basename "$source")"
+profile_mode="AUTO"
+if [[ "$scope" == "user" ]]; then
+  profile_mode="ALL"
+fi
+profile_receipt_path="$system_destination/capability-profile.json"
+python3 "$package_root/scripts/p2p_skill_profile.py" \
+  --root "$root" \
+  --skills-dir "$package_root/.agents/skills" \
+  --profile "$profile_mode" \
+  --format json > "$profile_receipt_path"
+capability_profile="$(python3 - "$profile_receipt_path" <<'PY'
+import json
+import sys
+from pathlib import Path
+print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))["profile"])
+PY
+)"
+
+while IFS= read -r name; do
+  [[ -z "$name" ]] && continue
+  source="$package_root/.agents/skills/$name"
   destination="$skills_destination/$name"
   if [[ "$install_class" == "SAME_VERSION_REINSTALL" && -e "$destination" ]]; then
     continue
@@ -230,7 +250,13 @@ for source in "$package_root"/.agents/skills/*; do
     mv "$destination" "$backup_root/skills/$name"
   fi
   cp -a "$source" "$destination"
-done
+done < <(
+  python3 "$package_root/scripts/p2p_skill_profile.py" \
+    --root "$root" \
+    --skills-dir "$package_root/.agents/skills" \
+    --profile "$profile_mode" \
+    --format lines
+)
 
 for source in "$package_root"/.codex/agents/p2p-*.toml; do
   name="$(basename "$source")"
@@ -325,6 +351,7 @@ echo "P2P Codex installed successfully."
 echo "Scope: $scope"
 echo "Root:  $root"
 echo "Install class: $install_class"
+echo "Capability profile: $capability_profile"
 [[ -d "$backup_root" ]] && echo "Backup: $backup_root"
 if ! python3 "$package_root/scripts/doctor.py" --root "$root"; then
   echo "P2P doctor failed; release marker was not written." >&2
