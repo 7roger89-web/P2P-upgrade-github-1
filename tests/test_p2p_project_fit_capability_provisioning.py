@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import shutil
+import subprocess
 import tempfile
 import unittest
 import sys
@@ -129,6 +131,43 @@ class PackagingAndInstallerContractTests(unittest.TestCase):
             self.assertIn("p2p_skill_profile.py", text, path.name)
             self.assertIn("capability-profile.json", text, path.name)
             self.assertIn("Capability profile", text, path.name)
+
+        sh_text = INSTALL_SH.read_text(encoding="utf-8")
+        ps_text = INSTALL_PS1.read_text(encoding="utf-8")
+        self.assertNotIn('for source in "$package_root"/.agents/skills/*; do', sh_text)
+        self.assertNotIn(
+            'foreach ($Skill in Get-ChildItem -LiteralPath $SkillsSource -Directory)',
+            ps_text,
+        )
+
+    def test_unix_installer_parses(self) -> None:
+        bash = shutil.which("bash")
+        if bash is None:
+            self.skipTest("bash unavailable")
+        result = subprocess.run(
+            [bash, "-n", str(INSTALL_SH)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_windows_installer_parses_when_pwsh_is_available(self) -> None:
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("pwsh unavailable")
+        command = (
+            "[scriptblock]::Create((Get-Content -LiteralPath '"
+            + str(INSTALL_PS1).replace("'", "''")
+            + "' -Raw)) | Out-Null"
+        )
+        result = subprocess.run(
+            [pwsh, "-NoProfile", "-Command", command],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_receipt_is_deterministic_and_contains_no_absolute_project_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
