@@ -33,7 +33,8 @@ Use this skill when:
 
 MCP servers configured in `.claude/.mcp.json`.
 
-**Gemini CLI Integration** (recommended): Create symlink to `.gemini/settings.json`:
+**Gemini CLI integration** (one optional path, when that CLI is the exposed
+capability): create a symlink to `.gemini/settings.json`:
 ```bash
 mkdir -p .gemini && ln -sf .claude/.mcp.json .gemini/settings.json
 ```
@@ -91,7 +92,8 @@ gemini -y -m gemini-2.5-flash -p "Take a screenshot of https://example.com"
 
 ### Pattern 2: Subagent-Based Execution (Fallback)
 
-Use `mcp-manager` agent when Gemini CLI unavailable. Subagent discovers tools, selects relevant ones, executes tasks, reports back.
+Use the `mcp-manager` agent (or the equivalent delegation capability) when a
+direct execution path is unavailable or context cost matters. Subagent discovers tools, selects relevant ones, executes tasks, reports back.
 
 **Benefit**: Main context stays clean, only relevant tool definitions loaded when needed.
 
@@ -126,7 +128,7 @@ Command-line interface for MCP operations. Commands:
 
 ## Quick Start
 
-**Method 1: Gemini CLI** (recommended)
+**Method 1: Gemini CLI** (one example path, when available)
 ```bash
 npm install -g gemini-cli
 mkdir -p .gemini && ln -sf .claude/.mcp.json .gemini/settings.json
@@ -155,25 +157,33 @@ See [references/mcp-protocol.md](references/mcp-protocol.md) for:
 
 ## Integration Strategy
 
-### Execution Priority
+### Execution Selection
 
-1. **Gemini CLI** (Primary): Fast, automatic, intelligent tool selection
-   - Check: `command -v gemini`
-   - Execute: `gemini -y -m gemini-2.5-flash -p "<task>"`
-   - Best for: All tasks when available
+Selection is capability-first. No provider gets semantic authority merely
+because documentation exists for it:
 
-2. **Direct CLI Scripts** (Secondary): Manual tool specification
-   - Use when: Need specific tool/server control
-   - Execute: `npx tsx scripts/cli.ts call-tool <server> <tool> <args>`
+1. Discover the MCP capabilities the current executor/runtime actually exposes.
+2. Select the smallest suitable existing execution path for the bounded task.
+3. Do not add routing logic, a registry, or a provider preference order.
 
-3. **mcp-manager Subagent** (Fallback): Context-efficient delegation
-   - Use when: Gemini unavailable or failed
-   - Keeps main context clean
+Equally valid existing paths, chosen by what is actually exposed:
+
+- **Host/native MCP capability**: use the MCP client the current executor
+  already provides, when it exposes the needed tools.
+- **Direct CLI scripts**: manual tool specification when you need specific
+  tool/server control.
+  - Execute: `npx tsx scripts/cli.ts call-tool <server> <tool> <args>`
+- **Gemini CLI**: one example path, valid when that CLI is the exposed
+  capability.
+  - Check: `command -v gemini`
+  - Execute: `gemini -y -m gemini-2.5-flash -p "<task>"`
+- **mcp-manager subagent (or equivalent delegation)**: context-efficient
+  delegation; keeps the main context clean.
 
 ### Integration with Agents
 
 The `mcp-manager` agent uses this skill to:
-- Check Gemini CLI availability first
+- Check which MCP execution capability the current executor actually exposes
 - Execute via `gemini` command if available
 - Fallback to direct script execution
 - Discover MCP capabilities without loading into main context

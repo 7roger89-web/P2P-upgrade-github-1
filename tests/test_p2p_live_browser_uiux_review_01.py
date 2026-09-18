@@ -8,6 +8,7 @@ Test success here proves the written contract, not browser execution.
 
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -167,13 +168,64 @@ class QAScopeBoundaryTests(unittest.TestCase):
 class MCPProviderNeutralityTests(unittest.TestCase):
     """The MCP execution wording must be capability-aware, not Gemini-locked."""
 
+    # Semantic drift patterns: a global preference claim for one provider, in any
+    # common Markdown spelling. Neutral wording such as "Gemini CLI is one
+    # supported/example path" must stay allowed.
+    GLOBAL_PREFERENCE_PATTERNS = (
+        (
+            "GEMINI_GLOBAL_PRIMARY",
+            re.compile(r"gemini[^\n]{0,40}\(\s*primary\s*\)|primary[^\n]{0,20}:\s*\**gemini", re.I),
+        ),
+        (
+            "GEMINI_GLOBAL_RECOMMENDED",
+            re.compile(r"gemini[^\n]{0,40}\(\s*recommended\s*\)|recommended[^\n]{0,20}:\s*\**gemini", re.I),
+        ),
+        (
+            "GEMINI_FIRST_AVAILABILITY_CHECK",
+            re.compile(r"check\s+gemini[^\n]{0,40}\bfirst\b", re.I),
+        ),
+        (
+            "GEMINI_DEFAULT_AUTHORITY",
+            re.compile(r"gemini[^\n]{0,40}\b(default provider|preferred provider)\b", re.I),
+        ),
+    )
+
     def test_execution_section_is_provider_neutral_in_every_projection(self) -> None:
         for path in MCP_COPIES:
             text = _read(path)
             self.assertIn("Capability-first and provider-neutral", text, str(path))
             self.assertIn("Gemini CLI is one supported path, not a", text, str(path))
             self.assertIn("Do not add a second router or registry", text, str(path))
-            self.assertNotIn("**Primary: Gemini CLI**", text, str(path))
+
+    def test_no_global_provider_preference_wording_survives(self) -> None:
+        for path in MCP_COPIES:
+            text = _read(path)
+            for label, pattern in self.GLOBAL_PREFERENCE_PATTERNS:
+                match = pattern.search(text)
+                self.assertIsNone(
+                    match,
+                    f"{path}: {label} drift: {match.group(0) if match else ''!r}",
+                )
+
+    def test_capability_first_selection_shape_is_documented(self) -> None:
+        for path in MCP_COPIES:
+            text = _read(path)
+            for marker in (
+                "Selection is capability-first",
+                "No provider gets semantic authority merely",
+                "Discover the MCP capabilities the current executor/runtime actually exposes",
+                "Select the smallest suitable existing execution path",
+                "Do not add routing logic, a registry, or a provider preference order",
+                "Host/native MCP capability",
+                "Direct CLI scripts",
+                "one example path",
+            ):
+                self.assertIn(marker, text, f"{path}: {marker}")
+
+    def test_neutral_example_mentions_of_gemini_remain_allowed(self) -> None:
+        text = _read(MCP_COPIES[0])
+        self.assertIn("gemini-cli-integration.md", text)
+        self.assertIn("command -v gemini", text)
 
     def test_mcp_projection_copies_are_byte_identical(self) -> None:
         contents = {path.read_bytes() for path in MCP_COPIES}
