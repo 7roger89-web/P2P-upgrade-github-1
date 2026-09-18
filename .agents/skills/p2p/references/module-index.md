@@ -19,7 +19,7 @@ compact; the portable P2P-Codex package retains the full 152-file source under
 | RAG | Clean semantic zones, stable anchors, grounded output | `rag.md` |
 | Evidence/LIVE | FACT_LEDGER, scoped evidence, expiry, generated Live Specs, drift gate | `live/` |
 | Project evaluation | Paired real tasks, frozen fixtures, explicit graders, isolated runs | `session_metrics.md`, `optimization.md` |
-| Writing/visuals | Match audience and medium; preserve output contract | `writing_suite.md`, `visual_suite.md` |
+| Writing/visuals | Match audience and medium; preserve output contract; run one bounded prose-clarity pass after semantics are correct | `prose-clarity.md`, `writing_suite.md`, `visual_suite.md` |
 | Current model/tool advice | Verify dated facts before routing | `live/` |
 | PXPIPE | Keep disabled unless independently reviewed and validated | `compression.md` |
 
