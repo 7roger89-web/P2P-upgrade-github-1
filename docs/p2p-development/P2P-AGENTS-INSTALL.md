@@ -18,7 +18,7 @@ Canonical authority when accessible:
 Installed projection:
 `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md`
 
-If canonical access is unavailable, use a valid installed projection or `SUPREME_LAW_CAPSULE`. Never claim the canonical law was read unless it actually was. If no valid law context exists, stop substantive P2P-managed work at `LAW_CONTEXT_BLOCKED`.
+If canonical access is unavailable, use a valid installed projection, a valid generated portable projection, or `SUPREME_LAW_CAPSULE`. Never claim the canonical law was read unless it actually was. If no valid law context exists, stop substantive P2P-managed work at `LAW_CONTEXT_BLOCKED`.
 
 `TASK_BRANCH != LAW_AUTHORITY`.
 `TARGET_PROJECT != LAW_SOURCE`.
@@ -37,6 +37,18 @@ portable projection stale/missing; never direct the executor to rely on a
 known-stale portable copy. A local clone is not required when an authenticated
 GitHub connector can update the target repository. Do not add a watcher,
 registry, GitHub Action, or new secret merely for this freshness check.
+
+For the repo-scoped executor itself:
+- `TARGET_REPO_AUTH != CANONICAL_CROSS_REPO_REACHABILITY`.
+- If a valid portable projection is present and canonical P2P has not already
+  been successfully read in the same actor/session, read the portable
+  projection directly and report `P2P_LAW_SOURCE=LOCAL_PORTABLE`.
+- Do not issue a cross-repository `gh`/API request solely to prove canonical
+  is unavailable so that fallback can begin.
+- This does not reuse the parent's law context. The executor still performs its
+  own preflight by reading repository-root `AGENTS.md` and the local portable
+  projection. If canonical is already successfully reachable in that same
+  session, canonical wins.
 
 ## Actor separation and self-law preflight
 
