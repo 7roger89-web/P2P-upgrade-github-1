@@ -146,14 +146,17 @@ AI agent chooses the skill that fits the work.
 | Sử dụng khi cần nâng cấp UI UI hiện có, làm UI bớt generic, bớt AI slop, frontend premium, redesign, image-to-code, imagegen web/mobile, brandkit, style variants và full-output. | `.claude/skills/UI-taste-skill/SKILL.md` |
 | Use when the user asks to inspect API or MCP surfaces. | `.claude/skills/api-surface/SKILL.md` |
 | Use when the user asks to build or change backend code. | `.claude/skills/backend-development/SKILL.md` |
+| Quickly deslop UI code by fixing spacing, hierarchy, typography, and small layout issues. Use when the interface needs a fast cleanup or polish pass. | `.claude/skills/baseline-ui/SKILL.md` |
 | Use when the user asks to implement Better Auth. | `.claude/skills/better-auth/SKILL.md` |
 | Use when the user asks to integrate Bunny.net. | `.claude/skills/bunny/SKILL.md` |
 | Use when the task is to implement code changes from an assigned scope, including bug fixes, follow-ups, rejects, or current-worktree repair. | `.claude/skills/coder/SKILL.md` |
+| React composition patterns that scale. Use when refactoring components with boolean prop proliferation, building flexible component libraries, or designing reusable APIs. | `.claude/skills/composition-patterns/SKILL.md` |
 | Use when creating, changing, or reviewing MongoDB/PostgreSQL database work in a real repository, including schema, models, migrations, queries, indexes, transactions, connection config, backup/restore assumptions, or performance; follow repo-native tooling and meet the production database bar unless the user explicitly asks for a prototype. | `.claude/skills/databases/SKILL.md` |
 | Use when the user asks to debug. | `.claude/skills/debugging/SKILL.md` |
 | Use when the user asks to deploy or operate infrastructure. | `.claude/skills/devops/SKILL.md` |
 | Use when the user asks to find current technical documentation. | `.claude/skills/docs-seeker/SKILL.md` |
 | Use when the user asks to create, edit, or analyze documents. | `.claude/skills/document-skills/docx/SKILL.md` |
+| Review React, Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, and frontend UI code. Use when reviewing a PR, branch, diff, page, component, hook, Server Action, route handler, or API client. | `.claude/skills/frontend-code-review/SKILL.md` |
 | Use when the user asks to design a frontend UI. | `.claude/skills/frontend-design/SKILL.md` |
 | Use when the user asks to build or change frontend code. | `.claude/skills/frontend-development/SKILL.md` |
 | Use when the user asks to build an MCP server. | `.claude/skills/mcp-builder/SKILL.md` |
@@ -165,6 +168,8 @@ AI agent chooses the skill that fits the work.
 | Use when creating, reviewing, or troubleshooting Claude Code plugin marketplaces, marketplace.json files, plugin sources, hosting, team allowlists, or install/update failures. | `.claude/skills/plugin-marketplace/SKILL.md` |
 | Use when the user asks to solve a hard problem. | `.claude/skills/problem-solving/problem-solving-parent-skill/SKILL.md` |
 | Use when the user asks to run QA without fixing code, including mounted runtime behavior, visible user flows, browser-visible app execution, source-of-truth checks, action/state coverage, route/control inventories, Playwright control sweeps, or QA report generation in repositories where Anvien can support | `.claude/skills/qa/SKILL.md` |
+| React and Next.js performance optimization guidelines from Vercel Engineering. Use when writing, reviewing, or refactoring React/Next.js code. | `.claude/skills/react-best-practices/SKILL.md` |
+| Scan, triage, or clean up React diagnostics with the external React Doctor CLI. Pinned optional adapter; never blocks frontend work when unavailable. | `.claude/skills/react-doctor/SKILL.md` |
 | Use when the user asks to refactor code. | `.claude/skills/refactoring/SKILL.md` |
 | Use when the user asks to bootstrap a new repo or project. | `.claude/skills/repo-bootstrap/SKILL.md` |
 | Use when the user asks to reason step by step. | `.claude/skills/sequential-thinking/SKILL.md` |

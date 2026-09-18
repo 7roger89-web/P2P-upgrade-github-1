@@ -88,6 +88,27 @@ the authority; this table is its derived view for this batch.
 | RA-EXT-080 | danny-avila/LibreChat | REJECTED | none (reference only) | chat-UI platform does not map to a bounded P2P gap; no duplication of P2P runtime for UI |
 | RA-EXT-081 | zjwzcx/Awesome-Astra-Embodied-AI | RESEARCHED | none (radar source) | catalog only, no executable code; no LICENSE file — rights-unspecified, cite do not copy |
 
+### 4.4 Frontend upstream intake batch 2026-09-18 (RA-EXT-082 .. RA-EXT-091)
+
+Appended projection of the ten records added by
+`P2P_FRONTEND_UPSTREAM_INTAKE_01`. The JSON ledger remains the authority;
+this table is its derived view for this batch. Full file-level matrix and
+blob-verification evidence live in
+`docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md`.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-082 | vercel-labs/agent-skills | IMPLEMENTED | react-best-practices + composition-patterns units, verbatim (blob/subtree verified) | `.agents/skills/react-best-practices`, `.agents/skills/composition-patterns` (+ mirrors, manifests, release/doctor, hub routing) |
+| RA-EXT-083 | PracticalSwan/agent-skills | IMPLEMENTED | frontend-design unit: workflow + a11y checklist + contrast checker + rights files, verbatim | under `.agents/skills/frontend-design/` beneath a P2P wrapper that fixes the BOLD-universal bias |
+| RA-EXT-084 | DNM03/frontend-code-review | IMPLEMENTED | SKILL.md + 11 references + 2 examples, verbatim | `.agents/skills/frontend-code-review` (+ mirrors, manifests, release/doctor, hub routing) |
+| RA-EXT-085 | ibelick/ui-skills | IMPLEMENTED | baseline-ui single-file unit, verbatim | `.agents/skills/baseline-ui` (+ mirrors, manifests, release/doctor, hub routing) |
+| RA-EXT-086 | millionco/react-doctor | IMPLEMENTED | pinned optional EXTERNAL_TOOL adapter (no code vendored) | `.agents/skills/react-doctor/SKILL.md`: `react-doctor@0.9.14` pin, report-reading contract, fail-honest unavailability |
+| RA-EXT-087 | pbakaus/impeccable | DEFERRED | deterministic UI anti-pattern detection as a future direction (selected, not adopted) | re-entry needs bounded-gap proof + Owner detector-tooling decision; nothing copied |
+| RA-EXT-088 | microsoft/skills | RESEARCHED | none (methodology reference: packaging, scenario harness, progressive loading) | reference only; nothing copied |
+| RA-EXT-089 | emilkowalski/skills | IMPLEMENTED | find-animation-opportunities unit, verbatim | `.agents/skills/UI-animation-design/find-animation-opportunities/` + router row |
+| RA-EXT-090 | vercel-labs/design-systems-to-agent-skills | RESEARCHED | none (methodology reference: verified-facts pipeline, closed PRD, mechanical verify) | reference only; nothing copied |
+| RA-EXT-091 | TanStack/table | RESEARCHED | none (component library, not guidance; no bounded gap) | nothing copied |
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:

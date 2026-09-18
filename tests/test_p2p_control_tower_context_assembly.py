@@ -3,6 +3,8 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -18,6 +20,9 @@ for candidate in (ROOT / "scripts", ROOT / ".p2p" / "system", ROOT):
 import p2p_control_tower as control_tower  # noqa: E402
 from p2p_capabilities import control_tower_handoff as handoff  # noqa: E402
 from p2p_capabilities.control_tower_handoff import SessionBinding  # noqa: E402
+from p2p_capabilities.review_extension_activation import (  # noqa: E402
+    runtime_review_evidence,
+)
 from p2p_capabilities.experience_evolution import (  # noqa: E402
     LEDGER_RELATIVE_PATH,
     activate_verified,
@@ -27,6 +32,52 @@ from p2p_capabilities.experience_evolution import (  # noqa: E402
 
 
 class ControlTowerContextAssemblyTests(unittest.TestCase):
+    def setUp(self) -> None:
+        # HERMETICITY: fixture tests must not observe the ambient checkout.
+        # ``render_review_guidance`` resolves its review-evidence root via an
+        # explicit/env/argv/cwd chain where a candidate is SKIPPED unless it
+        # is inside a git worktree, so an empty non-repo directory does NOT
+        # isolate (discovery falls through to the ambient cwd). A large
+        # ambient worktree (e.g. a many-file PR branch, or CI with
+        # full-history checkout) would then inject LARGE_DIFF_RUNTIME /
+        # ledger signals into these fixture-root assertions. Anchor
+        # discovery at a pristine empty git repo for each test instead.
+        # Production behavior is unchanged: the discovery chain, the
+        # LARGE_DIFF threshold, and all review signals are intact, and
+        # text-triggered guidance coverage is preserved.
+        self._runtime_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._runtime_tmp.cleanup)
+        init = subprocess.run(
+            ["git", "init", "-q", self._runtime_tmp.name],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(
+            0,
+            init.returncode,
+            "hermetic git-root setup failed; the git CLI is required to "
+            "isolate review-evidence discovery from the ambient checkout.",
+        )
+        previous = os.environ.get("P2P_PROJECT_ROOT")
+        os.environ["P2P_PROJECT_ROOT"] = self._runtime_tmp.name
+
+        def _restore() -> None:
+            if previous is None:
+                os.environ.pop("P2P_PROJECT_ROOT", None)
+            else:
+                os.environ["P2P_PROJECT_ROOT"] = previous
+
+        self.addCleanup(_restore)
+        # Precondition: fail loudly (not silently ambient-coupled) if the
+        # isolation seam ever stops resolving to the pristine repo.
+        evidence = runtime_review_evidence()
+        self.assertEqual(
+            [],
+            list(evidence.get("signals") or []),
+            f"ambient review signals leaked into fixture tests: {evidence!r}",
+        )
+
     def _activate_experience(
         self,
         root: Path,

@@ -1,42 +1,98 @@
 ---
 name: frontend-design
-description: Use when the user asks to design a frontend UI.
+description: "Design and implement context-fit frontend interfaces with deliberate art direction, accessible interaction, responsive behavior, complete states, and rendered verification. Use when creating or substantially reworking pages, components, product workspaces, dashboards, marketing sites, editorial surfaces, commerce flows, or justified immersive experiences."
 license: Complete terms in LICENSE.txt
+version: 2.0.0
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
+# Frontend Design (P2P Wrapper over Curated Upstream)
 
-The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.
+This skill designs interfaces that are FIT FOR THEIR CONTEXT — users,
+tasks, content, product category, and constraints — not interfaces that
+all look loud, bold, or unforgettable.
 
-## Design Thinking
+## Relationship to p2p-uiux
 
-Before coding, understand the context and commit to a BOLD aesthetic direction:
-- **Purpose**: What problem does this interface solve? Who uses it?
-- **Tone**: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are so many flavors to choose from. Use these for inspiration but design one that is true to the aesthetic direction.
-- **Constraints**: Technical requirements (framework, performance, accessibility).
-- **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?
+- `p2p-uiux` remains PRIMARY for a concrete interface/UX outcome: product
+  context, flows, navigation, Design System, accessibility baseline,
+  evidence, and drift.
+- This skill supplies the VISUAL-DIRECTION craft inside that outcome:
+  design modes, visual thesis, hierarchy, typography, color, state
+  completeness, and rendered verification.
+- A trivial padding/color/spacing fix is a direct UIUX task and normally
+  needs neither this skill's full workflow nor `p2p_aesthetica`.
 
-**CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.
+## Activation Boundary
 
-Then implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
-- Production-grade and functional
-- Visually striking and memorable
-- Cohesive with a clear aesthetic point-of-view
-- Meticulously refined in every detail
+Use this skill for creative visual direction and interface design. Do NOT
+apply one universal aesthetic (bold, maximalist, dark, hero-led, card
+mosaic) to every surface. Operational dashboards, dense forms, admin
+tools, elderly-first interfaces, and other context-sensitive products
+follow the mode router below, not a house style.
 
-## Frontend Aesthetics Guidelines
+Backend-only, data, or infrastructure work never loads this skill.
 
-Focus on:
-- **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font.
-- **Color & Theme**: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes.
-- **Motion**: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available (Use `anime.js` for animations: `./references/animejs.md`). Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.
-- **Spatial Composition**: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.
-- **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.
+## Authoritative Design Workflow (Vendored Upstream)
 
-NEVER use generic AI-generated aesthetics like overused font families (Inter, Roboto, Arial, system fonts), cliched color schemes (particularly purple gradients on white backgrounds), predictable layouts and component patterns, and cookie-cutter design that lacks context-specific character.
+The normative workflow is the verbatim upstream document:
 
-Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices (Space Grotesk, for example) across generations.
+- [`upstream-frontend-design-v2.md`](./upstream-frontend-design-v2.md) —
+  PracticalSwan `frontend-design` v2 (context-fit modes, decision rubric,
+  accessibility baseline, responsive/performance/state rules, component
+  review rubric, verification protocol). Read it before designing.
 
-**IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
+Supporting upstream artifacts in this skill:
 
-Remember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
+- [`references/accessibility-checklist.md`](./references/accessibility-checklist.md) —
+  focused WCAG 2.2 AA checks; read for forms, dialogs, complex widgets,
+  destructive actions, dense data, or accessibility reviews.
+- [`scripts/contrast-checker.py`](./scripts/contrast-checker.py) —
+  stdlib-only local contrast calculator (no install, no network).
+- [`references/animejs.md`](./references/animejs.md) — existing P2P motion
+  reference; specialist content, not a default.
+
+Upstream provenance (upstream `SKILL.md` renamed to
+`upstream-frontend-design-v2.md`; all other files byte-identical):
+
+- Repository: `https://github.com/PracticalSwan/agent-skills.git`
+- Observed commit: `ff6d12f61e8250dd1b988e101a482f6adc05c451`
+- Upstream skill: `frontend-design` version `2.0`
+- Rights: MIT AND Apache-2.0 (see `LICENSE.txt`,
+  `LICENSE-APACHE-2.0.txt`, `LICENSE-GITHUB-MIT.txt`,
+  `THIRD_PARTY_NOTICES.md`)
+
+The upstream body's "Related Skills" links point at sibling skills in the
+upstream monorepo. Inside P2P, use the local correspondences instead:
+`frontend-code-review` (implementation review),
+`react-best-practices` / `composition-patterns` (React engineering),
+`baseline-ui` (deterministic UI guardrails), `p2p-uiux` (UX outcome),
+`UI-animation-design` sub-skills (specialist motion only).
+
+## Project Design-System Precedence
+
+1. The target project's established design system, components, tokens,
+   and brand contracts win over every default in this skill.
+2. Reuse project components before creating new ones.
+3. Never silently replace an approved project system; material changes to
+   brand, navigation, tokens, hierarchy, or accessibility baseline need
+   owner approval (see `p2p-uiux` Design System and Contract rules).
+
+## Runtime Evidence Contract
+
+A visual claim is not proven by source inspection, a static screenshot
+alone, or an automated score. Follow the verification protocol in the
+vendored upstream workflow (rendered checks at representative widths,
+keyboard plus relevant pointer/touch input, honest limitation lists),
+and the runtime evidence contract in `p2p-uiux`. Unverified visual
+conclusions stay `NEEDS_EVIDENCE`.
+
+## Anti-Patterns (Binding)
+
+- Choosing a fashionable mode before understanding users, task, content,
+  and constraints.
+- Requiring heroes, cards, gradients, glass, dark themes, custom cursors,
+  smooth scrolling, or 3D for "premium" quality.
+- Approving fake data, incomplete states, inaccessible controls, broken
+  examples, or unmeasured performance claims.
+- Treating landing-page marketing direction as the default for
+  operational, dense, or elderly-first products.
