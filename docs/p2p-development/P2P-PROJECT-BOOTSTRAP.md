@@ -37,6 +37,7 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 | Entry contract expected? | Codex project agents surface (`AGENTS.md` `<-- BEGIN P2P CODEX -->` block) |
 | Where does project truth live? | In the project source itself; this manifest binds only |
 | Is the local runtime present? | Check `./.p2p/system/release.json` — absent means install needed |
+| Which capability profile was installed? | Check `./.p2p/system/capability-profile.json`; project installs detect `CORE`, `FRONTEND_GENERIC`, or `FRONTEND_REACT`, while user-scope installs use `ALL`. |
 | How to install/verify? | `scripts/p2p-bootstrap.sh` (in the P2P package) or manual: download artifact, verify SHA-256, run `install.sh project <PROJECT_ROOT> <ARTIFACT_PATH> <ARTIFACT_SHA256>` |
 | How to run doctor? | `python3 .p2p/system/scripts/doctor.py --root . --role installed --strict` |
 | Rollback? | Runtime removal leaves this file; full removal requires deleting it explicitly |
@@ -53,6 +54,35 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 5. Enter project: open the repository root in a Codex-compatible host; the
    tracked entry contract (`AGENTS.md` P2P block) loads automatically; or
    invoke `$p2p` from any host that reads `.agents/skills`.
+
+## Project-fit capability provisioning
+
+A packaged release may contain specialist skills for several stacks, but a
+project install must not mechanically copy every specialist into every
+repository. The existing installers call
+`scripts/p2p_skill_profile.py` before skill projection and record the
+deterministic result at `.p2p/system/capability-profile.json`.
+
+Profiles are deliberately small:
+
+- `CORE` — no supported frontend marker was found; install the non-frontend
+  packaged skills only.
+- `FRONTEND_GENERIC` — static web, Streamlit/Python UI, Vue/Svelte/Angular/
+  Astro/Vite or another supported generic frontend marker; add
+  `frontend-design`, `frontend-development`, and `baseline-ui`.
+- `FRONTEND_REACT` — React/Next/Remix/Gatsby markers; add the generic set plus
+  `react-best-practices`, `composition-patterns`,
+  `frontend-code-review`, and `react-doctor`.
+- `ALL` — user-scope installation only, preserving the historical full-skill
+  behavior where no single project stack is authoritative.
+
+Detection uses project-local files and dependency manifests only. It does not
+call the network, clone upstream repositories, or create a second router or
+registry. Re-installation is additive: newly relevant packaged skills may be
+added, while previously existing project skills are preserved rather than
+deleted merely because the detected profile changed. Doctor validates the
+installer-owned receipt and the exact required skill subset; extra preserved
+skills are warnings, not silent deletion authority.
 
 ## Arena Agent Mode binding
 
