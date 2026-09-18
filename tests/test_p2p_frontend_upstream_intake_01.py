@@ -35,6 +35,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import doctor as p2p_doctor  # noqa: E402
 import package_release  # noqa: E402
+import p2p_skill_profile  # noqa: E402
 
 
 CANONICAL = REPO_ROOT / ".agents" / "skills"
@@ -387,15 +388,27 @@ class PackageInstallProofTests(unittest.TestCase):
         cls.stage = Path(cls.temp.name) / "stage"
         cls.project = Path(cls.temp.name) / "synthetic-project"
         package_release.copy_selected(REPO_ROOT, cls.stage)
-        # Reproduce the install.sh/install.ps1 skill-copy contract:
-        # every packaged .agents/skills/* lands project-local.
+        cls.project.mkdir(parents=True)
+        (cls.project / "package.json").write_text(
+            json.dumps({"dependencies": {"react": "^19.0.0", "next": "^16.0.0"}}),
+            encoding="utf-8",
+        )
+        # Reproduce the current install.sh/install.ps1 project-fit contract:
+        # a React project receives the full curated frontend pack.
+        skills_source = cls.stage / ".agents" / "skills"
+        receipt = p2p_skill_profile.build_receipt(cls.project, skills_source)
+        cls.asserted_profile = receipt["profile"]
         target = cls.project / ".agents" / "skills"
         target.mkdir(parents=True)
-        for source in sorted((cls.stage / ".agents" / "skills").iterdir()):
-            if source.is_dir():
-                shutil.copytree(source, target / source.name)
-            else:
-                shutil.copy2(source, target / source.name)
+        for name in receipt["selected_skills"]:
+            source = skills_source / str(name)
+            shutil.copytree(source, target / source.name)
+
+    def test_react_fixture_uses_react_profile(self) -> None:
+        self.assertEqual(
+            self.asserted_profile,
+            p2p_skill_profile.PROFILE_FRONTEND_REACT,
+        )
 
     def test_release_ships_the_curated_pack(self) -> None:
         for skill in PACK_SKILLS:
