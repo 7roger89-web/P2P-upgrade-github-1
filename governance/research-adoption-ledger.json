@@ -2702,6 +2702,306 @@
       "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
       "last_reviewed_at": "2026-09-17T07:30:00+00:00",
       "notes": "P2P_EXTERNAL_CAPABILITY_ASSIMILATION_20260917_01. No LICENSE file at observed commit; repository self-describes as a non-commercial compilation. Treat content as rights-unspecified; cite, do not copy."
+    },
+    {
+      "research_id": "RA-EXT-082",
+      "source_name": "vercel-labs/agent-skills",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/vercel-labs/agent-skills",
+      "source_version_or_commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "Vercel agent-skills monorepo. At the observed commit skills/ holds composition-patterns, deploy-to-vercel, react-best-practices, react-native-skills, react-view-transitions, vercel-cli-with-tokens, vercel-optimize, web-design-guidelines, and writing-guidelines (plus *.zip bundles). Reviewed by full blob/tree inventory of the two adopted units and directory listing of the rest.",
+      "selected_ideas": [
+        "react-best-practices unit vendored verbatim (SKILL.md, AGENTS.md, metadata.json, 72 rules/)",
+        "composition-patterns unit vendored verbatim (SKILL.md, AGENTS.md, metadata.json, 10 rules/)"
+      ],
+      "rejected_ideas": [
+        "adopting deploy-to-vercel, react-native-skills, react-view-transitions, vercel-cli-with-tokens, vercel-optimize, web-design-guidelines, writing-guidelines (out of intake scope: deploy-, vendor-, platform-specific, or overlapping without a bounded gap)",
+        "vendoring the *.zip bundles (redundant with the unpacked directories)",
+        "vendoring per-unit README.md files (history/marketing stays upstream; SKILL.md is the entrypoint)"
+      ],
+      "p2p_translation": "Vendored as .agents/skills/react-best-practices and .agents/skills/composition-patterns with byte-identical mirrors, regenerated manifests, RELEASE_SKILLS/EXPECTED_SKILLS registration, and frontend-development hub routing. Every blob SHA and both rules/ subtree SHAs verified against the pinned commit.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py",
+        ".agents/skills/react-best-practices/UPSTREAM_NOTICES.md",
+        ".agents/skills/composition-patterns/UPSTREAM_NOTICES.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT per vendored SKILL.md frontmatter (author vercel); no root LICENSE file at the observed commit."
+    },
+    {
+      "research_id": "RA-EXT-083",
+      "source_name": "PracticalSwan/agent-skills",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/PracticalSwan/agent-skills",
+      "source_version_or_commit": "ff6d12f61e8250dd1b988e101a482f6adc05c451",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "Large agent-skills monorepo; reviewed the frontend-design/ unit in full (SKILL.md, references/, scripts/, agents/, rights files). The unit is a context-fit design workflow (modes, decision rubric, verification protocol) plus a WCAG 2.2 checklist and a stdlib-only contrast checker.",
+      "selected_ideas": [
+        "frontend-design/SKILL.md vendored verbatim as upstream-frontend-design-v2.md",
+        "references/accessibility-checklist.md vendored verbatim",
+        "scripts/contrast-checker.py vendored verbatim and smoke-tested (12.92:1 AAA pass)",
+        "LICENSE.txt, LICENSE-APACHE-2.0.txt, LICENSE-GITHUB-MIT.txt, THIRD_PARTY_NOTICES.md vendored verbatim"
+      ],
+      "rejected_ideas": [
+        "vendoring CHANGELOG.md (version history stays upstream)",
+        "vendoring agents/openai.yaml (provider-specific binding; P2P core is provider-neutral)",
+        "adopting other monorepo skills (out of frontend-intake scope)"
+      ],
+      "p2p_translation": "Vendored under .agents/skills/frontend-design/ beneath a P2P wrapper SKILL.md that fixes the old BOLD-universal bias (context-fit direction, p2p-uiux primacy, project design-system precedence, runtime evidence contract). Every vendored blob SHA verified against the pinned commit.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py",
+        ".agents/skills/frontend-design/UPSTREAM_NOTICES.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT AND Apache-2.0 (upstream rights files vendored alongside the unit)."
+    },
+    {
+      "research_id": "RA-EXT-084",
+      "source_name": "DNM03/frontend-code-review",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/DNM03/frontend-code-review",
+      "source_version_or_commit": "033d1c5d8bccc311fc3c4362690a482016651b96",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "Frontend code-review skill with an 11-file reference set (checklist, react, nextjs-app-router, data-fetching, frontend-security, ui-ux-accessibility, performance-seo, typescript, i18n, output-format, sources), two worked examples, and an upstream-owned evals/ harness. Reviewed by full recursive tree inventory.",
+      "selected_ideas": [
+        "skills/frontend-code-review/SKILL.md, references/*.md (11 files), examples/*.md (2 files) vendored verbatim"
+      ],
+      "rejected_ideas": [
+        "vendoring agents/openai.yaml (provider-specific binding; P2P core is provider-neutral)",
+        "vendoring evals/ (the upstream project's own eval harness stays upstream; P2P verifies with its own focused tests)",
+        "vendoring root README.md/LICENSE/.gitignore (rights reproduced in UPSTREAM_NOTICES.md instead)"
+      ],
+      "p2p_translation": "Vendored as .agents/skills/frontend-code-review with mirrors, manifests, release/doctor registration, and hub routing. SKILL.md blob plus references/ and examples/ subtree SHAs verified against the pinned commit.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py",
+        ".agents/skills/frontend-code-review/UPSTREAM_NOTICES.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT, Copyright (c) 2026 frontend-code-review contributors (full text in UPSTREAM_NOTICES.md)."
+    },
+    {
+      "research_id": "RA-EXT-085",
+      "source_name": "ibelick/ui-skills",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/ibelick/ui-skills",
+      "source_version_or_commit": "c5bcd86450b3582ba25204c622b9213b07464938",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "UI skills collection (Astro marketing site + bin/ installer + skills/ + tests). At the observed commit skills/ holds baseline-ui, create-design-md, fixing-accessibility, fixing-metadata, fixing-motion-performance, improve-ui, and ui-skills-root. Reviewed by root/skills listings and blob verification of the adopted unit.",
+      "selected_ideas": [
+        "skills/baseline-ui/SKILL.md single-file unit vendored verbatim (opinionated anti-slop UI baseline)"
+      ],
+      "rejected_ideas": [
+        "adopting the other six skills (fixing-*/improve-ui/create-design-md overlap the curated review/design pack without a bounded gap; ui-skills-root is a meta-router — a competing-router smell)",
+        "adopting the bin/ installer surface (no second installer; the existing skill/package/install machinery delivers)",
+        "vendoring site/src/public/tests product surfaces (not guidance)"
+      ],
+      "p2p_translation": "Vendored as .agents/skills/baseline-ui with mirrors, manifests, release/doctor registration, and hub routing. SKILL.md blob SHA verified against the pinned commit.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py",
+        ".agents/skills/baseline-ui/UPSTREAM_NOTICES.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT, Copyright (c) 2026 Julien Thibeaut (full text in UPSTREAM_NOTICES.md)."
+    },
+    {
+      "research_id": "RA-EXT-086",
+      "source_name": "millionco/react-doctor",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/millionco/react-doctor",
+      "source_version_or_commit": "499a0208fca5c0422b713bdedf2b83fcc8e29d20",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "oxlint-based React diagnostics CLI (906 rule entries enumerated at v0.9.14; versioned JsonReport schema v3; 0-100 health score computed by a remote API; agent-use license notice printed in AI/sandbox environments). Reviewed by source/test inspection at the pinned commit plus CLI behavior probes.",
+      "selected_ideas": [
+        "pinned optional EXTERNAL_TOOL adapter pattern (no code vendored): pinned invocation, applicability gate, honest report reading, fail-honest unavailability"
+      ],
+      "rejected_ideas": [
+        "vendoring the CLI or its rules (external tool, not P2P authority)",
+        "react-doctor@latest as canonical behavior (moving target; only the 0.9.14 pin is reproducible)",
+        "fetching the upstream remote triage playbook at runtime (moving remote prompt dependency)",
+        "treating score:null (remote API unreachable) or partial runs (complete:false) as pass/fail signal"
+      ],
+      "p2p_translation": "Implemented as .agents/skills/react-doctor/SKILL.md: canonical npx -y react-doctor@0.9.14 invocations, React-only + backend-never gate, schema-v3 reading contract (complete/analyzedFileCount/SCORE_UNAVAILABLE), REACT_DOCTOR_UNAVAILABLE downgrade that never blocks frontend work.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py",
+        ".agents/skills/react-doctor/SKILL.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: Modified MIT License (custom) plus an observed agent-use permission notice; recorded as disclosure, not an adoption filter. Full lint verdict unverifiable in this sandbox (oxlint worker killed by SIGABRT/OOM); recorded as an environment limitation, and the adapter requires the complete check instead of trusting exit output."
+    },
+    {
+      "research_id": "RA-EXT-087",
+      "source_name": "pbakaus/impeccable",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/pbakaus/impeccable",
+      "source_version_or_commit": "f2c7051853848826aac2f4646581d62a732155ad",
+      "provenance_status": "REPOSITORY_EVIDENCED",
+      "research_summary": "Opinionated design skill (23 design commands under skill/) plus deterministic no-LLM anti-pattern detectors (CLI, browser extension) plus live browser iteration; source-first system with generated per-harness distributions. Reviewed: root layout, PRODUCT.md, skill/ layout. Apache-2.0.",
+      "selected_ideas": [
+        "deterministic UI anti-pattern detection as a future external-tool/model direction (selected, not adopted in this intake)"
+      ],
+      "rejected_ideas": [
+        "vendoring skill/ now (a second skill system is a competing-router smell; overlaps frontend-code-review plus the p2p-uiux evidence contract without bounded-gap proof)",
+        "adopting generated harness distributions (generated artifacts, not sources)"
+      ],
+      "p2p_translation": "DEFERRED with re-entry conditions: (a) a bounded gap is proven against frontend-code-review plus the p2p-uiux runtime evidence contract; (b) the Owner decides the detector-tooling direction. Nothing copied.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: Apache-2.0."
+    },
+    {
+      "research_id": "RA-EXT-088",
+      "source_name": "microsoft/skills",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/microsoft/skills",
+      "source_version_or_commit": "f7d8a83e55ab7bf125cb1134e892302c2344592e",
+      "provenance_status": "REPOSITORY_EVIDENCED_NO_ADOPTION",
+      "research_summary": "133-skill Azure-SDK monorepo (skills under .github/skills/, installed via an npx installer; tests/scenarios harness with acceptance-criteria plus scenarios.yaml). Reviewed: root layout and Agents.md (fresh-info-first, surgical change, goal-driven TDD; SKILL.md frontmatter packaging; progressive loading with a context-rot warning). Nothing in it is frontend guidance.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "adopting Azure service skills (out of frontend scope)",
+        "adopting the npx installer, MCP configs, or hooks (second installer/daemon smells; P2P machinery already exists)"
+      ],
+      "p2p_translation": "REFERENCE ONLY. Skill-packaging and scenario-harness conventions kept as methodology reference; consistent with this intake's own blob-verified vendoring plus focused-test pattern. Nothing copied.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT."
+    },
+    {
+      "research_id": "RA-EXT-089",
+      "source_name": "emilkowalski/skills",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/emilkowalski/skills",
+      "source_version_or_commit": "85e8e2363b713506e1d5b6e07a0eb2da66be1bc3",
+      "provenance_status": "IMPLEMENTED_BOUNDED_SUBSET",
+      "research_summary": "Animation/design-engineering skills (13 skills at the observed commit: animate, animate-expo, animation-vocabulary, apple-design, ask-sonner, emil-design-eng, find-animation-opportunities, improve-animations, mobile-native, pick-ui-library, prototype, review-animations, write-swift). Reviewed by full recursive tree inventory.",
+      "selected_ideas": [
+        "skills/find-animation-opportunities/SKILL.md vendored verbatim (restraint-first motion-opportunity finder)"
+      ],
+      "rejected_ideas": [
+        "adopting animate, animate-expo, ask-sonner, mobile-native, pick-ui-library, prototype, write-swift, performance-cheatsheet.md in this intake (no bounded gap beyond the existing UI-animation-design router set; platform- or product-specific)"
+      ],
+      "p2p_translation": "Vendored as .agents/skills/UI-animation-design/find-animation-opportunities/ with a new router row in the UI-animation-design SKILL.md, mirrors, and regenerated manifests. SKILL.md blob SHA verified against the pinned commit. (animation-vocabulary, apple-design, emil-design-eng, improve-animations, review-animations pre-exist from earlier work and are out of this intake's change set.)",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py",
+        ".agents/skills/UI-animation-design/find-animation-opportunities/UPSTREAM_NOTICES.md"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT, Copyright (c) 2026 Emil Kowalski (full text in UPSTREAM_NOTICES.md)."
+    },
+    {
+      "research_id": "RA-EXT-090",
+      "source_name": "vercel-labs/design-systems-to-agent-skills",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/vercel-labs/design-systems-to-agent-skills",
+      "source_version_or_commit": "0e541bc7a8eb8e86e6b1c93fac7cf21588d487da",
+      "provenance_status": "REPOSITORY_EVIDENCED_NO_ADOPTION",
+      "research_summary": "Six-stage pipeline (Interview, Extract, optional Usage Analysis, PRD, Generate, Assets, Verify) that turns design-system source into verified skill files: session-isolated stages, persisted artifacts, closed-PRD discipline, mechanical verify script. Reviewed: full README plus root layout (commands/, docs/, example/, scripts/).",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "running or adopting the pipeline now (no design-system source exists in this core intake; pipeline execution is project work, not P2P core content)",
+        "copying commands/ or scripts/ as unexecuted inventory"
+      ],
+      "p2p_translation": "REFERENCE ONLY. Verified-facts/closed-PRD/mechanical-verify discipline kept as methodology reference for future design-system-to-skill work; mirrors this intake's own blob-verification plus focused-test discipline. Nothing copied.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT."
+    },
+    {
+      "research_id": "RA-EXT-091",
+      "source_name": "TanStack/table",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/TanStack/table",
+      "source_version_or_commit": "21d713fc4947d2a08cc2136bb055889a61412ded",
+      "provenance_status": "REPOSITORY_EVIDENCED_NO_ADOPTION",
+      "research_summary": "Headless table library monorepo (packages/, docs/, examples/). Reviewed: root layout and AGENTS.md (dependency-pin notes, not transferable). It is a component library, not guidance: it contains no skill content, and its docs would be a stale-clone burden without a recheck mechanism.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "vendoring library docs/guides (stale clone without recheck; a library is not guidance)",
+        "treating review-time table concerns as a gap (already covered generically by the frontend-code-review references)"
+      ],
+      "p2p_translation": "No bounded P2P gap: P2P core ships no data-grid guidance by design (the frontend-development hub routes project stacks to project-installed docs, never imposing a generic stack). Nothing copied.",
+      "capability_family": "SKILLS_AND_KNOWLEDGE",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
+        "tests/test_p2p_frontend_upstream_intake_01.py"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:skills",
+      "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
+      "last_reviewed_at": "2026-09-18T04:00:00+00:00",
+      "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT."
     }
   ],
   "rejected_register_summary": {
@@ -2730,7 +3030,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-09-16T13:35:00+07:00",
+  "last_reviewed": "2026-09-18T04:00:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]

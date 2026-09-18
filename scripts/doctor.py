@@ -41,6 +41,26 @@ EXPECTED_SKILLS = {
     "rag-grounding",
     "rag-prep",
     "rag-router",
+    # P2P_FRONTEND_UPSTREAM_INTAKE_01: first curated frontend capability pack.
+    # Mirrors RELEASE_SKILLS in scripts/package_release.py.
+    "frontend-design",
+    "frontend-development",
+    "react-best-practices",
+    "composition-patterns",
+    "frontend-code-review",
+    "baseline-ui",
+    "react-doctor",
+}
+
+# Install-directory -> additional accepted SKILL.md frontmatter `name` values.
+# Vendored upstream skills keep their authoritative upstream frontmatter name
+# (byte-identical intake); the install directory is P2P's stable path. The
+# frontend-development alias is a pre-existing P2P identity (frontmatter
+# `frontend-dev-guidelines`), preserved, not introduced, by this task.
+SKILL_NAME_ALIASES = {
+    "react-best-practices": {"vercel-react-best-practices"},
+    "composition-patterns": {"vercel-composition-patterns"},
+    "frontend-development": {"frontend-dev-guidelines"},
 }
 
 EXPECTED_AGENTS = {
@@ -149,7 +169,8 @@ def check_skills(root: Path, report: Report) -> None:
         report.warn("skills-extra", f"Additional skills are present: {', '.join(sorted(extra))}")
     for name in sorted(EXPECTED_SKILLS & found):
         actual, description = parse_skill(skills / name / "SKILL.md")
-        if actual != name:
+        accepted = {name} | SKILL_NAME_ALIASES.get(name, set())
+        if actual not in accepted:
             report.fail(f"skill:{name}", f"Frontmatter name is {actual!r}")
         elif description is None:
             report.fail(f"skill:{name}", "Frontmatter description is missing")

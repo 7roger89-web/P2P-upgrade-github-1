@@ -481,13 +481,16 @@ AI agent chooses the skill that fits the work.
 | Sử dụng khi cần nâng cấp UI UI hiện có, làm UI bớt generic, bớt AI slop, frontend premium, redesign, image-to-code, imagegen web/mobile, brandkit, style variants và full-output. | `.agents/skills/UI-taste-skill/SKILL.md` |
 | Use when the user asks to inspect API or MCP surfaces. | `.agents/skills/api-surface/SKILL.md` |
 | Use when the user asks to build or change backend code. | `.agents/skills/backend-development/SKILL.md` |
+| Quickly deslop UI code by fixing spacing, hierarchy, typography, and small layout issues. Use when the interface needs a fast cleanup or polish pass. | `.agents/skills/baseline-ui/SKILL.md` |
 | Use when the user asks to implement Better Auth. | `.agents/skills/better-auth/SKILL.md` |
 | Use when the task is to implement code changes from an assigned scope, including bug fixes, follow-ups, rejects, or current-worktree repair. | `.agents/skills/coder/SKILL.md` |
+| React composition patterns that scale. Use when refactoring components with boolean prop proliferation, building flexible component libraries, or designing reusable APIs. | `.agents/skills/composition-patterns/SKILL.md` |
 | Use when creating, changing, or reviewing MongoDB/PostgreSQL database work in a real repository, including schema, models, migrations, queries, indexes, transactions, connection config, backup/restore assumptions, or performance; follow repo-native tooling and meet the production database bar unless the user explicitly asks for a prototype. | `.agents/skills/databases/SKILL.md` |
 | Use when the user asks to debug. | `.agents/skills/debugging/SKILL.md` |
 | Use when the user asks to deploy or operate infrastructure. | `.agents/skills/devops/SKILL.md` |
 | Use when the user asks to find current technical documentation. | `.agents/skills/docs-seeker/SKILL.md` |
 | Use when the user asks to create, edit, or analyze documents. | `.agents/skills/document-skills/docx/SKILL.md` |
+| Review React, Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, and frontend UI code. Use when reviewing a PR, branch, diff, page, component, hook, Server Action, route handler, or API client. | `.agents/skills/frontend-code-review/SKILL.md` |
 | Use when the user asks to design a frontend UI. | `.agents/skills/frontend-design/SKILL.md` |
 | Use when the user asks to build or change frontend code. | `.agents/skills/frontend-development/SKILL.md` |
 | Use when the user asks to build an MCP server. | `.agents/skills/mcp-builder/SKILL.md` |
@@ -499,6 +502,8 @@ AI agent chooses the skill that fits the work.
 | Use when creating, reviewing, or troubleshooting Claude Code plugin marketplaces, marketplace.json files, plugin sources, hosting, team allowlists, or install/update failures. | `.agents/skills/plugin-marketplace/SKILL.md` |
 | Use when the user asks to solve a hard problem. | `.agents/skills/problem-solving/problem-solving-parent-skill/SKILL.md` |
 | Use when the user asks to run QA without fixing code, including mounted runtime behavior, visible user flows, browser-visible app execution, source-of-truth checks, action/state coverage, route/control inventories, Playwright control sweeps, or QA report generation in repositories where Anvien can support | `.agents/skills/qa/SKILL.md` |
+| React and Next.js performance optimization guidelines from Vercel Engineering. Use when writing, reviewing, or refactoring React/Next.js code. | `.agents/skills/react-best-practices/SKILL.md` |
+| Scan, triage, or clean up React diagnostics with the external React Doctor CLI. Pinned optional adapter; never blocks frontend work when unavailable. | `.agents/skills/react-doctor/SKILL.md` |
 | Use when the user asks to refactor code. | `.agents/skills/refactoring/SKILL.md` |
 | Use when the user asks to bootstrap a new repo or project. | `.agents/skills/repo-bootstrap/SKILL.md` |
 | Use when the user asks to reason step by step. | `.agents/skills/sequential-thinking/SKILL.md` |

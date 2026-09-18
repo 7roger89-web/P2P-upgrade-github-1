@@ -197,6 +197,18 @@ RELEASE_SKILLS = (
     "rag-grounding",
     "rag-prep",
     "rag-router",
+    # P2P_FRONTEND_UPSTREAM_INTAKE_01: first curated frontend capability pack.
+    # frontend-design (context-fit wrapper + PracticalSwan v2),
+    # frontend-development (thin hub), four vendored upstream units, and the
+    # pinned react-doctor external-tool adapter. Installed projects receive
+    # these under project-local .agents/skills/ via install.sh/install.ps1.
+    "frontend-design",
+    "frontend-development",
+    "react-best-practices",
+    "composition-patterns",
+    "frontend-code-review",
+    "baseline-ui",
+    "react-doctor",
 )
 COPYTREE_IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", ".coverage")
 

@@ -7,7 +7,7 @@ description: Dùng khi user hỏi về UI animation, motion design, gesture, tra
 
 ## Mục Đích
 
-Skill này là router điều phối cho bộ skill UI animation/design gồm tra thuật ngữ animation, tư vấn Apple-style fluid interaction, tư vấn Emil-style design engineering, review animation code/diff, và audit/cải thiện animation toàn codebase. 
+Skill này là router điều phối cho bộ skill UI animation/design gồm tra thuật ngữ animation, tư vấn Apple-style fluid interaction, tư vấn Emil-style design engineering, review animation code/diff, audit/cải thiện animation toàn codebase, và tìm motion opportunities nên/không nên animate.
 
 Không dùng file này để thay thế các skill con. Dùng nó để chọn đúng skill con, đọc `SKILL.md` của skill con đó, rồi làm theo workflow của skill con.
 
@@ -20,6 +20,7 @@ Không dùng file này để thay thế các skill con. Dùng nó để chọn �
 | Tư vấn polish component, easing, duration, component feel, design engineering craft | `skills/UI-animation-design/emil-design-eng` | Dùng cho taste/craft, decision framework, component-level motion |
 | Audit animation toàn app, “improve animations”, “make app feel better”, roadmap animation fixes | `skills/UI-animation-design/improve-animations` | Read-only trên source code; tạo audit/plan, không sửa code |
 | Review diff/file/code animation cụ thể | `skills/UI-animation-design/review-animations` | Dùng standards nghiêm ngặt, cite `file:line`, trả findings + verdict |
+| Tìm chỗ nên/không nên animate, “what could be animated here”, “make this feel more alive” | `skills/UI-animation-design/find-animation-opportunities` | Report-only; gate frequency/purpose/speed/function, tối đa 5-7 gợi ý |
 
 ## Quy Tắc Đọc
 
@@ -96,6 +97,17 @@ Dùng `emil-design-eng` khi vấn đề xoay quanh:
 - animation feel
 - performance và craft detail
 
+### Tìm Motion Opportunities
+
+Dùng `find-animation-opportunities` khi user hỏi:
+
+- “what could be animated here”
+- “make this feel more alive”
+- chỗ nào nên thêm motion / chỗ nào không nên
+
+Skill này report-only, không sửa code. Mọi gợi ý phải qua Gate
+(frequency/purpose/speed/function), nêu rõ rejected candidates.
+
 ## Conflict Rules
 
 1. `review-animations` thắng khi user yêu cầu review code/diff cụ thể.
@@ -103,14 +115,17 @@ Dùng `emil-design-eng` khi vấn đề xoay quanh:
 3. `animation-vocabulary` thắng khi user chỉ hỏi tên hiệu ứng.
 4. `apple-design` thắng khi trọng tâm là gesture, spring, momentum, velocity, sheet, drag, swipe, hoặc material.
 5. `emil-design-eng` thắng khi trọng tâm là polish, taste, component feel, easing, duration, hoặc perceived quality.
-6. Nếu user vừa cần naming vừa cần thiết kế, dùng `animation-vocabulary` trước để đặt tên, rồi chuyển sang skill thiết kế phù hợp.
-7. Nếu user vừa cần audit toàn app vừa hỏi một diff cụ thể, dùng `review-animations` cho diff cụ thể và `improve-animations` cho roadmap toàn app.
+6. `find-animation-opportunities` thắng khi user hỏi chỗ nên/không nên animate mà chưa có motion code cụ thể để review.
+7. Nếu user vừa cần naming vừa cần thiết kế, dùng `animation-vocabulary` trước để đặt tên, rồi chuyển sang skill thiết kế phù hợp.
+8. Nếu user vừa cần audit toàn app vừa hỏi một diff cụ thể, dùng `review-animations` cho diff cụ thể và `improve-animations` cho roadmap toàn app.
 
 ## Không Được Trộn Mode
 
 Không dùng `improve-animations` để review một diff nhỏ.
 
 Không dùng `review-animations` để audit toàn codebase.
+
+Không dùng `find-animation-opportunities` để review motion code đã tồn tại.
 
 Không dùng `animation-vocabulary` để đề xuất implementation.
 
@@ -135,6 +150,7 @@ Theo skill con đã chọn:
 - `animation-vocabulary`: trả thuật ngữ ngắn gọn, có 1-2 alternate nếu cần.
 - `review-animations`: trả markdown table `Before | After | Why`, rồi verdict.
 - `improve-animations`: trả audit table, missed opportunities, rồi chờ user chọn plan.
+- `find-animation-opportunities`: trả opportunities table, rejected candidates (bắt buộc), rồi verdict.
 - `apple-design`: trả khuyến nghị interaction cụ thể, nêu rõ spring/velocity/material/reduced-motion khi liên quan.
 - `emil-design-eng`: trả khuyến nghị design engineering cụ thể, có easing/duration/implementation guidance khi cần.
 
