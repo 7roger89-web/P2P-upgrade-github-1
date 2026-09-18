@@ -453,6 +453,7 @@ def _render_context_block(
             # Shortened but semantically equivalent to preserve budget for PRIMARY_RISK_WRAPPER.
             # Keeps executor-receipt != CT self-read invariant while fitting tight budgets.
             "P2P_LAW_PREFLIGHT=read AGENTS.md; resolve canonical>installed>portable>inline; report P2P_LAW_SOURCE; no fake read; executor receipt != Control Tower self-read.",
+            "REMOTE_PROJECTION_GATE=repo-scoped handoff: fresh-compare target portable hash to canonical; stale/missing=>refresh via authorized repo path or INLINE_CAPSULE; never delegate stale portable.",
             "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
         )
     )
