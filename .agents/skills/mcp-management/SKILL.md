@@ -56,7 +56,13 @@ LLM analyzes `assets/tools.json` directly - better than keyword matching algorit
 
 ### 4. Tool Execution
 
-**Primary: Gemini CLI** (if available)
+**Capability-first and provider-neutral**: use whichever MCP execution path the
+current executor actually exposes. Gemini CLI is one supported path, not a
+required provider. An equivalent host MCP client, Chrome DevTools MCP,
+Playwright, or another executor-native capability is equally valid when it
+satisfies the task contract. Do not add a second router or registry.
+
+**Example path: Gemini CLI** (if available)
 ```bash
 gemini -y -m gemini-2.5-flash -p "Take a screenshot of https://example.com"
 ```
@@ -72,7 +78,7 @@ See [references/gemini-cli-integration.md](references/gemini-cli-integration.md)
 
 ## Implementation Patterns
 
-### Pattern 1: Gemini CLI Auto-Execution (Primary)
+### Pattern 1: Gemini CLI Auto-Execution (example provider)
 
 Use Gemini CLI for automatic tool discovery and execution. See [references/gemini-cli-integration.md](references/gemini-cli-integration.md) for complete guide.
 
