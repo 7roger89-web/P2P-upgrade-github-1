@@ -177,6 +177,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn("LAW_AUTHORITY=ONE", block)
             self.assertIn("P2P_LAW_PREFLIGHT=", block)
             self.assertIn("repo-scoped portable=fresh|inline", block)
+            self.assertIn("no cross-repo probe solely for fallback", block)
             self.assertIn("OE_GATE=", block)
             self.assertIn("XP=USE_ACTIVE_EXPERIENCE", block)
             self.assertIn("NONAUTHORITATIVE", block)
@@ -305,6 +306,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn(control_tower.CONTEXT_MARKER, prompt)
             self.assertIn("P2P_LAW_PREFLIGHT=", prompt)
             self.assertIn("repo-scoped portable=fresh|inline", prompt)
+            self.assertIn("no cross-repo probe solely for fallback", prompt)
             self.assertIn("OE_GATE=", prompt)
             self.assertIn("GITHUB_GUIDANCE=", prompt)
             self.assertIn("XP=USE_ACTIVE_EXPERIENCE", prompt)
@@ -406,6 +408,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn("P2P_SUPREME_LAW_PREFLIGHT:", final_prompt)
             self.assertIn("P2P_LAW_PREFLIGHT=", final_prompt)
             self.assertIn("repo-scoped portable=fresh|inline", final_prompt)
+            self.assertIn("no cross-repo probe solely for fallback", final_prompt)
             self.assertIn("OE_GATE=", final_prompt)
 
 
