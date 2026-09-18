@@ -17,11 +17,21 @@ import types
 import zlib
 from pathlib import Path
 
-from p2p_skill_profile import (
-    PROFILES as CAPABILITY_PROFILES,
-    SCHEMA_VERSION as CAPABILITY_PROFILE_SCHEMA,
-    expected_skills_for_profile,
-)
+try:
+    from p2p_skill_profile import (
+        PROFILES as CAPABILITY_PROFILES,
+        SCHEMA_VERSION as CAPABILITY_PROFILE_SCHEMA,
+        expected_skills_for_profile,
+    )
+except ModuleNotFoundError:
+    scripts_root = Path(__file__).resolve().parent
+    if str(scripts_root) not in sys.path:
+        sys.path.insert(0, str(scripts_root))
+    from p2p_skill_profile import (
+        PROFILES as CAPABILITY_PROFILES,
+        SCHEMA_VERSION as CAPABILITY_PROFILE_SCHEMA,
+        expected_skills_for_profile,
+    )
 
 EXPECTED_SKILLS = {
     "bb4pda",
