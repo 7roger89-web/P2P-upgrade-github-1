@@ -125,8 +125,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn(control_tower.CONTEXT_MARKER, block)
             self.assertIn("LAW_AUTHORITY=ONE", block)
             self.assertIn("P2P_LAW_PREFLIGHT=", block)
-            self.assertIn("REMOTE_PROJECTION_GATE=", block)
-            self.assertIn("never delegate stale portable", block)
+            self.assertIn("repo-scoped portable=fresh|inline", block)
             self.assertIn("OE_GATE=", block)
             self.assertIn("XP=USE_ACTIVE_EXPERIENCE", block)
             self.assertIn("NONAUTHORITATIVE", block)
@@ -254,7 +253,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertIn("SUPREME_LAW_CAPSULE:", prompt)
             self.assertIn(control_tower.CONTEXT_MARKER, prompt)
             self.assertIn("P2P_LAW_PREFLIGHT=", prompt)
-            self.assertIn("REMOTE_PROJECTION_GATE=", prompt)
+            self.assertIn("repo-scoped portable=fresh|inline", prompt)
             self.assertIn("OE_GATE=", prompt)
             self.assertIn("GITHUB_GUIDANCE=", prompt)
             self.assertIn("XP=USE_ACTIVE_EXPERIENCE", prompt)
@@ -355,7 +354,7 @@ class ControlTowerContextAssemblyTests(unittest.TestCase):
             self.assertLessEqual(len(final_prompt), control_tower.PROMPT_GUARD_CHARS)
             self.assertIn("P2P_SUPREME_LAW_PREFLIGHT:", final_prompt)
             self.assertIn("P2P_LAW_PREFLIGHT=", final_prompt)
-            self.assertIn("REMOTE_PROJECTION_GATE=", final_prompt)
+            self.assertIn("repo-scoped portable=fresh|inline", final_prompt)
             self.assertIn("OE_GATE=", final_prompt)
 
 
