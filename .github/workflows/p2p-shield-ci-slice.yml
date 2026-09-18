@@ -91,7 +91,13 @@ jobs:
           import tempfile
           from pathlib import Path
 
-          from fw01.p2p_fw01_proof import ProofBackend, ProofVerifier, run_leg
+          from fw01.p2p_fw01_proof import (
+              ProofBackend,
+              ProofVerifier,
+              _make_records,
+              build_goal,
+          )
+          from p2p_capabilities.p2p_fw01_loop import build_fw01_loop
 
           repo = Path.cwd().resolve()
           expected_leg1 = [
@@ -114,6 +120,51 @@ jobs:
               os.symlink(repo / ".p2p" / "system", p2p / "system",
                          target_is_directory=True)
 
+          def current_records(root: Path):
+              records = _make_records(root)
+              # The August proof strings used "fixture-evidence-*". Current
+              # FW02 correctly treats the word "evidence" as a capability
+              # signal, which would demand live auth evidence in this fake
+              # fixture before the loop itself can be exercised.
+              # Keep evidence assertions in ProofVerifier, but make the
+              # fixture token semantically neutral for A/B/C. D remains the
+              # real owner-gate case.
+              for task_id in ("A", "B", "C"):
+                  records[task_id]["required_evidence"] = (
+                      f"fixture-proof-{task_id}-1",
+                  )
+              return records
+
+          def run_current_leg(root: Path, backend, verifier, max_steps=8):
+              loop = build_fw01_loop(
+                  root,
+                  goal_plan=build_goal(root),
+                  task_records=current_records(root),
+                  backend=backend,
+                  verifier=verifier,
+                  registry_permissions=("read", "write", "run-tests", "diff"),
+                  goal_scope="workspace",
+                  goal_non_scope="production security credentials",
+                  expected_project_revision="fixture-head-1",
+                  execution_targets=("fake-1",),
+              )
+              statuses = []
+              outcomes = []
+              for _ in range(max_steps):
+                  outcome = loop.step()
+                  outcomes.append(outcome)
+                  statuses.append(outcome.get("status"))
+                  if outcome.get("status") in (
+                      "GOAL_DONE",
+                      "OWNER_GATE_REQUIRED",
+                      "STOP_FAIL_CLOSED",
+                      "PRE_DISPATCH_BLOCKED",
+                      "LOOP_GUARD_BLOCKED",
+                      "BUDGET_BOUNDARY",
+                  ):
+                      break
+              return statuses, outcomes
+
           for trial in (1, 2):
               base = Path(tempfile.mkdtemp(prefix=f"p2p-goal-loop-{trial}-"))
               fixture = base / "consumer"
@@ -122,26 +173,32 @@ jobs:
 
               backend1 = ProofBackend()
               verifier1 = ProofVerifier()
-              leg1 = run_leg(fixture, backend1, verifier1, max_steps=8)
+              leg1, outcomes1 = run_current_leg(
+                  fixture, backend1, verifier1, max_steps=8
+              )
 
               backend2 = ProofBackend()
               verifier2 = ProofVerifier()
-              leg2 = run_leg(fixture, backend2, verifier2, max_steps=8)
+              leg2, outcomes2 = run_current_leg(
+                  fixture, backend2, verifier2, max_steps=8
+              )
 
               evidence = {
                   "trial": trial,
-                  "leg1": leg1["status_sequence"],
-                  "leg2": leg2["status_sequence"],
+                  "leg1": leg1,
+                  "leg2": leg2,
                   "leg1_executed": list(backend1.executed),
                   "leg2_executed": list(backend2.executed),
                   "leg1_verifications": list(verifier1.verifications),
                   "leg2_verifications": list(verifier2.verifications),
+                  "leg1_last": outcomes1[-1] if outcomes1 else None,
+                  "leg2_last": outcomes2[-1] if outcomes2 else None,
                   "claim_boundary": "SYNTHETIC_CONTROL_FLOW_ONLY",
               }
-              print(json.dumps(evidence, sort_keys=True))
+              print(json.dumps(evidence, sort_keys=True, default=str))
 
-              assert leg1["status_sequence"] == expected_leg1, evidence
-              assert leg2["status_sequence"] == expected_leg2, evidence
+              assert leg1 == expected_leg1, evidence
+              assert leg2 == expected_leg2, evidence
               assert backend1.executed == ["A", "B", "C"], evidence
               assert backend2.executed == [], evidence
               assert len(verifier1.verifications) == 3, evidence
