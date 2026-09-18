@@ -47,7 +47,7 @@ reachable active canonical notebook
 
 `TASK_BRANCH != LAW_AUTHORITY` and `TARGET_PROJECT != LAW_SOURCE` remain mandatory.
 
-When canonical access is available, compare against canonical and canonical wins. When canonical access is unavailable, an installed executor may use its valid installed projection; a fresh remote clone may use the generated portable projection and must report the source it actually read rather than falsely claiming it read the canonical repository.
+When canonical access is already available in the current actor/session, compare against canonical and canonical wins. A repo-scoped remote executor with a valid generated portable projection does not need to probe another private repository merely to prove canonical is unavailable. `TARGET_REPO_AUTH != CANONICAL_CROSS_REPO_REACHABILITY`. In that case it reads the portable projection directly and reports `P2P_LAW_SOURCE=LOCAL_PORTABLE`. An installed executor may still use its valid installed projection according to the normal precedence. Never claim a source was read when it was not.
 
 ## Future project provisioning rule
 
@@ -74,6 +74,12 @@ reach the private P2P source repository:
    repository path, preferably on a bounded branch/PR;
 4. verify the target projection records the fresh canonical source identity;
 5. only then hand off work that expects `P2P_LAW_SOURCE=LOCAL_PORTABLE`.
+
+The repo-scoped executor should then read repository-root `AGENTS.md` and the
+valid local portable projection directly. It must not issue a `gh`/API request
+to the private canonical repository solely to manufacture a 404 before using
+that already-prepared fallback. A canonical source that is already proven
+reachable in the executor's own session still wins.
 
 If repository write access is unavailable, do not use the stale projection.
 Carry a fresh inline capsule for that handoff instead. Do not provision a new
