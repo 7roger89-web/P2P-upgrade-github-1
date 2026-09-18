@@ -30,6 +30,22 @@ Anvien is a discovery tool for QA. It helps map routes, mounted surfaces, handle
 - If a blocker prevents downstream verification, downstream scope is `Blocked`, not passed.
 - For final visible QA, open the real built website, runtime, or generated app artifact the same way a user would open it, in a visible browser or app window on the user's physical PC. Headless, hidden, source-only, test-only, or screenshot-only execution cannot approve final visible QA.
 
+## Scope boundary: bounded runtime review vs full release QA
+
+`BOUNDED_RUNTIME_REVIEW != FULL_RELEASE_QA_CERTIFICATION`. The Iron Laws,
+full-build prerequisites, Owner-physical-PC visible-QA rule, Anvien discovery
+steps, and exhaustive every-control/every-action sweeps in this skill apply to
+full release QA certification. They are NOT mandatory for a bounded UI/UX
+runtime review routed through `p2p-uiux`.
+
+For a bounded UI/UX runtime review: `ANVIEN_REQUIRED=NO`,
+`OWNER_PHYSICAL_PC_REQUIRED=NO`, `COMPUTER_USE_REQUIRED=NO`,
+`CATDESK_REQUIRED=NO`. Anvien remains optional discovery support only. A
+cloud/sandbox/isolated browser is valid evidence when it satisfies the task
+contract, provided the evidence is scoped honestly to that environment and no
+Owner-device certification is claimed. Such a review must not be reported as
+release QA certification.
+
 ## Source Of Expected Behavior
 
 Use the first available applicable authority, in this order:
