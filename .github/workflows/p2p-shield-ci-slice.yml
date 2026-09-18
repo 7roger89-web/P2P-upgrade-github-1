@@ -79,6 +79,75 @@ jobs:
           tests.test_p2p_control_tower_context_assembly
           tests.test_p2p_control_tower_self_law_gate
 
+      - name: Run current-main bounded-loop pilot twice
+        env:
+          PYTHONPATH: .p2p/system:scripts
+        run: |
+          set -euo pipefail
+          for trial in 1 2; do
+            OUT="$RUNNER_TEMP/p2p-goal-loop-pilot-$trial"
+            python3 scripts/fw01/p2p_fw01_proof.py all "$OUT"
+            python3 - "$OUT/fw01-proof-report.json" "$trial" <<'PY'
+          import json
+          import sys
+
+          report_path, trial = sys.argv[1], sys.argv[2]
+          with open(report_path, encoding="utf-8") as handle:
+              report = json.load(handle)
+
+          primary = report["primary"]
+          expected_leg1 = [
+              "TASK_DONE_CONTINUE",
+              "TASK_DONE_CONTINUE",
+              "TASK_DONE_CONTINUE",
+              "PRE_DISPATCH_BLOCKED",
+          ]
+          expected_leg2 = ["PRE_DISPATCH_BLOCKED"]
+
+          assert primary.get("status_sequence_leg1") == expected_leg1, (
+              f"trial {trial}: unexpected leg1: {primary.get('status_sequence_leg1')}"
+          )
+          assert primary.get("status_sequence_leg2") == expected_leg2, (
+              f"trial {trial}: unexpected leg2: {primary.get('status_sequence_leg2')}"
+          )
+          counts = primary.get("execution_counts_after_restart", {})
+          assert counts == {"A": 0, "B": 0, "C": 0, "D": 0}, (
+              f"trial {trial}: duplicate execution after restart: {counts}"
+          )
+
+          negative = report.get("negative", {})
+          errors = {
+              name: result.get("error")
+              for name, result in negative.items()
+              if isinstance(result, dict) and result.get("error")
+          }
+          not_verified = []
+          def scan(path, value):
+              if isinstance(value, dict):
+                  for key, item in value.items():
+                      scan(path + [str(key)], item)
+              elif isinstance(value, list):
+                  for idx, item in enumerate(value):
+                      scan(path + [str(idx)], item)
+              elif value == "NOT_VERIFIED":
+                  not_verified.append(".".join(path))
+          scan(["negative"], negative)
+          assert not errors, f"trial {trial}: negative proof errors: {errors}"
+          assert not not_verified, (
+              f"trial {trial}: negative proofs not verified: {not_verified}"
+          )
+          print(json.dumps({
+              "trial": trial,
+              "status": "PASS",
+              "leg1": primary["status_sequence_leg1"],
+              "leg2": primary["status_sequence_leg2"],
+              "post_restart_execution_counts": counts,
+              "negative_proofs": sorted(negative),
+              "claim_boundary": "SYNTHETIC_CONTROL_FLOW_ONLY",
+          }, sort_keys=True))
+          PY
+          done
+
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
         env:
