@@ -150,6 +150,45 @@ file it could not access. The prompt writer must not copy the whole notebook
 into ordinary prompts when the generated projection or compact capsule is
 sufficient.
 
+### Remote repo-scoped projection freshness gate
+
+A handoff to a remote executor that may only see the target repository must
+not rely on a portable projection merely because the file exists.
+
+```text
+REMOTE_REPO_SCOPED_HANDOFF => FRESH_CHECK_TARGET_PORTABLE
+KNOWN_STALE_OR_MISSING_PORTABLE != VALID_LAW_CONTEXT
+```
+
+When the parent Control Tower or prompt writer has authenticated access to the
+canonical P2P source and the Git-hosted target repository, it must perform the
+smallest freshness check before delegating substantive work:
+
+1. fresh-read the active canonical notebook and establish its content SHA-256;
+2. read the target repository's `AGENTS.md` and portable projection header;
+3. if the portable projection is missing or its recorded source identity does
+   not match the fresh canonical source, refresh the target projection using
+   the existing projector semantics: full canonical notebook plus provenance
+   header and the managed `AGENTS.md` portable-law block;
+4. verify the target repository state now carries the matching source identity
+   before telling a repo-scoped executor to rely on `LOCAL_PORTABLE`.
+
+For GitHub-hosted projects, an already-authorized GitHub connector/repository
+write path may perform this refresh on a branch/PR without requiring a local
+clone. Use existing merge/Owner-Gate rules; this gate grants no new merge,
+deployment, secret, infrastructure, or destructive authority.
+
+If the parent can read canonical law but cannot safely refresh the target
+repository, it must mark the target portable projection stale/missing and
+serialize a fresh compact `SUPREME_LAW_CAPSULE` for that handoff. The
+repo-scoped executor must then report `P2P_LAW_SOURCE=INLINE_CAPSULE`; it must
+not treat a known-stale portable file as current law.
+
+This is a handoff-time freshness gate, not a background synchronization
+service. Do not add a daemon, watcher, polling loop, repository registry,
+GitHub Action, PAT/secret, or second control plane solely to keep projections
+fresh.
+
 ### GitHub connector preflight and failure classification
 
 GitHub-dependent work must distinguish the Owner's ChatGPT GitHub connection
