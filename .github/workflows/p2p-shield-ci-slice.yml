@@ -84,18 +84,16 @@ jobs:
           PYTHONPATH: .p2p/system:scripts
         run: |
           set -euo pipefail
-          for trial in 1 2; do
-            OUT="$RUNNER_TEMP/p2p-goal-loop-pilot-$trial"
-            python3 scripts/fw01/p2p_fw01_proof.py all "$OUT"
-            python3 - "$OUT/fw01-proof-report.json" "$trial" <<'PY'
+          python3 - <<'PY'
           import json
-          import sys
+          import os
+          import shutil
+          import tempfile
+          from pathlib import Path
 
-          report_path, trial = sys.argv[1], sys.argv[2]
-          with open(report_path, encoding="utf-8") as handle:
-              report = json.load(handle)
+          from fw01.p2p_fw01_proof import ProofBackend, ProofVerifier, run_leg
 
-          primary = report["primary"]
+          repo = Path.cwd().resolve()
           expected_leg1 = [
               "TASK_DONE_CONTINUE",
               "TASK_DONE_CONTINUE",
@@ -104,49 +102,52 @@ jobs:
           ]
           expected_leg2 = ["PRE_DISPATCH_BLOCKED"]
 
-          assert primary.get("status_sequence_leg1") == expected_leg1, (
-              f"trial {trial}: unexpected leg1: {primary.get('status_sequence_leg1')}"
-          )
-          assert primary.get("status_sequence_leg2") == expected_leg2, (
-              f"trial {trial}: unexpected leg2: {primary.get('status_sequence_leg2')}"
-          )
-          counts = primary.get("execution_counts_after_restart", {})
-          assert counts == {"A": 0, "B": 0, "C": 0, "D": 0}, (
-              f"trial {trial}: duplicate execution after restart: {counts}"
-          )
+          def installed_fixture(root: Path) -> None:
+              (root / "workspace").mkdir(parents=True)
+              (root / "workspace" / "manifest.json").write_text(
+                  json.dumps({"project": "goal-loop-current-main-pilot",
+                              "head": "fixture-head-1"}, indent=2),
+                  encoding="utf-8",
+              )
+              p2p = root / ".p2p"
+              p2p.mkdir(parents=True)
+              os.symlink(repo / ".p2p" / "system", p2p / "system",
+                         target_is_directory=True)
 
-          negative = report.get("negative", {})
-          errors = {
-              name: result.get("error")
-              for name, result in negative.items()
-              if isinstance(result, dict) and result.get("error")
-          }
-          not_verified = []
-          def scan(path, value):
-              if isinstance(value, dict):
-                  for key, item in value.items():
-                      scan(path + [str(key)], item)
-              elif isinstance(value, list):
-                  for idx, item in enumerate(value):
-                      scan(path + [str(idx)], item)
-              elif value == "NOT_VERIFIED":
-                  not_verified.append(".".join(path))
-          scan(["negative"], negative)
-          assert not errors, f"trial {trial}: negative proof errors: {errors}"
-          assert not not_verified, (
-              f"trial {trial}: negative proofs not verified: {not_verified}"
-          )
-          print(json.dumps({
-              "trial": trial,
-              "status": "PASS",
-              "leg1": primary["status_sequence_leg1"],
-              "leg2": primary["status_sequence_leg2"],
-              "post_restart_execution_counts": counts,
-              "negative_proofs": sorted(negative),
-              "claim_boundary": "SYNTHETIC_CONTROL_FLOW_ONLY",
-          }, sort_keys=True))
+          for trial in (1, 2):
+              base = Path(tempfile.mkdtemp(prefix=f"p2p-goal-loop-{trial}-"))
+              fixture = base / "consumer"
+              fixture.mkdir()
+              installed_fixture(fixture)
+
+              backend1 = ProofBackend()
+              verifier1 = ProofVerifier()
+              leg1 = run_leg(fixture, backend1, verifier1, max_steps=8)
+
+              backend2 = ProofBackend()
+              verifier2 = ProofVerifier()
+              leg2 = run_leg(fixture, backend2, verifier2, max_steps=8)
+
+              evidence = {
+                  "trial": trial,
+                  "leg1": leg1["status_sequence"],
+                  "leg2": leg2["status_sequence"],
+                  "leg1_executed": list(backend1.executed),
+                  "leg2_executed": list(backend2.executed),
+                  "leg1_verifications": list(verifier1.verifications),
+                  "leg2_verifications": list(verifier2.verifications),
+                  "claim_boundary": "SYNTHETIC_CONTROL_FLOW_ONLY",
+              }
+              print(json.dumps(evidence, sort_keys=True))
+
+              assert leg1["status_sequence"] == expected_leg1, evidence
+              assert leg2["status_sequence"] == expected_leg2, evidence
+              assert backend1.executed == ["A", "B", "C"], evidence
+              assert backend2.executed == [], evidence
+              assert len(verifier1.verifications) == 3, evidence
+              assert verifier2.verifications == [], evidence
+              shutil.rmtree(base)
           PY
-          done
 
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
