@@ -21,6 +21,7 @@ try:
     from p2p_skill_profile import (
         PROFILES as CAPABILITY_PROFILES,
         SCHEMA_VERSION as CAPABILITY_PROFILE_SCHEMA,
+        detect_profile,
         expected_skills_for_profile,
     )
 except ModuleNotFoundError:
@@ -198,6 +199,18 @@ def expected_skills_for_root(root: Path, report: Report) -> set[str]:
     except ValueError as exc:
         report.fail("capability-profile", str(exc))
         return set(EXPECTED_SKILLS)
+    if profile != "ALL":
+        detected_profile, detection_evidence = detect_profile(root)
+        if detected_profile != profile:
+            report.fail(
+                "capability-profile",
+                f"Capability profile is stale: receipt={profile}, detected={detected_profile}; rerun the P2P installer",
+            )
+            report.warn(
+                "capability-profile-evidence",
+                "Current project markers: " + ", ".join(detection_evidence),
+            )
+            return expected_skills_for_profile(EXPECTED_SKILLS, detected_profile)
     selected_set = {str(item) for item in selected}
     if selected_set != expected:
         report.fail(
