@@ -6,10 +6,12 @@ import importlib.util
 import json
 import tempfile
 import unittest
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 PROFILE_SCRIPT = ROOT / "scripts" / "p2p_skill_profile.py"
 PACKAGE_SCRIPT = ROOT / "scripts" / "package_release.py"
 INSTALL_SH = ROOT / "install.sh"
