@@ -312,11 +312,18 @@ the canonical notebook.
 
 ## Validation
 
-Use the command that matches the filesystem being validated:
+Use the command that matches the filesystem being validated. The `.p2p/system/**`
+commands below run from the root of a P2P-installed project, where `install.sh` /
+`install.ps1` place the package's own scripts:
 
 - Unpacked package validation: `python3 scripts/doctor.py --package .`
-- Installed project validation: `python3 .p2p/system/scripts/doctor.py --root .`
+- Installed project validation: `python3 .p2p/system/scripts/doctor.py --root . --role installed`
 - Installed drift validation: `python3 .p2p/system/scripts/p2p_governance.py drift --root . --governance .p2p/system/governance`
+
+In this development/source checkout that same `.p2p/system/scripts/doctor.py` path
+holds the UI/UX runtime doctor, invoked as
+`python3 .p2p/system/scripts/doctor.py --source .p2p/system`; the installed-project
+lanes above are run in an installed project root, not in the package source.
 
 For an unpacked package, also validate every `SKILL.md` and custom-agent TOML,
 reconcile the source inventory to 152/152 for baseline 8.4.6-C, and confirm no
