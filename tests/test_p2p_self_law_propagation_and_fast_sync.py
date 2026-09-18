@@ -51,6 +51,9 @@ def test_thin_installer_contains_actor_separation():
     assert "LAW_CONTEXT_BLOCKED" in text
     assert "Remote repo-scoped handoff freshness" in text
     assert "known-stale portable copy" in text
+    assert "TARGET_REPO_AUTH != CANONICAL_CROSS_REPO_REACHABILITY" in text
+    assert "Do not issue a cross-repository" in text
+    assert "P2P_LAW_SOURCE=LOCAL_PORTABLE" in text
     # must remain thin: not copy full law body
     assert "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS" not in text
     print("thin installer actor separation: PASS")
@@ -69,6 +72,9 @@ def test_portable_agents_block_contains_actor_separation():
     assert "Remote repo-scoped handoff freshness" in block
     assert "known-stale portable copy" in block
     assert "authenticated GitHub connector" in block
+    assert "TARGET_REPO_AUTH != CANONICAL_CROSS_REPO_REACHABILITY" in block
+    assert "do not probe canonical solely" in block
+    assert "P2P_LAW_SOURCE=<actual source>" in block
     print("portable block actor separation: PASS")
 
 
