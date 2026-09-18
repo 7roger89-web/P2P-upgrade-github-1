@@ -27,6 +27,8 @@ assert package_spec and package_spec.loader
 package_release = importlib.util.module_from_spec(package_spec)
 package_spec.loader.exec_module(package_release)
 
+import doctor as p2p_doctor
+
 
 class ProjectFitDetectionTests(unittest.TestCase):
     def test_backend_or_empty_project_gets_core_profile(self) -> None:
@@ -145,6 +147,90 @@ class PackagingAndInstallerContractTests(unittest.TestCase):
             self.assertEqual(receipt["schema_version"], "p2p-capability-profile/1")
             self.assertEqual(receipt["profile"], profile.PROFILE_FRONTEND_GENERIC)
             self.assertNotIn(str(root), json.dumps(receipt))
+
+
+class DoctorProfileReceiptTests(unittest.TestCase):
+    def _make_installed_root(self, tmp: str, profile_name: str) -> tuple[Path, set[str]]:
+        root = Path(tmp) / "project"
+        system = root / ".p2p" / "system"
+        system.mkdir(parents=True)
+        expected = profile.expected_skills_for_profile(
+            p2p_doctor.EXPECTED_SKILLS, profile_name
+        )
+        aliases = {
+            "react-best-practices": "vercel-react-best-practices",
+            "composition-patterns": "vercel-composition-patterns",
+            "frontend-development": "frontend-dev-guidelines",
+        }
+        for name in expected:
+            entry = root / ".agents" / "skills" / name
+            entry.mkdir(parents=True, exist_ok=True)
+            frontmatter_name = aliases.get(name, name)
+            (entry / "SKILL.md").write_text(
+                f"---\nname: {frontmatter_name}\ndescription: test skill\n---\n",
+                encoding="utf-8",
+            )
+        receipt = {
+            "schema_version": profile.SCHEMA_VERSION,
+            "profile": profile_name,
+            "detection_evidence": ["fixture"],
+            "selected_skills": sorted(expected),
+            "excluded_pack_skills": [],
+            "preserve_existing_unselected_skills": True,
+        }
+        (system / "capability-profile.json").write_text(
+            json.dumps(receipt) + "\n", encoding="utf-8"
+        )
+        return root, expected
+
+    def test_doctor_accepts_matching_generic_profile_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = self._make_installed_root(tmp, profile.PROFILE_FRONTEND_GENERIC)
+            (root / "index.html").write_text("<html></html>\n", encoding="utf-8")
+            report = p2p_doctor.Report()
+            p2p_doctor.check_skills(root, report)
+            failures = [item for item in report.items if item["level"] == "FAIL"]
+            self.assertEqual(failures, [])
+            self.assertTrue(
+                any(
+                    item["check"] == "capability-profile" and item["level"] == "PASS"
+                    for item in report.items
+                )
+            )
+
+    def test_doctor_rejects_stale_profile_after_stack_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, _ = self._make_installed_root(tmp, profile.PROFILE_CORE)
+            (root / "package.json").write_text(
+                json.dumps({"dependencies": {"react": "^19.0.0"}}),
+                encoding="utf-8",
+            )
+            report = p2p_doctor.Report()
+            p2p_doctor.check_skills(root, report)
+            self.assertTrue(
+                any(
+                    item["check"] == "capability-profile"
+                    and item["level"] == "FAIL"
+                    and "stale" in item["message"]
+                    for item in report.items
+                )
+            )
+
+    def test_doctor_rejects_tampered_selected_skill_list(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root, expected = self._make_installed_root(tmp, profile.PROFILE_CORE)
+            receipt_path = root / ".p2p" / "system" / "capability-profile.json"
+            receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+            receipt["selected_skills"] = sorted(expected - {"p2p"})
+            receipt_path.write_text(json.dumps(receipt) + "\n", encoding="utf-8")
+            report = p2p_doctor.Report()
+            p2p_doctor.check_skills(root, report)
+            self.assertTrue(
+                any(
+                    item["check"] == "capability-profile" and item["level"] == "FAIL"
+                    for item in report.items
+                )
+            )
 
 
 if __name__ == "__main__":
