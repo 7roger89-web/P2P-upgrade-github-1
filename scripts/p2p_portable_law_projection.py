@@ -29,6 +29,13 @@ CANONICAL_SOURCE = (
 )
 AGENTS_BEGIN = "<!-- BEGIN P2P PORTABLE LAW -->"
 AGENTS_END = "<!-- END P2P PORTABLE LAW -->"
+LEGACY_PREFLIGHT_HEADING = "## P2P law preflight"
+LEGACY_PREFLIGHT_REQUIRED_MARKERS = (
+    "7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+    ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md",
+    "P2P_LAW_SOURCE=",
+)
+
 
 
 def _sha256_text(value: str) -> str:
@@ -146,7 +153,39 @@ def _agents_block() -> str:
     )
 
 
+def _strip_recognized_legacy_preflight(existing: str) -> str:
+    """Remove a known standalone legacy P2P law-preflight section.
+
+    Older project bootstraps sometimes placed an unmanaged P2P law preflight
+    section before the generated portable block. When that stale section says
+    to probe canonical first, a repo-scoped executor may manufacture a
+    cross-repository 404 before reaching the current managed instructions.
+    Migrate only the exact P2P-shaped section identified by the heading plus
+    all required markers; preserve everything else verbatim.
+    """
+    start = existing.find(LEGACY_PREFLIGHT_HEADING)
+    if start < 0:
+        return existing
+    line_start = existing.rfind("\n", 0, start) + 1
+    if line_start != start:
+        return existing
+    next_heading = existing.find("\n## ", start + len(LEGACY_PREFLIGHT_HEADING))
+    end = len(existing) if next_heading < 0 else next_heading + 1
+    section = existing[start:end]
+    if not all(marker in section for marker in LEGACY_PREFLIGHT_REQUIRED_MARKERS):
+        return existing
+
+    prefix = existing[:start].rstrip()
+    suffix = existing[end:].lstrip("\n")
+    if prefix and suffix:
+        return prefix + "\n\n" + suffix
+    if prefix:
+        return prefix + "\n"
+    return suffix
+
+
 def _merge_agents(existing: str) -> str:
+    existing = _strip_recognized_legacy_preflight(existing)
     block = _agents_block()
     start = existing.find(AGENTS_BEGIN)
     end = existing.find(AGENTS_END)

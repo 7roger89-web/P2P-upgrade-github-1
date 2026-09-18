@@ -111,6 +111,69 @@ def test_projection_preserves_existing_agents_and_is_checkable(tmp_path: Path) -
     assert agents.startswith("# Existing project rules")
 
 
+
+def test_projection_migrates_recognized_legacy_preflight_without_touching_project_rules(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    legacy = """# AGENTS.md
+
+## P2P law preflight
+
+Before substantive work:
+
+1. Prefer canonical authenticated law:
+   `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
+2. If canonical cross-repo access is unavailable, read:
+   `.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`
+3. Report:
+   `P2P_LAW_SOURCE=CANONICAL_AUTHENTICATED|LOCAL_PORTABLE|LAW_CONTEXT_BLOCKED`
+
+## Repository role
+
+Keep this project-specific instruction.
+"""
+    (project / "AGENTS.md").write_text(legacy, encoding="utf-8")
+
+    first = _run(package, project)
+    assert first.returncode == 0, first.stderr + first.stdout
+    agents = (project / "AGENTS.md").read_text(encoding="utf-8")
+
+    assert "## P2P law preflight" not in agents
+    assert "Prefer canonical authenticated law" not in agents
+    assert agents.count("<!-- BEGIN P2P PORTABLE LAW -->") == 1
+    assert "do not probe canonical solely" in agents
+    assert "## Repository role" in agents
+    assert "Keep this project-specific instruction." in agents
+
+    second = _run(package, project)
+    assert second.returncode == 0
+    assert (project / "AGENTS.md").read_text(encoding="utf-8") == agents
+
+
+def test_projection_preserves_unrecognized_similar_project_section(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    custom = """# AGENTS.md
+
+## P2P law preflight
+
+This is a project-specific note without portable-law markers.
+
+## Repository role
+
+Keep me.
+"""
+    (project / "AGENTS.md").write_text(custom, encoding="utf-8")
+
+    result = _run(package, project)
+    assert result.returncode == 0, result.stderr + result.stdout
+    agents = (project / "AGENTS.md").read_text(encoding="utf-8")
+
+    assert "This is a project-specific note without portable-law markers." in agents
+    assert agents.count("<!-- BEGIN P2P PORTABLE LAW -->") == 1
+
 def test_check_fails_closed_after_projection_drift(tmp_path: Path) -> None:
     package = _package(tmp_path)
     project = tmp_path / "project"
