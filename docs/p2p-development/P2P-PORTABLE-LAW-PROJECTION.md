@@ -57,6 +57,29 @@ Do not copy the notebook manually. Regenerate it from the P2P package/source usi
 
 When the canonical notebook changes, refresh the projection with the same command. The operation is idempotent and replaces only the managed P2P portable-law block inside `AGENTS.md` while preserving unrelated project instructions.
 
+### GitHub-only / repo-scoped workflow
+
+A local clone is not required when the Owner operates projects directly on
+GitHub and the current Control Tower has an authenticated GitHub connector with
+repository write access.
+
+Before delegating work to Arena or another repo-scoped executor that may not
+reach the private P2P source repository:
+
+1. fresh-read the canonical notebook and establish its content SHA-256;
+2. read the target repository's `.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`
+   header and managed `AGENTS.md` block;
+3. if missing or stale, generate the exact projector-equivalent artifacts from
+   the current canonical notebook and update them through the authorized
+   repository path, preferably on a bounded branch/PR;
+4. verify the target projection records the fresh canonical source identity;
+5. only then hand off work that expects `P2P_LAW_SOURCE=LOCAL_PORTABLE`.
+
+If repository write access is unavailable, do not use the stale projection.
+Carry a fresh inline capsule for that handoff instead. Do not provision a new
+PAT, GitHub Action, watcher, registry, daemon, or service solely for this
+operation.
+
 ## Verification
 
 Read-only verification:

@@ -24,6 +24,20 @@ If canonical access is unavailable, use a valid installed projection or `SUPREME
 `TARGET_PROJECT != LAW_SOURCE`.
 If this entry point conflicts with the active canonical law, the canonical law wins.
 
+## Remote repo-scoped handoff freshness
+
+Before handing work to a repo-scoped remote executor that may not reach the
+canonical P2P repository, the parent Control Tower/prompt writer should
+fresh-compare the target portable projection's source identity with the
+reachable canonical notebook. If the target projection is stale or missing
+and an authorized repository write path is available, refresh the generated
+portable notebook and managed `AGENTS.md` block before handoff. If it cannot
+be refreshed safely, serialize a fresh `SUPREME_LAW_CAPSULE` and mark the
+portable projection stale/missing; never direct the executor to rely on a
+known-stale portable copy. A local clone is not required when an authenticated
+GitHub connector can update the target repository. Do not add a watcher,
+registry, GitHub Action, or new secret merely for this freshness check.
+
 ## Actor separation and self-law preflight
 
 Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool session) must establish its own valid Supreme Law context before substantive work. A law context valid for one actor does not satisfy another actor's preflight.

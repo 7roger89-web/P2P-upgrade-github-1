@@ -49,6 +49,8 @@ def test_thin_installer_contains_actor_separation():
     assert "EXECUTOR_P2P_LAW_SOURCE" in text
     assert "CONTROL_TOWER_SELF_LAW_RECEIPT=PASS" in text
     assert "LAW_CONTEXT_BLOCKED" in text
+    assert "Remote repo-scoped handoff freshness" in text
+    assert "known-stale portable copy" in text
     # must remain thin: not copy full law body
     assert "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS" not in text
     print("thin installer actor separation: PASS")
@@ -64,6 +66,9 @@ def test_portable_agents_block_contains_actor_separation():
     assert "CONTROL_TOWER_SELF_LAW_RECEIPT=PASS" in block
     assert "LAW_CONTEXT_BLOCKED" in block
     assert "TASK_BRANCH != LAW_AUTHORITY" in block
+    assert "Remote repo-scoped handoff freshness" in block
+    assert "known-stale portable copy" in block
+    assert "authenticated GitHub connector" in block
     print("portable block actor separation: PASS")
 
 
