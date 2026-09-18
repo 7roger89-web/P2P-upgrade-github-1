@@ -30,7 +30,12 @@ mechanisms.
    `P2P_SUPREME_OPERATING_LAW_V1` from the
    canonical P2P source
    `7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`,
-   regardless of the task branch. An installed
+   regardless of the task branch. For a repo-scoped remote clone with a valid
+   generated portable projection, target-repo authentication does not prove
+   canonical cross-repo reachability. Unless canonical has already been
+   successfully reached in the current actor/session, read the portable
+   projection directly instead of probing another private repo merely to
+   trigger fallback. An installed
    `.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md` may be used only when it
    contains that law. Every generated executor prompt must still carry the
    `SUPREME_LAW_CAPSULE` fallback so a stale branch or inaccessible canonical
