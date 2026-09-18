@@ -452,7 +452,7 @@ def _render_context_block(
         (
             # Shortened but semantically equivalent to preserve budget for PRIMARY_RISK_WRAPPER.
             # Keeps executor-receipt != CT self-read invariant while fitting tight budgets.
-            "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; canonical>installed>portable>inline; report P2P_LAW_SOURCE; never fake a read; repo-scoped portable=fresh|inline.",
+            "P2P_LAW_PREFLIGHT=read root AGENTS.md when present; canonical only if already reachable; repo-scoped portable=fresh|inline; no cross-repo probe solely for fallback; report P2P_LAW_SOURCE; never fake a read.",
             "OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.",
         )
     )
