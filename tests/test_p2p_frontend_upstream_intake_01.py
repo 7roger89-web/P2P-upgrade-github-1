@@ -487,6 +487,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/RESEARCH-ADOPTION-LEDGER.md",
             "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
             "tests/test_p2p_frontend_upstream_intake_01.py",
+            # Tower-directed same-PR repair (PR #211): hermeticize the
+            # control-tower context-assembly fixtures against ambient repo
+            # state (P2P_PROJECT_ROOT isolation; zero production changes).
+            "tests/test_p2p_control_tower_context_assembly.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -538,6 +542,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 "scripts/package_release.py",
                 "scripts/doctor.py",
                 "tests/test_p2p_frontend_upstream_intake_01.py",
+                # Tower-directed same-PR repair (PR #211): hermeticity-only.
+                "tests/test_p2p_control_tower_context_assembly.py",
                 ".agents/skills/frontend-design/scripts/contrast-checker.py",
                 ".claude/skills/frontend-design/scripts/contrast-checker.py",
                 ".p2p/system/.agents/skills/frontend-design/scripts/contrast-checker.py",
