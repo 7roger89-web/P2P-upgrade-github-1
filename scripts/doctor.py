@@ -17,6 +17,12 @@ import types
 import zlib
 from pathlib import Path
 
+from p2p_skill_profile import (
+    PROFILES as CAPABILITY_PROFILES,
+    SCHEMA_VERSION as CAPABILITY_PROFILE_SCHEMA,
+    expected_skills_for_profile,
+)
+
 EXPECTED_SKILLS = {
     "bb4pda",
     "notebook-pack",
@@ -153,21 +159,65 @@ def infer_role(root: Path) -> str:
     return "unknown"
 
 
+def expected_skills_for_root(root: Path, report: Report) -> set[str]:
+    """Resolve installed skill expectations from the installer-owned profile receipt."""
+    if infer_role(root) != "installed":
+        return set(EXPECTED_SKILLS)
+    receipt_path = root / ".p2p" / "system" / "capability-profile.json"
+    if not receipt_path.is_file():
+        report.warn(
+            "capability-profile",
+            "Legacy installed project has no capability profile receipt; using full historical skill expectation",
+        )
+        return set(EXPECTED_SKILLS)
+    try:
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        report.fail("capability-profile", f"Invalid capability profile receipt: {exc}")
+        return set(EXPECTED_SKILLS)
+    profile = receipt.get("profile")
+    selected = receipt.get("selected_skills")
+    if receipt.get("schema_version") != CAPABILITY_PROFILE_SCHEMA:
+        report.fail("capability-profile", "Capability profile receipt has the wrong schema")
+        return set(EXPECTED_SKILLS)
+    if profile not in CAPABILITY_PROFILES or not isinstance(selected, list):
+        report.fail("capability-profile", "Capability profile receipt is missing a supported profile or selected_skills")
+        return set(EXPECTED_SKILLS)
+    try:
+        expected = expected_skills_for_profile(EXPECTED_SKILLS, str(profile))
+    except ValueError as exc:
+        report.fail("capability-profile", str(exc))
+        return set(EXPECTED_SKILLS)
+    selected_set = {str(item) for item in selected}
+    if selected_set != expected:
+        report.fail(
+            "capability-profile",
+            "Capability profile receipt does not match the deterministic packaged skill profile",
+        )
+        return expected
+    report.pass_(
+        "capability-profile",
+        f"Installed capability profile {profile} selects {len(expected)} packaged skills",
+    )
+    return expected
+
+
 def check_skills(root: Path, report: Report) -> None:
     skills, _, _, _ = find_layout(root)
     if not skills.is_dir():
         report.fail("skills-dir", f"Missing skills directory: {skills}")
         return
+    expected_skills = expected_skills_for_root(root, report)
     found = {path.name for path in skills.iterdir() if path.is_dir() and (path / "SKILL.md").is_file()}
-    missing = EXPECTED_SKILLS - found
-    extra = found - EXPECTED_SKILLS
+    missing = expected_skills - found
+    extra = found - expected_skills
     if missing:
         report.fail("skills-count", f"Missing skills: {', '.join(sorted(missing))}")
     else:
-        report.pass_("skills-count", f"All {len(EXPECTED_SKILLS)} expected skills are present")
+        report.pass_("skills-count", f"All {len(expected_skills)} expected skills are present")
     if extra:
         report.warn("skills-extra", f"Additional skills are present: {', '.join(sorted(extra))}")
-    for name in sorted(EXPECTED_SKILLS & found):
+    for name in sorted(expected_skills & found):
         actual, description = parse_skill(skills / name / "SKILL.md")
         accepted = {name} | SKILL_NAME_ALIASES.get(name, set())
         if actual not in accepted:
