@@ -44,6 +44,21 @@ The assurance/release loop is separate:
 
 `Risk-Proportional Hardening → Independent Verification → Release`.
 
+### DesignArena as a replaceable product-fast-loop surface
+
+When DesignArena is selected for product/frontend work, route by bounded outcome instead of treating "Full-Stack" as the default:
+
+- Web Apps: default for multi-file frontend shells and vertical product slices that do not require persistence.
+- UI Component: use only when one difficult reusable widget deserves a focused design battle.
+- Data Visualization: use for timelines, comparison matrices, lineage, or dense analytical display.
+- Image-to-App: use only when a winning visual reference already exists and fidelity reconstruction is materially useful.
+- Full-Stack: use when database/auth/storage are explicit acceptance requirements; do not let Supabase template defaults silently become product architecture.
+- Agent Mode + GitHub: use for durable integration into an existing repository and bounded branch/PR work.
+
+The detailed reusable guide is `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
+
+DesignArena remains an executor/tool surface. It does not replace project architecture, task authority, P2P routing, evidence, Owner Gates, or release authority. Fresh official DesignArena capability evidence overrides stale snapshots.
+
 The product state model is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
 SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. OXP is a read-only projection
 over canonical/system truth and answers doing, finished, next, blocked, need
