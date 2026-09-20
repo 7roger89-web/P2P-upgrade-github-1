@@ -33,14 +33,16 @@ Tài liệu chính thức được kiểm tra ngày 2026-09-20 cho thấy:
 - **UI Component**: bề mặt chuyên cho component.
 - **Data Visualization**: bề mặt chuyên cho biểu diễn dữ liệu; agentic tool set dùng nền Web Apps.
 - **Image-to-App**: dựng app từ hình; agentic tool set dùng nền Web Apps.
-- **Agent Mode + GitHub**: sandbox repo, diff, checks, commit/push và theo tài liệu hiện tại là một PR cho mỗi chat.
+DesignArena KHÔNG phải Arena AI Agent Mode.
+
+- **DesignArena / designarena.ai**: tournament thiết kế nhiều model song song; mỗi model nhận cùng prompt, tạo phương án, rồi người dùng vote theo bracket.
+- **Arena AI / arena.ai Agent Mode**: một sản phẩm/bề mặt khác, có workflow agentic, sandbox, GitHub và PR. Không được gọi Agent Mode là một "mode của DesignArena".
 
 Nguồn chính thức:
+- https://www.designarena.ai/about
 - https://www.designarena.ai/methodology/agentic-harness
-- https://help.arena.ai/articles/5701270322-arena-how-to-code-arena
-- https://help.arena.ai/articles/1655691990-how-to-use-coding-in-agent-mode
 - https://help.arena.ai/articles/5432423882-how-to-use-agent-mode
-- https://notes.designarena.ai/fullstack-arena-methodology/
+- https://help.arena.ai/articles/1655691990-how-to-use-coding-in-agent-mode
 
 Đây là snapshot có ngày tháng, không phải bảo đảm vĩnh viễn. Khả năng chính thức mới hơn luôn thắng mẹo cũ.
 
@@ -53,14 +55,14 @@ Nguồn chính thức:
 | Timeline, comparison matrix, lineage, hiển thị phân tích dày | **Data Visualization** | Tập trung information geometry và tương tác |
 | Đã có screenshot tham chiếu rất mạnh | **Image-to-App** | Ép implementation bám fidelity |
 | Persistence/CRUD/auth/storage là acceptance thật | **Full-Stack** | Supabase là khả năng native của bề mặt này |
-| Tích hợp bền vững vào repo GitHub hiện có | **Agent Mode + GitHub** | Branch/diff/check/PR |
+| Đưa winner vào repo thật | **Rời DesignArena → executor tích hợp riêng do P2P chọn** | DesignArena dùng để tạo/so sánh product reference; tích hợp GitHub là bước khác |
 
 Quy tắc mặc định:
 
 ```text
-FRONTEND_KHÔNG_CẦN_PERSISTENCE => WEB_APPS_TRƯỚC
-DATABASE_OR_AUTH_LÀ_ACCEPTANCE => FULL_STACK
-TÍCH_HỢP_REPO_THẬT => AGENT_MODE_GITHUB
+FRONTEND_KHÔNG_CẦN_PERSISTENCE => DESIGNARENA_WEB_APPS
+DATABASE_OR_AUTH_LÀ_ACCEPTANCE => DESIGNARENA_FULL_STACK
+WINNER_ĐÃ_CHỐT => THOÁT_DESIGNARENA_VÀ_CHỌN_EXECUTOR_TÍCH_HỢP_RIÊNG
 ```
 
 Không chọn Full-Stack chỉ vì sản phẩm được gọi là “full app”. Nếu database/auth/storage chưa phải acceptance, Supabase-first thường là `DEFER_UNTIL_NEEDED`.
@@ -192,15 +194,20 @@ WINNING_RENDER
 
 Không biến thành nghi lễ bắt buộc.
 
-## 11. Agent Mode + GitHub
+## 11. Ranh giới sau DesignArena
 
-Khi đưa winner vào repo thật:
-- chọn đúng repo;
-- một bounded branch/PR cho mỗi session theo giới hạn hiện tại;
-- yêu cầu preview nếu acceptance có visual;
-- xem diff/checks;
-- bảo đảm mọi file cần thiết đã push trước khi PR đóng/merge;
-- GitHub là durable checkpoint.
+DesignArena kết thúc vai trò khi đã có winner/product reference đủ tốt cho lát cắt hiện tại.
+
+Sau đó Control Tower chọn executor tích hợp riêng theo capability thật của dự án. Ví dụ, Arena AI Agent Mode có thể là một executor GitHub phù hợp trong một số task, nhưng đó là **Arena AI**, không phải DesignArena.
+
+Luồng đúng:
+
+```text
+DESIGNARENA_TOURNAMENT
+→ WINNER / PRODUCT REFERENCE
+→ CONTROL TOWER CHỌN EXECUTOR TÍCH HỢP
+→ GITHUB / IMPLEMENTATION / VERIFY
+```
 
 Nếu artifact chỉ tồn tại ở preview, transport theo đường lossless được executor hỗ trợ và tuân Supreme Law #9.
 
