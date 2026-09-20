@@ -44,28 +44,23 @@ The assurance/release loop is separate:
 
 `Risk-Proportional Hardening → Independent Verification → Release`.
 
-### DesignArena as a replaceable product-fast-loop surface
+### DesignArena như bề mặt thay thế được trong product fast loop
 
-When DesignArena is selected for product/frontend work, route by bounded outcome instead of treating "Full-Stack" as the default:
+Khi chọn DesignArena cho frontend/sản phẩm, route theo bounded outcome thay vì mặc định chọn Full-Stack:
 
-- Web Apps: default for multi-file frontend shells and vertical product slices that do not require persistence.
-- UI Component: use only when one difficult reusable widget deserves a focused design battle.
-- Data Visualization: use for timelines, comparison matrices, lineage, or dense analytical display.
-- Image-to-App: use only when a winning visual reference already exists and fidelity reconstruction is materially useful.
-- Full-Stack: use when database/auth/storage are explicit acceptance requirements; do not let Supabase template defaults silently become product architecture.
-- Agent Mode + GitHub: use for durable integration into an existing repository and bounded branch/PR work.
+- Web Apps: mặc định cho app shell và vertical slice frontend không cần persistence.
+- UI Component: chỉ dùng khi một widget khó đáng một trận thiết kế riêng.
+- Data Visualization: dùng cho timeline, comparison matrix, lineage hoặc vùng phân tích dày.
+- Image-to-App: chỉ dùng khi đã có visual reference thắng và fidelity rebuild có giá trị.
+- Full-Stack: dùng khi database/auth/storage là acceptance thật; không để Supabase template tự biến thành product architecture.
+- Agent Mode + GitHub: dùng cho tích hợp bền vững vào repo và bounded branch/PR.
 
-The detailed reusable guide is `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
+Cẩm nang chi tiết: `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
 
-DesignArena remains an executor/tool surface. It does not replace project architecture, task authority, P2P routing, evidence, Owner Gates, or release authority. Fresh official DesignArena capability evidence overrides stale snapshots.
+DesignArena vẫn là executor/tool surface. Nó không thay thế kiến trúc dự án, task authority, P2P routing, evidence, Owner Gates hay release authority. Capability chính thức mới hơn của DesignArena luôn thắng snapshot cũ.
 
 The product state model is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
-SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. OXP is a read-only projection
-over canonical/system truth and answers doing, finished, next, blocked, need
-to decide, safe to do nothing, and safe-to-execute questions. It never writes
-state or grants authority. Human acceptance is an observable outcome where
-possible; “Owner can determine the item needing attention within 30 seconds”
-is an example, not a fabricated result.
+SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`.
 
 Assurance is proportional to risk: preview/focused check for low risk,
 targeted functional checks for normal risk, stronger persistence/data checks
