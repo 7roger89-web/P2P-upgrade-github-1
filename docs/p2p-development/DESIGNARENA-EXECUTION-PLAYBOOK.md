@@ -391,3 +391,20 @@ CANDIDATE → VERIFIED → ACTIVE → SUPERSEDED | QUARANTINED
 ```
 
 Không tạo “DesignArena memory” riêng. Khi có helper/runtime phù hợp và evidence đủ, ghi bài học dạng `PROCEDURAL` qua `experience_evolution.py`; project playbook này vẫn là contract thao tác trực tiếp và source evidence cho candidate.
+
+## 17. FOUNDATION_REPAIR_EVIDENCE_2026_09_21
+
+Huyền Học Lab provided the first concrete evidence that the prompt-lock pattern reduces DesignArena drift.
+
+Observed sequence:
+- initial candidate drifted into cosmic/gold visual, fake KPI, session/localStorage semantics, wrong mobile navigation, and invented universal chart architecture;
+- a locked replacement prompt produced a materially closer winner;
+- two targeted SAME_CANDIDATE repairs corrected exact mobile navigation, truthful state, Vietnamese wording, decorative imagery, and product subtitle without restarting the React structure.
+
+Reusable lesson:
+- when the candidate skeleton is good, prefer REVISE_IN_PLACE + exact repair list over restart;
+- exact literal interaction contracts outperform broad intent language for navigation;
+- anti-patterns should pair with a required replacement target;
+- platform-injected analytics/storage instrumentation must be distinguished from app-authored persistence before declaring scope drift.
+
+This is evidence for the existing prompt-lock procedural candidate, not automatic ACTIVE experience by itself.
