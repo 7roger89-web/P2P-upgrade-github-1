@@ -26,13 +26,21 @@ P2P vẫn sở hữu task contract, scope, evidence, durable state, Owner Gate, 
 
 ## 2. Ảnh chụp khả năng hiện tại của DesignArena
 
-Tài liệu chính thức được kiểm tra ngày 2026-09-20 cho thấy:
+Tài liệu chính thức và ảnh chụp UI thực tế của Owner được kiểm tra ngày 2026-09-20 cho thấy DesignArena có **hai lớp lựa chọn khác nhau** cần phân biệt:
 
-- **Web Apps**: frontend React đa tệp, có file tools, shell, web/media và preview/deploy.
-- **Full-Stack**: Web Apps + `propose_plan` + bộ công cụ Supabase cho database/auth/storage.
-- **UI Component**: bề mặt chuyên cho component.
-- **Data Visualization**: bề mặt chuyên cho biểu diễn dữ liệu; agentic tool set dùng nền Web Apps.
-- **Image-to-App**: dựng app từ hình; agentic tool set dùng nền Web Apps.
+1. **Loại arena/bề mặt**: ví dụ Website, UI Component, Data Visualization, Mobile Apps và các arena chuyên biệt khác.
+2. **Độ sâu build trong Website hiện tại**:
+   - **Fast** — “One HTML file, no extras. The fastest way to see your idea.” → dùng để phác nhanh ý tưởng, không phải lựa chọn mặc định cho app nhiều module.
+   - **Pro** — “Best for wireframes that you can reprompt and iterate on, built in React.” → phù hợp để xây/iterate frontend React có cấu trúc.
+   - **Max** — “Fullstack with auth and a database. For sites that need to save and store.” → chỉ dùng khi persistence/auth/database là yêu cầu thật.
+
+Ảnh chụp Owner hiện còn cho thấy **Website** là arena đang chọn. Không suy rộng rằng Fast/Pro/Max xuất hiện giống hệt ở mọi arena khác nếu chưa có bằng chứng trực tiếp.
+
+Các arena chuyên biệt vẫn dùng khi bài toán cần chúng:
+- **UI Component**: component/widget khó.
+- **Data Visualization**: biểu diễn dữ liệu dày, timeline, comparison.
+- **Image-to-App**: chỉ khi UI hiện tại thực sự cung cấp bề mặt này trong task cần fidelity từ ảnh.
+
 DesignArena KHÔNG phải Arena AI Agent Mode.
 
 - **DesignArena / designarena.ai**: tournament thiết kế nhiều model song song; mỗi model nhận cùng prompt, tạo phương án, rồi người dùng vote theo bracket.
@@ -50,22 +58,26 @@ Nguồn chính thức:
 
 | Mục tiêu | Bề mặt ưu tiên | Lý do |
 |---|---|---|
-| App shell, nhiều trang, workflow responsive | **Web Apps** | Làm frontend đa tệp mà không ép kiến trúc database |
+| App shell, nhiều trang, workflow responsive, cần iterate React | **Website → Pro** | React + reprompt/iterate; không kéo auth/database vào |
+| Phác nhanh một ý tưởng rất nhỏ | **Website → Fast** | Một HTML file; chỉ dùng khi proof nhanh là đủ |
 | Một widget khó, có khả năng tái sử dụng | **UI Component** | Cho nhiều phương án cùng đấu một bài |
 | Timeline, comparison matrix, lineage, hiển thị phân tích dày | **Data Visualization** | Tập trung information geometry và tương tác |
-| Đã có screenshot tham chiếu rất mạnh | **Image-to-App** | Ép implementation bám fidelity |
-| Persistence/CRUD/auth/storage là acceptance thật | **Full-Stack** | Supabase là khả năng native của bề mặt này |
+| Đã có screenshot tham chiếu mạnh và UI có hỗ trợ | **Image-to-App** | Ép implementation bám fidelity khi thật sự cần |
+| Persistence/auth/database là acceptance thật | **Website → Max** | Fullstack với auth + database; chỉ dùng khi cần lưu/giữ dữ liệu |
 | Đưa winner vào repo thật | **Rời DesignArena → executor tích hợp riêng do P2P chọn** | DesignArena dùng để tạo/so sánh product reference; tích hợp GitHub là bước khác |
 
 Quy tắc mặc định:
 
 ```text
-FRONTEND_KHÔNG_CẦN_PERSISTENCE => DESIGNARENA_WEB_APPS
-DATABASE_OR_AUTH_LÀ_ACCEPTANCE => DESIGNARENA_FULL_STACK
+PHÁC_NHANH_Ý_TƯỞNG_NHỎ => DESIGNARENA_WEBSITE_FAST
+FRONTEND_REACT_CẦN_ITERATE_KHÔNG_PERSISTENCE => DESIGNARENA_WEBSITE_PRO
+AUTH_OR_DATABASE_LÀ_ACCEPTANCE => DESIGNARENA_WEBSITE_MAX
 WINNER_ĐÃ_CHỐT => THOÁT_DESIGNARENA_VÀ_CHỌN_EXECUTOR_TÍCH_HỢP_RIÊNG
 ```
 
-Không chọn Full-Stack chỉ vì sản phẩm được gọi là “full app”. Nếu database/auth/storage chưa phải acceptance, Supabase-first thường là `DEFER_UNTIL_NEEDED`.
+Không chọn **Max** chỉ vì sản phẩm được gọi là “full app”. Nếu auth/database chưa phải acceptance, Max là `DEFER_UNTIL_NEEDED`.
+
+**Default mới cho frontend app nhiều module nhưng chưa cần lưu dữ liệu: Website → Pro.**
 
 ## 4. Cách dùng tournament
 
@@ -258,13 +270,14 @@ Nếu UI Component battle, Image-to-App, Full-Stack backend, redesign lần hai 
 
 ```text
 1. khóa product/language/visual contract
-2. Web Apps dựng shell hoặc vertical slice
-3. UI Component/Data Visualization chỉ cho chỗ thật sự khó
-4. khóa winner
-5. tích hợp qua lane có GitHub
-6. verify workflow thật đại diện
-7. lặp theo module khi cần
-8. chỉ thêm Full-Stack persistence khi acceptance yêu cầu
+2. Website → Pro dựng shell hoặc vertical slice React
+3. Website → Fast chỉ cho proof cực nhỏ; không dùng làm app nền
+4. UI Component/Data Visualization chỉ cho chỗ thật sự khó
+5. khóa winner
+6. tích hợp qua executor riêng phù hợp
+7. verify workflow thật đại diện
+8. lặp theo module khi cần
+9. chỉ chuyển Website → Max khi auth/database/persistence là acceptance thật
 ```
 
 Playbook này hướng dẫn chọn công cụ. Nó không thay thế kiến trúc riêng của dự án, product truth hay Supreme Law.
