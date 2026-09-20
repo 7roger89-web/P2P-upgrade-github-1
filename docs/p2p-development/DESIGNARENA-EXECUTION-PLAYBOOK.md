@@ -80,6 +80,14 @@ Quy tắc cho Mobile App:
 
 Không chọn Mobile App cho một web product chỉ vì người dùng truy cập bằng điện thoại.
 
+
+Ảnh UI bổ sung của Owner cùng ngày xác nhận **Data Visualization** và **UI Component** là hai lựa chọn arena độc lập ngay trên màn hình tạo mới. Trong hai ảnh này không thấy selector phụ như Fast/Pro/Max hay Auto/React Native/Android, vì vậy hiện ghi nhận:
+
+- `Data Visualization` → arena độc lập; chưa có bằng chứng cần chọn thêm mode/framework trước khi prompt.
+- `UI Component` → arena độc lập; chưa có bằng chứng cần chọn thêm mode/framework trước khi prompt.
+
+Không suy diễn option ẩn chưa quan sát.
+
 ## 3. Bảng chọn bề mặt
 
 | Mục tiêu | Bề mặt ưu tiên | Lý do |
