@@ -60,8 +60,12 @@ Cẩm nang chi tiết: `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
 DesignArena vẫn là executor/tool surface. Nó không thay thế kiến trúc dự án, task authority, P2P routing, evidence, Owner Gates hay release authority. Capability chính thức mới hơn của DesignArena luôn thắng snapshot cũ.
 
 The product state model is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
-SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`.
-OXP is a read-only projection over canonical/system truth and answers doing, finished, next, blocked, need to decide, safe to do nothing, and safe-to-execute questions. It never writes state or grants authority. Human acceptance is an observable outcome where possible; “Owner can determine the item needing attention within 30 seconds” is an example, not a fabricated result.
+SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. OXP is a read-only projection
+over canonical/system truth and answers doing, finished, next, blocked, need
+to decide, safe to do nothing, and safe-to-execute questions. It never writes
+state or grants authority. Human acceptance is an observable outcome where
+possible; “Owner can determine the item needing attention within 30 seconds”
+is an example, not a fabricated result.
 
 Assurance is proportional to risk: preview/focused check for low risk,
 targeted functional checks for normal risk, stronger persistence/data checks
