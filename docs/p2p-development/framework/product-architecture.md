@@ -44,6 +44,21 @@ The assurance/release loop is separate:
 
 `Risk-Proportional Hardening → Independent Verification → Release`.
 
+### DesignArena như bề mặt thay thế được trong product fast loop
+
+Khi chọn DesignArena cho frontend/sản phẩm, route theo bounded outcome thay vì mặc định chọn Full-Stack:
+
+- Web Apps: mặc định cho app shell và vertical slice frontend không cần persistence.
+- UI Component: chỉ dùng khi một widget khó đáng một trận thiết kế riêng.
+- Data Visualization: dùng cho timeline, comparison matrix, lineage hoặc vùng phân tích dày.
+- Image-to-App: chỉ dùng khi đã có visual reference thắng và fidelity rebuild có giá trị.
+- Full-Stack: dùng khi database/auth/storage là acceptance thật; không để Supabase template tự biến thành product architecture.
+- Agent Mode + GitHub: dùng cho tích hợp bền vững vào repo và bounded branch/PR.
+
+Cẩm nang chi tiết: `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
+
+DesignArena vẫn là executor/tool surface. Nó không thay thế kiến trúc dự án, task authority, P2P routing, evidence, Owner Gates hay release authority. Capability chính thức mới hơn của DesignArena luôn thắng snapshot cũ.
+
 The product state model is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
 SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. OXP is a read-only projection
 over canonical/system truth and answers doing, finished, next, blocked, need
