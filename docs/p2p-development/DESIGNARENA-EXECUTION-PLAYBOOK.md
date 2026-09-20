@@ -54,6 +54,32 @@ Nguồn chính thức:
 
 Đây là snapshot có ngày tháng, không phải bảo đảm vĩnh viễn. Khả năng chính thức mới hơn luôn thắng mẹo cũ.
 
+### 2.1. Ảnh UI thực tế của Owner — selector arena và framework
+
+Ảnh chụp DesignArena ngày 2026-09-20 xác nhận trang tạo mới hiện có nhiều loại tác vụ/bề mặt song song, trong đó nhìn thấy trực tiếp: Website, Image, Game, 3D Asset, UI Component, Mobile App, Logo, Text-to-Speech, ASCII Art và Video. Tài liệu/leaderboard chính thức còn liệt kê Web Apps, Fullstack, Data Visualization, Android và các arena chuyên biệt khác.
+
+Khi **Mobile App** được chọn, UI hiện có selector framework:
+- **Auto** — DesignArena tự chọn framework phù hợp;
+- **React Native** — cross-platform iOS + Android;
+- **Android** — native Android app.
+
+Điều này củng cố nguyên tắc hai tầng:
+
+```text
+CHỌN_LOẠI_BÀI / ARENA
+→ NẾU BỀ_MẶT_CÓ_SELECTOR_THÌ_CHỌN_MODE_OR_FRAMEWORK
+→ DÁN_PROMPT
+```
+
+Không giả định mọi arena có cùng selector. Chỉ hướng dẫn đúng các option đã được quan sát hoặc xác minh.
+
+Quy tắc cho Mobile App:
+- nếu Owner chỉ cần mobile app tốt nhất mà chưa khóa stack → **Auto**;
+- nếu cần một codebase iOS + Android → **React Native**;
+- nếu mục tiêu là Android native hoặc cần capability Android đặc thù → **Android**.
+
+Không chọn Mobile App cho một web product chỉ vì người dùng truy cập bằng điện thoại.
+
 ## 3. Bảng chọn bề mặt
 
 | Mục tiêu | Bề mặt ưu tiên | Lý do |
