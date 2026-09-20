@@ -315,3 +315,79 @@ Nếu UI Component battle, Image-to-App, Full-Stack backend, redesign lần hai 
 ```
 
 Playbook này hướng dẫn chọn công cụ. Nó không thay thế kiến trúc riêng của dự án, product truth hay Supreme Law.
+
+
+## 16. Bài học khóa mục tiêu prompt từ các vòng DesignArena thực tế
+
+Nguồn kinh nghiệm: các vòng DesignArena thực tế ngày 2026-09-20 trên Huyền Học Lab, gồm plan drift và Foundation candidate drift. Đây là kinh nghiệm thao tác, không phải authority cao hơn task contract hay Supreme Law.
+
+Các failure pattern đã quan sát:
+
+- **Visual drift dù đã có mood direction**: model vẫn tự kéo sản phẩm sang cosmic/dark/gold/gradient/glassmorphism nếu prompt chỉ nói “tránh” mà không khóa cả replacement target lẫn forbidden substitutions.
+- **Typical-app scope creep**: model tự thêm sessions, localStorage, notification, progress, roadmap, persistence hoặc generic app semantics dù task chỉ yêu cầu Foundation.
+- **Exact interaction drift**: mobile navigation hoặc nút “Thêm” bị đổi nghĩa khi prompt nói mục tiêu chung nhưng không khóa exact labels + exact behavior.
+- **Truthfulness drift**: KPI, phần trăm tiến độ, “đã sẵn sàng”, notification và capability chưa tồn tại dễ được bịa để làm màn hình trông hoàn chỉnh.
+- **Architecture invention**: model có xu hướng tạo universal/shared chart hoặc dependency order giữa module nếu prompt chỉ mô tả tương lai mà không cấm việc biến giả định thành architecture.
+- **Required-item omission**: một module bắt buộc có thể bị bỏ sót nếu acceptance không kiểm lại exact inventory.
+
+### Prompt-lock pattern
+
+Với DesignArena prompt có rủi ro drift, ưu tiên cấu trúc khóa sau:
+
+1. **PRIORITY_ORDER** — ghi rõ hard invariants outrank aesthetics và implementation freedom.
+2. **EXACT_REQUIRED** — liệt kê chính xác route, label, interaction, state hoặc module bắt buộc.
+3. **MUST_NOT_CREATE** — cấm các capability model hay tự thêm: auth, database, localStorage, sessions, fake KPI, notifications, roadmap, universal component, backend giả.
+4. **REPLACEMENT_TARGET** — mỗi anti-pattern quan trọng phải có hướng thay thế cụ thể; “không cosmic” đi cùng palette/layout/mood phải dùng.
+5. **TRUTHFUL_STATE_ONLY** — cấm progress/KPI/readiness/capability không có authority.
+6. **CREATIVE_FREEDOM_ZONE** — chỉ cho model tự do ở spacing, typography, composition, microinteraction trong phạm vi contract; không tự do đổi information architecture hay product semantics.
+7. **EXACT_ACCEPTANCE_REPLAY** — trước khi kết thúc, đối chiếu lại toàn bộ inventory bắt buộc và forbidden list.
+8. **REVISE_IN_PLACE** — khi candidate có bộ xương dùng được, sửa candidate hiện tại thay vì restart để giữ phần đã đúng và giảm drift mới.
+
+Mẫu ưu tiên:
+
+```text
+PRIORITY_ORDER:
+1. HARD PRODUCT INVARIANTS
+2. EXACT REQUIRED BEHAVIOR
+3. TRUTHFUL STATE
+4. VISUAL DIRECTION
+5. CREATIVE FREEDOM
+
+IF ANY DESIGN IDEA CONFLICTS WITH 1–3:
+DO NOT IMPLEMENT THAT IDEA.
+```
+
+### Anti-pattern: chỉ dùng câu “không được”
+
+Một danh sách cấm dài nhưng không đưa replacement target vẫn để model tự chọn một phong cách khác có thể lệch không kém.
+
+Ưu tiên:
+
+```text
+FORBIDDEN: cosmic / neon / glass / gold fantasy
+REQUIRED REPLACEMENT: warm ivory + warm white + ink black + stone gray + restrained cinnabar
+```
+
+### Anti-pattern: acceptance chung chung
+
+“Responsive, đẹp, đúng tiếng Việt” là chưa đủ khi interaction quan trọng.
+
+Khóa bằng exact behavior, ví dụ:
+
+```text
+MOBILE_BOTTOM_NAV_EXACT =
+Tổng quan | Bát Tự | Tử Vi | Lục Hào | Thêm
+
+THÊM_ACTION_EXACT =
+mở sheet danh sách module; không tạo session; không có nút cộng trung tâm
+```
+
+### Kết nối Evidence-Grounded Evolution
+
+Các bài học DesignArena chỉ nên trở thành kinh nghiệm P2P tự động tái sử dụng khi đi qua lifecycle hiện có:
+
+```text
+CANDIDATE → VERIFIED → ACTIVE → SUPERSEDED | QUARANTINED
+```
+
+Không tạo “DesignArena memory” riêng. Khi có helper/runtime phù hợp và evidence đủ, ghi bài học dạng `PROCEDURAL` qua `experience_evolution.py`; project playbook này vẫn là contract thao tác trực tiếp và source evidence cho candidate.
