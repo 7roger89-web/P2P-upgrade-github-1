@@ -1,283 +1,263 @@
-# DesignArena Execution Playbook — P2P
+# Cẩm nang thực thi DesignArena — P2P
 
-Status: REUSABLE EXECUTION GUIDANCE
-Applies from: 2026-09-20
-Authority: subordinate to `P2P_SUPREME_OPERATING_LAW_V1`
-Purpose: route product/frontend work through the DesignArena surface that best matches the bounded goal without turning DesignArena into a new P2P control plane.
+Trạng thái: HƯỚNG DẪN THỰC THI CÓ THỂ TÁI SỬ DỤNG  
+Áp dụng từ: 2026-09-20  
+Thẩm quyền: cấp dưới của `P2P_SUPREME_OPERATING_LAW_V1`
 
-## 1. Core principle
+Mục đích: dùng đúng bề mặt của DesignArena cho đúng loại việc, không biến DesignArena thành một control plane thứ hai của P2P.
 
-DesignArena is a replaceable execution surface inside the P2P product fast loop. It is not architecture authority, methodology authority, release authority, or a second orchestrator.
+## 1. Nguyên tắc cốt lõi
 
-Use the smallest arena that matches the work:
+DesignArena là một công cụ thực thi có thể thay thế trong vòng lặp phát triển sản phẩm của P2P. Nó không phải thẩm quyền kiến trúc, thẩm quyền nghiệp vụ, thẩm quyền phát hành hay bộ điều phối mới.
 
 ```text
-OWNER OUTCOME
-→ MINIMUM PRODUCT TRUTH
-→ CHOOSE DESIGNARENA SURFACE
-→ BUILD REPRESENTATIVE VERTICAL SLICE
-→ RENDER / INTERACT / COMPARE
-→ LOCK THE WINNING PRODUCT REFERENCE
-→ INTEGRATE INTO DURABLE PROJECT
-→ VERIFY
-→ STOP
+MỤC TIÊU OWNER
+→ SỰ THẬT SẢN PHẨM TỐI THIỂU
+→ CHỌN ĐÚNG BỀ MẶT DESIGNARENA
+→ XÂY MỘT LÁT CẮT DỌC ĐẠI DIỆN
+→ RENDER / TƯƠNG TÁC / SO SÁNH
+→ KHÓA THAM CHIẾU SẢN PHẨM THẮNG
+→ TÍCH HỢP VÀO DỰ ÁN BỀN VỮNG
+→ XÁC MINH
+→ DỪNG
 ```
 
-P2P remains responsible for task contract, scope, evidence, durable state, Owner Gates, executor routing, and acceptance.
+P2P vẫn sở hữu task contract, scope, evidence, durable state, Owner Gate, routing executor và acceptance.
 
-## 2. Current capability snapshot
+## 2. Ảnh chụp khả năng hiện tại của DesignArena
 
-Fresh official DesignArena/Arena documentation checked on 2026-09-20 shows:
+Tài liệu chính thức được kiểm tra ngày 2026-09-20 cho thấy:
 
-- **Web Apps**: multi-file React frontend work with file tools, shell, web/media tools, and Vercel preview/deploy.
-- **Full-Stack**: Web Apps capability plus `propose_plan` and Supabase database/auth/storage tools.
-- **UI Component**: specialized component design/evaluation surface.
-- **Data Visualization**: specialized visualization surface; its agentic tool set reuses Web Apps tooling.
-- **Image-to-App**: image-driven implementation surface; its agentic tool set reuses Web Apps tooling.
-- **Agent Mode + GitHub**: repo sandbox, diff review, checks, commit/push, and one pull request per chat session at the current documented capability.
+- **Web Apps**: frontend React đa tệp, có file tools, shell, web/media và preview/deploy.
+- **Full-Stack**: Web Apps + `propose_plan` + bộ công cụ Supabase cho database/auth/storage.
+- **UI Component**: bề mặt chuyên cho component.
+- **Data Visualization**: bề mặt chuyên cho biểu diễn dữ liệu; agentic tool set dùng nền Web Apps.
+- **Image-to-App**: dựng app từ hình; agentic tool set dùng nền Web Apps.
+- **Agent Mode + GitHub**: sandbox repo, diff, checks, commit/push và theo tài liệu hiện tại là một PR cho mỗi chat.
 
-Current official references:
+Nguồn chính thức:
 - https://www.designarena.ai/methodology/agentic-harness
 - https://help.arena.ai/articles/5701270322-arena-how-to-code-arena
 - https://help.arena.ai/articles/1655691990-how-to-use-coding-in-agent-mode
 - https://help.arena.ai/articles/5432423882-how-to-use-agent-mode
 - https://notes.designarena.ai/fullstack-arena-methodology/
 
-This is a dated capability snapshot, not an eternal product guarantee. Fresh official capability state wins when later behavior changes.
+Đây là snapshot có ngày tháng, không phải bảo đảm vĩnh viễn. Khả năng chính thức mới hơn luôn thắng mẹo cũ.
 
-## 3. Arena routing matrix
+## 3. Bảng chọn bề mặt
 
-| Goal | Preferred surface | Why |
+| Mục tiêu | Bề mặt ưu tiên | Lý do |
 |---|---|---|
-| Product shell / multi-page frontend / responsive workflow | **Web Apps** | Multi-file frontend without forcing database architecture |
-| One difficult reusable widget | **UI Component** | Compare several implementations of the same bounded component |
-| Timeline, comparison matrix, lineage, dense analytical display | **Data Visualization** | Optimize information geometry and interaction |
-| A strong visual reference already exists as an image | **Image-to-App** | Rebuild against a fixed fidelity target |
-| Persistent CRUD/auth/storage is part of acceptance | **Full-Stack** | Supabase-backed stack is native to this arena |
-| Durable integration into an existing GitHub repo | **Agent Mode + GitHub** | Branch/diff/check/PR workflow |
+| App shell, nhiều trang, workflow responsive | **Web Apps** | Làm frontend đa tệp mà không ép kiến trúc database |
+| Một widget khó, có khả năng tái sử dụng | **UI Component** | Cho nhiều phương án cùng đấu một bài |
+| Timeline, comparison matrix, lineage, hiển thị phân tích dày | **Data Visualization** | Tập trung information geometry và tương tác |
+| Đã có screenshot tham chiếu rất mạnh | **Image-to-App** | Ép implementation bám fidelity |
+| Persistence/CRUD/auth/storage là acceptance thật | **Full-Stack** | Supabase là khả năng native của bề mặt này |
+| Tích hợp bền vững vào repo GitHub hiện có | **Agent Mode + GitHub** | Branch/diff/check/PR |
 
-Default rule:
+Quy tắc mặc định:
 
 ```text
-FRONTEND_PRODUCT_WITHOUT_REQUIRED_PERSISTENCE => WEB_APPS_FIRST
-DATABASE_OR_AUTH_REQUIRED_BY_TASK_CONTRACT => FULL_STACK
-EXISTING_REPO_INTEGRATION => AGENT_MODE_GITHUB
+FRONTEND_KHÔNG_CẦN_PERSISTENCE => WEB_APPS_TRƯỚC
+DATABASE_OR_AUTH_LÀ_ACCEPTANCE => FULL_STACK
+TÍCH_HỢP_REPO_THẬT => AGENT_MODE_GITHUB
 ```
 
-Do not choose Full-Stack merely because an app is called “full app”. If database/auth/storage are not required by acceptance, introducing Supabase first is normally `DEFER_UNTIL_NEEDED`.
+Không chọn Full-Stack chỉ vì sản phẩm được gọi là “full app”. Nếu database/auth/storage chưa phải acceptance, Supabase-first thường là `DEFER_UNTIL_NEEDED`.
 
-## 4. Tournament pattern
+## 4. Cách dùng tournament
 
-Use DesignArena as a competition surface, not as a single-model oracle.
+Dùng DesignArena như đấu trường tuyển phương án, không coi một model là oracle.
 
-For a meaningful design decision:
+1. Cho các model cùng một bounded product contract.
+2. Giữ nguyên target user, dữ liệu thật, ngôn ngữ, responsive, interaction và acceptance.
+3. Xem preview của cả hai bên trước khi vote.
+4. Bấm thử workflow thật, không vote bằng ảnh.
+5. Chọn winner theo:
+   - đúng nghiệp vụ;
+   - dễ dùng và hierarchy tốt;
+   - responsive tốt;
+   - đủ state;
+   - khớp schema/dữ liệu thật;
+   - không bịa chức năng.
+6. Khóa product reference thắng trước khi mở rộng scope.
 
-1. Give competing models the same bounded product contract.
-2. Keep critical facts, target user, language, layout constraints, responsive requirements, and acceptance invariant identical.
-3. Preview both candidates before voting.
-4. Test interaction, not only screenshot beauty.
-5. Select the winner by:
-   - domain/task correctness;
-   - usability and visual hierarchy;
-   - responsive quality;
-   - state completeness;
-   - compatibility with real data/schema;
-   - absence of fabricated functionality.
-6. Preserve the winning product reference before expanding scope.
+Preview đẹp nhưng interaction hỏng hoặc đòi dữ liệu engine không có thì không thắng.
 
-A beautiful preview with broken interaction, impossible data requirements, or wrong product semantics is not a winner.
+## 5. Xây theo lát cắt dọc
 
-## 5. Vertical-slice rule
-
-Build by complete user workflow, not by horizontal technical layers.
-
-Preferred:
+Ưu tiên:
 
 ```text
-ONE MODULE
-→ real input contract
-→ domain presentation
-→ interactions
-→ loading/error/empty states
+MỘT MODULE
+→ input thật
+→ biểu diễn đúng domain
+→ tương tác
+→ loading/error/empty
 → mobile
-→ representative data
-→ rendered verification
-→ durable integration
+→ dữ liệu đại diện
+→ render verification
+→ tích hợp bền vững
 ```
 
-Avoid:
+Tránh:
 
 ```text
-all UI first
-→ all APIs later
-→ all engines later
-→ responsive at the end
+làm toàn bộ UI
+→ làm toàn bộ API
+→ nối toàn bộ engine
+→ cuối cùng mới sửa responsive
 ```
 
-The second pattern creates large integration debt and weakens evidence.
+## 6. Reuse-first
 
-## 6. Reuse-first UI rule
+Trước khi thiết kế module từ đầu:
 
-Before designing a domain/module from scratch:
-
-1. inspect the authoritative engine/data schema;
-2. inspect any existing frontend/component already paired with that engine;
-3. identify what can be reused or wrapped;
-4. rebuild only the missing or unusable presentation layer.
+1. đọc engine authority;
+2. đọc schema output thật;
+3. xem component/frontend đã ghép với engine đó;
+4. reuse/wrap phần dùng được;
+5. chỉ xây phần còn thiếu hoặc đã chứng minh không dùng được.
 
 ```text
-EXISTING_AUTHORITATIVE_COMPONENT
-→ PROVE_REUSE_OR_UNUSABILITY
-→ ONLY THEN CONSIDER_REPLACEMENT
+AUTHORITATIVE_COMPONENT_CÓ_SẴN
+→ CHỨNG MINH REUSE HOẶC UNUSABLE
+→ SAU ĐÓ MỚI XÉT REBUILD
 ```
 
-Frontend must not recalculate domain facts that already belong to an engine unless the task contract explicitly makes that calculation frontend authority.
+Frontend không tự tính lại fact đã thuộc engine trừ khi task contract nói rõ frontend là authority của phép tính đó.
 
-## 7. Prompt contract for DesignArena
+## 7. Hợp đồng prompt cho DesignArena
 
-A strong initial prompt should contain only the task delta needed for the current slice:
+Prompt đầu của mỗi lát cắt chỉ nên chứa phần delta cần thiết:
 
-- target user and primary workflow;
-- one-sentence visual thesis;
-- exact user-visible language;
-- real data/schema constraints;
-- required geometry/information hierarchy;
-- desktop and mobile behavior;
-- key interaction states;
-- explicit anti-patterns;
-- acceptance and rendered proof;
+- người dùng mục tiêu và workflow chính;
+- một câu visual thesis;
+- ngôn ngữ người dùng nhìn thấy;
+- data/schema thật;
+- geometry/hierarchy bắt buộc;
+- desktop + mobile;
+- state tương tác;
+- anti-pattern;
+- acceptance + rendered proof;
 - stop condition.
 
-Do not spend prompt budget repeating the whole project history when durable project files already carry it.
+Không nhồi toàn bộ lịch sử dự án nếu durable docs đã giữ authority.
 
-For long projects, preserve a small durable contract in the project repository and tell later DesignArena tasks to read it before changing established decisions.
+Dự án dài nên có một product/design/module contract nhỏ trong repo để các lượt sau đọc lại.
 
-## 8. Language contract
+## 8. Hợp đồng ngôn ngữ
 
-Every product task must explicitly state the user-visible language policy.
+Mỗi task sản phẩm phải nói rõ ngôn ngữ người dùng nhìn thấy.
 
-For strict single-language products, scope the requirement across:
-
+Với dự án chỉ dùng một ngôn ngữ, áp dụng cho:
 - navigation;
-- form labels;
-- buttons;
-- chart labels;
-- interpretation/explanation prose;
-- errors;
-- warnings;
-- empty states;
-- tooltips;
-- help;
-- exports/reports;
-- generated user-facing text.
+- label/form/button;
+- chart;
+- luận giải/giải thích;
+- lỗi/cảnh báo;
+- empty/loading;
+- tooltip/help;
+- export/report;
+- mọi text sinh ra cho người dùng.
 
-Machine identifiers that cannot be translated without losing identity (repository names, commit SHA, URLs, filenames, protocol keys) may remain unchanged only inside clearly technical/developer surfaces when the project contract allows it.
+Định danh máy không thể dịch mà không mất identity (repo, SHA, URL, filename, protocol key) chỉ được giữ nguyên trong vùng kỹ thuật khi contract dự án cho phép.
 
-Do not assume interface localization is enough when generated interpretation remains in another language.
+Không được coi “đã dịch UI” là đủ nếu phần luận giải vẫn ra ngôn ngữ khác.
 
-## 9. Full-Stack plan review
+## 9. Review kế hoạch Full-Stack
 
-When Full-Stack is actually selected, inspect the proposed plan before execution.
+Chỉ dùng Full-Stack khi persistence/auth/storage thực sự nằm trong acceptance.
 
-Reject or remove steps that introduce:
+Khi Full-Stack trả `propose_plan`, kiểm tra trước khi cho chạy. Loại bỏ:
+- persistence không cần;
+- auth không cần;
+- CRUD chung chung;
+- deploy trước khi proof workflow đại diện;
+- schema tự nhiên trở thành product architecture authority.
 
-- database persistence not required by the bounded outcome;
-- authentication not required by the bounded outcome;
-- generic CRUD unrelated to the primary workflow;
-- deployment before representative local/product behavior is proven;
-- schema design that silently becomes product architecture authority.
+Ô thêm bước trong plan dùng để kéo executor trở về task contract thật.
 
-Use the plan step field to restore the real task contract before implementation.
+## 10. Image-to-App
 
-## 10. Image-to-App tactic
-
-Use Image-to-App after a visual winner exists and fidelity is materially valuable.
-
-Pattern:
+Chỉ dùng khi đã có visual winner và fidelity thực sự quan trọng:
 
 ```text
 WINNING_RENDER
-→ capture representative screenshot
-→ Image-to-App implementation attempt
-→ compare fidelity + interaction
-→ keep only if materially better
+→ CHỤP MÀN HÌNH ĐẠI DIỆN
+→ IMAGE-TO-APP
+→ SO FIDELITY + INTERACTION
+→ GIỮ NẾU TỐT HƠN VẬT CHẤT
 ```
 
-Do not use this as mandatory ceremony. Skip it when the Web Apps winner is already implementable and accepted.
+Không biến thành nghi lễ bắt buộc.
 
-## 11. Agent Mode integration
+## 11. Agent Mode + GitHub
 
-For durable repo work:
+Khi đưa winner vào repo thật:
+- chọn đúng repo;
+- một bounded branch/PR cho mỗi session theo giới hạn hiện tại;
+- yêu cầu preview nếu acceptance có visual;
+- xem diff/checks;
+- bảo đảm mọi file cần thiết đã push trước khi PR đóng/merge;
+- GitHub là durable checkpoint.
 
-- connect the intended GitHub repository;
-- use one bounded branch/PR per session under the current one-PR-per-chat limitation;
-- ask for preview when visual verification is part of acceptance;
-- inspect diff and checks before merge;
-- push all required changes before the PR is closed/merged because the current documented session may not push afterward;
-- keep GitHub as durable checkpoint.
+Nếu artifact chỉ tồn tại ở preview, transport theo đường lossless được executor hỗ trợ và tuân Supreme Law #9.
 
-If the DesignArena winner exists only as preview code, transport it through a supported, lossless route that obeys Supreme Law artifact-transport rules.
+## 12. Evidence
 
-## 12. Evidence and acceptance
+Self-report của DesignArena không phải acceptance evidence.
 
-DesignArena self-report is not acceptance evidence.
+- visual claim → render thật;
+- responsive claim → desktop + mobile thật;
+- interaction claim → thao tác thật;
+- repo claim → branch/PR/head thật;
+- persistence claim → write/read thật;
+- schema/engine compatibility → payload đại diện thật.
 
-Use the evidence class required by the product task:
+Không nâng mock/preview thành runtime/production PASS.
 
-- visual claim → rendered view;
-- responsive claim → representative mobile/desktop render;
-- interaction claim → real interaction path;
-- repo integration claim → durable branch/PR/head;
-- persistence claim → actual write/read proof;
-- engine/schema compatibility → representative real payload.
+## 13. Cách tiếp nhận trick
 
-Do not promote mock/preview evidence into live/runtime/production proof.
-
-## 13. Trick adoption rule
-
-Useful tricks discovered during real work may update this playbook only when they materially improve outcome, recovery, fidelity, or effort.
-
-Discuss the observation first and classify it:
+Khi phát hiện mẹo mới, trước hết thảo luận và phân loại:
 
 ```text
-ONE-OFF QUIRK
-REPEATABLE USEFUL TRICK
-CURRENT PRODUCT CAPABILITY CHANGE
-MATERIAL FAILURE MODE
+QUIRK_MỘT_LẦN
+TRICK_LẶP_LẠI_ĐƯỢC
+THAY_ĐỔI_CAPABILITY_CỦA_PRODUCT
+FAILURE_MODE_VẬT_CHẤT
 ```
 
-Do not create a new framework, registry, benchmark system, or mandatory ritual around a one-off observation.
+Chỉ cập nhật playbook khi mẹo đó cải thiện outcome, recovery, fidelity hoặc effort một cách vật chất.
 
-Fresh official product behavior overrides stale tricks.
+Không dựng framework/registry/benchmark chỉ để chứa mẹo.
 
-## 14. OE gate
+## 14. OE Gate
 
-Before adding a DesignArena stage, ask exactly:
+Trước khi thêm một vòng DesignArena, hỏi đúng câu:
 
 `Không bị over engineering chứ?`
 
-Evaluate:
+Đánh giá:
 - SIMPLER_PATH
 - MATERIAL_PROGRESS
 - NECESSITY
 - CORE_BEFORE_SUPPORT
 - SMALLER_VERIFIABLE_SLICE
 
-If a UI Component battle, Image-to-App pass, Full-Stack backend, second redesign, or extra reviewer does not materially improve acceptance, return `SKIP_IT` or `DEFER_UNTIL_NEEDED`.
+Nếu UI Component battle, Image-to-App, Full-Stack backend, redesign lần hai hay reviewer thêm không cải thiện acceptance vật chất → `SKIP_IT` hoặc `DEFER_UNTIL_NEEDED`.
 
-## 15. Portable project pattern
-
-For a new P2P project using DesignArena:
+## 15. Mẫu áp dụng cho dự án P2P mới
 
 ```text
-1. establish language + visual + product contract
-2. Web Apps shell/vertical slice
-3. use UI Component/Data Visualization only for genuinely difficult surfaces
-4. lock the winner
-5. integrate through GitHub-capable lane
-6. verify representative real workflow
-7. repeat by module only when needed
-8. add Full-Stack persistence only when acceptance requires it
+1. khóa product/language/visual contract
+2. Web Apps dựng shell hoặc vertical slice
+3. UI Component/Data Visualization chỉ cho chỗ thật sự khó
+4. khóa winner
+5. tích hợp qua lane có GitHub
+6. verify workflow thật đại diện
+7. lặp theo module khi cần
+8. chỉ thêm Full-Stack persistence khi acceptance yêu cầu
 ```
 
-This playbook guides executor choice; it does not replace project-specific architecture, product truth, or the Supreme Law.
+Playbook này hướng dẫn chọn công cụ. Nó không thay thế kiến trúc riêng của dự án, product truth hay Supreme Law.
