@@ -465,3 +465,41 @@ Two-model battles are valid evidence for a local preference decision but are wea
 Because losing DesignArena candidates may not be exportable, inspect critical constraints before voting and save the winning artifact immediately.
 
 Arena AI note: no visible prompt-character cap should be interpreted as "literally unlimited context." Agent Mode still has session/context limits; its documented compaction reduces pressure but does not abolish finite context. Use long prompts when valuable, but keep task scope bounded.
+
+
+## 21. Arena AI vs DesignArena — artifact-first routing
+
+Fresh official evidence checked on 2026-09-21:
+
+### DesignArena
+- Blind design/product comparison surface.
+- Model identity is hidden during evaluation to reduce brand bias.
+- Exact number of models can differ by arena/category; the four-model/five-vote bracket is an example, not a universal guarantee.
+- Use for search over competing visual/information-architecture options when comparison itself has material value.
+- Treat the exported winner as an artifact/donor. Do not infer global model superiority from one win.
+- If model identity is not shown, do not spend effort guessing it. Evaluate the artifact against the task contract.
+
+### Arena AI Agent Mode
+- Multi-step agentic execution surface with sandbox, web/file tools, uploads, coding, and optional GitHub integration.
+- A new Agent Mode chat is routed to a dedicated orchestrator model; current official docs state the orchestrator is not revealed after feedback.
+- The session may switch models automatically when a response is likely to fail and strand the session.
+- Official Agent Arena currently includes recent orchestrators such as Claude Fable 5.1 (Max), GPT 6 Astra (Max), Claude Opus 5 and others. Therefore "model not visible" must not be interpreted as "only old models are available."
+- Agent Mode has finite context/session limits; compaction lowers pressure but does not create infinite context.
+- Use for long-context execution, file integration, repo surgery, tests, GitHub branch/PR work, and bounded multi-step completion.
+
+### P2P routing rule
+
+```text
+NEED_PARALLEL_DESIGN_SEARCH
+→ DESIGNARENA
+
+HAVE_A_WINNER_OR_CLEAR_REFERENCE
++ NEED_LONG_ITERATIVE_IMPLEMENTATION
+→ ARENA_AI_AGENT_MODE_OR_OTHER_GITHUB_EXECUTOR
+
+MODEL_IDENTITY_UNKNOWN
+→ DO_NOT_GUESS
+→ JUDGE_ARTIFACT / EVIDENCE / TASK FIT
+```
+
+Do not route by model brand when the surface intentionally anonymizes or randomizes models. Route by task capability and artifact quality.
