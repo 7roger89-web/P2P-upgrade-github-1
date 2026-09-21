@@ -503,3 +503,17 @@ MODEL_IDENTITY_UNKNOWN
 ```
 
 Do not route by model brand when the surface intentionally anonymizes or randomizes models. Route by task capability and artifact quality.
+
+
+## 22. Artifact transport between DesignArena and Arena AI
+
+Current Arena AI Agent Mode upload documentation does not list ZIP, TypeScript or TSX as direct upload formats. It does list HTML, CSS, JavaScript, JSON, Markdown and several media/document types.
+
+Therefore:
+- do not assume a DesignArena ZIP can be uploaded losslessly into Arena AI Agent Mode;
+- for a multi-file React/TypeScript winner, the preferred lossless bridge is a GitHub repository;
+- if no product repo exists yet, either keep iterating in the current DesignArena Website → Pro workspace until an export is stable enough to seed a repo, or explicitly extract/convert only supported files when the artifact is simple;
+- once Arena AI Agent Mode is connected to a repo, use its sandbox + branch + diff + checks + PR path for long-running integration;
+- without a connected repo, Arena AI keeps output in session workspace and can export the workspace as a ZIP at task end.
+
+Do not perform lossy copy/paste of a large app merely to switch executors.
