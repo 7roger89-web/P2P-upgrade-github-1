@@ -435,10 +435,12 @@ frontend-code-review references.
   unverifiable in-sandbox (oxlint worker SIGABRT/OOM) — environment
   limitation, adapter hardened accordingly.
 - Synthetic-project install proof (in-test, §7 D/E): `copy_selected` stages
-  the release, the install contract copies every packaged
-  `.agents/skills/*` into a synthetic project, and a repo-scoped executor
-  (only the synthetic tree readable) discovers all 7 pack entrypoints with
-  valid frontmatter; `doctor.check_skills` passes on the stage.
+  the release, then the project-fit selector classifies the React fixture as
+  `FRONTEND_REACT` and installs the selected skill set. The repo-scoped
+  executor (only the synthetic tree readable) discovers all 7 curated frontend
+  entrypoints with valid frontmatter; `doctor.check_skills` still validates
+  the full packaged stage. Backend/generic projects are covered separately by
+  `test_p2p_project_fit_capability_provisioning.py`.
 - Mirror discipline: canonical vs both mirrors byte-compared file by file
   in-test; manifests assert per-file SHA-256 equality plus the documented
   aggregate scheme for all 8 touched skills.

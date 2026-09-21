@@ -103,6 +103,7 @@ SCRIPT_FILES = (
     "scripts/p2p_development_control.py",
     "scripts/p2p_task_state.py",
     "scripts/p2p_safe_installer.py",
+    "scripts/p2p_skill_profile.py",
     "scripts/p2p_bootstrap.py",
     "scripts/p2p_portable_law_projection.py",
     "scripts/p2p_workflow.py",
