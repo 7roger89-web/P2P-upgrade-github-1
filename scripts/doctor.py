@@ -31,6 +31,7 @@ except ModuleNotFoundError:
     from p2p_skill_profile import (
         PROFILES as CAPABILITY_PROFILES,
         SCHEMA_VERSION as CAPABILITY_PROFILE_SCHEMA,
+        detect_profile,
         expected_skills_for_profile,
     )
 
