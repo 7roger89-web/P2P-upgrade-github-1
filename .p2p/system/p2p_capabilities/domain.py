@@ -5,7 +5,7 @@ Never an authority or persistence layer.
 Required invariants:
 - REPOSITORY != CAPABILITY
 - AVAILABLE != SELECTED
-- SELECTED != EXECUTABLE
+- SELECTION_DOES_NOT_IMPLY_EXECUTABILITY
 - REFERENCE != INSTALLED
 - DATASET != METHODOLOGY_AUTHORITY
 - ENGINEERING_PASS != DOMAIN_TRUTH
@@ -62,7 +62,7 @@ SOURCE_ROLE_ALIASES: dict[str, str] = {
 CORE_INVARIANTS: tuple[str, ...] = (
     "REPOSITORY_IS_NOT_CAPABILITY",
     "AVAILABLE_IS_NOT_SELECTED",
-    "SELECTED_IS_NOT_EXECUTABLE",
+    "SELECTION_DOES_NOT_IMPLY_EXECUTABILITY",
     "REFERENCE_IS_NOT_INSTALLED",
     "DATASET_IS_NOT_METHODOLOGY_AUTHORITY",
     "ENGINEERING_PASS_IS_NOT_DOMAIN_TRUTH",
@@ -85,11 +85,15 @@ def normalize_source_role(role: str) -> str:
 
 @dataclass(frozen=True)
 class SourceRoleMetadata:
+    """Structural consumption behavior of a source role.
+
+    Authority (methodology or domain truth) is NOT granted globally by role name;
+    it must be established by the specific DomainSourceRecord's explicit claims.
+    """
+
     role: str
     is_executable: bool
     is_installable: bool
-    is_methodology_authority: bool
-    is_domain_truth_authority: bool
     requires_pinned_provenance: bool
     description: str
 
@@ -99,8 +103,6 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="DEPENDENCY",
         is_executable=True,
         is_installable=True,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Runtime package or library linked directly into project code.",
     ),
@@ -108,8 +110,6 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="EXECUTABLE_ENGINE",
         is_executable=True,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Deterministic calculation or parsing engine. Pass does not prove domain truth or predictive validity.",
     ),
@@ -117,8 +117,6 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="SKILL",
         is_executable=False,
         is_installable=True,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Packaged knowledge unit or operational workflow guide for AI agents.",
     ),
@@ -126,8 +124,6 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="REFERENCE_IMPLEMENTATION",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Reference architecture or implementation pattern. Never installed or copied wholesale by default.",
     ),
@@ -135,8 +131,6 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="TECHNIQUE_REFERENCE",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Targeted technique or visual/algorithmic pattern reference. Not executable or installable.",
     ),
@@ -144,17 +138,13 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="TOOL",
         is_executable=True,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
-        requires_pinned_provenance=False,
-        description="External CLI or workspace tool invoked for builds, checks, or queries.",
+        requires_pinned_provenance=True,
+        description="External CLI or workspace tool invoked for builds, checks, or queries. Version/provenance required.",
     ),
     "STARTER": SourceRoleMetadata(
         role="STARTER",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Starter template or scaffolding structure. Requires explicit adoption decision.",
     ),
@@ -162,8 +152,6 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="DATASET",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Test fixture, evaluation corpus, or reference data. Never methodology or doctrinal authority.",
     ),
@@ -171,17 +159,13 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="PRIMARY_OR_OFFICIAL_EVIDENCE_SOURCE",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=True,
-        is_domain_truth_authority=True,
         requires_pinned_provenance=True,
-        description="Primary official source of truth (e.g. Official Gazette, primary text corpus). Code cannot substitute.",
+        description="Primary official source of truth. Scope and domain of authority must be explicitly recorded.",
     ),
     "RESEARCH_ONLY": SourceRoleMetadata(
         role="RESEARCH_ONLY",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=True,
         description="Independent exploratory research dossier. Strictly non-executable and not adopted in runtime.",
     ),
@@ -189,19 +173,15 @@ _ROLE_METADATA_TABLE: dict[str, SourceRoleMetadata] = {
         role="DEFER",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=False,
-        description="Candidate deferred from current task or workstream consideration.",
+        description="Candidate deferred from current task or workstream consideration. Intrinsically non-selectable.",
     ),
     "REJECT": SourceRoleMetadata(
         role="REJECT",
         is_executable=False,
         is_installable=False,
-        is_methodology_authority=False,
-        is_domain_truth_authority=False,
         requires_pinned_provenance=False,
-        description="Candidate rejected due to license incompatibility, security risk, or scope mismatch.",
+        description="Candidate rejected due to license incompatibility, security risk, or scope mismatch. Intrinsically non-selectable.",
     ),
 }
 
@@ -224,9 +204,12 @@ class DomainSourceRecord:
     consumption_mode: str
     capabilities_provided: tuple[str, ...] = ()
     upstream_repo: str = ""
-    pinned_ref: str = ""
+    pinned_ref: str = "UNKNOWN"
     license: str = "UNKNOWN"
     authority_scope: str = "NONE"
+    authority_domains: tuple[str, ...] = ()
+    methodology_authority: bool = False
+    domain_truth_authority: bool = False
     limitations: tuple[str, ...] = ()
     school_or_jurisdiction: str = ""
     evidence_pointers: tuple[str, ...] = ()
@@ -235,6 +218,11 @@ class DomainSourceRecord:
     def __post_init__(self) -> None:
         normalized_role = normalize_source_role(self.source_role)
         object.__setattr__(self, "source_role", normalized_role)
+        # Blockers 4: DEFER and REJECT are intrinsically non-selectable regardless of status
+        if normalized_role in ("DEFER", "REJECT") and self.status == "ACTIVE":
+            object.__setattr__(
+                self, "status", "DEFERRED" if normalized_role == "DEFER" else "REJECTED"
+            )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -248,6 +236,9 @@ class DomainSourceRecord:
             "pinned_ref": self.pinned_ref,
             "license": self.license,
             "authority_scope": self.authority_scope,
+            "authority_domains": list(self.authority_domains),
+            "methodology_authority": self.methodology_authority,
+            "domain_truth_authority": self.domain_truth_authority,
             "limitations": list(self.limitations),
             "school_or_jurisdiction": self.school_or_jurisdiction,
             "evidence_pointers": list(self.evidence_pointers),
@@ -311,7 +302,10 @@ class DomainSourceSelectionReceipt:
     task_id: str = ""
     domain: str = ""
     desired_outcome: str = ""
+    selection_status: str = "BLOCKED"  # SATISFIED | PARTIAL_OPTIONAL | BLOCKED
     required_capabilities: tuple[str, ...] = ()
+    satisfied_capabilities: tuple[str, ...] = ()
+    unsatisfied_required_capabilities: tuple[str, ...] = ()
     selected_sources: tuple[SelectedSourceItem, ...] = ()
     unselected_candidates: tuple[UnselectedSourceItem, ...] = ()
     authority_boundary_summary: tuple[str, ...] = ()
@@ -323,7 +317,10 @@ class DomainSourceSelectionReceipt:
             "task_id": self.task_id,
             "domain": self.domain,
             "desired_outcome": self.desired_outcome,
+            "selection_status": self.selection_status,
             "required_capabilities": list(self.required_capabilities),
+            "satisfied_capabilities": list(self.satisfied_capabilities),
+            "unsatisfied_required_capabilities": list(self.unsatisfied_required_capabilities),
             "selected_sources": [s.to_dict() for s in self.selected_sources],
             "unselected_candidates": [u.to_dict() for u in self.unselected_candidates],
             "authority_boundary_summary": list(self.authority_boundary_summary),
@@ -337,7 +334,10 @@ class DomainSourceSelectionReceipt:
         ]
         lines = [
             f"DOMAIN={self.domain}",
+            f"SELECTION_STATUS={self.selection_status}",
             f"CAPABILITIES_REQUIRED={','.join(self.required_capabilities)}",
+            f"SATISFIED_CAPABILITIES={','.join(self.satisfied_capabilities)}",
+            f"UNSATISFIED_REQUIRED_CAPABILITIES={','.join(self.unsatisfied_required_capabilities)}",
             f"SOURCES_SELECTED={','.join(s.source_id for s in self.selected_sources)}",
             f"SOURCE_ROLE_PER_SOURCE={','.join(f'{s.source_id}:{s.source_role}' for s in self.selected_sources)}",
             f"PIN_PROVENANCE={','.join(pin_entries)}",
@@ -395,19 +395,22 @@ class ProjectDomainModel:
 
 
 # ---------------------------------------------------------------------------
-# 4. Standard built-in domain source catalog (Three.js, VNLAW, Metaphysics)
+# 4. Standard built-in domain source catalog (projected from durable truth)
 # ---------------------------------------------------------------------------
 
 def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
-    """Provider-neutral canonical source catalog across proof domains.
+    """Provider-neutral canonical source catalog projected from durable truth surfaces.
 
-    Preserves:
-    - Three.js capability orthogonality (visual vs spatial vs navigation vs cinematic)
-    - VNLAW separation between official legal authority and code parsers/viewers
-    - Chinese Metaphysics rule: ONE_UPSTREAM_REPO = ONE_INDEPENDENT_RESEARCH_DOSSIER
+    Reuses existing truth from:
+    - docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json
+    - source/chinese-metaphysics/README.md pinned submodule upstreams
+    - Official Vietnamese legal portals of record (vbpl.vn, congbao.chinhphu.vn)
+
+    Contains ZERO fabricated example repositories or synthetic proof fixtures.
+    Proof-only synthetic fixtures are strictly isolated to tests.
     """
     return (
-        # --- Domain: UI / Three.js ---
+        # --- Domain: UI / Three.js (from capability-catalog.json) ---
         DomainSourceRecord(
             source_id="repo:three",
             source_name="Three.js core runtime library",
@@ -439,6 +442,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             authority_scope="AGENT_OPERATIONAL_GUIDANCE",
             evidence_pointers=(".agents/skills/threejs/SKILL.md",),
         ),
+        # CAND-GAME-UI-005 from capability-catalog.json (observed 2026-08-29)
         DomainSourceRecord(
             source_id="repo:three-mesh-bvh",
             source_name="three-mesh-bvh spatial query accelerator",
@@ -447,12 +451,13 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="LINK_AS_DEPENDENCY",
             capabilities_provided=("game.three.spatial_query", "spatial_query"),
             upstream_repo="gkjohnson/three-mesh-bvh",
-            pinned_ref="v0.7.5",
+            pinned_ref="v0.9.14 (observed 2026-08-29)",
             license="MIT",
             authority_scope="RAYCASTING_SPATIAL_ACCELERATION",
             limitations=("SPECIALIST_CAPABILITY_DEMAND_TRIGGERED",),
             evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
         ),
+        # CAND-GAME-UI-008 from capability-catalog.json
         DomainSourceRecord(
             source_id="repo:three-pathfinding",
             source_name="three-pathfinding navigation library",
@@ -461,12 +466,13 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="LINK_AS_DEPENDENCY",
             capabilities_provided=("game.three.navigation", "navigation"),
             upstream_repo="donmccurdy/three-pathfinding",
-            pinned_ref="v1.3.0",
+            pinned_ref="v0.3.0",
             license="MIT",
             authority_scope="NAVMESH_PATHFINDING",
             limitations=("SPECIALIST_CAPABILITY_DEMAND_TRIGGERED",),
             evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
         ),
+        # CAND-GAME-UI-007 from capability-catalog.json (explicit license split preserved)
         DomainSourceRecord(
             source_id="repo:theatre-js",
             source_name="Theatre.js cinematic animation library",
@@ -476,25 +482,15 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             capabilities_provided=("game.three.cinematic", "cinematic"),
             upstream_repo="theatre-js/theatre",
             pinned_ref="0.7.2",
-            license="Apache-2.0",
+            license="Apache-2.0 (core), AGPL-3.0 (studio)",
             authority_scope="TIMELINE_CINEMATIC_ANIMATION",
-            limitations=("SPECIALIST_CAPABILITY_DEMAND_TRIGGERED", "LICENSE_SPLIT_STUDIO_VS_CORE"),
+            limitations=(
+                "SPECIALIST_CAPABILITY_DEMAND_TRIGGERED",
+                "LICENSE_SPLIT_CORE_APACHE_STUDIO_AGPL",
+            ),
             evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
         ),
-        DomainSourceRecord(
-            source_id="repo:codrops-webgl-showcase",
-            source_name="Codrops WebGL interactive showcase technique reference",
-            domain="game.three",
-            source_role="TECHNIQUE_REFERENCE",
-            consumption_mode="CONSULT_TECHNIQUE_REFERENCE",
-            capabilities_provided=("technique_reference", "visual_effect_pattern"),
-            upstream_repo="codrops/interactive-webgl-demo",
-            pinned_ref="main@reviewed_snapshot",
-            license="MIT",
-            authority_scope="VISUAL_TECHNIQUE_REFERENCE_ONLY",
-            limitations=("NOT_EXECUTABLE_OR_INSTALLABLE", "DO_NOT_COPY_WHOLESALE"),
-            evidence_pointers=("docs/p2p-development/capability-catalog/protocols/threejs-visual-protocol.md",),
-        ),
+        # CAND-GAME-UI-018 from capability-catalog.json
         DomainSourceRecord(
             source_id="repo:threejsassets-game-hud",
             source_name="threejsassets game-hud layout reference",
@@ -503,14 +499,30 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="INSPECT_UI_PATTERN",
             capabilities_provided=("ui.game_hud", "hud_reference_layout"),
             upstream_repo="threejsassets/game-hud",
-            pinned_ref="v1.0",
+            pinned_ref="UNKNOWN_VERSION_AUDIT_REQUIRED",
             license="MIT",
             authority_scope="PRESENTATION_LAYOUT_REFERENCE_ONLY",
             limitations=("REFERENCE_NOT_INSTALLED",),
             evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
         ),
+        # CAND-GAME-UI-017 from capability-catalog.json (license gated)
+        DomainSourceRecord(
+            source_id="repo:prnthh-react-three-game",
+            source_name="prnthh/react-three-game reference",
+            domain="game.three.scene_authoring",
+            source_role="REJECT",
+            consumption_mode="REJECTED_LICENSE_GATE",
+            capabilities_provided=("game.three.scene_authoring",),
+            upstream_repo="prnthh/react-three-game",
+            pinned_ref="UNKNOWN",
+            license="PFYL / VPL",
+            authority_scope="NONE",
+            status="REJECTED",
+            limitations=("LICENSE_GATED_PROPRIETARY",),
+            evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
+        ),
 
-        # --- Domain: VNLAW / Legal ---
+        # --- Domain: VNLAW / Legal (authentic official evidence sources of record) ---
         DomainSourceRecord(
             source_id="official:vbpl_vn",
             source_name="Cơ sở dữ liệu Quốc gia về Văn bản Pháp luật (vbpl.vn)",
@@ -521,7 +533,10 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             upstream_repo="https://vbpl.vn",
             pinned_ref="OFFICIAL_STATE_DATABASE",
             license="PUBLIC_LEGAL_DOCUMENTS_VN",
-            authority_scope="OFFICIAL_LEGAL_TEXT_OF_RECORD",
+            authority_scope="OFFICIAL_LEGAL_PROMULGATED_TEXT",
+            authority_domains=("legal.vn",),
+            domain_truth_authority=True,
+            methodology_authority=False,
             school_or_jurisdiction="VIETNAM_LAW",
             evidence_pointers=("governance/fact-ledger.json",),
             limitations=("REQUIRES_PRIMARY_PROVENANCE_CITATION",),
@@ -536,43 +551,15 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             upstream_repo="http://congbao.chinhphu.vn",
             pinned_ref="OFFICIAL_GAZETTE_RECORDS",
             license="PUBLIC_LEGAL_DOCUMENTS_VN",
-            authority_scope="OFFICIAL_GAZETTE_PROMULGATION_OF_RECORD",
+            authority_scope="OFFICIAL_GAZETTE_PROMULGATION",
+            authority_domains=("legal.vn",),
+            domain_truth_authority=True,
+            methodology_authority=False,
             school_or_jurisdiction="VIETNAM_LAW",
             evidence_pointers=("governance/fact-ledger.json",),
         ),
-        DomainSourceRecord(
-            source_id="repo:vnlaw-parser",
-            source_name="vnlaw-text-parser legal text parsing & indexing engine",
-            domain="legal.vn",
-            source_role="EXECUTABLE_ENGINE",
-            consumption_mode="RUN_AS_ENGINE",
-            capabilities_provided=("legal_search_parser", "provision_indexing"),
-            upstream_repo="https://github.com/example/vnlaw-parser.git",
-            pinned_ref="v1.2.0",
-            license="MIT",
-            authority_scope="PARSING_AND_SEARCH_ENGINE_ONLY",
-            school_or_jurisdiction="VIETNAM_LAW",
-            limitations=(
-                "CODE_PASS_IS_NOT_LEGAL_AUTHORITY",
-                "PARSED_TEXT_MUST_BE_VERIFIED_AGAINST_OFFICIAL_SOURCE",
-            ),
-        ),
-        DomainSourceRecord(
-            source_id="repo:vnlaw-viewer",
-            source_name="vnlaw-viewer document display layout reference",
-            domain="legal.vn",
-            source_role="REFERENCE_IMPLEMENTATION",
-            consumption_mode="INSPECT_UI_PATTERN",
-            capabilities_provided=("legal_ui_viewer", "document_layout"),
-            upstream_repo="https://github.com/example/vnlaw-viewer.git",
-            pinned_ref="v0.8.0",
-            license="MIT",
-            authority_scope="PRESENTATION_UI_REFERENCE_ONLY",
-            school_or_jurisdiction="VIETNAM_LAW",
-            limitations=("REFERENCE_NOT_INSTALLED", "NO_LEGAL_AUTHORITY"),
-        ),
 
-        # --- Domain: Chinese Metaphysics (pinned upstreams + dossiers) ---
+        # --- Domain: Chinese Metaphysics (from source/chinese-metaphysics/README.md) ---
         DomainSourceRecord(
             source_id="repo:SylarLong/iztro",
             source_name="iztro Ziwei Doushu Calculation Engine",
@@ -584,6 +571,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             pinned_ref="2c7ef9be669df7b19d1799f4dce335fed3794f78",
             license="MIT",
             authority_scope="DETERMINISTIC_CHART_FACTS_ONLY",
+            authority_domains=("metaphysics.ziwei",),
             school_or_jurisdiction="IZTRO_CONVENTION",
             evidence_pointers=("source/chinese-metaphysics/research/iztro/RESEARCH.md",),
             limitations=(
@@ -602,6 +590,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             pinned_ref="a842dd65dabdc4ce42ec9688b88ae876858a9977",
             license="MIT",
             authority_scope="SCHOOL_SPECIFIC_INTERPRETATION_GUIDE",
+            authority_domains=("metaphysics.ziwei",),
             school_or_jurisdiction="ZHONGZHOU_PAI",
             evidence_pointers=("source/chinese-metaphysics/research/ziwei-doushu-skill/RESEARCH.md",),
             limitations=("SCHOOL_A_IS_NOT_SCHOOL_B", "DO_NOT_MERGE_WITH_OTHER_SCHOOLS"),
@@ -617,6 +606,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             pinned_ref="4531626403a0c645f1e538a9ed145ffec8799420",
             license="MIT",
             authority_scope="INDEPENDENT_RESEARCH_DOSSIER_ONLY",
+            authority_domains=("metaphysics.ziwei",),
             school_or_jurisdiction="SANHE_PAI",
             evidence_pointers=("source/chinese-metaphysics/research/ziwei-wuandyA/RESEARCH.md",),
             limitations=("RESEARCH_ONLY", "ISOLATED_DOSSIER"),
@@ -632,6 +622,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             pinned_ref="8a9a5e0f482dd225bfe4a1c52c2ae5546228607a",
             license="MIT",
             authority_scope="MEIHUA_HEXAGRAM_CALCULATION_ONLY",
+            authority_domains=("metaphysics.meihua",),
             school_or_jurisdiction="MEIHUA_YISHU",
             evidence_pointers=("source/chinese-metaphysics/research/meihua-yishu/RESEARCH.md",),
             limitations=(
@@ -650,6 +641,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             pinned_ref="5965bdc8e9ca69a3cc7e96be6f1cc585d5032814",
             license="MIT",
             authority_scope="APPLICATION_REFERENCE_ONLY",
+            authority_domains=("metaphysics.meihua",),
             school_or_jurisdiction="MEIHUA_YISHU",
             evidence_pointers=("source/chinese-metaphysics/research/plum-app/RESEARCH.md",),
             limitations=("REFERENCE_NOT_INSTALLED", "DO_NOT_MERGE_WITH_ZIWEI"),
@@ -665,6 +657,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             pinned_ref="1f67eea0ce5a2c49e6851e4eedce507f9c044dd9",
             license="MIT",
             authority_scope="LIUYAO_CALCULATION_ONLY",
+            authority_domains=("metaphysics.liuyao",),
             school_or_jurisdiction="LIUYAO_NAJIA",
             evidence_pointers=("source/chinese-metaphysics/research/yinyo-liuyao/RESEARCH.md",),
             limitations=(
@@ -673,20 +666,19 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             ),
         ),
         DomainSourceRecord(
-            source_id="dataset:ziwei-celebrity-charts-sample",
-            source_name="ziwei sample celebrity charts fixture dataset",
-            domain="metaphysics.ziwei",
-            source_role="DATASET",
-            consumption_mode="INSPECT_AS_DATASET",
-            capabilities_provided=("test_fixture_data", "test_cases"),
-            upstream_repo="local:fixtures/ziwei_charts.json",
-            pinned_ref="v1.0",
-            license="CC0-1.0",
-            authority_scope="TEST_FIXTURE_DATA_ONLY",
-            evidence_pointers=("source/chinese-metaphysics/README.md",),
-            limitations=(
-                "DATASET_IS_NOT_METHODOLOGY_AUTHORITY",
-                "FIXTURE_DOES_NOT_PROVE_PREDICTIVE_VALIDITY",
-            ),
+            source_id="repo:Johnson-Jia/liuyao-divination",
+            source_name="liuyao-divination method reference",
+            domain="metaphysics.liuyao",
+            source_role="REFERENCE_IMPLEMENTATION",
+            consumption_mode="INSPECT_UI_PATTERN",
+            capabilities_provided=("liuyao_app_reference",),
+            upstream_repo="Johnson-Jia/liuyao-divination",
+            pinned_ref="1a5a78b513c0e7b46dfb29f74043bcf978c32a3e",
+            license="MIT",
+            authority_scope="LIUYAO_REFERENCE_ONLY",
+            authority_domains=("metaphysics.liuyao",),
+            school_or_jurisdiction="LIUYAO_NAJIA",
+            evidence_pointers=("source/chinese-metaphysics/research/liuyao-divination/RESEARCH.md",),
+            limitations=("REFERENCE_NOT_INSTALLED", "DO_NOT_MERGE_WITH_ZIWEI_OR_MEIHUA"),
         ),
     )

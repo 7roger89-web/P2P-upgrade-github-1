@@ -1707,6 +1707,8 @@ def select_domain_sources(
                     required_caps.append("meihua_app_reference")
             elif target_domain == "metaphysics.liuyao":
                 required_caps.append("liuyao_hexagram_derivation")
+            elif target_domain == "metaphysics.bazi":
+                required_caps.append("bazi_chart_calculation")
 
     # School requirement for Metaphysics
     required_school = ""
@@ -1729,15 +1731,17 @@ def select_domain_sources(
     authority_summaries: list[str] = []
 
     for candidate in candidate_pool:
-        # A. Status check
-        if candidate.status in ("DEFER", "REJECT"):
+        # A. Status and role non-selectability check (DEFER and REJECT must never select)
+        if candidate.source_role in ("DEFER", "REJECT") or candidate.status in (
+            "DEFER", "REJECT", "DEFERRED", "REJECTED"
+        ):
             unselected_items.append(
                 UnselectedSourceItem(
                     source_id=candidate.source_id,
                     source_name=candidate.source_name,
                     domain=candidate.domain,
                     candidate_role=candidate.source_role,
-                    why_not_selected=f"CANDIDATE_STATUS_{candidate.status}",
+                    why_not_selected=f"CANDIDATE_ROLE_{candidate.source_role}_NON_SELECTABLE",
                 )
             )
             continue
@@ -1821,9 +1825,18 @@ def select_domain_sources(
             continue
 
         # F. Legal Authority check: CODE_PASS_IS_NOT_LEGAL_AUTHORITY
-        role_meta = get_source_role_metadata(candidate.source_role)
+        # Authority must be bounded by the source record's explicit domain + authority_scope/claim,
+        # never globally implied by source role name alone.
         if "official_legal_authority" in required_caps:
-            if not role_meta.is_domain_truth_authority and "official_legal_authority" in satisfied_caps:
+            is_valid_official_legal = (
+                candidate.domain_truth_authority
+                and any(
+                    target_domain == ad or target_domain.startswith(ad + ".")
+                    for ad in candidate.authority_domains
+                )
+                and "official_legal_authority" in candidate.capabilities_provided
+            )
+            if not is_valid_official_legal and "official_legal_authority" in satisfied_caps:
                 satisfied_caps.remove("official_legal_authority")
                 if not satisfied_caps:
                     unselected_items.append(
@@ -1833,7 +1846,7 @@ def select_domain_sources(
                             domain=candidate.domain,
                             candidate_role=candidate.source_role,
                             why_not_selected=(
-                                "CODE_PASS_IS_NOT_LEGAL_AUTHORITY:tested_code_cannot_satisfy_official_legal_authority"
+                                "CODE_PASS_IS_NOT_LEGAL_AUTHORITY:source_lacks_bounded_domain_truth_authority_for_official_legal_text"
                             ),
                         )
                     )
@@ -1906,6 +1919,25 @@ def select_domain_sources(
             )
         )
 
+    # 5. Deterministic Coverage Accounting (Blocker 3: Fail-Closed)
+    all_satisfied_caps: set[str] = set()
+    for item in selected_items:
+        all_satisfied_caps.update(item.capabilities_satisfied)
+    satisfied_tuple = tuple(sorted(all_satisfied_caps))
+    unsatisfied_required = tuple(
+        c for c in required_caps if c not in all_satisfied_caps
+    )
+
+    if not unsatisfied_required and selected_items:
+        selection_status = "SATISFIED"
+    elif selected_items and not any(
+        c in ("official_legal_authority", "chart_calculation", "bazi_chart_calculation", "school_methodology")
+        for c in unsatisfied_required
+    ):
+        selection_status = "PARTIAL_OPTIONAL"
+    else:
+        selection_status = "BLOCKED"
+
     # Invariants summary
     if not authority_summaries:
         authority_summaries.append("DOMAIN_BOUNDED_SELECTION_ONLY")
@@ -1915,7 +1947,10 @@ def select_domain_sources(
         task_id=task_id,
         domain=target_domain,
         desired_outcome=outcome_text,
+        selection_status=selection_status,
         required_capabilities=tuple(required_caps),
+        satisfied_capabilities=satisfied_tuple,
+        unsatisfied_required_capabilities=unsatisfied_required,
         selected_sources=tuple(selected_items),
         unselected_candidates=tuple(unselected_items),
         authority_boundary_summary=tuple(dict.fromkeys(authority_summaries)),
