@@ -306,6 +306,8 @@ class DomainSourceSelectionReceipt:
     required_capabilities: tuple[str, ...] = ()
     satisfied_capabilities: tuple[str, ...] = ()
     unsatisfied_required_capabilities: tuple[str, ...] = ()
+    optional_capabilities: tuple[str, ...] = ()
+    unsatisfied_optional_capabilities: tuple[str, ...] = ()
     selected_sources: tuple[SelectedSourceItem, ...] = ()
     unselected_candidates: tuple[UnselectedSourceItem, ...] = ()
     authority_boundary_summary: tuple[str, ...] = ()
@@ -321,6 +323,8 @@ class DomainSourceSelectionReceipt:
             "required_capabilities": list(self.required_capabilities),
             "satisfied_capabilities": list(self.satisfied_capabilities),
             "unsatisfied_required_capabilities": list(self.unsatisfied_required_capabilities),
+            "optional_capabilities": list(self.optional_capabilities),
+            "unsatisfied_optional_capabilities": list(self.unsatisfied_optional_capabilities),
             "selected_sources": [s.to_dict() for s in self.selected_sources],
             "unselected_candidates": [u.to_dict() for u in self.unselected_candidates],
             "authority_boundary_summary": list(self.authority_boundary_summary),
@@ -338,6 +342,8 @@ class DomainSourceSelectionReceipt:
             f"CAPABILITIES_REQUIRED={','.join(self.required_capabilities)}",
             f"SATISFIED_CAPABILITIES={','.join(self.satisfied_capabilities)}",
             f"UNSATISFIED_REQUIRED_CAPABILITIES={','.join(self.unsatisfied_required_capabilities)}",
+            f"OPTIONAL_CAPABILITIES={','.join(self.optional_capabilities)}",
+            f"UNSATISFIED_OPTIONAL_CAPABILITIES={','.join(self.unsatisfied_optional_capabilities)}",
             f"SOURCES_SELECTED={','.join(s.source_id for s in self.selected_sources)}",
             f"SOURCE_ROLE_PER_SOURCE={','.join(f'{s.source_id}:{s.source_role}' for s in self.selected_sources)}",
             f"PIN_PROVENANCE={','.join(pin_entries)}",
@@ -419,7 +425,7 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="LINK_AS_DEPENDENCY",
             capabilities_provided=("three_rendering", "webgl_webgpu_runtime"),
             upstream_repo="mrdoob/three.js",
-            pinned_ref="r168",
+            pinned_ref="UNVERIFIED_VERSION",
             license="MIT",
             authority_scope="GRAPHICS_RENDERING_RUNTIME",
             evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
@@ -455,9 +461,12 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             license="MIT",
             authority_scope="RAYCASTING_SPATIAL_ACCELERATION",
             limitations=("SPECIALIST_CAPABILITY_DEMAND_TRIGGERED",),
-            evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
+            evidence_pointers=(
+                "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
+                "governance/research-adoption-ledger.json",
+            ),
         ),
-        # CAND-GAME-UI-008 from capability-catalog.json
+        # CAND-GAME-UI-008 from capability-catalog.json & RA-EXT-039 (observed 2026-08-29)
         DomainSourceRecord(
             source_id="repo:three-pathfinding",
             source_name="three-pathfinding navigation library",
@@ -466,13 +475,16 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="LINK_AS_DEPENDENCY",
             capabilities_provided=("game.three.navigation", "navigation"),
             upstream_repo="donmccurdy/three-pathfinding",
-            pinned_ref="v0.3.0",
+            pinned_ref="v1.3.0 (observed 2026-08-29)",
             license="MIT",
             authority_scope="NAVMESH_PATHFINDING",
             limitations=("SPECIALIST_CAPABILITY_DEMAND_TRIGGERED",),
-            evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
+            evidence_pointers=(
+                "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
+                "governance/research-adoption-ledger.json",
+            ),
         ),
-        # CAND-GAME-UI-007 from capability-catalog.json (explicit license split preserved)
+        # CAND-GAME-UI-007 from capability-catalog.json & RA-EXT-038 (explicit license split preserved)
         DomainSourceRecord(
             source_id="repo:theatre-js",
             source_name="Theatre.js cinematic animation library",
@@ -481,14 +493,17 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="LINK_AS_DEPENDENCY",
             capabilities_provided=("game.three.cinematic", "cinematic"),
             upstream_repo="theatre-js/theatre",
-            pinned_ref="0.7.2",
+            pinned_ref="UNVERIFIED_VERSION",
             license="Apache-2.0 (core), AGPL-3.0 (studio)",
             authority_scope="TIMELINE_CINEMATIC_ANIMATION",
             limitations=(
                 "SPECIALIST_CAPABILITY_DEMAND_TRIGGERED",
                 "LICENSE_SPLIT_CORE_APACHE_STUDIO_AGPL",
             ),
-            evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
+            evidence_pointers=(
+                "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
+                "governance/research-adoption-ledger.json",
+            ),
         ),
         # CAND-GAME-UI-018 from capability-catalog.json
         DomainSourceRecord(
@@ -499,11 +514,14 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="INSPECT_UI_PATTERN",
             capabilities_provided=("ui.game_hud", "hud_reference_layout"),
             upstream_repo="threejsassets/game-hud",
-            pinned_ref="UNKNOWN_VERSION_AUDIT_REQUIRED",
+            pinned_ref="UNVERIFIED_VERSION",
             license="MIT",
             authority_scope="PRESENTATION_LAYOUT_REFERENCE_ONLY",
             limitations=("REFERENCE_NOT_INSTALLED",),
-            evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
+            evidence_pointers=(
+                "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
+                "governance/research-adoption-ledger.json",
+            ),
         ),
         # CAND-GAME-UI-017 from capability-catalog.json (license gated)
         DomainSourceRecord(
@@ -514,12 +532,15 @@ def build_domain_source_catalog() -> tuple[DomainSourceRecord, ...]:
             consumption_mode="REJECTED_LICENSE_GATE",
             capabilities_provided=("game.three.scene_authoring",),
             upstream_repo="prnthh/react-three-game",
-            pinned_ref="UNKNOWN",
+            pinned_ref="UNVERIFIED_VERSION",
             license="PFYL / VPL",
             authority_scope="NONE",
             status="REJECTED",
             limitations=("LICENSE_GATED_PROPRIETARY",),
-            evidence_pointers=("docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",),
+            evidence_pointers=(
+                "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json",
+                "governance/research-adoption-ledger.json",
+            ),
         ),
 
         # --- Domain: VNLAW / Legal (authentic official evidence sources of record) ---

@@ -15,6 +15,7 @@ Validates:
 
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -198,12 +199,67 @@ class TestProductionCatalogTruthfulness(unittest.TestCase):
         """Matches CAND-GAME-UI-007 in ui-game-threejs capability-catalog.json:
 
         Apache-2.0 (core), AGPL-3.0 (studio).
+        Must be UNVERIFIED_VERSION pin (no invented 0.7.2 pin).
         """
         self.assertIn("repo:theatre-js", self.catalog_by_id)
         theatre = self.catalog_by_id["repo:theatre-js"]
         self.assertIn("Apache-2.0 (core)", theatre.license)
         self.assertIn("AGPL-3.0 (studio)", theatre.license)
+        self.assertEqual(theatre.pinned_ref, "UNVERIFIED_VERSION")
         self.assertIn("LICENSE_SPLIT", theatre.limitations[1])
+
+    def test_three_pathfinding_matches_canonical_catalog_and_ledger(self) -> None:
+        """Matches CAND-GAME-UI-008 and RA-EXT-039: v1.3.0 observed (not v0.3.0)."""
+        self.assertIn("repo:three-pathfinding", self.catalog_by_id)
+        pf = self.catalog_by_id["repo:three-pathfinding"]
+        self.assertIn("v1.3.0", pf.pinned_ref)
+        self.assertIn("2026-08-29", pf.pinned_ref)
+        self.assertEqual(pf.license, "MIT")
+
+    def test_three_core_unverified_version_no_invented_pin(self) -> None:
+        """mrdoob/three.js has no audited release pin in ledger/catalog; marked UNVERIFIED_VERSION."""
+        self.assertIn("repo:three", self.catalog_by_id)
+        three = self.catalog_by_id["repo:three"]
+        self.assertEqual(three.pinned_ref, "UNVERIFIED_VERSION")
+
+    def test_durable_provenance_sync_against_canonical_files(self) -> None:
+        """Sync test against ui-game-threejs/capability-catalog.json and research-adoption-ledger.json."""
+        catalog_path = REPO_ROOT / "docs" / "p2p-development" / "capability-catalog" / "ui-game-threejs" / "capability-catalog.json"
+        ledger_path = REPO_ROOT / "governance" / "research-adoption-ledger.json"
+
+        with open(catalog_path, encoding="utf-8") as f:
+            cat_data = json.load(f)
+        with open(ledger_path, encoding="utf-8") as f:
+            ledger_data = json.load(f)
+
+        candidates = {c["candidate_id"]: c for c in cat_data.get("candidates", [])}
+        records = {r["research_id"]: r for r in ledger_data.get("records", [])}
+
+        # 1. three-mesh-bvh (CAND-GAME-UI-005, RA-EXT-036)
+        self.assertIn("v0.9.14", candidates["CAND-GAME-UI-005"]["source_version_or_commit"])
+        self.assertIn("v0.9.14", records["RA-EXT-036"]["source_version_or_commit"])
+        self.assertIn("v0.9.14", self.catalog_by_id["repo:three-mesh-bvh"].pinned_ref)
+
+        # 2. three-pathfinding (CAND-GAME-UI-008, RA-EXT-039)
+        self.assertIn("v1.3.0", candidates["CAND-GAME-UI-008"]["source_version_or_commit"])
+        self.assertIn("v1.3.0", records["RA-EXT-039"]["source_version_or_commit"])
+        self.assertIn("v1.3.0", self.catalog_by_id["repo:three-pathfinding"].pinned_ref)
+
+        # 3. theatre-js: split license, no audited pin (CAND-GAME-UI-007, RA-EXT-038)
+        theatre_cat = candidates["CAND-GAME-UI-007"]
+        theatre_rec = records["RA-EXT-038"]
+        self.assertIn("LICENSE SPLIT", theatre_cat["source_version_or_commit"])
+        self.assertIn("LICENSE SPLIT", theatre_rec["source_version_or_commit"])
+        self.assertEqual(self.catalog_by_id["repo:theatre-js"].pinned_ref, "UNVERIFIED_VERSION")
+        self.assertEqual(self.catalog_by_id["repo:theatre-js"].license, "Apache-2.0 (core), AGPL-3.0 (studio)")
+
+        # 4. three.js core: no pin in catalog or ledger
+        self.assertEqual(self.catalog_by_id["repo:three"].pinned_ref, "UNVERIFIED_VERSION")
+
+        # 5. hud and game references
+        self.assertEqual(self.catalog_by_id["repo:threejsassets-game-hud"].pinned_ref, "UNVERIFIED_VERSION")
+        self.assertEqual(self.catalog_by_id["repo:prnthh-react-three-game"].pinned_ref, "UNVERIFIED_VERSION")
+        self.assertEqual(self.catalog_by_id["repo:prnthh-react-three-game"].license, "PFYL / VPL")
 
     def test_chinese_metaphysics_upstreams_match_readme(self) -> None:
         """Exact pinned commits from source/chinese-metaphysics/README.md."""
@@ -306,6 +362,57 @@ class TestFailClosedCoverageAccounting(unittest.TestCase):
         self.assertEqual(len(receipt.unsatisfied_required_capabilities), 0)
         self.assertIn("chart_calculation", receipt.satisfied_capabilities)
         self.assertIn("school_methodology", receipt.satisfied_capabilities)
+
+    def test_missing_noncritical_required_capability_fails_closed_as_blocked(self) -> None:
+        """Regression R2-1: Any unsatisfied REQUIRED capability must fail closed as BLOCKED.
+
+        Task requires two capabilities: one satisfied, one missing.
+        The missing capability is NOT one of the former critical-whitelist names.
+        Status MUST be BLOCKED, not PARTIAL_OPTIONAL.
+        """
+        task = {
+            "task_id": "TASK-FAIL-CLOSED-NONCRITICAL",
+            "domain": "game.three",
+            "desired_outcome": "Spatial raycast query with custom noncritical capability",
+            "required_capabilities": ["spatial_query", "custom_noncritical_capability"],
+        }
+        receipt = select_domain_sources(task)
+        self.assertEqual(receipt.selection_status, "BLOCKED")
+        self.assertIn("spatial_query", receipt.satisfied_capabilities)
+        self.assertIn("custom_noncritical_capability", receipt.unsatisfied_required_capabilities)
+
+    def test_optional_capabilities_missing_allows_partial_optional(self) -> None:
+        """R2-1: PARTIAL_OPTIONAL is valid only when all required capabilities are satisfied,
+        and an explicitly declared optional capability is missing.
+        """
+        task = {
+            "task_id": "TASK-PARTIAL-OPTIONAL",
+            "domain": "game.three",
+            "desired_outcome": "Spatial raycast query with optional enhancement",
+            "required_capabilities": ["spatial_query"],
+            "optional_capabilities": ["optional_unsupported_enhancement"],
+        }
+        receipt = select_domain_sources(task)
+        self.assertEqual(receipt.selection_status, "PARTIAL_OPTIONAL")
+        self.assertIn("spatial_query", receipt.satisfied_capabilities)
+        self.assertEqual(receipt.unsatisfied_required_capabilities, ())
+        self.assertIn("optional_unsupported_enhancement", receipt.unsatisfied_optional_capabilities)
+
+    def test_optional_capabilities_fully_satisfied_reports_satisfied(self) -> None:
+        """R2-1: When both required and optional capabilities are satisfied, status is SATISFIED."""
+        task = {
+            "task_id": "TASK-OPTIONAL-SATISFIED",
+            "domain": "game.three",
+            "desired_outcome": "Spatial raycast query with rendering",
+            "required_capabilities": ["three_rendering"],
+            "optional_capabilities": ["spatial_query"],
+        }
+        receipt = select_domain_sources(task)
+        self.assertEqual(receipt.selection_status, "SATISFIED")
+        self.assertIn("three_rendering", receipt.satisfied_capabilities)
+        self.assertIn("spatial_query", receipt.satisfied_capabilities)
+        self.assertEqual(receipt.unsatisfied_required_capabilities, ())
+        self.assertEqual(receipt.unsatisfied_optional_capabilities, ())
 
 
 class TestProofCaseAThreeJS(unittest.TestCase):

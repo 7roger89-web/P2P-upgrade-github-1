@@ -1663,6 +1663,9 @@ def select_domain_sources(
     explicit_caps = tuple(
         str(c) for c in (task_record.get("required_capabilities", ()) or ())
     )
+    explicit_optional_caps = tuple(
+        str(c) for c in (task_record.get("optional_capabilities", ()) or ())
+    )
     if explicit_caps:
         required_caps = list(explicit_caps)
     else:
@@ -1709,6 +1712,7 @@ def select_domain_sources(
                 required_caps.append("liuyao_hexagram_derivation")
             elif target_domain == "metaphysics.bazi":
                 required_caps.append("bazi_chart_calculation")
+    optional_caps = list(explicit_optional_caps)
 
     # School requirement for Metaphysics
     required_school = ""
@@ -1807,8 +1811,9 @@ def select_domain_sources(
             continue
 
         # E. Capability need check (AVAILABLE_IS_NOT_SELECTED)
+        demanded_caps = set(required_caps) | set(optional_caps)
         satisfied_caps = [
-            cap for cap in candidate.capabilities_provided if cap in required_caps
+            cap for cap in candidate.capabilities_provided if cap in demanded_caps
         ]
         if not satisfied_caps:
             unselected_items.append(
@@ -1919,7 +1924,7 @@ def select_domain_sources(
             )
         )
 
-    # 5. Deterministic Coverage Accounting (Blocker 3: Fail-Closed)
+    # 5. Deterministic Coverage Accounting (Blocker R2-1: Fail-Closed without Whitelist)
     all_satisfied_caps: set[str] = set()
     for item in selected_items:
         all_satisfied_caps.update(item.capabilities_satisfied)
@@ -1927,16 +1932,16 @@ def select_domain_sources(
     unsatisfied_required = tuple(
         c for c in required_caps if c not in all_satisfied_caps
     )
+    unsatisfied_optional = tuple(
+        c for c in optional_caps if c not in all_satisfied_caps
+    )
 
-    if not unsatisfied_required and selected_items:
-        selection_status = "SATISFIED"
-    elif selected_items and not any(
-        c in ("official_legal_authority", "chart_calculation", "bazi_chart_calculation", "school_methodology")
-        for c in unsatisfied_required
-    ):
+    if unsatisfied_required or not selected_items:
+        selection_status = "BLOCKED"
+    elif unsatisfied_optional:
         selection_status = "PARTIAL_OPTIONAL"
     else:
-        selection_status = "BLOCKED"
+        selection_status = "SATISFIED"
 
     # Invariants summary
     if not authority_summaries:
@@ -1951,6 +1956,8 @@ def select_domain_sources(
         required_capabilities=tuple(required_caps),
         satisfied_capabilities=satisfied_tuple,
         unsatisfied_required_capabilities=unsatisfied_required,
+        optional_capabilities=tuple(optional_caps),
+        unsatisfied_optional_capabilities=unsatisfied_optional,
         selected_sources=tuple(selected_items),
         unselected_candidates=tuple(unselected_items),
         authority_boundary_summary=tuple(dict.fromkeys(authority_summaries)),
