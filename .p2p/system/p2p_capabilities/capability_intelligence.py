@@ -40,6 +40,35 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping, Sequence
 
+try:
+    from .domain import (
+        CORE_INVARIANTS,
+        SOURCE_ROLES,
+        DomainSourceRecord,
+        DomainSourceSelectionReceipt,
+        ProjectDomainModel,
+        SelectedSourceItem,
+        SourceRoleMetadata,
+        UnselectedSourceItem,
+        build_domain_source_catalog,
+        get_source_role_metadata,
+        normalize_source_role,
+    )
+except ImportError:
+    from domain import (
+        CORE_INVARIANTS,
+        SOURCE_ROLES,
+        DomainSourceRecord,
+        DomainSourceSelectionReceipt,
+        ProjectDomainModel,
+        SelectedSourceItem,
+        SourceRoleMetadata,
+        UnselectedSourceItem,
+        build_domain_source_catalog,
+        get_source_role_metadata,
+        normalize_source_role,
+    )
+
 UNKNOWN = "UNKNOWN"
 
 # ---------------------------------------------------------------------------
@@ -1565,3 +1594,331 @@ def compute_execution_requirements(
             r for r in requirements if r.required_or_optional == "REQUIRED"
             and r.capability_id in _declared_unknown),
     )
+
+
+# ---------------------------------------------------------------------------
+# 13. Domain-aware upstream repository & source consumption contract
+# ---------------------------------------------------------------------------
+
+def select_domain_sources(
+    task_record: Mapping[str, Any],
+    domain_model: ProjectDomainModel | None = None,
+    available_sources: Sequence[DomainSourceRecord] | None = None,
+) -> DomainSourceSelectionReceipt:
+    """Task-time domain-aware selection of external repositories and sources.
+
+    Answers the Owner outcome without requiring the Owner to know specific
+    repositories, libraries, engines, references, datasets or tools.
+
+    Enforces invariants:
+    - REPOSITORY != CAPABILITY
+    - AVAILABLE != SELECTED
+    - SELECTED != EXECUTABLE
+    - REFERENCE != INSTALLED
+    - DATASET != METHODOLOGY_AUTHORITY
+    - ENGINEERING_PASS != DOMAIN_TRUTH
+    - CODE_PASS != LEGAL_AUTHORITY
+    - DETERMINISTIC_OUTPUT != PREDICTIVE_VALIDITY
+    - DOMAIN_APPLICABILITY != AUTHORITY
+    """
+    task_id = str(task_record.get("task_id", "unknown_task"))
+    outcome_text = " ".join(
+        str(v)
+        for v in (
+            task_record.get("desired_outcome", ""),
+            task_record.get("title", ""),
+            task_record.get("purpose", ""),
+            *list(task_record.get("scope", ())),
+        )
+    ).strip()
+    lowered = outcome_text.lower()
+
+    # 1. Target Domain Resolution
+    explicit_domain = str(task_record.get("domain", "")).strip()
+    if explicit_domain:
+        target_domain = explicit_domain
+    elif domain_model and domain_model.domain and domain_model.domain != "GENERAL":
+        target_domain = domain_model.domain
+    else:
+        # Deterministic inference from outcome text
+        if re.search(r"three|r3f|webgl|webgpu|blender|gltf|shader|3d|raycast|collision|navmesh", lowered):
+            target_domain = "game.three"
+        elif re.search(
+            r"vnlaw|pháp luật|pháp lý|luật|nghị định|thông tư|văn bản quy phạm|vbpl|công báo|điều khoản|xử phạt|quy định",
+            lowered,
+        ):
+            target_domain = "legal.vn"
+        elif re.search(r"tử vi|ziwei", lowered):
+            target_domain = "metaphysics.ziwei"
+        elif re.search(r"mai hoa|meihua|plum", lowered):
+            target_domain = "metaphysics.meihua"
+        elif re.search(r"lục hào|liuyao", lowered):
+            target_domain = "metaphysics.liuyao"
+        elif re.search(r"bát tự|bazi", lowered):
+            target_domain = "metaphysics.bazi"
+        else:
+            target_domain = "general"
+
+    # 2. Required Capabilities Resolution
+    explicit_caps = tuple(
+        str(c) for c in (task_record.get("required_capabilities", ()) or ())
+    )
+    if explicit_caps:
+        required_caps = list(explicit_caps)
+    else:
+        required_caps = []
+        if target_domain.startswith("game.three") or target_domain == "ui.frontend":
+            required_caps.extend(["three_rendering", "three_production_knowledge"])
+            if re.search(r"technique|codrops|effect|pattern|showcase|shader", lowered):
+                required_caps.append("technique_reference")
+            if re.search(r"bvh|collision|spatial|raycast", lowered):
+                required_caps.append("spatial_query")
+            if re.search(r"pathfinding|navmesh|navigation|npc", lowered):
+                required_caps.append("navigation")
+            if re.search(r"cinematic|timeline|cutscene|theatre", lowered):
+                required_caps.append("cinematic")
+            if re.search(r"hud|game hud|interface layout", lowered):
+                required_caps.append("ui.game_hud")
+        elif target_domain.startswith("legal"):
+            if re.search(
+                r"chính thức|căn cứ pháp lý|văn bản gốc|hiệu lực|official|nghị định|thông tư|luật",
+                lowered,
+            ):
+                required_caps.append("official_legal_authority")
+            if re.search(r"tìm kiếm|tra cứu|parse|indexing|trích xuất|index", lowered):
+                required_caps.append("legal_search_parser")
+            if re.search(r"giao diện|xem|hiển thị|viewer|layout", lowered):
+                required_caps.append("legal_ui_viewer")
+            if not required_caps:
+                required_caps.extend(["official_legal_authority", "legal_search_parser"])
+        elif target_domain.startswith("metaphysics"):
+            if target_domain == "metaphysics.ziwei":
+                required_caps.append("chart_calculation")
+                if re.search(
+                    r"phái|trung châu|luận đoán|tứ hóa|phương pháp|nam phái|bắc phái",
+                    lowered,
+                ):
+                    required_caps.append("school_methodology")
+                if re.search(r"fixture|test case|mẫu|dữ liệu", lowered):
+                    required_caps.append("test_fixture_data")
+            elif target_domain == "metaphysics.meihua":
+                required_caps.append("meihua_hexagram_calculation")
+                if re.search(r"app|ứng dụng|ui", lowered):
+                    required_caps.append("meihua_app_reference")
+            elif target_domain == "metaphysics.liuyao":
+                required_caps.append("liuyao_hexagram_derivation")
+
+    # School requirement for Metaphysics
+    required_school = ""
+    if "trung châu" in lowered or "zhongzhou" in lowered:
+        required_school = "ZHONGZHOU_PAI"
+    elif "tam hợp" in lowered or "sanhe" in lowered:
+        required_school = "SANHE_PAI"
+
+    # 3. Source Pool
+    if available_sources is not None:
+        candidate_pool = tuple(available_sources)
+    elif domain_model and domain_model.known_sources:
+        candidate_pool = domain_model.known_sources
+    else:
+        candidate_pool = build_domain_source_catalog()
+
+    # 4. Evaluation and Invariant Enforcement
+    selected_items: list[SelectedSourceItem] = []
+    unselected_items: list[UnselectedSourceItem] = []
+    authority_summaries: list[str] = []
+
+    for candidate in candidate_pool:
+        # A. Status check
+        if candidate.status in ("DEFER", "REJECT"):
+            unselected_items.append(
+                UnselectedSourceItem(
+                    source_id=candidate.source_id,
+                    source_name=candidate.source_name,
+                    domain=candidate.domain,
+                    candidate_role=candidate.source_role,
+                    why_not_selected=f"CANDIDATE_STATUS_{candidate.status}",
+                )
+            )
+            continue
+
+        # B. Domain applicability check (DOMAIN_APPLICABILITY_IS_NOT_AUTHORITY)
+        cand_dom = candidate.domain.lower()
+        targ_dom = target_domain.lower()
+        domain_matches = (
+            cand_dom == targ_dom
+            or cand_dom.startswith(targ_dom + ".")
+            or targ_dom.startswith(cand_dom + ".")
+            or (targ_dom == "game.three" and cand_dom.startswith("game.three"))
+            or (targ_dom == "ui.frontend" and cand_dom.startswith("ui."))
+            or (targ_dom == "legal.vn" and cand_dom.startswith("legal"))
+            or (targ_dom.startswith("metaphysics") and cand_dom == targ_dom)
+        )
+        if not domain_matches:
+            unselected_items.append(
+                UnselectedSourceItem(
+                    source_id=candidate.source_id,
+                    source_name=candidate.source_name,
+                    domain=candidate.domain,
+                    candidate_role=candidate.source_role,
+                    why_not_selected=(
+                        f"DOMAIN_MISMATCH:candidate_domain({candidate.domain})!=task_domain({target_domain})"
+                    ),
+                )
+            )
+            continue
+
+        # C. School / Jurisdiction isolation (Chinese Metaphysics: school A != school B)
+        if (
+            required_school
+            and candidate.school_or_jurisdiction
+            and candidate.school_or_jurisdiction not in (required_school, "IZTRO_CONVENTION", "VIETNAM_LAW")
+        ):
+            unselected_items.append(
+                UnselectedSourceItem(
+                    source_id=candidate.source_id,
+                    source_name=candidate.source_name,
+                    domain=candidate.domain,
+                    candidate_role=candidate.source_role,
+                    why_not_selected=(
+                        f"SCHOOL_SEPARATION:candidate_school({candidate.school_or_jurisdiction})!=task_school({required_school})"
+                    ),
+                )
+            )
+            continue
+
+        # D. Research-only dossier check
+        if candidate.source_role == "RESEARCH_ONLY" and "research" not in lowered:
+            unselected_items.append(
+                UnselectedSourceItem(
+                    source_id=candidate.source_id,
+                    source_name=candidate.source_name,
+                    domain=candidate.domain,
+                    candidate_role=candidate.source_role,
+                    why_not_selected=(
+                        "RESEARCH_ONLY_ISOLATION:candidate_is_exploratory_dossier_not_for_runtime_adoption"
+                    ),
+                )
+            )
+            continue
+
+        # E. Capability need check (AVAILABLE_IS_NOT_SELECTED)
+        satisfied_caps = [
+            cap for cap in candidate.capabilities_provided if cap in required_caps
+        ]
+        if not satisfied_caps:
+            unselected_items.append(
+                UnselectedSourceItem(
+                    source_id=candidate.source_id,
+                    source_name=candidate.source_name,
+                    domain=candidate.domain,
+                    candidate_role=candidate.source_role,
+                    why_not_selected=(
+                        f"CAPABILITY_NOT_REQUIRED:{','.join(candidate.capabilities_provided)}_not_demanded_by_task"
+                    ),
+                )
+            )
+            continue
+
+        # F. Legal Authority check: CODE_PASS_IS_NOT_LEGAL_AUTHORITY
+        role_meta = get_source_role_metadata(candidate.source_role)
+        if "official_legal_authority" in required_caps:
+            if not role_meta.is_domain_truth_authority and "official_legal_authority" in satisfied_caps:
+                satisfied_caps.remove("official_legal_authority")
+                if not satisfied_caps:
+                    unselected_items.append(
+                        UnselectedSourceItem(
+                            source_id=candidate.source_id,
+                            source_name=candidate.source_name,
+                            domain=candidate.domain,
+                            candidate_role=candidate.source_role,
+                            why_not_selected=(
+                                "CODE_PASS_IS_NOT_LEGAL_AUTHORITY:tested_code_cannot_satisfy_official_legal_authority"
+                            ),
+                        )
+                    )
+                    continue
+
+        # G. Dataset check: DATASET_IS_NOT_METHODOLOGY_AUTHORITY
+        if candidate.source_role == "DATASET" and "school_methodology" in satisfied_caps:
+            satisfied_caps.remove("school_methodology")
+            if not satisfied_caps:
+                unselected_items.append(
+                    UnselectedSourceItem(
+                        source_id=candidate.source_id,
+                        source_name=candidate.source_name,
+                        domain=candidate.domain,
+                        candidate_role=candidate.source_role,
+                        why_not_selected=(
+                            "DATASET_IS_NOT_METHODOLOGY_AUTHORITY:sample_fixtures_do_not_establish_school_doctrine"
+                        ),
+                    )
+                )
+                continue
+
+        # H. Formulate selection rationale & boundary notes
+        why_selected = (
+            f"Fulfills required capabilities [{', '.join(satisfied_caps)}] as {candidate.source_role} "
+            f"under mode {candidate.consumption_mode}"
+        )
+        if candidate.source_role == "TECHNIQUE_REFERENCE":
+            why_selected += " (consulted as isolated pattern; not executable or installed wholesale)"
+            authority_summaries.append(
+                f"{candidate.source_id}:TECHNIQUE_REFERENCE_ONLY_NOT_EXECUTABLE"
+            )
+        elif candidate.source_role == "REFERENCE_IMPLEMENTATION":
+            why_selected += " (architectural pattern inspection only; not vendored)"
+            authority_summaries.append(
+                f"{candidate.source_id}:REFERENCE_NOT_INSTALLED"
+            )
+        elif candidate.source_role == "EXECUTABLE_ENGINE":
+            if "metaphysics" in candidate.domain:
+                authority_summaries.append(
+                    f"{candidate.source_id}:DETERMINISTIC_OUTPUT_IS_NOT_PREDICTIVE_VALIDITY"
+                )
+            elif "legal" in candidate.domain:
+                authority_summaries.append(
+                    f"{candidate.source_id}:CODE_PASS_IS_NOT_LEGAL_AUTHORITY"
+                )
+        elif candidate.source_role == "PRIMARY_OR_OFFICIAL_EVIDENCE_SOURCE":
+            authority_summaries.append(
+                f"{candidate.source_id}:PRIMARY_OFFICIAL_EVIDENCE_OF_RECORD"
+            )
+        elif candidate.source_role == "DATASET":
+            authority_summaries.append(
+                f"{candidate.source_id}:DATASET_IS_NOT_METHODOLOGY_AUTHORITY"
+            )
+
+        selected_items.append(
+            SelectedSourceItem(
+                source_id=candidate.source_id,
+                source_name=candidate.source_name,
+                domain=candidate.domain,
+                source_role=candidate.source_role,
+                consumption_mode=candidate.consumption_mode,
+                capabilities_satisfied=tuple(satisfied_caps),
+                pinned_ref=candidate.pinned_ref,
+                authority_scope=candidate.authority_scope,
+                limitations=candidate.limitations,
+                why_selected=why_selected,
+                evidence_pointers=candidate.evidence_pointers,
+                school_or_jurisdiction=candidate.school_or_jurisdiction,
+            )
+        )
+
+    # Invariants summary
+    if not authority_summaries:
+        authority_summaries.append("DOMAIN_BOUNDED_SELECTION_ONLY")
+
+    return DomainSourceSelectionReceipt(
+        receipt_schema="p2p-source-selection-receipt/1",
+        task_id=task_id,
+        domain=target_domain,
+        desired_outcome=outcome_text,
+        required_capabilities=tuple(required_caps),
+        selected_sources=tuple(selected_items),
+        unselected_candidates=tuple(unselected_items),
+        authority_boundary_summary=tuple(dict.fromkeys(authority_summaries)),
+        invariants_enforced=CORE_INVARIANTS,
+    )
+

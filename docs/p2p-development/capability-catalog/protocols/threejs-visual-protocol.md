@@ -104,6 +104,38 @@ Before activating each capability, verify:
 
 If the answer is **NO**, do not activate the capability.
 
+## Production Knowledge Delta (Issue #222)
+
+Production Three.js / WebGL / WebGPU workflows must adhere to the following reconciled engineering practices:
+
+1. **Asset Preparation & Blender Pipeline**:
+   - Apply all transforms (`Ctrl+A`) before export.
+   - Clean non-manifold geometry and ensure pivot/origin is logically positioned.
+   - Use Draco geometry compression selectively: beneficial for static meshes > 2 MB; avoid for small meshes or heavily morphed skinned characters where CPU decompression latency causes frame drops.
+   - Use KTX2 / Basis Universal compressed textures to prevent uncompressed PNG/JPEG VRAM bloat on mobile GPUs.
+   - Pack Ambient Occlusion, Roughness, and Metalness into a single ORM texture (R=AO, G=Roughness, B=Metalness).
+
+2. **Baking vs Dynamic Lighting Decision**:
+   - Static environments & architecture: bake lightmaps and ambient occlusion into `uv2` (`material.lightMap`).
+   - Hero interactive actors: dynamic lighting and directional shadows.
+   - Secondary actors: contact shadows or blob decals to save shadow map render passes.
+   - Ambient diffuse & specular: Image-Based Lighting (IBL) via HDR environment maps.
+
+3. **Color Management, PBR & Environment**:
+   - Renderer output color space: `renderer.outputColorSpace = THREE.SRGBColorSpace;`.
+   - Data maps (normal, roughness, metalness, AO): linear `THREE.NoColorSpace`.
+   - Tone mapping: `renderer.toneMapping = THREE.ACESFilmicToneMapping;`.
+   - Environment maps: `PMREMGenerator` pre-filtered equirectangular HDR maps.
+
+4. **Modern WebGL vs WebGPU / TSL Path**:
+   - Progressive enhancement: probe `WebGPU.isAvailable()` and fallback gracefully to `WebGLRenderer`.
+   - Three Shading Language (TSL): write custom visual shaders using node materials (`MeshStandardNodeMaterial`, `positionLocal`, `timerLocal`) for automatic compilation to both WGSL (WebGPU) and GLSL (WebGL).
+
+5. **Measurement-First Performance Guidance**:
+   - **Reject brittle magic numbers**: do not assume arbitrary polygon limits or heuristic GPU tiers guarantee frame rate.
+   - Profile actual runtime metrics: `renderer.info.render.calls` (< 150-200), `renderer.info.render.triangles`, `renderer.info.memory.textures`.
+   - Diagnose whether bottlenecks are CPU draw-call bound, GPU fill-rate bound, or memory-bandwidth bound before applying optimizations.
+
 ## Anti-Patterns
 
 - Activating all Three.js capabilities because the project uses Three.js.
