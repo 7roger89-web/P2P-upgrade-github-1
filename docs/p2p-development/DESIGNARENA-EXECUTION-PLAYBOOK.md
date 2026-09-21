@@ -546,3 +546,17 @@ EXISTING_FEATURE_PR
 This keeps Git history auditable and avoids copy/paste of large lockfiles or generated artifacts.
 
 If the Agent session cannot push at all, use Arena's workspace-download fallback and a GitHub-capable executor to land the verified files.
+
+
+## 24. Agent Mode repo-binding preflight
+
+Observed on 2026-09-21: Arena Agent Mode may bind the coding workspace to the repository selected when the session starts. A prompt that names a different target repo does not guarantee the session can switch repositories.
+
+Operational rule:
+- verify the connected repo before substantive execution;
+- if CURRENT_REPO != TASK_REPO, stop the task and start a NEW Agent Mode chat on the correct repo instead of trying to prompt-switch repositories;
+- once the repo is correct, perform that repo's own AGENTS/law preflight;
+- when the target repo carries a valid local portable P2P law projection, prefer LOCAL_PORTABLE per AGENTS.md rather than probing canonical solely to force a fallback;
+- do not reuse law context from a different repo/session.
+
+Prompt authors should serialize a compact REPO_IDENTITY_GATE before task execution so a wrong-repo session fails fast with a useful recovery instruction rather than misdiagnosing the target repo as lacking law context.
