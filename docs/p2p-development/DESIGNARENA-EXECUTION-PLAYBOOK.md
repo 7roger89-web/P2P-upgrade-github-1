@@ -517,3 +517,32 @@ Therefore:
 - without a connected repo, Arena AI keeps output in session workspace and can export the workspace as a ZIP at task end.
 
 Do not perform lossy copy/paste of a large app merely to switch executors.
+
+
+## 23. AGENT_MODE_BRANCH_PINNING
+
+Observed with Arena AI Agent Mode on Huyền Học Lab on 2026-09-21:
+
+A connected coding session may be policy-pinned to an Arena-owned working branch such as `arena/<session-id>-<repo>` and may refuse to push directly to an existing project branch even when the user explicitly asked for that branch.
+
+Operational consequence:
+- do not assume an Agent Mode session can mutate an arbitrary pre-existing branch;
+- when the session has already produced verified repairs on its pinned branch, prefer a **child PR** from the Arena branch into the target feature branch;
+- after the child PR is reviewed/merged, the original feature PR updates naturally;
+- only fall back to patch/workspace download when a child PR cannot be opened;
+- do not throw away a verified session solely because of branch ownership.
+
+Preferred bridge:
+
+```text
+EXISTING_FEATURE_PR
++ AGENT_SESSION_PINNED_BRANCH
+→ AGENT PUSHES PINNED BRANCH
+→ CHILD PR: arena/session-branch → existing feature branch
+→ REVIEW + MERGE CHILD PR
+→ ORIGINAL FEATURE PR HEAD ADVANCES
+```
+
+This keeps Git history auditable and avoids copy/paste of large lockfiles or generated artifacts.
+
+If the Agent session cannot push at all, use Arena's workspace-download fallback and a GitHub-capable executor to land the verified files.
