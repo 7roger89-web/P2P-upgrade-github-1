@@ -504,6 +504,17 @@ class NoParallelArchitectureTests(unittest.TestCase):
             # control-tower context-assembly fixtures against ambient repo
             # state (P2P_PROJECT_ROOT isolation; zero production changes).
             "tests/test_p2p_control_tower_context_assembly.py",
+            # PR #214 install-time project-fit capability provisioning. This
+            # workstream owns stack-evidence -> packaged skill profile
+            # selection at install time; it is not an upstream intake surface
+            # and adds no router, registry, daemon, or network fetcher.
+            ".github/workflows/p2p-shield-ci-slice.yml",
+            "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
+            "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md",
+            "install.sh",
+            "install.ps1",
+            "scripts/p2p_skill_profile.py",
+            "tests/test_p2p_project_fit_capability_provisioning.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -557,6 +568,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 "tests/test_p2p_frontend_upstream_intake_01.py",
                 # Tower-directed same-PR repair (PR #211): hermeticity-only.
                 "tests/test_p2p_control_tower_context_assembly.py",
+                # PR #214: the single deterministic project-fit profile
+                # selector shared by install.sh and install.ps1.
+                "scripts/p2p_skill_profile.py",
+                "tests/test_p2p_project_fit_capability_provisioning.py",
                 ".agents/skills/frontend-design/scripts/contrast-checker.py",
                 ".claude/skills/frontend-design/scripts/contrast-checker.py",
                 ".p2p/system/.agents/skills/frontend-design/scripts/contrast-checker.py",
@@ -578,7 +593,14 @@ class NoParallelArchitectureTests(unittest.TestCase):
             )
             self.assertFalse(
                 path.startswith("scripts/") and path.endswith(".py")
-                and path not in {"scripts/package_release.py", "scripts/doctor.py"},
+                and path not in {
+                    "scripts/package_release.py",
+                    "scripts/doctor.py",
+                    # PR #214: one deterministic profile selector consumed by
+                    # both installers. It reads packaged skill names only and
+                    # exposes no domain/source-selection surface.
+                    "scripts/p2p_skill_profile.py",
+                },
                 f"new script surface: {path}",
             )
 
