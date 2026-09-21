@@ -8,6 +8,23 @@ File chuẩn tắc của kiến trúc sản phẩm P2P. Máy đọc; người đ
 
 > Người dùng không kỹ thuật nói một câu — "Tiếp tục hoàn thiện dự án" — và P2P làm phần còn lại một cách an toàn, có thể kiểm chứng, có thể quay lại.
 
+## POLYGLOT_BY_EVIDENCE_V1 — Hybrid theo bằng chứng
+
+P2P không trung thành với một ngôn ngữ và cũng không tự động tăng số ngôn ngữ vì AI có thể viết chúng. **Existing stack is the default.** Một ngôn ngữ/runtime mới chỉ được thêm khi nó giải quyết một capability hoặc bottleneck thật với lợi ích vật chất lớn hơn complexity vận hành.
+
+Quy tắc mặc định:
+
+- Web UI mới có thể ưu tiên Next.js/TypeScript khi phù hợp với product surface, nhưng không rewrite một UI đang hoạt động chỉ để đổi framework.
+- Python được ưu tiên khi ecosystem hiện có phù hợp với AI/data/research/business orchestration hoặc khi project đã có Python authority.
+- Rust/C++/native code chỉ được đưa vào hot path đã đo; không coi tốc độ lý thuyết là bằng chứng.
+- Trước khi quy lỗi cho Python hoặc framework, kiểm tra database, network, storage/document I/O, serialization, external API/process và thuật toán.
+- Nếu thêm native component, giữ boundary nhỏ, typed/stable, benchmark trước-sau và có rollback/removal path. Không rewrite toàn hệ thống để tối ưu một đoạn nóng.
+- Một ngôn ngữ đủ thì dùng một. Polyglot là hệ quả của capability cần thiết, không phải KPI kiến trúc.
+- Coding-agent capability không tự cấp lý do thêm runtime, microservice, queue, daemon, database hoặc framework.
+
+Mọi đề xuất thêm ngôn ngữ/runtime phải có tối thiểu: `MEASURED_NEED`, `WHY_CURRENT_STACK_INSUFFICIENT`, `SMALLEST_BOUNDARY`, `BEFORE_AFTER_ACCEPTANCE`, `OPERATIONS_COST`, và `ROLLBACK_PATH`. Thiếu bằng chứng vật chất => `DEFER_UNTIL_NEEDED`.
+
+
 ## RF01 — Development framework boundary
 
 RF01 is a noncanonical development-plane projection on sealed `.74`; it is
@@ -26,6 +43,21 @@ Implementation → Targeted Tests → Human Outcome Test`.
 The assurance/release loop is separate:
 
 `Risk-Proportional Hardening → Independent Verification → Release`.
+
+### DesignArena như bề mặt thay thế được trong product fast loop
+
+Khi chọn DesignArena cho frontend/sản phẩm, route theo bounded outcome thay vì mặc định chọn Full-Stack:
+
+- Web Apps: mặc định cho app shell và vertical slice frontend không cần persistence.
+- UI Component: chỉ dùng khi một widget khó đáng một trận thiết kế riêng.
+- Data Visualization: dùng cho timeline, comparison matrix, lineage hoặc vùng phân tích dày.
+- Image-to-App: chỉ dùng khi đã có visual reference thắng và fidelity rebuild có giá trị.
+- Full-Stack: dùng khi database/auth/storage là acceptance thật; không để Supabase template tự biến thành product architecture.
+- Agent Mode + GitHub: dùng cho tích hợp bền vững vào repo và bounded branch/PR.
+
+Cẩm nang chi tiết: `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
+
+DesignArena vẫn là executor/tool surface. Nó không thay thế kiến trúc dự án, task authority, P2P routing, evidence, Owner Gates hay release authority. Capability chính thức mới hơn của DesignArena luôn thắng snapshot cũ.
 
 The product state model is `IDEA → PROTOTYPE → OWNER TRUTH → IMPLEMENTATION →
 SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH`. OXP is a read-only projection

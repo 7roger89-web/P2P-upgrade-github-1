@@ -53,6 +53,9 @@ Use when working with:
 - **WebGPU**: `references/16-webgpu.md` - Modern backend, compute shaders
 - **Shaders**: `references/17-shader.md` - GLSL, ShaderMaterial, uniforms, custom effects
 
+### Level 6: Production Workflow & Look-Dev
+- **Production Workflow**: `references/19-production-workflow.md` - Blender asset preparation (Draco/KTX2/channel-packing), baking vs dynamic lightmap decisions, PBR/color-management/environment workflow, WebGL vs modern WebGPU/TSL pipeline, and measurement-first performance guidance.
+
 ## Quick Start Pattern
 
 ```javascript

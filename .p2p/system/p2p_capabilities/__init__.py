@@ -50,7 +50,20 @@ from .specialist import validate_optional_specialist
 from .skill_standard import ADAPTIVE_SKILL_FIELDS, default_uiux_contract, validate_skill_contract
 from .beginner import discover_beginner_request
 from .isolation import IsolationViolation, assert_isolated_target
-from .domain import ProjectDomainModel
+from .domain import (
+    CORE_INVARIANTS,
+    SOURCE_ROLES,
+    SOURCE_ROLE_ALIASES,
+    DomainSourceRecord,
+    DomainSourceSelectionReceipt,
+    ProjectDomainModel,
+    SelectedSourceItem,
+    SourceRoleMetadata,
+    UnselectedSourceItem,
+    build_domain_source_catalog,
+    get_source_role_metadata,
+    normalize_source_role,
+)
 from .task_state import (
     LogicalOwner,
     PlanIdentity,
@@ -201,6 +214,18 @@ __all__ = [
     "discover_beginner_request",
     "IsolationViolation",
     "assert_isolated_target",
+    "CORE_INVARIANTS",
+    "SOURCE_ROLES",
+    "SOURCE_ROLE_ALIASES",
+    "normalize_source_role",
+    "SourceRoleMetadata",
+    "get_source_role_metadata",
+    "DomainSourceRecord",
+    "SelectedSourceItem",
+    "UnselectedSourceItem",
+    "DomainSourceSelectionReceipt",
+    "build_domain_source_catalog",
+    "select_domain_sources",
     "ProjectDomainModel",
     "LogicalOwner",
     "PlanIdentity",
@@ -341,6 +366,7 @@ from .capability_intelligence import (
     classify_task,
     compute_execution_requirements,
     beginner_status,
+    select_domain_sources,
 )
 
 from .host_attestation import (

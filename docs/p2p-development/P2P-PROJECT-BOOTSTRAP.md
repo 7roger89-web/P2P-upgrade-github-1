@@ -117,6 +117,30 @@ materializer or runtime path.
 | Single authority | Exactly one tracked manifest per project; installer never creates a second |
 | Rollback semantics | Tracked bootstrap != local runtime; each removable separately |
 
+## Project stack rule — POLYGLOT_BY_EVIDENCE_V1
+
+Every newly created or newly adopted P2P-managed project must preserve its existing stack by default and treat language/runtime expansion as an evidence-gated architecture decision.
+
+Before a bootstrap/project-profile recommends a new language or runtime, record:
+
+- `CURRENT_STACK` and which parts are already authoritative;
+- `MEASURED_NEED` or concrete capability gap;
+- `WHY_CURRENT_STACK_INSUFFICIENT`;
+- `SMALLEST_BOUNDARY` for the new component;
+- `BEFORE_AFTER_ACCEPTANCE` metrics;
+- `OPERATIONS_COST` (build/deploy/observability/security/maintenance);
+- `ROLLBACK_PATH` or removal path.
+
+Default routing guidance:
+
+- Next.js/TypeScript may be selected for a new web UI when product requirements justify it; never force a migration from a working UI without evidence.
+- Python remains preferred where the project already depends on Python ecosystems for AI, research, data or business orchestration.
+- Rust/native code is optional and hot-path-only after profiling/benchmark evidence; prefer a bounded module behind a stable interface over a rewrite.
+- Check DB/network/I/O/serialization/external-service/algorithm bottlenecks before blaming the language runtime.
+- One language is preferred when it is sufficient. Polyglot is allowed by need, never required by fashion.
+
+This rule does not grant migration, infrastructure, deploy, database, release or rewrite authority. If the evidence fields are materially incomplete, the architecture action is `DEFER_UNTIL_NEEDED`.
+
 ## Optional selective capability read order: img2threejs
 
 This hook does not make the full P2P runtime or any external vendor repository
