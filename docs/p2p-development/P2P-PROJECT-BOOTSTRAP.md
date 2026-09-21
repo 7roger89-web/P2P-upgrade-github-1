@@ -84,6 +84,13 @@ deleted merely because the detected profile changed. Doctor validates the
 installer-owned receipt and the exact required skill subset; extra preserved
 skills are warnings, not silent deletion authority.
 
+`PROJECT_STACK_DETECTION != DOMAIN_SOURCE_SELECTION`. Stack evidence tells the
+installer which packaged local skills are relevant; it never selects an
+authoritative domain, methodology, or upstream source. Task-time cross-domain
+source selection stays owned by `.p2p/system/p2p_capabilities`
+(`select_domain_sources`, `build_domain_source_catalog`), and the profile
+selector neither imports nor reimplements that surface.
+
 ## Arena Agent Mode binding
 
 GitHub-connected Arena work uses the canonical
