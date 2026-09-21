@@ -408,3 +408,24 @@ Reusable lesson:
 - platform-injected analytics/storage instrumentation must be distinguished from app-authored persistence before declaring scope drift.
 
 This is evidence for the existing prompt-lock procedural candidate, not automatic ACTIVE experience by itself.
+
+
+## 18. UI_COMPONENT_ONE_SHOT_OBSERVED
+
+Owner UI evidence on 2026-09-21 shows the current DesignArena UI Component arena behaves as a one-shot tournament surface: generate/compare once, with no same-candidate reprompt loop like Website → Pro.
+
+Operational consequence:
+- use UI Component to discover/select a visual and interaction reference for one bounded component;
+- do not plan a multi-turn repair loop inside UI Component;
+- if the winner needs repair or product integration, move the selected reference/code into an iterative surface such as Website → Pro or into the chosen external integration executor;
+- if the first tournament misses hard invariants badly, either rerun a new UI Component tournament with a stronger prompt or skip another tournament and continue from the best donor in Website → Pro.
+
+Preferred flow:
+```text
+UI COMPONENT TOURNAMENT (ONE SHOT)
+→ SELECT BEST DONOR
+→ WEBSITE PRO / INTEGRATION EXECUTOR
+→ ITERATE + VERIFY
+```
+
+Do not treat UI Component as the durable app workspace.
