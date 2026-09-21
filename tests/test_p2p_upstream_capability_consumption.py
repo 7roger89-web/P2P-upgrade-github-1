@@ -361,7 +361,7 @@ class TestFailClosedCoverageAccounting(unittest.TestCase):
         self.assertGreater(len(receipt.selected_sources), 0)
         self.assertEqual(len(receipt.unsatisfied_required_capabilities), 0)
         self.assertIn("chart_calculation", receipt.satisfied_capabilities)
-        self.assertIn("school_methodology", receipt.satisfied_capabilities)
+        self.assertIn("interpretation_reference", receipt.satisfied_capabilities)
 
     def test_missing_noncritical_required_capability_fails_closed_as_blocked(self) -> None:
         """Regression R2-1: Any unsatisfied REQUIRED capability must fail closed as BLOCKED.
@@ -570,6 +570,164 @@ class TestProofCaseCChineseMetaphysics(unittest.TestCase):
             "DATASET_IS_NOT_METHODOLOGY_AUTHORITY",
             receipt.unselected_candidates[0].why_not_selected,
         )
+
+    def test_fake_skill_without_methodology_authority_fails_closed(self) -> None:
+        """Regression R3-1: Fake SKILL with capabilities_provided=('school_methodology',)
+
+        and methodology_authority=False MUST NOT satisfy school_methodology.
+        If required: selection_status=BLOCKED.
+        """
+        fake_skill = DomainSourceRecord(
+            source_id="fixture:fake-skill-unauthorized",
+            source_name="Fake School Skill Without Authority",
+            domain="metaphysics.ziwei",
+            source_role="SKILL",
+            consumption_mode="READ_AS_SKILL",
+            capabilities_provided=("school_methodology",),
+            upstream_repo="test/fake-skill",
+            pinned_ref="v1.0.0",
+            license="MIT",
+            authority_scope="UNVERIFIED_GUIDE",
+            authority_domains=("metaphysics.ziwei",),
+            methodology_authority=False,
+            school_or_jurisdiction="ZHONGZHOU_PAI",
+        )
+        task = {
+            "task_id": "TASK-UNAUTH-METHODOLOGY",
+            "domain": "metaphysics.ziwei",
+            "desired_outcome": "An sao phái Trung Châu theo quy tắc chuẩn",
+            "required_capabilities": ["school_methodology"],
+        }
+        receipt = select_domain_sources(task, available_sources=[fake_skill])
+        self.assertEqual(receipt.selection_status, "BLOCKED")
+        self.assertEqual(len(receipt.selected_sources), 0)
+        self.assertIn("school_methodology", receipt.unsatisfied_required_capabilities)
+        self.assertIn(
+            "METHODOLOGY_AUTHORITY_NOT_ESTABLISHED",
+            receipt.unselected_candidates[0].why_not_selected,
+        )
+
+    def test_methodology_authority_domain_mismatch_fails_closed(self) -> None:
+        """Regression R3-2: methodology_authority=True but authority_domains does not cover target domain."""
+        wrong_domain_source = DomainSourceRecord(
+            source_id="fixture:methodology-wrong-domain",
+            source_name="Methodology Authority Wrong Domain",
+            domain="metaphysics.ziwei",
+            source_role="SKILL",
+            consumption_mode="READ_AS_SKILL",
+            capabilities_provided=("school_methodology",),
+            upstream_repo="test/wrong-domain",
+            pinned_ref="v1.0.0",
+            license="MIT",
+            authority_scope="LIUYAO_AUTHORITY",
+            authority_domains=("metaphysics.liuyao",),  # Domain mismatch!
+            methodology_authority=True,
+            school_or_jurisdiction="ZHONGZHOU_PAI",
+        )
+        task = {
+            "task_id": "TASK-WRONG-DOMAIN-METHODOLOGY",
+            "domain": "metaphysics.ziwei",
+            "desired_outcome": "An sao phái Trung Châu theo quy tắc chuẩn",
+            "required_capabilities": ["school_methodology"],
+        }
+        receipt = select_domain_sources(task, available_sources=[wrong_domain_source])
+        self.assertEqual(receipt.selection_status, "BLOCKED")
+        self.assertEqual(len(receipt.selected_sources), 0)
+        self.assertIn("school_methodology", receipt.unsatisfied_required_capabilities)
+        self.assertIn(
+            "AUTHORITY_DOMAIN_MISMATCH",
+            receipt.unselected_candidates[0].why_not_selected,
+        )
+
+    def test_methodology_authority_wrong_school_fails_closed(self) -> None:
+        """Regression R3-3: methodology_authority=True with matching domain but wrong school."""
+        wrong_school_source = DomainSourceRecord(
+            source_id="fixture:methodology-wrong-school",
+            source_name="Methodology Authority Sanhe School",
+            domain="metaphysics.ziwei",
+            source_role="SKILL",
+            consumption_mode="READ_AS_SKILL",
+            capabilities_provided=("school_methodology",),
+            upstream_repo="test/sanhe-authority",
+            pinned_ref="v1.0.0",
+            license="MIT",
+            authority_scope="SANHE_METHODOLOGY_AUTHORITY",
+            authority_domains=("metaphysics.ziwei",),
+            methodology_authority=True,
+            school_or_jurisdiction="SANHE_PAI",  # Sanhe != Zhongzhou
+        )
+        task = {
+            "task_id": "TASK-WRONG-SCHOOL-METHODOLOGY",
+            "domain": "metaphysics.ziwei",
+            "desired_outcome": "An sao phái Trung Châu theo quy tắc chuẩn",
+            "required_capabilities": ["school_methodology"],
+        }
+        receipt = select_domain_sources(task, available_sources=[wrong_school_source])
+        self.assertEqual(receipt.selection_status, "BLOCKED")
+        self.assertEqual(len(receipt.selected_sources), 0)
+        self.assertIn("school_methodology", receipt.unsatisfied_required_capabilities)
+        self.assertTrue(
+            any(
+                tag in receipt.unselected_candidates[0].why_not_selected
+                for tag in ("SCHOOL_MISMATCH", "SCHOOL_SEPARATION")
+            )
+        )
+
+    def test_actual_zhongzhou_truthful_dossier_proof_case(self) -> None:
+        """Regression R3-4: Actual Zhongzhou source repo:Linden-TR/ziwei-doushu-skill is reference guide.
+
+        Per RESEARCH.md ('Không có locator thì không nâng authority'):
+        methodology_authority is False.
+        - When task demands school_methodology authority, status is BLOCKED truthfully (no fake authority).
+        - When task demands chart_calculation + interpretation_reference, status is SATISFIED.
+        - When an audited authority fixture with methodology_authority=True is supplied, school_methodology is SATISFIED.
+        """
+        # A. Demanding methodology authority from production catalog fails closed as BLOCKED
+        task_authority = {
+            "task_id": "TASK-ZW-AUTHORITY-DEMAND",
+            "domain": "metaphysics.ziwei",
+            "desired_outcome": "Xác lập phương pháp luận chính thống phái Trung Châu",
+            "required_capabilities": ["school_methodology"],
+        }
+        receipt_auth = select_domain_sources(task_authority)
+        self.assertEqual(receipt_auth.selection_status, "BLOCKED")
+        self.assertIn("school_methodology", receipt_auth.unsatisfied_required_capabilities)
+
+        # B. Demanding calculation engine and interpretation reference succeeds as SATISFIED
+        task_reference = {
+            "task_id": "TASK-ZW-REFERENCE",
+            "domain": "metaphysics.ziwei",
+            "desired_outcome": "Lập lá số Tử Vi Đẩu Số theo phái Trung Châu và tham khảo luận giải",
+            "required_capabilities": ["chart_calculation", "interpretation_reference"],
+        }
+        receipt_ref = select_domain_sources(task_reference)
+        self.assertEqual(receipt_ref.selection_status, "SATISFIED")
+        selected_ids = {s.source_id for s in receipt_ref.selected_sources}
+        self.assertIn("repo:SylarLong/iztro", selected_ids)
+        self.assertIn("repo:Linden-TR/ziwei-doushu-skill", selected_ids)
+
+        # C. When an audited authority fixture is provided, methodology authority is SATISFIED
+        audited_authority = DomainSourceRecord(
+            source_id="fixture:audited-zhongzhou-authority",
+            source_name="Audited Zhongzhou Doctrine Authority Fixture",
+            domain="metaphysics.ziwei",
+            source_role="SKILL",
+            consumption_mode="READ_AS_SKILL",
+            capabilities_provided=("school_methodology",),
+            upstream_repo="test/audited-zhongzhou",
+            pinned_ref="v1.0.0",
+            license="MIT",
+            authority_scope="CANONICAL_ZHONGZHOU_DOCTRINE",
+            authority_domains=("metaphysics.ziwei",),
+            methodology_authority=True,
+            school_or_jurisdiction="ZHONGZHOU_PAI",
+        )
+        receipt_audited = select_domain_sources(
+            task_authority, available_sources=[audited_authority]
+        )
+        self.assertEqual(receipt_audited.selection_status, "SATISFIED")
+        self.assertIn("school_methodology", receipt_audited.satisfied_capabilities)
+        self.assertEqual(len(receipt_audited.unsatisfied_required_capabilities), 0)
 
 
 class TestReceiptAndAntiOverengineering(unittest.TestCase):

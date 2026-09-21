@@ -1697,11 +1697,13 @@ def select_domain_sources(
         elif target_domain.startswith("metaphysics"):
             if target_domain == "metaphysics.ziwei":
                 required_caps.append("chart_calculation")
-                if re.search(
+                if re.search(r"quy tắc chuẩn|pháp phái|chính thống|methodology authority|học thuyết", lowered):
+                    required_caps.append("school_methodology")
+                elif re.search(
                     r"phái|trung châu|luận đoán|tứ hóa|phương pháp|nam phái|bắc phái",
                     lowered,
                 ):
-                    required_caps.append("school_methodology")
+                    required_caps.append("interpretation_reference")
                 if re.search(r"fixture|test case|mẫu|dữ liệu", lowered):
                     required_caps.append("test_fixture_data")
             elif target_domain == "metaphysics.meihua":
@@ -1832,7 +1834,7 @@ def select_domain_sources(
         # F. Legal Authority check: CODE_PASS_IS_NOT_LEGAL_AUTHORITY
         # Authority must be bounded by the source record's explicit domain + authority_scope/claim,
         # never globally implied by source role name alone.
-        if "official_legal_authority" in required_caps:
+        if "official_legal_authority" in demanded_caps:
             is_valid_official_legal = (
                 candidate.domain_truth_authority
                 and any(
@@ -1857,22 +1859,67 @@ def select_domain_sources(
                     )
                     continue
 
-        # G. Dataset check: DATASET_IS_NOT_METHODOLOGY_AUTHORITY
-        if candidate.source_role == "DATASET" and "school_methodology" in satisfied_caps:
-            satisfied_caps.remove("school_methodology")
-            if not satisfied_caps:
-                unselected_items.append(
-                    UnselectedSourceItem(
-                        source_id=candidate.source_id,
-                        source_name=candidate.source_name,
-                        domain=candidate.domain,
-                        candidate_role=candidate.source_role,
-                        why_not_selected=(
-                            "DATASET_IS_NOT_METHODOLOGY_AUTHORITY:sample_fixtures_do_not_establish_school_doctrine"
-                        ),
+        # G. Methodology Authority check: METHODOLOGY_AUTHORITY_IS_DECLARED_AND_ENFORCED
+        # Capability representing methodology authority (school_methodology) is satisfied ONLY when:
+        # 1. candidate.methodology_authority == True
+        # 2. target_domain in candidate.authority_domains
+        # 3. school_or_jurisdiction isolation PASS
+        if "school_methodology" in satisfied_caps:
+            if candidate.source_role == "DATASET":
+                satisfied_caps.remove("school_methodology")
+                if not satisfied_caps:
+                    unselected_items.append(
+                        UnselectedSourceItem(
+                            source_id=candidate.source_id,
+                            source_name=candidate.source_name,
+                            domain=candidate.domain,
+                            candidate_role=candidate.source_role,
+                            why_not_selected=(
+                                "DATASET_IS_NOT_METHODOLOGY_AUTHORITY:sample_fixtures_do_not_establish_school_doctrine"
+                            ),
+                        )
                     )
+                    continue
+            else:
+                domain_authority_passed = any(
+                    target_domain == ad or target_domain.startswith(ad + ".")
+                    for ad in candidate.authority_domains
                 )
-                continue
+                school_isolation_passed = True
+                if required_school and candidate.school_or_jurisdiction:
+                    school_isolation_passed = (candidate.school_or_jurisdiction == required_school)
+                elif required_school and not candidate.school_or_jurisdiction:
+                    school_isolation_passed = False
+
+                is_valid_methodology_authority = (
+                    candidate.methodology_authority
+                    and domain_authority_passed
+                    and school_isolation_passed
+                )
+
+                if not is_valid_methodology_authority:
+                    satisfied_caps.remove("school_methodology")
+                    if not satisfied_caps:
+                        if not candidate.methodology_authority:
+                            why = "METHODOLOGY_AUTHORITY_NOT_ESTABLISHED:candidate_lacks_bounded_methodology_authority"
+                        elif not domain_authority_passed:
+                            why = (
+                                f"AUTHORITY_DOMAIN_MISMATCH:candidate_authority_domains({candidate.authority_domains})_do_not_cover_{target_domain}"
+                            )
+                        else:
+                            why = (
+                                f"SCHOOL_MISMATCH:candidate_school({candidate.school_or_jurisdiction})!=task_school({required_school})"
+                            )
+                        unselected_items.append(
+                            UnselectedSourceItem(
+                                source_id=candidate.source_id,
+                                source_name=candidate.source_name,
+                                domain=candidate.domain,
+                                candidate_role=candidate.source_role,
+                                why_not_selected=why,
+                            )
+                        )
+                        continue
 
         # H. Formulate selection rationale & boundary notes
         why_selected = (
