@@ -5400,6 +5400,318 @@
       },
       "VERSION": "1.0.0",
       "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "web.browser.evidence",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "First-line public web/browser evidence contract: DOM, served document, and observed network truth that can already separate client-hidden from server-redacted content. Live browser interaction is a future authorization-gated adapter only.",
+      "TRIGGERS": [
+        "browser evidence",
+        "web page evidence",
+        "dom evidence",
+        "public site evidence"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "archive reconstruction",
+        "endpoint discovery",
+        "runtime hook",
+        "credential",
+        "bypass",
+        "exploit"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "mcp-auto-registration",
+        "unauthorized-live-target-interaction",
+        "credential-or-authenticated-session-use",
+        "bypass-or-exploit",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "explicit-target-scope-before-live-interaction"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-browser-evidence"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "local-document-or-explicit-public-target-only",
+        "active-test-authorized-before-live-browser-interaction",
+        "no-credential-no-authenticated-session",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "explicit-target-scope",
+        "dom-document-network-evidence",
+        "backend-identity",
+        "client-hidden-vs-server-redacted-verdict",
+        "uncertainty-state"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+        "external_candidates": [
+          "ChromeDevTools/chrome-devtools-mcp"
+        ],
+        "upstream_repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+        "upstream_commit": "61780c7498a447771127d1fd3b2454fc4ae4ba28",
+        "license": "Apache-2.0",
+        "backend_role": "CANDIDATE_DEFAULT_BROWSER_EVIDENCE_BACKEND",
+        "runtime_activation": "DISABLED_IN_THIS_FOUNDATION",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "web.js.reverse",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "Authorization-gated web JS runtime/source-tracing contract, used only when first-line browser evidence is insufficient. The optional deep-inspection backend is external-only under an explicit AGPL boundary and is not vendored, linked, imported, or activated by this foundation.",
+      "TRIGGERS": [
+        "js reverse",
+        "javascript reverse",
+        "js runtime trace",
+        "javascript runtime trace"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "browser evidence",
+        "archive reconstruction",
+        "endpoint discovery",
+        "credential",
+        "bypass",
+        "exploit"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "candidate-owner-gate",
+        "explicit-task-authority"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "vendor-or-link-agpl-backend",
+        "safe-class-bypass",
+        "unauthorized-target",
+        "credential-use",
+        "bypass-or-exploit",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "active-test-authorization"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-js-reverse"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "active-test-authorized",
+        "controlled-test-environment",
+        "explicit-task-authority",
+        "agpl-external-only-no-vendor-no-link",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "target-authorization",
+        "runtime-scope",
+        "trace-evidence-refs",
+        "uncertainty-state"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "OPTIONAL_EXTERNAL_BACKEND_ONLY",
+        "external_backend": "vmoranv/jshookmcp",
+        "upstream_repository": "https://github.com/vmoranv/jshookmcp",
+        "upstream_commit": "33983e58cddc998af88a2ed46484364e5425cc86",
+        "license": "AGPL-3.0",
+        "license_boundary": "AGPL-3.0_EXTERNAL_ONLY: no vendor snapshot, no linking, no import, no install, no runtime activation in this foundation",
+        "backend_role": "OPTIONAL_EXTERNAL_DEEP_INSPECTION_BACKEND",
+        "runtime_activation": "DISABLED_IN_THIS_FOUNDATION",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "web.endpoint.discover",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "Authorization-gated web endpoint discovery contract over JS, static, and headless sources for an explicitly scoped public target. No crawl runtime is enabled by this foundation.",
+      "TRIGGERS": [
+        "endpoint discovery",
+        "web endpoint discovery",
+        "js endpoint",
+        "endpoint crawl"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "browser evidence",
+        "archive reconstruction",
+        "runtime hook",
+        "credential",
+        "bypass",
+        "exploit"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "candidate-owner-gate",
+        "explicit-task-authority"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "unscoped-crawl",
+        "unauthorized-target",
+        "credential-use",
+        "bypass-or-exploit",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "active-test-authorization"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-endpoint-discovery"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "active-test-authorized",
+        "explicit-target-scope",
+        "no-credential-no-authenticated-session",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "target-authorization",
+        "endpoint-scope",
+        "discovery-receipt",
+        "uncertainty-state"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+        "external_candidates": [
+          "projectdiscovery/katana"
+        ],
+        "upstream_repository": "https://github.com/projectdiscovery/katana",
+        "upstream_commit": "c1de26dbe69764a92dfa9a142eb64035e5d05a9d",
+        "license": "MIT",
+        "backend_role": "CANDIDATE_ENDPOINT_DISCOVERY_BACKEND",
+        "subordinate_reference": {
+          "repository": "https://github.com/BishopFox/jsluice",
+          "commit": "0ddfab153e060a9eeaded4d8669233f7c071e7e4",
+          "license": "MIT",
+          "role": "SUBORDINATE_PARSER_REFERENCE_NOT_A_SEPARATE_P2P_AUTHORITY"
+        },
+        "runtime_activation": "DISABLED_IN_THIS_FOUNDATION",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "web.public.reconstruct",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "Public archive/index/search reconstruction contract over historical and public URL/response sources, distinct from live browser evidence and runtime inspection. No retrieval runtime is enabled by this foundation.",
+      "TRIGGERS": [
+        "public reconstruction",
+        "archive reconstruction",
+        "historical url discovery",
+        "wayback reconstruction"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "browser evidence",
+        "endpoint discovery",
+        "runtime hook",
+        "live browser",
+        "credential",
+        "bypass",
+        "exploit"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-dependency",
+        "credential-or-authenticated-session-use",
+        "present-archive-as-live-truth",
+        "unauthorized-live-target-interaction",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-public-reconstruction"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "public-archive-index-sources-only",
+        "no-credential-no-authenticated-session",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "public-source-scope",
+        "archive-evidence-refs",
+        "backend-identity",
+        "uncertainty-state"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "FUTURE_MINIMAL_ADAPTER_ONLY",
+        "external_candidates": [
+          "xnl-h4ck3r/waymore"
+        ],
+        "upstream_repository": "https://github.com/xnl-h4ck3r/waymore",
+        "upstream_commit": "4e02de512fd6b110be92dc8bffb3002edfebcb6c",
+        "license": "MIT",
+        "backend_role": "CANDIDATE_PUBLIC_RECONSTRUCTION_BACKEND",
+        "runtime_activation": "DISABLED_IN_THIS_FOUNDATION",
+        "install_mode": "DISABLED",
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
     }
   ]
 }
