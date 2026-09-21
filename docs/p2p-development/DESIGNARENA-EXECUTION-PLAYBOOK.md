@@ -446,3 +446,22 @@ Operational rules:
 - for component tournaments, the exported winner is a donor/reference unless it also preserves the target app shell and contract.
 
 Observed roster for one Huyền Học Lab Bát Tự tournament: GPT-6 Astra (xhigh/Max label in UI), Muse Spark 1.1, GPT-5.5, Nemotron 3 Ultra. Roster is stochastic and must not be hard-coded into prompts.
+
+
+## 20. Quota-scarce tournament strategy
+
+Owner-observed product behavior on 2026-09-21: a DesignArena account may only allow a small number of generation sessions per day, and many ordinary sessions present only a two-model head-to-head rather than the four-model/five-vote tournament documented for some categories/sessions.
+
+Treat DesignArena generation quota as scarce design-search budget.
+
+Default routing:
+- DesignArena = high-uncertainty visual/product forks where parallel model comparison creates material value.
+- iterative Website → Pro candidate = exploit the already-created winner for as much repair/polish as the current product UI permits before spending another new tournament.
+- Arena AI Agent Mode or another GitHub-capable executor = long-context integration, repo surgery, engine wiring, tests, and repetitive correction.
+- do not spend a new DesignArena tournament on routine forms, copy fixes, route wiring, dependency changes, build errors, or minor polish.
+
+Two-model battles are valid evidence for a local preference decision but are weaker search coverage than a four-model tournament. Do not wait for four models as a prerequisite. If four models appear, reserve that richer search opportunity for the hardest visual/interaction decision.
+
+Because losing DesignArena candidates may not be exportable, inspect critical constraints before voting and save the winning artifact immediately.
+
+Arena AI note: no visible prompt-character cap should be interpreted as "literally unlimited context." Agent Mode still has session/context limits; its documented compaction reduces pressure but does not abolish finite context. Use long prompts when valuable, but keep task scope bounded.
