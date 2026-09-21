@@ -429,3 +429,20 @@ UI COMPONENT TOURNAMENT (ONE SHOT)
 ```
 
 Do not treat UI Component as the durable app workspace.
+
+## 19. FOUR_MODELS_FIVE_VOTES_WINNER_EXPORT
+
+Owner-observed DesignArena tournament behavior on 2026-09-21 matches the official tournament description:
+- four distinct models are sampled for one prompt;
+- the user makes five pairwise votes across initial, winner/loser and tie-breaker battles;
+- the session yields a complete ranking;
+- in the observed UI, only the selected/final winner was available for download/export; losing candidates were not exportable.
+
+Operational rules:
+- treat the tournament as a selection surface, not a persistent multi-candidate workspace;
+- preserve the winning export immediately when it matters;
+- never infer that a model is globally best from one prompt win; the result proves only that this model/design won this prompt/session under these votes;
+- if only the winner is exportable, review hard invariants before voting whenever possible because losing implementation artifacts may be unrecoverable;
+- for component tournaments, the exported winner is a donor/reference unless it also preserves the target app shell and contract.
+
+Observed roster for one Huyền Học Lab Bát Tự tournament: GPT-6 Astra (xhigh/Max label in UI), Muse Spark 1.1, GPT-5.5, Nemotron 3 Ultra. Roster is stochastic and must not be hard-coded into prompts.
