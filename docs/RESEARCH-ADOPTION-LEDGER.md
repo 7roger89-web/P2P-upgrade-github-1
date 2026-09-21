@@ -109,6 +109,25 @@ blob-verification evidence live in
 | RA-EXT-090 | vercel-labs/design-systems-to-agent-skills | RESEARCHED | none (methodology reference: verified-facts pipeline, closed PRD, mechanical verify) | reference only; nothing copied |
 | RA-EXT-091 | TanStack/table | RESEARCHED | none (component library, not guidance; no bounded gap) | nothing copied |
 
+### 4.5 Web/browser reverse evidence batch 2026-09-21 (RA-EXT-092 .. RA-EXT-098)
+
+Appended projection of the seven records added by
+`P2P_WEB_REVERSE_FOUNDATION_01` (Issue #224). The JSON ledger remains the
+authority; this table is its derived view for this batch. Every pin equalled
+upstream HEAD when verified on 2026-09-21, and no upstream repository is
+vendored. Details live in
+`docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md`.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-092 | ChromeDevTools/chrome-devtools-mcp | SELECTED | first-line document/network evidence backend candidate (Apache-2.0, pin verified) | declared candidate for `web.browser.evidence`; nothing installed or activated |
+| RA-EXT-093 | vmoranv/jshookmcp | DEFERRED | optional external deep-runtime backend only (AGPL-3.0 boundary explicit) | referenced for `web.js.reverse`; not vendored, linked, redistributed, or activated |
+| RA-EXT-094 | projectdiscovery/katana | SELECTED | bounded endpoint discovery backend candidate (MIT, pin verified) | declared candidate for `web.endpoint.discovery`; no crawler service created |
+| RA-EXT-095 | BishopFox/jsluice | SELECTED | subordinate static JS parser reference (MIT, pin verified) | under `web.endpoint.discovery`; no separate capability ID or authority |
+| RA-EXT-096 | xnl-h4ck3r/waymore | SELECTED | public archive/index reconstruction backend candidate (MIT, pin verified) | declared candidate for `web.public.reconstruction`; public sources only |
+| RA-EXT-097 | Mouseww/anything-analyzer | DEFERRED | none (second traffic stack not adopted by default) | no capability ID, no backend reference, no install |
+| RA-EXT-098 | Reqable/reqable-mcp-server | DEFERRED | none (no SPDX license exposed by repository metadata) | reference only; bridge lookup fails closed until the license is resolved |
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
