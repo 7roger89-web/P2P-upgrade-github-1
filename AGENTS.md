@@ -94,10 +94,13 @@ and stop when sufficient.
   obeys anti-overengineering and stop-when-sufficient.
 - `ARENA HIDDEN/RANDOM SESSION QUALITY`: for a new medium/high-risk Arena Agent
   session whose quality is materially unproven, apply RULE 19
-  `MODEL_CANARY_GATE_V1`. Classify observed session capability as
-  `GREEN|YELLOW|ORANGE|RED`; never infer exact hidden model/provider/reasoning
-  level from style or quality, never self-score, and never reroll repeatedly to
-  gamble for a preferred model. Skip the gate for low-risk/mechanical work.
+  `MODEL_CANARY_GATE_V1` + `OWNER_CONTINUATION_GATE_V1`. Use the first safe
+  slice of the real task as the canary, return evidence only, stop the first
+  turn, and wait for Owner continuation. When Arena surfaces its native
+  `keep working` action, use it as the Owner approval control; fallback owner
+  reply is `Tiếp tục công việc`. Never infer exact hidden model/provider/
+  reasoning level, never self-score, and never reroll repeatedly to gamble for
+  a preferred model. Skip the gate for low-risk/mechanical work.
 - `HIDDEN MODEL IDENTITY`: apply `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`.
   Self-reported names, first/last-letter tricks, obfuscated disclosure, and
   writing-style guesses are not identity evidence. Prefer official reveal when
