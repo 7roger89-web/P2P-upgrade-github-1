@@ -28,7 +28,8 @@ def test_arena_new_chat_packet_starts_with_human_task_title() -> None:
     lines = handoff["packet_text"].splitlines()
     title = handoff["chat_title"]
 
-    assert title == "p2p-arena-title-" + Path(directory).name.split("p2p-arena-title-", 1)[-1] + " — Official VBPL WebSocket Probe" if False else title
+    assert title.endswith(" — Official VBPL WebSocket Probe")
+    assert "\\n" not in title
     assert lines[0] == title
     assert " — " in title
     assert lines[1] == ""
