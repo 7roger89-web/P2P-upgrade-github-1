@@ -18,6 +18,10 @@ def test_projected_agents_serialize_law_and_oe_gates():
 
     required = (
         "Mandatory prompt serialization contract",
+        "ARENA_CHAT_TITLE_FIRST_LINE_V1",
+        "<PROJECT> — <bounded task/outcome>",
+        "GỬI CHO:",
+        "CHAT_TITLE",
         "P2P_LAW_PREFLIGHT",
         "P2P_LAW_SOURCE=<actual source>",
         "OE_GATE",
