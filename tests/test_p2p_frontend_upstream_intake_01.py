@@ -515,6 +515,16 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "install.ps1",
             "scripts/p2p_skill_profile.py",
             "tests/test_p2p_project_fit_capability_provisioning.py",
+            # Issue #224 bounded web/browser reverse evidence foundation. It
+            # extends the existing single capability registry with four
+            # declared routes plus one data-only post-route reference bridge;
+            # it adds no second router, registry, daemon, service, installer,
+            # MCP registration, or network/runtime activation.
+            ".p2p/system/p2p_capabilities/capabilities.json",
+            ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+            "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/",
+            "tests/test_p2p_web_reverse_reference.py",
+            ".github/workflows/web-reverse-foundation-focused.yml",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -572,6 +582,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # selector shared by install.sh and install.ps1.
                 "scripts/p2p_skill_profile.py",
                 "tests/test_p2p_project_fit_capability_provisioning.py",
+                # Issue #224: a data-only post-route reference bridge plus its
+                # focused test. The bridge holds pins, license boundaries and
+                # fail-closed flags; it routes nothing and executes nothing.
+                ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+                "tests/test_p2p_web_reverse_reference.py",
                 ".agents/skills/frontend-design/scripts/contrast-checker.py",
                 ".claude/skills/frontend-design/scripts/contrast-checker.py",
                 ".p2p/system/.agents/skills/frontend-design/scripts/contrast-checker.py",
@@ -585,10 +600,17 @@ class NoParallelArchitectureTests(unittest.TestCase):
         self.assertEqual(violations, [], "\n".join(violations))
 
     def test_no_new_executable_capability_modules(self) -> None:
+        # Issue #224: exactly one new capability-package module is permitted,
+        # and only as the bounded data-only reference bridge. It exposes pins,
+        # license boundaries and fail-closed flags; it contains no router,
+        # executor, installer, network or subprocess primitive. Any other new
+        # `.py` under `p2p_capabilities/` still fails closed.
+        permitted_capability_modules = {".p2p/system/p2p_capabilities/web_reverse_reference.py"}
         for path in self.changed:
             self.assertFalse(
                 path.startswith(".p2p/system/p2p_capabilities/")
-                and path.endswith(".py"),
+                and path.endswith(".py")
+                and path not in permitted_capability_modules,
                 f"new capability module: {path}",
             )
             self.assertFalse(

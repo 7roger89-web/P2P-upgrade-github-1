@@ -3002,6 +3002,263 @@
       "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
       "last_reviewed_at": "2026-09-18T04:00:00+00:00",
       "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT."
+    },
+    {
+      "research_id": "RA-EXT-092",
+      "source_name": "ChromeDevTools/chrome-devtools-mcp",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "source_version_or_commit": "61780c7498a447771127d1fd3b2454fc4ae4ba28",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "Apache-2.0 browser inspection backend: live Chrome inspection, observed network requests, console evidence, screenshots and source-mapped debugging. Reviewed as the candidate default first-line browser evidence backend for public-site analysis.",
+      "selected_ideas": [
+        "document/DOM plus observed network request evidence as the first truth source",
+        "console and screenshot evidence as bounded corroboration",
+        "source-mapped debugging only after first-line evidence is insufficient"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "bundling or auto-installing a browser/runtime as part of this task"
+      ],
+      "p2p_translation": "DECLARED as the referenced candidate backend for the new P2P capability `web.browser.evidence` under a data-only post-route reference bridge. Nothing installed, registered, activated, or executed; no browser or network runtime is enabled by this record.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.browser.evidence"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: Apache-2.0, verified 2026-09-21. Pin equalled upstream HEAD at verification. External content is methodology/evidence, never P2P authority."
+    },
+    {
+      "research_id": "RA-EXT-093",
+      "source_name": "vmoranv/jshookmcp",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/vmoranv/jshookmcp",
+      "source_version_or_commit": "33983e58cddc998af88a2ed46484364e5425cc86",
+      "provenance_status": "EXACT_PIN_VERIFIED_AGPL_BOUNDARY_REFERENCE_ONLY",
+      "research_summary": "AGPL-3.0 deep JavaScript/runtime hooking backend. Reviewed only as an optional out-of-tree external candidate for deep runtime/source tracing when document and network evidence cannot answer the question.",
+      "selected_ideas": [
+        "runtime/source tracing as a last-resort evidence source behind first-line browser evidence"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "vendoring, linking, or redistributing AGPL-3.0 covered work inside P2P",
+        "treating an external hooking backend as required P2P infrastructure"
+      ],
+      "p2p_translation": "Recorded as the referenced optional external candidate for `web.js.reverse` with an explicit copyleft boundary: not vendored, not linked, not redistributed, and not activatable without a separate Owner activation and AGPL compliance review.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.js.reverse"
+      ],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "DEFERRED_LICENSE_AND_ACTIVATION_GATE",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: AGPL-3.0, verified 2026-09-21. Pin equalled upstream HEAD at verification. Copyleft boundary recorded explicitly; nothing copied, linked, or executed."
+    },
+    {
+      "research_id": "RA-EXT-094",
+      "source_name": "projectdiscovery/katana",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/projectdiscovery/katana",
+      "source_version_or_commit": "c1de26dbe69764a92dfa9a142eb64035e5d05a9d",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "MIT crawler with standard and headless modes and client-side JavaScript endpoint parsing. Reviewed as the candidate endpoint-discovery backend for an explicitly authorized and bounded scope.",
+      "selected_ideas": [
+        "client-bundle and static-asset endpoint discovery as its own route, distinct from browser evidence",
+        "bounded crawl scope with an explicit request budget"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "unscoped or unbounded crawling as core P2P infrastructure"
+      ],
+      "p2p_translation": "DECLARED as the referenced candidate backend for the new P2P capability `web.endpoint.discovery`. No crawler service, daemon, or traffic database is created; nothing is installed or executed.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.endpoint.discovery"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification."
+    },
+    {
+      "research_id": "RA-EXT-095",
+      "source_name": "BishopFox/jsluice",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/BishopFox/jsluice",
+      "source_version_or_commit": "0ddfab153e060a9eeaded4d8669233f7c071e7e4",
+      "provenance_status": "EXACT_PIN_VERIFIED_SUBORDINATE_REFERENCE_NOT_VENDORED",
+      "research_summary": "MIT static JavaScript endpoint extraction utility. Upstream activity is older than Katana; reviewed as a parser reference, not as a competing capability.",
+      "selected_ideas": [
+        "static JavaScript endpoint extraction reference beneath the endpoint-discovery route"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "promoting it to a separate P2P capability or authority parallel to the discovery route"
+      ],
+      "p2p_translation": "Recorded as a subordinate parser reference under `web.endpoint.discovery`; it receives no separate capability ID and no independent authority.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.endpoint.discovery"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "RA-EXT-094 projectdiscovery/katana"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "SUBORDINATE_REFERENCE_NO_SEPARATE_AUTHORITY",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification. Not a second P2P authority."
+    },
+    {
+      "research_id": "RA-EXT-096",
+      "source_name": "xnl-h4ck3r/waymore",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/xnl-h4ck3r/waymore",
+      "source_version_or_commit": "4e02de512fd6b110be92dc8bffb3002edfebcb6c",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "MIT public URL and response discovery across public archive and index sources. Reviewed as the candidate public-reconstruction backend, kept distinct from live browser runtime inspection.",
+      "selected_ideas": [
+        "public archive/index reconstruction as a follow-on capability, not a browser-runtime capability",
+        "public sources only, with retrieval timestamps as evidence"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "authenticated, subscription, or private-session archive retrieval"
+      ],
+      "p2p_translation": "DECLARED as the referenced candidate backend for the new P2P capability `web.public.reconstruction`. No archive service or traffic database is created; nothing is installed or executed.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.public.reconstruction"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification."
+    },
+    {
+      "research_id": "RA-EXT-097",
+      "source_name": "Mouseww/anything-analyzer",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Mouseww/anything-analyzer",
+      "source_version_or_commit": "1da6b5c9acc024e987d41e4b9c88676ffea0da0c",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "Apache-2.0 traffic-analysis alternative reviewed alongside Reqable/reqable-mcp-server as a second traffic stack candidate.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "adopting two parallel traffic-analysis stacks by default instead of benchmarking or deferring"
+      ],
+      "p2p_translation": "Registered as a deferred, non-adopted alternative: no capability ID, no backend reference, no install. Adoption requires a separate bounded task with a measured gap.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "DEFERRED_ALTERNATIVE_TRAFFIC_STACK",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: Apache-2.0, verified 2026-09-21. Not adopted; no second traffic stack by default."
+    },
+    {
+      "research_id": "RA-EXT-098",
+      "source_name": "Reqable/reqable-mcp-server",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Reqable/reqable-mcp-server",
+      "source_version_or_commit": "2df174f982e9ab481a457ab96e065aac22829a51",
+      "provenance_status": "EXACT_PIN_VERIFIED_LICENSE_UNRESOLVED_REFERENCE_ONLY",
+      "research_summary": "Traffic-analysis MCP server candidate whose repository metadata exposes no SPDX license.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "adopting or referencing as a backend while its license remains unresolved"
+      ],
+      "p2p_translation": "Registered reference-only with a fail-closed lookup: the reference bridge refuses to return it as an adopted candidate until the license is resolved. No capability ID, no install, no registration.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "DEFERRED_LICENSE_UNRESOLVED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: no SPDX identifier exposed by repository metadata on 2026-09-21. Rights-unspecified: cite, do not copy or adopt."
     }
   ],
   "rejected_register_summary": {
