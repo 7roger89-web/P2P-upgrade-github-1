@@ -3293,7 +3293,8 @@
         "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
         "AGENTS.md",
         "docs/p2p-development/P2P-AGENTS-INSTALL.md",
-        "tests/test_p2p_global_community_research.py"
+        "tests/test_p2p_global_community_research.py",
+        "docs/p2p-development/research/ARENA-FAST-CANARY-EXPERIMENT-V1.md"
       ],
       "dependencies": [
         "RULE 19 REALITY_FIRST_CAPABILITY_PROBE",
@@ -3302,7 +3303,7 @@
       "roadmap_slot": "operations-law/research-and-executor-intelligence",
       "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED",
       "last_reviewed_at": "2026-09-22T00:00:00+00:00",
-      "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority. Correction 2026-09-22: Arena may add/remove models from Direct/Side-by-Side independently of the Agent pool; cross-surface references are not calibrated Agent ground truth."
+      "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority. Correction 2026-09-22: Arena may add/remove models from Direct/Side-by-Side independently of the Agent pool; cross-surface references are not calibrated Agent ground truth. Five-trial read-only Arena FAST_CANARY experiment started 2026-09-22 to test whether one real-task-first probe meaningfully separates session quality without identifying the hidden model."
     }
   ],
   "rejected_register_summary": {
