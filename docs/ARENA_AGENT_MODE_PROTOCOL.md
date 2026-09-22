@@ -144,8 +144,12 @@ itself is already the cheapest representative probe.
 
 The canary:
 
-- uses at most three tiny probes;
-- includes at least one task-representative probe;
+- defaults to FAST_CANARY: one task-representative probe;
+- prefers the first read-only/disposable slice of the REAL task itself
+  (`REAL_TASK_FIRST_SLICE = CANARY`);
+- adds a second or third tiny probe only when the first is ambiguous,
+  contradictory, materially incomplete, or the task is high-risk enough to
+  require broader evidence;
 - keeps coding probes disposable/non-durable (no canary-only PR/commit);
 - may use a randomized animal × vehicle SVG probe only for relevant
   visual/spatial work;
@@ -153,14 +157,23 @@ The canary:
 - never asks the tested Arena session to grade itself; and
 - never infers model/provider/reasoning level from output style or quality.
 
-Return only observable classification:
+FAST_CANARY default return:
 
 ```text
-CANARY_CLASS=GREEN | YELLOW | ORANGE | RED
+FAST_CANARY_V1
+CANARY_RESULT=GREEN | YELLOW | RED
 MODEL_IDENTITY=UNKNOWN
-CAPABILITY_EVIDENCE=<tests/render/diff/tool/recovery evidence>
-SESSION_POLICY=KEEP_SESSION | LIMIT_SESSION | ADVISORY_ONLY | REROLL_OR_SWITCH
+FACTS=<brief task-relevant evidence>
+CHECK=<one focused test/render/read-only verification + result>
+TOOL_HALLUCINATION=YES | NO
+UNNECESSARY_SCOPE=YES | NO
+NEXT=CONTINUE_REAL_TASK | LIMIT_TASK | REROLL_OR_SWITCH
 ```
+
+If `GREEN`, continue the real task immediately in the same session; do not
+stop solely to ask the Owner for permission to continue work already authorized
+by the task contract. Use the fuller `GREEN|YELLOW|ORANGE|RED` classification
+only when the gate actually needed multiple probes.
 
 `RED` permits one evidence-justified fresh-session reroll by default; do not
 reroll repeatedly to gamble for a preferred hidden model.
