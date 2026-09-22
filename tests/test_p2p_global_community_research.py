@@ -41,6 +41,14 @@ class GlobalCommunityResearchPolicyTests(unittest.TestCase):
         ):
             self.assertIn(token, self.notebook)
 
+    def test_arena_reference_requires_matching_surface_and_harness(self):
+        for token in (
+            "AGENT_POOL != DIRECT_SELECTOR",
+            "AGENT_POOL != SIDE_BY_SIDE_SELECTOR",
+            "REFERENCE_HARNESS_MUST_MATCH_TARGET_HARNESS",
+        ):
+            self.assertIn(token, self.notebook)
+
     def test_behavioral_fingerprint_is_bounded_and_uncertain(self):
         self.assertIn("define a CLOSED candidate set", self.notebook)
         self.assertIn("ranked candidate set or family-level estimate with confidence", self.notebook)
