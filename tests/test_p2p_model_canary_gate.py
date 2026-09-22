@@ -54,7 +54,23 @@ class ModelCanaryGateTests(unittest.TestCase):
         ):
             self.assertIn(token, self.notebook)
         self.assertIn("The tested Arena session does not grade itself", self.arena)
-        self.assertIn("continue the real task immediately in the same session", self.arena)
+        self.assertIn("OWNER_CONTINUATION_GATE_V1", self.notebook)
+        self.assertIn("CONTINUATION_CHECKPOINT=READY", self.notebook)
+        self.assertIn("NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED", self.arena)
+        self.assertIn("FALLBACK_OWNER_REPLY=Tiếp tục công việc", self.arena)
+        self.assertIn("never\npretend the model itself rendered or controls the button", self.arena)
+
+    def test_owner_continuation_gate_routes_after_external_grade(self):
+        for token in (
+            "OWNER_CONTINUATION_GATE_V1",
+            "ARENA_NATIVE_CONTINUATION_UI=USE_WHEN_AVAILABLE",
+            "MODEL_CANNOT_GUARANTEE_UI_BUTTON_RENDERING=YES",
+            "GREEN  -> recommend CONTINUE_REAL_TASK",
+            "RED    -> recommend REROLL_OR_SWITCH",
+        ):
+            self.assertIn(token, self.notebook)
+        self.assertIn("same-chat Keep working / CONTINUE_REAL_TASK", self.arena)
+        self.assertIn("After the Owner chooses Keep working/Continue", self.arena)
 
     def test_shallow_clone_cannot_prove_unrelated_histories(self):
         for token in (

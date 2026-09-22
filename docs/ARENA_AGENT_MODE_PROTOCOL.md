@@ -181,9 +181,31 @@ not evidence of unrelated histories. Check shallow-clone state first and
 deepen/unshallow or use durable remote ancestry evidence before making that
 claim.
 
-If Control Tower assigns `GREEN`, continue the real task immediately in the
-same session; do not stop solely to ask the Owner for permission to continue
-work already authorized by the task contract.
+For a NEW medium/high-risk Arena Agent session, do not automatically continue
+past the first real-task canary slice. End the turn at
+`OWNER_CONTINUATION_GATE_V1` after returning the evidence packet.
+
+```text
+CONTINUATION_CHECKPOINT=READY
+OWNER_ACTION_REQUIRED=YES
+NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED
+FALLBACK_OWNER_REPLY=Tiếp tục công việc
+```
+
+Arena's product currently supports a native `keep working` action after a
+completed task/turn. Use that native continuation UI when it appears; never
+pretend the model itself rendered or controls the button.
+
+Control Tower/independent grading determines what to recommend:
+- GREEN -> same-chat Keep working / CONTINUE_REAL_TASK;
+- YELLOW -> bounded continuation with explicit verification;
+- ORANGE -> advisory or low-risk continuation only;
+- RED -> REROLL_OR_SWITCH, not Keep working;
+- UNVERIFIED -> no default continue recommendation.
+
+After the Owner chooses Keep working/Continue on a GREEN result, continue the
+real task in the SAME Arena session without another canary unless material
+risk/state changes.
 
 `RED` permits one evidence-justified fresh-session reroll by default; do not
 reroll repeatedly to gamble for a preferred hidden model.
