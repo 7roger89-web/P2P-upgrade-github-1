@@ -143,6 +143,11 @@ South African, Japanese, Taiwanese, Brazilian and other technical ecosystems.
 The implementation explicitly rejects fixed-country whitelists and treats
 forum claims as lived-experience signals unless independently corroborated.
 
+Correction 2026-09-22: Arena Agent availability is distinct from the
+Direct/Side-by-Side selector surfaces. Cross-surface outputs are not calibrated
+Agent references unless the exact model variant and materially equivalent
+system/tool harness are established.
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
