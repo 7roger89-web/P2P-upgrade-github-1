@@ -133,8 +133,7 @@ Beginner-facing operational guidance must apply
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
   prompt goes (e.g. `ARENA AI — CHAT MỚI — WRITER`, `00 — P2P CONTROL TOWER`).
-- `RULE 02 CHAT_TITLE_REQUIRED` — every new execution chat is titled
-  `PROJECT | PR-or-TASK | ROLE | SHORT-GOAL`.
+- `RULE 02 CHAT_TITLE_REQUIRED` — every new execution chat gets a recognizable title. For Arena `NEW_CHAT`, the first nonblank prompt line is the human-readable title, normally `PROJECT — SHORT-GOAL`; routing boilerplate such as `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, code fences, or a generic `P2P` prefix must not be first, and `CHAT_TITLE` repeats that exact title. `SAME_CHAT` preserves the existing title.
 - `RULE 03 SAME_CHAT_MUST_NAME_CHAT` — `SAME CHAT` instructions name the
   exact existing chat, never "the old chat".
 - `RULE 04 GITHUB_IS_DURABLE_CHECKPOINT` — work identity =

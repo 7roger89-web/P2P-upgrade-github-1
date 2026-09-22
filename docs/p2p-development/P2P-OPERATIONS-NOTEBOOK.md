@@ -294,21 +294,42 @@ the failure class is established.
    execution, verification, recovery, or context. When the required outcome is
    proven, stop instead of opening optional refactor, benchmark, framework,
    hardening, or future-phase work.
-6. **PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT** — Every P2P-generated
+6. **PROMPT_TITLE_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT** — Every P2P-generated
    operational prompt handed to the beginner Owner for execution in another
    tool/chat must state the target project/workstream, destination/tool,
    `CHAT_MODE=NEW_CHAT` or `CHAT_MODE=SAME_CHAT`, the exact existing chat name
    when continuing (or a recognizable `CHAT_TITLE` when new), and the role where
-   applicable. The same prompt must include a compact fresh project-plan
-   checkpoint anchored to durable state: `PLAN_REFERENCE` (or
-   `NO_FORMAL_PLAN`), what is already completed, the current checkpoint,
-   blocker/Owner Gate if any, and the single next bounded step. Control Tower
-   refreshes this from the active project plan/task state before issuing the
-   prompt; chat memory may supplement but never override durable state. The
-   beginner must never infer where to paste a prompt or reconstruct project
-   progress from old chats. Do not invent a plan when none exists. This compact
-   handoff checkpoint is not continuous progress narration and does not override
+   applicable. For Arena, and for any destination where a new conversation title
+   is derived from the opening prompt text, `NEW_CHAT` prompts must follow
+   `ARENA_CHAT_TITLE_FIRST_LINE_V1`: the **first nonblank line** is one concise,
+   human-readable task title, normally `<PROJECT> — <bounded task/outcome>`.
+   Front-load the distinguishing words so the title remains useful when the UI
+   truncates it. That first line must not be routing boilerplate such as
+   `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P`
+   prefix. Immediately after the title, serialize the normal routing metadata,
+   including `GỬI CHO: <destination>` (or the destination's equivalent),
+   `PROJECT=`, `CHAT_MODE=`, and for `NEW_CHAT`,
+   `CHAT_TITLE=<exact same human-readable title>`. For `SAME_CHAT`, the exact
+   existing `CHAT_TITLE` remains authoritative and must not be silently renamed.
+   The same prompt must include a compact fresh project-plan checkpoint anchored
+   to durable state: `PLAN_REFERENCE` (or `NO_FORMAL_PLAN`), what is already
+   completed, the current checkpoint, blocker/Owner Gate if any, and the single
+   next bounded step. Control Tower refreshes this from the active project
+   plan/task state before issuing the prompt; chat memory may supplement but
+   never override durable state. The beginner must never infer where to paste a
+   prompt, manually rename a newly created Arena chat merely to make the sidebar
+   intelligible, or reconstruct project progress from old chats. Do not invent a
+   plan when none exists. This compact handoff checkpoint is not continuous
+   progress narration and does not override
    `PROGRESS_REPORTING=EXCEPTIONS_ONLY`.
+
+   ```text
+   ARENA_CHAT_TITLE_FIRST_LINE_V1=YES
+   NEW_CHAT_FIRST_NONBLANK_LINE=<PROJECT> — <bounded task/outcome>
+   ROUTING_BOILERPLATE_FIRST_LINE=NO
+   NEW_CHAT_CHAT_TITLE_MUST_EQUAL_FIRST_LINE=YES
+   ```
+
 7. **ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT** — For non-trivial P2P
    reasoning, use analytical scepticism rather than agreement-seeking. Deconstruct
    the Owner goal, acceptance conditions, requirements, assumptions, evidence,
@@ -949,11 +970,26 @@ The beginner must never infer where a prompt should go.
 
 ### RULE 02 — CHAT_TITLE_REQUIRED
 
-Every new execution chat gets a recognizable title. Default shape:
+Every new execution chat gets a recognizable title. For Arena `NEW_CHAT`,
+the title must also be the first nonblank line of the prompt so the generated
+conversation is useful in the Arena sidebar without manual renaming.
+
+Default Arena shape:
 
 ```text
-PROJECT | PR-or-TASK | ROLE | SHORT-GOAL
+PROJECT — SHORT-GOAL
+
+GỬI CHO: ARENA AI
+PROJECT=PROJECT
+CHAT_MODE=NEW_CHAT
+CHAT_TITLE=PROJECT — SHORT-GOAL
 ```
+
+Front-load the distinguishing project/task words. Do not put `GỬI CHO:`,
+`DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P` prefix on the
+first line. Other destinations may retain their verified naming convention
+when they expose an explicit title field or do not derive the title from the
+opening prompt.
 
 ### RULE 03 — SAME_CHAT_MUST_NAME_CHAT
 

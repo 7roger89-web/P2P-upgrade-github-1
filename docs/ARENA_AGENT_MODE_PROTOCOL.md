@@ -192,14 +192,26 @@ ASSESS
 
 In compact form: `ASSESS → IMPLEMENT → VERIFY → RETURN`.
 
-Every P2P-generated Arena prompt must expose these user-facing routing fields:
+Every P2P-generated Arena prompt must expose a useful conversation title before routing metadata. For `START_NEW_SESSION`, the first nonblank line is the human-readable task title that Arena can reuse for the sidebar conversation title.
 
 ```text
+<PROJECT> — <bounded task/outcome>
+
+GỬI CHO: ARENA AI
 DESTINATION=ARENA AI
 SESSION_ACTION=CONTINUE_CURRENT_SESSION | START_NEW_SESSION
+CHAT_TITLE=<exact first-line title for START_NEW_SESSION; exact existing chat name for CONTINUE_CURRENT_SESSION>
 SESSION_GOAL=
 PR_EXPECTATION=
 ```
+
+`ARENA_CHAT_TITLE_FIRST_LINE_V1` rules:
+
+- For `START_NEW_SESSION`, first nonblank line = concise, distinctive task title, normally `<PROJECT> — <bounded task/outcome>`.
+- Front-load the distinguishing words because the Arena sidebar truncates long titles.
+- Do not put `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P` prefix on the first line.
+- `CHAT_TITLE` must repeat that exact first-line title for a new session.
+- For `CONTINUE_CURRENT_SESSION`, keep the exact existing `CHAT_TITLE`; do not imply a rename.
 
 Before `ASSESS`, every Arena executor must complete the
 `P2P_SUPREME_OPERATING_LAW_V1` preflight.
@@ -240,11 +252,15 @@ Do not request private chain-of-thought. Do not repeat large P2P or project
 architecture text when the canonical GitHub files already contain it. Use
 risk-proportional tests and stop once sufficient evidence exists.
 
-A minimal operational shape is:
+A minimal operational shape for a new Arena session is:
 
 ```text
+VNLAW — Official VBPL WebSocket Probe
+
+GỬI CHO: ARENA AI
 DESTINATION=ARENA AI
-SESSION_ACTION=CONTINUE_CURRENT_SESSION | START_NEW_SESSION
+SESSION_ACTION=START_NEW_SESSION
+CHAT_TITLE=VNLAW — Official VBPL WebSocket Probe
 SESSION_GOAL=<one bounded goal>
 PR_EXPECTATION=<one working branch and one PR>
 
