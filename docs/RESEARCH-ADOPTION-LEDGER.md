@@ -165,7 +165,7 @@ Upstream provenance: `REPO=markfulton/ai-employees`,
 
 | ID | Source | Status | Selection | Translation |
 | --- | --- | --- | --- | --- |
-| RA-EXT-100 | markfulton/ai-employees @ `edffe8f` (MIT) | DEFERRED | 15 patterns classified KEEP 4 / ADAPT 2 / ALREADY_COVERED 7 / DEFER 2; nothing adopted | RESEARCH_ONLY_PASS, zero runtime; reuse mapped to `decision_trace` freshness, `fw06` pause, the existing execution ledger + fingerprint idempotency, `experience_evolution`, and the typed capability registry |
+| RA-EXT-100 | markfulton/ai-employees @ `edffe8f` (MIT) | RESEARCHED | 15 patterns classified KEEP 4 / ADAPT 2 / ALREADY_COVERED 7 / DEFER 2; nothing adopted | completed source study, zero runtime; reuse mapped to `decision_trace` freshness, `fw06` pause, the existing execution ledger + fingerprint idempotency, `experience_evolution`, and the typed capability registry |
 | RA-EXT-101 | `PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT` (candidate direction) | DEFERRED | cadence identity (period key + window/day eligibility + once-per-period `RUN` / `SKIP` decision) specified, not implemented | re-entry trigger recorded: a period-form obligation, a real firing source that can fire late or twice, not already decided by freshness, and a written period-vs-identity boundary |
 
 ## 5. Rejected / non-adopted register (preserved)

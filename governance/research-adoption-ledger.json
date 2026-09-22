@@ -3337,10 +3337,10 @@
         "browser-profile automation as a P2P core dependency rather than a declared evidence backend",
         "the eight-employee / sixty-routine business-role catalogue as P2P agent identities (TASK_NOT_AGENT; canonical eight untouched)"
       ],
-      "p2p_translation": "NO IMPLEMENTATION — RESEARCH_ONLY_PASS with OE_VERDICT=DEFER_UNTIL_NEEDED. Reuse mapping recorded instead of new code: date-driven obligation freshness -> decision_trace.py (expires_at -> STALE); pause -> fw06_operational_resilience.py (pause_project/is_paused/paused_projects/PROJECT_PAUSED); receipts and identity-keyed idempotency -> the existing .p2p/state/execution-ledger.jsonl writer plus control_tower_handoff PACKET_FINGERPRINT and work_item_handoff idempotent paths; procedural learning -> experience_evolution.py CANDIDATE->VERIFIED->ACTIVE->SUPERSEDED/QUARANTINED; capability neutrality -> the typed capability registry. No second control plane, router, registry, task-state store, execution ledger, scheduler or daemon was created, and no canonical P2P identity or Owner Gate changed.",
+      "p2p_translation": "RESEARCH_ONLY_PASS (study complete). Adoption of runtime is not implied; OE_VERDICT=DEFER_UNTIL_NEEDED lives on RA-EXT-101. Reuse mapping recorded instead of new code: date-driven obligation freshness -> decision_trace.py (expires_at -> STALE); pause -> fw06_operational_resilience.py; receipts and identity-keyed idempotency -> existing execution-ledger.jsonl writer plus PACKET_FINGERPRINT; procedural learning -> experience_evolution.py; capability neutrality -> typed capability registry. No second control plane, router, registry, scheduler or daemon. Canonical eight and Owner Gates unchanged.",
       "capability_family": "EXECUTION_AND_ORCHESTRATION",
       "canonical_capability_ids": [],
-      "status": "DEFERRED",
+      "status": "RESEARCHED",
       "evidence_pointers": [
         "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md",
         "tests/test_p2p_ai_employees_pattern_assimilation_01.py",
