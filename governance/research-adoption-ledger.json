@@ -3259,6 +3259,48 @@
       "owner_decision_status": "DEFERRED_LICENSE_UNRESOLVED",
       "last_reviewed_at": "2026-09-21T00:00:00+00:00",
       "notes": "License: no SPDX identifier exposed by repository metadata on 2026-09-21. Rights-unspecified: cite, do not copy or adopt."
+    },
+    {
+      "research_id": "RA-EXT-099",
+      "source_name": "Global multilingual community research + black-box LLM fingerprinting",
+      "source_type": "MULTI_SOURCE_RESEARCH",
+      "source_reference": "USENIX Security 2025 LLMmap; Arena Agent Mode docs; Habr; MyBroadband; ComputerBase; Qiita; Mobile01; LessWrong",
+      "source_version_or_commit": "researched 2026-09-22",
+      "provenance_status": "PRIMARY_RESEARCH_PLUS_MULTILINGUAL_COMMUNITY_EVIDENCE",
+      "research_summary": "Owner-directed research broadened beyond Reddit and fixed-country habits, sampling German, Russian, South African, Japanese, Taiwanese, Brazilian and other technical communities plus primary research. Evidence separates official/primary capability claims from community lived experience. LLM identity work showed direct/self-obfuscated self-report is unreliable; research-grade black-box fingerprinting uses multiple behavioral probes and explicit candidate sets.",
+      "selected_ideas": [
+        "adaptive multilingual cross-community search without a country whitelist",
+        "local-language concept search and independent-ecosystem diversity",
+        "forum/community evidence for lived experience while primary sources retain factual authority",
+        "bounded closed-set behavioral fingerprinting with confidence and UNKNOWN",
+        "session capability evidence remains more important than guessed hidden model identity"
+      ],
+      "rejected_ideas": [
+        "Reddit/English-web monoculture presented as global consensus",
+        "fixed country/forum whitelist",
+        "raw source-count voting or treating reposts as independent evidence",
+        "first-letter/last-letter, acrostic, encoded or role-play self-disclosure as model-identity proof",
+        "prompt-injection or bypass tactics aimed at defeating intentional model non-disclosure",
+        "exact model claims from writing style, one prompt, or self-report"
+      ],
+      "p2p_translation": "Implemented as GLOBAL_COMMUNITY_RESEARCH_V1 plus MODEL_IDENTITY_INFERENCE_BOUNDARY_V1 inside the existing Supreme Operations Notebook; no new research engine, scraper, router, benchmark service, or fingerprinting daemon.",
+      "capability_family": "RESEARCH_AND_EXECUTOR_INTELLIGENCE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+        "AGENTS.md",
+        "docs/p2p-development/P2P-AGENTS-INSTALL.md",
+        "tests/test_p2p_global_community_research.py"
+      ],
+      "dependencies": [
+        "RULE 19 REALITY_FIRST_CAPABILITY_PROBE",
+        "MODEL_CANARY_GATE_V1"
+      ],
+      "roadmap_slot": "operations-law/research-and-executor-intelligence",
+      "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED",
+      "last_reviewed_at": "2026-09-22T00:00:00+00:00",
+      "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority."
     }
   ],
   "rejected_register_summary": {
@@ -3287,7 +3329,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-09-18T04:00:00+00:00",
+  "last_reviewed": "2026-09-22T00:00:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]
