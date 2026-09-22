@@ -39,10 +39,24 @@ class ModelCanaryGateTests(unittest.TestCase):
         self.assertIn("never asks the tested Arena session to grade itself", self.arena)
 
     def test_gate_is_risk_proportional_and_anti_reroll_gambling(self):
-        self.assertIn("at most three tiny probes", self.notebook)
+        self.assertIn("Default to FAST_CANARY: ONE task-representative probe only", self.notebook)
+        self.assertIn("REAL_TASK_FIRST_SLICE = CANARY", self.notebook)
+        self.assertIn("second or third tiny probe only", self.notebook)
         self.assertIn("Skip the gate for low-risk/mechanical work", self.notebook)
         self.assertIn("one evidence-justified fresh-session reroll", self.arena)
         self.assertIn("do not\nreroll repeatedly to gamble", self.arena)
+
+    def test_fast_canary_has_simple_keep_limit_reroll_contract(self):
+        for token in (
+            "FAST_CANARY_V1",
+            "CANARY_RESULT=GREEN | YELLOW | RED",
+            "TOOL_HALLUCINATION=YES | NO",
+            "UNNECESSARY_SCOPE=YES | NO",
+            "NEXT=CONTINUE_REAL_TASK | LIMIT_TASK | REROLL_OR_SWITCH",
+        ):
+            self.assertIn(token, self.notebook)
+            self.assertIn(token, self.arena)
+        self.assertIn("continue the real task immediately in the same session", self.arena)
 
     def test_pelican_is_not_a_general_model_ranking(self):
         self.assertIn("FIXED_PELICAN_PROMPT != MODEL_RANKING", self.notebook)

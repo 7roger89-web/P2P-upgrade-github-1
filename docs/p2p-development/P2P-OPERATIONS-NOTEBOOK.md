@@ -1495,23 +1495,51 @@ probe.
 
 Probe discipline:
 
-1. Use at most three tiny probes and prefer one task-representative probe over a
-   generic puzzle.
-2. For coding work, evidence should come from real tool use such as a disposable
+1. Default to FAST_CANARY: ONE task-representative probe only. Prefer the first
+   read-only or disposable slice of the real task itself over a synthetic
+   benchmark. The preferred pattern is:
+   `REAL_TASK_FIRST_SLICE = CANARY`.
+2. Escalate to a second or third tiny probe only when the first probe is
+   ambiguous, contradictory, materially incomplete, or the intended task is
+   high-risk enough that one probe is not representative. Never expand merely
+   to make the canary look thorough.
+3. For coding work, evidence should come from real tool use such as a disposable
    scratch edit, focused test, diff inspection, or recovery from a genuine
    command/tool error. Do not create durable commits/PRs merely for the canary.
-3. For visual/spatial work, an animal × vehicle SVG variant may be used as ONE
+4. For visual/spatial work, an animal × vehicle SVG variant may be used as ONE
    probe when that capability is relevant. Randomize the animal/vehicle pair;
    the canonical "pelican riding a bicycle" prompt alone is saturated and must
    never be treated as a general model ranking.
-4. Judge externally observable evidence: correctness, constraint adherence,
+5. Judge externally observable evidence: correctness, constraint adherence,
    actual tool receipts, render/test result, self-verification, recovery, and
    unnecessary scope expansion. The tested model must not grade itself.
-5. Do not infer an exact model name, provider, or reasoning level from writing
+6. Do not infer an exact model name, provider, or reasoning level from writing
    style, output quality, token use, or tool behavior. Arena may also switch the
    underlying model to recover a failing session; the canary therefore
    classifies the observed SESSION/HARNESS capability, not a stable hidden
    model identity.
+
+
+FAST_CANARY default return shape:
+
+```text
+FAST_CANARY_V1
+CANARY_RESULT=GREEN | YELLOW | RED
+FACTS=<brief task-relevant facts observed through tools>
+CHECK=<one representative test/render/read-only verification + result>
+TOOL_HALLUCINATION=YES | NO
+UNNECESSARY_SCOPE=YES | NO
+NEXT=CONTINUE_REAL_TASK | LIMIT_TASK | REROLL_OR_SWITCH
+```
+
+`ORANGE` remains available to the fuller three-probe classification when
+evidence is mixed across multiple probes. The FAST_CANARY one-probe path uses
+`GREEN|YELLOW|RED` so the Owner does not have to interpret a four-level score
+for a simple keep/limit/reroll decision.
+
+If FAST_CANARY is `GREEN`, continue the already-authorized real task in the
+same session without asking the Owner again merely because the canary ended.
+Normal task scope, Owner Gates, and merge/deploy authority still apply.
 
 Decision classes:
 
