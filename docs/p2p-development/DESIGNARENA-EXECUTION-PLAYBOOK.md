@@ -67,22 +67,52 @@ Không chọn Full-Stack chỉ vì sản phẩm được gọi là “full app�
 
 ## 4. Cách dùng tournament
 
-Dùng DesignArena như đấu trường tuyển phương án, không coi một model là oracle.
+DesignArena là blind design-selection tournament, không phải công cụ nhận dạng
+model ẩn. Theo methodology hiện tại, mỗi voting session lấy bốn model khác nhau
+từ active pool (cộng một backup), đưa cùng một prompt cho tất cả, rồi xếp hạng
+qua các cặp đấu ẩn danh. Model identity không được dùng làm tín hiệu chọn thiết
+kế.
 
-1. Cho các model cùng một bounded product contract.
-2. Giữ nguyên target user, dữ liệu thật, ngôn ngữ, responsive, interaction và acceptance.
-3. Xem preview của cả hai bên trước khi vote.
-4. Bấm thử workflow thật, không vote bằng ảnh.
-5. Chọn winner theo:
+```text
+DESIGNARENA_TOURNAMENT_IS_SELECTION_GATE=YES
+FOUR_MODELS_SAME_PROMPT=YES
+BLIND_OUTPUT_FIRST=YES
+GUESS_MODEL_BEFORE_VOTE=NO
+SEPARATE_PELICAN_CANARY_BEFORE_REAL_PROMPT=NO
+```
+
+Quy trình:
+
+1. Khóa một bounded product/design contract dùng CHUNG cho mọi model.
+2. Giữ nguyên target user, dữ liệu thật, ngôn ngữ, responsive, interaction và
+   acceptance; không đổi prompt giữa các đối thủ.
+3. Xem/render và bấm thử workflow thật của từng phương án trước khi vote.
+4. Chấm theo acceptance matrix cố định:
    - đúng nghiệp vụ;
-   - dễ dùng và hierarchy tốt;
-   - responsive tốt;
-   - đủ state;
-   - khớp schema/dữ liệu thật;
-   - không bịa chức năng.
-6. Khóa product reference thắng trước khi mở rộng scope.
+   - interaction/workflow chạy thật;
+   - hierarchy và khả năng đọc;
+   - responsive;
+   - state/loading/error/empty cần thiết;
+   - fidelity với schema/dữ liệu/reference;
+   - không bịa chức năng hoặc authority.
+5. Vote blind theo output thực tế, không theo suy đoán model/provider.
+6. Khóa winner/reference rồi mới chuyển sang Control Tower/executor để tích hợp
+   bền vững vào repo.
 
-Preview đẹp nhưng interaction hỏng hoặc đòi dữ liệu engine không có thì không thắng.
+Preview đẹp nhưng interaction hỏng, dữ liệu sai, hoặc đòi capability sản phẩm
+không có thì không thắng.
+
+### 4.1 MODEL_CANARY_GATE_V1 và DesignArena
+
+`MODEL_CANARY_GATE_V1` của Supreme Law dùng để kiểm tra chất lượng một
+hidden/random EXECUTOR SESSION như Arena Agent Mode. Không áp nó máy móc lên
+DesignArena tournament: bản thân tournament với cùng một prompt đã là cơ chế
+chọn phương án.
+
+Không chạy "bồ nông đạp xe" trước mỗi tournament chỉ để đoán model. Benchmark
+SVG canonical đã bão hòa và không đại diện cho chất lượng sản phẩm nói chung.
+Nếu task thực sự cần SVG/vector spatial reasoning, có thể dùng animal × vehicle
+randomized như một bounded task/probe riêng; vẫn chấm output, không suy model.
 
 ## 5. Xây theo lát cắt dọc
 
