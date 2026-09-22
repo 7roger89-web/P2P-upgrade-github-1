@@ -88,6 +88,12 @@ and stop when sufficient.
   materially improve outcome, evidence, or recovery. Arena is not forced into
   Codex/Astra MIN-BURN merely because Astra quota is expensive, but it still
   obeys anti-overengineering and stop-when-sufficient.
+- `ARENA HIDDEN/RANDOM SESSION QUALITY`: for a new medium/high-risk Arena Agent
+  session whose quality is materially unproven, apply RULE 19
+  `MODEL_CANARY_GATE_V1`. Classify observed session capability as
+  `GREEN|YELLOW|ORANGE|RED`; never infer exact hidden model/provider/reasoning
+  level from style or quality, never self-score, and never reroll repeatedly to
+  gamble for a preferred model. Skip the gate for low-risk/mechanical work.
 - `OTHER EXECUTORS`: use an observed executor profile when available; do not
   copy resource tactics across executors without evidence.
 - Control Tower must know the executor before writing its task packet. Lower
