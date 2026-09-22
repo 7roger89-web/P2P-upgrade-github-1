@@ -273,11 +273,12 @@ def build_arena_handoff(
         from .control_tower_handoff import SUPREME_LAW_CAPSULE as _CAPSULE
         capsule = _CAPSULE
     except Exception:
-        capsule = "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS; SIMPLEST_USEFUL_PATH; REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS; RECOVER_ADAPTIVELY; PRESERVE_CONTINUITY_AND_STOP; PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT; ANALYTICAL_AUTONOMY; TASK_CONTRACT_FIDELITY; EXECUTOR_INPUT_FORMAT_FIDELITY"
+        capsule = "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS; SIMPLEST_USEFUL_PATH; REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS; RECOVER_ADAPTIVELY; PRESERVE_CONTINUITY_AND_STOP; PROMPT_TITLE_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT; ANALYTICAL_AUTONOMY; TASK_CONTRACT_FIDELITY; EXECUTOR_INPUT_FORMAT_FIDELITY"
 
     project_name = root.name
     repo = git_id["repo"]
-    chat_title = f"{project_name} | {goal_id[:20]} | WRITER | {objective[:40]}"
+    title_goal = " ".join(objective.split()) or goal_id
+    chat_title = f"{project_name} — {title_goal[:64]}"
     session_action = "CONTINUE_CURRENT_SESSION" if reuse else "START_NEW_SESSION"
 
     gate = detect_owner_gate(task_plan)
@@ -285,6 +286,9 @@ def build_arena_handoff(
         delta = {}
 
     packet_lines = [
+        chat_title,
+        "",
+        "GỬI CHO: ARENA AI",
         f"DESTINATION=ARENA AI",
         f"CHAT_MODE=NEW_CHAT",
         f"ROLE=WRITER",
