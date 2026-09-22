@@ -46,17 +46,24 @@ class ModelCanaryGateTests(unittest.TestCase):
         self.assertIn("one evidence-justified fresh-session reroll", self.arena)
         self.assertIn("do not\nreroll repeatedly to gamble", self.arena)
 
-    def test_fast_canary_has_simple_keep_limit_reroll_contract(self):
+    def test_fast_canary_is_externally_graded(self):
         for token in (
-            "FAST_CANARY_V1",
-            "CANARY_RESULT=GREEN | YELLOW | RED",
-            "TOOL_HALLUCINATION=YES | NO",
-            "UNNECESSARY_SCOPE=YES | NO",
-            "NEXT=CONTINUE_REAL_TASK | LIMIT_TASK | REROLL_OR_SWITCH",
+            "CANARY_EVIDENCE_PACKET_V1",
+            "EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN",
+            "CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER",
         ):
             self.assertIn(token, self.notebook)
-            self.assertIn(token, self.arena)
+        self.assertIn("The tested Arena session does not grade itself", self.arena)
         self.assertIn("continue the real task immediately in the same session", self.arena)
+
+    def test_shallow_clone_cannot_prove_unrelated_histories(self):
+        for token in (
+            "SHALLOW_CLONE_ANOMALY != REPOSITORY_HISTORY_FACT",
+            "EMPTY_LOCAL_MERGE_BASE_ON_SHALLOW_CLONE != UNRELATED_HISTORIES",
+            "git rev-parse --is-shallow-repository",
+        ):
+            self.assertIn(token, self.notebook)
+        self.assertIn("empty local merge-base from a shallow Arena clone is", self.arena)
 
     def test_pelican_is_not_a_general_model_ranking(self):
         self.assertIn("FIXED_PELICAN_PROMPT != MODEL_RANKING", self.notebook)
