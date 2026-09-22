@@ -3274,7 +3274,9 @@
         "forum/community evidence for lived experience while primary sources retain factual authority",
         "bounded closed-set behavioral fingerprinting with confidence and UNKNOWN",
         "session capability evidence remains more important than guessed hidden model identity",
-        "Arena reference behavior must match the target surface/harness; Agent availability does not imply Direct/Side-by-Side selectability"
+        "Arena reference behavior must match the target surface/harness; Agent availability does not imply Direct/Side-by-Side selectability",
+        "FAST_CANARY evidence should be externally graded by Control Tower; executor self-classification is not evidence",
+        "shallow-clone artifacts must be resolved before declaring unrelated Git histories"
       ],
       "rejected_ideas": [
         "Reddit/English-web monoculture presented as global consensus",
@@ -3283,7 +3285,8 @@
         "first-letter/last-letter, acrostic, encoded or role-play self-disclosure as model-identity proof",
         "prompt-injection or bypass tactics aimed at defeating intentional model non-disclosure",
         "exact model claims from writing style, one prompt, or self-report",
-        "cross-surface calibration that treats Text/Direct/Side-by-Side output as an Agent reference without matching variant and harness"
+        "cross-surface calibration that treats Text/Direct/Side-by-Side output as an Agent reference without matching variant and harness",
+        "accepting a tested executor's self-reported GREEN/KEEP verdict without independent evidence grading"
       ],
       "p2p_translation": "Implemented as GLOBAL_COMMUNITY_RESEARCH_V1 plus MODEL_IDENTITY_INFERENCE_BOUNDARY_V1 inside the existing Supreme Operations Notebook; no new research engine, scraper, router, benchmark service, or fingerprinting daemon.",
       "capability_family": "RESEARCH_AND_EXECUTOR_INTELLIGENCE",
@@ -3303,7 +3306,7 @@
       "roadmap_slot": "operations-law/research-and-executor-intelligence",
       "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED",
       "last_reviewed_at": "2026-09-22T00:00:00+00:00",
-      "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority. Correction 2026-09-22: Arena may add/remove models from Direct/Side-by-Side independently of the Agent pool; cross-surface references are not calibrated Agent ground truth. Five-trial read-only Arena FAST_CANARY experiment started 2026-09-22 to test whether one real-task-first probe meaningfully separates session quality without identifying the hidden model."
+      "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority. Correction 2026-09-22: Arena may add/remove models from Direct/Side-by-Side independently of the Agent pool; cross-surface references are not calibrated Agent ground truth. Five-trial read-only Arena FAST_CANARY experiment started 2026-09-22 to test whether one real-task-first probe meaningfully separates session quality without identifying the hidden model. Ten-chat Arena experiment completed 2026-09-22: external CT grades 6 GREEN / 1 YELLOW / 3 RED while every completed executor self-reported GREEN. Two RED sessions falsely inferred unrelated histories from shallow/incomplete clones; durable GitHub compare proves merge-base 2ac7ae4 and main ahead by 28. Canonical canary updated to evidence-only executor return plus independent CT grading."
     }
   ],
   "rejected_register_summary": {
