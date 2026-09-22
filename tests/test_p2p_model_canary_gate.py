@@ -32,8 +32,8 @@ class ModelCanaryGateTests(unittest.TestCase):
         self.assertIn("must not create a new router, benchmark", self.notebook)
 
     def test_canary_measures_session_not_hidden_model_identity(self):
-        for text in (self.notebook, self.arena):
-            self.assertIn("SESSION_QUALITY != MODEL_IDENTITY", text if text is self.notebook else self.notebook)
+        self.assertIn("SESSION_QUALITY != MODEL_IDENTITY", self.notebook)
+        self.assertIn("model identity", self.arena.lower())
         self.assertIn("MODEL_IDENTITY=UNKNOWN", self.arena)
         self.assertIn("never infers model/provider/reasoning level", self.arena)
         self.assertIn("never asks the tested Arena session to grade itself", self.arena)
