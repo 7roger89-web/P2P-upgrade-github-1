@@ -1715,6 +1715,20 @@ black-box interaction, use a bounded behavioral fingerprint instead:
    estimate stability; sampling/system-prompt/tool-wrapper effects must remain
    explicit uncertainties.
 
+   Arena surface boundary:
+
+   ```text
+   AGENT_POOL != DIRECT_SELECTOR
+   AGENT_POOL != SIDE_BY_SIDE_SELECTOR
+   REFERENCE_HARNESS_MUST_MATCH_TARGET_HARNESS
+   ```
+
+   A model listed for Agent Mode is not guaranteed to be selectable in Direct
+   or Side-by-Side, because Arena can add or remove models from those selector
+   surfaces independently. References captured from Text/Direct/Side-by-Side
+   must not be treated as calibrated Agent references unless the exact variant
+   and materially equivalent system/tool harness are established.
+
    For Arena specifically:
 
    ```text
