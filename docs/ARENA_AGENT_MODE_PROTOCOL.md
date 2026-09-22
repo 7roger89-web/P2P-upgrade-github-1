@@ -129,6 +129,43 @@ not be inferred from writing style, quality, tool use, or self-report. No
 model-selection requirement is added unless Arena later exposes explicit Agent
 Mode model selection.
 
+
+### 5.1 Session-quality canary for hidden/random Agent Mode
+
+Arena Agent Mode currently selects a dedicated orchestrator for a new chat and
+does not expose that orchestrator identity. Product behavior may also switch the
+underlying model when a response is likely to fail. Therefore P2P evaluates the
+observed session capability, not a guessed model identity.
+
+For a new Arena Agent session handling medium/high-risk work whose quality is
+not yet proven, apply notebook RULE 19 `MODEL_CANARY_GATE_V1` before material
+project mutation. Skip it for low-risk/mechanical tasks or when the real task
+itself is already the cheapest representative probe.
+
+The canary:
+
+- uses at most three tiny probes;
+- includes at least one task-representative probe;
+- keeps coding probes disposable/non-durable (no canary-only PR/commit);
+- may use a randomized animal × vehicle SVG probe only for relevant
+  visual/spatial work;
+- never treats the fixed pelican/bicycle prompt as a model ranking;
+- never asks the tested Arena session to grade itself; and
+- never infers model/provider/reasoning level from output style or quality.
+
+Return only observable classification:
+
+```text
+CANARY_CLASS=GREEN | YELLOW | ORANGE | RED
+MODEL_IDENTITY=UNKNOWN
+CAPABILITY_EVIDENCE=<tests/render/diff/tool/recovery evidence>
+SESSION_POLICY=KEEP_SESSION | LIMIT_SESSION | ADVISORY_ONLY | REROLL_OR_SWITCH
+```
+
+`RED` permits one evidence-justified fresh-session reroll by default; do not
+reroll repeatedly to gamble for a preferred hidden model.
+
+
 ## 6. Prompt architecture and routing
 
 The standard execution prompt is concise and follows:

@@ -1462,6 +1462,100 @@ This rule is an independent P2P operational abstraction. It does not import an
 external instruction architecture, mandatory per-turn metadata system,
 complexity scoring formula, autonomous baton loop, or monolithic prompt core.
 
+
+#### MODEL_CANARY_GATE_V1 — hidden/random executor session quality
+
+This gate is a bounded application of RULE 19. It measures whether the current
+execution session is trustworthy enough for the intended work. It is NOT a
+model-identification benchmark and must not create a new router, benchmark
+service, score database, or permanent harness.
+
+Canonical distinctions:
+
+```text
+SESSION_QUALITY != MODEL_IDENTITY
+MODEL_SELF_REPORT != MODEL_IDENTITY_EVIDENCE
+SELF_SCORE_IS_NOT_EVIDENCE
+FIXED_PELICAN_PROMPT != MODEL_RANKING
+CANARY_PASS != PERMANENT_EXECUTOR_CERTIFICATION
+```
+
+Use `MODEL_CANARY_GATE_V1` only when ALL are true:
+
+- the executor/model is hidden, random, newly sampled, or otherwise materially
+  uncertain for the current session;
+- the task is medium/high risk or materially expensive enough that a weak
+  session would cause meaningful rework; and
+- session quality has not already been established by representative evidence
+  under materially equivalent conditions.
+
+Skip the gate for low-risk/mechanical work, already-proven session conditions,
+or when the real bounded task itself is already the cheapest representative
+probe.
+
+Probe discipline:
+
+1. Use at most three tiny probes and prefer one task-representative probe over a
+   generic puzzle.
+2. For coding work, evidence should come from real tool use such as a disposable
+   scratch edit, focused test, diff inspection, or recovery from a genuine
+   command/tool error. Do not create durable commits/PRs merely for the canary.
+3. For visual/spatial work, an animal × vehicle SVG variant may be used as ONE
+   probe when that capability is relevant. Randomize the animal/vehicle pair;
+   the canonical "pelican riding a bicycle" prompt alone is saturated and must
+   never be treated as a general model ranking.
+4. Judge externally observable evidence: correctness, constraint adherence,
+   actual tool receipts, render/test result, self-verification, recovery, and
+   unnecessary scope expansion. The tested model must not grade itself.
+5. Do not infer an exact model name, provider, or reasoning level from writing
+   style, output quality, token use, or tool behavior. Arena may also switch the
+   underlying model to recover a failing session; the canary therefore
+   classifies the observed SESSION/HARNESS capability, not a stable hidden
+   model identity.
+
+Decision classes:
+
+```text
+GREEN  = critical representative probes pass; claims are evidence-backed;
+         no material tool hallucination; verification/recovery is trustworthy
+YELLOW = core probe passes with a non-critical weakness; bounded execution is
+         allowed but requires independent verification
+ORANGE = mixed/fragile evidence; advisory or low-risk bounded work only
+RED    = wrong result/scope, fabricated verification, material tool
+         hallucination, or unrecovered/repeated failure; do not entrust the
+         intended medium/high-risk task to this session
+```
+
+Routing after classification:
+
+```text
+GREEN  -> KEEP_SESSION
+YELLOW -> LIMIT_SESSION + INDEPENDENT_VERIFY
+ORANGE -> ADVISORY_OR_LOW_RISK_ONLY
+RED    -> REROLL_OR_SWITCH_EXECUTOR
+```
+
+A RED result may justify ONE fresh-session reroll when the expected benefit is
+material and quota/cost permits. Do not create a slot-machine loop that keeps
+opening sessions until a desired hidden model is guessed. Further rerolls
+require new evidence that they are cheaper/safer than switching executor or
+reducing scope.
+
+DesignArena exception:
+
+```text
+DESIGNARENA_TOURNAMENT != ARENA_AGENT_SESSION_CANARY
+```
+
+For DesignArena's blind tournament, the real bounded design prompt is the
+selection test. Give every sampled model the same prompt and judge the rendered
+product/workflow against a fixed acceptance matrix. Do not run a separate
+pelican canary first, do not infer hidden model identity before voting, and do
+not prefer a design because of a guessed provider/model. A specialized SVG
+animal × vehicle probe is appropriate only when SVG spatial composition itself
+is the target capability.
+
+
 ### RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION
 
 The beginner Owner selects an executor with one natural command. The project

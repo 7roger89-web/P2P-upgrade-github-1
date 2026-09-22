@@ -48,12 +48,13 @@ The assurance/release loop is separate:
 
 Khi chọn DesignArena cho frontend/sản phẩm, route theo bounded outcome thay vì mặc định chọn Full-Stack:
 
-- Web Apps: mặc định cho app shell và vertical slice frontend không cần persistence.
+- Website → Pro: mặc định cho app shell và vertical slice React cần reprompt/iterate nhưng chưa cần persistence.
+- Website → Fast: chỉ cho proof ý tưởng rất nhỏ khi một HTML file là đủ.
 - UI Component: chỉ dùng khi một widget khó đáng một trận thiết kế riêng.
 - Data Visualization: dùng cho timeline, comparison matrix, lineage hoặc vùng phân tích dày.
-- Image-to-App: chỉ dùng khi đã có visual reference thắng và fidelity rebuild có giá trị.
-- Full-Stack: dùng khi database/auth/storage là acceptance thật; không để Supabase template tự biến thành product architecture.
-- Agent Mode + GitHub: dùng cho tích hợp bền vững vào repo và bounded branch/PR.
+- Image-to-App: chỉ dùng khi bề mặt hiện tại hỗ trợ, đã có visual reference thắng và fidelity rebuild có giá trị.
+- Website → Max: dùng khi auth/database/persistence là acceptance thật; không chọn Max chỉ vì sản phẩm được gọi là “full app”.
+- DesignArena không bao gồm Arena AI Agent Mode. Khi đã chốt winner, Control Tower rời DesignArena và chọn executor tích hợp riêng phù hợp với repo/runtime.
 
 Cẩm nang chi tiết: `docs/p2p-development/DESIGNARENA-EXECUTION-PLAYBOOK.md`.
 
