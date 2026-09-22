@@ -157,23 +157,33 @@ The canary:
 - never asks the tested Arena session to grade itself; and
 - never infers model/provider/reasoning level from output style or quality.
 
-FAST_CANARY default return:
+FAST_CANARY executor return:
 
 ```text
-FAST_CANARY_V1
-CANARY_RESULT=GREEN | YELLOW | RED
+CANARY_EVIDENCE_PACKET_V1
+P2P_LAW_SOURCE=<actual source read>
+CURRENT_STATE=<pinned repo/task state>
+FACTS=<max 5 brief observed facts>
+DECISIVE_CHECK=<one focused real check>
+CHECK_RESULT=<actual result>
+ERRORS_ENCOUNTERED=<brief or NONE>
+RECOVERY_ACTIONS=<brief or NONE>
+DURABLE_MUTATION_CREATED=YES | NO
 MODEL_IDENTITY=UNKNOWN
-FACTS=<brief task-relevant evidence>
-CHECK=<one focused test/render/read-only verification + result>
-TOOL_HALLUCINATION=YES | NO
-UNNECESSARY_SCOPE=YES | NO
-NEXT=CONTINUE_REAL_TASK | LIMIT_TASK | REROLL_OR_SWITCH
 ```
 
-If `GREEN`, continue the real task immediately in the same session; do not
-stop solely to ask the Owner for permission to continue work already authorized
-by the task contract. Use the fuller `GREEN|YELLOW|ORANGE|RED` classification
-only when the gate actually needed multiple probes.
+The tested Arena session does not grade itself. Control Tower independently
+validates the evidence and assigns GREEN/YELLOW/RED (or ORANGE only for a
+multi-probe mixed case), then chooses KEEP/LIMIT/REROLL.
+
+For Git-history probes, an empty local merge-base from a shallow Arena clone is
+not evidence of unrelated histories. Check shallow-clone state first and
+deepen/unshallow or use durable remote ancestry evidence before making that
+claim.
+
+If Control Tower assigns `GREEN`, continue the real task immediately in the
+same session; do not stop solely to ask the Owner for permission to continue
+work already authorized by the task contract.
 
 `RED` permits one evidence-justified fresh-session reroll by default; do not
 reroll repeatedly to gamble for a preferred hidden model.
