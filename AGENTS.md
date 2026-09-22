@@ -37,6 +37,10 @@ promise that an uncertain recommendation is guaranteed to be optimal.
   numerical limits, prices, or model-bug labels into active skills or routing.
 - Treat repeated AI research reports as search routes, not independent votes.
   Never average exact prices or incomparable benchmark results.
+- For broad forum/community research, apply `GLOBAL_COMMUNITY_RESEARCH_V1`:
+  do not equate Reddit/English results with the global web; diversify by
+  independent community ecosystem and local-language search when useful, while
+  keeping forums as lived-experience evidence rather than factual authority.
 - Keep PXPIPE, hooks, proxying, external downloads, and dependency installation
   disabled until the user explicitly requests them and the relevant component
   passes security and compatibility review.
@@ -94,6 +98,11 @@ and stop when sufficient.
   `GREEN|YELLOW|ORANGE|RED`; never infer exact hidden model/provider/reasoning
   level from style or quality, never self-score, and never reroll repeatedly to
   gamble for a preferred model. Skip the gate for low-risk/mechanical work.
+- `HIDDEN MODEL IDENTITY`: apply `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`.
+  Self-reported names, first/last-letter tricks, obfuscated disclosure, and
+  writing-style guesses are not identity evidence. Prefer official reveal when
+  available; otherwise use bounded behavioral fingerprinting with an
+  `UNKNOWN` outcome only when model-family inference has material value.
 - `OTHER EXECUTORS`: use an observed executor profile when available; do not
   copy resource tactics across executors without evidence.
 - Control Tower must know the executor before writing its task packet. Lower

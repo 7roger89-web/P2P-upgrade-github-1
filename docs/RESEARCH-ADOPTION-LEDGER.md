@@ -128,6 +128,21 @@ vendored. Details live in
 | RA-EXT-097 | Mouseww/anything-analyzer | DEFERRED | none (second traffic stack not adopted by default) | no capability ID, no backend reference, no install |
 | RA-EXT-098 | Reqable/reqable-mcp-server | DEFERRED | none (no SPDX license exposed by repository metadata) | reference only; bridge lookup fails closed until the license is resolved |
 
+### 4.6 Global community research + model fingerprinting (RA-EXT-099)
+
+Appended projection of the Owner-selected research direction adopted on
+2026-09-22. The JSON ledger remains authoritative.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-099 | Global multilingual community research + black-box LLM fingerprinting | IMPLEMENTED | adaptive cross-community/local-language search; primary-vs-community evidence separation; bounded behavioral fingerprinting with confidence/UNKNOWN | `GLOBAL_COMMUNITY_RESEARCH_V1` + `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`; no scraper/router/benchmark daemon |
+
+Research inputs included primary Arena documentation and USENIX Security
+LLMmap research, plus community/practitioner evidence from German, Russian,
+South African, Japanese, Taiwanese, Brazilian and other technical ecosystems.
+The implementation explicitly rejects fixed-country whitelists and treats
+forum claims as lived-experience signals unless independently corroborated.
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
