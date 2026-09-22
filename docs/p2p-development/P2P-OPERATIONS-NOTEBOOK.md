@@ -970,11 +970,26 @@ The beginner must never infer where a prompt should go.
 
 ### RULE 02 — CHAT_TITLE_REQUIRED
 
-Every new execution chat gets a recognizable title. Default shape:
+Every new execution chat gets a recognizable title. For Arena `NEW_CHAT`,
+the title must also be the first nonblank line of the prompt so the generated
+conversation is useful in the Arena sidebar without manual renaming.
+
+Default Arena shape:
 
 ```text
-PROJECT | PR-or-TASK | ROLE | SHORT-GOAL
+PROJECT — SHORT-GOAL
+
+GỬI CHO: ARENA AI
+PROJECT=PROJECT
+CHAT_MODE=NEW_CHAT
+CHAT_TITLE=PROJECT — SHORT-GOAL
 ```
+
+Front-load the distinguishing project/task words. Do not put `GỬI CHO:`,
+`DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P` prefix on the
+first line. Other destinations may retain their verified naming convention
+when they expose an explicit title field or do not derive the title from the
+opening prompt.
 
 ### RULE 03 — SAME_CHAT_MUST_NAME_CHAT
 
