@@ -1714,6 +1714,22 @@ black-box interaction, use a bounded behavioral fingerprint instead:
    under materially similar settings when possible. Repeat only enough to
    estimate stability; sampling/system-prompt/tool-wrapper effects must remain
    explicit uncertainties.
+
+   For Arena specifically:
+
+   ```text
+   AGENT_POOL != DIRECT_SELECTOR
+   AGENT_POOL != SIDE_BY_SIDE_SELECTOR
+   REFERENCE_HARNESS_MUST_MATCH_TARGET_HARNESS
+   ```
+
+   A model appearing on the Agent leaderboard does not imply that the same
+   model/variant is selectable in Direct or Side-by-Side. Arena explicitly
+   allows models to be added/removed from those selector surfaces independently.
+   Therefore a Direct/Side-by-Side/Battle output must not be treated as a
+   calibrated reference for an Agent orchestrator unless the exact model
+   identity/variant AND materially equivalent harness/system/tool conditions are
+   established. Cross-surface resemblance is exploratory evidence only.
 5. Report a ranked candidate set or family-level estimate with confidence and
    an `UNKNOWN` option. Never upgrade behavioral resemblance into exact model
    identity without direct evidence.
