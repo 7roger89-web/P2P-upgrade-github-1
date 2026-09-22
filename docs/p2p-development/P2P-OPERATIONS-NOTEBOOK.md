@@ -1619,26 +1619,55 @@ Probe discipline:
    model identity.
 
 
-FAST_CANARY default return shape:
+FAST_CANARY executor return shape:
 
 ```text
-FAST_CANARY_V1
-CANARY_RESULT=GREEN | YELLOW | RED
-FACTS=<brief task-relevant facts observed through tools>
-CHECK=<one representative test/render/read-only verification + result>
-TOOL_HALLUCINATION=YES | NO
-UNNECESSARY_SCOPE=YES | NO
-NEXT=CONTINUE_REAL_TASK | LIMIT_TASK | REROLL_OR_SWITCH
+CANARY_EVIDENCE_PACKET_V1
+P2P_LAW_SOURCE=<actual source read>
+CURRENT_STATE=<pinned repo/task state>
+FACTS=<max 5 task-relevant observed facts>
+DECISIVE_CHECK=<one representative real check>
+CHECK_RESULT=<actual result/exit/status>
+ERRORS_ENCOUNTERED=<brief or NONE>
+RECOVERY_ACTIONS=<brief or NONE>
+DURABLE_MUTATION_CREATED=YES | NO
+MODEL_IDENTITY=UNKNOWN
 ```
 
-`ORANGE` remains available to the fuller three-probe classification when
-evidence is mixed across multiple probes. The FAST_CANARY one-probe path uses
-`GREEN|YELLOW|RED` so the Owner does not have to interpret a four-level score
-for a simple keep/limit/reroll decision.
+The tested executor MUST NOT assign itself GREEN/YELLOW/RED or KEEP/LIMIT/REROLL.
+That classification belongs to Control Tower or another independent verifier:
 
-If FAST_CANARY is `GREEN`, continue the already-authorized real task in the
-same session without asking the Owner again merely because the canary ended.
-Normal task scope, Owner Gates, and merge/deploy authority still apply.
+```text
+EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN
+CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER
+CANARY_CLASSIFICATION=GREEN | YELLOW | RED | ORANGE
+SESSION_POLICY=KEEP_SESSION | LIMIT_SESSION | ADVISORY_OR_LOW_RISK_ONLY | REROLL_OR_SWITCH_EXECUTOR
+```
+
+If independent verification is unavailable, the result is `UNVERIFIED`, not
+implicitly GREEN.
+
+`ORANGE` remains available to the fuller multi-probe classification when
+evidence is mixed across multiple probes. FAST_CANARY normally needs only
+GREEN/YELLOW/RED after independent grading.
+
+If Control Tower classifies FAST_CANARY as `GREEN`, continue the
+already-authorized real task in the same session without asking the Owner again
+merely because the canary ended. Normal task scope, Owner Gates, and
+merge/deploy authority still apply.
+
+Git-history guard for shallow sandboxes:
+
+```text
+SHALLOW_CLONE_ANOMALY != REPOSITORY_HISTORY_FACT
+EMPTY_LOCAL_MERGE_BASE_ON_SHALLOW_CLONE != UNRELATED_HISTORIES
+```
+
+Before concluding that two refs have unrelated histories, first inspect
+`git rev-parse --is-shallow-repository`. If the clone is shallow, either
+deepen/unshallow enough for the relevant ancestry or cross-check against durable
+remote ancestry/compare evidence. An empty merge-base from incomplete local
+history is a tool-environment artifact, not a repository fact.
 
 Decision classes:
 
