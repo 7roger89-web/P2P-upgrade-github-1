@@ -168,6 +168,22 @@ Upstream provenance: `REPO=markfulton/ai-employees`,
 | RA-EXT-100 | markfulton/ai-employees @ `edffe8f` (MIT) | RESEARCHED | 15 patterns classified KEEP 4 / ADAPT 2 / ALREADY_COVERED 7 / DEFER 2; nothing adopted | completed source study, zero runtime; reuse mapped to `decision_trace` freshness, `fw06` pause, the existing execution ledger + fingerprint idempotency, `experience_evolution`, and the typed capability registry |
 | RA-EXT-101 | `PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT` (candidate direction) | DEFERRED | cadence identity (period key + window/day eligibility + once-per-period `RUN` / `SKIP` decision) specified, not implemented | re-entry trigger recorded: a period-form obligation, a real firing source that can fire late or twice, not already decided by freshness, and a written period-vs-identity boundary |
 
+### 4.8 Domain capability admission batch 2026-09-23 (RA-EXT-102)
+
+Appended projection of the assimilation produced by
+`P2P_DOMAIN_CAPABILITY_ADMISSION_01` (Issue #245). The JSON ledger remains the
+authority; this table is its derived view for this batch. The motivating
+target-domain evidence comes from VNLAW Issue #75 / #81 / #84 and PR #86 and is
+assimilated domain-neutrally: nothing was installed, vendored, executed, or
+added to the P2P runtime, and no benchmark service, router, registry, or daemon
+was created. At Writer stage the canonical subsection exists in the Issue #245
+PR while `RULE_ASSIMILATION_STATUS=PENDING`; independent Control Tower
+verification of the exact PR head/tree precedes any `VERIFIED` claim.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-102 | `DOMAIN_CAPABILITY_ADMISSION_V1` — cross-project capability-admission lesson (OpenJev/VNLAW evidence) | IMPLEMENTED | target-domain proof; cheap credible baseline first; frozen evaluation set; predeclared promotion criteria; observe-before-control; routing vs domain authority; abstention valid; complexity/value gate | one bounded subsection under notebook RULE 19 + PENDING `BACKLOG_J` assimilation entry; rejected: upstream benchmark as target proof, cross-domain extrapolation, runtime success as product value, global OpenJev install, classifier as domain truth authority |
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:

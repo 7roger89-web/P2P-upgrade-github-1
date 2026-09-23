@@ -124,7 +124,8 @@ class P2POperationsNotebookTests(unittest.TestCase):
         ids = [entry["id"] for entry in ledger["entries"]]
         self.assertEqual(set(ids), {"BACKLOG_A", "BACKLOG_B", "BACKLOG_C",
                                     "BACKLOG_D", "BACKLOG_E", "BACKLOG_F",
-                                    "BACKLOG_G", "BACKLOG_H", "BACKLOG_I"})
+                                    "BACKLOG_G", "BACKLOG_H", "BACKLOG_I",
+                                    "BACKLOG_J"})
         backlog_h = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_H")
         self.assertEqual(backlog_h["item"], "ARENA_TASK_COMPLETION_DIALOG")
         self.assertEqual(backlog_h["status"], "VERIFIED")
@@ -139,6 +140,30 @@ class P2POperationsNotebookTests(unittest.TestCase):
             self.assertIn(entry["status"], LEDGER_STATUSES, entry["id"])
             self.assertIsInstance(entry["evidence"], list)
             self.assertTrue(entry["evidence"], entry["id"])
+
+    def test_rule19_domain_capability_admission_is_a_bounded_subsection(self) -> None:
+        # Issue #245 adds DOMAIN_CAPABILITY_ADMISSION_V1 as ONE subsection under
+        # RULE 19. It must not become a new top-level numbered rule, and it must
+        # sit inside RULE 19's span (before RULE 20).
+        self.assertIn("#### DOMAIN_CAPABILITY_ADMISSION_V1", self.notebook_text)
+        rule19 = self.notebook_text.index("### RULE 19 — REALITY_FIRST_CAPABILITY_PROBE")
+        rule20 = self.notebook_text.index("### RULE 20 — OWNER_EXECUTOR_SELECTION")
+        admission = self.notebook_text.index("#### DOMAIN_CAPABILITY_ADMISSION_V1")
+        self.assertLess(rule19, admission)
+        self.assertLess(admission, rule20)
+        # Subsections of RULE 19 use level-4 headings; a promotion to level 3
+        # would create a new numbered rule. Match at line start: "#### X"
+        # contains "### X" as a substring.
+        self.assertIsNone(
+            re.search(r"^### DOMAIN_CAPABILITY_ADMISSION_V1\b", self.notebook_text, re.M)
+        )
+        for law in (
+            "CROSS_DOMAIN_SUCCESS != TARGET_DOMAIN_PROOF",
+            "NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST",
+            "CAN_RUN != WORKS_FOR_TARGET_TASK",
+            "TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS",
+        ):
+            self.assertIn(law, self.notebook_text, law)
 
     def test_install_inheritance_through_agents_md_entrypoint(self) -> None:
         # install.sh / install.ps1 read the thin package file
