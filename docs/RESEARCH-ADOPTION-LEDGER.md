@@ -176,13 +176,13 @@ authority; this table is its derived view for this batch. The motivating
 target-domain evidence comes from VNLAW Issue #75 / #81 / #84 and PR #86 and is
 assimilated domain-neutrally: nothing was installed, vendored, executed, or
 added to the P2P runtime, and no benchmark service, router, registry, or daemon
-was created. At Writer stage the canonical subsection exists in the Issue #245
-PR while `RULE_ASSIMILATION_STATUS=PENDING`; independent Control Tower
-verification of the exact PR head/tree precedes any `VERIFIED` claim.
+was created. Control Tower independently verified PR #246 exact Writer head
+`d14b5e89d14f84dc70d4eb53fda978e4f7b2060a` in comment `5793604664` before
+`BACKLOG_J` was flipped to `RULE_ASSIMILATION_STATUS=VERIFIED`.
 
 | ID | Source | Status | Selection | Translation |
 | --- | --- | --- | --- | --- |
-| RA-EXT-102 | `DOMAIN_CAPABILITY_ADMISSION_V1` — cross-project capability-admission lesson (OpenJev/VNLAW evidence) | IMPLEMENTED | target-domain proof; cheap credible baseline first; frozen evaluation set; predeclared promotion criteria; observe-before-control; routing vs domain authority; abstention valid; complexity/value gate | one bounded subsection under notebook RULE 19 + PENDING `BACKLOG_J` assimilation entry; rejected: upstream benchmark as target proof, cross-domain extrapolation, runtime success as product value, global OpenJev install, classifier as domain truth authority |
+| RA-EXT-102 | `DOMAIN_CAPABILITY_ADMISSION_V1` — cross-project capability-admission lesson (OpenJev/VNLAW evidence) | IMPLEMENTED | target-domain proof; cheap credible baseline first; frozen evaluation set; predeclared promotion criteria; observe-before-control; routing vs domain authority; abstention valid; complexity/value gate | one bounded subsection under notebook RULE 19 + independently verified `BACKLOG_J` assimilation entry; rejected: upstream benchmark as target proof, cross-domain extrapolation, runtime success as product value, global OpenJev install, classifier as domain truth authority |
 
 ## 5. Rejected / non-adopted register (preserved)
 
