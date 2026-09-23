@@ -386,6 +386,69 @@ def _law_receipt_line(receipt: Mapping[str, Any]) -> str:
     )
 
 
+def check_target_law_freshness(
+    root: Path | str,
+    target_project: Path | str,
+    *,
+    package_root: Path | str | None = None,
+) -> dict[str, str]:
+    """Check freshness of target project's portable law against reachable canonical law."""
+    root_path = Path(root).resolve()
+    target_path = Path(target_project).resolve()
+    canonical_notebook = root_path / CANONICAL_NOTEBOOK_REL
+    if not canonical_notebook.is_file() and package_root:
+        canonical_notebook = Path(package_root).resolve() / CANONICAL_NOTEBOOK_REL
+    if not canonical_notebook.is_file():
+        return {
+            "status": "BLOCKED",
+            "canonical_law_sha256": UNKNOWN,
+            "target_law_sha256": UNKNOWN,
+            "reason": "CANONICAL_NOTEBOOK_UNREACHABLE",
+        }
+    canonical_sha = hashlib.sha256(canonical_notebook.read_bytes()).hexdigest()
+    target_portable = target_path / PORTABLE_NOTEBOOK_REL
+    if not target_portable.is_file():
+        return {
+            "status": "INLINE",
+            "canonical_law_sha256": canonical_sha,
+            "target_law_sha256": "NONE",
+            "reason": "TARGET_PORTABLE_MISSING",
+        }
+    try:
+        content = target_portable.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return {
+            "status": "INLINE",
+            "canonical_law_sha256": canonical_sha,
+            "target_law_sha256": "UNREADABLE",
+            "reason": "TARGET_PORTABLE_UNREADABLE",
+        }
+    target_sha = UNKNOWN
+    for line in content.splitlines()[:25]:
+        if line.startswith("SOURCE_CONTENT_SHA256="):
+            target_sha = line.split("=", 1)[1].strip()
+            break
+    if target_sha == canonical_sha:
+        return {
+            "status": "CURRENT",
+            "canonical_law_sha256": canonical_sha,
+            "target_law_sha256": target_sha,
+        }
+    return {
+        "status": "INLINE",
+        "canonical_law_sha256": canonical_sha,
+        "target_law_sha256": target_sha,
+        "reason": "TARGET_PORTABLE_STALE",
+    }
+
+
+def format_target_law_freshness_receipt(freshness: Mapping[str, str]) -> str:
+    status = freshness.get("status", "BLOCKED")
+    c_sha = freshness.get("canonical_law_sha256", UNKNOWN)
+    t_sha = freshness.get("target_law_sha256", UNKNOWN)
+    return f"TARGET_LAW_FRESHNESS={status}; CANONICAL_LAW_SHA256={c_sha}; TARGET_LAW_SHA256={t_sha}"
+
+
 def _experience_summary(root: Path, task_text: str) -> dict[str, Any]:
     """Retrieve bounded ACTIVE experience without making it execution authority."""
 

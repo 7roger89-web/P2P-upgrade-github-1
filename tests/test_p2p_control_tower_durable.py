@@ -15,6 +15,7 @@ for candidate in (str(SYSTEM_ROOT), str(SCRIPTS_ROOT)):
     if candidate not in sys.path:
         sys.path.insert(0, candidate)
 
+import p2p_control_tower  # noqa: F401
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     BindingError,
     ControlTower,

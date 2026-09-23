@@ -59,6 +59,21 @@ Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool 
 - `CONTROL_TOWER_SELF_LAW_RECEIPT=PASS` (when serialized by Control Tower) proves only the parent Control Tower's own preflight; it never proves executor preflight and never substitutes for `P2P_LAW_PREFLIGHT`
 - No actor may fake, infer, or copy another actor's receipt/source. Only an actually performed read counts
 - If no valid law source can be established for the current actor, stop at `LAW_CONTEXT_BLOCKED`
+- Every actor must visibly emit its own self-read receipt before first substantive work:
+  `LAW_CHECK=PASS | SOURCE=<actual source> | SOURCE_SHA256=<canonical source content sha256>`
+  or: `LAW_CHECK=BLOCKED | REASON=<reason>`
+- A portable PASS must bind to the recorded `SOURCE_CONTENT_SHA256` from `.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`. A stale portable copy cannot produce PASS
+
+## Remote repo-scoped handoff freshness
+
+- Before delegating to a repo-scoped remote executor that may not reach canonical P2P, the parent Control Tower/prompt writer must fresh-compare this projection's source identity with reachable canonical law.
+- If this projection is stale or missing and an authorized repository write path is available, refresh the generated portable notebook and managed AGENTS block before handoff.
+- If refresh cannot be performed safely, mark the portable projection stale/missing and hand off a fresh SUPREME_LAW_CAPSULE; the executor must not rely on a known-stale portable copy.
+- An authenticated GitHub connector may perform the repository refresh without a local clone; do not add a daemon, registry, GitHub Action, PAT, or new secret solely for projection freshness.
+- Parent delegation surfaces handoff freshness receipt:
+  `TARGET_LAW_FRESHNESS=CURRENT | REFRESHED | INLINE | BLOCKED`
+  `CANONICAL_LAW_SHA256=<sha256>`
+  `TARGET_LAW_SHA256=<sha256>`
 
 ## Universal invariants
 
@@ -111,13 +126,21 @@ Native `/goal` is session continuation only. It creates no new P2P authority, do
 
 ## Evidence-grounded experience auto-reuse
 
-For a non-trivial P2P-managed task, after valid law/task-state preflight and before substantive execution, use the installed experience helper when present:
+For a non-trivial P2P-managed task, after valid law/task-state preflight and before substantive execution:
 
-`python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<bounded current task>"`
+1. Lookup bounded ACTIVE experience:
+   - When installed runtime is present: run `python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<bounded current task>"`
+   - In a repo-scoped remote clone without installed runtime: read `.p2p/portable/P2P-EXPERIENCE-CAPSULE.json` directly and match task triggers against promoted ACTIVE records.
+2. Emit observable preflight receipt before substantive execution:
+   `EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<id,...>`
+   or: `EXPERIENCE_CHECK=NO_MATCH`
+   or: `EXPERIENCE_CHECK=UNAVAILABLE`
 
-This lookup is read-only. It considers project-local `ACTIVE` experience and, when the packaged federation runtime/catalog is present, matching promoted shared experience. Local `QUARANTINED` or `SUPERSEDED` state wins over shared catalog content. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
+This lookup is read-only. It considers project-local `ACTIVE` experience and, when the packaged federation runtime/catalog or portable experience capsule is present, matching promoted shared experience. Local `QUARANTINED` or `SUPERSEDED` state wins over shared catalog content. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
 
-After a task, do not manufacture memory from routine success. Create an experience `CANDIDATE` only when a repeated/material failure or clearly reusable correction has independent evidence. Model self-report, chat summary, or verbal confidence alone is not proof. A candidate is inert until verification supplies `BEHAVIOR_PROOF + REGRESSION_PROOF + CHALLENGE_PROOF`; only then may it transition `VERIFIED -> ACTIVE`.
+At task reconciliation, close the learning loop:
+- `ROUTINE_SUCCESS` => emit `LEARNING_RECONCILIATION=NONE`; do not manufacture memory from routine success.
+- `REPEATED_OR_MATERIAL_FAILURE` / `CLEARLY_REUSABLE_CORRECTION` => emit `LEARNING_RECONCILIATION=CANDIDATE` with evidence and trigger conditions, or provide an explicit evidence-based reason why no reusable lesson exists. Create an experience `CANDIDATE` only when a repeated/material failure or clearly reusable correction has independent evidence. Model self-report, chat summary, or verbal confidence alone is not proof. A candidate is inert until verification supplies `BEHAVIOR_PROOF + REGRESSION_PROOF + CHALLENGE_PROOF`; only then may it transition `VERIFIED -> ACTIVE`.
 
 The same helper exposes bounded lifecycle commands: `candidate`, `verify`, `activate`, `use`, `quarantine`, and `supersede`. Record whether an ACTIVE experience `HELPED`, was `NEUTRAL`, or `HARMED` using evidence from the new run. One harmful run recommends review but does not automatically erase history. Quarantine or supersession requires evidence and remains append-only.
 

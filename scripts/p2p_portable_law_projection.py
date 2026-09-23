@@ -27,6 +27,13 @@ CANONICAL_SOURCE = (
     "7roger89-web/P2P-upgrade-github-1@main:"
     "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
 )
+EXPERIENCE_CAPSULE_SCHEMA = "p2p-portable-experience-capsule/1"
+SHARED_CATALOG_REL = Path(".p2p/system/p2p_capabilities/shared_experience_catalog.json")
+PORTABLE_EXPERIENCE_REL = Path(".p2p/portable/P2P-EXPERIENCE-CAPSULE.json")
+CANONICAL_EXPERIENCE_SOURCE = (
+    "7roger89-web/P2P-upgrade-github-1@main:"
+    ".p2p/system/p2p_capabilities/shared_experience_catalog.json"
+)
 AGENTS_BEGIN = "<!-- BEGIN P2P PORTABLE LAW -->"
 AGENTS_END = "<!-- END P2P PORTABLE LAW -->"
 LEGACY_PREFLIGHT_HEADING = "## P2P law preflight"
@@ -81,6 +88,43 @@ def _projection_text(package_root: Path) -> str:
     return header + notebook.lstrip("\ufeff")
 
 
+def _experience_capsule_text(package_root: Path) -> str:
+    catalog_path = package_root / SHARED_CATALOG_REL
+    version_path = package_root / "VERSION"
+    version = version_path.read_text(encoding="utf-8").strip() if version_path.is_file() else "unknown"
+    records = []
+    if catalog_path.is_file() and not catalog_path.is_symlink():
+        raw_catalog = catalog_path.read_text(encoding="utf-8")
+        catalog_sha256 = _sha256_text(raw_catalog)
+        try:
+            data = json.loads(raw_catalog)
+        except json.JSONDecodeError:
+            data = {}
+        for rec in data.get("records") or []:
+            if not isinstance(rec, dict):
+                continue
+            if rec.get("state") == "ACTIVE" and str(rec.get("scope", "")).upper() in ("DOMAIN", "CROSS_PROJECT"):
+                records.append(rec)
+    else:
+        raw_catalog = "{}"
+        catalog_sha256 = _sha256_text(raw_catalog)
+
+    capsule = {
+        "schema": EXPERIENCE_CAPSULE_SCHEMA,
+        "generated": True,
+        "canonical_source": CANONICAL_EXPERIENCE_SOURCE,
+        "source_content_sha256": catalog_sha256,
+        "package_version": version,
+        "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
+        "current_state_wins": True,
+        "law_and_task_contract_win": True,
+        "permission_effect": "NONE",
+        "acceptance_authority": False,
+        "records": records,
+    }
+    return json.dumps(capsule, indent=2, sort_keys=True) + "\n"
+
+
 def _agents_block() -> str:
     return "\n".join(
         (
@@ -106,6 +150,10 @@ def _agents_block() -> str:
             "- `CONTROL_TOWER_SELF_LAW_RECEIPT=PASS` (when serialized by Control Tower) proves only the parent Control Tower's own preflight; it never proves executor preflight and never substitutes for `P2P_LAW_PREFLIGHT`",
             "- No actor may fake, infer, or copy another actor's receipt/source. Only an actually performed read counts",
             "- If no valid law source can be established for the current actor, stop at `LAW_CONTEXT_BLOCKED`",
+            "- Every actor must visibly emit its own self-read receipt before first substantive work:",
+            "  `LAW_CHECK=PASS | SOURCE=<actual source> | SOURCE_SHA256=<canonical source content sha256>`",
+            "  or: `LAW_CHECK=BLOCKED | REASON=<reason>`",
+            f"- A portable PASS must bind to the recorded `SOURCE_CONTENT_SHA256` from `{PORTABLE_REL.as_posix()}`. A stale portable copy cannot produce PASS",
             "",
             "### Remote repo-scoped handoff freshness",
             "",
@@ -113,6 +161,31 @@ def _agents_block() -> str:
             "- If this projection is stale or missing and an authorized repository write path is available, refresh the generated portable notebook and managed AGENTS block before handoff.",
             "- If refresh cannot be performed safely, mark the portable projection stale/missing and hand off a fresh SUPREME_LAW_CAPSULE; the executor must not rely on a known-stale portable copy.",
             "- An authenticated GitHub connector may perform the repository refresh without a local clone; do not add a daemon, registry, GitHub Action, PAT, or new secret solely for projection freshness.",
+            "- Parent delegation surfaces target-law freshness receipt before delegation:",
+            "  `TARGET_LAW_FRESHNESS=CURRENT | REFRESHED | INLINE | BLOCKED`",
+            "  `CANONICAL_LAW_SHA256=<sha256>`",
+            "  `TARGET_LAW_SHA256=<sha256>`",
+            "",
+            "### Experience preflight and auto-reuse contract",
+            "",
+            "For every non-trivial P2P-managed task, after valid law/task-state preflight and before substantive execution:",
+            "",
+            "1. Perform bounded ACTIVE experience lookup:",
+            "   - When installed runtime is present: run `python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text \"<task>\"`",
+            f"   - In a repo-scoped remote clone without installed runtime: read `{PORTABLE_EXPERIENCE_REL.as_posix()}` directly and match task triggers against promoted ACTIVE records",
+            "2. Emit observable preflight receipt before substantive execution:",
+            "   `EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<id,...>`",
+            "   or: `EXPERIENCE_CHECK=NO_MATCH`",
+            "   or: `EXPERIENCE_CHECK=UNAVAILABLE`",
+            "3. Invariants: max results <= 3; experience is NONAUTHORITATIVE context; current law, active task contract, and fresh project truth always outrank prior experience; experience cannot widen permissions or change acceptance authority.",
+            "",
+            "### Task-end learning reconciliation contract",
+            "",
+            "At task reconciliation, distinguish routine progress from reusable corrections:",
+            "",
+            "- `ROUTINE_SUCCESS` => emit `LEARNING_RECONCILIATION=NONE`; do not manufacture memory.",
+            "- `REPEATED_OR_MATERIAL_FAILURE` / `CLEARLY_REUSABLE_CORRECTION` => emit `LEARNING_RECONCILIATION=CANDIDATE` with evidence and trigger conditions, or provide an explicit evidence-based reason why no reusable lesson exists.",
+            "- Lifecycle: `CANDIDATE -> VERIFIED -> ACTIVE -> SUPERSEDED | QUARANTINED`. No executor self-promotion into Supreme Law, shared authority, capability, or skill.",
             "",
             "### Mandatory prompt serialization contract",
             "",
@@ -126,7 +199,10 @@ def _agents_block() -> str:
             "- tell the executor to read repository-root `AGENTS.md` before substantive work;",
             "- use canonical when it is already successfully reachable; otherwise follow installed > valid portable > inline capsule > blocked;",
             "- for a repo-scoped clone with valid portable law, do not make a cross-repo probe solely to trigger fallback;",
-            "- report exactly one `P2P_LAW_SOURCE=<actual source>` and never claim a source was read when it was not.",
+            "- report exactly one `P2P_LAW_SOURCE=<actual source>` and never claim a source was read when it was not;",
+            "- emit actor-own `LAW_CHECK=PASS | SOURCE=<actual source> | SOURCE_SHA256=<canonical hash>` or `LAW_CHECK=BLOCKED`;",
+            "- for non-trivial tasks, perform bounded experience check and emit `EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE`;",
+            "- at task reconciliation, emit `LEARNING_RECONCILIATION=NONE|CANDIDATE`.",
             "",
             "`OE_GATE`:",
             "- ask exactly `Không bị over engineering chứ?`;",
@@ -207,14 +283,19 @@ def _merge_agents(existing: str) -> str:
     return block + "\n"
 
 
-def expected_project_state(package_root: Path, project: Path) -> tuple[str, str]:
+def expected_project_state(package_root: Path, project: Path) -> tuple[str, str, str]:
     projection = _projection_text(package_root)
     agents_path = project / "AGENTS.md"
     if agents_path.is_symlink():
         raise ValueError(f"AGENTS_SYMLINK_NOT_ALLOWED:{agents_path}")
     existing_agents = agents_path.read_text(encoding="utf-8") if agents_path.is_file() else ""
     agents = _merge_agents(existing_agents)
-    return projection, agents
+    capsule = _experience_capsule_text(package_root)
+    return projection, agents, capsule
+
+
+def expected_experience_capsule(package_root: Path) -> str:
+    return _experience_capsule_text(package_root)
 
 
 def project_law(package_root: Path, project: Path, *, check: bool = False) -> dict[str, object]:
@@ -224,41 +305,54 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         raise ValueError(f"PROJECT_NOT_DIRECTORY:{project}")
 
     _assert_safe_parent(project, PORTABLE_REL)
+    _assert_safe_parent(project, PORTABLE_EXPERIENCE_REL)
     portable_path = project / PORTABLE_REL
     if portable_path.is_symlink():
         raise ValueError(f"PROJECTION_SYMLINK_NOT_ALLOWED:{portable_path}")
     if portable_path.exists() and not portable_path.is_file():
         raise ValueError(f"PROJECTION_PATH_NOT_FILE:{portable_path}")
 
-    expected_projection, expected_agents = expected_project_state(package_root, project)
+    portable_exp_path = project / PORTABLE_EXPERIENCE_REL
+    if portable_exp_path.is_symlink():
+        raise ValueError(f"PROJECTION_SYMLINK_NOT_ALLOWED:{portable_exp_path}")
+    if portable_exp_path.exists() and not portable_exp_path.is_file():
+        raise ValueError(f"PROJECTION_PATH_NOT_FILE:{portable_exp_path}")
+
+    expected_projection, expected_agents, expected_exp = expected_project_state(package_root, project)
     agents_path = project / "AGENTS.md"
 
     if check:
         projection_ok = portable_path.is_file() and portable_path.read_text(encoding="utf-8") == expected_projection
         agents_ok = agents_path.is_file() and agents_path.read_text(encoding="utf-8") == expected_agents
-        if not projection_ok or not agents_ok:
+        exp_ok = portable_exp_path.is_file() and portable_exp_path.read_text(encoding="utf-8") == expected_exp
+        if not projection_ok or not agents_ok or not exp_ok:
             raise ValueError(
                 "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING:"
-                f"projection_ok={projection_ok},agents_ok={agents_ok}"
+                f"projection_ok={projection_ok},agents_ok={agents_ok},experience_ok={exp_ok}"
             )
         return {
             "status": "PASS",
             "mode": "CHECK",
             "schema": SCHEMA,
             "portable_path": PORTABLE_REL.as_posix(),
+            "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
             "agents_path": "AGENTS.md",
         }
 
     portable_path.parent.mkdir(parents=True, exist_ok=True)
     portable_path.write_text(expected_projection, encoding="utf-8", newline="\n")
+    portable_exp_path.parent.mkdir(parents=True, exist_ok=True)
+    portable_exp_path.write_text(expected_exp, encoding="utf-8", newline="\n")
     agents_path.write_text(expected_agents, encoding="utf-8", newline="\n")
     return {
         "status": "PASS",
         "mode": "WRITE",
         "schema": SCHEMA,
         "portable_path": PORTABLE_REL.as_posix(),
+        "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
         "agents_path": "AGENTS.md",
         "source_sha256": _sha256_text(_read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")),
+        "experience_source_sha256": json.loads(expected_exp).get("source_content_sha256", ""),
     }
 
 
