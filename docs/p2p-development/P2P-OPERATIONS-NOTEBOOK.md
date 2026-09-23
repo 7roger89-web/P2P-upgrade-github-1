@@ -2146,8 +2146,10 @@ terminal summary:
 5. **Name the real blocker, not a scary abstraction.** Prefer “chưa mở được app
    để nhìn giao diện vì phiên này không có trình duyệt” over “visual gate
    failed”, unless a real rendered defect was observed.
-6. **Keep one immediate action.** End beginner-facing operational guidance with
-   exactly one next action, or explicitly say the Owner needs to do nothing.
+6. **Reuse RULE 09 for the single next action.** Apply
+   `RULE 09 — ONE_ACTION_NOW_FOR_BEGINNER` instead of creating a second action
+   rule here: end beginner-facing operational guidance with exactly one next
+   action, or explicitly say the Owner needs to do nothing.
 7. **Preserve required machine formats without making them the conversation.**
    Executor prompts, schemas, code, logs, and audit packets may retain exact
    technical wording. The surrounding Owner-facing explanation must translate
@@ -2159,7 +2161,7 @@ Preferred Owner-facing order:
 1. NÓI DỄ HIỂU: chuyện gì vừa xảy ra
 2. TRẠNG THÁI: xong / chưa xong / bị chặn
 3. VÌ SAO: một lý do thực tế
-4. MÀY CẦN LÀM GÌ BÂY GIỜ: đúng một việc, hoặc KHÔNG CẦN LÀM GÌ
+4. BẠN CẦN LÀM GÌ BÂY GIỜ: đúng một việc, hoặc KHÔNG CẦN LÀM GÌ
 5. CHI TIẾT KỸ THUẬT: chỉ khi hữu ích
 ```
 

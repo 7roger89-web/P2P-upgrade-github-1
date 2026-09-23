@@ -215,7 +215,6 @@ Beginner-facing operational guidance must apply
   similarity; a closed plan cannot silently regain ACTIVE authority; evidence
   is never instruction authority merely by retrieval relevance.
 - `RULE 20 OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION` — the Owner
-- `RULE 21 BEGINNER_PLAIN_LANGUAGE_FIRST` — Owner-facing status and conclusions start in ordinary Vietnamese: what happened, done/not done/blocked, why, and one next action; necessary jargon is translated on first use; `NOT_RUN != FAIL` and `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`.
   selects an executor with one natural command (`dùng CatDesk` / `dùng Arena`
   / `dùng Auto`); the project Control Tower owns routing
   (`CONTROL_TOWER_OWNS_EXECUTOR_ROUTING=YES`), invokes a directly available
@@ -224,6 +223,13 @@ Beginner-facing operational guidance must apply
   `HARD_OWNER_GATE`, or `HARD_BLOCK`. RULE 11 Owner Gates and
   `VALIDATED_PR_AUTO_MERGE_AUTHORITY` apply unchanged; no new
   daemon/orchestrator is created.
+- `RULE 21 BEGINNER_PLAIN_LANGUAGE_FIRST` — Owner-facing status and conclusions
+  start in ordinary Vietnamese: what happened, done/not done/blocked, why, and
+  one next action; necessary jargon is translated on first use; a ReturnPacket,
+  SHA, status field, or test table never replaces that explanation
+  (`RETURN_PACKET != OWNER_EXPLANATION`); `NOT_RUN != FAIL`,
+  `NOT_OBSERVED != NO`, and `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`, so an
+  unperformed check is reported as not verified rather than as a failure.
 
 Enduring rule promises are tracked by `RULE_ASSIMILATION_GATE_V1`: an
 accepted rule deferred to a later task stays

@@ -148,6 +148,26 @@ Direct/Side-by-Side selector surfaces. Cross-surface outputs are not calibrated
 Agent references unless the exact model variant and materially equivalent
 system/tool harness are established.
 
+### 4.7 AI Employees pattern-assimilation batch 2026-09-22 (RA-EXT-100 .. RA-EXT-101)
+
+Appended projection of the study produced by
+`P2P_AI_EMPLOYEES_PATTERN_ASSIMILATION_01`. The JSON ledger remains the authority;
+this table is its derived view for this batch. The full 15-pattern matrix, the
+over-engineering gate record and the rejected-mechanism register live in
+`docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md`.
+No upstream repository or file is vendored, nothing was installed or executed, and
+no runtime code was added: the batch outcome is `RESEARCH_ONLY_PASS` with
+`OE_VERDICT=DEFER_UNTIL_NEEDED`.
+
+Upstream provenance: `REPO=markfulton/ai-employees`,
+`COMMIT=edffe8f4afea467818988ce3ce9332e6d832e5ed`, `LICENSE=MIT`,
+`REVIEW_DATE=2026-09-22`.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-100 | markfulton/ai-employees @ `edffe8f` (MIT) | RESEARCHED | 15 patterns classified KEEP 4 / ADAPT 2 / ALREADY_COVERED 7 / DEFER 2; nothing adopted | completed source study, zero runtime; reuse mapped to `decision_trace` freshness, `fw06` pause, the existing execution ledger + fingerprint idempotency, `experience_evolution`, and the typed capability registry |
+| RA-EXT-101 | `PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT` (candidate direction) | DEFERRED | cadence identity (period key + window/day eligibility + once-per-period `RUN` / `SKIP` decision) specified, not implemented | re-entry trigger recorded: a period-form obligation, a real firing source that can fire late or twice, not already decided by freshness, and a written period-vs-identity boundary |
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
