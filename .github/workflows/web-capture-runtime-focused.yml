@@ -1,0 +1,51 @@
+name: Web capture runtime focused acceptance
+
+on:
+  pull_request:
+    paths:
+      - '.p2p/system/p2p_capabilities/web_capture_runtime.py'
+      - 'tests/test_p2p_web_capture_runtime.py'
+      - 'evidence/p2p-web-capture-runtime-01/**'
+      - 'docs/plans/2026-09-23-p2p-public-web-scrape-runtime-01/**'
+      - 'scripts/package_release.py'
+      - '.github/workflows/web-capture-runtime-focused.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Web capture runtime bounded tests (offline)
+        run: |
+          python -m unittest -v \
+            tests.test_p2p_web_capture_runtime
+
+      - name: Issue 224 web family surface stays unchanged
+        run: |
+          python -m unittest -v \
+            tests.test_p2p_web_reverse_reference \
+            tests.test_p2p_reverse_skill_reference \
+            tests.test_p2p_sec01_security_reverse_apkid
+
+      - name: Evidence manifest rebuilds deterministically
+        run: |
+          python evidence/p2p-web-capture-runtime-01/build_manifest.py > /tmp/rebuild-1.txt
+          python evidence/p2p-web-capture-runtime-01/build_manifest.py > /tmp/rebuild-2.txt
+          diff /tmp/rebuild-1.txt /tmp/rebuild-2.txt
+          git diff --exit-code evidence/p2p-web-capture-runtime-01/manifest.json
+
+      - name: Compile changed runtime module
+        run: |
+          python -m py_compile .p2p/system/p2p_capabilities/web_capture_runtime.py
