@@ -47,7 +47,9 @@ class ExecutorAutonomyRoutingTests(unittest.TestCase):
         cls.install_text = INSTALL_SOURCE.read_text(encoding="utf-8")
         cls.arena_text = ARENA_PROTOCOL.read_text(encoding="utf-8")
         cls.rule20 = _rule20_section(cls.notebook_text)
+        cls.rule21 = _rule21_section(cls.notebook_text)
         cls.flat = re.sub(r"\s+", " ", cls.rule20)
+        cls.flat21 = re.sub(r"\s+", " ", cls.rule21)
 
     def test_rule20_exists_in_canonical_notebook(self) -> None:
         self.assertIn("### " + RULE20_HEADING, self.notebook_text)
