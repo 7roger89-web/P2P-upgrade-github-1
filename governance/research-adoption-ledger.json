@@ -3313,6 +3313,87 @@
       "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED",
       "last_reviewed_at": "2026-09-22T00:00:00+00:00",
       "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority. Correction 2026-09-22: Arena may add/remove models from Direct/Side-by-Side independently of the Agent pool; cross-surface references are not calibrated Agent ground truth. Five-trial read-only Arena FAST_CANARY experiment started 2026-09-22 to test whether one real-task-first probe meaningfully separates session quality without identifying the hidden model. Ten-chat Arena experiment completed 2026-09-22: external CT grades 6 GREEN / 1 YELLOW / 3 RED while every completed executor self-reported GREEN. Two RED sessions falsely inferred unrelated histories from shallow/incomplete clones; durable GitHub compare proves merge-base 2ac7ae4 and main ahead by 28. Canonical canary updated to evidence-only executor return plus independent CT grading. FAST_CANARY V2 started 2026-09-22 on a different task shape: Python validation edge-case diagnosis using real BAZI code and one disposable /tmp runtime reproducer; executor returns evidence only and Control Tower grades externally. V2 received 10 chats after BAZI main had advanced from 9ce39103 to 81190346, invalidating the intended Python-debug comparison. Secondary external grading of drift obedience: 5 GREEN / 2 YELLOW / 3 RED. V2.1 rebased to 81190346; target source/test blobs unchanged and bug ground truth still present. V2.1 completed on five valid sessions: external CT grades 3 GREEN / 2 YELLOW / 0 RED. All found the real Python validation gap; the task shape was weak-to-moderately discriminating, so trials 6-10 were skipped under information-gain discipline. Cross-experiment conclusion: FAST_CANARY has routing value, but probes must remain task-representative and externally graded."
+    },
+    {
+      "research_id": "RA-EXT-100",
+      "source_name": "markfulton/ai-employees — AI Employees operating-pattern assimilation study",
+      "source_type": "UPSTREAM_REPOSITORY_PATTERN_STUDY",
+      "source_reference": "https://github.com/markfulton/ai-employees (8 employee kits, 60 scheduled routines, installer hire/upgrade/contribute, kit scripts guard.mjs + runlog.mjs, docs/HOW-EMPLOYEES-WORK.md, docs/GUARDRAILS.md, docs/HARNESSES.md, docs/COST.md, docs/PREREQUISITES.md)",
+      "source_version_or_commit": "edffe8f4afea467818988ce3ce9332e6d832e5ed (kits 1.7.0, SEO/AEO 1.8.0, employee standard v1.3); reviewed 2026-09-22",
+      "provenance_status": "PIN_VERIFIED_EQUALS_PACKET_EXPECTED_HEAD; LICENSE=MIT (licenseInfo.key=mit + root LICENSE, (c) 2026 Mark Fulton); SOURCE_READ_STUDY_ZERO_UPSTREAM_BYTES_LICENSED_COPIED_OR_VENDORED",
+      "research_summary": "Source-read study of the upstream AI-Employee architecture and operating patterns, then a per-pattern assimilation decision against current P2P primitives. Fifteen patterns (A-O) were classified KEEP=4 (capability-not-tool, outbound-action authority, browser/resource concurrency, content-is-data), ADAPT=2 (pause switch, brief/exception-only interruption), ALREADY_COVERED=7 (routine != skill, durable run log/receipts, Corrections + procedural self-improvement, member-owned vs kit-owned state, upgrade-without-overwrite, Chief-of-Staff read-only supervision, verify-one-before-registering-many), DEFER_UNTIL_NEEDED=2 (schedule window, once-per-period/period-key identity). Mechanisms evaluated directly: guard.mjs verdict/period/window vocabulary, runlog.mjs closed status set and refusal rules, SCHEDULE.md row semantics, CONTRACT.md five opening lines plus mutex and guardrails, employee.json kit/merge/member classification, installer report-then-apply drift handling with hashed receipt, and the Corrections/self-improvement chapter.",
+      "selected_ideas": [
+        "held-outbound-by-default with a named release authority and conditions attached (retained formulation; P2P keeps its own Owner Gate surface, no second authority file)",
+        "capability-not-tool portability (validates the existing typed capability registry as the portability lever; nothing added)",
+        "interruption suppression discipline (never twice for an unchanged blocker, re-arm on resolution, never notify outside working hours; maps onto existing exceptions-only reporting; no channel added)",
+        "resource serialization by identity rather than by process or lock file (validates existing heartbeat leases; nothing added)",
+        "cadence identity for recurring operational obligations as the single deferred direction, re-entry trigger recorded in RA-EXT-101"
+      ],
+      "rejected_ideas": [
+        "instruction-level guardrail sufficiency: upstream delegates the security model to the harness permission layer and adds no gate of its own; P2P keeps SHA-bound Owner Gates and evidence gates as the authority",
+        "a member-written RELEASES.md as a second outbound-action authority surface",
+        "ungated routine self-editing of its own instructions, fire time and job registration",
+        "local-machine and single-harness core assumptions (per-OS schedulers, awake local PC, cloud-sync prohibition, Node kit scripts, auto-approve permission modes, signed-in browser profile)",
+        "browser-profile automation as a P2P core dependency rather than a declared evidence backend",
+        "the eight-employee / sixty-routine business-role catalogue as P2P agent identities (TASK_NOT_AGENT; canonical eight untouched)"
+      ],
+      "p2p_translation": "RESEARCH_ONLY_PASS (study complete). Adoption of runtime is not implied; OE_VERDICT=DEFER_UNTIL_NEEDED lives on RA-EXT-101. Reuse mapping recorded instead of new code: date-driven obligation freshness -> decision_trace.py (expires_at -> STALE); pause -> fw06_operational_resilience.py; receipts and identity-keyed idempotency -> existing execution-ledger.jsonl writer plus PACKET_FINGERPRINT; procedural learning -> experience_evolution.py; capability neutrality -> typed capability registry. No second control plane, router, registry, scheduler or daemon. Canonical eight and Owner Gates unchanged.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md",
+        "tests/test_p2p_ai_employees_pattern_assimilation_01.py",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 14 over-engineering gate, RULE 19 reality-first probe, OWNER_CONTINUATION_GATE_V1)"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none (study only; no roadmap item created)",
+      "owner_decision_status": "OWNER_TASK_DIRECTED_RESEARCH_ONLY",
+      "last_reviewed_at": "2026-09-22T00:00:00+00:00",
+      "notes": "TASK_ID=P2P_AI_EMPLOYEES_PATTERN_ASSIMILATION_01. Verified before analysis: CONTROL_TOWER_EXPECTED_MAIN=49d8550d2aa0fae438c992490924673bc227e55c is an ANCESTOR of durable main (83ff252e0c7c28d5e5eb583ed8d648d037af596f, 2 commits ahead); upstream HEAD equals UPSTREAM_EXPECTED_HEAD exactly. Prior-assimilation scan: 0 files match ai-employees/period_key/window_start/skipped-out-of-window/skipped-already-ran. Cost figures in upstream docs/COST.md are the author's own single-seat measurements and are provenance only, never P2P facts. Frozen packets C/D only."
+    },
+    {
+      "research_id": "RA-EXT-101",
+      "source_name": "PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT (candidate direction, deferral record)",
+      "source_type": "DEFERRED_CAPABILITY_DIRECTION",
+      "source_reference": "Composed from markfulton/ai-employees SCHEDULE.md window semantics + CONTRACT.md five opening lines (pause, window, once-per-period) + guard.mjs; specified in docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md headings 'Deferred candidate (not implemented)' and 'Re-entry trigger (all four required)'",
+      "source_version_or_commit": "upstream edffe8f4afea467818988ce3ce9332e6d832e5ed; P2P candidate specified 2026-09-22, NOT implemented",
+      "provenance_status": "SPECIFIED_NOT_IMPLEMENTED; gap evidenced by a whole-tree negative scan for cadence/period/window vocabulary in P2P core",
+      "research_summary": "The only genuine expression gap found in the study: P2P cannot express routine identity, day/window eligibility or calendar-period identity, and therefore cannot decide deterministically RUN vs SKIP for a recurring operational obligation. The need is not yet demonstrated: P2P has no firing source (no scheduler, no daemon, no worker queue, NO_UNBOUNDED_BACKGROUND_AUTONOMY), no Owner-approved recurring obligation in period form, and no recorded lost or duplicated period; the P2P duplicate-failure class actually observed is identity-based and is already covered by packet-fingerprint idempotency and RULE 06. Building the guard before the thing it guards would be infrastructure ahead of its consumer.",
+      "selected_ideas": [
+        "deterministic period identity computed from the LOCAL clock (local date / ISO week from local date / calendar month), never UTC and never a stored timezone",
+        "window and day vocabulary as a catch-up net (be generous about when, strict about how many times) rather than a concurrency plan",
+        "once-per-period state written BEFORE any work, because a guard written after the work is not a guard",
+        "pause checked BEFORE the window, because a paused obligation should not care what time it is",
+        "unparsable schedule state fails honestly with a named blocker and never guesses a window",
+        "one receipt on every path including every SKIP path, through the existing ledger writer",
+        "pause reuses the existing fw06 authority; a routine-scoped pause is a new scope on an existing mechanism, never a second pause file"
+      ],
+      "rejected_ideas": [
+        "cron engine, persistent scheduler, worker queue, service, database, event bus or workflow DSL",
+        "fleet registry, routine catalogue, discovery scan or registration command",
+        "a second task-state system or a second execution ledger",
+        "any autonomous outbound action or any widening of the permission envelope by a routine definition",
+        "local-PC, host-specific or provider/tool-specific coupling inside P2P core"
+      ],
+      "p2p_translation": "DEFERRED with re-entry trigger. If ever built, composition order is REUSE_EXISTING_P2P > EXTEND_EXISTING_P2P > ADAPTER > NEW_IMPLEMENTATION, and on present evidence the first three would cover it: period/window eligibility added minimally over the existing durable-state contracts, pause read from fw06, receipts through the existing ledger writer, execution delegated to existing task-state/execution-target/orchestration machinery.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md (Over-engineering gate; Pattern matrix (A-O) patterns C and D; Deferred candidate (not implemented); Re-entry trigger (all four required))",
+        "tests/test_p2p_ai_employees_pattern_assimilation_01.py"
+      ],
+      "dependencies": [
+        "P2P durable task/plan state contracts (task_state.py)",
+        "FW06 pause authority and execution leases (fw06_operational_resilience.py)",
+        "decision_trace.py deterministic date freshness for obligations that are due-date checks",
+        "the existing execution-ledger writer"
+      ],
+      "roadmap_slot": "deferred/recurring-routine-cadence-identity (no roadmap item created)",
+      "owner_decision_status": "OWNER_TASK_DIRECTED_RESEARCH_ONLY",
+      "last_reviewed_at": "2026-09-22T00:00:00+00:00",
+      "notes": "RE_ENTRY_TRIGGER (all four must hold and be durably recorded): (1) a P2P-owned recurring obligation exists in PERIOD form, not merely a due-date check; (2) an actual firing source exists that can fire late or twice (host/OS scheduler or an Owner-approved recurring goal); (3) the obligation is not already decided deterministically by decision_trace.py freshness (expires_at -> STALE) or by an existing lease/pause check; (4) a written boundary exists for calendar-period identity versus the existing task/packet/work-item identity, including the local-clock rule. Until then the simpler path stands: reuse decision_trace freshness, fw06 pause, and the existing ledger."
     }
   ],
   "rejected_register_summary": {
