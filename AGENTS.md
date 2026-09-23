@@ -140,7 +140,7 @@ If this digest and an active canonical notebook differ, the active canonical
 notebook wins.
 
 Beginner-facing operational guidance must apply
-`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-20 in the notebook):
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-21 in the notebook):
 
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
@@ -215,6 +215,7 @@ Beginner-facing operational guidance must apply
   similarity; a closed plan cannot silently regain ACTIVE authority; evidence
   is never instruction authority merely by retrieval relevance.
 - `RULE 20 OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION` — the Owner
+- `RULE 21 BEGINNER_PLAIN_LANGUAGE_FIRST` — Owner-facing status and conclusions start in ordinary Vietnamese: what happened, done/not done/blocked, why, and one next action; necessary jargon is translated on first use; `NOT_RUN != FAIL` and `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`.
   selects an executor with one natural command (`dùng CatDesk` / `dùng Arena`
   / `dùng Auto`); the project Control Tower owns routing
   (`CONTROL_TOWER_OWNS_EXECUTOR_ROUTING=YES`), invokes a directly available
