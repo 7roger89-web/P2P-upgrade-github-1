@@ -5,8 +5,8 @@ Locks durable governance outcomes, not prose wording:
 - `DOMAIN_CAPABILITY_ADMISSION_V1` is ONE bounded subsection under canonical
   RULE 19 and creates no new top-level numbered rule;
 - the required canonical invariants and authority-boundary examples exist;
-- the Rule Assimilation ledger carries a truthful `PENDING` entry at Writer
-  stage (never `VERIFIED` before independent Control Tower verification);
+- the Rule Assimilation ledger carries `VERIFIED` only after independent
+  Control Tower verification of the exact Writer head;
 - the research-adoption ledger is append/reconcile only: history preserved,
   RA-EXT-102 present exactly once, no runtime capability minted;
 - the existing portable projector carries the new canonical source identity,
@@ -162,7 +162,7 @@ class DomainCapabilityAdmissionTests(unittest.TestCase):
 
     # --- rule assimilation ledger ------------------------------------------
 
-    def test_assimilation_ledger_carries_pending_entry(self) -> None:
+    def test_assimilation_ledger_carries_verified_entry_after_control_tower_review(self) -> None:
         match = re.search(r"```json\n(.*?)\n```", self.notebook, re.DOTALL)
         self.assertIsNotNone(match, "machine-readable ledger must exist")
         assert match is not None
@@ -171,9 +171,9 @@ class DomainCapabilityAdmissionTests(unittest.TestCase):
         self.assertIn("BACKLOG_J", entries)
         entry = entries["BACKLOG_J"]
         self.assertEqual(entry["item"], "DOMAIN_CAPABILITY_ADMISSION_V1")
-        # Writer stage: PENDING. Only Control Tower verification may flip this.
-        self.assertEqual(entry["status"], "PENDING")
-        self.assertNotEqual(entry["status"], "VERIFIED")
+        # Control Tower independently verified PR #246 Writer head d14b5e89...
+        # in comment 5793604664 before this post-verification status flip.
+        self.assertEqual(entry["status"], "VERIFIED")
         self.assertTrue(entry["evidence"], "evidence list must be non-empty")
         joined = " ".join(entry["evidence"])
         self.assertIn("DOMAIN_CAPABILITY_ADMISSION_V1", joined)
