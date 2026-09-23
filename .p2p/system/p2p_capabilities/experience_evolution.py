@@ -346,10 +346,10 @@ def _retrieve_promoted_shared_experiences(
     if catalog is None or not catalog.get("records"):
         portable_capsule_path = Path(root) / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
         if portable_capsule_path.is_file() and not portable_capsule_path.is_symlink():
-            try:
-                catalog = json.loads(portable_capsule_path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeError, json.JSONDecodeError):
-                catalog = None
+            res = retrieve_portable_experience(root, task, max_results=max_results)
+            if res.get("decision") == "USE_ACTIVE_EXPERIENCE":
+                return tuple(res.get("experiences") or ()), "USE_ACTIVE_EXPERIENCE"
+            return (), res.get("decision", "UNAVAILABLE")
 
     if not catalog or not isinstance(catalog, Mapping):
         return (), "UNAVAILABLE"
@@ -430,24 +430,12 @@ def retrieve_portable_experience(
     max_results: int = 3,
 ) -> dict[str, Any]:
     """Standalone read-only retrieval from .p2p/portable/P2P-EXPERIENCE-CAPSULE.json."""
-    capsule_path = Path(project_root) / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
-    if not capsule_path.is_file() or capsule_path.is_symlink():
+
+    def _fail_closed(reason: str = "UNAVAILABLE") -> dict[str, Any]:
         return {
             "schema": "p2p-portable-experience-capsule/1",
             "decision": "UNAVAILABLE",
-            "experiences": [],
-            "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
-            "current_state_wins": True,
-            "law_and_task_contract_win": True,
-            "permission_effect": "NONE",
-            "acceptance_authority": False,
-        }
-    try:
-        data = json.loads(capsule_path.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
-        return {
-            "schema": "p2p-portable-experience-capsule/1",
-            "decision": "UNAVAILABLE",
+            "reason": reason,
             "experiences": [],
             "authority": "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE",
             "current_state_wins": True,
@@ -456,24 +444,98 @@ def retrieve_portable_experience(
             "acceptance_authority": False,
         }
 
+    root_path = Path(project_root).resolve()
+    capsule_path = root_path / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
+    if not capsule_path.is_file() or capsule_path.is_symlink():
+        return _fail_closed("CAPSULE_MISSING_OR_INVALID_PATH")
+
+    try:
+        capsule_bytes = capsule_path.read_bytes()
+        capsule_sha = hashlib.sha256(capsule_bytes).hexdigest()
+        data = json.loads(capsule_bytes.decode("utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return _fail_closed(f"CAPSULE_UNREADABLE_OR_JSON_INVALID:{exc}")
+
+    # Transport integrity: check bound hash in portable notebook or AGENTS if present
+    portable_notebook = root_path / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md"
+    if portable_notebook.is_file() and not portable_notebook.is_symlink():
+        try:
+            head_text = portable_notebook.read_text(encoding="utf-8")[:1500]
+            match = re.search(r"(?m)^PORTABLE_EXPERIENCE_CONTENT_SHA256=([0-9a-fA-F]{64})$", head_text)
+            if match and match.group(1).lower() != capsule_sha:
+                return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_HASH_MISMATCH")
+        except (OSError, UnicodeError):
+            pass
+
+    agents_file = root_path / "AGENTS.md"
+    if agents_file.is_file() and not agents_file.is_symlink():
+        try:
+            agents_text = agents_file.read_text(encoding="utf-8")
+            match = re.search(r"PORTABLE_EXPERIENCE_SHA256`?:\s*`?([0-9a-fA-F]{64})`?", agents_text)
+            if match and match.group(1).lower() != capsule_sha:
+                return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_HASH_MISMATCH")
+        except (OSError, UnicodeError):
+            pass
+
+    # Exact capsule schema and metadata invariants
+    if data.get("schema") != "p2p-portable-experience-capsule/1":
+        return _fail_closed("CAPSULE_SCHEMA_INVALID")
+    if data.get("generated") is not True:
+        return _fail_closed("CAPSULE_GENERATED_MARKER_INVALID")
+    if data.get("canonical_source") not in (
+        "7roger89-web/P2P-upgrade-github-1@main:.p2p/system/p2p_capabilities/shared_experience_catalog.json",
+        "p2p_capabilities.shared_experience_catalog",
+    ):
+        return _fail_closed("CAPSULE_CANONICAL_SOURCE_INVALID")
+    source_sha = str(data.get("source_content_sha256") or "")
+    if not re.fullmatch(r"^[0-9a-fA-F]{64}$", source_sha):
+        return _fail_closed("CAPSULE_SOURCE_SHA256_INVALID")
+    if data.get("authority") != "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE":
+        return _fail_closed("CAPSULE_AUTHORITY_INVALID")
+    if data.get("permission_effect") != "NONE":
+        return _fail_closed("CAPSULE_PERMISSION_EFFECT_INVALID")
+    if data.get("acceptance_authority") is not False:
+        return _fail_closed("CAPSULE_ACCEPTANCE_AUTHORITY_INVALID")
+    if data.get("current_state_wins") is not True or data.get("law_and_task_contract_win") is not True:
+        return _fail_closed("CAPSULE_PRECEDENCE_INVALID")
+
+    records = data.get("records")
+    if not isinstance(records, (list, tuple)):
+        return _fail_closed("CAPSULE_RECORDS_INVALID")
+
+    # Record authority and scope invariants (fail-closed on any unauthorized or corrupted record)
+    for rec in records:
+        if not isinstance(rec, Mapping):
+            return _fail_closed("CAPSULE_RECORD_NOT_MAPPING")
+        if rec.get("state") != "ACTIVE":
+            return _fail_closed("CAPSULE_RECORD_NOT_ACTIVE")
+        scope = str(rec.get("scope") or "").upper()
+        if scope not in ("DOMAIN", "CROSS_PROJECT"):
+            return _fail_closed("CAPSULE_RECORD_SCOPE_INVALID")
+        if rec.get("authority") != "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE":
+            return _fail_closed("CAPSULE_RECORD_AUTHORITY_INVALID")
+        if rec.get("permission_effect") != "NONE":
+            return _fail_closed("CAPSULE_RECORD_PERMISSION_EFFECT_INVALID")
+        if rec.get("acceptance_authority") is not False:
+            return _fail_closed("CAPSULE_RECORD_ACCEPTANCE_AUTHORITY_INVALID")
+        if not rec.get("lesson") or not rec.get("trigger_tokens"):
+            return _fail_closed("CAPSULE_RECORD_CONTENT_INCOMPLETE")
+
     limit = max(0, min(int(max_results), MAX_RESULTS))
     tokens = _task_tokens(task)
     ranked: list[tuple[int, str, Mapping[str, object]]] = []
-    for record in data.get("records") or ():
-        if not isinstance(record, Mapping) or record.get("state") != "ACTIVE":
-            continue
+    for record in records:
         scope = str(record.get("scope") or "").upper()
         if scope == "DOMAIN":
             domain = str(record.get("domain") or "").lower()
             if not domain or domain not in tokens:
                 continue
-        elif scope != "CROSS_PROJECT":
-            continue
         triggers = {str(x).lower() for x in (record.get("trigger_tokens") or ())}
         matched = tokens.intersection(triggers)
         if matched:
             record_id = str(record.get("record_id") or record.get("source_experience_id") or "")
             ranked.append((len(matched), record_id, record))
+
     ranked.sort(key=lambda item: (-item[0], item[1]))
     matches: list[dict[str, Any]] = []
     for score, rec_id, rec in ranked[:limit]:
@@ -495,6 +557,7 @@ def retrieve_portable_experience(
             "permission_effect": "NONE",
             "acceptance_authority": False,
         })
+
     return {
         "schema": "p2p-portable-experience-capsule/1",
         "decision": "USE_ACTIVE_EXPERIENCE" if matches else "NO_MATCH",

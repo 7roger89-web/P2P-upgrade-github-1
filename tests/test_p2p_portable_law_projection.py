@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -226,6 +227,30 @@ def test_check_fails_closed_after_experience_capsule_drift(tmp_path: Path) -> No
     assert "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING" in check.stdout
 
 
+def test_actor_law_receipt_and_experience_capsule(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project_receipt"
+    project.mkdir()
+    res = _run(package, project)
+    assert res.returncode == 0
+
+    agents = (project / "AGENTS.md").read_text(encoding="utf-8")
+    assert "LAW_CHECK=PASS" in agents
+    assert "PARENT_SELF_LAW_PREFLIGHT != EXECUTOR_LAW_PREFLIGHT" in agents
+    assert "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE" in agents
+    assert "LEARNING_RECONCILIATION=" in agents
+
+    notebook = (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_text(encoding="utf-8")
+    assert "PORTABLE_EXPERIENCE_CONTENT_SHA256=" in notebook
+
+    capsule = project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
+    assert capsule.is_file()
+    data = json.loads(capsule.read_text(encoding="utf-8"))
+    assert data["schema"] == "p2p-portable-experience-capsule/1"
+    assert data["generated"] is True
+    assert data["authority"] == "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE"
+
+
 if __name__ == "__main__":
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
@@ -237,5 +262,6 @@ if __name__ == "__main__":
         test_projection_preserves_unrecognized_similar_project_section(base / "5")
         test_check_fails_closed_after_projection_drift(base / "6")
         test_check_fails_closed_after_experience_capsule_drift(base / "7")
+        test_actor_law_receipt_and_experience_capsule(base / "8")
         test_canonical_law_and_release_package_recognize_portable_projection()
     print("ALL PORTABLE LAW PROJECTION TESTS PASS")

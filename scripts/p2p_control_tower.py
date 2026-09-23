@@ -157,7 +157,7 @@ def _validate_law_text(
         if fields.get("CANONICAL_WINS_WHEN_REACHABLE") != "YES":
             raise BindingError("PORTABLE_LAW_PRECEDENCE_INVALID")
 
-    return {
+    receipt = {
         "schema": LAW_RECEIPT_SCHEMA,
         "status": "PASS",
         "actor": "CONTROL_TOWER_SELF",
@@ -172,6 +172,9 @@ def _validate_law_text(
         "authority_effect": "NONE",
         "mutated": False,
     }
+    if portable:
+        receipt["declared_source_sha256"] = expected_sha
+    return receipt
 
 
 def _read_law_text(path: Path, *, source_type: str, portable: bool = False) -> dict[str, Any] | None:
@@ -414,20 +417,36 @@ def check_target_law_freshness(
             "target_law_sha256": "NONE",
             "reason": "TARGET_PORTABLE_MISSING",
         }
+
+    declared_target_sha = UNKNOWN
     try:
-        content = target_portable.read_text(encoding="utf-8")
+        header_text = target_portable.read_text(encoding="utf-8")[:1000]
+        for line in header_text.splitlines():
+            if line.startswith("SOURCE_CONTENT_SHA256="):
+                declared_target_sha = line.split("=", 1)[1].strip().lower()
+                break
     except (OSError, UnicodeError):
+        pass
+
+    try:
+        receipt = _read_law_text(target_portable, source_type="PORTABLE_PROJECTION", portable=True)
+    except BindingError as exc:
         return {
             "status": "INLINE",
             "canonical_law_sha256": canonical_sha,
-            "target_law_sha256": "UNREADABLE",
-            "reason": "TARGET_PORTABLE_UNREADABLE",
+            "target_law_sha256": declared_target_sha if _SHA256_RE.fullmatch(declared_target_sha) else "INVALID",
+            "reason": f"TARGET_PORTABLE_TAMPERED_OR_INVALID:{exc}",
         }
-    target_sha = UNKNOWN
-    for line in content.splitlines()[:25]:
-        if line.startswith("SOURCE_CONTENT_SHA256="):
-            target_sha = line.split("=", 1)[1].strip()
-            break
+
+    if receipt is None:
+        return {
+            "status": "INLINE",
+            "canonical_law_sha256": canonical_sha,
+            "target_law_sha256": "NONE",
+            "reason": "TARGET_PORTABLE_MISSING",
+        }
+
+    target_sha = str(receipt.get("declared_source_sha256") or receipt.get("content_sha256") or "")
     if target_sha == canonical_sha:
         return {
             "status": "CURRENT",
@@ -437,7 +456,7 @@ def check_target_law_freshness(
     return {
         "status": "INLINE",
         "canonical_law_sha256": canonical_sha,
-        "target_law_sha256": target_sha,
+        "target_law_sha256": target_sha or declared_target_sha,
         "reason": "TARGET_PORTABLE_STALE",
     }
 

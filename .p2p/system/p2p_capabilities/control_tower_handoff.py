@@ -10,7 +10,7 @@ durable P2P evidence.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -910,6 +910,8 @@ class ControlTowerReturnPacket:
     attachment_manifest: ControlTowerAttachmentManifest = field(
         default_factory=ControlTowerAttachmentManifest
     )
+    law_check: Mapping[str, Any] | None = None
+    learning_reconciliation: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.binding, SessionBinding):
@@ -986,6 +988,10 @@ class ControlTowerReturnPacket:
             "PACKET_IS_CANONICAL_TRUTH": "NO",
             "CANONICAL_TRUTH": "NO",
         }
+        if self.law_check is not None:
+            result["LAW_CHECK"] = _safe_json(self.law_check, path="law_check")
+        if self.learning_reconciliation is not None:
+            result["LEARNING_RECONCILIATION"] = _safe_json(self.learning_reconciliation, path="learning_reconciliation")
         return result
 
     @classmethod
@@ -1027,6 +1033,8 @@ class ControlTowerReturnPacket:
                 "Return this packet to the Control Tower for reconciliation.",
             ),
             attachment_manifest=manifest,
+            law_check=value.get("LAW_CHECK"),
+            learning_reconciliation=value.get("LEARNING_RECONCILIATION"),
         )
 
     def fingerprint(self) -> str:
@@ -1043,6 +1051,82 @@ class ControlTowerReturnPacket:
     def to_marked_text(self) -> str:
         payload = json.dumps(self.to_dict(), ensure_ascii=False, sort_keys=True, indent=2)
         return f"{PACKET_BEGIN}\n{payload}\n{PACKET_END}"
+
+
+def _extract_executor_receipts(
+    final_response: str,
+    payload: Mapping[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Extract and parse actor-own LAW_CHECK and LEARNING_RECONCILIATION receipts."""
+    law_check: dict[str, Any] | None = None
+    if isinstance(payload.get("LAW_CHECK"), Mapping):
+        law_check = dict(payload["LAW_CHECK"])
+    elif isinstance(payload.get("LAW_CHECK"), str):
+        raw = str(payload["LAW_CHECK"]).strip()
+        m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", raw)
+        if m:
+            verdict, rest = m.group(1).upper(), m.group(2).strip()
+            if verdict == "BLOCKED":
+                rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+                law_check = {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
+            else:
+                sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
+                hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
+                if sm and hm:
+                    law_check = {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
+                else:
+                    law_check = {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+
+    if law_check is None:
+        matching_lines: list[tuple[str, str]] = []
+        for line in final_response.splitlines():
+            if "CONTROL_TOWER_SELF_LAW_RECEIPT" in line or "ACTOR=CONTROL_TOWER_SELF" in line:
+                continue
+            m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", line)
+            if m:
+                matching_lines.append((m.group(1).upper(), m.group(2).strip()))
+        if len(matching_lines) == 0:
+            law_check = {"status": "MISSING"}
+        elif len(matching_lines) > 1:
+            law_check = {"status": "CONTRADICTORY", "count": len(matching_lines)}
+        else:
+            verdict, rest = matching_lines[0]
+            if verdict == "BLOCKED":
+                rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+                law_check = {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
+            else:
+                sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
+                hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
+                if sm and hm:
+                    law_check = {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
+                else:
+                    law_check = {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+
+    learning: dict[str, Any] | None = None
+    if isinstance(payload.get("LEARNING_RECONCILIATION"), Mapping):
+        learning = dict(payload["LEARNING_RECONCILIATION"])
+    elif isinstance(payload.get("LEARNING_RECONCILIATION"), str):
+        raw = str(payload["LEARNING_RECONCILIATION"]).strip()
+        m = re.match(r"(?im)^\s*LEARNING_RECONCILIATION\s*=\s*(NONE|CANDIDATE)\b(.*)$", raw)
+        if m:
+            ltype, rest = m.group(1).upper(), m.group(2).strip()
+            rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+            learning = {"type": ltype, "reason": rm.group(1).strip() if rm else ""}
+
+    if learning is None:
+        lr_lines: list[tuple[str, str]] = []
+        for line in final_response.splitlines():
+            m = re.match(r"(?im)^\s*LEARNING_RECONCILIATION\s*=\s*(NONE|CANDIDATE)\b(.*)$", line)
+            if m:
+                lr_lines.append((m.group(1).upper(), m.group(2).strip()))
+        if lr_lines:
+            ltype, rest = lr_lines[0]
+            rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+            learning = {"type": ltype, "reason": rm.group(1).strip() if rm else ""}
+        else:
+            learning = {"type": "MISSING"}
+
+    return law_check, learning
 
 
 def parse_return_packet(final_response: str) -> ControlTowerReturnPacket:
@@ -1351,6 +1435,52 @@ class ControlTowerState:
         else:
             status = packet.session_state
             next_action = packet.next_recommended_action
+
+        # Ingest-level enforcement of actor-own LAW_CHECK receipt
+        if packet.law_check is not None:
+            lc = packet.law_check
+            lc_status = lc.get("status")
+            if lc_status == "MISSING":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("EXECUTOR_LAW_CHECK_MISSING")
+                next_action = "Supply valid actor-own LAW_CHECK receipt before reconciliation."
+            elif lc_status == "CONTRADICTORY":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("EXECUTOR_LAW_CHECK_CONTRADICTORY")
+                next_action = "Resolve contradictory executor LAW_CHECK receipts before reconciliation."
+            elif lc_status == "INVALID":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+                next_action = "Provide valid SOURCE and SOURCE_SHA256 in actor-own LAW_CHECK receipt."
+            elif lc_status == "BLOCKED":
+                if status not in ("BLOCKED", "FAILED"):
+                    status = "BLOCKED"
+                blockers.append("EXECUTOR_LAW_CHECK_BLOCKED")
+                next_action = "Investigate executor law check blockage before proceeding."
+
+        # Ingest-level enforcement of LEARNING_RECONCILIATION
+        if packet.learning_reconciliation is not None:
+            lr = packet.learning_reconciliation
+            lr_type = lr.get("type")
+            task_context = " ".join([
+                str(packet.binding.goal),
+                str(packet.changes),
+                str(packet.evidence),
+            ]).lower()
+            is_correction = (
+                packet.session_state == "FAILED"
+                or any(k in task_context for k in ("fix", "repair", "defect", "correction", "bug", "patch"))
+            )
+            if is_correction:
+                if lr_type == "MISSING":
+                    status = "RECONCILIATION_REQUIRED"
+                    blockers.append("LEARNING_RECONCILIATION_MISSING")
+                    next_action = "Record LEARNING_RECONCILIATION=CANDIDATE or explicit evidence-based explanation why no reusable lesson exists."
+                elif lr_type == "NONE" and not lr.get("reason"):
+                    status = "RECONCILIATION_REQUIRED"
+                    blockers.append("LEARNING_RECONCILIATION_REASON_REQUIRED")
+                    next_action = "Supply evidence-based reason why no reusable lesson exists for this material correction."
+
         deduped_blockers = tuple(dict.fromkeys(blockers))
         promotion_claim_detected = _contains_promotion_claim(
             (
@@ -1897,7 +2027,20 @@ class ControlTower:
             packet = parse_return_packet(final_response)
         except ControlTowerHandoffError as exc:
             raise PacketParseError(str(exc)) from exc
-        return self.ingest_packet(packet, **kwargs)
+        payload: dict[str, Any] = {}
+        try:
+            start = final_response.index(PACKET_BEGIN) + len(PACKET_BEGIN)
+            end = final_response.index(PACKET_END)
+            payload = json.loads(final_response[start:end].strip())
+        except (ValueError, json.JSONDecodeError):
+            pass
+        law_check, learning_reconciliation = _extract_executor_receipts(final_response, payload)
+        return self.ingest_packet(
+            packet,
+            law_check=kwargs.pop("law_check", law_check),
+            learning_reconciliation=kwargs.pop("learning_reconciliation", learning_reconciliation),
+            **kwargs,
+        )
 
     def ingest_packet(
         self,
@@ -1906,6 +2049,8 @@ class ControlTower:
         current_canonical_base_sha: str | None = None,
         current_canonical_base_tree: str | None = None,
         narrative_host: Any = None,
+        law_check: Mapping[str, Any] | None = None,
+        learning_reconciliation: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         if not isinstance(packet, ControlTowerReturnPacket):
             raise BindingError("CONTROL_TOWER_PACKET_REQUIRED")
@@ -1939,14 +2084,21 @@ class ControlTower:
                     ),
                 }
             raise BindingError("SESSION_ALREADY_HAS_A_DIFFERENT_RETURN_PACKET")
+        effective_packet = packet
+        if law_check is not None or learning_reconciliation is not None:
+            effective_packet = replace(
+                packet,
+                law_check=packet.law_check or law_check,
+                learning_reconciliation=packet.learning_reconciliation or learning_reconciliation,
+            )
         result = state.ingest(
-            packet,
+            effective_packet,
             current_canonical_base_sha=current_sha,
             current_canonical_base_tree=current_tree,
             narrative_host=narrative_host,
             record_event=False,
         )
-        _append_existing_execution_event(self.ledger_path, to_execution_ledger_event(packet, result))
+        _append_existing_execution_event(self.ledger_path, to_execution_ledger_event(effective_packet, result))
         snapshot = self.snapshot(
             current_canonical_base_sha=current_sha,
             current_canonical_base_tree=current_tree,

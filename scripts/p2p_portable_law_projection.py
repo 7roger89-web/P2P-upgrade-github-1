@@ -74,12 +74,15 @@ def _projection_text(package_root: Path) -> str:
         raise ValueError("SOURCE_NOTEBOOK_MISSING_SUPREME_LAW_MARKER")
     version = _read_required(package_root / "VERSION", "PACKAGE_VERSION").strip()
     source_sha256 = _sha256_text(notebook)
+    capsule_text = _experience_capsule_text(package_root)
+    capsule_sha256 = _sha256_text(capsule_text)
     header = (
         "<!--\n"
         "P2P_PORTABLE_LAW_PROJECTION=YES\n"
         f"SCHEMA={SCHEMA}\n"
         f"CANONICAL_SOURCE={CANONICAL_SOURCE}\n"
         f"SOURCE_CONTENT_SHA256={source_sha256}\n"
+        f"PORTABLE_EXPERIENCE_CONTENT_SHA256={capsule_sha256}\n"
         f"PACKAGE_VERSION={version}\n"
         "PROJECTION_DO_NOT_EDIT=YES\n"
         "CANONICAL_WINS_WHEN_REACHABLE=YES\n"
