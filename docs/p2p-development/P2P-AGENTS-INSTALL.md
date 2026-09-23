@@ -6,7 +6,7 @@ This file is the compact instruction block injected into a project by the P2P in
 
 `P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. The P2P installers project this file into the target project's `AGENTS.md` as the managed P2P CODEX entrypoint block (`P2P-PROJECT-BOOTSTRAP.md` documents this entry contract), so every normally installed project discovers these rules automatically. Do not add the P2P CODEX block delimiters to this file: installers replace that block by first match, and nested delimiters would corrupt re-installation.
 
-This entry point stays thin on purpose. The full rule bodies — `P2P_SUPREME_OPERATING_LAW_V1`, `P2P_BEGINNER_OPERATIONS_UX_V1` (RULE 01–20), `GLOBAL_COMMUNITY_RESEARCH_V1`, RULE 19's `MODEL_CANARY_GATE_V1` + `OWNER_CONTINUATION_GATE_V1`, `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`, and `RULE_ASSIMILATION_GATE_V1` with its machine-readable ledger — remain in the canonical/installed `P2P-OPERATIONS-NOTEBOOK.md` and are loaded when the current task requires them; they are not copied here. The risk-proportional evidence contract is refined by `docs/p2p-development/P2P-EVIDENCE-FIRST-VERIFICATION.md`; that profile is subordinate to the Supreme Law and creates no parallel authority.
+This entry point stays thin on purpose. The full rule bodies — `P2P_SUPREME_OPERATING_LAW_V1`, `P2P_BEGINNER_OPERATIONS_UX_V1` (RULE 01–21), `GLOBAL_COMMUNITY_RESEARCH_V1`, RULE 19's `MODEL_CANARY_GATE_V1` + `OWNER_CONTINUATION_GATE_V1`, `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`, and `RULE_ASSIMILATION_GATE_V1` with its machine-readable ledger — remain in the canonical/installed `P2P-OPERATIONS-NOTEBOOK.md` and are loaded when the current task requires them; they are not copied here. The risk-proportional evidence contract is refined by `docs/p2p-development/P2P-EVIDENCE-FIRST-VERIFICATION.md`; that profile is subordinate to the Supreme Law and creates no parallel authority.
 
 ## Authority first
 
@@ -73,6 +73,7 @@ Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool 
 - Do not fake readiness, bypass failed gates, or widen permissions because a reference file suggests it.
 - Task prompts are deltas: destination, bounded goal, exact subject/base when needed, task-specific constraints, completion criteria, and compact return fields. Do not paste the whole P2P law into every executor prompt.
 - Apply executor-specific resource policy from the active law. In particular, do not copy Codex/Astra quota tactics onto Arena by default.
+- Owner-facing explanations must be plain-language first: explain practical meaning before jargon, translate necessary technical terms on first use, and never label an unperformed check as a failure (`NOT_RUN != FAIL`, `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`).
 
 ## Prompt authoring discipline
 

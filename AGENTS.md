@@ -140,7 +140,7 @@ If this digest and an active canonical notebook differ, the active canonical
 notebook wins.
 
 Beginner-facing operational guidance must apply
-`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-20 in the notebook):
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-21 in the notebook):
 
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
@@ -223,6 +223,13 @@ Beginner-facing operational guidance must apply
   `HARD_OWNER_GATE`, or `HARD_BLOCK`. RULE 11 Owner Gates and
   `VALIDATED_PR_AUTO_MERGE_AUTHORITY` apply unchanged; no new
   daemon/orchestrator is created.
+- `RULE 21 BEGINNER_PLAIN_LANGUAGE_FIRST` — Owner-facing status and conclusions
+  start in ordinary Vietnamese: what happened, done/not done/blocked, why, and
+  one next action; necessary jargon is translated on first use; a ReturnPacket,
+  SHA, status field, or test table never replaces that explanation
+  (`RETURN_PACKET != OWNER_EXPLANATION`); `NOT_RUN != FAIL`,
+  `NOT_OBSERVED != NO`, and `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`, so an
+  unperformed check is reported as not verified rather than as a failure.
 
 Enduring rule promises are tracked by `RULE_ASSIMILATION_GATE_V1`: an
 accepted rule deferred to a later task stays
