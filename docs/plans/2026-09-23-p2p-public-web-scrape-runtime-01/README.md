@@ -1,6 +1,8 @@
 # P2P Generic Public-Web Capture Runtime — Issue #241
 
-Task: `P2P_PUBLIC_WEB_SCRAPE_RUNTIME_01` (Issue #241).
+Task: `P2P_PUBLIC_WEB_SCRAPE_RUNTIME_01` (Issue #241), repair round
+`P2P_PUBLIC_WEB_SCRAPE_RUNTIME_01_REPAIR_02` (Supervisor review comment
+#5790818568 / Control Tower correction #5790906508).
 Fresh baseline: `83ff252e0c7c28d5e5eb583ed8d648d037af596f` (main).
 Law source fresh-read: `docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md`
 (`P2P_SUPREME_OPERATING_LAW_V1`, canonical in development source) plus the
@@ -18,7 +20,7 @@ database/queue/scheduler, a scraping DSL, or any ChatGPT Work dependency.
 | Added | Deliberately not added |
 | --- | --- |
 | `.p2p/system/p2p_capabilities/web_capture_runtime.py` — one generic capture contract + thin transport adapters + bounded plans + checkpoint/resume | no new capability IDs (the four `web.*` IDs from #224 are reused unchanged) |
-| `tests/test_p2p_web_capture_runtime.py` — 13 focused offline tests | no changes to `capabilities.json`, the router, quorum, or `web_reverse_reference.py` |
+| `tests/test_p2p_web_capture_runtime.py` — 36 focused offline tests (fully mocked transport boundary; no sockets, no live sites) | no changes to `capabilities.json`, the router, quorum, `security_contract.py`, or `web_reverse_reference.py` |
 | `evidence/p2p-web-capture-runtime-01/` — bounded live multi-site proof (10 stored captures, deterministic manifest, honest blockers) | no full crawl, no attachment downloads, no ID enumeration, no browser lane activation |
 | one line in `scripts/package_release.py` (`FOUNDATION_RUNTIME_MODULES`) to keep installed-project projection parity | no MCP registration, no installs, no vendoring |
 | `.github/workflows/web-capture-runtime-focused.yml` — focused PR acceptance mirroring the #224 workflow | no research-adoption ledger changes (no new external upstream was adopted) |
@@ -36,13 +38,18 @@ NETWORK_RESPONSE`), `byte_count`, `char_count`, `sha256`, `capture_scope`,
 
 ## Transport policy (cheapest working transport first)
 
-1. `PlainHttpTransport` — stdlib urllib GET; explicit per-call
-   `authorized` flag (execution-class ceiling `ACTIVE_TEST_AUTHORIZED` from
-   the existing security contract); no cookies/credentials, no proxies
-   (environment proxies disabled, never rotated), default TLS verification
-   never weakened, bounded reads. In this Arena sandbox direct egress to the
-   target hosts is blocked, so this lane was proven offline against a
-   loopback fixture in tests.
+1. `PlainHttpTransport` — stdlib urllib GET; gated by the EXISTING SEC01
+   decision (`security_contract.authorize_security_execution(ACTIVE_TEST_AUTHORIZED, ...)`,
+   which requires `target_authorized=True` AND `controlled_test_environment=True`
+   per call — there is no ad-hoc single boolean); public-only target
+   validation plus a fail-closed `socket.getaddrinfo` check that every
+   resolved address is globally routable before any external I/O; no
+   cookies/credentials, no proxies (environment proxies disabled, never
+   rotated), default TLS verification never weakened, bounded reads. In this
+   Arena sandbox direct egress to the target hosts is blocked, so this lane is
+   proven offline through a mocked public transport boundary in tests (fake
+   public DNS answers + fake opener), never through a loopback/private
+   production bypass.
 2. `ExecutorTextTransport` — executor-native public text fetch (Arena
    `fetch_page`). Used for the entire live proof. Unobserved HTTP metadata
    stays null.
@@ -64,8 +71,14 @@ capture provenance. When the discovery capture text is supplied, each step
 URL is verified to appear literally inside it — fabricated/hidden record-ID
 enumeration fails closed (`URL_NOT_PRESENT_IN_DISCOVERY_CAPTURE`).
 Out-of-scope hosts/paths, credential-bearing URLs, non-http(s) schemes,
-out-of-scope redirects, unauthorized live HTTP, and missing browser
-providers all fail closed. Checkpoint/resume metadata (`plan_id`,
+malformed/ambiguous hosts, out-of-scope redirects, unauthorized live
+interaction, and missing browser providers all fail closed. Public-target-only
+validation rejects `localhost`-shaped names and every literal address that is
+not globally routable (loopback, RFC1918, link-local, unspecified, multicast,
+reserved, CGNAT, documentation, IPv6 site-local) via stdlib `ipaddress`. One
+runtime-wide capture-size ceiling (`MAX_CAPTURE_BYTES`) is enforced centrally
+in `normalize_capture` for all four transport kinds, so plain HTTP, executor
+text, executor browser, and recorded results share the same bound. Checkpoint/resume metadata (`plan_id`,
 completed/blocked step maps, `pending_steps`, `resume_plan`) is
 byte-deterministic.
 
@@ -100,7 +113,7 @@ Issue #241 allows `PASS|PARTIAL` per site with honest classification.
 ## Tests
 
 ```
-python3 -m unittest -v tests.test_p2p_web_capture_runtime      # 13 tests
+python3 -m unittest -v tests.test_p2p_web_capture_runtime      # 36 tests
 python3 -m unittest tests.test_p2p_web_reverse_reference \
     tests.test_p2p_reverse_skill_reference \
     tests.test_p2p_sec01_security_reverse_apkid                # #224 surface unchanged
@@ -108,15 +121,25 @@ python3 evidence/p2p-web-capture-runtime-01/build_manifest.py  # deterministic m
 ```
 
 Coverage maps to the acceptance fields: `GENERIC_CAPTURE_CONTRACT`,
-`SINGLE_URL_CAPTURE` (plain-HTTP loopback + executor text),
+`SINGLE_URL_CAPTURE` (mocked public plain-HTTP boundary + executor text),
+per-transport SEC01 authorization facts (target authorized and controlled
+environment, each alone insufficient, for plain HTTP / executor text /
+executor browser, plus the policy entry point and proof that the existing
+`authorize_security_execution` is reused), public-only literal-host and DNS
+guards, the runtime-wide capture-size ceiling for every transport kind,
 `BOUNDED_PAGINATION_PLAN`, `DISCOVERED_LINK_FOLLOWUP`,
 `CHECKPOINT_RESUME_METADATA`, determinism, null-not-fabricated metadata,
-fail-closed unauthorized/unbounded/enumeration plans, unchanged router /
-registry / 8/8 quorum, and projection parity.
+fail-closed unbounded/enumeration plans, unchanged router / registry / 8/8
+quorum, and projection parity.
 
 ## OE gate
 
-`Không bị over engineering chứ?` → **DO_IT**. One module (~750 lines with
+`Không bị over engineering chứ?` → **DO_IT**, and re-asked for the repair
+round → **DO_IT**: the repair added no new module, no new capability ID, no
+second router/registry/risk classifier, no dependency, and no DNS or SSRF
+framework — it reuses the existing SEC01 authority function, stdlib
+`ipaddress`/`socket.getaddrinfo`, and the existing normalization step. One
+module (~750 lines with
 docs), one test file, one evidence directory, one workflow; everything else
 reused. No crawler platform, no new capability IDs, no second router/
 registry; the browser lane is a slot, not an implementation; the live proof

@@ -31,9 +31,30 @@ no credentials or cookies; no login/WAF/CAPTCHA bypass; no TLS weakening; no
 proxy rotation; no hidden numeric record-ID enumeration (the runtime never
 generates URLs from numeric ranges — every non-seed plan step must replay an
 explicitly discovered URL, optionally verified as literally present in the
-discovery capture text); no unbounded crawl (hard plan caps). Live interaction
-sits under the existing security contract ceiling ``ACTIVE_TEST_AUTHORIZED``
-and requires an explicit per-call authorization flag.
+discovery capture text); no unbounded crawl (hard plan caps).
+
+Live interaction is gated by the EXISTING security contract, never by a second
+authorization model: every transport that can cause live external interaction
+(``PlainHttpTransport``, ``ExecutorTextTransport``, ``ExecutorBrowserTransport``)
+fails closed unless
+``security_contract.authorize_security_execution(ACTIVE_TEST_AUTHORIZED, ...)``
+returns ``allowed is True``, which requires BOTH ``target_authorized=True`` and
+``controlled_test_environment=True``. ``capture_with_policy()`` applies the same
+gate before it selects any transport, so neither direct adapter calls nor
+policy-driven orchestration can bypass SEC01. There is no single-boolean
+shortcut.
+
+Two further fail-closed bounds are runtime-wide, not adapter-local:
+
+* public-target-only validation: literal ``localhost``-shaped names, loopback,
+  private, link-local, unspecified, multicast, reserved, and otherwise
+  non-globally-routable literal addresses are rejected by
+  :func:`validate_public_url` and :class:`CaptureScope` using stdlib
+  ``ipaddress``; the plain-HTTP lane additionally fails closed unless EVERY
+  address the host resolves to (stdlib ``socket.getaddrinfo``) is globally
+  routable — a DNS failure is a rejection, not a retry;
+* one common capture-size ceiling (``MAX_CAPTURE_BYTES``) enforced centrally in
+  :func:`normalize_capture` for every transport kind.
 
 This module performs no routing/classification of task text. Callers arrive
 here only after the sole P2P router has selected a ``web.*`` capability.
@@ -42,8 +63,11 @@ here only after the sole P2P router has selected a ``web.*`` capability.
 from __future__ import annotations
 
 import hashlib
+import inspect
+import ipaddress
 import json
 import re
+import socket
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -52,7 +76,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
-from .security_contract import ACTIVE_TEST_AUTHORIZED
+from .security_contract import (
+    ACTIVE_TEST_AUTHORIZED,
+    SecurityContractError,
+    authorize_security_execution,
+)
 from .web_reverse_reference import WEB_REVERSE_FAMILY_FLOW
 
 WEB_CAPTURE_RUNTIME_SCHEMA = "p2p-web-capture-runtime/1"
@@ -91,9 +119,17 @@ STEP_STATUSES = ("PENDING", "CAPTURED", "FAILED", "BLOCKED", "SKIPPED")
 # Hard bounded-plan ceilings. There is no unbounded mode.
 MAX_PLAN_CAPTURES = 64
 MAX_CAPTURE_BYTES = 8 * 1024 * 1024
+# One shared fail-closed code for the runtime-wide capture-size ceiling.
+CAPTURE_SIZE_LIMIT_EXCEEDED = "CAPTURE_SIZE_LIMIT_EXCEEDED"
 DEFAULT_TIMEOUT_SECONDS = 30.0
 HONEST_USER_AGENT = (
     "P2P-web-capture-runtime/1 (bounded public capture; no credentials; Issue #241)"
+)
+
+# ``localhost``-shaped names are loopback-only by RFC 6761/6762 convention and
+# are rejected before any resolution is attempted.
+_LOOPBACK_ONLY_HOSTNAMES = frozenset(
+    {"localhost", "localhost.localdomain", "ip6-localhost", "ip6-loopback"}
 )
 
 _REQUIRED_RECORD_FIELDS = (
@@ -147,25 +183,178 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _address_is_public(address: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """True only for plain globally routable unicast addresses.
+
+    The explicit ``is_multicast`` / ``is_reserved`` / ``is_site_local`` terms
+    exist because some stdlib versions report those special ranges as
+    ``is_global`` (for example multicast), which would silently widen the
+    public-only guard.
+    """
+
+    if address.is_multicast or address.is_reserved or not address.is_global:
+        return False
+    if getattr(address, "is_site_local", False):  # IPv6 fec0::/10, fail closed
+        return False
+    return True
+
+
+def _host_is_public_literal(host: str) -> bool:
+    """Fail-closed public-target check for a host string, using stdlib only.
+
+    Rejects ``localhost``-shaped names outright and every literal address that
+    is not a plain globally routable unicast address: loopback, private,
+    link-local, unspecified, multicast, reserved, IPv6-site-local,
+    documentation, carrier-grade NAT, IPv4-mapped loopback, and anything else
+    ``ipaddress`` does not mark as global. The explicit ``is_multicast`` /
+    ``is_reserved`` / ``is_site_local`` terms exist because some stdlib
+    versions report multicast (and other special ranges) as ``is_global``.
+
+    DNS names return ``True`` here because this helper performs no network I/O;
+    a name is only ever reached after the caller's explicit scope allowlist
+    matched it exactly, and the plain-HTTP lane separately verifies every
+    resolved address (see :func:`require_public_resolved_host`).
+    """
+
+    candidate = host.strip()
+    if candidate.startswith("[") and candidate.endswith("]"):
+        candidate = candidate[1:-1]
+    candidate = candidate.rstrip(".").lower()
+    if not candidate:
+        return False
+    if candidate in _LOOPBACK_ONLY_HOSTNAMES or candidate.endswith(".localhost"):
+        return False
+    try:
+        address = ipaddress.ip_address(candidate)
+    except ValueError:
+        return True  # a DNS name: no literal to judge without network I/O
+    return _address_is_public(address)
+
+
+def _public_host_from_netloc(netloc: str) -> str:
+    """Extract the host from a URL authority, failing closed on odd shapes.
+
+    Unbracketed IPv6 authorities (``https://fd12:3456::1/``) are ambiguous —
+    ``urlsplit`` silently reports ``fd12`` as the hostname — and non-numeric
+    ports cannot be trusted either, so both are rejected instead of guessed at.
+    """
+
+    if netloc.startswith("["):
+        host, separator, port = netloc[1:].partition("]")
+        if not separator:
+            raise CaptureScopeError(f"INVALID_HOST_SYNTAX:{netloc}")
+    else:
+        host, separator, port = netloc.rpartition(":")
+        if not separator:
+            host, port = netloc, ""
+        elif ":" in host:
+            raise CaptureScopeError(f"INVALID_HOST_SYNTAX:{netloc}")
+    if port and not port.isdigit():
+        raise CaptureScopeError(f"INVALID_PORT:{port}")
+    if not host:
+        raise CaptureScopeError("EMPTY_HOST")
+    return host
+
+
 def validate_public_url(url: Any, *, allowed_schemes: Sequence[str] = ("https", "http")) -> str:
     """Validate a public unauthenticated http/https URL; fail closed.
 
-    Rejects: empty/non-string URLs, non-http(s) schemes, embedded credentials
-    (userinfo), and empty hosts. Never rewrites the URL beyond returning it
-    unchanged; percent-encoding is left exactly as provided.
+    Rejects: empty/non-string URLs, malformed URL syntax, non-http(s) schemes,
+    embedded credentials (userinfo), empty or ambiguous hosts, non-numeric
+    ports, and non-public literal hosts (``localhost``, loopback, private,
+    link-local, unspecified, multicast, reserved, or any address stdlib
+    ``ipaddress`` does not mark globally routable). Never rewrites the URL
+    beyond returning it unchanged; percent-encoding is left exactly as
+    provided.
     """
 
     if not isinstance(url, str) or not url.strip():
         raise CaptureScopeError("EMPTY_OR_NON_STRING_URL")
     candidate = url.strip()
-    parsed = urllib.parse.urlsplit(candidate)
+    try:
+        parsed = urllib.parse.urlsplit(candidate)
+    except ValueError as error:
+        raise CaptureScopeError(f"INVALID_URL_SYNTAX:{error}") from error
     if parsed.scheme.lower() not in {scheme.lower() for scheme in allowed_schemes}:
         raise CaptureScopeError(f"SCHEME_NOT_ALLOWED:{parsed.scheme or 'EMPTY'}")
     if "@" in (parsed.netloc or ""):
         raise CaptureScopeError("CREDENTIALS_IN_URL_REJECTED")
-    if not parsed.hostname:
-        raise CaptureScopeError("EMPTY_HOST")
+    host = _public_host_from_netloc(parsed.netloc or "")
+    if not _host_is_public_literal(host):
+        raise CaptureScopeError(f"NON_PUBLIC_TARGET_HOST_REJECTED:{host.lower()}")
     return candidate
+
+
+def require_live_capture_authorization(
+    *,
+    target_authorized: bool,
+    controlled_test_environment: bool,
+) -> Mapping[str, Any]:
+    """Gate live public-web interaction through the EXISTING SEC01 decision.
+
+    This is a thin reuse of
+    ``security_contract.authorize_security_execution(ACTIVE_TEST_AUTHORIZED, ...)``.
+    It adds no new authorization model, no new risk classifier, and no new
+    execution class: the SEC01 decision already requires BOTH
+    ``target_authorized=True`` and ``controlled_test_environment=True`` for
+    ``ACTIVE_TEST_AUTHORIZED``. A denied (or undecidable) decision fails closed
+    with :class:`CaptureAuthorizationError`, which carries the SEC01 reason
+    codes so callers can see exactly which fact was missing.
+    """
+
+    try:
+        decision = authorize_security_execution(
+            ACTIVE_TEST_AUTHORIZED,
+            target_authorized=target_authorized,
+            controlled_test_environment=controlled_test_environment,
+        )
+    except SecurityContractError as error:  # malformed facts -> fail closed
+        raise CaptureAuthorizationError(f"LIVE_CAPTURE_AUTHORIZATION_INVALID:{error}") from error
+    if decision.get("allowed") is not True:
+        reasons = ",".join(decision.get("reason_codes") or ())
+        raise CaptureAuthorizationError(
+            f"LIVE_CAPTURE_NOT_AUTHORIZED:{reasons or 'SEC01_DENIED'}"
+        )
+    return decision
+
+
+def require_public_resolved_host(url: str) -> tuple[str, ...]:
+    """Smallest practical fail-closed DNS guard for the plain-HTTP lane.
+
+    Resolves the URL host with stdlib ``socket.getaddrinfo`` and rejects the
+    request unless EVERY resolved address is globally routable. DNS resolution
+    failure, an empty answer, an unparseable address, and any loopback /
+    private / link-local / reserved / non-global address all fail closed. This
+    is a public-target check only: it is not a scanner, a proxy layer, or an
+    SSRF framework, and it performs no I/O beyond one name resolution.
+    """
+
+    host = urllib.parse.urlsplit(url).hostname
+    if not host:
+        raise CaptureScopeError("EMPTY_HOST")
+    try:
+        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+    except (socket.gaierror, OSError, UnicodeError) as error:
+        raise CaptureTransportError(f"DNS_RESOLUTION_FAILED:{host}") from error
+    resolved: list[str] = []
+    for info in infos:
+        sockaddr = info[4]
+        raw_address = str(sockaddr[0]) if sockaddr else ""
+        address_text = raw_address.split("%", 1)[0]  # strip IPv6 zone id
+        if not address_text:
+            raise CaptureTransportError(f"DNS_RESOLVED_ADDRESS_INVALID:{host}")
+        try:
+            address = ipaddress.ip_address(address_text)
+        except ValueError as error:
+            raise CaptureTransportError(
+                f"DNS_RESOLVED_ADDRESS_INVALID:{host}->{raw_address}"
+            ) from error
+        if not _address_is_public(address):
+            raise CaptureTransportError(f"NON_PUBLIC_TARGET_RESOLVED:{host}->{raw_address}")
+        resolved.append(raw_address)
+    if not resolved:
+        raise CaptureTransportError(f"DNS_RESOLUTION_EMPTY:{host}")
+    return tuple(sorted(set(resolved)))
 
 
 @dataclass(frozen=True)
@@ -186,6 +375,8 @@ class CaptureScope:
         host = self.allowed_host.strip().lower()
         if not host or "/" in host or "@" in host or ":" in host:
             raise CaptureScopeError(f"INVALID_ALLOWED_HOST:{self.allowed_host!r}")
+        if not _host_is_public_literal(host):
+            raise CaptureScopeError(f"NON_PUBLIC_TARGET_HOST_REJECTED:{host}")
         object.__setattr__(self, "allowed_host", host)
         if not self.allowed_path_prefixes:
             raise CaptureScopeError("SCOPE_REQUIRES_EXPLICIT_PATH_PREFIXES")
@@ -343,8 +534,12 @@ def normalize_capture(
     """Normalize one transport result into the generic capture contract.
 
     Scope is enforced on both ``requested_url`` and any observed ``final_url``
-    (an out-of-scope redirect fails closed). Hashes/counts are computed from
-    the actual content bytes; nothing else is derived or invented.
+    (an out-of-scope redirect fails closed). The runtime-wide capture-size
+    ceiling ``MAX_CAPTURE_BYTES`` is applied here, once, for EVERY transport
+    kind (``PLAIN_HTTP``, ``EXECUTOR_TEXT``, ``EXECUTOR_BROWSER``,
+    ``RECORDED_RESULT``) so no adapter can normalize an oversized payload.
+    Hashes/counts are computed from the actual content bytes; nothing else is
+    derived or invented.
     """
 
     scope.require_allows(result.requested_url)
@@ -353,12 +548,26 @@ def normalize_capture(
 
     if isinstance(result.content, bytes):
         raw = result.content
+        if len(raw) > MAX_CAPTURE_BYTES:
+            raise CaptureTransportError(
+                f"{CAPTURE_SIZE_LIMIT_EXCEEDED}:{len(raw)}>{MAX_CAPTURE_BYTES}"
+            )
         try:
             char_count: int | None = len(raw.decode("utf-8"))
         except UnicodeDecodeError:
             char_count = None
     else:
+        if len(result.content) > MAX_CAPTURE_BYTES:
+            # UTF-8 never encodes below one byte per character, so this cheap
+            # check already fails closed before the payload is materialized.
+            raise CaptureTransportError(
+                f"{CAPTURE_SIZE_LIMIT_EXCEEDED}:{len(result.content)}>{MAX_CAPTURE_BYTES}"
+            )
         raw = result.content.encode("utf-8")
+        if len(raw) > MAX_CAPTURE_BYTES:
+            raise CaptureTransportError(
+                f"{CAPTURE_SIZE_LIMIT_EXCEEDED}:{len(raw)}>{MAX_CAPTURE_BYTES}"
+            )
         char_count = len(result.content)
 
     host = urllib.parse.urlsplit(result.final_url or result.requested_url).hostname or ""
@@ -414,8 +623,11 @@ class Capture:
 class PlainHttpTransport:
     """Cheapest transport: direct public HTTP GET via stdlib urllib.
 
-    Fail-closed properties: requires explicit per-call ``authorized=True``;
-    GET only; no cookies, no credential headers, no proxy configuration
+    Fail-closed properties: live interaction requires the EXISTING SEC01
+    decision (``target_authorized=True`` AND ``controlled_test_environment=True``
+    under ``ACTIVE_TEST_AUTHORIZED``); the target must be a public-only URL and
+    must resolve exclusively to globally routable addresses before any external
+    I/O; GET only; no cookies, no credential headers, no proxy configuration
     (environment proxies are disabled, never rotated), default TLS
     verification is never weakened, and reads are bounded by ``max_bytes``.
     HTTP metadata is recorded only from the real response.
@@ -427,13 +639,23 @@ class PlainHttpTransport:
     max_bytes: int = MAX_CAPTURE_BYTES
     user_agent: str = HONEST_USER_AGENT
 
-    def fetch(self, url: str, *, authorized: bool = False) -> TransportResult:
-        if not authorized:
-            raise CaptureAuthorizationError(
-                "LIVE_HTTP_REQUIRES_EXPLICIT_AUTHORIZATION:"
-                f"{LIVE_CAPTURE_EXECUTION_CLASS}"
-            )
+    def __post_init__(self) -> None:
+        if self.max_bytes > MAX_CAPTURE_BYTES:
+            raise CaptureTransportError("ADAPTER_BOUND_EXCEEDS_RUNTIME_CEILING")
+
+    def fetch(
+        self,
+        url: str,
+        *,
+        target_authorized: bool = False,
+        controlled_test_environment: bool = False,
+    ) -> TransportResult:
+        require_live_capture_authorization(
+            target_authorized=target_authorized,
+            controlled_test_environment=controlled_test_environment,
+        )
         candidate = validate_public_url(url)
+        require_public_resolved_host(candidate)
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
         request = urllib.request.Request(
             candidate,
@@ -456,7 +678,7 @@ class PlainHttpTransport:
         except (urllib.error.URLError, OSError, ValueError) as error:
             raise CaptureTransportError(f"PLAIN_HTTP_UNAVAILABLE:{error}") from error
         if len(raw) > self.max_bytes:
-            raise CaptureTransportError("CAPTURE_SIZE_LIMIT_EXCEEDED")
+            raise CaptureTransportError(CAPTURE_SIZE_LIMIT_EXCEEDED)
         return TransportResult(
             requested_url=candidate,
             content=raw,
@@ -479,6 +701,11 @@ class ExecutorTextTransport:
     ``http_status``, ``content_type``, ``retrieved_at`` and ``executor_meta``
     (for example honest chunk information). Unobserved HTTP metadata stays
     None — this adapter never guesses a status code or content type.
+
+    This lane causes live external interaction too, so it is gated by the same
+    EXISTING SEC01 decision as the plain-HTTP lane: the executor callable is
+    never invoked unless ``target_authorized=True`` AND
+    ``controlled_test_environment=True``.
     """
 
     executor_name: str
@@ -486,8 +713,17 @@ class ExecutorTextTransport:
     kind: str = EXECUTOR_TEXT
     representation: str = TEXT_CAPTURE
 
-    def fetch(self, url: str, *, authorized: bool = False) -> TransportResult:
-        del authorized  # executor-native public text fetch needs no live-HTTP flag
+    def fetch(
+        self,
+        url: str,
+        *,
+        target_authorized: bool = False,
+        controlled_test_environment: bool = False,
+    ) -> TransportResult:
+        require_live_capture_authorization(
+            target_authorized=target_authorized,
+            controlled_test_environment=controlled_test_environment,
+        )
         candidate = validate_public_url(url)
         raw = self.fetch_callable(candidate)
         if not isinstance(raw, Mapping):
@@ -521,6 +757,11 @@ class ExecutorBrowserTransport:
     browser-use/jev-ultrafast or Browser Harness integration elsewhere) may
     inject ``render_callable``; without one, this adapter fails closed and the
     transport policy simply proceeds without a browser lane.
+
+    A provided render surface performs live external interaction, so it is
+    gated by the same EXISTING SEC01 decision: ``render_callable`` is never
+    invoked unless ``target_authorized=True`` AND
+    ``controlled_test_environment=True``.
     """
 
     executor_name: str = "UNPROVIDED_BROWSER_ADAPTER"
@@ -528,8 +769,17 @@ class ExecutorBrowserTransport:
     kind: str = EXECUTOR_BROWSER
     representation: str = BROWSER_DOCUMENT
 
-    def fetch(self, url: str, *, authorized: bool = False) -> TransportResult:
-        del authorized
+    def fetch(
+        self,
+        url: str,
+        *,
+        target_authorized: bool = False,
+        controlled_test_environment: bool = False,
+    ) -> TransportResult:
+        require_live_capture_authorization(
+            target_authorized=target_authorized,
+            controlled_test_environment=controlled_test_environment,
+        )
         if self.render_callable is None:
             raise CaptureTransportError(
                 "BROWSER_ADAPTER_NOT_PROVIDED:OPTIONAL_ONLY_NEVER_MANDATORY"
@@ -558,7 +808,8 @@ def capture_with_policy(
     scope: CaptureScope,
     adapters: Sequence[Any],
     *,
-    authorized: bool = False,
+    target_authorized: bool = False,
+    controlled_test_environment: bool = False,
     parent_capture: str | None = None,
     discovered_from: str | None = None,
     notes: Sequence[str] = (),
@@ -567,10 +818,27 @@ def capture_with_policy(
 
     Adapters are tried in ``TRANSPORT_POLICY_ORDER`` (plain HTTP -> executor
     text -> browser), regardless of the order they are supplied in. An adapter
-    that cannot expose the content (unavailable, unauthorized, or failing)
-    yields to the next one; the browser lane is used only when the cheaper
-    lanes cannot work, and is never required at all.
+    that cannot expose the content (unavailable or failing) yields to the next
+    one; the browser lane is used only when the cheaper lanes cannot work, and
+    is never required at all.
+
+    Live interaction is gated by the EXISTING SEC01 decision, exactly like the
+    adapters: the caller must supply both ``target_authorized=True`` and
+    ``controlled_test_environment=True``, otherwise this function fails closed
+    with :class:`CaptureAuthorizationError` before any adapter can run. The
+    same facts are forwarded to the selected adapter (per call, so there is one
+    source of truth per capture), which applies the gate again for itself.
+    Policy orchestration therefore cannot be used as an authorization bypass.
     """
+
+    require_live_capture_authorization(
+        target_authorized=target_authorized,
+        controlled_test_environment=controlled_test_environment,
+    )
+    authorization = {
+        "target_authorized": target_authorized,
+        "controlled_test_environment": controlled_test_environment,
+    }
 
     by_kind: dict[str, Any] = {}
     for adapter in adapters:
@@ -586,7 +854,7 @@ def capture_with_policy(
             failures.append(f"{kind}:ADAPTER_NOT_PROVIDED")
             continue
         try:
-            result = adapter.fetch(url, authorized=authorized)
+            result = adapter.fetch(url, **authorization)
         except (CaptureAuthorizationError, CaptureTransportError) as error:
             failures.append(f"{kind}:{error}")
             continue
@@ -1030,6 +1298,18 @@ def _validate_module_contracts() -> None:
             raise WebCaptureError(f"CAPTURE_CONTRACT_MISSING_FIELD:{field_name}")
     if not RELATED_CAPABILITY_IDS:
         raise WebCaptureError("EXISTING_WEB_FAMILY_NOT_REUSED")
+    if LIVE_CAPTURE_EXECUTION_CLASS != ACTIVE_TEST_AUTHORIZED:
+        raise WebCaptureError("LIVE_CAPTURE_CLASS_DRIFTED_FROM_SEC01")
+    # Every live transport must accept BOTH SEC01 facts per call, and must not
+    # fall back to an ad-hoc single authorization boolean. This catches the
+    # Blocker-A regression statically at import time.
+    for transport_class in (PlainHttpTransport, ExecutorTextTransport, ExecutorBrowserTransport):
+        parameters = inspect.signature(transport_class.fetch).parameters
+        if "authorized" in parameters:
+            raise WebCaptureError(f"TRANSPORT_AD_HOC_AUTHORIZATION_FLAG:{transport_class.__name__}")
+        for fact_name in ("target_authorized", "controlled_test_environment"):
+            if fact_name not in parameters:
+                raise WebCaptureError(f"TRANSPORT_MISSING_SEC01_FACT:{transport_class.__name__}")
 
 
 _validate_module_contracts()
@@ -1038,6 +1318,7 @@ _validate_module_contracts()
 __all__ = [
     "ATTACHMENT_DISCOVERY",
     "BROWSER_DOCUMENT",
+    "CAPTURE_SIZE_LIMIT_EXCEEDED",
     "CaptureAuthorizationError",
     "CapturePlan",
     "CapturePlanError",
@@ -1083,6 +1364,8 @@ __all__ = [
     "normalize_capture",
     "page_range_plan",
     "pending_steps",
+    "require_live_capture_authorization",
+    "require_public_resolved_host",
     "resume_plan",
     "select_urls",
     "single_url_plan",

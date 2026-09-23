@@ -13,8 +13,10 @@ Arena session on **2026-09-23** (~02:11–02:55 UTC window).
 - **Plain HTTP lane:** unavailable in this sandbox — outbound TLS to the
   target hosts is blocked by the sandbox egress policy (only allowlisted
   hosts such as `api.github.com` are reachable directly). The runtime's
-  `PlainHttpTransport` is exercised offline against a loopback fixture in
-  `tests/test_p2p_web_capture_runtime.py` instead.
+  `PlainHttpTransport` is exercised offline in
+  `tests/test_p2p_web_capture_runtime.py` through a mocked public transport
+  boundary (fake globally-routable DNS answers + fake opener), so production
+  validation stays public-only and no loopback/private bypass knob exists.
 - **Browser lane:** not provided (optional by design). The known dead-end
   Arena configuration from Issue #241 (no local Chrome/Chromium, Browser Use
   Cloud auth missing, `api.browser-use.com` unreachable) was deliberately NOT
@@ -69,6 +71,34 @@ in the manifest checkpoint as `BLOCKED` steps:
 Neither failure is a runtime-contract failure: the same normalized capture
 contract, plans, and checkpoint metadata were produced for all three sites
 from real captures.
+
+## Post-review repair round (2026-09-23)
+
+Supervisor review comment #5790818568 blocked the first head on three
+control-plane defects; the repair round
+(`P2P_PUBLIC_WEB_SCRAPE_RUNTIME_01_REPAIR_02`) fixed them inside the same
+module, with no new capability/registry/router and no further live-site
+requests:
+
+1. **Authorization** — every live transport (`PlainHttpTransport`,
+   `ExecutorTextTransport`, `ExecutorBrowserTransport`) and the
+   `capture_with_policy` entry point now fail closed unless the EXISTING
+   `security_contract.authorize_security_execution(ACTIVE_TEST_AUTHORIZED, ...)`
+   decision allows it, which requires both `target_authorized=True` and
+   `controlled_test_environment=True`. The previous ad-hoc single boolean is
+   gone; no second authorization model exists.
+2. **Public targets only** — `validate_public_url`/`CaptureScope` reject
+   `localhost`-shaped names and non-globally-routable literal addresses
+   (loopback, private, link-local, unspecified, multicast, reserved, CGNAT,
+   documentation, IPv6 site-local) via stdlib `ipaddress`, and the plain-HTTP
+   lane additionally fails closed unless every resolved address (stdlib
+   `socket.getaddrinfo`) is globally routable before any external I/O.
+3. **One size bound** — `MAX_CAPTURE_BYTES` is now enforced centrally in
+   `normalize_capture` for all transport kinds, not only plain HTTP.
+
+The captures and manifest below are unchanged by the repair: content hashes
+still describe the stored bytes, and `build_manifest.py` still rebuilds
+`manifest.json` byte-deterministically.
 
 ## Source-specific boundary
 
