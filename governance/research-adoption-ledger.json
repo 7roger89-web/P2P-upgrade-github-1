@@ -3356,7 +3356,7 @@
       "research_id": "RA-EXT-101",
       "source_name": "PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT (candidate direction, deferral record)",
       "source_type": "DEFERRED_CAPABILITY_DIRECTION",
-      "source_reference": "Composed from markfulton/ai-employees SCHEDULE.md window semantics + CONTRACT.md five opening lines (pause, window, once-per-period) + guard.mjs; specified in docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md section 7",
+      "source_reference": "Composed from markfulton/ai-employees SCHEDULE.md window semantics + CONTRACT.md five opening lines (pause, window, once-per-period) + guard.mjs; specified in docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md headings 'Deferred candidate (not implemented)' and 'Re-entry trigger (all four required)'",
       "source_version_or_commit": "upstream edffe8f4afea467818988ce3ce9332e6d832e5ed; P2P candidate specified 2026-09-22, NOT implemented",
       "provenance_status": "SPECIFIED_NOT_IMPLEMENTED; gap evidenced by a whole-tree negative scan for cadence/period/window vocabulary in P2P core",
       "research_summary": "The only genuine expression gap found in the study: P2P cannot express routine identity, day/window eligibility or calendar-period identity, and therefore cannot decide deterministically RUN vs SKIP for a recurring operational obligation. The need is not yet demonstrated: P2P has no firing source (no scheduler, no daemon, no worker queue, NO_UNBOUNDED_BACKGROUND_AUTONOMY), no Owner-approved recurring obligation in period form, and no recorded lost or duplicated period; the P2P duplicate-failure class actually observed is identity-based and is already covered by packet-fingerprint idempotency and RULE 06. Building the guard before the thing it guards would be infrastructure ahead of its consumer.",
@@ -3381,7 +3381,7 @@
       "canonical_capability_ids": [],
       "status": "DEFERRED",
       "evidence_pointers": [
-        "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md (section 2 OE gate, section 3 patterns C/D, section 7 candidate shape and trigger)",
+        "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md (Over-engineering gate; Pattern matrix (A-O) patterns C and D; Deferred candidate (not implemented); Re-entry trigger (all four required))",
         "tests/test_p2p_ai_employees_pattern_assimilation_01.py"
       ],
       "dependencies": [
