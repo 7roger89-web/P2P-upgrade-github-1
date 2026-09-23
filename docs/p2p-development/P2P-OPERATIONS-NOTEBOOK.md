@@ -2428,7 +2428,7 @@ machine-readable ledger below is the durable record.
     {
       "id": "BACKLOG_J",
       "item": "DOMAIN_CAPABILITY_ADMISSION_V1",
-      "status": "PENDING",
+      "status": "VERIFIED",
       "evidence": [
         "Issue #245 P2P_DOMAIN_CAPABILITY_ADMISSION_01 (bounded goal, required invariants, OE gate)",
         "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 — REALITY_FIRST_CAPABILITY_PROBE, subsection DOMAIN_CAPABILITY_ADMISSION_V1)",
@@ -2444,10 +2444,10 @@ machine-readable ledger below is the durable record.
 `BACKLOG_I` stays `PENDING` until Control Tower independently verifies the
 exact PR head/tree for Issue #42 under RULE_ASSIMILATION_GATE_V1.
 
-`BACKLOG_J` (`DOMAIN_CAPABILITY_ADMISSION_V1`) stays `PENDING` at Writer
-stage: the subsection is written, but Control Tower must independently verify
-the exact PR head/tree for Issue #245 under RULE_ASSIMILATION_GATE_V1 before
-the entry may flip to `VERIFIED`.
+`BACKLOG_J` (`DOMAIN_CAPABILITY_ADMISSION_V1`) is `VERIFIED`. Control Tower
+independently verified PR #246 at exact Writer head
+`d14b5e89d14f84dc70d4eb53fda978e4f7b2060a` (PR comment `5793604664`) under
+RULE_ASSIMILATION_GATE_V1 before this status flip.
 
 ## 5. ASSIMILATION_BACKLOG — previously promised items
 
@@ -2492,13 +2492,14 @@ section 4.3.
   in `tests/test_p2p_context_hygiene.py`. Flips to `VERIFIED` only after
   Control Tower verifies the exact PR head/tree.
 - **J. Domain capability admission (`DOMAIN_CAPABILITY_ADMISSION_V1`)** —
-  `PENDING`. Issue #245 PR candidate: the bounded subsection under RULE 19
-  above (target-domain proof, cheap credible baseline, frozen evaluation set,
+  `VERIFIED`. Issue #245 / PR #246: the bounded subsection under RULE 19 above
+  (target-domain proof, cheap credible baseline, frozen evaluation set,
   predeclared promotion criteria, observe-before-control, routing-vs-domain
   authority, valid abstention, complexity/value gate), the RA-EXT-102
   research-adoption record, and focused tests in
-  `tests/test_p2p_domain_capability_admission_01.py`. Flips to `VERIFIED`
-  only after Control Tower verifies the exact PR head/tree.
+  `tests/test_p2p_domain_capability_admission_01.py`. Control Tower independently
+  verified exact Writer head `d14b5e89d14f84dc70d4eb53fda978e4f7b2060a`
+  in PR comment `5793604664` before this status flip.
 
 ## 6. Discovery and operator paths
 
