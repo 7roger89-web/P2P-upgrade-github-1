@@ -199,7 +199,8 @@ NOTEBOOKLM_SEARCH_SCHEMA = _schema(
     "notebooklm_domain_search",
     "Search Trường Thành Logistics' configured NotebookLM knowledge notebooks. "
     "Use this for Support/Sale questions about HS classification, chemicals, "
-    "Bộ KH&CN / quality-regulation topics, and Bộ TT&TT / telecom-radio topics. "
+    "Bộ KH&CN / quality-regulation topics, Bộ TT&TT / telecom-radio topics, "
+    "and Bộ Y tế / health-product topics. "
     "If domains is omitted, the tool deterministically routes the Vietnamese "
     "question to up to three matching notebooks. It returns ranked source "
     "passages and source titles from NotebookLM; it does NOT create or modify "
@@ -513,7 +514,7 @@ async def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
                     "routed_domains": [],
                     "needed": (
                         "Bổ sung loại hàng/công dụng/thành phần/CAS/model/tần số "
-                        "hoặc chỉ rõ nhóm HS, Hóa chất, Bộ KH&CN, Bộ TT&TT."
+                        "hoặc chỉ rõ nhóm HS, Hóa chất, Bộ KH&CN, Bộ TT&TT, Bộ Y tế."
                     ),
                     "legal_authority": False,
                 }
