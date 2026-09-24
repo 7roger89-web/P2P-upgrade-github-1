@@ -1,0 +1,18 @@
+{
+  "SCENARIO": "ZIWEI_518400_DATASET_CANARY",
+  "CURRENT_STACK": "TypeScript upstream engine / P2P research orchestration",
+  "DATASET_PROVENANCE": {
+    "source_repo": "Renhuai123/ziwei-doushu",
+    "release_tag": "v3.0-samples",
+    "records": 518400,
+    "bytes": 5878228608,
+    "sha256": "21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870",
+    "verified_at_utc": "2026-09-18T16:09:25.203848+00:00"
+  },
+  "ACCEPTANCE_TARGET": null,
+  "BASELINE": null,
+  "BOTTLENECK": "UNKNOWN",
+  "EXPECTED_VERDICT": "INSUFFICIENT_EVIDENCE",
+  "EXPECTED_NATIVE_CANDIDATE": false,
+  "WHY": "Real scale/provenance is not a measured performance failure. Do not invent a target or blame the runtime."
+}

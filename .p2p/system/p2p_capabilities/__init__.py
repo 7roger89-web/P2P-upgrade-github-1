@@ -505,3 +505,26 @@ if _PROMPT_AUTHORING_DISCIPLINE_MARKER not in _control_tower_handoff.SUPREME_LAW
             _PROMPT_AUTHORING_DISCIPLINE_CAPSULE,
         )
     )
+
+
+# POLYGLOT_BY_EVIDENCE_V1 — deterministic evidence gate only.
+# No benchmark execution, toolchain installation, migration, or permission widening.
+from .performance_language_gate import (
+    SCHEMA as PERFORMANCE_LANGUAGE_GATE_SCHEMA,
+    CPU_BOTTLENECK,
+    NON_CPU_BOTTLENECKS,
+    VALID_BOTTLENECKS,
+    VERDICTS as PERFORMANCE_LANGUAGE_VERDICTS,
+    performance_signal,
+    evaluate_performance_language_admission,
+)
+
+__all__ += [
+    "PERFORMANCE_LANGUAGE_GATE_SCHEMA",
+    "CPU_BOTTLENECK",
+    "NON_CPU_BOTTLENECKS",
+    "VALID_BOTTLENECKS",
+    "PERFORMANCE_LANGUAGE_VERDICTS",
+    "performance_signal",
+    "evaluate_performance_language_admission",
+]

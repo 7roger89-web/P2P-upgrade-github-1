@@ -204,3 +204,26 @@ The following patterns are permanently registered as rejected and appear in char
 ## 6. Provenance notes
 
 RA-EXT-009 (NUI): the 174-faculty count is `PROVENANCE_NOT_RECOVERED` — no repository artifact reproduces the claim. Per machinery (RI-003), this is **not evidence of absence**; it remains NOT_PROVEN, not REJECTED. RA-EXT-012 (Electron) has no durable selection evidence; it is recorded UNKNOWN and must not be silently treated as adopted. RA-EXT-007 (Anvien) and other license-constrained sources remain research-only.
+
+
+### 4.9 Rust/polyglot operationalization 2026-09-24 (RA-EXT-103)
+
+Appended projection of Issue #252. The JSON ledger remains the authority. This
+closes the gap between the earlier `POLYGLOT_BY_EVIDENCE_V1` documentation
+and an executable decision path; it does **not** force Rust into any project.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-103 | `RUST_OPERATIONALIZATION_V1` + real Ziwei v3 dataset provenance (518,400 records, 5,878,228,608 bytes, SHA-256 `21fe90f8…`) | IMPLEMENTED | acceptance target → baseline → bottleneck → measured CPU hot path → current-stack optimization → bounded same-workload native spike → cost/rollback | RULE 19 `PERFORMANCE_LANGUAGE_ADMISSION_V1` + deterministic `performance_language_gate.py` + thin CLI + package transport + focused tests; scale alone returns `INSUFFICIENT_EVIDENCE` |
+
+The representative Ziwei canary intentionally does not invent a latency or
+throughput target. Its correct result is `INSUFFICIENT_EVIDENCE` and
+`NATIVE_CANDIDATE=false`: a 5.8 GB / 518,400-record dataset proves scale,
+not a language-runtime bottleneck. A real Rust/native spike becomes eligible
+only after a task-specific acceptance failure is measured and profiling
+identifies a CPU hot path that remains insufficient after the current stack's
+smallest credible optimization.
+
+No benchmark service, daemon, watcher, second router/registry, generic shell
+executor, Rust toolchain install, product rewrite, deployment, release, or
+local-PC/Anvien dependency is introduced by RA-EXT-103.
