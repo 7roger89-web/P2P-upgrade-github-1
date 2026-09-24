@@ -119,8 +119,8 @@ Notebook matching uses the known titles by default. Exact IDs or alternate
 titles can be supplied without code changes:
 
 ```text
-NOTEBOOKLM_NOTEBOOKS_JSON={"HS":"...","CHEMICAL":"...","BKHCN":"...","BTTTT":"..."}
-NOTEBOOKLM_NOTEBOOK_TITLES_JSON={"HS":"Tra mã HS","CHEMICAL":"Hóa chất","BKHCN":"Bộ khoa học công nghệ","BTTTT":"Bộ Thông Tin truyền thông"}
+NOTEBOOKLM_NOTEBOOKS_JSON={"HS":"...","CHEMICAL":"...","BKHCN":"...","BTTTT":"...","YTE":"..."}
+NOTEBOOKLM_NOTEBOOK_TITLES_JSON={"HS":"Tra mã HS","CHEMICAL":"Hóa chất","BKHCN":"Bộ khoa học công nghệ","BTTTT":"Bộ Thông Tin truyền thông","YTE":"Y TẾ"}
 ```
 
 NotebookLM is an operational research layer, not final legal authority. VNLAW
