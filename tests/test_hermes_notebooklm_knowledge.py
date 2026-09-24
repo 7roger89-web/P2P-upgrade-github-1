@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import importlib.util
 import json
 import os
@@ -35,6 +36,11 @@ def load_plugin():
 
 
 PLUGIN = load_plugin()
+
+
+def call_handler(args):
+    """Invoke the async tool handler from this synchronous test process."""
+    return asyncio.run(PLUGIN.tools.handle_notebooklm_search(args))
 
 
 class FakeNotebook:
@@ -120,6 +126,31 @@ class FakeNotebookLMClient:
         return FakeClient()
 
 
+class RaisingNotebooks:
+    """Simulates an upstream failure whose message carries credential-like
+    material; the handler must never echo that material back."""
+
+    LEAKED = "SUPERSECRET_SID=abc123 FdrFJe=leakme"
+
+    async def list(self):
+        raise PermissionError(f"denied: cookie={self.LEAKED}")
+
+
+class RaisingClient:
+    async def __aenter__(self):
+        self.notebooks = RaisingNotebooks()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        return False
+
+
+class RaisingNotebookLMClient:
+    @classmethod
+    def from_storage(cls):
+        return RaisingClient()
+
+
 class RouterTests(unittest.TestCase):
     def test_wifi_routes_to_btttt(self):
         self.assertEqual(
@@ -164,7 +195,7 @@ class HandlerTests(unittest.TestCase):
             clear=False,
         ), patch.dict(sys.modules, {"notebooklm": self._fake_module()}):
             payload = json.loads(
-                PLUGIN.tools.handle_notebooklm_search(
+                call_handler(
                     {
                         "question": "Router WiFi công nghiệp có cần kiểm tra gì?",
                         "domains": ["BTTTT"],
@@ -195,7 +226,7 @@ class HandlerTests(unittest.TestCase):
             clear=False,
         ), patch.dict(sys.modules, {"notebooklm": self._fake_module()}):
             payload = json.loads(
-                PLUGIN.tools.handle_notebooklm_search(
+                call_handler(
                     {"question": "mã HS nào?", "domains": ["HS"]}
                 )
             )
@@ -209,7 +240,7 @@ class HandlerTests(unittest.TestCase):
             clear=False,
         ):
             payload = json.loads(
-                PLUGIN.tools.handle_notebooklm_search(
+                call_handler(
                     {"question": "Khách gửi cái này, xem giúp em"}
                 )
             )
@@ -221,7 +252,7 @@ class HandlerTests(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop("NOTEBOOKLM_AUTH_JSON", None)
             payload = json.loads(
-                PLUGIN.tools.handle_notebooklm_search(
+                call_handler(
                     {"question": "Router wifi?", "domains": ["BTTTT"]}
                 )
             )
@@ -236,12 +267,96 @@ class HandlerTests(unittest.TestCase):
             clear=False,
         ):
             payload = json.loads(
-                PLUGIN.tools.handle_notebooklm_search(
+                call_handler(
                     {"question": "mã HS nào?", "domains": ["HS"]}
                 )
             )
         self.assertEqual(payload["error_type"], "notebooklm_config_error")
         self.assertNotIn(secret, json.dumps(payload))
+
+    def test_auth_json_wrong_shape_is_config_error(self):
+        secret = "TOP_SECRET_SHAPE_VALUE"
+        with patch.dict(
+            os.environ,
+            {"NOTEBOOKLM_AUTH_JSON": json.dumps({"foo": secret})},
+            clear=False,
+        ):
+            payload = json.loads(
+                call_handler(
+                    {"question": "mã HS nào?", "domains": ["HS"]}
+                )
+            )
+        self.assertEqual(payload["error_type"], "notebooklm_config_error")
+        self.assertNotIn(secret, json.dumps(payload))
+
+    def test_upstream_exception_is_sanitized(self):
+        raising_module = types.ModuleType("notebooklm")
+        raising_module.NotebookLMClient = RaisingNotebookLMClient
+        with patch.dict(
+            os.environ,
+            {"NOTEBOOKLM_AUTH_JSON": '{"cookies":[]}'},
+            clear=False,
+        ), patch.dict(sys.modules, {"notebooklm": raising_module}):
+            payload = json.loads(
+                call_handler(
+                    {"question": "Router wifi?", "domains": ["BTTTT"]}
+                )
+            )
+        rendered = json.dumps(payload)
+        self.assertEqual(payload["error_type"], "notebooklm_upstream_error")
+        self.assertIn("PermissionError", payload["error"])
+        self.assertNotIn(RaisingNotebooks.LEAKED, rendered)
+
+    def test_limit_per_domain_is_bounded(self):
+        for requested, expected in ((99, 6), (0, 1)):
+            with patch.dict(
+                os.environ,
+                {"NOTEBOOKLM_AUTH_JSON": '{"cookies":[]}'},
+                clear=False,
+            ), patch.dict(sys.modules, {"notebooklm": self._fake_module()}):
+                payload = json.loads(
+                    call_handler(
+                        {
+                            "question": "Router wifi?",
+                            "domains": ["BTTTT"],
+                            "limit_per_domain": requested,
+                        }
+                    )
+                )
+            self.assertEqual(payload["status"], "OK")
+            self.assertEqual(
+                FakeClient.last_instance.sources.search_calls[-1]["limit"],
+                expected,
+            )
+
+    def test_more_than_three_domains_rejected(self):
+        with patch.dict(
+            os.environ,
+            {"NOTEBOOKLM_AUTH_JSON": '{"cookies":[]}'},
+            clear=False,
+        ):
+            payload = json.loads(
+                call_handler(
+                    {
+                        "question": "mã HS?",
+                        "domains": ["HS", "CHEMICAL", "BKHCN", "BTTTT"],
+                    }
+                )
+            )
+        self.assertEqual(payload["error_type"], "notebooklm_bad_request")
+
+    def test_unknown_domain_rejected(self):
+        with patch.dict(
+            os.environ,
+            {"NOTEBOOKLM_AUTH_JSON": '{"cookies":[]}'},
+            clear=False,
+        ):
+            payload = json.loads(
+                call_handler(
+                    {"question": "mã HS?", "domains": ["FOO"]}
+                )
+            )
+        self.assertEqual(payload["error_type"], "notebooklm_bad_request")
 
 
 class ImageWiringTests(unittest.TestCase):
@@ -266,6 +381,15 @@ class ImageWiringTests(unittest.TestCase):
             text = (REPO_ROOT / relative).read_text(encoding="utf-8")
             self.assertIn('NOTEBOOKLM_AUTH_JSON:-', text)
             self.assertIn("plugins enable notebooklm-knowledge", text)
+
+    def test_workflow_verifies_discovery_gates_inside_image(self):
+        text = (
+            REPO_ROOT / ".github" / "workflows" / "hermes-runtime-compatibility.yml"
+        ).read_text(encoding="utf-8")
+        # Fail-closed: without auth the toolset must not be exposed.
+        self.assertIn("NOTEBOOKLM_HIDDEN_WITHOUT_AUTH=PASS", text)
+        # With a dummy auth state the plugin must load and expose the tool.
+        self.assertIn("NOTEBOOKLM_ENABLED_WITH_AUTH=PASS", text)
 
 
 if __name__ == "__main__":

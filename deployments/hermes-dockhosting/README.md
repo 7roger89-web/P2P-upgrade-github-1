@@ -89,8 +89,15 @@ Logistics tools (`logistics_today_work`, `logistics_freight_rate`,
 NotebookLM internal knowledge search (optional):
 
 ```text
-NOTEBOOKLM_AUTH_JSON=<NotebookLM storage-state JSON; secret>
+NOTEBOOKLM_AUTH_JSON=<Playwright storage-state JSON; secret>
 ```
+
+The value is the full Playwright `storage_state.json` content of the dedicated
+account, i.e. `{"cookies": [{"name": ..., "value": ..., ...}, ...]}` — the same
+file `notebooklm login` captures on a workstation. `notebooklm-py` 0.8.2 reads
+this environment variable natively as inline auth state, so no credential file
+is written into the container; the value stays in DockHosting environment
+variables only.
 
 When this secret is absent, the NotebookLM plugin stays disabled and the
 existing Hermes/Telegram runtime is unchanged. When present, Hermes enables the

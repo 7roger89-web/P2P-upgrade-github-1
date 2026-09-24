@@ -113,6 +113,60 @@ jobs:
             /opt/hermes/.venv/bin/python -c "import importlib.metadata; assert importlib.metadata.version(\"notebooklm-py\") == \"0.8.2\"; print(\"NOTEBOOKLM_PY_PIN=PASS\")"
           '
 
+      - name: Verify NotebookLM plugin discovery is fail-closed without auth
+        run: |
+          mkdir -p "$RUNNER_TEMP/nb-home-noauth"
+          chmod 0777 "$RUNNER_TEMP/nb-home-noauth"
+          docker run --rm --user 0:0 \
+            -e HERMES_HOME=/tmp/nb-home \
+            -v "$RUNNER_TEMP/nb-home-noauth:/tmp/nb-home" \
+            --entrypoint /bin/sh \
+            "$IMAGE" -lc '
+              set -eu
+              /opt/hermes/.venv/bin/python -c "
+              from hermes_cli.plugins import discover_plugins, get_plugin_manager
+              from tools.registry import registry
+              discover_plugins(force=True)
+              manager = get_plugin_manager()
+              loaded = manager._plugins.get(\"notebooklm-knowledge\")
+              assert loaded is not None, \"notebooklm-knowledge not discovered\"
+              err = str(loaded.error or \"\")
+              assert not err.startswith((\"No module\", \"cannot import\", \"ModuleNotFound\", \"ImportError\", \"No __init__\")), f\"plugin import error: {err}\"
+              assert not registry.is_toolset_available(\"notebooklm_knowledge\"), \"notebooklm toolset exposed without auth\"
+              logistics = manager._plugins.get(\"logistics\")
+              assert logistics is not None, \"logistics plugin not discovered\"
+              assert not str(logistics.error or \"\").startswith((\"No module\", \"cannot import\", \"ModuleNotFound\", \"ImportError\")), f\"logistics import error: {logistics.error}\"
+              print(\"NOTEBOOKLM_HIDDEN_WITHOUT_AUTH=PASS\")
+              print(\"LOGISTICS_PLUGIN_INTACT=PASS\")
+              "
+            '
+
+      - name: Verify NotebookLM plugin enables and exposes the tool with auth
+        run: |
+          mkdir -p "$RUNNER_TEMP/nb-home-auth"
+          chmod 0777 "$RUNNER_TEMP/nb-home-auth"
+          docker run --rm --user 0:0 \
+            -e HERMES_HOME=/tmp/nb-home \
+            -e NOTEBOOKLM_AUTH_JSON='{"cookies":[]}' \
+            -v "$RUNNER_TEMP/nb-home-auth:/tmp/nb-home" \
+            --entrypoint /bin/sh \
+            "$IMAGE" -lc '
+              set -eu
+              /opt/hermes/.venv/bin/hermes plugins enable notebooklm-knowledge
+              /opt/hermes/.venv/bin/python -c "
+              from hermes_cli.plugins import discover_plugins, get_plugin_manager
+              from tools.registry import registry
+              discover_plugins(force=True)
+              manager = get_plugin_manager()
+              loaded = manager._plugins.get(\"notebooklm-knowledge\")
+              assert loaded is not None, \"notebooklm-knowledge not discovered\"
+              assert loaded.enabled is True, f\"plugin not enabled: {loaded.error}\"
+              assert loaded.error is None, f\"plugin load error: {loaded.error}\"
+              assert registry.is_toolset_available(\"notebooklm_knowledge\"), \"tool not available with auth configured\"
+              print(\"NOTEBOOKLM_ENABLED_WITH_AUTH=PASS\")
+              "
+            '
+
       - name: Verify Opik observer is bundled but dependency and telemetry stay off by default
         run: |
           docker run --rm --entrypoint /bin/sh "$IMAGE" -lc '
