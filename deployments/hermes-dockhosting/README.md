@@ -86,6 +86,44 @@ Use a dedicated MongoDB credential with read-only privileges. The three
 Logistics tools (`logistics_today_work`, `logistics_freight_rate`,
 `logistics_shipment_status`) stay hidden until both variables are set.
 
+NotebookLM internal knowledge search (optional):
+
+```text
+NOTEBOOKLM_AUTH_JSON=<Playwright storage-state JSON; secret>
+```
+
+The value is the full Playwright `storage_state.json` content of the dedicated
+account, i.e. `{"cookies": [{"name": ..., "value": ..., ...}, ...]}` — the same
+file `notebooklm login` captures on a workstation. `notebooklm-py` 0.8.2 reads
+this environment variable natively as inline auth state, so no credential file
+is written into the container; the value stays in DockHosting environment
+variables only.
+
+When this secret is absent, the NotebookLM plugin stays disabled and the
+existing Hermes/Telegram runtime is unchanged. When present, Hermes enables the
+read-only `notebooklm_domain_search` tool. It auto-routes staff questions to
+the configured HS, Hóa chất, Bộ KH&CN, and Bộ TT&TT notebooks and retrieves
+ranked source passages; it does not create/delete notebook content or use shared
+NotebookLM chat history.
+
+The connector is intentionally pinned to `notebooklm-py==0.8.2`. It uses
+undocumented Google NotebookLM APIs, so upstream changes can break the
+integration. Treat `NOTEBOOKLM_AUTH_JSON` as a full-account credential: use a
+dedicated Google account that has access only to the notebooks needed by staff,
+store the value only in DockHosting environment variables, and never commit or
+log it.
+
+Notebook matching uses the known titles by default. Exact IDs or alternate
+titles can be supplied without code changes:
+
+```text
+NOTEBOOKLM_NOTEBOOKS_JSON={"HS":"...","CHEMICAL":"...","BKHCN":"...","BTTTT":"..."}
+NOTEBOOKLM_NOTEBOOK_TITLES_JSON={"HS":"Tra mã HS","CHEMICAL":"Hóa chất","BKHCN":"Bộ khoa học công nghệ","BTTTT":"Bộ Thông Tin truyền thông"}
+```
+
+NotebookLM is an operational research layer, not final legal authority. Binding
+legal conclusions must still be checked against VNLAW / official sources.
+
 Do not commit real tokens or API keys to GitHub.
 
 ## DockHosting settings

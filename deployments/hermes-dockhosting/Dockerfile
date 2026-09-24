@@ -29,6 +29,10 @@ RUN set -eux; \
 # only, over a collection allowlist. See README-logistics.md.
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/hermes/plugins/logistics/
 
+# Read-only NotebookLM knowledge search for Support/Sale. The plugin stays
+# hidden unless NOTEBOOKLM_AUTH_JSON is configured at runtime.
+COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/notebooklm-knowledge/ /opt/hermes/plugins/notebooklm-knowledge/
+
 # P2P Personal AI behavior runtime bridge. Reuse the canonical behavior module
 # rather than carrying a second implementation inside the deployment plugin.
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/p2p-personal-behavior/ /opt/hermes/plugins/p2p-personal-behavior/
@@ -39,6 +43,11 @@ COPY --chmod=a+r,go-w .p2p/system/p2p_capabilities/personal_ai_behavior.py /opt/
 # image venv at build time so the Free-tier runtime never needs PyPI access.
 ARG PYMONGO_VERSION=4.18.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
+
+# notebooklm-py is an unofficial NotebookLM client. Exact-pin the reviewed
+# release so upstream undocumented-API drift cannot enter via a floating build.
+ARG NOTEBOOKLM_PY_VERSION=0.8.2
+RUN uv pip install --python /opt/hermes/.venv/bin/python "notebooklm-py==${NOTEBOOKLM_PY_VERSION}"
 
 COPY --chmod=0755 deployments/hermes-dockhosting/dockhosting-entrypoint.sh /usr/local/bin/dockhosting-entrypoint.sh
 COPY --chmod=0755 deployments/hermes-dockhosting/p2p-post-bootstrap-main.sh /usr/local/bin/p2p-post-bootstrap-main.sh

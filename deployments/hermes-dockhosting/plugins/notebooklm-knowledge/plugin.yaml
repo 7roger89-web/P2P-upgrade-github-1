@@ -1,0 +1,15 @@
+name: notebooklm-knowledge
+version: 0.1.0
+description: >-
+  Read-only internal knowledge search over selected Google NotebookLM notebooks
+  for Trường Thành Logistics Support/Sale. Routes questions to HS, Hóa chất,
+  Bộ KH&CN, and Bộ TT&TT notebooks, returns ranked source passages and source
+  titles, and never creates/deletes notebook content or chat history. Uses the
+  pinned unofficial notebooklm-py connector; NotebookLM results are operational
+  research, not final legal authority.
+author: 7roger89-web
+kind: backend
+requires_env:
+  - NOTEBOOKLM_AUTH_JSON
+provides_tools:
+  - notebooklm_domain_search
