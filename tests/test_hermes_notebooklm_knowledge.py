@@ -79,6 +79,7 @@ class FakeNotebooks:
             FakeNotebook("6afaf293-e6d1-42f4-beaa-208f2d417f92", "Bộ khoa học công nghệ"),
             FakeNotebook("242b2eed-2a6d-4bb8-a0b2-c347d79e1047", "Bộ Thông Tin truyền thông"),
             FakeNotebook("5a5d2a90-9881-49fc-9c65-e820b9497088", "Y TẾ"),
+            FakeNotebook("nb-hs", "Custom HS notebook"),
         ]
 
 
@@ -197,7 +198,7 @@ class HandlerTests(unittest.TestCase):
             os.environ,
             {
                 "NOTEBOOKLM_AUTH_JSON": '{"cookies":[]}',
-                "NOTEBOOKLM_NOTEBOOKS_JSON": "{}",
+                "NOTEBOOKLM_NOTEBOOKS_JSON": '{"BTTTT":null}',
             },
             clear=False,
         ), patch.dict(sys.modules, {"notebooklm": self._fake_module()}):
