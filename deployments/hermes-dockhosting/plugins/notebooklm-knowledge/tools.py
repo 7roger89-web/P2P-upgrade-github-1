@@ -7,11 +7,30 @@ between staff questions and avoids destructive conversation resets.
 Consumer NotebookLM has no stable official automation API. The pinned
 notebooklm-py dependency uses undocumented Google APIs, so failures are isolated
 behind one tool and must never degrade into invented results.
+
+Verified against notebooklm-py==0.8.2 (installed source, 2026-09-24):
+
+- Auth: ``NotebookLMClient.from_storage()`` (no path) natively reads the
+  ``NOTEBOOKLM_AUTH_JSON`` environment variable as inline Playwright storage
+  state — a JSON object with a ``cookies`` list. No storage file is
+  materialized in the container, and the library's error messages for
+  malformed values do not echo the secret content.
+- ``client.notebooks.list() -> list[Notebook]`` (fields: ``id``, ``title``).
+- ``client.sources.list(notebook_id) -> list[Source]`` (fields: ``id``,
+  ``title`` may be ``None``).
+- ``client.sources.search(notebook_id, query, *, source_ids=None,
+  limit=None) -> list[RelevantChunk]`` (fields: ``source_id``, ``text``,
+  ``rank``, ``start``, ``end`` — offsets are ``None`` when the backend
+  omits a span).
+
+The handler is an async coroutine registered with ``is_async=True`` so the
+Hermes registry bridges it through its own sync->async path (works both from
+the CLI and from the gateway's running event loop). It must never be wrapped
+in a raw ``asyncio.run`` call, which would fail inside a running loop.
 """
 
 from __future__ import annotations
 
-import asyncio
 import datetime as _dt
 import json
 import os
@@ -114,6 +133,26 @@ def tool_error(message: str, **extra: Any) -> str:
 
 def _check_notebooklm_configured() -> bool:
     return bool(os.environ.get(AUTH_ENV, "").strip())
+
+
+def _validate_auth_state() -> None:
+    """Validate NOTEBOOKLM_AUTH_JSON against the pinned library's contract.
+
+    notebooklm-py 0.8.2 reads NOTEBOOKLM_AUTH_JSON natively as inline
+    Playwright storage state: a JSON object with a ``cookies`` list. Checking
+    the same contract locally lets a malformed secret fail closed as a config
+    error before any upstream call. The secret value is never included in the
+    raised message (the raised text is a fixed string, not the parsed value).
+    """
+    try:
+        value = json.loads(os.environ.get(AUTH_ENV, ""))
+    except json.JSONDecodeError:
+        raise _ConfigError(f"{AUTH_ENV} is not valid JSON") from None
+    if not isinstance(value, dict) or not isinstance(value.get("cookies"), list):
+        raise _ConfigError(
+            f"{AUTH_ENV} must be a JSON object with a 'cookies' list "
+            "(Playwright storage state)"
+        )
 
 
 def _schema(
@@ -402,7 +441,14 @@ async def _search_async(
     }
 
 
-def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
+async def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
+    """Async tool handler (registered with ``is_async=True``).
+
+    The Hermes registry bridges async handlers through its own sync->async
+    path, which is safe both from the CLI and from the gateway's running
+    event loop. A raw ``asyncio.run`` here would raise inside a running
+    loop and break the tool in the live Telegram runtime.
+    """
     args = args or {}
     question = str(args.get("question") or "").strip()
     if not question:
@@ -419,11 +465,10 @@ def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
         )
 
     try:
-        # Parse once here so malformed secret JSON fails locally without
-        # forwarding credential material into an upstream exception/log.
-        auth_value = json.loads(os.environ[AUTH_ENV])
-        if not isinstance(auth_value, dict):
-            raise _ConfigError(f"{AUTH_ENV} must be a JSON object")
+        # Validate the secret shape locally so a malformed value fails
+        # closed before any upstream call, without forwarding credential
+        # material into an upstream exception/log.
+        _validate_auth_state()
 
         domains = _requested_domains(args, question)
         if not domains:
@@ -441,12 +486,10 @@ def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
             )
         limit_per_domain = _bounded_limit(args)
         return tool_result(
-            asyncio.run(
-                _search_async(
-                    question,
-                    domains,
-                    limit_per_domain,
-                )
+            await _search_async(
+                question,
+                domains,
+                limit_per_domain,
             )
         )
     except _BadRequest as exc:
@@ -459,18 +502,9 @@ def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
             str(exc),
             error_type="notebooklm_config_error",
         )
-    except RuntimeError as exc:
-        if "asyncio.run()" in str(exc):
-            return tool_error(
-                "NotebookLM event-loop conflict",
-                error_type="notebooklm_runtime_error",
-            )
-        return tool_error(
-            f"NotebookLM runtime failed: {type(exc).__name__}",
-            error_type="notebooklm_upstream_error",
-        )
     except Exception as exc:
-        # Fail closed and never echo request/response/cookie details.
+        # Fail closed and never echo request/response/cookie details:
+        # only the exception type name is reported, never its message.
         return tool_error(
             f"NotebookLM request failed: {type(exc).__name__}",
             error_type="notebooklm_upstream_error",
@@ -483,6 +517,7 @@ TOOL_REGISTRATIONS = (
         "toolset": TOOLSET,
         "schema": NOTEBOOKLM_SEARCH_SCHEMA,
         "handler": handle_notebooklm_search,
+        "is_async": True,
         "check_fn": _check_notebooklm_configured,
         "requires_env": [AUTH_ENV],
         "emoji": "📚",
