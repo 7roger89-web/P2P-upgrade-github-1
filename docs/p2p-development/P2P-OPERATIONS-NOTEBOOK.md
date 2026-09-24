@@ -2617,7 +2617,7 @@ machine-readable ledger below is the durable record.
     {
       "id": "BACKLOG_K",
       "item": "PERFORMANCE_LANGUAGE_ADMISSION_V1",
-      "status": "PENDING",
+      "status": "VERIFIED",
       "evidence": [
         "Issue #252 P2P — Operationalize Rust evidence gate end-to-end",
         "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 — PERFORMANCE_LANGUAGE_ADMISSION_V1)",
@@ -2639,7 +2639,7 @@ independently verified PR #246 at exact Writer head
 `d14b5e89d14f84dc70d4eb53fda978e4f7b2060a` (PR comment `5793604664`) under
 RULE_ASSIMILATION_GATE_V1 before this status flip.
 
-`BACKLOG_K` (`PERFORMANCE_LANGUAGE_ADMISSION_V1`) stays `PENDING` at Writer stage. It may flip to `VERIFIED` only after an independent Control Tower/Supervisor review binds the exact Issue #252 PR head/tree under `RULE_ASSIMILATION_GATE_V1`.
+`BACKLOG_K` (`PERFORMANCE_LANGUAGE_ADMISSION_V1`) is `VERIFIED`. Independent Supervisor review bound exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752` for PR #253, with Control Tower durable receipt comment `5815665839`, before this status flip under `RULE_ASSIMILATION_GATE_V1`.
 
 ## 5. ASSIMILATION_BACKLOG — previously promised items
 
@@ -2693,7 +2693,7 @@ section 4.3.
   verified exact Writer head `d14b5e89d14f84dc70d4eb53fda978e4f7b2060a`
   in PR comment `5793604664` before this status flip.
 
-- **K. Performance/language admission (`PERFORMANCE_LANGUAGE_ADMISSION_V1`)** — `PENDING`. Issue #252 operationalizes the earlier Rust/polyglot research through one Rule 19 subsection, a deterministic evidence gate, packaging/install inheritance, a real Ziwei 518,400-record canary, RA-EXT-103, and focused tests. It remains `PENDING` until independent exact-head verification under `RULE_ASSIMILATION_GATE_V1`; no Rust dependency, migration, deployment, benchmark service, or background monitor is introduced.
+- **K. Performance/language admission (`PERFORMANCE_LANGUAGE_ADMISSION_V1`)** — `VERIFIED`. Issue #252 operationalizes the earlier Rust/polyglot research through one Rule 19 subsection, a deterministic evidence gate, packaging/install inheritance, a real Ziwei 518,400-record canary, RA-EXT-103, and focused tests. Independent Supervisor verification covered exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752`; Control Tower recorded receipt `5815665839` before this status flip. No Rust dependency, migration, deployment, benchmark service, or background monitor is introduced.
 
 ## 6. Discovery and operator paths
 
