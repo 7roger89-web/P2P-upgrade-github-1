@@ -74,10 +74,11 @@ class FakePassage:
 class FakeNotebooks:
     async def list(self):
         return [
-            FakeNotebook("nb-hs", "Tra mã HS"),
-            FakeNotebook("nb-chem", "Hóa chất"),
-            FakeNotebook("nb-khcn", "Bộ khoa học công nghệ"),
-            FakeNotebook("nb-btttt", "Bộ Thông Tin truyền thông"),
+            FakeNotebook("f5c90bb9-9244-4027-a9ae-84f6ab023a09", "Tra mã HS"),
+            FakeNotebook("50716c0b-7da6-4984-9f05-be0b19be4b95", "Hóa chất"),
+            FakeNotebook("6afaf293-e6d1-42f4-beaa-208f2d417f92", "Bộ khoa học công nghệ"),
+            FakeNotebook("242b2eed-2a6d-4bb8-a0b2-c347d79e1047", "Bộ Thông Tin truyền thông"),
+            FakeNotebook("5a5d2a90-9881-49fc-9c65-e820b9497088", "Y TẾ"),
         ]
 
 
@@ -171,6 +172,12 @@ class RouterTests(unittest.TestCase):
         )
         self.assertEqual(routed[0], "BKHCN")
 
+    def test_health_question_routes_yte(self):
+        self.assertEqual(
+            PLUGIN.tools.route_domains("Thiết bị y tế nhập khẩu cần kiểm tra gì?"),
+            ("YTE",),
+        )
+
     def test_unknown_does_not_guess(self):
         self.assertEqual(
             PLUGIN.tools.route_domains("Khách gửi cái này, xem giúp em"),
@@ -210,11 +217,32 @@ class HandlerTests(unittest.TestCase):
         self.assertEqual(payload["routed_domains"], ["BTTTT"])
         result = payload["results"][0]
         self.assertEqual(result["notebook_title"], "Bộ Thông Tin truyền thông")
-        self.assertEqual(result["passages"][0]["source_title"], "Nguồn nb-btttt")
+        self.assertEqual(
+            result["notebook_id"],
+            "242b2eed-2a6d-4bb8-a0b2-c347d79e1047",
+        )
+        self.assertEqual(result["passages"][0]["source_title"], "Nguồn 242b2eed-2a6d-4bb8-a0b2-c347d79e1047")
         self.assertIn("Passage grounded", result["passages"][0]["text"])
         calls = FakeClient.last_instance.sources.search_calls
-        self.assertEqual(calls[0]["notebook_id"], "nb-btttt")
+        self.assertEqual(calls[0]["notebook_id"], "242b2eed-2a6d-4bb8-a0b2-c347d79e1047")
         self.assertEqual(calls[0]["limit"], 4)
+
+    def test_owner_default_id_avoids_title_guessing(self):
+        with patch.dict(
+            os.environ,
+            {
+                "NOTEBOOKLM_AUTH_JSON": '{"cookies":[]}',
+                "NOTEBOOKLM_NOTEBOOKS_JSON": "{}",
+            },
+            clear=False,
+        ), patch.dict(sys.modules, {"notebooklm": self._fake_module()}):
+            payload = json.loads(
+                call_handler({"question": "mã HS nào?", "domains": ["HS"]})
+            )
+        self.assertEqual(
+            payload["results"][0]["notebook_id"],
+            "f5c90bb9-9244-4027-a9ae-84f6ab023a09",
+        )
 
     def test_id_override_avoids_title_dependency(self):
         with patch.dict(
@@ -381,6 +409,27 @@ class ImageWiringTests(unittest.TestCase):
             text = (REPO_ROOT / relative).read_text(encoding="utf-8")
             self.assertIn('NOTEBOOKLM_AUTH_JSON:-', text)
             self.assertIn("plugins enable notebooklm-knowledge", text)
+
+    def test_plugin_registers_mandatory_grounding_prompt(self):
+        class FakeCtx:
+            def __init__(self):
+                self.tools = []
+                self.sections = []
+
+            def register_tool(self, **spec):
+                self.tools.append(spec)
+
+            def register_system_prompt_section(self, *args, **kwargs):
+                self.sections.append((args, kwargs))
+
+        ctx = FakeCtx()
+        PLUGIN.register(ctx)
+        self.assertTrue(ctx.tools)
+        self.assertEqual(ctx.sections[0][0][0], "notebooklm-knowledge.grounding")
+        rendered = ctx.sections[0][0][1]()
+        self.assertIn("MUST call notebooklm_domain_search", rendered)
+        self.assertIn("Do not answer those domain questions from model memory alone", rendered)
+        self.assertIn("Bộ Y tế", rendered)
 
     def test_workflow_verifies_discovery_gates_inside_image(self):
         text = (
