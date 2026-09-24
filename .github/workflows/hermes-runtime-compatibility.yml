@@ -11,6 +11,7 @@ on:
       - deployments/hermes-dockhosting/plugins/p2p-personal-behavior/**
       - deployments/hermes-dockhosting/plugins/notebooklm-knowledge/**
       - tests/test_hermes_notebooklm_knowledge.py
+      - tests/test_hermes_vnlaw_crosscheck.py
       - deployments/hermes-essential-stack/plugins/p2p-opik-observer/**
       - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
       - scripts/hermes_runtime_compatibility.py
@@ -28,6 +29,7 @@ on:
       - deployments/hermes-dockhosting/plugins/p2p-personal-behavior/**
       - deployments/hermes-dockhosting/plugins/notebooklm-knowledge/**
       - tests/test_hermes_notebooklm_knowledge.py
+      - tests/test_hermes_vnlaw_crosscheck.py
       - deployments/hermes-essential-stack/plugins/p2p-opik-observer/**
       - deployments/hermes-dockhosting/hindsight-p2p-safe.example.json
       - scripts/hermes_runtime_compatibility.py
@@ -60,6 +62,7 @@ jobs:
           tests.test_p2p_hermes_tool_bridges
           tests.test_hermes_personal_behavior_runtime
           tests.test_hermes_notebooklm_knowledge
+          tests.test_hermes_vnlaw_crosscheck
           tests.test_hermes_essential_stack_guard
 
       - name: Verify both Dockerfiles pin the same release tag
