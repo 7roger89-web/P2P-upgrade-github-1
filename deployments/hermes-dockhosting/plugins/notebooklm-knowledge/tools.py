@@ -317,7 +317,7 @@ async def _resolve_notebooks(
         if len(matches) == 1:
             notebook_id, item = next(iter(matches.items()))
             resolved.append(
-                (domain, notebook_id, str(getattr(item, "title", "") or alias))
+                (domain, notebook_id, str(getattr(item, "title", "") or DOMAIN_LABELS[domain]))
             )
             continue
         if len(matches) > 1:
