@@ -456,26 +456,44 @@ def retrieve_portable_experience(
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         return _fail_closed(f"CAPSULE_UNREADABLE_OR_JSON_INVALID:{exc}")
 
-    # Transport integrity: check bound hash in portable notebook or AGENTS if present
+    # Transport binding check (Blocker 1): MUST fail closed when missing, malformed, mismatched, or conflicting
     portable_notebook = root_path / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md"
+    notebook_binding: str | None = None
     if portable_notebook.is_file() and not portable_notebook.is_symlink():
         try:
-            head_text = portable_notebook.read_text(encoding="utf-8")[:1500]
-            match = re.search(r"(?m)^PORTABLE_EXPERIENCE_CONTENT_SHA256=([0-9a-fA-F]{64})$", head_text)
-            if match and match.group(1).lower() != capsule_sha:
-                return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_HASH_MISMATCH")
+            head_text = portable_notebook.read_text(encoding="utf-8")[:2000]
+            m = re.search(r"(?m)^PORTABLE_EXPERIENCE_CONTENT_SHA256=([^\r\n]*)", head_text)
+            if m:
+                raw_hash = m.group(1).strip()
+                if not re.fullmatch(r"^[0-9a-fA-F]{64}$", raw_hash):
+                    return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_BINDING_MALFORMED")
+                notebook_binding = raw_hash.lower()
         except (OSError, UnicodeError):
             pass
 
     agents_file = root_path / "AGENTS.md"
+    agents_binding: str | None = None
     if agents_file.is_file() and not agents_file.is_symlink():
         try:
             agents_text = agents_file.read_text(encoding="utf-8")
-            match = re.search(r"PORTABLE_EXPERIENCE_SHA256`?:\s*`?([0-9a-fA-F]{64})`?", agents_text)
-            if match and match.group(1).lower() != capsule_sha:
-                return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_HASH_MISMATCH")
+            m = re.search(r"PORTABLE_EXPERIENCE_SHA256`?:\s*`?([^\r\n` ]*)", agents_text)
+            if m:
+                raw_hash = m.group(1).strip()
+                if not re.fullmatch(r"^[0-9a-fA-F]{64}$", raw_hash):
+                    return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_BINDING_MALFORMED")
+                agents_binding = raw_hash.lower()
         except (OSError, UnicodeError):
             pass
+
+    if not notebook_binding and not agents_binding:
+        return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_BINDING_MISSING")
+
+    if notebook_binding and agents_binding and notebook_binding != agents_binding:
+        return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_BINDING_CONFLICT")
+
+    effective_binding = notebook_binding or agents_binding
+    if effective_binding != capsule_sha.lower():
+        return _fail_closed("PORTABLE_EXPERIENCE_TRANSPORT_HASH_MISMATCH")
 
     # Exact capsule schema and metadata invariants
     if data.get("schema") != "p2p-portable-experience-capsule/1":

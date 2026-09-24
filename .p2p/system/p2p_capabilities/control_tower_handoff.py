@@ -912,6 +912,7 @@ class ControlTowerReturnPacket:
     )
     law_check: Mapping[str, Any] | None = None
     learning_reconciliation: Mapping[str, Any] | None = None
+    experience_check: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.binding, SessionBinding):
@@ -992,6 +993,8 @@ class ControlTowerReturnPacket:
             result["LAW_CHECK"] = _safe_json(self.law_check, path="law_check")
         if self.learning_reconciliation is not None:
             result["LEARNING_RECONCILIATION"] = _safe_json(self.learning_reconciliation, path="learning_reconciliation")
+        if self.experience_check is not None:
+            result["EXPERIENCE_CHECK"] = _safe_json(self.experience_check, path="experience_check")
         return result
 
     @classmethod
@@ -1035,6 +1038,7 @@ class ControlTowerReturnPacket:
             attachment_manifest=manifest,
             law_check=value.get("LAW_CHECK"),
             learning_reconciliation=value.get("LEARNING_RECONCILIATION"),
+            experience_check=value.get("EXPERIENCE_CHECK"),
         )
 
     def fingerprint(self) -> str:
@@ -1053,80 +1057,195 @@ class ControlTowerReturnPacket:
         return f"{PACKET_BEGIN}\n{payload}\n{PACKET_END}"
 
 
+def _parse_law_check_dict_or_str(val: Any) -> dict[str, Any] | None:
+    if isinstance(val, Mapping):
+        status = str(val.get("status") or "").upper()
+        if status in ("PASS", "BLOCKED", "INVALID", "MISSING", "CONTRADICTORY"):
+            return dict(val)
+        return {"status": "INVALID", "reason": "UNKNOWN_STATUS"}
+    if not isinstance(val, str):
+        return None
+    raw = val.strip()
+    m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", raw)
+    if not m:
+        return None
+    verdict, rest = m.group(1).upper(), m.group(2).strip()
+    if verdict == "BLOCKED":
+        rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+        return {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
+    sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
+    hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
+    if sm and hm:
+        return {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
+    return {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+
+
+def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
+    if isinstance(val, Mapping):
+        dec = str(val.get("decision") or val.get("EXPERIENCE_CHECK") or "").upper()
+        if dec in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
+            ids = val.get("ids") or val.get("IDS") or []
+            if isinstance(ids, str):
+                ids = [i.strip() for i in ids.split(",") if i.strip()]
+            return {"decision": dec, "ids": list(ids), "reason": str(val.get("reason", ""))}
+        return {"decision": "INVALID", "raw": dict(val)}
+    if not isinstance(val, str):
+        return None
+    raw = val.strip()
+    m = re.match(r"(?im)^\s*EXPERIENCE_CHECK\s*=\s*(USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE)\b(.*)$", raw)
+    if not m:
+        return None
+    dec, rest = m.group(1).upper(), m.group(2).strip()
+    if dec == "USE_ACTIVE_EXPERIENCE":
+        im = re.search(r"IDS?\s*=\s*([^|;\n]+)", rest)
+        ids = [i.strip() for i in im.group(1).split(",") if i.strip()] if im else []
+        return {"decision": "USE_ACTIVE_EXPERIENCE", "ids": ids}
+    elif dec == "NO_MATCH":
+        return {"decision": "NO_MATCH", "ids": []}
+    elif dec == "UNAVAILABLE":
+        rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+        return {"decision": "UNAVAILABLE", "reason": rm.group(1).strip() if rm else "UNAVAILABLE", "ids": []}
+    return {"decision": "INVALID", "raw": raw}
+
+
+def _parse_learning_dict_or_str(val: Any) -> dict[str, Any] | None:
+    if isinstance(val, Mapping):
+        ltype = str(val.get("type") or val.get("LEARNING_RECONCILIATION") or "").upper()
+        if ltype in ("NONE", "CANDIDATE"):
+            return {"type": ltype, "reason": str(val.get("reason", ""))}
+        return {"type": "INVALID", "raw": dict(val)}
+    if not isinstance(val, str):
+        return None
+    raw = val.strip()
+    m = re.match(r"(?im)^\s*LEARNING_RECONCILIATION\s*=\s*(NONE|CANDIDATE)\b(.*)$", raw)
+    if not m:
+        return None
+    ltype, rest = m.group(1).upper(), m.group(2).strip()
+    rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
+    return {"type": ltype, "reason": rm.group(1).strip() if rm else ""}
+
+
 def _extract_executor_receipts(
     final_response: str,
     payload: Mapping[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Extract and parse actor-own LAW_CHECK and LEARNING_RECONCILIATION receipts."""
-    law_check: dict[str, Any] | None = None
-    if isinstance(payload.get("LAW_CHECK"), Mapping):
-        law_check = dict(payload["LAW_CHECK"])
-    elif isinstance(payload.get("LAW_CHECK"), str):
-        raw = str(payload["LAW_CHECK"]).strip()
-        m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", raw)
-        if m:
-            verdict, rest = m.group(1).upper(), m.group(2).strip()
-            if verdict == "BLOCKED":
-                rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
-                law_check = {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
-            else:
-                sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
-                hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
-                if sm and hm:
-                    law_check = {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
-                else:
-                    law_check = {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Extract and parse actor-own LAW_CHECK, EXPERIENCE_CHECK, and LEARNING_RECONCILIATION receipts."""
 
-    if law_check is None:
-        matching_lines: list[tuple[str, str]] = []
-        for line in final_response.splitlines():
-            if "CONTROL_TOWER_SELF_LAW_RECEIPT" in line or "ACTOR=CONTROL_TOWER_SELF" in line:
-                continue
-            m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", line)
-            if m:
-                matching_lines.append((m.group(1).upper(), m.group(2).strip()))
-        if len(matching_lines) == 0:
-            law_check = {"status": "MISSING"}
-        elif len(matching_lines) > 1:
-            law_check = {"status": "CONTRADICTORY", "count": len(matching_lines)}
+    # 1. LAW_CHECK
+    narrative_lc_list: list[dict[str, Any]] = []
+    for line in final_response.splitlines():
+        if "CONTROL_TOWER_SELF_LAW_RECEIPT" in line or "ACTOR=CONTROL_TOWER_SELF" in line:
+            continue
+        parsed = _parse_law_check_dict_or_str(line)
+        if parsed is not None:
+            narrative_lc_list.append(parsed)
+
+    narrative_lc: dict[str, Any] | None = None
+    if narrative_lc_list:
+        first = narrative_lc_list[0]
+        if any(p != first for p in narrative_lc_list):
+            narrative_lc = {"status": "CONTRADICTORY", "count": len(narrative_lc_list)}
         else:
-            verdict, rest = matching_lines[0]
-            if verdict == "BLOCKED":
-                rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
-                law_check = {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
+            narrative_lc = first
+
+    payload_lc = _parse_law_check_dict_or_str(payload.get("LAW_CHECK"))
+
+    law_check: dict[str, Any]
+    if payload_lc is None and narrative_lc is None:
+        law_check = {"status": "MISSING"}
+    elif payload_lc is None:
+        law_check = narrative_lc
+    elif narrative_lc is None:
+        law_check = payload_lc
+    else:
+        p_status = payload_lc.get("status")
+        n_status = narrative_lc.get("status")
+        if p_status != n_status:
+            law_check = {"status": "CONTRADICTORY", "reason": "CROSS_SURFACE_STATUS_MISMATCH"}
+        elif p_status == "PASS":
+            p_sha = str(payload_lc.get("source_sha256", "")).lower()
+            n_sha = str(narrative_lc.get("source_sha256", "")).lower()
+            p_src = str(payload_lc.get("source", "")).strip()
+            n_src = str(narrative_lc.get("source", "")).strip()
+            if p_sha != n_sha or p_src != n_src:
+                law_check = {"status": "CONTRADICTORY", "reason": "CROSS_SURFACE_PASS_DETAIL_MISMATCH"}
             else:
-                sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
-                hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
-                if sm and hm:
-                    law_check = {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
-                else:
-                    law_check = {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
-
-    learning: dict[str, Any] | None = None
-    if isinstance(payload.get("LEARNING_RECONCILIATION"), Mapping):
-        learning = dict(payload["LEARNING_RECONCILIATION"])
-    elif isinstance(payload.get("LEARNING_RECONCILIATION"), str):
-        raw = str(payload["LEARNING_RECONCILIATION"]).strip()
-        m = re.match(r"(?im)^\s*LEARNING_RECONCILIATION\s*=\s*(NONE|CANDIDATE)\b(.*)$", raw)
-        if m:
-            ltype, rest = m.group(1).upper(), m.group(2).strip()
-            rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
-            learning = {"type": ltype, "reason": rm.group(1).strip() if rm else ""}
-
-    if learning is None:
-        lr_lines: list[tuple[str, str]] = []
-        for line in final_response.splitlines():
-            m = re.match(r"(?im)^\s*LEARNING_RECONCILIATION\s*=\s*(NONE|CANDIDATE)\b(.*)$", line)
-            if m:
-                lr_lines.append((m.group(1).upper(), m.group(2).strip()))
-        if lr_lines:
-            ltype, rest = lr_lines[0]
-            rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
-            learning = {"type": ltype, "reason": rm.group(1).strip() if rm else ""}
+                law_check = payload_lc
         else:
-            learning = {"type": "MISSING"}
+            law_check = payload_lc
 
-    return law_check, learning
+    # 2. EXPERIENCE_CHECK
+    narrative_ec_list: list[dict[str, Any]] = []
+    for line in final_response.splitlines():
+        parsed = _parse_experience_check_dict_or_str(line)
+        if parsed is not None:
+            narrative_ec_list.append(parsed)
+
+    narrative_ec: dict[str, Any] | None = None
+    if narrative_ec_list:
+        first_ec = narrative_ec_list[0]
+        if any(e != first_ec for e in narrative_ec_list):
+            narrative_ec = {"decision": "CONTRADICTORY", "count": len(narrative_ec_list)}
+        else:
+            narrative_ec = first_ec
+
+    payload_ec = _parse_experience_check_dict_or_str(payload.get("EXPERIENCE_CHECK"))
+
+    experience_check: dict[str, Any]
+    if payload_ec is None and narrative_ec is None:
+        experience_check = {"decision": "MISSING"}
+    elif payload_ec is None:
+        experience_check = narrative_ec
+    elif narrative_ec is None:
+        experience_check = payload_ec
+    else:
+        p_dec = payload_ec.get("decision")
+        n_dec = narrative_ec.get("decision")
+        if p_dec != n_dec:
+            experience_check = {"decision": "CONTRADICTORY", "reason": "CROSS_SURFACE_DECISION_MISMATCH"}
+        elif p_dec == "USE_ACTIVE_EXPERIENCE":
+            p_ids = set(payload_ec.get("ids") or [])
+            n_ids = set(narrative_ec.get("ids") or [])
+            if p_ids != n_ids:
+                experience_check = {"decision": "CONTRADICTORY", "reason": "CROSS_SURFACE_IDS_MISMATCH"}
+            else:
+                experience_check = payload_ec
+        else:
+            experience_check = payload_ec
+
+    # 3. LEARNING_RECONCILIATION
+    narrative_lr_list: list[dict[str, Any]] = []
+    for line in final_response.splitlines():
+        parsed = _parse_learning_dict_or_str(line)
+        if parsed is not None:
+            narrative_lr_list.append(parsed)
+
+    narrative_lr: dict[str, Any] | None = None
+    if narrative_lr_list:
+        first_lr = narrative_lr_list[0]
+        if any(l != first_lr for l in narrative_lr_list):
+            narrative_lr = {"type": "CONTRADICTORY", "count": len(narrative_lr_list)}
+        else:
+            narrative_lr = first_lr
+
+    payload_lr = _parse_learning_dict_or_str(payload.get("LEARNING_RECONCILIATION"))
+
+    learning: dict[str, Any]
+    if payload_lr is None and narrative_lr is None:
+        learning = {"type": "MISSING"}
+    elif payload_lr is None:
+        learning = narrative_lr
+    elif narrative_lr is None:
+        learning = payload_lr
+    else:
+        p_type = payload_lr.get("type")
+        n_type = narrative_lr.get("type")
+        if p_type != n_type:
+            learning = {"type": "CONTRADICTORY", "reason": "CROSS_SURFACE_TYPE_MISMATCH"}
+        else:
+            learning = payload_lr
+
+    return law_check, experience_check, learning
 
 
 def parse_return_packet(final_response: str) -> ControlTowerReturnPacket:
@@ -1423,6 +1542,8 @@ class ControlTowerState:
         current_canonical_base_tree: str,
         narrative_host: Any = None,
         record_event: bool = True,
+        expected_law_sha: str | None = None,
+        expected_experience_ids: Sequence[str] = (),
     ) -> ControlTowerIngestResult:
         if not isinstance(packet, ControlTowerReturnPacket):
             raise ControlTowerHandoffError("CONTROL_TOWER_PACKET_REQUIRED")
@@ -1436,7 +1557,12 @@ class ControlTowerState:
             status = packet.session_state
             next_action = packet.next_recommended_action
 
+        session_rec = self.session_records.get(packet.binding.session_id, {})
+        effective_expected_law_sha = expected_law_sha or session_rec.get("EXPECTED_LAW_SHA")
+        effective_expected_exp_ids = list(expected_experience_ids) or session_rec.get("EXPECTED_EXPERIENCE_IDS", [])
+
         # Ingest-level enforcement of actor-own LAW_CHECK receipt
+        is_law_blocked = False
         if packet.law_check is not None:
             lc = packet.law_check
             lc_status = lc.get("status")
@@ -1453,33 +1579,72 @@ class ControlTowerState:
                 blockers.append("EXECUTOR_LAW_CHECK_INVALID")
                 next_action = "Provide valid SOURCE and SOURCE_SHA256 in actor-own LAW_CHECK receipt."
             elif lc_status == "BLOCKED":
+                is_law_blocked = True
                 if status not in ("BLOCKED", "FAILED"):
                     status = "BLOCKED"
                 blockers.append("EXECUTOR_LAW_CHECK_BLOCKED")
                 next_action = "Investigate executor law check blockage before proceeding."
+            elif lc_status == "PASS":
+                if effective_expected_law_sha:
+                    actual_sha = str(lc.get("source_sha256") or "").lower()
+                    if actual_sha != effective_expected_law_sha.lower():
+                        status = "RECONCILIATION_REQUIRED"
+                        blockers.append("EXECUTOR_LAW_HASH_MISMATCH")
+                        next_action = "Executor LAW_CHECK SHA does not match expected session law SHA."
 
-        # Ingest-level enforcement of LEARNING_RECONCILIATION
-        if packet.learning_reconciliation is not None:
+        # Ingest-level enforcement of EXPERIENCE_CHECK receipt (Blocker 4)
+        if not is_law_blocked and packet.experience_check is not None:
+            ec = packet.experience_check
+            ec_decision = ec.get("decision")
+            if ec_decision == "MISSING":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("EXPERIENCE_CHECK_MISSING")
+                next_action = "Supply valid EXPERIENCE_CHECK receipt before reconciliation."
+            elif ec_decision == "CONTRADICTORY":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("EXPERIENCE_CHECK_CONTRADICTORY")
+                next_action = "Resolve contradictory EXPERIENCE_CHECK receipts before reconciliation."
+            elif ec_decision not in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("EXPERIENCE_CHECK_INVALID")
+                next_action = "Provide valid decision (USE_ACTIVE_EXPERIENCE, NO_MATCH, UNAVAILABLE) in EXPERIENCE_CHECK receipt."
+            else:
+                if effective_expected_exp_ids:
+                    expected_set = set(effective_expected_exp_ids)
+                    if ec_decision == "NO_MATCH":
+                        status = "RECONCILIATION_REQUIRED"
+                        blockers.append("EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION")
+                        next_action = "Executor reported NO_MATCH but active experience was expected for this session."
+                    elif ec_decision == "USE_ACTIVE_EXPERIENCE":
+                        reported_ids = set(ec.get("ids") or [])
+                        if not (reported_ids & expected_set):
+                            status = "RECONCILIATION_REQUIRED"
+                            blockers.append("EXPERIENCE_CHECK_IDS_MISMATCH")
+                            next_action = f"Executor reported EXPERIENCE_CHECK IDs {reported_ids} do not include any expected active experience IDs {expected_set}."
+
+        # Ingest-level enforcement of LEARNING_RECONCILIATION (Blocker 5)
+        # Every terminal substantive task must provide LEARNING_RECONCILIATION=NONE or CANDIDATE
+        # (no keyword heuristics)
+        is_terminal_substantive = packet.session_state in ("COMPLETED", "FAILED") and not is_law_blocked
+        if is_terminal_substantive and packet.learning_reconciliation is not None:
             lr = packet.learning_reconciliation
             lr_type = lr.get("type")
-            task_context = " ".join([
-                str(packet.binding.goal),
-                str(packet.changes),
-                str(packet.evidence),
-            ]).lower()
-            is_correction = (
-                packet.session_state == "FAILED"
-                or any(k in task_context for k in ("fix", "repair", "defect", "correction", "bug", "patch"))
-            )
-            if is_correction:
-                if lr_type == "MISSING":
-                    status = "RECONCILIATION_REQUIRED"
-                    blockers.append("LEARNING_RECONCILIATION_MISSING")
-                    next_action = "Record LEARNING_RECONCILIATION=CANDIDATE or explicit evidence-based explanation why no reusable lesson exists."
-                elif lr_type == "NONE" and not lr.get("reason"):
-                    status = "RECONCILIATION_REQUIRED"
-                    blockers.append("LEARNING_RECONCILIATION_REASON_REQUIRED")
-                    next_action = "Supply evidence-based reason why no reusable lesson exists for this material correction."
+            if lr_type == "MISSING":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("LEARNING_RECONCILIATION_MISSING")
+                next_action = "Record LEARNING_RECONCILIATION=NONE or CANDIDATE before terminal close."
+            elif lr_type == "CONTRADICTORY":
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("LEARNING_RECONCILIATION_CONTRADICTORY")
+                next_action = "Resolve contradictory LEARNING_RECONCILIATION receipts before reconciliation."
+            elif lr_type not in ("NONE", "CANDIDATE"):
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("LEARNING_RECONCILIATION_INVALID")
+                next_action = "Provide valid LEARNING_RECONCILIATION (NONE or CANDIDATE)."
+            elif lr_type == "NONE" and packet.session_state == "FAILED" and not lr.get("reason"):
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("LEARNING_RECONCILIATION_REASON_REQUIRED")
+                next_action = "Supply evidence-based reason why no reusable lesson exists for failed task."
 
         deduped_blockers = tuple(dict.fromkeys(blockers))
         promotion_claim_detected = _contains_promotion_claim(
@@ -1750,6 +1915,8 @@ class ControlTower:
                         "SESSION_STATE": record.get("SESSION_STATE", "ACTIVE"),
                         "PACKET_FINGERPRINT": record.get("PACKET_FINGERPRINT", UNKNOWN),
                         "RECOMMENDED_NEW_CHAT": event.get("RECOMMENDED_NEW_CHAT"),
+                        "EXPECTED_LAW_SHA": event.get("EXPECTED_LAW_SHA"),
+                        "EXPECTED_EXPERIENCE_IDS": event.get("EXPECTED_EXPERIENCE_IDS", []),
                     }
                 )
                 records[session_id] = record
@@ -1946,6 +2113,8 @@ class ControlTower:
         canonical_base_sha: str = UNKNOWN,
         canonical_base_tree: str = UNKNOWN,
         acceptance_criteria: Sequence[str] = (),
+        expected_law_sha: str | None = None,
+        expected_experience_ids: Sequence[str] = (),
     ) -> dict[str, Any]:
         if not isinstance(binding, SessionBinding):
             raise BindingError("SESSION_BINDING_REQUIRED")
@@ -2004,6 +2173,8 @@ class ControlTower:
             "CANONICAL_BASE_SHA": canonical_base_sha,
             "CANONICAL_BASE_TREE": canonical_base_tree,
             "RECOMMENDED_NEW_CHAT": recommendation,
+            "EXPECTED_LAW_SHA": expected_law_sha,
+            "EXPECTED_EXPERIENCE_IDS": list(expected_experience_ids),
             "PACKET_IS_CANONICAL_TRUTH": "NO",
             "PROMOTED": False,
             "PROTECTED_ACTION_EXECUTED": False,
@@ -2021,6 +2192,9 @@ class ControlTower:
     def ingest_response(
         self,
         final_response: str,
+        *,
+        expected_law_sha: str | None = None,
+        expected_experience_ids: Sequence[str] = (),
         **kwargs: Any,
     ) -> dict[str, Any]:
         try:
@@ -2034,11 +2208,14 @@ class ControlTower:
             payload = json.loads(final_response[start:end].strip())
         except (ValueError, json.JSONDecodeError):
             pass
-        law_check, learning_reconciliation = _extract_executor_receipts(final_response, payload)
+        law_check, experience_check, learning_reconciliation = _extract_executor_receipts(final_response, payload)
         return self.ingest_packet(
             packet,
             law_check=kwargs.pop("law_check", law_check),
+            experience_check=kwargs.pop("experience_check", experience_check),
             learning_reconciliation=kwargs.pop("learning_reconciliation", learning_reconciliation),
+            expected_law_sha=expected_law_sha,
+            expected_experience_ids=expected_experience_ids,
             **kwargs,
         )
 
@@ -2051,6 +2228,9 @@ class ControlTower:
         narrative_host: Any = None,
         law_check: Mapping[str, Any] | None = None,
         learning_reconciliation: Mapping[str, Any] | None = None,
+        experience_check: Mapping[str, Any] | None = None,
+        expected_law_sha: str | None = None,
+        expected_experience_ids: Sequence[str] = (),
     ) -> dict[str, Any]:
         if not isinstance(packet, ControlTowerReturnPacket):
             raise BindingError("CONTROL_TOWER_PACKET_REQUIRED")
@@ -2085,11 +2265,12 @@ class ControlTower:
                 }
             raise BindingError("SESSION_ALREADY_HAS_A_DIFFERENT_RETURN_PACKET")
         effective_packet = packet
-        if law_check is not None or learning_reconciliation is not None:
+        if law_check is not None or learning_reconciliation is not None or experience_check is not None:
             effective_packet = replace(
                 packet,
-                law_check=packet.law_check or law_check,
-                learning_reconciliation=packet.learning_reconciliation or learning_reconciliation,
+                law_check=law_check if law_check is not None else packet.law_check,
+                learning_reconciliation=learning_reconciliation if learning_reconciliation is not None else packet.learning_reconciliation,
+                experience_check=experience_check if experience_check is not None else packet.experience_check,
             )
         result = state.ingest(
             effective_packet,
@@ -2097,6 +2278,8 @@ class ControlTower:
             current_canonical_base_tree=current_tree,
             narrative_host=narrative_host,
             record_event=False,
+            expected_law_sha=expected_law_sha,
+            expected_experience_ids=expected_experience_ids,
         )
         _append_existing_execution_event(self.ledger_path, to_execution_ledger_event(effective_packet, result))
         snapshot = self.snapshot(
