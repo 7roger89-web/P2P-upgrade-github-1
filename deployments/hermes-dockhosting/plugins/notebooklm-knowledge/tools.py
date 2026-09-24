@@ -265,9 +265,15 @@ def _notebook_id_overrides() -> dict[str, str]:
     result: dict[str, str] = dict(DEFAULT_NOTEBOOK_IDS)
     for key, value in raw.items():
         domain = str(key).upper().strip()
+        if domain not in SUPPORTED_DOMAINS:
+            continue
         notebook_id = str(value or "").strip()
-        if domain in SUPPORTED_DOMAINS and notebook_id:
+        if notebook_id:
             result[domain] = notebook_id
+        else:
+            # Explicit null/empty removes the Owner default and re-enables
+            # title-based discovery for that domain.
+            result.pop(domain, None)
     return result
 
 
