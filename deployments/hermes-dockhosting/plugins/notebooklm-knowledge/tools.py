@@ -42,7 +42,7 @@ TOOLSET = "notebooklm_knowledge"
 AUTH_ENV = "NOTEBOOKLM_AUTH_JSON"
 IDS_ENV = "NOTEBOOKLM_NOTEBOOKS_JSON"
 TITLES_ENV = "NOTEBOOKLM_NOTEBOOK_TITLES_JSON"
-SUPPORTED_DOMAINS = ("HS", "CHEMICAL", "BKHCN", "BTTTT")
+SUPPORTED_DOMAINS = ("HS", "CHEMICAL", "BKHCN", "BTTTT", "YTE")
 DEFAULT_LIMIT_PER_DOMAIN = 4
 MAX_LIMIT_PER_DOMAIN = 6
 MAX_DOMAINS = 3
@@ -53,6 +53,17 @@ DOMAIN_LABELS = {
     "CHEMICAL": "Hóa chất",
     "BKHCN": "Bộ KH&CN",
     "BTTTT": "Bộ TT&TT",
+    "YTE": "Bộ Y tế",
+}
+
+# Owner-supplied NotebookLM notebook IDs (2026-09-24). IDs are resource
+# locators, not credentials; authenticated access is still required.
+DEFAULT_NOTEBOOK_IDS = {
+    "BTTTT": "242b2eed-2a6d-4bb8-a0b2-c347d79e1047",
+    "YTE": "5a5d2a90-9881-49fc-9c65-e820b9497088",
+    "BKHCN": "6afaf293-e6d1-42f4-beaa-208f2d417f92",
+    "HS": "f5c90bb9-9244-4027-a9ae-84f6ab023a09",
+    "CHEMICAL": "50716c0b-7da6-4984-9f05-be0b19be4b95",
 }
 
 DEFAULT_TITLE_ALIASES = {
@@ -68,6 +79,11 @@ DEFAULT_TITLE_ALIASES = {
         "Bộ Thông Tin truyền thông",
         "Bộ Thông tin và Truyền thông",
         "BTTTT",
+    ),
+    "YTE": (
+        "Y TẾ",
+        "Y tế",
+        "Bộ Y tế",
     ),
 }
 
@@ -109,6 +125,13 @@ DOMAIN_PATTERNS = {
         r"thiết\s*bị\s*phát\s*sóng",
         r"viễn\s*thông",
         r"ict",
+    ),
+    "YTE": (
+        r"bộ\s*y\s*tế",
+        r"\by\s*tế\b",
+        r"thiết\s*bị\s*y\s*tế",
+        r"trang\s*thiết\s*bị\s*y\s*tế",
+        r"dược|thuốc|mỹ\s*phẩm",
     ),
 }
 
@@ -176,7 +199,8 @@ NOTEBOOKLM_SEARCH_SCHEMA = _schema(
     "notebooklm_domain_search",
     "Search Trường Thành Logistics' configured NotebookLM knowledge notebooks. "
     "Use this for Support/Sale questions about HS classification, chemicals, "
-    "Bộ KH&CN / quality-regulation topics, and Bộ TT&TT / telecom-radio topics. "
+    "Bộ KH&CN / quality-regulation topics, Bộ TT&TT / telecom-radio topics, "
+    "and Bộ Y tế / health-product topics. "
     "If domains is omitted, the tool deterministically routes the Vietnamese "
     "question to up to three matching notebooks. It returns ranked source "
     "passages and source titles from NotebookLM; it does NOT create or modify "
@@ -198,7 +222,7 @@ NOTEBOOKLM_SEARCH_SCHEMA = _schema(
             },
             "description": (
                 "Optional explicit notebook domains. Omit to auto-route. "
-                "Supported: HS, CHEMICAL, BKHCN, BTTTT."
+                "Supported: HS, CHEMICAL, BKHCN, BTTTT, YTE."
             ),
         },
         "limit_per_domain": {
@@ -239,12 +263,18 @@ def _load_json_object(env_name: str) -> dict:
 
 def _notebook_id_overrides() -> dict[str, str]:
     raw = _load_json_object(IDS_ENV)
-    result: dict[str, str] = {}
+    result: dict[str, str] = dict(DEFAULT_NOTEBOOK_IDS)
     for key, value in raw.items():
         domain = str(key).upper().strip()
+        if domain not in SUPPORTED_DOMAINS:
+            continue
         notebook_id = str(value or "").strip()
-        if domain in SUPPORTED_DOMAINS and notebook_id:
+        if notebook_id:
             result[domain] = notebook_id
+        else:
+            # Explicit null/empty removes the Owner default and re-enables
+            # title-based discovery for that domain.
+            result.pop(domain, None)
     return result
 
 
@@ -291,7 +321,7 @@ def _requested_domains(args: dict, question: str) -> tuple[str, ...]:
         domain = str(value or "").upper().strip()
         if domain not in SUPPORTED_DOMAINS:
             raise _BadRequest(
-                "unsupported domain; use HS, CHEMICAL, BKHCN, or BTTTT"
+                "unsupported domain; use HS, CHEMICAL, BKHCN, BTTTT, or YTE"
             )
         if domain not in domains:
             domains.append(domain)
@@ -342,6 +372,10 @@ async def _resolve_notebooks(
         override_id = overrides.get(domain)
         if override_id:
             item = by_id.get(override_id)
+            if item is None:
+                raise _ConfigError(
+                    f"configured notebook for {domain} is not visible to the authenticated account"
+                )
             title = str(getattr(item, "title", "") or DOMAIN_LABELS[domain])
             resolved.append((domain, override_id, title))
             continue
@@ -419,6 +453,7 @@ async def _search_async(
                     "domain": domain,
                     "label": DOMAIN_LABELS[domain],
                     "notebook_title": notebook_title,
+                    "notebook_id": notebook_id,
                     "status": "OK" if items else "NOT_FOUND",
                     "passages": items,
                 }
@@ -479,7 +514,7 @@ async def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
                     "routed_domains": [],
                     "needed": (
                         "Bổ sung loại hàng/công dụng/thành phần/CAS/model/tần số "
-                        "hoặc chỉ rõ nhóm HS, Hóa chất, Bộ KH&CN, Bộ TT&TT."
+                        "hoặc chỉ rõ nhóm HS, Hóa chất, Bộ KH&CN, Bộ TT&TT, Bộ Y tế."
                     ),
                     "legal_authority": False,
                 }
