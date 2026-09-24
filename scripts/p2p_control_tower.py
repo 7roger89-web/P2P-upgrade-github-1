@@ -61,12 +61,15 @@ if len(_law_lines) < 9 or any(
 _handoff.SUPREME_LAW_CAPSULE = "\n".join(_law_lines[:9])
 
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
+    CANARY_PROMPT_BUDGET_GUARD_CHARS,
     UNKNOWN,
     BindingError,
+    CanaryDirective,
     ControlTower,
     ControlTowerHandoffError,
     SessionBinding,
     build_execution_prompt,
+    canary_requirement,
     new_session_id,
     render_snapshot,
 )
@@ -93,7 +96,10 @@ PORTABLE_CANONICAL_SOURCE = (
 )
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 MAX_ACTIVE_EXPERIENCES = 3
-PROMPT_GUARD_CHARS = 8192
+# The prompt budget must be able to carry the mandatory FAST_CANARY context for
+# a triggered Arena session. Required canary context is never truncated or
+# evicted; when it cannot fit, generation fails closed instead.
+PROMPT_GUARD_CHARS = CANARY_PROMPT_BUDGET_GUARD_CHARS
 MIN_CONTEXT_BUDGET = 380
 MAX_PRIMARY_RISK_WRAPPER_CHARS = 360
 CONTROL_TOWER_FLOW = (
@@ -626,6 +632,44 @@ def _render_context_block(
     return "\n".join(parts)
 
 
+def _canary_directive_for_session(
+    root: Path,
+    binding: SessionBinding,
+    task: str,
+    *,
+    session_action: str | None = None,
+) -> CanaryDirective | None:
+    """Derive the executable FAST_CANARY directive for one generated session.
+
+    The decision uses only the explicit host label, a deterministic risk
+    classification of the bounded task, and durable Control Tower session
+    quality. No router, scheduler, score database, or second state store is
+    created.
+    """
+
+    try:
+        session_quality = ControlTower(root).session_quality(binding.goal_id, binding.session_id)
+    except (ControlTowerHandoffError, OSError):
+        session_quality = "UNKNOWN"
+    decision = canary_requirement(
+        binding.host,
+        task,
+        session_quality=session_quality,
+        session_action=session_action,
+    )
+    if decision.get("FAST_CANARY_REQUIRED") != "YES":
+        return None
+    return CanaryDirective(
+        host=binding.host,
+        session_id=binding.session_id,
+        goal_id=binding.goal_id,
+        goal=binding.goal,
+        original_task=task,
+        risk_class=str(decision.get("RISK_CLASS") or "MODERATE"),
+        session_quality=str(decision.get("SESSION_QUALITY") or "UNKNOWN"),
+    )
+
+
 def _contextual_task_and_expectations_for_session(
     root: Path,
     binding: SessionBinding,
@@ -637,6 +681,7 @@ def _contextual_task_and_expectations_for_session(
     canonical_base_tree: str = UNKNOWN,
     acceptance_criteria: Sequence[str] = (),
     law_receipt: Mapping[str, Any] | None = None,
+    session_action: str | None = None,
 ) -> tuple[str, str | None, list[str]]:
     """Fit runtime guidance + relevant experience into the exact prompt budget.
 
@@ -650,6 +695,7 @@ def _contextual_task_and_expectations_for_session(
         raise BindingError("CONTROL_TOWER_RESERVED_CONTEXT_IN_TASK")
 
     receipt = law_receipt or _establish_control_tower_law_context(root)
+    directive = _canary_directive_for_session(root, binding, task, session_action=session_action)
     base_prompt = build_execution_prompt(
         binding,
         task,
@@ -658,6 +704,8 @@ def _contextual_task_and_expectations_for_session(
         canonical_base_sha=canonical_base_sha,
         canonical_base_tree=canonical_base_tree,
         acceptance_criteria=acceptance_criteria,
+        canary_directive=directive,
+        max_prompt_chars=PROMPT_GUARD_CHARS,
     )
     remaining = PROMPT_GUARD_CHARS - len(base_prompt) - 2
     if remaining < MIN_CONTEXT_BUDGET:
@@ -684,6 +732,8 @@ def _contextual_task_and_expectations_for_session(
         canonical_base_sha=canonical_base_sha,
         canonical_base_tree=canonical_base_tree,
         acceptance_criteria=acceptance_criteria,
+        canary_directive=directive,
+        max_prompt_chars=PROMPT_GUARD_CHARS,
     )
     if len(final_prompt) > PROMPT_GUARD_CHARS:
         raise BindingError(f"CONTROL_TOWER_FINAL_PROMPT_TOO_LARGE:{len(final_prompt)}")
@@ -720,6 +770,7 @@ def _contextual_task_for_session(
     canonical_base_tree: str = UNKNOWN,
     acceptance_criteria: Sequence[str] = (),
     law_receipt: Mapping[str, Any] | None = None,
+    session_action: str | None = None,
 ) -> str:
     """Fit runtime guidance + relevant experience into the exact prompt budget."""
     contextual, _, _ = _contextual_task_and_expectations_for_session(
@@ -732,6 +783,7 @@ def _contextual_task_for_session(
         canonical_base_tree=canonical_base_tree,
         acceptance_criteria=acceptance_criteria,
         law_receipt=law_receipt,
+        session_action=session_action,
     )
     return contextual
 
@@ -773,6 +825,10 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
     if reconciliation is not None:
         print("\nINGEST RECONCILIATION")
         print(json.dumps(reconciliation, ensure_ascii=False, sort_keys=True, indent=2))
+    canary_grade = result.get("canary_grade")
+    if isinstance(canary_grade, Mapping):
+        print("\nCANARY EXTERNAL GRADE")
+        print(json.dumps(canary_grade, ensure_ascii=False, sort_keys=True, indent=2))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -807,6 +863,15 @@ def build_parser() -> argparse.ArgumentParser:
     ingest = sub.add_parser("ingest", help="ingest a complete executor response from a UTF-8 text file")
     ingest.add_argument("--response-file", required=True)
     ingest.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
+
+    continue_session = sub.add_parser(
+        "continue",
+        help="apply OWNER_CONTINUATION_GATE_V1 and resume the original real task in the SAME session",
+    )
+    continue_session.add_argument("--session-id", required=True)
+    continue_session.add_argument("--owner-continuation", default="YES")
+    continue_session.add_argument("--owner-reply", default="")
+    continue_session.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
 
     next_session = sub.add_parser(
         "next",
@@ -855,6 +920,7 @@ def _start_next_with_context(
     binding = SessionBinding.from_mapping(binding_mapping)
     task_id = str(planned.get("task_id", UNKNOWN))
     criteria = tuple(planned.get("acceptance_criteria") or ())
+    directive = _canary_directive_for_session(root, binding, _extract_task_text(prompt))
     task_prompt, expected_law_sha, expected_exp_ids = _contextual_task_and_expectations_for_session(
         root,
         binding,
@@ -873,6 +939,7 @@ def _start_next_with_context(
         acceptance_criteria=criteria,
         expected_law_sha=expected_law_sha,
         expected_experience_ids=expected_exp_ids,
+        canary_directive=directive,
     )
     result.update(
         {
@@ -904,6 +971,7 @@ def main(argv: list[str] | None = None) -> int:
                 goal=args.goal,
             )
             criteria = tuple(args.acceptance_criterion)
+            directive = _canary_directive_for_session(root, binding, args.goal)
             task_prompt, expected_law_sha, expected_exp_ids = _contextual_task_and_expectations_for_session(
                 root,
                 binding,
@@ -926,6 +994,7 @@ def main(argv: list[str] | None = None) -> int:
                 acceptance_criteria=criteria,
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
+                canary_directive=directive,
             )
         elif args.command == "snapshot":
             result = {"status": "PASS", "snapshot": tower.snapshot()}
@@ -935,6 +1004,12 @@ def main(argv: list[str] | None = None) -> int:
                 response_path.read_text(encoding="utf-8"),
                 current_canonical_base_sha=args.current_canonical_base_sha,
                 current_canonical_base_tree=args.current_canonical_base_tree,
+            )
+        elif args.command == "continue":
+            result = tower.continue_canary_session(
+                args.session_id,
+                owner_continuation=args.owner_continuation,
+                owner_reply=args.owner_reply,
             )
         elif args.command == "next":
             result = _start_next_with_context(

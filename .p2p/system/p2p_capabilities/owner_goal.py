@@ -81,6 +81,29 @@ HOST_INVOCATION_SEAM_MODULES = (
 
 # Evidence for Control Tower: Arena direct invocation capability absent
 ARENA_DIRECT_INVOCATION = "NOT_AVAILABLE"
+# A generated Arena handoff packet has no registered Control Tower session id
+# yet; the canary directive therefore carries an explicit UNKNOWN session.
+UNKNOWN_SESSION = "UNKNOWN"
+# Fail-closed canary context used only when the existing Control Tower canary
+# helpers cannot be imported. It keeps the gate executable instead of silently
+# dropping it, and it never grants continuation authority.
+FAIL_CLOSED_CANARY_LINES = (
+    "FAST_CANARY (MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1):",
+    "FAST_CANARY_REQUIRED=YES",
+    "REAL_TASK_FIRST_SLICE=CANARY",
+    "CANARY_DURABLE_MUTATION_ALLOWED=NO",
+    "STOP_AFTER_CANARY=YES",
+    "EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN",
+    "MODEL_IDENTITY=UNKNOWN",
+    "Perform exactly ONE first safe read-only or disposable probe of the bounded",
+    "objective above, then return exactly CANARY_EVIDENCE_PACKET_V1 and stop.",
+    "Do not emit GREEN/YELLOW/ORANGE/RED/KEEP_SESSION/LIMIT_SESSION/REROLL; that",
+    "classification belongs to Control Tower or an independent verifier.",
+    "CONTINUATION_CHECKPOINT=READY",
+    "OWNER_ACTION_REQUIRED=YES",
+    "NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED",
+    "FALLBACK_OWNER_REPLY=Tiếp tục công việc",
+)
 DIRECT_INVOCATION_EVIDENCE = {
     "chatgpt_surface": "No Arena invocation action/plugin found in ChatGPT tool list",
     "control_tower_surface": "No Arena integration in plugin discovery",
@@ -281,6 +304,50 @@ def build_arena_handoff(
     chat_title = f"{project_name} — {title_goal[:64]}"
     session_action = "CONTINUE_CURRENT_SESSION" if reuse else "START_NEW_SESSION"
 
+    # MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1 reuse the existing
+    # Control Tower canary decision/serialization helpers. A new Arena session
+    # on medium/high-risk work canaries automatically; low-risk/mechanical work
+    # and non-Arena executors bypass.
+    canary_decision = {
+        "FAST_CANARY_REQUIRED": "NO",
+        "REASON": "CANARY_DECISION_UNAVAILABLE",
+        "RISK_CLASS": "UNKNOWN",
+    }
+    canary_directive = None
+    canary_lines: tuple[str, ...] = ()
+    try:
+        from .control_tower_handoff import (
+            CanaryDirective,
+            canary_prompt_lines,
+            canary_requirement,
+        )
+
+        canary_decision = canary_requirement(
+            executor,
+            objective,
+            session_action=session_action,
+        )
+        if canary_decision.get("FAST_CANARY_REQUIRED") == "YES":
+            canary_directive = CanaryDirective(
+                host=executor,
+                session_id=UNKNOWN_SESSION,
+                goal_id=goal_id,
+                goal=objective,
+                original_task=objective,
+                risk_class=str(canary_decision.get("RISK_CLASS") or "MODERATE"),
+            )
+            canary_lines = canary_prompt_lines(canary_directive)
+    except Exception:
+        # Fail closed: the gate stays executable even if the helpers cannot be
+        # imported, because a silently missing canary is the Issue #254 defect.
+        canary_decision = {
+            "FAST_CANARY_REQUIRED": "YES",
+            "REASON": "CANARY_DECISION_FAILED_CLOSED",
+            "RISK_CLASS": "UNKNOWN",
+        }
+        canary_directive = None
+        canary_lines = FAIL_CLOSED_CANARY_LINES
+
     gate = detect_owner_gate(task_plan)
     if gate["has_gate"]:
         delta = {}
@@ -317,6 +384,7 @@ def build_arena_handoff(
         f"ACCEPTANCE: {delta.get('acceptance_requirements') or []}",
         f"EVIDENCE: {delta.get('required_evidence') or []}",
         "EXECUTION_RULES: Obey scope/non-scope/acceptance/evidence; AGENT_CLAIM_IS_NOT_EVIDENCE; no second router/daemon/state DB; preserve native_goal_activation; RULE20 AUTONOMOUS_UNTIL_TERMINAL; stop at MISSION_COMPLETE|HARD_OWNER_GATE|HARD_BLOCK",
+        *canary_lines,
         "VERIFY: Run narrow affected tests + AGENTS.md validation; independent verifier evidence required",
         "RETURN: Evidence + exact branch/commit/PR + ReturnPacket TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION",
         f"SESSION_GOAL={objective}",
@@ -356,6 +424,9 @@ def build_arena_handoff(
         "branch": branch,
         "executor": executor,
         "execution_mode": "AUTONOMOUS_UNTIL_TERMINAL",
+        "fast_canary_required": canary_decision.get("FAST_CANARY_REQUIRED", "NO"),
+        "canary_decision": dict(canary_decision),
+        "canary": canary_directive.to_dict() if canary_directive is not None else None,
         "supreme_law_preflight": "P2P_SUPREME_OPERATING_LAW_V1",
         "supreme_law_capsule": capsule,
         "task_delta": delta,

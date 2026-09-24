@@ -27,6 +27,8 @@ CONTROL_TOWER_PROJECTION_SCHEMA = "p2p-control-tower-state-projection/2"
 ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
 CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
+CANARY_EVIDENCE_SCHEMA = "p2p-canary-evidence-packet/1"
+CANARY_CONTINUATION_EVENT_SCHEMA = "p2p-control-tower-canary-continuation/1"
 SUPREME_LAW_CANONICAL_REPO = "7roger89-web/P2P-upgrade-github-1"
 SUPREME_LAW_CANONICAL_REF = "main"
 SUPREME_LAW_DEVELOPMENT_PATH = "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"
@@ -51,6 +53,141 @@ SUPREME_LAW_CAPSULE = "\n".join(
     )
 )
 UNKNOWN = "UNKNOWN"
+
+# --- Arena FAST_CANARY runtime enforcement (MODEL_CANARY_GATE_V1) ------------
+# These constants make the existing canonical gate executable inside the
+# existing Control Tower prompt/session lifecycle. They add no router,
+# scheduler, daemon, benchmark service, score database, or second state store:
+# the canary decision is derived from the explicit host label, a deterministic
+# risk classification of the bounded task, and durable Control Tower state in
+# the existing execution ledger.
+MODEL_CANARY_GATE_V1 = "MODEL_CANARY_GATE_V1"
+OWNER_CONTINUATION_GATE_V1 = "OWNER_CONTINUATION_GATE_V1"
+CANARY_EVIDENCE_HEADER = "CANARY_EVIDENCE_PACKET_V1"
+CANARY_REQUIRED_HOST = "ARENA"
+CANARY_SESSION_QUALITY_ESTABLISHED = "ESTABLISHED"
+CANARY_SESSION_QUALITY_UNKNOWN = "UNKNOWN"
+RISK_CLASSES = ("LOW", "MODERATE", "CROSS_SUBSYSTEM", "SECURITY", "ARCHITECTURE")
+LOW_RISK_MECHANICAL_RISK_CLASS = "LOW"
+MEDIUM_OR_HIGH_RISK_CLASSES = ("MODERATE", "CROSS_SUBSYSTEM", "SECURITY", "ARCHITECTURE")
+CANARY_CLASSIFICATIONS = ("GREEN", "YELLOW", "ORANGE", "RED", "UNVERIFIED")
+CANARY_SESSION_POLICIES = {
+    "GREEN": "KEEP_SESSION",
+    "YELLOW": "LIMIT_SESSION",
+    "ORANGE": "ADVISORY_OR_LOW_RISK_ONLY",
+    "RED": "REROLL_OR_SWITCH_EXECUTOR",
+    "UNVERIFIED": "NO_DEFAULT_CONTINUATION",
+}
+CANARY_CONTINUATION_RECOMMENDATIONS = {
+    "GREEN": "CONTINUE_REAL_TASK_IN_SAME_SESSION_AFTER_OWNER_CONTINUATION",
+    "YELLOW": "CONTINUE_LIMITED_WITH_DECLARED_VERIFICATION_BOUND",
+    "ORANGE": "ADVISORY_OR_LOW_RISK_ONLY",
+    "RED": "REROLL_OR_SWITCH_EXECUTOR_NO_KEEP_WORKING",
+    "UNVERIFIED": "NO_DEFAULT_CONTINUATION",
+}
+# A tested executor must never authoritatively emit its own grade or session
+# policy. Presence of any of these as an executor-authored classification is a
+# canary contract violation.
+EXECUTOR_SELF_CLASSIFICATION_FORBIDDEN = (
+    "GREEN",
+    "YELLOW",
+    "ORANGE",
+    "RED",
+    "KEEP_SESSION",
+    "LIMIT_SESSION",
+    "REROLL",
+    "REROLL_OR_SWITCH_EXECUTOR",
+    "ADVISORY_OR_LOW_RISK_ONLY",
+    "NO_DEFAULT_CONTINUATION",
+)
+CANARY_EVIDENCE_REQUIRED_FIELDS = (
+    "P2P_LAW_SOURCE",
+    "CURRENT_STATE",
+    "DECISIVE_CHECK",
+    "CHECK_RESULT",
+    "DURABLE_MUTATION_CREATED",
+    "MODEL_IDENTITY",
+)
+CANARY_CHECKPOINT_FIELDS = (
+    "CONTINUATION_CHECKPOINT=READY",
+    "OWNER_ACTION_REQUIRED=YES",
+    "NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED",
+    "FALLBACK_OWNER_REPLY=Tiếp tục công việc",
+)
+FALLBACK_OWNER_REPLY = "Tiếp tục công việc"
+CANARY_EVENT_TYPES = (
+    "CONTROL_TOWER_SESSION_STARTED",
+    "CONTROL_TOWER_RETURN_PACKET",
+    "CONTROL_TOWER_CANARY_CONTINUATION",
+)
+# Deterministic prompt-budget floor for required canary context: the Control
+# Tower prompt budget must never be smaller than this, otherwise the mandatory
+# FAST_CANARY context could not fit and generation would fail closed on every
+# triggered Arena session.
+CANARY_PROMPT_BUDGET_GUARD_CHARS = 12000
+# One Control Tower execution prompt is a single ledger string value. The
+# durable-value cap must stay above the prompt budget so required canary context
+# is neither rejected nor silently truncated when the event is persisted.
+MAX_LEDGER_STRING_CHARS = 16384
+
+_HIGH_RISK_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    (
+        "SECURITY",
+        re.compile(
+            r"\b(security|secrets?|credentials?|tokens?|authenticat\w*|authoriz\w*|permissions?|"
+            r"privileges?|vulnerab\w*|exploit\w*|encrypt\w*|signature|access[_ ]control|payment|billing)\b",
+            re.I,
+        ),
+    ),
+    (
+        "ARCHITECTURE",
+        re.compile(
+            r"\b(architect\w*|refactor\w*|migrat\w*|rewrit\w*|redesign\w*|framework|runtime|protocol|"
+            r"router|scheduler|daemon|consolidat\w*|reconcil\w*|governance|schema|contract)\b",
+            re.I,
+        ),
+    ),
+    (
+        "CROSS_SUBSYSTEM",
+        re.compile(
+            r"\b(cross[- ]subsystem|end[- ]to[- ]end|pipeline|integration|integrate|deploy\w*|release\w*|"
+            r"production|promot\w*|merge|broad|repository[- ]wide|multi[- ]file|subsystem)\b",
+            re.I,
+        ),
+    ),
+)
+_MEDIUM_RISK_PATTERN = re.compile(
+    r"\b(implement\w*|fix\w*|repair\w*|add\w*|updat\w*|chang\w*|modif\w*|extend\w*|build\w*|creat\w*|"
+    r"writ\w*|test\w*|debug\w*|investigat\w*|diagnos\w*|analy[sz]\w*|enforc\w*|wir\w*|port\w*|"
+    r"upgrad\w*|repair|issue|regression|defect|runtime)\b",
+    re.I,
+)
+_LOW_RISK_MECHANICAL_PATTERN = re.compile(
+    r"^(typo|rename|reword|reformat|comment|doc|docs|readme|changelog|bump|version|"
+    r"whitespace|spelling|log|label|title|copy|string|message|translat\w*)\b",
+    re.I,
+)
+_LOW_RISK_MECHANICAL_PHRASE = re.compile(
+    r"\b(low[- ]risk|mechanical|read[- ]only|doc(?:umentation)?[- ]only|cosmetic|trivial|"
+    r"typo|rename|reword|reformat|whitespace|spelling|readme|changelog|label|title)\b",
+    re.I,
+)
+_SUBSTANTIVE_WORK_PATTERN = re.compile(
+    r"\b(implement\w*|fix\w*|repair\w*|migrat\w*|refactor\w*|rewrit\w*|redesign\w*|debug\w*|"
+    r"investigat\w*|diagnos\w*|enforc\w*|extend\w*|upgrad\w*|wir\w*|port\w*|test\w*|"
+    r"analy[sz]\w*|regression|defect|issue|schema|"
+    r"runtime|router|pipeline|integration|deploy\w*|release\w*|promot\w*|merge|"
+    r"security|secret\w*|credential\w*|token\w*|auth\w*|permission\w*|architect\w*)\b",
+    re.I,
+)
+_CHECK_RESULT_FAILURE_PATTERN = re.compile(
+    r"\b(fail\w*|error\w*|mismatch\w*|reject\w*|broken|exit[_ ]?code[=: ]*[1-9]|non[- ]zero|"
+    r"not[_ ]pass\w*|unverified|unknown)\b",
+    re.I,
+)
+_CHECK_RESULT_PASS_PATTERN = re.compile(r"\b(pass\w*|ok|success\w*|exit[_ ]?code[=: ]*0)\b", re.I)
+_CANARY_EVIDENCE_LINE = re.compile(r"^([A-Z][A-Z0-9_]{2,63})=(.*)$")
+_SELF_CLASSIFICATION_KEY = re.compile(r"(classif|grade|score|self|verdict|session[_ ]?policy|keep|reroll)", re.I)
 
 TERMINAL_STATES = (
     "COMPLETED",
@@ -173,7 +310,7 @@ def _safe_json(value: Any, *, path: str = "value", depth: int = 0) -> Any:
             raise ControlTowerHandoffError(f"{path}_TOO_LARGE")
         return [_safe_json(item, path=f"{path}[{index}]", depth=depth + 1) for index, item in enumerate(value)]
     if isinstance(value, str):
-        if len(value) > 8192 or _SECRET_VALUE_PATTERN.search(value):
+        if len(value) > MAX_LEDGER_STRING_CHARS or _SECRET_VALUE_PATTERN.search(value):
             raise ControlTowerHandoffError(f"{path}_SECRET_OR_TOO_LARGE")
         return value
     if value is None or isinstance(value, (bool, int, float)):
@@ -888,6 +1025,342 @@ def bind_session(
     return SessionBinding(session_id=session_id, host=host, goal_id=goal_id, goal=goal)
 
 
+# --- MODEL_CANARY_GATE_V1 executable runtime --------------------------------
+# Deterministic risk classification reuses the existing P2P risk-class taxonomy
+# (LOW / MODERATE / CROSS_SUBSYSTEM / SECURITY / ARCHITECTURE) so no new
+# scoring, ranking, or benchmark subsystem is introduced.
+
+
+def classify_task_risk_class(task_text: Any) -> str:
+    """Classify one bounded task into an existing P2P risk class.
+
+    The classification is deterministic and conservative: an unclassifiable
+    task is treated as at least MODERATE so the canary gate stays fail-closed.
+    """
+
+    task = " ".join(str(task_text or "").split())
+    if not task:
+        return "MODERATE"
+    if len(task) <= 400 and _LOW_RISK_MECHANICAL_PHRASE.search(task):
+        if not _SUBSTANTIVE_WORK_PATTERN.search(task) and not any(
+            pattern.search(task) for _, pattern in _HIGH_RISK_PATTERNS
+        ):
+            return LOW_RISK_MECHANICAL_RISK_CLASS
+    for risk_class, pattern in _HIGH_RISK_PATTERNS:
+        if pattern.search(task):
+            return risk_class
+    if _MEDIUM_RISK_PATTERN.search(task):
+        return "MODERATE"
+    return "MODERATE"
+
+
+@dataclass(frozen=True)
+class CanaryDirective:
+    """The executable FAST_CANARY directive for one Arena session.
+
+    ``original_task`` is the durable real bounded task that must be restored
+    from Control Tower state after external grading plus Owner continuation.
+    It is never reconstructed from chat memory.
+    """
+
+    host: str
+    session_id: str
+    goal_id: str
+    goal: str
+    original_task: str
+    risk_class: str = "MODERATE"
+    task_id: str = UNKNOWN
+    session_quality: str = CANARY_SESSION_QUALITY_UNKNOWN
+    model_identity: str = UNKNOWN
+    durable_mutation_allowed: str = "NO"
+    stop_after_canary: str = "YES"
+    gate: str = MODEL_CANARY_GATE_V1
+    owner_continuation_gate: str = OWNER_CONTINUATION_GATE_V1
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema": CANARY_EVIDENCE_SCHEMA,
+            "GATE": self.gate,
+            "HOST": self.host,
+            "SESSION_ID": self.session_id,
+            "GOAL_ID": self.goal_id,
+            "GOAL": self.goal,
+            "TASK_ID": self.task_id,
+            "ORIGINAL_TASK": self.original_task,
+            "RISK_CLASS": self.risk_class,
+            "SESSION_QUALITY": self.session_quality,
+            "FAST_CANARY_REQUIRED": "YES",
+            "REAL_TASK_FIRST_SLICE": "CANARY",
+            "CANARY_DURABLE_MUTATION_ALLOWED": self.durable_mutation_allowed,
+            "STOP_AFTER_CANARY": self.stop_after_canary,
+            "EXECUTOR_SELF_CLASSIFICATION": "FORBIDDEN",
+            "MODEL_IDENTITY": self.model_identity,
+            "OWNER_CONTINUATION_GATE": self.owner_continuation_gate,
+            "CANARY_CLASSIFIER": "CONTROL_TOWER_OR_INDEPENDENT_VERIFIER",
+            "CONTINUATION_CHECKPOINT": "READY",
+            "OWNER_ACTION_REQUIRED": "YES",
+            "NATIVE_ACTION_HINT": "KEEP_WORKING_IF_APPROVED",
+            "FALLBACK_OWNER_REPLY": FALLBACK_OWNER_REPLY,
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "CanaryDirective":
+        if not isinstance(value, Mapping):
+            raise ControlTowerHandoffError("CANARY_DIRECTIVE_REQUIRED")
+        return cls(
+            host=str(value.get("HOST") or CANARY_REQUIRED_HOST),
+            session_id=str(value.get("SESSION_ID") or UNKNOWN),
+            goal_id=str(value.get("GOAL_ID") or UNKNOWN),
+            goal=str(value.get("GOAL") or UNKNOWN),
+            original_task=str(value.get("ORIGINAL_TASK") or value.get("GOAL") or UNKNOWN),
+            risk_class=str(value.get("RISK_CLASS") or "MODERATE"),
+            task_id=str(value.get("TASK_ID") or UNKNOWN),
+            session_quality=str(value.get("SESSION_QUALITY") or CANARY_SESSION_QUALITY_UNKNOWN),
+            model_identity=str(value.get("MODEL_IDENTITY") or UNKNOWN),
+            durable_mutation_allowed=str(value.get("CANARY_DURABLE_MUTATION_ALLOWED") or "NO"),
+            stop_after_canary=str(value.get("STOP_AFTER_CANARY") or "YES"),
+        )
+
+
+def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
+    """Serialize the FAST_CANARY directive into executable prompt context."""
+
+    if not isinstance(directive, CanaryDirective):
+        raise ControlTowerHandoffError("CANARY_DIRECTIVE_REQUIRED")
+    return (
+        "FAST_CANARY (MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1):",
+        "This Arena session is NEW and its session quality is materially unproven, so the",
+        "first safe real-task slice IS the canary. The real bounded task is preserved below and",
+        "in durable Control Tower state; it is restored only after external grading plus explicit",
+        "Owner continuation. Do not reconstruct it from chat memory.",
+        "",
+        f"FAST_CANARY_REQUIRED=YES",
+        f"REAL_TASK_FIRST_SLICE=CANARY",
+        f"CANARY_DURABLE_MUTATION_ALLOWED={directive.durable_mutation_allowed}",
+        f"STOP_AFTER_CANARY={directive.stop_after_canary}",
+        "EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN",
+        f"MODEL_IDENTITY={directive.model_identity}",
+        f"RISK_CLASS={directive.risk_class}",
+        f"SESSION_QUALITY={directive.session_quality}",
+        f"OWNER_CONTINUATION_GATE={directive.owner_continuation_gate}",
+        f"CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER",
+        "",
+        "ORIGINAL_REAL_TASK (bounded goal preserved for continuation):",
+        directive.original_task,
+        "",
+        "CANARY EXECUTION RULES:",
+        "- Perform exactly ONE first safe real-task slice: the smallest read-only or disposable",
+        "  probe of the real task above that materially answers whether this session can do the work.",
+        "- Do not create durable commits, branches, PRs, remote writes, deployments, or protected",
+        "  actions for the canary. Disposable scratch edits and focused checks are allowed.",
+        "- Stop after that one decisive probe. Do not sweep budgets, re-run broad investigations,",
+        "  or continue toward a terminal technical conclusion in this turn.",
+        "- Judge nothing yourself. You MUST NOT emit GREEN, YELLOW, ORANGE, RED, KEEP_SESSION,",
+        "  LIMIT_SESSION, or REROLL; that classification belongs to Control Tower or another",
+        "  independent verifier.",
+        "- Do not infer or claim a hidden model, provider, or reasoning level; MODEL_IDENTITY=UNKNOWN.",
+        "",
+        "CANARY_EVIDENCE_PACKET_V1 (return exactly this shape, then stop):",
+        "CANARY_EVIDENCE_PACKET_V1",
+        "P2P_LAW_SOURCE=<actual source read>",
+        "CURRENT_STATE=<pinned repo/task state>",
+        "FACTS=<max 5 task-relevant observed facts>",
+        "DECISIVE_CHECK=<one representative real check>",
+        "CHECK_RESULT=<actual result/exit/status>",
+        "ERRORS_ENCOUNTERED=<brief or NONE>",
+        "RECOVERY_ACTIONS=<brief or NONE>",
+        "DURABLE_MUTATION_CREATED=NO",
+        "MODEL_IDENTITY=UNKNOWN",
+        "",
+        "END OF CANARY TURN — checkpoint metadata (not a self-grade):",
+        *CANARY_CHECKPOINT_FIELDS,
+        "",
+        "After you stop, Control Tower ingests this evidence, grades the session externally, and",
+        "the Owner decides continuation. Do not continue the original task in this turn.",
+    )
+
+
+def canary_requirement(
+    host: Any,
+    task_text: Any,
+    *,
+    session_quality: str = CANARY_SESSION_QUALITY_UNKNOWN,
+    risk_class: str | None = None,
+    session_action: str | None = None,
+) -> dict[str, Any]:
+    """Decide whether FAST_CANARY is required for one generated session.
+
+    Fail-closed order: non-Arena executors bypass; low-risk/mechanical work
+    bypasses; a session whose quality is already durably established for the
+    same bounded goal does not re-canary; every other new Arena medium/high
+    risk session canaries.
+    """
+
+    normalized_host = str(host or "").strip().upper().replace("-", "_")
+    task = " ".join(str(task_text or "").split())
+    resolved_risk = risk_class or classify_task_risk_class(task)
+    if resolved_risk not in RISK_CLASSES:
+        raise ControlTowerHandoffError(f"CANARY_RISK_CLASS_INVALID:{resolved_risk}")
+    decision = {
+        "GATE": MODEL_CANARY_GATE_V1,
+        "HOST": normalized_host or UNKNOWN,
+        "RISK_CLASS": resolved_risk,
+        "SESSION_QUALITY": str(session_quality or CANARY_SESSION_QUALITY_UNKNOWN).upper(),
+        "FAST_CANARY_REQUIRED": "NO",
+        "REASON": UNKNOWN,
+        "SESSION_ACTION": str(session_action or UNKNOWN),
+    }
+    if normalized_host != CANARY_REQUIRED_HOST:
+        decision["REASON"] = "NON_ARENA_EXECUTOR"
+        return decision
+    if str(session_action or "").upper() == "CONTINUE_CURRENT_SESSION":
+        decision["REASON"] = "EXISTING_SESSION_CONTINUATION"
+        return decision
+    if resolved_risk not in MEDIUM_OR_HIGH_RISK_CLASSES:
+        decision["REASON"] = "LOW_RISK_MECHANICAL_ARENA_TASK"
+        return decision
+    if decision["SESSION_QUALITY"] == CANARY_SESSION_QUALITY_ESTABLISHED:
+        decision["REASON"] = "SESSION_QUALITY_ALREADY_ESTABLISHED"
+        return decision
+    decision["FAST_CANARY_REQUIRED"] = "YES"
+    decision["REASON"] = "NEW_ARENA_SESSION_MEDIUM_OR_HIGH_RISK_SESSION_QUALITY_UNKNOWN"
+    decision["REAL_TASK_FIRST_SLICE"] = "CANARY"
+    decision["CANARY_DURABLE_MUTATION_ALLOWED"] = "NO"
+    decision["STOP_AFTER_CANARY"] = "YES"
+    decision["EXECUTOR_SELF_CLASSIFICATION"] = "FORBIDDEN"
+    decision["MODEL_IDENTITY"] = UNKNOWN
+    return decision
+
+
+def parse_canary_evidence_packet(response_text: Any) -> dict[str, Any] | None:
+    """Parse a CANARY_EVIDENCE_PACKET_V1 block from an executor response."""
+
+    text = str(response_text or "")
+    lines = text.splitlines()
+    header_index = None
+    for index, line in enumerate(lines):
+        if line.strip().upper().startswith(CANARY_EVIDENCE_HEADER):
+            header_index = index
+            break
+    if header_index is None:
+        return None
+    fields: dict[str, str] = {}
+    order: list[str] = []
+    for line in lines[header_index + 1 :]:
+        stripped = line.strip()
+        if not stripped:
+            if fields:
+                break
+            continue
+        match = _CANARY_EVIDENCE_LINE.match(stripped)
+        if match is None:
+            if fields:
+                break
+            continue
+        key, value = match.group(1), match.group(2).strip()
+        if key not in fields:
+            order.append(key)
+        fields[key] = value
+    if not fields:
+        return None
+    return {"schema": CANARY_EVIDENCE_SCHEMA, "FIELDS": fields, "FIELD_ORDER": tuple(order)}
+
+
+def _canary_self_classification_violation(fields: Mapping[str, Any]) -> str | None:
+    for key, value in fields.items():
+        normalized = str(value or "").strip().upper()
+        if _SELF_CLASSIFICATION_KEY.search(key) and normalized in EXECUTOR_SELF_CLASSIFICATION_FORBIDDEN:
+            return f"{key}={normalized}"
+    return None
+
+
+def classify_canary_evidence(
+    evidence: Mapping[str, Any] | None,
+    *,
+    return_packet: Any = None,
+    response_text: Any = None,
+) -> dict[str, Any]:
+    """Externally grade one canary return using deterministic existing policy.
+
+    The tested executor never grades itself. Control Tower (or an independent
+    verifier) grades externally observable evidence only. When independent
+    verification is unavailable the result is UNVERIFIED, never implicit GREEN.
+    """
+
+    fields: dict[str, Any] = {}
+    if isinstance(evidence, Mapping):
+        raw_fields = evidence.get("FIELDS")
+        fields = dict(raw_fields) if isinstance(raw_fields, Mapping) else dict(evidence)
+    session_state = ""
+    if return_packet is not None:
+        session_state = str(getattr(return_packet, "session_state", "") or "").upper()
+
+    def _result(classification: str, reasons: tuple[str, ...]) -> dict[str, Any]:
+        return {
+            "GATE": MODEL_CANARY_GATE_V1,
+            "CLASSIFICATION": classification,
+            "SESSION_POLICY": CANARY_SESSION_POLICIES[classification],
+            "CONTINUATION_RECOMMENDATION": CANARY_CONTINUATION_RECOMMENDATIONS[classification],
+            "REASONS": list(reasons),
+            "EXECUTOR_SELF_CLASSIFICATION": "FORBIDDEN",
+            "CANARY_CLASSIFIER": "CONTROL_TOWER_OR_INDEPENDENT_VERIFIER",
+            "OWNER_CONTINUATION_REQUIRED": "YES" if classification == "GREEN" else "NO",
+            "MODEL_IDENTITY": str(fields.get("MODEL_IDENTITY") or UNKNOWN),
+        }
+
+    if not fields:
+        # Live regression shape: a canary session that keeps investigating and
+        # returns a terminal conclusion without the evidence packet.
+        if session_state in {"COMPLETED", "FAILED", "ABORTED"}:
+            return _result(
+                "RED",
+                ("CANARY_EVIDENCE_PACKET_MISSING_AFTER_TERMINAL_CONCLUSION",),
+            )
+        return _result("UNVERIFIED", ("CANARY_EVIDENCE_PACKET_MISSING",))
+
+    self_grade = _canary_self_classification_violation(fields)
+    if self_grade is not None:
+        return _result("RED", (f"EXECUTOR_SELF_CLASSIFICATION_FORBIDDEN:{self_grade}",))
+
+    missing = [name for name in CANARY_EVIDENCE_REQUIRED_FIELDS if not str(fields.get(name) or "").strip()]
+    if missing:
+        return _result("UNVERIFIED", (f"CANARY_EVIDENCE_INCOMPLETE:{','.join(missing)}",))
+
+    if str(fields.get("DURABLE_MUTATION_CREATED") or "").strip().upper() == "YES":
+        return _result("RED", ("CANARY_DURABLE_MUTATION_BOUNDARY_VIOLATED",))
+
+    response = str(response_text or "")
+    checkpoint_missing = [
+        token
+        for token in CANARY_CHECKPOINT_FIELDS
+        if token not in response and token.split("=", 1)[0] not in fields
+    ]
+    if checkpoint_missing:
+        return _result("RED", (f"CANARY_STOP_BOUNDARY_VIOLATION:{','.join(checkpoint_missing)}",))
+
+    check_result = str(fields.get("CHECK_RESULT") or "").strip()
+    errors = str(fields.get("ERRORS_ENCOUNTERED") or "").strip()
+    recovery = str(fields.get("RECOVERY_ACTIONS") or "").strip()
+    recovered = bool(recovery) and recovery.upper() not in {"NONE", "UNKNOWN", "N/A"}
+    identity = str(fields.get("MODEL_IDENTITY") or "").strip().upper()
+
+    if not check_result or check_result.upper() in {"UNKNOWN", "NONE", "N/A"}:
+        return _result("ORANGE", ("CANARY_DECISIVE_CHECK_RESULT_UNKNOWN",))
+
+    if _CHECK_RESULT_FAILURE_PATTERN.search(check_result) and not _CHECK_RESULT_PASS_PATTERN.search(check_result):
+        if recovered:
+            return _result("YELLOW", ("CANARY_CHECK_FAILED_THEN_RECOVERED",))
+        return _result("RED", ("CANARY_CHECK_FAILED_WITHOUT_RECOVERY",))
+
+    if errors and errors.upper() != "NONE":
+        return _result("YELLOW", ("CANARY_ERRORS_ENCOUNTERED_WITH_RECOVERY" if recovered else "CANARY_ERRORS_WITHOUT_RECOVERY",))
+
+    if identity not in {"", UNKNOWN}:
+        return _result("YELLOW", ("MODEL_IDENTITY_SELF_REPORT_IS_NOT_EVIDENCE",))
+
+    return _result("GREEN", ("CANARY_PROBE_PASSED_WITHOUT_MATERIAL_WEAKNESS",))
+
+
 @dataclass(frozen=True)
 class ControlTowerReturnPacket:
     """A structured return proposal. It is never canonical truth."""
@@ -1461,6 +1934,7 @@ class ControlTowerIngestResult:
     idempotent: bool = False
     packet_fingerprint: str = "UNKNOWN"
     promotion_claim_detected: bool = False
+    canary_classification: str = UNKNOWN
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1482,6 +1956,7 @@ class ControlTowerIngestResult:
             "IDEMPOTENT": self.idempotent,
             "PACKET_FINGERPRINT": self.packet_fingerprint,
             "PROMOTION_CLAIM_DETECTED": self.promotion_claim_detected,
+            "CANARY_CLASSIFICATION": self.canary_classification,
         }
 
 
@@ -1716,11 +2191,14 @@ class ControlTowerState:
 def to_execution_ledger_event(
     packet: ControlTowerReturnPacket,
     reconciliation: ControlTowerIngestResult | None = None,
+    canary_grade: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return a JSON event for the existing execution-ledger writer.
 
     This function deliberately does not write a file. The caller may pass the
-    event to the repository's existing append_event surface.
+    event to the repository's existing append_event surface. When the packet is
+    a canary return, the external Control Tower grade rides in the same
+    existing-ledger event instead of a second state store.
     """
 
     if not isinstance(packet, ControlTowerReturnPacket):
@@ -1731,6 +2209,7 @@ def to_execution_ledger_event(
         "PACKET_FINGERPRINT": packet.fingerprint(),
         "CONTROL_TOWER_RETURN_PACKET": packet.to_dict(),
         "CONTROL_TOWER_RECONCILIATION": reconciliation.to_dict() if reconciliation is not None else None,
+        "CONTROL_TOWER_CANARY": _safe_json(dict(canary_grade), path="canary_grade") if canary_grade is not None else None,
         "CANONICAL_TRUTH_UPDATED": "NO",
         "PROTECTED_ACTION_EXECUTED": "NO",
     }
@@ -1766,10 +2245,7 @@ def _read_control_tower_events(path: Path) -> list[dict[str, Any]]:
             raise ProjectionError(f"CONTROL_TOWER_LEDGER_INVALID_JSON:{line_number}") from exc
         if not isinstance(raw, Mapping):
             continue
-        if raw.get("event_type") not in {
-            "CONTROL_TOWER_SESSION_STARTED",
-            "CONTROL_TOWER_RETURN_PACKET",
-        }:
+        if raw.get("event_type") not in CANARY_EVENT_TYPES:
             continue
         try:
             _reject_secret_keys(raw)
@@ -1803,6 +2279,45 @@ def _same_binding(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
     return all(left.get(field_name) == right.get(field_name) for field_name in ("SESSION_ID", "HOST", "GOAL_ID", "GOAL"))
 
 
+def _canary_record(value: Any) -> dict[str, Any]:
+    """Project one durable canary directive without creating a second store."""
+
+    if not isinstance(value, Mapping):
+        return {"FAST_CANARY_REQUIRED": "NO", "REASON": "NOT_RECORDED"}
+    record = _safe_json(dict(value), path="canary")
+    record["FAST_CANARY_REQUIRED"] = str(record.get("FAST_CANARY_REQUIRED") or "NO").upper()
+    return record
+
+
+def canary_session_quality(
+    records: Mapping[str, Any],
+    *,
+    goal_id: str,
+    session_id: str,
+) -> str:
+    """Return durable session quality for one SAME session and bounded goal.
+
+    Quality is established only by a durable external GREEN grade for the same
+    session id AND the same bounded goal. A NEW Arena session, a material reset,
+    or a changed harness is a different durable session record, so quality is
+    UNKNOWN again and medium/high-risk work must canary again.
+    """
+
+    if not str(session_id or "").strip():
+        return CANARY_SESSION_QUALITY_UNKNOWN
+    for record in records.values():
+        if not isinstance(record, Mapping):
+            continue
+        if str(record.get("GOAL_ID") or "") != str(goal_id or ""):
+            continue
+        if str(record.get("SESSION_ID") or "") != str(session_id or ""):
+            continue
+        grade = record.get("CANARY_GRADE")
+        if isinstance(grade, Mapping) and str(grade.get("CLASSIFICATION") or "").upper() == "GREEN":
+            return CANARY_SESSION_QUALITY_ESTABLISHED
+    return CANARY_SESSION_QUALITY_UNKNOWN
+
+
 def _session_recommendation(
     binding: SessionBinding,
     *,
@@ -1813,6 +2328,8 @@ def _session_recommendation(
     canonical_base_tree: str = UNKNOWN,
     acceptance_criteria: Sequence[str] = (),
     task_id: str = UNKNOWN,
+    canary_directive: CanaryDirective | None = None,
+    max_prompt_chars: int | None = None,
 ) -> dict[str, Any]:
     prompt = build_execution_prompt(
         binding,
@@ -1822,8 +2339,10 @@ def _session_recommendation(
         canonical_base_sha=canonical_base_sha,
         canonical_base_tree=canonical_base_tree,
         acceptance_criteria=acceptance_criteria,
+        canary_directive=canary_directive,
+        max_prompt_chars=max_prompt_chars,
     )
-    return {
+    recommendation = {
         "CHAT_NAME": f"{binding.host} — {binding.goal_id} — {binding.goal}",
         "HOST": binding.host,
         "SESSION_ID": binding.session_id,
@@ -1832,6 +2351,10 @@ def _session_recommendation(
         "PROMPT": prompt,
         "PACKET_IS_CANONICAL_TRUTH": "NO",
     }
+    if canary_directive is not None:
+        recommendation["CANARY"] = canary_directive.to_dict()
+        recommendation["FAST_CANARY_REQUIRED"] = "YES"
+    return recommendation
 
 
 class ControlTower:
@@ -1917,6 +2440,8 @@ class ControlTower:
                         "RECOMMENDED_NEW_CHAT": event.get("RECOMMENDED_NEW_CHAT"),
                         "EXPECTED_LAW_SHA": event.get("EXPECTED_LAW_SHA"),
                         "EXPECTED_EXPERIENCE_IDS": event.get("EXPECTED_EXPERIENCE_IDS", []),
+                        "ACCEPTANCE_CRITERIA": list(event.get("ACCEPTANCE_CRITERIA") or []),
+                        "CANARY": _canary_record(event.get("CANARY")),
                     }
                 )
                 records[session_id] = record
@@ -1932,6 +2457,29 @@ class ControlTower:
                         "PACKET_IS_CANONICAL_TRUTH": "NO",
                     },
                 )
+                continue
+
+            if event_type == "CONTROL_TOWER_CANARY_CONTINUATION":
+                record = records.get(str(event.get("SESSION_ID") or ""))
+                if record is None:
+                    continue
+                record["CANARY_CONTINUATION"] = _safe_json(
+                    {
+                        key: value
+                        for key, value in event.items()
+                        if key not in {"_LINE_NUMBER", "schema", "event_type"}
+                    },
+                    path="canary_continuation",
+                )
+                recommendation = event.get("RECOMMENDED_NEW_CHAT")
+                if isinstance(recommendation, Mapping):
+                    record["RECOMMENDED_NEW_CHAT"] = _safe_json(
+                        dict(recommendation), path="canary_continuation_recommendation"
+                    )
+                # The Owner continuation reopens the SAME session for the original
+                # real task; the canary is never repeated for that session.
+                record["SESSION_STATE"] = "ACTIVE"
+                records[str(event.get("SESSION_ID"))] = record
                 continue
 
             raw_packet = event.get("CONTROL_TOWER_RETURN_PACKET")
@@ -1981,6 +2529,9 @@ class ControlTower:
                     "RECONCILIATION": result.to_dict(),
                 }
             )
+            canary_grade = event.get("CONTROL_TOWER_CANARY")
+            if isinstance(canary_grade, Mapping):
+                updated["CANARY_GRADE"] = _safe_json(dict(canary_grade), path="canary_grade")
             records[packet.binding.session_id] = updated
         state.session_records = records
         return state, orphan_returns
@@ -1995,6 +2546,26 @@ class ControlTower:
         session_state = record.get("SESSION_STATE", UNKNOWN)
         reconciliation = record.get("RECONCILIATION")
         relation = reconciliation.get("CANONICAL_RELATION", UNKNOWN) if isinstance(reconciliation, Mapping) else UNKNOWN
+        canary = record.get("CANARY")
+        if isinstance(canary, Mapping) and canary.get("FAST_CANARY_REQUIRED") == "YES":
+            grade = record.get("CANARY_GRADE")
+            if not isinstance(grade, Mapping):
+                return {
+                    "ACTION": "WAIT_FOR_CANARY_EXTERNAL_GRADE",
+                    "REASON": "The canary evidence packet has not been externally graded yet.",
+                }
+            classification = str(grade.get("CLASSIFICATION") or "UNVERIFIED").upper()
+            if classification != "GREEN":
+                return {
+                    "ACTION": CANARY_SESSION_POLICIES.get(classification, "NO_DEFAULT_CONTINUATION"),
+                    "REASON": f"External canary classification is {classification}; "
+                    f"{CANARY_CONTINUATION_RECOMMENDATIONS.get(classification, 'NO_DEFAULT_CONTINUATION')}.",
+                }
+            if not isinstance(record.get("CANARY_CONTINUATION"), Mapping):
+                return {
+                    "ACTION": "WAIT_FOR_OWNER_CONTINUATION",
+                    "REASON": "External GREEN alone does not unlock full execution; explicit Owner continuation is required.",
+                }
         if session_state == "WAITING_OWNER_GATE":
             return {"ACTION": "WAIT_FOR_OWNER_DECISION", "REASON": "The packet records a pending Owner Gate."}
         if session_state in {"FAILED", "BLOCKED", "ABORTED"}:
@@ -2022,8 +2593,44 @@ class ControlTower:
         closed: list[dict[str, Any]] = []
         owner_gates: list[dict[str, Any]] = []
         risks: list[dict[str, Any]] = []
+        canary_gates: list[dict[str, Any]] = []
         latest: Mapping[str, Any] | None = None
         for record in state.session_records.values():
+            canary = record.get("CANARY")
+            if isinstance(canary, Mapping) and canary.get("FAST_CANARY_REQUIRED") == "YES":
+                grade = record.get("CANARY_GRADE")
+                classification = (
+                    str(grade.get("CLASSIFICATION") or "UNVERIFIED").upper()
+                    if isinstance(grade, Mapping)
+                    else "UNVERIFIED"
+                )
+                canary_gates.append(
+                    {
+                        "SESSION_ID": record.get("SESSION_ID", UNKNOWN),
+                        "HOST": record.get("HOST", UNKNOWN),
+                        "GOAL_ID": record.get("GOAL_ID", UNKNOWN),
+                        "TASK_ID": record.get("TASK_ID", UNKNOWN),
+                        "GATE": MODEL_CANARY_GATE_V1,
+                        "RISK_CLASS": canary.get("RISK_CLASS", UNKNOWN),
+                        "SESSION_QUALITY": canary.get("SESSION_QUALITY", UNKNOWN),
+                        "CLASSIFICATION": classification,
+                        "SESSION_POLICY": CANARY_SESSION_POLICIES.get(classification, "NO_DEFAULT_CONTINUATION"),
+                        "CONTINUATION_RECOMMENDATION": CANARY_CONTINUATION_RECOMMENDATIONS.get(
+                            classification, "NO_DEFAULT_CONTINUATION"
+                        ),
+                        "OWNER_CONTINUATION_RECORDED": (
+                            "YES"
+                            if isinstance(record.get("CANARY_CONTINUATION"), Mapping)
+                            else "NO"
+                        ),
+                        "CANARY_REPEAT": (
+                            "NO"
+                            if isinstance(record.get("CANARY_CONTINUATION"), Mapping)
+                            else "PENDING_OWNER_CONTINUATION"
+                        ),
+                        "ORIGINAL_TASK_SOURCE": "CONTROL_TOWER_DURABLE_STATE",
+                    }
+                )
             if record.get("SESSION_STATE") == "ACTIVE":
                 active.append(
                     {
@@ -2061,6 +2668,7 @@ class ControlTower:
                     "CANONICAL_TRUTH_UPDATED": "NO",
                 },
                 "HOST_LANES": state.lanes,
+                "CANARY_GATES": canary_gates,
                 "ACTIVE_EXECUTION": active,
                 "OWNER_GATES": owner_gates,
                 "RECENTLY_CLOSED": closed,
@@ -2116,9 +2724,12 @@ class ControlTower:
         acceptance_criteria: Sequence[str] = (),
         expected_law_sha: str | None = None,
         expected_experience_ids: Sequence[str] = (),
+        canary_directive: CanaryDirective | None = None,
     ) -> dict[str, Any]:
         if not isinstance(binding, SessionBinding):
             raise BindingError("SESSION_BINDING_REQUIRED")
+        if canary_directive is not None and not isinstance(canary_directive, CanaryDirective):
+            raise BindingError("CANARY_DIRECTIVE_REQUIRED")
         task_id = _optional_text(task_id, "task_id", max_length=256)
         worktree = _location(worktree, "worktree")
         branch = _location(branch, "branch")
@@ -2144,6 +2755,7 @@ class ControlTower:
                     canonical_base_tree=canonical_base_tree,
                     acceptance_criteria=criteria,
                     task_id=task_id,
+                    canary_directive=canary_directive,
                 )
             return {
                 "status": "PASS",
@@ -2162,6 +2774,7 @@ class ControlTower:
             canonical_base_tree=canonical_base_tree,
             acceptance_criteria=criteria,
             task_id=task_id,
+            canary_directive=canary_directive,
         )
         event = {
             "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
@@ -2176,6 +2789,8 @@ class ControlTower:
             "RECOMMENDED_NEW_CHAT": recommendation,
             "EXPECTED_LAW_SHA": expected_law_sha,
             "EXPECTED_EXPERIENCE_IDS": list(expected_experience_ids),
+            "ACCEPTANCE_CRITERIA": list(criteria),
+            "CANARY": canary_directive.to_dict() if canary_directive is not None else None,
             "PACKET_IS_CANONICAL_TRUTH": "NO",
             "PROMOTED": False,
             "PROTECTED_ACTION_EXECUTED": False,
@@ -2215,6 +2830,8 @@ class ControlTower:
             law_check=kwargs.pop("law_check", law_check),
             experience_check=kwargs.pop("experience_check", experience_check),
             learning_reconciliation=kwargs.pop("learning_reconciliation", learning_reconciliation),
+            canary_evidence=kwargs.pop("canary_evidence", parse_canary_evidence_packet(final_response)),
+            response_text=kwargs.pop("response_text", final_response),
             expected_law_sha=expected_law_sha,
             expected_experience_ids=expected_experience_ids,
             **kwargs,
@@ -2232,6 +2849,8 @@ class ControlTower:
         experience_check: Mapping[str, Any] | None = None,
         expected_law_sha: str | None = None,
         expected_experience_ids: Sequence[str] = (),
+        canary_evidence: Mapping[str, Any] | None = None,
+        response_text: str | None = None,
     ) -> dict[str, Any]:
         if not isinstance(packet, ControlTowerReturnPacket):
             raise BindingError("CONTROL_TOWER_PACKET_REQUIRED")
@@ -2249,11 +2868,25 @@ class ControlTower:
         binding = record.get("BINDING")
         if not isinstance(binding, Mapping) or not _same_binding(binding, packet.binding.to_dict()):
             raise BindingError("PACKET_BINDING_REJECTED")
-        packet_fingerprint = packet.fingerprint()
+        effective_packet = packet
+        if law_check is not None or learning_reconciliation is not None or experience_check is not None:
+            effective_packet = replace(
+                packet,
+                law_check=law_check if law_check is not None else packet.law_check,
+                learning_reconciliation=learning_reconciliation if learning_reconciliation is not None else packet.learning_reconciliation,
+                experience_check=experience_check if experience_check is not None else packet.experience_check,
+            )
+        # Idempotency is recognised against the packet as received and against
+        # the receipt-completed packet that is actually appended to the ledger,
+        # so a repeated identical ingest is never mistaken for a different
+        # packet whichever surface delivered it.
+        packet_fingerprint = effective_packet.fingerprint()
+        received_fingerprint = packet.fingerprint()
         previous_fingerprint = record.get("PACKET_FINGERPRINT", UNKNOWN)
         if previous_fingerprint != UNKNOWN:
-            if previous_fingerprint == packet_fingerprint:
-                return {
+            if previous_fingerprint in (packet_fingerprint, received_fingerprint):
+                grade = record.get("CANARY_GRADE")
+                response = {
                     "status": "PASS",
                     "idempotent": True,
                     "reconciliation": record.get("RECONCILIATION"),
@@ -2264,15 +2897,18 @@ class ControlTower:
                         current_canonical_base_tree=current_tree,
                     ),
                 }
+                if isinstance(grade, Mapping):
+                    response["canary_grade"] = dict(grade)
+                return response
             raise BindingError("SESSION_ALREADY_HAS_A_DIFFERENT_RETURN_PACKET")
-        effective_packet = packet
-        if law_check is not None or learning_reconciliation is not None or experience_check is not None:
-            effective_packet = replace(
-                packet,
-                law_check=law_check if law_check is not None else packet.law_check,
-                learning_reconciliation=learning_reconciliation if learning_reconciliation is not None else packet.learning_reconciliation,
-                experience_check=experience_check if experience_check is not None else packet.experience_check,
-            )
+        # MODEL_CANARY_GATE_V1: the canary return is graded externally here, by
+        # Control Tower, never by the tested executor.
+        canary_grade = self._grade_canary_return(
+            record,
+            packet=effective_packet,
+            canary_evidence=canary_evidence,
+            response_text=response_text,
+        )
         result = state.ingest(
             effective_packet,
             current_canonical_base_sha=current_sha,
@@ -2282,16 +2918,168 @@ class ControlTower:
             expected_law_sha=expected_law_sha,
             expected_experience_ids=expected_experience_ids,
         )
-        _append_existing_execution_event(self.ledger_path, to_execution_ledger_event(effective_packet, result))
+        if canary_grade is not None:
+            result = replace(
+                result,
+                blockers=tuple(
+                    dict.fromkeys(
+                        (*result.blockers, f"CANARY_CLASSIFICATION_{canary_grade['CLASSIFICATION']}")
+                    )
+                ),
+                canary_classification=str(canary_grade["CLASSIFICATION"]),
+            )
+        _append_existing_execution_event(
+            self.ledger_path,
+            to_execution_ledger_event(effective_packet, result, canary_grade=canary_grade),
+        )
         snapshot = self.snapshot(
             current_canonical_base_sha=current_sha,
             current_canonical_base_tree=current_tree,
         )
-        return {
+        response = {
             "status": "PASS",
             "idempotent": False,
             "reconciliation": result.to_dict(),
             "snapshot": snapshot,
+        }
+        if canary_grade is not None:
+            response["canary_grade"] = dict(canary_grade)
+        return response
+
+    @staticmethod
+    def _grade_canary_return(
+        record: Mapping[str, Any] | None,
+        *,
+        packet: ControlTowerReturnPacket,
+        canary_evidence: Mapping[str, Any] | None,
+        response_text: str | None,
+    ) -> dict[str, Any] | None:
+        """Externally grade a canary return when the session was triggered."""
+
+        if not isinstance(record, Mapping):
+            return None
+        canary = record.get("CANARY")
+        if not isinstance(canary, Mapping) or canary.get("FAST_CANARY_REQUIRED") != "YES":
+            return None
+        if isinstance(record.get("CANARY_GRADE"), Mapping):
+            return None
+        return classify_canary_evidence(
+            canary_evidence,
+            return_packet=packet,
+            response_text=response_text,
+        )
+
+    def session_quality(self, goal_id: str, session_id: str) -> str:
+        """Return durable session quality for one SAME session and bounded goal.
+
+        A NEW session, a material reset, or a changed harness has no durable
+        GREEN record for that session, so quality is UNKNOWN again.
+        """
+
+        state, _ = self._replay()
+        return canary_session_quality(
+            state.session_records,
+            goal_id=goal_id,
+            session_id=session_id,
+        )
+
+    def continue_canary_session(
+        self,
+        session_id: str,
+        *,
+        owner_continuation: str = "YES",
+        owner_reply: str = "",
+    ) -> dict[str, Any]:
+        """Apply OWNER_CONTINUATION_GATE_V1 after an external GREEN grade.
+
+        The original real task is restored from durable Control Tower state and
+        resumed in the SAME Arena session. Continuation before external GREEN is
+        blocked, GREEN without explicit Owner continuation is blocked, and a
+        same-session same-goal continuation never repeats the canary.
+        """
+
+        state, orphan_returns = self._replay()
+        record = state.session_records.get(str(session_id or ""))
+        if not isinstance(record, Mapping):
+            raise BindingError("SESSION_ID_NOT_REGISTERED_IN_CONTROL_TOWER_LEDGER")
+        canary = record.get("CANARY")
+        if not isinstance(canary, Mapping) or canary.get("FAST_CANARY_REQUIRED") != "YES":
+            raise BindingError("CANARY_SESSION_NOT_REQUIRED")
+        grade = record.get("CANARY_GRADE")
+        classification = str(grade.get("CLASSIFICATION") or "UNVERIFIED").upper() if isinstance(grade, Mapping) else "UNVERIFIED"
+        if classification != "GREEN":
+            raise BindingError(f"CANARY_OWNER_CONTINUATION_BLOCKED:{classification}")
+        approved = str(owner_continuation or "").strip().upper() == "YES" or str(
+            owner_reply or ""
+        ).strip() == FALLBACK_OWNER_REPLY
+        if not approved:
+            raise BindingError("CANARY_OWNER_CONTINUATION_REQUIRED")
+        binding_mapping = record.get("BINDING")
+        if not isinstance(binding_mapping, Mapping):
+            raise BindingError("CONTROL_TOWER_SESSION_BINDING_INVALID")
+        binding = SessionBinding.from_mapping(binding_mapping)
+        original_task = str(canary.get("ORIGINAL_TASK") or record.get("GOAL") or UNKNOWN)
+        directive = CanaryDirective.from_mapping(canary)
+        existing = record.get("CANARY_CONTINUATION")
+        if isinstance(existing, Mapping) and existing.get("OWNER_CONTINUATION") == "YES":
+            recommendation = record.get("RECOMMENDED_NEW_CHAT")
+            if isinstance(recommendation, Mapping):
+                return {
+                    "status": "PASS",
+                    "idempotent": True,
+                    "binding": binding.to_dict(),
+                    "task_id": record.get("TASK_ID", UNKNOWN),
+                    "canary_classification": classification,
+                    "canary_repeat": "NO",
+                    "recommendation": dict(recommendation),
+                    "snapshot": self._projection(state, orphan_returns),
+                }
+        recommendation = _session_recommendation(
+            binding,
+            task_prompt=original_task,
+            worktree=str(record.get("WORKTREE") or UNKNOWN),
+            branch=str(record.get("BRANCH") or UNKNOWN),
+            canonical_base_sha=str(record.get("CANONICAL_BASE_SHA") or UNKNOWN),
+            canonical_base_tree=str(record.get("CANONICAL_BASE_TREE") or UNKNOWN),
+            acceptance_criteria=tuple(record.get("ACCEPTANCE_CRITERIA") or ()),
+            task_id=str(record.get("TASK_ID") or UNKNOWN),
+        )
+        recommendation["CANARY_REPEAT"] = "NO"
+        recommendation["CONTINUATION_MODE"] = "RESUME_ORIGINAL_TASK_IN_SAME_SESSION"
+        recommendation["CANARY_CLASSIFICATION"] = classification
+        recommendation["SESSION_POLICY"] = CANARY_SESSION_POLICIES[classification]
+        recommendation["ORIGINAL_TASK_SOURCE"] = "CONTROL_TOWER_DURABLE_STATE"
+        event = {
+            "schema": CANARY_CONTINUATION_EVENT_SCHEMA,
+            "event_type": "CONTROL_TOWER_CANARY_CONTINUATION",
+            "SESSION_ID": binding.session_id,
+            "HOST": binding.host,
+            "GOAL_ID": binding.goal_id,
+            "GOAL": binding.goal,
+            "TASK_ID": str(record.get("TASK_ID") or UNKNOWN),
+            "GATE": OWNER_CONTINUATION_GATE_V1,
+            "CANARY_CLASSIFICATION": classification,
+            "SESSION_POLICY": CANARY_SESSION_POLICIES[classification],
+            "OWNER_CONTINUATION": "YES",
+            "OWNER_REPLY": str(owner_reply or FALLBACK_OWNER_REPLY),
+            "ORIGINAL_TASK_SOURCE": "CONTROL_TOWER_DURABLE_STATE",
+            "ORIGINAL_TASK": original_task,
+            "CANARY_REPEAT": "NO",
+            "RECOMMENDED_NEW_CHAT": recommendation,
+            "PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PROMOTED": False,
+            "PROTECTED_ACTION_EXECUTED": False,
+        }
+        _append_existing_execution_event(self.ledger_path, event)
+        return {
+            "status": "PASS",
+            "idempotent": False,
+            "binding": binding.to_dict(),
+            "task_id": record.get("TASK_ID", UNKNOWN),
+            "canary_classification": classification,
+            "canary_repeat": "NO",
+            "recommendation": recommendation,
+            "snapshot": self.snapshot(),
         }
 
     def recommend_next_session(
@@ -2460,11 +3248,23 @@ def build_execution_prompt(
     canonical_base_sha: str = "UNKNOWN",
     canonical_base_tree: str = "UNKNOWN",
     acceptance_criteria: Sequence[str] = (),
+    canary_directive: CanaryDirective | None = None,
+    max_prompt_chars: int | None = None,
 ) -> str:
-    """Build a self-contained recursive prompt for one compatible host."""
+    """Build a self-contained recursive prompt for one compatible host.
+
+    When ``canary_directive`` is supplied the prompt automatically enters
+    FAST_CANARY: the first safe real-task slice is the canary, the executor
+    returns evidence only and stops, and full continuation requires external
+    grading plus explicit Owner continuation. Required canary context is never
+    silently truncated or evicted; if it cannot fit inside the deterministic
+    prompt budget the call fails closed.
+    """
 
     if not isinstance(binding, SessionBinding):
         raise ControlTowerHandoffError("SESSION_BINDING_REQUIRED")
+    if canary_directive is not None and not isinstance(canary_directive, CanaryDirective):
+        raise ControlTowerHandoffError("CANARY_DIRECTIVE_REQUIRED")
     task = _text(task_prompt, "task_prompt", max_length=12000)
     worktree_value = _location(worktree, "worktree")
     branch_value = _location(branch, "branch")
@@ -2472,7 +3272,7 @@ def build_execution_prompt(
     tree_value = _hash_or_unknown(canonical_base_tree, "canonical_base_tree")
     criteria = _refs(acceptance_criteria, "acceptance_criteria", max_length=4096)
     criteria_text = "\n".join(f"- {item}" for item in criteria) or "- Return a truthful terminal packet."
-    return "\n".join(
+    prompt = "\n".join(
         (
             f"CONTROL_TOWER_EXECUTION_PROMPT: {CONTROL_TOWER_PROMPT_SCHEMA}",
             "AUTHORITATIVE_SESSION_BINDING:",
@@ -2507,6 +3307,8 @@ def build_execution_prompt(
             "- Do not promote, merge, deploy, release, or perform a protected action from this prompt.",
             "- Finish with one structured CONTROL_TOWER_RETURN_PACKET.",
             "",
+            *(canary_prompt_lines(canary_directive) if canary_directive is not None else ()),
+            "",
             "CONTROL_TOWER_RETURN_PACKET:",
             PACKET_BEGIN,
             "Return one JSON object matching the packet schema between these markers.",
@@ -2537,6 +3339,13 @@ def build_execution_prompt(
             USER_ACTION_BLOCK,
         )
     )
+    if canary_directive is not None and max_prompt_chars is not None and len(prompt) > max_prompt_chars:
+        # Required canary context must never be silently truncated or evicted.
+        raise BindingError(
+            "CONTROL_TOWER_CANARY_CONTEXT_DID_NOT_FIT:"
+            f"chars={len(prompt)}:budget={max_prompt_chars}"
+        )
+    return prompt
 
 
 def load_snapshot(

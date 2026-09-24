@@ -214,6 +214,54 @@ The build_execution_prompt function emits a self-contained prompt with:
 
 The final response from the new host is copied in full to 00 — P2P CONTROL TOWER. The next session is created from the durable packet and fresh project evidence, not from the prior chat.
 
+## Arena FAST_CANARY runtime enforcement (MODEL_CANARY_GATE_V1)
+
+The canonical gate in the operations notebook is policy. This surface makes the
+same gate executable inside the existing prompt/session lifecycle, with no
+second Control Tower, router, daemon, scheduler, benchmark service, score
+database, telemetry platform, project registry, or parallel state store.
+
+Trigger is derived from three inputs only: the explicit `HOST` label, a
+deterministic risk classification of the bounded task using the existing
+LOW / MODERATE / CROSS_SUBSYSTEM / SECURITY / ARCHITECTURE taxonomy, and durable
+session quality replayed from the existing execution ledger.
+
+```text
+HOST=ARENA + NEW session + medium/high risk + SESSION_QUALITY=UNKNOWN
+  -> generated prompt enters FAST_CANARY automatically
+  -> first safe real-task slice IS the canary
+  -> CANARY_EVIDENCE_PACKET_V1 returned, then STOP
+  -> Control Tower grades externally (GREEN|YELLOW|ORANGE|RED|UNVERIFIED)
+  -> OWNER_CONTINUATION_GATE_V1
+  -> GREEN + explicit Owner continuation resumes the ORIGINAL task in the SAME session
+```
+
+Bypass is fail-closed and explicit: `NON_ARENA_EXECUTOR`,
+`LOW_RISK_MECHANICAL_ARENA_TASK`, `EXISTING_SESSION_CONTINUATION`, and
+`SESSION_QUALITY_ALREADY_ESTABLISHED` all yield `FAST_CANARY_REQUIRED=NO`.
+
+Required canary context is never silently truncated or evicted. The prompt
+budget is derived from `CANARY_PROMPT_BUDGET_GUARD_CHARS`; when the required
+canary context cannot fit, generation fails closed with
+`CONTROL_TOWER_CANARY_CONTEXT_DID_NOT_FIT` instead of emitting a degraded
+prompt.
+
+Durable state stays inside the existing execution ledger: the canary directive
+rides on the existing `CONTROL_TOWER_SESSION_STARTED` event, the external grade
+rides on the existing `CONTROL_TOWER_RETURN_PACKET` event, and the Owner
+continuation decision is one additional `CONTROL_TOWER_CANARY_CONTINUATION`
+event. Replay is idempotent and the raw executor transcript is never persisted.
+
+| Operator surface | Command / symbol |
+|---|---|
+| Triggered prompt generation | `scripts/p2p_control_tower.py start --host ARENA ...` |
+| Canary ingest + external grade | `scripts/p2p_control_tower.py ingest --response-file ...` |
+| Owner continuation | `scripts/p2p_control_tower.py continue --session-id ... [--owner-continuation YES] [--owner-reply "Tiếp tục công việc"]` |
+| Decision / serialization | `canary_requirement`, `CanaryDirective`, `canary_prompt_lines` |
+| Evidence parse + grade | `parse_canary_evidence_packet`, `classify_canary_evidence` |
+| Session quality | `ControlTower.session_quality(goal_id, session_id)` |
+| Executable proof | tests/test_p2p_arena_canary_runtime.py, tests/test_p2p_arena_canary_baseline_gap.py |
+
 ## Existing architecture binding
 
 CT01 composes existing surfaces:
@@ -233,6 +281,7 @@ No second router, second truth store, nested certification system, simulated quo
 |---|---|
 | Return contract and implementation | .p2p/system/p2p_capabilities/control_tower_handoff.py |
 | A-H and ROTATION A-F behavior proof | tests/test_p2p_control_tower_session_handoff.py |
+| Arena FAST_CANARY runtime proof | tests/test_p2p_arena_canary_runtime.py |
 | Durable coordinator/CLI behavior proof | tests/test_p2p_control_tower_durable.py |
 | Foreground coordinator CLI | scripts/p2p_control_tower.py |
 | Successor packet/reconciliation API | `ControlTowerSuccessorPacket`, `ControlTowerRotationHandoff`, `reconcile_control_tower_successor` in the implementation module |
