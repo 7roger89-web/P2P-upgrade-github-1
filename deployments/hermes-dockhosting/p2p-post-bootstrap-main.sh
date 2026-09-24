@@ -7,6 +7,13 @@ set -eu
 # no root-owned runtime state is introduced into the persistent volume.
 s6-setuidgid hermes /opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior >/dev/null
 
+# NotebookLM is optional and secret-gated. When no auth state is configured,
+# the plugin stays disabled/hidden and the existing Hermes Telegram runtime is
+# unchanged.
+if [ -n "${NOTEBOOKLM_AUTH_JSON:-}" ]; then
+    s6-setuidgid hermes /opt/hermes/.venv/bin/hermes plugins enable notebooklm-knowledge >/dev/null
+fi
+
 # Opik remains explicit opt-in. The reusable P2P Hermes image bundles the
 # observer plugin; the local essential stack may additionally bind-mount the
 # same source under HERMES_HOME while iterating. No telemetry is enabled merely
