@@ -626,7 +626,7 @@ def _render_context_block(
     return "\n".join(parts)
 
 
-def _contextual_task_for_session(
+def _contextual_task_and_expectations_for_session(
     root: Path,
     binding: SessionBinding,
     task_text: str,
@@ -637,8 +637,11 @@ def _contextual_task_for_session(
     canonical_base_tree: str = UNKNOWN,
     acceptance_criteria: Sequence[str] = (),
     law_receipt: Mapping[str, Any] | None = None,
-) -> str:
-    """Fit runtime guidance + relevant experience into the exact prompt budget."""
+) -> tuple[str, str | None, list[str]]:
+    """Fit runtime guidance + relevant experience into the exact prompt budget.
+
+    Returns (contextual_prompt, expected_law_sha, expected_experience_ids).
+    """
 
     task = str(task_text or "").strip()
     if not task:
@@ -662,8 +665,9 @@ def _contextual_task_for_session(
             f"CONTROL_TOWER_PROMPT_BUDGET_EXHAUSTED:base={len(base_prompt)}:remaining={remaining}"
         )
 
+    summary = _experience_summary(root, task)
     block = _render_context_block(
-        _experience_summary(root, task),
+        summary,
         task,
         max_chars=remaining,
         law_receipt=receipt,
@@ -683,6 +687,52 @@ def _contextual_task_for_session(
     )
     if len(final_prompt) > PROMPT_GUARD_CHARS:
         raise BindingError(f"CONTROL_TOWER_FINAL_PROMPT_TOO_LARGE:{len(final_prompt)}")
+
+    # Extract actual actor handoff canonical/source-bound law SHA
+    expected_law_sha = str(receipt.get("content_sha256") or "").lower() or None
+
+    # Extract exact ACTIVE experience IDs actually serialized/injected for this session
+    expected_experience_ids: list[str] = []
+    if summary.get("decision") == "USE_ACTIVE_EXPERIENCE":
+        raw_exps = summary.get("experiences")
+        active_items = [
+            item
+            for item in (raw_exps[:MAX_ACTIVE_EXPERIENCES] if isinstance(raw_exps, list) else [])
+            if isinstance(item, Mapping)
+        ]
+        for item in active_items:
+            for key in ("record_id", "shared_record_id", "experience_id"):
+                val = str(item.get(key) or "").strip()
+                if val and val != UNKNOWN and val not in expected_experience_ids:
+                    expected_experience_ids.append(val)
+
+    return contextual, expected_law_sha, expected_experience_ids
+
+
+def _contextual_task_for_session(
+    root: Path,
+    binding: SessionBinding,
+    task_text: str,
+    *,
+    worktree: str = UNKNOWN,
+    branch: str = UNKNOWN,
+    canonical_base_sha: str = UNKNOWN,
+    canonical_base_tree: str = UNKNOWN,
+    acceptance_criteria: Sequence[str] = (),
+    law_receipt: Mapping[str, Any] | None = None,
+) -> str:
+    """Fit runtime guidance + relevant experience into the exact prompt budget."""
+    contextual, _, _ = _contextual_task_and_expectations_for_session(
+        root,
+        binding,
+        task_text,
+        worktree=worktree,
+        branch=branch,
+        canonical_base_sha=canonical_base_sha,
+        canonical_base_tree=canonical_base_tree,
+        acceptance_criteria=acceptance_criteria,
+        law_receipt=law_receipt,
+    )
     return contextual
 
 
@@ -805,21 +855,24 @@ def _start_next_with_context(
     binding = SessionBinding.from_mapping(binding_mapping)
     task_id = str(planned.get("task_id", UNKNOWN))
     criteria = tuple(planned.get("acceptance_criteria") or ())
-    result = tower.start_session(
+    task_prompt, expected_law_sha, expected_exp_ids = _contextual_task_and_expectations_for_session(
+        root,
         binding,
-        task_id=task_id,
-        task_prompt=_contextual_task_for_session(
-            root,
-            binding,
-            _extract_task_text(prompt),
-            worktree=worktree,
-            branch=branch,
-            acceptance_criteria=criteria,
-            law_receipt=law_receipt,
-        ),
+        _extract_task_text(prompt),
         worktree=worktree,
         branch=branch,
         acceptance_criteria=criteria,
+        law_receipt=law_receipt,
+    )
+    result = tower.start_session(
+        binding,
+        task_id=task_id,
+        task_prompt=task_prompt,
+        worktree=worktree,
+        branch=branch,
+        acceptance_criteria=criteria,
+        expected_law_sha=expected_law_sha,
+        expected_experience_ids=expected_exp_ids,
     )
     result.update(
         {
@@ -851,25 +904,28 @@ def main(argv: list[str] | None = None) -> int:
                 goal=args.goal,
             )
             criteria = tuple(args.acceptance_criterion)
+            task_prompt, expected_law_sha, expected_exp_ids = _contextual_task_and_expectations_for_session(
+                root,
+                binding,
+                args.goal,
+                worktree=args.worktree,
+                branch=args.branch,
+                canonical_base_sha=args.canonical_base_sha,
+                canonical_base_tree=args.canonical_base_tree,
+                acceptance_criteria=criteria,
+                law_receipt=law_receipt,
+            )
             result = tower.start_session(
                 binding,
                 task_id=args.task_id,
-                task_prompt=_contextual_task_for_session(
-                    root,
-                    binding,
-                    args.goal,
-                    worktree=args.worktree,
-                    branch=args.branch,
-                    canonical_base_sha=args.canonical_base_sha,
-                    canonical_base_tree=args.canonical_base_tree,
-                    acceptance_criteria=criteria,
-                    law_receipt=law_receipt,
-                ),
+                task_prompt=task_prompt,
                 canonical_base_sha=args.canonical_base_sha,
                 canonical_base_tree=args.canonical_base_tree,
                 worktree=args.worktree,
                 branch=args.branch,
                 acceptance_criteria=criteria,
+                expected_law_sha=expected_law_sha,
+                expected_experience_ids=expected_exp_ids,
             )
         elif args.command == "snapshot":
             result = {"status": "PASS", "snapshot": tower.snapshot()}

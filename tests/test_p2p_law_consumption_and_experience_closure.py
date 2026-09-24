@@ -69,6 +69,10 @@ class LawConsumptionAndExperienceClosureTests(unittest.TestCase):
         source = REPO_ROOT / projector.SOURCE_REL
         return hashlib.sha256(source.read_bytes()).hexdigest()
 
+    def _canonical_main_sha(self) -> str:
+        receipt = control_tower._establish_control_tower_law_context(self.base)
+        return str(receipt.get("content_sha256") or "")
+
     def _catalog_sha(self) -> str:
         catalog = REPO_ROOT / projector.SHARED_CATALOG_REL
         return hashlib.sha256(catalog.read_bytes()).hexdigest()
@@ -801,11 +805,11 @@ class LawConsumptionAndExperienceClosureTests(unittest.TestCase):
         self.assertEqual(committed_rec["verification_evidence"], generated_rec["verification_evidence"])
 
     # -------------------------------------------------------------------------
-    # Blocker G & Blocker 6: Representative Real Repo-Scoped Proof
+    # Blocker G & Blocker 6: Representative Fixture Regression (Logistics Work Desk)
     # -------------------------------------------------------------------------
 
     def test_blocker_g_representative_real_repo_logistics_work_desk_arena_proof(self) -> None:
-        """Prove representative repo-scoped project path end-to-end on representative real repo."""
+        """Representative fixture regression for repo-scoped project path end-to-end (synthetic fixture, not real-byte proof)."""
         canonical_sha = self._canonical_sha()
 
         # Ephemeral worktree / proof area: ZERO durable mutation to Logistics
@@ -916,6 +920,256 @@ class LawConsumptionAndExperienceClosureTests(unittest.TestCase):
         )
         self.assertEqual("UNAVAILABLE", tampered_exp["decision"])
         self.assertEqual("PORTABLE_EXPERIENCE_TRANSPORT_HASH_MISMATCH", tampered_exp.get("reason"))
+
+    # -------------------------------------------------------------------------
+    # REPAIR_03: Normal Production Orchestration Path (CLI / Persisted Sessions)
+    # -------------------------------------------------------------------------
+
+    def test_repair_03_real_path_a_normal_start_persists_expected_law_sha(self) -> None:
+        """CLI normal start persists actual canonical law SHA in EXPECTED_LAW_SHA, not None."""
+        canonical_sha = self._canonical_main_sha()
+        repo = self.base / "rt_start_a"
+        repo.mkdir()
+        code = control_tower.main([
+            "--root", str(repo),
+            "start",
+            "--host", "host-a",
+            "--goal-id", "goal-1",
+            "--goal", "Implement routine feature",
+            "--task-id", "task-1",
+            "--session-id", "s-rt-a",
+            "--json",
+        ])
+        self.assertEqual(0, code)
+        tower = ControlTower(repo)
+        state, _ = tower._replay()
+        rec = state.session_records.get("s-rt-a")
+        self.assertIsNotNone(rec)
+        self.assertEqual(canonical_sha, rec.get("EXPECTED_LAW_SHA"))
+        self.assertEqual([], rec.get("EXPECTED_EXPERIENCE_IDS"))
+
+    def test_repair_03_real_path_b_normal_start_persists_expected_experience_ids(self) -> None:
+        """CLI normal start with matching active experience persists injected record IDs."""
+        canonical_sha = self._canonical_main_sha()
+        repo = self.base / "rt_start_b"
+        repo.mkdir()
+        code = control_tower.main([
+            "--root", str(repo),
+            "start",
+            "--host", "host-b",
+            "--goal-id", "goal-2",
+            "--goal", "Close gap where distribution exists without consumption by executing actor",
+            "--task-id", "task-2",
+            "--session-id", "s-rt-b",
+            "--json",
+        ])
+        self.assertEqual(0, code)
+        tower = ControlTower(repo)
+        state, _ = tower._replay()
+        rec = state.session_records.get("s-rt-b")
+        self.assertIsNotNone(rec)
+        self.assertEqual(canonical_sha, rec.get("EXPECTED_LAW_SHA"))
+        exp_ids = rec.get("EXPECTED_EXPERIENCE_IDS", [])
+        self.assertIn("shared-exp-b2611df4c9393f0017f07dcb", exp_ids)
+
+    def test_repair_03_real_path_c_normal_ingest_rejects_wrong_law_sha_without_manual_param(self) -> None:
+        """Later ingest through normal persisted-session path with NO manual expected_law_sha rejects wrong 64-hex SHA."""
+        repo = self.base / "rt_ingest_c"
+        repo.mkdir()
+        code = control_tower.main([
+            "--root", str(repo),
+            "--current-canonical-base-sha", BASE_SHA,
+            "--current-canonical-base-tree", BASE_TREE,
+            "start",
+            "--host", "host-c",
+            "--goal-id", "goal-3",
+            "--goal", "Routine feature implementation",
+            "--task-id", "task-3",
+            "--session-id", "s-rt-c",
+            "--canonical-base-sha", BASE_SHA,
+            "--canonical-base-tree", BASE_TREE,
+            "--json",
+        ])
+        self.assertEqual(0, code)
+
+        b = SessionBinding(session_id="s-rt-c", host="HOST_C", goal_id="goal-3", goal="Routine feature implementation")
+        p = create_return_packet(
+            b, session_state="COMPLETED", canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE, canonical_relation="CURRENT",
+            changes=["feature"], test_results={"all": "PASS"},
+        )
+        wrong_sha = "1" * 64
+        response_text = (
+            f"LAW_CHECK=PASS | SOURCE=canonical.md | SOURCE_SHA256={wrong_sha}\n"
+            "EXPERIENCE_CHECK=NO_MATCH\n"
+            "LEARNING_RECONCILIATION=NONE\n"
+            + p.to_marked_text()
+        )
+        resp_file = repo / "response_c.txt"
+        resp_file.write_text(response_text, encoding="utf-8")
+
+        code = control_tower.main([
+            "--root", str(repo),
+            "--current-canonical-base-sha", BASE_SHA,
+            "--current-canonical-base-tree", BASE_TREE,
+            "ingest",
+            "--response-file", str(resp_file),
+            "--json",
+        ])
+        self.assertEqual(0, code)
+        tower = ControlTower(repo)
+        state, _ = tower._replay(current_canonical_base_sha=BASE_SHA, current_canonical_base_tree=BASE_TREE)
+        rec = state.session_records["s-rt-c"]
+        self.assertEqual("RECONCILIATION_REQUIRED", rec["RECONCILIATION"]["CONTROL_TOWER_STATUS"])
+        self.assertIn("EXECUTOR_LAW_HASH_MISMATCH", rec["RECONCILIATION"]["BLOCKERS"])
+
+    def test_repair_03_real_path_d_normal_ingest_rejects_no_match_when_active_expected(self) -> None:
+        """Later ingest through normal persisted-session path with NO manual expected_experience_ids rejects NO_MATCH."""
+        canonical_sha = self._canonical_main_sha()
+        repo = self.base / "rt_ingest_d"
+        repo.mkdir()
+        code = control_tower.main([
+            "--root", str(repo),
+            "--current-canonical-base-sha", BASE_SHA,
+            "--current-canonical-base-tree", BASE_TREE,
+            "start",
+            "--host", "host-d",
+            "--goal-id", "goal-4",
+            "--goal", "Close gap where distribution exists without consumption by executing actor",
+            "--task-id", "task-4",
+            "--session-id", "s-rt-d",
+            "--canonical-base-sha", BASE_SHA,
+            "--canonical-base-tree", BASE_TREE,
+            "--json",
+        ])
+        self.assertEqual(0, code)
+
+        b = SessionBinding(session_id="s-rt-d", host="HOST_D", goal_id="goal-4", goal="Close gap where distribution exists without consumption by executing actor")
+        p = create_return_packet(
+            b, session_state="COMPLETED", canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE, canonical_relation="CURRENT",
+            changes=["feature"], test_results={"all": "PASS"},
+        )
+        response_text = (
+            f"LAW_CHECK=PASS | SOURCE=canonical.md | SOURCE_SHA256={canonical_sha}\n"
+            "EXPERIENCE_CHECK=NO_MATCH\n"
+            "LEARNING_RECONCILIATION=NONE\n"
+            + p.to_marked_text()
+        )
+        resp_file = repo / "response_d.txt"
+        resp_file.write_text(response_text, encoding="utf-8")
+
+        code = control_tower.main([
+            "--root", str(repo),
+            "--current-canonical-base-sha", BASE_SHA,
+            "--current-canonical-base-tree", BASE_TREE,
+            "ingest",
+            "--response-file", str(resp_file),
+            "--json",
+        ])
+        self.assertEqual(0, code)
+        tower = ControlTower(repo)
+        state, _ = tower._replay(current_canonical_base_sha=BASE_SHA, current_canonical_base_tree=BASE_TREE)
+        rec = state.session_records["s-rt-d"]
+        self.assertEqual("RECONCILIATION_REQUIRED", rec["RECONCILIATION"]["CONTROL_TOWER_STATUS"])
+        self.assertIn("EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION", rec["RECONCILIATION"]["BLOCKERS"])
+
+    def test_repair_03_real_path_e_normal_ingest_rejects_incompatible_experience_id(self) -> None:
+        """Later ingest through normal persisted-session path rejects USE_ACTIVE_EXPERIENCE with incompatible ID."""
+        canonical_sha = self._canonical_main_sha()
+        repo = self.base / "rt_ingest_e"
+        repo.mkdir()
+        code = control_tower.main([
+            "--root", str(repo),
+            "--current-canonical-base-sha", BASE_SHA,
+            "--current-canonical-base-tree", BASE_TREE,
+            "start",
+            "--host", "host-e",
+            "--goal-id", "goal-5",
+            "--goal", "Close gap where distribution exists without consumption by executing actor",
+            "--task-id", "task-5",
+            "--session-id", "s-rt-e",
+            "--canonical-base-sha", BASE_SHA,
+            "--canonical-base-tree", BASE_TREE,
+            "--json",
+        ])
+        self.assertEqual(0, code)
+
+        b = SessionBinding(session_id="s-rt-e", host="HOST_E", goal_id="goal-5", goal="Close gap where distribution exists without consumption by executing actor")
+        p = create_return_packet(
+            b, session_state="COMPLETED", canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE, canonical_relation="CURRENT",
+            changes=["feature"], test_results={"all": "PASS"},
+        )
+        response_text = (
+            f"LAW_CHECK=PASS | SOURCE=canonical.md | SOURCE_SHA256={canonical_sha}\n"
+            "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=unknown-unrelated-exp-99\n"
+            "LEARNING_RECONCILIATION=NONE\n"
+            + p.to_marked_text()
+        )
+        resp_file = repo / "response_e.txt"
+        resp_file.write_text(response_text, encoding="utf-8")
+
+        code = control_tower.main([
+            "--root", str(repo),
+            "--current-canonical-base-sha", BASE_SHA,
+            "--current-canonical-base-tree", BASE_TREE,
+            "ingest",
+            "--response-file", str(resp_file),
+            "--json",
+        ])
+        self.assertEqual(0, code)
+        tower = ControlTower(repo)
+        state, _ = tower._replay(current_canonical_base_sha=BASE_SHA, current_canonical_base_tree=BASE_TREE)
+        rec = state.session_records["s-rt-e"]
+        self.assertEqual("RECONCILIATION_REQUIRED", rec["RECONCILIATION"]["CONTROL_TOWER_STATUS"])
+        self.assertIn("EXPERIENCE_CHECK_IDS_MISMATCH", rec["RECONCILIATION"]["BLOCKERS"])
+
+    def test_repair_03_real_path_next_persists_both_expectations(self) -> None:
+        """_start_next_with_context persists both EXPECTED_LAW_SHA and EXPECTED_EXPERIENCE_IDS."""
+        from p2p_capabilities.task_state import TaskPlan, TaskStateStore
+        canonical_sha = self._canonical_main_sha()
+        repo = self.base / "rt_next"
+        repo.mkdir()
+        now = "2026-09-24T00:00:00+00:00"
+        plan = TaskPlan.from_goal(
+            {
+                "goal_id": "goal-next-1",
+                "scope": ["Close gap where distribution exists without consumption by executing actor"],
+                "out_of_scope": ["promotion and deployment"],
+            },
+            [
+                {
+                    "task_id": "task-next-1",
+                    "title": "Close gap where distribution exists without consumption by executing actor",
+                    "purpose": "Verify active experience injection on next session.",
+                    "status": "READY",
+                    "scope": ["Close gap where distribution exists without consumption by executing actor"],
+                    "acceptance_requirements": ["Proof passes."],
+                    "required_evidence": ["proof"],
+                }
+            ],
+            now=now,
+        )
+        TaskStateStore(repo).initialize(plan, at=now)
+
+        tower = ControlTower(repo)
+        law_receipt = control_tower._establish_control_tower_law_context(repo)
+        result = control_tower._start_next_with_context(
+            tower,
+            repo,
+            "HOST_NEXT",
+            session_id="s-rt-next",
+            worktree="UNKNOWN",
+            branch="UNKNOWN",
+            law_receipt=law_receipt,
+        )
+        self.assertEqual("PASS", result["status"])
+        state, _ = tower._replay()
+        rec = state.session_records.get("s-rt-next")
+        self.assertIsNotNone(rec)
+        self.assertEqual(canonical_sha, rec.get("EXPECTED_LAW_SHA"))
+        self.assertIn("shared-exp-b2611df4c9393f0017f07dcb", rec.get("EXPECTED_EXPERIENCE_IDS", []))
 
 
 if __name__ == "__main__":

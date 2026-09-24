@@ -1920,6 +1920,7 @@ class ControlTower:
                     }
                 )
                 records[session_id] = record
+                state.session_records = records
                 state.lanes.setdefault(
                     binding.host,
                     {
