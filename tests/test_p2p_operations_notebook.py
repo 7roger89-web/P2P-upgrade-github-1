@@ -138,7 +138,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertTrue(any("test_p2p_context_hygiene" in line for line in backlog_i["evidence"]))
         backlog_k = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_K")
         self.assertEqual(backlog_k["item"], "PERFORMANCE_LANGUAGE_ADMISSION_V1")
-        self.assertEqual(backlog_k["status"], "PENDING")
+        self.assertEqual(backlog_k["status"], "VERIFIED")
         self.assertTrue(any("test_p2p_performance_language_admission_01.py" in line for line in backlog_k["evidence"]))
         for entry in ledger["entries"]:
             self.assertIn(entry["status"], LEDGER_STATUSES, entry["id"])
