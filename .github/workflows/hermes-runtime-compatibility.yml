@@ -110,7 +110,7 @@ jobs:
             test -f /opt/hermes/plugins/notebooklm-knowledge/plugin.yaml
             test -f /opt/hermes/plugins/notebooklm-knowledge/__init__.py
             test -f /opt/hermes/plugins/notebooklm-knowledge/tools.py
-            /opt/hermes/.venv/bin/python -c "import importlib.metadata; assert importlib.metadata.version("notebooklm-py") == "0.8.2"; print("NOTEBOOKLM_PY_PIN=PASS")"
+            /opt/hermes/.venv/bin/python -c "import importlib.metadata; assert importlib.metadata.version(\"notebooklm-py\") == \"0.8.2\"; print(\"NOTEBOOKLM_PY_PIN=PASS\")"
           '
 
       - name: Verify Opik observer is bundled but dependency and telemetry stay off by default
