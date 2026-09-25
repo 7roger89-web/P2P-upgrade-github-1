@@ -42,7 +42,7 @@ class ExternalSourcesDoctorTests(unittest.TestCase):
 
     def test_duplicate_or_malformed_id_fails_closed(self) -> None:
         baseline = json.loads((REPO_ROOT / "manifest" / "external-sources.json").read_text(encoding="utf-8"))
-        for replacement in ("P2P-EXT-0001", "P2P-EXT-X006"):
+        for replacement in ("P2P-EXT-0001", "P2P-EXT-X006", ["P2P-EXT-0006"]):
             with self.subTest(source_id=replacement), tempfile.TemporaryDirectory() as raw:
                 data = copy.deepcopy(baseline)
                 data["sources"][5]["source_id"] = replacement
