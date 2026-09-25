@@ -37,6 +37,10 @@ promise that an uncertain recommendation is guaranteed to be optimal.
   numerical limits, prices, or model-bug labels into active skills or routing.
 - Treat repeated AI research reports as search routes, not independent votes.
   Never average exact prices or incomparable benchmark results.
+- For broad forum/community research, apply `GLOBAL_COMMUNITY_RESEARCH_V1`:
+  do not equate Reddit/English results with the global web; diversify by
+  independent community ecosystem and local-language search when useful, while
+  keeping forums as lived-experience evidence rather than factual authority.
 - Keep PXPIPE, hooks, proxying, external downloads, and dependency installation
   disabled until the user explicitly requests them and the relevant component
   passes security and compatibility review.
@@ -88,6 +92,20 @@ and stop when sufficient.
   materially improve outcome, evidence, or recovery. Arena is not forced into
   Codex/Astra MIN-BURN merely because Astra quota is expensive, but it still
   obeys anti-overengineering and stop-when-sufficient.
+- `ARENA HIDDEN/RANDOM SESSION QUALITY`: for a new medium/high-risk Arena Agent
+  session whose quality is materially unproven, apply RULE 19
+  `MODEL_CANARY_GATE_V1` + `OWNER_CONTINUATION_GATE_V1`. Use the first safe
+  slice of the real task as the canary, return evidence only, stop the first
+  turn, and wait for Owner continuation. When Arena surfaces its native
+  `keep working` action, use it as the Owner approval control; fallback owner
+  reply is `Tiếp tục công việc`. Never infer exact hidden model/provider/
+  reasoning level, never self-score, and never reroll repeatedly to gamble for
+  a preferred model. Skip the gate for low-risk/mechanical work.
+- `HIDDEN MODEL IDENTITY`: apply `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`.
+  Self-reported names, first/last-letter tricks, obfuscated disclosure, and
+  writing-style guesses are not identity evidence. Prefer official reveal when
+  available; otherwise use bounded behavioral fingerprinting with an
+  `UNKNOWN` outcome only when model-family inference has material value.
 - `OTHER EXECUTORS`: use an observed executor profile when available; do not
   copy resource tactics across executors without evidence.
 - Control Tower must know the executor before writing its task packet. Lower
@@ -122,13 +140,12 @@ If this digest and an active canonical notebook differ, the active canonical
 notebook wins.
 
 Beginner-facing operational guidance must apply
-`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-20 in the notebook):
+`P2P_BEGINNER_OPERATIONS_UX_V1` (rules 01-21 in the notebook):
 
 - `RULE 01 EXPLICIT_DESTINATION` — every instruction names destination/tool,
   `NEW CHAT` or `SAME CHAT`, and role; the beginner never infers where a
   prompt goes (e.g. `ARENA AI — CHAT MỚI — WRITER`, `00 — P2P CONTROL TOWER`).
-- `RULE 02 CHAT_TITLE_REQUIRED` — every new execution chat is titled
-  `PROJECT | PR-or-TASK | ROLE | SHORT-GOAL`.
+- `RULE 02 CHAT_TITLE_REQUIRED` — every new execution chat gets a recognizable title. For Arena `NEW_CHAT`, the first nonblank prompt line is the human-readable title, normally `PROJECT — SHORT-GOAL`; routing boilerplate such as `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, code fences, or a generic `P2P` prefix must not be first, and `CHAT_TITLE` repeats that exact title. `SAME_CHAT` preserves the existing title.
 - `RULE 03 SAME_CHAT_MUST_NAME_CHAT` — `SAME CHAT` instructions name the
   exact existing chat, never "the old chat".
 - `RULE 04 GITHUB_IS_DURABLE_CHECKPOINT` — work identity =
@@ -206,6 +223,13 @@ Beginner-facing operational guidance must apply
   `HARD_OWNER_GATE`, or `HARD_BLOCK`. RULE 11 Owner Gates and
   `VALIDATED_PR_AUTO_MERGE_AUTHORITY` apply unchanged; no new
   daemon/orchestrator is created.
+- `RULE 21 BEGINNER_PLAIN_LANGUAGE_FIRST` — Owner-facing status and conclusions
+  start in ordinary Vietnamese: what happened, done/not done/blocked, why, and
+  one next action; necessary jargon is translated on first use; a ReturnPacket,
+  SHA, status field, or test table never replaces that explanation
+  (`RETURN_PACKET != OWNER_EXPLANATION`); `NOT_RUN != FAIL`,
+  `NOT_OBSERVED != NO`, and `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`, so an
+  unperformed check is reported as not verified rather than as a failure.
 
 Enduring rule promises are tracked by `RULE_ASSIMILATION_GATE_V1`: an
 accepted rule deferred to a later task stays

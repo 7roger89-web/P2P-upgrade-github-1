@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -55,10 +56,19 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "PROJECTION_DO_NOT_EDIT=YES" in text
     assert not (project / ".p2p" / "system").exists()
 
+    capsule = project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
+    assert capsule.is_file()
+    capsule_text = capsule.read_text(encoding="utf-8")
+    assert "p2p-portable-experience-capsule/1" in capsule_text
+    assert "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE" in capsule_text
+
     agents = (project / "AGENTS.md").read_text(encoding="utf-8")
     assert "<!-- BEGIN P2P PORTABLE LAW -->" in agents
     assert ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md" in agents
     assert "TASK_BRANCH != LAW_AUTHORITY" in agents
+    assert "LAW_CHECK=PASS" in agents
+    assert "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE" in agents
+    assert "LEARNING_RECONCILIATION=" in agents
     assert "### Native long-running goal bridge" in agents
     assert ".p2p/system/p2p_capabilities/native_goal_bridge.py" in agents
     assert ".p2p/system/p2p_capabilities/native_goal_activation.py" in agents
@@ -81,12 +91,14 @@ def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None
     assert first.returncode == 0
     first_agents = (project / "AGENTS.md").read_bytes()
     first_projection = (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()
+    first_capsule = (project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json").read_bytes()
 
     second = _run(package, project)
     assert second.returncode == 0
 
     assert (project / "AGENTS.md").read_bytes() == first_agents
     assert (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes() == first_projection
+    assert (project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json").read_bytes() == first_capsule
 
 
 def test_projection_preserves_existing_agents_and_is_checkable(tmp_path: Path) -> None:
@@ -198,3 +210,58 @@ def test_canonical_law_and_release_package_recognize_portable_projection() -> No
     assert "generated portable project projection" in notebook
     assert '"docs/p2p-development/P2P-PORTABLE-LAW-PROJECTION.md"' in package_release
     assert '"scripts/p2p_portable_law_projection.py"' in package_release
+
+
+def test_check_fails_closed_after_experience_capsule_drift(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    assert _run(package, project).returncode == 0
+
+    capsule = project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
+    capsule.write_text(capsule.read_text(encoding="utf-8") + "\nDRIFT\n", encoding="utf-8")
+
+    check = _run(package, project, "--check")
+
+    assert check.returncode == 2
+    assert "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING" in check.stdout
+
+
+def test_actor_law_receipt_and_experience_capsule(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project_receipt"
+    project.mkdir()
+    res = _run(package, project)
+    assert res.returncode == 0
+
+    agents = (project / "AGENTS.md").read_text(encoding="utf-8")
+    assert "LAW_CHECK=PASS" in agents
+    assert "PARENT_SELF_LAW_PREFLIGHT != EXECUTOR_LAW_PREFLIGHT" in agents
+    assert "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE" in agents
+    assert "LEARNING_RECONCILIATION=" in agents
+
+    notebook = (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_text(encoding="utf-8")
+    assert "PORTABLE_EXPERIENCE_CONTENT_SHA256=" in notebook
+
+    capsule = project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json"
+    assert capsule.is_file()
+    data = json.loads(capsule.read_text(encoding="utf-8"))
+    assert data["schema"] == "p2p-portable-experience-capsule/1"
+    assert data["generated"] is True
+    assert data["authority"] == "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE"
+
+
+if __name__ == "__main__":
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        base = Path(tmp)
+        test_writes_git_trackable_portable_projection_without_runtime_install(base / "1")
+        test_projection_is_byte_idempotent_for_empty_project(base / "2")
+        test_projection_preserves_existing_agents_and_is_checkable(base / "3")
+        test_projection_migrates_recognized_legacy_preflight_without_touching_project_rules(base / "4")
+        test_projection_preserves_unrecognized_similar_project_section(base / "5")
+        test_check_fails_closed_after_projection_drift(base / "6")
+        test_check_fails_closed_after_experience_capsule_drift(base / "7")
+        test_actor_law_receipt_and_experience_capsule(base / "8")
+        test_canonical_law_and_release_package_recognize_portable_projection()
+    print("ALL PORTABLE LAW PROJECTION TESTS PASS")

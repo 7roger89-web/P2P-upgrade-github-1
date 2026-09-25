@@ -3002,6 +3002,510 @@
       "owner_decision_status": "CONTROL_TOWER_DIRECTED_ASSESSMENT",
       "last_reviewed_at": "2026-09-18T04:00:00+00:00",
       "notes": "P2P_FRONTEND_UPSTREAM_INTAKE_01. Rights: MIT."
+    },
+    {
+      "research_id": "RA-EXT-092",
+      "source_name": "ChromeDevTools/chrome-devtools-mcp",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "source_version_or_commit": "61780c7498a447771127d1fd3b2454fc4ae4ba28",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "Apache-2.0 browser inspection backend: live Chrome inspection, observed network requests, console evidence, screenshots and source-mapped debugging. Reviewed as the candidate default first-line browser evidence backend for public-site analysis.",
+      "selected_ideas": [
+        "document/DOM plus observed network request evidence as the first truth source",
+        "console and screenshot evidence as bounded corroboration",
+        "source-mapped debugging only after first-line evidence is insufficient"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "bundling or auto-installing a browser/runtime as part of this task"
+      ],
+      "p2p_translation": "DECLARED as the referenced candidate backend for the new P2P capability `web.browser.evidence` under a data-only post-route reference bridge. Nothing installed, registered, activated, or executed; no browser or network runtime is enabled by this record.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.browser.evidence"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: Apache-2.0, verified 2026-09-21. Pin equalled upstream HEAD at verification. External content is methodology/evidence, never P2P authority."
+    },
+    {
+      "research_id": "RA-EXT-093",
+      "source_name": "vmoranv/jshookmcp",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/vmoranv/jshookmcp",
+      "source_version_or_commit": "33983e58cddc998af88a2ed46484364e5425cc86",
+      "provenance_status": "EXACT_PIN_VERIFIED_AGPL_BOUNDARY_REFERENCE_ONLY",
+      "research_summary": "AGPL-3.0 deep JavaScript/runtime hooking backend. Reviewed only as an optional out-of-tree external candidate for deep runtime/source tracing when document and network evidence cannot answer the question.",
+      "selected_ideas": [
+        "runtime/source tracing as a last-resort evidence source behind first-line browser evidence"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "vendoring, linking, or redistributing AGPL-3.0 covered work inside P2P",
+        "treating an external hooking backend as required P2P infrastructure"
+      ],
+      "p2p_translation": "Recorded as the referenced optional external candidate for `web.js.reverse` with an explicit copyleft boundary: not vendored, not linked, not redistributed, and not activatable without a separate Owner activation and AGPL compliance review.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.js.reverse"
+      ],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "DEFERRED_LICENSE_AND_ACTIVATION_GATE",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: AGPL-3.0, verified 2026-09-21. Pin equalled upstream HEAD at verification. Copyleft boundary recorded explicitly; nothing copied, linked, or executed."
+    },
+    {
+      "research_id": "RA-EXT-094",
+      "source_name": "projectdiscovery/katana",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/projectdiscovery/katana",
+      "source_version_or_commit": "c1de26dbe69764a92dfa9a142eb64035e5d05a9d",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "MIT crawler with standard and headless modes and client-side JavaScript endpoint parsing. Reviewed as the candidate endpoint-discovery backend for an explicitly authorized and bounded scope.",
+      "selected_ideas": [
+        "client-bundle and static-asset endpoint discovery as its own route, distinct from browser evidence",
+        "bounded crawl scope with an explicit request budget"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "unscoped or unbounded crawling as core P2P infrastructure"
+      ],
+      "p2p_translation": "DECLARED as the referenced candidate backend for the new P2P capability `web.endpoint.discovery`. No crawler service, daemon, or traffic database is created; nothing is installed or executed.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.endpoint.discovery"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification."
+    },
+    {
+      "research_id": "RA-EXT-095",
+      "source_name": "BishopFox/jsluice",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/BishopFox/jsluice",
+      "source_version_or_commit": "0ddfab153e060a9eeaded4d8669233f7c071e7e4",
+      "provenance_status": "EXACT_PIN_VERIFIED_SUBORDINATE_REFERENCE_NOT_VENDORED",
+      "research_summary": "MIT static JavaScript endpoint extraction utility. Upstream activity is older than Katana; reviewed as a parser reference, not as a competing capability.",
+      "selected_ideas": [
+        "static JavaScript endpoint extraction reference beneath the endpoint-discovery route"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "promoting it to a separate P2P capability or authority parallel to the discovery route"
+      ],
+      "p2p_translation": "Recorded as a subordinate parser reference under `web.endpoint.discovery`; it receives no separate capability ID and no independent authority.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.endpoint.discovery"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "RA-EXT-094 projectdiscovery/katana"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "SUBORDINATE_REFERENCE_NO_SEPARATE_AUTHORITY",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification. Not a second P2P authority."
+    },
+    {
+      "research_id": "RA-EXT-096",
+      "source_name": "xnl-h4ck3r/waymore",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/xnl-h4ck3r/waymore",
+      "source_version_or_commit": "4e02de512fd6b110be92dc8bffb3002edfebcb6c",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "MIT public URL and response discovery across public archive and index sources. Reviewed as the candidate public-reconstruction backend, kept distinct from live browser runtime inspection.",
+      "selected_ideas": [
+        "public archive/index reconstruction as a follow-on capability, not a browser-runtime capability",
+        "public sources only, with retrieval timestamps as evidence"
+      ],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "authenticated, subscription, or private-session archive retrieval"
+      ],
+      "p2p_translation": "DECLARED as the referenced candidate backend for the new P2P capability `web.public.reconstruction`. No archive service or traffic database is created; nothing is installed or executed.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [
+        "web.public.reconstruction"
+      ],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation"
+      ],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification."
+    },
+    {
+      "research_id": "RA-EXT-097",
+      "source_name": "Mouseww/anything-analyzer",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Mouseww/anything-analyzer",
+      "source_version_or_commit": "1da6b5c9acc024e987d41e4b9c88676ffea0da0c",
+      "provenance_status": "EXACT_PIN_VERIFIED_EQUALS_UPSTREAM_HEAD_NOT_VENDORED",
+      "research_summary": "Apache-2.0 traffic-analysis alternative reviewed alongside Reqable/reqable-mcp-server as a second traffic stack candidate.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "adopting two parallel traffic-analysis stacks by default instead of benchmarking or deferring"
+      ],
+      "p2p_translation": "Registered as a deferred, non-adopted alternative: no capability ID, no backend reference, no install. Adoption requires a separate bounded task with a measured gap.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "DEFERRED_ALTERNATIVE_TRAFFIC_STACK",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: Apache-2.0, verified 2026-09-21. Not adopted; no second traffic stack by default."
+    },
+    {
+      "research_id": "RA-EXT-098",
+      "source_name": "Reqable/reqable-mcp-server",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/Reqable/reqable-mcp-server",
+      "source_version_or_commit": "2df174f982e9ab481a457ab96e065aac22829a51",
+      "provenance_status": "EXACT_PIN_VERIFIED_LICENSE_UNRESOLVED_REFERENCE_ONLY",
+      "research_summary": "Traffic-analysis MCP server candidate whose repository metadata exposes no SPDX license.",
+      "selected_ideas": [],
+      "rejected_ideas": [
+        "second router, second registry, or any control plane competing with P2P",
+        "automatic dependency/tool installation or global MCP registration",
+        "unbounded live target interaction, credentials, cookies, or authenticated private sessions",
+        "bypass/exploit semantics and any claim that external tool output grants permission",
+        "adopting or referencing as a backend while its license remains unresolved"
+      ],
+      "p2p_translation": "Registered reference-only with a fail-closed lookup: the reference bridge refuses to return it as an adopted candidate until the license is resolved. No capability ID, no install, no registration.",
+      "capability_family": "WEB_BROWSER_REVERSE_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "Issue #224 P2P_WEB_REVERSE_FOUNDATION_01"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "family:security-reverse",
+      "owner_decision_status": "DEFERRED_LICENSE_UNRESOLVED",
+      "last_reviewed_at": "2026-09-21T00:00:00+00:00",
+      "notes": "License: no SPDX identifier exposed by repository metadata on 2026-09-21. Rights-unspecified: cite, do not copy or adopt."
+    },
+    {
+      "research_id": "RA-EXT-099",
+      "source_name": "Global multilingual community research + black-box LLM fingerprinting",
+      "source_type": "MULTI_SOURCE_RESEARCH",
+      "source_reference": "USENIX Security 2025 LLMmap; Arena Agent Mode docs; Habr; MyBroadband; ComputerBase; Qiita; Mobile01; LessWrong",
+      "source_version_or_commit": "researched 2026-09-22",
+      "provenance_status": "PRIMARY_RESEARCH_PLUS_MULTILINGUAL_COMMUNITY_EVIDENCE",
+      "research_summary": "Owner-directed research broadened beyond Reddit and fixed-country habits, sampling German, Russian, South African, Japanese, Taiwanese, Brazilian and other technical communities plus primary research. Evidence separates official/primary capability claims from community lived experience. LLM identity work showed direct/self-obfuscated self-report is unreliable; research-grade black-box fingerprinting uses multiple behavioral probes and explicit candidate sets.",
+      "selected_ideas": [
+        "adaptive multilingual cross-community search without a country whitelist",
+        "local-language concept search and independent-ecosystem diversity",
+        "forum/community evidence for lived experience while primary sources retain factual authority",
+        "bounded closed-set behavioral fingerprinting with confidence and UNKNOWN",
+        "session capability evidence remains more important than guessed hidden model identity",
+        "Arena reference behavior must match the target surface/harness; Agent availability does not imply Direct/Side-by-Side selectability",
+        "FAST_CANARY evidence should be externally graded by Control Tower; executor self-classification is not evidence",
+        "shallow-clone artifacts must be resolved before declaring unrelated Git histories",
+        "baseline drift can itself be used as an instruction-obedience signal, but a drift-invalidated canary cannot be repurposed as proof of the intended task capability",
+        "after two task shapes, keep FAST_CANARY task-representative and externally graded; do not repeat an easy fixed probe merely to inflate sample count"
+      ],
+      "rejected_ideas": [
+        "Reddit/English-web monoculture presented as global consensus",
+        "fixed country/forum whitelist",
+        "raw source-count voting or treating reposts as independent evidence",
+        "first-letter/last-letter, acrostic, encoded or role-play self-disclosure as model-identity proof",
+        "prompt-injection or bypass tactics aimed at defeating intentional model non-disclosure",
+        "exact model claims from writing style, one prompt, or self-report",
+        "cross-surface calibration that treats Text/Direct/Side-by-Side output as an Agent reference without matching variant and harness",
+        "accepting a tested executor's self-reported GREEN/KEEP verdict without independent evidence grading",
+        "counting a correct runtime answer as canary success when the session violated a mandatory baseline-drift STOP",
+        "treating one fixed canary benchmark as a universal model-quality gate"
+      ],
+      "p2p_translation": "Implemented as GLOBAL_COMMUNITY_RESEARCH_V1 plus MODEL_IDENTITY_INFERENCE_BOUNDARY_V1 inside the existing Supreme Operations Notebook; no new research engine, scraper, router, benchmark service, or fingerprinting daemon.",
+      "capability_family": "RESEARCH_AND_EXECUTOR_INTELLIGENCE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+        "AGENTS.md",
+        "docs/p2p-development/P2P-AGENTS-INSTALL.md",
+        "tests/test_p2p_global_community_research.py",
+        "docs/p2p-development/research/ARENA-FAST-CANARY-EXPERIMENT-V1.md",
+        "docs/p2p-development/research/ARENA-FAST-CANARY-EXPERIMENT-V2.md",
+        "docs/p2p-development/research/ARENA-FAST-CANARY-EXPERIMENT-V2_1.md"
+      ],
+      "dependencies": [
+        "RULE 19 REALITY_FIRST_CAPABILITY_PROBE",
+        "MODEL_CANARY_GATE_V1"
+      ],
+      "roadmap_slot": "operations-law/research-and-executor-intelligence",
+      "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED",
+      "last_reviewed_at": "2026-09-22T00:00:00+00:00",
+      "notes": "Primary research: LLMmap (USENIX Security 2025). Arena docs establish hidden orchestrator behavior and possible recovery switching. Community sources are anecdotal/practitioner evidence, not authority. Correction 2026-09-22: Arena may add/remove models from Direct/Side-by-Side independently of the Agent pool; cross-surface references are not calibrated Agent ground truth. Five-trial read-only Arena FAST_CANARY experiment started 2026-09-22 to test whether one real-task-first probe meaningfully separates session quality without identifying the hidden model. Ten-chat Arena experiment completed 2026-09-22: external CT grades 6 GREEN / 1 YELLOW / 3 RED while every completed executor self-reported GREEN. Two RED sessions falsely inferred unrelated histories from shallow/incomplete clones; durable GitHub compare proves merge-base 2ac7ae4 and main ahead by 28. Canonical canary updated to evidence-only executor return plus independent CT grading. FAST_CANARY V2 started 2026-09-22 on a different task shape: Python validation edge-case diagnosis using real BAZI code and one disposable /tmp runtime reproducer; executor returns evidence only and Control Tower grades externally. V2 received 10 chats after BAZI main had advanced from 9ce39103 to 81190346, invalidating the intended Python-debug comparison. Secondary external grading of drift obedience: 5 GREEN / 2 YELLOW / 3 RED. V2.1 rebased to 81190346; target source/test blobs unchanged and bug ground truth still present. V2.1 completed on five valid sessions: external CT grades 3 GREEN / 2 YELLOW / 0 RED. All found the real Python validation gap; the task shape was weak-to-moderately discriminating, so trials 6-10 were skipped under information-gain discipline. Cross-experiment conclusion: FAST_CANARY has routing value, but probes must remain task-representative and externally graded."
+    },
+    {
+      "research_id": "RA-EXT-100",
+      "source_name": "markfulton/ai-employees — AI Employees operating-pattern assimilation study",
+      "source_type": "UPSTREAM_REPOSITORY_PATTERN_STUDY",
+      "source_reference": "https://github.com/markfulton/ai-employees (8 employee kits, 60 scheduled routines, installer hire/upgrade/contribute, kit scripts guard.mjs + runlog.mjs, docs/HOW-EMPLOYEES-WORK.md, docs/GUARDRAILS.md, docs/HARNESSES.md, docs/COST.md, docs/PREREQUISITES.md)",
+      "source_version_or_commit": "edffe8f4afea467818988ce3ce9332e6d832e5ed (kits 1.7.0, SEO/AEO 1.8.0, employee standard v1.3); reviewed 2026-09-22",
+      "provenance_status": "PIN_VERIFIED_EQUALS_PACKET_EXPECTED_HEAD; LICENSE=MIT (licenseInfo.key=mit + root LICENSE, (c) 2026 Mark Fulton); SOURCE_READ_STUDY_ZERO_UPSTREAM_BYTES_LICENSED_COPIED_OR_VENDORED",
+      "research_summary": "Source-read study of the upstream AI-Employee architecture and operating patterns, then a per-pattern assimilation decision against current P2P primitives. Fifteen patterns (A-O) were classified KEEP=4 (capability-not-tool, outbound-action authority, browser/resource concurrency, content-is-data), ADAPT=2 (pause switch, brief/exception-only interruption), ALREADY_COVERED=7 (routine != skill, durable run log/receipts, Corrections + procedural self-improvement, member-owned vs kit-owned state, upgrade-without-overwrite, Chief-of-Staff read-only supervision, verify-one-before-registering-many), DEFER_UNTIL_NEEDED=2 (schedule window, once-per-period/period-key identity). Mechanisms evaluated directly: guard.mjs verdict/period/window vocabulary, runlog.mjs closed status set and refusal rules, SCHEDULE.md row semantics, CONTRACT.md five opening lines plus mutex and guardrails, employee.json kit/merge/member classification, installer report-then-apply drift handling with hashed receipt, and the Corrections/self-improvement chapter.",
+      "selected_ideas": [
+        "held-outbound-by-default with a named release authority and conditions attached (retained formulation; P2P keeps its own Owner Gate surface, no second authority file)",
+        "capability-not-tool portability (validates the existing typed capability registry as the portability lever; nothing added)",
+        "interruption suppression discipline (never twice for an unchanged blocker, re-arm on resolution, never notify outside working hours; maps onto existing exceptions-only reporting; no channel added)",
+        "resource serialization by identity rather than by process or lock file (validates existing heartbeat leases; nothing added)",
+        "cadence identity for recurring operational obligations as the single deferred direction, re-entry trigger recorded in RA-EXT-101"
+      ],
+      "rejected_ideas": [
+        "instruction-level guardrail sufficiency: upstream delegates the security model to the harness permission layer and adds no gate of its own; P2P keeps SHA-bound Owner Gates and evidence gates as the authority",
+        "a member-written RELEASES.md as a second outbound-action authority surface",
+        "ungated routine self-editing of its own instructions, fire time and job registration",
+        "local-machine and single-harness core assumptions (per-OS schedulers, awake local PC, cloud-sync prohibition, Node kit scripts, auto-approve permission modes, signed-in browser profile)",
+        "browser-profile automation as a P2P core dependency rather than a declared evidence backend",
+        "the eight-employee / sixty-routine business-role catalogue as P2P agent identities (TASK_NOT_AGENT; canonical eight untouched)"
+      ],
+      "p2p_translation": "RESEARCH_ONLY_PASS (study complete). Adoption of runtime is not implied; OE_VERDICT=DEFER_UNTIL_NEEDED lives on RA-EXT-101. Reuse mapping recorded instead of new code: date-driven obligation freshness -> decision_trace.py (expires_at -> STALE); pause -> fw06_operational_resilience.py; receipts and identity-keyed idempotency -> existing execution-ledger.jsonl writer plus PACKET_FINGERPRINT; procedural learning -> experience_evolution.py; capability neutrality -> typed capability registry. No second control plane, router, registry, scheduler or daemon. Canonical eight and Owner Gates unchanged.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md",
+        "tests/test_p2p_ai_employees_pattern_assimilation_01.py",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 14 over-engineering gate, RULE 19 reality-first probe, OWNER_CONTINUATION_GATE_V1)"
+      ],
+      "dependencies": [],
+      "roadmap_slot": "none (study only; no roadmap item created)",
+      "owner_decision_status": "OWNER_TASK_DIRECTED_RESEARCH_ONLY",
+      "last_reviewed_at": "2026-09-22T00:00:00+00:00",
+      "notes": "TASK_ID=P2P_AI_EMPLOYEES_PATTERN_ASSIMILATION_01. Verified before analysis: CONTROL_TOWER_EXPECTED_MAIN=49d8550d2aa0fae438c992490924673bc227e55c is an ANCESTOR of durable main (83ff252e0c7c28d5e5eb583ed8d648d037af596f, 2 commits ahead); upstream HEAD equals UPSTREAM_EXPECTED_HEAD exactly. Prior-assimilation scan: 0 files match ai-employees/period_key/window_start/skipped-out-of-window/skipped-already-ran. Cost figures in upstream docs/COST.md are the author's own single-seat measurements and are provenance only, never P2P facts. Frozen packets C/D only."
+    },
+    {
+      "research_id": "RA-EXT-101",
+      "source_name": "PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT (candidate direction, deferral record)",
+      "source_type": "DEFERRED_CAPABILITY_DIRECTION",
+      "source_reference": "Composed from markfulton/ai-employees SCHEDULE.md window semantics + CONTRACT.md five opening lines (pause, window, once-per-period) + guard.mjs; specified in docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md headings 'Deferred candidate (not implemented)' and 'Re-entry trigger (all four required)'",
+      "source_version_or_commit": "upstream edffe8f4afea467818988ce3ce9332e6d832e5ed; P2P candidate specified 2026-09-22, NOT implemented",
+      "provenance_status": "SPECIFIED_NOT_IMPLEMENTED; gap evidenced by a whole-tree negative scan for cadence/period/window vocabulary in P2P core",
+      "research_summary": "The only genuine expression gap found in the study: P2P cannot express routine identity, day/window eligibility or calendar-period identity, and therefore cannot decide deterministically RUN vs SKIP for a recurring operational obligation. The need is not yet demonstrated: P2P has no firing source (no scheduler, no daemon, no worker queue, NO_UNBOUNDED_BACKGROUND_AUTONOMY), no Owner-approved recurring obligation in period form, and no recorded lost or duplicated period; the P2P duplicate-failure class actually observed is identity-based and is already covered by packet-fingerprint idempotency and RULE 06. Building the guard before the thing it guards would be infrastructure ahead of its consumer.",
+      "selected_ideas": [
+        "deterministic period identity computed from the LOCAL clock (local date / ISO week from local date / calendar month), never UTC and never a stored timezone",
+        "window and day vocabulary as a catch-up net (be generous about when, strict about how many times) rather than a concurrency plan",
+        "once-per-period state written BEFORE any work, because a guard written after the work is not a guard",
+        "pause checked BEFORE the window, because a paused obligation should not care what time it is",
+        "unparsable schedule state fails honestly with a named blocker and never guesses a window",
+        "one receipt on every path including every SKIP path, through the existing ledger writer",
+        "pause reuses the existing fw06 authority; a routine-scoped pause is a new scope on an existing mechanism, never a second pause file"
+      ],
+      "rejected_ideas": [
+        "cron engine, persistent scheduler, worker queue, service, database, event bus or workflow DSL",
+        "fleet registry, routine catalogue, discovery scan or registration command",
+        "a second task-state system or a second execution ledger",
+        "any autonomous outbound action or any widening of the permission envelope by a routine definition",
+        "local-PC, host-specific or provider/tool-specific coupling inside P2P core"
+      ],
+      "p2p_translation": "DEFERRED with re-entry trigger. If ever built, composition order is REUSE_EXISTING_P2P > EXTEND_EXISTING_P2P > ADAPTER > NEW_IMPLEMENTATION, and on present evidence the first three would cover it: period/window eligibility added minimally over the existing durable-state contracts, pause read from fw06, receipts through the existing ledger writer, execution delegated to existing task-state/execution-target/orchestration machinery.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "DEFERRED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md (Over-engineering gate; Pattern matrix (A-O) patterns C and D; Deferred candidate (not implemented); Re-entry trigger (all four required))",
+        "tests/test_p2p_ai_employees_pattern_assimilation_01.py"
+      ],
+      "dependencies": [
+        "P2P durable task/plan state contracts (task_state.py)",
+        "FW06 pause authority and execution leases (fw06_operational_resilience.py)",
+        "decision_trace.py deterministic date freshness for obligations that are due-date checks",
+        "the existing execution-ledger writer"
+      ],
+      "roadmap_slot": "deferred/recurring-routine-cadence-identity (no roadmap item created)",
+      "owner_decision_status": "OWNER_TASK_DIRECTED_RESEARCH_ONLY",
+      "last_reviewed_at": "2026-09-22T00:00:00+00:00",
+      "notes": "RE_ENTRY_TRIGGER (all four must hold and be durably recorded): (1) a P2P-owned recurring obligation exists in PERIOD form, not merely a due-date check; (2) an actual firing source exists that can fire late or twice (host/OS scheduler or an Owner-approved recurring goal); (3) the obligation is not already decided deterministically by decision_trace.py freshness (expires_at -> STALE) or by an existing lease/pause check; (4) a written boundary exists for calendar-period identity versus the existing task/packet/work-item identity, including the local-clock rule. Until then the simpler path stands: reuse decision_trace freshness, fw06 pause, and the existing ledger."
+    },
+    {
+      "research_id": "RA-EXT-102",
+      "source_name": "DOMAIN_CAPABILITY_ADMISSION_V1 — cross-project capability-admission lesson (OpenJev/VNLAW evidence, assimilated domain-neutrally)",
+      "source_type": "CROSS_SOURCE_RESEARCH",
+      "source_reference": "VNLAW Issue #75 (optional shadow decision provider, non-authoritative), Issue #81 (bounded 3-judgment fan-out, shadow-only), Issue #84 + merged PR #86 (real ONNX model ran; verdict REJECT_FANOUT); P2P Issue #245 is the task authority; P2P Issue #222 carries the cross-domain SOURCE ROLE / CONSUMPTION semantics reused here instead of being duplicated",
+      "source_version_or_commit": "VNLAW durable metrics reviewed 2026-09-23: OpenJev route 0.4384 vs deterministic 0.8219; temporal 0.1096 vs 0.9452; clarification 0.1781 vs 0.8904; bundle 0.0000 vs 0.7945; route option-order flips 43/73. P2P START_MAIN=40f304d0477a7cde78c487a9d96b319876a7db28",
+      "provenance_status": "CROSS_PROJECT_EVIDENCE_STUDIED_NOT_VENDORED; ZERO_UPSTREAM_BYTES_INSTALLED_COPIED_OR_VENDORED; no model, dependency, benchmark service, daemon, or runtime was added to P2P by this record",
+      "research_summary": "The cross-project failure case that motivated Issue #245: a real optional model ran successfully and integrated cleanly, yet on a frozen target-domain benchmark it underperformed the deterministic comparison path and showed material option-order instability. The lesson is not project-specific: runtime success, cross-domain success, and an attractive upstream benchmark are each insufficient grounds for granting a new capability real influence. P2P therefore adopts an admission/promotion discipline — target-domain proof against a cheap credible baseline, frozen evaluation set, predeclared promotion criteria, observe-before-control for unproven models/providers, routing signal kept separate from domain truth authority, abstention as a valid outcome, and an explicit complexity/value gate — as one bounded subsection under RULE 19 rather than as a new rule or framework.",
+      "selected_ideas": [
+        "CROSS_DOMAIN_SUCCESS != TARGET_DOMAIN_PROOF",
+        "NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST",
+        "EVALUATION_SET => FREEZE_BEFORE_RESULT_WHEN_RESULT_CAN_BIAS_THE_TEST",
+        "PROMOTION_CRITERIA => PREDECLARE_BEFORE_FINAL_RESULT",
+        "CAN_RUN != WORKS_FOR_TARGET_TASK != MATERIALLY_BETTER_THAN_CURRENT_PATH != WORTH_COMPLEXITY != READY_FOR_PRODUCT_CONTROL",
+        "UNPROVEN_MODEL_OR_PROVIDER => OBSERVE_BEFORE_CONTROL_WHEN_CONTROL_HAS_MATERIAL_RISK",
+        "ROUTING_OR_CLASSIFICATION_SIGNAL != DOMAIN_TRUTH_AUTHORITY",
+        "ABSTAIN_OR_UNKNOWN => VALID_OUTCOME_WHEN_EVIDENCE_IS_INSUFFICIENT",
+        "TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS",
+        "revalidate only when material conditions change (domain, language, task type, input distribution, model/artifact/version, authority level, runtime environment)"
+      ],
+      "rejected_ideas": [
+        "upstream benchmark as target-domain proof",
+        "cross-domain extrapolation from another project's success",
+        "runtime success (it runs / it integrates) as product value",
+        "global OpenJev install or model dependency inside P2P",
+        "classifier, router, or embedding score as domain truth authority",
+        "mandatory broad benchmark ceremony for every tool/library, or a standalone benchmark service to run it"
+      ],
+      "p2p_translation": "One bounded subsection `DOMAIN_CAPABILITY_ADMISSION_V1` under canonical notebook RULE 19 — REALITY_FIRST_CAPABILITY_PROBE, plus PENDING RULE_ASSIMILATION_LEDGER entry BACKLOG_J. The subsection is operations memory: no new top-level numbered rule, no router, registry, framework, benchmark service, daemon, or runtime authority. Cross-domain source selection continues to reuse Issue #222 semantics.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 -> subsection DOMAIN_CAPABILITY_ADMISSION_V1)",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE_ASSIMILATION_LEDGER entry BACKLOG_J, status PENDING)",
+        "docs/p2p-development/P2P-AGENTS-INSTALL.md (thin entrypoint names DOMAIN_CAPABILITY_ADMISSION_V1 among RULE 19 bodies)",
+        "tests/test_p2p_domain_capability_admission_01.py",
+        "tests/test_p2p_operations_notebook.py (machine-readable ledger includes BACKLOG_J)",
+        "docs/RESEARCH-ADOPTION-LEDGER.md section 4.8 (derived human projection; JSON wins)",
+        "P2P Issue #245 (task authority) + Control Tower comment 5792918565 (preflight, OE_VERDICT=DO_IT)",
+        "VNLAW Issue #75 / #81 / #84 and PR #86 (cross-project evidence, external repository)"
+      ],
+      "dependencies": [
+        "RULE 19 — REALITY_FIRST_CAPABILITY_PROBE (smallest representative probe; fail closed on contradictions)",
+        "Issue #222 cross-domain SOURCE ROLE / CONSUMPTION semantics (reused, not duplicated)",
+        "RULE_ASSIMILATION_GATE_V1 (entry BACKLOG_J stays PENDING until independent verification)",
+        "RULE 11 Owner Gates (canonical promotion/release remain Owner Gates; no release authorized by #245)",
+        "scripts/p2p_portable_law_projection.py + scripts/p2p_sync_managed_projects.py (existing projection/sync, unchanged)"
+      ],
+      "roadmap_slot": "canonical governance/operations-memory delta for Issue #245; no roadmap item created",
+      "owner_decision_status": "OWNER_SELECTED",
+      "last_reviewed_at": "2026-09-23T00:00:00+00:00",
+      "notes": "OWNER_APPROVED_BOUNDED_GOVERNANCE_CHANGE (Issue #245): no P2P package release/promotion/deployment authorized. STATUS_TRUTHFULNESS: IMPLEMENTED means the canonical subsection and this record exist in the Issue #245 PR; it is not VERIFIED and not PROMOTED. RULE_ASSIMILATION_STATUS=VERIFIED after Control Tower independently verified PR #246 exact Writer head d14b5e89d14f84dc70d4eb53fda978e4f7b2060a in PR comment 5793604664 before BACKLOG_J was flipped. NON_GOALS_HONORED: no global OpenJev install, no model dependency, no benchmark service, no model leaderboard, no new router/agent population, no vector DB, no daemon/watcher, no new project registry, no duplicated Supreme Law, no product-code change, no force push. POST_MERGE_PROPAGATION to P2P-managed projects remains authorized only after the canonical merge; no propagation is claimed by this pre-merge record."
+    },
+    {
+      "research_id": "RA-EXT-103",
+      "source_name": "RUST_OPERATIONALIZATION_V1 — evidence-gated native/runtime admission",
+      "source_type": "OWNER_DIRECTED_RESEARCH_OPERATIONALIZATION",
+      "source_reference": "P2P PR #218 POLYGLOT_BY_EVIDENCE_V1; Gia Phả PR #12; Logistics PR #81; Bazi PR #98; Renhuai123/ziwei-doushu release v3.0-samples + current engine main; P2P Issue #252",
+      "source_version_or_commit": "P2P base 6adfa3b85658e4c0670ccfc22eb22e19e6395879; upstream Renhuai123/ziwei-doushu main 9d98b3ae7fce298f751cb43c47783d6e84a7735d; dataset v3.0-samples verified 2026-09-18",
+      "provenance_status": "OWNER_DRIVE_DATASET_PROVENANCE_VERIFIED + PUBLIC_UPSTREAM_REPO_AND_RELEASE_FRESH_READ; ZERO_DATASET_BYTES_VENDORED; NO_RUST_TOOLCHAIN_INSTALLED",
+      "research_summary": "The earlier Rust/polyglot study had durable architecture guidance but no executable trigger from task-specific performance evidence to a native-language decision. Issue #252 closes that gap with one deterministic classifier under existing Rule 19. It requires a real acceptance target, measured baseline, bottleneck classification, measured CPU hot path, current-stack optimization, and a same-workload bounded native spike before adoption. Large datasets or generic language-speed claims cannot activate Rust. The real Ziwei v3 dataset (518,400 records, 5,878,228,608 bytes, combined SHA-256 21fe90f8...) is used as an anti-hallucination canary: without a task-specific performance target/baseline, the gate returns INSUFFICIENT_EVIDENCE and does not nominate Rust.",
+      "selected_ideas": [
+        "PERFORMANCE_SIGNAL != PERFORMANCE_PROOF",
+        "LARGE_DATASET != RUST_NEED",
+        "PERFORMANCE_FAILURE => CLASSIFY_BOTTLENECK_FIRST",
+        "NON_CPU_BOTTLENECK => DO_NOT_ACTIVATE_NATIVE",
+        "CURRENT_STACK_MEETS_ACCEPTANCE => STOP_KEEP_CURRENT_STACK",
+        "NATIVE_SPIKE_REQUIRES_MEASURED_CPU_HOT_PATH",
+        "current-stack credible optimization before adding a new runtime",
+        "same-workload before/after measurement for the bounded native spike",
+        "native adoption requires smallest stable boundary + operations cost + rollback path",
+        "INSUFFICIENT_EVIDENCE is the truthful result when acceptance or measurement is missing",
+        "deterministic evidence classifier with PERMISSION_EFFECT=NONE"
+      ],
+      "rejected_ideas": [
+        "adding Rust merely because a project or dataset is large",
+        "generic Python-vs-Rust or TypeScript-vs-Rust benchmark as project proof",
+        "CPU threshold folklore without a task-specific acceptance target",
+        "rewriting an application or backend to Rust before a bounded hot-path spike",
+        "benchmark daemon/service/watcher or permanent performance-monitoring control plane",
+        "automatic shell execution, Rust toolchain installation, migration, deploy, or release from the evidence gate",
+        "downloading or vendoring the full 5.8 GB Ziwei dataset merely to make the gate look thorough"
+      ],
+      "p2p_translation": "One bounded PERFORMANCE_LANGUAGE_ADMISSION_V1 subsection under existing RULE 19 plus .p2p/system/p2p_capabilities/performance_language_gate.py and thin CLI wrappers. The helper classifies supplied measurements only and emits KEEP_CURRENT_STACK / FIX_NON_CPU_BOTTLENECK / OPTIMIZE_CURRENT_STACK_FIRST / RUN_BOUNDED_NATIVE_SPIKE / ADOPT_BOUNDED_NATIVE_COMPONENT / REJECT_NATIVE_SPIKE / INSUFFICIENT_EVIDENCE. It runs no benchmark command and grants no permission. Research is therefore operationalized as a reusable decision path without forcing Rust into any project.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "Issue #252 P2P — Operationalize Rust evidence gate end-to-end",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 -> PERFORMANCE_LANGUAGE_ADMISSION_V1)",
+        "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md (POLYGLOT_BY_EVIDENCE_V1 executable admission binding)",
+        ".p2p/system/p2p_capabilities/performance_language_gate.py",
+        "scripts/p2p_performance_language_gate.py",
+        "scripts/package_release.py (foundation runtime module + CLI transport)",
+        "tests/test_p2p_performance_language_admission_01.py",
+        "tests/fixtures/p2p_performance_language_gate/ziwei_518400_canary.json",
+        "Renhuai123/ziwei-doushu@9d98b3ae7fce298f751cb43c47783d6e84a7735d README + release v3.0-samples",
+        "Owner Drive provenance: ZIWEI_518400_DATASET_TRANSPORT_01"
+      ],
+      "dependencies": [
+        "POLYGLOT_BY_EVIDENCE_V1",
+        "RULE 19 — REALITY_FIRST_CAPABILITY_PROBE",
+        "DOMAIN_CAPABILITY_ADMISSION_V1",
+        "RULE 14 — OVER_ENGINEERING_CHECK",
+        "RULE_ASSIMILATION_GATE_V1"
+      ],
+      "roadmap_slot": "operations-law/quality-and-evidence/performance-language-admission",
+      "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED_PENDING_INDEPENDENT_RULE_ASSIMILATION_VERIFICATION",
+      "last_reviewed_at": "2026-09-24T00:00:00+00:00",
+      "notes": "Issue #252 Owner direction is to finish the Rust research 100% operationally, not to force a Rust dependency. Ziwei canary provenance: 518,400 records; 5,878,228,608 bytes; combined SHA-256 21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870. BACKLOG_K remains PENDING at Writer stage until an independent reviewer verifies the exact PR head/tree. No deployment, release, promotion, local-PC/Anvien requirement, benchmark service, daemon, or Rust toolchain installation is authorized or claimed."
     }
   ],
   "rejected_register_summary": {
@@ -3030,7 +3534,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-09-18T04:00:00+00:00",
+  "last_reviewed": "2026-09-24T00:00:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]

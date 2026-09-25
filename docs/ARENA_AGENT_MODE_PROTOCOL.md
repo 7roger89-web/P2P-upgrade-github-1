@@ -129,6 +129,88 @@ not be inferred from writing style, quality, tool use, or self-report. No
 model-selection requirement is added unless Arena later exposes explicit Agent
 Mode model selection.
 
+
+### 5.1 Session-quality canary for hidden/random Agent Mode
+
+Arena Agent Mode currently selects a dedicated orchestrator for a new chat and
+does not expose that orchestrator identity. Product behavior may also switch the
+underlying model when a response is likely to fail. Therefore P2P evaluates the
+observed session capability, not a guessed model identity.
+
+For a new Arena Agent session handling medium/high-risk work whose quality is
+not yet proven, apply notebook RULE 19 `MODEL_CANARY_GATE_V1` before material
+project mutation. Skip it for low-risk/mechanical tasks or when the real task
+itself is already the cheapest representative probe.
+
+The canary:
+
+- defaults to FAST_CANARY: one task-representative probe;
+- prefers the first read-only/disposable slice of the REAL task itself
+  (`REAL_TASK_FIRST_SLICE = CANARY`);
+- adds a second or third tiny probe only when the first is ambiguous,
+  contradictory, materially incomplete, or the task is high-risk enough to
+  require broader evidence;
+- keeps coding probes disposable/non-durable (no canary-only PR/commit);
+- may use a randomized animal × vehicle SVG probe only for relevant
+  visual/spatial work;
+- never treats the fixed pelican/bicycle prompt as a model ranking;
+- never asks the tested Arena session to grade itself; and
+- never infers model/provider/reasoning level from output style or quality.
+
+FAST_CANARY executor return:
+
+```text
+CANARY_EVIDENCE_PACKET_V1
+P2P_LAW_SOURCE=<actual source read>
+CURRENT_STATE=<pinned repo/task state>
+FACTS=<max 5 brief observed facts>
+DECISIVE_CHECK=<one focused real check>
+CHECK_RESULT=<actual result>
+ERRORS_ENCOUNTERED=<brief or NONE>
+RECOVERY_ACTIONS=<brief or NONE>
+DURABLE_MUTATION_CREATED=YES | NO
+MODEL_IDENTITY=UNKNOWN
+```
+
+The tested Arena session does not grade itself. Control Tower independently
+validates the evidence and assigns GREEN/YELLOW/RED (or ORANGE only for a
+multi-probe mixed case), then chooses KEEP/LIMIT/REROLL.
+
+For Git-history probes, an empty local merge-base from a shallow Arena clone is
+not evidence of unrelated histories. Check shallow-clone state first and
+deepen/unshallow or use durable remote ancestry evidence before making that
+claim.
+
+For a NEW medium/high-risk Arena Agent session, do not automatically continue
+past the first real-task canary slice. End the turn at
+`OWNER_CONTINUATION_GATE_V1` after returning the evidence packet.
+
+```text
+CONTINUATION_CHECKPOINT=READY
+OWNER_ACTION_REQUIRED=YES
+NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED
+FALLBACK_OWNER_REPLY=Tiếp tục công việc
+```
+
+Arena's product currently supports a native `keep working` action after a
+completed task/turn. Use that native continuation UI when it appears; never
+pretend the model itself rendered or controls the button.
+
+Control Tower/independent grading determines what to recommend:
+- GREEN -> same-chat Keep working / CONTINUE_REAL_TASK;
+- YELLOW -> bounded continuation with explicit verification;
+- ORANGE -> advisory or low-risk continuation only;
+- RED -> REROLL_OR_SWITCH, not Keep working;
+- UNVERIFIED -> no default continue recommendation.
+
+After the Owner chooses Keep working/Continue on a GREEN result, continue the
+real task in the SAME Arena session without another canary unless material
+risk/state changes.
+
+`RED` permits one evidence-justified fresh-session reroll by default; do not
+reroll repeatedly to gamble for a preferred hidden model.
+
+
 ## 6. Prompt architecture and routing
 
 The standard execution prompt is concise and follows:
@@ -142,14 +224,26 @@ ASSESS
 
 In compact form: `ASSESS → IMPLEMENT → VERIFY → RETURN`.
 
-Every P2P-generated Arena prompt must expose these user-facing routing fields:
+Every P2P-generated Arena prompt must expose a useful conversation title before routing metadata. For `START_NEW_SESSION`, the first nonblank line is the human-readable task title that Arena can reuse for the sidebar conversation title.
 
 ```text
+<PROJECT> — <bounded task/outcome>
+
+GỬI CHO: ARENA AI
 DESTINATION=ARENA AI
 SESSION_ACTION=CONTINUE_CURRENT_SESSION | START_NEW_SESSION
+CHAT_TITLE=<exact first-line title for START_NEW_SESSION; exact existing chat name for CONTINUE_CURRENT_SESSION>
 SESSION_GOAL=
 PR_EXPECTATION=
 ```
+
+`ARENA_CHAT_TITLE_FIRST_LINE_V1` rules:
+
+- For `START_NEW_SESSION`, first nonblank line = concise, distinctive task title, normally `<PROJECT> — <bounded task/outcome>`.
+- Front-load the distinguishing words because the Arena sidebar truncates long titles.
+- Do not put `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P` prefix on the first line.
+- `CHAT_TITLE` must repeat that exact first-line title for a new session.
+- For `CONTINUE_CURRENT_SESSION`, keep the exact existing `CHAT_TITLE`; do not imply a rename.
 
 Before `ASSESS`, every Arena executor must complete the
 `P2P_SUPREME_OPERATING_LAW_V1` preflight.
@@ -190,11 +284,15 @@ Do not request private chain-of-thought. Do not repeat large P2P or project
 architecture text when the canonical GitHub files already contain it. Use
 risk-proportional tests and stop once sufficient evidence exists.
 
-A minimal operational shape is:
+A minimal operational shape for a new Arena session is:
 
 ```text
+VNLAW — Official VBPL WebSocket Probe
+
+GỬI CHO: ARENA AI
 DESTINATION=ARENA AI
-SESSION_ACTION=CONTINUE_CURRENT_SESSION | START_NEW_SESSION
+SESSION_ACTION=START_NEW_SESSION
+CHAT_TITLE=VNLAW — Official VBPL WebSocket Probe
 SESSION_GOAL=<one bounded goal>
 PR_EXPECTATION=<one working branch and one PR>
 

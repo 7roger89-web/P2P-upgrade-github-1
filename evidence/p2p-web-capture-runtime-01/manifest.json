@@ -1,0 +1,856 @@
+{
+  "boundary": {
+    "SOURCE_SPECIFIC_PARSERS_OUTSIDE_RUNTIME": true,
+    "browser_required_for_all_sites": false,
+    "chatgpt_work_required": false,
+    "projects_own": [
+      "VIMDA parser",
+      "VBPL parser (see parse_vbpl_sitemap_text in this evidence script)",
+      "Công Báo attachment semantics",
+      "legal interpretation and business semantics"
+    ],
+    "runtime_owns": [
+      "fetch/capture normalization",
+      "provenance (parent_capture/discovered_from)",
+      "sha256 hashing",
+      "bounded navigation plans",
+      "checkpoint/resume metadata"
+    ],
+    "second_registry_created": false,
+    "second_router_created": false
+  },
+  "captures": [
+    {
+      "byte_count": 95,
+      "capture_id": "cap-1bfb994f776b27de0f757ba9e184e8098a20eb565e56645d0ac33146beeb8ded",
+      "capture_scope": "VBPL-PUBLIC-PORTAL",
+      "char_count": 95,
+      "content_path": "captures/vbpl-robots.txt",
+      "content_type": null,
+      "discovered_from": null,
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "FULL",
+        "executor_chunk_index": 0,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 1,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vbpl.vn/robots.txt",
+      "http_status": null,
+      "notes": [
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": null,
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vbpl.vn/robots.txt",
+      "retrieved_at": "2026-09-23",
+      "sha256": "f8b495dbc6d0edee08542ed95a71a53665e4e032c6369cdc0487e1b166fb7c7b",
+      "source_host": "vbpl.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 1100,
+      "capture_id": "cap-6b62a7eddff8c8c3dab7f82c649234ea49698eacb44882c95356fafcadcd1de0",
+      "capture_scope": "VBPL-PUBLIC-PORTAL",
+      "char_count": 1100,
+      "content_path": "captures/vbpl-sitemap-index.txt",
+      "content_type": null,
+      "discovered_from": "cap-1bfb994f776b27de0f757ba9e184e8098a20eb565e56645d0ac33146beeb8ded",
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "FULL",
+        "executor_chunk_index": 0,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 1,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vbpl.vn/sitemap.xml",
+      "http_status": null,
+      "notes": [
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": "cap-1bfb994f776b27de0f757ba9e184e8098a20eb565e56645d0ac33146beeb8ded",
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vbpl.vn/sitemap.xml",
+      "retrieved_at": "2026-09-23",
+      "sha256": "4d6449b46d83223f585be8343d6a03d97b1209913299ccda1714ccae63f4bd8a",
+      "source_host": "vbpl.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 142,
+      "capture_id": "cap-665f6b5a7fb8509bb744d895f85332caa03561c89e745eb0f01701e71f6089b9",
+      "capture_scope": "VBPL-PUBLIC-PORTAL",
+      "char_count": 142,
+      "content_path": "captures/vbpl-sitemap-0.txt",
+      "content_type": null,
+      "discovered_from": "cap-6b62a7eddff8c8c3dab7f82c649234ea49698eacb44882c95356fafcadcd1de0",
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "FULL",
+        "executor_chunk_index": 0,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 1,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vbpl.vn/sitemap/0.xml",
+      "http_status": null,
+      "notes": [
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": "cap-6b62a7eddff8c8c3dab7f82c649234ea49698eacb44882c95356fafcadcd1de0",
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vbpl.vn/sitemap/0.xml",
+      "retrieved_at": "2026-09-23",
+      "sha256": "fdfd1eb102140ba58e54dbcb692ef010a0a18eb62cc627d3c7a9db1f690c3ad4",
+      "source_host": "vbpl.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 965,
+      "capture_id": "cap-a327a813b24f8aefa064d8846f091a7e5fadebd8077a013eedb7f970c1d1b1f0",
+      "capture_scope": "VBPL-PUBLIC-PORTAL",
+      "char_count": 965,
+      "content_path": "captures/vbpl-sitemap-1.chunk0-of-133.excerpt.txt",
+      "content_type": null,
+      "discovered_from": "cap-6b62a7eddff8c8c3dab7f82c649234ea49698eacb44882c95356fafcadcd1de0",
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_0_OF_133",
+        "executor_chunk_index": 0,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 133,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vbpl.vn/sitemap/1.xml",
+      "http_status": null,
+      "notes": [
+        "EXCERPT_FIRST_4_SITEMAP_ENTRIES",
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": "cap-6b62a7eddff8c8c3dab7f82c649234ea49698eacb44882c95356fafcadcd1de0",
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vbpl.vn/sitemap/1.xml",
+      "retrieved_at": "2026-09-23",
+      "sha256": "b9c9271e1dd9365ea3dc2c39d5244ef6cc9faf98a02bb691b5a9aab92e62c55a",
+      "source_host": "vbpl.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 696,
+      "capture_id": "cap-d4aa4b4baaba33f51450c06ea521f86f89c4fb6feea924df112fc82229c59666",
+      "capture_scope": "VBPL-PUBLIC-PORTAL",
+      "char_count": 572,
+      "content_path": "captures/vbpl-doc-detail-luat-18-2026-qh16.chunk0-of-2.excerpt.md",
+      "content_type": null,
+      "discovered_from": "cap-a327a813b24f8aefa064d8846f091a7e5fadebd8077a013eedb7f970c1d1b1f0",
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_0_OF_2",
+        "executor_chunk_index": 0,
+        "executor_reported_title": "Luật 18/2026/QH16 của Quốc hội | CSDL quốc gia về pháp luật",
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 2,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vbpl.vn/van-ban/chi-tiet/luat-phat-trien-do-thi-so-18-2026-qh16--deec8480-b58b-11f1-bea2-5d13f4b83b24",
+      "http_status": null,
+      "notes": [
+        "DOCUMENT_BODY_JS_GATED_TEXT_TRANSPORT_LOADER_SHELL_ONLY",
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": "cap-a327a813b24f8aefa064d8846f091a7e5fadebd8077a013eedb7f970c1d1b1f0",
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vbpl.vn/van-ban/chi-tiet/luat-phat-trien-do-thi-so-18-2026-qh16--deec8480-b58b-11f1-bea2-5d13f4b83b24",
+      "retrieved_at": "2026-09-23",
+      "sha256": "594ec584a0d3f7e186385c4013087062ebe4b7084456155f5ca880420817cd66",
+      "source_host": "vbpl.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 1910,
+      "capture_id": "cap-b16be4969e8bbce8a3d4c83022dec510d09cae6be6028bd649f96f0d1dcb573f",
+      "capture_scope": "VIMDA-VAN-BAN-CONG-BO",
+      "char_count": 1766,
+      "content_path": "captures/vimda-listing.chunk1-of-7.excerpt.md",
+      "content_type": null,
+      "discovered_from": null,
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_1_OF_7",
+        "chunk_group": "vimda-listing-p1-2026-09-23",
+        "executor_chunk_index": 1,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 7,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo",
+      "http_status": null,
+      "notes": [
+        "SEED_EXPLICIT_TARGET",
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": null,
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo",
+      "retrieved_at": "2026-09-23",
+      "sha256": "3482eb84e3b7b40e0e64d8d0de1e449718b978ea286d54988881b49c22bf46f8",
+      "source_host": "vimda.moh.gov.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 2198,
+      "capture_id": "cap-c150206ae34447ee2dbeb265a7775fe2aeca95cef83a746f5eb91f5b9f1ff77c",
+      "capture_scope": "VIMDA-VAN-BAN-CONG-BO",
+      "char_count": 2174,
+      "content_path": "captures/vimda-listing.chunk6-of-7.excerpt.md",
+      "content_type": null,
+      "discovered_from": null,
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_6_OF_7",
+        "chunk_group": "vimda-listing-p1-2026-09-23",
+        "executor_chunk_index": 6,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 7,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo",
+      "http_status": null,
+      "notes": [
+        "SEED_EXPLICIT_TARGET_SAME_FETCH_AS_vimda_listing_c1",
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": null,
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo",
+      "retrieved_at": "2026-09-23",
+      "sha256": "78df19bcce9dafe94ed1f5def40dea9e446bde169900aa86de84e783c61ec22e",
+      "source_host": "vimda.moh.gov.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 293,
+      "capture_id": "cap-e4eeb2be56740761b50c3b1d2ecd225fa69d821988994e5bcbd4bde381d24293",
+      "capture_scope": "CONGBAO-CHINHPHU",
+      "char_count": 260,
+      "content_path": "captures/congbao-home.chunk3-of-5.excerpt.md",
+      "content_type": null,
+      "discovered_from": null,
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_3_OF_5",
+        "executor_chunk_index": 3,
+        "executor_reported_title": "Công báo điện tử Nước CHXHCN Việt Nam",
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 5,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://congbao.chinhphu.vn/",
+      "http_status": null,
+      "notes": [
+        "SEED_EXPLICIT_TARGET",
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": null,
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://congbao.chinhphu.vn/",
+      "retrieved_at": "2026-09-23",
+      "sha256": "bbd9ada6696f7cec60275e18b628b22624b0026fdf16cba55f77007eb20eecc6",
+      "source_host": "congbao.chinhphu.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 1902,
+      "capture_id": "cap-5871999005b64af48a43afd57a647322ad3e95a61375501e0e2edf730d2647f3",
+      "capture_scope": "CONGBAO-CHINHPHU",
+      "char_count": 1737,
+      "content_path": "captures/congbao-chinhphu-c1.chunk4-of-10.excerpt.md",
+      "content_type": null,
+      "discovered_from": "cap-e4eeb2be56740761b50c3b1d2ecd225fa69d821988994e5bcbd4bde381d24293",
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_4_OF_10",
+        "executor_chunk_index": 4,
+        "executor_reported_title": "Văn bản ban hành bởi Chính phủ",
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 10,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://congbao.chinhphu.vn/van-ban-dang-cong-bao/chinh-phu-c1.htm",
+      "http_status": null,
+      "notes": [
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": "cap-e4eeb2be56740761b50c3b1d2ecd225fa69d821988994e5bcbd4bde381d24293",
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://congbao.chinhphu.vn/van-ban-dang-cong-bao/chinh-phu-c1.htm",
+      "retrieved_at": "2026-09-23",
+      "sha256": "1119027fb9ed2d1196d6f487cb44216721d7b8f738481bdf00cff3c581bcb3b7",
+      "source_host": "congbao.chinhphu.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    },
+    {
+      "byte_count": 2754,
+      "capture_id": "cap-ad9255e85d0bfe14c51db34a24a04bc7002c849bdceae11ec9731c691422e428",
+      "capture_scope": "CONGBAO-CHINHPHU",
+      "char_count": 2460,
+      "content_path": "captures/congbao-record-nghi-dinh-so-347-2026-nd-cp.chunk0-of-5.excerpt.md",
+      "content_type": null,
+      "discovered_from": "cap-5871999005b64af48a43afd57a647322ad3e95a61375501e0e2edf730d2647f3",
+      "executor": "ARENA_FETCH_PAGE",
+      "executor_meta": {
+        "capture_completeness": "EXCERPT_OF_CHUNK_0_OF_5",
+        "executor_chunk_index": 0,
+        "executor_surface": "arena_fetch_page_markdown_text",
+        "executor_total_chunks": 5,
+        "original_transport_kind": "EXECUTOR_TEXT",
+        "retrieved_at_precision": "DATE"
+      },
+      "final_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-347-2026-nd-cp-470418.htm",
+      "http_status": null,
+      "notes": [
+        "NORMALIZED_FROM_RECORDED_EXECUTOR_RESULT"
+      ],
+      "parent_capture": "cap-5871999005b64af48a43afd57a647322ad3e95a61375501e0e2edf730d2647f3",
+      "representation": "TEXT_CAPTURE",
+      "requested_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-347-2026-nd-cp-470418.htm",
+      "retrieved_at": "2026-09-23",
+      "sha256": "edd6f9a9eab69880acbd883e4f419e6a7a8980ab461fa507a4af5d2b9ffd03ee",
+      "source_host": "congbao.chinhphu.vn",
+      "transport_kind": "EXECUTOR_TEXT"
+    }
+  ],
+  "determinism": "BYTE_DETERMINISTIC_REBUILD (no wall-clock inputs)",
+  "discoveries": {
+    "congbao": {
+      "agency_listing_links_from_home": [
+        "https://congbao.chinhphu.vn/van-ban-dang-cong-bao/chinh-phu-c1.htm",
+        "https://congbao.chinhphu.vn/van-ban-dang-cong-bao/thu-tuong-chinh-phu-c2.htm"
+      ],
+      "attachments_downloaded": false,
+      "caller_include_patterns": "/van-ban-dang-cong-bao/ , /van-ban/ , /cong-bao/ , g7.cdnchinhphu.vn/api/download/",
+      "issue_links": [
+        "https://congbao.chinhphu.vn/cong-bao/516-47465.htm"
+      ],
+      "issue_record_variant_links": [
+        "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-347-2026-nd-cp-470418/68388.htm"
+      ],
+      "official_attachment_links_discovered": [
+        "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAaHMpvrqWaeHuYm7lW3HNfzTzww8Myg35dDL_fJB4izwzvidWXcCrlzhmFuPbXeRzTpddo2mZmQOQIee7FdHvy1JanwRWBaMQnwWTqfXgVW9bdS3jWN_J9X-tWQ7LhMkTQ~~&file_name=2026_516_347%2f2026%2fN%c4%90-CP.docx",
+        "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAaHMpvrqWaeHuYm7lW3HNfzTzww8Myg35dDL_fJB4izwzvidWXcCrlzhmFuPbXeRzYFghoz_c3pO_3Dr85MwR3U7vQtBEcW2jcW1SdNLD_1wbm4-LCw85HWpeqMTK_voxw~~&file_name=2026_516_347%2f2026%2fN%c4%90-CP.pdf"
+      ],
+      "record_links_from_listing": [
+        "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-347-2026-nd-cp-470418.htm"
+      ]
+    },
+    "mechanism": "runtime.extract_urls/select_urls (generic) + caller-provided include patterns (project-owned semantics)",
+    "vbpl": {
+      "document_links_from_sitemap_1_excerpt": [
+        "https://vbpl.vn/van-ban/chi-tiet/quy-dinh-ve-dinh-muc-kinh-te-ky-thuat-dich-vu-xuc-tien-quang-ba-du-lich-o-trong-nuoc-va-ngoai-nuoc-phat-trien-thuong-hieu-du-lich-quoc-gia-va-dia-phuong-to-chuc-tham-gia-cac-su-kien-du-lich-quy-mo-lien-vung-quoc-gia--4d140fd0-b6f1-11f1-9287-cf99cca744ad",
+        "https://vbpl.vn/van-ban/chi-tiet/thong-tu-so-11-2026-tt-vkstc-quy-dinh-muc-khoan-chi-cho-nhiem-vu-hoat-dong-xay-dung-thong-tu-thuoc-tham-quyen-xay-dung-ban-hanh-cua-vien-truong-vien-kiem-sat-nhan-dan-toi-cao-thong-tu-lien-tich-do-vien-kiem-sat-nhan-dan-toi-cao-chu-tri-xay-dung--f6400860-b670-11f1-a156-fdc23b1e7ee9",
+        "https://vbpl.vn/van-ban/chi-tiet/nghi-quyet-so-121-2020-qh14-ve-tiep-tuc-tang-cuong-hieu-luc-hieu-qua-viec-thuc-hien-chinh-sach-phap-luat-ve-phong-chong-xam-hai-tre-em--169632",
+        "https://vbpl.vn/van-ban/chi-tiet/luat-phat-trien-do-thi-so-18-2026-qh16--deec8480-b58b-11f1-bea2-5d13f4b83b24"
+      ],
+      "observed_third_party_assets": [
+        "https://cmp.biznext.vn/api/v1/dms/files/01a06a92-8834-7304-961b-b3860594d2b5/download?tenantId=019fc5b5-5b58-7195-8719-a0c531e970ee"
+      ],
+      "relation_links_from_document_detail": [],
+      "relation_note": "JS_GATED_BODY: document detail body/relation links are rendered client-side; only loader shell + consent text observable via text transport. robots.txt Disallow:/api/ respected (API surface not touched).",
+      "section_links": [
+        "https://vbpl.vn/",
+        "https://vbpl.vn/gioi-thieu",
+        "https://vbpl.vn/van-ban/trung-uong",
+        "https://vbpl.vn/van-ban/dia-phuong"
+      ],
+      "source_specific_parser": "parse_vbpl_sitemap_text() in THIS evidence build script (project layer), not in the runtime",
+      "sub_sitemaps": [
+        "https://vbpl.vn/sitemap/0.xml",
+        "https://vbpl.vn/sitemap/1.xml",
+        "https://vbpl.vn/sitemap/2.xml",
+        "https://vbpl.vn/sitemap/3.xml",
+        "https://vbpl.vn/sitemap/4.xml",
+        "https://vbpl.vn/sitemap/5.xml",
+        "https://vbpl.vn/sitemap/6.xml",
+        "https://vbpl.vn/sitemap/7.xml",
+        "https://vbpl.vn/sitemap/8.xml",
+        "https://vbpl.vn/sitemap/9.xml",
+        "https://vbpl.vn/sitemap/10.xml",
+        "https://vbpl.vn/sitemap/11.xml",
+        "https://vbpl.vn/sitemap/12.xml",
+        "https://vbpl.vn/sitemap/13.xml",
+        "https://vbpl.vn/sitemap/14.xml",
+        "https://vbpl.vn/sitemap/15.xml",
+        "https://vbpl.vn/sitemap/16.xml",
+        "https://vbpl.vn/sitemap/17.xml",
+        "https://vbpl.vn/sitemap/18.xml",
+        "https://vbpl.vn/sitemap/19.xml",
+        "https://vbpl.vn/sitemap/20.xml",
+        "https://vbpl.vn/sitemap/21.xml",
+        "https://vbpl.vn/sitemap/22.xml",
+        "https://vbpl.vn/sitemap/23.xml",
+        "https://vbpl.vn/sitemap/24.xml",
+        "https://vbpl.vn/sitemap/25.xml",
+        "https://vbpl.vn/sitemap/26.xml",
+        "https://vbpl.vn/sitemap/27.xml",
+        "https://vbpl.vn/sitemap/28.xml",
+        "https://vbpl.vn/sitemap/29.xml",
+        "https://vbpl.vn/sitemap/30.xml",
+        "https://vbpl.vn/sitemap/31.xml",
+        "https://vbpl.vn/sitemap/32.xml",
+        "https://vbpl.vn/sitemap/33.xml",
+        "https://vbpl.vn/sitemap/34.xml",
+        "https://vbpl.vn/sitemap/35.xml",
+        "https://vbpl.vn/sitemap/36.xml"
+      ]
+    },
+    "vimda": {
+      "attachment_links": [],
+      "attachment_note": "NOT_OBSERVED_IN_STORED_CHUNKS: 'Văn bản công bố' column empty in stored listing rows; record detail page (attachment/history surface) BLOCKED by transport degradation.",
+      "caller_include_pattern": "hoSoId= / _cur=\\d+",
+      "pagination_last_page_observed": [
+        "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_keyword=&_vanbancongbo_WAR_trangthietbiyteportlet_showHide=0&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiDen=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoDen=&_vanbancongbo_WAR_trangthietbiyteportlet_tenDoanhNghiep=&_vanbancongbo_WAR_trangthietbiyteportlet_tenTTBYT=&_vanbancongbo_WAR_trangthietbiyteportlet_coQuanQuanLyId=0&_vanbancongbo_WAR_trangthietbiyteportlet_tthcId=0&_vanbancongbo_WAR_trangthietbiyteportlet_delta=10&_vanbancongbo_WAR_trangthietbiyteportlet_keywords=&_vanbancongbo_WAR_trangthietbiyteportlet_advancedSearch=false&_vanbancongbo_WAR_trangthietbiyteportlet_andOperator=true&_vanbancongbo_WAR_trangthietbiyteportlet_resetCur=false&_vanbancongbo_WAR_trangthietbiyteportlet_cur=12020"
+      ],
+      "pagination_links": [
+        "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_keyword=&_vanbancongbo_WAR_trangthietbiyteportlet_showHide=0&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiDen=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoDen=&_vanbancongbo_WAR_trangthietbiyteportlet_tenDoanhNghiep=&_vanbancongbo_WAR_trangthietbiyteportlet_tenTTBYT=&_vanbancongbo_WAR_trangthietbiyteportlet_coQuanQuanLyId=0&_vanbancongbo_WAR_trangthietbiyteportlet_tthcId=0&_vanbancongbo_WAR_trangthietbiyteportlet_delta=10&_vanbancongbo_WAR_trangthietbiyteportlet_keywords=&_vanbancongbo_WAR_trangthietbiyteportlet_advancedSearch=false&_vanbancongbo_WAR_trangthietbiyteportlet_andOperator=true&_vanbancongbo_WAR_trangthietbiyteportlet_resetCur=false&_vanbancongbo_WAR_trangthietbiyteportlet_cur=12020",
+        "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_keyword=&_vanbancongbo_WAR_trangthietbiyteportlet_showHide=0&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiDen=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoDen=&_vanbancongbo_WAR_trangthietbiyteportlet_tenDoanhNghiep=&_vanbancongbo_WAR_trangthietbiyteportlet_tenTTBYT=&_vanbancongbo_WAR_trangthietbiyteportlet_coQuanQuanLyId=0&_vanbancongbo_WAR_trangthietbiyteportlet_tthcId=0&_vanbancongbo_WAR_trangthietbiyteportlet_delta=10&_vanbancongbo_WAR_trangthietbiyteportlet_keywords=&_vanbancongbo_WAR_trangthietbiyteportlet_advancedSearch=false&_vanbancongbo_WAR_trangthietbiyteportlet_andOperator=true&_vanbancongbo_WAR_trangthietbiyteportlet_resetCur=false&_vanbancongbo_WAR_trangthietbiyteportlet_cur=2"
+      ],
+      "record_detail_links": [
+        "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_hoSoId=781012&_vanbancongbo_WAR_trangthietbiyteportlet_vanBanId=705380&_vanbancongbo_WAR_trangthietbiyteportlet_doanhNghiepId=467002&_vanbancongbo_WAR_trangthietbiyteportlet_redirectVanBanURL=%2Fweb%2Fguest%2Fvan-ban-cong-bo&_vanbancongbo_WAR_trangthietbiyteportlet_jspPage=%2Fhtml%2Fttbyte%2Fportlet%2Fvanbancongbo%2Fxemhoso_tuybien.jsp",
+        "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_hoSoId=783001&_vanbancongbo_WAR_trangthietbiyteportlet_vanBanId=705379&_vanbancongbo_WAR_trangthietbiyteportlet_doanhNghiepId=481603&_vanbancongbo_WAR_trangthietbiyteportlet_redirectVanBanURL=%2Fweb%2Fguest%2Fvan-ban-cong-bo&_vanbancongbo_WAR_trangthietbiyteportlet_jspPage=%2Fhtml%2Fttbyte%2Fportlet%2Fvanbancongbo%2Fxemhoso_tuybien.jsp"
+      ],
+      "result_count_text_observed": "Hiển thị 1 - 10 of 120.198 kết quả."
+    }
+  },
+  "executor": "ARENA_FETCH_PAGE",
+  "generated_at": "2026-09-23",
+  "generated_by": "evidence/p2p-web-capture-runtime-01/build_manifest.py",
+  "issue": 241,
+  "new_capability_ids_created": [],
+  "plans_and_checkpoints": [
+    {
+      "checkpoint": {
+        "blocked": {
+          "1": "EXECUTOR_TRANSPORT_BLOCKED:ARENA_FETCH_PAGE_PROXY_SIGNATURE_FAILURES_ON_QUERY_URLS_THEN_SESSION_WIDE_DEGRADATION_2026-09-23"
+        },
+        "completed": {
+          "0": "cap-b16be4969e8bbce8a3d4c83022dec510d09cae6be6028bd649f96f0d1dcb573f"
+        },
+        "plan_id": "plan-c833f03a3413b4d24befc8871d115e7d29fffe731bf7fb265e41ca6f552975b5",
+        "scope_id": "VIMDA-VAN-BAN-CONG-BO",
+        "updated_at": null
+      },
+      "pending_steps": [
+        {
+          "discovered_from": "cap-c150206ae34447ee2dbeb265a7775fe2aeca95cef83a746f5eb91f5b9f1ff77c",
+          "step_index": 1,
+          "step_kind": "PAGINATION",
+          "url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_keyword=&_vanbancongbo_WAR_trangthietbiyteportlet_showHide=0&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiDen=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoDen=&_vanbancongbo_WAR_trangthietbiyteportlet_tenDoanhNghiep=&_vanbancongbo_WAR_trangthietbiyteportlet_tenTTBYT=&_vanbancongbo_WAR_trangthietbiyteportlet_coQuanQuanLyId=0&_vanbancongbo_WAR_trangthietbiyteportlet_tthcId=0&_vanbancongbo_WAR_trangthietbiyteportlet_delta=10&_vanbancongbo_WAR_trangthietbiyteportlet_keywords=&_vanbancongbo_WAR_trangthietbiyteportlet_advancedSearch=false&_vanbancongbo_WAR_trangthietbiyteportlet_andOperator=true&_vanbancongbo_WAR_trangthietbiyteportlet_resetCur=false&_vanbancongbo_WAR_trangthietbiyteportlet_cur=2"
+        }
+      ],
+      "plan": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 2,
+        "notes": [
+          "BOUNDED_SAMPLE: site advertises 120.198 results / cur=12020 last page; plan stops at 2 pages"
+        ],
+        "plan_id": "plan-c833f03a3413b4d24befc8871d115e7d29fffe731bf7fb265e41ca6f552975b5",
+        "plan_kind": "PAGE_RANGE",
+        "scope": {
+          "allowed_host": "vimda.moh.gov.vn",
+          "allowed_path_prefixes": [
+            "/web/guest/van-ban-cong-bo"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "VIMDA-VAN-BAN-CONG-BO",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": null,
+            "step_index": 0,
+            "step_kind": "SEED",
+            "url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo"
+          },
+          {
+            "discovered_from": "cap-c150206ae34447ee2dbeb265a7775fe2aeca95cef83a746f5eb91f5b9f1ff77c",
+            "step_index": 1,
+            "step_kind": "PAGINATION",
+            "url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_keyword=&_vanbancongbo_WAR_trangthietbiyteportlet_showHide=0&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiDen=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoDen=&_vanbancongbo_WAR_trangthietbiyteportlet_tenDoanhNghiep=&_vanbancongbo_WAR_trangthietbiyteportlet_tenTTBYT=&_vanbancongbo_WAR_trangthietbiyteportlet_coQuanQuanLyId=0&_vanbancongbo_WAR_trangthietbiyteportlet_tthcId=0&_vanbancongbo_WAR_trangthietbiyteportlet_delta=10&_vanbancongbo_WAR_trangthietbiyteportlet_keywords=&_vanbancongbo_WAR_trangthietbiyteportlet_advancedSearch=false&_vanbancongbo_WAR_trangthietbiyteportlet_andOperator=true&_vanbancongbo_WAR_trangthietbiyteportlet_resetCur=false&_vanbancongbo_WAR_trangthietbiyteportlet_cur=2"
+          }
+        ]
+      },
+      "resume_metadata": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 1,
+        "notes": [
+          "BOUNDED_SAMPLE: site advertises 120.198 results / cur=12020 last page; plan stops at 2 pages",
+          "RESUMED_FROM_CHECKPOINT:plan-c833f03a3413b4d24befc8871d115e7d29fffe731bf7fb265e41ca6f552975b5"
+        ],
+        "plan_id": "plan-559acd1d42e5410f70e8a066c1f9dbc1d5cc2088c104f77d3c13424f8be4be11",
+        "plan_kind": "PAGE_RANGE",
+        "scope": {
+          "allowed_host": "vimda.moh.gov.vn",
+          "allowed_path_prefixes": [
+            "/web/guest/van-ban-cong-bo"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "VIMDA-VAN-BAN-CONG-BO",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": "cap-c150206ae34447ee2dbeb265a7775fe2aeca95cef83a746f5eb91f5b9f1ff77c",
+            "step_index": 1,
+            "step_kind": "PAGINATION",
+            "url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_keyword=&_vanbancongbo_WAR_trangthietbiyteportlet_showHide=0&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayGuiDen=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoTu=&_vanbancongbo_WAR_trangthietbiyteportlet_ngayCongBoDen=&_vanbancongbo_WAR_trangthietbiyteportlet_tenDoanhNghiep=&_vanbancongbo_WAR_trangthietbiyteportlet_tenTTBYT=&_vanbancongbo_WAR_trangthietbiyteportlet_coQuanQuanLyId=0&_vanbancongbo_WAR_trangthietbiyteportlet_tthcId=0&_vanbancongbo_WAR_trangthietbiyteportlet_delta=10&_vanbancongbo_WAR_trangthietbiyteportlet_keywords=&_vanbancongbo_WAR_trangthietbiyteportlet_advancedSearch=false&_vanbancongbo_WAR_trangthietbiyteportlet_andOperator=true&_vanbancongbo_WAR_trangthietbiyteportlet_resetCur=false&_vanbancongbo_WAR_trangthietbiyteportlet_cur=2"
+          }
+        ]
+      }
+    },
+    {
+      "checkpoint": {
+        "blocked": {
+          "0": "EXECUTOR_TRANSPORT_BLOCKED:ARENA_FETCH_PAGE_PROXY_SIGNATURE_FAILURES_ON_QUERY_URLS_THEN_SESSION_WIDE_DEGRADATION_2026-09-23"
+        },
+        "completed": {},
+        "plan_id": "plan-28d3ea13c3c4d0b26f03c5c886231131481d303d382043c809a8ab88c56da02c",
+        "scope_id": "VIMDA-VAN-BAN-CONG-BO",
+        "updated_at": null
+      },
+      "pending_steps": [
+        {
+          "discovered_from": "cap-b16be4969e8bbce8a3d4c83022dec510d09cae6be6028bd649f96f0d1dcb573f",
+          "step_index": 0,
+          "step_kind": "RECORD_FOLLOWUP",
+          "url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_hoSoId=781012&_vanbancongbo_WAR_trangthietbiyteportlet_vanBanId=705380&_vanbancongbo_WAR_trangthietbiyteportlet_doanhNghiepId=467002&_vanbancongbo_WAR_trangthietbiyteportlet_redirectVanBanURL=%2Fweb%2Fguest%2Fvan-ban-cong-bo&_vanbancongbo_WAR_trangthietbiyteportlet_jspPage=%2Fhtml%2Fttbyte%2Fportlet%2Fvanbancongbo%2Fxemhoso_tuybien.jsp"
+        }
+      ],
+      "plan": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 1,
+        "notes": [
+          "BOUNDED_SAMPLE: 1 of 2 discovered record links planned"
+        ],
+        "plan_id": "plan-28d3ea13c3c4d0b26f03c5c886231131481d303d382043c809a8ab88c56da02c",
+        "plan_kind": "DISCOVERED_LINKS",
+        "scope": {
+          "allowed_host": "vimda.moh.gov.vn",
+          "allowed_path_prefixes": [
+            "/web/guest/van-ban-cong-bo"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "VIMDA-VAN-BAN-CONG-BO",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": "cap-b16be4969e8bbce8a3d4c83022dec510d09cae6be6028bd649f96f0d1dcb573f",
+            "step_index": 0,
+            "step_kind": "RECORD_FOLLOWUP",
+            "url": "https://vimda.moh.gov.vn/web/guest/van-ban-cong-bo?p_p_id=vanbancongbo_WAR_trangthietbiyteportlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_vanbancongbo_WAR_trangthietbiyteportlet_hoSoId=781012&_vanbancongbo_WAR_trangthietbiyteportlet_vanBanId=705380&_vanbancongbo_WAR_trangthietbiyteportlet_doanhNghiepId=467002&_vanbancongbo_WAR_trangthietbiyteportlet_redirectVanBanURL=%2Fweb%2Fguest%2Fvan-ban-cong-bo&_vanbancongbo_WAR_trangthietbiyteportlet_jspPage=%2Fhtml%2Fttbyte%2Fportlet%2Fvanbancongbo%2Fxemhoso_tuybien.jsp"
+          }
+        ]
+      }
+    },
+    {
+      "checkpoint": {
+        "blocked": {},
+        "completed": {
+          "0": "cap-d4aa4b4baaba33f51450c06ea521f86f89c4fb6feea924df112fc82229c59666"
+        },
+        "plan_id": "plan-7d6d47e8196d75946dc943f2835668ac65015fc601b0330c7acf681a8a244330",
+        "scope_id": "VBPL-PUBLIC-PORTAL",
+        "updated_at": null
+      },
+      "pending_steps": [],
+      "plan": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 1,
+        "notes": [],
+        "plan_id": "plan-7d6d47e8196d75946dc943f2835668ac65015fc601b0330c7acf681a8a244330",
+        "plan_kind": "DISCOVERED_LINKS",
+        "scope": {
+          "allowed_host": "vbpl.vn",
+          "allowed_path_prefixes": [
+            "/"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "VBPL-PUBLIC-PORTAL",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": "cap-a327a813b24f8aefa064d8846f091a7e5fadebd8077a013eedb7f970c1d1b1f0",
+            "step_index": 0,
+            "step_kind": "RECORD_FOLLOWUP",
+            "url": "https://vbpl.vn/van-ban/chi-tiet/luat-phat-trien-do-thi-so-18-2026-qh16--deec8480-b58b-11f1-bea2-5d13f4b83b24"
+          }
+        ]
+      }
+    },
+    {
+      "checkpoint": {
+        "blocked": {},
+        "completed": {
+          "0": "cap-5871999005b64af48a43afd57a647322ad3e95a61375501e0e2edf730d2647f3"
+        },
+        "plan_id": "plan-01ac05cadb7ed72a1e5cb99b2193bba45930ead8d5466ab167bd94fb0716ff55",
+        "scope_id": "CONGBAO-CHINHPHU",
+        "updated_at": null
+      },
+      "pending_steps": [],
+      "plan": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 1,
+        "notes": [],
+        "plan_id": "plan-01ac05cadb7ed72a1e5cb99b2193bba45930ead8d5466ab167bd94fb0716ff55",
+        "plan_kind": "DISCOVERED_LINKS",
+        "scope": {
+          "allowed_host": "congbao.chinhphu.vn",
+          "allowed_path_prefixes": [
+            "/"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "CONGBAO-CHINHPHU",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": "cap-e4eeb2be56740761b50c3b1d2ecd225fa69d821988994e5bcbd4bde381d24293",
+            "step_index": 0,
+            "step_kind": "RECORD_FOLLOWUP",
+            "url": "https://congbao.chinhphu.vn/van-ban-dang-cong-bao/chinh-phu-c1.htm"
+          }
+        ]
+      }
+    },
+    {
+      "checkpoint": {
+        "blocked": {},
+        "completed": {
+          "0": "cap-ad9255e85d0bfe14c51db34a24a04bc7002c849bdceae11ec9731c691422e428"
+        },
+        "plan_id": "plan-d0d8ea03663a6a4fbdecc3e6407cfa85e16bd32894db8812d14d24c3a66ac5d6",
+        "scope_id": "CONGBAO-CHINHPHU",
+        "updated_at": null
+      },
+      "pending_steps": [],
+      "plan": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 1,
+        "notes": [],
+        "plan_id": "plan-d0d8ea03663a6a4fbdecc3e6407cfa85e16bd32894db8812d14d24c3a66ac5d6",
+        "plan_kind": "DISCOVERED_LINKS",
+        "scope": {
+          "allowed_host": "congbao.chinhphu.vn",
+          "allowed_path_prefixes": [
+            "/"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "CONGBAO-CHINHPHU",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": "cap-5871999005b64af48a43afd57a647322ad3e95a61375501e0e2edf730d2647f3",
+            "step_index": 0,
+            "step_kind": "RECORD_FOLLOWUP",
+            "url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-347-2026-nd-cp-470418.htm"
+          }
+        ]
+      }
+    },
+    {
+      "checkpoint": {
+        "blocked": {},
+        "completed": {},
+        "plan_id": "plan-9596240aa80adbf77ae748febceead4e753c5651e981e155d0d7402514054b5b",
+        "scope_id": "CONGBAO-CDN-ATTACHMENTS",
+        "updated_at": null
+      },
+      "pending_steps": [
+        {
+          "discovered_from": "cap-ad9255e85d0bfe14c51db34a24a04bc7002c849bdceae11ec9731c691422e428",
+          "step_index": 0,
+          "step_kind": "ATTACHMENT",
+          "url": "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAaHMpvrqWaeHuYm7lW3HNfzTzww8Myg35dDL_fJB4izwzvidWXcCrlzhmFuPbXeRzTpddo2mZmQOQIee7FdHvy1JanwRWBaMQnwWTqfXgVW9bdS3jWN_J9X-tWQ7LhMkTQ~~&file_name=2026_516_347%2f2026%2fN%c4%90-CP.docx"
+        },
+        {
+          "discovered_from": "cap-ad9255e85d0bfe14c51db34a24a04bc7002c849bdceae11ec9731c691422e428",
+          "step_index": 1,
+          "step_kind": "ATTACHMENT",
+          "url": "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAaHMpvrqWaeHuYm7lW3HNfzTzww8Myg35dDL_fJB4izwzvidWXcCrlzhmFuPbXeRzYFghoz_c3pO_3Dr85MwR3U7vQtBEcW2jcW1SdNLD_1wbm4-LCw85HWpeqMTK_voxw~~&file_name=2026_516_347%2f2026%2fN%c4%90-CP.pdf"
+        }
+      ],
+      "plan": {
+        "max_bytes_per_capture": 8388608,
+        "max_captures": 2,
+        "notes": [
+          "DISCOVERED_NOT_DOWNLOADED: bounded proof records explicit official attachment URLs only; no bulk/large-file download performed"
+        ],
+        "plan_id": "plan-9596240aa80adbf77ae748febceead4e753c5651e981e155d0d7402514054b5b",
+        "plan_kind": "ATTACHMENT_DISCOVERY",
+        "scope": {
+          "allowed_host": "g7.cdnchinhphu.vn",
+          "allowed_path_prefixes": [
+            "/api/download/"
+          ],
+          "allowed_schemes": [
+            "https"
+          ],
+          "scope_id": "CONGBAO-CDN-ATTACHMENTS",
+          "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+        },
+        "steps": [
+          {
+            "discovered_from": "cap-ad9255e85d0bfe14c51db34a24a04bc7002c849bdceae11ec9731c691422e428",
+            "step_index": 0,
+            "step_kind": "ATTACHMENT",
+            "url": "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAaHMpvrqWaeHuYm7lW3HNfzTzww8Myg35dDL_fJB4izwzvidWXcCrlzhmFuPbXeRzTpddo2mZmQOQIee7FdHvy1JanwRWBaMQnwWTqfXgVW9bdS3jWN_J9X-tWQ7LhMkTQ~~&file_name=2026_516_347%2f2026%2fN%c4%90-CP.docx"
+          },
+          {
+            "discovered_from": "cap-ad9255e85d0bfe14c51db34a24a04bc7002c849bdceae11ec9731c691422e428",
+            "step_index": 1,
+            "step_kind": "ATTACHMENT",
+            "url": "https://g7.cdnchinhphu.vn/api/download/stream?Url=tm-8mq6BhNw0NbrKRhTDAaHMpvrqWaeHuYm7lW3HNfzTzww8Myg35dDL_fJB4izwzvidWXcCrlzhmFuPbXeRzYFghoz_c3pO_3Dr85MwR3U7vQtBEcW2jcW1SdNLD_1wbm4-LCw85HWpeqMTK_voxw~~&file_name=2026_516_347%2f2026%2fN%c4%90-CP.pdf"
+          }
+        ]
+      }
+    }
+  ],
+  "related_capability_ids": [
+    "web.browser.evidence",
+    "web.js.reverse",
+    "web.endpoint.discovery",
+    "web.public.reconstruction"
+  ],
+  "retrieved_session_window_utc_approx": "2026-09-23T02:11Z/2026-09-23T02:58Z",
+  "safety": {
+    "ATTACHMENTS_DOWNLOADED": false,
+    "CREDENTIALS_OR_COOKIES_USED": false,
+    "FULL_CRAWL_PERFORMED": false,
+    "ID_BRUTE_FORCE": false,
+    "LOGIN_WAF_CAPTCHA_BYPASS": false,
+    "PROXY_ROTATION": false,
+    "PUBLIC_UNAUTHENTICATED_CONTENT_ONLY": true,
+    "RAW_EVIDENCE_VS_DERIVED_TEXT_VS_INTERPRETATION_SEPARATED": true,
+    "ROBOTS_DISALLOWED_SURFACES_TOUCHED": false,
+    "SERVER_REDACTED_DATA_REPRESENTED_AS_ORIGIN_TRUTH": false,
+    "TLS_WEAKENED": false
+  },
+  "schema": "p2p-web-capture-runtime/1",
+  "scopes": {
+    "CONGBAO": {
+      "allowed_host": "congbao.chinhphu.vn",
+      "allowed_path_prefixes": [
+        "/"
+      ],
+      "allowed_schemes": [
+        "https"
+      ],
+      "scope_id": "CONGBAO-CHINHPHU",
+      "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+    },
+    "CONGBAO_CDN": {
+      "allowed_host": "g7.cdnchinhphu.vn",
+      "allowed_path_prefixes": [
+        "/api/download/"
+      ],
+      "allowed_schemes": [
+        "https"
+      ],
+      "scope_id": "CONGBAO-CDN-ATTACHMENTS",
+      "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+    },
+    "VBPL": {
+      "allowed_host": "vbpl.vn",
+      "allowed_path_prefixes": [
+        "/"
+      ],
+      "allowed_schemes": [
+        "https"
+      ],
+      "scope_id": "VBPL-PUBLIC-PORTAL",
+      "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+    },
+    "VIMDA": {
+      "allowed_host": "vimda.moh.gov.vn",
+      "allowed_path_prefixes": [
+        "/web/guest/van-ban-cong-bo"
+      ],
+      "allowed_schemes": [
+        "https"
+      ],
+      "scope_id": "VIMDA-VAN-BAN-CONG-BO",
+      "task_authority": "ISSUE-241-BOUNDED-MULTI-SITE-PROOF"
+    }
+  },
+  "site_proofs": {
+    "CONGBAO_PROOF": {
+      "explicit_official_attachment_discovery": "PASS (DOCX + PDF stream URLs on g7.cdnchinhphu.vn discovered from BOTH listing and record captures; not downloaded)",
+      "index_capture": "PASS (home chunk 3/5 excerpt)",
+      "record_html_capture": "PASS (agency listing chunk 4/10 excerpt -> record page chunk 0/5 excerpt, full provenance chain)",
+      "relation_links": "PASS (Công báo issue links 516-47465.htm and 470418/68388.htm discovered)",
+      "verdict": "PASS"
+    },
+    "VBPL_PROOF": {
+      "browser_lane": "NOT_AVAILABLE_KNOWN_DEAD_END_CONFIGURATION_NOT_RETRIED",
+      "document_detail_capture": "PASS_AS_TEXT_TRANSPORT_SHELL (loader shell captured; document body JS-gated)",
+      "document_url_discovery": "PASS (4 chi-tiet URLs incl. UUID-slug identities parsed from stored sitemap excerpt by PROJECT-OWNED parser)",
+      "relation_followup_links": "NOT_EXPOSED_VIA_TEXT_TRANSPORT (JS-gated; /api/ disallowed by robots and respected)",
+      "sitemap_index_capture": "PASS (robots.txt -> sitemap.xml -> sitemap/0.xml full + sitemap/1.xml chunk-0 excerpt)",
+      "verdict": "PARTIAL"
+    },
+    "VIMDA_PROOF": {
+      "attachment_history_url_discovery": "NOT_REACHED (requires record detail page)",
+      "listing_index_capture": "PASS (stored chunk excerpts 1/7 and 6/7, marked EXCERPT)",
+      "no_crawl_no_enumeration": true,
+      "pagination_discovery": "PASS (cur=2 next-page and cur=12020 last-page links discovered verbatim; bounded 2-page plan built)",
+      "record_detail_capture": "BLOCKED (Arena fetch proxy fails query-string URLs; session-wide proxy degradation afterwards; 5 attempts logged)",
+      "verdict": "PARTIAL"
+    }
+  },
+  "task_id": "P2P_PUBLIC_WEB_SCRAPE_RUNTIME_01",
+  "transport_log": {
+    "failed_transport_attempt_breakdown": {
+      "operator_malformed_proxy_url_fetches": 4,
+      "post_degradation_control_failures": 3,
+      "vimda_query_url_signature_failures": 5
+    },
+    "failed_transport_attempts": 12,
+    "lanes": {
+      "EXECUTOR_BROWSER": "NOT_PROVIDED: optional lane only; known dead-end browser configuration from Issue #241 deliberately not retried.",
+      "EXECUTOR_TEXT": "USED: Arena native public fetch_page markdown text surface; http_status/content_type unobserved -> null.",
+      "PLAIN_HTTP": "UNAVAILABLE_IN_ARENA_SANDBOX: egress restricted to allowlisted hosts (api.github.com reachable; vbpl.vn TLS handshake blocked). Exercised offline in tests via loopback fixture."
+    },
+    "policy_order": [
+      "PLAIN_HTTP",
+      "EXECUTOR_TEXT",
+      "EXECUTOR_BROWSER"
+    ],
+    "successful_live_page_fetches": 16
+  }
+}

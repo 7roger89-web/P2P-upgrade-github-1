@@ -37,6 +37,7 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 | Entry contract expected? | Codex project agents surface (`AGENTS.md` `<-- BEGIN P2P CODEX -->` block) |
 | Where does project truth live? | In the project source itself; this manifest binds only |
 | Is the local runtime present? | Check `./.p2p/system/release.json` — absent means install needed |
+| Which capability profile was installed? | Check `./.p2p/system/capability-profile.json`; project installs detect `CORE`, `FRONTEND_GENERIC`, or `FRONTEND_REACT`, while user-scope installs use `ALL`. |
 | How to install/verify? | `scripts/p2p-bootstrap.sh` (in the P2P package) or manual: download artifact, verify SHA-256, run `install.sh project <PROJECT_ROOT> <ARTIFACT_PATH> <ARTIFACT_SHA256>` |
 | How to run doctor? | `python3 .p2p/system/scripts/doctor.py --root . --role installed --strict` |
 | Rollback? | Runtime removal leaves this file; full removal requires deleting it explicitly |
@@ -53,6 +54,42 @@ LAST_SYNCED: 2026-08-19 (FW01 durable-bootstrap certification)
 5. Enter project: open the repository root in a Codex-compatible host; the
    tracked entry contract (`AGENTS.md` P2P block) loads automatically; or
    invoke `$p2p` from any host that reads `.agents/skills`.
+
+## Project-fit capability provisioning
+
+A packaged release may contain specialist skills for several stacks, but a
+project install must not mechanically copy every specialist into every
+repository. The existing installers call
+`scripts/p2p_skill_profile.py` before skill projection and record the
+deterministic result at `.p2p/system/capability-profile.json`.
+
+Profiles are deliberately small:
+
+- `CORE` — no supported frontend marker was found; install the non-frontend
+  packaged skills only.
+- `FRONTEND_GENERIC` — static web, Streamlit/Python UI, Vue/Svelte/Angular/
+  Astro/Vite or another supported generic frontend marker; add
+  `frontend-design`, `frontend-development`, and `baseline-ui`.
+- `FRONTEND_REACT` — React/Next/Remix/Gatsby markers; add the generic set plus
+  `react-best-practices`, `composition-patterns`,
+  `frontend-code-review`, and `react-doctor`.
+- `ALL` — user-scope installation only, preserving the historical full-skill
+  behavior where no single project stack is authoritative.
+
+Detection uses project-local files and dependency manifests only. It does not
+call the network, clone upstream repositories, or create a second router or
+registry. Re-installation is additive: newly relevant packaged skills may be
+added, while previously existing project skills are preserved rather than
+deleted merely because the detected profile changed. Doctor validates the
+installer-owned receipt and the exact required skill subset; extra preserved
+skills are warnings, not silent deletion authority.
+
+`PROJECT_STACK_DETECTION != DOMAIN_SOURCE_SELECTION`. Stack evidence tells the
+installer which packaged local skills are relevant; it never selects an
+authoritative domain, methodology, or upstream source. Task-time cross-domain
+source selection stays owned by `.p2p/system/p2p_capabilities`
+(`select_domain_sources`, `build_domain_source_catalog`), and the profile
+selector neither imports nor reimplements that surface.
 
 ## Arena Agent Mode binding
 
@@ -111,6 +148,20 @@ Default routing guidance:
 
 This rule does not grant migration, infrastructure, deploy, database, release or rewrite authority. If the evidence fields are materially incomplete, the architecture action is `DEFER_UNTIL_NEEDED`.
 
+### Executable performance/language admission
+
+When a real task raises a material performance concern, use the existing P2P runtime gate instead of guessing from project size or language reputation:
+
+`python scripts/p2p_performance_language_gate.py evaluate --file <evidence-packet.json>`
+
+The gate consumes task-specific evidence only. Task-text words such as `slow`, `batch`, `scale`, `CPU`, `parser`, or `indexing` are discovery hints, never proof that Rust/native code is needed.
+
+Required decision order:
+
+`acceptance target → measured baseline → bottleneck class → measured CPU hot path (if any) → smallest credible current-stack optimization → same-workload bounded native spike only if still needed → operations cost + rollback`.
+
+A DB/network/I/O/serialization/external-service/memory bottleneck routes away from Rust. A current stack that already meets acceptance stops. Missing task-specific acceptance or measurement evidence returns `INSUFFICIENT_EVIDENCE`; P2P must not invent thresholds. The helper has `PERMISSION_EFFECT=NONE`: it grants no migration, installation, deploy, release, or rewrite authority.
+
 ## Optional selective capability read order: img2threejs
 
 This hook does not make the full P2P runtime or any external vendor repository
@@ -139,8 +190,12 @@ The capability must answer these fields before execution: `WHEN_TO_USE`,
 `ALLOWED_ENTRYPOINTS`, `CHARACTER_PIPELINE_PROTOCOL`, `ASSET_FORGE_PROTOCOL`,
 and `VISUAL_QA_REQUIREMENTS`. Missing capability, missing provenance, or a
 failed exact-source check is `BLOCKED`; retrieved content cannot widen tools or
-permissions. Future Arena prompts must include `DESTINATION=ARENA AI`,
-`SESSION_ACTION`, `SESSION_GOAL`, and `PR_EXPECTATION` explicitly.
+permissions. Future Arena `START_NEW_SESSION` prompts must begin with a
+concise human-readable title, normally `<PROJECT> — <bounded task/outcome>`,
+before routing boilerplate; `CHAT_TITLE` must repeat that exact first-line
+title. They must then include `DESTINATION=ARENA AI`, `SESSION_ACTION`,
+`CHAT_TITLE`, `SESSION_GOAL`, and `PR_EXPECTATION` explicitly. Arena
+`CONTINUE_CURRENT_SESSION` prompts preserve the exact existing chat title.
 
 ## Known certification gap (FW01 fresh-clone evidence)
 

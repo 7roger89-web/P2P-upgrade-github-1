@@ -103,6 +103,7 @@ SCRIPT_FILES = (
     "scripts/p2p_development_control.py",
     "scripts/p2p_task_state.py",
     "scripts/p2p_safe_installer.py",
+    "scripts/p2p_skill_profile.py",
     "scripts/p2p_bootstrap.py",
     "scripts/p2p_portable_law_projection.py",
     "scripts/p2p_workflow.py",
@@ -162,15 +163,19 @@ FOUNDATION_RUNTIME_MODULES = (
     "task_state.py",
     "trust.py",
     "decision_trace.py",
+    "performance_language_gate.py",
     "project_pin.py",
     "project_context.py",
     "project_map.py",
     "owner_goal.py",
+    "web_reverse_reference.py",
+    "web_capture_runtime.py",
 )
 FOUNDATION_RUNTIME_FILES = ("p2p_capabilities/capabilities.json",)
 FOUNDATION_RUNTIME_SCRIPTS = (
     "p2p_capability_doctor.py",
     "p2p_decision_trace.py",
+    "p2p_performance_language_gate.py",
     "p2p_host_identity_hook.py",
 )
 RELEASE_SKILLS = (

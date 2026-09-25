@@ -90,12 +90,18 @@ ONE ARENA CHAT SESSION
     -> ONE PR
 ```
 
-Arena conversation state is ephemeral; GitHub project state is canonical. The
-Owner-facing prompt must state `DESTINATION=ARENA AI`, an explicit
-`SESSION_ACTION`, `SESSION_GOAL`, and `PR_EXPECTATION`. Continue the current
-session only for the same open PR and healthy context; start a new one for a
-new PR or goal, merged/closed PR, context exhaustion, or persistent tool
-confusion. Prompt count is not a rotation trigger.
+Arena conversation state is ephemeral; GitHub project state is canonical. For
+`START_NEW_SESSION`, the Owner-facing prompt must start with one concise,
+human-readable first-line task title (normally `<PROJECT> — <bounded task/outcome>`)
+before any routing boilerplate, and `CHAT_TITLE` must repeat that exact title.
+Do not start a new Arena prompt with `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, a
+code fence, or a generic `P2P` prefix. After the title, the prompt must state
+`DESTINATION=ARENA AI`, an explicit `SESSION_ACTION`, `CHAT_TITLE`,
+`SESSION_GOAL`, and `PR_EXPECTATION`. For `CONTINUE_CURRENT_SESSION`, preserve
+the exact existing chat title. Continue the current session only for the same
+open PR and healthy context; start a new one for a new PR or goal, merged/closed
+PR, context exhaustion, or persistent tool confusion. Prompt count is not a
+rotation trigger.
 
 Arena executors also discover the single canonical operations notebook.
 For Supreme Law authority,

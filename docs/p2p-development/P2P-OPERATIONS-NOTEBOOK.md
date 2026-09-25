@@ -105,6 +105,10 @@ EXECUTOR_BEFORE_IMPLEMENTATION => READ_P2P_SUPREME_OPERATING_LAW_V1
 REVIEWER_OR_SUPERVISOR_BEFORE_REVIEW => READ_P2P_SUPREME_OPERATING_LAW_V1
 MODEL_SWITCH_OR_SESSION_RESET => READ_P2P_SUPREME_OPERATING_LAW_V1_AGAIN
 NO_SUBSTANTIVE_WORK_BEFORE_VALID_LAW_CONTEXT = YES
+ACTOR_OWN_LAW_READ_RECEIPT_MANDATORY = YES
+PARENT_SELF_LAW_PREFLIGHT != EXECUTOR_LAW_PREFLIGHT
+CONTROL_TOWER_SELF_LAW_RECEIPT != EXECUTOR_LAW_RECEIPT
+WRITER_RECEIPT != SUPERVISOR_RECEIPT
 ```
 
 This preflight applies to every P2P-managed project and every P2P-managed
@@ -114,6 +118,34 @@ reasoning, planning, prompt construction, implementation, review, testing, or
 release work, the actor must first establish a valid Supreme Law context.
 This requirement concerns the operating law used to make decisions; it does
 not require disclosure, storage, or narration of private chain-of-thought.
+
+Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool
+session) must establish and visibly expose its OWN Supreme Law read receipt before
+its first substantive work unit or operational response:
+
+```text
+LAW_CHECK=PASS | SOURCE=<actual source> | SOURCE_SHA256=<canonical source content sha256>
+```
+or:
+```text
+LAW_CHECK=BLOCKED | REASON=<reason>
+```
+
+Rules for the actor self-read receipt:
+- Only an actually performed read counts. Inferring, guessing, copying, or
+  assuming a read from chat memory is forbidden.
+- `PARENT_SELF_LAW_PREFLIGHT != EXECUTOR_LAW_PREFLIGHT`.
+  `CONTROL_TOWER_SELF_LAW_RECEIPT != EXECUTOR_LAW_RECEIPT`.
+  `WRITER_RECEIPT != SUPERVISOR_RECEIPT`.
+  One actor cannot copy or inherit another actor's receipt.
+- Law source precedence remains strict: reachable canonical > installed
+  projection > fresh portable projection > inline capsule.
+- A portable projection receipt (`LOCAL_PORTABLE`) can yield `LAW_CHECK=PASS` only
+  when bound to the recorded `SOURCE_CONTENT_SHA256` matching the canonical
+  notebook content SHA-256. A stale portable copy cannot produce `PASS`.
+- `LAW_CHECK=BLOCKED` requires immediate cessation of substantive work.
+- The receipt is verifiable preflight evidence only; it grants no execution
+  authority, permission widening, or acceptance waiver.
 
 A valid law context is, in precedence order: the reachable active canonical
 notebook; an up-to-date installed projection of that notebook; an up-to-date
@@ -184,10 +216,88 @@ serialize a fresh compact `SUPREME_LAW_CAPSULE` for that handoff. The
 repo-scoped executor must then report `P2P_LAW_SOURCE=INLINE_CAPSULE`; it must
 not treat a known-stale portable file as current law.
 
+Before delegating substantive work to a remote executor, the parent Control
+Tower or prompt writer must make target-law freshness visible with a compact
+receipt:
+
+```text
+TARGET_LAW_FRESHNESS=CURRENT | REFRESHED | INLINE | BLOCKED
+CANONICAL_LAW_SHA256=<canonical content sha256>
+TARGET_LAW_SHA256=<target projection content sha256>
+```
+
+Interpretation:
+- `CURRENT` — target repository portable projection matches active canonical source SHA-256.
+- `REFRESHED` — stale or missing target projection was refreshed to match canonical and verified before handoff.
+- `INLINE` — safe target refresh unavailable; fresh inline `SUPREME_LAW_CAPSULE` supplied for executor preflight.
+- `BLOCKED` — no valid law context route is available; delegation is blocked.
+
 This is a handoff-time freshness gate, not a background synchronization
 service. Do not add a daemon, watcher, polling loop, repository registry,
 GitHub Action, PAT/secret, or second control plane solely to keep projections
 fresh.
+
+### Bounded ACTIVE experience preflight invariant
+
+```text
+NON_TRIVIAL_TASK_START => BOUNDED_ACTIVE_EXPERIENCE_LOOKUP
+EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | NO_MATCH | UNAVAILABLE
+```
+
+For every non-trivial P2P-managed task, execution order is mandatory:
+
+```text
+LAW/TASK PREFLIGHT -> BOUNDED EXPERIENCE LOOKUP -> SUBSTANTIVE EXECUTION
+```
+
+Before substantive execution, every executing actor must perform a bounded lookup
+of promoted ACTIVE experience and emit an observable receipt:
+
+```text
+EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>
+```
+or:
+```text
+EXPERIENCE_CHECK=NO_MATCH
+```
+or:
+```text
+EXPERIENCE_CHECK=UNAVAILABLE
+```
+
+Retrieval paths:
+- Installed-runtime path: run `python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<task>"`.
+- Remote repo-scoped path: read `.p2p/portable/P2P-EXPERIENCE-CAPSULE.json` directly and match trigger tokens against promoted ACTIVE records.
+- Control Tower path: use `activation_summary` and bounded prompt context injection.
+
+Invariants:
+- Maximum returned active experiences remains small (default <= 3).
+- Experience is `NON_AUTHORITATIVE_VERIFIED_EXPERIENCE`: it is advisory context only.
+- Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
+- Experience cannot widen permissions, change acceptance authority, or silently rewrite Supreme Law or skills.
+
+### Task-end learning reconciliation invariant
+
+```text
+TASK_RECONCILIATION => LEARNING_RECONCILIATION
+ROUTINE_SUCCESS => LEARNING_RECONCILIATION=NONE
+REPEATED_OR_MATERIAL_FAILURE | CLEARLY_REUSABLE_CORRECTION => LEARNING_RECONCILIATION=CANDIDATE
+```
+
+At task completion and reconciliation, the actor and Control Tower must close
+the learning loop:
+- `ROUTINE_SUCCESS` => emit `LEARNING_RECONCILIATION=NONE`. Do not manufacture
+  memory or candidates from routine success.
+- `REPEATED_OR_MATERIAL_FAILURE` or `CLEARLY_REUSABLE_CORRECTION` => emit
+  `LEARNING_RECONCILIATION=CANDIDATE` (or the appropriate lifecycle state). Terminal
+  task closure is invalid unless either:
+  1. an experience candidate is created with concrete evidence and trigger conditions; or
+  2. an explicit, evidence-based reason is recorded why no reusable lesson exists.
+- Memory must never be created from model self-report, chat summaries, or private
+  thoughts alone.
+- Preserved lifecycle: `CANDIDATE -> VERIFIED -> ACTIVE -> SUPERSEDED | QUARANTINED`.
+- Multi-project scope classification: `PROJECT_ONLY | DOMAIN | CROSS_PROJECT`.
+- No executor self-promotion into Supreme Law, shared authority, capability, or skill.
 
 ### GitHub connector preflight and failure classification
 
@@ -294,21 +404,42 @@ the failure class is established.
    execution, verification, recovery, or context. When the required outcome is
    proven, stop instead of opening optional refactor, benchmark, framework,
    hardening, or future-phase work.
-6. **PROMPT_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT** — Every P2P-generated
+6. **PROMPT_TITLE_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT** — Every P2P-generated
    operational prompt handed to the beginner Owner for execution in another
    tool/chat must state the target project/workstream, destination/tool,
    `CHAT_MODE=NEW_CHAT` or `CHAT_MODE=SAME_CHAT`, the exact existing chat name
    when continuing (or a recognizable `CHAT_TITLE` when new), and the role where
-   applicable. The same prompt must include a compact fresh project-plan
-   checkpoint anchored to durable state: `PLAN_REFERENCE` (or
-   `NO_FORMAL_PLAN`), what is already completed, the current checkpoint,
-   blocker/Owner Gate if any, and the single next bounded step. Control Tower
-   refreshes this from the active project plan/task state before issuing the
-   prompt; chat memory may supplement but never override durable state. The
-   beginner must never infer where to paste a prompt or reconstruct project
-   progress from old chats. Do not invent a plan when none exists. This compact
-   handoff checkpoint is not continuous progress narration and does not override
+   applicable. For Arena, and for any destination where a new conversation title
+   is derived from the opening prompt text, `NEW_CHAT` prompts must follow
+   `ARENA_CHAT_TITLE_FIRST_LINE_V1`: the **first nonblank line** is one concise,
+   human-readable task title, normally `<PROJECT> — <bounded task/outcome>`.
+   Front-load the distinguishing words so the title remains useful when the UI
+   truncates it. That first line must not be routing boilerplate such as
+   `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P`
+   prefix. Immediately after the title, serialize the normal routing metadata,
+   including `GỬI CHO: <destination>` (or the destination's equivalent),
+   `PROJECT=`, `CHAT_MODE=`, and for `NEW_CHAT`,
+   `CHAT_TITLE=<exact same human-readable title>`. For `SAME_CHAT`, the exact
+   existing `CHAT_TITLE` remains authoritative and must not be silently renamed.
+   The same prompt must include a compact fresh project-plan checkpoint anchored
+   to durable state: `PLAN_REFERENCE` (or `NO_FORMAL_PLAN`), what is already
+   completed, the current checkpoint, blocker/Owner Gate if any, and the single
+   next bounded step. Control Tower refreshes this from the active project
+   plan/task state before issuing the prompt; chat memory may supplement but
+   never override durable state. The beginner must never infer where to paste a
+   prompt, manually rename a newly created Arena chat merely to make the sidebar
+   intelligible, or reconstruct project progress from old chats. Do not invent a
+   plan when none exists. This compact handoff checkpoint is not continuous
+   progress narration and does not override
    `PROGRESS_REPORTING=EXCEPTIONS_ONLY`.
+
+   ```text
+   ARENA_CHAT_TITLE_FIRST_LINE_V1=YES
+   NEW_CHAT_FIRST_NONBLANK_LINE=<PROJECT> — <bounded task/outcome>
+   ROUTING_BOILERPLATE_FIRST_LINE=NO
+   NEW_CHAT_CHAT_TITLE_MUST_EQUAL_FIRST_LINE=YES
+   ```
+
 7. **ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT** — For non-trivial P2P
    reasoning, use analytical scepticism rather than agreement-seeking. Deconstruct
    the Owner goal, acceptance conditions, requirements, assumptions, evidence,
@@ -336,11 +467,23 @@ the failure class is established.
    may operate at expert depth, but Owner-facing explanation must remain
    beginner-clear; Vietnamese is the default Owner-facing language unless the
    Owner requests otherwise or the external artifact/audience requires another
-   language. Owner-facing Control Tower communication should be direct,
-   informal, adaptive, and willing to criticize weak reasoning without
-   sugar-coating; criticism targets the decision/design/work, not the Owner, and
-   never overrides safety or audience requirements. The purpose is to increase
-   the Owner's intellectual autonomy, not to increase complexity for its own sake.
+   language. `EXPERT_INTERNAL_DEPTH != EXPERT_OWNER_WORDING`: when a technical
+   term is necessary, explain its practical meaning in ordinary Vietnamese on
+   first use. A material Owner-facing status update or terminal summary must
+   lead with what happened, whether the work is actually done / not done /
+   blocked, why that matters, and the single Owner action now; raw technical
+   fields may follow as supporting detail. Never make the beginner decode a
+   ReturnPacket, SHA, PR status, runtime label, gate name, or other jargon to
+   discover the practical outcome. `NOT_RUN != FAIL`,
+   `NOT_OBSERVED != NO`, and `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`;
+   unperformed checks must be reported as not verified rather than as observed
+   failures. Full beginner-facing wording rules are defined by
+   `P2P_BEGINNER_OPERATIONS_UX_V1 > RULE 21 — BEGINNER_PLAIN_LANGUAGE_FIRST`.
+   Owner-facing Control Tower communication should be direct, informal,
+   adaptive, and willing to criticize weak reasoning without sugar-coating;
+   criticism targets the decision/design/work, not the Owner, and never
+   overrides safety or audience requirements. The purpose is to increase the
+   Owner's intellectual autonomy, not to increase complexity for its own sake.
 8. **TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY** — Before delegating or executing a
    non-trivial P2P task, bind the Owner outcome to the smallest useful task
    contract: objective, in-scope and out-of-scope boundaries, real affected
@@ -821,6 +964,69 @@ capsule required by the preflight. Owner-facing rationale and terminal
 challenge summaries remain Control Tower responsibilities and need not be paid
 for again inside a Codex/Astra implementation turn.
 
+### GLOBAL_COMMUNITY_RESEARCH_V1 — multilingual, cross-community web research
+
+Use this rule when the Owner explicitly asks for broad internet/community
+research, worldwide user experience, forum sentiment, or "search beyond the
+usual places", or when community evidence materially affects a recommendation.
+
+Canonical law:
+
+```text
+INTERNET != REDDIT
+ENGLISH_WEB != GLOBAL_WEB
+COUNTRY_WHITELIST = FORBIDDEN
+FORUM_ANECDOTE != AUTHORITATIVE_FACT
+PRIMARY_SOURCE_FOR_FACTS + COMMUNITY_SOURCE_FOR_LIVED_EXPERIENCE
+SEARCH_DIVERSITY_IS_ADAPTIVE_NOT_CEREMONIAL
+```
+
+Research behavior:
+
+1. **Start from the question, not a country list.** Discover relevant technical
+   communities dynamically. Do not hard-code China/Japan/Russia/Reddit or any
+   fixed geography as the default research universe.
+2. **Diversify across independent community ecosystems.** When broad community
+   research is materially useful, seek evidence from multiple community types
+   and language/geography clusters: technical forums, developer communities,
+   specialist boards, local-language communities, project issue/discussion
+   surfaces, and practitioner writeups.
+3. **Search in local languages when useful.** Translate the concept, not merely
+   the English keywords. Preserve local terminology and inspect the original
+   source; machine translation is a reading aid, not evidence of what the
+   source literally said.
+4. **Avoid platform monoculture.** If the useful results are dominated by one
+   platform, one language, one country, or mirrors/reposts of the same claim,
+   intentionally rotate the search surface before concluding that community
+   sentiment is global.
+5. **Separate evidence roles.** Official docs, specifications, primary research,
+   source code, and direct measurements support factual/capability claims.
+   Forums and community posts primarily support lived experience, failure
+   patterns, workarounds, usability, and emerging practice unless independently
+   corroborated.
+6. **Track independence, not raw link count.** Ten reposts of one claim are one
+   evidence lineage. Prefer fewer independent ecosystems over many near-duplicate
+   links.
+7. **Stop when marginal information falls.** Do not force a country quota or
+   collect decorative sources after independent perspectives converge and the
+   bounded decision is adequately informed.
+
+For a broad community research result, the final synthesis should make source
+diversity visible without turning the answer into a bibliography dump:
+
+```text
+COMMUNITY_ECOSYSTEMS_SAMPLED=<brief>
+LANGUAGE_OR_REGION_SPREAD=<brief>
+PRIMARY_EVIDENCE=<brief>
+COMMUNITY_SIGNALS=<brief>
+CONTRADICTIONS=<brief>
+CONFIDENCE=<HIGH|MEDIUM|LOW>
+```
+
+This rule does not lower evidence standards. "People on a forum said it" is
+never a substitute for direct product documentation, verified runtime evidence,
+or primary research when those are available.
+
 ### Anti-overengineering decision
 
 Canonical principle:
@@ -949,11 +1155,26 @@ The beginner must never infer where a prompt should go.
 
 ### RULE 02 — CHAT_TITLE_REQUIRED
 
-Every new execution chat gets a recognizable title. Default shape:
+Every new execution chat gets a recognizable title. For Arena `NEW_CHAT`,
+the title must also be the first nonblank line of the prompt so the generated
+conversation is useful in the Arena sidebar without manual renaming.
+
+Default Arena shape:
 
 ```text
-PROJECT | PR-or-TASK | ROLE | SHORT-GOAL
+PROJECT — SHORT-GOAL
+
+GỬI CHO: ARENA AI
+PROJECT=PROJECT
+CHAT_MODE=NEW_CHAT
+CHAT_TITLE=PROJECT — SHORT-GOAL
 ```
+
+Front-load the distinguishing project/task words. Do not put `GỬI CHO:`,
+`DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P` prefix on the
+first line. Other destinations may retain their verified naming convention
+when they expose an explicit title field or do not derive the title from the
+opening prompt.
 
 ### RULE 03 — SAME_CHAT_MUST_NAME_CHAT
 
@@ -1462,6 +1683,461 @@ This rule is an independent P2P operational abstraction. It does not import an
 external instruction architecture, mandatory per-turn metadata system,
 complexity scoring formula, autonomous baton loop, or monolithic prompt core.
 
+
+#### MODEL_CANARY_GATE_V1 — hidden/random executor session quality
+
+This gate is a bounded application of RULE 19. It measures whether the current
+execution session is trustworthy enough for the intended work. It is NOT a
+model-identification benchmark and must not create a new router, benchmark
+service, score database, or permanent harness.
+
+Canonical distinctions:
+
+```text
+SESSION_QUALITY != MODEL_IDENTITY
+MODEL_SELF_REPORT != MODEL_IDENTITY_EVIDENCE
+SELF_SCORE_IS_NOT_EVIDENCE
+FIXED_PELICAN_PROMPT != MODEL_RANKING
+CANARY_PASS != PERMANENT_EXECUTOR_CERTIFICATION
+```
+
+Use `MODEL_CANARY_GATE_V1` only when ALL are true:
+
+- the executor/model is hidden, random, newly sampled, or otherwise materially
+  uncertain for the current session;
+- the task is medium/high risk or materially expensive enough that a weak
+  session would cause meaningful rework; and
+- session quality has not already been established by representative evidence
+  under materially equivalent conditions.
+
+Skip the gate for low-risk/mechanical work, already-proven session conditions,
+or when the real bounded task itself is already the cheapest representative
+probe.
+
+Probe discipline:
+
+1. Default to FAST_CANARY: ONE task-representative probe only. Prefer the first
+   read-only or disposable slice of the real task itself over a synthetic
+   benchmark. The preferred pattern is:
+   `REAL_TASK_FIRST_SLICE = CANARY`.
+2. Escalate to a second or third tiny probe only when the first probe is
+   ambiguous, contradictory, materially incomplete, or the intended task is
+   high-risk enough that one probe is not representative. Never expand merely
+   to make the canary look thorough.
+3. For coding work, evidence should come from real tool use such as a disposable
+   scratch edit, focused test, diff inspection, or recovery from a genuine
+   command/tool error. Do not create durable commits/PRs merely for the canary.
+4. For visual/spatial work, an animal × vehicle SVG variant may be used as ONE
+   probe when that capability is relevant. Randomize the animal/vehicle pair;
+   the canonical "pelican riding a bicycle" prompt alone is saturated and must
+   never be treated as a general model ranking.
+5. Judge externally observable evidence: correctness, constraint adherence,
+   actual tool receipts, render/test result, self-verification, recovery, and
+   unnecessary scope expansion. The tested model must not grade itself.
+6. Do not infer an exact model name, provider, or reasoning level from writing
+   style, output quality, token use, or tool behavior. Arena may also switch the
+   underlying model to recover a failing session; the canary therefore
+   classifies the observed SESSION/HARNESS capability, not a stable hidden
+   model identity.
+
+
+FAST_CANARY executor return shape:
+
+```text
+CANARY_EVIDENCE_PACKET_V1
+P2P_LAW_SOURCE=<actual source read>
+CURRENT_STATE=<pinned repo/task state>
+FACTS=<max 5 task-relevant observed facts>
+DECISIVE_CHECK=<one representative real check>
+CHECK_RESULT=<actual result/exit/status>
+ERRORS_ENCOUNTERED=<brief or NONE>
+RECOVERY_ACTIONS=<brief or NONE>
+DURABLE_MUTATION_CREATED=YES | NO
+MODEL_IDENTITY=UNKNOWN
+```
+
+The tested executor MUST NOT assign itself GREEN/YELLOW/RED or KEEP/LIMIT/REROLL.
+That classification belongs to Control Tower or another independent verifier:
+
+```text
+EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN
+CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER
+CANARY_CLASSIFICATION=GREEN | YELLOW | RED | ORANGE
+SESSION_POLICY=KEEP_SESSION | LIMIT_SESSION | ADVISORY_OR_LOW_RISK_ONLY | REROLL_OR_SWITCH_EXECUTOR
+```
+
+If independent verification is unavailable, the result is `UNVERIFIED`, not
+implicitly GREEN.
+
+`ORANGE` remains available to the fuller multi-probe classification when
+evidence is mixed across multiple probes. FAST_CANARY normally needs only
+GREEN/YELLOW/RED after independent grading.
+
+#### OWNER_CONTINUATION_GATE_V1
+
+For a new Arena Agent session on medium/high-risk work, the first real-task
+slice is a bounded checkpoint, not automatic authority to continue the entire
+task:
+
+```text
+REAL_TASK
+  -> FIRST_SAFE_SLICE_CANARY
+  -> CANARY_EVIDENCE_PACKET_V1
+  -> CONTROL_TOWER_OR_INDEPENDENT_GRADE
+  -> OWNER_CONTINUATION_GATE
+  -> CONTINUE | LIMIT | REROLL
+```
+
+The tested Arena executor still does not grade itself. After returning the
+evidence packet it must end the turn and wait at the continuation checkpoint.
+
+Arena currently provides a native `keep working` continuation action after a
+completed task/turn. P2P should use that native action when the product surface
+offers it, but the executor must never claim it rendered a UI button that it
+cannot actually control.
+
+```text
+ARENA_NATIVE_CONTINUATION_UI=USE_WHEN_AVAILABLE
+MODEL_CANNOT_GUARANTEE_UI_BUTTON_RENDERING=YES
+FALLBACK_OWNER_REPLY="Tiếp tục công việc"
+```
+
+At the end of the canary turn, append only this neutral checkpoint metadata;
+it is not a self-grade:
+
+```text
+CONTINUATION_CHECKPOINT=READY
+OWNER_ACTION_REQUIRED=YES
+NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED
+FALLBACK_OWNER_REPLY=Tiếp tục công việc
+```
+
+After independent grading:
+
+```text
+GREEN  -> recommend CONTINUE_REAL_TASK in the SAME Arena chat
+YELLOW -> recommend CONTINUE_LIMITED only with the declared verification bound
+ORANGE -> do not recommend full continuation; advisory/low-risk only
+RED    -> recommend REROLL_OR_SWITCH, not Keep working
+UNVERIFIED -> no default continuation recommendation
+```
+
+The Owner's one-click/one-message continuation is a deliberate approval gate,
+not message-bus work. Once the Owner chooses Continue/Keep working after a GREEN
+classification, do not insert another canary or approval gate unless material
+risk/state changes.
+
+Git-history guard for shallow sandboxes:
+
+```text
+SHALLOW_CLONE_ANOMALY != REPOSITORY_HISTORY_FACT
+EMPTY_LOCAL_MERGE_BASE_ON_SHALLOW_CLONE != UNRELATED_HISTORIES
+```
+
+Before concluding that two refs have unrelated histories, first inspect
+`git rev-parse --is-shallow-repository`. If the clone is shallow, either
+deepen/unshallow enough for the relevant ancestry or cross-check against durable
+remote ancestry/compare evidence. An empty merge-base from incomplete local
+history is a tool-environment artifact, not a repository fact.
+
+Decision classes:
+
+```text
+GREEN  = critical representative probes pass; claims are evidence-backed;
+         no material tool hallucination; verification/recovery is trustworthy
+YELLOW = core probe passes with a non-critical weakness; bounded execution is
+         allowed but requires independent verification
+ORANGE = mixed/fragile evidence; advisory or low-risk bounded work only
+RED    = wrong result/scope, fabricated verification, material tool
+         hallucination, or unrecovered/repeated failure; do not entrust the
+         intended medium/high-risk task to this session
+```
+
+Routing after classification:
+
+```text
+GREEN  -> KEEP_SESSION
+YELLOW -> LIMIT_SESSION + INDEPENDENT_VERIFY
+ORANGE -> ADVISORY_OR_LOW_RISK_ONLY
+RED    -> REROLL_OR_SWITCH_EXECUTOR
+```
+
+A RED result may justify ONE fresh-session reroll when the expected benefit is
+material and quota/cost permits. Do not create a slot-machine loop that keeps
+opening sessions until a desired hidden model is guessed. Further rerolls
+require new evidence that they are cheaper/safer than switching executor or
+reducing scope.
+
+DesignArena exception:
+
+```text
+DESIGNARENA_TOURNAMENT != ARENA_AGENT_SESSION_CANARY
+```
+
+For DesignArena's blind tournament, the real bounded design prompt is the
+selection test. Give every sampled model the same prompt and judge the rendered
+product/workflow against a fixed acceptance matrix. Do not run a separate
+pelican canary first, do not infer hidden model identity before voting, and do
+not prefer a design because of a guessed provider/model. A specialized SVG
+animal × vehicle probe is appropriate only when SVG spatial composition itself
+is the target capability.
+
+
+#### MODEL_IDENTITY_INFERENCE_BOUNDARY_V1
+
+When an execution surface intentionally does not expose its underlying model,
+P2P must not turn self-disclosure tricks into identity evidence.
+
+```text
+SELF_DISCLOSURE != MODEL_IDENTITY_EVIDENCE
+FIRST_LETTER_OR_LAST_LETTER_TRICK != MODEL_IDENTITY_EVIDENCE
+OBFUSCATED_SELF_REPORT != MODEL_IDENTITY_EVIDENCE
+WRITING_STYLE_GUESS != MODEL_IDENTITY_EVIDENCE
+SESSION_QUALITY > GUESSED_MODEL_NAME
+```
+
+Do not use prompt-injection, acrostic/letter-by-letter coercion, encoded
+self-disclosure, role-play indirection, or similar bypass tactics to defeat a
+product's intentional model non-disclosure. Even if the model supplies a name,
+that answer is only a self-report and may be wrong.
+
+If model-family inference has real decision value and the target permits normal
+black-box interaction, use a bounded behavioral fingerprint instead:
+
+1. Prefer an official reveal/selector/API identity when the product exposes one.
+2. Otherwise define a CLOSED candidate set from current public product/model
+   evidence. Do not search an unbounded model universe.
+3. Use several benign, thematically diverse probes only when identity inference
+   is actually needed. A single "who are you?" prompt or one stylometric clue
+   is insufficient.
+4. Compare the combined response pattern against reference behavior captured
+   under materially similar settings when possible. Repeat only enough to
+   estimate stability; sampling/system-prompt/tool-wrapper effects must remain
+   explicit uncertainties.
+
+   Arena surface boundary:
+
+   ```text
+   AGENT_POOL != DIRECT_SELECTOR
+   AGENT_POOL != SIDE_BY_SIDE_SELECTOR
+   REFERENCE_HARNESS_MUST_MATCH_TARGET_HARNESS
+   ```
+
+   A model listed for Agent Mode is not guaranteed to be selectable in Direct
+   or Side-by-Side, because Arena can add or remove models from those selector
+   surfaces independently. References captured from Text/Direct/Side-by-Side
+   must not be treated as calibrated Agent references unless the exact variant
+   and materially equivalent system/tool harness are established.
+
+   For Arena specifically:
+
+   ```text
+   AGENT_POOL != DIRECT_SELECTOR
+   AGENT_POOL != SIDE_BY_SIDE_SELECTOR
+   REFERENCE_HARNESS_MUST_MATCH_TARGET_HARNESS
+   ```
+
+   A model appearing on the Agent leaderboard does not imply that the same
+   model/variant is selectable in Direct or Side-by-Side. Arena explicitly
+   allows models to be added/removed from those selector surfaces independently.
+   Therefore a Direct/Side-by-Side/Battle output must not be treated as a
+   calibrated reference for an Agent orchestrator unless the exact model
+   identity/variant AND materially equivalent harness/system/tool conditions are
+   established. Cross-surface resemblance is exploratory evidence only.
+5. Report a ranked candidate set or family-level estimate with confidence and
+   an `UNKNOWN` option. Never upgrade behavioral resemblance into exact model
+   identity without direct evidence.
+6. For Arena Agent Mode specifically, preserve Arena's documented possibility
+   of automatic model switching on likely-failing responses. A fingerprint may
+   therefore describe an observed response/session segment, not necessarily a
+   stable identity for the whole chat.
+7. Fingerprinting never replaces `MODEL_CANARY_GATE_V1`. Capability and
+   correctness evidence decide whether to keep a session; a guessed model name
+   does not.
+
+Research-grade fingerprinting methods may be studied as external evidence, but
+P2P does not deploy a reconnaissance/exploitation framework merely to discover
+a hidden model name.
+
+
+#### DOMAIN_CAPABILITY_ADMISSION_V1 — admitting a capability into real influence
+
+This subsection is a bounded application of RULE 19. RULE 19 answers "does
+this capability actually work here?"; this subsection answers the next
+question: "even if it runs, and even if it worked somewhere else, may it take
+real influence here?" It is an admission/promotion discipline only. It creates
+no second framework, router, registry, benchmark service, daemon, or top-level
+numbered rule, and it restates none of the cross-domain SOURCE ROLE /
+CONSUMPTION selection semantics already carried by Issue #222 — reuse those
+for source selection and apply this subsection to the admission decision.
+
+Canonical distinctions:
+
+```text
+CROSS_DOMAIN_SUCCESS != TARGET_DOMAIN_PROOF
+NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST
+EVALUATION_SET => FREEZE_BEFORE_RESULT_WHEN_RESULT_CAN_BIAS_THE_TEST
+PROMOTION_CRITERIA => PREDECLARE_BEFORE_FINAL_RESULT
+CAN_RUN != WORKS_FOR_TARGET_TASK != MATERIALLY_BETTER_THAN_CURRENT_PATH != WORTH_COMPLEXITY != READY_FOR_PRODUCT_CONTROL
+UNPROVEN_MODEL_OR_PROVIDER => OBSERVE_BEFORE_CONTROL_WHEN_CONTROL_HAS_MATERIAL_RISK
+ROUTING_OR_CLASSIFICATION_SIGNAL != DOMAIN_TRUTH_AUTHORITY
+ABSTAIN_OR_UNKNOWN => VALID_OUTCOME_WHEN_EVIDENCE_IS_INSUFFICIENT
+TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS
+```
+
+Admission order:
+
+1. **Name the target-domain claim.** State what the capability must prove for
+   THIS domain, language, task type, and input distribution. An upstream
+   benchmark, another project's success, or a stronger-looking number is
+   context, never proof (`CROSS_DOMAIN_SUCCESS != TARGET_DOMAIN_PROOF`).
+2. **Stand up the cheapest credible baseline first** when the candidate is
+   materially more complex than the current path. A baseline is the simplest
+   meaningful comparison already at hand: the existing
+   implementation/provider/ranking, deterministic rules, a no-op/control, or
+   manual policy. Do not manufacture one ceremonially
+   (`NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST`).
+3. **Freeze the evaluation set before the result is known** whenever the
+   result could shape the test — for example when the same person/process
+   chooses both the rows and the winner
+   (`EVALUATION_SET => FREEZE_BEFORE_RESULT_WHEN_RESULT_CAN_BIAS_THE_TEST`).
+4. **Predeclare the promotion criteria** — threshold, what counts as
+   materially better, what blocks, and who grades — before the final result is
+   produced, and freeze them with the evaluation set
+   (`PROMOTION_CRITERIA => PREDECLARE_BEFORE_FINAL_RESULT`).
+5. **Measure under materially relevant target conditions**, reusing RULE 19's
+   smallest representative probe. If the real bounded task is the cheapest
+   representative test, use it. If a tiny probe answers the question, stop
+   there; no mandatory broad benchmark ceremony.
+6. **Observe before control** when the model, provider, or artifact is
+   unproven and granting control carries material risk: run shadow/suggest-only
+   and keep the deterministic path authoritative
+   (`UNPROVEN_MODEL_OR_PROVIDER => OBSERVE_BEFORE_CONTROL_WHEN_CONTROL_HAS_MATERIAL_RISK`).
+7. **Admit, reject, or abstain on the recorded evidence.** Escalating through
+   `CAN_RUN`, `WORKS_FOR_TARGET_TASK`, `MATERIALLY_BETTER_THAN_CURRENT_PATH`,
+   `WORTH_COMPLEXITY`, and `READY_FOR_PRODUCT_CONTROL` requires a separate
+   yes at each step; none of them implies the next.
+8. **Stop when the question is answered.** Record the decision, the baseline,
+   and the criteria so a later reader can re-check it without rerunning
+   everything.
+
+Promotion accounting. Before a capability is granted real influence, weigh the
+measured benefit against the current path and against complexity, latency,
+dependency/artifact/runtime management, maintenance burden, failure modes, and
+reversibility cost. `WORTH_COMPLEXITY` is a distinct gate: a real but small
+improvement does not justify a heavy, hard-to-reverse dependency
+(`CAN_RUN != ... != READY_FOR_PRODUCT_CONTROL`).
+
+Authority boundary. A probabilistic router, classifier, recommender, or
+embedding score may observe and suggest workflow. It never becomes domain
+truth authority:
+
+```text
+ROUTER_CLASSIFIES_PAYMENT_QUERY != PAYMENT_IS_SETTLED
+ROUTER_CLASSIFIES_LEGAL_HISTORY != LAW_IS_CURRENT
+ROUTER_CLASSIFIES_BAZI_DUNG_THAN != DUNG_THAN_IS_X
+ROUTER_CLASSIFIES_GENEALOGY_RELATION_QUERY != PERSON_A_IS_PARENT_OF_PERSON_B
+```
+
+Routing or classification confidence is a workflow signal, never a domain
+fact.
+
+Unknown is a valid outcome. When evidence is insufficient, record
+`ABSTAIN`/`UNKNOWN` and keep the current path rather than upgrading a guess
+(`ABSTAIN_OR_UNKNOWN => VALID_OUTCOME_WHEN_EVIDENCE_IS_INSUFFICIENT`,
+`TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS`).
+
+Proportionality and revalidation:
+
+- Do not require a broad benchmark for every tool, library, or model. Match
+  the probe to the risk of being wrong; the cheapest representative probe that
+  answers the question is the correct one.
+- Revalidate only when material conditions change: domain, language, task
+  type, input distribution, model/artifact/version, authority level, or
+  runtime environment. Do not re-test materially equivalent proven conditions.
+- A rejected or abstained candidate stays recorded as evidence. It is not a
+  permanent ban, and it is not silently retried under a new name.
+
+Beginner-facing explanation at a material capability admission decision must
+say, in plain language:
+
+```text
+WHAT_NEW_THING_IS_BEING_CONSIDERED=
+WHAT_IT_MUST_PROVE_HERE=
+WHAT_SIMPLE_CURRENT_PATH_IT_MUST_BEAT=
+WHAT_COUNTED_AS_PASS_FAIL_UNSURE=
+WHAT_IT_COSTS_AND_HOW_EASILY_IT_CAN_BE_UNDONE=
+DECISION=ADMIT | OBSERVE_ONLY | REJECT | UNSURE_KEEP_CURRENT_PATH
+OWNER_ACTION_NOW=
+```
+
+
+#### PERFORMANCE_LANGUAGE_ADMISSION_V1 — evidence before Rust/native expansion
+
+This subsection operationalizes `POLYGLOT_BY_EVIDENCE_V1` as one bounded
+application of RULE 19. It answers: "does a measured performance problem
+justify testing or adopting a new native/runtime language such as Rust?" It
+does not create a benchmark service, daemon, watcher, second router, registry,
+microservice, or automatic migration path.
+
+Canonical distinctions:
+
+```text
+PERFORMANCE_SIGNAL != PERFORMANCE_PROOF
+LARGE_DATASET != RUST_NEED
+PERFORMANCE_FAILURE => CLASSIFY_BOTTLENECK_FIRST
+NON_CPU_BOTTLENECK => DO_NOT_ACTIVATE_NATIVE
+CURRENT_STACK_MEETS_ACCEPTANCE => STOP_KEEP_CURRENT_STACK
+NATIVE_SPIKE_REQUIRES_MEASURED_CPU_HOT_PATH
+NATIVE_ADOPTION_REQUIRES_SAME_WORKLOAD_BEFORE_AFTER + SMALLEST_BOUNDARY + OPERATIONS_COST + ROLLBACK_PATH
+MISSING_TASK_SPECIFIC_ACCEPTANCE_OR_MEASUREMENT => INSUFFICIENT_EVIDENCE
+```
+
+Decision order:
+
+1. **Bind a real acceptance target.** Use the task/product requirement that
+   matters (latency, duration, throughput, memory, or another comparable
+   metric). Do not invent a threshold merely because a workload is large.
+2. **Measure the current path.** Capture a comparable baseline for the same
+   target metric. A task-text cue such as "slow", "batch", "scale", "CPU",
+   "parser", or "indexing" is only a discovery hint.
+3. **Classify the bottleneck before blaming the language runtime.** Distinguish
+   at least CPU/algorithm from DB, network, I/O, serialization, external
+   service, memory, or unknown. A non-CPU bottleneck routes to that cause and
+   does not activate Rust/native work.
+4. **Stop if the current stack already meets acceptance.** Faster in theory is
+   not a reason to add a runtime.
+5. **For a CPU bottleneck, require an observed hot path.** Record the concrete
+   component and measured share. If no hot path is measured, return
+   `INSUFFICIENT_EVIDENCE`.
+6. **Try the smallest credible current-stack optimization first** when it is
+   cheaper and reversible. If that path meets acceptance, stop.
+7. **Open only a bounded native spike** when a measured CPU hot path still
+   misses acceptance after the current stack's credible optimization. Keep the
+   boundary small and stable; do not rewrite the application.
+8. **Compare the spike on the same workload and target.** A spike that misses
+   acceptance is rejected. A passing spike still cannot be adopted until the
+   smallest boundary, operating/build/deploy/observability/security/maintenance
+   cost, and rollback/removal path are explicit.
+9. **Adopt only the proved boundary.** A passing Rust/native module proves that
+   component under the tested conditions, not a project-wide migration.
+10. **Stop honestly when evidence is missing.** Scale or reputation never
+    substitutes for task-specific acceptance and measurement.
+
+The existing runtime implementation is
+`.p2p/system/p2p_capabilities/performance_language_gate.py`, with the thin
+CLI `scripts/p2p_performance_language_gate.py`. The helper is a deterministic
+evidence classifier only: it executes no benchmark commands, installs no
+toolchain, makes no project mutation, and emits `PERMISSION_EFFECT=NONE`.
+Its technical verdict cannot widen task authority or bypass Owner Gates.
+
+Representative canary: the verified Ziwei v3 dataset contains 518,400 records
+and 5,878,228,608 bytes with combined SHA-256
+`21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870`.
+That real scale is deliberately insufficient by itself: without a task-specific
+performance acceptance target and measured baseline, the correct verdict is
+`INSUFFICIENT_EVIDENCE`, not "use Rust".
+
 ### RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION
 
 The beginner Owner selects an executor with one natural command. The project
@@ -1472,7 +2148,14 @@ and executor.
 ```text
 CONTROL_TOWER_OWNS_EXECUTOR_ROUTING=YES
 OWNER_IS_NOT_MESSAGE_BUS=YES
+ARENA_CANARY_OWNER_CONTINUATION_GATE=ALLOWED_ONCE
 ```
+
+The one explicit Arena continuation approval after a new-session FAST_CANARY is
+not message-bus work. It is an Owner risk gate: the executor pauses after the
+first real-task slice, Control Tower/independent evidence grading occurs, and
+the Owner chooses Continue/Keep working, bounded continuation, or reroll.
+After that decision, normal Control Tower autonomous completion resumes.
 
 Canonical Owner commands (matched by intent; the Owner does not have to
 remember exact capitalization or syntax):
@@ -1711,6 +2394,71 @@ prompt-generation semantics and project inheritance. It creates no
 daemon, server, orchestration service, agent framework, routing
 subsystem, persistent background process, registry, or database.
 
+### RULE 21 — BEGINNER_PLAIN_LANGUAGE_FIRST
+
+P2P may reason, code, and verify at expert depth internally, but communication
+to a beginner Owner must be understandable without prior software knowledge.
+
+Canonical law:
+
+```text
+EXPERT_INTERNAL_DEPTH=ALLOWED
+OWNER_FACING_JARGON_FIRST=NO
+PLAIN_LANGUAGE_FIRST=YES
+RETURN_PACKET != OWNER_EXPLANATION
+NOT_RUN != FAIL
+NOT_OBSERVED != NO
+BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT
+```
+
+For every material Owner-facing update, blocker report, review result, or
+terminal summary:
+
+1. **Say the practical meaning first.** Start with ordinary language covering:
+   what happened; whether the goal is done, not done, or blocked; why; and the
+   one thing the Owner should do now. Technical evidence follows only when it
+   helps.
+2. **Translate necessary jargon on first use.** Keep the exact technical term
+   when it matters for precision, but pair it with a short Vietnamese meaning,
+   for example: `PR (gói thay đổi đang chờ nhập vào bản chính)`,
+   `HEAD/SHA (mã phiên bản code hiện tại)`, `runtime (app đang chạy thật)`,
+   `visual gate (kiểm tra giao diện trên app thật)`, `merge (gộp thay đổi vào
+   bản chính)`. These are examples, not a fixed glossary.
+3. **Do not force the Owner to decode machine fields.** A ReturnPacket,
+   test table, status enum, SHA, log excerpt, or checklist may be included for
+   executors/reviewers, but it must not replace the plain-language explanation.
+4. **Separate “not checked” from “checked and failed”.** If a browser, preview,
+   dependency, secret, device, external service, or other proof surface was
+   unavailable, say “chưa kiểm tra được vì thiếu công cụ/điều kiện”. Use
+   `NOT_VERIFIED` / `BLOCKED` as appropriate. Do not write `FAIL`, `NO`,
+   or a defect claim for something that was never actually observed.
+5. **Name the real blocker, not a scary abstraction.** Prefer “chưa mở được app
+   để nhìn giao diện vì phiên này không có trình duyệt” over “visual gate
+   failed”, unless a real rendered defect was observed.
+6. **Reuse RULE 09 for the single next action.** Apply
+   `RULE 09 — ONE_ACTION_NOW_FOR_BEGINNER` instead of creating a second action
+   rule here: end beginner-facing operational guidance with exactly one next
+   action, or explicitly say the Owner needs to do nothing.
+7. **Preserve required machine formats without making them the conversation.**
+   Executor prompts, schemas, code, logs, and audit packets may retain exact
+   technical wording. The surrounding Owner-facing explanation must translate
+   their meaning.
+
+Preferred Owner-facing order:
+
+```text
+1. NÓI DỄ HIỂU: chuyện gì vừa xảy ra
+2. TRẠNG THÁI: xong / chưa xong / bị chặn
+3. VÌ SAO: một lý do thực tế
+4. BẠN CẦN LÀM GÌ BÂY GIỜ: đúng một việc, hoặc KHÔNG CẦN LÀM GÌ
+5. CHI TIẾT KỸ THUẬT: chỉ khi hữu ích
+```
+
+This rule changes communication, not evidence standards. Plain language must
+never soften a real defect, inflate confidence, hide uncertainty, or turn an
+unverified result into PASS.
+
+
 ## 4. RULE_ASSIMILATION_GATE_V1
 
 ### 4.1 Failure mode fixed
@@ -1853,6 +2601,31 @@ machine-readable ledger below is the durable record.
         "governance/development-control.json (session-context-is-not-authority invariant)",
         "tests/test_p2p_context_hygiene.py"
       ]
+    },
+    {
+      "id": "BACKLOG_J",
+      "item": "DOMAIN_CAPABILITY_ADMISSION_V1",
+      "status": "VERIFIED",
+      "evidence": [
+        "Issue #245 P2P_DOMAIN_CAPABILITY_ADMISSION_01 (bounded goal, required invariants, OE gate)",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 — REALITY_FIRST_CAPABILITY_PROBE, subsection DOMAIN_CAPABILITY_ADMISSION_V1)",
+        "governance/research-adoption-ledger.json (RA-EXT-102 selected/rejected ideas)",
+        "tests/test_p2p_domain_capability_admission_01.py",
+        "tests/test_p2p_operations_notebook.py (ledger entry BACKLOG_J truthfulness check)"
+      ]
+    },
+    {
+      "id": "BACKLOG_K",
+      "item": "PERFORMANCE_LANGUAGE_ADMISSION_V1",
+      "status": "VERIFIED",
+      "evidence": [
+        "Issue #252 P2P — Operationalize Rust evidence gate end-to-end",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 — PERFORMANCE_LANGUAGE_ADMISSION_V1)",
+        ".p2p/system/p2p_capabilities/performance_language_gate.py + scripts/p2p_performance_language_gate.py",
+        "tests/test_p2p_performance_language_admission_01.py",
+        "governance/research-adoption-ledger.json (RA-EXT-103)",
+        "tests/fixtures/p2p_performance_language_gate/ziwei_518400_canary.json"
+      ]
     }
   ]
 }
@@ -1860,6 +2633,13 @@ machine-readable ledger below is the durable record.
 
 `BACKLOG_I` stays `PENDING` until Control Tower independently verifies the
 exact PR head/tree for Issue #42 under RULE_ASSIMILATION_GATE_V1.
+
+`BACKLOG_J` (`DOMAIN_CAPABILITY_ADMISSION_V1`) is `VERIFIED`. Control Tower
+independently verified PR #246 at exact Writer head
+`d14b5e89d14f84dc70d4eb53fda978e4f7b2060a` (PR comment `5793604664`) under
+RULE_ASSIMILATION_GATE_V1 before this status flip.
+
+`BACKLOG_K` (`PERFORMANCE_LANGUAGE_ADMISSION_V1`) is `VERIFIED`. Independent Supervisor review bound exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752` for PR #253, with Control Tower durable receipt comment `5815665839`, before this status flip under `RULE_ASSIMILATION_GATE_V1`.
 
 ## 5. ASSIMILATION_BACKLOG — previously promised items
 
@@ -1903,6 +2683,17 @@ section 4.3.
   `task_state.py` / `context.py` / `orchestration_policy.py`, focused tests
   in `tests/test_p2p_context_hygiene.py`. Flips to `VERIFIED` only after
   Control Tower verifies the exact PR head/tree.
+- **J. Domain capability admission (`DOMAIN_CAPABILITY_ADMISSION_V1`)** —
+  `VERIFIED`. Issue #245 / PR #246: the bounded subsection under RULE 19 above
+  (target-domain proof, cheap credible baseline, frozen evaluation set,
+  predeclared promotion criteria, observe-before-control, routing-vs-domain
+  authority, valid abstention, complexity/value gate), the RA-EXT-102
+  research-adoption record, and focused tests in
+  `tests/test_p2p_domain_capability_admission_01.py`. Control Tower independently
+  verified exact Writer head `d14b5e89d14f84dc70d4eb53fda978e4f7b2060a`
+  in PR comment `5793604664` before this status flip.
+
+- **K. Performance/language admission (`PERFORMANCE_LANGUAGE_ADMISSION_V1`)** — `VERIFIED`. Issue #252 operationalizes the earlier Rust/polyglot research through one Rule 19 subsection, a deterministic evidence gate, packaging/install inheritance, a real Ziwei 518,400-record canary, RA-EXT-103, and focused tests. Independent Supervisor verification covered exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752`; Control Tower recorded receipt `5815665839` before this status flip. No Rust dependency, migration, deployment, benchmark service, or background monitor is introduced.
 
 ## 6. Discovery and operator paths
 

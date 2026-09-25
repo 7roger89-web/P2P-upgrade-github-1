@@ -1,0 +1,39 @@
+name: Web reverse foundation focused acceptance
+
+on:
+  pull_request:
+    paths:
+      - '.p2p/system/p2p_capabilities/web_reverse_reference.py'
+      - '.p2p/system/p2p_capabilities/capabilities.json'
+      - 'tests/test_p2p_web_reverse_reference.py'
+      - 'docs/plans/2026-09-21-p2p-web-reverse-foundation-01/**'
+      - 'scripts/package_release.py'
+      - '.github/workflows/web-reverse-foundation-focused.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Web reverse foundation bounded reference tests
+        run: |
+          python -m unittest -v \
+            tests.test_p2p_web_reverse_reference \
+            tests.test_p2p_reverse_skill_reference \
+            tests.test_p2p_sec01_security_reverse_apkid
+
+      - name: Compile changed runtime module
+        run: |
+          python -m py_compile .p2p/system/p2p_capabilities/web_reverse_reference.py

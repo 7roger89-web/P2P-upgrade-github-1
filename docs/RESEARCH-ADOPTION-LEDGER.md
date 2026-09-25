@@ -109,6 +109,81 @@ blob-verification evidence live in
 | RA-EXT-090 | vercel-labs/design-systems-to-agent-skills | RESEARCHED | none (methodology reference: verified-facts pipeline, closed PRD, mechanical verify) | reference only; nothing copied |
 | RA-EXT-091 | TanStack/table | RESEARCHED | none (component library, not guidance; no bounded gap) | nothing copied |
 
+### 4.5 Web/browser reverse evidence batch 2026-09-21 (RA-EXT-092 .. RA-EXT-098)
+
+Appended projection of the seven records added by
+`P2P_WEB_REVERSE_FOUNDATION_01` (Issue #224). The JSON ledger remains the
+authority; this table is its derived view for this batch. Every pin equalled
+upstream HEAD when verified on 2026-09-21, and no upstream repository is
+vendored. Details live in
+`docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md`.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-092 | ChromeDevTools/chrome-devtools-mcp | SELECTED | first-line document/network evidence backend candidate (Apache-2.0, pin verified) | declared candidate for `web.browser.evidence`; nothing installed or activated |
+| RA-EXT-093 | vmoranv/jshookmcp | DEFERRED | optional external deep-runtime backend only (AGPL-3.0 boundary explicit) | referenced for `web.js.reverse`; not vendored, linked, redistributed, or activated |
+| RA-EXT-094 | projectdiscovery/katana | SELECTED | bounded endpoint discovery backend candidate (MIT, pin verified) | declared candidate for `web.endpoint.discovery`; no crawler service created |
+| RA-EXT-095 | BishopFox/jsluice | SELECTED | subordinate static JS parser reference (MIT, pin verified) | under `web.endpoint.discovery`; no separate capability ID or authority |
+| RA-EXT-096 | xnl-h4ck3r/waymore | SELECTED | public archive/index reconstruction backend candidate (MIT, pin verified) | declared candidate for `web.public.reconstruction`; public sources only |
+| RA-EXT-097 | Mouseww/anything-analyzer | DEFERRED | none (second traffic stack not adopted by default) | no capability ID, no backend reference, no install |
+| RA-EXT-098 | Reqable/reqable-mcp-server | DEFERRED | none (no SPDX license exposed by repository metadata) | reference only; bridge lookup fails closed until the license is resolved |
+
+### 4.6 Global community research + model fingerprinting (RA-EXT-099)
+
+Appended projection of the Owner-selected research direction adopted on
+2026-09-22. The JSON ledger remains authoritative.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-099 | Global multilingual community research + black-box LLM fingerprinting | IMPLEMENTED | adaptive cross-community/local-language search; primary-vs-community evidence separation; bounded behavioral fingerprinting with confidence/UNKNOWN | `GLOBAL_COMMUNITY_RESEARCH_V1` + `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1`; no scraper/router/benchmark daemon |
+
+Research inputs included primary Arena documentation and USENIX Security
+LLMmap research, plus community/practitioner evidence from German, Russian,
+South African, Japanese, Taiwanese, Brazilian and other technical ecosystems.
+The implementation explicitly rejects fixed-country whitelists and treats
+forum claims as lived-experience signals unless independently corroborated.
+
+Correction 2026-09-22: Arena Agent availability is distinct from the
+Direct/Side-by-Side selector surfaces. Cross-surface outputs are not calibrated
+Agent references unless the exact model variant and materially equivalent
+system/tool harness are established.
+
+### 4.7 AI Employees pattern-assimilation batch 2026-09-22 (RA-EXT-100 .. RA-EXT-101)
+
+Appended projection of the study produced by
+`P2P_AI_EMPLOYEES_PATTERN_ASSIMILATION_01`. The JSON ledger remains the authority;
+this table is its derived view for this batch. The full 15-pattern matrix, the
+over-engineering gate record and the rejected-mechanism register live in
+`docs/p2p-development/research/P2P-AI-EMPLOYEES-PATTERN-ASSIMILATION-01.md`.
+No upstream repository or file is vendored, nothing was installed or executed, and
+no runtime code was added: the batch outcome is `RESEARCH_ONLY_PASS` with
+`OE_VERDICT=DEFER_UNTIL_NEEDED`.
+
+Upstream provenance: `REPO=markfulton/ai-employees`,
+`COMMIT=edffe8f4afea467818988ce3ce9332e6d832e5ed`, `LICENSE=MIT`,
+`REVIEW_DATE=2026-09-22`.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-100 | markfulton/ai-employees @ `edffe8f` (MIT) | RESEARCHED | 15 patterns classified KEEP 4 / ADAPT 2 / ALREADY_COVERED 7 / DEFER 2; nothing adopted | completed source study, zero runtime; reuse mapped to `decision_trace` freshness, `fw06` pause, the existing execution ledger + fingerprint idempotency, `experience_evolution`, and the typed capability registry |
+| RA-EXT-101 | `PROVIDER_NEUTRAL_RECURRING_ROUTINE_CONTRACT` (candidate direction) | DEFERRED | cadence identity (period key + window/day eligibility + once-per-period `RUN` / `SKIP` decision) specified, not implemented | re-entry trigger recorded: a period-form obligation, a real firing source that can fire late or twice, not already decided by freshness, and a written period-vs-identity boundary |
+
+### 4.8 Domain capability admission batch 2026-09-23 (RA-EXT-102)
+
+Appended projection of the assimilation produced by
+`P2P_DOMAIN_CAPABILITY_ADMISSION_01` (Issue #245). The JSON ledger remains the
+authority; this table is its derived view for this batch. The motivating
+target-domain evidence comes from VNLAW Issue #75 / #81 / #84 and PR #86 and is
+assimilated domain-neutrally: nothing was installed, vendored, executed, or
+added to the P2P runtime, and no benchmark service, router, registry, or daemon
+was created. Control Tower independently verified PR #246 exact Writer head
+`d14b5e89d14f84dc70d4eb53fda978e4f7b2060a` in comment `5793604664` before
+`BACKLOG_J` was flipped to `RULE_ASSIMILATION_STATUS=VERIFIED`.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-102 | `DOMAIN_CAPABILITY_ADMISSION_V1` — cross-project capability-admission lesson (OpenJev/VNLAW evidence) | IMPLEMENTED | target-domain proof; cheap credible baseline first; frozen evaluation set; predeclared promotion criteria; observe-before-control; routing vs domain authority; abstention valid; complexity/value gate | one bounded subsection under notebook RULE 19 + independently verified `BACKLOG_J` assimilation entry; rejected: upstream benchmark as target proof, cross-domain extrapolation, runtime success as product value, global OpenJev install, classifier as domain truth authority |
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
@@ -129,3 +204,26 @@ The following patterns are permanently registered as rejected and appear in char
 ## 6. Provenance notes
 
 RA-EXT-009 (NUI): the 174-faculty count is `PROVENANCE_NOT_RECOVERED` — no repository artifact reproduces the claim. Per machinery (RI-003), this is **not evidence of absence**; it remains NOT_PROVEN, not REJECTED. RA-EXT-012 (Electron) has no durable selection evidence; it is recorded UNKNOWN and must not be silently treated as adopted. RA-EXT-007 (Anvien) and other license-constrained sources remain research-only.
+
+
+### 4.9 Rust/polyglot operationalization 2026-09-24 (RA-EXT-103)
+
+Appended projection of Issue #252. The JSON ledger remains the authority. This
+closes the gap between the earlier `POLYGLOT_BY_EVIDENCE_V1` documentation
+and an executable decision path; it does **not** force Rust into any project.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-103 | `RUST_OPERATIONALIZATION_V1` + real Ziwei v3 dataset provenance (518,400 records, 5,878,228,608 bytes, SHA-256 `21fe90f8…`) | IMPLEMENTED | acceptance target → baseline → bottleneck → measured CPU hot path → current-stack optimization → bounded same-workload native spike → cost/rollback | RULE 19 `PERFORMANCE_LANGUAGE_ADMISSION_V1` + deterministic `performance_language_gate.py` + thin CLI + package transport + focused tests; scale alone returns `INSUFFICIENT_EVIDENCE` |
+
+The representative Ziwei canary intentionally does not invent a latency or
+throughput target. Its correct result is `INSUFFICIENT_EVIDENCE` and
+`NATIVE_CANDIDATE=false`: a 5.8 GB / 518,400-record dataset proves scale,
+not a language-runtime bottleneck. A real Rust/native spike becomes eligible
+only after a task-specific acceptance failure is measured and profiling
+identifies a CPU hot path that remains insufficient after the current stack's
+smallest credible optimization.
+
+No benchmark service, daemon, watcher, second router/registry, generic shell
+executor, Rust toolchain install, product rewrite, deployment, release, or
+local-PC/Anvien dependency is introduced by RA-EXT-103.

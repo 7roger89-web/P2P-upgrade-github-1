@@ -35,6 +35,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import doctor as p2p_doctor  # noqa: E402
 import package_release  # noqa: E402
+import p2p_skill_profile  # noqa: E402
 
 
 CANONICAL = REPO_ROOT / ".agents" / "skills"
@@ -387,15 +388,27 @@ class PackageInstallProofTests(unittest.TestCase):
         cls.stage = Path(cls.temp.name) / "stage"
         cls.project = Path(cls.temp.name) / "synthetic-project"
         package_release.copy_selected(REPO_ROOT, cls.stage)
-        # Reproduce the install.sh/install.ps1 skill-copy contract:
-        # every packaged .agents/skills/* lands project-local.
+        cls.project.mkdir(parents=True)
+        (cls.project / "package.json").write_text(
+            json.dumps({"dependencies": {"react": "^19.0.0", "next": "^16.0.0"}}),
+            encoding="utf-8",
+        )
+        # Reproduce the current install.sh/install.ps1 project-fit contract:
+        # a React project receives the full curated frontend pack.
+        skills_source = cls.stage / ".agents" / "skills"
+        receipt = p2p_skill_profile.build_receipt(cls.project, skills_source)
+        cls.asserted_profile = receipt["profile"]
         target = cls.project / ".agents" / "skills"
         target.mkdir(parents=True)
-        for source in sorted((cls.stage / ".agents" / "skills").iterdir()):
-            if source.is_dir():
-                shutil.copytree(source, target / source.name)
-            else:
-                shutil.copy2(source, target / source.name)
+        for name in receipt["selected_skills"]:
+            source = skills_source / str(name)
+            shutil.copytree(source, target / source.name)
+
+    def test_react_fixture_uses_react_profile(self) -> None:
+        self.assertEqual(
+            self.asserted_profile,
+            p2p_skill_profile.PROFILE_FRONTEND_REACT,
+        )
 
     def test_release_ships_the_curated_pack(self) -> None:
         for skill in PACK_SKILLS:
@@ -491,6 +504,27 @@ class NoParallelArchitectureTests(unittest.TestCase):
             # control-tower context-assembly fixtures against ambient repo
             # state (P2P_PROJECT_ROOT isolation; zero production changes).
             "tests/test_p2p_control_tower_context_assembly.py",
+            # PR #214 install-time project-fit capability provisioning. This
+            # workstream owns stack-evidence -> packaged skill profile
+            # selection at install time; it is not an upstream intake surface
+            # and adds no router, registry, daemon, or network fetcher.
+            ".github/workflows/p2p-shield-ci-slice.yml",
+            "docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md",
+            "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md",
+            "install.sh",
+            "install.ps1",
+            "scripts/p2p_skill_profile.py",
+            "tests/test_p2p_project_fit_capability_provisioning.py",
+            # Issue #224 bounded web/browser reverse evidence foundation. It
+            # extends the existing single capability registry with four
+            # declared routes plus one data-only post-route reference bridge;
+            # it adds no second router, registry, daemon, service, installer,
+            # MCP registration, or network/runtime activation.
+            ".p2p/system/p2p_capabilities/capabilities.json",
+            ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+            "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/",
+            "tests/test_p2p_web_reverse_reference.py",
+            ".github/workflows/web-reverse-foundation-focused.yml",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -544,6 +578,15 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 "tests/test_p2p_frontend_upstream_intake_01.py",
                 # Tower-directed same-PR repair (PR #211): hermeticity-only.
                 "tests/test_p2p_control_tower_context_assembly.py",
+                # PR #214: the single deterministic project-fit profile
+                # selector shared by install.sh and install.ps1.
+                "scripts/p2p_skill_profile.py",
+                "tests/test_p2p_project_fit_capability_provisioning.py",
+                # Issue #224: a data-only post-route reference bridge plus its
+                # focused test. The bridge holds pins, license boundaries and
+                # fail-closed flags; it routes nothing and executes nothing.
+                ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+                "tests/test_p2p_web_reverse_reference.py",
                 ".agents/skills/frontend-design/scripts/contrast-checker.py",
                 ".claude/skills/frontend-design/scripts/contrast-checker.py",
                 ".p2p/system/.agents/skills/frontend-design/scripts/contrast-checker.py",
@@ -557,15 +600,29 @@ class NoParallelArchitectureTests(unittest.TestCase):
         self.assertEqual(violations, [], "\n".join(violations))
 
     def test_no_new_executable_capability_modules(self) -> None:
+        # Issue #224: exactly one new capability-package module is permitted,
+        # and only as the bounded data-only reference bridge. It exposes pins,
+        # license boundaries and fail-closed flags; it contains no router,
+        # executor, installer, network or subprocess primitive. Any other new
+        # `.py` under `p2p_capabilities/` still fails closed.
+        permitted_capability_modules = {".p2p/system/p2p_capabilities/web_reverse_reference.py"}
         for path in self.changed:
             self.assertFalse(
                 path.startswith(".p2p/system/p2p_capabilities/")
-                and path.endswith(".py"),
+                and path.endswith(".py")
+                and path not in permitted_capability_modules,
                 f"new capability module: {path}",
             )
             self.assertFalse(
                 path.startswith("scripts/") and path.endswith(".py")
-                and path not in {"scripts/package_release.py", "scripts/doctor.py"},
+                and path not in {
+                    "scripts/package_release.py",
+                    "scripts/doctor.py",
+                    # PR #214: one deterministic profile selector consumed by
+                    # both installers. It reads packaged skill names only and
+                    # exposes no domain/source-selection surface.
+                    "scripts/p2p_skill_profile.py",
+                },
                 f"new script surface: {path}",
             )
 

@@ -25,6 +25,10 @@ RUN set -eux; \
 # as well as in deployments/hermes-dockhosting/Dockerfile.
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/logistics/ /opt/hermes/plugins/logistics/
 
+# Read-only NotebookLM knowledge search for Support/Sale. The plugin stays
+# hidden unless NOTEBOOKLM_AUTH_JSON is configured at runtime.
+COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/notebooklm-knowledge/ /opt/hermes/plugins/notebooklm-knowledge/
+
 # P2P Personal AI behavior runtime bridge. Keep the harness logic single-source
 # in .p2p; the image receives that exact module beside the thin Hermes plugin.
 COPY --chmod=a+rX,go-w deployments/hermes-dockhosting/plugins/p2p-personal-behavior/ /opt/hermes/plugins/p2p-personal-behavior/
@@ -40,6 +44,11 @@ COPY --chmod=a+rX,go-w deployments/hermes-essential-stack/plugins/p2p-opik-obser
 # older stable 4.17.0 release so the build can resolve reproducibly.
 ARG PYMONGO_VERSION=4.17.0
 RUN uv pip install --python /opt/hermes/.venv/bin/python "pymongo==${PYMONGO_VERSION}"
+
+# notebooklm-py is an unofficial NotebookLM client. Exact-pin the reviewed
+# release so upstream undocumented-API drift cannot enter via a floating build.
+ARG NOTEBOOKLM_PY_VERSION=0.8.2
+RUN uv pip install --python /opt/hermes/.venv/bin/python "notebooklm-py==${NOTEBOOKLM_PY_VERSION}"
 
 # Opik is required only by explicitly opted-in Hermes builds.
 # Keep production/DockHosting's default image dependency set unchanged: the

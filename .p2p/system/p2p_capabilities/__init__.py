@@ -50,7 +50,20 @@ from .specialist import validate_optional_specialist
 from .skill_standard import ADAPTIVE_SKILL_FIELDS, default_uiux_contract, validate_skill_contract
 from .beginner import discover_beginner_request
 from .isolation import IsolationViolation, assert_isolated_target
-from .domain import ProjectDomainModel
+from .domain import (
+    CORE_INVARIANTS,
+    SOURCE_ROLES,
+    SOURCE_ROLE_ALIASES,
+    DomainSourceRecord,
+    DomainSourceSelectionReceipt,
+    ProjectDomainModel,
+    SelectedSourceItem,
+    SourceRoleMetadata,
+    UnselectedSourceItem,
+    build_domain_source_catalog,
+    get_source_role_metadata,
+    normalize_source_role,
+)
 from .task_state import (
     LogicalOwner,
     PlanIdentity,
@@ -201,6 +214,18 @@ __all__ = [
     "discover_beginner_request",
     "IsolationViolation",
     "assert_isolated_target",
+    "CORE_INVARIANTS",
+    "SOURCE_ROLES",
+    "SOURCE_ROLE_ALIASES",
+    "normalize_source_role",
+    "SourceRoleMetadata",
+    "get_source_role_metadata",
+    "DomainSourceRecord",
+    "SelectedSourceItem",
+    "UnselectedSourceItem",
+    "DomainSourceSelectionReceipt",
+    "build_domain_source_catalog",
+    "select_domain_sources",
     "ProjectDomainModel",
     "LogicalOwner",
     "PlanIdentity",
@@ -341,6 +366,7 @@ from .capability_intelligence import (
     classify_task,
     compute_execution_requirements,
     beginner_status,
+    select_domain_sources,
 )
 
 from .host_attestation import (
@@ -463,6 +489,7 @@ _PROMPT_AUTHORING_DISCIPLINE_CAPSULE = "\n".join(
         "PROMPT_INPUT_MATURITY — Internally classify the supplied material as READY_PROMPT, PARTIAL_DRAFT, CLEAR_SIMPLE_REQUEST, or AMBIGUOUS_HIGH_IMPACT. READY_PROMPT: preserve known task/output/constraints and clarify only real weak points. PARTIAL_DRAFT: fill only material gaps. CLEAR_SIMPLE_REQUEST: compose immediately with the smallest reasonable assumptions. AMBIGUOUS_HIGH_IMPACT: ask only questions whose answers can materially change correctness, authority, acceptance, or destination execution.",
         "CLARIFICATION_DISCIPLINE — Never re-ask facts already explicit in the Owner request, durable project state, or active task contract. Group genuinely blocking clarifications compactly, normally 2-4 at a time. After one useful clarification round, do not enter an interview loop for non-blocking gaps: state reasonable assumptions and proceed. Ask the Owner only when the uncertainty is genuinely outcome-, authority-, risk-, or execution-blocking.",
         "DESTINATION_RESOLUTION — Resolve target model/executor from the Owner request and fresh durable routing state when already known; never ask again merely because a generic prompt recipe says to. If the destination is truly unknown and materially changes execution, clarify it. Otherwise use destination-neutral instructions until a concrete destination is resolved by existing P2P routing.",
+        "ARENA_CHAT_TITLE_FIRST_LINE_V1 — For Arena NEW_CHAT, make the first nonblank line a concise human-readable <PROJECT> — <bounded task/outcome> title with distinguishing words front-loaded. Do not start with GỬI CHO:, DESTINATION=, TASK_ID=, a code fence, or a generic P2P prefix. Put routing metadata immediately after it and set CHAT_TITLE to the exact first-line title. SAME_CHAT preserves the exact existing chat title.",
         "CAPABILITY_OVER_FOLKLORE — Adapt structure and transport to verified/current destination capabilities or authoritative instructions when that materially changes execution. Do not hard-code model-specific prompting stereotypes as law. Fresh destination capability evidence outranks stale prompting folklore.",
         "PROPORTIONAL_PROMPT_COMPLEXITY — Prompt structure must be proportional to task complexity. A simple one-purpose task gets a concise executable prompt; a genuinely multi-part or high-risk task may use additional sections, placeholders, examples, edge-case rules, or strict output schemas only when they materially improve acceptance or recovery. No decorative roles, duplicated constraints, or checklist inflation.",
         "NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST — Do not instruct an executor to reveal private chain-of-thought, hidden scratchpad, or step-by-step internal reasoning. Request the final answer, concise decision rationale, assumptions, evidence, calculations, verification results, or an auditable action summary when those are needed.",
@@ -478,3 +505,26 @@ if _PROMPT_AUTHORING_DISCIPLINE_MARKER not in _control_tower_handoff.SUPREME_LAW
             _PROMPT_AUTHORING_DISCIPLINE_CAPSULE,
         )
     )
+
+
+# POLYGLOT_BY_EVIDENCE_V1 — deterministic evidence gate only.
+# No benchmark execution, toolchain installation, migration, or permission widening.
+from .performance_language_gate import (
+    SCHEMA as PERFORMANCE_LANGUAGE_GATE_SCHEMA,
+    CPU_BOTTLENECK,
+    NON_CPU_BOTTLENECKS,
+    VALID_BOTTLENECKS,
+    VERDICTS as PERFORMANCE_LANGUAGE_VERDICTS,
+    performance_signal,
+    evaluate_performance_language_admission,
+)
+
+__all__ += [
+    "PERFORMANCE_LANGUAGE_GATE_SCHEMA",
+    "CPU_BOTTLENECK",
+    "NON_CPU_BOTTLENECKS",
+    "VALID_BOTTLENECKS",
+    "PERFORMANCE_LANGUAGE_VERDICTS",
+    "performance_signal",
+    "evaluate_performance_language_admission",
+]

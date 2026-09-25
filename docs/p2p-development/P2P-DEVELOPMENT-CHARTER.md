@@ -34,6 +34,7 @@ These are the enduring invariants. The canonical machine-readable form is `archi
 | `GENERATION_NOT_RUNTIME_USE` | Files generated as reference differ from runtime-executed code. |
 | `DETERMINISTIC_FIRST` | Deterministic checks come before AI inference wherever sufficient. |
 | `PROGRESSIVE_DISCLOSURE` | Load only the context a task needs; small index, deep detail on retrieval. |
+| `PROJECT_FIT_CAPABILITY_PROVISIONING` | A normal P2P project install selects only packaged specialist skills justified by deterministic project-local stack markers; core skills remain available, user-scope installs retain the full package, the selected profile is recorded in `.p2p/system/capability-profile.json`, and re-installation may add newly relevant skills but never deletes existing project skills merely because detection changed. |
 | `CORRECTNESS_OVER_TOKEN_SAVING` | Correctness always outranks token or credit economy. |
 | `RAW_OUTPUT_NOT_MODEL_CONTEXT` | Raw outputs (filesystem artifacts, logs, test results, terminal output) are durable evidence, not disposable model context; they must be preserved on disk and never silently discarded to save context, and they are never treated as verified without deterministic checking (`DETERMINISTIC_FIRST`). |
 | `NO_SECOND_TRUTH_STORE` | No second runtime truth store competes with development-control, Task State, or FACT/Evidence. |

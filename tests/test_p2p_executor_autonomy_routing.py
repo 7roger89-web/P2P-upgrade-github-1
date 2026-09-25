@@ -24,10 +24,17 @@ INSTALL_SOURCE = REPO_ROOT / "docs" / "p2p-development" / "P2P-AGENTS-INSTALL.md
 ARENA_PROTOCOL = REPO_ROOT / "docs" / "ARENA_AGENT_MODE_PROTOCOL.md"
 
 RULE20_HEADING = "RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION"
+RULE21_HEADING = "RULE 21 — BEGINNER_PLAIN_LANGUAGE_FIRST"
 
 
 def _rule20_section(notebook_text: str) -> str:
     start = notebook_text.index("### " + RULE20_HEADING)
+    end = notebook_text.index("### " + RULE21_HEADING, start)
+    return notebook_text[start:end]
+
+
+def _rule21_section(notebook_text: str) -> str:
+    start = notebook_text.index("### " + RULE21_HEADING)
     end = notebook_text.index("## 4. RULE_ASSIMILATION_GATE_V1", start)
     return notebook_text[start:end]
 
@@ -40,7 +47,9 @@ class ExecutorAutonomyRoutingTests(unittest.TestCase):
         cls.install_text = INSTALL_SOURCE.read_text(encoding="utf-8")
         cls.arena_text = ARENA_PROTOCOL.read_text(encoding="utf-8")
         cls.rule20 = _rule20_section(cls.notebook_text)
+        cls.rule21 = _rule21_section(cls.notebook_text)
         cls.flat = re.sub(r"\s+", " ", cls.rule20)
+        cls.flat21 = re.sub(r"\s+", " ", cls.rule21)
 
     def test_rule20_exists_in_canonical_notebook(self) -> None:
         self.assertIn("### " + RULE20_HEADING, self.notebook_text)
@@ -56,12 +65,12 @@ class ExecutorAutonomyRoutingTests(unittest.TestCase):
         # Development-repo digest names the new rule and its core semantics.
         self.assertIn("RULE 20 OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION",
                       self.agents_text)
-        self.assertIn("rules 01-20 in the notebook", self.agents_text)
+        self.assertIn("rules 01-21 in the notebook", self.agents_text)
         self.assertIn("AUTONOMOUS_UNTIL_TERMINAL", self.agents_text)
         # Installed thin entrypoint advertises the extended rule range so a
         # normal installed project discovers RULE 20 via the installed
         # notebook projection (installers copy the full notebook wholesale).
-        self.assertIn("RULE 01–20", self.install_text)
+        self.assertIn("RULE 01–21", self.install_text)
         # ... while staying thin: full rule bodies are never copied there.
         self.assertNotIn(RULE20_HEADING, self.install_text)
         self.assertIn("not copied here", self.install_text)
@@ -263,6 +272,35 @@ class ExecutorAutonomyRoutingTests(unittest.TestCase):
         self.assertIn("OWNER KHÔNG CHUYỂN PROMPT", flat)
         self.assertIn("CONTROL TOWER TỰ CHỌN NGƯỜI LÀM PHÙ HỢP", flat)
 
+
+    def test_rule21_beginner_plain_language_contract(self) -> None:
+        self.assertIn("### " + RULE21_HEADING, self.notebook_text)
+        self.assertIn("PLAIN_LANGUAGE_FIRST=YES", self.rule21)
+        self.assertIn("RETURN_PACKET != OWNER_EXPLANATION", self.rule21)
+        self.assertIn("NOT_RUN != FAIL", self.rule21)
+        self.assertIn("NOT_OBSERVED != NO", self.rule21)
+        self.assertIn("BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT", self.rule21)
+
+    def test_rule21_distinguishes_unverified_from_failed(self) -> None:
+        self.assertIn("not verified rather than as observed failures", self.flat21)
+        self.assertIn("chưa kiểm tra được vì thiếu công cụ/điều kiện", self.rule21)
+        self.assertIn("visual gate failed", self.rule21)
+
+    def test_rule21_reuses_rule09_for_one_action(self) -> None:
+        self.assertIn("RULE 09 — ONE_ACTION_NOW_FOR_BEGINNER", self.rule21)
+        self.assertIn("instead of creating a second action rule", self.flat21)
+
+    def test_rule21_owner_wording_is_neutral_and_digest_is_exposed(self) -> None:
+        self.assertIn("BẠN CẦN LÀM GÌ BÂY GIỜ", self.rule21)
+        self.assertNotIn("MÀY CẦN LÀM GÌ BÂY GIỜ", self.rule21)
+        self.assertIn("RULE 21 BEGINNER_PLAIN_LANGUAGE_FIRST", self.agents_text)
+        self.assertIn("RETURN_PACKET != OWNER_EXPLANATION", self.agents_text)
+        self.assertIn("NOT_OBSERVED != NO", self.agents_text)
+
+    def test_rule21_install_entrypoint_stays_thin(self) -> None:
+        self.assertIn("RULE 01–21", self.install_text)
+        self.assertIn("Owner-facing explanations must be plain-language first", self.install_text)
+        self.assertNotIn(RULE21_HEADING, self.install_text)
 
 if __name__ == "__main__":
     unittest.main()

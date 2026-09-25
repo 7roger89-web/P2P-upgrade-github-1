@@ -91,7 +91,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $SystemDestination "scripts
 Get-ChildItem -LiteralPath (Join-Path $PackageRoot "governance") -Force | ForEach-Object {
   Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $SystemDestination "governance") -Recurse -Force
 }
-foreach ($ScriptName in @("p2p_governance.py", "p2p_eval.py", "p2p_approval.py", "p2p_gate.py", "p2p_bootstrap.py", "p2p_workflow.py", "p2p_orientation.py", "p2p_decision_trace.py", "p2p_task_state.py", "p2p_safe_installer.py", "doctor.py")) {
+foreach ($ScriptName in @("p2p_governance.py", "p2p_eval.py", "p2p_approval.py", "p2p_gate.py", "p2p_bootstrap.py", "p2p_workflow.py", "p2p_orientation.py", "p2p_decision_trace.py", "p2p_task_state.py", "p2p_safe_installer.py", "p2p_skill_profile.py", "doctor.py")) {
   Copy-Item -LiteralPath (Join-Path $PackageRoot ("scripts\" + $ScriptName)) -Destination (Join-Path $SystemDestination ("scripts\" + $ScriptName)) -Force
 }
 
@@ -197,7 +197,40 @@ if (-not (Test-Path -LiteralPath $ProjectPolicyPath -PathType Leaf)) {
   [System.IO.File]::WriteAllText($ProjectPolicyPath, $PolicyJson, [System.Text.UTF8Encoding]::new($false))
 }
 
-foreach ($Skill in Get-ChildItem -LiteralPath $SkillsSource -Directory) {
+$PythonCommand = Get-Command py -ErrorAction SilentlyContinue
+if (-not $PythonCommand) {
+  $PythonCommand = Get-Command python -ErrorAction SilentlyContinue
+}
+if (-not $PythonCommand) {
+  throw "Python was not found. It is required for project-fit capability provisioning."
+}
+
+$ProfileMode = if ($Scope -eq "User") { "ALL" } else { "AUTO" }
+$ProfileReceiptPath = Join-Path $SystemDestination "capability-profile.json"
+$ProfileJson = & $PythonCommand.Source (Join-Path $PackageRoot "scripts\p2p_skill_profile.py") `
+  --root $Root `
+  --skills-dir $SkillsSource `
+  --profile $ProfileMode `
+  --format json
+if ($LASTEXITCODE -ne 0) {
+  throw "Project-fit capability profile detection failed."
+}
+[System.IO.File]::WriteAllText($ProfileReceiptPath, (($ProfileJson -join $NL) + $NL), [System.Text.UTF8Encoding]::new($false))
+$CapabilityProfile = ((Get-Content -LiteralPath $ProfileReceiptPath -Raw) | ConvertFrom-Json).profile
+
+$SelectedSkills = & $PythonCommand.Source (Join-Path $PackageRoot "scripts\p2p_skill_profile.py") `
+  --root $Root `
+  --skills-dir $SkillsSource `
+  --profile $ProfileMode `
+  --format lines
+if ($LASTEXITCODE -ne 0) {
+  throw "Project-fit capability skill selection failed."
+}
+foreach ($SkillName in $SelectedSkills) {
+  if (-not $SkillName) {
+    continue
+  }
+  $Skill = Get-Item -LiteralPath (Join-Path $SkillsSource $SkillName)
   $Destination = Join-Path $SkillsDestination $Skill.Name
   if ($InstallClass -eq "SAME_VERSION_REINSTALL" -and (Test-Path -LiteralPath $Destination)) {
     continue
@@ -284,13 +317,6 @@ if (Test-Path -LiteralPath $InstructionsPath) {
 }
 [System.IO.File]::WriteAllText($InstructionsPath, $Merged, [System.Text.UTF8Encoding]::new($false))
 
-$PythonCommand = Get-Command py -ErrorAction SilentlyContinue
-if (-not $PythonCommand) {
-  $PythonCommand = Get-Command python -ErrorAction SilentlyContinue
-}
-if (-not $PythonCommand) {
-  throw "Python was not found. It is required to build the mandatory P2P runtime drift lock."
-}
 & $PythonCommand.Source (Join-Path $SystemDestination "scripts\p2p_governance.py") lock-runtime `
   --root $Root `
   --governance (Join-Path $SystemDestination "governance") `
@@ -315,6 +341,7 @@ Write-Host "P2P Codex installed successfully." -ForegroundColor Green
 Write-Host "Scope: $Scope"
 Write-Host "Root:  $Root"
 Write-Host "Install class: $InstallClass"
+Write-Host "Capability profile: $CapabilityProfile"
 if (Test-Path -LiteralPath $BackupRoot) {
   Write-Host "Backup: $BackupRoot"
 }

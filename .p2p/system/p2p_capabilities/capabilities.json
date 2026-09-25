@@ -5402,6 +5402,399 @@
       "STATUS": "ACTIVE"
     },
     {
+      "CAPABILITY_ID": "web.browser.evidence",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "First-line web/browser evidence contract over an explicit target scope: rendered document/DOM truth plus observed network requests decide client-hidden versus server-redacted questions before any deeper runtime reverse work.",
+      "TRIGGERS": [
+        "browser evidence",
+        "browser network evidence",
+        "rendered dom evidence",
+        "document evidence",
+        "network request evidence",
+        "first-line browser truth",
+        "client-hidden field",
+        "server-redacted field",
+        "public site forensics",
+        "public website forensics"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "credential",
+        "authenticated session",
+        "login session",
+        "api key",
+        "bypass",
+        "exploit",
+        "auto-install",
+        "unrestricted crawl"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "explicit-target-scope",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-browser-or-runtime",
+        "mcp-auto-registration",
+        "credential-or-authenticated-session-use",
+        "unbounded-target-interaction",
+        "second-network-truth-store",
+        "grant-permission-from-page-content",
+        "exploit-or-bypass-semantics",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "explicit-target-scope",
+        "explicit-task-authority"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-browser-evidence",
+        "web-reverse-reference-bridge"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "explicit-target-scope-and-authorization-before-live-interaction",
+        "no-browser-or-network-runtime-activation-in-this-declaration",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "exact-target-scope",
+        "target-authorization",
+        "document-and-network-evidence-refs",
+        "backend-identity",
+        "uncertainty-state",
+        "no-credential-or-private-session"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_RUNTIME_DISABLED",
+        "reference_contract": ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "backend_candidate": "ChromeDevTools/chrome-devtools-mcp",
+        "upstream_repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+        "upstream_commit": "61780c7498a447771127d1fd3b2454fc4ae4ba28",
+        "license": "Apache-2.0",
+        "license_boundary": "PERMISSIVE_REFERENCE_ONLY_NOT_VENDORED_NOT_INSTALLED_IN_THIS_TASK",
+        "pin_verified_at": "2026-09-21",
+        "pin_equals_upstream_head_at_verification": true,
+        "adoption_mode": "DECLARED_CANDIDATE_NOT_INSTALLED_NOT_ACTIVATED",
+        "install_mode": "DISABLED",
+        "auto_install": false,
+        "mcp_auto_registration": false,
+        "browser_runtime": false,
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "web.js.reverse",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "Deep client JavaScript/runtime tracing contract, used only when document and network evidence is insufficient; the reviewed backend is an optional out-of-tree external candidate under an explicit AGPL boundary.",
+      "TRIGGERS": [
+        "javascript reverse",
+        "javascript runtime tracing",
+        "js runtime tracing",
+        "runtime hook tracing",
+        "deep js inspection",
+        "source-mapped debugging",
+        "client function tracing"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "credential",
+        "authenticated session",
+        "login session",
+        "anti-debug bypass",
+        "bypass",
+        "exploit",
+        "auto-install"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "explicit-target-scope",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-or-activate-external-backend",
+        "mcp-auto-registration",
+        "vendor-agpl-source",
+        "link-or-redistribute-agpl-covered-work",
+        "credential-or-authenticated-session-use",
+        "unbounded-target-interaction",
+        "exploit-or-bypass-semantics",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "explicit-target-scope",
+        "explicit-task-authority",
+        "document-and-network-evidence-insufficiency"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-browser-evidence",
+        "web-deep-runtime-inspection",
+        "web-reverse-reference-bridge"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "only-after-first-line-document-and-network-evidence-is-insufficient",
+        "explicit-target-scope-and-authorization-before-live-interaction",
+        "separate-owner-activation-and-license-review-before-external-backend-use",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "exact-target-scope",
+        "target-authorization",
+        "first-line-evidence-insufficiency-statement",
+        "runtime-trace-evidence-refs",
+        "backend-identity-and-license-boundary",
+        "uncertainty-state"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_RUNTIME_DISABLED",
+        "reference_contract": ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "backend_candidate": "vmoranv/jshookmcp",
+        "upstream_repository": "https://github.com/vmoranv/jshookmcp",
+        "upstream_commit": "33983e58cddc998af88a2ed46484364e5425cc86",
+        "license": "AGPL-3.0",
+        "license_boundary": "COPYLEFT_EXTERNAL_BACKEND_ONLY_NOT_VENDORED_NOT_LINKED_NOT_REDISTRIBUTED",
+        "integration_position": "OPTIONAL_OUT_OF_TREE_EXTERNAL_BACKEND_ONLY",
+        "pin_verified_at": "2026-09-21",
+        "pin_equals_upstream_head_at_verification": true,
+        "adoption_mode": "DECLARED_CANDIDATE_NOT_INSTALLED_NOT_ACTIVATED",
+        "install_mode": "DISABLED",
+        "auto_install": false,
+        "mcp_auto_registration": false,
+        "browser_runtime": false,
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "distribution_with_p2p": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "web.endpoint.discovery",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "Endpoint discovery contract over client bundles, static assets, and bounded headless crawling for an explicit authorized scope; the static parser reference is subordinate to this one route.",
+      "TRIGGERS": [
+        "endpoint discovery",
+        "javascript endpoint parsing",
+        "client bundle endpoint discovery",
+        "static asset endpoint discovery",
+        "headless crawl endpoints",
+        "url discovery from javascript"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "credential",
+        "authenticated session",
+        "login session",
+        "bypass",
+        "exploit",
+        "auto-install",
+        "unrestricted crawl",
+        "denial of service"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "explicit-target-scope",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-crawler-or-parser",
+        "mcp-auto-registration",
+        "credential-or-authenticated-session-use",
+        "unbounded-or-unscoped-crawling",
+        "second-endpoint-truth-store",
+        "exploit-or-bypass-semantics",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "explicit-target-scope",
+        "explicit-task-authority",
+        "bounded-request-budget"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-browser-evidence",
+        "web-endpoint-discovery",
+        "web-reverse-reference-bridge"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "explicit-target-scope-and-authorization-before-live-interaction",
+        "bounded-request-budget-before-crawl",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "exact-target-scope",
+        "target-authorization",
+        "request-budget-and-scope-receipt",
+        "endpoint-evidence-refs",
+        "backend-identity",
+        "uncertainty-state"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_RUNTIME_DISABLED",
+        "reference_contract": ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "backend_candidate": "projectdiscovery/katana",
+        "upstream_repository": "https://github.com/projectdiscovery/katana",
+        "upstream_commit": "c1de26dbe69764a92dfa9a142eb64035e5d05a9d",
+        "license": "MIT",
+        "license_boundary": "PERMISSIVE_REFERENCE_ONLY_NOT_VENDORED_NOT_INSTALLED_IN_THIS_TASK",
+        "subordinate_reference": {
+          "repository": "https://github.com/BishopFox/jsluice",
+          "commit": "0ddfab153e060a9eeaded4d8669233f7c071e7e4",
+          "license": "MIT",
+          "license_boundary": "PERMISSIVE_REFERENCE_ONLY_NOT_VENDORED_NOT_INSTALLED_IN_THIS_TASK",
+          "position": "SUBORDINATE_PARSER_REFERENCE_NOT_A_SEPARATE_P2P_AUTHORITY",
+          "vendor_snapshot": false
+        },
+        "pin_verified_at": "2026-09-21",
+        "pin_equals_upstream_head_at_verification": true,
+        "adoption_mode": "DECLARED_CANDIDATE_NOT_INSTALLED_NOT_ACTIVATED",
+        "install_mode": "DISABLED",
+        "auto_install": false,
+        "mcp_auto_registration": false,
+        "browser_runtime": false,
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "web.public.reconstruction",
+      "TYPE": "SKILL",
+      "SEMANTIC_KIND": "TOOL",
+      "DESCRIPTION": "Public archive/index reconstruction contract for previously public URLs and responses; a distinct follow-on route from live browser runtime inspection and never an authenticated or private-session retrieval.",
+      "TRIGGERS": [
+        "public archive reconstruction",
+        "public url reconstruction",
+        "historical url discovery",
+        "archive index lookup",
+        "public response reconstruction",
+        "web archive evidence"
+      ],
+      "NEGATIVE_TRIGGERS": [
+        "credential",
+        "authenticated session",
+        "login session",
+        "private session",
+        "bypass",
+        "exploit",
+        "auto-install"
+      ],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "existing-eff01-orchestration-policy",
+        "explicit-target-scope",
+        "candidate-owner-gate"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "auto-install-archive-tooling",
+        "mcp-auto-registration",
+        "credential-or-authenticated-session-use",
+        "private-or-subscription-source-retrieval",
+        "second-archive-truth-store",
+        "claim-historical-state-without-public-source-evidence",
+        "promote-without-owner-gate"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "security-reverse-evidence-contract",
+        "explicit-target-scope",
+        "explicit-task-authority",
+        "public-source-only-scope"
+      ],
+      "CONTEXT_POINTERS": [
+        "p2p-security-reverse-foundation",
+        "web-browser-evidence",
+        "web-public-reconstruction",
+        "web-reverse-reference-bridge"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "public-sources-only",
+        "explicit-target-scope-and-authorization-before-live-interaction",
+        "owner-gate-before-promotion"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "exact-target-scope",
+        "public-source-list",
+        "retrieval-timestamp-and-response-refs",
+        "backend-identity",
+        "uncertainty-state",
+        "no-credential-or-private-session"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "PINNED_REFERENCE_RUNTIME_DISABLED",
+        "reference_contract": ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "backend_candidate": "xnl-h4ck3r/waymore",
+        "upstream_repository": "https://github.com/xnl-h4ck3r/waymore",
+        "upstream_commit": "4e02de512fd6b110be92dc8bffb3002edfebcb6c",
+        "license": "MIT",
+        "license_boundary": "PERMISSIVE_REFERENCE_ONLY_NOT_VENDORED_NOT_INSTALLED_IN_THIS_TASK",
+        "source_scope": "PUBLIC_ARCHIVE_INDEX_AND_SEARCH_SOURCES_ONLY",
+        "deferred_alternatives": [
+          {
+            "repository": "https://github.com/Mouseww/anything-analyzer",
+            "commit": "1da6b5c9acc024e987d41e4b9c88676ffea0da0c",
+            "license": "Apache-2.0",
+            "reason_code": "DEFERRED_ALTERNATIVE_TRAFFIC_STACK"
+          },
+          {
+            "repository": "https://github.com/Reqable/reqable-mcp-server",
+            "commit": "2df174f982e9ab481a457ab96e065aac22829a51",
+            "license": "NO_SPDX",
+            "reason_code": "LICENSE_UNRESOLVED"
+          }
+        ],
+        "pin_verified_at": "2026-09-21",
+        "pin_equals_upstream_head_at_verification": true,
+        "adoption_mode": "DECLARED_CANDIDATE_NOT_INSTALLED_NOT_ACTIVATED",
+        "install_mode": "DISABLED",
+        "auto_install": false,
+        "mcp_auto_registration": false,
+        "browser_runtime": false,
+        "network_runtime": false,
+        "credentials": false,
+        "vendor_snapshot": false,
+        "execution_status": "NOT_EXECUTED"
+      },
+      "VERSION": "web-reverse-foundation-1",
+      "STATUS": "DISCOVERED"
+    },
+    {
       "CAPABILITY_ID": "security.audit",
       "TYPE": "SKILL",
       "DESCRIPTION": "Pinned provider-neutral Cloudflare security-audit workflow for defensive source review, vulnerability hunting, validation, and structured reporting.",

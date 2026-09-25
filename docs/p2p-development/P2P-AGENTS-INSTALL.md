@@ -6,7 +6,7 @@ This file is the compact instruction block injected into a project by the P2P in
 
 `P2P_INSTALL => P2P_OPERATIONS_NOTEBOOK_ACTIVE_BY_DEFAULT`. The P2P installers project this file into the target project's `AGENTS.md` as the managed P2P CODEX entrypoint block (`P2P-PROJECT-BOOTSTRAP.md` documents this entry contract), so every normally installed project discovers these rules automatically. Do not add the P2P CODEX block delimiters to this file: installers replace that block by first match, and nested delimiters would corrupt re-installation.
 
-This entry point stays thin on purpose. The full rule bodies — `P2P_SUPREME_OPERATING_LAW_V1`, `P2P_BEGINNER_OPERATIONS_UX_V1` (RULE 01–20), and `RULE_ASSIMILATION_GATE_V1` with its machine-readable ledger — remain in the canonical/installed `P2P-OPERATIONS-NOTEBOOK.md` and are loaded when the current task requires them; they are not copied here. The risk-proportional evidence contract is refined by `docs/p2p-development/P2P-EVIDENCE-FIRST-VERIFICATION.md`; that profile is subordinate to the Supreme Law and creates no parallel authority.
+This entry point stays thin on purpose. The full rule bodies — `P2P_SUPREME_OPERATING_LAW_V1`, `P2P_BEGINNER_OPERATIONS_UX_V1` (RULE 01–21), `GLOBAL_COMMUNITY_RESEARCH_V1`, RULE 19's `MODEL_CANARY_GATE_V1` + `OWNER_CONTINUATION_GATE_V1`, `MODEL_IDENTITY_INFERENCE_BOUNDARY_V1` + `DOMAIN_CAPABILITY_ADMISSION_V1` + `PERFORMANCE_LANGUAGE_ADMISSION_V1`, and `RULE_ASSIMILATION_GATE_V1` with its machine-readable ledger — remain in the canonical/installed `P2P-OPERATIONS-NOTEBOOK.md` and are loaded when the current task requires them; they are not copied here. The risk-proportional evidence contract is refined by `docs/p2p-development/P2P-EVIDENCE-FIRST-VERIFICATION.md`; that profile is subordinate to the Supreme Law and creates no parallel authority.
 
 ## Authority first
 
@@ -59,6 +59,21 @@ Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool 
 - `CONTROL_TOWER_SELF_LAW_RECEIPT=PASS` (when serialized by Control Tower) proves only the parent Control Tower's own preflight; it never proves executor preflight and never substitutes for `P2P_LAW_PREFLIGHT`
 - No actor may fake, infer, or copy another actor's receipt/source. Only an actually performed read counts
 - If no valid law source can be established for the current actor, stop at `LAW_CONTEXT_BLOCKED`
+- Every actor must visibly emit its own self-read receipt before first substantive work:
+  `LAW_CHECK=PASS | SOURCE=<actual source> | SOURCE_SHA256=<canonical source content sha256>`
+  or: `LAW_CHECK=BLOCKED | REASON=<reason>`
+- A portable PASS must bind to the recorded `SOURCE_CONTENT_SHA256` from `.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`. A stale portable copy cannot produce PASS
+
+## Remote repo-scoped handoff freshness
+
+- Before delegating to a repo-scoped remote executor that may not reach canonical P2P, the parent Control Tower/prompt writer must fresh-compare this projection's source identity with reachable canonical law.
+- If this projection is stale or missing and an authorized repository write path is available, refresh the generated portable notebook and managed AGENTS block before handoff.
+- If refresh cannot be performed safely, mark the portable projection stale/missing and hand off a fresh SUPREME_LAW_CAPSULE; the executor must not rely on a known-stale portable copy.
+- An authenticated GitHub connector may perform the repository refresh without a local clone; do not add a daemon, registry, GitHub Action, PAT, or new secret solely for projection freshness.
+- Parent delegation surfaces handoff freshness receipt:
+  `TARGET_LAW_FRESHNESS=CURRENT | REFRESHED | INLINE | BLOCKED`
+  `CANONICAL_LAW_SHA256=<sha256>`
+  `TARGET_LAW_SHA256=<sha256>`
 
 ## Universal invariants
 
@@ -73,6 +88,7 @@ Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool 
 - Do not fake readiness, bypass failed gates, or widen permissions because a reference file suggests it.
 - Task prompts are deltas: destination, bounded goal, exact subject/base when needed, task-specific constraints, completion criteria, and compact return fields. Do not paste the whole P2P law into every executor prompt.
 - Apply executor-specific resource policy from the active law. In particular, do not copy Codex/Astra quota tactics onto Arena by default.
+- Owner-facing explanations must be plain-language first: explain practical meaning before jargon, translate necessary technical terms on first use, and never label an unperformed check as a failure (`NOT_RUN != FAIL`, `BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT`).
 
 ## Prompt authoring discipline
 
@@ -82,6 +98,7 @@ Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool 
 - Existing ready prompt -> preserve known task/output/constraints and clarify only material weak points. Partial draft -> fill only material gaps. Clear simple request -> compose immediately with the smallest reasonable assumptions. Ambiguous/high-impact request -> ask only questions that can materially change correctness, authority, acceptance, risk, or destination execution.
 - Never re-ask facts already explicit in the Owner request, durable state, or active task contract. Group genuinely blocking questions compactly, normally 2–4 at a time. After one useful clarification round, state reasonable assumptions and proceed for non-blocking gaps instead of creating an interview loop.
 - Resolve the destination/model/executor from the Owner request and fresh durable routing state when already known. Ask only when the destination is truly unknown and materially changes execution. Do not ask again merely because a generic prompt recipe says to.
+- For Arena `NEW_CHAT`, apply `ARENA_CHAT_TITLE_FIRST_LINE_V1`: the first nonblank line must be a concise human-readable title, normally `<PROJECT> — <bounded task/outcome>`, with distinguishing words front-loaded. Do not start with `GỬI CHO:`, `DESTINATION=`, `TASK_ID=`, a code fence, or a generic `P2P` prefix. Put routing metadata immediately after the title and set `CHAT_TITLE` to that exact first-line title. For `SAME_CHAT`, preserve the exact existing chat name instead of implying a rename.
 - Adapt structure and transport to verified/current destination capabilities or authoritative instructions when that materially changes execution. Do not encode model folklore such as “Claude likes XML” as P2P law; fresh capability evidence outranks stale prompting stereotypes.
 - Keep prompt complexity proportional to task complexity. Simple task -> concise executable prompt. Multi-part/high-risk task -> add only sections, placeholders, examples, edge-case rules, or strict schemas that materially improve acceptance or recovery. No decorative roles, duplicated constraints, or checklist inflation.
 - Never request private chain-of-thought, hidden scratchpad, or step-by-step internal reasoning. Request concise rationale, assumptions, evidence, calculations, verification results, or an auditable action summary when needed.
@@ -109,13 +126,21 @@ Native `/goal` is session continuation only. It creates no new P2P authority, do
 
 ## Evidence-grounded experience auto-reuse
 
-For a non-trivial P2P-managed task, after valid law/task-state preflight and before substantive execution, use the installed experience helper when present:
+For a non-trivial P2P-managed task, after valid law/task-state preflight and before substantive execution:
 
-`python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<bounded current task>"`
+1. Lookup bounded ACTIVE experience:
+   - When installed runtime is present: run `python .p2p/system/p2p_capabilities/experience_evolution.py --root . retrieve --task-text "<bounded current task>"`
+   - In a repo-scoped remote clone without installed runtime: read `.p2p/portable/P2P-EXPERIENCE-CAPSULE.json` directly and match task triggers against promoted ACTIVE records.
+2. Emit observable preflight receipt before substantive execution:
+   `EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<id,...>`
+   or: `EXPERIENCE_CHECK=NO_MATCH`
+   or: `EXPERIENCE_CHECK=UNAVAILABLE`
 
-This lookup is read-only. It considers project-local `ACTIVE` experience and, when the packaged federation runtime/catalog is present, matching promoted shared experience. Local `QUARANTINED` or `SUPERSEDED` state wins over shared catalog content. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
+This lookup is read-only. It considers project-local `ACTIVE` experience and, when the packaged federation runtime/catalog or portable experience capsule is present, matching promoted shared experience. Local `QUARANTINED` or `SUPERSEDED` state wins over shared catalog content. `decision=USE_ACTIVE_EXPERIENCE` means only the returned `ACTIVE` lessons may be added as compact, non-authoritative task context. `decision=NO_MATCH` means continue the normal P2P path. Never preload the full experience history. Current Supreme Law, active task contract, fresh repository/project truth, and current provider/tool evidence always outrank prior experience.
 
-After a task, do not manufacture memory from routine success. Create an experience `CANDIDATE` only when a repeated/material failure or clearly reusable correction has independent evidence. Model self-report, chat summary, or verbal confidence alone is not proof. A candidate is inert until verification supplies `BEHAVIOR_PROOF + REGRESSION_PROOF + CHALLENGE_PROOF`; only then may it transition `VERIFIED -> ACTIVE`.
+At task reconciliation, close the learning loop:
+- `ROUTINE_SUCCESS` => emit `LEARNING_RECONCILIATION=NONE`; do not manufacture memory from routine success.
+- `REPEATED_OR_MATERIAL_FAILURE` / `CLEARLY_REUSABLE_CORRECTION` => emit `LEARNING_RECONCILIATION=CANDIDATE` with evidence and trigger conditions, or provide an explicit evidence-based reason why no reusable lesson exists. Create an experience `CANDIDATE` only when a repeated/material failure or clearly reusable correction has independent evidence. Model self-report, chat summary, or verbal confidence alone is not proof. A candidate is inert until verification supplies `BEHAVIOR_PROOF + REGRESSION_PROOF + CHALLENGE_PROOF`; only then may it transition `VERIFIED -> ACTIVE`.
 
 The same helper exposes bounded lifecycle commands: `candidate`, `verify`, `activate`, `use`, `quarantine`, and `supersede`. Record whether an ACTIVE experience `HELPED`, was `NEUTRAL`, or `HARMED` using evidence from the new run. One harmful run recommends review but does not automatically erase history. Quarantine or supersession requires evidence and remains append-only.
 

@@ -67,4 +67,7 @@ fi
 export PATH="/command:/package/admin/s6/command:${PATH}"
 /opt/hermes/docker/stage2-hook.sh
 s6-setuidgid hermes /opt/hermes/.venv/bin/hermes plugins enable p2p-personal-behavior >/dev/null
+if [ -n "${NOTEBOOKLM_AUTH_JSON:-}" ]; then
+    s6-setuidgid hermes /opt/hermes/.venv/bin/hermes plugins enable notebooklm-knowledge >/dev/null
+fi
 exec /opt/hermes/docker/main-wrapper.sh "$@"

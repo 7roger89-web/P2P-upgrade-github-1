@@ -104,6 +104,41 @@ Before activating each capability, verify:
 
 If the answer is **NO**, do not activate the capability.
 
+## Production Knowledge Delta (Issue #222)
+
+Production Three.js / WebGL / WebGPU workflows adhere to the following reconciled engineering practices:
+
+1. **Asset Preparation & Blender Pipeline**:
+   - Apply all transforms (`Ctrl+A`) before export.
+   - Clean non-manifold geometry and ensure pivot/origin is logically positioned.
+   - Evaluate Draco geometry compression empirically: measure network transfer time savings against client-side CPU/worker decompression overhead.
+   - Use GPU-compressed textures (KTX2 / Basis Universal) where texture memory pressure requires VRAM conservation.
+   - Pack Ambient Occlusion, Roughness, and Metalness into a single ORM texture (R=AO, G=Roughness, B=Metalness).
+
+2. **Baking vs Dynamic Lighting Decision**:
+   - Static environments & architecture: bake lightmaps and ambient occlusion into `uv2` using `LinearSRGBColorSpace` (`material.lightMap`).
+   - Hero interactive actors: dynamic lighting and directional shadows.
+   - Secondary actors: contact shadows or decal shadows to eliminate costly shadow map render passes.
+   - Ambient diffuse & specular: Image-Based Lighting (IBL) via HDR environment maps (`scene.environment`).
+
+3. **Color Management, PBR & Environment**:
+   - Renderer output color space: `renderer.outputColorSpace = THREE.SRGBColorSpace;`.
+   - Data maps (normal, roughness, metalness, AO): linear `THREE.NoColorSpace`.
+   - Lightmaps: linear `THREE.LinearSRGBColorSpace`.
+   - Tone mapping: `renderer.toneMapping = THREE.ACESFilmicToneMapping;`.
+   - Environment maps: `PMREMGenerator` pre-filtered equirectangular HDR maps.
+
+4. **Modern WebGL vs WebGPU / TSL Path**:
+   - WebGPURenderer (`three/webgpu`): automatically attempts WebGPU initialization and falls back to WebGL 2 backend if unsupported (`await renderer.init()`).
+   - Stable foundation: `WebGLRenderer` remains a verified, stable path.
+   - Three Shading Language (TSL): write node materials (`MeshStandardNodeMaterial`, `positionLocal`, `time`) from `three/tsl` for cross-compilation to both WGSL and GLSL.
+
+5. **Measurement-First Performance Guidance**:
+   - **Reject brittle magic numbers**: do not assume arbitrary polygon ceilings, static draw-call limits, or heuristic GPU tiers dictate performance.
+   - Profile actual runtime metrics: `renderer.info.render.calls`, `renderer.info.render.triangles`, `renderer.info.memory.textures`.
+   - Diagnose whether bottlenecks are CPU draw-call bound, GPU fill-rate bound, or memory-bandwidth bound before applying optimizations.
+   - Scale resolution dynamically based on measured frame time rather than rigid device pixel ratio caps.
+
 ## Anti-Patterns
 
 - Activating all Three.js capabilities because the project uses Three.js.

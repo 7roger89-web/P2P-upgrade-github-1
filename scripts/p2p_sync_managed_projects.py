@@ -31,6 +31,7 @@ for candidate in (str(REPO_ROOT), str(REPO_ROOT / "scripts"), str(REPO_ROOT / ".
 import p2p_portable_law_projection as projector  # noqa: E402
 
 PORTABLE_REL = projector.PORTABLE_REL
+PORTABLE_EXPERIENCE_REL = getattr(projector, "PORTABLE_EXPERIENCE_REL", Path(".p2p/portable/P2P-EXPERIENCE-CAPSULE.json"))
 AGENTS_BEGIN_PORTABLE = projector.AGENTS_BEGIN
 AGENTS_BEGIN_CODEX = "<!-- BEGIN P2P CODEX -->"
 
@@ -127,6 +128,7 @@ def _check_project(package_root: Path, project: Path) -> dict:
     try:
         # This will raise if parent symlink unsafe
         projector._assert_safe_parent(project_resolved, PORTABLE_REL)
+        projector._assert_safe_parent(project_resolved, PORTABLE_EXPERIENCE_REL)
     except ValueError as exc:
         return {
             "project": str(project),
@@ -136,7 +138,10 @@ def _check_project(package_root: Path, project: Path) -> dict:
         }
 
     try:
-        expected_proj, expected_agents = projector.expected_project_state(package_root, project_resolved)
+        state = projector.expected_project_state(package_root, project_resolved)
+        expected_proj = state[0]
+        expected_agents = state[1]
+        expected_exp = state[2] if len(state) > 2 else ""
     except (ValueError, OSError, UnicodeError) as exc:
         return {
             "project": str(project),
@@ -146,6 +151,7 @@ def _check_project(package_root: Path, project: Path) -> dict:
         }
 
     portable_path = project_resolved / PORTABLE_REL
+    portable_exp_path = project_resolved / PORTABLE_EXPERIENCE_REL
     agents_path = project_resolved / "AGENTS.md"
 
     try:
@@ -156,14 +162,19 @@ def _check_project(package_root: Path, project: Path) -> dict:
         agents_ok = agents_path.is_file() and agents_path.read_text(encoding="utf-8") == expected_agents
     except (OSError, UnicodeError):
         agents_ok = False
+    try:
+        exp_ok = (not expected_exp) or (portable_exp_path.is_file() and portable_exp_path.read_text(encoding="utf-8") == expected_exp)
+    except (OSError, UnicodeError):
+        exp_ok = False
 
-    if proj_ok and agents_ok:
+    if proj_ok and agents_ok and exp_ok:
         return {
             "project": str(project),
             "resolved": str(project_resolved),
             "status": "CURRENT",
             "portable_ok": proj_ok,
             "agents_ok": agents_ok,
+            "experience_ok": exp_ok,
         }
     else:
         return {
@@ -172,6 +183,7 @@ def _check_project(package_root: Path, project: Path) -> dict:
             "status": "STALE",
             "portable_ok": proj_ok,
             "agents_ok": agents_ok,
+            "experience_ok": exp_ok,
         }
 
 
@@ -183,7 +195,7 @@ def _write_project(package_root: Path, project: Path) -> dict:
     except OSError:
         project_resolved = project
     if project_resolved.is_dir() and (project_resolved / ".git").exists():
-        dirty = _is_git_dirty(project_resolved, [Path("AGENTS.md"), PORTABLE_REL])
+        dirty = _is_git_dirty(project_resolved, [Path("AGENTS.md"), PORTABLE_REL, PORTABLE_EXPERIENCE_REL])
         if dirty:
             return {
                 "project": str(project),
