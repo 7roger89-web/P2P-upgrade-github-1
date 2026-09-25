@@ -40,6 +40,16 @@ class ExternalSourcesDoctorTests(unittest.TestCase):
             report = self.check(root)
         self.assertTrue(any(item["level"] == "FAIL" for item in report.items))
 
+    def test_missing_final_required_0006_fails_closed(self) -> None:
+        data = json.loads((REPO_ROOT / "manifest" / "external-sources.json").read_text(encoding="utf-8"))
+        data["sources"] = [item for item in data["sources"] if item["source_id"] != "P2P-EXT-0006"]
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            self.write_manifest(root, data)
+            report = self.check(root)
+        failures = [item["message"] for item in report.items if item["level"] == "FAIL"]
+        self.assertEqual(failures, ["External-source schema or IDs are incomplete"])
+
     def test_duplicate_or_malformed_id_fails_closed(self) -> None:
         baseline = json.loads((REPO_ROOT / "manifest" / "external-sources.json").read_text(encoding="utf-8"))
         for replacement in ("P2P-EXT-0001", "P2P-EXT-X006", ["P2P-EXT-0006"]):
