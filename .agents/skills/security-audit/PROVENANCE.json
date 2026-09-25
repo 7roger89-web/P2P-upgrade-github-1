@@ -16,7 +16,7 @@
     "file": "LICENSE"
   },
   "integration_mode": "PROVIDER_NEUTRAL_WRAPPER_OVER_PINNED_UPSTREAM",
-  "projection_entrypoint_sha256": "b7c6540ebae9e2f4c76b04233277b6bdca330308cc9c2bb2416310e70f4d6c07",
+  "projection_entrypoint_sha256": "feff9d033a4d93a5ce5037493e967c838a560aa345f5aec715dc36093acb4a38",
   "upstream_subset_sha256": "c102d192cc47ba10605dee6dad184410a347c472e460e3c5273af9b77bb898fb",
   "source_files": [
     {
