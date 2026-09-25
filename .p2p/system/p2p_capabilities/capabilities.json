@@ -5868,8 +5868,8 @@
           "verified": false,
           "reason": "unsigned"
         },
-        "upstream_subset_sha256": "a79c3008d38b433d6c3bc3b030238a6501acc290128bb7a1b75003aee6361723",
-        "snapshot_sha256": "7b6954fce494934f87e960484a56c69168ce45d89d2572bcdfd218001ea60605",
+        "upstream_subset_sha256": "c102d192cc47ba10605dee6dad184410a347c472e460e3c5273af9b77bb898fb",
+        "snapshot_sha256": "e6746baf70771e36ceba9a2250858e4f98ffb03a521ebddc9d29b0dc0cc466bb",
         "license": {
           "file": "LICENSE",
           "kind": "MIT",
@@ -5877,7 +5877,7 @@
         },
         "integration": {
           "entrypoint": "SKILL.md",
-          "entrypoint_sha256": "3f83d1b2c533b73954a7ae84c50e4fb0707ea4aaa0eaae2e8dd060e480ad3569",
+          "entrypoint_sha256": "b7c6540ebae9e2f4c76b04233277b6bdca330308cc9c2bb2416310e70f4d6c07",
           "load_mode": "ON_DEMAND",
           "selection_mode": "ROUTE_SELECTED_ONLY",
           "operating_modes": [

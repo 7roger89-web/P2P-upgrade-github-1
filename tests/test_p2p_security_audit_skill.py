@@ -106,6 +106,14 @@ class P2PSecurityAuditSkillTests(unittest.TestCase):
                 self.assertEqual(canonical_sha256(path), item["sha256"])
                 self.assertEqual(item["status"], "VENDORED_EXACT")
 
+        subset_entries = [
+            f'{item["snapshot_path"]}\n{item["sha256"]}'
+            for item in sorted(self.provenance["source_files"], key=lambda item: item["snapshot_path"])
+        ]
+        subset_hash = hashlib.sha256("\n".join(subset_entries).encode("utf-8")).hexdigest()
+        self.assertEqual(subset_hash, self.provenance["upstream_subset_sha256"])
+        self.assertEqual(subset_hash, self.manifest.upstream_provenance["upstream_subset_sha256"])
+
     def test_06_wrapper_is_compact_and_keeps_fail_closed_safety(self) -> None:
         text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertLessEqual(len(text.splitlines()), 150)
