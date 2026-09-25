@@ -5797,7 +5797,7 @@
     {
       "CAPABILITY_ID": "security.audit",
       "TYPE": "SKILL",
-      "DESCRIPTION": "Pinned provider-neutral Cloudflare security-audit workflow for defensive source review, vulnerability hunting, validation, and structured reporting.",
+      "DESCRIPTION": "Pinned provider-neutral Cloudflare security-audit workflow for three-mode defensive source review: finding validation, focused review, and explicit full audits with structured evidence reporting.",
       "TRIGGERS": [
         "security audit",
         "security review",
@@ -5807,9 +5807,15 @@
         "pen test",
         "pen-test",
         "BOLA",
-        "authorization",
+        "IDOR",
+        "broken access control",
+        "access control vulnerability",
+        "authorization vulnerability",
+        "authorization vulnerabilities",
         "auth bypass",
-        "security vulnerability"
+        "security vulnerability",
+        "validate security finding",
+        "validate vulnerability"
       ],
       "NEGATIVE_TRIGGERS": [],
       "INVOCATION_CLASS": "MODEL_ROUTABLE",
@@ -5847,10 +5853,13 @@
         "selected-route",
         "exact-upstream-commit-tree-and-source-hashes",
         "snapshot-provenance",
-        "guidance-or-full-audit-mode",
+        "finding-validation-focused-review-or-full-audit-mode",
+        "mode-and-scope-receipt",
         "coverage-ledger-for-full-audit",
         "independent-candidate-validation",
         "independent-final-record-verification",
+        "confirmed-needs-validation-rejected-separation",
+        "terminal-result-contract",
         "structured-findings-schema",
         "no-live-target-execution"
       ],
@@ -5869,7 +5878,7 @@
           "reason": "unsigned"
         },
         "upstream_subset_sha256": "c102d192cc47ba10605dee6dad184410a347c472e460e3c5273af9b77bb898fb",
-        "snapshot_sha256": "e6746baf70771e36ceba9a2250858e4f98ffb03a521ebddc9d29b0dc0cc466bb",
+        "snapshot_sha256": "ad8cc8f40416ad352bfd6ace3a29b43f125b0780599c0bcc49ce4fb0baf6f716",
         "license": {
           "file": "LICENSE",
           "kind": "MIT",
@@ -5877,11 +5886,12 @@
         },
         "integration": {
           "entrypoint": "SKILL.md",
-          "entrypoint_sha256": "b7c6540ebae9e2f4c76b04233277b6bdca330308cc9c2bb2416310e70f4d6c07",
+          "entrypoint_sha256": "feff9d033a4d93a5ce5037493e967c838a560aa345f5aec715dc36093acb4a38",
           "load_mode": "ON_DEMAND",
           "selection_mode": "ROUTE_SELECTED_ONLY",
           "operating_modes": [
-            "GUIDANCE",
+            "FINDING_VALIDATION",
+            "FOCUSED_REVIEW",
             "FULL_AUDIT"
           ],
           "dependency_mode": "PREINSTALLED_NODE_REQUIRED_FOR_VALIDATORS_ONLY",
