@@ -773,7 +773,7 @@ def check_external_sources(root: Path, report: Report) -> None:
 
     actual_external_ids = [item.get("source_id") for item in external_items]
     expected_external_ids = [f"P2P-EXT-{index:04d}" for index in range(1, len(external_items) + 1)]
-    if actual_external_ids != expected_external_ids or len(set(actual_external_ids)) != len(actual_external_ids):
+    if actual_external_ids != expected_external_ids:
         report.fail("external-sources", "External-source schema or IDs are incomplete")
         return
 
