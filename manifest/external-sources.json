@@ -71,6 +71,28 @@
       "sha256": "e040a3ca47ca74236c245345a76c9740825e4355cc4e96c585083892877c4ddb",
       "audited_in_full": true,
       "integration_status": "EXACT_SNAPSHOT_PRESERVED"
+    },
+    {
+      "source_id": "P2P-EXT-0006",
+      "type": "external_repository_skill_snapshot",
+      "title": "Cloudflare security-audit skill",
+      "url": "https://github.com/cloudflare/security-audit-skill",
+      "audited_at": "2026-09-20",
+      "upstream_commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "upstream_tree": "8cd03bb3941496e441d6248aaae2429a35b93cc3",
+      "upstream_commit_verification": "UNSIGNED",
+      "license": "MIT",
+      "stored_path": ".agents/skills/security-audit",
+      "sha256": "7b6954fce494934f87e960484a56c69168ce45d89d2572bcdfd218001ea60605",
+      "provenance_manifest": ".agents/skills/security-audit/PROVENANCE.json",
+      "capability_id": "security.audit",
+      "integration_status": "PINNED_PROVIDER_NEUTRAL_RELEASE_SKILL",
+      "install_mode": "RELEASE_PROJECT_LOCAL",
+      "network_runtime": false,
+      "credentials": false,
+      "audited_scope": "Repository tree, selected runtime workflow files, execution/safety boundaries, validator source, P2P compatibility; no target code executed.",
+      "update_rule": "Fresh-review a new upstream commit, create a new pinned snapshot/provenance record, and re-run affected tests. Never float main or invoke the upstream installer at runtime.",
+      "rights_note": "MIT license retained with the pinned upstream snapshot."
     }
   ],
   "candidate_sources": [

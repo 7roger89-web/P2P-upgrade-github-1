@@ -156,6 +156,11 @@ class PerformanceLanguageAdmissionTests(unittest.TestCase):
         records = [r for r in self.ledger["records"] if r.get("research_id") == "RA-EXT-103"]
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["canonical_capability_ids"], [])
+        self.assertEqual(
+            records[0]["owner_decision_status"],
+            "OWNER_SELECTED_IMPLEMENTED_AND_RULE_ASSIMILATION_VERIFIED",
+        )
+        self.assertIn("BACKLOG_K flipped to VERIFIED", records[0]["notes"])
         self.assertEqual(list(ROOT.rglob("Cargo.toml")), [])
         self.assertEqual(list(ROOT.rglob("*.rs")), [])
         match = re.search(r"\`\`\`json\n(.*?)\n\`\`\`", self.notebook, re.DOTALL)
