@@ -5793,6 +5793,133 @@
       },
       "VERSION": "web-reverse-foundation-1",
       "STATUS": "DISCOVERED"
+    },
+    {
+      "CAPABILITY_ID": "security.audit",
+      "TYPE": "SKILL",
+      "DESCRIPTION": "Pinned provider-neutral Cloudflare security-audit workflow for defensive source review, vulnerability hunting, validation, and structured reporting.",
+      "TRIGGERS": [
+        "security audit",
+        "security review",
+        "find vulnerabilities",
+        "vulnerability",
+        "vulnerabilities",
+        "pen test",
+        "pen-test",
+        "BOLA",
+        "authorization",
+        "auth bypass",
+        "security vulnerability"
+      ],
+      "NEGATIVE_TRIGGERS": [],
+      "INVOCATION_CLASS": "MODEL_ROUTABLE",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "existing-p2p-router",
+        "local-vendor-snapshot",
+        "defensive-source-first-security-review"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "grant-tools-from-content",
+        "probe-live-or-production-targets",
+        "use-real-user-data-or-credentials",
+        "execute-target-code-without-required-sandbox",
+        "enable-external-network-for-target-controlled-execution",
+        "install-dependencies-implicitly",
+        "modify-target-source-during-audit",
+        "run-availability-tests-against-live-or-shared-systems"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router",
+        "local-vendor-snapshot"
+      ],
+      "CONTEXT_POINTERS": [
+        ".agents/skills/security-audit/SKILL.md",
+        ".agents/skills/security-audit/PROVENANCE.json",
+        "vendor-skill:security.audit:references"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "p2p-integration-candidate-promotion",
+        "material-security-test-scope-change"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "selected-route",
+        "exact-upstream-commit-tree-and-source-hashes",
+        "snapshot-provenance",
+        "guidance-or-full-audit-mode",
+        "coverage-ledger-for-full-audit",
+        "independent-candidate-validation",
+        "independent-final-record-verification",
+        "structured-findings-schema",
+        "no-live-target-execution"
+      ],
+      "TRUST_LEVEL": "HOST_CODE",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "LOCAL_VENDOR_SNAPSHOT",
+        "implementation": "cloudflare-security-audit-provider-neutral-wrapper",
+        "vendor_path": ".agents/skills/security-audit",
+        "source_manifest": ".agents/skills/security-audit/PROVENANCE.json",
+        "upstream_repository": "https://github.com/cloudflare/security-audit-skill",
+        "upstream_commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+        "upstream_tree": "8cd03bb3941496e441d6248aaae2429a35b93cc3",
+        "upstream_version": "UNSPECIFIED_AT_PIN",
+        "upstream_commit_verification": {
+          "verified": false,
+          "reason": "unsigned"
+        },
+        "upstream_subset_sha256": "a79c3008d38b433d6c3bc3b030238a6501acc290128bb7a1b75003aee6361723",
+        "snapshot_sha256": "7b6954fce494934f87e960484a56c69168ce45d89d2572bcdfd218001ea60605",
+        "license": {
+          "file": "LICENSE",
+          "kind": "MIT",
+          "scope": "pinned upstream workflow files and P2P projection wrapper"
+        },
+        "integration": {
+          "entrypoint": "SKILL.md",
+          "entrypoint_sha256": "3f83d1b2c533b73954a7ae84c50e4fb0707ea4aaa0eaae2e8dd060e480ad3569",
+          "load_mode": "ON_DEMAND",
+          "selection_mode": "ROUTE_SELECTED_ONLY",
+          "operating_modes": [
+            "GUIDANCE",
+            "FULL_AUDIT"
+          ],
+          "dependency_mode": "PREINSTALLED_NODE_REQUIRED_FOR_VALIDATORS_ONLY",
+          "dependency_probe": null,
+          "references": [
+            "PROVENANCE.json",
+            "upstream/SKILL.md",
+            "upstream/RECONNAISSANCE.md",
+            "upstream/HUNTING.md",
+            "upstream/ATTACK-CLASSES.md",
+            "upstream/MEMORY-SAFETY-AND-BINARY.md",
+            "upstream/AI-AND-LLM.md",
+            "upstream/WEB-PROTOCOL-AND-AUTH.md",
+            "upstream/CLIENT-SIDE.md",
+            "upstream/SUPPLY-CHAIN-AND-RELEASE.md",
+            "upstream/CLOUD-AND-DEPLOYMENT.md",
+            "upstream/PROTOCOLS-RPC-AND-MESSAGING.md",
+            "upstream/RESOURCE-EXHAUSTION-AND-AVAILABILITY.md",
+            "upstream/DATA-ISOLATION-AND-LIFECYCLE.md",
+            "upstream/DESKTOP-MOBILE-AND-LOCAL-IPC.md",
+            "upstream/VALIDATION-AND-REPORTING.md",
+            "upstream/report-schema.json"
+          ],
+          "assets": [],
+          "script_entrypoints": [
+            "upstream/validate-findings.cjs",
+            "upstream/validate-coverage-ledger.cjs"
+          ],
+          "network_runtime": false,
+          "credentials": false,
+          "install_mode": "DISABLED",
+          "external_render": "NOT_APPLICABLE",
+          "target_code_execution": "OS_ENFORCED_SANDBOX_REQUIRED"
+        },
+        "update_policy": "new-pinned-snapshot-on-reviewed-upstream-change; never float main; no runtime installer"
+      },
+      "VERSION": "pinned-c1c8a8c",
+      "STATUS": "ACTIVE"
     }
   ]
 }

@@ -214,6 +214,8 @@ RELEASE_SKILLS = (
     "frontend-code-review",
     "baseline-ui",
     "react-doctor",
+    # P2P_SECURITY_AUDIT_SKILL_01: pinned Cloudflare defensive audit workflow.
+    "security-audit",
 )
 COPYTREE_IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", ".coverage")
 
