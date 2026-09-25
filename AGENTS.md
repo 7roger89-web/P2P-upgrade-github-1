@@ -158,11 +158,18 @@ Beginner-facing operational guidance must apply
   not create a duplicate PR because the execution chat changed.
 - `RULE 07 WRITER_BOUNDARY` — one Writer unit = 1 bounded goal -> 1 branch ->
   1 PR; a new workstream or closed PR normally needs a new Writer chat.
+  Independent lanes run concurrently by default
+  (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`, notebook section 2A); coordinate
+  only for exclusive shared state; when another lane advances main, preserve
+  the PR and refresh/verify only the integration delta — no restart, duplicate
+  PR, or unrelated full re-review.
 - `RULE 08 INDEPENDENT_SUPERVISOR` — Supervisor review is read/review only in
   a NEW CHAT, independent from the Writer; bounded re-review of a corrected
   head may reuse the same Supervisor chat.
 - `RULE 09 ONE_ACTION_NOW_FOR_BEGINNER` — separate `LÀM BÂY GIỜ` from later
   workflow; give exactly one immediate action.
+  `ONE_ACTION_NOW_FOR_BEGINNER != ONE_WORKSTREAM_TOTAL`: other launched lanes
+  may continue; Control Tower owns lane topology.
 - `RULE 10 SUCCESS_SIGNAL_AND_RETURN` — every instruction states what success
   looks like and the exact ReturnPacket to paste back to Control Tower.
 - `RULE 11 OWNER_GATE_ONLY_WHEN_REAL` — Owner Gate only for canonical

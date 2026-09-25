@@ -125,7 +125,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertEqual(set(ids), {"BACKLOG_A", "BACKLOG_B", "BACKLOG_C",
                                     "BACKLOG_D", "BACKLOG_E", "BACKLOG_F",
                                     "BACKLOG_G", "BACKLOG_H", "BACKLOG_I",
-                                    "BACKLOG_J", "BACKLOG_K"})
+                                    "BACKLOG_J", "BACKLOG_K", "BACKLOG_L"})
         backlog_h = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_H")
         self.assertEqual(backlog_h["item"], "ARENA_TASK_COMPLETION_DIALOG")
         self.assertEqual(backlog_h["status"], "VERIFIED")
@@ -140,6 +140,10 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertEqual(backlog_k["item"], "PERFORMANCE_LANGUAGE_ADMISSION_V1")
         self.assertEqual(backlog_k["status"], "VERIFIED")
         self.assertTrue(any("test_p2p_performance_language_admission_01.py" in line for line in backlog_k["evidence"]))
+        # Issue #264: PENDING until Control Tower verifies the exact PR head/tree.
+        backlog_l = next(entry for entry in ledger["entries"] if entry["id"] == "BACKLOG_L")
+        self.assertEqual(backlog_l["item"], "PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT")
+        self.assertEqual(backlog_l["status"], "PENDING")
         for entry in ledger["entries"]:
             self.assertIn(entry["status"], LEDGER_STATUSES, entry["id"])
             self.assertIsInstance(entry["evidence"], list)
