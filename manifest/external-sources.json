@@ -83,7 +83,7 @@
       "upstream_commit_verification": "UNSIGNED",
       "license": "MIT",
       "stored_path": ".agents/skills/security-audit",
-      "sha256": "e6746baf70771e36ceba9a2250858e4f98ffb03a521ebddc9d29b0dc0cc466bb",
+      "sha256": "ad8cc8f40416ad352bfd6ace3a29b43f125b0780599c0bcc49ce4fb0baf6f716",
       "provenance_manifest": ".agents/skills/security-audit/PROVENANCE.json",
       "capability_id": "security.audit",
       "integration_status": "PINNED_PROVIDER_NEUTRAL_RELEASE_SKILL",
