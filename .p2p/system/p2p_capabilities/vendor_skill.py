@@ -1,4 +1,4 @@
-"""Manifest-driven, offline-safe access to local vendor skill snapshots.
+"""Manifest-driven, offline-safe access to sparse local vendor skill snapshots.
 
 This module is an adapter around the existing capability registry and router.
 It is intentionally not a skill engine, router, executor, package manager, or
@@ -438,6 +438,8 @@ def optional_dependency_status(
     missing: list[str] = []
     probe = str(integration.get("dependency_probe", ""))
     if capability_id == "media.whiteboard_animation":
+        if not (vendor_root / "assets" / "drawing-hand.png").is_file():
+            missing.append("project-render-assets")
         if not probe:
             missing.append("dependency-probe")
         else:
@@ -463,11 +465,13 @@ def optional_dependency_status(
                     if check.returncode != 0:
                         missing.append("whiteboard-python-dependencies")
     elif capability_id == "creative.copywriting":
-        canvas_module = vendor_root / "assets" / "node_modules" / "@napi-rs" / "canvas"
-        if not canvas_module.is_dir():
-            missing.append("@napi-rs/canvas")
-        if not (vendor_root / "assets" / "package.json").is_file():
-            missing.append("asset-package-manifest")
+        package_manifest = vendor_root / "assets" / "package.json"
+        if not package_manifest.is_file():
+            missing.append("project-render-bundle")
+        else:
+            canvas_module = vendor_root / "assets" / "node_modules" / "@napi-rs" / "canvas"
+            if not canvas_module.is_dir():
+                missing.append("@napi-rs/canvas")
     else:
         missing.append("unsupported-optional-operation")
 

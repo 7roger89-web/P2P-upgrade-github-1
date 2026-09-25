@@ -735,7 +735,7 @@
         "vendor_path": ".p2p/vendor/skill/xiaoma-durex-copywriter-main",
         "upstream_repository": "https://github.com/crawfordxx/xiaoma-durex-copywriter.git",
         "upstream_commit": "UNKNOWN",
-        "snapshot_sha256": "5a02c082b531b6731dbdd6e55ccc8798ba2514bbb27df8e9c2ef74c88752830d",
+        "snapshot_sha256": "7c196e4f52cb0b077266fd1b521b0b14dc327c875dbb650136d0eb11a3dd6136",
         "license": {
           "file": "LICENSE",
           "kind": "MIT",
@@ -745,7 +745,7 @@
           "entrypoint": "SKILL.md",
           "entrypoint_sha256": "780444534ef8e7a452cd09467948d5226dc23f352e062d1829500df94565dfbb",
           "load_mode": "ON_DEMAND",
-          "dependency_mode": "OPTIONAL_RENDER_BLOCKING",
+          "dependency_mode": "PROJECT_SUPPLIED_RENDER_BUNDLE",
           "dependency_probe": "assets/package.json",
           "references": [
             "references/copy-formulas.md",
@@ -759,20 +759,19 @@
             "references/typography.md",
             "references/visual-system.md"
           ],
-          "assets": [
-            "assets/",
-            "examples/"
-          ],
-          "script_entrypoints": [
-            "assets/compose_canvas.js",
-            "assets/compose_example.py",
-            "assets/gen_hero_example.py"
-          ],
+          "assets": [],
+          "script_entrypoints": [],
           "network_runtime": false,
           "credentials": false,
           "install_mode": "DISABLED",
-          "external_render": "EXPLICIT_ONLY"
-        }
+          "external_render": "PROJECT_SUPPLIED_ONLY"
+        },
+        "snapshot_policy": "SPARSE_INSTRUCTION_ONLY",
+        "omitted_upstream_paths": [
+          "assets/",
+          "evals/",
+          "examples/"
+        ]
       },
       "VERSION": "UNKNOWN",
       "STATUS": "ACTIVE"
@@ -1011,7 +1010,7 @@
         "vendor_path": ".p2p/vendor/skill/srt-whiteboard-animation-main",
         "upstream_repository": "UNKNOWN",
         "upstream_commit": "UNKNOWN",
-        "snapshot_sha256": "55dbed4743cad90f80d1603ed639508c8e3a6e650a1abccfe7d4e8b2e148742c",
+        "snapshot_sha256": "87130ca5be2e2963789912200173a16abf16dd2221f30926abd18a8050843798",
         "license": {
           "file": "LICENSE",
           "kind": "MIT",
@@ -1021,12 +1020,11 @@
           "entrypoint": "SKILL.md",
           "entrypoint_sha256": "0778b795cc53856b4841eb5ce65d879936bacaf79840a17b188011edd7caab11",
           "load_mode": "ON_DEMAND",
-          "dependency_mode": "OPTIONAL_RENDER_BLOCKING",
+          "dependency_mode": "PROJECT_SUPPLIED_RENDER_ASSETS",
           "dependency_probe": "scripts/prepare_env.py --check",
           "references": [],
           "assets": [
-            "assets/",
-            "examples/"
+            "assets/preview.html"
           ],
           "script_entrypoints": [
             "scripts/parse_srt.py",
@@ -1037,8 +1035,13 @@
           "network_runtime": false,
           "credentials": false,
           "install_mode": "DISABLED",
-          "external_render": "EXPLICIT_ONLY"
-        }
+          "external_render": "PROJECT_SUPPLIED_ONLY"
+        },
+        "snapshot_policy": "SPARSE_INSTRUCTION_AND_SCRIPT",
+        "omitted_upstream_paths": [
+          "assets/drawing-hand.png",
+          "examples/"
+        ]
       },
       "VERSION": "UNKNOWN",
       "STATUS": "ACTIVE"

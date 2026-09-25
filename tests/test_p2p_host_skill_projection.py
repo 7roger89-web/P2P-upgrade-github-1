@@ -33,8 +33,8 @@ VENDOR_ROOTS = {
     "visual.gpt_image_2_style_library": REPO_ROOT / ".p2p" / "vendor" / "skill" / "gpt-image-2-style-library-9a7b2e9",
 }
 EXPECTED_VENDOR_HASHES = {
-    "creative.copywriting": "5a02c082b531b6731dbdd6e55ccc8798ba2514bbb27df8e9c2ef74c88752830d",
-    "media.whiteboard_animation": "55dbed4743cad90f80d1603ed639508c8e3a6e650a1abccfe7d4e8b2e148742c",
+    "creative.copywriting": "7c196e4f52cb0b077266fd1b521b0b14dc327c875dbb650136d0eb11a3dd6136",
+    "media.whiteboard_animation": "87130ca5be2e2963789912200173a16abf16dd2221f30926abd18a8050843798",
     "visual.gpt_image_2_style_library": "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482",
 }
 
