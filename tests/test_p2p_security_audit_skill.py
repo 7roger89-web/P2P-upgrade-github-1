@@ -48,7 +48,7 @@ class P2PSecurityAuditSkillTests(unittest.TestCase):
             repository_root=REPO_ROOT,
         )
 
-    def test_01_registered_noncanonical_provider_neutral_skill(self) -> None:
+    def test_01_registered_noncanonical_provider_neutral_three_mode_skill(self) -> None:
         self.assertEqual(self.manifest.type, "SKILL")
         self.assertFalse(self.manifest.canonical_quorum_member)
         self.assertFalse(self.manifest.optional_specialist)
@@ -57,23 +57,36 @@ class P2PSecurityAuditSkillTests(unittest.TestCase):
         self.assertEqual(upstream["vendor_path"], ".agents/skills/security-audit")
         self.assertEqual(upstream["upstream_commit"], UPSTREAM_COMMIT)
         self.assertEqual(upstream["upstream_tree"], UPSTREAM_TREE)
+        self.assertEqual(
+            upstream["integration"]["operating_modes"],
+            ["FINDING_VALIDATION", "FOCUSED_REVIEW", "FULL_AUDIT"],
+        )
         self.assertFalse(upstream["integration"]["network_runtime"])
         self.assertFalse(upstream["integration"]["credentials"])
         self.assertEqual(upstream["integration"]["install_mode"], "DISABLED")
 
     def test_02_security_requests_route_without_loading_content(self) -> None:
         for request in (
-            "security audit this codebase",
+            "validate this suspected auth bypass in middleware",
+            "security review this API for BOLA and access control vulnerability",
+            "security audit this entire codebase",
             "find vulnerabilities in this API",
-            "review this API for BOLA and authorization vulnerabilities",
         ):
             with self.subTest(request=request):
                 result = self.route(request)
                 self.assertIn(CAPABILITY_ID, result["selected"])
                 self.assertFalse(result["content_loaded"])
 
-    def test_03_unrelated_request_does_not_route_security_audit(self) -> None:
-        self.assertNotIn(CAPABILITY_ID, self.route("write a marketing slogan for a cafe")["selected"])
+    def test_03_ordinary_authorization_or_unrelated_requests_do_not_route(self) -> None:
+        for request in (
+            "implement OAuth authorization code flow",
+            "explain the HTTP Authorization header",
+            "write a marketing slogan for a cafe",
+        ):
+            with self.subTest(request=request):
+                self.assertNotIn(CAPABILITY_ID, self.route(request)["selected"])
+        self.assertNotIn("authorization", self.manifest.triggers)
+        self.assertIn("authorization vulnerability", self.manifest.triggers)
 
     def test_04_snapshot_and_entrypoint_hashes_are_bound(self) -> None:
         upstream = self.manifest.upstream_provenance
@@ -81,6 +94,10 @@ class P2PSecurityAuditSkillTests(unittest.TestCase):
         self.assertEqual(
             vendor_skill._sha256_file(SKILL_ROOT / "SKILL.md"),
             upstream["integration"]["entrypoint_sha256"],
+        )
+        self.assertEqual(
+            upstream["integration"]["entrypoint_sha256"],
+            self.provenance["projection_entrypoint_sha256"],
         )
         loaded = load_vendor_skill(
             CAPABILITY_ID,
@@ -106,13 +123,32 @@ class P2PSecurityAuditSkillTests(unittest.TestCase):
                 self.assertEqual(canonical_sha256(path), item["sha256"])
                 self.assertEqual(item["status"], "VENDORED_EXACT")
 
-    def test_06_wrapper_is_compact_and_keeps_fail_closed_safety(self) -> None:
+        subset_entries = [
+            f'{item["snapshot_path"]}\n{item["sha256"]}'
+            for item in sorted(self.provenance["source_files"], key=lambda item: item["snapshot_path"])
+        ]
+        subset_hash = hashlib.sha256("\n".join(subset_entries).encode("utf-8")).hexdigest()
+        self.assertEqual(subset_hash, self.provenance["upstream_subset_sha256"])
+        self.assertEqual(subset_hash, self.manifest.upstream_provenance["upstream_subset_sha256"])
+
+    def test_06_wrapper_exposes_operating_and_result_contracts_with_safety(self) -> None:
         text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertLessEqual(len(text.splitlines()), 150)
         match = re.search(r"^description:\s*(.+)$", text, flags=re.MULTILINE)
         self.assertIsNotNone(match)
         self.assertLess(len(match.group(1)), 200)
         for required in (
+            "FINDING_VALIDATION",
+            "FOCUSED_REVIEW",
+            "FULL_AUDIT",
+            "SECURITY_AUDIT_MODE=",
+            "SECURITY_AUDIT_SCOPE=",
+            "RESULT=PASS_NO_CONFIRMED_FINDINGS",
+            "FINDINGS_CONFIRMED",
+            "BLOCKED_VALIDATION",
+            "CONFIRMED_FINDINGS=",
+            "NEEDS_VALIDATION=",
+            "REJECTED_CANDIDATES=",
             "external networking disabled",
             "do not execute target code",
             "needs_validation",

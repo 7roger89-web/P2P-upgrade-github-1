@@ -97,6 +97,15 @@ DOCTOR_ROLES = ("auto", "development", "portable", "installed")
 BASELINE_ZIP_SHA256 = "cafa5bbfa48048a9f2e6c54f6cfc329d2b25b34ea764809175dbae0e8f233fd8"
 SUPPLEMENTAL_CATALOG_SHA256 = "90d1cd03d15667b5aa8ec12ded6245fe84f5aacd9de478f09f5777301e829341"
 
+REQUIRED_EXTERNAL_SOURCE_IDS = (
+    "P2P-EXT-0001",
+    "P2P-EXT-0002",
+    "P2P-EXT-0003",
+    "P2P-EXT-0004",
+    "P2P-EXT-0005",
+    "P2P-EXT-0006",
+)
+
 
 class Report:
     def __init__(self) -> None:
@@ -748,6 +757,104 @@ def check_development(root: Path, report: Report) -> None:
     check_installed_foundation(root, report)
 
 
+def _load_vendor_skill(root: Path):
+    """Load the snapshot hasher from the runtime owned by this exact root."""
+    if infer_role(root) == "portable":
+        package_dir = root / "runtime" / "p2p_capabilities"
+    else:
+        package_dir = root / ".p2p" / "system" / "p2p_capabilities"
+    module_path = package_dir / "vendor_skill.py"
+    if not module_path.is_file():
+        raise ImportError(f"Missing canonical vendor-skill runtime: {module_path}")
+
+    # Keep relative imports inside the selected runtime package. Never resolve
+    # vendor_skill through global PYTHONPATH or a cached p2p_capabilities.
+    package_name = "p2p_doctor_vendor_runtime"
+    for cached in [
+        name
+        for name in sys.modules
+        if name == package_name or name.startswith(f"{package_name}.")
+    ]:
+        del sys.modules[cached]
+    package = types.ModuleType(package_name)
+    package.__path__ = [str(package_dir.resolve())]
+    package.__package__ = package_name
+    sys.modules[package_name] = package
+    spec = importlib.util.spec_from_file_location(f"{package_name}.vendor_skill", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load canonical vendor-skill runtime: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def check_external_sources(root: Path, report: Report) -> None:
+    """Validate admitted external-source IDs and their stored snapshot hashes."""
+    external_manifest = root / "manifest" / "external-sources.json"
+    if not external_manifest.is_file():
+        report.fail("external-sources", f"Missing {external_manifest}")
+        return
+    try:
+        external_data = json.loads(external_manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        report.fail("external-sources", f"Invalid external-source manifest: {exc}")
+        return
+
+    external_items = external_data.get("sources") if isinstance(external_data, dict) else None
+    if (
+        not isinstance(external_data, dict)
+        or external_data.get("schema_version") != "p2p-codex-external-sources/1"
+        or not isinstance(external_items, list)
+        or not external_items
+        or any(not isinstance(item, dict) for item in external_items)
+    ):
+        report.fail("external-sources", "External-source schema or IDs are incomplete")
+        return
+
+    actual_external_ids = [item.get("source_id") for item in external_items]
+    expected_external_ids = list(REQUIRED_EXTERNAL_SOURCE_IDS)
+    if actual_external_ids != expected_external_ids:
+        report.fail("external-sources", "External-source schema or IDs are incomplete")
+        return
+
+    mismatches = []
+    matched_snapshots = 0
+    for item in external_items:
+        stored_path = item.get("stored_path")
+        expected_hash = item.get("sha256")
+        if not stored_path:
+            continue
+        stored_file = root / str(stored_path)
+        if not stored_file.exists():
+            mismatches.append(f"{item.get('source_id')}:missing")
+            continue
+        if expected_hash:
+            try:
+                if stored_file.is_dir():
+                    vendor_skill = _load_vendor_skill(root)
+                    actual_hash = vendor_skill.snapshot_tree_sha256(stored_file)
+                elif stored_file.is_file():
+                    actual_hash = sha256(stored_file)
+                else:
+                    mismatches.append(f"{item.get('source_id')}:missing")
+                    continue
+            except (ImportError, OSError, ValueError, RuntimeError):
+                mismatches.append(f"{item.get('source_id')}:hash")
+                continue
+            if actual_hash != expected_hash:
+                mismatches.append(f"{item.get('source_id')}:hash")
+            else:
+                matched_snapshots += 1
+    if mismatches:
+        report.fail("external-sources", f"Supplemental snapshot mismatches: {', '.join(mismatches)}")
+    else:
+        report.pass_(
+            "external-sources",
+            f"{len(external_items)} external sources are identified; {matched_snapshots} stored snapshots match",
+        )
+
+
 def check_package(root: Path, report: Report) -> None:
     check_uiux_payload(root, report)
     check_foundation_payload(root, report)
@@ -796,39 +903,7 @@ def check_package(root: Path, report: Report) -> None:
             report.fail("supplemental-catalog", "Supplemental catalog SHA-256 mismatch")
         else:
             report.pass_("supplemental-catalog", "User-supplied catalog snapshot matches its locked SHA-256")
-    external_manifest = root / "manifest" / "external-sources.json"
-    if not external_manifest.is_file():
-        report.fail("external-sources", f"Missing {external_manifest}")
-    else:
-        try:
-            external_data = json.loads(external_manifest.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            report.fail("external-sources", f"Invalid external-source manifest: {exc}")
-        else:
-            external_items = external_data.get("sources", []) if isinstance(external_data, dict) else []
-            expected_external_ids = {f"P2P-EXT-{index:04d}" for index in range(1, 6)}
-            actual_external_ids = {str(item.get("source_id", "")) for item in external_items if isinstance(item, dict)}
-            if (
-                external_data.get("schema_version") != "p2p-codex-external-sources/1"
-                or actual_external_ids != expected_external_ids
-            ):
-                report.fail("external-sources", "External-source schema or IDs are incomplete")
-            else:
-                mismatches = []
-                for item in external_items:
-                    stored_path = item.get("stored_path")
-                    expected_hash = item.get("sha256")
-                    if not stored_path:
-                        continue
-                    stored_file = root / str(stored_path)
-                    if not stored_file.is_file():
-                        mismatches.append(f"{item.get('source_id')}:missing")
-                    elif expected_hash and sha256(stored_file) != expected_hash:
-                        mismatches.append(f"{item.get('source_id')}:hash")
-                if mismatches:
-                    report.fail("external-sources", f"Supplemental snapshot mismatches: {', '.join(mismatches)}")
-                else:
-                    report.pass_("external-sources", "Five external sources are identified; four stored snapshots match")
+    check_external_sources(root, report)
     inventory = root / "manifest" / "source-inventory.json"
     conversion = root / "manifest" / "conversion-map.csv"
     inventory_items: list[dict] = []

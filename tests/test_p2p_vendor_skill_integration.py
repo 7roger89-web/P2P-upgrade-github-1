@@ -114,12 +114,11 @@ class P2PVendorSkillIntegrationTests(unittest.TestCase):
             registry_path=REGISTRY_PATH,
             repository_root=REPO_ROOT,
             references=("references/diction.md",),
-            assets=("assets/package.json",),
         )
         self.assertEqual(result["status"], "LOADED")
         self.assertEqual(
             result["loaded_paths"],
-            ["SKILL.md", "references/diction.md", "assets/package.json"],
+            ["SKILL.md", "references/diction.md"],
         )
         self.assertFalse(result["permission_grant"])
         self.assertFalse(result["network_used"])
@@ -144,6 +143,7 @@ class P2PVendorSkillIntegrationTests(unittest.TestCase):
             repository_root=REPO_ROOT,
         )
         self.assertEqual(result["status"], "BLOCKED_OPTIONAL_DEPENDENCY")
+        self.assertIn("project-render-assets", result["missing"])
         self.assertIn("vendor-venv", result["missing"])
         self.assertFalse(result["network_used"])
 
@@ -155,7 +155,7 @@ class P2PVendorSkillIntegrationTests(unittest.TestCase):
             repository_root=REPO_ROOT,
         )
         self.assertEqual(result["status"], "BLOCKED_OPTIONAL_DEPENDENCY")
-        self.assertIn("@napi-rs/canvas", result["missing"])
+        self.assertIn("project-render-bundle", result["missing"])
         self.assertFalse(result["network_used"])
 
     def test_15_vendor_tree_and_entrypoint_hashes_match_registry(self) -> None:
@@ -256,6 +256,18 @@ class P2PVendorSkillIntegrationTests(unittest.TestCase):
         for item in route["vendor_skills"]["skills"]:
             self.assertFalse(item["network_runtime"])
             self.assertFalse(item["permission_grant"])
+
+    def test_23_sparse_vendor_core_excludes_bulk_payloads(self) -> None:
+        copywriter = VENDOR_ROOTS["creative.copywriting"]
+        whiteboard = VENDOR_ROOTS["media.whiteboard_animation"]
+        self.assertFalse((copywriter / "assets").exists())
+        self.assertFalse((copywriter / "examples").exists())
+        self.assertFalse((copywriter / "evals").exists())
+        self.assertTrue((copywriter / "references" / "diction.md").is_file())
+        self.assertFalse((whiteboard / "examples").exists())
+        self.assertFalse((whiteboard / "assets" / "drawing-hand.png").exists())
+        self.assertTrue((whiteboard / "assets" / "preview.html").is_file())
+        self.assertTrue((whiteboard / "scripts" / "parse_srt.py").is_file())
 
 
 if __name__ == "__main__":
