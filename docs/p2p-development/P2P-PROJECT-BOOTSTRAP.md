@@ -148,6 +148,20 @@ Default routing guidance:
 
 This rule does not grant migration, infrastructure, deploy, database, release or rewrite authority. If the evidence fields are materially incomplete, the architecture action is `DEFER_UNTIL_NEEDED`.
 
+### Executable performance/language admission
+
+When a real task raises a material performance concern, use the existing P2P runtime gate instead of guessing from project size or language reputation:
+
+`python scripts/p2p_performance_language_gate.py evaluate --file <evidence-packet.json>`
+
+The gate consumes task-specific evidence only. Task-text words such as `slow`, `batch`, `scale`, `CPU`, `parser`, or `indexing` are discovery hints, never proof that Rust/native code is needed.
+
+Required decision order:
+
+`acceptance target → measured baseline → bottleneck class → measured CPU hot path (if any) → smallest credible current-stack optimization → same-workload bounded native spike only if still needed → operations cost + rollback`.
+
+A DB/network/I/O/serialization/external-service/memory bottleneck routes away from Rust. A current stack that already meets acceptance stops. Missing task-specific acceptance or measurement evidence returns `INSUFFICIENT_EVIDENCE`; P2P must not invent thresholds. The helper has `PERMISSION_EFFECT=NONE`: it grants no migration, installation, deploy, release, or rewrite authority.
+
 ## Optional selective capability read order: img2threejs
 
 This hook does not make the full P2P runtime or any external vendor repository

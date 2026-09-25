@@ -3448,6 +3448,64 @@
       "owner_decision_status": "OWNER_SELECTED",
       "last_reviewed_at": "2026-09-23T00:00:00+00:00",
       "notes": "OWNER_APPROVED_BOUNDED_GOVERNANCE_CHANGE (Issue #245): no P2P package release/promotion/deployment authorized. STATUS_TRUTHFULNESS: IMPLEMENTED means the canonical subsection and this record exist in the Issue #245 PR; it is not VERIFIED and not PROMOTED. RULE_ASSIMILATION_STATUS=VERIFIED after Control Tower independently verified PR #246 exact Writer head d14b5e89d14f84dc70d4eb53fda978e4f7b2060a in PR comment 5793604664 before BACKLOG_J was flipped. NON_GOALS_HONORED: no global OpenJev install, no model dependency, no benchmark service, no model leaderboard, no new router/agent population, no vector DB, no daemon/watcher, no new project registry, no duplicated Supreme Law, no product-code change, no force push. POST_MERGE_PROPAGATION to P2P-managed projects remains authorized only after the canonical merge; no propagation is claimed by this pre-merge record."
+    },
+    {
+      "research_id": "RA-EXT-103",
+      "source_name": "RUST_OPERATIONALIZATION_V1 — evidence-gated native/runtime admission",
+      "source_type": "OWNER_DIRECTED_RESEARCH_OPERATIONALIZATION",
+      "source_reference": "P2P PR #218 POLYGLOT_BY_EVIDENCE_V1; Gia Phả PR #12; Logistics PR #81; Bazi PR #98; Renhuai123/ziwei-doushu release v3.0-samples + current engine main; P2P Issue #252",
+      "source_version_or_commit": "P2P base 6adfa3b85658e4c0670ccfc22eb22e19e6395879; upstream Renhuai123/ziwei-doushu main 9d98b3ae7fce298f751cb43c47783d6e84a7735d; dataset v3.0-samples verified 2026-09-18",
+      "provenance_status": "OWNER_DRIVE_DATASET_PROVENANCE_VERIFIED + PUBLIC_UPSTREAM_REPO_AND_RELEASE_FRESH_READ; ZERO_DATASET_BYTES_VENDORED; NO_RUST_TOOLCHAIN_INSTALLED",
+      "research_summary": "The earlier Rust/polyglot study had durable architecture guidance but no executable trigger from task-specific performance evidence to a native-language decision. Issue #252 closes that gap with one deterministic classifier under existing Rule 19. It requires a real acceptance target, measured baseline, bottleneck classification, measured CPU hot path, current-stack optimization, and a same-workload bounded native spike before adoption. Large datasets or generic language-speed claims cannot activate Rust. The real Ziwei v3 dataset (518,400 records, 5,878,228,608 bytes, combined SHA-256 21fe90f8...) is used as an anti-hallucination canary: without a task-specific performance target/baseline, the gate returns INSUFFICIENT_EVIDENCE and does not nominate Rust.",
+      "selected_ideas": [
+        "PERFORMANCE_SIGNAL != PERFORMANCE_PROOF",
+        "LARGE_DATASET != RUST_NEED",
+        "PERFORMANCE_FAILURE => CLASSIFY_BOTTLENECK_FIRST",
+        "NON_CPU_BOTTLENECK => DO_NOT_ACTIVATE_NATIVE",
+        "CURRENT_STACK_MEETS_ACCEPTANCE => STOP_KEEP_CURRENT_STACK",
+        "NATIVE_SPIKE_REQUIRES_MEASURED_CPU_HOT_PATH",
+        "current-stack credible optimization before adding a new runtime",
+        "same-workload before/after measurement for the bounded native spike",
+        "native adoption requires smallest stable boundary + operations cost + rollback path",
+        "INSUFFICIENT_EVIDENCE is the truthful result when acceptance or measurement is missing",
+        "deterministic evidence classifier with PERMISSION_EFFECT=NONE"
+      ],
+      "rejected_ideas": [
+        "adding Rust merely because a project or dataset is large",
+        "generic Python-vs-Rust or TypeScript-vs-Rust benchmark as project proof",
+        "CPU threshold folklore without a task-specific acceptance target",
+        "rewriting an application or backend to Rust before a bounded hot-path spike",
+        "benchmark daemon/service/watcher or permanent performance-monitoring control plane",
+        "automatic shell execution, Rust toolchain installation, migration, deploy, or release from the evidence gate",
+        "downloading or vendoring the full 5.8 GB Ziwei dataset merely to make the gate look thorough"
+      ],
+      "p2p_translation": "One bounded PERFORMANCE_LANGUAGE_ADMISSION_V1 subsection under existing RULE 19 plus .p2p/system/p2p_capabilities/performance_language_gate.py and thin CLI wrappers. The helper classifies supplied measurements only and emits KEEP_CURRENT_STACK / FIX_NON_CPU_BOTTLENECK / OPTIMIZE_CURRENT_STACK_FIRST / RUN_BOUNDED_NATIVE_SPIKE / ADOPT_BOUNDED_NATIVE_COMPONENT / REJECT_NATIVE_SPIKE / INSUFFICIENT_EVIDENCE. It runs no benchmark command and grants no permission. Research is therefore operationalized as a reusable decision path without forcing Rust into any project.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "IMPLEMENTED",
+      "evidence_pointers": [
+        "Issue #252 P2P — Operationalize Rust evidence gate end-to-end",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 -> PERFORMANCE_LANGUAGE_ADMISSION_V1)",
+        "docs/p2p-development/P2P-PROJECT-BOOTSTRAP.md (POLYGLOT_BY_EVIDENCE_V1 executable admission binding)",
+        ".p2p/system/p2p_capabilities/performance_language_gate.py",
+        "scripts/p2p_performance_language_gate.py",
+        "scripts/package_release.py (foundation runtime module + CLI transport)",
+        "tests/test_p2p_performance_language_admission_01.py",
+        "tests/fixtures/p2p_performance_language_gate/ziwei_518400_canary.json",
+        "Renhuai123/ziwei-doushu@9d98b3ae7fce298f751cb43c47783d6e84a7735d README + release v3.0-samples",
+        "Owner Drive provenance: ZIWEI_518400_DATASET_TRANSPORT_01"
+      ],
+      "dependencies": [
+        "POLYGLOT_BY_EVIDENCE_V1",
+        "RULE 19 — REALITY_FIRST_CAPABILITY_PROBE",
+        "DOMAIN_CAPABILITY_ADMISSION_V1",
+        "RULE 14 — OVER_ENGINEERING_CHECK",
+        "RULE_ASSIMILATION_GATE_V1"
+      ],
+      "roadmap_slot": "operations-law/quality-and-evidence/performance-language-admission",
+      "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED_PENDING_INDEPENDENT_RULE_ASSIMILATION_VERIFICATION",
+      "last_reviewed_at": "2026-09-24T00:00:00+00:00",
+      "notes": "Issue #252 Owner direction is to finish the Rust research 100% operationally, not to force a Rust dependency. Ziwei canary provenance: 518,400 records; 5,878,228,608 bytes; combined SHA-256 21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870. BACKLOG_K remains PENDING at Writer stage until an independent reviewer verifies the exact PR head/tree. No deployment, release, promotion, local-PC/Anvien requirement, benchmark service, daemon, or Rust toolchain installation is authorized or claimed."
     }
   ],
   "rejected_register_summary": {
@@ -3476,7 +3534,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-09-23T00:00:00+00:00",
+  "last_reviewed": "2026-09-24T00:00:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]

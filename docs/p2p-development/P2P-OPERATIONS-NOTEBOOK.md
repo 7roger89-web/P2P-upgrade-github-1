@@ -2071,6 +2071,73 @@ DECISION=ADMIT | OBSERVE_ONLY | REJECT | UNSURE_KEEP_CURRENT_PATH
 OWNER_ACTION_NOW=
 ```
 
+
+#### PERFORMANCE_LANGUAGE_ADMISSION_V1 — evidence before Rust/native expansion
+
+This subsection operationalizes `POLYGLOT_BY_EVIDENCE_V1` as one bounded
+application of RULE 19. It answers: "does a measured performance problem
+justify testing or adopting a new native/runtime language such as Rust?" It
+does not create a benchmark service, daemon, watcher, second router, registry,
+microservice, or automatic migration path.
+
+Canonical distinctions:
+
+```text
+PERFORMANCE_SIGNAL != PERFORMANCE_PROOF
+LARGE_DATASET != RUST_NEED
+PERFORMANCE_FAILURE => CLASSIFY_BOTTLENECK_FIRST
+NON_CPU_BOTTLENECK => DO_NOT_ACTIVATE_NATIVE
+CURRENT_STACK_MEETS_ACCEPTANCE => STOP_KEEP_CURRENT_STACK
+NATIVE_SPIKE_REQUIRES_MEASURED_CPU_HOT_PATH
+NATIVE_ADOPTION_REQUIRES_SAME_WORKLOAD_BEFORE_AFTER + SMALLEST_BOUNDARY + OPERATIONS_COST + ROLLBACK_PATH
+MISSING_TASK_SPECIFIC_ACCEPTANCE_OR_MEASUREMENT => INSUFFICIENT_EVIDENCE
+```
+
+Decision order:
+
+1. **Bind a real acceptance target.** Use the task/product requirement that
+   matters (latency, duration, throughput, memory, or another comparable
+   metric). Do not invent a threshold merely because a workload is large.
+2. **Measure the current path.** Capture a comparable baseline for the same
+   target metric. A task-text cue such as "slow", "batch", "scale", "CPU",
+   "parser", or "indexing" is only a discovery hint.
+3. **Classify the bottleneck before blaming the language runtime.** Distinguish
+   at least CPU/algorithm from DB, network, I/O, serialization, external
+   service, memory, or unknown. A non-CPU bottleneck routes to that cause and
+   does not activate Rust/native work.
+4. **Stop if the current stack already meets acceptance.** Faster in theory is
+   not a reason to add a runtime.
+5. **For a CPU bottleneck, require an observed hot path.** Record the concrete
+   component and measured share. If no hot path is measured, return
+   `INSUFFICIENT_EVIDENCE`.
+6. **Try the smallest credible current-stack optimization first** when it is
+   cheaper and reversible. If that path meets acceptance, stop.
+7. **Open only a bounded native spike** when a measured CPU hot path still
+   misses acceptance after the current stack's credible optimization. Keep the
+   boundary small and stable; do not rewrite the application.
+8. **Compare the spike on the same workload and target.** A spike that misses
+   acceptance is rejected. A passing spike still cannot be adopted until the
+   smallest boundary, operating/build/deploy/observability/security/maintenance
+   cost, and rollback/removal path are explicit.
+9. **Adopt only the proved boundary.** A passing Rust/native module proves that
+   component under the tested conditions, not a project-wide migration.
+10. **Stop honestly when evidence is missing.** Scale or reputation never
+    substitutes for task-specific acceptance and measurement.
+
+The existing runtime implementation is
+`.p2p/system/p2p_capabilities/performance_language_gate.py`, with the thin
+CLI `scripts/p2p_performance_language_gate.py`. The helper is a deterministic
+evidence classifier only: it executes no benchmark commands, installs no
+toolchain, makes no project mutation, and emits `PERMISSION_EFFECT=NONE`.
+Its technical verdict cannot widen task authority or bypass Owner Gates.
+
+Representative canary: the verified Ziwei v3 dataset contains 518,400 records
+and 5,878,228,608 bytes with combined SHA-256
+`21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870`.
+That real scale is deliberately insufficient by itself: without a task-specific
+performance acceptance target and measured baseline, the correct verdict is
+`INSUFFICIENT_EVIDENCE`, not "use Rust".
+
 ### RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION
 
 The beginner Owner selects an executor with one natural command. The project
@@ -2546,6 +2613,19 @@ machine-readable ledger below is the durable record.
         "tests/test_p2p_domain_capability_admission_01.py",
         "tests/test_p2p_operations_notebook.py (ledger entry BACKLOG_J truthfulness check)"
       ]
+    },
+    {
+      "id": "BACKLOG_K",
+      "item": "PERFORMANCE_LANGUAGE_ADMISSION_V1",
+      "status": "VERIFIED",
+      "evidence": [
+        "Issue #252 P2P — Operationalize Rust evidence gate end-to-end",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (RULE 19 — PERFORMANCE_LANGUAGE_ADMISSION_V1)",
+        ".p2p/system/p2p_capabilities/performance_language_gate.py + scripts/p2p_performance_language_gate.py",
+        "tests/test_p2p_performance_language_admission_01.py",
+        "governance/research-adoption-ledger.json (RA-EXT-103)",
+        "tests/fixtures/p2p_performance_language_gate/ziwei_518400_canary.json"
+      ]
     }
   ]
 }
@@ -2558,6 +2638,8 @@ exact PR head/tree for Issue #42 under RULE_ASSIMILATION_GATE_V1.
 independently verified PR #246 at exact Writer head
 `d14b5e89d14f84dc70d4eb53fda978e4f7b2060a` (PR comment `5793604664`) under
 RULE_ASSIMILATION_GATE_V1 before this status flip.
+
+`BACKLOG_K` (`PERFORMANCE_LANGUAGE_ADMISSION_V1`) is `VERIFIED`. Independent Supervisor review bound exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752` for PR #253, with Control Tower durable receipt comment `5815665839`, before this status flip under `RULE_ASSIMILATION_GATE_V1`.
 
 ## 5. ASSIMILATION_BACKLOG — previously promised items
 
@@ -2610,6 +2692,8 @@ section 4.3.
   `tests/test_p2p_domain_capability_admission_01.py`. Control Tower independently
   verified exact Writer head `d14b5e89d14f84dc70d4eb53fda978e4f7b2060a`
   in PR comment `5793604664` before this status flip.
+
+- **K. Performance/language admission (`PERFORMANCE_LANGUAGE_ADMISSION_V1`)** — `VERIFIED`. Issue #252 operationalizes the earlier Rust/polyglot research through one Rule 19 subsection, a deterministic evidence gate, packaging/install inheritance, a real Ziwei 518,400-record canary, RA-EXT-103, and focused tests. Independent Supervisor verification covered exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752`; Control Tower recorded receipt `5815665839` before this status flip. No Rust dependency, migration, deployment, benchmark service, or background monitor is introduced.
 
 ## 6. Discovery and operator paths
 

@@ -163,6 +163,7 @@ FOUNDATION_RUNTIME_MODULES = (
     "task_state.py",
     "trust.py",
     "decision_trace.py",
+    "performance_language_gate.py",
     "project_pin.py",
     "project_context.py",
     "project_map.py",
@@ -174,6 +175,7 @@ FOUNDATION_RUNTIME_FILES = ("p2p_capabilities/capabilities.json",)
 FOUNDATION_RUNTIME_SCRIPTS = (
     "p2p_capability_doctor.py",
     "p2p_decision_trace.py",
+    "p2p_performance_language_gate.py",
     "p2p_host_identity_hook.py",
 )
 RELEASE_SKILLS = (
