@@ -210,6 +210,32 @@ write path may perform this refresh on a branch/PR without requiring a local
 clone. Use existing merge/Owner-Gate rules; this gate grants no new merge,
 deployment, secret, infrastructure, or destructive authority.
 
+One-command owner-wide form (Issue #264), run from the canonical P2P source by
+an executor whose GitHub access is already authorized:
+
+```text
+python scripts/p2p_sync_managed_projects.py --github-owner <owner> --check|--write
+SYNC_GENERATED != MERGED_TO_MAIN
+DISCOVERY_SCOPE=INSTALLATION_SELECTED => DISCOVERY_COMPLETE=NO
+```
+
+It reuses the existing `gh` authentication (no token flag, secret input, or
+Owner copy/paste), discovers repositories from the authenticated GitHub view
+(no registry), selects P2P-managed repos by the same durable markers as local
+`--workspace` mode (managed `AGENTS.md` block, `.p2p/portable`, or
+`.p2p/system`), computes expected bytes with the same projector, and in
+`--write` mode commits only `AGENTS.md` (managed block),
+`.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`, and
+`.p2p/portable/P2P-EXPERIENCE-CAPSULE.json` to one deterministic
+`p2p/portable-law-sync` branch/PR per stale repo. A repo counts as `CURRENT`
+only when its default branch verifiably carries the fresh projection; a
+generated sync PR is `SYNC_GENERATED` and merges under RULE 11 /
+`VALIDATED_PR_AUTO_MERGE_AUTHORITY`. Unavailable GitHub access fails closed
+(`GITHUB_ACCESS=UNAVAILABLE`, `OWNER_GITHUB_CONNECTOR_STATUS=NOT_PROVEN_BROKEN`),
+blocked repos stay listed in `BLOCKED_REPOS`, and a selected-repository
+installation scope is reported as incomplete discovery, never as full-owner
+rollout.
+
 If the parent can read canonical law but cannot safely refresh the target
 repository, it must mark the target portable projection stale/missing and
 serialize a fresh compact `SUPREME_LAW_CAPSULE` for that handoff. The
@@ -361,6 +387,77 @@ Do not create a connector-health daemon, polling service, registry, or
 monitoring framework for this rule. Run the preflight only when GitHub access
 is materially required or when a relevant failure is observed, then stop once
 the failure class is established.
+
+### PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT — controlled parallel workstreams
+
+```text
+PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT=YES
+ONE_WORKSTREAM = ONE_BOUNDED_GOAL -> ONE_BRANCH -> ONE_PR
+INDEPENDENT_WORKSTREAMS => RUN_CONCURRENTLY_WHEN_MATERIALLY_FASTER_AND_SHARED_STATE_RISK_BOUNDED
+SAME_REPOSITORY != SERIALIZATION_REASON
+SHARED_EXCLUSIVE_STATE => COORDINATE_OR_SERIALIZE
+PARALLEL_IMPLEMENTATION != PARALLEL_INTEGRATION
+MAIN_ADVANCED_BY_OTHER_LANE => PRESERVE_BRANCH_AND_PR + FRESH_DETECT + REFRESH_TO_CURRENT_MAIN + VERIFY_INTEGRATION_DELTA
+MAIN_ADVANCED_BY_OTHER_LANE != RESTART_WORKSTREAM | DUPLICATE_PR | FULL_UNRELATED_REREVIEW
+EXACT_HEAD_VALIDATION_SCOPE = HEAD + BASE_INTEGRATION_CONTEXT
+CONTROL_TOWER_OWNS_CROSS_WORKSTREAM_TOPOLOGY=YES
+ONE_ACTION_NOW_FOR_BEGINNER != ONE_WORKSTREAM_TOTAL
+```
+
+Controlled parallelism is the default for every P2P-managed project, not a
+project-specific convention:
+
+1. Independent workstreams SHOULD run concurrently when doing so materially
+   shortens time-to-outcome and shared-state risk is bounded.
+2. Each bounded workstream remains `one bounded goal -> one branch -> one PR`
+   (RULE 07). Parallelism means several such lanes at once, never one lane
+   spread across several branches/PRs or one PR mixing several goals.
+3. Parallel lanes are appropriate when their surfaces are disjoint or have
+   bounded overlap and each lane's contract can be verified independently.
+4. Do not serialize unrelated work merely because it lives in the same
+   repository or project.
+5. Coordinate or serialize when lanes share any exclusive state:
+   high-conflict files/symbols, the same schema/migration, destructive or
+   shared external state, secrets/infrastructure, release/deploy state, or
+   another explicitly exclusive contract.
+6. Merge and deploy are integration boundaries and may be ordered even when
+   implementation ran concurrently. Ordering integration does not require
+   serializing implementation.
+7. If another valid lane merges first and advances main: fresh-detect the
+   state change; preserve the existing branch/PR; refresh/reconcile it against
+   current main; verify the integration delta / affected intersection in
+   proportion to risk. Do not restart the workstream, create a duplicate PR, or
+   repeat unrelated full review solely because main moved.
+8. Current durable state wins over stale validation receipts. An exact-head
+   validation is valid only for that head and its base/integration context;
+   when that context changes, refresh it boundedly (item 7), not wholesale.
+9. Control Tower owns cross-workstream topology (which lanes exist, their
+   branch/PR/head, overlap, and integration order — RULE 13). The beginner
+   Owner never tracks branch topology manually. `ONE_ACTION_NOW_FOR_BEGINNER`
+   (RULE 09) limits the Owner's *immediate action*, not the number of lanes
+   already running: `ONE_ACTION_NOW_FOR_BEGINNER != ONE_WORKSTREAM_TOTAL`.
+   Independent Supervisor lanes may likewise run concurrently where their
+   evidence/state boundaries are independent.
+10. Use existing branches, PRs, durable state, and risk-proportional
+    verification. Do not add a scheduler, queue, distributed lock service,
+    dependency-graph engine, daemon/watcher, workstream registry/database,
+    second router/control plane, or extra agent layer to implement this law.
+
+Inline fallback: the compact `SUPREME_LAW_CAPSULE` carries this invariant by its
+two identifiers (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`;
+`ONE_ACTION_NOW_FOR_BEGINNER != ONE_WORKSTREAM_TOTAL`) inside its existing
+continuity law (entry 5, `PRESERVE_CONTINUITY_AND_STOP`), so an executor with
+only the inline capsule still receives it within the existing executor prompt
+budget; the capsule keeps exactly nine numbered laws.
+
+RULE 11 Owner Gates, `VALIDATED_PR_AUTO_MERGE_AUTHORITY`, and
+release/deploy/destructive gates are unchanged by this invariant.
+
+Informative example (not normative routing): Logistics Issue #115 / PR #116
+(Freightos benchmark) and PR #118 (legacy numeric shipment ID) changed disjoint
+surfaces and progressed concurrently. PR #118 merged first; PR #116 then needed
+only fresh main detection, a bounded refresh of its existing branch, and a
+combined-tree compatibility check — no duplicate PR and no restart.
 
 ### Supreme laws
 
@@ -1111,7 +1208,9 @@ Typical triggers:
 - repeated unattended failures cannot be diagnosed from existing evidence ->
   add the minimum useful logging/alerting;
 - independent workstreams demonstrably gain enough execution or evidence value
-  from parallelism -> consider additional agents;
+  from parallelism -> consider additional agents (ordinary concurrent
+  branch/PR lanes are not a harness component; they are the default under
+  `PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`);
 - repeated handoff ambiguity breaks continuation -> consider a structured
   handoff/schema.
 
@@ -1221,6 +1320,9 @@ Normal Arena Writer unit:
 ```
 
 A new workstream or a closed PR normally requires a new Writer chat.
+Several Writer units may run concurrently as independent lanes under
+`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`; each lane keeps its own explicit
+workstream/branch/PR identity.
 
 ### RULE 08 — INDEPENDENT_SUPERVISOR
 
@@ -1239,6 +1341,12 @@ A bounded re-review of a corrected head may reuse the same Supervisor chat.
 Beginner-facing instructions must clearly separate `LÀM BÂY GIỜ` (do now)
 from later workflow, and give the user one immediate action — never force
 them to choose between internal workflow alternatives.
+
+`ONE_ACTION_NOW_FOR_BEGINNER != ONE_WORKSTREAM_TOTAL`: the beginner receives
+one immediate action per instruction while several previously launched lanes
+may continue independently (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`).
+Control Tower may intentionally dispatch multiple independent Writer or
+Supervisor lanes at once.
 
 ### RULE 10 — SUCCESS_SIGNAL_AND_RETURN
 
@@ -1344,7 +1452,10 @@ Control Tower, not the beginner Owner, tracks:
 - Owner Gate
 - next action
 
-Do not make the beginner memorize internal Git state.
+Do not make the beginner memorize internal Git state. With several
+concurrent lanes, Control Tower also owns the cross-workstream topology:
+lane overlap, integration/merge order, and bounded refresh of a lane whose
+base advanced (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`).
 
 ### RULE 14 — OVER_ENGINEERING_CHECK
 
@@ -2626,6 +2737,20 @@ machine-readable ledger below is the durable record.
         "governance/research-adoption-ledger.json (RA-EXT-103)",
         "tests/fixtures/p2p_performance_language_gate/ziwei_518400_canary.json"
       ]
+    },
+    {
+      "id": "BACKLOG_L",
+      "item": "PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT",
+      "status": "PENDING",
+      "evidence": [
+        "Issue #264 P2P — Parallel workstream Supreme Law + one-command managed-project sync",
+        "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (section 2A PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT; RULE 07, RULE 09, RULE 13 cross-references)",
+        "scripts/p2p_portable_law_projection.py (managed AGENTS.md portable block) + docs/p2p-development/P2P-AGENTS-INSTALL.md (thin entrypoint)",
+        "tests/test_p2p_parallel_workstream_law.py",
+        ".p2p/system/p2p_capabilities/control_tower_handoff.py (inline SUPREME_LAW_CAPSULE entry 5 carries the invariant; nine laws preserved)",
+        "scripts/p2p_sync_managed_projects.py --github-owner (one-command GitHub-mode managed-project sync)",
+        "tests/test_p2p_managed_sync_github_mode.py"
+      ]
     }
   ]
 }
@@ -2640,6 +2765,10 @@ independently verified PR #246 at exact Writer head
 RULE_ASSIMILATION_GATE_V1 before this status flip.
 
 `BACKLOG_K` (`PERFORMANCE_LANGUAGE_ADMISSION_V1`) is `VERIFIED`. Independent Supervisor review bound exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752` for PR #253, with Control Tower durable receipt comment `5815665839`, before this status flip under `RULE_ASSIMILATION_GATE_V1`.
+
+`BACKLOG_L` (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`) stays `PENDING` until
+Control Tower independently verifies the exact Issue #264 PR head/tree under
+RULE_ASSIMILATION_GATE_V1.
 
 ## 5. ASSIMILATION_BACKLOG — previously promised items
 
@@ -2694,6 +2823,8 @@ section 4.3.
   in PR comment `5793604664` before this status flip.
 
 - **K. Performance/language admission (`PERFORMANCE_LANGUAGE_ADMISSION_V1`)** — `VERIFIED`. Issue #252 operationalizes the earlier Rust/polyglot research through one Rule 19 subsection, a deterministic evidence gate, packaging/install inheritance, a real Ziwei 518,400-record canary, RA-EXT-103, and focused tests. Independent Supervisor verification covered exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752`; Control Tower recorded receipt `5815665839` before this status flip. No Rust dependency, migration, deployment, benchmark service, or background monitor is introduced.
+
+- **L. Parallel workstreams (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`)** — `PENDING`. Issue #264 assimilates controlled parallel workstreams into section 2A, with RULE 07/09/13 cross-references, the portable/thin entrypoint projections, and focused tests in `tests/test_p2p_parallel_workstream_law.py`. Slice 2 of the same Issue/PR carries the invariant in the inline `SUPREME_LAW_CAPSULE` (entry 5, still nine laws) and adds the one-command GitHub-mode sync `scripts/p2p_sync_managed_projects.py --github-owner <owner>`, tested in `tests/test_p2p_managed_sync_github_mode.py`. Flips to `VERIFIED` only after Control Tower independently verifies the exact PR head/tree.
 
 ## 6. Discovery and operator paths
 
