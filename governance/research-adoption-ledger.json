@@ -3503,9 +3503,9 @@
         "RULE_ASSIMILATION_GATE_V1"
       ],
       "roadmap_slot": "operations-law/quality-and-evidence/performance-language-admission",
-      "owner_decision_status": "OWNER_SELECTED_AND_IMPLEMENTED_PENDING_INDEPENDENT_RULE_ASSIMILATION_VERIFICATION",
+      "owner_decision_status": "OWNER_SELECTED_IMPLEMENTED_AND_RULE_ASSIMILATION_VERIFIED",
       "last_reviewed_at": "2026-09-24T00:00:00+00:00",
-      "notes": "Issue #252 Owner direction is to finish the Rust research 100% operationally, not to force a Rust dependency. Ziwei canary provenance: 518,400 records; 5,878,228,608 bytes; combined SHA-256 21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870. BACKLOG_K remains PENDING at Writer stage until an independent reviewer verifies the exact PR head/tree. No deployment, release, promotion, local-PC/Anvien requirement, benchmark service, daemon, or Rust toolchain installation is authorized or claimed."
+      "notes": "Issue #252 Owner direction is to finish the Rust research 100% operationally, not to force a Rust dependency. Ziwei canary provenance: 518,400 records; 5,878,228,608 bytes; combined SHA-256 21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870. RULE_ASSIMILATION_STATUS=VERIFIED: independent Supervisor review passed exact Writer head 90c69c5d650d54590f3277c00d9ec5cc5b647e3d / tree b4a84a495eb13f5c0ff4b17dc1931e3f7a809752, Control Tower receipt comment 5815665839 was recorded before BACKLOG_K flipped to VERIFIED, and PR #253 merged as 3cb8049921805dbd963a091d9b37ae06a3a9fd61. No deployment, release, promotion, local-PC/Anvien requirement, benchmark service, daemon, or Rust toolchain installation is authorized or claimed."
     }
   ],
   "rejected_register_summary": {
