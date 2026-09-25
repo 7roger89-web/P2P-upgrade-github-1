@@ -757,6 +757,38 @@ def check_development(root: Path, report: Report) -> None:
     check_installed_foundation(root, report)
 
 
+def _load_vendor_skill(root: Path):
+    """Load the snapshot hasher from the runtime owned by this exact root."""
+    if infer_role(root) == "portable":
+        package_dir = root / "runtime" / "p2p_capabilities"
+    else:
+        package_dir = root / ".p2p" / "system" / "p2p_capabilities"
+    module_path = package_dir / "vendor_skill.py"
+    if not module_path.is_file():
+        raise ImportError(f"Missing canonical vendor-skill runtime: {module_path}")
+
+    # Keep relative imports inside the selected runtime package. Never resolve
+    # vendor_skill through global PYTHONPATH or a cached p2p_capabilities.
+    package_name = "p2p_doctor_vendor_runtime"
+    for cached in [
+        name
+        for name in sys.modules
+        if name == package_name or name.startswith(f"{package_name}.")
+    ]:
+        del sys.modules[cached]
+    package = types.ModuleType(package_name)
+    package.__path__ = [str(package_dir.resolve())]
+    package.__package__ = package_name
+    sys.modules[package_name] = package
+    spec = importlib.util.spec_from_file_location(f"{package_name}.vendor_skill", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load canonical vendor-skill runtime: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def check_external_sources(root: Path, report: Report) -> None:
     """Validate admitted external-source IDs and their stored snapshot hashes."""
     external_manifest = root / "manifest" / "external-sources.json"
@@ -800,11 +832,8 @@ def check_external_sources(root: Path, report: Report) -> None:
         if expected_hash:
             try:
                 if stored_file.is_dir():
-                    system_root = str(root / ".p2p" / "system")
-                    if system_root not in sys.path:
-                        sys.path.insert(0, system_root)
-                    from p2p_capabilities.vendor_skill import snapshot_tree_sha256
-                    actual_hash = snapshot_tree_sha256(stored_file)
+                    vendor_skill = _load_vendor_skill(root)
+                    actual_hash = vendor_skill.snapshot_tree_sha256(stored_file)
                 elif stored_file.is_file():
                     actual_hash = sha256(stored_file)
                 else:
