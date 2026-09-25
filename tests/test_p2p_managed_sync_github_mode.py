@@ -497,5 +497,5 @@ def test_inline_only_fallback_prompt_carries_parallel_invariant_with_nine_laws()
         assert lines[index - 1].startswith(f"{index}. {identifier}")
     law5 = lines[4]
     assert PARALLEL in law5 and ONE_ACTION in law5
-    assert "never restart, open a duplicate PR" in law5
+    assert "checkpoint" in law5 and "stop once proven" in law5  # continuity semantics kept
     assert capsule.count(PARALLEL) == 1

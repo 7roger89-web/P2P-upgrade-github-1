@@ -443,10 +443,12 @@ project-specific convention:
     dependency-graph engine, daemon/watcher, workstream registry/database,
     second router/control plane, or extra agent layer to implement this law.
 
-Inline fallback: the compact `SUPREME_LAW_CAPSULE` carries this invariant inside
-its existing continuity law (entry 5, `PRESERVE_CONTINUITY_AND_STOP`) so an
-executor with only the inline capsule still receives it; the capsule keeps
-exactly nine numbered laws.
+Inline fallback: the compact `SUPREME_LAW_CAPSULE` carries this invariant by its
+two identifiers (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`;
+`ONE_ACTION_NOW_FOR_BEGINNER != ONE_WORKSTREAM_TOTAL`) inside its existing
+continuity law (entry 5, `PRESERVE_CONTINUITY_AND_STOP`), so an executor with
+only the inline capsule still receives it within the existing executor prompt
+budget; the capsule keeps exactly nine numbered laws.
 
 RULE 11 Owner Gates, `VALIDATED_PR_AUTO_MERGE_AUTHORITY`, and
 release/deploy/destructive gates are unchanged by this invariant.
