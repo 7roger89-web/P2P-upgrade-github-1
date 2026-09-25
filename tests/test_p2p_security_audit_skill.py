@@ -107,10 +107,10 @@ class P2PSecurityAuditSkillTests(unittest.TestCase):
                 self.assertEqual(item["status"], "VENDORED_EXACT")
 
         subset_entries = [
-            f'{item["snapshot_path"]}\\n{item["sha256"]}'
+            f'{item["snapshot_path"]}\n{item["sha256"]}'
             for item in sorted(self.provenance["source_files"], key=lambda item: item["snapshot_path"])
         ]
-        subset_hash = hashlib.sha256("\\n".join(subset_entries).encode("utf-8")).hexdigest()
+        subset_hash = hashlib.sha256("\n".join(subset_entries).encode("utf-8")).hexdigest()
         self.assertEqual(subset_hash, self.provenance["upstream_subset_sha256"])
         self.assertEqual(subset_hash, self.manifest.upstream_provenance["upstream_subset_sha256"])
 
