@@ -210,6 +210,32 @@ write path may perform this refresh on a branch/PR without requiring a local
 clone. Use existing merge/Owner-Gate rules; this gate grants no new merge,
 deployment, secret, infrastructure, or destructive authority.
 
+One-command owner-wide form (Issue #264), run from the canonical P2P source by
+an executor whose GitHub access is already authorized:
+
+```text
+python scripts/p2p_sync_managed_projects.py --github-owner <owner> --check|--write
+SYNC_GENERATED != MERGED_TO_MAIN
+DISCOVERY_SCOPE=INSTALLATION_SELECTED => DISCOVERY_COMPLETE=NO
+```
+
+It reuses the existing `gh` authentication (no token flag, secret input, or
+Owner copy/paste), discovers repositories from the authenticated GitHub view
+(no registry), selects P2P-managed repos by the same durable markers as local
+`--workspace` mode (managed `AGENTS.md` block, `.p2p/portable`, or
+`.p2p/system`), computes expected bytes with the same projector, and in
+`--write` mode commits only `AGENTS.md` (managed block),
+`.p2p/portable/P2P-OPERATIONS-NOTEBOOK.md`, and
+`.p2p/portable/P2P-EXPERIENCE-CAPSULE.json` to one deterministic
+`p2p/portable-law-sync` branch/PR per stale repo. A repo counts as `CURRENT`
+only when its default branch verifiably carries the fresh projection; a
+generated sync PR is `SYNC_GENERATED` and merges under RULE 11 /
+`VALIDATED_PR_AUTO_MERGE_AUTHORITY`. Unavailable GitHub access fails closed
+(`GITHUB_ACCESS=UNAVAILABLE`, `OWNER_GITHUB_CONNECTOR_STATUS=NOT_PROVEN_BROKEN`),
+blocked repos stay listed in `BLOCKED_REPOS`, and a selected-repository
+installation scope is reported as incomplete discovery, never as full-owner
+rollout.
+
 If the parent can read canonical law but cannot safely refresh the target
 repository, it must mark the target portable projection stale/missing and
 serialize a fresh compact `SUPREME_LAW_CAPSULE` for that handoff. The
@@ -416,6 +442,11 @@ project-specific convention:
     verification. Do not add a scheduler, queue, distributed lock service,
     dependency-graph engine, daemon/watcher, workstream registry/database,
     second router/control plane, or extra agent layer to implement this law.
+
+Inline fallback: the compact `SUPREME_LAW_CAPSULE` carries this invariant inside
+its existing continuity law (entry 5, `PRESERVE_CONTINUITY_AND_STOP`) so an
+executor with only the inline capsule still receives it; the capsule keeps
+exactly nine numbered laws.
 
 RULE 11 Owner Gates, `VALIDATED_PR_AUTO_MERGE_AUTHORITY`, and
 release/deploy/destructive gates are unchanged by this invariant.
@@ -2713,7 +2744,10 @@ machine-readable ledger below is the durable record.
         "Issue #264 P2P — Parallel workstream Supreme Law + one-command managed-project sync",
         "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md (section 2A PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT; RULE 07, RULE 09, RULE 13 cross-references)",
         "scripts/p2p_portable_law_projection.py (managed AGENTS.md portable block) + docs/p2p-development/P2P-AGENTS-INSTALL.md (thin entrypoint)",
-        "tests/test_p2p_parallel_workstream_law.py"
+        "tests/test_p2p_parallel_workstream_law.py",
+        ".p2p/system/p2p_capabilities/control_tower_handoff.py (inline SUPREME_LAW_CAPSULE entry 5 carries the invariant; nine laws preserved)",
+        "scripts/p2p_sync_managed_projects.py --github-owner (one-command GitHub-mode managed-project sync)",
+        "tests/test_p2p_managed_sync_github_mode.py"
       ]
     }
   ]
@@ -2788,7 +2822,7 @@ section 4.3.
 
 - **K. Performance/language admission (`PERFORMANCE_LANGUAGE_ADMISSION_V1`)** — `VERIFIED`. Issue #252 operationalizes the earlier Rust/polyglot research through one Rule 19 subsection, a deterministic evidence gate, packaging/install inheritance, a real Ziwei 518,400-record canary, RA-EXT-103, and focused tests. Independent Supervisor verification covered exact Writer head `90c69c5d650d54590f3277c00d9ec5cc5b647e3d` / tree `b4a84a495eb13f5c0ff4b17dc1931e3f7a809752`; Control Tower recorded receipt `5815665839` before this status flip. No Rust dependency, migration, deployment, benchmark service, or background monitor is introduced.
 
-- **L. Parallel workstreams (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`)** — `PENDING`. Issue #264 assimilates controlled parallel workstreams into section 2A, with RULE 07/09/13 cross-references, the portable/thin entrypoint projections, and focused tests in `tests/test_p2p_parallel_workstream_law.py`. The one-command GitHub-mode managed-project sync is a later slice of the same Issue/PR. Flips to `VERIFIED` only after Control Tower independently verifies the exact PR head/tree.
+- **L. Parallel workstreams (`PARALLEL_WORKSTREAM_EXECUTION_BY_DEFAULT`)** — `PENDING`. Issue #264 assimilates controlled parallel workstreams into section 2A, with RULE 07/09/13 cross-references, the portable/thin entrypoint projections, and focused tests in `tests/test_p2p_parallel_workstream_law.py`. Slice 2 of the same Issue/PR carries the invariant in the inline `SUPREME_LAW_CAPSULE` (entry 5, still nine laws) and adds the one-command GitHub-mode sync `scripts/p2p_sync_managed_projects.py --github-owner <owner>`, tested in `tests/test_p2p_managed_sync_github_mode.py`. Flips to `VERIFIED` only after Control Tower independently verifies the exact PR head/tree.
 
 ## 6. Discovery and operator paths
 
