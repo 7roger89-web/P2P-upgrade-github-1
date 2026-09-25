@@ -97,6 +97,15 @@ DOCTOR_ROLES = ("auto", "development", "portable", "installed")
 BASELINE_ZIP_SHA256 = "cafa5bbfa48048a9f2e6c54f6cfc329d2b25b34ea764809175dbae0e8f233fd8"
 SUPPLEMENTAL_CATALOG_SHA256 = "90d1cd03d15667b5aa8ec12ded6245fe84f5aacd9de478f09f5777301e829341"
 
+REQUIRED_EXTERNAL_SOURCE_IDS = (
+    "P2P-EXT-0001",
+    "P2P-EXT-0002",
+    "P2P-EXT-0003",
+    "P2P-EXT-0004",
+    "P2P-EXT-0005",
+    "P2P-EXT-0006",
+)
+
 
 class Report:
     def __init__(self) -> None:
@@ -772,7 +781,7 @@ def check_external_sources(root: Path, report: Report) -> None:
         return
 
     actual_external_ids = [item.get("source_id") for item in external_items]
-    expected_external_ids = [f"P2P-EXT-{index:04d}" for index in range(1, len(external_items) + 1)]
+    expected_external_ids = list(REQUIRED_EXTERNAL_SOURCE_IDS)
     if actual_external_ids != expected_external_ids:
         report.fail("external-sources", "External-source schema or IDs are incomplete")
         return
