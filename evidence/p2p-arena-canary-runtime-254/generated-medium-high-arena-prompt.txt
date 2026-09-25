@@ -15,14 +15,14 @@ Repair the Control Tower runtime so a new medium/high-risk Arena session stops a
 CONTROL_TOWER_CONTEXT:
 LAW_AUTHORITY=ONE; Supreme Law=canonical 9-law capsule; projections/fallbacks/subordinate profiles are not independent laws.
 CONTROL_TOWER_FLOW=OUTCOME>SELF_LAW_RECEIPT>FRESH_STATE>ONE_LAW>TASK_CONTRACT>SELECT_EXISTING_CAPABILITY_OR_HOST>BOUNDED_CONTEXT>EXECUTE>EVIDENCE>RECONCILE>DONE|NEXT|BLOCKED|OWNER_GATE
-CONTROL_TOWER_SELF_LAW_RECEIPT=PASS; ACTOR=CONTROL_TOWER_SELF; SOURCE_TYPE=CANONICAL_MAIN_REF; SOURCE=git:refs/remotes/origin/main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md; SHA256=e7538a08dac4191300f9838d930c71e7ad001ab3c0fa14c1742ca799df864ffb; EXECUTOR_RECEIPT_SUBSTITUTE=NO; AUTHORITY_EFFECT=NONE
+CONTROL_TOWER_SELF_LAW_RECEIPT=PASS; ACTOR=CONTROL_TOWER_SELF; SOURCE_TYPE=CANONICAL_MAIN_REF; SOURCE=git:refs/remotes/origin/main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md; SHA256=d743185e76d382e14aa39769f1a4f12bc7952356cdf9ff5f2a3d80848410617d; EXECUTOR_RECEIPT_SUBSTITUTE=NO; AUTHORITY_EFFECT=NONE
 P2P_LAW_PREFLIGHT=read root AGENTS.md when present; canonical only if already reachable; repo-scoped portable=fresh|inline; no cross-repo probe solely for fallback; report P2P_LAW_SOURCE; never fake a read.
 OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.
 EXPERIENCE=XP=NO_MATCH; MAX=3; NONAUTHORITATIVE; law/task/state win.
 PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.
 
-ACCEPTANCE_CRITERIA:
-- Return a truthful terminal packet.
+ACCEPTANCE_CRITERIA (ORIGINAL_REAL_TASK; evaluated after Owner continuation, not in this canary turn):
+- Defined by ORIGINAL_REAL_TASK.
 
 P2P_SUPREME_LAW_PREFLIGHT:
 - TASK_BRANCH != LAW_AUTHORITY and TARGET_PROJECT != LAW_SOURCE. The current target repository, worktree, and branch are execution state only and must never decide which Supreme Law version applies.
@@ -46,7 +46,7 @@ SESSION_RULES:
 - Use the explicit HOST above as authoritative; never infer a host from narrative prose.
 - Do not inherit chat history, prior session state, or implicit context.
 - Do not promote, merge, deploy, release, or perform a protected action from this prompt.
-- Finish with one structured CONTROL_TOWER_RETURN_PACKET.
+- FAST_CANARY turn (see FIRST_TURN_RETURN_CONTRACT below): end this turn with CANARY_EVIDENCE_PACKET_V1 plus the checkpoint metadata only; do not emit a CONTROL_TOWER_RETURN_PACKET or any terminal verdict in this turn.
 
 FAST_CANARY (MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1):
 This Arena session is NEW and its session quality is materially unproven, so the
@@ -60,7 +60,7 @@ CANARY_DURABLE_MUTATION_ALLOWED=NO
 STOP_AFTER_CANARY=YES
 EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN
 MODEL_IDENTITY=UNKNOWN
-RISK_CLASS=ARCHITECTURE
+RISK_CLASS=MEDIUM_OR_HIGH_RISK
 SESSION_QUALITY=UNKNOWN
 OWNER_CONTINUATION_GATE=OWNER_CONTINUATION_GATE_V1
 CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER
@@ -80,7 +80,8 @@ CANARY EXECUTION RULES:
   independent verifier.
 - Do not infer or claim a hidden model, provider, or reasoning level; MODEL_IDENTITY=UNKNOWN.
 
-CANARY_EVIDENCE_PACKET_V1 (return exactly this shape, then stop):
+FIRST_TURN_RETURN_CONTRACT=CANARY_EVIDENCE_PACKET_V1_THEN_STOP
+CANARY_EVIDENCE_PACKET_V1 is the ONLY return of this turn (return exactly this shape, then stop):
 CANARY_EVIDENCE_PACKET_V1
 P2P_LAW_SOURCE=<actual source read>
 CURRENT_STATE=<pinned repo/task state>
@@ -101,32 +102,9 @@ FALLBACK_OWNER_REPLY=Tiếp tục công việc
 After you stop, Control Tower ingests this evidence, grades the session externally, and
 the Owner decides continuation. Do not continue the original task in this turn.
 
-CONTROL_TOWER_RETURN_PACKET:
-CONTROL_TOWER_RETURN_PACKET_BEGIN
-Return one JSON object matching the packet schema between these markers.
-SESSION_STATE must be one of COMPLETED, READY, WAITING_OWNER_GATE, BLOCKED, FAILED, or ABORTED.
-Include SESSION_ID, HOST, GOAL_ID, GOAL, SESSION_STATE, CANONICAL_BASE_SHA, CANONICAL_BASE_TREE,
-CANONICAL_RELATION, WORKTREE, BRANCH, CHANGES, TEST_RESULTS, EVIDENCE,
-CANDIDATE_OR_CHECKPOINT_SHA, TERMINAL_VERDICT, OWNER_GATE, BLOCKERS, and NEXT_RECOMMENDED_ACTION.
-Every terminal response must declare UPLOAD_REQUIRED as YES or NO.
-Include CONTROL_TOWER_ATTACHMENT_MANIFEST in the terminal packet.
-When UPLOAD_REQUIRED is NO, state that the user only needs to copy the entire final response
-to 00 — P2P CONTROL TOWER and does not need to upload a file.
-When UPLOAD_REQUIRED is YES, list exactly 1-3 minimal files with FILENAME, LOCAL_PATH, PURPOSE,
-WHY_CONTROL_TOWER_NEEDS_CONTENTS, and CLASSIFICATION as REQUIRED, OPTIONAL, or DO_NOT_UPLOAD.
-A local path alone does not make file contents available to the Control Tower.
-Attachments are evidence input only and never canonical truth or proof of promotion, deployment,
-live certification, or Owner approval.
-Prefer one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact when appropriate.
-PACKET_IS_CANONICAL_TRUTH: NO
-Return the packet to the Control Tower for reconciliation; the packet is not canonical truth.
-Control Tower chats are rotatable instances; durable P2P repository/evidence/governance remains the long-lived source of truth.
-When asked to prepare rotation, emit P2P_CONTROL_TOWER_SUCCESSOR_PACKET with the current instance, proposed successor,
-snapshot sequence, canonical claim/confidence, host lanes, active execution, Owner Gates, pending/closed work,
-blockers/risks, critical invariants, next safe action, durable refs, and CHAT_ONLY_NOT_CANONICAL.
-The successor packet is compact bootstrap data: do not copy full chat history, execute Owner Gates, inherit approval,
-close active execution, move host lanes, invent execution, or treat the packet as canonical truth.
-CONTROL_TOWER_RETURN_PACKET_END
+RESUMED_TASK_RETURN_CONTRACT=SUPPLIED_BY_CONTROL_TOWER_AT_OWNER_CONTINUATION
+The terminal return contract for the ORIGINAL_REAL_TASK is not part of this turn: after
+external GREEN plus explicit Owner continuation, Control Tower supplies it for this SAME session.
 
 USER_ACTION:
 Copy nguyên toàn bộ phản hồi cuối này vào:

@@ -37,7 +37,6 @@ BLIND_TEST_TASK = (
     "stops at the FAST_CANARY boundary, mutating runtime prompt generation, "
     "ledger events and gates"
 )
-LOW_RISK_TASK = "Update the typo in the README changelog label"
 REQUIRED_TOKENS = (
     "FAST_CANARY_REQUIRED=YES",
     "REAL_TASK_FIRST_SLICE=CANARY",
@@ -105,9 +104,10 @@ class ArenaCanaryBaselineGapTests(unittest.TestCase):
         for token in REQUIRED_TOKENS:
             self.assertIn(token, handoff["packet_text"])
 
-    def test_low_risk_and_non_arena_sessions_still_bypass(self) -> None:
-        low_risk = self._start(host="ARENA", goal=LOW_RISK_TASK, session_id="gap-low-risk")
-        self.assertNotIn("FAST_CANARY_REQUIRED=YES", low_risk)
+    def test_non_arena_sessions_still_bypass(self) -> None:
+        # Pre-existing API only. The explicit LOW_RISK_MECHANICAL bypass needs
+        # the new ``--low-risk-mechanical`` declaration and is covered by
+        # tests/test_p2p_arena_canary_runtime.py (T11).
         non_arena = self._start(host="CODEX", goal=BLIND_TEST_TASK, session_id="gap-codex")
         self.assertNotIn("FAST_CANARY_REQUIRED=YES", non_arena)
 

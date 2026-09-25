@@ -28,6 +28,7 @@ ATTACHMENT_MANIFEST_SCHEMA = "p2p-control-tower-attachment-manifest/1"
 CONTROL_TOWER_SUCCESSOR_PACKET_SCHEMA = "p2p-control-tower-successor-packet/1"
 CONTROL_TOWER_ROTATION_HANDOFF_SCHEMA = "p2p-control-tower-rotation-handoff/1"
 CANARY_EVIDENCE_SCHEMA = "p2p-canary-evidence-packet/1"
+CANARY_EVIDENCE_EVENT_SCHEMA = "p2p-control-tower-canary-evidence/1"
 CANARY_CONTINUATION_EVENT_SCHEMA = "p2p-control-tower-canary-continuation/1"
 SUPREME_LAW_CANONICAL_REPO = "7roger89-web/P2P-upgrade-github-1"
 SUPREME_LAW_CANONICAL_REF = "main"
@@ -58,18 +59,26 @@ UNKNOWN = "UNKNOWN"
 # These constants make the existing canonical gate executable inside the
 # existing Control Tower prompt/session lifecycle. They add no router,
 # scheduler, daemon, benchmark service, score database, or second state store:
-# the canary decision is derived from the explicit host label, a deterministic
-# risk classification of the bounded task, and durable Control Tower state in
-# the existing execution ledger.
+# the canary decision is derived from the explicit host label, an explicit
+# Control Tower low-risk/mechanical declaration, and durable Control Tower state
+# in the existing execution ledger.
 MODEL_CANARY_GATE_V1 = "MODEL_CANARY_GATE_V1"
 OWNER_CONTINUATION_GATE_V1 = "OWNER_CONTINUATION_GATE_V1"
 CANARY_EVIDENCE_HEADER = "CANARY_EVIDENCE_PACKET_V1"
 CANARY_REQUIRED_HOST = "ARENA"
 CANARY_SESSION_QUALITY_ESTABLISHED = "ESTABLISHED"
 CANARY_SESSION_QUALITY_UNKNOWN = "UNKNOWN"
-RISK_CLASSES = ("LOW", "MODERATE", "CROSS_SUBSYSTEM", "SECURITY", "ARCHITECTURE")
-LOW_RISK_MECHANICAL_RISK_CLASS = "LOW"
-MEDIUM_OR_HIGH_RISK_CLASSES = ("MODERATE", "CROSS_SUBSYSTEM", "SECURITY", "ARCHITECTURE")
+# The free-text seams (Control Tower ``start`` and Owner ``/goal``) carry no
+# structured TaskProfile or mutation class, so no existing authoritative P2P
+# risk signal is usable here. The smallest conservative rule is therefore
+# binary: an explicit Control Tower LOW_RISK_MECHANICAL declaration bypasses the
+# canary; everything else fails closed into MEDIUM_OR_HIGH_RISK. No task-text
+# classifier or parallel risk taxonomy is maintained.
+LOW_RISK_MECHANICAL = "LOW_RISK_MECHANICAL"
+MEDIUM_OR_HIGH_RISK = "MEDIUM_OR_HIGH_RISK"
+RISK_CLASSES = (LOW_RISK_MECHANICAL, MEDIUM_OR_HIGH_RISK)
+# One unambiguous first-turn return contract for a triggered canary session.
+FIRST_TURN_RETURN_CONTRACT = "CANARY_EVIDENCE_PACKET_V1_THEN_STOP"
 CANARY_CLASSIFICATIONS = ("GREEN", "YELLOW", "ORANGE", "RED", "UNVERIFIED")
 CANARY_SESSION_POLICIES = {
     "GREEN": "KEEP_SESSION",
@@ -100,6 +109,17 @@ EXECUTOR_SELF_CLASSIFICATION_FORBIDDEN = (
     "ADVISORY_OR_LOW_RISK_ONLY",
     "NO_DEFAULT_CONTINUATION",
 )
+CANARY_EVIDENCE_FIELDS = (
+    "P2P_LAW_SOURCE",
+    "CURRENT_STATE",
+    "FACTS",
+    "DECISIVE_CHECK",
+    "CHECK_RESULT",
+    "ERRORS_ENCOUNTERED",
+    "RECOVERY_ACTIONS",
+    "DURABLE_MUTATION_CREATED",
+    "MODEL_IDENTITY",
+)
 CANARY_EVIDENCE_REQUIRED_FIELDS = (
     "P2P_LAW_SOURCE",
     "CURRENT_STATE",
@@ -115,11 +135,17 @@ CANARY_CHECKPOINT_FIELDS = (
     "FALLBACK_OWNER_REPLY=Tiếp tục công việc",
 )
 FALLBACK_OWNER_REPLY = "Tiếp tục công việc"
-CANARY_EVENT_TYPES = (
+# Existing execution-ledger event types read by the Control Tower. The canary
+# phase adds exactly two: the externally graded canary turn and the recorded
+# Owner continuation decision.
+CONTROL_TOWER_EVENT_TYPES = (
     "CONTROL_TOWER_SESSION_STARTED",
     "CONTROL_TOWER_RETURN_PACKET",
+    "CONTROL_TOWER_CANARY_EVIDENCE",
     "CONTROL_TOWER_CANARY_CONTINUATION",
 )
+# Executor terminal conclusions that are past the canary stop boundary.
+CANARY_TERMINAL_CONCLUSION_STATES = ("COMPLETED", "FAILED", "ABORTED")
 # Deterministic prompt-budget floor for required canary context: the Control
 # Tower prompt budget must never be smaller than this, otherwise the mandatory
 # FAST_CANARY context could not fit and generation would fail closed on every
@@ -130,56 +156,6 @@ CANARY_PROMPT_BUDGET_GUARD_CHARS = 12000
 # is neither rejected nor silently truncated when the event is persisted.
 MAX_LEDGER_STRING_CHARS = 16384
 
-_HIGH_RISK_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
-    (
-        "SECURITY",
-        re.compile(
-            r"\b(security|secrets?|credentials?|tokens?|authenticat\w*|authoriz\w*|permissions?|"
-            r"privileges?|vulnerab\w*|exploit\w*|encrypt\w*|signature|access[_ ]control|payment|billing)\b",
-            re.I,
-        ),
-    ),
-    (
-        "ARCHITECTURE",
-        re.compile(
-            r"\b(architect\w*|refactor\w*|migrat\w*|rewrit\w*|redesign\w*|framework|runtime|protocol|"
-            r"router|scheduler|daemon|consolidat\w*|reconcil\w*|governance|schema|contract)\b",
-            re.I,
-        ),
-    ),
-    (
-        "CROSS_SUBSYSTEM",
-        re.compile(
-            r"\b(cross[- ]subsystem|end[- ]to[- ]end|pipeline|integration|integrate|deploy\w*|release\w*|"
-            r"production|promot\w*|merge|broad|repository[- ]wide|multi[- ]file|subsystem)\b",
-            re.I,
-        ),
-    ),
-)
-_MEDIUM_RISK_PATTERN = re.compile(
-    r"\b(implement\w*|fix\w*|repair\w*|add\w*|updat\w*|chang\w*|modif\w*|extend\w*|build\w*|creat\w*|"
-    r"writ\w*|test\w*|debug\w*|investigat\w*|diagnos\w*|analy[sz]\w*|enforc\w*|wir\w*|port\w*|"
-    r"upgrad\w*|repair|issue|regression|defect|runtime)\b",
-    re.I,
-)
-_LOW_RISK_MECHANICAL_PATTERN = re.compile(
-    r"^(typo|rename|reword|reformat|comment|doc|docs|readme|changelog|bump|version|"
-    r"whitespace|spelling|log|label|title|copy|string|message|translat\w*)\b",
-    re.I,
-)
-_LOW_RISK_MECHANICAL_PHRASE = re.compile(
-    r"\b(low[- ]risk|mechanical|read[- ]only|doc(?:umentation)?[- ]only|cosmetic|trivial|"
-    r"typo|rename|reword|reformat|whitespace|spelling|readme|changelog|label|title)\b",
-    re.I,
-)
-_SUBSTANTIVE_WORK_PATTERN = re.compile(
-    r"\b(implement\w*|fix\w*|repair\w*|migrat\w*|refactor\w*|rewrit\w*|redesign\w*|debug\w*|"
-    r"investigat\w*|diagnos\w*|enforc\w*|extend\w*|upgrad\w*|wir\w*|port\w*|test\w*|"
-    r"analy[sz]\w*|regression|defect|issue|schema|"
-    r"runtime|router|pipeline|integration|deploy\w*|release\w*|promot\w*|merge|"
-    r"security|secret\w*|credential\w*|token\w*|auth\w*|permission\w*|architect\w*)\b",
-    re.I,
-)
 _CHECK_RESULT_FAILURE_PATTERN = re.compile(
     r"\b(fail\w*|error\w*|mismatch\w*|reject\w*|broken|exit[_ ]?code[=: ]*[1-9]|non[- ]zero|"
     r"not[_ ]pass\w*|unverified|unknown)\b",
@@ -1031,29 +1007,6 @@ def bind_session(
 # scoring, ranking, or benchmark subsystem is introduced.
 
 
-def classify_task_risk_class(task_text: Any) -> str:
-    """Classify one bounded task into an existing P2P risk class.
-
-    The classification is deterministic and conservative: an unclassifiable
-    task is treated as at least MODERATE so the canary gate stays fail-closed.
-    """
-
-    task = " ".join(str(task_text or "").split())
-    if not task:
-        return "MODERATE"
-    if len(task) <= 400 and _LOW_RISK_MECHANICAL_PHRASE.search(task):
-        if not _SUBSTANTIVE_WORK_PATTERN.search(task) and not any(
-            pattern.search(task) for _, pattern in _HIGH_RISK_PATTERNS
-        ):
-            return LOW_RISK_MECHANICAL_RISK_CLASS
-    for risk_class, pattern in _HIGH_RISK_PATTERNS:
-        if pattern.search(task):
-            return risk_class
-    if _MEDIUM_RISK_PATTERN.search(task):
-        return "MODERATE"
-    return "MODERATE"
-
-
 @dataclass(frozen=True)
 class CanaryDirective:
     """The executable FAST_CANARY directive for one Arena session.
@@ -1068,7 +1021,7 @@ class CanaryDirective:
     goal_id: str
     goal: str
     original_task: str
-    risk_class: str = "MODERATE"
+    risk_class: str = MEDIUM_OR_HIGH_RISK
     task_id: str = UNKNOWN
     session_quality: str = CANARY_SESSION_QUALITY_UNKNOWN
     model_identity: str = UNKNOWN
@@ -1113,7 +1066,7 @@ class CanaryDirective:
             goal_id=str(value.get("GOAL_ID") or UNKNOWN),
             goal=str(value.get("GOAL") or UNKNOWN),
             original_task=str(value.get("ORIGINAL_TASK") or value.get("GOAL") or UNKNOWN),
-            risk_class=str(value.get("RISK_CLASS") or "MODERATE"),
+            risk_class=str(value.get("RISK_CLASS") or MEDIUM_OR_HIGH_RISK),
             task_id=str(value.get("TASK_ID") or UNKNOWN),
             session_quality=str(value.get("SESSION_QUALITY") or CANARY_SESSION_QUALITY_UNKNOWN),
             model_identity=str(value.get("MODEL_IDENTITY") or UNKNOWN),
@@ -1134,8 +1087,8 @@ def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
         "in durable Control Tower state; it is restored only after external grading plus explicit",
         "Owner continuation. Do not reconstruct it from chat memory.",
         "",
-        f"FAST_CANARY_REQUIRED=YES",
-        f"REAL_TASK_FIRST_SLICE=CANARY",
+        "FAST_CANARY_REQUIRED=YES",
+        "REAL_TASK_FIRST_SLICE=CANARY",
         f"CANARY_DURABLE_MUTATION_ALLOWED={directive.durable_mutation_allowed}",
         f"STOP_AFTER_CANARY={directive.stop_after_canary}",
         "EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN",
@@ -1143,7 +1096,7 @@ def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
         f"RISK_CLASS={directive.risk_class}",
         f"SESSION_QUALITY={directive.session_quality}",
         f"OWNER_CONTINUATION_GATE={directive.owner_continuation_gate}",
-        f"CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER",
+        "CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER",
         "",
         "ORIGINAL_REAL_TASK (bounded goal preserved for continuation):",
         directive.original_task,
@@ -1160,7 +1113,8 @@ def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
         "  independent verifier.",
         "- Do not infer or claim a hidden model, provider, or reasoning level; MODEL_IDENTITY=UNKNOWN.",
         "",
-        "CANARY_EVIDENCE_PACKET_V1 (return exactly this shape, then stop):",
+        f"FIRST_TURN_RETURN_CONTRACT={FIRST_TURN_RETURN_CONTRACT}",
+        "CANARY_EVIDENCE_PACKET_V1 is the ONLY return of this turn (return exactly this shape, then stop):",
         "CANARY_EVIDENCE_PACKET_V1",
         "P2P_LAW_SOURCE=<actual source read>",
         "CURRENT_STATE=<pinned repo/task state>",
@@ -1180,31 +1134,44 @@ def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
     )
 
 
+def canary_resumed_task_pointer_lines() -> tuple[str, ...]:
+    """Deferred pointer that replaces the terminal return contract in a canary turn."""
+
+    return (
+        "RESUMED_TASK_RETURN_CONTRACT=SUPPLIED_BY_CONTROL_TOWER_AT_OWNER_CONTINUATION",
+        "The terminal return contract for the ORIGINAL_REAL_TASK is not part of this turn: after",
+        "external GREEN plus explicit Owner continuation, Control Tower supplies it for this SAME session.",
+    )
+
+
 def canary_requirement(
     host: Any,
-    task_text: Any,
     *,
     session_quality: str = CANARY_SESSION_QUALITY_UNKNOWN,
-    risk_class: str | None = None,
     session_action: str | None = None,
+    low_risk_mechanical: bool = False,
 ) -> dict[str, Any]:
     """Decide whether FAST_CANARY is required for one generated session.
 
-    Fail-closed order: non-Arena executors bypass; low-risk/mechanical work
-    bypasses; a session whose quality is already durably established for the
-    same bounded goal does not re-canary; every other new Arena medium/high
-    risk session canaries.
+    Fail-closed order: non-Arena executors bypass; an existing-session
+    continuation does not re-canary; an explicit Control Tower
+    LOW_RISK_MECHANICAL declaration bypasses; a session whose quality is already
+    durably established for the same bounded goal does not re-canary; every
+    other NEW Arena session is treated as MEDIUM_OR_HIGH_RISK and canaries.
+    Task text is never classified here.
     """
 
     normalized_host = str(host or "").strip().upper().replace("-", "_")
-    task = " ".join(str(task_text or "").split())
-    resolved_risk = risk_class or classify_task_risk_class(task)
-    if resolved_risk not in RISK_CLASSES:
-        raise ControlTowerHandoffError(f"CANARY_RISK_CLASS_INVALID:{resolved_risk}")
+    resolved_risk = LOW_RISK_MECHANICAL if low_risk_mechanical is True else MEDIUM_OR_HIGH_RISK
     decision = {
         "GATE": MODEL_CANARY_GATE_V1,
         "HOST": normalized_host or UNKNOWN,
         "RISK_CLASS": resolved_risk,
+        "RISK_DECISION": (
+            "EXPLICIT_CONTROL_TOWER_DECLARATION"
+            if resolved_risk == LOW_RISK_MECHANICAL
+            else "FAIL_CLOSED_NOT_DECLARED_LOW_RISK_MECHANICAL"
+        ),
         "SESSION_QUALITY": str(session_quality or CANARY_SESSION_QUALITY_UNKNOWN).upper(),
         "FAST_CANARY_REQUIRED": "NO",
         "REASON": UNKNOWN,
@@ -1216,7 +1183,7 @@ def canary_requirement(
     if str(session_action or "").upper() == "CONTINUE_CURRENT_SESSION":
         decision["REASON"] = "EXISTING_SESSION_CONTINUATION"
         return decision
-    if resolved_risk not in MEDIUM_OR_HIGH_RISK_CLASSES:
+    if resolved_risk == LOW_RISK_MECHANICAL:
         decision["REASON"] = "LOW_RISK_MECHANICAL_ARENA_TASK"
         return decision
     if decision["SESSION_QUALITY"] == CANARY_SESSION_QUALITY_ESTABLISHED:
@@ -1228,6 +1195,7 @@ def canary_requirement(
     decision["CANARY_DURABLE_MUTATION_ALLOWED"] = "NO"
     decision["STOP_AFTER_CANARY"] = "YES"
     decision["EXECUTOR_SELF_CLASSIFICATION"] = "FORBIDDEN"
+    decision["FIRST_TURN_RETURN_CONTRACT"] = FIRST_TURN_RETURN_CONTRACT
     decision["MODEL_IDENTITY"] = UNKNOWN
     return decision
 
@@ -1311,7 +1279,7 @@ def classify_canary_evidence(
     if not fields:
         # Live regression shape: a canary session that keeps investigating and
         # returns a terminal conclusion without the evidence packet.
-        if session_state in {"COMPLETED", "FAILED", "ABORTED"}:
+        if session_state in CANARY_TERMINAL_CONCLUSION_STATES:
             return _result(
                 "RED",
                 ("CANARY_EVIDENCE_PACKET_MISSING_AFTER_TERMINAL_CONCLUSION",),
@@ -1321,6 +1289,11 @@ def classify_canary_evidence(
     self_grade = _canary_self_classification_violation(fields)
     if self_grade is not None:
         return _result("RED", (f"EXECUTOR_SELF_CLASSIFICATION_FORBIDDEN:{self_grade}",))
+
+    # A terminal technical conclusion in the canary turn means the executor ran
+    # past the first safe probe, even when an evidence packet is attached.
+    if session_state in CANARY_TERMINAL_CONCLUSION_STATES:
+        return _result("RED", ("CANARY_STOP_BOUNDARY_VIOLATION:TERMINAL_CONCLUSION_IN_CANARY_TURN",))
 
     missing = [name for name in CANARY_EVIDENCE_REQUIRED_FIELDS if not str(fields.get(name) or "").strip()]
     if missing:
@@ -1934,7 +1907,6 @@ class ControlTowerIngestResult:
     idempotent: bool = False
     packet_fingerprint: str = "UNKNOWN"
     promotion_claim_detected: bool = False
-    canary_classification: str = UNKNOWN
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1956,7 +1928,6 @@ class ControlTowerIngestResult:
             "IDEMPOTENT": self.idempotent,
             "PACKET_FINGERPRINT": self.packet_fingerprint,
             "PROMOTION_CLAIM_DETECTED": self.promotion_claim_detected,
-            "CANARY_CLASSIFICATION": self.canary_classification,
         }
 
 
@@ -2191,14 +2162,11 @@ class ControlTowerState:
 def to_execution_ledger_event(
     packet: ControlTowerReturnPacket,
     reconciliation: ControlTowerIngestResult | None = None,
-    canary_grade: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return a JSON event for the existing execution-ledger writer.
 
     This function deliberately does not write a file. The caller may pass the
-    event to the repository's existing append_event surface. When the packet is
-    a canary return, the external Control Tower grade rides in the same
-    existing-ledger event instead of a second state store.
+    event to the repository's existing append_event surface.
     """
 
     if not isinstance(packet, ControlTowerReturnPacket):
@@ -2209,7 +2177,6 @@ def to_execution_ledger_event(
         "PACKET_FINGERPRINT": packet.fingerprint(),
         "CONTROL_TOWER_RETURN_PACKET": packet.to_dict(),
         "CONTROL_TOWER_RECONCILIATION": reconciliation.to_dict() if reconciliation is not None else None,
-        "CONTROL_TOWER_CANARY": _safe_json(dict(canary_grade), path="canary_grade") if canary_grade is not None else None,
         "CANONICAL_TRUTH_UPDATED": "NO",
         "PROTECTED_ACTION_EXECUTED": "NO",
     }
@@ -2245,7 +2212,7 @@ def _read_control_tower_events(path: Path) -> list[dict[str, Any]]:
             raise ProjectionError(f"CONTROL_TOWER_LEDGER_INVALID_JSON:{line_number}") from exc
         if not isinstance(raw, Mapping):
             continue
-        if raw.get("event_type") not in CANARY_EVENT_TYPES:
+        if raw.get("event_type") not in CONTROL_TOWER_EVENT_TYPES:
             continue
         try:
             _reject_secret_keys(raw)
@@ -2459,6 +2426,55 @@ class ControlTower:
                 )
                 continue
 
+            if event_type == "CONTROL_TOWER_CANARY_EVIDENCE":
+                raw_binding = event.get("SESSION_BINDING")
+                if not isinstance(raw_binding, Mapping):
+                    raise ProjectionError("CONTROL_TOWER_CANARY_BINDING_INVALID")
+                binding = SessionBinding.from_mapping(raw_binding)
+                record = records.get(binding.session_id)
+                if record is None:
+                    orphan_returns.append(
+                        {
+                            "LINE": event.get("_LINE_NUMBER"),
+                            "SESSION_ID": binding.session_id,
+                            "HOST": binding.host,
+                        }
+                    )
+                    continue
+                if not _same_binding(record.get("BINDING", {}), binding.to_dict()):
+                    raise ProjectionError("CONTROL_TOWER_CANARY_BINDING_CONFLICT")
+                fingerprint = str(event.get("EVIDENCE_FINGERPRINT") or "")
+                previous = record.get("CANARY_EVIDENCE_FINGERPRINT")
+                if previous not in (None, fingerprint):
+                    raise ProjectionError("CONTROL_TOWER_MULTIPLE_DIFFERENT_CANARY_EVIDENCE")
+                grade = event.get("CONTROL_TOWER_CANARY")
+                if not isinstance(grade, Mapping):
+                    raise ProjectionError("CONTROL_TOWER_CANARY_GRADE_INVALID")
+                grade = _safe_json(dict(grade), path="canary_grade")
+                classification = str(grade.get("CLASSIFICATION") or "UNVERIFIED").upper()
+                updated = dict(record)
+                updated.update(
+                    {
+                        "CANARY_GRADE": grade,
+                        "CANARY_EVIDENCE_FINGERPRINT": fingerprint,
+                        # The session pauses at OWNER_CONTINUATION_GATE_V1; it is
+                        # neither executing nor terminally returned.
+                        "SESSION_STATE": "WAITING_OWNER_GATE",
+                        "OWNER_GATE": {
+                            "GATE": OWNER_CONTINUATION_GATE_V1,
+                            "SESSION_ID": binding.session_id,
+                            "CANARY_CLASSIFICATION": classification,
+                            "SESSION_POLICY": CANARY_SESSION_POLICIES.get(classification, "NO_DEFAULT_CONTINUATION"),
+                            "CONTINUATION_RECOMMENDATION": CANARY_CONTINUATION_RECOMMENDATIONS.get(
+                                classification, "NO_DEFAULT_CONTINUATION"
+                            ),
+                            "FALLBACK_OWNER_REPLY": FALLBACK_OWNER_REPLY,
+                        },
+                    }
+                )
+                records[binding.session_id] = updated
+                continue
+
             if event_type == "CONTROL_TOWER_CANARY_CONTINUATION":
                 record = records.get(str(event.get("SESSION_ID") or ""))
                 if record is None:
@@ -2479,6 +2495,7 @@ class ControlTower:
                 # The Owner continuation reopens the SAME session for the original
                 # real task; the canary is never repeated for that session.
                 record["SESSION_STATE"] = "ACTIVE"
+                record["OWNER_GATE"] = None
                 records[str(event.get("SESSION_ID"))] = record
                 continue
 
@@ -2529,9 +2546,6 @@ class ControlTower:
                     "RECONCILIATION": result.to_dict(),
                 }
             )
-            canary_grade = event.get("CONTROL_TOWER_CANARY")
-            if isinstance(canary_grade, Mapping):
-                updated["CANARY_GRADE"] = _safe_json(dict(canary_grade), path="canary_grade")
             records[packet.binding.session_id] = updated
         state.session_records = records
         return state, orphan_returns
@@ -2809,14 +2823,39 @@ class ControlTower:
         self,
         final_response: str,
         *,
+        session_id: str | None = None,
         expected_law_sha: str | None = None,
         expected_experience_ids: Sequence[str] = (),
         **kwargs: Any,
     ) -> dict[str, Any]:
+        """Ingest one complete executor response.
+
+        A triggered canary turn returns the canonical CANARY_EVIDENCE_PACKET_V1
+        plus neutral checkpoint metadata only. That evidence-only response is
+        bound to the Control Tower session the caller names explicitly and is
+        graded externally; no CONTROL_TOWER_RETURN_PACKET is required from the
+        executor. Every other response still requires exactly one marked
+        CONTROL_TOWER_RETURN_PACKET.
+        """
+
+        if not isinstance(final_response, str):
+            raise PacketParseError("FINAL_RESPONSE_MUST_BE_TEXT")
+        canary_evidence = kwargs.pop("canary_evidence", parse_canary_evidence_packet(final_response))
+        has_packet_marker = PACKET_BEGIN in final_response or PACKET_END in final_response
+        if not has_packet_marker and canary_evidence is not None:
+            if not str(session_id or "").strip():
+                raise PacketParseError("CANARY_EVIDENCE_SESSION_ID_REQUIRED")
+            return self.ingest_canary_evidence(
+                final_response,
+                session_id=str(session_id),
+                canary_evidence=canary_evidence,
+            )
         try:
             packet = parse_return_packet(final_response)
         except ControlTowerHandoffError as exc:
             raise PacketParseError(str(exc)) from exc
+        if session_id is not None and str(session_id) != packet.binding.session_id:
+            raise BindingError("INGEST_SESSION_ID_DOES_NOT_MATCH_PACKET_BINDING")
         payload: dict[str, Any] = {}
         try:
             start = final_response.index(PACKET_BEGIN) + len(PACKET_BEGIN)
@@ -2830,12 +2869,123 @@ class ControlTower:
             law_check=kwargs.pop("law_check", law_check),
             experience_check=kwargs.pop("experience_check", experience_check),
             learning_reconciliation=kwargs.pop("learning_reconciliation", learning_reconciliation),
-            canary_evidence=kwargs.pop("canary_evidence", parse_canary_evidence_packet(final_response)),
+            canary_evidence=canary_evidence,
             response_text=kwargs.pop("response_text", final_response),
             expected_law_sha=expected_law_sha,
             expected_experience_ids=expected_experience_ids,
             **kwargs,
         )
+
+    def ingest_canary_evidence(
+        self,
+        response_text: str,
+        *,
+        session_id: str,
+        canary_evidence: Mapping[str, Any] | None = None,
+        packet: ControlTowerReturnPacket | None = None,
+    ) -> dict[str, Any]:
+        """Ingest and externally grade one triggered canary turn.
+
+        MODEL_CANARY_GATE_V1: the tested executor never grades itself; Control
+        Tower grades the externally observable evidence here. The canary turn is
+        persisted as ONE ``CONTROL_TOWER_CANARY_EVIDENCE`` event in the existing
+        execution ledger (canonical evidence fields, checkpoint presence, an
+        optional executor-packet summary, and the external grade). The raw
+        executor response is never persisted, and a canary turn never becomes
+        the session's terminal return: that slot stays reserved for the resumed
+        ORIGINAL task after external GREEN plus explicit Owner continuation.
+        """
+
+        text = response_text if isinstance(response_text, str) else ""
+        if len(text) > 500_000:
+            raise PacketParseError("FINAL_RESPONSE_TOO_LARGE")
+        state, orphan_returns = self._replay()
+        record = state.session_records.get(str(session_id or ""))
+        if not isinstance(record, Mapping):
+            raise BindingError("SESSION_ID_NOT_REGISTERED_IN_CONTROL_TOWER_LEDGER")
+        canary = record.get("CANARY")
+        if not isinstance(canary, Mapping) or canary.get("FAST_CANARY_REQUIRED") != "YES":
+            raise BindingError("CANARY_EVIDENCE_REQUIRES_TRIGGERED_CANARY_SESSION")
+        binding_mapping = record.get("BINDING")
+        if not isinstance(binding_mapping, Mapping):
+            raise BindingError("CONTROL_TOWER_SESSION_BINDING_INVALID")
+        binding = SessionBinding.from_mapping(binding_mapping)
+        if packet is not None and not _same_binding(binding.to_dict(), packet.binding.to_dict()):
+            raise BindingError("PACKET_BINDING_REJECTED")
+        evidence = canary_evidence if canary_evidence is not None else parse_canary_evidence_packet(text)
+        raw_fields = evidence.get("FIELDS") if isinstance(evidence, Mapping) else None
+        fields = {str(key): str(value) for key, value in raw_fields.items()} if isinstance(raw_fields, Mapping) else {}
+        checkpoint = [token for token in CANARY_CHECKPOINT_FIELDS if token in text]
+        packet_summary = (
+            None
+            if packet is None
+            else {"SESSION_STATE": packet.session_state, "PACKET_FINGERPRINT": packet.fingerprint()}
+        )
+        fingerprint = hashlib.sha256(
+            json.dumps(
+                {"FIELDS": fields, "CHECKPOINT": checkpoint, "EXECUTOR_RETURN_PACKET": packet_summary},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        previous = record.get("CANARY_EVIDENCE_FINGERPRINT")
+        if previous is not None:
+            grade = record.get("CANARY_GRADE")
+            classification = (
+                str(grade.get("CLASSIFICATION") or "UNVERIFIED").upper() if isinstance(grade, Mapping) else "UNVERIFIED"
+            )
+            if previous == fingerprint and isinstance(grade, Mapping):
+                return {
+                    "status": "PASS",
+                    "idempotent": True,
+                    "ingest_kind": "CANARY_EVIDENCE",
+                    "binding": binding.to_dict(),
+                    "task_id": record.get("TASK_ID", UNKNOWN),
+                    "canary_grade": dict(grade),
+                    "snapshot": self._projection(state, orphan_returns),
+                }
+            required = (
+                "RESUMED_TASK_REQUIRES_CONTROL_TOWER_RETURN_PACKET"
+                if isinstance(record.get("CANARY_CONTINUATION"), Mapping)
+                else "CANARY_OWNER_CONTINUATION_REQUIRED"
+            )
+            raise BindingError(f"CANARY_SESSION_ALREADY_GRADED:{classification}:{required}")
+        grade = classify_canary_evidence(evidence, return_packet=packet, response_text=text)
+        event = {
+            "schema": CANARY_EVIDENCE_EVENT_SCHEMA,
+            "event_type": "CONTROL_TOWER_CANARY_EVIDENCE",
+            "SESSION_BINDING": binding.to_dict(),
+            "TASK_ID": str(record.get("TASK_ID") or UNKNOWN),
+            "GATE": MODEL_CANARY_GATE_V1,
+            "CANARY_EVIDENCE": {name: fields[name] for name in CANARY_EVIDENCE_FIELDS if name in fields} or None,
+            "CHECKPOINT_METADATA_PRESENT": checkpoint,
+            "EXECUTOR_RETURN_PACKET": packet_summary,
+            "EVIDENCE_FINGERPRINT": fingerprint,
+            "CONTROL_TOWER_CANARY": dict(grade),
+            "RAW_EXECUTOR_RESPONSE_PERSISTED": "NO",
+            "PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PROMOTED": False,
+            "PROTECTED_ACTION_EXECUTED": False,
+        }
+        # Validate with the same rules replay applies, BEFORE writing: unsafe or
+        # oversized executor evidence is rejected here instead of poisoning
+        # every later replay of the existing ledger.
+        try:
+            _reject_secret_keys(event)
+            event = _safe_json(event, path="canary_evidence_event")
+        except ControlTowerHandoffError as exc:
+            raise BindingError(f"CANARY_EVIDENCE_UNSAFE_FOR_LEDGER:{exc}") from exc
+        _append_existing_execution_event(self.ledger_path, event)
+        return {
+            "status": "PASS",
+            "idempotent": False,
+            "ingest_kind": "CANARY_EVIDENCE",
+            "binding": binding.to_dict(),
+            "task_id": record.get("TASK_ID", UNKNOWN),
+            "canary_grade": dict(grade),
+            "snapshot": self.snapshot(),
+        }
 
     def ingest_packet(
         self,
@@ -2868,6 +3018,21 @@ class ControlTower:
         binding = record.get("BINDING")
         if not isinstance(binding, Mapping) or not _same_binding(binding, packet.binding.to_dict()):
             raise BindingError("PACKET_BINDING_REJECTED")
+        canary = record.get("CANARY")
+        if (
+            isinstance(canary, Mapping)
+            and canary.get("FAST_CANARY_REQUIRED") == "YES"
+            and not isinstance(record.get("CANARY_CONTINUATION"), Mapping)
+        ):
+            # MODEL_CANARY_GATE_V1: until the Owner continuation is recorded, the
+            # only response a triggered canary session can return is its canary
+            # turn. It is graded externally and never becomes the terminal return.
+            return self.ingest_canary_evidence(
+                response_text if isinstance(response_text, str) else packet.to_marked_text(),
+                session_id=packet.binding.session_id,
+                canary_evidence=canary_evidence,
+                packet=packet,
+            )
         effective_packet = packet
         if law_check is not None or learning_reconciliation is not None or experience_check is not None:
             effective_packet = replace(
@@ -2885,8 +3050,7 @@ class ControlTower:
         previous_fingerprint = record.get("PACKET_FINGERPRINT", UNKNOWN)
         if previous_fingerprint != UNKNOWN:
             if previous_fingerprint in (packet_fingerprint, received_fingerprint):
-                grade = record.get("CANARY_GRADE")
-                response = {
+                return {
                     "status": "PASS",
                     "idempotent": True,
                     "reconciliation": record.get("RECONCILIATION"),
@@ -2897,18 +3061,7 @@ class ControlTower:
                         current_canonical_base_tree=current_tree,
                     ),
                 }
-                if isinstance(grade, Mapping):
-                    response["canary_grade"] = dict(grade)
-                return response
             raise BindingError("SESSION_ALREADY_HAS_A_DIFFERENT_RETURN_PACKET")
-        # MODEL_CANARY_GATE_V1: the canary return is graded externally here, by
-        # Control Tower, never by the tested executor.
-        canary_grade = self._grade_canary_return(
-            record,
-            packet=effective_packet,
-            canary_evidence=canary_evidence,
-            response_text=response_text,
-        )
         result = state.ingest(
             effective_packet,
             current_canonical_base_sha=current_sha,
@@ -2918,56 +3071,17 @@ class ControlTower:
             expected_law_sha=expected_law_sha,
             expected_experience_ids=expected_experience_ids,
         )
-        if canary_grade is not None:
-            result = replace(
-                result,
-                blockers=tuple(
-                    dict.fromkeys(
-                        (*result.blockers, f"CANARY_CLASSIFICATION_{canary_grade['CLASSIFICATION']}")
-                    )
-                ),
-                canary_classification=str(canary_grade["CLASSIFICATION"]),
-            )
-        _append_existing_execution_event(
-            self.ledger_path,
-            to_execution_ledger_event(effective_packet, result, canary_grade=canary_grade),
-        )
+        _append_existing_execution_event(self.ledger_path, to_execution_ledger_event(effective_packet, result))
         snapshot = self.snapshot(
             current_canonical_base_sha=current_sha,
             current_canonical_base_tree=current_tree,
         )
-        response = {
+        return {
             "status": "PASS",
             "idempotent": False,
             "reconciliation": result.to_dict(),
             "snapshot": snapshot,
         }
-        if canary_grade is not None:
-            response["canary_grade"] = dict(canary_grade)
-        return response
-
-    @staticmethod
-    def _grade_canary_return(
-        record: Mapping[str, Any] | None,
-        *,
-        packet: ControlTowerReturnPacket,
-        canary_evidence: Mapping[str, Any] | None,
-        response_text: str | None,
-    ) -> dict[str, Any] | None:
-        """Externally grade a canary return when the session was triggered."""
-
-        if not isinstance(record, Mapping):
-            return None
-        canary = record.get("CANARY")
-        if not isinstance(canary, Mapping) or canary.get("FAST_CANARY_REQUIRED") != "YES":
-            return None
-        if isinstance(record.get("CANARY_GRADE"), Mapping):
-            return None
-        return classify_canary_evidence(
-            canary_evidence,
-            return_packet=packet,
-            response_text=response_text,
-        )
 
     def session_quality(self, goal_id: str, session_id: str) -> str:
         """Return durable session quality for one SAME session and bounded goal.
@@ -3019,7 +3133,6 @@ class ControlTower:
             raise BindingError("CONTROL_TOWER_SESSION_BINDING_INVALID")
         binding = SessionBinding.from_mapping(binding_mapping)
         original_task = str(canary.get("ORIGINAL_TASK") or record.get("GOAL") or UNKNOWN)
-        directive = CanaryDirective.from_mapping(canary)
         existing = record.get("CANARY_CONTINUATION")
         if isinstance(existing, Mapping) and existing.get("OWNER_CONTINUATION") == "YES":
             recommendation = record.get("RECOMMENDED_NEW_CHAT")
@@ -3271,7 +3384,24 @@ def build_execution_prompt(
     sha_value = _hash_or_unknown(canonical_base_sha, "canonical_base_sha")
     tree_value = _hash_or_unknown(canonical_base_tree, "canonical_base_tree")
     criteria = _refs(acceptance_criteria, "acceptance_criteria", max_length=4096)
-    criteria_text = "\n".join(f"- {item}" for item in criteria) or "- Return a truthful terminal packet."
+    canary_turn = canary_directive is not None
+    if canary_turn:
+        # ONE first-turn return contract: the canary evidence packet, then STOP.
+        # The terminal CONTROL_TOWER_RETURN_PACKET contract belongs to the
+        # resumed ORIGINAL task and is supplied at Owner continuation.
+        criteria_header = "ACCEPTANCE_CRITERIA (ORIGINAL_REAL_TASK; evaluated after Owner continuation, not in this canary turn):"
+        criteria_text = "\n".join(f"- {item}" for item in criteria) or "- Defined by ORIGINAL_REAL_TASK."
+        return_rule = (
+            "- FAST_CANARY turn (see FIRST_TURN_RETURN_CONTRACT below): end this turn with "
+            "CANARY_EVIDENCE_PACKET_V1 plus the checkpoint metadata only; do not emit a "
+            "CONTROL_TOWER_RETURN_PACKET or any terminal verdict in this turn."
+        )
+        return_contract_lines: tuple[str, ...] = canary_resumed_task_pointer_lines()
+    else:
+        criteria_header = "ACCEPTANCE_CRITERIA:"
+        criteria_text = "\n".join(f"- {item}" for item in criteria) or "- Return a truthful terminal packet."
+        return_rule = "- Finish with one structured CONTROL_TOWER_RETURN_PACKET."
+        return_contract_lines = _terminal_return_contract_lines()
     prompt = "\n".join(
         (
             f"CONTROL_TOWER_EXECUTION_PROMPT: {CONTROL_TOWER_PROMPT_SCHEMA}",
@@ -3288,7 +3418,7 @@ def build_execution_prompt(
             "TASK:",
             task,
             "",
-            "ACCEPTANCE_CRITERIA:",
+            criteria_header,
             criteria_text,
             "",
             "P2P_SUPREME_LAW_PREFLIGHT:",
@@ -3305,36 +3435,11 @@ def build_execution_prompt(
             "- Use the explicit HOST above as authoritative; never infer a host from narrative prose.",
             "- Do not inherit chat history, prior session state, or implicit context.",
             "- Do not promote, merge, deploy, release, or perform a protected action from this prompt.",
-            "- Finish with one structured CONTROL_TOWER_RETURN_PACKET.",
+            return_rule,
             "",
             *(canary_prompt_lines(canary_directive) if canary_directive is not None else ()),
-            "",
-            "CONTROL_TOWER_RETURN_PACKET:",
-            PACKET_BEGIN,
-            "Return one JSON object matching the packet schema between these markers.",
-            "SESSION_STATE must be one of COMPLETED, READY, WAITING_OWNER_GATE, BLOCKED, FAILED, or ABORTED.",
-            "Include SESSION_ID, HOST, GOAL_ID, GOAL, SESSION_STATE, CANONICAL_BASE_SHA, CANONICAL_BASE_TREE,",
-            "CANONICAL_RELATION, WORKTREE, BRANCH, CHANGES, TEST_RESULTS, EVIDENCE,",
-            "CANDIDATE_OR_CHECKPOINT_SHA, TERMINAL_VERDICT, OWNER_GATE, BLOCKERS, and NEXT_RECOMMENDED_ACTION.",
-            "Every terminal response must declare UPLOAD_REQUIRED as YES or NO.",
-            "Include CONTROL_TOWER_ATTACHMENT_MANIFEST in the terminal packet.",
-            "When UPLOAD_REQUIRED is NO, state that the user only needs to copy the entire final response",
-            "to 00 — P2P CONTROL TOWER and does not need to upload a file.",
-            "When UPLOAD_REQUIRED is YES, list exactly 1-3 minimal files with FILENAME, LOCAL_PATH, PURPOSE,",
-            "WHY_CONTROL_TOWER_NEEDS_CONTENTS, and CLASSIFICATION as REQUIRED, OPTIONAL, or DO_NOT_UPLOAD.",
-            "A local path alone does not make file contents available to the Control Tower.",
-            "Attachments are evidence input only and never canonical truth or proof of promotion, deployment,",
-            "live certification, or Owner approval.",
-            "Prefer one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact when appropriate.",
-            "PACKET_IS_CANONICAL_TRUTH: NO",
-            "Return the packet to the Control Tower for reconciliation; the packet is not canonical truth.",
-            "Control Tower chats are rotatable instances; durable P2P repository/evidence/governance remains the long-lived source of truth.",
-            "When asked to prepare rotation, emit P2P_CONTROL_TOWER_SUCCESSOR_PACKET with the current instance, proposed successor,",
-            "snapshot sequence, canonical claim/confidence, host lanes, active execution, Owner Gates, pending/closed work,",
-            "blockers/risks, critical invariants, next safe action, durable refs, and CHAT_ONLY_NOT_CANONICAL.",
-            "The successor packet is compact bootstrap data: do not copy full chat history, execute Owner Gates, inherit approval,",
-            "close active execution, move host lanes, invent execution, or treat the packet as canonical truth.",
-            PACKET_END,
+            *(("",) if canary_turn else ()),
+            *return_contract_lines,
             "",
             USER_ACTION_BLOCK,
         )
@@ -3346,6 +3451,39 @@ def build_execution_prompt(
             f"chars={len(prompt)}:budget={max_prompt_chars}"
         )
     return prompt
+
+
+def _terminal_return_contract_lines() -> tuple[str, ...]:
+    """The existing terminal CONTROL_TOWER_RETURN_PACKET contract (non-canary turns)."""
+
+    return (
+        "CONTROL_TOWER_RETURN_PACKET:",
+        PACKET_BEGIN,
+        "Return one JSON object matching the packet schema between these markers.",
+        "SESSION_STATE must be one of COMPLETED, READY, WAITING_OWNER_GATE, BLOCKED, FAILED, or ABORTED.",
+        "Include SESSION_ID, HOST, GOAL_ID, GOAL, SESSION_STATE, CANONICAL_BASE_SHA, CANONICAL_BASE_TREE,",
+        "CANONICAL_RELATION, WORKTREE, BRANCH, CHANGES, TEST_RESULTS, EVIDENCE,",
+        "CANDIDATE_OR_CHECKPOINT_SHA, TERMINAL_VERDICT, OWNER_GATE, BLOCKERS, and NEXT_RECOMMENDED_ACTION.",
+        "Every terminal response must declare UPLOAD_REQUIRED as YES or NO.",
+        "Include CONTROL_TOWER_ATTACHMENT_MANIFEST in the terminal packet.",
+        "When UPLOAD_REQUIRED is NO, state that the user only needs to copy the entire final response",
+        "to 00 — P2P CONTROL TOWER and does not need to upload a file.",
+        "When UPLOAD_REQUIRED is YES, list exactly 1-3 minimal files with FILENAME, LOCAL_PATH, PURPOSE,",
+        "WHY_CONTROL_TOWER_NEEDS_CONTENTS, and CLASSIFICATION as REQUIRED, OPTIONAL, or DO_NOT_UPLOAD.",
+        "A local path alone does not make file contents available to the Control Tower.",
+        "Attachments are evidence input only and never canonical truth or proof of promotion, deployment,",
+        "live certification, or Owner approval.",
+        "Prefer one SESSION_ID-CONTROL-TOWER-HANDOFF.md artifact when appropriate.",
+        "PACKET_IS_CANONICAL_TRUTH: NO",
+        "Return the packet to the Control Tower for reconciliation; the packet is not canonical truth.",
+        "Control Tower chats are rotatable instances; durable P2P repository/evidence/governance remains the long-lived source of truth.",
+        "When asked to prepare rotation, emit P2P_CONTROL_TOWER_SUCCESSOR_PACKET with the current instance, proposed successor,",
+        "snapshot sequence, canonical claim/confidence, host lanes, active execution, Owner Gates, pending/closed work,",
+        "blockers/risks, critical invariants, next safe action, durable refs, and CHAT_ONLY_NOT_CANONICAL.",
+        "The successor packet is compact bootstrap data: do not copy full chat history, execute Owner Gates, inherit approval,",
+        "close active execution, move host lanes, invent execution, or treat the packet as canonical truth.",
+        PACKET_END,
+    )
 
 
 def load_snapshot(

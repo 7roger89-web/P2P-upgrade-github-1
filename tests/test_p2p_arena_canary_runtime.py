@@ -14,14 +14,22 @@ smallest repair inside the existing Control Tower prompt/session lifecycle:
     + existing execution ledger
     + existing prompt assembly
 
-They deliberately assert runtime behavior (generated prompts, ledger events,
-ingest, external grading, continuation) instead of documentation-string
-presence. No second router, daemon, scheduler, benchmark service, score
-database, telemetry platform, or project registry is created.
+Supervisor review 5306294879 showed that the first iteration's canary helper
+silently appended a full CONTROL_TOWER_RETURN_PACKET to every canary response,
+hiding that the canonical evidence-only return was not ingestible. Every canary
+turn below therefore uses ONLY the canonical executor-visible shape:
+
+    CANARY_EVIDENCE_PACKET_V1 + neutral checkpoint metadata, then STOP.
+
+A CONTROL_TOWER_RETURN_PACKET appears only where the scenario is explicitly the
+live-regression shape (an executor that ran past the canary boundary) or the
+resumed ORIGINAL task after external GREEN + explicit Owner continuation.
 """
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import sys
 import tempfile
@@ -43,18 +51,18 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     BindingError,
     CanaryDirective,
     ControlTower,
+    ControlTowerHandoffError,
     SessionBinding,
     build_execution_prompt,
-    canary_prompt_lines,
     canary_requirement,
     classify_canary_evidence,
-    classify_task_risk_class,
     create_return_packet,
     parse_canary_evidence_packet,
 )
 
 BASE_SHA = "a" * 40
 BASE_TREE = "b" * 40
+LEDGER_RELATIVE = Path(".p2p") / "state" / "execution-ledger.jsonl"
 
 # The real bounded task shape observed in the 2026-09-24 blind test.
 BLIND_TEST_TASK = (
@@ -62,7 +70,8 @@ BLIND_TEST_TASK = (
     "stops at the FAST_CANARY boundary, mutating runtime prompt generation, "
     "ledger events and gates"
 )
-LOW_RISK_TASK = "Update the typo in the README changelog label"
+# Looks mechanical, but nothing explicitly declares it LOW_RISK_MECHANICAL.
+MECHANICAL_LOOKING_TASK = "Fix a typo in the README changelog label"
 
 CANARY_TOKENS = (
     "FAST_CANARY_REQUIRED=YES",
@@ -78,12 +87,37 @@ CHECKPOINT_TOKENS = (
     "NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED",
     "FALLBACK_OWNER_REPLY=Tiếp tục công việc",
 )
+CANONICAL_EVIDENCE_KEYS = (
+    "P2P_LAW_SOURCE",
+    "CURRENT_STATE",
+    "FACTS",
+    "DECISIVE_CHECK",
+    "CHECK_RESULT",
+    "ERRORS_ENCOUNTERED",
+    "RECOVERY_ACTIONS",
+    "DURABLE_MUTATION_CREATED",
+    "MODEL_IDENTITY",
+)
+# Any of these in a first-turn canary prompt is a second, contradictory return
+# contract (Supervisor review 5306294879, BLOCKER 2).
+TERMINAL_RETURN_CONTRACT_MARKERS = (
+    "CONTROL_TOWER_RETURN_PACKET_BEGIN",
+    "CONTROL_TOWER_RETURN_PACKET_END",
+    "Finish with one structured CONTROL_TOWER_RETURN_PACKET",
+    "Return a truthful terminal packet",
+    "Every terminal response must declare UPLOAD_REQUIRED",
+)
+FIRST_TURN_RETURN_CONTRACT_LINE = "FIRST_TURN_RETURN_CONTRACT=CANARY_EVIDENCE_PACKET_V1_THEN_STOP"
+CANARY_FIRST_TURN_MODE_LINE = "EXECUTION_MODE=FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP"
+CANARY_FIRST_TURN_FLOW_LINE = "FIRST_TURN_FLOW=FIRST_SAFE_REAL_TASK_SLICE -> CANARY_EVIDENCE_PACKET_V1 -> STOP"
+RESUMED_TASK_BEGIN_PREFIX = "RESUMED_TASK_CONTRACT"
+RESUMED_TASK_END = "END_RESUMED_TASK_CONTRACT"
 
 
 def canary_evidence_block(
     *,
     law_source: str = "7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
-    current_state: str = "arena/canary @ 6adfa3b85658e4c0670ccfc22eb22e19e6395879",
+    current_state: str = "arena/canary @ 3cb8049921805dbd963a091d9b37ae06a3a9fd61",
     facts: str = "runtime has no FAST_CANARY token; only structural policy tests exist",
     decisive_check: str = "grep -c FAST_CANARY scripts/p2p_control_tower.py",
     check_result: str = "exit=0; 0 matches in runtime",
@@ -93,6 +127,8 @@ def canary_evidence_block(
     model_identity: str = "UNKNOWN",
     extra_lines: tuple[str, ...] = (),
 ) -> str:
+    """Return exactly the canonical CANARY_EVIDENCE_PACKET_V1 block."""
+
     lines = [
         "CANARY_EVIDENCE_PACKET_V1",
         f"P2P_LAW_SOURCE={law_source}",
@@ -104,45 +140,61 @@ def canary_evidence_block(
         f"RECOVERY_ACTIONS={recovery}",
         f"DURABLE_MUTATION_CREATED={durable_mutation}",
         f"MODEL_IDENTITY={model_identity}",
-        *CHECKPOINT_TOKENS,
         *extra_lines,
     ]
     return "\n".join(lines)
 
 
-def canary_response(
-    binding: SessionBinding,
+def canary_evidence_response(
     *,
-    evidence_block: str | None = None,
-    session_state: str = "READY",
-    base_sha: str = BASE_SHA,
-    base_tree: str = BASE_TREE,
+    preface: str = "",
+    checkpoint: tuple[str, ...] = CHECKPOINT_TOKENS,
+    **evidence: object,
 ) -> str:
-    """Build one complete executor response for a canary turn."""
+    """Return the canonical executor-visible canary turn and nothing else.
+
+    CANARY_EVIDENCE_PACKET_V1, a blank line, then the neutral checkpoint
+    metadata. No CONTROL_TOWER_RETURN_PACKET is ever added here.
+    """
+
+    block = canary_evidence_block(**evidence)  # type: ignore[arg-type]
+    return f"{preface}{block}\n\n" + "\n".join(checkpoint) + "\n"
+
+
+def terminal_return_packet(binding: SessionBinding, *, session_state: str = "COMPLETED") -> str:
+    """A full marked CONTROL_TOWER_RETURN_PACKET for the same binding."""
 
     packet = create_return_packet(
         binding,
         session_state=session_state,
-        canonical_base_sha=base_sha,
-        canonical_base_tree=base_tree,
+        canonical_base_sha=BASE_SHA,
+        canonical_base_tree=BASE_TREE,
         canonical_relation="CURRENT",
         worktree="fixture-worktree",
         branch="fixture-branch",
-        changes=(),
-        test_results={"canary": "EVIDENCE_ONLY"},
-        evidence=("canary-evidence-only",),
-        candidate_or_checkpoint_sha="UNKNOWN",
+        changes=("scripts/p2p_control_tower.py",),
+        test_results={"focused": "PASS"},
+        evidence=("focused-tests",),
+        candidate_or_checkpoint_sha="c" * 40,
         blockers=(),
-        next_recommended_action="Wait for external canary grade and Owner continuation.",
-        law_check={
-            "status": "PASS",
-            "source": "7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
-            "source_sha256": "0" * 64,
-        },
-        experience_check={"decision": "NO_MATCH"},
+        next_recommended_action="Request independent exact-head review.",
     )
-    prefix = evidence_block if evidence_block is not None else canary_evidence_block()
-    return f"{prefix}\n\n{packet.to_marked_text()}"
+    return packet.to_marked_text()
+
+
+def split_first_turn_packet(text: str) -> tuple[list[str], list[str]]:
+    """Split a /goal Arena packet into ACTIVE (this turn) and DEFERRED lines."""
+
+    lines = text.splitlines()
+    begins = [index for index, line in enumerate(lines) if line.startswith(RESUMED_TASK_BEGIN_PREFIX)]
+    ends = [index for index, line in enumerate(lines) if line.strip() == RESUMED_TASK_END]
+    if len(begins) != 1 or len(ends) != 1 or begins[0] >= ends[0]:
+        raise AssertionError(
+            f"expected exactly one deferred RESUMED_TASK_CONTRACT section; begins={begins} ends={ends}"
+        )
+    deferred = lines[begins[0] : ends[0] + 1]
+    active = lines[: begins[0]] + lines[ends[0] + 1 :]
+    return active, deferred
 
 
 class ArenaCanaryRuntimeTests(unittest.TestCase):
@@ -174,10 +226,37 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             goal_id="P2P-CT01-CANARY",
             goal=BLIND_TEST_TASK,
             original_task=BLIND_TEST_TASK,
-            risk_class=classify_task_risk_class(BLIND_TEST_TASK),
         )
 
-    def start_cli(self, *, host: str = "ARENA", goal: str = BLIND_TEST_TASK, session_id: str = "s1") -> dict:
+    def start_canary(self, session_id: str = "session-arena-canary-0001") -> SessionBinding:
+        binding = self.binding(session_id)
+        self.tower().start_session(
+            binding,
+            task_id="TASK-CANARY-1",
+            worktree="fixture-worktree",
+            branch="fixture-branch",
+            canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE,
+            canary_directive=self.directive(session_id),
+        )
+        return binding
+
+    def _run_cli(self, args: list[str], *, expect: int = 0, global_args: tuple[str, ...] = ()) -> str:
+        buffer = io.StringIO()
+        errors = io.StringIO()
+        with contextlib.redirect_stdout(buffer), contextlib.redirect_stderr(errors):
+            code = control_tower.main(["--root", str(self.root), *global_args, *args])
+        self.assertEqual(expect, code, buffer.getvalue() + errors.getvalue())
+        return buffer.getvalue() + errors.getvalue()
+
+    def start_cli(
+        self,
+        *,
+        host: str = "ARENA",
+        goal: str = BLIND_TEST_TASK,
+        session_id: str = "s1",
+        extra: tuple[str, ...] = (),
+    ) -> dict:
         output = self._run_cli(
             [
                 "start",
@@ -191,25 +270,30 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
                 session_id,
                 "--goal",
                 goal,
+                *extra,
                 "--json",
             ]
         )
         return json.loads(output)
 
-    def _run_cli(self, args: list[str]) -> str:
-        import contextlib
-        import io
-
-        buffer = io.StringIO()
-        with contextlib.redirect_stdout(buffer):
-            code = control_tower.main(["--root", str(self.root), *args])
-        self.assertEqual(0, code, buffer.getvalue())
-        return buffer.getvalue()
-
-    def ingest_response(self, response: str) -> dict:
+    def ingest_cli(self, response: str, *, session_id: str | None = None) -> dict:
         response_path = self.root / "response.txt"
         response_path.write_text(response, encoding="utf-8")
-        return json.loads(self._run_cli(["ingest", "--response-file", str(response_path), "--json"]))
+        args = ["ingest", "--response-file", str(response_path)]
+        if session_id is not None:
+            args.extend(["--session-id", session_id])
+        observed_base = ("--current-canonical-base-sha", BASE_SHA, "--current-canonical-base-tree", BASE_TREE)
+        return json.loads(self._run_cli([*args, "--json"], global_args=observed_base))
+
+    def ingest_canary(self, binding: SessionBinding, response: str | None = None) -> dict:
+        return self.tower().ingest_response(
+            response if response is not None else canary_evidence_response(),
+            session_id=binding.session_id,
+        )
+
+    def ledger_events(self) -> list[dict]:
+        ledger = self.root / LEDGER_RELATIVE
+        return [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines() if line.strip()]
 
     # --- T01 runtime trigger ---------------------------------------------
     def test_t01_new_arena_medium_high_risk_session_triggers_canary_in_runtime(self) -> None:
@@ -220,7 +304,10 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertEqual("YES", result["recommendation"]["CANARY"]["FAST_CANARY_REQUIRED"])
         # The decision is derived at runtime, not from the task text mentioning
         # FAST_CANARY.
-        blind = self.start_cli(goal="Investigate why the Logistics shipment status endpoint regressed and repair it", session_id="s-blind")
+        blind = self.start_cli(
+            goal="Investigate why the Logistics shipment status endpoint regressed and repair it",
+            session_id="s-blind",
+        )
         self.assertIn("FAST_CANARY_REQUIRED=YES", blind["recommendation"]["PROMPT"])
 
     def test_t01b_owner_goal_arena_handoff_triggers_canary(self) -> None:
@@ -242,13 +329,15 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             self.assertIn(token, prompt)
         for token in CHECKPOINT_TOKENS:
             self.assertIn(token, prompt)
+        for key in CANONICAL_EVIDENCE_KEYS:
+            self.assertIn(f"{key}=", prompt)
         self.assertIn("OWNER_CONTINUATION_GATE=OWNER_CONTINUATION_GATE_V1", prompt)
         self.assertIn("CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER", prompt)
         self.assertIn(BLIND_TEST_TASK, prompt)
         # The original task is preserved for continuation, not dropped.
         self.assertIn("ORIGINAL_REAL_TASK", prompt)
 
-    # --- T03 stop boundary ------------------------------------------------
+    # --- T03 stop boundary + one first-turn contract -----------------------
     def test_t03_canary_turn_must_stop_after_one_first_safe_probe(self) -> None:
         prompt = self.start_cli()["recommendation"]["PROMPT"]
         self.assertIn("STOP_AFTER_CANARY=YES", prompt)
@@ -257,27 +346,109 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertIn("CONTINUATION_CHECKPOINT=READY", prompt)
 
     def test_t03b_stop_boundary_violation_is_classified_red(self) -> None:
-        # Executor returned evidence but ran past the checkpoint boundary.
-        evidence = canary_evidence_block(extra_lines=("SELF_ASSESSMENT=looks fine",))
-        evidence = "\n".join(
-            line for line in evidence.splitlines() if not line.startswith("CONTINUATION_CHECKPOINT=")
-        )
-        grade = classify_canary_evidence(
-            parse_canary_evidence_packet(evidence),
-            response_text=evidence,
-        )
+        # Evidence returned, but the neutral checkpoint that ends the turn is missing.
+        response = canary_evidence_response(checkpoint=CHECKPOINT_TOKENS[1:])
+        grade = classify_canary_evidence(parse_canary_evidence_packet(response), response_text=response)
         self.assertEqual("RED", grade["CLASSIFICATION"])
         self.assertIn("CANARY_STOP_BOUNDARY_VIOLATION", grade["REASONS"][0])
+
+    def test_t03c_control_tower_canary_prompt_has_one_unambiguous_first_turn_return_contract(self) -> None:
+        """CONTROL_TOWER_CANARY_PROMPT_CONFLICT_TEST (Supervisor BLOCKER 2)."""
+
+        prompt = self.start_cli()["recommendation"]["PROMPT"]
+        for marker in TERMINAL_RETURN_CONTRACT_MARKERS:
+            self.assertNotIn(marker, prompt, f"contradictory terminal return contract in canary turn: {marker}")
+        self.assertEqual(1, prompt.count(FIRST_TURN_RETURN_CONTRACT_LINE))
+        self.assertIn("return exactly this shape, then stop", prompt)
+        # Any remaining mention of the terminal packet must be an explicit
+        # prohibition/deferral for this turn, never an instruction to emit it.
+        for line in prompt.splitlines():
+            if "CONTROL_TOWER_RETURN_PACKET" in line:
+                upper = line.upper()
+                self.assertTrue(
+                    "DO NOT" in upper or "NOT PART OF THIS TURN" in upper,
+                    f"active terminal-packet instruction in canary turn: {line}",
+                )
+        # Control: a non-canary session keeps the full terminal return contract.
+        codex = self.start_cli(host="CODEX", session_id="codex-contract")["recommendation"]["PROMPT"]
+        self.assertIn(handoff.PACKET_BEGIN, codex)
+        self.assertIn("Finish with one structured CONTROL_TOWER_RETURN_PACKET.", codex)
+        self.assertNotIn(FIRST_TURN_RETURN_CONTRACT_LINE, codex)
+
+    def test_t03d_owner_goal_canary_prompt_has_no_active_continue_until_terminal_instruction(self) -> None:
+        """OWNER_GOAL_CANARY_PROMPT_CONFLICT_TEST (Supervisor BLOCKER 3).
+
+        Uses the real Owner /goal intake, and checks both executor-visible
+        packets: the compact Arena handoff and the beginner packet the Owner
+        actually pastes into Arena.
+        """
+
+        intake = owner_goal.build_owner_goal_intake(
+            self.root,
+            "/goal Hoàn thiện workflow hợp đồng logistics, dùng Arena",
+        )
+        arena = intake["arena_handoff"]
+        self.assertIsNotNone(arena, intake.get("arena_handoff_error"))
+        self.assertEqual("YES", arena["fast_canary_required"])
+        self.assertEqual("FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP", arena["execution_mode"])
+        self.assertEqual("FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP", intake["execution_mode"])
+        self.assertEqual("AUTONOMOUS_UNTIL_TERMINAL", arena["resumed_task_mode"])
+        beginner = intake["beginner_arena_handoff"]["packet_text"]
+        for label, text in (("arena_handoff", arena["packet_text"]), ("beginner_packet", beginner)):
+            active, deferred = split_first_turn_packet(text)
+            active_text = "\n".join(active)
+            mode_lines = [line for line in active if line.startswith("EXECUTION_MODE=")]
+            self.assertEqual([CANARY_FIRST_TURN_MODE_LINE], mode_lines, label)
+            self.assertIn(CANARY_FIRST_TURN_FLOW_LINE, active, label)
+            for forbidden in (
+                "AUTONOMOUS_UNTIL_TERMINAL",
+                "RULE20",
+                "create exactly one bounded branch",
+                "terminal ReturnPacket produced",
+            ):
+                self.assertNotIn(forbidden, active_text, f"{label}: active {forbidden!r}")
+            for prefix in ("PR_EXPECTATION", "RETURN_PACKET:", "RETURN:", "IMPLEMENT:"):
+                self.assertFalse(
+                    any(line.startswith(prefix) for line in active),
+                    f"{label}: active {prefix} line in first canary turn",
+                )
+            for token in (*CANARY_TOKENS, "CANARY_EVIDENCE_PACKET_V1", *CHECKPOINT_TOKENS):
+                self.assertIn(token, active_text, f"{label}: {token}")
+            deferred_text = "\n".join(deferred)
+            self.assertIn("external GREEN", deferred[0])
+            self.assertIn("Owner continuation", deferred[0])
+            self.assertIn("RESUMED_TASK_MODE=AUTONOMOUS_UNTIL_TERMINAL", deferred_text)
+            self.assertIn("RULE20 AUTONOMOUS_UNTIL_TERMINAL", deferred_text)
+            self.assertIn("create exactly one bounded branch", deferred_text)
+            self.assertIn("RETURN_PACKET:", deferred_text)
+        # The compact handoff ends on the canary STOP instruction.
+        active, _ = split_first_turn_packet(arena["packet_text"])
+        self.assertEqual(
+            "the Owner decides continuation. Do not continue the original task in this turn.",
+            [line for line in active if line.strip()][-1],
+        )
+        # Control: an existing-session continuation (no canary) keeps RULE20 active.
+        resumed = owner_goal.build_arena_handoff(
+            self.root,
+            {"goal_id": "HERMES-LOGISTICS-01", "objective": BLIND_TEST_TASK},
+            None,
+            "ARENA",
+            reuse=True,
+        )
+        self.assertEqual("NO", resumed["fast_canary_required"])
+        self.assertEqual("AUTONOMOUS_UNTIL_TERMINAL", resumed["execution_mode"])
+        self.assertIn("EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL", resumed["packet_text"].splitlines())
+        self.assertNotIn(RESUMED_TASK_END, resumed["packet_text"])
 
     # --- T04 executor self-grade forbidden --------------------------------
     def test_t04_executor_self_classification_is_forbidden_and_rejected(self) -> None:
         prompt = self.start_cli()["recommendation"]["PROMPT"]
         self.assertIn("EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN", prompt)
         self.assertIn("You MUST NOT emit GREEN, YELLOW, ORANGE, RED, KEEP_SESSION", prompt)
-        evidence = canary_evidence_block(
+        response = canary_evidence_response(
             extra_lines=("SELF_CLASSIFICATION=GREEN", "SESSION_POLICY=KEEP_SESSION")
         )
-        grade = classify_canary_evidence(parse_canary_evidence_packet(evidence), response_text=evidence)
+        grade = classify_canary_evidence(parse_canary_evidence_packet(response), response_text=response)
         self.assertEqual("RED", grade["CLASSIFICATION"])
         self.assertTrue(
             any(reason.startswith("EXECUTOR_SELF_CLASSIFICATION_FORBIDDEN") for reason in grade["REASONS"])
@@ -285,51 +456,73 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
 
     def test_t04b_arena_never_authoritatively_self_emits_grade_or_policy(self) -> None:
         prompt = self.start_cli()["recommendation"]["PROMPT"]
-        # The prompt must not instruct the executor to emit an authoritative
-        # session grade or policy token of its own.
         for token in ("KEEP_SESSION=YES", "LIMIT_SESSION=YES", "REROLL=YES", "SESSION_GRADE=GREEN"):
             self.assertNotIn(token, prompt)
         self.assertIn("CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER", prompt)
 
     # --- T05 canary ingest ------------------------------------------------
-    def test_t05_canary_evidence_is_ingested_into_existing_execution_ledger(self) -> None:
-        binding = self.binding()
-        started = self.tower().start_session(
-            binding,
-            task_id="TASK-CANARY-1",
-            worktree="fixture-worktree",
-            branch="fixture-branch",
-            canonical_base_sha=BASE_SHA,
-            canonical_base_tree=BASE_TREE,
-            acceptance_criteria=("Return evidence only and stop.",),
-            canary_directive=self.directive(),
-        )
-        self.assertEqual("PASS", started["status"])
-        result = self.ingest_response(canary_response(binding))
-        self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
-        self.assertEqual("KEEP_SESSION", result["canary_grade"]["SESSION_POLICY"])
+    def test_t05_pure_canary_evidence_only_response_is_ingested_and_externally_graded(self) -> None:
+        """PURE_CANARY_EVIDENCE_ONLY_INGEST_TEST (Supervisor BLOCKER 2).
 
-        ledger = self.root / ".p2p" / "state" / "execution-ledger.jsonl"
-        events = [json.loads(line) for line in ledger.read_text(encoding="utf-8").splitlines()]
-        self.assertEqual(2, len(events))
-        self.assertEqual("CONTROL_TOWER_SESSION_STARTED", events[0]["event_type"])
-        self.assertEqual("YES", events[0]["CANARY"]["FAST_CANARY_REQUIRED"])
-        self.assertEqual(BLIND_TEST_TASK, events[0]["CANARY"]["ORIGINAL_TASK"])
-        self.assertEqual("CONTROL_TOWER_RETURN_PACKET", events[1]["event_type"])
-        self.assertEqual("GREEN", events[1]["CONTROL_TOWER_CANARY"]["CLASSIFICATION"])
-        # No second state store is created.
-        self.assertFalse((self.root / ".p2p" / "state" / "control-tower.json").exists())
-        self.assertFalse((self.root / ".p2p" / "state" / "canary.json").exists())
+        The input is ONLY CANARY_EVIDENCE_PACKET_V1 + checkpoint metadata. No
+        CONTROL_TOWER_RETURN_PACKET is present; the Control Tower binds the
+        response to the session it registered.
+        """
+
+        self.start_cli(session_id="pure-1")
+        response = canary_evidence_response()
+        self.assertNotIn("CONTROL_TOWER_RETURN_PACKET", response)
+        self.assertNotIn(handoff.PACKET_BEGIN, response)
+        self.assertNotIn(handoff.PACKET_END, response)
+        keys = [line.split("=", 1)[0] for line in response.splitlines() if "=" in line]
+        self.assertEqual(
+            [*CANONICAL_EVIDENCE_KEYS, *(token.split("=", 1)[0] for token in CHECKPOINT_TOKENS)],
+            keys,
+        )
+        self.assertEqual("CANARY_EVIDENCE_PACKET_V1", response.splitlines()[0])
+
+        result = self.ingest_cli(response, session_id="pure-1")
+        self.assertEqual("PASS", result["status"])
+        self.assertFalse(result["idempotent"])
+        grade = result["canary_grade"]
+        self.assertEqual("GREEN", grade["CLASSIFICATION"])
+        self.assertEqual("KEEP_SESSION", grade["SESSION_POLICY"])
+        self.assertEqual("CONTROL_TOWER_OR_INDEPENDENT_VERIFIER", grade["CANARY_CLASSIFIER"])
+        self.assertEqual("YES", grade["OWNER_CONTINUATION_REQUIRED"])
+        snapshot = result["snapshot"]
+        self.assertEqual("WAIT_FOR_OWNER_CONTINUATION", snapshot["NEXT_SAFE_ACTION"]["ACTION"])
+        self.assertEqual("GREEN", snapshot["CANARY_GATES"][0]["CLASSIFICATION"])
+        self.assertEqual([], snapshot["ACTIVE_EXECUTION"])
+
+        events = self.ledger_events()
+        self.assertEqual(
+            ["CONTROL_TOWER_SESSION_STARTED", "CONTROL_TOWER_CANARY_EVIDENCE"],
+            [event["event_type"] for event in events],
+        )
+        evidence_event = events[1]
+        self.assertEqual("pure-1", evidence_event["SESSION_BINDING"]["SESSION_ID"])
+        self.assertEqual("GREEN", evidence_event["CONTROL_TOWER_CANARY"]["CLASSIFICATION"])
+        self.assertEqual(
+            "grep -c FAST_CANARY scripts/p2p_control_tower.py",
+            evidence_event["CANARY_EVIDENCE"]["DECISIVE_CHECK"],
+        )
+        self.assertIsNone(evidence_event["EXECUTOR_RETURN_PACKET"])
+        self.assertEqual("NO", evidence_event["RAW_EXECUTOR_RESPONSE_PERSISTED"])
+
+        # The same evidence-only shape is genuinely graded, not rubber-stamped.
+        self.start_cli(session_id="pure-2")
+        red = self.ingest_cli(canary_evidence_response(durable_mutation="YES"), session_id="pure-2")
+        self.assertEqual("RED", red["canary_grade"]["CLASSIFICATION"])
+        self.assertIn("CANARY_DURABLE_MUTATION_BOUNDARY_VIOLATED", red["canary_grade"]["REASONS"])
 
     def test_t05b_replay_is_idempotent_and_raw_transcript_is_not_persisted(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        response = "UNIQUE RAW EXECUTOR TRANSCRIPT\n" + canary_response(binding)
-        first = self.tower().ingest_response(response)
-        ledger = self.root / ".p2p" / "state" / "execution-ledger.jsonl"
+        binding = self.start_canary()
+        response = canary_evidence_response(preface="UNIQUE RAW EXECUTOR TRANSCRIPT\n\n")
+        first = self.ingest_canary(binding, response)
+        ledger = self.root / LEDGER_RELATIVE
         first_raw = ledger.read_text(encoding="utf-8")
-        second = self.tower().ingest_response(response)
-        self.assertTrue(first["idempotent"] is False)
+        second = self.ingest_canary(binding, response)
+        self.assertFalse(first["idempotent"])
         self.assertTrue(second["idempotent"])
         self.assertEqual(first_raw, ledger.read_text(encoding="utf-8"))
         self.assertNotIn("UNIQUE RAW EXECUTOR TRANSCRIPT", ledger.read_text(encoding="utf-8"))
@@ -339,73 +532,124 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertEqual("GREEN", gate["CLASSIFICATION"])
         self.assertEqual("KEEP_SESSION", gate["SESSION_POLICY"])
         self.assertEqual("CONTROL_TOWER_DURABLE_STATE", gate["ORIGINAL_TASK_SOURCE"])
+        # A different canary response for the same graded session fails closed.
+        with self.assertRaises(ControlTowerHandoffError) as ctx:
+            self.ingest_canary(binding, canary_evidence_response(facts="a different story"))
+        self.assertIn("CANARY_SESSION_ALREADY_GRADED", str(ctx.exception))
+
+    def test_t05c_evidence_only_ingest_is_bound_explicitly_and_only_to_triggered_canary_sessions(self) -> None:
+        self.start_canary()
+        response = canary_evidence_response()
+        with self.assertRaises(ControlTowerHandoffError) as missing:
+            self.tower().ingest_response(response)
+        self.assertIn("CANARY_EVIDENCE_SESSION_ID_REQUIRED", str(missing.exception))
+        with self.assertRaises(ControlTowerHandoffError) as unknown:
+            self.tower().ingest_response(response, session_id="never-registered")
+        self.assertIn("SESSION_ID_NOT_REGISTERED", str(unknown.exception))
+        # A non-canary session still requires the full terminal packet.
+        codex = SessionBinding(session_id="codex-1", host="CODEX", goal_id="G", goal=BLIND_TEST_TASK)
+        self.tower().start_session(codex, canonical_base_sha=BASE_SHA, canonical_base_tree=BASE_TREE)
+        with self.assertRaises(ControlTowerHandoffError) as not_canary:
+            self.tower().ingest_response(response, session_id="codex-1")
+        self.assertIn("CANARY_EVIDENCE_REQUIRES_TRIGGERED_CANARY_SESSION", str(not_canary.exception))
+        accepted = self.tower().ingest_response(terminal_return_packet(codex))
+        self.assertEqual("PASS", accepted["status"])
+        self.assertNotIn("canary_grade", accepted)
+
+    def test_t05d_unsafe_canary_evidence_is_rejected_before_it_can_poison_the_ledger(self) -> None:
+        binding = self.start_canary()
+        with self.assertRaises(ControlTowerHandoffError) as ctx:
+            self.ingest_canary(binding, canary_evidence_response(facts="found token=abc123 in env"))
+        self.assertIn("CANARY_EVIDENCE_UNSAFE_FOR_LEDGER", str(ctx.exception))
+        # Nothing was written, replay still works, and a clean retry is graded.
+        self.assertEqual(["CONTROL_TOWER_SESSION_STARTED"], [event["event_type"] for event in self.ledger_events()])
+        snapshot = self.tower().snapshot()
+        self.assertEqual("UNVERIFIED", snapshot["CANARY_GATES"][0]["CLASSIFICATION"])
+        self.assertEqual("session-arena-canary-0001", snapshot["ACTIVE_EXECUTION"][0]["SESSION_ID"])
+        self.assertEqual("GREEN", self.ingest_canary(binding)["canary_grade"]["CLASSIFICATION"])
 
     # --- T06 external grading --------------------------------------------
     def test_t06_external_grade_routing_table_is_deterministic(self) -> None:
         cases = {
-            "GREEN": canary_evidence_block(),
-            "YELLOW": canary_evidence_block(
+            "GREEN": canary_evidence_response(),
+            "YELLOW": canary_evidence_response(
                 check_result="exit=1; focused probe failed",
                 errors="one command error",
                 recovery="re-ran with corrected path",
             ),
-            "ORANGE": canary_evidence_block(check_result="UNKNOWN"),
-            "RED": canary_evidence_block(durable_mutation="YES"),
+            "ORANGE": canary_evidence_response(check_result="UNKNOWN"),
+            "RED": canary_evidence_response(durable_mutation="YES"),
         }
-        for expected, evidence in cases.items():
-            grade = classify_canary_evidence(parse_canary_evidence_packet(evidence), response_text=evidence)
-            self.assertEqual(expected, grade["CLASSIFICATION"], evidence)
+        for expected, response in cases.items():
+            grade = classify_canary_evidence(parse_canary_evidence_packet(response), response_text=response)
+            self.assertEqual(expected, grade["CLASSIFICATION"], response)
         expected_policies = {
             "GREEN": "KEEP_SESSION",
             "YELLOW": "LIMIT_SESSION",
             "ORANGE": "ADVISORY_OR_LOW_RISK_ONLY",
             "RED": "REROLL_OR_SWITCH_EXECUTOR",
+            "UNVERIFIED": "NO_DEFAULT_CONTINUATION",
         }
         for classification, policy in expected_policies.items():
             self.assertEqual(policy, handoff.CANARY_SESSION_POLICIES[classification])
 
     def test_t06b_unverified_is_not_implicit_green(self) -> None:
-        incomplete = canary_evidence_block()
         incomplete = "\n".join(
-            line for line in incomplete.splitlines() if not line.startswith("DECISIVE_CHECK=")
+            line for line in canary_evidence_response().splitlines() if not line.startswith("DECISIVE_CHECK=")
         )
         grade = classify_canary_evidence(parse_canary_evidence_packet(incomplete), response_text=incomplete)
         self.assertEqual("UNVERIFIED", grade["CLASSIFICATION"])
         self.assertEqual("NO_DEFAULT_CONTINUATION", grade["SESSION_POLICY"])
 
+    def test_t06c_red_rerolls_without_keep_working(self) -> None:
+        binding = self.start_canary()
+        result = self.ingest_canary(
+            binding,
+            canary_evidence_response(
+                check_result="exit=1; decisive probe failed",
+                errors="command failed",
+                recovery="NONE",
+            ),
+        )
+        self.assertEqual("RED", result["canary_grade"]["CLASSIFICATION"])
+        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", result["canary_grade"]["SESSION_POLICY"])
+        self.assertIn("CANARY_CHECK_FAILED_WITHOUT_RECOVERY", result["canary_grade"]["REASONS"])
+        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", result["snapshot"]["NEXT_SAFE_ACTION"]["ACTION"])
+
     # --- T07 Owner continuation gate --------------------------------------
     def test_t07_owner_continuation_before_external_green_is_blocked(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        self.ingest_response(canary_response(binding))
-        with self.assertRaises(BindingError) as ctx:
+        binding = self.start_canary()
+        with self.assertRaises(BindingError) as before_grade:
+            self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
+        self.assertIn("CANARY_OWNER_CONTINUATION_BLOCKED:UNVERIFIED", str(before_grade.exception))
+        self.ingest_canary(binding)
+        with self.assertRaises(BindingError) as without_owner:
             self.tower().continue_canary_session(binding.session_id, owner_continuation="NO")
-        self.assertIn("CANARY_OWNER_CONTINUATION_REQUIRED", str(ctx.exception))
+        self.assertIn("CANARY_OWNER_CONTINUATION_REQUIRED", str(without_owner.exception))
 
     def test_t07b_owner_continuation_without_green_is_blocked(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        red = canary_response(binding)
-        red = red.replace("DURABLE_MUTATION_CREATED=NO", "DURABLE_MUTATION_CREATED=YES")
-        self.ingest_response(red)
+        binding = self.start_canary()
+        self.ingest_canary(binding, canary_evidence_response(durable_mutation="YES"))
         with self.assertRaises(BindingError) as ctx:
             self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
         self.assertIn("CANARY_OWNER_CONTINUATION_BLOCKED:RED", str(ctx.exception))
 
+    def test_t07c_resumed_return_before_owner_continuation_is_rejected(self) -> None:
+        binding = self.start_canary()
+        self.ingest_canary(binding)
+        with self.assertRaises(ControlTowerHandoffError) as ctx:
+            self.tower().ingest_response(terminal_return_packet(binding))
+        self.assertIn("CANARY_OWNER_CONTINUATION_REQUIRED", str(ctx.exception))
+        # Nothing but the session start and the canary grade is durable.
+        self.assertEqual(
+            ["CONTROL_TOWER_SESSION_STARTED", "CONTROL_TOWER_CANARY_EVIDENCE"],
+            [event["event_type"] for event in self.ledger_events()],
+        )
+
     # --- T08 GREEN + Owner continuation resumes original task -------------
     def test_t08_green_plus_owner_continuation_resumes_original_task_same_session(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(
-            binding,
-            task_id="TASK-CANARY-1",
-            worktree="fixture-worktree",
-            branch="fixture-branch",
-            canonical_base_sha=BASE_SHA,
-            canonical_base_tree=BASE_TREE,
-            acceptance_criteria=("Return evidence only and stop.",),
-            canary_directive=self.directive(),
-        )
-        self.ingest_response(canary_response(binding))
+        binding = self.start_canary()
+        self.ingest_canary(binding)
         result = self.tower().continue_canary_session(
             binding.session_id,
             owner_continuation="YES",
@@ -420,20 +664,44 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertEqual("CONTROL_TOWER_DURABLE_STATE", recommendation["ORIGINAL_TASK_SOURCE"])
         self.assertEqual("RESUME_ORIGINAL_TASK_IN_SAME_SESSION", recommendation["CONTINUATION_MODE"])
         self.assertEqual("NO", recommendation["CANARY_REPEAT"])
-        self.assertIn(BLIND_TEST_TASK, recommendation["PROMPT"])
-        # Continuation does not repeat the canary.
-        self.assertNotIn("FAST_CANARY_REQUIRED=YES", recommendation["PROMPT"])
-        self.assertIn("CONTROL_TOWER_EXECUTION_PROMPT", recommendation["PROMPT"])
+        prompt = recommendation["PROMPT"]
+        self.assertIn(BLIND_TEST_TASK, prompt)
+        # Continuation does not repeat the canary; the resumed ORIGINAL task
+        # now carries the full terminal return contract.
+        self.assertNotIn("FAST_CANARY_REQUIRED=YES", prompt)
+        self.assertNotIn(FIRST_TURN_RETURN_CONTRACT_LINE, prompt)
+        self.assertIn(handoff.PACKET_BEGIN, prompt)
+        self.assertIn("Finish with one structured CONTROL_TOWER_RETURN_PACKET.", prompt)
 
         # Idempotent replay of the Owner decision.
         again = self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
         self.assertTrue(again["idempotent"])
-        self.assertEqual(recommendation["PROMPT"], again["recommendation"]["PROMPT"])
+        self.assertEqual(prompt, again["recommendation"]["PROMPT"])
+
+        # The resumed ORIGINAL task's terminal return is ingested for the SAME session.
+        final = self.ingest_cli(terminal_return_packet(binding))
+        self.assertEqual("PASS", final["status"])
+        self.assertFalse(final["idempotent"])
+        self.assertEqual("CURRENT", final["reconciliation"]["CANONICAL_RELATION"])
+        self.assertTrue(self.ingest_cli(terminal_return_packet(binding))["idempotent"])
+        self.assertEqual(
+            [
+                "CONTROL_TOWER_SESSION_STARTED",
+                "CONTROL_TOWER_CANARY_EVIDENCE",
+                "CONTROL_TOWER_CANARY_CONTINUATION",
+                "CONTROL_TOWER_RETURN_PACKET",
+            ],
+            [event["event_type"] for event in self.ledger_events()],
+        )
+        snapshot = self.tower().snapshot()
+        closed = [record for record in snapshot["RECENTLY_CLOSED"] if record["SESSION_ID"] == binding.session_id]
+        self.assertEqual("COMPLETED", closed[0]["SESSION_STATE"])
+        self.assertEqual("GREEN", snapshot["CANARY_GATES"][0]["CLASSIFICATION"])
+        self.assertEqual("YES", snapshot["CANARY_GATES"][0]["OWNER_CONTINUATION_RECORDED"])
 
     def test_t08b_fallback_owner_reply_is_accepted(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        self.ingest_response(canary_response(binding))
+        binding = self.start_canary()
+        self.ingest_canary(binding)
         result = self.tower().continue_canary_session(
             binding.session_id,
             owner_continuation="NO",
@@ -444,53 +712,46 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
 
     # --- T09 same-session no repeat ---------------------------------------
     def test_t09_same_green_session_same_goal_does_not_recanary(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        self.ingest_response(canary_response(binding))
+        binding = self.start_canary()
+        self.ingest_canary(binding)
         self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
-        # Re-registering the same session returns the stored continuation
-        # recommendation instead of a fresh canary.
         again = self.tower().start_session(binding, task_prompt=BLIND_TEST_TASK)
         self.assertTrue(again["idempotent"])
         self.assertNotIn("FAST_CANARY_REQUIRED=YES", again["recommendation"]["PROMPT"])
         self.assertEqual("NO", again["recommendation"]["CANARY_REPEAT"])
-        self.assertEqual(
-            "ESTABLISHED",
-            self.tower().session_quality(binding.goal_id, binding.session_id),
-        )
+        self.assertEqual("ESTABLISHED", self.tower().session_quality(binding.goal_id, binding.session_id))
 
     # --- T10 new session re-canaries --------------------------------------
     def test_t10_new_arena_session_recanaries(self) -> None:
-        binding = self.binding("session-arena-canary-0001")
-        self.tower().start_session(binding, canary_directive=self.directive("session-arena-canary-0001"))
-        self.ingest_response(canary_response(binding))
+        binding = self.start_canary("session-arena-canary-0001")
+        self.ingest_canary(binding)
         self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
-
         fresh = self.binding("session-arena-canary-0002")
-        result = self.tower().start_session(
-            fresh,
-            canary_directive=self.directive("session-arena-canary-0002"),
-        )
+        result = self.tower().start_session(fresh, canary_directive=self.directive("session-arena-canary-0002"))
         self.assertFalse(result["idempotent"])
         self.assertIn("FAST_CANARY_REQUIRED=YES", result["recommendation"]["PROMPT"])
-        self.assertEqual(
-            "UNKNOWN",
-            self.tower().session_quality(fresh.goal_id, fresh.session_id),
-        )
+        self.assertEqual("UNKNOWN", self.tower().session_quality(fresh.goal_id, fresh.session_id))
+        # The CLI derives the same decision from durable state for a new session id.
+        cli = self.start_cli(session_id="session-arena-canary-0003")
+        self.assertEqual("YES", cli["recommendation"]["FAST_CANARY_REQUIRED"])
 
-    # --- T11 low-risk bypass ----------------------------------------------
-    def test_t11_low_risk_mechanical_arena_task_bypasses_canary(self) -> None:
-        decision = canary_requirement("ARENA", LOW_RISK_TASK)
-        self.assertEqual("NO", decision["FAST_CANARY_REQUIRED"])
-        self.assertEqual("LOW_RISK_MECHANICAL_ARENA_TASK", decision["REASON"])
-        self.assertEqual("LOW", decision["RISK_CLASS"])
-        result = self.start_cli(goal=LOW_RISK_TASK, session_id="low-risk-1")
+    # --- T11 low-risk bypass (explicit declaration only) ------------------
+    def test_t11_low_risk_mechanical_arena_task_bypasses_canary_only_by_explicit_declaration(self) -> None:
+        declared = canary_requirement("ARENA", low_risk_mechanical=True)
+        self.assertEqual("NO", declared["FAST_CANARY_REQUIRED"])
+        self.assertEqual("LOW_RISK_MECHANICAL_ARENA_TASK", declared["REASON"])
+        self.assertEqual("LOW_RISK_MECHANICAL", declared["RISK_CLASS"])
+        result = self.start_cli(goal=MECHANICAL_LOOKING_TASK, session_id="low-risk-1", extra=("--low-risk-mechanical",))
         self.assertNotIn("FAST_CANARY_REQUIRED=YES", result["recommendation"]["PROMPT"])
         self.assertNotIn("CANARY_EVIDENCE_PACKET_V1", result["recommendation"]["PROMPT"])
+        self.assertIn(handoff.PACKET_BEGIN, result["recommendation"]["PROMPT"])
+        # Without the explicit declaration the same text fails closed into canary.
+        undeclared = self.start_cli(goal=MECHANICAL_LOOKING_TASK, session_id="low-risk-2")
+        self.assertIn("FAST_CANARY_REQUIRED=YES", undeclared["recommendation"]["PROMPT"])
 
     # --- T12 non-Arena bypass ---------------------------------------------
     def test_t12_non_arena_executor_bypasses_arena_canary(self) -> None:
-        decision = canary_requirement("CODEX", BLIND_TEST_TASK)
+        decision = canary_requirement("CODEX")
         self.assertEqual("NO", decision["FAST_CANARY_REQUIRED"])
         self.assertEqual("NON_ARENA_EXECUTOR", decision["REASON"])
         result = self.start_cli(host="CODEX", session_id="codex-1")
@@ -502,96 +763,134 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         binding = self.binding()
         directive = self.directive()
         with self.assertRaises(BindingError) as ctx:
-            build_execution_prompt(
-                binding,
-                BLIND_TEST_TASK,
-                canary_directive=directive,
-                max_prompt_chars=2000,
-            )
+            build_execution_prompt(binding, BLIND_TEST_TASK, canary_directive=directive, max_prompt_chars=2000)
         self.assertIn("CONTROL_TOWER_CANARY_CONTEXT_DID_NOT_FIT", str(ctx.exception))
-        # Required canary context is never silently shortened.
         prompt = build_execution_prompt(
             binding,
             BLIND_TEST_TASK,
             canary_directive=directive,
             max_prompt_chars=control_tower.PROMPT_GUARD_CHARS,
         )
-        for token in CANARY_TOKENS:
+        for token in (*CANARY_TOKENS, *CHECKPOINT_TOKENS, FIRST_TURN_RETURN_CONTRACT_LINE):
             self.assertIn(token, prompt)
 
-    def test_t13b_oversized_task_fails_closed_in_control_tower_runtime(self) -> None:
-        oversized = "Repair the runtime gate " + ("x" * 11000)
-        with self.assertRaises(BindingError) as ctx:
-            control_tower._contextual_task_and_expectations_for_session(
-                self.root,
-                self.binding(),
-                oversized,
-                law_receipt=control_tower._establish_control_tower_law_context(self.root),
-            )
-        self.assertIn("CONTROL_TOWER_CANARY_CONTEXT_DID_NOT_FIT", str(ctx.exception))
-
-    # --- T14 live regression shape ----------------------------------------
-    def test_t14_live_blind_test_regression_is_classified_red_and_blocked(self) -> None:
-        """The 2026-09-24 blind test: broad investigation, terminal conclusion.
-
-        The session never returned CANARY_EVIDENCE_PACKET_V1 and never stopped at
-        CONTINUATION_CHECKPOINT. Control Tower must classify that externally and
-        must not unlock full execution.
-        """
-
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        blind = canary_response(binding, evidence_block=None, session_state="COMPLETED")
-        blind = blind.replace(canary_evidence_block(), "")
-        result = self.ingest_response(blind)
-        self.assertEqual("RED", result["canary_grade"]["CLASSIFICATION"])
-        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", result["canary_grade"]["SESSION_POLICY"])
-        self.assertIn(
-            "CANARY_EVIDENCE_PACKET_MISSING_AFTER_TERMINAL_CONCLUSION",
-            result["canary_grade"]["REASONS"],
-        )
-        snapshot = result["snapshot"]
-        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", snapshot["NEXT_SAFE_ACTION"]["ACTION"])
-        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", snapshot["CANARY_GATES"][0]["SESSION_POLICY"])
+    # --- T14 live blind-test regression shape -----------------------------
+    def test_t14_live_blind_test_terminal_conclusion_without_evidence_is_red(self) -> None:
+        binding = self.start_canary()
+        blind = "SUSPECTED DEFECT FALSIFIED after broad investigation and budget sweeps.\n\n"
+        result = self.tower().ingest_response(blind + terminal_return_packet(binding, session_state="COMPLETED"))
+        grade = result["canary_grade"]
+        self.assertEqual("RED", grade["CLASSIFICATION"])
+        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", grade["SESSION_POLICY"])
+        self.assertIn("CANARY_EVIDENCE_PACKET_MISSING_AFTER_TERMINAL_CONCLUSION", grade["REASONS"])
+        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", result["snapshot"]["NEXT_SAFE_ACTION"]["ACTION"])
+        # The canary turn is graded as a canary turn; it never becomes the
+        # session's terminal return.
+        events = self.ledger_events()
+        self.assertEqual("CONTROL_TOWER_CANARY_EVIDENCE", events[-1]["event_type"])
+        self.assertEqual("COMPLETED", events[-1]["EXECUTOR_RETURN_PACKET"]["SESSION_STATE"])
         with self.assertRaises(BindingError) as ctx:
             self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
         self.assertIn("CANARY_OWNER_CONTINUATION_BLOCKED:RED", str(ctx.exception))
 
     def test_t14b_non_terminal_missing_evidence_is_unverified_not_green(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        response = canary_response(binding, evidence_block=None)
-        response = response.replace(canary_evidence_block(), "")
-        result = self.ingest_response(response)
+        binding = self.start_canary()
+        result = self.tower().ingest_response(terminal_return_packet(binding, session_state="READY"))
         self.assertEqual("UNVERIFIED", result["canary_grade"]["CLASSIFICATION"])
         self.assertEqual("NO_DEFAULT_CONTINUATION", result["canary_grade"]["SESSION_POLICY"])
         self.assertEqual("NO_DEFAULT_CONTINUATION", result["snapshot"]["NEXT_SAFE_ACTION"]["ACTION"])
+
+    def test_t14c_terminal_conclusion_in_canary_turn_is_red_even_with_evidence(self) -> None:
+        binding = self.start_canary()
+        response = canary_evidence_response() + "\n" + terminal_return_packet(binding, session_state="COMPLETED")
+        result = self.tower().ingest_response(response)
+        self.assertEqual("RED", result["canary_grade"]["CLASSIFICATION"])
+        self.assertIn(
+            "CANARY_STOP_BOUNDARY_VIOLATION:TERMINAL_CONCLUSION_IN_CANARY_TURN",
+            result["canary_grade"]["REASONS"],
+        )
 
     # --- T15 durable mutation boundary ------------------------------------
     def test_t15_canary_forbids_durable_mutation_and_flags_violation(self) -> None:
         prompt = self.start_cli()["recommendation"]["PROMPT"]
         self.assertIn("CANARY_DURABLE_MUTATION_ALLOWED=NO", prompt)
         self.assertIn("Do not create durable commits, branches, PRs, remote writes", prompt)
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        mutated = canary_response(binding).replace("DURABLE_MUTATION_CREATED=NO", "DURABLE_MUTATION_CREATED=YES")
-        result = self.ingest_response(mutated)
+        binding = self.start_canary()
+        result = self.ingest_canary(binding, canary_evidence_response(durable_mutation="YES"))
         self.assertEqual("RED", result["canary_grade"]["CLASSIFICATION"])
         self.assertIn("CANARY_DURABLE_MUTATION_BOUNDARY_VIOLATED", result["canary_grade"]["REASONS"])
 
+    # --- T16 Logistics PR112 regression shape -----------------------------
+    def test_t16_logistics_pr112_canary_regression_stops_at_first_safe_boundary(self) -> None:
+        goal = (
+            "Logistics PR112: ship the read-only shipment-status endpoint and wire "
+            "the Telegram route handler with durable state changes"
+        )
+        handoff_packet = owner_goal.build_arena_handoff(
+            self.root,
+            {"goal_id": "HERMES-LOGISTICS-01", "objective": goal},
+            None,
+            "ARENA",
+            reuse=False,
+        )
+        self.assertEqual("YES", handoff_packet["fast_canary_required"])
+        active, _ = split_first_turn_packet(handoff_packet["packet_text"])
+        for token in CANARY_TOKENS:
+            self.assertIn(token, "\n".join(active))
+        self.assertIn(goal, handoff_packet["packet_text"])
+
+        binding = SessionBinding(
+            session_id="session-arena-logistics-pr112",
+            host="ARENA",
+            goal_id="HERMES-LOGISTICS-01",
+            goal=goal,
+        )
+        directive = CanaryDirective(
+            host="ARENA",
+            session_id=binding.session_id,
+            goal_id="HERMES-LOGISTICS-01",
+            goal=goal,
+            original_task=goal,
+        )
+        self.tower().start_session(
+            binding,
+            task_id="HERMES-LOGISTICS-01-T1",
+            worktree="fixture-worktree",
+            branch="arena/hermes-logistics-01",
+            canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE,
+            canary_directive=directive,
+        )
+        response = canary_evidence_response(
+            current_state="arena/hermes-logistics-01 @ 3cb8049921805dbd963a091d9b37ae06a3a9fd61",
+            facts="read-only endpoint missing; route handler has no status branch",
+            decisive_check="grep -n shipment_status deployments/hermes-dockhosting/plugins/logistics/__init__.py",
+            check_result="exit=0; 0 matches",
+        )
+        self.assertNotIn("CONTROL_TOWER_RETURN_PACKET", response)
+        result = self.ingest_cli(response, session_id=binding.session_id)
+        self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+        self.assertEqual("UNKNOWN", result["canary_grade"]["MODEL_IDENTITY"])
+        # The first safe probe is evidence only; the real PR work still waits.
+        self.assertEqual("WAIT_FOR_OWNER_CONTINUATION", result["snapshot"]["NEXT_SAFE_ACTION"]["ACTION"])
+        with self.assertRaises(BindingError):
+            self.tower().continue_canary_session(binding.session_id, owner_continuation="NO")
+        resumed = self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
+        self.assertEqual("NO", resumed["recommendation"]["CANARY_REPEAT"])
+        self.assertIn(goal, resumed["recommendation"]["PROMPT"])
+        self.assertNotIn("FAST_CANARY_REQUIRED=YES", resumed["recommendation"]["PROMPT"])
+
     # --- T17 YELLOW bounded continuation ----------------------------------
     def test_t17_yellow_allows_only_bounded_limited_continuation(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        yellow = canary_response(
+        binding = self.start_canary()
+        result = self.ingest_canary(
             binding,
-            evidence_block=canary_evidence_block(
+            canary_evidence_response(
                 check_result="exit=1; focused probe failed on first attempt",
                 errors="one command error",
                 recovery="re-ran with corrected path and passed",
             ),
         )
-        result = self.ingest_response(yellow)
         self.assertEqual("YELLOW", result["canary_grade"]["CLASSIFICATION"])
         self.assertEqual("LIMIT_SESSION", result["canary_grade"]["SESSION_POLICY"])
         self.assertEqual(
@@ -605,13 +904,8 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
 
     # --- T18 ORANGE advisory only -----------------------------------------
     def test_t18_orange_is_advisory_or_low_risk_only(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        orange = canary_response(
-            binding,
-            evidence_block=canary_evidence_block(check_result="UNKNOWN"),
-        )
-        result = self.ingest_response(orange)
+        binding = self.start_canary()
+        result = self.ingest_canary(binding, canary_evidence_response(check_result="UNKNOWN"))
         self.assertEqual("ORANGE", result["canary_grade"]["CLASSIFICATION"])
         self.assertEqual("ADVISORY_OR_LOW_RISK_ONLY", result["canary_grade"]["SESSION_POLICY"])
         self.assertEqual("ADVISORY_OR_LOW_RISK_ONLY", result["snapshot"]["NEXT_SAFE_ACTION"]["ACTION"])
@@ -619,22 +913,9 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
         self.assertIn("CANARY_OWNER_CONTINUATION_BLOCKED:ORANGE", str(ctx.exception))
 
-    # --- T19 RED reroll ---------------------------------------------------
-    def test_t19_red_rerolls_without_keep_working(self) -> None:
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
-        red = canary_response(
-            binding,
-            evidence_block=canary_evidence_block(
-                check_result="exit=1; decisive probe failed",
-                errors="command failed",
-                recovery="NONE",
-            ),
-        )
-        result = self.ingest_response(red)
-        self.assertEqual("RED", result["canary_grade"]["CLASSIFICATION"])
-        self.assertEqual("REROLL_OR_SWITCH_EXECUTOR", result["canary_grade"]["SESSION_POLICY"])
-        self.assertIn("CANARY_CHECK_FAILED_WITHOUT_RECOVERY", result["canary_grade"]["REASONS"])
+    # T19 (managed-project package/install inheritance) lives in
+    # tests/test_p2p_arena_canary_install_inheritance.py because it builds and
+    # installs the real release.
 
     # --- T20 existing context preserved + OE guard ------------------------
     def test_t20_existing_law_oe_and_experience_context_survive_canary(self) -> None:
@@ -653,78 +934,34 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         for forbidden in ("class Router", "class TaskRegistry", "class StateDB", "class Scheduler"):
             self.assertNotIn(forbidden, source)
         self.assertIn("CONTROL_TOWER_LEDGER_RELATIVE_PATH", source)
-        binding = self.binding()
-        self.tower().start_session(binding, canary_directive=self.directive())
+        binding = self.start_canary()
+        self.ingest_canary(binding)
+        self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
         state_dir = self.root / ".p2p" / "state"
-        self.assertEqual(
-            ["execution-ledger.jsonl"],
-            sorted(path.name for path in state_dir.iterdir()),
+        self.assertEqual(["execution-ledger.jsonl"], sorted(path.name for path in state_dir.iterdir()))
+        self.assertTrue(
+            {event["event_type"] for event in self.ledger_events()} <= set(handoff.CONTROL_TOWER_EVENT_TYPES)
         )
 
-    # --- Logistics PR112 regression shape ---------------------------------
-    def test_logistics_pr112_canary_regression_stops_at_first_safe_boundary(self) -> None:
-        goal = (
-            "Logistics PR112: ship the read-only shipment-status endpoint and wire "
-            "the Telegram route handler with durable state changes"
-        )
-        handoff_packet = owner_goal.build_arena_handoff(
+    def test_oe_risk_decision_is_explicit_bypass_or_fail_closed_without_parallel_taxonomy(self) -> None:
+        """OE challenge: no regex task-text risk taxonomy at this seam."""
+
+        self.assertEqual(("LOW_RISK_MECHANICAL", "MEDIUM_OR_HIGH_RISK"), handoff.RISK_CLASSES)
+        self.assertFalse(hasattr(handoff, "classify_task_risk_class"))
+        for name in ("_HIGH_RISK_PATTERNS", "_MEDIUM_RISK_PATTERN", "_LOW_RISK_MECHANICAL_PHRASE"):
+            self.assertFalse(hasattr(handoff, name), name)
+        fail_closed = canary_requirement("ARENA")
+        self.assertEqual("YES", fail_closed["FAST_CANARY_REQUIRED"])
+        self.assertEqual("MEDIUM_OR_HIGH_RISK", fail_closed["RISK_CLASS"])
+        # Owner /goal has no explicit low-risk declaration input, so even a
+        # mechanical-looking objective fails closed into canary.
+        mechanical = owner_goal.build_arena_handoff(
             self.root,
-            {"goal_id": "HERMES-LOGISTICS-01", "objective": goal},
+            {"goal_id": "DOCS-01", "objective": MECHANICAL_LOOKING_TASK},
             None,
             "ARENA",
-            reuse=False,
         )
-        self.assertEqual("YES", handoff_packet["fast_canary_required"])
-        packet_text = handoff_packet["packet_text"]
-        for token in CANARY_TOKENS:
-            self.assertIn(token, packet_text)
-        self.assertIn(goal, packet_text)
-
-        binding = SessionBinding(
-            session_id="session-arena-logistics-pr112",
-            host="ARENA",
-            goal_id="HERMES-LOGISTICS-01",
-            goal=goal,
-        )
-        directive = CanaryDirective(
-            host="ARENA",
-            session_id=binding.session_id,
-            goal_id="HERMES-LOGISTICS-01",
-            goal=goal,
-            original_task=goal,
-            risk_class=classify_task_risk_class(goal),
-        )
-        self.tower().start_session(
-            binding,
-            task_id="HERMES-LOGISTICS-01-T1",
-            worktree="fixture-worktree",
-            branch="arena/hermes-logistics-01",
-            canonical_base_sha=BASE_SHA,
-            canonical_base_tree=BASE_TREE,
-            canary_directive=directive,
-        )
-        evidence = canary_evidence_block(
-            current_state="arena/hermes-logistics-01 @ 6adfa3b85658e4c0670ccfc22eb22e19e6395879",
-            facts="read-only endpoint missing; route handler has no status branch",
-            decisive_check="grep -n shipment_status deployments/hermes-dockhosting/plugins/logistics/__init__.py",
-            check_result="exit=0; 0 matches",
-        )
-        result = self.ingest_response(
-            canary_response(binding, evidence_block=evidence, base_sha=BASE_SHA, base_tree=BASE_TREE)
-        )
-        self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
-        self.assertEqual("UNKNOWN", result["canary_grade"]["MODEL_IDENTITY"])
-        # The first safe probe is evidence only; the real PR work still waits.
-        self.assertEqual(
-            "WAIT_FOR_OWNER_CONTINUATION",
-            result["snapshot"]["NEXT_SAFE_ACTION"]["ACTION"],
-        )
-        with self.assertRaises(BindingError):
-            self.tower().continue_canary_session(binding.session_id, owner_continuation="NO")
-        resumed = self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
-        self.assertEqual("NO", resumed["recommendation"]["CANARY_REPEAT"])
-        self.assertIn(goal, resumed["recommendation"]["PROMPT"])
-        self.assertNotIn("FAST_CANARY_REQUIRED=YES", resumed["recommendation"]["PROMPT"])
+        self.assertEqual("YES", mechanical["fast_canary_required"])
 
 
 if __name__ == "__main__":

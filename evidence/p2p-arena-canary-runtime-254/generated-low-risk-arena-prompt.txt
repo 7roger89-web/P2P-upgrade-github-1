@@ -3,19 +3,19 @@ AUTHORITATIVE_SESSION_BINDING:
 SESSION_ID: proof-arena-low-risk
 HOST: ARENA
 GOAL_ID: P2P-CT01-CANARY
-GOAL: Update the typo in the README changelog label
+GOAL: Fix a typo in the README changelog label
 WORKTREE: UNKNOWN
 BRANCH: UNKNOWN
 CANONICAL_BASE_SHA: UNKNOWN
 CANONICAL_BASE_TREE: UNKNOWN
 
 TASK:
-Update the typo in the README changelog label
+Fix a typo in the README changelog label
 
 CONTROL_TOWER_CONTEXT:
 LAW_AUTHORITY=ONE; Supreme Law=canonical 9-law capsule; projections/fallbacks/subordinate profiles are not independent laws.
 CONTROL_TOWER_FLOW=OUTCOME>SELF_LAW_RECEIPT>FRESH_STATE>ONE_LAW>TASK_CONTRACT>SELECT_EXISTING_CAPABILITY_OR_HOST>BOUNDED_CONTEXT>EXECUTE>EVIDENCE>RECONCILE>DONE|NEXT|BLOCKED|OWNER_GATE
-CONTROL_TOWER_SELF_LAW_RECEIPT=PASS; ACTOR=CONTROL_TOWER_SELF; SOURCE_TYPE=CANONICAL_MAIN_REF; SOURCE=git:refs/remotes/origin/main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md; SHA256=e7538a08dac4191300f9838d930c71e7ad001ab3c0fa14c1742ca799df864ffb; EXECUTOR_RECEIPT_SUBSTITUTE=NO; AUTHORITY_EFFECT=NONE
+CONTROL_TOWER_SELF_LAW_RECEIPT=PASS; ACTOR=CONTROL_TOWER_SELF; SOURCE_TYPE=CANONICAL_MAIN_REF; SOURCE=git:refs/remotes/origin/main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md; SHA256=d743185e76d382e14aa39769f1a4f12bc7952356cdf9ff5f2a3d80848410617d; EXECUTOR_RECEIPT_SUBSTITUTE=NO; AUTHORITY_EFFECT=NONE
 P2P_LAW_PREFLIGHT=read root AGENTS.md when present; canonical only if already reachable; repo-scoped portable=fresh|inline; no cross-repo probe solely for fallback; report P2P_LAW_SOURCE; never fake a read.
 OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.
 EXPERIENCE=XP=NO_MATCH; MAX=3; NONAUTHORITATIVE; law/task/state win.
@@ -46,7 +46,6 @@ SESSION_RULES:
 - Do not inherit chat history, prior session state, or implicit context.
 - Do not promote, merge, deploy, release, or perform a protected action from this prompt.
 - Finish with one structured CONTROL_TOWER_RETURN_PACKET.
-
 
 CONTROL_TOWER_RETURN_PACKET:
 CONTROL_TOWER_RETURN_PACKET_BEGIN

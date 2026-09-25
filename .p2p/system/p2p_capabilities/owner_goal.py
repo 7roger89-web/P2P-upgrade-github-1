@@ -104,6 +104,22 @@ FAIL_CLOSED_CANARY_LINES = (
     "NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED",
     "FALLBACK_OWNER_REPLY=Tiếp tục công việc",
 )
+# MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1 + RULE 20: a triggered
+# first Arena turn has exactly ONE active mode. RULE 20 autonomous completion is
+# serialized only inside the explicitly deferred resumed-task contract, which
+# applies after external GREEN plus explicit Owner continuation.
+AUTONOMOUS_UNTIL_TERMINAL = "AUTONOMOUS_UNTIL_TERMINAL"
+CANARY_FIRST_TURN_EXECUTION_MODE = "FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP"
+CANARY_FIRST_TURN_FLOW = "FIRST_SAFE_REAL_TASK_SLICE -> CANARY_EVIDENCE_PACKET_V1 -> STOP"
+RESUMED_TASK_CONTRACT_BEGIN = (
+    "RESUMED_TASK_CONTRACT (DEFERRED - INACTIVE IN THIS TURN; applies only after Control Tower "
+    "external GREEN + explicit Owner continuation, when resuming the ORIGINAL task in this SAME session):"
+)
+RESUMED_TASK_CONTRACT_END = "END_RESUMED_TASK_CONTRACT"
+CANARY_SUCCESS_SIGNAL = (
+    "SUCCESS_SIGNAL (THIS TURN): YES=CANARY_EVIDENCE_PACKET_V1 + checkpoint metadata returned, then STOP; "
+    "the Owner continues only after Control Tower external GREEN"
+)
 DIRECT_INVOCATION_EVIDENCE = {
     "chatgpt_surface": "No Arena invocation action/plugin found in ChatGPT tool list",
     "control_tower_surface": "No Arena integration in plugin discovery",
@@ -324,7 +340,6 @@ def build_arena_handoff(
 
         canary_decision = canary_requirement(
             executor,
-            objective,
             session_action=session_action,
         )
         if canary_decision.get("FAST_CANARY_REQUIRED") == "YES":
@@ -334,7 +349,7 @@ def build_arena_handoff(
                 goal_id=goal_id,
                 goal=objective,
                 original_task=objective,
-                risk_class=str(canary_decision.get("RISK_CLASS") or "MODERATE"),
+                risk_class=str(canary_decision.get("RISK_CLASS") or "MEDIUM_OR_HIGH_RISK"),
             )
             canary_lines = canary_prompt_lines(canary_directive)
     except Exception:
@@ -352,7 +367,9 @@ def build_arena_handoff(
     if gate["has_gate"]:
         delta = {}
 
-    packet_lines = [
+    canary_turn = canary_decision.get("FAST_CANARY_REQUIRED") == "YES"
+    execution_mode = CANARY_FIRST_TURN_EXECUTION_MODE if canary_turn else AUTONOMOUS_UNTIL_TERMINAL
+    header_lines = [
         chat_title,
         "",
         "GỬI CHO: ARENA AI",
@@ -366,32 +383,34 @@ def build_arena_handoff(
         f"TASK_ID={delta.get('task_id','UNKNOWN')}",
         f"BRANCH={branch}",
         f"EXECUTOR={executor}",
-        f"EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL",
+        f"EXECUTION_MODE={execution_mode}",
+        *((f"FIRST_TURN_FLOW={CANARY_FIRST_TURN_FLOW}",) if canary_turn else ()),
         f"REUSE_EXISTING_GOAL={reuse}",
         f"SESSION_ACTION={session_action}",
         "",
         "P2P_SUPREME_LAW_PREFLIGHT: Read canonical law from 7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md when accessible; else use capsule",
         f"SUPREME_LAW_CAPSULE: {capsule[:500]}...",
         "",
-        "FRESH_CHECK:",
-        "- git fetch origin main; git rev-parse origin/main; git branch -a --list 'arena/*'",
-        "- If BRANCH=UNKNOWN, Arena must inspect existing compatible open PR/branch and reuse it, else create exactly one bounded branch arena/<goal-id> and one PR",
-        "",
+    ]
+    fresh_check_read = "- git fetch origin main; git rev-parse origin/main; git branch -a --list 'arena/*'"
+    fresh_check_branch = "- If BRANCH=UNKNOWN, Arena must inspect existing compatible open PR/branch and reuse it, else create exactly one bounded branch arena/<goal-id> and one PR"
+    state_lines = [
         "CANONICAL_STATE: Fresh-read .p2p/state/goal-contract.json and .p2p/state/task-state.json; verify plan_hash/goal_hash; reuse existing compatible Goal",
         "TASK_SELECTION: Use task_state.next_safe_task; if WAITING_OWNER stop HARD_OWNER_GATE; if BLOCKED return BLOCKER",
         f"TASK_DELTA: {json.dumps(delta, ensure_ascii=False)}",
         f"SCOPE: {goal_contract.get('scope') or goal_contract.get('constraints') or []}",
         f"ACCEPTANCE: {delta.get('acceptance_requirements') or []}",
         f"EVIDENCE: {delta.get('required_evidence') or []}",
-        "EXECUTION_RULES: Obey scope/non-scope/acceptance/evidence; AGENT_CLAIM_IS_NOT_EVIDENCE; no second router/daemon/state DB; preserve native_goal_activation; RULE20 AUTONOMOUS_UNTIL_TERMINAL; stop at MISSION_COMPLETE|HARD_OWNER_GATE|HARD_BLOCK",
-        *canary_lines,
-        "VERIFY: Run narrow affected tests + AGENTS.md validation; independent verifier evidence required",
-        "RETURN: Evidence + exact branch/commit/PR + ReturnPacket TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION",
-        f"SESSION_GOAL={objective}",
-        f"PR_EXPECTATION=One bounded goal -> one branch {branch} -> one PR",
+    ]
+    rule20_rules = "EXECUTION_RULES: Obey scope/non-scope/acceptance/evidence; AGENT_CLAIM_IS_NOT_EVIDENCE; no second router/daemon/state DB; preserve native_goal_activation; RULE20 AUTONOMOUS_UNTIL_TERMINAL; stop at MISSION_COMPLETE|HARD_OWNER_GATE|HARD_BLOCK"
+    verify_line = "VERIFY: Run narrow affected tests + AGENTS.md validation; independent verifier evidence required"
+    return_line = "RETURN: Evidence + exact branch/commit/PR + ReturnPacket TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION"
+    pr_expectation = f"PR_EXPECTATION=One bounded goal -> one branch {branch} -> one PR"
+    identity_lines = [
         f"OWNER_GATE={gate}",
         f"ARENA_DIRECT_INVOCATION={ARENA_DIRECT_INVOCATION} {DIRECT_INVOCATION_EVIDENCE['consequence']}",
-        "",
+    ]
+    mission_lines = [
         "ASSESS:",
         f"GOAL={objective}",
         f"CURRENT_STATE=.p2p/state/goal-contract.json, .p2p/state/task-state.json, goal_id={goal_id}, task_id={delta.get('task_id','UNKNOWN')}",
@@ -407,6 +426,56 @@ def build_arena_handoff(
         "SUCCESS_SIGNAL: YES=terminal ReturnPacket produced, KEEP WORKING=continue, NO=material failure",
         "RETURN_PACKET: TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION",
     ]
+    if canary_turn:
+        # First turn: ONE active mode (first safe slice -> evidence -> STOP).
+        # The full mission contract is carried for the native one-click
+        # continuation, but only inside the explicitly deferred section, which
+        # precedes the canary block so the last active instruction is STOP.
+        packet_lines = [
+            *header_lines,
+            "FRESH_CHECK (read-only in this turn):",
+            fresh_check_read,
+            "",
+            *state_lines,
+            f"SESSION_GOAL={objective}",
+            *identity_lines,
+            "",
+            RESUMED_TASK_CONTRACT_BEGIN,
+            f"RESUMED_TASK_MODE={AUTONOMOUS_UNTIL_TERMINAL}",
+            fresh_check_branch,
+            rule20_rules,
+            verify_line,
+            return_line,
+            pr_expectation,
+            "",
+            *mission_lines,
+            RESUMED_TASK_CONTRACT_END,
+            "",
+            (
+                "EXECUTION_RULES (THIS TURN): Obey scope/non-scope/acceptance/evidence; AGENT_CLAIM_IS_NOT_EVIDENCE; "
+                "no second router/daemon/state DB; preserve native_goal_activation; "
+                f"{CANARY_FIRST_TURN_FLOW}; no branch, commit, PR, or other durable mutation in this turn"
+            ),
+            *canary_lines,
+        ]
+    else:
+        packet_lines = [
+            *header_lines,
+            "FRESH_CHECK:",
+            fresh_check_read,
+            fresh_check_branch,
+            "",
+            *state_lines,
+            rule20_rules,
+            *canary_lines,
+            verify_line,
+            return_line,
+            f"SESSION_GOAL={objective}",
+            pr_expectation,
+            *identity_lines,
+            "",
+            *mission_lines,
+        ]
     packet_text = "\n".join(packet_lines)
 
     return {
@@ -423,7 +492,9 @@ def build_arena_handoff(
         "task_id": delta.get("task_id", "UNKNOWN"),
         "branch": branch,
         "executor": executor,
-        "execution_mode": "AUTONOMOUS_UNTIL_TERMINAL",
+        "execution_mode": execution_mode,
+        "resumed_task_mode": AUTONOMOUS_UNTIL_TERMINAL,
+        "first_turn_flow": CANARY_FIRST_TURN_FLOW if canary_turn else None,
         "fast_canary_required": canary_decision.get("FAST_CANARY_REQUIRED", "NO"),
         "canary_decision": dict(canary_decision),
         "canary": canary_directive.to_dict() if canary_directive is not None else None,
@@ -462,6 +533,16 @@ def build_beginner_handoff(
     root = Path(project_root).expanduser().resolve()
     arena = build_arena_handoff(root, goal_contract, task_plan, executor, reuse=reuse, direct_invoke_possible=False)
     chat_title = arena["chat_title"]
+    canary_turn = arena.get("fast_canary_required") == "YES"
+    if canary_turn:
+        # The terminal ReturnPacket spec already travels inside the deferred
+        # resumed-task section; this turn's only success signal is the canary.
+        trailer = [CANARY_SUCCESS_SIGNAL]
+    else:
+        trailer = [
+            "SUCCESS_SIGNAL: YES=terminal ReturnPacket produced, KEEP WORKING=continue, NO=material failure",
+            "RETURN_PACKET: TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION",
+        ]
     beginner_packet = "\n".join(
         [
             "LÀM BÂY GIỜ: ARENA AI — CHAT MỚI — WRITER",
@@ -469,8 +550,7 @@ def build_beginner_handoff(
             "",
             arena["packet_text"],
             "",
-            "SUCCESS_SIGNAL: YES=terminal ReturnPacket produced, KEEP WORKING=continue, NO=material failure",
-            "RETURN_PACKET: TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION",
+            *trailer,
             "Copy toàn bộ phản hồi cuối này vào: 00 — P2P CONTROL TOWER",
         ]
     )
@@ -478,7 +558,12 @@ def build_beginner_handoff(
         "schema": "p2p-beginner-arena-handoff/1",
         "destination": "ARENA AI — CHAT MỚI — WRITER",
         "chat_title": chat_title,
-        "success_signal": "YES means terminal ReturnPacket produced",
+        "success_signal": (
+            "YES means CANARY_EVIDENCE_PACKET_V1 returned then STOP (first turn); terminal ReturnPacket "
+            "only after external GREEN + Owner continuation"
+            if canary_turn
+            else "YES means terminal ReturnPacket produced"
+        ),
         "return_packet_spec": "TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION",
         "task_packet": arena,
         "packet_text": beginner_packet,
@@ -943,7 +1028,7 @@ def build_owner_goal_intake(project_root: Path | str, raw_command: str, *, packa
                 handoff = build_arena_handoff(root, contract, plan, executor, reuse=reuse)
                 result["arena_handoff"] = handoff
                 result["arena_handoff_path"] = "COMPACT_TASK_DELTA_VIA_CANONICAL_STATE"
-                result["execution_mode"] = "AUTONOMOUS_UNTIL_TERMINAL"
+                result["execution_mode"] = handoff.get("execution_mode", AUTONOMOUS_UNTIL_TERMINAL)
                 try:
                     beginner = build_beginner_handoff(root, contract, plan, executor, reuse=reuse)
                     result["beginner_arena_handoff"] = beginner

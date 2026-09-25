@@ -62,6 +62,7 @@ _handoff.SUPREME_LAW_CAPSULE = "\n".join(_law_lines[:9])
 
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     CANARY_PROMPT_BUDGET_GUARD_CHARS,
+    MEDIUM_OR_HIGH_RISK,
     UNKNOWN,
     BindingError,
     CanaryDirective,
@@ -111,8 +112,21 @@ _GITHUB_TASK = re.compile(r"\b(github|pull request|\bpr\b|merge|branch|commit|re
 _PROMPT_TASK = re.compile(r"\b(prompt|instruction|delegate|delegation|handoff|executor prompt|rewrite prompt)\b", re.I)
 
 
+def _default_root() -> Path:
+    """Default project root for the source checkout and the installed layout.
+
+    In the P2P source checkout this CLI lives at ``<repo>/scripts/``. A managed
+    project receives it from the release at ``<project>/.p2p/system/scripts/``;
+    there the project root is the parent of ``.p2p``, never the runtime copy.
+    """
+
+    if REPO_ROOT.name == "system" and REPO_ROOT.parent.name == ".p2p":
+        return REPO_ROOT.parent.parent
+    return REPO_ROOT
+
+
 def _root(args: argparse.Namespace) -> Path:
-    return Path(args.root).expanduser().resolve() if args.root else REPO_ROOT
+    return Path(args.root).expanduser().resolve() if args.root else _default_root()
 
 
 def _sha256_text(value: str) -> str:
@@ -638,13 +652,14 @@ def _canary_directive_for_session(
     task: str,
     *,
     session_action: str | None = None,
+    low_risk_mechanical: bool = False,
 ) -> CanaryDirective | None:
     """Derive the executable FAST_CANARY directive for one generated session.
 
-    The decision uses only the explicit host label, a deterministic risk
-    classification of the bounded task, and durable Control Tower session
-    quality. No router, scheduler, score database, or second state store is
-    created.
+    The decision uses only the explicit host label, an explicit Control Tower
+    LOW_RISK_MECHANICAL declaration (otherwise fail closed), and durable Control
+    Tower session quality. Task text is never risk-classified. No router,
+    scheduler, score database, or second state store is created.
     """
 
     try:
@@ -653,9 +668,9 @@ def _canary_directive_for_session(
         session_quality = "UNKNOWN"
     decision = canary_requirement(
         binding.host,
-        task,
         session_quality=session_quality,
         session_action=session_action,
+        low_risk_mechanical=low_risk_mechanical,
     )
     if decision.get("FAST_CANARY_REQUIRED") != "YES":
         return None
@@ -665,7 +680,7 @@ def _canary_directive_for_session(
         goal_id=binding.goal_id,
         goal=binding.goal,
         original_task=task,
-        risk_class=str(decision.get("RISK_CLASS") or "MODERATE"),
+        risk_class=str(decision.get("RISK_CLASS") or MEDIUM_OR_HIGH_RISK),
         session_quality=str(decision.get("SESSION_QUALITY") or "UNKNOWN"),
     )
 
@@ -682,6 +697,7 @@ def _contextual_task_and_expectations_for_session(
     acceptance_criteria: Sequence[str] = (),
     law_receipt: Mapping[str, Any] | None = None,
     session_action: str | None = None,
+    low_risk_mechanical: bool = False,
 ) -> tuple[str, str | None, list[str]]:
     """Fit runtime guidance + relevant experience into the exact prompt budget.
 
@@ -695,7 +711,13 @@ def _contextual_task_and_expectations_for_session(
         raise BindingError("CONTROL_TOWER_RESERVED_CONTEXT_IN_TASK")
 
     receipt = law_receipt or _establish_control_tower_law_context(root)
-    directive = _canary_directive_for_session(root, binding, task, session_action=session_action)
+    directive = _canary_directive_for_session(
+        root,
+        binding,
+        task,
+        session_action=session_action,
+        low_risk_mechanical=low_risk_mechanical,
+    )
     base_prompt = build_execution_prompt(
         binding,
         task,
@@ -855,6 +877,14 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--worktree", default=UNKNOWN)
     start.add_argument("--branch", default=UNKNOWN)
     start.add_argument("--acceptance-criterion", action="append", default=[])
+    start.add_argument(
+        "--low-risk-mechanical",
+        action="store_true",
+        help=(
+            "explicit Control Tower declaration that the bounded task is low-risk/mechanical; "
+            "without it a NEW Arena session fails closed into FAST_CANARY"
+        ),
+    )
     start.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
 
     snapshot = sub.add_parser("snapshot", help="show the reconciled Control Tower projection")
@@ -862,6 +892,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     ingest = sub.add_parser("ingest", help="ingest a complete executor response from a UTF-8 text file")
     ingest.add_argument("--response-file", required=True)
+    ingest.add_argument(
+        "--session-id",
+        help=(
+            "Control Tower session that produced the response; required for a canary turn's "
+            "evidence-only CANARY_EVIDENCE_PACKET_V1 return, which carries no packet binding"
+        ),
+    )
     ingest.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
 
     continue_session = sub.add_parser(
@@ -971,7 +1008,12 @@ def main(argv: list[str] | None = None) -> int:
                 goal=args.goal,
             )
             criteria = tuple(args.acceptance_criterion)
-            directive = _canary_directive_for_session(root, binding, args.goal)
+            directive = _canary_directive_for_session(
+                root,
+                binding,
+                args.goal,
+                low_risk_mechanical=args.low_risk_mechanical,
+            )
             task_prompt, expected_law_sha, expected_exp_ids = _contextual_task_and_expectations_for_session(
                 root,
                 binding,
@@ -982,6 +1024,7 @@ def main(argv: list[str] | None = None) -> int:
                 canonical_base_tree=args.canonical_base_tree,
                 acceptance_criteria=criteria,
                 law_receipt=law_receipt,
+                low_risk_mechanical=args.low_risk_mechanical,
             )
             result = tower.start_session(
                 binding,
@@ -1002,6 +1045,7 @@ def main(argv: list[str] | None = None) -> int:
             response_path = Path(args.response_file).expanduser().resolve()
             result = tower.ingest_response(
                 response_path.read_text(encoding="utf-8"),
+                session_id=args.session_id,
                 current_canonical_base_sha=args.current_canonical_base_sha,
                 current_canonical_base_tree=args.current_canonical_base_tree,
             )

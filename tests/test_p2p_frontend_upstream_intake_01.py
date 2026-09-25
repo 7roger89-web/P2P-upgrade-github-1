@@ -512,6 +512,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/owner_goal.py",
             "tests/test_p2p_arena_canary_runtime.py",
             "tests/test_p2p_arena_canary_baseline_gap.py",
+            "tests/test_p2p_arena_canary_install_inheritance.py",
+            "tests/test_p2p_owner_goal_one_command.py",
             "docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md",
             "evidence/p2p-arena-canary-runtime-254/",
             # Tower-directed same-PR repair (PR #211): hermeticize the
@@ -613,6 +615,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 ".p2p/system/p2p_capabilities/owner_goal.py",
                 "tests/test_p2p_arena_canary_runtime.py",
                 "tests/test_p2p_arena_canary_baseline_gap.py",
+                "tests/test_p2p_arena_canary_install_inheritance.py",
+                "tests/test_p2p_owner_goal_one_command.py",
                 "scripts/generate_arena_canary_proofs.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
