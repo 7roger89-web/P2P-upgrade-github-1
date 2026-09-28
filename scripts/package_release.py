@@ -107,6 +107,9 @@ SCRIPT_FILES = (
     "scripts/p2p_bootstrap.py",
     "scripts/p2p_portable_law_projection.py",
     "scripts/p2p_workflow.py",
+    # Foreground Control Tower CLI (Issue #254): managed projects inherit the
+    # FAST_CANARY session-start, evidence ingest and Owner-continuation path.
+    "scripts/p2p_control_tower.py",
     "scripts/p2p_orientation.py",
     "scripts/package.ps1",
     "scripts/package.sh",

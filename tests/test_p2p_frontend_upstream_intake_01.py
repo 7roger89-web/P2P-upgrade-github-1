@@ -500,6 +500,22 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/RESEARCH-ADOPTION-LEDGER.md",
             "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
             "tests/test_p2p_frontend_upstream_intake_01.py",
+            # Issue #254 Arena FAST_CANARY runtime enforcement. It extends the
+            # existing Control Tower prompt/session lifecycle, the existing
+            # MODEL_CANARY_GATE_V1 / OWNER_CONTINUATION_GATE_V1 policy, and the
+            # existing execution ledger. No second Control Tower, router,
+            # daemon, scheduler, benchmark service, score database, telemetry
+            # platform, project registry, or parallel state store is created.
+            "scripts/p2p_control_tower.py",
+            "scripts/generate_arena_canary_proofs.py",
+            ".p2p/system/p2p_capabilities/control_tower_handoff.py",
+            ".p2p/system/p2p_capabilities/owner_goal.py",
+            "tests/test_p2p_arena_canary_runtime.py",
+            "tests/test_p2p_arena_canary_baseline_gap.py",
+            "tests/test_p2p_arena_canary_install_inheritance.py",
+            "tests/test_p2p_owner_goal_one_command.py",
+            "docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md",
+            "evidence/p2p-arena-canary-runtime-254/",
             # Tower-directed same-PR repair (PR #211): hermeticize the
             # control-tower context-assembly fixtures against ambient repo
             # state (P2P_PROJECT_ROOT isolation; zero production changes).
@@ -590,6 +606,18 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 ".agents/skills/frontend-design/scripts/contrast-checker.py",
                 ".claude/skills/frontend-design/scripts/contrast-checker.py",
                 ".p2p/system/.agents/skills/frontend-design/scripts/contrast-checker.py",
+                # Issue #254: Arena FAST_CANARY runtime enforcement extends the
+                # existing Control Tower prompt/session lifecycle and its
+                # existing execution ledger. No new capability module, router,
+                # daemon, scheduler, or second state store is introduced.
+                "scripts/p2p_control_tower.py",
+                ".p2p/system/p2p_capabilities/control_tower_handoff.py",
+                ".p2p/system/p2p_capabilities/owner_goal.py",
+                "tests/test_p2p_arena_canary_runtime.py",
+                "tests/test_p2p_arena_canary_baseline_gap.py",
+                "tests/test_p2p_arena_canary_install_inheritance.py",
+                "tests/test_p2p_owner_goal_one_command.py",
+                "scripts/generate_arena_canary_proofs.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             if not is_vendored_bytes and any(
@@ -605,7 +633,13 @@ class NoParallelArchitectureTests(unittest.TestCase):
         # license boundaries and fail-closed flags; it contains no router,
         # executor, installer, network or subprocess primitive. Any other new
         # `.py` under `p2p_capabilities/` still fails closed.
-        permitted_capability_modules = {".p2p/system/p2p_capabilities/web_reverse_reference.py"}
+        permitted_capability_modules = {
+            ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+            # Issue #254 modifies the EXISTING Control Tower handoff module
+            # instead of adding a parallel capability module.
+            ".p2p/system/p2p_capabilities/control_tower_handoff.py",
+            ".p2p/system/p2p_capabilities/owner_goal.py",
+        }
         for path in self.changed:
             self.assertFalse(
                 path.startswith(".p2p/system/p2p_capabilities/")
@@ -622,6 +656,13 @@ class NoParallelArchitectureTests(unittest.TestCase):
                     # both installers. It reads packaged skill names only and
                     # exposes no domain/source-selection surface.
                     "scripts/p2p_skill_profile.py",
+                    # Issue #254: the EXISTING foreground Control Tower CLI is
+                    # extended with FAST_CANARY trigger, ingest grading and the
+                    # Owner-continuation command. It adds no new entrypoint.
+                    "scripts/p2p_control_tower.py",
+                    # Issue #254: evidence generator for the generated Arena
+                    # prompt proofs. It reads and prints; it routes nothing.
+                    "scripts/generate_arena_canary_proofs.py",
                 },
                 f"new script surface: {path}",
             )

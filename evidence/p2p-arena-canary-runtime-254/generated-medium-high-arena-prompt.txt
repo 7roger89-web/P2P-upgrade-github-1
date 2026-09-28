@@ -1,0 +1,113 @@
+CONTROL_TOWER_EXECUTION_PROMPT: p2p-control-tower-execution-prompt/1
+AUTHORITATIVE_SESSION_BINDING:
+SESSION_ID: proof-arena-medium-high
+HOST: ARENA
+GOAL_ID: P2P-CT01-CANARY
+GOAL: Repair the Control Tower runtime so a new medium/high-risk Arena session stops at the FAST_CANARY boundary, mutating runtime prompt generation, ledger events and gates
+WORKTREE: UNKNOWN
+BRANCH: UNKNOWN
+CANONICAL_BASE_SHA: UNKNOWN
+CANONICAL_BASE_TREE: UNKNOWN
+
+TASK:
+Repair the Control Tower runtime so a new medium/high-risk Arena session stops at the FAST_CANARY boundary, mutating runtime prompt generation, ledger events and gates
+
+CONTROL_TOWER_CONTEXT:
+LAW_AUTHORITY=ONE; Supreme Law=canonical 9-law capsule; projections/fallbacks/subordinate profiles are not independent laws.
+CONTROL_TOWER_FLOW=OUTCOME>SELF_LAW_RECEIPT>FRESH_STATE>ONE_LAW>TASK_CONTRACT>SELECT_EXISTING_CAPABILITY_OR_HOST>BOUNDED_CONTEXT>EXECUTE>EVIDENCE>RECONCILE>DONE|NEXT|BLOCKED|OWNER_GATE
+CONTROL_TOWER_SELF_LAW_RECEIPT=PASS; ACTOR=CONTROL_TOWER_SELF; SOURCE_TYPE=CANONICAL_MAIN_REF; SOURCE=git:refs/remotes/origin/main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md; SHA256=d743185e76d382e14aa39769f1a4f12bc7952356cdf9ff5f2a3d80848410617d; EXECUTOR_RECEIPT_SUBSTITUTE=NO; AUTHORITY_EFFECT=NONE
+P2P_LAW_PREFLIGHT=read root AGENTS.md when present; canonical only if already reachable; repo-scoped portable=fresh|inline; no cross-repo probe solely for fallback; report P2P_LAW_SOURCE; never fake a read.
+OE_GATE=Không bị over engineering chứ? Check SIMPLER_PATH,MATERIAL_PROGRESS,NECESSITY,CORE_BEFORE_SUPPORT,SMALLER_VERIFIABLE_SLICE; return DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED.
+EXPERIENCE=XP=NO_MATCH; MAX=3; NONAUTHORITATIVE; law/task/state win.
+PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.
+
+ACCEPTANCE_CRITERIA (ORIGINAL_REAL_TASK; evaluated after Owner continuation, not in this canary turn):
+- Defined by ORIGINAL_REAL_TASK.
+
+P2P_SUPREME_LAW_PREFLIGHT:
+- TASK_BRANCH != LAW_AUTHORITY and TARGET_PROJECT != LAW_SOURCE. The current target repository, worktree, and branch are execution state only and must never decide which Supreme Law version applies.
+- Canonical law source: 7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md. Read it when that canonical source is accessible, even when the task executes in a different repository or branch.
+- In an installed project, .p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md may be used only when it contains P2P_SUPREME_OPERATING_LAW_V1; a stale task-branch copy is not higher authority than the inline capsule.
+- The inline SUPREME_LAW_CAPSULE below is always included. If the canonical P2P source is unavailable or the local copy is stale/missing, the capsule is the authoritative minimum operating law for this execution.
+- Do not claim that a repository file was read unless it actually was.
+- Apply the law to outcome, authority, next useful action, verification, retry/stuckness, and stopping; do not turn preflight into a separate report.
+SUPREME_LAW_CAPSULE:
+1. OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS — Preserve the Owner's outcome, acceptance, and authority; decide routine technical details inside approved scope; never lower acceptance or widen authority to manufacture success.
+2. SIMPLEST_USEFUL_PATH_TO_COMPLETION — Choose the simplest useful action that materially advances outcome, evidence, recovery, or risk reduction; do not build speculative supporting infrastructure first.
+3. REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS — Fresh-check mutable state; evidence proves only its own scope; reconcile UNKNOWN side effects before unsafe retry.
+4. RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS — Retry according to process/failure type; diagnose root cause; change route when progress stalls; do not use ritual fixed-count retries.
+5. PRESERVE_CONTINUITY_AND_STOP — Retain only the durable checkpoint needed to continue and stop when the required outcome is proven.
+6. PROMPT_TITLE_DESTINATION_AND_PLAN_STATE_ARE_EXPLICIT — Cross-tool operational prompts state project/workstream, destination, chat mode/title, role where applicable, fresh durable plan checkpoint, and one next bounded step. Arena NEW_CHAT prompts use ARENA_CHAT_TITLE_FIRST_LINE_V1: first nonblank line is a concise human-readable <PROJECT> — <bounded task/outcome>; routing boilerplate such as GỬI CHO:, DESTINATION=, TASK_ID=, code fences, or generic P2P prefixes must not be first; CHAT_TITLE repeats the exact first-line title.
+7. ANALYTICAL_AUTONOMY_AND_DELEGATION_ALIGNMENT — Use analytical scepticism, top-down deconstruction plus bottom-up reconstruction, distinguish evidence/inference when material, prefer root-cause repair, and rewrite delegation prompts that could drift from the Owner outcome.
+8. TASK_CONTRACT_AND_ACCEPTANCE_FIDELITY — Bind objective, scope, representative scenario/quality invariant where relevant, observable acceptance, evidence class, failure/blocker criteria, and stop condition; never promote local/mock/proxy evidence to live/business/visual/official PASS without representative proof; reuse authoritative existing components first.
+9. EXECUTOR_INPUT_FORMAT_AND_ARTIFACT_TRANSPORT_FIDELITY — Verify destination input capability before handoff; prefer direct lossless transport when supported, otherwise the simplest trustworthy reversible transport; never spoof MIME/extensions or disguise semantic conversion; when artifact identity matters verify reconstructed byte size and SHA-256 before use; transport never expands authority or bypasses security/privacy/Owner Gates.
+
+SESSION_RULES:
+- Use the explicit HOST above as authoritative; never infer a host from narrative prose.
+- Do not inherit chat history, prior session state, or implicit context.
+- Do not promote, merge, deploy, release, or perform a protected action from this prompt.
+- FAST_CANARY turn (see FIRST_TURN_RETURN_CONTRACT below): end this turn with CANARY_EVIDENCE_PACKET_V1 plus the checkpoint metadata only; do not emit a CONTROL_TOWER_RETURN_PACKET or any terminal verdict in this turn.
+
+FAST_CANARY (MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1):
+This Arena session is NEW and its session quality is materially unproven, so the
+first safe real-task slice IS the canary. The real bounded task is preserved below and
+in durable Control Tower state; it is restored only after external grading plus explicit
+Owner continuation. Do not reconstruct it from chat memory.
+
+FAST_CANARY_REQUIRED=YES
+REAL_TASK_FIRST_SLICE=CANARY
+CANARY_DURABLE_MUTATION_ALLOWED=NO
+STOP_AFTER_CANARY=YES
+EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN
+MODEL_IDENTITY=UNKNOWN
+RISK_CLASS=MEDIUM_OR_HIGH_RISK
+SESSION_QUALITY=UNKNOWN
+OWNER_CONTINUATION_GATE=OWNER_CONTINUATION_GATE_V1
+CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER
+
+ORIGINAL_REAL_TASK (bounded goal preserved for continuation):
+Repair the Control Tower runtime so a new medium/high-risk Arena session stops at the FAST_CANARY boundary, mutating runtime prompt generation, ledger events and gates
+
+CANARY EXECUTION RULES:
+- Perform exactly ONE first safe real-task slice: the smallest read-only or disposable
+  probe of the real task above that materially answers whether this session can do the work.
+- Do not create durable commits, branches, PRs, remote writes, deployments, or protected
+  actions for the canary. Disposable scratch edits and focused checks are allowed.
+- Stop after that one decisive probe. Do not sweep budgets, re-run broad investigations,
+  or continue toward a terminal technical conclusion in this turn.
+- Judge nothing yourself. You MUST NOT emit GREEN, YELLOW, ORANGE, RED, KEEP_SESSION,
+  LIMIT_SESSION, or REROLL; that classification belongs to Control Tower or another
+  independent verifier.
+- Do not infer or claim a hidden model, provider, or reasoning level; MODEL_IDENTITY=UNKNOWN.
+
+FIRST_TURN_RETURN_CONTRACT=CANARY_EVIDENCE_PACKET_V1_THEN_STOP
+CANARY_EVIDENCE_PACKET_V1 is the ONLY return of this turn (return exactly this shape, then stop):
+CANARY_EVIDENCE_PACKET_V1
+P2P_LAW_SOURCE=<actual source read>
+CURRENT_STATE=<pinned repo/task state>
+FACTS=<max 5 task-relevant observed facts>
+DECISIVE_CHECK=<one representative real check>
+CHECK_RESULT=<actual result/exit/status>
+ERRORS_ENCOUNTERED=<brief or NONE>
+RECOVERY_ACTIONS=<brief or NONE>
+DURABLE_MUTATION_CREATED=NO
+MODEL_IDENTITY=UNKNOWN
+
+END OF CANARY TURN — checkpoint metadata (not a self-grade):
+CONTINUATION_CHECKPOINT=READY
+OWNER_ACTION_REQUIRED=YES
+NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED
+FALLBACK_OWNER_REPLY=Tiếp tục công việc
+
+After you stop, Control Tower ingests this evidence, grades the session externally, and
+the Owner decides continuation. Do not continue the original task in this turn.
+
+RESUMED_TASK_RETURN_CONTRACT=SUPPLIED_BY_CONTROL_TOWER_AT_OWNER_CONTINUATION
+The terminal return contract for the ORIGINAL_REAL_TASK is not part of this turn: after
+external GREEN plus explicit Owner continuation, Control Tower supplies it for this SAME session.
+
+USER_ACTION:
+Copy nguyên toàn bộ phản hồi cuối này vào:
+00 — P2P CONTROL TOWER
+
+Không cần viết thêm nội dung bàn giao.

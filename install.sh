@@ -92,6 +92,7 @@ cp \
   "$package_root/scripts/p2p_gate.py" \
   "$package_root/scripts/p2p_bootstrap.py" \
   "$package_root/scripts/p2p_workflow.py" \
+  "$package_root/scripts/p2p_control_tower.py" \
   "$package_root/scripts/p2p_orientation.py" \
   "$package_root/scripts/p2p_decision_trace.py" \
   "$package_root/scripts/p2p_task_state.py" \

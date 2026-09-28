@@ -598,19 +598,31 @@ def test_case7_beginner_handoff_when_direct_invoke_impossible():
         assert "packet_text" in handoff
         inner = handoff["task_packet"]
         assert inner["destination"] == "ARENA AI"
-        assert inner["execution_mode"] == "AUTONOMOUS_UNTIL_TERMINAL"
+        # MODEL_CANARY_GATE_V1 (Issue #254): a NEW Arena session on unproven
+        # medium/high-risk work starts with ONE canary slice and stops. RULE20
+        # autonomous completion is deferred to the resumed original task after
+        # external GREEN + explicit Owner continuation.
+        assert inner["fast_canary_required"] == "YES"
+        assert inner["execution_mode"] == "FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP"
+        assert inner["resumed_task_mode"] == "AUTONOMOUS_UNTIL_TERMINAL"
         assert inner["no_second_orchestrator"] is True
         assert inner["native_goal_behavior_preserved"] is True
         assert inner["rule20_preserved"] is True
         assert inner["agent_claim_is_not_evidence"] is True
         text = handoff["packet_text"]
         assert "DESTINATION=ARENA AI" in text
-        assert "EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL" in text
+        assert "EXECUTION_MODE=FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP" in text.splitlines()
+        assert "EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL" not in text.splitlines()
+        assert "RESUMED_TASK_MODE=AUTONOMOUS_UNTIL_TERMINAL" in text.splitlines()
         assert "SUPREME_LAW" in text or "SUPREME_LAW_CAPSULE" in text or "P2P_SUPREME_LAW_PREFLIGHT" in text
         assert "RETURN_PACKET" in text
         assert "SUCCESS_SIGNAL" in text
         assert handoff["owner_is_not_message_bus"] is True
         assert handoff["arena_direct_invocation"] == "NOT_AVAILABLE"
+        # Continuing an existing session is not a new canary: RULE20 stays active.
+        resumed = owner_goal.build_beginner_handoff(tmp, contract, plan, "ARENA", reuse=True)
+        assert resumed["task_packet"]["execution_mode"] == "AUTONOMOUS_UNTIL_TERMINAL"
+        assert "EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL" in resumed["packet_text"].splitlines()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -648,7 +660,10 @@ def test_arena_handoff_builder_fields():
         assert handoff["role"] == "WRITER"
         assert "chat_title" in handoff
         assert "session_action" in handoff
-        assert handoff["execution_mode"] == "AUTONOMOUS_UNTIL_TERMINAL"
+        # A NEW Arena session with unproven quality canaries first (Issue #254).
+        assert handoff["fast_canary_required"] == "YES"
+        assert handoff["execution_mode"] == "FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP"
+        assert handoff["resumed_task_mode"] == "AUTONOMOUS_UNTIL_TERMINAL"
         assert "supreme_law_preflight" in handoff
         assert "task_delta" in handoff
         assert "goal_contract_path" in handoff
@@ -659,13 +674,18 @@ def test_arena_handoff_builder_fields():
         assert "ROLE=WRITER" in text
         assert "GOAL_ID=" in text
         assert "BRANCH=" in text
-        assert "EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL" in text
+        assert "EXECUTION_MODE=FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP" in text.splitlines()
+        assert "EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL" not in text.splitlines()
+        assert "RESUMED_TASK_MODE=AUTONOMOUS_UNTIL_TERMINAL" in text.splitlines()
         assert "ASSESS:" in text
         assert "IMPLEMENT:" in text
         assert "VERIFY:" in text
         assert "RETURN:" in text
         assert "ReturnPacket" in text or "RETURN_PACKET" in text or "TASK_ID" in text
         assert handoff["arena_direct_invocation"] == "NOT_AVAILABLE"
+        reused = owner_goal.build_arena_handoff(tmp, contract, plan, "ARENA", reuse=True)
+        assert reused["execution_mode"] == "AUTONOMOUS_UNTIL_TERMINAL"
+        assert "EXECUTION_MODE=AUTONOMOUS_UNTIL_TERMINAL" in reused["packet_text"].splitlines()
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

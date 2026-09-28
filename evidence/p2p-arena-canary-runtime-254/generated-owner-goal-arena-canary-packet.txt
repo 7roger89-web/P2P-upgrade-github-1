@@ -1,0 +1,120 @@
+LÀM BÂY GIỜ: ARENA AI — CHAT MỚI — WRITER
+Chat title: goal-project — Inspect the current logistics_software project and complete only
+
+goal-project — Inspect the current logistics_software project and complete only
+
+GỬI CHO: ARENA AI
+DESTINATION=ARENA AI
+CHAT_MODE=NEW_CHAT
+ROLE=WRITER
+CHAT_TITLE=goal-project — Inspect the current logistics_software project and complete only
+PROJECT=goal-project
+REPO=goal-project
+GOAL_ID=goal-20260925-033937-ho-n-thi-n-workflow-h-p-
+TASK_ID=beginner-gateway-next
+BRANCH=UNKNOWN
+EXECUTOR=ARENA
+EXECUTION_MODE=FAST_CANARY_FIRST_SAFE_SLICE_THEN_STOP
+FIRST_TURN_FLOW=FIRST_SAFE_REAL_TASK_SLICE -> CANARY_EVIDENCE_PACKET_V1 -> STOP
+REUSE_EXISTING_GOAL=False
+SESSION_ACTION=START_NEW_SESSION
+
+P2P_SUPREME_LAW_PREFLIGHT: Read canonical law from 7roger89-web/P2P-upgrade-github-1@main:docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md when accessible; else use capsule
+SUPREME_LAW_CAPSULE: 1. OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS — Preserve the Owner's outcome, acceptance, and authority; decide routine technical details inside approved scope; never lower acceptance or widen authority to manufacture success.
+2. SIMPLEST_USEFUL_PATH_TO_COMPLETION — Choose the simplest useful action that materially advances outcome, evidence, recovery, or risk reduction; do not build speculative supporting infrastructure first.
+3. REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS — Fresh-check mutabl...
+
+FRESH_CHECK (read-only in this turn):
+- git fetch origin main; git rev-parse origin/main; git branch -a --list 'arena/*'
+
+CANONICAL_STATE: Fresh-read .p2p/state/goal-contract.json and .p2p/state/task-state.json; verify plan_hash/goal_hash; reuse existing compatible Goal
+TASK_SELECTION: Use task_state.next_safe_task; if WAITING_OWNER stop HARD_OWNER_GATE; if BLOCKED return BLOCKER
+TASK_DELTA: {"task_id": "beginner-gateway-next", "goal_id": "goal-20260925-033937-ho-n-thi-n-workflow-h-p-", "title": "Xác định phần đang cần cải thiện.", "purpose": "Xác định đúng phần cần cải thiện và giữ nguyên phần đang hoạt động.", "status": "READY", "dependencies": [], "scope": ["BEGINNER_INTAKE", "AUTO01_GOAL_DECOMPOSITION", "WORKSTREAM:scope"], "non_scope": ["UNAUTHORIZED_PROTECTED_ACTIONS", "AUTOMATIC_HOST_START"], "acceptance_requirements": ["Phần cần cải thiện có thay đổi quan sát được theo mục tiêu đã nêu."], "required_evidence": [".p2p/state/goal-contract.json", ".p2p/state/execution-ledger.jsonl"], "permission_needs": [], "required_capabilities": [], "context_refs": [".p2p/state/goal-contract.json"]}
+SCOPE: ['Do not expand into unrelated improvements; record discoveries as OUT OF SCOPE / BACKLOG.', 'Do not regenerate a valid project eval suite or rerun valid PASS evidence when protected inputs are unchanged.', 'Do not replace or weaken FACT_LEDGER, Live Specs, Drift Gate, Approval Gate, RAG, Eval, or Execution Ledger controls.', 'Do not enable network, hooks, proxying, connectors, or destructive actions implicitly.']
+ACCEPTANCE: ['Phần cần cải thiện có thay đổi quan sát được theo mục tiêu đã nêu.']
+EVIDENCE: ['.p2p/state/goal-contract.json', '.p2p/state/execution-ledger.jsonl']
+SESSION_GOAL=Inspect the current logistics_software project and complete only the smallest evidence-supported interpretation of: Hoàn thiện workflow hợp đồng logistics. Bound the work to the first measurable blocker, verify it, and stop when the contract passes.
+OWNER_GATE={'has_gate': False, 'gate_type': 'NONE', 'tasks': []}
+ARENA_DIRECT_INVOCATION=NOT_AVAILABLE Must use canonical Goal Contract + TaskPlan + exactly ONE beginner handoff packet
+
+RESUMED_TASK_CONTRACT (DEFERRED - INACTIVE IN THIS TURN; applies only after Control Tower external GREEN + explicit Owner continuation, when resuming the ORIGINAL task in this SAME session):
+RESUMED_TASK_MODE=AUTONOMOUS_UNTIL_TERMINAL
+- If BRANCH=UNKNOWN, Arena must inspect existing compatible open PR/branch and reuse it, else create exactly one bounded branch arena/<goal-id> and one PR
+EXECUTION_RULES: Obey scope/non-scope/acceptance/evidence; AGENT_CLAIM_IS_NOT_EVIDENCE; no second router/daemon/state DB; preserve native_goal_activation; RULE20 AUTONOMOUS_UNTIL_TERMINAL; stop at MISSION_COMPLETE|HARD_OWNER_GATE|HARD_BLOCK
+VERIFY: Run narrow affected tests + AGENTS.md validation; independent verifier evidence required
+RETURN: Evidence + exact branch/commit/PR + ReturnPacket TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION
+PR_EXPECTATION=One bounded goal -> one branch UNKNOWN -> one PR
+
+ASSESS:
+GOAL=Inspect the current logistics_software project and complete only the smallest evidence-supported interpretation of: Hoàn thiện workflow hợp đồng logistics. Bound the work to the first measurable blocker, verify it, and stop when the contract passes.
+CURRENT_STATE=.p2p/state/goal-contract.json, .p2p/state/task-state.json, goal_id=goal-20260925-033937-ho-n-thi-n-workflow-h-p-, task_id=beginner-gateway-next
+MAIN_RISK=Scope expansion or false DONE from self-report
+PLAN=Execute next eligible task beginner-gateway-next within original scope
+
+IMPLEMENT: Bounded implementation only within task delta scope
+
+VERIFY: Risk-proportional checks and durable evidence; independent verifier required
+
+RETURN: Result, changed files, checks, candidate SHA/tree, blockers, next action, ReturnPacket
+
+SUCCESS_SIGNAL: YES=terminal ReturnPacket produced, KEEP WORKING=continue, NO=material failure
+RETURN_PACKET: TASK_ID, RESULT, MAIN_BASE_SHA, BRANCH, HEAD_SHA, PR, CHANGED_FILES, OWNER_GOAL_ENTRYPOINT, ARENA_HANDOFF_PATH, NATIVE_GOAL_BEHAVIOR_PRESERVED, RULE20_PRESERVED, ANVIEN_BLAST_RADIUS, TESTS, VALIDATION, EVIDENCE, MERGE_STATE, BLOCKER, NEXT_ACTION
+END_RESUMED_TASK_CONTRACT
+
+EXECUTION_RULES (THIS TURN): Obey scope/non-scope/acceptance/evidence; AGENT_CLAIM_IS_NOT_EVIDENCE; no second router/daemon/state DB; preserve native_goal_activation; FIRST_SAFE_REAL_TASK_SLICE -> CANARY_EVIDENCE_PACKET_V1 -> STOP; no branch, commit, PR, or other durable mutation in this turn
+FAST_CANARY (MODEL_CANARY_GATE_V1 + OWNER_CONTINUATION_GATE_V1):
+This Arena session is NEW and its session quality is materially unproven, so the
+first safe real-task slice IS the canary. The real bounded task is preserved below and
+in durable Control Tower state; it is restored only after external grading plus explicit
+Owner continuation. Do not reconstruct it from chat memory.
+
+FAST_CANARY_REQUIRED=YES
+REAL_TASK_FIRST_SLICE=CANARY
+CANARY_DURABLE_MUTATION_ALLOWED=NO
+STOP_AFTER_CANARY=YES
+EXECUTOR_SELF_CLASSIFICATION=FORBIDDEN
+MODEL_IDENTITY=UNKNOWN
+RISK_CLASS=MEDIUM_OR_HIGH_RISK
+SESSION_QUALITY=UNKNOWN
+OWNER_CONTINUATION_GATE=OWNER_CONTINUATION_GATE_V1
+CANARY_CLASSIFIER=CONTROL_TOWER_OR_INDEPENDENT_VERIFIER
+
+ORIGINAL_REAL_TASK (bounded goal preserved for continuation):
+Inspect the current logistics_software project and complete only the smallest evidence-supported interpretation of: Hoàn thiện workflow hợp đồng logistics. Bound the work to the first measurable blocker, verify it, and stop when the contract passes.
+
+CANARY EXECUTION RULES:
+- Perform exactly ONE first safe real-task slice: the smallest read-only or disposable
+  probe of the real task above that materially answers whether this session can do the work.
+- Do not create durable commits, branches, PRs, remote writes, deployments, or protected
+  actions for the canary. Disposable scratch edits and focused checks are allowed.
+- Stop after that one decisive probe. Do not sweep budgets, re-run broad investigations,
+  or continue toward a terminal technical conclusion in this turn.
+- Judge nothing yourself. You MUST NOT emit GREEN, YELLOW, ORANGE, RED, KEEP_SESSION,
+  LIMIT_SESSION, or REROLL; that classification belongs to Control Tower or another
+  independent verifier.
+- Do not infer or claim a hidden model, provider, or reasoning level; MODEL_IDENTITY=UNKNOWN.
+
+FIRST_TURN_RETURN_CONTRACT=CANARY_EVIDENCE_PACKET_V1_THEN_STOP
+CANARY_EVIDENCE_PACKET_V1 is the ONLY return of this turn (return exactly this shape, then stop):
+CANARY_EVIDENCE_PACKET_V1
+P2P_LAW_SOURCE=<actual source read>
+CURRENT_STATE=<pinned repo/task state>
+FACTS=<max 5 task-relevant observed facts>
+DECISIVE_CHECK=<one representative real check>
+CHECK_RESULT=<actual result/exit/status>
+ERRORS_ENCOUNTERED=<brief or NONE>
+RECOVERY_ACTIONS=<brief or NONE>
+DURABLE_MUTATION_CREATED=NO
+MODEL_IDENTITY=UNKNOWN
+
+END OF CANARY TURN — checkpoint metadata (not a self-grade):
+CONTINUATION_CHECKPOINT=READY
+OWNER_ACTION_REQUIRED=YES
+NATIVE_ACTION_HINT=KEEP_WORKING_IF_APPROVED
+FALLBACK_OWNER_REPLY=Tiếp tục công việc
+
+After you stop, Control Tower ingests this evidence, grades the session externally, and
+the Owner decides continuation. Do not continue the original task in this turn.
+
+SUCCESS_SIGNAL (THIS TURN): YES=CANARY_EVIDENCE_PACKET_V1 + checkpoint metadata returned, then STOP; the Owner continues only after Control Tower external GREEN
+Copy toàn bộ phản hồi cuối này vào: 00 — P2P CONTROL TOWER
