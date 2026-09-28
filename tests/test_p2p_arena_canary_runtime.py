@@ -29,6 +29,7 @@ resumed ORIGINAL task after external GREEN + explicit Owner continuation.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import sys
@@ -62,6 +63,9 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
 
 BASE_SHA = "a" * 40
 BASE_TREE = "b" * 40
+EXPECTED_CANONICAL_LAW_SHA = hashlib.sha256(
+    (REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()
+).hexdigest()
 LEDGER_RELATIVE = Path(".p2p") / "state" / "execution-ledger.jsonl"
 
 # The real bounded task shape observed in the 2026-09-24 blind test.
@@ -89,6 +93,8 @@ CHECKPOINT_TOKENS = (
 )
 CANONICAL_EVIDENCE_KEYS = (
     "P2P_LAW_SOURCE",
+    "LAW_CHECK",
+    "EXPERIENCE_CHECK",
     "CURRENT_STATE",
     "FACTS",
     "DECISIVE_CHECK",
@@ -126,12 +132,19 @@ def canary_evidence_block(
     durable_mutation: str = "NO",
     model_identity: str = "UNKNOWN",
     extra_lines: tuple[str, ...] = (),
+    law_check: str | None = None,
+    experience_check: str | None = None,
 ) -> str:
     """Return exactly the canonical CANARY_EVIDENCE_PACKET_V1 block."""
 
     lines = [
         "CANARY_EVIDENCE_PACKET_V1",
         f"P2P_LAW_SOURCE={law_source}",
+        *([law_check if law_check is not None else (
+            f"LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md | SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+        )] if (law_check is None or law_check) else []),
+        *([experience_check if experience_check is not None else "EXPERIENCE_CHECK=UNAVAILABLE"]
+          if (experience_check is None or experience_check) else []),
         f"CURRENT_STATE={current_state}",
         f"FACTS={facts}",
         f"DECISIVE_CHECK={decisive_check}",
@@ -237,6 +250,8 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             branch="fixture-branch",
             canonical_base_sha=BASE_SHA,
             canonical_base_tree=BASE_TREE,
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(),
             canary_directive=self.directive(session_id),
         )
         return binding
@@ -336,6 +351,27 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertIn(BLIND_TEST_TASK, prompt)
         # The original task is preserved for continuation, not dropped.
         self.assertIn("ORIGINAL_REAL_TASK", prompt)
+        self.assertIn("LAW_CHECK=PASS | SOURCE=<actual law source read>", prompt)
+        self.assertIn("EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>", prompt)
+        self.assertIn("EXPERIENCE_CHECK=NO_MATCH", prompt)
+        self.assertIn("EXPERIENCE_CHECK=UNAVAILABLE", prompt)
+
+    def test_t02b_arena_generated_prompt_title_and_recommendation_metadata_match(self) -> None:
+        result = self.start_cli(session_id="title-proof")
+        recommendation = result["recommendation"]
+        prompt = recommendation["PROMPT"]
+        title = next(line for line in prompt.splitlines() if line.strip())
+        self.assertEqual(recommendation["CHAT_TITLE"], title)
+        self.assertEqual(recommendation["CHAT_NAME"], title)
+        self.assertEqual(f"CHAT_TITLE={title}", prompt.splitlines()[1])
+        self.assertEqual(f"CHAT_NAME={title}", prompt.splitlines()[2])
+        self.assertNotIn("CONTROL_TOWER_EXECUTION_PROMPT:", title)
+        self.assertNotIn("DESTINATION=", title)
+
+        codex = self.start_cli(host="CODEX", session_id="codex-title")["recommendation"]
+        self.assertTrue(codex["PROMPT"].splitlines()[0].startswith("CONTROL_TOWER_EXECUTION_PROMPT:"))
+        self.assertNotIn("CHAT_TITLE", codex)
+        self.assertEqual("CODEX — P2P-CT01-CANARY — " + BLIND_TEST_TASK, codex["CHAT_NAME"])
 
     # --- T03 stop boundary + one first-turn contract -----------------------
     def test_t03_canary_turn_must_stop_after_one_first_safe_probe(self) -> None:
@@ -514,6 +550,122 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         red = self.ingest_cli(canary_evidence_response(durable_mutation="YES"), session_id="pure-2")
         self.assertEqual("RED", red["canary_grade"]["CLASSIFICATION"])
         self.assertIn("CANARY_DURABLE_MUTATION_BOUNDARY_VIOLATED", red["canary_grade"]["REASONS"])
+
+    def test_t05_receipts_fail_closed_for_missing_invalid_contradictory_and_mismatched_inputs(self) -> None:
+        cases = (
+            (
+                "missing",
+                canary_evidence_response(law_check="", experience_check=""),
+                "EXECUTOR_LAW_CHECK_MISSING",
+            ),
+            (
+                "malformed-law-and-experience",
+                canary_evidence_response(
+                    law_check="LAW_CHECK=PASS | SOURCE=notebook.md | SOURCE_SHA256=bad",
+                    experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=",
+                ),
+                "EXECUTOR_LAW_CHECK_INVALID",
+            ),
+            (
+                "blocked-law",
+                canary_evidence_response(
+                    law_check="LAW_CHECK=BLOCKED | REASON=canonical law unavailable",
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                ),
+                "EXECUTOR_LAW_CHECK_BLOCKED",
+            ),
+            (
+                "blocked-experience",
+                canary_evidence_response(
+                    experience_check="EXPERIENCE_CHECK=BLOCKED | REASON=lookup failed",
+                ),
+                "EXPERIENCE_CHECK_BLOCKED",
+            ),
+            (
+                "contradictory",
+                canary_evidence_response(
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                    extra_lines=("EXPERIENCE_CHECK=NO_MATCH",),
+                ),
+                "EXPERIENCE_CHECK_CONTRADICTORY",
+            ),
+        )
+        for suffix, response, expected_blocker in cases:
+            with self.subTest(case=suffix):
+                session_id = f"receipt-{suffix}"
+                self.start_cli(session_id=session_id)
+                result = self.ingest_cli(response, session_id=session_id)
+                self.assertNotEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+                self.assertTrue(
+                    any(expected_blocker in reason for reason in result["canary_grade"]["REASONS"]),
+                    result["canary_grade"],
+                )
+                event = self.ledger_events()[-1]
+                self.assertIn(expected_blocker, event["ACTOR_RECEIPT_BLOCKERS"])
+                if suffix == "malformed-law-and-experience":
+                    self.assertIn("EXPERIENCE_CHECK_INVALID", event["ACTOR_RECEIPT_BLOCKERS"])
+
+        # Correctly shaped receipts with a wrong law SHA and wrong active ID also fail closed.
+        mismatch_cases = (
+            (
+                "wrong-sha",
+                canary_evidence_response(
+                    law_check="LAW_CHECK=PASS | SOURCE=notebook.md | SOURCE_SHA256=" + "0" * 64,
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                ),
+                "EXECUTOR_LAW_HASH_MISMATCH",
+            ),
+            (
+                "wrong-experience",
+                canary_evidence_response(
+                    experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=not-the-active-id",
+                ),
+                "EXPERIENCE_CHECK_IDS_MISMATCH",
+            ),
+            (
+                "inconsistent-no-match",
+                canary_evidence_response(experience_check="EXPERIENCE_CHECK=NO_MATCH"),
+                "EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION",
+            ),
+        )
+        for suffix, response, expected_blocker in mismatch_cases:
+            with self.subTest(case=suffix):
+                session_id = f"receipt-{suffix}"
+                expected_id = "shared-exp-expected-for-mismatch"
+                binding = self.binding(session_id)
+                self.tower().start_session(
+                    binding,
+                    expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+                    expected_experience_ids=(expected_id,),
+                    canary_directive=self.directive(session_id),
+                )
+                self.assertEqual([expected_id], self.ledger_events()[-1]["EXPECTED_EXPERIENCE_IDS"])
+                result = self.ingest_cli(response, session_id=session_id)
+                self.assertNotEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+                self.assertTrue(
+                    any(expected_blocker in reason for reason in result["canary_grade"]["REASONS"]),
+                    result["canary_grade"],
+                )
+
+    def test_t05_valid_actor_receipts_matching_session_expectations_allow_green(self) -> None:
+        binding = self.binding("receipt-valid-expected")
+        expected_id = "shared-exp-expected-receipt"
+        self.tower().start_session(
+            binding,
+            task_id="TASK-CANARY-RECEIPTS",
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(expected_id,),
+            canary_directive=self.directive(binding.session_id),
+        )
+        response = canary_evidence_response(
+            experience_check=f"EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS={expected_id}",
+        )
+        result = self.ingest_canary(binding, response)
+        self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+        event = self.ledger_events()[-1]
+        self.assertEqual("PASS", event["ACTOR_RECEIPTS"]["LAW_CHECK"]["status"])
+        self.assertEqual("USE_ACTIVE_EXPERIENCE", event["ACTOR_RECEIPTS"]["EXPERIENCE_CHECK"]["decision"])
+        self.assertEqual([], event["ACTOR_RECEIPT_BLOCKERS"])
 
     def test_t05b_replay_is_idempotent_and_raw_transcript_is_not_persisted(self) -> None:
         binding = self.start_canary()
@@ -859,6 +1011,8 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             branch="arena/hermes-logistics-01",
             canonical_base_sha=BASE_SHA,
             canonical_base_tree=BASE_TREE,
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(),
             canary_directive=directive,
         )
         response = canary_evidence_response(

@@ -1117,6 +1117,10 @@ def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
         "CANARY_EVIDENCE_PACKET_V1 is the ONLY return of this turn (return exactly this shape, then stop):",
         "CANARY_EVIDENCE_PACKET_V1",
         "P2P_LAW_SOURCE=<actual source read>",
+        "LAW_CHECK=PASS | SOURCE=<actual law source read> | SOURCE_SHA256=<64-hex canonical law content SHA-256>",
+        "or LAW_CHECK=BLOCKED | REASON=<reason>; P2P_LAW_SOURCE is separate source evidence and never substitutes for LAW_CHECK.",
+        "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>",
+        "or EXPERIENCE_CHECK=NO_MATCH or EXPERIENCE_CHECK=UNAVAILABLE",
         "CURRENT_STATE=<pinned repo/task state>",
         "FACTS=<max 5 task-relevant observed facts>",
         "DECISIVE_CHECK=<one representative real check>",
@@ -1514,7 +1518,7 @@ def _parse_law_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     raw = val.strip()
     m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", raw)
     if not m:
-        return None
+        return {"status": "INVALID", "reason": "MALFORMED_LAW_CHECK"} if re.match(r"(?i)^\s*LAW_CHECK\s*=", raw) else None
     verdict, rest = m.group(1).upper(), m.group(2).strip()
     if verdict == "BLOCKED":
         rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
@@ -1529,7 +1533,7 @@ def _parse_law_check_dict_or_str(val: Any) -> dict[str, Any] | None:
 def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if isinstance(val, Mapping):
         dec = str(val.get("decision") or val.get("EXPERIENCE_CHECK") or "").upper()
-        if dec in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
+        if dec in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE", "BLOCKED"):
             ids = val.get("ids") or val.get("IDS") or []
             if isinstance(ids, str):
                 ids = [i.strip() for i in ids.split(",") if i.strip()]
@@ -1538,9 +1542,9 @@ def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if not isinstance(val, str):
         return None
     raw = val.strip()
-    m = re.match(r"(?im)^\s*EXPERIENCE_CHECK\s*=\s*(USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE)\b(.*)$", raw)
+    m = re.match(r"(?im)^\s*EXPERIENCE_CHECK\s*=\s*(USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE|BLOCKED)\b(.*)$", raw)
     if not m:
-        return None
+        return {"decision": "INVALID", "raw": raw} if re.match(r"(?i)^\s*EXPERIENCE_CHECK\s*=", raw) else None
     dec, rest = m.group(1).upper(), m.group(2).strip()
     if dec == "USE_ACTIVE_EXPERIENCE":
         im = re.search(r"IDS?\s*=\s*([^|;\n]+)", rest)
@@ -1548,9 +1552,9 @@ def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
         return {"decision": "USE_ACTIVE_EXPERIENCE", "ids": ids}
     elif dec == "NO_MATCH":
         return {"decision": "NO_MATCH", "ids": []}
-    elif dec == "UNAVAILABLE":
+    elif dec in ("UNAVAILABLE", "BLOCKED"):
         rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
-        return {"decision": "UNAVAILABLE", "reason": rm.group(1).strip() if rm else "UNAVAILABLE", "ids": []}
+        return {"decision": dec, "reason": rm.group(1).strip() if rm else dec, "ids": []}
     return {"decision": "INVALID", "raw": raw}
 
 
@@ -1692,6 +1696,65 @@ def _extract_executor_receipts(
             learning = payload_lr
 
     return law_check, experience_check, learning
+
+
+def _validate_executor_receipts(
+    law_check: Mapping[str, Any] | None,
+    experience_check: Mapping[str, Any] | None,
+    *,
+    expected_law_sha: str | None = None,
+    expected_experience_ids: Sequence[str] = (),
+) -> tuple[list[str], bool]:
+    """Apply the existing actor-receipt semantics to terminal and canary returns."""
+
+    blockers: list[str] = []
+    law_blocked = False
+    lc = law_check if isinstance(law_check, Mapping) else {"status": "MISSING"}
+    law_status = str(lc.get("status") or "MISSING").upper()
+    if law_status == "MISSING":
+        blockers.append("EXECUTOR_LAW_CHECK_MISSING")
+    elif law_status == "CONTRADICTORY":
+        blockers.append("EXECUTOR_LAW_CHECK_CONTRADICTORY")
+    elif law_status == "INVALID":
+        blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+    elif law_status == "BLOCKED":
+        blockers.append("EXECUTOR_LAW_CHECK_BLOCKED")
+        law_blocked = True
+    elif law_status == "PASS":
+        source = str(lc.get("source") or "").strip()
+        actual_sha = str(lc.get("source_sha256") or "").lower()
+        if not source or re.fullmatch(r"[0-9a-f]{64}", actual_sha) is None:
+            blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+        elif expected_law_sha and actual_sha != str(expected_law_sha).lower():
+            blockers.append("EXECUTOR_LAW_HASH_MISMATCH")
+    else:
+        blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+
+    if law_blocked:
+        return list(dict.fromkeys(blockers)), law_blocked
+
+    ec = experience_check if isinstance(experience_check, Mapping) else {"decision": "MISSING"}
+    decision = str(ec.get("decision") or "MISSING").upper()
+    if decision == "MISSING":
+        blockers.append("EXPERIENCE_CHECK_MISSING")
+    elif decision == "CONTRADICTORY":
+        blockers.append("EXPERIENCE_CHECK_CONTRADICTORY")
+    elif decision == "BLOCKED":
+        blockers.append("EXPERIENCE_CHECK_BLOCKED")
+    elif decision == "INVALID":
+        blockers.append("EXPERIENCE_CHECK_INVALID")
+    elif decision not in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
+        blockers.append("EXPERIENCE_CHECK_INVALID")
+    elif decision == "USE_ACTIVE_EXPERIENCE":
+        reported = {str(item).strip() for item in (ec.get("ids") or []) if str(item).strip()}
+        if not reported:
+            blockers.append("EXPERIENCE_CHECK_INVALID")
+        elif expected_experience_ids and not (reported & {str(item) for item in expected_experience_ids}):
+            blockers.append("EXPERIENCE_CHECK_IDS_MISMATCH")
+    elif decision == "NO_MATCH" and expected_experience_ids:
+        blockers.append("EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION")
+
+    return list(dict.fromkeys(blockers)), law_blocked
 
 
 def parse_return_packet(final_response: str) -> ControlTowerReturnPacket:
@@ -2007,66 +2070,26 @@ class ControlTowerState:
         effective_expected_law_sha = expected_law_sha or session_rec.get("EXPECTED_LAW_SHA")
         effective_expected_exp_ids = list(expected_experience_ids) or session_rec.get("EXPECTED_EXPERIENCE_IDS", [])
 
-        # Ingest-level enforcement of actor-own LAW_CHECK receipt
-        is_law_blocked = False
-        if packet.law_check is not None:
-            lc = packet.law_check
-            lc_status = lc.get("status")
-            if lc_status == "MISSING":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXECUTOR_LAW_CHECK_MISSING")
-                next_action = "Supply valid actor-own LAW_CHECK receipt before reconciliation."
-            elif lc_status == "CONTRADICTORY":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXECUTOR_LAW_CHECK_CONTRADICTORY")
-                next_action = "Resolve contradictory executor LAW_CHECK receipts before reconciliation."
-            elif lc_status == "INVALID":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXECUTOR_LAW_CHECK_INVALID")
-                next_action = "Provide valid SOURCE and SOURCE_SHA256 in actor-own LAW_CHECK receipt."
-            elif lc_status == "BLOCKED":
-                is_law_blocked = True
+        receipt_blockers, is_law_blocked = _validate_executor_receipts(
+            packet.law_check,
+            packet.experience_check,
+            expected_law_sha=effective_expected_law_sha,
+            expected_experience_ids=effective_expected_exp_ids,
+        )
+        # Preserve the direct-packet API's historical optional-receipt behavior;
+        # parsed executor responses carry explicit MISSING mappings and are enforced.
+        if packet.law_check is None:
+            receipt_blockers = [item for item in receipt_blockers if not item.startswith("EXECUTOR_LAW_")]
+        if packet.experience_check is None:
+            receipt_blockers = [item for item in receipt_blockers if not item.startswith("EXPERIENCE_CHECK_")]
+        if receipt_blockers:
+            if is_law_blocked:
                 if status not in ("BLOCKED", "FAILED"):
                     status = "BLOCKED"
-                blockers.append("EXECUTOR_LAW_CHECK_BLOCKED")
-                next_action = "Investigate executor law check blockage before proceeding."
-            elif lc_status == "PASS":
-                if effective_expected_law_sha:
-                    actual_sha = str(lc.get("source_sha256") or "").lower()
-                    if actual_sha != effective_expected_law_sha.lower():
-                        status = "RECONCILIATION_REQUIRED"
-                        blockers.append("EXECUTOR_LAW_HASH_MISMATCH")
-                        next_action = "Executor LAW_CHECK SHA does not match expected session law SHA."
-
-        # Ingest-level enforcement of EXPERIENCE_CHECK receipt (Blocker 4)
-        if not is_law_blocked and packet.experience_check is not None:
-            ec = packet.experience_check
-            ec_decision = ec.get("decision")
-            if ec_decision == "MISSING":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXPERIENCE_CHECK_MISSING")
-                next_action = "Supply valid EXPERIENCE_CHECK receipt before reconciliation."
-            elif ec_decision == "CONTRADICTORY":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXPERIENCE_CHECK_CONTRADICTORY")
-                next_action = "Resolve contradictory EXPERIENCE_CHECK receipts before reconciliation."
-            elif ec_decision not in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXPERIENCE_CHECK_INVALID")
-                next_action = "Provide valid decision (USE_ACTIVE_EXPERIENCE, NO_MATCH, UNAVAILABLE) in EXPERIENCE_CHECK receipt."
             else:
-                if effective_expected_exp_ids:
-                    expected_set = set(effective_expected_exp_ids)
-                    if ec_decision == "NO_MATCH":
-                        status = "RECONCILIATION_REQUIRED"
-                        blockers.append("EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION")
-                        next_action = "Executor reported NO_MATCH but active experience was expected for this session."
-                    elif ec_decision == "USE_ACTIVE_EXPERIENCE":
-                        reported_ids = set(ec.get("ids") or [])
-                        if not (reported_ids & expected_set):
-                            status = "RECONCILIATION_REQUIRED"
-                            blockers.append("EXPERIENCE_CHECK_IDS_MISMATCH")
-                            next_action = f"Executor reported EXPERIENCE_CHECK IDs {reported_ids} do not include any expected active experience IDs {expected_set}."
+                status = "RECONCILIATION_REQUIRED"
+            blockers.extend(receipt_blockers)
+            next_action = "Resolve actor-own LAW_CHECK and EXPERIENCE_CHECK receipts before reconciliation."
 
         # Ingest-level enforcement of LEARNING_RECONCILIATION (Blocker 5)
         # Every terminal substantive task must provide LEARNING_RECONCILIATION=NONE or CANDIDATE
@@ -2285,6 +2308,21 @@ def canary_session_quality(
     return CANARY_SESSION_QUALITY_UNKNOWN
 
 
+def _arena_chat_title(binding: SessionBinding) -> str:
+    """Build a concise title from the durable workstream and bounded goal."""
+
+    workstream = re.sub(r"[-_]+", " ", str(binding.goal_id or "").strip())
+    workstream = re.sub(r"\s+", " ", workstream).strip()
+    goal = re.sub(r"\s+", " ", str(binding.goal or "").strip())
+    if not goal:
+        goal = workstream or "Arena workstream"
+    if len(goal) > 78:
+        shortened = goal[:75].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        goal = (shortened or goal[:75].rstrip()) + "…"
+    title = f"{workstream} — {goal}" if workstream and workstream.upper() != "UNKNOWN" else goal
+    return title[:120].rstrip()
+
+
 def _session_recommendation(
     binding: SessionBinding,
     *,
@@ -2298,6 +2336,7 @@ def _session_recommendation(
     canary_directive: CanaryDirective | None = None,
     max_prompt_chars: int | None = None,
 ) -> dict[str, Any]:
+    chat_title = _arena_chat_title(binding) if binding.host == "ARENA" else None
     prompt = build_execution_prompt(
         binding,
         task_prompt or binding.goal,
@@ -2310,7 +2349,7 @@ def _session_recommendation(
         max_prompt_chars=max_prompt_chars,
     )
     recommendation = {
-        "CHAT_NAME": f"{binding.host} — {binding.goal_id} — {binding.goal}",
+        "CHAT_NAME": chat_title or f"{binding.host} — {binding.goal_id} — {binding.goal}",
         "HOST": binding.host,
         "SESSION_ID": binding.session_id,
         "GOAL_ID": binding.goal_id,
@@ -2318,6 +2357,8 @@ def _session_recommendation(
         "PROMPT": prompt,
         "PACKET_IS_CANONICAL_TRUTH": "NO",
     }
+    if chat_title is not None:
+        recommendation["CHAT_TITLE"] = chat_title
     if canary_directive is not None:
         recommendation["CANARY"] = canary_directive.to_dict()
         recommendation["FAST_CANARY_REQUIRED"] = "YES"
@@ -2903,6 +2944,20 @@ class ControlTower:
         record = state.session_records.get(str(session_id or ""))
         if not isinstance(record, Mapping):
             raise BindingError("SESSION_ID_NOT_REGISTERED_IN_CONTROL_TOWER_LEDGER")
+        law_check, experience_check, _ = _extract_executor_receipts(text, {})
+        effective_expected_law_sha = record.get("EXPECTED_LAW_SHA")
+        effective_expected_exp_ids = record.get("EXPECTED_EXPERIENCE_IDS")
+        receipt_blockers, _ = _validate_executor_receipts(
+            law_check,
+            experience_check,
+            expected_law_sha=(effective_expected_law_sha if isinstance(effective_expected_law_sha, str) else None),
+            expected_experience_ids=(effective_expected_exp_ids if isinstance(effective_expected_exp_ids, list) else ()),
+        )
+        if not isinstance(effective_expected_law_sha, str) or re.fullmatch(r"[0-9a-fA-F]{64}", effective_expected_law_sha) is None:
+            receipt_blockers.append("SESSION_EXPECTED_LAW_SHA_MISSING_OR_INVALID")
+        if not isinstance(effective_expected_exp_ids, list):
+            receipt_blockers.append("SESSION_EXPECTED_EXPERIENCE_IDS_MISSING_OR_INVALID")
+        receipt_blockers = list(dict.fromkeys(receipt_blockers))
         canary = record.get("CANARY")
         if not isinstance(canary, Mapping) or canary.get("FAST_CANARY_REQUIRED") != "YES":
             raise BindingError("CANARY_EVIDENCE_REQUIRES_TRIGGERED_CANARY_SESSION")
@@ -2923,7 +2978,13 @@ class ControlTower:
         )
         fingerprint = hashlib.sha256(
             json.dumps(
-                {"FIELDS": fields, "CHECKPOINT": checkpoint, "EXECUTOR_RETURN_PACKET": packet_summary},
+                {
+                    "FIELDS": fields,
+                    "CHECKPOINT": checkpoint,
+                    "EXECUTOR_RETURN_PACKET": packet_summary,
+                    "LAW_CHECK": law_check,
+                    "EXPERIENCE_CHECK": experience_check,
+                },
                 ensure_ascii=False,
                 sort_keys=True,
                 separators=(",", ":"),
@@ -2952,6 +3013,17 @@ class ControlTower:
             )
             raise BindingError(f"CANARY_SESSION_ALREADY_GRADED:{classification}:{required}")
         grade = classify_canary_evidence(evidence, return_packet=packet, response_text=text)
+        if receipt_blockers:
+            grade = dict(grade)
+            if grade.get("CLASSIFICATION") != "RED":
+                grade["CLASSIFICATION"] = "UNVERIFIED"
+                grade["SESSION_POLICY"] = CANARY_SESSION_POLICIES["UNVERIFIED"]
+                grade["CONTINUATION_RECOMMENDATION"] = CANARY_CONTINUATION_RECOMMENDATIONS["UNVERIFIED"]
+                grade["OWNER_CONTINUATION_REQUIRED"] = "NO"
+            grade["REASONS"] = [
+                *grade.get("REASONS", []),
+                "EXECUTOR_RECEIPT_VALIDATION_FAILED:" + ",".join(receipt_blockers),
+            ]
         event = {
             "schema": CANARY_EVIDENCE_EVENT_SCHEMA,
             "event_type": "CONTROL_TOWER_CANARY_EVIDENCE",
@@ -2959,6 +3031,8 @@ class ControlTower:
             "TASK_ID": str(record.get("TASK_ID") or UNKNOWN),
             "GATE": MODEL_CANARY_GATE_V1,
             "CANARY_EVIDENCE": {name: fields[name] for name in CANARY_EVIDENCE_FIELDS if name in fields} or None,
+            "ACTOR_RECEIPTS": {"LAW_CHECK": law_check, "EXPERIENCE_CHECK": experience_check},
+            "ACTOR_RECEIPT_BLOCKERS": receipt_blockers,
             "CHECKPOINT_METADATA_PRESENT": checkpoint,
             "EXECUTOR_RETURN_PACKET": packet_summary,
             "EVIDENCE_FINGERPRINT": fingerprint,
@@ -3402,8 +3476,13 @@ def build_execution_prompt(
         criteria_text = "\n".join(f"- {item}" for item in criteria) or "- Return a truthful terminal packet."
         return_rule = "- Finish with one structured CONTROL_TOWER_RETURN_PACKET."
         return_contract_lines = _terminal_return_contract_lines()
+    title_lines: tuple[str, ...] = ()
+    if binding.host == "ARENA":
+        title = _arena_chat_title(binding)
+        title_lines = (title, f"CHAT_TITLE={title}", f"CHAT_NAME={title}", "")
     prompt = "\n".join(
         (
+            *title_lines,
             f"CONTROL_TOWER_EXECUTION_PROMPT: {CONTROL_TOWER_PROMPT_SCHEMA}",
             "AUTHORITATIVE_SESSION_BINDING:",
             f"SESSION_ID: {binding.session_id}",
