@@ -1516,18 +1516,29 @@ def _parse_law_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if not isinstance(val, str):
         return None
     raw = val.strip()
+    if not re.match(r"(?i)^\s*LAW_CHECK\s*=", raw):
+        return None
+    directives = list(re.finditer(r"(?i)\bLAW_CHECK\s*=", raw))
+    if len(directives) != 1:
+        return {"status": "INVALID", "reason": "REPEATED_LAW_CHECK_DIRECTIVE"}
     m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", raw)
     if not m:
-        return {"status": "INVALID", "reason": "MALFORMED_LAW_CHECK"} if re.match(r"(?i)^\s*LAW_CHECK\s*=", raw) else None
+        return {"status": "INVALID", "reason": "MALFORMED_LAW_CHECK"}
     verdict, rest = m.group(1).upper(), m.group(2).strip()
     if verdict == "BLOCKED":
         rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
         return {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
-    sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
-    hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
-    if sm and hm:
-        return {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
-    return {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+    source_fields = list(re.finditer(r"(?i)\bSOURCE\s*=\s*([^|;\n]*)", rest))
+    sha_fields = list(re.finditer(r"(?i)\bSOURCE_SHA256\s*=\s*([^|;\n]*)", rest))
+    if len(source_fields) != 1:
+        return {"status": "INVALID", "reason": "SOURCE_FIELD_DUPLICATED_OR_MISSING"}
+    if len(sha_fields) != 1:
+        return {"status": "INVALID", "reason": "SOURCE_SHA256_FIELD_DUPLICATED_OR_MISSING"}
+    source = source_fields[0].group(1).strip()
+    source_sha = sha_fields[0].group(1).strip()
+    if not source or re.fullmatch(r"[0-9a-fA-F]{64}", source_sha) is None:
+        return {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+    return {"status": "PASS", "source": source, "source_sha256": source_sha.lower()}
 
 
 def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
@@ -1542,13 +1553,25 @@ def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if not isinstance(val, str):
         return None
     raw = val.strip()
+    if not re.match(r"(?i)^\s*EXPERIENCE_CHECK\s*=", raw):
+        return None
+    directives = list(re.finditer(r"(?i)\bEXPERIENCE_CHECK\s*=", raw))
+    if len(directives) != 1:
+        return {"decision": "INVALID", "reason": "REPEATED_EXPERIENCE_CHECK_DIRECTIVE"}
     m = re.match(r"(?im)^\s*EXPERIENCE_CHECK\s*=\s*(USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE|BLOCKED)\b(.*)$", raw)
     if not m:
-        return {"decision": "INVALID", "raw": raw} if re.match(r"(?i)^\s*EXPERIENCE_CHECK\s*=", raw) else None
+        return {"decision": "INVALID", "raw": raw}
     dec, rest = m.group(1).upper(), m.group(2).strip()
     if dec == "USE_ACTIVE_EXPERIENCE":
-        im = re.search(r"IDS?\s*=\s*([^|;\n]+)", rest)
-        ids = [i.strip() for i in im.group(1).split(",") if i.strip()] if im else []
+        id_fields = list(re.finditer(r"(?i)\bIDS?\s*=\s*([^|;\n]*)", rest))
+        if len(id_fields) != 1:
+            return {"decision": "INVALID", "reason": "IDS_FIELD_DUPLICATED_OR_MISSING"}
+        ids_value = id_fields[0].group(1).strip()
+        if not ids_value:
+            return {"decision": "INVALID", "reason": "IDS_VALUE_MISSING"}
+        ids = [i.strip() for i in ids_value.split(",") if i.strip()]
+        if not ids:
+            return {"decision": "INVALID", "reason": "IDS_VALUE_MISSING"}
         return {"decision": "USE_ACTIVE_EXPERIENCE", "ids": ids}
     elif dec == "NO_MATCH":
         return {"decision": "NO_MATCH", "ids": []}
@@ -1632,12 +1655,14 @@ def _extract_executor_receipts(
             narrative_ec_list.append(parsed)
 
     narrative_ec: dict[str, Any] | None = None
-    if narrative_ec_list:
-        first_ec = narrative_ec_list[0]
-        if any(e != first_ec for e in narrative_ec_list):
-            narrative_ec = {"decision": "CONTRADICTORY", "count": len(narrative_ec_list)}
-        else:
-            narrative_ec = first_ec
+    if len(narrative_ec_list) > 1:
+        narrative_ec = {
+            "decision": "CONTRADICTORY",
+            "reason": "REPEATED_EXPERIENCE_CHECK_DIRECTIVE",
+            "count": len(narrative_ec_list),
+        }
+    elif narrative_ec_list:
+        narrative_ec = narrative_ec_list[0]
 
     payload_ec = _parse_experience_check_dict_or_str(payload.get("EXPERIENCE_CHECK"))
 

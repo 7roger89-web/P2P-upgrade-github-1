@@ -256,6 +256,34 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         )
         return binding
 
+    def start_expected_receipt_canary(
+        self,
+        session_id: str,
+        expected_id: str = "shared-exp-parser-expected",
+    ) -> tuple[SessionBinding, str]:
+        binding = self.binding(session_id)
+        self.tower().start_session(
+            binding,
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(expected_id,),
+            canary_directive=self.directive(session_id),
+        )
+        return binding, expected_id
+
+    def assert_receipt_response_fails_closed(
+        self,
+        session_id: str,
+        response: str,
+        expected_reason: str,
+    ) -> None:
+        binding, _ = self.start_expected_receipt_canary(session_id)
+        result = self.ingest_canary(binding, response)
+        self.assertNotEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+        self.assertTrue(
+            any(expected_reason in reason for reason in result["canary_grade"]["REASONS"]),
+            result["canary_grade"],
+        )
+
     def _run_cli(self, args: list[str], *, expect: int = 0, global_args: tuple[str, ...] = ()) -> str:
         buffer = io.StringIO()
         errors = io.StringIO()
@@ -646,6 +674,91 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
                     any(expected_blocker in reason for reason in result["canary_grade"]["REASONS"]),
                     result["canary_grade"],
                 )
+
+    def test_t05e_expected_law_sha_with_trailing_hex_character_cannot_grade_green(self) -> None:
+        malformed_sha = EXPECTED_CANONICAL_LAW_SHA + "a"
+        response = canary_evidence_response(
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+                f"| SOURCE_SHA256={malformed_sha}"
+            ),
+            experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=shared-exp-parser-expected",
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-trailing-sha", response, "EXECUTOR_LAW_CHECK_INVALID"
+        )
+
+    def test_t05f_duplicate_law_sha_fields_cannot_grade_green(self) -> None:
+        response = canary_evidence_response(
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+                f"| SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA} | SOURCE_SHA256={'0' * 64}"
+            ),
+            experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=shared-exp-parser-expected",
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-duplicate-law-sha", response, "EXECUTOR_LAW_CHECK_INVALID"
+        )
+
+    def test_t05g_duplicate_law_source_fields_cannot_grade_green(self) -> None:
+        response = canary_evidence_response(
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+                f"| SOURCE=attacker-controlled.md | SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+            ),
+            experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=shared-exp-parser-expected",
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-duplicate-law-source", response, "EXECUTOR_LAW_CHECK_INVALID"
+        )
+
+    def test_t05h_repeated_experience_directives_cannot_grade_green(self) -> None:
+        matching_law = (
+            "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+            f"| SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+        )
+        cases = (
+            (
+                "repeated-lines",
+                canary_evidence_response(
+                    law_check=matching_law,
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                    extra_lines=("EXPERIENCE_CHECK=UNAVAILABLE",),
+                ),
+                "EXPERIENCE_CHECK_CONTRADICTORY",
+            ),
+            (
+                "repeated-same-line",
+                canary_evidence_response(
+                    law_check=matching_law,
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE | EXPERIENCE_CHECK=UNAVAILABLE",
+                ),
+                "EXPERIENCE_CHECK_INVALID",
+            ),
+        )
+        for suffix, response, expected_reason in cases:
+            with self.subTest(case=suffix):
+                self.assert_receipt_response_fails_closed(
+                    f"receipt-repeat-experience-{suffix}",
+                    response,
+                    expected_reason,
+                )
+
+    def test_t05i_duplicate_experience_ids_cannot_hide_conflicting_value(self) -> None:
+        matching_law = (
+            "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+            f"| SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+        )
+        response = canary_evidence_response(
+            law_check=matching_law,
+            experience_check=(
+                "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE "
+                "| IDS=shared-exp-parser-expected | IDS=conflicting-exp-id"
+            ),
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-duplicate-experience-ids", response, "EXPERIENCE_CHECK_INVALID"
+        )
 
     def test_t05_valid_actor_receipts_matching_session_expectations_allow_green(self) -> None:
         binding = self.binding("receipt-valid-expected")
