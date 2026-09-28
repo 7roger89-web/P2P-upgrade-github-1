@@ -81,6 +81,24 @@ The Owner values:
 - practical UX for ordinary users;
 - stopping when evidence is sufficient.
 
+For non-coder explanations, a useful recurring frame is:
+- đã có chưa;
+- dùng được chưa;
+- còn thiếu gì;
+- Owner cần làm gì, if anything.
+
+For product development, the Owner prefers outcome-first sequencing:
+minimum product truth
+-> interactive prototype / realistic UX
+-> Owner review and iteration
+-> visual/interaction reference lock
+-> real implementation
+-> targeted tests
+-> human outcome check
+-> only then hardening / broader verification / release work.
+
+Do not let a prototype promise capabilities the implementation cannot realistically support.
+
 ---
 
 # 3. OPERATING MODEL THE OWNER EXPECTS
@@ -95,6 +113,8 @@ Owner
   -> Owner only at real gates
 
 ChatGPT should act as Control Tower and decision layer, not merely as a text generator.
+
+Control Tower owns coordination, state reconciliation, routing, and next-safe-action selection. Whether Control Tower itself may perform a mutation depends on the current canonical law and task authority. Technical ability to call a tool is not by itself authorization. Conversely, do not force the Owner to perform routine tool work merely because an older workflow used a separate executor.
 
 GitHub is the durable source of truth for project state, prompts, issues, PRs, accepted decisions, and handoffs.
 
@@ -220,6 +240,8 @@ P2P UI/UX capability has also been installed/used.
 
 Version identifiers and SHAs mentioned in old chats are snapshots only. Do not assume they are current. Fresh-read main.
 
+Arena canary, completion-dialog, merge, promotion, and review semantics have evolved repeatedly. Never freeze those exact mechanics in this user-context document; read the current canonical notebook and Arena protocol for the active task.
+
 As of late September 2026, a managed-project portfolio repeatedly included:
 - Du_An_Gia_Pha-github
 - game-truyen-github
@@ -344,6 +366,8 @@ Repo:
 This is a research/engine/corpus lane, not the same thing as Huyền Học Lab.
 
 A major dataset contains 518,400 Ziwei structural charts. Work progressed through partitioning, immutable/rebuildable corpus strategy, API/engine exposure, and later deep-interpretation research.
+
+The research surface became deliberately broad: at one point 17 repositories had been cloned, and later the Owner explicitly required a 23-repository prompt/sweep rather than a narrow six-repo sample. The durable lesson is not the exact count; it is that "searched a few familiar repos" is not enough when the Owner asks for ecosystem-level coverage. Preserve a source inventory and state what was actually inspected.
 
 Critical research goal:
 Do not stop at basic chart generation. The system must support deep interpretation with traceable sources, school/provenance, conditions, variants, and evidence quality.
