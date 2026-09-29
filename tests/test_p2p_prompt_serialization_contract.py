@@ -60,20 +60,20 @@ def test_downstream_oe_guidance_matches_directional_canonical_semantics():
 
     for text in (agents, runtime_init, shield):
         assert "weak or negative answer means" not in text
-        assert "Any weak answer means" not in text
+        assert "any weak answer means" not in text
 
-    assert "SIMPLER_PATH=YES" in agents
-    assert "SMALLER_VERIFIABLE_SLICE=YES" in agents
-    assert "MATERIAL_PROGRESS=NO" in agents
-    assert "Do not treat every literal negative answer as failure" in agents
+    assert "simpler_path=yes" in agents
+    assert "smaller_verifiable_slice=yes" in agents
+    assert "material_progress=no" in agents
+    assert "do not treat every literal negative answer as failure" in agents
 
-    assert "SIMPLER_PATH=YES or SMALLER_VERIFIABLE_SLICE=YES" in runtime_init
-    assert "MATERIAL_PROGRESS=NO, NECESSITY=NO, or CORE_BEFORE_SUPPORT=NO" in runtime_init
-    assert "Do not treat every negative answer as failure" in runtime_init
+    assert "simpler_path=yes or smaller_verifiable_slice=yes" in runtime_init
+    assert "material_progress=no, necessity=no, or core_before_support=no" in runtime_init
+    assert "do not treat every negative answer as failure" in runtime_init
 
-    assert "YES on questions 1 and 5 is a" in shield
-    assert "Questions 2–4 require YES to proceed" in shield
-    assert "Do not treat every literal negative answer as failure" in shield
+    assert "yes on questions 1 and 5 is a reduction signal" in shield
+    assert "questions 2–4 require yes to proceed" in shield
+    assert "do not treat every literal negative answer as failure" in shield
 
 
 def test_projector_keeps_full_notebook_and_source_content_sha():
