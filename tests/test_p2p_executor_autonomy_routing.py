@@ -282,7 +282,7 @@ class ExecutorAutonomyRoutingTests(unittest.TestCase):
         self.assertIn("BLOCKED_BY_ENVIRONMENT != PRODUCT_DEFECT", self.rule21)
 
     def test_rule21_distinguishes_unverified_from_failed(self) -> None:
-        self.assertIn("not verified rather than as observed failures", self.flat21)
+        self.assertIn("Separate “not checked” from “checked and failed”", self.flat21)
         self.assertIn("chưa kiểm tra được vì thiếu công cụ/điều kiện", self.rule21)
         self.assertIn("visual gate failed", self.rule21)
 
