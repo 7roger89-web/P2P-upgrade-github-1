@@ -1,5 +1,10 @@
 from pathlib import Path
 import importlib.util
+import re
+
+
+def _flat(text: str) -> str:
+    return re.sub(r"\\s+", " ", text).strip().lower()
 
 
 def _load_projector():
