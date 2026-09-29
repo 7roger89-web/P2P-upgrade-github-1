@@ -954,7 +954,10 @@ Before each Shield implementation increment ask:
 4. Chúng ta đang giải capability chính hay tối ưu hạ tầng phụ trước capability?
 5. Có thể thu nhỏ thành vertical slice độc lập kiểm chứng nhỏ hơn không?
 
-Any weak answer means reduce scope before proceeding.
+Interpret the questions directionally: YES on questions 1 and 5 is a
+reduction signal, while NO may mean the current path is already minimal.
+Questions 2–4 require YES to proceed; NO means reduce, remove, or defer.
+Do not treat every literal negative answer as failure.
 
 Explicitly deferred until evidence creates need:
 
