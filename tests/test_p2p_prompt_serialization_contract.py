@@ -4,7 +4,7 @@ import re
 
 
 def _flat(text: str) -> str:
-    return re.sub(r"\\s+", " ", text).strip().lower()
+    return re.sub(r"\s+", " ", text).strip().lower()
 
 
 def _load_projector():
@@ -43,8 +43,9 @@ def test_projected_agents_serialize_law_and_oe_gates():
     for marker in required:
         assert marker in block
 
-    assert "Do not treat every negative answer as failure" in block
-    assert "if the answer is weak or negative" not in block
+    flat_block = _flat(block)
+    assert "do not treat every negative answer as failure" in flat_block
+    assert "if the answer is weak or negative" not in flat_block
 
 
 def test_downstream_oe_guidance_matches_directional_canonical_semantics():
