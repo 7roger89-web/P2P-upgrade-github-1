@@ -146,6 +146,15 @@ Rules for the actor self-read receipt:
 - `LAW_CHECK=BLOCKED` requires immediate cessation of substantive work.
 - The receipt is verifiable preflight evidence only; it grants no execution
   authority, permission widening, or acceptance waiver.
+- `LAW_READ_RECEIPT != LAW_APPLICATION_EVIDENCE`. A truthful
+  `LAW_CHECK=PASS` proves only that the actor established source-bound law
+  context; it does not prove that later material decisions actually applied
+  the relevant law.
+- When a material decision is changed, constrained, blocked, or simplified by
+  a Supreme Law clause, bind that observable consequence to the existing
+  evidence/status/ReturnPacket/task-state surface where it materially helps
+  verification. Do not add per-turn ceremony, private-chain-of-thought
+  narration, or a second law-compliance ledger.
 
 A valid law context is, in precedence order: the reachable active canonical
 notebook; an up-to-date installed projection of that notebook; an up-to-date
@@ -1054,10 +1063,30 @@ mandatory OE Gate:
 5. **SMALLER_VERIFIABLE_SLICE** — Can the current work be reduced to a smaller
    independently verifiable vertical slice that still creates a useful result?
 
+Directional interpretation:
+
+- `SIMPLER_PATH`: **YES** is a reduction signal — choose the simpler valid path
+  unless concrete acceptance/risk evidence shows it is not materially
+  equivalent. **NO** may mean the current path is already the simplest valid
+  path.
+- `MATERIAL_PROGRESS`: **YES** supports proceeding; **NO** is a stop/reduce
+  signal.
+- `NECESSITY`: **YES** supports proceeding; **NO** is a remove/defer signal.
+- `CORE_BEFORE_SUPPORT`: **YES** supports proceeding; **NO** is a
+  core-first/reduce signal.
+- `SMALLER_VERIFIABLE_SLICE`: **YES** is a reduction signal — use the smaller
+  independently useful slice. **NO** may mean the current slice is already
+  minimal.
+
 Decision rule:
 
-- If any answer is negative, weak, or materially uncertain, reduce scope, remove
-  the step, or choose the simpler path before continuing.
+- Do not treat a literal `YES` or `NO` as having the same polarity across
+  all five questions. Apply the directional interpretation above.
+- If a positive-to-proceed question is negative/weak, or a reduction-signal
+  question is positive and unresolved, reduce scope, remove/defer the step, or
+  choose the simpler/smaller path before continuing.
+- Material uncertainty in any gate answer must be resolved or fail toward the
+  smaller reversible path; do not manufacture a ceremonial `DO_IT`.
 - Do not split work merely to maximize the number of tasks. Decomposition is
   justified only when it improves execution, verification, recovery, or context.
 - The target is the **smallest useful verified increment**, not the largest plan
@@ -1371,8 +1400,12 @@ Evaluate the five canonical questions:
 `CORE_BEFORE_SUPPORT`, and `SMALLER_VERIFIABLE_SLICE`.
 
 The actionable result is `DO_IT`, `SKIP_IT`, or `DEFER_UNTIL_NEEDED`,
-with one concrete reason. A weak or negative answer to any gate question means
-the proposed step must be reduced, removed, or deferred before continuing.
+with one concrete reason. Apply the canonical directional interpretation:
+negative/weak answers to `MATERIAL_PROGRESS`, `NECESSITY`, or
+`CORE_BEFORE_SUPPORT` require reduction/removal/defer; positive unresolved
+answers to `SIMPLER_PATH` or `SMALLER_VERIFIABLE_SLICE` require choosing
+the simpler/smaller path. Do not use a blanket "any negative answer fails"
+rule.
 
 ### RULE 15 — ARENA_TASK_COMPLETION_DIALOG
 
@@ -1983,41 +2016,54 @@ UNPROVEN_MODEL_OR_PROVIDER => OBSERVE_BEFORE_CONTROL_WHEN_CONTROL_HAS_MATERIAL_R
 ROUTING_OR_CLASSIFICATION_SIGNAL != DOMAIN_TRUTH_AUTHORITY
 ABSTAIN_OR_UNKNOWN => VALID_OUTCOME_WHEN_EVIDENCE_IS_INSUFFICIENT
 TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS
+MATERIAL_CAPABILITY_REOPEN => PRIOR_DECISION_CHECK_FIRST
+MATERIALLY_EQUIVALENT_PRIOR_DECISION => REUSE_UNLESS_MATERIAL_CONDITION_CHANGED
+REOPEN_REQUIRES_RECORDED_MATERIAL_CHANGE
 ```
 
 Admission order:
 
-1. **Name the target-domain claim.** State what the capability must prove for
+1. **Run a bounded prior-decision check before reopening evaluation.** Look for
+   a durable materially equivalent prior ADMIT / OBSERVE_ONLY / REJECT /
+   UNSURE decision for the same capability family, target domain/language,
+   task type/input distribution, material model/artifact version, authority
+   level, and runtime conditions. Prefer exact durable identity plus bounded
+   synonym/alias lookup over broad historical preload. If the prior decision
+   is still materially equivalent, reuse it. Reopen only when a concrete
+   changed condition is recorded
+   (`MATERIAL_CAPABILITY_REOPEN => PRIOR_DECISION_CHECK_FIRST`,
+   `REOPEN_REQUIRES_RECORDED_MATERIAL_CHANGE`).
+2. **Name the target-domain claim.** State what the capability must prove for
    THIS domain, language, task type, and input distribution. An upstream
    benchmark, another project's success, or a stronger-looking number is
    context, never proof (`CROSS_DOMAIN_SUCCESS != TARGET_DOMAIN_PROOF`).
-2. **Stand up the cheapest credible baseline first** when the candidate is
+3. **Stand up the cheapest credible baseline first** when the candidate is
    materially more complex than the current path. A baseline is the simplest
    meaningful comparison already at hand: the existing
    implementation/provider/ranking, deterministic rules, a no-op/control, or
    manual policy. Do not manufacture one ceremonially
    (`NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST`).
-3. **Freeze the evaluation set before the result is known** whenever the
+4. **Freeze the evaluation set before the result is known** whenever the
    result could shape the test — for example when the same person/process
    chooses both the rows and the winner
    (`EVALUATION_SET => FREEZE_BEFORE_RESULT_WHEN_RESULT_CAN_BIAS_THE_TEST`).
-4. **Predeclare the promotion criteria** — threshold, what counts as
+5. **Predeclare the promotion criteria** — threshold, what counts as
    materially better, what blocks, and who grades — before the final result is
    produced, and freeze them with the evaluation set
    (`PROMOTION_CRITERIA => PREDECLARE_BEFORE_FINAL_RESULT`).
-5. **Measure under materially relevant target conditions**, reusing RULE 19's
+6. **Measure under materially relevant target conditions**, reusing RULE 19's
    smallest representative probe. If the real bounded task is the cheapest
    representative test, use it. If a tiny probe answers the question, stop
    there; no mandatory broad benchmark ceremony.
-6. **Observe before control** when the model, provider, or artifact is
+7. **Observe before control** when the model, provider, or artifact is
    unproven and granting control carries material risk: run shadow/suggest-only
    and keep the deterministic path authoritative
    (`UNPROVEN_MODEL_OR_PROVIDER => OBSERVE_BEFORE_CONTROL_WHEN_CONTROL_HAS_MATERIAL_RISK`).
-7. **Admit, reject, or abstain on the recorded evidence.** Escalating through
+8. **Admit, reject, or abstain on the recorded evidence.** Escalating through
    `CAN_RUN`, `WORKS_FOR_TARGET_TASK`, `MATERIALLY_BETTER_THAN_CURRENT_PATH`,
    `WORTH_COMPLEXITY`, and `READY_FOR_PRODUCT_CONTROL` requires a separate
    yes at each step; none of them implies the next.
-8. **Stop when the question is answered.** Record the decision, the baseline,
+9. **Stop when the question is answered.** Record the decision, the baseline,
    and the criteria so a later reader can re-check it without rerunning
    everything.
 
@@ -2173,12 +2219,15 @@ otherwise (Supreme Law #7).
 #### A. Control Tower responsibility
 
 When such a command is received, the active project Control Tower must
-itself:
+itself. A minimal read-only bootstrap may precede the law receipt only when it
+is necessary to locate/read the valid law source; that bootstrap may not make
+task decisions, recover substantive mission state, choose an executor, or
+mutate project state.
 
 ```text
-FRESH_CHECK
+READ_ACTIVE_SUPREME_LAW
+→ FRESH_CHECK
 → RECOVER_DURABLE_MISSION_STATE
-→ READ_ACTIVE_SUPREME_LAW
 → READ_PROJECT_AGENTS_SPEC_STATE
 → RESOLVE_UNFINISHED_BOUNDED_GOAL
 → SELECT_OR_CONFIRM_EXECUTOR
