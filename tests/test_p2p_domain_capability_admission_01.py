@@ -49,6 +49,9 @@ REQUIRED_INVARIANTS = (
     "ROUTING_OR_CLASSIFICATION_SIGNAL != DOMAIN_TRUTH_AUTHORITY",
     "ABSTAIN_OR_UNKNOWN => VALID_OUTCOME_WHEN_EVIDENCE_IS_INSUFFICIENT",
     "TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS",
+    "MATERIAL_CAPABILITY_REOPEN => PRIOR_DECISION_CHECK_FIRST",
+    "MATERIALLY_EQUIVALENT_PRIOR_DECISION => REUSE_UNLESS_MATERIAL_CONDITION_CHANGED",
+    "REOPEN_REQUIRES_RECORDED_MATERIAL_CHANGE",
 )
 
 AUTHORITY_BOUNDARY_EXAMPLES = (
@@ -146,6 +149,19 @@ class DomainCapabilityAdmissionTests(unittest.TestCase):
         flat = _flatten(self.notebook)
         for example in AUTHORITY_BOUNDARY_EXAMPLES:
             self.assertIn(example, flat, example)
+
+    def test_prior_decision_check_precedes_new_admission_cycle(self) -> None:
+        start = self.notebook.index(SUBSECTION)
+        end = self.notebook.index(RULE20)
+        section = self.notebook[start:end]
+        flat = _flatten(section)
+        self.assertIn("Run a bounded prior-decision check before reopening evaluation", flat)
+        self.assertIn("If the prior decision is still materially equivalent, reuse it", flat)
+        self.assertIn("Reopen only when a concrete changed condition is recorded", flat)
+        self.assertLess(
+            section.index("Run a bounded prior-decision check"),
+            section.index("Name the target-domain claim"),
+        )
 
     def test_subsection_declares_no_second_framework(self) -> None:
         start = self.notebook.index(SUBSECTION)
