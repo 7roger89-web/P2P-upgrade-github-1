@@ -101,6 +101,34 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("Before building any P2P prompt", self.p2p_skill_text)
         self.assertNotIn("The expected normal result is `PASS`", self.notebook_text)
         self.assertIn("never auto-return `PASS`", self.notebook_text)
+        self.assertIn("LAW_READ_RECEIPT != LAW_APPLICATION_EVIDENCE", self.notebook_text)
+
+    def test_oe_gate_directional_semantics_are_unambiguous(self) -> None:
+        start = self.notebook_text.index("### Anti-overengineering decision")
+        end = self.notebook_text.index("### Triggered harness rule", start)
+        section = self.notebook_text[start:end]
+        self.assertIn("Directional interpretation", section)
+        self.assertIn("SIMPLER_PATH", section)
+        self.assertIn("YES** is a reduction signal", section)
+        self.assertIn("MATERIAL_PROGRESS", section)
+        self.assertIn("YES** supports proceeding", section)
+        self.assertIn("SMALLER_VERIFIABLE_SLICE", section)
+        self.assertIn("Do not treat a literal `YES` or `NO` as having the same polarity", section)
+        self.assertNotIn("If any answer is negative, weak, or materially uncertain", section)
+
+    def test_rule20_reads_law_before_substantive_mission_recovery(self) -> None:
+        start = self.notebook_text.index(
+            "### RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION"
+        )
+        end = self.notebook_text.index("### RULE 21 — BEGINNER_PLAIN_LANGUAGE_FIRST", start)
+        section = self.notebook_text[start:end]
+        flat = re.sub(r"\s+", " ", section)
+        self.assertIn("minimal read-only bootstrap", flat)
+        self.assertIn("may not make task decisions", flat)
+        self.assertLess(
+            section.index("READ_ACTIVE_SUPREME_LAW"),
+            section.index("RECOVER_DURABLE_MISSION_STATE"),
+        )
 
     def test_beginner_operations_ux_v1_rules_01_to_14_present(self) -> None:
         self.assertIn("## 3. P2P_BEGINNER_OPERATIONS_UX_V1", self.notebook_text)
@@ -166,6 +194,9 @@ class P2POperationsNotebookTests(unittest.TestCase):
             "NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST",
             "CAN_RUN != WORKS_FOR_TARGET_TASK",
             "TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS",
+            "MATERIAL_CAPABILITY_REOPEN => PRIOR_DECISION_CHECK_FIRST",
+            "MATERIALLY_EQUIVALENT_PRIOR_DECISION => REUSE_UNLESS_MATERIAL_CONDITION_CHANGED",
+            "REOPEN_REQUIRES_RECORDED_MATERIAL_CHANGE",
         ):
             self.assertIn(law, self.notebook_text, law)
 
