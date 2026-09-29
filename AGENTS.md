@@ -191,8 +191,12 @@ Beginner-facing operational guidance must apply
   `CORE_BEFORE_SUPPORT`, `SMALLER_VERIFIABLE_SLICE`); ask
   `Không bị over engineering chứ?` and return `DO_IT`, `SKIP_IT`, or
   `DEFER_UNTIL_NEEDED` with one concrete reason — never a ceremonial
-  `PASS`; a weak or negative answer means reduce, remove, or defer the
-  step (`DEFERRED_NOT_REQUIRED` when not needed now). Harness components are
+  `PASS`; interpret the five questions directionally:
+  `SIMPLER_PATH=YES` or `SMALLER_VERIFIABLE_SLICE=YES` means choose the
+  simpler/smaller valid path, while `MATERIAL_PROGRESS=NO`, `NECESSITY=NO`,
+  or `CORE_BEFORE_SUPPORT=NO` means reduce, remove, or defer the step
+  (`DEFERRED_NOT_REQUIRED` when not needed now). Do not treat every literal
+  negative answer as failure. Harness components are
   trigger-based, not mandatory architecture: add guides, sensors, memory,
   permissions, observability, reviewers, routers, registries, shared state,
   schemas, background agents, or multi-agent coordination only when a concrete

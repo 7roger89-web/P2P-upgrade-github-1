@@ -82,7 +82,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
             "OWNER_OUTCOME_AND_AUTHORITY_ARE_INVARIANTS",
             "SIMPLEST_USEFUL_PATH_TO_COMPLETION",
             "REAL_STATE_AND_EVIDENCE_OVERRIDE_ASSUMPTIONS",
-            "RECOVER_ADAPTIVELY; DO NOT_ENTER_SPECULATIVE_FIX_LOOPS",
+            "RECOVER_ADAPTIVELY; DO_NOT_ENTER_SPECULATIVE_FIX_LOOPS",
             "PRESERVE_CONTINUITY_AND_STOP",
         ):
             self.assertIn(law, self.notebook_text, law)
@@ -100,7 +100,54 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("SUPREME_LAW_CAPSULE", self.arena_text)
         self.assertIn("Before building any P2P prompt", self.p2p_skill_text)
         self.assertNotIn("The expected normal result is `PASS`", self.notebook_text)
-        self.assertIn("never auto-return `PASS`", self.notebook_text)
+        self.assertIn("Do not use a ceremonial or expected-`PASS` check", self.notebook_text)
+
+    def test_law_read_receipt_is_not_application_evidence(self) -> None:
+        flat = re.sub(r"\s+", " ", self.notebook_text)
+        self.assertIn("LAW_READ_RECEIPT != LAW_APPLICATION_EVIDENCE", flat)
+        self.assertIn("proves only that the actor established source-bound law context", flat)
+        self.assertIn("existing evidence/status/ReturnPacket/task-state surface", flat)
+        self.assertIn("Do not add per-turn ceremony", flat)
+        self.assertIn("private-chain-of-thought", flat)
+        self.assertIn("second law-compliance ledger", flat)
+
+    def test_oe_gate_directional_semantics_are_unambiguous(self) -> None:
+        start = self.notebook_text.index("### Anti-overengineering decision")
+        end = self.notebook_text.index("### Triggered harness rule", start)
+        section = self.notebook_text[start:end]
+        self.assertIn("Directional interpretation", section)
+        self.assertIn("SIMPLER_PATH", section)
+        self.assertIn("YES** is a reduction signal", section)
+        self.assertIn("MATERIAL_PROGRESS", section)
+        self.assertIn("YES** supports proceeding", section)
+        self.assertIn("NECESSITY", section)
+        self.assertIn("NO** is a remove/defer signal", section)
+        self.assertIn("CORE_BEFORE_SUPPORT", section)
+        self.assertIn("core-first/reduce signal", section)
+        self.assertIn("SMALLER_VERIFIABLE_SLICE", section)
+        self.assertIn("Do not treat a literal `YES` or `NO` as having the same polarity", section)
+        self.assertNotIn("If any answer is negative, weak, or materially uncertain", section)
+
+        rule14_start = self.notebook_text.index("### RULE 14 — OVER_ENGINEERING_CHECK")
+        rule15_start = self.notebook_text.index("### RULE 15 — ARENA_TASK_COMPLETION_DIALOG")
+        rule14 = re.sub(r"\s+", " ", self.notebook_text[rule14_start:rule15_start])
+        self.assertIn('Do not use a blanket "any negative answer fails" rule.', rule14)
+
+    def test_rule20_reads_law_before_substantive_mission_recovery(self) -> None:
+        start = self.notebook_text.index(
+            "### RULE 20 — OWNER_EXECUTOR_SELECTION_AND_AUTONOMOUS_COMPLETION"
+        )
+        end = self.notebook_text.index("### RULE 21 — BEGINNER_PLAIN_LANGUAGE_FIRST", start)
+        section = self.notebook_text[start:end]
+        flat = re.sub(r"\s+", " ", section)
+        self.assertIn("minimal read-only bootstrap", flat)
+        self.assertIn("necessary to locate/read the valid law source", flat)
+        self.assertIn("may not make task decisions", flat)
+        self.assertIn("mutate project state", flat)
+        self.assertLess(
+            section.index("READ_ACTIVE_SUPREME_LAW"),
+            section.index("RECOVER_DURABLE_MISSION_STATE"),
+        )
 
     def test_beginner_operations_ux_v1_rules_01_to_14_present(self) -> None:
         self.assertIn("## 3. P2P_BEGINNER_OPERATIONS_UX_V1", self.notebook_text)
@@ -166,6 +213,9 @@ class P2POperationsNotebookTests(unittest.TestCase):
             "NEW_COMPLEX_CAPABILITY => CHEAP_CREDIBLE_BASELINE_FIRST",
             "CAN_RUN != WORKS_FOR_TARGET_TASK",
             "TRUTHFUL_UNKNOWN > UNSUPPORTED_CONFIDENT_GUESS",
+            "MATERIAL_CAPABILITY_REOPEN => PRIOR_DECISION_CHECK_FIRST",
+            "MATERIALLY_EQUIVALENT_PRIOR_DECISION => REUSE_UNLESS_MATERIAL_CONDITION_CHANGED",
+            "REOPEN_REQUIRES_RECORDED_MATERIAL_CHANGE",
         ):
             self.assertIn(law, self.notebook_text, law)
 
@@ -189,10 +239,11 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("P2P_OPERATIONS_NOTEBOOK", self.arena_text)
 
     def test_control_tower_handoff_discovers_notebook(self) -> None:
-        self.assertIn("P2P operations notebook", self.ct_text)
+        self.assertIn("single canonical operations notebook", self.ct_text)
         self.assertIn(NOTEBOOK_RELATIVE, self.ct_text)
-        self.assertIn("P2P_BEGINNER_OPERATIONS_UX_V1", self.ct_text)
-        self.assertIn("RULE_ASSIMILATION_GATE_V1", self.ct_text)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", self.ct_text)
+        self.assertIn("SUPREME_LAW_CAPSULE", self.ct_text)
+        self.assertIn("Before Control Tower writes any executor prompt", self.ct_text)
 
     def test_release_projection_includes_notebook(self) -> None:
         # The release must ship BOTH the full canonical notebook and the thin
@@ -359,7 +410,8 @@ class P2POperationsNotebookTests(unittest.TestCase):
         # preserved in the thin entrypoint itself.
         self.assertIn("## Owner gates", self.install_text)
         self.assertIn("## Progressive disclosure", self.install_text)
-        self.assertIn("## Anti-overengineering gate", self.install_text)
+        self.assertIn("Use the smallest useful independently verifiable slice", self.install_text)
+        self.assertIn("Use existing capability before adding routers", self.install_text)
 
     def test_installed_notebook_contains_gate_and_rule15(self) -> None:
         # F. The installed canonical notebook contains RULE_ASSIMILATION_GATE_V1
