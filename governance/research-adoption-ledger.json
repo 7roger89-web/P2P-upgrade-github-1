@@ -3506,6 +3506,64 @@
       "owner_decision_status": "OWNER_SELECTED_IMPLEMENTED_AND_RULE_ASSIMILATION_VERIFIED",
       "last_reviewed_at": "2026-09-24T00:00:00+00:00",
       "notes": "Issue #252 Owner direction is to finish the Rust research 100% operationally, not to force a Rust dependency. Ziwei canary provenance: 518,400 records; 5,878,228,608 bytes; combined SHA-256 21fe90f8737931c63397f38e419bbba6e839b7f8318440ccb747f9bb3e9b1870. RULE_ASSIMILATION_STATUS=VERIFIED: independent Supervisor review passed exact Writer head 90c69c5d650d54590f3277c00d9ec5cc5b647e3d / tree b4a84a495eb13f5c0ff4b17dc1931e3f7a809752, Control Tower receipt comment 5815665839 was recorded before BACKLOG_K flipped to VERIFIED, and PR #253 merged as 3cb8049921805dbd963a091d9b37ae06a3a9fd61. No deployment, release, promotion, local-PC/Anvien requirement, benchmark service, daemon, or Rust toolchain installation is authorized or claimed."
+    },
+    {
+      "research_id": "RA-EXT-104",
+      "source_name": "TypeSafe Jev / System One — bounded semantic pre-action shadow admission",
+      "source_type": "OWNER_SELECTED_BOUNDED_CAPABILITY_REOPEN",
+      "source_reference": "P2P Issue #282; official TypeSafe docs (introduction, Noul, Choice, Score, Jev 1.13 jaggedness, patterns) and typesafe-ai/typesafe-sdk-python reviewed 2026-09-29; prior durable decision RA-EXT-102 / Issue #245",
+      "source_version_or_commit": "TypeSafe Jev docs current on 2026-09-29; benchmark frozen against P2P main 577c0eba7578113438e5222eca232015806de5d2 before any live provider result",
+      "provenance_status": "PRIMARY_DOCS_REVIEWED; PRIOR_DECISION_REUSED; FROZEN_TARGET_DOMAIN_BENCHMARK_CREATED; LIVE_PROVIDER_EVIDENCE_NOT_RUN; ZERO_PROVIDER_SECRET_OR_MODEL_ARTIFACT_COMMITTED",
+      "research_summary": "RA-EXT-102 remains authoritative for the earlier OpenJev/VNLAW failure: no global Jev/OpenJev dependency and no classifier-as-domain-truth authority. Issue #282 reopens a materially different claim only: whether current official TypeSafe Jev can supply useful shadow semantic observations for P2P tool proposals (destructive intent, closed-set action class, operational ambiguity) while deterministic P2P permission, Owner Gates, security contract and FAST/STANDARD/STRICT/CRITICAL lanes remain authoritative. A 30-case source-bound benchmark, thresholds and stability challenges are frozen before any live Jev result.",
+      "selected_ideas": [
+        "JEV_OBSERVATION != EXECUTION_AUTHORITY",
+        "reuse deterministic P2P Owner Gates/security/execution lanes as the authoritative baseline",
+        "freeze target-domain evaluation before provider results",
+        "Noul for one atomic destructive-intent proposition",
+        "Choice for one closed-set action classification with UNKNOWN",
+        "Score for one descriptive ambiguity dimension, never exact numeric risk magnitude",
+        "minimal sanitized provider state: proposal/target/environment/note only",
+        "shadow-only provider run with option-order and harmless-rewrap challenges",
+        "zero critical destructive false negatives required even for later bounded-influence candidacy",
+        "provider unavailable or credential absent => LIVE_PROVIDER_EVIDENCE_NOT_RUN, never fabricated value"
+      ],
+      "rejected_ideas": [
+        "global Jev/OpenJev install or model dependency inside P2P",
+        "Jev as permission authority, Owner Gate, execution lane selector, security authority, or domain-truth authority",
+        "READ/WRITE/DELETE verb alone as the risk model",
+        "universal 0.3/0.7 threshold policy across Noul, Choice and Score",
+        "MCP middleware or production database hard gate before target-domain proof",
+        "second P2P risk classifier/framework/router/daemon/service/registry",
+        "sending secrets, raw production records, unnecessary personal data or full tool arguments to the provider"
+      ],
+      "p2p_translation": "RESEARCH/ADMISSION ONLY. Issue #282 adds one frozen 30-case benchmark fixture, one research-only harness, one focused regression module and this research record. Existing deterministic P2P policy remains the sole authority. Possible benchmark verdicts are REJECT | OBSERVE_ONLY | CANDIDATE_FOR_BOUNDED_INFLUENCE_TEST; production control is not a verdict. Live provider evidence remains NOT_RUN until an authorized environment already has the official typesafe-sdk and caller-supplied TYPESAFE_API_KEY.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-JEV-SHADOW-ADMISSION-01.md",
+        "tests/fixtures/p2p_jev_shadow_admission_01.json",
+        "scripts/p2p_jev_shadow_admission.py",
+        "tests/test_p2p_jev_shadow_admission_01.py",
+        "P2P Issue #282",
+        "RA-EXT-102 / P2P Issue #245",
+        "https://docs.typesafe.ai/introduction",
+        "https://docs.typesafe.ai/primitives/noul",
+        "https://docs.typesafe.ai/primitives/choice",
+        "https://docs.typesafe.ai/primitives/score",
+        "https://docs.typesafe.ai/model-jaggedness/jev-1.13",
+        "https://github.com/typesafe-ai/typesafe-sdk-python"
+      ],
+      "dependencies": [
+        "P2P_SUPREME_OPERATING_LAW_V1 DOMAIN_CAPABILITY_ADMISSION_V1",
+        ".p2p/system/p2p_capabilities/orchestration_policy.py",
+        "RA-EXT-102 prior decision",
+        "live Jev execution only when official typesafe-sdk is already installed and TYPESAFE_API_KEY is supplied by the caller"
+      ],
+      "roadmap_slot": "bounded capability admission / shadow observation; no runtime roadmap item yet",
+      "owner_decision_status": "OWNER_SELECTED_BOUNDED_SHADOW_PROBE",
+      "last_reviewed_at": "2026-09-29T00:00:00+00:00",
+      "notes": "MATERIAL_REOPEN_REASON: target claim changed from domain-truth/routing influence in VNLAW to shadow semantic pre-action observation in P2P, and the evaluated provider surface is current official TypeSafe Jev/System One. RA-EXT-102 rejections remain in force. OE_VERDICT=DO_IT only for the frozen shadow benchmark. No live provider call, dependency install, MCP integration, permission change, production mutation, release, deploy or promotion is claimed by this record."
     }
   ],
   "rejected_register_summary": {
