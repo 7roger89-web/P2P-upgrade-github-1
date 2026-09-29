@@ -100,7 +100,7 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("SUPREME_LAW_CAPSULE", self.arena_text)
         self.assertIn("Before building any P2P prompt", self.p2p_skill_text)
         self.assertNotIn("The expected normal result is `PASS`", self.notebook_text)
-        self.assertIn("never auto-return `PASS`", self.notebook_text)
+        self.assertIn("Do not use a ceremonial or expected-`PASS` check", self.notebook_text)
 
     def test_law_read_receipt_is_not_application_evidence(self) -> None:
         flat = re.sub(r"\s+", " ", self.notebook_text)
@@ -239,10 +239,11 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("P2P_OPERATIONS_NOTEBOOK", self.arena_text)
 
     def test_control_tower_handoff_discovers_notebook(self) -> None:
-        self.assertIn("P2P operations notebook", self.ct_text)
+        self.assertIn("single canonical operations notebook", self.ct_text)
         self.assertIn(NOTEBOOK_RELATIVE, self.ct_text)
-        self.assertIn("P2P_BEGINNER_OPERATIONS_UX_V1", self.ct_text)
-        self.assertIn("RULE_ASSIMILATION_GATE_V1", self.ct_text)
+        self.assertIn("P2P_SUPREME_OPERATING_LAW_V1", self.ct_text)
+        self.assertIn("SUPREME_LAW_CAPSULE", self.ct_text)
+        self.assertIn("Before Control Tower writes any executor prompt", self.ct_text)
 
     def test_release_projection_includes_notebook(self) -> None:
         # The release must ship BOTH the full canonical notebook and the thin
@@ -409,7 +410,8 @@ class P2POperationsNotebookTests(unittest.TestCase):
         # preserved in the thin entrypoint itself.
         self.assertIn("## Owner gates", self.install_text)
         self.assertIn("## Progressive disclosure", self.install_text)
-        self.assertIn("## Anti-overengineering gate", self.install_text)
+        self.assertIn("Use the smallest useful independently verifiable slice", self.install_text)
+        self.assertIn("Use existing capability before adding routers", self.install_text)
 
     def test_installed_notebook_contains_gate_and_rule15(self) -> None:
         # F. The installed canonical notebook contains RULE_ASSIMILATION_GATE_V1
