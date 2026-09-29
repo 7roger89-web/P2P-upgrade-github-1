@@ -50,9 +50,13 @@ def test_projected_agents_serialize_law_and_oe_gates():
 
 def test_downstream_oe_guidance_matches_directional_canonical_semantics():
     root = Path(__file__).resolve().parents[1]
-    agents = (root / "AGENTS.md").read_text(encoding="utf-8")
-    runtime_init = (root / ".p2p/system/p2p_capabilities/__init__.py").read_text(encoding="utf-8")
-    shield = (root / "docs/p2p-development/P2P-SHIELD-PLAN.md").read_text(encoding="utf-8")
+    agents = _flat((root / "AGENTS.md").read_text(encoding="utf-8"))
+    runtime_init = _flat(
+        (root / ".p2p/system/p2p_capabilities/__init__.py").read_text(encoding="utf-8")
+    )
+    shield = _flat(
+        (root / "docs/p2p-development/P2P-SHIELD-PLAN.md").read_text(encoding="utf-8")
+    )
 
     for text in (agents, runtime_init, shield):
         assert "weak or negative answer means" not in text
