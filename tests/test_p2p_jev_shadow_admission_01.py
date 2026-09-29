@@ -202,6 +202,47 @@ class JevShadowAdmissionTests(unittest.TestCase):
             grade["metrics"]["critical_destructive_false_negatives"], 1
         )
 
+    def test_research_ledger_records_bounded_reopen_without_runtime_admission(self) -> None:
+        ledger = json.loads(
+            (ROOT / "governance" / "research-adoption-ledger.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        matches = [
+            record for record in ledger["records"]
+            if record.get("research_id") == "RA-EXT-104"
+        ]
+        self.assertEqual(len(matches), 1)
+        record = matches[0]
+        self.assertEqual(record["status"], "RESEARCHED")
+        self.assertEqual(
+            record["owner_decision_status"],
+            "OWNER_SELECTED_BOUNDED_SHADOW_PROBE",
+        )
+        rejected = " ".join(record["rejected_ideas"]).lower()
+        self.assertIn("global jev/openjev install", rejected)
+        self.assertIn("permission authority", rejected)
+        self.assertIn("mcp middleware", rejected)
+        self.assertIn("live_provider_evidence_not_run", record["provenance_status"].lower())
+
+    def test_human_projection_and_research_doc_preserve_authority_boundary(self) -> None:
+        projection = (
+            ROOT / "docs" / "RESEARCH-ADOPTION-LEDGER.md"
+        ).read_text(encoding="utf-8")
+        research = (
+            ROOT / "docs" / "p2p-development" / "research"
+            / "P2P-JEV-SHADOW-ADMISSION-01.md"
+        ).read_text(encoding="utf-8")
+        for marker in (
+            "RA-EXT-104",
+            "JEV_OBSERVATION != EXECUTION_AUTHORITY",
+            "LIVE_PROVIDER_EVIDENCE=NOT_RUN",
+        ):
+            self.assertIn(marker, research)
+        self.assertIn("RA-EXT-104", projection)
+        self.assertIn("JEV_OBSERVATION != EXECUTION_AUTHORITY", projection)
+        self.assertIn("production MCP", projection)
+
     def test_fixture_does_not_embed_a_real_secret_value(self) -> None:
         text = FIXTURE.read_text(encoding="utf-8")
         # Semantic words such as "API key" are valid benchmark content; common
