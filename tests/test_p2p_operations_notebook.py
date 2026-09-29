@@ -103,14 +103,13 @@ class P2POperationsNotebookTests(unittest.TestCase):
         self.assertIn("never auto-return `PASS`", self.notebook_text)
 
     def test_law_read_receipt_is_not_application_evidence(self) -> None:
-        self.assertIn("LAW_READ_RECEIPT != LAW_APPLICATION_EVIDENCE", self.notebook_text)
-        self.assertIn("proves only that the actor established source-bound law context",
-                      self.notebook_text)
-        self.assertIn("existing\n  evidence/status/ReturnPacket/task-state surface",
-                      self.notebook_text)
-        self.assertIn("Do not add per-turn ceremony", self.notebook_text)
-        self.assertIn("private-chain-of-thought", self.notebook_text)
-        self.assertIn("second law-compliance ledger", self.notebook_text)
+        flat = re.sub(r"\s+", " ", self.notebook_text)
+        self.assertIn("LAW_READ_RECEIPT != LAW_APPLICATION_EVIDENCE", flat)
+        self.assertIn("proves only that the actor established source-bound law context", flat)
+        self.assertIn("existing evidence/status/ReturnPacket/task-state surface", flat)
+        self.assertIn("Do not add per-turn ceremony", flat)
+        self.assertIn("private-chain-of-thought", flat)
+        self.assertIn("second law-compliance ledger", flat)
 
     def test_oe_gate_directional_semantics_are_unambiguous(self) -> None:
         start = self.notebook_text.index("### Anti-overengineering decision")
@@ -131,8 +130,8 @@ class P2POperationsNotebookTests(unittest.TestCase):
 
         rule14_start = self.notebook_text.index("### RULE 14 — OVER_ENGINEERING_CHECK")
         rule15_start = self.notebook_text.index("### RULE 15 — ARENA_TASK_COMPLETION_DIALOG")
-        rule14 = self.notebook_text[rule14_start:rule15_start]
-        self.assertIn('Do not use a blanket "any negative answer fails"\nrule.', rule14)
+        rule14 = re.sub(r"\s+", " ", self.notebook_text[rule14_start:rule15_start])
+        self.assertIn('Do not use a blanket "any negative answer fails" rule.', rule14)
 
     def test_rule20_reads_law_before_substantive_mission_recovery(self) -> None:
         start = self.notebook_text.index(
