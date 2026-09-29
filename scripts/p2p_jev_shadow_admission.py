@@ -14,13 +14,14 @@ state or output.
 from __future__ import annotations
 
 import argparse
-import importlib
+import importlib.util
 import json
 import os
 from pathlib import Path
 import statistics
 import sys
 import time
+import types
 from typing import Any, Iterable, Mapping
 
 
@@ -51,10 +52,23 @@ def load_fixture(path: Path = FIXTURE) -> dict[str, Any]:
 
 
 def _load_orchestration_policy():
-    system_root = ROOT / ".p2p" / "system"
-    if str(system_root) not in sys.path:
-        sys.path.insert(0, str(system_root))
-    return importlib.import_module("p2p_capabilities.orchestration_policy")
+    package_root = ROOT / ".p2p" / "system" / "p2p_capabilities"
+    package_name = "p2p_capabilities"
+    if package_name not in sys.modules:
+        package = types.ModuleType(package_name)
+        package.__path__ = [str(package_root)]
+        sys.modules[package_name] = package
+    module_name = package_name + ".orchestration_policy"
+    if module_name in sys.modules:
+        return sys.modules[module_name]
+    path = package_root / "orchestration_policy.py"
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    if spec is None or spec.loader is None:
+        raise JevShadowAdmissionError("ORCHESTRATION_POLICY_LOAD_FAILED")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 def validate_deterministic_baseline(fixture: Mapping[str, Any]) -> dict[str, Any]:
