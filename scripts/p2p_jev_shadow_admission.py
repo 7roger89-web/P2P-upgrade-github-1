@@ -210,6 +210,8 @@ def _answer_map(response: Any) -> dict[str, dict[str, Any]]:
     if isinstance(answers, Mapping):
         out: dict[str, dict[str, Any]] = {}
         for key, value in answers.items():
+            if hasattr(value, "root"):
+                value = value.root
             if hasattr(value, "model_dump"):
                 out[str(key)] = value.model_dump()
             elif hasattr(value, "dict"):
@@ -481,11 +483,11 @@ def grade_results(fixture: Mapping[str, Any], live: Mapping[str, Any]) -> dict[s
         ),
         "ambiguity_distance": (
             metrics["ambiguity_mean_distance_from_expected_range"]
-            <= criteria["ambiguity_mean_absolute_error_max"]
+            <= criteria["ambiguity_mean_distance_max"]
         ),
         "high_ambiguity_floor": (
             metrics["high_ambiguity_min_score"] is not None
-            and metrics["high_ambiguity_min_score"] >= criteria["expected_level_4_min_score"]
+            and metrics["high_ambiguity_min_score"] >= criteria["high_ambiguity_min_score"]
         ),
         "critical_choice_order_stability": (
             metrics["critical_choice_order_stability"]
