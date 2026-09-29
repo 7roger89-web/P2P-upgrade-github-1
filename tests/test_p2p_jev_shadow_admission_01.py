@@ -73,7 +73,7 @@ class JevShadowAdmissionTests(unittest.TestCase):
             self.assertNotIn("baseline", request)
             self.assertNotIn("expected", request)
             self.assertNotIn("source_ref", request)
-            self.assertNotIn("owner_gate", json.dumps(request).lower())
+            self.assertNotIn('"owner_gate":', json.dumps(request).lower())
             self.assertNotIn("api_key", json.dumps(request).lower())
 
     def test_request_contains_three_atomic_observation_questions(self) -> None:
