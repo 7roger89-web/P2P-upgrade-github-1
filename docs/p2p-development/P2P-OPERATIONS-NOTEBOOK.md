@@ -2218,11 +2218,11 @@ otherwise (Supreme Law #7).
 
 #### A. Control Tower responsibility
 
-When such a command is received, the active project Control Tower must
-itself. A minimal read-only bootstrap may precede the law receipt only when it
-is necessary to locate/read the valid law source; that bootstrap may not make
-task decisions, recover substantive mission state, choose an executor, or
-mutate project state.
+When such a command is received, the active project Control Tower must itself
+follow the sequence below. A minimal read-only bootstrap may precede the law
+receipt only when it is necessary to locate/read the valid law source; that
+bootstrap may not make task decisions, recover substantive mission state,
+choose an executor, or mutate project state.
 
 ```text
 READ_ACTIVE_SUPREME_LAW
