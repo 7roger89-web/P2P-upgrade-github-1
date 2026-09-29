@@ -284,7 +284,7 @@ class ExecutorAutonomyRoutingTests(unittest.TestCase):
     def test_rule21_distinguishes_unverified_from_failed(self) -> None:
         self.assertIn("Separate “not checked” from “checked and failed”", self.flat21)
         self.assertIn("chưa kiểm tra được vì thiếu công cụ/điều kiện", self.rule21)
-        self.assertIn("visual gate failed", self.rule21)
+        self.assertIn("visual gate failed", self.flat21)
 
     def test_rule21_reuses_rule09_for_one_action(self) -> None:
         self.assertIn("RULE 09 — ONE_ACTION_NOW_FOR_BEGINNER", self.rule21)
