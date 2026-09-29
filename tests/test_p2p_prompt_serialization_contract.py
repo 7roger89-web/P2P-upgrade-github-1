@@ -1,5 +1,10 @@
 from pathlib import Path
 import importlib.util
+import re
+
+
+def _flat(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip().lower()
 
 
 def _load_projector():
@@ -37,6 +42,38 @@ def test_projected_agents_serialize_law_and_oe_gates():
     )
     for marker in required:
         assert marker in block
+
+    flat_block = _flat(block)
+    assert "do not treat every negative answer as failure" in flat_block
+    assert "if the answer is weak or negative" not in flat_block
+
+
+def test_downstream_oe_guidance_matches_directional_canonical_semantics():
+    root = Path(__file__).resolve().parents[1]
+    agents = _flat((root / "AGENTS.md").read_text(encoding="utf-8"))
+    runtime_init = _flat(
+        (root / ".p2p/system/p2p_capabilities/__init__.py").read_text(encoding="utf-8")
+    )
+    shield = _flat(
+        (root / "docs/p2p-development/P2P-SHIELD-PLAN.md").read_text(encoding="utf-8")
+    )
+
+    for text in (agents, runtime_init, shield):
+        assert "weak or negative answer means" not in text
+        assert "any weak answer means" not in text
+
+    assert "simpler_path=yes" in agents
+    assert "smaller_verifiable_slice=yes" in agents
+    assert "material_progress=no" in agents
+    assert "do not treat every literal negative answer as failure" in agents
+
+    assert "simpler_path=yes or smaller_verifiable_slice=yes" in runtime_init
+    assert "material_progress=no, necessity=no, or core_before_support=no" in runtime_init
+    assert "do not treat every negative answer as failure" in runtime_init
+
+    assert "yes on questions 1 and 5 is a reduction signal" in shield
+    assert "questions 2–4 require yes to proceed" in shield
+    assert "do not treat every literal negative answer as failure" in shield
 
 
 def test_projector_keeps_full_notebook_and_source_content_sha():
