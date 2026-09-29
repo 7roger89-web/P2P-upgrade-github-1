@@ -184,6 +184,35 @@ was created. Control Tower independently verified PR #246 exact Writer head
 | --- | --- | --- | --- | --- |
 | RA-EXT-102 | `DOMAIN_CAPABILITY_ADMISSION_V1` — cross-project capability-admission lesson (OpenJev/VNLAW evidence) | IMPLEMENTED | target-domain proof; cheap credible baseline first; frozen evaluation set; predeclared promotion criteria; observe-before-control; routing vs domain authority; abstention valid; complexity/value gate | one bounded subsection under notebook RULE 19 + independently verified `BACKLOG_J` assimilation entry; rejected: upstream benchmark as target proof, cross-domain extrapolation, runtime success as product value, global OpenJev install, classifier as domain truth authority |
 
+
+### 4.10 Jev semantic pre-action shadow admission 2026-09-29 (RA-EXT-104)
+
+Owner-selected bounded reopen under `DOMAIN_CAPABILITY_ADMISSION_V1`. The
+authoritative JSON record is RA-EXT-104; this section is a derived human
+projection.
+
+The prior RA-EXT-102 decision remains active: the earlier OpenJev/VNLAW case
+proved that a model can run and integrate yet still lose badly to a
+deterministic target-domain baseline and show option-order instability. P2P
+still rejects a global Jev/OpenJev dependency and any classifier as permission
+or domain-truth authority.
+
+The material change is the target claim: current official TypeSafe Jev is being
+evaluated only as a **shadow semantic observation** over sanitized P2P tool
+proposals, not as legal/domain truth or an execution gate. A 30-case benchmark,
+deterministic baseline, promotion criteria and option-order/rewrap/adversarial
+challenges were frozen before any live provider result.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-104 | TypeSafe Jev / System One + prior RA-EXT-102 | RESEARCHED | shadow-only Noul destructive-intent signal; Choice action class; Score ambiguity; sanitized state; frozen target-domain benchmark; deterministic P2P baseline | research harness only; `JEV_OBSERVATION != EXECUTION_AUTHORITY`; possible result `REJECT | OBSERVE_ONLY | CANDIDATE_FOR_BOUNDED_INFLUENCE_TEST`; live provider evidence currently NOT_RUN |
+
+Rejected in this batch: universal 0.3/0.7 thresholds, READ/WRITE/DELETE as the
+risk model, Jev as Owner Gate/security/permission authority, production MCP
+middleware, global dependency install, second risk framework/router/service,
+or sending secrets/raw production records to the provider.
+
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
