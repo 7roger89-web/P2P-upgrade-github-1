@@ -2,6 +2,7 @@
 
 Status: `FROZEN_BENCHMARK_READY / LIVE_PROVIDER_EVIDENCE_NOT_RUN`  
 Issue: #282  
+Research record: `RA-EXT-104`  
 Canonical base used to freeze benchmark: `577c0eba7578113438e5222eca232015806de5d2`  
 Authority: research/admission evidence only; subordinate to `P2P_SUPREME_OPERATING_LAW_V1`.
 
