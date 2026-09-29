@@ -38,6 +38,33 @@ def test_projected_agents_serialize_law_and_oe_gates():
     for marker in required:
         assert marker in block
 
+    assert "Do not treat every negative answer as failure" in block
+    assert "if the answer is weak or negative" not in block
+
+
+def test_downstream_oe_guidance_matches_directional_canonical_semantics():
+    root = Path(__file__).resolve().parents[1]
+    agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+    runtime_init = (root / ".p2p/system/p2p_capabilities/__init__.py").read_text(encoding="utf-8")
+    shield = (root / "docs/p2p-development/P2P-SHIELD-PLAN.md").read_text(encoding="utf-8")
+
+    for text in (agents, runtime_init, shield):
+        assert "weak or negative answer means" not in text
+        assert "Any weak answer means" not in text
+
+    assert "SIMPLER_PATH=YES" in agents
+    assert "SMALLER_VERIFIABLE_SLICE=YES" in agents
+    assert "MATERIAL_PROGRESS=NO" in agents
+    assert "Do not treat every literal negative answer as failure" in agents
+
+    assert "SIMPLER_PATH=YES or SMALLER_VERIFIABLE_SLICE=YES" in runtime_init
+    assert "MATERIAL_PROGRESS=NO, NECESSITY=NO, or CORE_BEFORE_SUPPORT=NO" in runtime_init
+    assert "Do not treat every negative answer as failure" in runtime_init
+
+    assert "YES on questions 1 and 5 is a" in shield
+    assert "Questions 2–4 require YES to proceed" in shield
+    assert "Do not treat every literal negative answer as failure" in shield
+
 
 def test_projector_keeps_full_notebook_and_source_content_sha():
     projector = _load_projector()
