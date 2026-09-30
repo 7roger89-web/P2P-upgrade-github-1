@@ -1117,6 +1117,10 @@ def canary_prompt_lines(directive: CanaryDirective) -> tuple[str, ...]:
         "CANARY_EVIDENCE_PACKET_V1 is the ONLY return of this turn (return exactly this shape, then stop):",
         "CANARY_EVIDENCE_PACKET_V1",
         "P2P_LAW_SOURCE=<actual source read>",
+        "LAW_CHECK=PASS | SOURCE=<actual law source read> | SOURCE_SHA256=<64-hex canonical law content SHA-256>",
+        "or LAW_CHECK=BLOCKED | REASON=<reason>; P2P_LAW_SOURCE is separate source evidence and never substitutes for LAW_CHECK.",
+        "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>",
+        "or EXPERIENCE_CHECK=NO_MATCH or EXPERIENCE_CHECK=UNAVAILABLE",
         "CURRENT_STATE=<pinned repo/task state>",
         "FACTS=<max 5 task-relevant observed facts>",
         "DECISIVE_CHECK=<one representative real check>",
@@ -1512,24 +1516,35 @@ def _parse_law_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if not isinstance(val, str):
         return None
     raw = val.strip()
+    if not re.match(r"(?i)^\s*LAW_CHECK\s*=", raw):
+        return None
+    directives = list(re.finditer(r"(?i)\bLAW_CHECK\s*=", raw))
+    if len(directives) != 1:
+        return {"status": "INVALID", "reason": "REPEATED_LAW_CHECK_DIRECTIVE"}
     m = re.match(r"(?im)^\s*LAW_CHECK\s*=\s*(PASS|BLOCKED)\b(.*)$", raw)
     if not m:
-        return None
+        return {"status": "INVALID", "reason": "MALFORMED_LAW_CHECK"}
     verdict, rest = m.group(1).upper(), m.group(2).strip()
     if verdict == "BLOCKED":
         rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
         return {"status": "BLOCKED", "reason": (rm.group(1).strip() if rm else rest) or "EXECUTOR_BLOCKED"}
-    sm = re.search(r"SOURCE\s*=\s*([^|;\n]+)", rest)
-    hm = re.search(r"SOURCE_SHA256\s*=\s*([0-9a-fA-F]{64})", rest)
-    if sm and hm:
-        return {"status": "PASS", "source": sm.group(1).strip(), "source_sha256": hm.group(1).strip().lower()}
-    return {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+    source_fields = list(re.finditer(r"(?i)\bSOURCE\s*=\s*([^|;\n]*)", rest))
+    sha_fields = list(re.finditer(r"(?i)\bSOURCE_SHA256\s*=\s*([^|;\n]*)", rest))
+    if len(source_fields) != 1:
+        return {"status": "INVALID", "reason": "SOURCE_FIELD_DUPLICATED_OR_MISSING"}
+    if len(sha_fields) != 1:
+        return {"status": "INVALID", "reason": "SOURCE_SHA256_FIELD_DUPLICATED_OR_MISSING"}
+    source = source_fields[0].group(1).strip()
+    source_sha = sha_fields[0].group(1).strip()
+    if not source or re.fullmatch(r"[0-9a-fA-F]{64}", source_sha) is None:
+        return {"status": "INVALID", "reason": "SOURCE_OR_SHA256_MISSING_OR_INVALID"}
+    return {"status": "PASS", "source": source, "source_sha256": source_sha.lower()}
 
 
 def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if isinstance(val, Mapping):
         dec = str(val.get("decision") or val.get("EXPERIENCE_CHECK") or "").upper()
-        if dec in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
+        if dec in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE", "BLOCKED"):
             ids = val.get("ids") or val.get("IDS") or []
             if isinstance(ids, str):
                 ids = [i.strip() for i in ids.split(",") if i.strip()]
@@ -1538,19 +1553,31 @@ def _parse_experience_check_dict_or_str(val: Any) -> dict[str, Any] | None:
     if not isinstance(val, str):
         return None
     raw = val.strip()
-    m = re.match(r"(?im)^\s*EXPERIENCE_CHECK\s*=\s*(USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE)\b(.*)$", raw)
-    if not m:
+    if not re.match(r"(?i)^\s*EXPERIENCE_CHECK\s*=", raw):
         return None
+    directives = list(re.finditer(r"(?i)\bEXPERIENCE_CHECK\s*=", raw))
+    if len(directives) != 1:
+        return {"decision": "INVALID", "reason": "REPEATED_EXPERIENCE_CHECK_DIRECTIVE"}
+    m = re.match(r"(?im)^\s*EXPERIENCE_CHECK\s*=\s*(USE_ACTIVE_EXPERIENCE|NO_MATCH|UNAVAILABLE|BLOCKED)\b(.*)$", raw)
+    if not m:
+        return {"decision": "INVALID", "raw": raw}
     dec, rest = m.group(1).upper(), m.group(2).strip()
     if dec == "USE_ACTIVE_EXPERIENCE":
-        im = re.search(r"IDS?\s*=\s*([^|;\n]+)", rest)
-        ids = [i.strip() for i in im.group(1).split(",") if i.strip()] if im else []
+        id_fields = list(re.finditer(r"(?i)\bIDS?\s*=\s*([^|;\n]*)", rest))
+        if len(id_fields) != 1:
+            return {"decision": "INVALID", "reason": "IDS_FIELD_DUPLICATED_OR_MISSING"}
+        ids_value = id_fields[0].group(1).strip()
+        if not ids_value:
+            return {"decision": "INVALID", "reason": "IDS_VALUE_MISSING"}
+        ids = [i.strip() for i in ids_value.split(",") if i.strip()]
+        if not ids:
+            return {"decision": "INVALID", "reason": "IDS_VALUE_MISSING"}
         return {"decision": "USE_ACTIVE_EXPERIENCE", "ids": ids}
     elif dec == "NO_MATCH":
         return {"decision": "NO_MATCH", "ids": []}
-    elif dec == "UNAVAILABLE":
+    elif dec in ("UNAVAILABLE", "BLOCKED"):
         rm = re.search(r"REASON\s*=\s*([^|;\n]+)", rest)
-        return {"decision": "UNAVAILABLE", "reason": rm.group(1).strip() if rm else "UNAVAILABLE", "ids": []}
+        return {"decision": dec, "reason": rm.group(1).strip() if rm else dec, "ids": []}
     return {"decision": "INVALID", "raw": raw}
 
 
@@ -1628,12 +1655,14 @@ def _extract_executor_receipts(
             narrative_ec_list.append(parsed)
 
     narrative_ec: dict[str, Any] | None = None
-    if narrative_ec_list:
-        first_ec = narrative_ec_list[0]
-        if any(e != first_ec for e in narrative_ec_list):
-            narrative_ec = {"decision": "CONTRADICTORY", "count": len(narrative_ec_list)}
-        else:
-            narrative_ec = first_ec
+    if len(narrative_ec_list) > 1:
+        narrative_ec = {
+            "decision": "CONTRADICTORY",
+            "reason": "REPEATED_EXPERIENCE_CHECK_DIRECTIVE",
+            "count": len(narrative_ec_list),
+        }
+    elif narrative_ec_list:
+        narrative_ec = narrative_ec_list[0]
 
     payload_ec = _parse_experience_check_dict_or_str(payload.get("EXPERIENCE_CHECK"))
 
@@ -1692,6 +1721,65 @@ def _extract_executor_receipts(
             learning = payload_lr
 
     return law_check, experience_check, learning
+
+
+def _validate_executor_receipts(
+    law_check: Mapping[str, Any] | None,
+    experience_check: Mapping[str, Any] | None,
+    *,
+    expected_law_sha: str | None = None,
+    expected_experience_ids: Sequence[str] = (),
+) -> tuple[list[str], bool]:
+    """Apply the existing actor-receipt semantics to terminal and canary returns."""
+
+    blockers: list[str] = []
+    law_blocked = False
+    lc = law_check if isinstance(law_check, Mapping) else {"status": "MISSING"}
+    law_status = str(lc.get("status") or "MISSING").upper()
+    if law_status == "MISSING":
+        blockers.append("EXECUTOR_LAW_CHECK_MISSING")
+    elif law_status == "CONTRADICTORY":
+        blockers.append("EXECUTOR_LAW_CHECK_CONTRADICTORY")
+    elif law_status == "INVALID":
+        blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+    elif law_status == "BLOCKED":
+        blockers.append("EXECUTOR_LAW_CHECK_BLOCKED")
+        law_blocked = True
+    elif law_status == "PASS":
+        source = str(lc.get("source") or "").strip()
+        actual_sha = str(lc.get("source_sha256") or "").lower()
+        if not source or re.fullmatch(r"[0-9a-f]{64}", actual_sha) is None:
+            blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+        elif expected_law_sha and actual_sha != str(expected_law_sha).lower():
+            blockers.append("EXECUTOR_LAW_HASH_MISMATCH")
+    else:
+        blockers.append("EXECUTOR_LAW_CHECK_INVALID")
+
+    if law_blocked:
+        return list(dict.fromkeys(blockers)), law_blocked
+
+    ec = experience_check if isinstance(experience_check, Mapping) else {"decision": "MISSING"}
+    decision = str(ec.get("decision") or "MISSING").upper()
+    if decision == "MISSING":
+        blockers.append("EXPERIENCE_CHECK_MISSING")
+    elif decision == "CONTRADICTORY":
+        blockers.append("EXPERIENCE_CHECK_CONTRADICTORY")
+    elif decision == "BLOCKED":
+        blockers.append("EXPERIENCE_CHECK_BLOCKED")
+    elif decision == "INVALID":
+        blockers.append("EXPERIENCE_CHECK_INVALID")
+    elif decision not in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
+        blockers.append("EXPERIENCE_CHECK_INVALID")
+    elif decision == "USE_ACTIVE_EXPERIENCE":
+        reported = {str(item).strip() for item in (ec.get("ids") or []) if str(item).strip()}
+        if not reported:
+            blockers.append("EXPERIENCE_CHECK_INVALID")
+        elif expected_experience_ids and not (reported & {str(item) for item in expected_experience_ids}):
+            blockers.append("EXPERIENCE_CHECK_IDS_MISMATCH")
+    elif decision == "NO_MATCH" and expected_experience_ids:
+        blockers.append("EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION")
+
+    return list(dict.fromkeys(blockers)), law_blocked
 
 
 def parse_return_packet(final_response: str) -> ControlTowerReturnPacket:
@@ -2007,66 +2095,26 @@ class ControlTowerState:
         effective_expected_law_sha = expected_law_sha or session_rec.get("EXPECTED_LAW_SHA")
         effective_expected_exp_ids = list(expected_experience_ids) or session_rec.get("EXPECTED_EXPERIENCE_IDS", [])
 
-        # Ingest-level enforcement of actor-own LAW_CHECK receipt
-        is_law_blocked = False
-        if packet.law_check is not None:
-            lc = packet.law_check
-            lc_status = lc.get("status")
-            if lc_status == "MISSING":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXECUTOR_LAW_CHECK_MISSING")
-                next_action = "Supply valid actor-own LAW_CHECK receipt before reconciliation."
-            elif lc_status == "CONTRADICTORY":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXECUTOR_LAW_CHECK_CONTRADICTORY")
-                next_action = "Resolve contradictory executor LAW_CHECK receipts before reconciliation."
-            elif lc_status == "INVALID":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXECUTOR_LAW_CHECK_INVALID")
-                next_action = "Provide valid SOURCE and SOURCE_SHA256 in actor-own LAW_CHECK receipt."
-            elif lc_status == "BLOCKED":
-                is_law_blocked = True
+        receipt_blockers, is_law_blocked = _validate_executor_receipts(
+            packet.law_check,
+            packet.experience_check,
+            expected_law_sha=effective_expected_law_sha,
+            expected_experience_ids=effective_expected_exp_ids,
+        )
+        # Preserve the direct-packet API's historical optional-receipt behavior;
+        # parsed executor responses carry explicit MISSING mappings and are enforced.
+        if packet.law_check is None:
+            receipt_blockers = [item for item in receipt_blockers if not item.startswith("EXECUTOR_LAW_")]
+        if packet.experience_check is None:
+            receipt_blockers = [item for item in receipt_blockers if not item.startswith("EXPERIENCE_CHECK_")]
+        if receipt_blockers:
+            if is_law_blocked:
                 if status not in ("BLOCKED", "FAILED"):
                     status = "BLOCKED"
-                blockers.append("EXECUTOR_LAW_CHECK_BLOCKED")
-                next_action = "Investigate executor law check blockage before proceeding."
-            elif lc_status == "PASS":
-                if effective_expected_law_sha:
-                    actual_sha = str(lc.get("source_sha256") or "").lower()
-                    if actual_sha != effective_expected_law_sha.lower():
-                        status = "RECONCILIATION_REQUIRED"
-                        blockers.append("EXECUTOR_LAW_HASH_MISMATCH")
-                        next_action = "Executor LAW_CHECK SHA does not match expected session law SHA."
-
-        # Ingest-level enforcement of EXPERIENCE_CHECK receipt (Blocker 4)
-        if not is_law_blocked and packet.experience_check is not None:
-            ec = packet.experience_check
-            ec_decision = ec.get("decision")
-            if ec_decision == "MISSING":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXPERIENCE_CHECK_MISSING")
-                next_action = "Supply valid EXPERIENCE_CHECK receipt before reconciliation."
-            elif ec_decision == "CONTRADICTORY":
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXPERIENCE_CHECK_CONTRADICTORY")
-                next_action = "Resolve contradictory EXPERIENCE_CHECK receipts before reconciliation."
-            elif ec_decision not in ("USE_ACTIVE_EXPERIENCE", "NO_MATCH", "UNAVAILABLE"):
-                status = "RECONCILIATION_REQUIRED"
-                blockers.append("EXPERIENCE_CHECK_INVALID")
-                next_action = "Provide valid decision (USE_ACTIVE_EXPERIENCE, NO_MATCH, UNAVAILABLE) in EXPERIENCE_CHECK receipt."
             else:
-                if effective_expected_exp_ids:
-                    expected_set = set(effective_expected_exp_ids)
-                    if ec_decision == "NO_MATCH":
-                        status = "RECONCILIATION_REQUIRED"
-                        blockers.append("EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION")
-                        next_action = "Executor reported NO_MATCH but active experience was expected for this session."
-                    elif ec_decision == "USE_ACTIVE_EXPERIENCE":
-                        reported_ids = set(ec.get("ids") or [])
-                        if not (reported_ids & expected_set):
-                            status = "RECONCILIATION_REQUIRED"
-                            blockers.append("EXPERIENCE_CHECK_IDS_MISMATCH")
-                            next_action = f"Executor reported EXPERIENCE_CHECK IDs {reported_ids} do not include any expected active experience IDs {expected_set}."
+                status = "RECONCILIATION_REQUIRED"
+            blockers.extend(receipt_blockers)
+            next_action = "Resolve actor-own LAW_CHECK and EXPERIENCE_CHECK receipts before reconciliation."
 
         # Ingest-level enforcement of LEARNING_RECONCILIATION (Blocker 5)
         # Every terminal substantive task must provide LEARNING_RECONCILIATION=NONE or CANDIDATE
@@ -2285,6 +2333,244 @@ def canary_session_quality(
     return CANARY_SESSION_QUALITY_UNKNOWN
 
 
+def _arena_chat_title(binding: SessionBinding, project_identity: str | None = None) -> str:
+    """Build a concise title from the durable project/workstream and bounded goal."""
+
+    workstream = re.sub(
+        r"[-_]+",
+        " ",
+        str(project_identity or binding.goal_id or "").strip(),
+    )
+    workstream = re.sub(r"\s+", " ", workstream).strip()
+    goal = re.sub(r"\s+", " ", str(binding.goal or "").strip())
+    if not goal:
+        goal = workstream or "Arena workstream"
+    if len(goal) > 78:
+        shortened = goal[:75].rsplit(" ", 1)[0].rstrip(" ,;:-")
+        goal = (shortened or goal[:75].rstrip()) + "…"
+    title = f"{workstream} — {goal}" if workstream and workstream.upper() != "UNKNOWN" else goal
+    return title[:120].rstrip()
+
+
+def _checkpoint_text(value: Any, field_name: str, *, max_length: int = 1024) -> str:
+    """Normalize one compact prompt field without inventing or truncating state."""
+
+    if not isinstance(value, str):
+        raise BindingError(f"ARENA_CHECKPOINT_FIELD_INVALID:{field_name}")
+    text = re.sub(r"\s+", " ", value).strip()
+    if not text or len(text) > max_length:
+        raise BindingError(f"ARENA_CHECKPOINT_FIELD_INVALID:{field_name}")
+    return text
+
+
+def _arena_prompt_checkpoint(
+    binding: SessionBinding,
+    task_prompt: str,
+    task_id: str,
+    acceptance_criteria: Sequence[str],
+    *,
+    plan: Any = None,
+    task_record: Any = None,
+    session_checkpoint: str | None = None,
+) -> dict[str, str]:
+    """Project current durable plan/task state into a bounded Arena handoff."""
+
+    session_checkpoint_text = (
+        _checkpoint_text(session_checkpoint, "session_checkpoint", max_length=1024)
+        if session_checkpoint is not None
+        else None
+    )
+    session_gate = "NONE_RECORDED"
+    if session_checkpoint_text:
+        session_checkpoint_upper = session_checkpoint_text.upper()
+        if "OWNER_CONTINUATION=BLOCKED_UNTIL_GREEN" in session_checkpoint_upper:
+            session_gate = "OWNER_CONTINUATION=BLOCKED_UNTIL_GREEN"
+        elif "OWNER_CONTINUATION=PENDING" in session_checkpoint_upper:
+            session_gate = "OWNER_CONTINUATION=PENDING"
+
+    if plan is None:
+        project = binding.goal_id
+        if project.strip().upper() in {"", UNKNOWN} and task_id.strip().upper() not in {"", UNKNOWN}:
+            project = task_id
+        if str(project).strip().upper() in {"", UNKNOWN}:
+            project = "NONE_RECORDED"
+        session_task = task_id if task_id.strip().upper() not in {"", UNKNOWN} else "NONE_RECORDED"
+        session_goal = binding.goal_id if binding.goal_id.strip().upper() not in {"", UNKNOWN} else "NONE_RECORDED"
+        return {
+            "project": _checkpoint_text(project, "project", max_length=1024),
+            "plan_reference": "NO_FORMAL_PLAN",
+            "already_completed": "NONE_RECORDED",
+            "current_checkpoint": _checkpoint_text(
+                session_checkpoint_text
+                or f"SESSION_START; SESSION_ID={binding.session_id}; GOAL_ID={session_goal}; "
+                f"TASK_ID={session_task}; EXECUTION_PROGRESS=NONE_RECORDED",
+                "current_checkpoint",
+                max_length=1024,
+            ),
+            "blocker_or_owner_gate": session_gate,
+            "next_bounded_step": (
+                "Wait for explicit Owner continuation before resuming the recorded task."
+                if session_gate == "OWNER_CONTINUATION=PENDING"
+                else "Wait for the external GREEN grade before requesting Owner continuation."
+                if session_gate == "OWNER_CONTINUATION=BLOCKED_UNTIL_GREEN"
+                else "Take the first safe bounded step from the recorded TASK above; no narrower step is recorded."
+            ),
+        }
+
+    if getattr(plan, "plan_lifecycle", None) != "ACTIVE":
+        raise ProjectionError("ARENA_TASK_PLAN_NOT_ACTIVE")
+    if str(getattr(plan, "goal_id", "")) != binding.goal_id:
+        raise ProjectionError("ARENA_TASK_PLAN_GOAL_MISMATCH")
+    if task_record is None:
+        task_map = getattr(plan, "tasks", None)
+        normalized_task_id = task_id.strip().lower()
+        if not isinstance(task_map, Mapping):
+            raise ProjectionError("ARENA_TASK_PLAN_TASKS_INVALID")
+        task_record = task_map.get(normalized_task_id)
+        if task_record is None and task_id.strip().upper() in {"", UNKNOWN}:
+            try:
+                from .task_state import next_safe_task
+
+                task_record = next_safe_task(plan)
+            except Exception as exc:
+                raise ProjectionError(f"ARENA_TASK_SELECTION_FAILED:{exc}") from exc
+    if task_record is None:
+        raise ProjectionError("ARENA_TASK_RECORD_NOT_FOUND")
+    if getattr(task_record, "goal_id", None) != binding.goal_id:
+        raise ProjectionError("ARENA_TASK_RECORD_GOAL_MISMATCH")
+
+    identity = getattr(plan, "plan_identity", None)
+    if identity is not None:
+        identity_values = [
+            str(getattr(identity, field, "") or "").strip()
+            for field in ("repository", "workstream", "subject")
+        ]
+        identity_values = [
+            "NONE_RECORDED" if value.upper() in {"", UNKNOWN, "NONE_RECORDED"} else value
+            for value in identity_values
+        ]
+        repository, workstream, subject = identity_values
+        project = f"{repository} / {workstream}"
+        identity_parts = [repository, workstream, subject]
+        identity_pr = str(getattr(identity, "pr", "") or "").strip()
+        if identity_pr and identity_pr.upper() not in {UNKNOWN, "NONE_RECORDED"}:
+            identity_parts.append(f"PR {identity_pr}")
+        plan_identity_ref = " / ".join(identity_parts)
+    else:
+        workstream = next(
+            (
+                str(scope_ref).split(":", 1)[1].strip()
+                for scope_ref in getattr(task_record, "scope", ())
+                if str(scope_ref).startswith("WORKSTREAM:")
+                and str(scope_ref).split(":", 1)[1].strip().upper() not in {UNKNOWN, "NONE_RECORDED"}
+            ),
+            str(getattr(task_record, "task_id", "")),
+        )
+        if workstream.strip().upper() in {"", UNKNOWN, "NONE_RECORDED"}:
+            workstream = "NONE_RECORDED"
+        plan_goal_id = str(getattr(plan, "goal_id", "") or "").strip()
+        if plan_goal_id.upper() in {"", UNKNOWN, "NONE_RECORDED"}:
+            plan_goal_id = "NONE_RECORDED"
+        project = f"{plan_goal_id} / {workstream}"
+        plan_identity_ref = f"goal {plan_goal_id}"
+    plan_hash = plan.canonical_hash()
+    plan_reference = (
+        f".p2p/state/task-state.json#{plan_identity_ref}; plan_hash={plan_hash}"
+    )
+
+    completed_ids = [
+        str(item_id)
+        for item_id, item in getattr(plan, "tasks", {}).items()
+        if getattr(item, "status", None) == "DONE"
+    ]
+    completed = ", ".join(completed_ids) if completed_ids else "NONE_RECORDED"
+
+    checkpoint = getattr(task_record, "checkpoint", None)
+    checkpoint = checkpoint if isinstance(checkpoint, Mapping) else {}
+    checkpoint_ref = str(checkpoint.get("checkpoint_ref") or "NONE_RECORDED")
+    recovery = str(checkpoint.get("recovery_classification") or "NONE_RECORDED")
+    current = (
+        f"TASK_ID={task_record.task_id}; STATUS={task_record.status}; TITLE={task_record.title}; "
+        f"CHECKPOINT_REF={checkpoint_ref}; RECOVERY={recovery}"
+    )
+    if session_checkpoint_text:
+        current += f"; SESSION_CHECKPOINT={session_checkpoint_text}"
+
+    blocker_parts: list[str] = []
+    if session_gate != "NONE_RECORDED":
+        blocker_parts.append(session_gate)
+    blocker = getattr(task_record, "blocker", None)
+    if isinstance(blocker, Mapping):
+        reason = blocker.get("reason")
+        blocker_reason = (
+            reason
+            if isinstance(reason, str) and reason.strip() and reason.strip().upper() not in {UNKNOWN, "NONE_RECORDED"}
+            else task_record.status
+        )
+        blocker_parts.append(f"BLOCKER={blocker_reason}")
+    owner_decision = getattr(task_record, "owner_decision", None)
+    if isinstance(owner_decision, Mapping) and str(owner_decision.get("status") or "").upper() == "PENDING":
+        question = owner_decision.get("question")
+        blocker_parts.append(
+            "OWNER_GATE=PENDING" + (f": {question}" if isinstance(question, str) and question.strip() else "")
+        )
+    if not blocker_parts and str(task_record.status) == "BLOCKED":
+        blocker_parts.append("BLOCKER=BLOCKED_WITHOUT_REASON")
+    blocker_value = "; ".join(blocker_parts) if blocker_parts else "NONE_RECORDED"
+
+    next_step = checkpoint.get("next_safe_step")
+    if (
+        not isinstance(next_step, str)
+        or not next_step.strip()
+        or next_step.strip().upper() in {UNKNOWN, "NONE_RECORDED"}
+    ):
+        if blocker_parts:
+            next_step = "Resolve the recorded blocker or Owner Gate before executing this task."
+        else:
+            first_acceptance = next(iter(getattr(task_record, "acceptance_requirements", ())), None)
+            next_step = f"Work on {task_record.task_id}: {task_record.title} within its recorded scope."
+            if first_acceptance:
+                next_step += f" Verify: {first_acceptance}"
+
+    return {
+        "project": _checkpoint_text(project, "project", max_length=1024),
+        "plan_reference": _checkpoint_text(plan_reference, "plan_reference", max_length=2048),
+        "already_completed": _checkpoint_text(completed, "already_completed", max_length=2048),
+        "current_checkpoint": _checkpoint_text(current, "current_checkpoint", max_length=2048),
+        "blocker_or_owner_gate": _checkpoint_text(blocker_value, "blocker_or_owner_gate", max_length=2048),
+        "next_bounded_step": _checkpoint_text(next_step, "next_bounded_step", max_length=2048),
+    }
+
+
+def _load_arena_prompt_checkpoint(
+    root: str | Path,
+    binding: SessionBinding,
+    task_prompt: str,
+    task_id: str,
+    acceptance_criteria: Sequence[str],
+    *,
+    session_checkpoint: str | None = None,
+) -> dict[str, str]:
+    """Read the existing task-state store; unreadable formal state fails closed."""
+
+    try:
+        from .task_state import TaskStateStore
+    except ImportError as exc:
+        raise ProjectionError("TASK_STATE_SURFACE_UNAVAILABLE") from exc
+    try:
+        plan = TaskStateStore(root).load()
+    except Exception as exc:
+        raise ProjectionError(f"TASK_STATE_UNREADABLE:{exc}") from exc
+    return _arena_prompt_checkpoint(
+        binding,
+        task_prompt,
+        task_id,
+        acceptance_criteria,
+        plan=plan,
+        session_checkpoint=session_checkpoint,
+    )
+
+
 def _session_recommendation(
     binding: SessionBinding,
     *,
@@ -2297,7 +2583,22 @@ def _session_recommendation(
     task_id: str = UNKNOWN,
     canary_directive: CanaryDirective | None = None,
     max_prompt_chars: int | None = None,
+    arena_prompt_checkpoint: Mapping[str, str] | None = None,
+    chat_mode: str = "NEW_CHAT",
+    chat_title_override: str | None = None,
 ) -> dict[str, Any]:
+    project_identity = (
+        arena_prompt_checkpoint.get("project")
+        if isinstance(arena_prompt_checkpoint, Mapping)
+        else None
+    )
+    chat_title = (
+        _checkpoint_text(chat_title_override, "chat_title", max_length=120)
+        if binding.host == "ARENA" and chat_title_override is not None
+        else _arena_chat_title(binding, project_identity)
+        if binding.host == "ARENA"
+        else None
+    )
     prompt = build_execution_prompt(
         binding,
         task_prompt or binding.goal,
@@ -2308,9 +2609,13 @@ def _session_recommendation(
         acceptance_criteria=acceptance_criteria,
         canary_directive=canary_directive,
         max_prompt_chars=max_prompt_chars,
+        task_id=task_id,
+        arena_prompt_checkpoint=arena_prompt_checkpoint,
+        chat_mode=chat_mode,
+        chat_title_override=chat_title,
     )
     recommendation = {
-        "CHAT_NAME": f"{binding.host} — {binding.goal_id} — {binding.goal}",
+        "CHAT_NAME": chat_title or f"{binding.host} — {binding.goal_id} — {binding.goal}",
         "HOST": binding.host,
         "SESSION_ID": binding.session_id,
         "GOAL_ID": binding.goal_id,
@@ -2318,6 +2623,8 @@ def _session_recommendation(
         "PROMPT": prompt,
         "PACKET_IS_CANONICAL_TRUTH": "NO",
     }
+    if chat_title is not None:
+        recommendation["CHAT_TITLE"] = chat_title
     if canary_directive is not None:
         recommendation["CANARY"] = canary_directive.to_dict()
         recommendation["FAST_CANARY_REQUIRED"] = "YES"
@@ -2758,19 +3065,108 @@ class ControlTower:
                 raise BindingError("SESSION_ID_ALREADY_BOUND_TO_DIFFERENT_SESSION")
             if existing.get("SESSION_STATE") != "ACTIVE":
                 raise BindingError("SESSION_ID_ALREADY_HAS_TERMINAL_RESULT")
+
+        existing_continuation = existing.get("CANARY_CONTINUATION") if isinstance(existing, Mapping) else None
+        effective_directive = canary_directive
+        if effective_directive is None and isinstance(existing, Mapping) and not isinstance(existing_continuation, Mapping):
+            recorded_canary = existing.get("CANARY")
+            if isinstance(recorded_canary, Mapping) and recorded_canary.get("FAST_CANARY_REQUIRED") == "YES":
+                effective_directive = CanaryDirective.from_mapping(recorded_canary)
+        effective_task_id = task_id
+        if effective_task_id.strip().upper() in {"", UNKNOWN} and effective_directive is not None:
+            effective_task_id = effective_directive.task_id
+        if effective_task_id.strip().upper() in {"", UNKNOWN} and isinstance(existing, Mapping):
+            effective_task_id = str(existing.get("TASK_ID") or UNKNOWN)
+        recorded_original_task = (
+            existing_continuation.get("ORIGINAL_TASK")
+            if isinstance(existing_continuation, Mapping)
+            else None
+        )
+        prompt_task = task_prompt or (
+            effective_directive.original_task
+            if effective_directive is not None
+            else recorded_original_task or binding.goal
+        )
+        prompt_criteria = criteria or tuple(existing.get("ACCEPTANCE_CRITERIA") or ()) if isinstance(existing, Mapping) else criteria
+        chat_mode = "SAME_CHAT" if isinstance(existing_continuation, Mapping) else "NEW_CHAT"
+        chat_title_override = None
+        if chat_mode == "SAME_CHAT" and isinstance(existing, Mapping):
+            previous_recommendation = existing.get("RECOMMENDED_NEW_CHAT")
+            if isinstance(previous_recommendation, Mapping):
+                previous_title = previous_recommendation.get("CHAT_TITLE")
+                if isinstance(previous_title, str):
+                    chat_title_override = previous_title
+        session_checkpoint = None
+        if isinstance(existing, Mapping):
+            if isinstance(existing_continuation, Mapping):
+                session_checkpoint = (
+                    f"SESSION_ID={binding.session_id}; TASK_ID={effective_task_id}; "
+                    "CANARY_GRADE=GREEN; OWNER_CONTINUATION=YES; EXECUTION_PROGRESS=NOT_RECORDED"
+                )
+            else:
+                existing_grade = existing.get("CANARY_GRADE")
+                if isinstance(existing_grade, Mapping):
+                    classification = str(existing_grade.get("CLASSIFICATION") or "UNVERIFIED").upper()
+                    owner_gate = "PENDING" if classification == "GREEN" else "BLOCKED_UNTIL_GREEN"
+                    session_checkpoint = (
+                        f"SESSION_ID={binding.session_id}; TASK_ID={effective_task_id}; "
+                        f"CANARY_GRADE={classification}; OWNER_CONTINUATION={owner_gate}"
+                    )
+                elif isinstance(existing.get("CANARY"), Mapping) and existing["CANARY"].get("FAST_CANARY_REQUIRED") == "YES":
+                    session_checkpoint = (
+                        f"SESSION_ID={binding.session_id}; TASK_ID={effective_task_id}; "
+                        "CANARY_GRADE=AWAITING_EXTERNAL_GRADE; "
+                        "OWNER_CONTINUATION=BLOCKED_UNTIL_GREEN"
+                    )
+                else:
+                    session_checkpoint = (
+                        f"SESSION_ID={binding.session_id}; TASK_ID={effective_task_id}; "
+                        "SESSION_STATE=ACTIVE; EXECUTION_PROGRESS=NONE_RECORDED"
+                    )
+        arena_checkpoint = None
+        if binding.host == "ARENA":
+            arena_checkpoint = _load_arena_prompt_checkpoint(
+                self.root,
+                binding,
+                prompt_task,
+                effective_task_id,
+                prompt_criteria,
+                session_checkpoint=session_checkpoint,
+            )
+
+        if existing is not None:
             recommendation = existing.get("RECOMMENDED_NEW_CHAT")
-            if not isinstance(recommendation, Mapping):
+            if binding.host == "ARENA" or not isinstance(recommendation, Mapping):
                 recommendation = _session_recommendation(
                     binding,
-                    task_prompt=task_prompt,
+                    task_prompt=prompt_task,
                     worktree=worktree,
                     branch=branch,
                     canonical_base_sha=canonical_base_sha,
                     canonical_base_tree=canonical_base_tree,
-                    acceptance_criteria=criteria,
-                    task_id=task_id,
-                    canary_directive=canary_directive,
+                    acceptance_criteria=prompt_criteria,
+                    task_id=effective_task_id,
+                    canary_directive=effective_directive,
+                    arena_prompt_checkpoint=arena_checkpoint,
+                    chat_mode=chat_mode,
+                    chat_title_override=chat_title_override,
                 )
+                if isinstance(existing_continuation, Mapping):
+                    existing_grade = existing.get("CANARY_GRADE") if isinstance(existing, Mapping) else None
+                    classification = (
+                        str(existing_grade.get("CLASSIFICATION") or "UNVERIFIED").upper()
+                        if isinstance(existing_grade, Mapping)
+                        else "UNVERIFIED"
+                    )
+                    recommendation.update(
+                        {
+                            "CANARY_REPEAT": "NO",
+                            "CONTINUATION_MODE": "RESUME_ORIGINAL_TASK_IN_SAME_SESSION",
+                            "CANARY_CLASSIFICATION": classification,
+                            "SESSION_POLICY": CANARY_SESSION_POLICIES.get(classification, "NO_DEFAULT_CONTINUATION"),
+                            "ORIGINAL_TASK_SOURCE": "CONTROL_TOWER_DURABLE_STATE",
+                        }
+                    )
             return {
                 "status": "PASS",
                 "idempotent": True,
@@ -2781,14 +3177,16 @@ class ControlTower:
             }
         recommendation = _session_recommendation(
             binding,
-            task_prompt=task_prompt,
+            task_prompt=prompt_task,
             worktree=worktree,
             branch=branch,
             canonical_base_sha=canonical_base_sha,
             canonical_base_tree=canonical_base_tree,
             acceptance_criteria=criteria,
-            task_id=task_id,
-            canary_directive=canary_directive,
+            task_id=effective_task_id,
+            canary_directive=effective_directive,
+            arena_prompt_checkpoint=arena_checkpoint,
+            chat_mode=chat_mode,
         )
         event = {
             "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
@@ -2903,6 +3301,20 @@ class ControlTower:
         record = state.session_records.get(str(session_id or ""))
         if not isinstance(record, Mapping):
             raise BindingError("SESSION_ID_NOT_REGISTERED_IN_CONTROL_TOWER_LEDGER")
+        law_check, experience_check, _ = _extract_executor_receipts(text, {})
+        effective_expected_law_sha = record.get("EXPECTED_LAW_SHA")
+        effective_expected_exp_ids = record.get("EXPECTED_EXPERIENCE_IDS")
+        receipt_blockers, _ = _validate_executor_receipts(
+            law_check,
+            experience_check,
+            expected_law_sha=(effective_expected_law_sha if isinstance(effective_expected_law_sha, str) else None),
+            expected_experience_ids=(effective_expected_exp_ids if isinstance(effective_expected_exp_ids, list) else ()),
+        )
+        if not isinstance(effective_expected_law_sha, str) or re.fullmatch(r"[0-9a-fA-F]{64}", effective_expected_law_sha) is None:
+            receipt_blockers.append("SESSION_EXPECTED_LAW_SHA_MISSING_OR_INVALID")
+        if not isinstance(effective_expected_exp_ids, list):
+            receipt_blockers.append("SESSION_EXPECTED_EXPERIENCE_IDS_MISSING_OR_INVALID")
+        receipt_blockers = list(dict.fromkeys(receipt_blockers))
         canary = record.get("CANARY")
         if not isinstance(canary, Mapping) or canary.get("FAST_CANARY_REQUIRED") != "YES":
             raise BindingError("CANARY_EVIDENCE_REQUIRES_TRIGGERED_CANARY_SESSION")
@@ -2923,7 +3335,13 @@ class ControlTower:
         )
         fingerprint = hashlib.sha256(
             json.dumps(
-                {"FIELDS": fields, "CHECKPOINT": checkpoint, "EXECUTOR_RETURN_PACKET": packet_summary},
+                {
+                    "FIELDS": fields,
+                    "CHECKPOINT": checkpoint,
+                    "EXECUTOR_RETURN_PACKET": packet_summary,
+                    "LAW_CHECK": law_check,
+                    "EXPERIENCE_CHECK": experience_check,
+                },
                 ensure_ascii=False,
                 sort_keys=True,
                 separators=(",", ":"),
@@ -2952,6 +3370,17 @@ class ControlTower:
             )
             raise BindingError(f"CANARY_SESSION_ALREADY_GRADED:{classification}:{required}")
         grade = classify_canary_evidence(evidence, return_packet=packet, response_text=text)
+        if receipt_blockers:
+            grade = dict(grade)
+            if grade.get("CLASSIFICATION") != "RED":
+                grade["CLASSIFICATION"] = "UNVERIFIED"
+                grade["SESSION_POLICY"] = CANARY_SESSION_POLICIES["UNVERIFIED"]
+                grade["CONTINUATION_RECOMMENDATION"] = CANARY_CONTINUATION_RECOMMENDATIONS["UNVERIFIED"]
+                grade["OWNER_CONTINUATION_REQUIRED"] = "NO"
+            grade["REASONS"] = [
+                *grade.get("REASONS", []),
+                "EXECUTOR_RECEIPT_VALIDATION_FAILED:" + ",".join(receipt_blockers),
+            ]
         event = {
             "schema": CANARY_EVIDENCE_EVENT_SCHEMA,
             "event_type": "CONTROL_TOWER_CANARY_EVIDENCE",
@@ -2959,6 +3388,8 @@ class ControlTower:
             "TASK_ID": str(record.get("TASK_ID") or UNKNOWN),
             "GATE": MODEL_CANARY_GATE_V1,
             "CANARY_EVIDENCE": {name: fields[name] for name in CANARY_EVIDENCE_FIELDS if name in fields} or None,
+            "ACTOR_RECEIPTS": {"LAW_CHECK": law_check, "EXPERIENCE_CHECK": experience_check},
+            "ACTOR_RECEIPT_BLOCKERS": receipt_blockers,
             "CHECKPOINT_METADATA_PRESENT": checkpoint,
             "EXECUTOR_RETURN_PACKET": packet_summary,
             "EVIDENCE_FINGERPRINT": fingerprint,
@@ -3134,9 +3565,48 @@ class ControlTower:
         binding = SessionBinding.from_mapping(binding_mapping)
         original_task = str(canary.get("ORIGINAL_TASK") or record.get("GOAL") or UNKNOWN)
         existing = record.get("CANARY_CONTINUATION")
+        task_id = str(record.get("TASK_ID") or UNKNOWN)
+        acceptance_criteria = tuple(record.get("ACCEPTANCE_CRITERIA") or ())
+        stored_recommendation = record.get("RECOMMENDED_NEW_CHAT")
+        stored_title = (
+            stored_recommendation.get("CHAT_TITLE")
+            if isinstance(stored_recommendation, Mapping)
+            else None
+        )
+        chat_title_override = stored_title if isinstance(stored_title, str) else None
+        arena_checkpoint = None
+        if binding.host == "ARENA":
+            arena_checkpoint = _load_arena_prompt_checkpoint(
+                self.root,
+                binding,
+                original_task,
+                task_id,
+                acceptance_criteria,
+                session_checkpoint=(
+                    f"SESSION_ID={binding.session_id}; TASK_ID={task_id}; "
+                    "CANARY_GRADE=GREEN; OWNER_CONTINUATION=YES; EXECUTION_PROGRESS=NOT_RECORDED"
+                ),
+            )
         if isinstance(existing, Mapping) and existing.get("OWNER_CONTINUATION") == "YES":
             recommendation = record.get("RECOMMENDED_NEW_CHAT")
             if isinstance(recommendation, Mapping):
+                if binding.host == "ARENA":
+                    recommendation = _session_recommendation(
+                        binding,
+                        task_prompt=original_task,
+                        worktree=str(record.get("WORKTREE") or UNKNOWN),
+                        branch=str(record.get("BRANCH") or UNKNOWN),
+                        canonical_base_sha=str(record.get("CANONICAL_BASE_SHA") or UNKNOWN),
+                        canonical_base_tree=str(record.get("CANONICAL_BASE_TREE") or UNKNOWN),
+                        acceptance_criteria=acceptance_criteria,
+                        task_id=task_id,
+                        arena_prompt_checkpoint=arena_checkpoint,
+                        chat_mode="SAME_CHAT",
+                        chat_title_override=chat_title_override,
+                    )
+                    recommendation.update(
+                        {"CANARY_REPEAT": "NO", "CONTINUATION_MODE": "RESUME_ORIGINAL_TASK_IN_SAME_SESSION"}
+                    )
                 return {
                     "status": "PASS",
                     "idempotent": True,
@@ -3154,8 +3624,11 @@ class ControlTower:
             branch=str(record.get("BRANCH") or UNKNOWN),
             canonical_base_sha=str(record.get("CANONICAL_BASE_SHA") or UNKNOWN),
             canonical_base_tree=str(record.get("CANONICAL_BASE_TREE") or UNKNOWN),
-            acceptance_criteria=tuple(record.get("ACCEPTANCE_CRITERIA") or ()),
-            task_id=str(record.get("TASK_ID") or UNKNOWN),
+            acceptance_criteria=acceptance_criteria,
+            task_id=task_id,
+            arena_prompt_checkpoint=arena_checkpoint,
+            chat_mode="SAME_CHAT" if binding.host == "ARENA" else "NEW_CHAT",
+            chat_title_override=chat_title_override,
         )
         recommendation["CANARY_REPEAT"] = "NO"
         recommendation["CONTINUATION_MODE"] = "RESUME_ORIGINAL_TASK_IN_SAME_SESSION"
@@ -3258,6 +3731,25 @@ class ControlTower:
             existing_binding = record.get("BINDING")
             recommendation = record.get("RECOMMENDED_NEW_CHAT")
             if isinstance(existing_binding, Mapping) and isinstance(recommendation, Mapping):
+                if normalized_host == "ARENA":
+                    existing_session = SessionBinding.from_mapping(existing_binding)
+                    arena_checkpoint = _arena_prompt_checkpoint(
+                        existing_session,
+                        task.purpose,
+                        task.task_id,
+                        task.acceptance_requirements,
+                        plan=plan,
+                        task_record=task,
+                    )
+                    recommendation = _session_recommendation(
+                        existing_session,
+                        task_prompt=task.purpose,
+                        worktree=worktree,
+                        branch=branch,
+                        acceptance_criteria=task.acceptance_requirements,
+                        task_id=task.task_id,
+                        arena_prompt_checkpoint=arena_checkpoint,
+                    )
                 return {
                     "status": "PASS",
                     "idempotent": True,
@@ -3281,6 +3773,18 @@ class ControlTower:
             goal_id=plan.goal_id,
             goal=task.purpose,
         )
+        arena_checkpoint = (
+            _arena_prompt_checkpoint(
+                binding,
+                task.purpose,
+                task.task_id,
+                task.acceptance_requirements,
+                plan=plan,
+                task_record=task,
+            )
+            if normalized_host == "ARENA"
+            else None
+        )
         recommendation = _session_recommendation(
             binding,
             task_prompt=task.purpose,
@@ -3288,6 +3792,7 @@ class ControlTower:
             branch=branch,
             acceptance_criteria=task.acceptance_requirements,
             task_id=task.task_id,
+            arena_prompt_checkpoint=arena_checkpoint,
         )
         return {
             "status": "PASS",
@@ -3363,6 +3868,10 @@ def build_execution_prompt(
     acceptance_criteria: Sequence[str] = (),
     canary_directive: CanaryDirective | None = None,
     max_prompt_chars: int | None = None,
+    task_id: str = UNKNOWN,
+    arena_prompt_checkpoint: Mapping[str, str] | None = None,
+    chat_mode: str = "NEW_CHAT",
+    chat_title_override: str | None = None,
 ) -> str:
     """Build a self-contained recursive prompt for one compatible host.
 
@@ -3385,6 +3894,32 @@ def build_execution_prompt(
     tree_value = _hash_or_unknown(canonical_base_tree, "canonical_base_tree")
     criteria = _refs(acceptance_criteria, "acceptance_criteria", max_length=4096)
     canary_turn = canary_directive is not None
+    chat_mode_value = "NEW_CHAT"
+    arena_context: dict[str, str] | None = None
+    if binding.host == "ARENA":
+        chat_mode_value = _text(chat_mode, "chat_mode", max_length=32).upper()
+        if chat_mode_value not in {"NEW_CHAT", "SAME_CHAT"}:
+            raise BindingError("ARENA_CHAT_MODE_INVALID")
+        raw_context = arena_prompt_checkpoint or _arena_prompt_checkpoint(
+            binding,
+            task,
+            task_id,
+            criteria,
+        )
+        required_context_fields = (
+            "project",
+            "plan_reference",
+            "already_completed",
+            "current_checkpoint",
+            "blocker_or_owner_gate",
+            "next_bounded_step",
+        )
+        if not isinstance(raw_context, Mapping) or any(key not in raw_context for key in required_context_fields):
+            raise BindingError("ARENA_PROMPT_CHECKPOINT_INCOMPLETE")
+        arena_context = {
+            key: _checkpoint_text(raw_context[key], key)
+            for key in required_context_fields
+        }
     if canary_turn:
         # ONE first-turn return contract: the canary evidence packet, then STOP.
         # The terminal CONTROL_TOWER_RETURN_PACKET contract belongs to the
@@ -3402,8 +3937,31 @@ def build_execution_prompt(
         criteria_text = "\n".join(f"- {item}" for item in criteria) or "- Return a truthful terminal packet."
         return_rule = "- Finish with one structured CONTROL_TOWER_RETURN_PACKET."
         return_contract_lines = _terminal_return_contract_lines()
+    title_lines: tuple[str, ...] = ()
+    if binding.host == "ARENA":
+        assert arena_context is not None
+        title = (
+            _checkpoint_text(chat_title_override, "chat_title", max_length=120)
+            if chat_title_override is not None
+            else _arena_chat_title(binding, arena_context["project"])
+        )
+        title_lines = (
+            title,
+            "GỬI CHO: ARENA AI",
+            f"PROJECT={arena_context['project']}",
+            f"CHAT_MODE={chat_mode_value}",
+            f"CHAT_TITLE={title}",
+            f"CHAT_NAME={title}",
+            f"PLAN_REFERENCE={arena_context['plan_reference']}",
+            f"ALREADY_COMPLETED={arena_context['already_completed']}",
+            f"CURRENT_CHECKPOINT={arena_context['current_checkpoint']}",
+            f"BLOCKER_OR_OWNER_GATE={arena_context['blocker_or_owner_gate']}",
+            f"NEXT_BOUNDED_STEP={arena_context['next_bounded_step']}",
+            "",
+        )
     prompt = "\n".join(
         (
+            *title_lines,
             f"CONTROL_TOWER_EXECUTION_PROMPT: {CONTROL_TOWER_PROMPT_SCHEMA}",
             "AUTHORITATIVE_SESSION_BINDING:",
             f"SESSION_ID: {binding.session_id}",
@@ -3444,12 +4002,21 @@ def build_execution_prompt(
             USER_ACTION_BLOCK,
         )
     )
-    if canary_directive is not None and max_prompt_chars is not None and len(prompt) > max_prompt_chars:
-        # Required canary context must never be silently truncated or evicted.
-        raise BindingError(
-            "CONTROL_TOWER_CANARY_CONTEXT_DID_NOT_FIT:"
-            f"chars={len(prompt)}:budget={max_prompt_chars}"
-        )
+    prompt_budget = max_prompt_chars
+    if binding.host == "ARENA" and prompt_budget is None:
+        prompt_budget = CANARY_PROMPT_BUDGET_GUARD_CHARS
+    if prompt_budget is not None and len(prompt) > prompt_budget:
+        # Required routing/checkpoint and canary context must never be truncated.
+        if canary_directive is not None:
+            raise BindingError(
+                "CONTROL_TOWER_CANARY_CONTEXT_DID_NOT_FIT:"
+                f"chars={len(prompt)}:budget={prompt_budget}"
+            )
+        if binding.host == "ARENA":
+            raise BindingError(
+                "CONTROL_TOWER_ARENA_ROUTING_CONTEXT_DID_NOT_FIT:"
+                f"chars={len(prompt)}:budget={prompt_budget}"
+            )
     return prompt
 
 

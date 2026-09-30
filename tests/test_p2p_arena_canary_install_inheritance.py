@@ -63,6 +63,9 @@ EVIDENCE_ONLY_RESPONSE = "\n".join(
     (
         "CANARY_EVIDENCE_PACKET_V1",
         "P2P_LAW_SOURCE=.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md",
+        "LAW_CHECK=PASS | SOURCE=.p2p/system/docs/P2P-OPERATIONS-NOTEBOOK.md | SOURCE_SHA256="
+        + hashlib.sha256((REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()).hexdigest(),
+        "EXPERIENCE_CHECK=UNAVAILABLE",
         "CURRENT_STATE=synthetic managed project @ installed release",
         "FACTS=installed Control Tower CLI present; ledger lives in project .p2p/state",
         "DECISIVE_CHECK=python3 .p2p/system/scripts/p2p_control_tower.py snapshot",

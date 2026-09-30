@@ -29,6 +29,7 @@ resumed ORIGINAL task after external GREEN + explicit Owner continuation.
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
 import sys
@@ -52,6 +53,7 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     CanaryDirective,
     ControlTower,
     ControlTowerHandoffError,
+    ProjectionError,
     SessionBinding,
     build_execution_prompt,
     canary_requirement,
@@ -59,9 +61,20 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     create_return_packet,
     parse_canary_evidence_packet,
 )
+from p2p_capabilities.evidence import EvidenceClaim  # noqa: E402
+from p2p_capabilities.task_state import (  # noqa: E402
+    PlanIdentity,
+    TaskPlan,
+    TaskStateStore,
+    complete_task,
+    request_owner_decision,
+)
 
 BASE_SHA = "a" * 40
 BASE_TREE = "b" * 40
+EXPECTED_CANONICAL_LAW_SHA = hashlib.sha256(
+    (REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()
+).hexdigest()
 LEDGER_RELATIVE = Path(".p2p") / "state" / "execution-ledger.jsonl"
 
 # The real bounded task shape observed in the 2026-09-24 blind test.
@@ -89,6 +102,8 @@ CHECKPOINT_TOKENS = (
 )
 CANONICAL_EVIDENCE_KEYS = (
     "P2P_LAW_SOURCE",
+    "LAW_CHECK",
+    "EXPERIENCE_CHECK",
     "CURRENT_STATE",
     "FACTS",
     "DECISIVE_CHECK",
@@ -126,12 +141,19 @@ def canary_evidence_block(
     durable_mutation: str = "NO",
     model_identity: str = "UNKNOWN",
     extra_lines: tuple[str, ...] = (),
+    law_check: str | None = None,
+    experience_check: str | None = None,
 ) -> str:
     """Return exactly the canonical CANARY_EVIDENCE_PACKET_V1 block."""
 
     lines = [
         "CANARY_EVIDENCE_PACKET_V1",
         f"P2P_LAW_SOURCE={law_source}",
+        *([law_check if law_check is not None else (
+            f"LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md | SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+        )] if (law_check is None or law_check) else []),
+        *([experience_check if experience_check is not None else "EXPERIENCE_CHECK=UNAVAILABLE"]
+          if (experience_check is None or experience_check) else []),
         f"CURRENT_STATE={current_state}",
         f"FACTS={facts}",
         f"DECISIVE_CHECK={decisive_check}",
@@ -237,9 +259,39 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             branch="fixture-branch",
             canonical_base_sha=BASE_SHA,
             canonical_base_tree=BASE_TREE,
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(),
             canary_directive=self.directive(session_id),
         )
         return binding
+
+    def start_expected_receipt_canary(
+        self,
+        session_id: str,
+        expected_id: str = "shared-exp-parser-expected",
+    ) -> tuple[SessionBinding, str]:
+        binding = self.binding(session_id)
+        self.tower().start_session(
+            binding,
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(expected_id,),
+            canary_directive=self.directive(session_id),
+        )
+        return binding, expected_id
+
+    def assert_receipt_response_fails_closed(
+        self,
+        session_id: str,
+        response: str,
+        expected_reason: str,
+    ) -> None:
+        binding, _ = self.start_expected_receipt_canary(session_id)
+        result = self.ingest_canary(binding, response)
+        self.assertNotEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+        self.assertTrue(
+            any(expected_reason in reason for reason in result["canary_grade"]["REASONS"]),
+            result["canary_grade"],
+        )
 
     def _run_cli(self, args: list[str], *, expect: int = 0, global_args: tuple[str, ...] = ()) -> str:
         buffer = io.StringIO()
@@ -254,6 +306,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         *,
         host: str = "ARENA",
         goal: str = BLIND_TEST_TASK,
+        goal_id: str = "P2P-CT01-CANARY",
         session_id: str = "s1",
         extra: tuple[str, ...] = (),
     ) -> dict:
@@ -263,7 +316,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
                 "--host",
                 host,
                 "--goal-id",
-                "P2P-CT01-CANARY",
+                goal_id,
                 "--task-id",
                 "TASK-CANARY-1",
                 "--session-id",
@@ -336,6 +389,199 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertIn(BLIND_TEST_TASK, prompt)
         # The original task is preserved for continuation, not dropped.
         self.assertIn("ORIGINAL_REAL_TASK", prompt)
+        self.assertIn("LAW_CHECK=PASS | SOURCE=<actual law source read>", prompt)
+        self.assertIn("EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>", prompt)
+        self.assertIn("EXPERIENCE_CHECK=NO_MATCH", prompt)
+        self.assertIn("EXPERIENCE_CHECK=UNAVAILABLE", prompt)
+
+    def test_t02b_arena_generated_prompt_title_and_recommendation_metadata_match(self) -> None:
+        result = self.start_cli(session_id="title-proof")
+        recommendation = result["recommendation"]
+        prompt = recommendation["PROMPT"]
+        lines = prompt.splitlines()
+        title = next(line for line in lines if line.strip())
+        self.assertEqual(title, lines[0])
+        self.assertEqual(recommendation["CHAT_TITLE"], title)
+        self.assertEqual(recommendation["CHAT_NAME"], title)
+        self.assertEqual("GỬI CHO: ARENA AI", lines[1])
+        self.assertEqual("PROJECT=P2P-CT01-CANARY", lines[2])
+        self.assertEqual("CHAT_MODE=NEW_CHAT", lines[3])
+        self.assertEqual(f"CHAT_TITLE={title}", lines[4])
+        self.assertEqual(f"CHAT_NAME={title}", lines[5])
+        self.assertEqual("NO_FORMAL_PLAN", lines[6].removeprefix("PLAN_REFERENCE="))
+        self.assertEqual("NONE_RECORDED", lines[7].removeprefix("ALREADY_COMPLETED="))
+        self.assertIn("EXECUTION_PROGRESS=NONE_RECORDED", lines[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=NONE_RECORDED", lines[9])
+        self.assertTrue(lines[10].startswith("NEXT_BOUNDED_STEP="))
+        self.assertNotIn("CONTROL_TOWER_EXECUTION_PROMPT:", title)
+        self.assertNotIn("DESTINATION=", title)
+        self.assertFalse(prompt.startswith("GỬI CHO:"))
+
+        codex = self.start_cli(host="CODEX", session_id="codex-title")["recommendation"]
+        self.assertTrue(codex["PROMPT"].splitlines()[0].startswith("CONTROL_TOWER_EXECUTION_PROMPT:"))
+        self.assertNotIn("CHAT_TITLE", codex)
+        self.assertEqual("CODEX — P2P-CT01-CANARY — " + BLIND_TEST_TASK, codex["CHAT_NAME"])
+
+        # Digest captured from the pre-repair non-Arena serializer; the Arena-only
+        # routing/checkpoint change must not alter its bytes.
+        non_arena = SessionBinding(
+            session_id="non-arena-byte-stable",
+            host="CODEX",
+            goal_id="WORKSTREAM-42",
+            goal="Implement deterministic checkpoint routing",
+        )
+        non_arena_prompt = build_execution_prompt(non_arena, "Perform one focused serialization repair.")
+        self.assertEqual(
+            "150b5c88d75c693a2efeabc175c223187a08a8b9627160848a7ee9ead0107653",
+            hashlib.sha256(non_arena_prompt.encode("utf-8")).hexdigest(),
+        )
+
+        unknown_identity = SessionBinding(
+            session_id="unknown-project-identity",
+            host="ARENA",
+            goal_id="UNKNOWN",
+            goal="Record an honest unknown identity checkpoint",
+        )
+        unknown_prompt = build_execution_prompt(unknown_identity, "Do not invent an identity or progress.")
+        self.assertIn("PROJECT=NONE_RECORDED", unknown_prompt)
+        self.assertIn("TASK_ID=NONE_RECORDED; EXECUTION_PROGRESS=NONE_RECORDED", unknown_prompt)
+
+    def test_t02c_available_task_plan_drives_project_and_fresh_checkpoint(self) -> None:
+        now = "2026-09-30T00:00:00+00:00"
+        goal_id = "goal-route-repair"
+        plan = TaskPlan.from_goal(
+            {
+                "goal_id": goal_id,
+                "scope": ["route prompts from existing task state"],
+                "out_of_scope": ["new plan storage"],
+            },
+            [
+                {
+                    "task_id": "foundation",
+                    "title": "Record verified task state",
+                    "purpose": "Prove the existing state can be resumed.",
+                    "scope": ["task-state fixture"],
+                    "acceptance_requirements": ["Current task is bound to the recorded plan."],
+                    "required_evidence": ["foundation-proof"],
+                },
+                {
+                    "task_id": "route-prompt",
+                    "title": "Serialize Arena routing metadata",
+                    "purpose": "Emit the routing and current checkpoint from durable task state.",
+                    "dependencies": ["foundation"],
+                    "scope": ["Control Tower prompt"],
+                    "acceptance_requirements": ["The generated prompt reflects current TaskRecord state."],
+                    "required_evidence": ["route-prompt-proof"],
+                },
+            ],
+            now=now,
+            plan_identity=PlanIdentity(
+                repository="acme/queue-service",
+                workstream="release-readiness",
+                subject="Prompt routing contract",
+                pr="273",
+            ),
+        )
+        plan = plan.refresh_ready(now="2026-09-30T00:01:00+00:00")
+        plan = plan.transition("foundation", "ACTIVE", now="2026-09-30T00:02:00+00:00")
+        evidence = EvidenceClaim(
+            claim="The prerequisite task completed with current evidence.",
+            required_evidence=("foundation-proof",),
+            actual_evidence=(
+                {
+                    "source": "tests/test_p2p_arena_canary_runtime.py",
+                    "evidence_ref": "foundation-proof",
+                    "origin": "RUNTIME_EVIDENCE",
+                    "observed_at": now,
+                    "freshness": "CURRENT",
+                    "scope": ["task-state fixture"],
+                    "source_binding": "focused-test",
+                    "fingerprint": "a" * 64,
+                },
+            ),
+            status="VERIFIED",
+        )
+        plan = complete_task(
+            plan,
+            "foundation",
+            [evidence],
+            {"verified": "yes"},
+            now="2026-09-30T00:03:00+00:00",
+        ).refresh_ready(now="2026-09-30T00:04:00+00:00")
+        TaskStateStore(self.root).initialize(plan, at="2026-09-30T00:04:00+00:00")
+
+        recommendation = self.tower().recommend_next_session(
+            "ARENA",
+            session_id="plan-routing-proof",
+        )["recommendation"]
+        prompt = recommendation["PROMPT"]
+        lines = prompt.splitlines()
+        self.assertTrue(lines[0].startswith("acme/queue service / release readiness —"), lines[0])
+        self.assertEqual(recommendation["CHAT_TITLE"], lines[0])
+        self.assertEqual("acme/queue-service / release-readiness", lines[2].removeprefix("PROJECT="))
+        self.assertIn("Prompt routing contract", lines[6])
+        self.assertIn("plan_hash=", lines[6])
+        self.assertEqual("foundation", lines[7].removeprefix("ALREADY_COMPLETED="))
+        self.assertIn("TASK_ID=route-prompt; STATUS=READY", lines[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=NONE_RECORDED", lines[9])
+        self.assertIn("current TaskRecord state.", lines[10])
+        self.assertNotIn("PROJECT=P2P", lines[2])
+
+    def test_t02d_pending_task_owner_gate_is_serialized_from_task_state(self) -> None:
+        now = "2026-09-30T00:00:00+00:00"
+        goal_id = "goal-owner-gate"
+        plan = TaskPlan.from_goal(
+            {"goal_id": goal_id, "scope": ["WORKSTREAM:owner-gate-routing"]},
+            [
+                {
+                    "task_id": "owner-task",
+                    "title": "Wait for the recorded Owner decision",
+                    "purpose": "Serialize the current Owner gate without bypassing it.",
+                    "scope": ["Control Tower prompt"],
+                    "acceptance_requirements": ["The Owner decision remains pending."],
+                    "required_evidence": ["owner-gate-proof"],
+                }
+            ],
+            now=now,
+        ).refresh_ready(now="2026-09-30T00:01:00+00:00")
+        plan = request_owner_decision(
+            plan,
+            "owner-task",
+            question="May the task resume?",
+            options=("Continue", "Stop"),
+            now="2026-09-30T00:02:00+00:00",
+        )
+        TaskStateStore(self.root).initialize(plan, at="2026-09-30T00:02:00+00:00")
+
+        recommendation = self.tower().start_session(
+            SessionBinding("owner-gate-routing", "ARENA", goal_id, "Owner-gated routing"),
+            task_id="owner-task",
+            task_prompt="Wait for the recorded Owner decision.",
+        )["recommendation"]
+        lines = recommendation["PROMPT"].splitlines()
+        self.assertIn("STATUS=WAITING_OWNER", lines[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=OWNER_GATE=PENDING: May the task resume?", lines[9])
+        self.assertIn("Resolve the recorded blocker or Owner Gate", lines[10])
+
+    def test_t02e_arena_prompt_fails_closed_for_unreadable_plan_and_budget(self) -> None:
+        state_dir = self.root / ".p2p" / "state"
+        state_dir.mkdir(parents=True)
+        (state_dir / "task-state.json").write_text("{broken", encoding="utf-8")
+        with self.assertRaises(ProjectionError):
+            self.tower().start_session(
+                self.binding("unreadable-plan"),
+                task_id="TASK-CANARY-1",
+                task_prompt=BLIND_TEST_TASK,
+            )
+
+        with self.assertRaisesRegex(BindingError, "ARENA_ROUTING_CONTEXT_DID_NOT_FIT"):
+            build_execution_prompt(
+                self.binding("budget-proof"),
+                BLIND_TEST_TASK,
+                max_prompt_chars=100,
+            )
+        with self.assertRaisesRegex(BindingError, "ARENA_ROUTING_CONTEXT_DID_NOT_FIT"):
+            build_execution_prompt(self.binding("default-budget-proof"), "x" * 11500)
 
     # --- T03 stop boundary + one first-turn contract -----------------------
     def test_t03_canary_turn_must_stop_after_one_first_safe_probe(self) -> None:
@@ -515,6 +761,207 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertEqual("RED", red["canary_grade"]["CLASSIFICATION"])
         self.assertIn("CANARY_DURABLE_MUTATION_BOUNDARY_VIOLATED", red["canary_grade"]["REASONS"])
 
+    def test_t05_receipts_fail_closed_for_missing_invalid_contradictory_and_mismatched_inputs(self) -> None:
+        cases = (
+            (
+                "missing",
+                canary_evidence_response(law_check="", experience_check=""),
+                "EXECUTOR_LAW_CHECK_MISSING",
+            ),
+            (
+                "malformed-law-and-experience",
+                canary_evidence_response(
+                    law_check="LAW_CHECK=PASS | SOURCE=notebook.md | SOURCE_SHA256=bad",
+                    experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=",
+                ),
+                "EXECUTOR_LAW_CHECK_INVALID",
+            ),
+            (
+                "blocked-law",
+                canary_evidence_response(
+                    law_check="LAW_CHECK=BLOCKED | REASON=canonical law unavailable",
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                ),
+                "EXECUTOR_LAW_CHECK_BLOCKED",
+            ),
+            (
+                "blocked-experience",
+                canary_evidence_response(
+                    experience_check="EXPERIENCE_CHECK=BLOCKED | REASON=lookup failed",
+                ),
+                "EXPERIENCE_CHECK_BLOCKED",
+            ),
+            (
+                "contradictory",
+                canary_evidence_response(
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                    extra_lines=("EXPERIENCE_CHECK=NO_MATCH",),
+                ),
+                "EXPERIENCE_CHECK_CONTRADICTORY",
+            ),
+        )
+        for suffix, response, expected_blocker in cases:
+            with self.subTest(case=suffix):
+                session_id = f"receipt-{suffix}"
+                self.start_cli(session_id=session_id)
+                result = self.ingest_cli(response, session_id=session_id)
+                self.assertNotEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+                self.assertTrue(
+                    any(expected_blocker in reason for reason in result["canary_grade"]["REASONS"]),
+                    result["canary_grade"],
+                )
+                event = self.ledger_events()[-1]
+                self.assertIn(expected_blocker, event["ACTOR_RECEIPT_BLOCKERS"])
+                if suffix == "malformed-law-and-experience":
+                    self.assertIn("EXPERIENCE_CHECK_INVALID", event["ACTOR_RECEIPT_BLOCKERS"])
+
+        # Correctly shaped receipts with a wrong law SHA and wrong active ID also fail closed.
+        mismatch_cases = (
+            (
+                "wrong-sha",
+                canary_evidence_response(
+                    law_check="LAW_CHECK=PASS | SOURCE=notebook.md | SOURCE_SHA256=" + "0" * 64,
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                ),
+                "EXECUTOR_LAW_HASH_MISMATCH",
+            ),
+            (
+                "wrong-experience",
+                canary_evidence_response(
+                    experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=not-the-active-id",
+                ),
+                "EXPERIENCE_CHECK_IDS_MISMATCH",
+            ),
+            (
+                "inconsistent-no-match",
+                canary_evidence_response(experience_check="EXPERIENCE_CHECK=NO_MATCH"),
+                "EXPERIENCE_CHECK_INCONSISTENT_WITH_ACTIVE_EXPECTATION",
+            ),
+        )
+        for suffix, response, expected_blocker in mismatch_cases:
+            with self.subTest(case=suffix):
+                session_id = f"receipt-{suffix}"
+                expected_id = "shared-exp-expected-for-mismatch"
+                binding = self.binding(session_id)
+                self.tower().start_session(
+                    binding,
+                    expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+                    expected_experience_ids=(expected_id,),
+                    canary_directive=self.directive(session_id),
+                )
+                self.assertEqual([expected_id], self.ledger_events()[-1]["EXPECTED_EXPERIENCE_IDS"])
+                result = self.ingest_cli(response, session_id=session_id)
+                self.assertNotEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+                self.assertTrue(
+                    any(expected_blocker in reason for reason in result["canary_grade"]["REASONS"]),
+                    result["canary_grade"],
+                )
+
+    def test_t05e_expected_law_sha_with_trailing_hex_character_cannot_grade_green(self) -> None:
+        malformed_sha = EXPECTED_CANONICAL_LAW_SHA + "a"
+        response = canary_evidence_response(
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+                f"| SOURCE_SHA256={malformed_sha}"
+            ),
+            experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=shared-exp-parser-expected",
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-trailing-sha", response, "EXECUTOR_LAW_CHECK_INVALID"
+        )
+
+    def test_t05f_duplicate_law_sha_fields_cannot_grade_green(self) -> None:
+        response = canary_evidence_response(
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+                f"| SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA} | SOURCE_SHA256={'0' * 64}"
+            ),
+            experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=shared-exp-parser-expected",
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-duplicate-law-sha", response, "EXECUTOR_LAW_CHECK_INVALID"
+        )
+
+    def test_t05g_duplicate_law_source_fields_cannot_grade_green(self) -> None:
+        response = canary_evidence_response(
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+                f"| SOURCE=attacker-controlled.md | SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+            ),
+            experience_check="EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=shared-exp-parser-expected",
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-duplicate-law-source", response, "EXECUTOR_LAW_CHECK_INVALID"
+        )
+
+    def test_t05h_repeated_experience_directives_cannot_grade_green(self) -> None:
+        matching_law = (
+            "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+            f"| SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+        )
+        cases = (
+            (
+                "repeated-lines",
+                canary_evidence_response(
+                    law_check=matching_law,
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE",
+                    extra_lines=("EXPERIENCE_CHECK=UNAVAILABLE",),
+                ),
+                "EXPERIENCE_CHECK_CONTRADICTORY",
+            ),
+            (
+                "repeated-same-line",
+                canary_evidence_response(
+                    law_check=matching_law,
+                    experience_check="EXPERIENCE_CHECK=UNAVAILABLE | EXPERIENCE_CHECK=UNAVAILABLE",
+                ),
+                "EXPERIENCE_CHECK_INVALID",
+            ),
+        )
+        for suffix, response, expected_reason in cases:
+            with self.subTest(case=suffix):
+                self.assert_receipt_response_fails_closed(
+                    f"receipt-repeat-experience-{suffix}",
+                    response,
+                    expected_reason,
+                )
+
+    def test_t05i_duplicate_experience_ids_cannot_hide_conflicting_value(self) -> None:
+        matching_law = (
+            "LAW_CHECK=PASS | SOURCE=docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md "
+            f"| SOURCE_SHA256={EXPECTED_CANONICAL_LAW_SHA}"
+        )
+        response = canary_evidence_response(
+            law_check=matching_law,
+            experience_check=(
+                "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE "
+                "| IDS=shared-exp-parser-expected | IDS=conflicting-exp-id"
+            ),
+        )
+        self.assert_receipt_response_fails_closed(
+            "receipt-duplicate-experience-ids", response, "EXPERIENCE_CHECK_INVALID"
+        )
+
+    def test_t05_valid_actor_receipts_matching_session_expectations_allow_green(self) -> None:
+        binding = self.binding("receipt-valid-expected")
+        expected_id = "shared-exp-expected-receipt"
+        self.tower().start_session(
+            binding,
+            task_id="TASK-CANARY-RECEIPTS",
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(expected_id,),
+            canary_directive=self.directive(binding.session_id),
+        )
+        response = canary_evidence_response(
+            experience_check=f"EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS={expected_id}",
+        )
+        result = self.ingest_canary(binding, response)
+        self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+        event = self.ledger_events()[-1]
+        self.assertEqual("PASS", event["ACTOR_RECEIPTS"]["LAW_CHECK"]["status"])
+        self.assertEqual("USE_ACTIVE_EXPERIENCE", event["ACTOR_RECEIPTS"]["EXPERIENCE_CHECK"]["decision"])
+        self.assertEqual([], event["ACTOR_RECEIPT_BLOCKERS"])
+
     def test_t05b_replay_is_idempotent_and_raw_transcript_is_not_persisted(self) -> None:
         binding = self.start_canary()
         response = canary_evidence_response(preface="UNIQUE RAW EXECUTOR TRANSCRIPT\n\n")
@@ -649,6 +1096,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
     # --- T08 GREEN + Owner continuation resumes original task -------------
     def test_t08_green_plus_owner_continuation_resumes_original_task_same_session(self) -> None:
         binding = self.start_canary()
+        initial_title = self.ledger_events()[0]["RECOMMENDED_NEW_CHAT"]["CHAT_TITLE"]
         self.ingest_canary(binding)
         result = self.tower().continue_canary_session(
             binding.session_id,
@@ -660,12 +1108,21 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertFalse(result["idempotent"])
         # Same Arena session, restored from durable state.
         self.assertEqual(binding.session_id, recommendation["SESSION_ID"])
+        self.assertEqual(initial_title, recommendation["CHAT_TITLE"])
         self.assertEqual("ARENA", recommendation["HOST"])
         self.assertEqual("CONTROL_TOWER_DURABLE_STATE", recommendation["ORIGINAL_TASK_SOURCE"])
         self.assertEqual("RESUME_ORIGINAL_TASK_IN_SAME_SESSION", recommendation["CONTINUATION_MODE"])
         self.assertEqual("NO", recommendation["CANARY_REPEAT"])
         prompt = recommendation["PROMPT"]
         self.assertIn(BLIND_TEST_TASK, prompt)
+        self.assertEqual("GỬI CHO: ARENA AI", prompt.splitlines()[1])
+        self.assertEqual("CHAT_MODE=SAME_CHAT", prompt.splitlines()[3])
+        self.assertEqual(f"CHAT_TITLE={recommendation['CHAT_TITLE']}", prompt.splitlines()[4])
+        self.assertEqual("NO_FORMAL_PLAN", prompt.splitlines()[6].removeprefix("PLAN_REFERENCE="))
+        self.assertNotIn("SESSION_START", prompt.splitlines()[8])
+        self.assertIn(f"SESSION_ID={binding.session_id}", prompt.splitlines()[8])
+        self.assertIn("CANARY_GRADE=GREEN; OWNER_CONTINUATION=YES", prompt.splitlines()[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=NONE_RECORDED", prompt.splitlines()[9])
         # Continuation does not repeat the canary; the resumed ORIGINAL task
         # now carries the full terminal return contract.
         self.assertNotIn("FAST_CANARY_REQUIRED=YES", prompt)
@@ -859,6 +1316,8 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
             branch="arena/hermes-logistics-01",
             canonical_base_sha=BASE_SHA,
             canonical_base_tree=BASE_TREE,
+            expected_law_sha=EXPECTED_CANONICAL_LAW_SHA,
+            expected_experience_ids=(),
             canary_directive=directive,
         )
         response = canary_evidence_response(
