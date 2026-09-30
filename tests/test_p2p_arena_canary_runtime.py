@@ -53,12 +53,21 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     CanaryDirective,
     ControlTower,
     ControlTowerHandoffError,
+    ProjectionError,
     SessionBinding,
     build_execution_prompt,
     canary_requirement,
     classify_canary_evidence,
     create_return_packet,
     parse_canary_evidence_packet,
+)
+from p2p_capabilities.evidence import EvidenceClaim  # noqa: E402
+from p2p_capabilities.task_state import (  # noqa: E402
+    PlanIdentity,
+    TaskPlan,
+    TaskStateStore,
+    complete_task,
+    request_owner_decision,
 )
 
 BASE_SHA = "a" * 40
@@ -297,6 +306,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         *,
         host: str = "ARENA",
         goal: str = BLIND_TEST_TASK,
+        goal_id: str = "P2P-CT01-CANARY",
         session_id: str = "s1",
         extra: tuple[str, ...] = (),
     ) -> dict:
@@ -306,7 +316,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
                 "--host",
                 host,
                 "--goal-id",
-                "P2P-CT01-CANARY",
+                goal_id,
                 "--task-id",
                 "TASK-CANARY-1",
                 "--session-id",
@@ -388,18 +398,190 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         result = self.start_cli(session_id="title-proof")
         recommendation = result["recommendation"]
         prompt = recommendation["PROMPT"]
-        title = next(line for line in prompt.splitlines() if line.strip())
+        lines = prompt.splitlines()
+        title = next(line for line in lines if line.strip())
+        self.assertEqual(title, lines[0])
         self.assertEqual(recommendation["CHAT_TITLE"], title)
         self.assertEqual(recommendation["CHAT_NAME"], title)
-        self.assertEqual(f"CHAT_TITLE={title}", prompt.splitlines()[1])
-        self.assertEqual(f"CHAT_NAME={title}", prompt.splitlines()[2])
+        self.assertEqual("GỬI CHO: ARENA AI", lines[1])
+        self.assertEqual("PROJECT=P2P-CT01-CANARY", lines[2])
+        self.assertEqual("CHAT_MODE=NEW_CHAT", lines[3])
+        self.assertEqual(f"CHAT_TITLE={title}", lines[4])
+        self.assertEqual(f"CHAT_NAME={title}", lines[5])
+        self.assertEqual("NO_FORMAL_PLAN", lines[6].removeprefix("PLAN_REFERENCE="))
+        self.assertEqual("NONE_RECORDED", lines[7].removeprefix("ALREADY_COMPLETED="))
+        self.assertIn("EXECUTION_PROGRESS=NONE_RECORDED", lines[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=NONE_RECORDED", lines[9])
+        self.assertTrue(lines[10].startswith("NEXT_BOUNDED_STEP="))
         self.assertNotIn("CONTROL_TOWER_EXECUTION_PROMPT:", title)
         self.assertNotIn("DESTINATION=", title)
+        self.assertFalse(prompt.startswith("GỬI CHO:"))
 
         codex = self.start_cli(host="CODEX", session_id="codex-title")["recommendation"]
         self.assertTrue(codex["PROMPT"].splitlines()[0].startswith("CONTROL_TOWER_EXECUTION_PROMPT:"))
         self.assertNotIn("CHAT_TITLE", codex)
         self.assertEqual("CODEX — P2P-CT01-CANARY — " + BLIND_TEST_TASK, codex["CHAT_NAME"])
+
+        # Digest captured from the pre-repair non-Arena serializer; the Arena-only
+        # routing/checkpoint change must not alter its bytes.
+        non_arena = SessionBinding(
+            session_id="non-arena-byte-stable",
+            host="CODEX",
+            goal_id="WORKSTREAM-42",
+            goal="Implement deterministic checkpoint routing",
+        )
+        non_arena_prompt = build_execution_prompt(non_arena, "Perform one focused serialization repair.")
+        self.assertEqual(
+            "150b5c88d75c693a2efeabc175c223187a08a8b9627160848a7ee9ead0107653",
+            hashlib.sha256(non_arena_prompt.encode("utf-8")).hexdigest(),
+        )
+
+        unknown_identity = SessionBinding(
+            session_id="unknown-project-identity",
+            host="ARENA",
+            goal_id="UNKNOWN",
+            goal="Record an honest unknown identity checkpoint",
+        )
+        unknown_prompt = build_execution_prompt(unknown_identity, "Do not invent an identity or progress.")
+        self.assertIn("PROJECT=NONE_RECORDED", unknown_prompt)
+        self.assertIn("TASK_ID=NONE_RECORDED; EXECUTION_PROGRESS=NONE_RECORDED", unknown_prompt)
+
+    def test_t02c_available_task_plan_drives_project_and_fresh_checkpoint(self) -> None:
+        now = "2026-09-30T00:00:00+00:00"
+        goal_id = "goal-route-repair"
+        plan = TaskPlan.from_goal(
+            {
+                "goal_id": goal_id,
+                "scope": ["route prompts from existing task state"],
+                "out_of_scope": ["new plan storage"],
+            },
+            [
+                {
+                    "task_id": "foundation",
+                    "title": "Record verified task state",
+                    "purpose": "Prove the existing state can be resumed.",
+                    "scope": ["task-state fixture"],
+                    "acceptance_requirements": ["Current task is bound to the recorded plan."],
+                    "required_evidence": ["foundation-proof"],
+                },
+                {
+                    "task_id": "route-prompt",
+                    "title": "Serialize Arena routing metadata",
+                    "purpose": "Emit the routing and current checkpoint from durable task state.",
+                    "dependencies": ["foundation"],
+                    "scope": ["Control Tower prompt"],
+                    "acceptance_requirements": ["The generated prompt reflects current TaskRecord state."],
+                    "required_evidence": ["route-prompt-proof"],
+                },
+            ],
+            now=now,
+            plan_identity=PlanIdentity(
+                repository="acme/queue-service",
+                workstream="release-readiness",
+                subject="Prompt routing contract",
+                pr="273",
+            ),
+        )
+        plan = plan.refresh_ready(now="2026-09-30T00:01:00+00:00")
+        plan = plan.transition("foundation", "ACTIVE", now="2026-09-30T00:02:00+00:00")
+        evidence = EvidenceClaim(
+            claim="The prerequisite task completed with current evidence.",
+            required_evidence=("foundation-proof",),
+            actual_evidence=(
+                {
+                    "source": "tests/test_p2p_arena_canary_runtime.py",
+                    "evidence_ref": "foundation-proof",
+                    "origin": "RUNTIME_EVIDENCE",
+                    "observed_at": now,
+                    "freshness": "CURRENT",
+                    "scope": ["task-state fixture"],
+                    "source_binding": "focused-test",
+                    "fingerprint": "a" * 64,
+                },
+            ),
+            status="VERIFIED",
+        )
+        plan = complete_task(
+            plan,
+            "foundation",
+            [evidence],
+            {"verified": "yes"},
+            now="2026-09-30T00:03:00+00:00",
+        ).refresh_ready(now="2026-09-30T00:04:00+00:00")
+        TaskStateStore(self.root).initialize(plan, at="2026-09-30T00:04:00+00:00")
+
+        recommendation = self.tower().recommend_next_session(
+            "ARENA",
+            session_id="plan-routing-proof",
+        )["recommendation"]
+        prompt = recommendation["PROMPT"]
+        lines = prompt.splitlines()
+        self.assertTrue(lines[0].startswith("acme/queue service / release readiness —"), lines[0])
+        self.assertEqual(recommendation["CHAT_TITLE"], lines[0])
+        self.assertEqual("acme/queue-service / release-readiness", lines[2].removeprefix("PROJECT="))
+        self.assertIn("Prompt routing contract", lines[6])
+        self.assertIn("plan_hash=", lines[6])
+        self.assertEqual("foundation", lines[7].removeprefix("ALREADY_COMPLETED="))
+        self.assertIn("TASK_ID=route-prompt; STATUS=READY", lines[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=NONE_RECORDED", lines[9])
+        self.assertIn("current TaskRecord state.", lines[10])
+        self.assertNotIn("PROJECT=P2P", lines[2])
+
+    def test_t02d_pending_task_owner_gate_is_serialized_from_task_state(self) -> None:
+        now = "2026-09-30T00:00:00+00:00"
+        goal_id = "goal-owner-gate"
+        plan = TaskPlan.from_goal(
+            {"goal_id": goal_id, "scope": ["WORKSTREAM:owner-gate-routing"]},
+            [
+                {
+                    "task_id": "owner-task",
+                    "title": "Wait for the recorded Owner decision",
+                    "purpose": "Serialize the current Owner gate without bypassing it.",
+                    "scope": ["Control Tower prompt"],
+                    "acceptance_requirements": ["The Owner decision remains pending."],
+                    "required_evidence": ["owner-gate-proof"],
+                }
+            ],
+            now=now,
+        ).refresh_ready(now="2026-09-30T00:01:00+00:00")
+        plan = request_owner_decision(
+            plan,
+            "owner-task",
+            question="May the task resume?",
+            options=("Continue", "Stop"),
+            now="2026-09-30T00:02:00+00:00",
+        )
+        TaskStateStore(self.root).initialize(plan, at="2026-09-30T00:02:00+00:00")
+
+        recommendation = self.tower().start_session(
+            SessionBinding("owner-gate-routing", "ARENA", goal_id, "Owner-gated routing"),
+            task_id="owner-task",
+            task_prompt="Wait for the recorded Owner decision.",
+        )["recommendation"]
+        lines = recommendation["PROMPT"].splitlines()
+        self.assertIn("STATUS=WAITING_OWNER", lines[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=OWNER_GATE=PENDING: May the task resume?", lines[9])
+        self.assertIn("Resolve the recorded blocker or Owner Gate", lines[10])
+
+    def test_t02e_arena_prompt_fails_closed_for_unreadable_plan_and_budget(self) -> None:
+        state_dir = self.root / ".p2p" / "state"
+        state_dir.mkdir(parents=True)
+        (state_dir / "task-state.json").write_text("{broken", encoding="utf-8")
+        with self.assertRaises(ProjectionError):
+            self.tower().start_session(
+                self.binding("unreadable-plan"),
+                task_id="TASK-CANARY-1",
+                task_prompt=BLIND_TEST_TASK,
+            )
+
+        with self.assertRaisesRegex(BindingError, "ARENA_ROUTING_CONTEXT_DID_NOT_FIT"):
+            build_execution_prompt(
+                self.binding("budget-proof"),
+                BLIND_TEST_TASK,
+                max_prompt_chars=100,
+            )
+        with self.assertRaisesRegex(BindingError, "ARENA_ROUTING_CONTEXT_DID_NOT_FIT"):
+            build_execution_prompt(self.binding("default-budget-proof"), "x" * 11500)
 
     # --- T03 stop boundary + one first-turn contract -----------------------
     def test_t03_canary_turn_must_stop_after_one_first_safe_probe(self) -> None:
@@ -914,6 +1096,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
     # --- T08 GREEN + Owner continuation resumes original task -------------
     def test_t08_green_plus_owner_continuation_resumes_original_task_same_session(self) -> None:
         binding = self.start_canary()
+        initial_title = self.ledger_events()[0]["RECOMMENDED_NEW_CHAT"]["CHAT_TITLE"]
         self.ingest_canary(binding)
         result = self.tower().continue_canary_session(
             binding.session_id,
@@ -925,12 +1108,21 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertFalse(result["idempotent"])
         # Same Arena session, restored from durable state.
         self.assertEqual(binding.session_id, recommendation["SESSION_ID"])
+        self.assertEqual(initial_title, recommendation["CHAT_TITLE"])
         self.assertEqual("ARENA", recommendation["HOST"])
         self.assertEqual("CONTROL_TOWER_DURABLE_STATE", recommendation["ORIGINAL_TASK_SOURCE"])
         self.assertEqual("RESUME_ORIGINAL_TASK_IN_SAME_SESSION", recommendation["CONTINUATION_MODE"])
         self.assertEqual("NO", recommendation["CANARY_REPEAT"])
         prompt = recommendation["PROMPT"]
         self.assertIn(BLIND_TEST_TASK, prompt)
+        self.assertEqual("GỬI CHO: ARENA AI", prompt.splitlines()[1])
+        self.assertEqual("CHAT_MODE=SAME_CHAT", prompt.splitlines()[3])
+        self.assertEqual(f"CHAT_TITLE={recommendation['CHAT_TITLE']}", prompt.splitlines()[4])
+        self.assertEqual("NO_FORMAL_PLAN", prompt.splitlines()[6].removeprefix("PLAN_REFERENCE="))
+        self.assertNotIn("SESSION_START", prompt.splitlines()[8])
+        self.assertIn(f"SESSION_ID={binding.session_id}", prompt.splitlines()[8])
+        self.assertIn("CANARY_GRADE=GREEN; OWNER_CONTINUATION=YES", prompt.splitlines()[8])
+        self.assertEqual("BLOCKER_OR_OWNER_GATE=NONE_RECORDED", prompt.splitlines()[9])
         # Continuation does not repeat the canary; the resumed ORIGINAL task
         # now carries the full terminal return contract.
         self.assertNotIn("FAST_CANARY_REQUIRED=YES", prompt)
