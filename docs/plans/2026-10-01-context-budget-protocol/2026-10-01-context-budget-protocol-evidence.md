@@ -94,6 +94,8 @@ Matching plan item(s): `P1-A`
 - `E1-P1A-DRIFT1`: Fresh Supervisor precheck found current main `135dcf845b59c5fa09a0737a68fbf7b6b957778a` while candidate HEAD `d30636b0998c740660f937475ea62ba8ef4bd9b7` was `behind_by=6`; exact-head acceptance was rejected and recorded in `reports/supervisor/rp_supervisor_261001_174500_by_gpt-5-6-sol_context-budget-protocol-pr286-drift.md`.
 - `E1-P1A-MERGE1`: Writer repair verified the six main-side commits touched only `docs/RESEARCH-ADOPTION-LEDGER.md`, `docs/p2p-development/research/P2P-KONG-REVERSE-INTAKE-01.md`, and `governance/research-adoption-ledger.json`, disjoint from the context-budget policy paths. A non-force two-parent merge commit `e512364c4333f400f5640869334d695a4edb094e` merged current main into the existing PR branch while preserving both histories.
 
+- `E1-P1A-CAP1`: Fresh capability-ledger/source inspection found `ADAPTIVE_CONTEXT_BUDGET` remains `PARTIAL` and `.p2p/system/p2p_capabilities/adaptive_budget.py` implements separate task-level dynamic soft/hard budgets. The policy now explicitly states that 70k/100k session heuristics do not promote, replace, or reconfigure that runtime capability.
+
 ## E2 - P2 Evidence
 
 Matching plan item(s): `P2-A`
