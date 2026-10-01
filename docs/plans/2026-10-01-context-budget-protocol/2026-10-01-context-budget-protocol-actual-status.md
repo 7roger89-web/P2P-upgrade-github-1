@@ -2,7 +2,7 @@
 
 Title: Context Budget Protocol
 Date: 2026-10-01
-Status: Draft / P0 Complete / Blocked
+Status: P0 Complete / P1 Docs Slice Complete / Ready For Supervisor
 Companion plan: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-plan.md`
 Companion evidence: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-evidence.md`
 Companion benchmark: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-benchmark.md`
@@ -77,14 +77,14 @@ Record how many files the target is related to before deciding touch mode. A fil
 
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
-| Context Budget Protocol policy family | Core context-hygiene and rotation mechanisms already exist, but explicit 70k/100k heuristic budgeting, targeted hydration order, thin-handoff semantics, do-not-carry list, and Supervisor hydration rules are incomplete across the docs. | Existing mechanisms remain authoritative while the missing operational context-budget semantics are explicit and consistent. | correct/partial/wrong/missing/unbound/fake-or-stub/blocked | N/A related files | E0-P0A-SRC1, E0-P0A-SRC2, E0-P0A-SRC3, E0-P0A-SRC4, E0-P0A-SRC5 | preserve / edit P1-A / update P2-B status / block |
+| Context Budget Protocol policy family | Existing mechanisms are preserved and the four policy/guidance surfaces now carry explicit 70k/100k heuristic budgeting, targeted hydration, thin handoff, do-not-carry, rotation, Writer stop, Supervisor independence, and mutable-state re-verification rules. | Existing mechanisms remain authoritative while operational context-budget semantics are explicit and consistent. | correct | N/A related files | E1-P1A-DOC1, E1-P1A-DOC2, E1-P1A-DOC3, E1-P1A-SCENARIO1 | preserve runtime; send exact branch HEAD to independent Supervisor |
 
 ## Status Refresh Log
 
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---------|------|------------|----------------|----------------|----------|-------------------|
 | R0 | 2026-10-01 | baseline before P0 | Issue #285 docs-only context-budget assimilation across canonical law, Control Tower handoff, Arena protocol, and installed-agent entrypoint. | initial classification | E0-P0A-SRC1, E0-P0A-SRC2, E0-P0A-SRC3, E0-P0A-SRC4, E0-P0A-SRC5 | Proceed with one docs-only P1-A slice; preserve runtime. |
-| R1 | 2026-10-01 | after P1-A | four docs-only authority/guidance surfaces | partial -> correct (pending P1 evidence) | E0-P0A-SRC1, E0-P0A-SRC2, E0-P0A-SRC3, E0-P0A-SRC4, E0-P0A-SRC5 | close after Supervisor review; no runtime follow-up unless evidence disproves docs-only sufficiency. |
+| R1 | 2026-10-01 | after P1-A docs commits | four docs-only authority/guidance surfaces | partial -> correct | E1-P1A-DOC1, E1-P1A-DOC2, E1-P1A-DOC3, E1-P1A-SCENARIO1 | independent Supervisor review next; runtime remains preserve-only. |
 
 ## Phase Touch Map
 
