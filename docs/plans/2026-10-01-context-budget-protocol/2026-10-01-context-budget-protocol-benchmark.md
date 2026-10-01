@@ -41,13 +41,13 @@ Benchmark sections must follow the plan phases:
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P0 | context-policy authority surfaces | files | 4 | 4 | pending | 4 aligned, 0 new framework files | 0 new authority frameworks | E0-P0A-SRC1..E0-P0A-SRC4 |
+| P0 | context-policy authority surfaces | files | 4 | 4 | 4 | 4 aligned, 0 new framework files | 0 | E0-P0A-SRC1..E0-P0A-SRC4 |
 
 ## B1 - P1 Benchmarks
 
 | Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P1 | context-policy authority surfaces | files | 4 | 4 | pending | 4 aligned, 0 new framework files | 0 new authority frameworks | E0-P0A-SRC1..E0-P0A-SRC4 |
+| P1 | context-policy authority surfaces | files | 4 | 4 | 4 | 4 aligned, 0 new framework files | 0 | E1-P1A-DOC1..E1-P1A-DOC3 |
 
 ## B2 - P2 Benchmarks
 
