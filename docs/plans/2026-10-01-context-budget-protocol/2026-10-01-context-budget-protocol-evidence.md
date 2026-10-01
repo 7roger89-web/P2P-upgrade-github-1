@@ -83,7 +83,12 @@ Matching plan item(s): `P0-A`
 
 Matching plan item(s): `P1-A`
 
-Pending implementation read-back on branch `ct/context-budget-protocol-285`.
+- `E1-P1A-DOC1`: Branch read-back confirms canonical RULE 16 now contains the 70k soft / 100k rotation heuristics, targeted hydration order, thin-handoff fields, evidence-over-history, do-not-carry rules, Writer stop conditions, independent Supervisor hydration, and mutable-state re-verification.
+- `E1-P1A-DOC2`: Control Tower handoff guide now explicitly reuses `P2P_CONTROL_TOWER_SUCCESSOR_PACKET` as the compaction mechanism, keeps `FULL_CHAT_HISTORY_INCLUDED=NO`, identifies rehydration references, excludes disposable history, and requires fresh verification of mutable Git/test claims.
+- `E1-P1A-DOC3`: Arena protocol now applies the same heuristic budget and relevance-driven hydration without a provider-specific framework; installed-agent entrypoint carries only a thin digest of the canonical rule.
+- `E1-P1A-SCENARIO1`: Structural branch read-back mapped all four required scenarios to explicit policy text: A bounded Writer/targeted verification = PASS; B successor-packet compaction/rotation = PASS; C independent Supervisor hydration = PASS; D mutable Git/test state re-verification and noncanonical packet semantics = PASS.
+- `E1-P1A-DIFF1`: Compare from base `4ce35d4559edb9f83023568ef7e6089132c54a8d` to implementation head `e69bfdd34884f71e09b6cdc52470fcb2a0af7790` showed only eight docs/plan files changed, branch ahead by 8 and behind by 0; no runtime source, schema, dependency, generated AGENTS.md, or state-store file changed.
+- `E1-P1A-RUNNER1`: Direct container Git access was unavailable because the environment could not resolve github.com, so repository tests were NOT_RUN rather than reported failed. Validation therefore uses authenticated GitHub branch read-back and compare evidence for this docs-only slice.
 
 ## E2 - P2 Evidence
 
@@ -95,4 +100,4 @@ N/A — this plan has one docs-only implementation phase.
 
 Use this section for final detect-changes, commit hash, and closure evidence when the plan reaches completion.
 
-Pending final branch diff, commit SHA, draft PR, and independent Supervisor handoff.
+Implementation policy slice is complete and ready for an independent Supervisor. Runtime tests were not run in this surface; no runtime code changed. Final branch/PR SHA is recorded in the terminal implementation report after closure-ledger commits. Independent Supervisor review remains intentionally separate from this Writer/Control Tower actor.
