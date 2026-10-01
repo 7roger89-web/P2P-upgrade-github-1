@@ -77,6 +77,38 @@ The packet is bootstrap/coordination data, not canonical truth. CT002 must recon
 
 The user does not summarize CT001 or reproduce the full chat history. Rotation is qualitative: use it when the current Control Tower becomes unwieldy, loses continuity, or the Owner wants a clean coordination surface. A soft recommendation after roughly 10–20 material handoffs may be useful, but it is not a rigid trigger and never closes active execution.
 
+### Context-budget compaction and thin successor handoff
+
+RULE 16 in the canonical operations notebook defines the context-budget policy.
+This guide reuses the existing successor packet and rotation wrapper; it does
+not create a second compaction format.
+
+Operational defaults are `SOFT_CONTEXT_LIMIT = 70000` tokens and
+`ROTATION_CONTEXT_LIMIT = 100000` tokens. They are heuristics, not model hard
+limits, and exact token measurement is not required. Near the soft limit,
+prefer targeted retrieval and stop carrying obsolete logs/diffs or duplicated
+durable material. At the rotation limit, or when equivalent qualitative
+context exhaustion is visible, rotate before substantial new work.
+
+`P2P_CONTROL_TOWER_SUCCESSOR_PACKET` is the compact durable handoff. Populate
+it with live state only: active/pending work, Owner Gates, blockers/risks,
+critical live decisions, active evidence/checkpoint references, next safe
+action, acceptance/stop conditions when relevant, and the authoritative
+references the successor must rehydrate from. `FULL_CHAT_HISTORY_INCLUDED=NO`
+remains mandatory.
+
+Do not carry forward old full diffs, obsolete terminal logs, superseded plans,
+dead-end exploration, already-merged code blobs, copied governance text, prior
+reasoning history, or entire executor conversations after their outcome is
+durably represented. Never drop unresolved blockers or evidence that still
+affects acceptance.
+
+The successor rehydrates from the active law, current durable task/project
+state, exact relevant docs/source paths, and exact PR/commit/receipt references.
+Mutable claims such as main SHA, PR HEAD, branch state, mergeability, and test
+status must be freshly verified where practical before they drive a decision.
+The successor packet is coordination data, not canonical truth.
+
 ### GitHub-connected Arena Agent Mode boundary
 
 The Arena-specific session contract is canonical in
