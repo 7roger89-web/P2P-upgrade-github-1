@@ -86,6 +86,8 @@ Record how many files the target is related to before deciding touch mode. A fil
 | R0 | 2026-10-01 | baseline before P0 | Issue #285 docs-only context-budget assimilation across canonical law, Control Tower handoff, Arena protocol, and installed-agent entrypoint. | initial classification | E0-P0A-SRC1, E0-P0A-SRC2, E0-P0A-SRC3, E0-P0A-SRC4, E0-P0A-SRC5 | Proceed with one docs-only P1-A slice; preserve runtime. |
 | R1 | 2026-10-01 | after P1-A docs commits | four docs-only authority/guidance surfaces | partial -> correct | E1-P1A-DOC1, E1-P1A-DOC2, E1-P1A-DOC3, E1-P1A-SCENARIO1 | independent Supervisor review next; runtime remains preserve-only. |
 
+| R2 | 2026-10-01 | after main drift repair | PR #286 branch relation | stale/diverged -> synchronized by two-parent merge | E1-P1A-DRIFT1, E1-P1A-MERGE1 | perform fresh exact-HEAD Supervisor review; no further Writer mutation unless rejected. |
+
 ## Phase Touch Map
 
 Use this map to prevent accidental edits. A related file is not automatically editable.
