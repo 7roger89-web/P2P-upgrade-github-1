@@ -333,6 +333,47 @@ candidate-only file must not use a relative link or a default-main URL that
 resolves against an unmerged branch. A visual claim is not complete until the
 Owner can open the exact-SHA URL, including on mobile.
 
+## 7.1 Context budget and targeted hydration
+
+Arena follows canonical RULE 16 rather than inventing a provider-specific
+context framework. Use `SOFT_CONTEXT_LIMIT = 70000` tokens and
+`ROTATION_CONTEXT_LIMIT = 100000` tokens as operational heuristics only;
+Arena-reported product/session limits still win. Exact token measurement is not
+required.
+
+When context is healthy, continue the same bounded goal/PR. Near the soft
+budget, stop carrying unrelated files, stale logs, old diffs, duplicated
+durable policy, or previous-agent narration and retrieve only what the next
+bounded action needs. At the rotation budget, Arena-reported exhaustion, or
+persistent context degradation/tool confusion, start a fresh session according
+to section 4 and reconstruct from durable GitHub/project state.
+
+Hydration order is relevance-driven:
+
+```text
+law/instructions
+-> relevant architecture/contracts
+-> entry point
+-> direct dependencies
+-> tests
+-> current diff
+-> targeted runtime evidence
+```
+
+Expand scope only when evidence requires it. Never preload the whole repository
+for completeness and never enforce a fixed docs/code percentage.
+
+Writer handoff remains thin: task contract, exact base/PR/HEAD, bounded
+objective/scope, acceptance criteria, prohibitions, required evidence, stop
+condition, and authoritative durable references. Do not paste full source,
+large diffs, giant logs, whole PR discussions, or the previous conversation
+when those facts can be re-read from GitHub.
+
+An independent Supervisor does not inherit the Writer conversation. It
+reconstructs from its actor-own law preflight, the task contract, exact
+PR/commit/HEAD, relevant source/diff, and durable evidence, then performs its
+own verification.
+
 ## 8. Durable memory and fresh-session bootstrap
 
 The state boundary is explicit:
