@@ -1528,6 +1528,12 @@ SEARCH
 Do not preload the whole repository "for completeness", and do not enforce a
 fixed docs/code ratio such as 90/10.
 
+These session-level 70k/100k heuristics do **not** promote, replace, or
+reconfigure the existing `ADAPTIVE_CONTEXT_BUDGET` runtime capability.
+That capability remains governed by its own implementation/evidence and
+capability-ledger status; this RULE 16 policy creates no runtime token-metering
+claim and no capability promotion.
+
 Handoffs are intentionally thin. A normal Writer/Codex implementation handoff
 contains only information the next actor cannot reliably rediscover:
 
