@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-10-01`
-- Status: `draft`
+- Status: `ready_for_supervisor`
 - Plan: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-plan.md`
 - Evidence: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-evidence.md`
 - Benchmark: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-benchmark.md`
@@ -73,7 +73,7 @@ Scenario A: bounded Writer task hydrates only relevant law/docs/code and returns
 
 ## Checklist
 
-- [ ] P0-A: Complete actual status before implementation work.
+- [x] P0-A: Complete actual status before implementation work.
   - Goal: establish the real current state.
   - Work Steps: inspect source-of-truth files, classify each surface, record blocked or missing pieces, and update later phase status assumptions, next actions, and work steps from evidence.
   - Implementation Gate: no implementation or editing starts until `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-actual-status.md` has a final P0 decision.
@@ -91,7 +91,7 @@ Scenario A: bounded Writer task hydrates only relevant law/docs/code and returns
   - P1-A: Extend existing docs-only context policy
   - P1-B: N/A — one atomic docs-only policy slice; splitting the four linked authority surfaces would leave inconsistent instructions.
 
-- [ ] P1-A: Extend existing docs-only context policy
+- [x] P1-A: Extend existing docs-only context policy
   - Goal: Add explicit context-budget, thin-handoff, targeted-hydration, do-not-carry, rotation, Writer, and Supervisor guidance while preserving existing mechanisms.
   - Scope Boundary:
     - Editable: docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md; docs/p2p-development/CONTROL-TOWER-SESSION-HANDOFF.md; docs/ARENA_AGENT_MODE_PROTOCOL.md; docs/p2p-development/P2P-AGENTS-INSTALL.md.
