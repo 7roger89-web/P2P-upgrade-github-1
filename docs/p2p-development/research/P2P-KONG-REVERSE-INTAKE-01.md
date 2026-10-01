@@ -23,16 +23,16 @@ Observed implementation surfaces:
 - `kong/agent/deobfuscator.py`: heuristic classification for control-flow flattening, bogus control flow, instruction substitution, string encryption and VM-style protection.
 - `kong/llm/tools.py`: bounded tool calls for Z3-backed expression simplification, dead-code elimination, state-machine tracing, crypto-constant identification, decompilation and basic-block/CFG retrieval.
 - `kong/evals/*`: symbol/type scoring against ground truth.
-- `.github/workflows/ci.yml`: pytest matrix for Python 3.11-3.14.
-- PR #16 head `4c5f09294cfc712e37cabd88d69ccdc11cd915c3` had a successful four-version CI run.
+- [`.github/workflows/ci.yml`](https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/.github/workflows/ci.yml): pytest matrix for Python 3.11-3.14.
+- [`amruth-sn/kong` PR #16](https://github.com/amruth-sn/kong/pull/16) head `4c5f09294cfc712e37cabd88d69ccdc11cd915c3` had a successful four-version CI run.
 
 The upstream XZ/liblzma benchmark is useful evidence of author-observed behavior, but it is NOT independent P2P proof. The repository reports 558 functions enumerated, 396 queued, 355 analyzed, 15 minutes, USD 6.63, using Claude Opus 4.6, and claims reconstruction of five core backdoor functions. P2P did not reproduce this benchmark in this intake.
 
 Relevant upstream limitations observed from open issues:
 
-- #17 reports that one Ghidra decompilation failure can terminate a large analysis run.
-- #18 reports long decompilation periods with little UI feedback.
-- #10 reports packed software not being unpacked.
+- [`amruth-sn/kong` issue #17](https://github.com/amruth-sn/kong/issues/17) reports that one Ghidra decompilation failure can terminate a large analysis run.
+- [`amruth-sn/kong` issue #18](https://github.com/amruth-sn/kong/issues/18) reports long decompilation periods with little UI feedback.
+- [`amruth-sn/kong` issue #10](https://github.com/amruth-sn/kong/issues/10) reports packed software not being unpacked.
 
 Therefore `UPSTREAM_BENCHMARK_CLAIM != P2P_CERTIFICATION` and `UPSTREAM_CONFIDENCE_SCORE != STATISTICAL_PROBABILITY_OF_CORRECTNESS`.
 
