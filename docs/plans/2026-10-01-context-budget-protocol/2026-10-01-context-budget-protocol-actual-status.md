@@ -59,7 +59,7 @@ Record how many files the target is related to before deciding touch mode. A fil
 
 | Unit / File / Surface | File Detail Evidence | Related File Count | Relationship Summary | Impact Note |
 |-----------------------|----------------------|--------------------|----------------------|-------------|
-| Context Budget Protocol policy family | E0-P0A-SRC1..E0-P0A-SRC5 | N/A | The four docs are policy/discovery surfaces over existing runtime; no runtime behavior needs to change. | low / medium / high / critical scope warning |
+| Context Budget Protocol policy family | E0-P0A-SRC1..E0-P0A-SRC5 | N/A | The four docs are policy/discovery surfaces over existing runtime; no runtime behavior needs to change. | medium policy-scope warning |
 
 ## Status Rules
 
@@ -125,11 +125,11 @@ Relationship and impact:
 
 Classification:
 
-partial
+correct
 
 Allowed next action:
 
-Edit only the missing policy semantics in the four docs; preserve existing runtime and packet schemas.
+Preserve the completed docs-only policy slice and send the exact current HEAD to independent Supervisor review.
 
 Forbidden next action:
 
@@ -139,7 +139,7 @@ Do not create a new context framework, packet, state store, token-metering servi
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | Existing runtime and core invariants are correct; only docs/policy detail is partial. | keep / change / remove / block |
+| P1-A | Existing runtime and core invariants are correct; the docs-only policy gap is now closed. | keep; independent Supervisor review |
 
 ## Implementation Gate
 
@@ -154,8 +154,8 @@ Do not create a new context framework, packet, state store, token-metering servi
 - [x] Blockers are recorded, if any: none.
 - [x] Next phase status assumptions, next action, and work steps have been updated from this status file when needed.
 - [x] Status Refresh Log has an R0 baseline row.
-- [ ] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
-- [ ] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
+- [x] If implementation has started, affected Current Status Matrix rows have been refreshed from latest evidence.
+- [x] If refreshed statuses changed next work, only the stale next-phase status assumptions, next action, or work steps have been updated before the next phase.
 
 ## Final P0 Decision
 
