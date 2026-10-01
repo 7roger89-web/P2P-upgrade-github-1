@@ -90,6 +90,10 @@ Matching plan item(s): `P1-A`
 - `E1-P1A-DIFF1`: Compare from base `4ce35d4559edb9f83023568ef7e6089132c54a8d` to implementation head `e69bfdd34884f71e09b6cdc52470fcb2a0af7790` showed only eight docs/plan files changed, branch ahead by 8 and behind by 0; no runtime source, schema, dependency, generated AGENTS.md, or state-store file changed.
 - `E1-P1A-RUNNER1`: Direct container Git access was unavailable because the environment could not resolve github.com, so repository tests were NOT_RUN rather than reported failed. Validation therefore uses authenticated GitHub branch read-back and compare evidence for this docs-only slice.
 
+
+- `E1-P1A-DRIFT1`: Fresh Supervisor precheck found current main `135dcf845b59c5fa09a0737a68fbf7b6b957778a` while candidate HEAD `d30636b0998c740660f937475ea62ba8ef4bd9b7` was `behind_by=6`; exact-head acceptance was rejected and recorded in `reports/supervisor/rp_supervisor_261001_174500_by_gpt-5-6-sol_context-budget-protocol-pr286-drift.md`.
+- `E1-P1A-MERGE1`: Writer repair verified the six main-side commits touched only `docs/RESEARCH-ADOPTION-LEDGER.md`, `docs/p2p-development/research/P2P-KONG-REVERSE-INTAKE-01.md`, and `governance/research-adoption-ledger.json`, disjoint from the context-budget policy paths. A non-force two-parent merge commit `e512364c4333f400f5640869334d695a4edb094e` merged current main into the existing PR branch while preserving both histories.
+
 ## E2 - P2 Evidence
 
 Matching plan item(s): `P2-A`
