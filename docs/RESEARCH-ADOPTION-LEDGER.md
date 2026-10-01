@@ -213,6 +213,38 @@ middleware, global dependency install, second risk framework/router/service,
 or sending secrets/raw production records to the provider.
 
 
+
+### 4.11 Kong reverse-engineering intake 2026-10-01 (RA-EXT-105)
+
+Fresh READ-stage intake of `amruth-sn/kong` at upstream main
+`8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2` (`kong-re 0.2.2`,
+Apache-2.0). Source inspection covered the supervisor/analyzer pipeline,
+deobfuscation layer, symbolic tool surface, evaluation harness, CI and current
+open limitations.
+
+The architectural finding is deliberately small: Kong does **not** supply a
+missing P2P control plane. P2P already owns dependency ordering, targeted
+context, quality/risk gating, ToolSet/execution-target boundaries, evidence
+authority and the SEC01 reverse-engineering capability contracts. Kong is
+therefore retained only as a possible future external backend that could
+compose the existing `reverse.decompile.native`, `reverse.callgraph`,
+`reverse.deobfuscate` and `reverse.semantic_reconstruct` capabilities.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-105 | amruth-sn/kong @ `8c4ee4bf` | RESEARCHED | Ghidra-rich context; bottom-up call graph; symbolic/Z3 helper tools; structured output; ground-truth eval methodology | READ complete; future external backend candidate only; PILOT deferred until a real authorized binary/fixture and runtime need exist; no core/router/authority change |
+
+Upstream's XZ/liblzma result is recorded as author-reported evidence, not
+independent P2P certification. Current upstream issues also show practical
+hardening gaps such as whole-run failure after one decompilation failure and
+long low-feedback decompilation phases. P2P therefore rejects confidence-as-
+proof, auto-install, vendoring, automatic external-target interaction and any
+claim of original-source recovery.
+
+`OE_VERDICT=DO_IT` for this small durable READ-stage record.
+`PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED`.
+
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
