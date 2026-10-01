@@ -3564,6 +3564,67 @@
       "owner_decision_status": "OWNER_SELECTED_BOUNDED_SHADOW_PROBE",
       "last_reviewed_at": "2026-09-29T00:00:00+00:00",
       "notes": "MATERIAL_REOPEN_REASON: target claim changed from domain-truth/routing influence in VNLAW to shadow semantic pre-action observation in P2P, and the evaluated provider surface is current official TypeSafe Jev/System One. RA-EXT-102 rejections remain in force. OE_VERDICT=DO_IT only for the frozen shadow benchmark. No live provider call, dependency install, MCP integration, permission change, production mutation, release, deploy or promotion is claimed by this record."
+    },
+    {
+      "research_id": "RA-EXT-105",
+      "source_name": "amruth-sn/kong — agentic binary reverse-engineering backend candidate",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/amruth-sn/kong",
+      "source_version_or_commit": "main@8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2; kong-re 0.2.2 observed 2026-10-01",
+      "provenance_status": "PUBLIC_REPOSITORY_FRESH_READ; SOURCE_INSPECTED; LICENSE_APACHE_2_0; UPSTREAM_BENCHMARK_SELF_REPORTED_NOT_INDEPENDENTLY_REPRODUCED",
+      "research_summary": "Kong is a Python/PyGhidra binary-analysis pipeline that composes Ghidra structural context, bottom-up call-graph analysis, LLM-guided symbol/type recovery, heuristic obfuscation detection, Z3/symbolic tool calls, semantic synthesis, Ghidra writeback and an evaluation harness. P2P already owns task dependency ordering, targeted context, quality/risk gates, ToolSet/execution-target boundaries, evidence authority and the SEC01 reverse capability identities. Kong therefore contributes no missing core control plane; its useful delta is as a future external backend candidate for existing reverse.decompile.native / reverse.callgraph / reverse.deobfuscate / reverse.semantic_reconstruct contracts.",
+      "selected_ideas": [
+        "Ghidra-derived structural context before LLM inference",
+        "bottom-up call-graph processing so resolved callees improve caller context",
+        "deterministic and symbolic tools as evidence helpers during deobfuscation",
+        "structured analysis output with token/cost tracking",
+        "ground-truth evaluation when a known reference exists",
+        "compose existing P2P reverse capability IDs instead of creating a Kong-specific canonical capability"
+      ],
+      "rejected_ideas": [
+        "Kong supervisor as a second P2P router, orchestrator, task graph, evidence store or control plane",
+        "vendoring Kong into P2P core",
+        "automatic Kong, Ghidra, JDK or dependency installation",
+        "treating Kong confidence values as acceptance probability or final evidence",
+        "treating the upstream XZ benchmark as independent P2P certification",
+        "automatic external-target interaction, offensive execution, bypass flow, credential widening, release, deployment or promotion",
+        "claiming original-source recovery from decompiled or semantically reconstructed output"
+      ],
+      "p2p_translation": "READ stage COMPLETE. Preserve Kong as a FUTURE external backend/admission candidate over existing SEC01 reverse capability contracts. PILOT is DEFER_UNTIL_NEEDED until an authorized local binary or bounded benign ground-truth fixture creates a real task need and the selected executor has an authorized Ghidra/JDK/LLM environment. Kong output remains proposed evidence subject to existing P2P verification; no core architecture or authority change is introduced.",
+      "capability_family": "SECURITY_REVERSE_ENGINEERING",
+      "canonical_capability_ids": [
+        "reverse.decompile.native",
+        "reverse.callgraph",
+        "reverse.deobfuscate",
+        "reverse.semantic_reconstruct"
+      ],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "docs/p2p-development/research/P2P-KONG-REVERSE-INTAKE-01.md",
+        "https://github.com/amruth-sn/kong/tree/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/kong/agent/supervisor.py",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/kong/agent/analyzer.py",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/kong/agent/deobfuscator.py",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/kong/llm/tools.py",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/BENCHMARKS.md",
+        "https://github.com/amruth-sn/kong/issues/17",
+        "https://github.com/amruth-sn/kong/issues/18",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/kong/evals/metrics.py",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/kong/evals/harness.py",
+        "https://github.com/amruth-sn/kong/blob/8c4ee4bf52e0eb9efc3a0b22ad6da03387543fd2/.github/workflows/ci.yml",
+        "https://github.com/amruth-sn/kong/pull/16",
+        "https://github.com/amruth-sn/kong/issues/10"
+      ],
+      "dependencies": [
+        "SEC01 security/reverse foundation",
+        "RA-EXT-070 reverse-skill methodology adoption",
+        "P2P-SEC01-GHIDRA external runtime candidate",
+        "READ/PILOT/ADOPT/CORE external-tool policy"
+      ],
+      "roadmap_slot": "family:security-reverse / future external backend candidate",
+      "owner_decision_status": "OWNER_SELECTED_READ_COMPLETE_PILOT_DEFERRED_UNTIL_REAL_BINARY",
+      "last_reviewed_at": "2026-10-01T00:00:00+00:00",
+      "notes": "OE_VERDICT=DO_IT for the bounded READ-stage intake only. PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED. No runtime execution, dependency install, vendoring, model/API call, adapter implementation, release, deployment or promotion is claimed."
     }
   ],
   "rejected_register_summary": {
@@ -3592,7 +3653,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-09-24T00:00:00+00:00",
+  "last_reviewed": "2026-10-01T00:00:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]
