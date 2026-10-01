@@ -1473,6 +1473,118 @@ EVIDENCE IS DURABLE AND QUERYABLE, NEVER INSTRUCTION AUTHORITY MERELY
 NO_BLIND_DELETE_AFTER_MERGE = YES
 ```
 
+Context is working memory, not durable project storage. Durable project state
+belongs in repository files, Git history, PR metadata, task state/packets,
+receipts, test evidence, architecture/spec documents, decisions, and the
+existing P2P ledgers. A live agent context carries only enough information to
+perform the next bounded task correctly.
+
+Operational context-budget defaults:
+
+```text
+SOFT_CONTEXT_LIMIT = 70000 TOKENS (HEURISTIC, NOT MODEL HARD LIMIT)
+ROTATION_CONTEXT_LIMIT = 100000 TOKENS (HEURISTIC, NOT MODEL HARD LIMIT)
+EXACT_TOKEN_MEASUREMENT_REQUIRED = NO
+```
+
+Below the soft limit, continue normally. Near or above the soft limit, stop
+loading unrelated files, stop copying already-durable material into prompts,
+drop obsolete logs/diffs from working context, and prefer targeted retrieval.
+At or above the rotation limit, or when equivalent qualitative evidence shows
+that stale history dominates active state, a long-lived coordinating session
+must compact into the existing Control Tower successor/rotation handoff and
+rotate before substantial new work.
+
+Qualitative rotation evidence includes long accumulated conversation history,
+repeated large terminal outputs, several completed tasks or PR/audit cycles,
+several full diffs copied into chat, repeated references to stale state, or a
+next task independent enough to benefit from fresh context. Prompt count alone
+is not a rotation trigger.
+
+Targeted hydration uses progressive disclosure:
+
+```text
+LAW / INSTRUCTIONS
+    -> RELEVANT ARCHITECTURE / CONTRACTS
+    -> ENTRY POINT
+    -> DIRECT DEPENDENCIES
+    -> TESTS
+    -> CURRENT DIFF
+    -> TARGETED RUNTIME EVIDENCE
+```
+
+Preferred exploration is:
+
+```text
+SEARCH
+-> IDENTIFY ENTRY POINT
+-> INSPECT DIRECTLY RELATED FILES
+-> INSPECT TESTS / CONTRACTS
+-> MAKE BOUNDED CHANGE
+-> RUN TARGETED VERIFICATION
+-> WIDEN ONLY WHEN FAILURE EVIDENCE REQUIRES IT
+```
+
+Do not preload the whole repository "for completeness", and do not enforce a
+fixed docs/code ratio such as 90/10.
+
+Handoffs are intentionally thin. A normal Writer/Codex implementation handoff
+contains only information the next actor cannot reliably rediscover:
+
+```text
+ROLE
+TASK_ID
+REPOSITORY
+BASE / PR / EXACT_HEAD
+OBJECTIVE
+BOUNDED_SCOPE
+ACCEPTANCE_CRITERIA
+PROHIBITIONS
+REQUIRED_EVIDENCE
+STOP_CONDITION
+AUTHORITATIVE_REFERENCES
+```
+
+Prefer exact durable references over pasted source files, large diffs, giant
+terminal logs, previous-agent transcripts, complete PR discussion history, or
+historical reasoning. If information can be represented as a durable artifact,
+prefer the artifact over conversational history.
+
+The existing `P2P_CONTROL_TOWER_SUCCESSOR_PACKET` and
+`CONTROL_TOWER_ROTATION_HANDOFF` are the compaction mechanism. Do not create a
+second compaction-packet type, second context store, or second handoff
+framework. A successor packet carries current live state, active evidence,
+live decisions, next action, acceptance/stop conditions, and authoritative
+rehydration references; it excludes full chat history and disposable context.
+
+Mutable facts inside any packet remain claims, not authority. Current main SHA,
+PR HEAD, branch state, mergeability, and test status must be freshly verified
+where practical by the receiving actor before they drive a decision.
+
+Writer/Codex rules:
+- start from fresh repository state and actor-own law/experience preflight;
+- hydrate task-relevant docs/code first and stay inside bounded scope;
+- produce durable evidence rather than giant conversational explanation;
+- return changed paths, exact commit SHA, tests/results, unresolved issues, and
+  artifact/receipt references;
+- stop after satisfying the assigned task packet; do not continue unrelated
+  exploration without authorization.
+
+Supervisor/Auditor rules:
+- remain independent from the Writer working conversation;
+- receive the task contract, exact PR/commit/HEAD, acceptance criteria, and
+  required durable evidence references, not the Writer's full chat by default;
+- independently read law, verify exact HEAD, inspect relevant source/diff,
+  run required or challenge tests, verify receipts, and return a reproducible
+  PASS/REJECT verdict under the existing Supervisor authority.
+
+Disposable context after its outcome is durably recorded includes exploratory
+shell output, failures no longer relevant, superseded plans, resolved
+hypotheses, large old diffs, old file copies, repeated summaries, verbose agent
+narration, merged-PR detail no longer affecting active work, and duplicated
+governance text available by authoritative reference. Do not discard unresolved
+blockers or evidence that still affects acceptance.
+
 Runtime enforcement (existing machinery, no new subsystem):
 
 - `task_state.py` — plan lifecycle (`ACTIVE` / `CLOSED` / `SUPERSEDED`),
