@@ -524,7 +524,7 @@
       "title": "ROADMAP_AWARE_DEVELOPMENT_PLANNER",
       "family": "OWNER_INTENT_PROJECT_FORMATION",
       "owner_value": "P2P ch\u1ecdn m\u1ee5c ti\u00eau ti\u1ebfp theo t\u1eeb ch\u00e2n l\u00fd b\u1ec1n v\u1eefng (baseline + ledger + roadmap + evidence + Owner priority) thay v\u00ec chat memory \u2014 bao ph\u1ee7 gap ROADMAP_COVERAGE_GAP \u0111\u01b0\u1ee3c ph\u00e1t hi\u1ec7n t\u1ef1 \u0111\u1ed9ng.",
-      "status": "PLANNED",
+      "status": "DONE",
       "priority": 4,
       "dependencies": [
         "research-adoption-ledger.json (this goal)",
@@ -537,13 +537,14 @@
         "RA-EXT-022"
       ],
       "canonical_capability_ids": [],
-      "current_evidence": "goal-choice narrative in charter \u00a76 (heuristic, not machine-readable)",
+      "current_evidence": "scripts/p2p_roadmap_planner.py VERSION=4 (sha256 00d8bfafd7bfc64b) \u2014 fail-closed coverage gate, strict intake/adoption binding, deterministic ranking, hash binding; latest current-main run reports/planner/P2P-PLANNER-RUN-09.json: PLANNING_STATUS=PLANNING_COMPLETE, PLAN_COMPLETE=true, ROADMAP_COVERAGE_GAP=false; capability ROADMAP_AWARE_DEVELOPMENT_PLANNER_PLANNED=VERIFIED_IMPLEMENTED; charter MACHINE_READABLE_ROADMAP_VERIFIED; runtime execution-loop integration remains an open disclosed gap.",
       "target_evidence": "planner reads official baseline + ledger + roadmap + evidence gaps + Owner priority; outputs ranked candidate goals with coverage-gap detection; never overrides Owner Gates",
       "mutation_risk_class": "READ_ONLY",
       "project_impact": "NONE",
       "promotion_required": "NO",
-      "next_safe_when": "now",
-      "defer_reason": ""
+      "next_safe_when": "DONE \u2014 no further action on this item; runtime execution-loop integration (if ever pursued) requires its own goal and promotion",
+      "defer_reason": "",
+      "reconciliation_note": "RM-PRIORITY-PLANNER reconciled PLANNED -> DONE by issue #287 (fresh current-main planner v4 rerun + durable status closure): implementation and validation already existed; capability identity ROADMAP_AWARE_DEVELOPMENT_PLANNER_PLANNED preserved (no rename, no duplicate); read-only; never overrides Owner Gates; no recommended goal auto-executed."
     },
     {
       "roadmap_id": "RM-PRIORITY-DESIGN",
@@ -752,7 +753,7 @@
   "roadmap_reader_status": {
     "mechanism": "NO_AUTOMATIC_CONSUMPTION",
     "fact": "Current P2P runtime has no canonical mechanism that reads this roadmap when choosing the next development Goal. Goal choice is governed by charter \u00a76 heuristics plus Owner instruction.",
-    "planned_capability": "ROADMAP_AWARE_DEVELOPMENT_PLANNER (status PLANNED, item RM-PRIORITY-PLANNER) \u2014 never overrides Owner Gates."
+    "verified_capability": "ROADMAP_AWARE_DEVELOPMENT_PLANNER (status DONE, item RM-PRIORITY-PLANNER) \u2014 verified governance-side read-only planner (scripts/p2p_roadmap_planner.py VERSION=4) that mechanically consumes this roadmap + research-adoption-ledger + capability-index + official baseline, with hash binding and a fail-closed coverage gate; never overrides Owner Gates; runtime execution-loop integration remains an open disclosed gap."
   },
   "baseline_identity": {
     "version": "8.4.7-C-codex.46",
