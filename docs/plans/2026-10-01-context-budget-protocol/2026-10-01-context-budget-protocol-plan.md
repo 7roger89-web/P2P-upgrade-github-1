@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-10-01`
-- Status: `ready_for_supervisor`
+- Status: `closed`
 - Plan: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-plan.md`
 - Evidence: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-evidence.md`
 - Benchmark: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-benchmark.md`
@@ -153,7 +153,8 @@ Scenario A: bounded Writer task hydrates only relevant law/docs/code and returns
   - Evidence Targets: Canonical doc read-back, cross-surface consistency, scenario A-D mapping, branch diff review.
   - Actual-status Update: partial -> correct for the four doc surfaces; runtime remains correct/preserve-only.
   - Commit Boundary: commit after this slice when acceptance passes.
-- [ ] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+- [x] Pn-A: Call supervisor for the implemented-plan acceptance loop.
+  - Closure evidence: independent Arena Supervisor APPROVED PR #286 at exact HEAD `c37ba6fa9f01af67e3c81083242837fe48296042` / tree `30319ef0154d9bcce11579b2e396337a1766cc59`; challenge tests and exact-head Shield were successful; blocking findings: none.
   - Goal: verify the completed plan work against the accepted plan, actual-status decisions, evidence, benchmark, changed files, generated output, and validation results before closure.
   - Work Steps:
     1. Call the supervisor skill to review the full completed plan work.
@@ -162,7 +163,8 @@ Scenario A: bounded Writer task hydrates only relevant law/docs/code and returns
     4. Repeat until supervisor passes or records a blocker.
   - Implementation Gate: all planned implementation phases must be completed or explicitly blocked before this review.
   - Acceptance: supervisor review passes, or the plan records a blocker with evidence and no closure is performed.
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
+  - Closure evidence: removed the orphan `B2 - P2 Benchmarks` section because this plan has no P2 implementation phase. Preserved the stale-head drift rejection report because it is durable evidence of the mutable-state invariant, not dead work. Supervisor's remaining section-numbering and instruction-contract observations are non-blocking baseline/cosmetic notes, not closure blockers.
   - Goal: ensure the final diff contains only artifacts that still serve the accepted plan.
   - Work Steps:
     1. Review files, sections, generated output, tests, temp files, and plan artifacts created or modified during this plan.
@@ -172,7 +174,8 @@ Scenario A: bounded Writer task hydrates only relevant law/docs/code and returns
     5. If supervisor fails the cleanup, return to the responsible implementation workflow/skill for the failed cleanup scope only, then re-run supervisor review.
   - Implementation Gate: only remove artifacts created by this plan unless the user explicitly approves broader cleanup.
   - Acceptance: final `git diff/status` contains no dead plan-created artifacts, supervisor passes the cleanup, and evidence records what was removed or preserved.
-- [ ] Pn-C: Close the plan.
+- [x] Pn-C: Close the plan.
+  - Closure evidence: PR #286 merged to `main` as `e3eabbd3a1bd157d20c5bd5938a7a0cca979d24a`; Issue #285 is closed as completed; scope remained docs-only; no runtime/UI/Docker/Playwright/generated-output action applies; no promotion/deploy/release occurred.
   - Goal: finish validation, evidence, benchmark, detect-changes, commit, and final status.
   - Work Steps:
     1. Run the required final validation for the accepted scope, including full build before final runtime validation. For app/runtime scopes, full build must include Docker image/container build.

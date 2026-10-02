@@ -49,12 +49,6 @@ Benchmark sections must follow the plan phases:
 |-------|--------|------|----------|--------|-------|--------|-------|----------|
 | P1 | context-policy authority surfaces | files | 4 | 4 | 4 | 4 aligned, 0 new framework files | 0 | E1-P1A-DOC1..E1-P1A-DOC3 |
 
-## B2 - P2 Benchmarks
-
-| Phase | Metric | Unit | Baseline | Latest | Final | Target | Delta | Evidence |
-|-------|--------|------|----------|--------|-------|--------|-------|----------|
-| P2 | context-policy authority surfaces | files | 4 | 4 | pending | 4 aligned, 0 new framework files | 0 new authority frameworks | E0-P0A-SRC1..E0-P0A-SRC4 |
-
 ## Non-Benchmarkable Notes
 
 Use this section only for phases that are not benchmarkable. Do not invent metrics.

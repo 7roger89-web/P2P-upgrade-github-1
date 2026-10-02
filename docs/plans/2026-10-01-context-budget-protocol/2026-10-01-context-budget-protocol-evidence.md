@@ -106,4 +106,8 @@ N/A — this plan has one docs-only implementation phase.
 
 Use this section for final detect-changes, commit hash, and closure evidence when the plan reaches completion.
 
-Implementation policy slice is complete and ready for an independent Supervisor. Runtime tests were not run in this surface; no runtime code changed. Final branch/PR SHA is recorded in the terminal implementation report after closure-ledger commits. Independent Supervisor review remains intentionally separate from this Writer/Control Tower actor.
+- `E-CLOSE-SUP1`: Independent Arena Supervisor review on PR #286 returned APPROVED/PASS at exact HEAD `c37ba6fa9f01af67e3c81083242837fe48296042` / tree `30319ef0154d9bcce11579b2e396337a1766cc59`, with no blocking findings. The reviewer independently re-read law, reverified Git identity, ran 11 challenge-test modules, and confirmed exact-head Shield success.
+- `E-CLOSE-MERGE1`: PR #286 merged to `main` as merge commit `e3eabbd3a1bd157d20c5bd5938a7a0cca979d24a`; Issue #285 is closed as completed.
+- `E-CLOSE-DEAD1`: Closure cleanup removes the orphan `B2 - P2 Benchmarks` section because the plan has no P2 implementation phase. The earlier drift-rejection report is intentionally preserved as durable evidence of Scenario D rather than deleted as dead work.
+- `E-CLOSE-SCOPE1`: Closure remains docs-only. Runtime/unit implementation, Docker, Playwright, generated-output regeneration, promotion, release, deployment, secret, and infrastructure actions are not part of this closure.
+- `E-CLOSE-LEARN1`: `LEARNING_RECONCILIATION=NONE` — the drift lesson is already embodied by the new mutable-state rule and no additional reusable experience candidate is necessary for this routine successful closure.
