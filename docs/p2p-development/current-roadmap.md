@@ -6,7 +6,7 @@
 > - Charter truth: `docs/p2p-development/P2P-DEVELOPMENT-CHARTER.md`.
 > If this file disagrees with any canonical source, the canonical source wins. Regenerate this file whenever governance or the ledger changes.
 
-**Generated:** 2026-08-26 (P2P-CT01 rotatable Control Tower ledger projection refresh; derived, not authored-by-hand as a decision document).
+**Generated:** 2026-10-02 (capability landscape section refreshed from the canonical capability-index; other historical projection sections retain their prior recorded content; derived, not authored as a decision document).
 
 ## 6. Framework goals (FW series)
 
@@ -67,25 +67,28 @@ The record exists because the candidate requirement is a **deterministic policy*
 
 ## 3. Capability landscape snapshot (from the ledger)
 
-Counts per family in `capability-index.json` at regeneration time (176 records, 12 registered families; 3 residual records use unregistered legacy family labels):
-| Family | Count | Dominant statuses |
-| --- | --- | --- |
-| Truth & Governance | 22 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-| Durable Project Intelligence | 12 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-| Context & Knowledge | 39 | PLANNED + VERIFIED_IMPLEMENTED |
-| Skill & Learning | 5 | VERIFIED_IMPLEMENTED + PARTIAL |
-| Execution & Orchestration | 28 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-| Design & Product Intelligence | 7 | VERIFIED_IMPLEMENTED + REJECTED |
-| Multi-AI Interoperability | 32 | FOUNDATION_READY + REJECTED |
-| Routing & Cognitive Economy | 4 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
-| Verification & Evaluation | 7 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-| Recovery & Continuation | 6 | FOUNDATION_READY + VERIFIED_IMPLEMENTED |
-| Beginner Lifecycle | 7 | VERIFIED_IMPLEMENTED + PARTIAL |
-| Outcome Learning | 4 | VERIFIED_IMPLEMENTED + FOUNDATION_READY |
-Status vocabulary used by the ledger: `VERIFIED_IMPLEMENTED`, `FOUNDATION_READY`, `PARTIAL`, `PLANNED`, `DEFERRED`, `REJECTED`, `OBSOLETE`, `UNKNOWN`.
+Recomputed on 2026-10-02 directly from `docs/p2p-development/capability-ledger/capability-index.json` (191 records total; 12 registered families; 188 records in registered families; 3 records under unregistered legacy family labels).
 
-Registered-family subtotal is 172 records. Three inherited records remain visible under the unregistered legacy family labels `RELEASE_INSTALL_PROJECT_LIFECYCLE`, `SAFETY_AUTHORITY_PERMISSIONS`, and `OBSOLESCENCE_CAPABILITY_DRIFT`; C43 reports them as residual schema drift rather than silently moving or deleting them.
+| Family | Count | Status counts (all observed statuses) |
+| --- | ---: | --- |
+| Truth & Governance | 22 | `VERIFIED_IMPLEMENTED`=11; `FOUNDATION_READY`=9; `PLANNED`=1; `REJECTED`=1 |
+| Durable Project Intelligence | 12 | `VERIFIED_IMPLEMENTED`=6; `FOUNDATION_READY`=2; `REJECTED`=2; `PARTIAL`=1; `PLANNED`=1 |
+| Context & Knowledge | 42 | `PLANNED`=23; `VERIFIED_IMPLEMENTED`=8; `DEFERRED`=4; `FOUNDATION_READY`=3; `PARTIAL`=3; `REJECTED`=1 |
+| Skill & Learning | 5 | `VERIFIED_IMPLEMENTED`=4; `PARTIAL`=1 |
+| Execution & Orchestration | 28 | `FOUNDATION_READY`=9; `VERIFIED_IMPLEMENTED`=9; `REJECTED`=6; `PLANNED`=4 |
+| Design & Product Intelligence | 19 | `VERIFIED_IMPLEMENTED`=16; `DEFERRED`=1; `PLANNED`=1; `REJECTED`=1 |
+| Multi-AI Interoperability | 32 | `FOUNDATION_READY`=15; `PLANNED`=4; `REJECTED`=4; `VERIFIED_IMPLEMENTED`=4; `DEFERRED`=3; `PARTIAL`=1; `UNKNOWN`=1 |
+| Routing & Cognitive Economy | 4 | `FOUNDATION_READY`=2; `PLANNED`=1; `VERIFIED_IMPLEMENTED`=1 |
+| Verification & Evaluation | 7 | `VERIFIED_IMPLEMENTED`=6; `FOUNDATION_READY`=1 |
+| Recovery & Continuation | 6 | `FOUNDATION_READY`=2; `PLANNED`=2; `VERIFIED_IMPLEMENTED`=2 |
+| Beginner Lifecycle | 7 | `VERIFIED_IMPLEMENTED`=4; `PARTIAL`=3 |
+| Outcome Learning | 4 | `VERIFIED_IMPLEMENTED`=3; `FOUNDATION_READY`=1 |
 
+Observed status counts across all 191 records (declared vocabulary order): `DEFERRED`=8; `FOUNDATION_READY`=44; `OBSOLETE`=0; `PARTIAL`=9; `PLANNED`=39; `REJECTED`=15; `UNKNOWN`=1; `VERIFIED_IMPLEMENTED`=75.
+Status vocabulary declared by the ledger: `DEFERRED`, `FOUNDATION_READY`, `OBSOLETE`, `PARTIAL`, `PLANNED`, `REJECTED`, `UNKNOWN`, `VERIFIED_IMPLEMENTED`.
+
+Registered-family subtotal is 188 records. The 3 inherited records remain visible under unregistered legacy family labels: `RELEASE_INSTALL_PROJECT_LIFECYCLE`=1; `SAFETY_AUTHORITY_PERMISSIONS`=1; `OBSOLESCENCE_CAPABILITY_DRIFT`=1; they are reported as residual schema drift rather than silently moved or deleted.
+This snapshot refresh changes no runtime status, adoption decision, Owner gate, roadmap item, or goal.
 
 ### 3a. Owner-accepted context/session capability intake (C26, 20 records, all `PLANNED`)
 

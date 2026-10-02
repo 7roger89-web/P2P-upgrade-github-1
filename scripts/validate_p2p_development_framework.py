@@ -5,7 +5,7 @@ templates). Runs without network access; exits non-zero on any violation.
 
 Checks (all deterministic against the filesystem):
   V01 Ledger JSON parses and validates against capability-ledger.schema.json.
-  V02 capability_id uniqueness + SCREAMING_SNAKE_CASE pattern.
+  V02 capability_id uniqueness + canonical ID pattern (ledger SCREAMING_SNAKE_CASE or lowercase dotted runtime identity).
   V03 Every family used in capabilities is registered in families.
   V04 Status values come only from status_vocabulary; DEFERRED has deferred_reason;
       REJECTED has rejected_reason; VERIFIED_IMPLEMENTED has non-empty evidence_refs.
@@ -34,7 +34,7 @@ ROADMAP = ROOT / "docs/p2p-development/current-roadmap.md"
 TEMPLATE_DIR = ROOT / "docs/p2p-development/templates"
 GOVERNANCE = ROOT / "governance/development-control.json"
 
-ID_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]{2,60}$")
+ID_PATTERN = re.compile(r"^(?:[A-Z][A-Z0-9_]{2,60}|[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+)$")
 FRESHNESS_ALLOWED = {
     "verified_against_filesystem",
     "from_governance_record",
