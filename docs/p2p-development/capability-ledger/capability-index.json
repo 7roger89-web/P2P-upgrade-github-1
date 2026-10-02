@@ -1,9 +1,9 @@
 {
   "ledger_id": "capability-index",
   "schema_version": 2,
-  "canonical_source_statement": "Derived from governance/development-control.json (architectural_invariants, roadmap, capability_status, candidate_records, research_decisions), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, docs/plans/, and per-goal evidence reports in reports/. This ledger is capability knowledge, status, and roadmap intent only; it is NOT runtime truth, NOT Task State, and NOT a second FACT store. Where this ledger contradicts development-control.json, development-control.json wins.",
-  "authority_boundary": "This ledger records capability knowledge, capability status, and development intent. It does not control runtime task completion. Runtime task authority lives in Task State; goal/development governance authority lives in governance/development-control.json; factual and evidence authority lives in governance/fact-ledger.json and governance/live-specs.json with their evidence files.",
-  "generated_at": "2026-08-26T07:47:22Z",
+  "canonical_source_statement": "Derived from governance/development-control.json (architectural_invariants, roadmap, capability_status, candidate_records, research_decisions), governance/research-adoption-ledger.json (research provenance and Owner decision states), .p2p/system/p2p_capabilities/capabilities.json (runtime capability identities/statuses), docs/p2p-development/capability-catalog/ (candidate provenance and activation conditions), docs/plans/ (bounded reference contracts), docs/AI-HANDOFF.md, docs/KIEN-TRUC.md, and per-goal evidence reports in reports/. This ledger is capability knowledge, status, and roadmap intent only; it is NOT runtime truth, NOT Task State, and NOT a second FACT store. Where this ledger contradicts development-control.json, development-control.json wins; runtime capability declarations remain authoritative for runtime status.",
+  "authority_boundary": "This ledger records capability knowledge, capability status, and development intent. It does not control runtime task completion. Runtime task authority lives in Task State; goal/development governance authority lives in governance/development-control.json; factual and evidence authority lives in governance/fact-ledger.json and governance/live-specs.json with their evidence files. Runtime identity and status are projected without mutation from .p2p/system/p2p_capabilities/capabilities.json; external candidate installation/activation remains governed only by the runtime registry and separate Owner gates.",
+  "generated_at": "2026-10-02T00:00:00Z",
   "families": {
     "TRUTH_AND_GOVERNANCE": {
       "name": "Truth & Governance",
@@ -5076,9 +5076,521 @@
       "last_reviewed": "2026-08-26",
       "freshness": "verified_against_filesystem",
       "notes": "P2P-CT01 local foundation proof is 37 focused tests on an isolated canonical worktree: the original 28 contract/attachment/rotation cases plus 9 existing-ledger coordinator, replay, fail-closed CLI, and task-state discovery cases. The rotatable Control Tower contract emits a compact P2P_CONTROL_TOWER_SUCCESSOR_PACKET with exact CT001 archive/CT002 chat instructions and read-only reconciliation. The foreground CLI uses the existing execution ledger only; it never persists raw responses, launches a host, or promotes. The terminal response declares UPLOAD_REQUIRED and uses one REQUIRED handoff artifact when upload is needed; local paths do not prove Control Tower content access, and attachments are evidence input rather than canonical truth. Candidate remains FOUNDATION_READY and UNPROMOTED; CANONICAL_PROMOTED is NO."
+    },
+    {
+      "capability_id": "ui.design_system",
+      "name": "UI design-system foundation",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "The project can select compatible component foundations without inheriting a generic visual identity or installing them globally.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-033)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-002)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=ui.design_system; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Requires a compatible project stack; component foundation does not determine visual direction."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Select only when project stack fit is established; keep visual direction project-specific.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing."
+    },
+    {
+      "capability_id": "ui.motion",
+      "name": "UI motion and transitions",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Interaction motion is available when it serves the product and fits the frontend, rather than being added by default.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-034)",
+        "governance/research-adoption-ledger.json (RA-EXT-038)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-003)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-007)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=ui.motion; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Animation need and stack fit must be established.",
+        "Theatre Core and Studio license split remains distinct; Studio remains separately gated."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Select only for justified UI motion; preserve Theatre Core/Studio license gates if applicable.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. The two linked research records remain separate provenance; neither changes the upstream runtime status."
+    },
+    {
+      "capability_id": "ui.component_lab",
+      "name": "Component lab and visual QA pattern",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Isolated component development and visual QA can be used when project scale justifies the extra tooling.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-035)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-004)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=ui.component_lab; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Do not mandate a full component lab for small projects where a lighter local workflow suffices."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Choose only when project size and framework fit justify component-lab infrastructure.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing."
+    },
+    {
+      "capability_id": "game.three.spatial_query",
+      "name": "Three.js spatial queries",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Raycasting and spatial-query work can be accelerated when measured project needs justify it.",
+      "principle": "DETERMINISTIC_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-036)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-005)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=game.three.spatial_query; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [
+        "game.three.visual"
+      ],
+      "known_gaps": [
+        "Requires Three.js and a measured raycasting/spatial-query need; not a global default."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Activate only after a project-specific spatial-query need is measured.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing."
+    },
+    {
+      "capability_id": "game.three.visual",
+      "name": "Three.js visual rendering patterns",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Rendering references can inform a project only when they match its chosen art direction.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-037)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-006)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=game.three.visual; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Conditional on the project visual direction; source code and bundled asset licenses remain separate."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Use only when the project requires aligned stylized or toon rendering.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. RA-EXT-037 remains CONDITIONALLY_ACCEPTED; no unconditional visual style is asserted."
+    },
+    {
+      "capability_id": "game.three.cinematic",
+      "name": "Three.js cinematic animation patterns",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Cinematic timelines can be considered without collapsing the separate runtime and editor license obligations.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-038)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-007)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=game.three.cinematic; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [
+        "game.three.visual"
+      ],
+      "known_gaps": [
+        "Theatre Core is Apache-2.0; Theatre Studio is AGPL-3.0 and remains subject to its distinct license gate."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Use only when cinematic animation needs and project fit justify it; keep Core/Studio licensing distinct.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. RA-EXT-038 remains CONDITIONALLY_ACCEPTED; the Theatre license split is preserved."
+    },
+    {
+      "capability_id": "game.three.navigation",
+      "name": "Three.js navigation and pathfinding",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Navmesh and NPC pathfinding patterns can be selected only for projects that need them.",
+      "principle": "DETERMINISTIC_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-039)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-008)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=game.three.navigation; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [
+        "game.three.visual"
+      ],
+      "known_gaps": [
+        "Requires Three.js and a project need for navmesh or NPC pathfinding."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Select only when the project explicitly needs navigation/pathfinding.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing."
+    },
+    {
+      "capability_id": "game.three.adaptive_quality",
+      "name": "Three.js adaptive quality guidance",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "GPU-tier information can inform conservative quality choices without being treated as authoritative hardware capability.",
+      "principle": "DETERMINISTIC_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-040)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-009)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=game.three.adaptive_quality; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [
+        "game.three.visual"
+      ],
+      "known_gaps": [
+        "GPU_TIER is heuristic; gfxbench.com data is stale; a conservative fallback is required and benchmarks must not unlock critical gameplay alone."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Use only with a conservative fallback and independent runtime measurement where relevant.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. RA-EXT-040 remains CONDITIONALLY_ACCEPTED; stale benchmark caveat is retained."
+    },
+    {
+      "capability_id": "ui.game_hud",
+      "name": "Reactive game HUD patterns",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "High-frequency game UI state patterns can be considered without claiming the entire Mojang UI stack is open source.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-041)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-010)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=ui.game_hud; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Only the mature open-source @react-facet package is represented; architecture fit is still required."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Select only for a project requiring high-frequency reactive game UI state and compatible architecture.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. RA-EXT-041 remains CONDITIONALLY_ACCEPTED."
+    },
+    {
+      "capability_id": "ui.spatial",
+      "name": "Spatial and world-space UI",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "World-space UI can be considered for genuine spatial or XR needs without replacing a conventional DOM HUD by default.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-042)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-011)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=ui.spatial; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [
+        "game.three.visual"
+      ],
+      "known_gaps": [
+        "Requires genuine R3F spatial/XR/world-space need and an exact license review; it is not a default DOM HUD replacement."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Require R3F fit, genuine spatial use case, and the cataloged license review before adoption.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. RA-EXT-042 remains CONDITIONALLY_ACCEPTED."
+    },
+    {
+      "capability_id": "game.three.scene_authoring",
+      "name": "Three.js scene-authoring patterns",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "Scene-authoring approaches can be assessed package-by-package without adopting a whole editor suite automatically.",
+      "principle": "BEGINNER_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-043)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-012)",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=game.three.scene_authoring; TYPE=KNOWLEDGE_SOURCE; STATUS=ACTIVE)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_capability_catalog_ui_game_threejs.py",
+        "tests/test_p2p_upstream_capability_consumption.py"
+      ],
+      "dependencies": [
+        "game.three.visual"
+      ],
+      "known_gaps": [
+        "Architecture fit is required per package; other scene-authoring candidates retain separate maturity and license gates."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Select individual packages only after the project architecture and per-package gates are reviewed.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Projection records the existing ACTIVE KNOWLEDGE_SOURCE declaration and its catalog-backed selection contract; it does not install or globally activate the upstream package. Catalog global_install remains false. Capability-index dependencies contain only IDs represented in this index; the runtime registry REQUIRES field remains authoritative for runtime routing. RA-EXT-043 remains CONDITIONALLY_ACCEPTED; no whole-suite adoption is claimed."
+    },
+    {
+      "capability_id": "ui.design_quality",
+      "name": "Design-quality critique and deterministic check",
+      "family": "DESIGN_AND_PRODUCT_INTELLIGENCE",
+      "beginner_value": "An existing UI can receive bounded critique and a deterministic local check while P2P keeps implementation authority and promotion remains gated.",
+      "principle": "DETERMINISTIC_FIRST",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-069)",
+        "docs/p2p-development/capability-catalog/ui-game-threejs/capability-catalog.json (CAND-GAME-UI-019)",
+        ".p2p/vendor/provenance/p2p-impeccable-01.json",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=ui.design_quality; TYPE=SKILL; STATUS=DISCOVERED)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "DEFERRED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        ".p2p/system/p2p_capabilities/impeccable_design_quality.py",
+        ".p2p/system/p2p_capabilities/impeccable_detector_runner.mjs",
+        ".p2p/vendor/skill/pbakaus-impeccable-94b7f34"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_p2p_impeccable_design_quality.py",
+        "governance/evidence/p2p-impeccable-01-deterministic-check.json"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Runtime capability STATUS remains DISCOVERED.",
+        "CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE remains unresolved; no promotion or global activation is claimed."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Revisit only after the existing Supervisor and Owner gates are explicitly resolved; runtime status remains DISCOVERED until separately authorized and evidenced.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Capability-index DEFERRED is a roadmap/promotion boundary only. Canonical runtime registry STATUS=DISCOVERED and RA-EXT-069 owner_decision_status=CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE remain unchanged. Existing on-demand local detector/reference surfaces are evidence only; this projection performs no install or global activation.",
+      "deferred_reason": "Roadmap work beyond the existing partial, on-demand evidence surface is deferred until the existing Supervisor and Owner gates are satisfied.",
+      "roadmap_relation": "defer: retain the existing ui.design_quality projection; no roadmap implementation or status promotion before the pending Supervisor and Owner gates."
+    },
+    {
+      "capability_id": "web.browser.evidence",
+      "name": "Web/browser evidence reference surface",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "beginner_value": "Browser evidence methodology has one existing P2P reference route while the external ChromeDevTools backend remains disabled and separately gated.",
+      "principle": "evidence-authority-is-not-model-confidence",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-092)",
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=web.browser.evidence; TYPE=SKILL; STATUS=DISCOVERED)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "DEFERRED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Runtime registry STATUS remains DISCOVERED; external backend install and activation are disabled, with browser/network runtime, credentials, and MCP registration false/not performed."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Revisit only with separate Owner activation, explicit authorized target scope, and bounded external-interaction evidence.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Capability-index DEFERRED applies to external backend/runtime adoption only. Canonical registry STATUS=DISCOVERED, install_mode=DISABLED, execution_status=NOT_EXECUTED, and browser_runtime/network_runtime/credentials=false remain unchanged. The reference bridge is data-only, not an active backend.",
+      "deferred_reason": "No external backend installation, MCP registration, browser/network runtime, credential use, execution, or live target interaction is authorized; separate Owner activation and explicit target-scope authorization are required.",
+      "roadmap_relation": "defer: preserve the existing data-only web.browser.evidence reference surface; external backend activation remains separately Owner-gated."
+    },
+    {
+      "capability_id": "web.endpoint.discovery",
+      "name": "Web endpoint-discovery reference surface",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "beginner_value": "Endpoint-discovery methodology stays under one existing P2P route while crawler and parser candidates remain uninstalled and inactive.",
+      "principle": "evidence-authority-is-not-model-confidence",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-094)",
+        "governance/research-adoption-ledger.json (RA-EXT-095)",
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=web.endpoint.discovery; TYPE=SKILL; STATUS=DISCOVERED)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "DEFERRED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Runtime registry STATUS remains DISCOVERED; Katana and subordinate jsluice remain uninstalled and inactive.",
+        "RA-EXT-095 remains subordinate to web.endpoint.discovery and has no separate capability ID or authority."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Revisit only with separate Owner activation, explicit target authorization, and a bounded request budget; keep jsluice subordinate.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Capability-index DEFERRED applies to external backend/runtime adoption only. Canonical registry STATUS=DISCOVERED, install_mode=DISABLED, execution_status=NOT_EXECUTED, and browser_runtime/network_runtime/credentials=false remain unchanged. RA-EXT-095 is subordinate to this route; no separate capability is created.",
+      "deferred_reason": "No crawler/parser installation, MCP registration, browser/network runtime, credential use, execution, or live target interaction is authorized; separate Owner activation, explicit target authorization, and bounded request budget are prerequisites.",
+      "roadmap_relation": "defer: preserve web.endpoint.discovery as the sole route; Katana remains runtime-disabled and jsluice remains a subordinate reference with no separate capability or roadmap item."
+    },
+    {
+      "capability_id": "web.public.reconstruction",
+      "name": "Public web/archive reconstruction reference surface",
+      "family": "CONTEXT_AND_KNOWLEDGE",
+      "beginner_value": "Public archive/index reconstruction remains distinct from live browser evidence while its external backend remains uninstalled and inactive.",
+      "principle": "evidence-authority-is-not-model-confidence",
+      "origin_refs": [
+        "governance/research-adoption-ledger.json (RA-EXT-096)",
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md",
+        ".p2p/system/p2p_capabilities/capabilities.json (CAPABILITY_ID=web.public.reconstruction; TYPE=SKILL; STATUS=DISCOVERED)"
+      ],
+      "origin_type": "RESEARCH_DECISION",
+      "status": "DEFERRED",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/capabilities.json",
+        ".p2p/system/p2p_capabilities/web_reverse_reference.py"
+      ],
+      "evidence_refs": [
+        "tests/test_p2p_ledger_provenance.py",
+        "tests/test_p2p_web_reverse_reference.py",
+        "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/README.md"
+      ],
+      "dependencies": [],
+      "known_gaps": [
+        "Runtime registry STATUS remains DISCOVERED; Waymore remains uninstalled and inactive, and private/authenticated archive retrieval is not authorized."
+      ],
+      "do_not_duplicate_with": [],
+      "next_condition": "Revisit only with separate Owner activation and explicitly authorized public-source scope; do not infer permission from external content.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Capability-index DEFERRED applies to external backend/runtime adoption only. Canonical registry STATUS=DISCOVERED, install_mode=DISABLED, execution_status=NOT_EXECUTED, and browser_runtime/network_runtime/credentials=false remain unchanged. The reference surface does not create an archive service or traffic database.",
+      "deferred_reason": "No Waymore installation, MCP registration, browser/network runtime, credential use, execution, or private/authenticated archive retrieval is authorized; separate Owner activation and public-source scope are prerequisites.",
+      "roadmap_relation": "defer: preserve the existing data-only web.public.reconstruction reference surface; external backend activation remains separately Owner-gated."
     }
   ],
-  "last_reviewed": "2026-08-26T09:10:05Z",
+  "last_reviewed": "2026-10-02T00:00:00Z",
   "review_notes": [
     "FRAMEWORK-00 consolidation review: 158 capabilities, 12 families; cross-referenced against capability & skill map (63 top-level skills, 54 p2p modules, 23 scripts, 8 council roles); no status promotions.",
     {
@@ -5104,9 +5616,15 @@
       "at": "2026-08-26T09:10:05Z",
       "change": "Extended the same foundation-ready record with compact rotatable Control Tower successor/reconciliation support, exact CT001 archive and CT002 chat instructions, and 6 ROTATION A-F tests; no runtime authority, active execution, host lane, Owner approval, promotion, release, or host certification changed.",
       "dedup_check": "verified the existing unique capability_id, registered family, and existing dependency IDs before projection"
+    },
+    {
+      "reviewed_after_goal": "ISSUE-290-RUN-07-COVERAGE-RECONCILIATION",
+      "at": "2026-10-02T00:00:00Z",
+      "change": "Added 15 missing capability-index projections from existing ACTIVE UI/Three.js runtime declarations and existing DISCOVERED/gate-bound UI design-quality and Web Reverse reference surfaces. Research/runtime adoption states were not promoted; external backends remain disabled; no roadmap rows or capability IDs were minted.",
+      "dedup_check": "Verified all 15 canonical IDs were absent before projection and unique afterward; each is bound to an existing research/catalog/runtime record. UI/Three.js research family and Owner gates remain unchanged."
     }
   ],
-  "reviewed_after_goal": "GOVERNANCE-TRUTH-SYNC",
+  "reviewed_after_goal": "ISSUE-290-RUN-07-COVERAGE-RECONCILIATION",
   "notes": [
     "FW01 adds skill eligibility surface but does not change capability statuses; reviewed after FW01."
   ]

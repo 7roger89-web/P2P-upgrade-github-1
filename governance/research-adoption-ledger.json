@@ -1188,7 +1188,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license verified. Do not force shadcn visual identity on unrelated projects."
+      "notes": "MIT license verified. Do not force shadcn visual identity on unrelated projects.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-034",
@@ -1217,7 +1219,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license verified."
+      "notes": "MIT license verified.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-035",
@@ -1248,7 +1252,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license verified. Pattern reuse, not mandate."
+      "notes": "MIT license verified. Pattern reuse, not mandate.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-036",
@@ -1279,7 +1285,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license verified. Zero dependencies."
+      "notes": "MIT license verified. Zero dependencies.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-037",
@@ -1310,7 +1318,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CONDITIONALLY_ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "Dual license: code MIT, assets CC0. Project visual direction remains authoritative."
+      "notes": "Dual license: code MIT, assets CC0. Project visual direction remains authoritative.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-038",
@@ -1343,7 +1353,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CONDITIONALLY_ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "LICENSE SPLIT: @theatre/core=Apache-2.0, @theatre/studio=AGPL-3.0. Do NOT flatten. Studio requires explicit owner approval."
+      "notes": "LICENSE SPLIT: @theatre/core=Apache-2.0, @theatre/studio=AGPL-3.0. Do NOT flatten. Studio requires explicit owner approval.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-039",
@@ -1371,7 +1383,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license verified."
+      "notes": "MIT license verified.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-040",
@@ -1401,7 +1415,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CONDITIONALLY_ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license. ESM-only. STALE_DATA_CAVEAT: gfxbench.com stopped updating December 2025."
+      "notes": "MIT license. ESM-only. STALE_DATA_CAVEAT: gfxbench.com stopped updating December 2025.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-041",
@@ -1431,7 +1447,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CONDITIONALLY_ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license. Only @react-facet is mature open-source. Do not represent whole Mojang stack."
+      "notes": "MIT license. Only @react-facet is mature open-source. Do not represent whole Mojang stack.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-042",
@@ -1461,7 +1479,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CONDITIONALLY_ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "License review required. Only for genuine spatial requirement."
+      "notes": "License review required. Only for genuine spatial requirement.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-043",
@@ -1490,7 +1510,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CONDITIONALLY_ACCEPTED",
       "last_reviewed_at": "2026-08-29T16:00:00Z",
-      "notes": "MIT license. Per-package architecture fit required."
+      "notes": "MIT license. Per-package architecture fit required.",
+      "defer_reason": "No standalone UI/Three.js roadmap item is created by this repair. The existing ACCEPTED or CONDITIONALLY_ACCEPTED decision, family mapping, and catalog capability mapping remain unchanged; revisit only under a future explicit roadmap direction.",
+      "roadmap_relation": "defer: UI_GAME_THREEJS family-level research/catalog mappings are retained; this consistency repair creates no standalone roadmap item or implementation goal."
     },
     {
       "research_id": "RA-EXT-044",
@@ -2302,7 +2324,9 @@
       "roadmap_slot": "family:ui-game-threejs",
       "owner_decision_status": "CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE",
       "last_reviewed_at": "2026-09-01T00:00:00Z",
-      "notes": "P2P-IMPECCABLE-01 / issue #44. REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY. AVAILABLE != LOADED != AUTHORIZED != EXECUTED."
+      "notes": "P2P-IMPECCABLE-01 / issue #44. REVIEW_AUTHORITY != IMPLEMENTATION_AUTHORITY. AVAILABLE != LOADED != AUTHORIZED != EXECUTED.",
+      "defer_reason": "Roadmap work beyond the existing PARTIAL evidence surface remains held until the recorded Supervisor and Owner gates are satisfied. The adoption status, runtime DISCOVERED status, and gate state are unchanged.",
+      "roadmap_relation": "defer: the existing design-quality candidate remains pending its Supervisor and Owner gates; no separate roadmap implementation or promotion is made."
     },
     {
       "research_id": "RA-EXT-070",
@@ -3042,7 +3066,9 @@
       "roadmap_slot": "family:security-reverse",
       "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
       "last_reviewed_at": "2026-09-21T00:00:00+00:00",
-      "notes": "License: Apache-2.0, verified 2026-09-21. Pin equalled upstream HEAD at verification. External content is methodology/evidence, never P2P authority."
+      "notes": "License: Apache-2.0, verified 2026-09-21. Pin equalled upstream HEAD at verification. External content is methodology/evidence, never P2P authority.",
+      "defer_reason": "The backend remains a declared candidate only: no installation, MCP registration, browser/network runtime, credentials, execution, or live target interaction. Revisit only after separate Owner activation and explicit target-scope authorization.",
+      "roadmap_relation": "defer: preserve the existing web.browser.evidence reference surface; ChromeDevTools backend remains runtime-disabled pending separate Owner activation."
     },
     {
       "research_id": "RA-EXT-093",
@@ -3120,7 +3146,9 @@
       "roadmap_slot": "family:security-reverse",
       "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
       "last_reviewed_at": "2026-09-21T00:00:00+00:00",
-      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification."
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification.",
+      "defer_reason": "The backend remains a declared candidate only: no installation, MCP registration, browser/network runtime, credentials, execution, or live target interaction. Revisit only after separate Owner activation and explicit target-scope authorization.",
+      "roadmap_relation": "defer: preserve the existing web.endpoint.discovery reference surface; Katana remains runtime-disabled pending separate Owner activation."
     },
     {
       "research_id": "RA-EXT-095",
@@ -3157,7 +3185,9 @@
       "roadmap_slot": "family:security-reverse",
       "owner_decision_status": "SUBORDINATE_REFERENCE_NO_SEPARATE_AUTHORITY",
       "last_reviewed_at": "2026-09-21T00:00:00+00:00",
-      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification. Not a second P2P authority."
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification. Not a second P2P authority.",
+      "defer_reason": "This parser reference remains subordinate to web.endpoint.discovery. No separate capability ID, independent authority, installation, or roadmap implementation is authorized or implied.",
+      "roadmap_relation": "defer: keep jsluice subordinate under web.endpoint.discovery; no separate capability identity, authority, or roadmap item is created."
     },
     {
       "research_id": "RA-EXT-096",
@@ -3196,7 +3226,9 @@
       "roadmap_slot": "family:security-reverse",
       "owner_decision_status": "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED",
       "last_reviewed_at": "2026-09-21T00:00:00+00:00",
-      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification."
+      "notes": "License: MIT, verified 2026-09-21. Pin equalled upstream HEAD at verification.",
+      "defer_reason": "The backend remains a declared candidate only: no installation, MCP registration, browser/network runtime, credentials, execution, or live target interaction. Revisit only after separate Owner activation and explicit public-source/target-scope authorization.",
+      "roadmap_relation": "defer: preserve the existing web.public.reconstruction reference surface; Waymore remains runtime-disabled pending separate Owner activation."
     },
     {
       "research_id": "RA-EXT-097",

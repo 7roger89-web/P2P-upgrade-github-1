@@ -25,9 +25,11 @@ SUP_TPL = ROOT / "docs/p2p-development/templates/P2P-SUPERVISOR-TEMPLATE.md"
 GOV = ROOT / "governance/development-control.json"
 VALIDATOR = ROOT / "scripts/validate_p2p_development_framework.py"
 DEVCTRL = ROOT / "scripts/p2p_development_control.py"
+RESEARCH_LEDGER = ROOT / "governance/research-adoption-ledger.json"
+RUNTIME_CAPABILITIES = ROOT / ".p2p/system/p2p_capabilities/capabilities.json"
 
 GOAL_ID_RE = re.compile(r"^C(\d+)$")
-CAP_ID_RE = re.compile(r"^[A-Z][A-Z0-9_]{2,60}$")
+CAP_ID_RE = re.compile(r"^(?:[A-Z][A-Z0-9_]{2,60}|[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+)$")
 
 ORIGIN_TYPES = {
     "IMPLEMENTATION_GOAL", "RESEARCH_DECISION", "OWNER_ACCEPTED_PROPOSAL",
@@ -212,6 +214,104 @@ def test_cp21_schema_version_bumped():
     assert data["schema_version"] >= 2, "ledger follows schema v2 record shape"
     assert schema.get("properties", {}).get("schema_version", {}).get("minimum", 0) >= 2, \
         "schema must enforce v2 record shape"
+
+
+def test_capability_id_pattern_accepts_runtime_namespaced_identity_without_aliasing():
+    schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+    capability_pattern = schema["$defs"]["capability"]["properties"]["capability_id"]["pattern"]
+    dependency_pattern = schema["$defs"]["capability"]["properties"]["dependencies"]["items"]["pattern"]
+    assert capability_pattern == dependency_pattern
+    assert capability_pattern == CAP_ID_RE.pattern
+    from scripts import validate_p2p_development_framework as validator
+    assert validator.ID_PATTERN.pattern == capability_pattern
+    pattern = re.compile(capability_pattern)
+    for capability_id in (
+        "DECISION_TRACE",
+        "ui.design_system",
+        "game.three.scene_authoring",
+        "web.public.reconstruction",
+    ):
+        assert pattern.fullmatch(capability_id), f"canonical ID rejected: {capability_id}"
+    for malformed in ("ui..design", "ui.design/quality", "ui_design_system"):
+        assert not pattern.fullmatch(malformed), f"malformed ID accepted: {malformed}"
+
+
+def test_run07_coverage_projection_preserves_runtime_and_adoption_authority():
+    index = load_ledger()
+    adoption = json.loads(RESEARCH_LEDGER.read_text(encoding="utf-8"))
+    runtime = json.loads(RUNTIME_CAPABILITIES.read_text(encoding="utf-8"))
+    index_by_id = caps_by_id(index)
+    adoption_by_id = {record["research_id"]: record for record in adoption["records"]}
+    runtime_by_id = {record["CAPABILITY_ID"]: record for record in runtime["capabilities"]}
+
+    ui_mapping = {
+        "RA-EXT-033": "ui.design_system",
+        "RA-EXT-034": "ui.motion",
+        "RA-EXT-035": "ui.component_lab",
+        "RA-EXT-036": "game.three.spatial_query",
+        "RA-EXT-037": "game.three.visual",
+        "RA-EXT-038": "game.three.cinematic",
+        "RA-EXT-039": "game.three.navigation",
+        "RA-EXT-040": "game.three.adaptive_quality",
+        "RA-EXT-041": "ui.game_hud",
+        "RA-EXT-042": "ui.spatial",
+        "RA-EXT-043": "game.three.scene_authoring",
+    }
+    for research_id, capability_id in ui_mapping.items():
+        research = adoption_by_id[research_id]
+        cap = index_by_id[capability_id]
+        runtime_cap = runtime_by_id[capability_id]
+        assert research["status"] == "SELECTED"
+        assert research["capability_family"] == "UI_GAME_THREEJS"
+        assert research["owner_decision_status"] in {"ACCEPTED", "CONDITIONALLY_ACCEPTED"}
+        assert research["roadmap_relation"].startswith("defer:") and research.get("defer_reason")
+        assert cap["family"] == "DESIGN_AND_PRODUCT_INTELLIGENCE"
+        assert cap["status"] == "VERIFIED_IMPLEMENTED"
+        assert runtime_cap["STATUS"] == "ACTIVE"
+        assert runtime_cap["TYPE"] == "KNOWLEDGE_SOURCE"
+        assert any(research_id in ref for ref in cap["origin_refs"])
+
+    # RA-EXT-038 also maps to the pre-existing ui.motion ID; it does not mint an alias.
+    motion = index_by_id["ui.motion"]
+    assert sum("ui.motion" == c["capability_id"] for c in index["capabilities"]) == 1
+    assert any("RA-EXT-038" in ref for ref in motion["origin_refs"])
+
+    design_quality = adoption_by_id["RA-EXT-069"]
+    assert design_quality["status"] == "PARTIAL"
+    assert design_quality["owner_decision_status"] == "CANDIDATE_PENDING_SUPERVISOR_AND_OWNER_GATE"
+    assert runtime_by_id["ui.design_quality"]["STATUS"] == "DISCOVERED"
+    dq_projection = index_by_id["ui.design_quality"]
+    assert dq_projection["status"] == "DEFERRED"
+    assert dq_projection["deferred_reason"] and dq_projection["roadmap_relation"].startswith("defer:")
+    assert "DISCOVERED" in dq_projection["notes"]
+
+    for research_id, capability_id in (
+        ("RA-EXT-092", "web.browser.evidence"),
+        ("RA-EXT-094", "web.endpoint.discovery"),
+        ("RA-EXT-096", "web.public.reconstruction"),
+    ):
+        research = adoption_by_id[research_id]
+        cap = index_by_id[capability_id]
+        runtime_cap = runtime_by_id[capability_id]
+        assert research["status"] == "SELECTED"
+        assert research["owner_decision_status"] == "OWNER_SELECTED_IMPLEMENTATION_CANDIDATE_RUNTIME_DISABLED"
+        assert research["roadmap_relation"].startswith("defer:") and research.get("defer_reason")
+        assert runtime_cap["STATUS"] == "DISCOVERED"
+        assert cap["status"] == "DEFERRED"
+        assert "DISCOVERED" in cap["notes"]
+        provenance = runtime_cap["UPSTREAM_PROVENANCE"]
+        assert provenance["install_mode"] == "DISABLED"
+        assert provenance["execution_status"] == "NOT_EXECUTED"
+        for boundary in ("auto_install", "mcp_auto_registration", "browser_runtime", "network_runtime", "credentials", "vendor_snapshot"):
+            assert provenance[boundary] is False, f"{capability_id} boundary changed: {boundary}"
+
+    subordinate = adoption_by_id["RA-EXT-095"]
+    assert subordinate["status"] == "SELECTED"
+    assert subordinate["owner_decision_status"] == "SUBORDINATE_REFERENCE_NO_SEPARATE_AUTHORITY"
+    assert subordinate["canonical_capability_ids"] == ["web.endpoint.discovery"]
+    assert subordinate["roadmap_relation"].startswith("defer:") and subordinate.get("defer_reason")
+    assert "RA-EXT-095" in index_by_id["web.endpoint.discovery"]["notes"]
+    assert not any(c["capability_id"] in {"web.endpoint.discovery.jsluice", "web.jsluice"} for c in index["capabilities"])
 
 
 # ---------------------------------------------------------------- dependencies

@@ -61,8 +61,8 @@
       "properties": {
         "capability_id": {
           "type": "string",
-          "description": "Unique machine identifier, SCREAMING_SNAKE_CASE.",
-          "pattern": "^[A-Z][A-Z0-9_]{2,60}$"
+          "description": "Unique machine identifier. Existing ledger-native IDs use SCREAMING_SNAKE_CASE; canonical runtime capability IDs retain lowercase dotted identity.",
+          "pattern": "^(?:[A-Z][A-Z0-9_]{2,60}|[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+)$"
         },
         "name": { "type": "string" },
         "family": { "type": "string", "description": "Must be a key registered in families." },
@@ -98,7 +98,7 @@
         "dependencies": {
           "type": "array",
           "description": "capability_ids this record depends on; each must reference a valid capability_id in this ledger. The field itself is REQUIRED: an empty list is a valid declaration meaning 'no dependencies'. Dependency intent must always be explicitly declared, never implied by absence.",
-          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,60}$" }
+          "items": { "type": "string", "pattern": "^(?:[A-Z][A-Z0-9_]{2,60}|[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+)$" }
         },
         "known_gaps": {
           "type": "array",
@@ -113,6 +113,10 @@
         "next_condition": {
           "type": "string",
           "description": "When this capability should be reconsidered or what must be true before work resumes."
+        },
+        "roadmap_relation": {
+          "type": "string",
+          "description": "Truthful relation to an existing roadmap item or an explicit deferral. Must not imply a roadmap row, adoption state, or Owner authorization that does not exist."
         },
         "deferred_reason": {
           "type": "string",
