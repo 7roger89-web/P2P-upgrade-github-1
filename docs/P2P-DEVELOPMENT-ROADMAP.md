@@ -38,7 +38,7 @@ Items are ordered by **Owner value + dependency necessity + safety maturity + ev
 | Mutation Capability Ladder | 2 levels proven | Pilot-02, promotion-readiness review |
 | Resilience / Recovery / Failover | SHIPPED | C39, FW06 |
 | UI / UX / Visual Intelligence | SHIPPED | C13, C14 |
-| Obsolescence / Capability Drift | PARTIAL | drift-policy.json |
+| Obsolescence / Capability Drift | SHIPPED | drift-policy.json; P2P-CAPABILITY-DRIFT-SWEEP-01 |
 | Release / Install / Project Lifecycle | SHIPPED | C40, C43 |
 
 ## 4. Future roadmap items (priority-ordered, PLANNED)
@@ -52,8 +52,9 @@ Items are ordered by **Owner value + dependency necessity + safety maturity + ev
 | 6 | Bounded code mutation | Mutation Capability Ladder | Owner policy + new primitive design; .41 documentation base | Ladder-2 requires its own authority/evidence/rollback; safety-critical |
 | 7 | Orca-style isolated/parallel execution extension | Workspace / Session / Worktree Isolation | C08 re-selection | Bounded candidate comparison; permission envelope never widens |
 | 8 | Adaptive multi-host Council | Role / Team / Council | C09/C27 live-host evidence unblocked | Multi-host certification NOT_PROVEN; cannot rank above blocked evidence |
-| 9 | Capability drift revalidation sweep | Obsolescence / Capability Drift | none | Read-only; expires stale claims; strengthens every other item |
 | 10 | Release / project-installation lifecycle hardening | Release / Install / Project Lifecycle | Owner pin policy | Needed before Zero-to-Project touches authoritative projects; C40/C43 foundation exists |
+
+Completed priority item (no longer future/PLANNED): `RM-PRIORITY-DRIFT-SWEEP` (`Capability drift revalidation sweep`, priority #9) — **DONE**. Read-only full-index sweep executed 2026-10-02 (issue #293): all 191 capability records classified `VERIFIED_AT_EVIDENCE_TIME` (186) or `UNKNOWN_NOT_PROBED` (5), stale current-eligibility claims expired with history preserved, no live probe run and no credential requested; `scripts/p2p_capability_drift_sweep.py`, `docs/p2p-development/capability-ledger/capability-drift-sweep.json`, `docs/p2p-development/reports/P2P-CAPABILITY-DRIFT-SWEEP-01-REPORT.md`. Re-runs on demand; never scheduled, never mutates capability statuses.
 
 Completed priority item (no longer future/PLANNED): `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`, priority #4) — **DONE**. Governance-side read-only planner `scripts/p2p_roadmap_planner.py` VERSION=4, verified by charter invariant `MACHINE_READABLE_ROADMAP_VERIFIED`; latest current-main evidence `reports/planner/P2P-PLANNER-RUN-09.json`; never overrides Owner Gates and never auto-executes the goal it recommends. Runtime execution-loop integration remains an open gap — see §7.
 
@@ -89,11 +90,11 @@ Ba mảnh còn thiếu theo thứ tự phụ thuộc: (1) **completion của Lar
 
 ## Tính năng nào đã chọn nhưng chưa làm?
 
-`C08` continuation có kiểm soát (chủ động DEFERRED theo Owner); Zero-to-Project; Large-Goal completion; context-intelligence completeness; design intelligence composition; bounded code mutation; Orca-style parallel candidates; multi-host Council; drift revalidation sweep; release/install lifecycle hardening.
+`C08` continuation có kiểm soát (chủ động DEFERRED theo Owner); Zero-to-Project; Large-Goal completion; context-intelligence completeness; design intelligence composition; bounded code mutation; Orca-style parallel candidates; multi-host Council; release/install lifecycle hardening.
 
 ## Tính năng nào đã làm một phần?
 
-NUI design cognition (registry đã chọn, nhưng con số "174 faculties" chưa tìm được bằng chứng kho lưu trữ — không phải bị từ chối, vẫn NOT_PROVEN); Visual Commander (ý tưởng đã dùng làm đầu vào design, chưa composition hoàn chỉnh); decision trace đã có lõi, nhưng Code-Impact Evidence Contract chưa đầy đủ; drift watch đã có chính sách nhưng chưa sweep toàn bộ capabilities; session/cold-process recovery đã ship qua FW06.
+NUI design cognition (registry đã chọn, nhưng con số "174 faculties" chưa tìm được bằng chứng kho lưu trữ — không phải bị từ chối, vẫn NOT_PROVEN); Visual Commander (ý tưởng đã dùng làm đầu vào design, chưa composition hoàn chỉnh); decision trace đã có lõi, nhưng Code-Impact Evidence Contract chưa đầy đủ; drift watch đã có chính sách **và** đã sweep toàn bộ capabilities ngày 2026-10-02 (read-only, 191/191 record được phân loại); session/cold-process recovery đã ship qua FW06.
 
 ## Cái gì bị chủ động loại bỏ?
 
@@ -110,8 +111,9 @@ Tự promote sau khi goal PASS; tác vụ thành agent; 174 faculties thành 174
 | 6 | Bounded code mutation | Mức 2 của thang đột biến; cần authority/evidence/rollback riêng — an toàn trước |
 | 7 | Orca-style parallel candidates | Nâng chất lượng quyết định; phụ thuộc C08 |
 | 8 | Multi-host Council | Bằng chứng host thật đang BLOCKED (C09/C27) — không thể xếp cao hơn |
-| 9 | Drift revalidation sweep | Read-only, làm sạch claim lỗi thời, tăng độ tin cho mọi mục khác |
 | 10 | Release/install lifecycle hardening | Cần thiết trước khi Zero-to-Project chạm dự án chính thức |
+
+`Drift revalidation sweep` (hạng 9) đã **DONE** ngày 2026-10-02 — không còn là hướng tương lai: `scripts/p2p_capability_drift_sweep.py` + `docs/p2p-development/capability-ledger/capability-drift-sweep.json` (191/191 record phân loại; claim lỗi thời được expire nhưng giữ nguyên lịch sử; không probe live, không xin credential; chỉ chạy khi được yêu cầu).
 
 `Roadmap-aware Development Planner` (hạng 4) đã **DONE** — không còn là hướng tương lai: `scripts/p2p_roadmap_planner.py` VERSION=4 (read-only, hash binding, coverage gate fail-closed) đã máy hóa coverage gate và không ghi đè Owner Gate; bằng chứng mới nhất `reports/planner/P2P-PLANNER-RUN-09.json` (xem §7). Runtime execution-loop integration vẫn là gap mở, được khai báo trung thực.
 

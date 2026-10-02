@@ -541,6 +541,20 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/plans/2026-09-21-p2p-web-reverse-foundation-01/",
             "tests/test_p2p_web_reverse_reference.py",
             ".github/workflows/web-reverse-foundation-focused.yml",
+            # Issue #293 capability-drift revalidation sweep. The helper is a
+            # deterministic read-only evidence classifier over the existing
+            # capability index; it creates no router, registry, daemon,
+            # scheduler, execution path, network probe service, or second
+            # state store. Only the exact Issue-#293 surfaces are permitted.
+            "scripts/p2p_capability_drift_sweep.py",
+            "tests/test_p2p_capability_drift_sweep.py",
+            "docs/p2p-development/capability-ledger/capability-drift-sweep.json",
+            "docs/p2p-development/capability-ledger/capability-index.json",
+            "docs/p2p-development/reports/P2P-CAPABILITY-DRIFT-SWEEP-01-REPORT.md",
+            "governance/p2p-development-roadmap.json",
+            "docs/P2P-DEVELOPMENT-ROADMAP.md",
+            "docs/p2p-development/current-roadmap.md",
+            "reports/planner/P2P-PLANNER-RUN-10.json",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -618,6 +632,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 "tests/test_p2p_arena_canary_install_inheritance.py",
                 "tests/test_p2p_owner_goal_one_command.py",
                 "scripts/generate_arena_canary_proofs.py",
+                # Issue #293 capability-drift revalidation sweep: the bounded
+                # deterministic read-only audit helper plus its focused test.
+                "scripts/p2p_capability_drift_sweep.py",
+                "tests/test_p2p_capability_drift_sweep.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             if not is_vendored_bytes and any(
@@ -663,6 +681,12 @@ class NoParallelArchitectureTests(unittest.TestCase):
                     # Issue #254: evidence generator for the generated Arena
                     # prompt proofs. It reads and prints; it routes nothing.
                     "scripts/generate_arena_canary_proofs.py",
+                    # Issue #293 capability-drift revalidation sweep. The
+                    # helper is a deterministic read-only evidence classifier
+                    # over the existing capability index; it creates no
+                    # router, registry, daemon, scheduler, execution path,
+                    # network probe service, or second state store.
+                    "scripts/p2p_capability_drift_sweep.py",
                 },
                 f"new script surface: {path}",
             )

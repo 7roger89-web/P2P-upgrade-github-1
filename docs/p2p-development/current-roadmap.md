@@ -84,7 +84,7 @@ Recomputed on 2026-10-02 directly from `docs/p2p-development/capability-ledger/c
 | Beginner Lifecycle | 7 | `VERIFIED_IMPLEMENTED`=4; `PARTIAL`=3 |
 | Outcome Learning | 4 | `VERIFIED_IMPLEMENTED`=3; `FOUNDATION_READY`=1 |
 
-Observed status counts across all 191 records (declared vocabulary order): `DEFERRED`=8; `FOUNDATION_READY`=44; `OBSOLETE`=0; `PARTIAL`=9; `PLANNED`=39; `REJECTED`=15; `UNKNOWN`=1; `VERIFIED_IMPLEMENTED`=75.
+Observed status counts across all 191 records (declared vocabulary order): `DEFERRED`=8; `FOUNDATION_READY`=44; `OBSOLETE`=0; `PARTIAL`=9; `PLANNED`=38; `REJECTED`=15; `UNKNOWN`=1; `VERIFIED_IMPLEMENTED`=76. (Refreshed 2026-10-02 after `CAPABILITY_DRIFT_REVALIDATION_SWEEP` moved `PLANNED` -> `VERIFIED_IMPLEMENTED` on full-index sweep evidence.)
 Status vocabulary declared by the ledger: `DEFERRED`, `FOUNDATION_READY`, `OBSOLETE`, `PARTIAL`, `PLANNED`, `REJECTED`, `UNKNOWN`, `VERIFIED_IMPLEMENTED`.
 
 Registered-family subtotal is 188 records. The 3 inherited records remain visible under unregistered legacy family labels: `RELEASE_INSTALL_PROJECT_LIFECYCLE`=1; `SAFETY_AUTHORITY_PERMISSIONS`=1; `OBSOLESCENCE_CAPABILITY_DRIFT`=1; they are reported as residual schema drift rather than silently moved or deleted.
