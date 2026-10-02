@@ -2,7 +2,7 @@
 
 Title: Context Budget Protocol
 Date: 2026-10-01
-Status: P0 Complete / P1 Docs Slice Complete / Ready For Supervisor
+Status: Closed / Merged / Supervisor Accepted
 Companion plan: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-plan.md`
 Companion evidence: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-evidence.md`
 Companion benchmark: `docs/plans/2026-10-01-context-budget-protocol/2026-10-01-context-budget-protocol-benchmark.md`
@@ -77,7 +77,7 @@ Record how many files the target is related to before deciding touch mode. A fil
 
 | Unit | Current State | Required State | Status | Relationship Count | Evidence | Next Plan Decision |
 |------|---------------|----------------|--------|--------------------|----------|--------------------|
-| Context Budget Protocol policy family | Existing mechanisms are preserved and the four policy/guidance surfaces now carry explicit 70k/100k heuristic budgeting, targeted hydration, thin handoff, do-not-carry, rotation, Writer stop, Supervisor independence, and mutable-state re-verification rules. | Existing mechanisms remain authoritative while operational context-budget semantics are explicit and consistent. | correct | N/A related files | E1-P1A-DOC1, E1-P1A-DOC2, E1-P1A-DOC3, E1-P1A-SCENARIO1 | preserve runtime; send exact branch HEAD to independent Supervisor |
+| Context Budget Protocol policy family | Existing mechanisms are preserved and the four policy/guidance surfaces carry the accepted context-budget protocol. PR #286 passed independent exact-head Supervisor review and is merged to main. | Existing mechanisms remain authoritative while operational context-budget semantics remain explicit and consistent. | correct | N/A related files | E1-P1A-DOC1, E1-P1A-DOC2, E1-P1A-DOC3, E1-P1A-SCENARIO1, E-CLOSE-SUP1, E-CLOSE-MERGE1 | preserve merged policy; no active follow-up for Issue #285 |
 
 ## Status Refresh Log
 
@@ -87,6 +87,8 @@ Record how many files the target is related to before deciding touch mode. A fil
 | R1 | 2026-10-01 | after P1-A docs commits | four docs-only authority/guidance surfaces | partial -> correct | E1-P1A-DOC1, E1-P1A-DOC2, E1-P1A-DOC3, E1-P1A-SCENARIO1 | independent Supervisor review next; runtime remains preserve-only. |
 
 | R2 | 2026-10-01 | after main drift repair | PR #286 branch relation | stale/diverged -> synchronized by two-parent merge | E1-P1A-DRIFT1, E1-P1A-MERGE1 | perform fresh exact-HEAD Supervisor review; no further Writer mutation unless rejected. |
+
+| R3 | 2026-10-02 | post-merge closure | plan lifecycle + benchmark cleanup | ready_for_supervisor -> closed; orphan P2 benchmark removed | E-CLOSE-SUP1, E-CLOSE-MERGE1, E-CLOSE-DEAD1 | no active follow-up for Issue #285. |
 
 ## Phase Touch Map
 
@@ -129,7 +131,7 @@ correct
 
 Allowed next action:
 
-Preserve the completed docs-only policy slice and send the exact current HEAD to independent Supervisor review.
+Preserve the merged docs-only policy. No active follow-up remains for Issue #285.
 
 Forbidden next action:
 
@@ -139,7 +141,7 @@ Do not create a new context framework, packet, state store, token-metering servi
 
 | Plan Item | Actual Status Finding | Required Status / Next-Action Update |
 |-----------|-----------------------|--------------------------------------|
-| P1-A | Existing runtime and core invariants are correct; the docs-only policy gap is now closed. | keep; independent Supervisor review |
+| P1-A | Existing runtime and core invariants are correct; policy gap is closed, independently accepted, and merged. | preserve / closed |
 
 ## Implementation Gate
 
