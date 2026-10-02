@@ -282,14 +282,16 @@
       "family_id": "OBSOLESCENCE_DRIFT",
       "name": "Obsolescence / Capability Drift",
       "purpose": "Drift fail-closed policy, stale-claim expiration, capability evidence revalidation, vendor-displacement survival.",
-      "status": "PARTIAL",
+      "status": "SHIPPED",
       "provenance": [
         "RA-EXT-024",
         "drift-policy.json"
       ],
       "canonical_refs": [
         "governance/drift-policy.json",
-        "charter DRIFT_FAIL_CLOSED"
+        "charter DRIFT_FAIL_CLOSED",
+        "scripts/p2p_capability_drift_sweep.py",
+        "docs/p2p-development/capability-ledger/capability-drift-sweep.json"
       ]
     },
     {
@@ -678,7 +680,7 @@
       "title": "Capability drift revalidation sweep",
       "family": "OBSOLESCENCE_DRIFT",
       "owner_value": "Kh\u00f4ng c\u00f2n claim l\u1ed7i th\u1eddi: m\u1ecdi capability evidence \u0111\u01b0\u1ee3c revalidate ho\u1eb7c \u0111\u00e1nh d\u1ea5u UNKNOWN.",
-      "status": "PLANNED",
+      "status": "DONE",
       "priority": 9,
       "dependencies": [
         "drift-policy.json",
@@ -690,13 +692,14 @@
         "RA-EXT-024"
       ],
       "canonical_capability_ids": [],
-      "current_evidence": "drift-policy.json; DRIFT_FAIL_CLOSED invariant; per-capability LIVE_CERTIFICATION_RECORD semantics",
+      "current_evidence": "drift-policy.json; DRIFT_FAIL_CLOSED invariant; per-capability LIVE_CERTIFICATION_RECORD semantics; 2026-10-02 full-index sweep: scripts/p2p_capability_drift_sweep.py, docs/p2p-development/capability-ledger/capability-drift-sweep.json (191/191 records classified; capability-index sha256 40c82d77c13ec17d8ed10475529a076af48c9d993040ae2cad0da36b00d02515), docs/p2p-development/reports/P2P-CAPABILITY-DRIFT-SWEEP-01-REPORT.md",
       "target_evidence": "sweep report: every capability marked VERIFIED-AT-EVIDENCE-TIME or UNKNOWN_NOT_PROBED; stale claims expired",
       "mutation_risk_class": "READ_ONLY",
       "project_impact": "NONE",
       "promotion_required": "NO",
-      "next_safe_when": "now",
-      "defer_reason": ""
+      "next_safe_when": "DONE \u2014 no further action; re-run the read-only sweep on demand when canonical inputs change (no schedule, no daemon)",
+      "defer_reason": "",
+      "reconciliation_note": "RM-PRIORITY-DRIFT-SWEEP reconciled PLANNED -> DONE by issue #293: full-index read-only sweep executed 2026-10-02 with SWEEP_RECORD_COUNT=191 == CURRENT_CAPABILITY_INDEX_COUNT=191, every record classified VERIFIED_AT_EVIDENCE_TIME (186) or UNKNOWN_NOT_PROBED (5), stale current-eligibility claims expired with history preserved, no live probe run and no credential requested, deterministic output reproduced, one unmerged PR. Reuses the existing drift-policy/DRIFT_FAIL_CLOSED/capability-index machinery; no second drift framework and no automatic status mutation."
     },
     {
       "roadmap_id": "RM-PRIORITY-RELEASE-LIFECYCLE",

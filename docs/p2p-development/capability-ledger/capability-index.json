@@ -304,7 +304,9 @@
         "DRIFT_GATE",
         "DOCTOR_VALIDATION"
       ],
-      "known_gaps": [],
+      "known_gaps": [
+        "reports/PILOT_INSTALLATION_EVIDENCE.md (historical pilot evidence pointer) is not present in the current tree. The pointer is preserved as history and is NOT current-tree evidence; current-tree proof is scripts/p2p_safe_installer.py + scripts/test_safe_installer_rollback.py (capability drift sweep 2026-10-02)."
+      ],
       "do_not_duplicate_with": [],
       "next_condition": "Hỗ trợ cập nhật từng phần (incremental updates).",
       "last_reviewed": "2026-08-21",
@@ -1873,7 +1875,9 @@
       "dependencies": [
         "BACKEND_ADAPTER_REGISTRY"
       ],
-      "known_gaps": [],
+      "known_gaps": [
+        "Provider certification is HISTORICAL_ONLY: the Manus certification evidence is not durably present in the current tree and no fresh authorized probe was run. CURRENT_MANUS_ELIGIBILITY = UNKNOWN_NOT_PROBED, so the certified-as-safe-environment statement must never be read as current eligibility; the adapter implementation refs below are the current-tree verified part (capability drift sweep 2026-10-02)."
+      ],
       "do_not_duplicate_with": [],
       "next_condition": "Hỗ trợ nhiều luồng thực thi song song (parallel dispatch).",
       "last_reviewed": "2026-08-21",
@@ -4559,7 +4563,7 @@
       ],
       "status": "FOUNDATION_READY",
       "implementation_refs": [
-        "host_attestation.py (lane-only)",
+        ".p2p/system/p2p_capabilities/host_attestation.py (canonical; the earlier lane-only status is preserved as history)",
         "role_bridge/role_receipt/role_verifier (canonical, byte-identical base)"
       ],
       "evidence_refs": [
@@ -4578,13 +4582,14 @@
       "dependencies": [],
       "known_gaps": [
         "MULTIHOST_LIVE_COUNCIL = NOT_PROVEN",
-        "host_attestation.py NOT in canonical runtime"
+        "host_attestation.py canonicalization is resolved: the module is present at .p2p/system/p2p_capabilities/host_attestation.py; the earlier lane-only wording is kept in git history, not as a current gap.",
+        "CURRENT_LIVE_CERTIFICATION_ELIGIBILITY = UNKNOWN_NOT_PROBED: this record's evidence anchors live in git-ignored .p2p/state/ runtime state or on a superseded branch, so no current-tree evidence anchor resolves (capability drift sweep 2026-10-02). The historical single-host 8/8 certification is preserved as history only."
       ],
       "do_not_duplicate_with": [
         "C36 candidate c8915363... (UNPROMOTED, preserved)",
         "C31 terminal (BLOCKED, preserved)"
       ],
-      "next_condition": "Owner decision: integrate host_attestation.py into canonical runtime or keep lane-only",
+      "next_condition": "Resolved by this record's own 2026-08-19 canonicalization note (host_attestation.py is canonical). Remaining open item: re-running live certification needs a fresh authorized host probe; MULTIHOST_LIVE_COUNCIL stays NOT_PROVEN.",
       "last_reviewed": "2026-08-19T13:15:00Z",
       "freshness": "from_governance_record",
       "notes": "Certification record NOT a development candidate; DO NOT PROMOTE. | HOST_ATTESTATION_CANONICALIZED: all 4 live-cert modules canonical; certification bound to canonical runtime surface; no rerun; verified 2026-08-19 evidence time only. HISTORICAL_SINGLE_HOST_LIVE_COUNCIL_8_OF_8=TRUE; CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE.",
@@ -4833,19 +4838,27 @@
         "RA-EXT-024",
         "drift-policy.json"
       ],
-      "status": "PLANNED",
-      "implementation_refs": [],
+      "status": "VERIFIED_IMPLEMENTED",
+      "implementation_refs": [
+        "scripts/p2p_capability_drift_sweep.py"
+      ],
       "evidence_refs": [
         "governance/drift-policy.json",
-        "charter DRIFT_FAIL_CLOSED"
+        "charter DRIFT_FAIL_CLOSED",
+        "docs/p2p-development/capability-ledger/capability-drift-sweep.json",
+        "docs/p2p-development/reports/P2P-CAPABILITY-DRIFT-SWEEP-01-REPORT.md",
+        "tests/test_p2p_capability_drift_sweep.py"
       ],
       "dependencies": [],
-      "known_gaps": [],
+      "known_gaps": [
+        "Revalidation is point-in-time and on demand, never scheduled: no daemon, watcher, polling loop, or second drift framework was added. A later re-run is required to refresh current-eligibility statements."
+      ],
       "do_not_duplicate_with": [],
-      "next_condition": "Can start now \u2014 no blocked dependencies.",
-      "last_reviewed": "2026-08-21T04:27:11Z",
-      "freshness": "from_roadmap_consolidation",
-      "notes": "Policy and invariant SHIPPED; the full sweep across all capabilities is the open PLANNED piece. Read-only."
+      "next_condition": "Re-run scripts/p2p_capability_drift_sweep.py when canonical inputs change; no automatic scheduling.",
+      "last_reviewed": "2026-10-02",
+      "freshness": "verified_against_filesystem",
+      "notes": "Full-index sweep implemented and executed 2026-10-02 (Issue #293): every capability-index record classified VERIFIED_AT_EVIDENCE_TIME or UNKNOWN_NOT_PROBED, no live probe run, stale current-eligibility claims expired. Reuses drift-policy.json + DRIFT_FAIL_CLOSED + capability-index semantics; adds no second drift framework and never rewrites statuses automatically.",
+      "origin_type": "IMPLEMENTATION_GOAL"
     },
     {
       "capability_id": "RELEASE_INSTALL_LIFECYCLE_HARDENING",

@@ -54,7 +54,7 @@ The vocabulary enforces strict distinctions: **RESEARCHED ≠ SELECTED ≠ IMPLE
 | RA-EXT-021 | Large Goal autonomous execution | PARTIAL | bounded foreground execution, delegation, checkpoint/resume | C12 + C15 DONE; completeness = PLANNED roadmap item |
 | RA-EXT-022 | Beginner-first experience | VERIFIED | North Star, progressive disclosure, decision separation | charter §1/§4; BEGINNER_LIFECYCLE family |
 | RA-EXT-023 | Decision Trace / Code-Impact Evidence | PARTIAL | native decision trace, beginner certification | FW02/FW05 shipped; code-impact contract = PLANNED |
-| RA-EXT-024 | Obsolescence / capability drift watch | PARTIAL | drift fail-closed policy, revalidation discipline | drift-policy.json; DRIFT_FAIL_CLOSED invariant |
+| RA-EXT-024 | Obsolescence / capability drift watch | VERIFIED | drift fail-closed policy, revalidation discipline | drift-policy.json; DRIFT_FAIL_CLOSED invariant; P2P-CAPABILITY-DRIFT-SWEEP-01 (`scripts/p2p_capability_drift_sweep.py` + `capability-drift-sweep.json`) |
 | RA-EXT-025 | Provider-neutral control plane | VERIFIED | full identity ladder, neutral adapter registry | C35 PROMOTED_VERIFIED; P2P_CORE_PROVIDER_NEUTRAL |
 | RA-EXT-026 | Deliberately rejected safety boundaries | VERIFIED | explicit rejected-pattern register | charter §7 never-reintroduce list (21 patterns) |
 

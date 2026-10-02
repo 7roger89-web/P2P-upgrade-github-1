@@ -827,7 +827,7 @@
       "source_type": "INTERNAL_P2P_RESEARCH",
       "source_reference": "governance/drift-policy.json; charter DRIFT_FAIL_CLOSED",
       "source_version_or_commit": "drift-policy.json",
-      "provenance_status": "MECHANISM_SHIPPED_VALIDATION_PENDING",
+      "provenance_status": "MECHANISM_SHIPPED_AND_VALIDATED",
       "research_summary": "AI providers evolve quickly; stale host/model/capability claims expire; capability evidence must be revalidated; P2P must survive vendor displacement.",
       "selected_ideas": [
         "drift fail-closed policy",
@@ -838,25 +838,28 @@
       "rejected_ideas": [
         "stale certification silently remaining current"
       ],
-      "p2p_translation": "Mechanism shipped: drift-policy.json + DRIFT_FAIL_CLOSED invariant + LIVE_CERTIFICATION_RECORD semantics. Validation gap: full drift revalidation sweep across all capabilities is PLANNED.",
+      "p2p_translation": "Mechanism shipped and validated: drift-policy.json + DRIFT_FAIL_CLOSED invariant + LIVE_CERTIFICATION_RECORD semantics + the full read-only revalidation sweep executed 2026-10-02 (scripts/p2p_capability_drift_sweep.py; every capability-index record classified VERIFIED_AT_EVIDENCE_TIME or UNKNOWN_NOT_PROBED; stale current-eligibility claims expired with history preserved; no live probe run).",
       "capability_family": "OBSOLESCENCE_CAPABILITY_DRIFT",
       "canonical_capability_ids": [
         "DRIFT_FAIL_CLOSED (charter invariant)",
         "drift-policy.json"
       ],
-      "status": "PARTIAL",
+      "status": "VERIFIED",
       "evidence_pointers": [
         "governance/drift-policy.json",
         "charter invariant DRIFT_FAIL_CLOSED",
-        "master-roadmap C36/C38 live-cert semantics"
+        "master-roadmap C36/C38 live-cert semantics",
+        "scripts/p2p_capability_drift_sweep.py",
+        "docs/p2p-development/capability-ledger/capability-drift-sweep.json",
+        "docs/p2p-development/reports/P2P-CAPABILITY-DRIFT-SWEEP-01-REPORT.md"
       ],
       "dependencies": [
         "RA-EXT-017"
       ],
       "roadmap_slot": "family:drift",
       "owner_decision_status": "OWNER_SELECTED",
-      "last_reviewed_at": "2026-08-21T04:25:23Z",
-      "notes": "CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED after host transitions; drift watch is the standing reason not to claim CURRENTLY_ELIGIBLE."
+      "last_reviewed_at": "2026-10-02T00:00:00Z",
+      "notes": "CURRENT_AUTH_STATE = UNKNOWN_NOT_PROBED after host transitions; drift watch is the standing reason not to claim CURRENTLY_ELIGIBLE. 2026-10-02 (issue #293): the PLANNED validation gap is closed by the full-index sweep; status PARTIAL -> VERIFIED, provenance MECHANISM_SHIPPED_VALIDATION_PENDING -> MECHANISM_SHIPPED_AND_VALIDATED. History preserved: the earlier PARTIAL wording stays in git history."
     },
     {
       "research_id": "RA-EXT-025",
