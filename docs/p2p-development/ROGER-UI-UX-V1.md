@@ -219,3 +219,27 @@ Until then:
 ROGER_UI_UX_V1=EXPERIMENTAL
 CROSS_PROJECT_DEFAULT=NO
 ```
+
+
+## 16. Integration discovery — existing p2p-uiux wins
+
+Fresh repository inspection found the existing project-owned `.agents/skills/p2p-uiux/SKILL.md`, runtime UI/UX routing, browser-evidence contract, installer semantics, and eval coverage.
+
+Therefore this experiment MUST NOT create a second P2P UI/UX authority. The durable P2P path is to fold only proven pilot rules into the existing `p2p-uiux` skill:
+
+- project/codebase audit before layout;
+- ARRIVE / DECIDE / ACT / EXCEPTIONS user-job contract;
+- BUILD / REDESIGN / AUDIT / SYSTEM / VISUAL_REGRESSION execution lanes;
+- reuse-first component/dependency order;
+- minimum necessary Owner Gate;
+- operational attention > decoration patterns.
+
+Preserve the existing `p2p-uiux` runtime-evidence contract, provider-neutral browser classification, read-only review safety, accessibility boundary, router primacy, and optional Aesthetica boundary.
+
+A standalone `roger-ui-ux` package may exist as a portable user skill outside P2P. When a target project exposes a stronger project-owned UI/UX authority (especially P2P `p2p-uiux`), that authority wins and the portable skill is supplemental only.
+
+```text
+P2P_PARALLEL_UIUX_SKILL=NO
+P2P_INTEGRATION_TARGET=existing p2p-uiux
+PORTABLE_ROGER_UIUX=ALLOWED_AS_SUPPLEMENT_OUTSIDE_P2P
+```
