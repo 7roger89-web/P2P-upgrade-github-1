@@ -1,0 +1,444 @@
+{
+  "planner": "p2p_roadmap_planner",
+  "version": "4",
+  "spec_goal": "P2P-OWNER-CAPABILITY-INTAKE-STRICT-BINDING-01",
+  "OFFICIAL_BASELINE": {
+    "version": "8.4.7-C-codex.19",
+    "artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "promotion_status": "PROMOTED_VERIFIED",
+    "approval_reference": "P2P-APR-20260815T013545Z-0068b3047f"
+  },
+  "HASHES": {
+    "p2p_development_roadmap_json_sha256": "2e234e2d2bd765a0c25cf7a8c18323fe9e192bee906e91ad97fa263237cec7a1",
+    "p2p_development_roadmap_schema_version": "p2p-framework/development-roadmap/1",
+    "research_adoption_ledger_json_sha256": "50417aad1121a0e47eb4daa8f03f49adfd4419348efdbdc16a698e38533c52c9",
+    "research_adoption_ledger_schema_version": "p2p-framework/research-adoption-ledger/1",
+    "capability_index_json_sha256": "5cb76f095e9a117323c8e0aceb3783d69f44e6ed769d1952412a853b099b3918",
+    "development_control_json_sha256": "3fc6cebdfb4170320ea1edde1ef857ee15967bb7c7af83706f87a3ab08b8d7e0",
+    "intake_contract_json_sha256": "609e10fac3991703951c6b3b17520b2132d83aa57cdd2b6dbc58d51bc63b504a",
+    "research_intake_ledger_json_sha256": "5617e00ca41b221a7f17177166fed44a1ef6060e2fbf07a3a3158da092fe2885",
+    "official_baseline_version": "8.4.7-C-codex.19",
+    "official_baseline_artifact_sha256": "3a9ee51321e1f5e40e35ce73eb90727cddb571a672aa095d16d76af2feb03dd8",
+    "planning_timestamp_utc": "2026-10-02T04:01:49Z"
+  },
+  "AUTHORITY_ORDER": {
+    "official_baseline": "development-control",
+    "c_line_historical_status": "development-control",
+    "future_roadmap_item_family": "p2p-development-roadmap",
+    "research_adoption_provenance": "research-adoption-ledger",
+    "capability_existence_status": "capability-index",
+    "owner_current_intent": "OWNER_INPUT_MODEL",
+    "external_research": "PROVENANCE_ONLY_NEVER_AUTHORITY"
+  },
+  "PLANNING_STATUS": "PLANNING_COMPLETE",
+  "PLAN_COMPLETE": true,
+  "ROADMAP_COVERAGE_GATE": {
+    "ROADMAP_COVERAGE_GAP": false,
+    "gaps": [],
+    "owner_selected_candidates": [
+      "RM-Z2P",
+      "RM-PRIORITY-LARGE-GOAL",
+      "RM-PRIORITY-DESIGN",
+      "RM-PRIORITY-CODE-MUTATION",
+      "RM-PRIORITY-ORCA-EXT",
+      "RM-PRIORITY-MULTIHOST-COUNCIL",
+      "RM-PRIORITY-DRIFT-SWEEP",
+      "RA-EXT-009",
+      "RA-EXT-010",
+      "RA-EXT-021",
+      "RA-EXT-023",
+      "RA-EXT-024",
+      "RA-EXT-033",
+      "RA-EXT-034",
+      "RA-EXT-035",
+      "RA-EXT-036",
+      "RA-EXT-037",
+      "RA-EXT-038",
+      "RA-EXT-039",
+      "RA-EXT-040",
+      "RA-EXT-041",
+      "RA-EXT-042",
+      "RA-EXT-043",
+      "RA-EXT-069",
+      "RA-EXT-092",
+      "RA-EXT-094",
+      "RA-EXT-095",
+      "RA-EXT-096"
+    ],
+    "status_translation": {
+      "ledger_material": [
+        "PARTIAL",
+        "PLANNED",
+        "SELECTED"
+      ],
+      "ledger_adopted": [
+        "IMPLEMENTED",
+        "SHIPPED",
+        "VERIFIED"
+      ],
+      "ledger_excluded_with_reason": [
+        "DEFERRED",
+        "REJECTED",
+        "SUPERSEDED"
+      ],
+      "unknown_never_satisfies": true
+    },
+    "RESEARCH_TO_ROADMAP_REVERSE_COVERAGE": true,
+    "CAPABILITY_TO_ROADMAP_COVERAGE": true,
+    "CAPABILITY_REGISTRY_ENTRIES_EXCLUDED_FROM_GATE": [
+      "ATLAS_CAPSULE",
+      "CONTEXT_CAPSULES",
+      "KNOWLEDGE_DELTA",
+      "BOOK_TO_SKILL_CONVERSION",
+      "QUALITY_ADJUSTED_ROUTING",
+      "HOST_FALLBACK",
+      "BEGINNER_CONTROL_CENTER",
+      "BEGINNER_DECISION_INBOX",
+      "BEGINNER_HEALTH_GOAL_VIEWS",
+      "C31_LIVE_AUTH_PROBE_FRESH_EVIDENCE",
+      "C31_OWNER_AUTH_ACTION_DEPENDENCY",
+      "ZERO_TO_PROJECT_INTENT_COMPILER",
+      "LARGE_GOAL_COMPLETENESS",
+      "CONTEXT_INTELLIGENCE_COMPLETENESS",
+      "GOAL_DESIGN_INTELLIGENCE_COMPOSITION",
+      "BOUNDED_CODE_MUTATION_PRIMITIVE",
+      "ORCA_BOUNDED_CANDIDATE_FANOUT",
+      "MULTIHOST_COUNCIL_CERTIFICATION",
+      "CAPABILITY_DRIFT_REVALIDATION_SWEEP",
+      "RELEASE_INSTALL_LIFECYCLE_HARDENING",
+      "TOKEN_BOUNDED_PROJECT_MAP",
+      "ADAPTIVE_CONTEXT_BUDGET"
+    ],
+    "ORPHAN_OWNER_DECISIONS": [],
+    "INTAKE_RECORDS_CONSUMED": 7,
+    "INTAKE_CONTRACT_BOUND": true,
+    "INTAKE_UNKNOWN_RECORDS": [],
+    "UNKNOWN_ADOPTION_RECORDS": [],
+    "EXPLICIT_INTAKE_BINDINGS": 1,
+    "FUZZY_MATCHES_USED_FOR_AUTHORITY": 0,
+    "OWNER_ACCEPTED_CAPABILITIES": [
+      "BOUNDED_TOOL_OUTPUT",
+      "C31_EXECUTION_TARGET_AS_CERTIFICATION_INTAKE",
+      "CACHE_AFFECTING_CONFIGURATION_FINGERPRINT",
+      "CACHE_AWARE_MODEL_EFFORT_STABILITY",
+      "CACHE_HIT_TELEMETRY",
+      "CODE_INTELLIGENCE_FIRST_NAVIGATION",
+      "CONTEXTUAL_RULE_INTELLIGENCE",
+      "CONTEXT_COST_TELEMETRY",
+      "CONTEXT_PRESSURE_MONITORING",
+      "DURABLE_PRE_COMPACTION_CHECKPOINT",
+      "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
+      "PLANNER_PROVIDER_NEUTRALITY",
+      "PROVIDER_NEUTRAL_AUTOPILOT",
+      "QUALITY_ADJUSTED_CONTEXT_OPTIMIZATION",
+      "RAW_OUTPUT_ARTIFACT_OFFLOADING",
+      "SAFE_CONTEXT_COMPACTION",
+      "SAFE_QUIESCE_AND_DRAIN",
+      "SESSION_CONFIGURATION_STABILITY",
+      "SESSION_REUSE_DECISION",
+      "SUBAGENT_CONTEXT_ISOLATION",
+      "SYMBOL_AWARE_RETRIEVAL",
+      "TASK_SESSION_BOUNDARY_MANAGEMENT",
+      "TASK_TARGETED_MCP_LOADING",
+      "TASK_TARGETED_SKILL_LOADING",
+      "TASK_TARGETED_TOOL_LOADING",
+      "VERBOSE_WORK_CONTEXT_ISOLATION"
+    ],
+    "EXPLICITLY_ROADMAPPED_CAPABILITIES": [
+      "BOUNDED_TOOL_OUTPUT",
+      "C31_EXECUTION_TARGET_AS_CERTIFICATION_INTAKE",
+      "CACHE_AFFECTING_CONFIGURATION_FINGERPRINT",
+      "CACHE_AWARE_MODEL_EFFORT_STABILITY",
+      "CACHE_HIT_TELEMETRY",
+      "CODE_INTELLIGENCE_FIRST_NAVIGATION",
+      "CONTEXTUAL_RULE_INTELLIGENCE",
+      "CONTEXT_COST_TELEMETRY",
+      "CONTEXT_PRESSURE_MONITORING",
+      "DURABLE_PRE_COMPACTION_CHECKPOINT",
+      "MODEL_PROVIDER_SWAP_WITHOUT_CORE_CHANGE",
+      "PLANNER_PROVIDER_NEUTRALITY",
+      "PROVIDER_NEUTRAL_AUTOPILOT",
+      "QUALITY_ADJUSTED_CONTEXT_OPTIMIZATION",
+      "RAW_OUTPUT_ARTIFACT_OFFLOADING",
+      "SAFE_CONTEXT_COMPACTION",
+      "SAFE_QUIESCE_AND_DRAIN",
+      "SESSION_CONFIGURATION_STABILITY",
+      "SESSION_REUSE_DECISION",
+      "SUBAGENT_CONTEXT_ISOLATION",
+      "SYMBOL_AWARE_RETRIEVAL",
+      "TASK_SESSION_BOUNDARY_MANAGEMENT",
+      "TASK_TARGETED_MCP_LOADING",
+      "TASK_TARGETED_SKILL_LOADING",
+      "TASK_TARGETED_TOOL_LOADING",
+      "VERBOSE_WORK_CONTEXT_ISOLATION"
+    ],
+    "FUZZY_AUTHORITY_MATCHING": "DISABLED",
+    "FAMILY_ALIAS_ALONE_DOES_NOT_SATISFY_COVERAGE": true
+  },
+  "DEPENDENCY_GRAPH": {
+    "RM-C08": {
+      "class": "OWNER_DEFERRED",
+      "reason": "Explicit Owner deferral; superseded in sequencing by lifecycle/foundation goals",
+      "status": "DEFERRED"
+    },
+    "RM-C09": {
+      "class": "BLOCKED_BY_EXTERNAL_EVIDENCE",
+      "reason": "EVENT_EVIDENCE_UNAVAILABLE",
+      "status": "BLOCKED"
+    },
+    "RM-C27": {
+      "class": "BLOCKED_BY_EXTERNAL_EVIDENCE",
+      "reason": "LIVE_HOST_EVIDENCE_UNAVAILABLE",
+      "status": "BLOCKED"
+    },
+    "RM-Z2P": {
+      "class": "BLOCKED_BY_DEPENDENCY",
+      "reason": "depends on RM-PRIORITY-LARGE-GOAL (status PLANNED, not terminal)",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-LARGE-GOAL": {
+      "class": "OWNER_DEFERRED",
+      "reason": "depends on Owner-deferred RM-C08",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-CONTEXT": {
+      "class": "DONE_SHIPPED_VERIFIED",
+      "reason": "terminal status DONE",
+      "status": "DONE"
+    },
+    "RM-PRIORITY-PLANNER": {
+      "class": "DONE_SHIPPED_VERIFIED",
+      "reason": "terminal status DONE",
+      "status": "DONE"
+    },
+    "RM-PRIORITY-DESIGN": {
+      "class": "BLOCKED_BY_DEPENDENCY",
+      "reason": "NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-CODE-MUTATION": {
+      "class": "READY_NOW",
+      "reason": "ISOLATED_REPOS",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-ORCA-EXT": {
+      "class": "READY_NOW",
+      "reason": "NONE",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-MULTIHOST-COUNCIL": {
+      "class": "BLOCKED_BY_EXTERNAL_EVIDENCE",
+      "reason": "C09/C27 LIVE_HOST_EVIDENCE_UNAVAILABLE; MULTIHOST_LIVE_COUNCIL = NOT_PROVEN",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-DRIFT-SWEEP": {
+      "class": "READY_NOW",
+      "reason": "NONE",
+      "status": "PLANNED"
+    },
+    "RM-PRIORITY-RELEASE-LIFECYCLE": {
+      "class": "DONE_SHIPPED_VERIFIED",
+      "reason": "terminal status DONE",
+      "status": "DONE"
+    }
+  },
+  "STRATEGIC_PRIORITY_LIST": [
+    {
+      "rank": 1,
+      "roadmap_id": "RM-PRIORITY-CONTEXT",
+      "score": 16.4346
+    },
+    {
+      "rank": 2,
+      "roadmap_id": "RM-PRIORITY-DESIGN",
+      "score": 13.5
+    },
+    {
+      "rank": 3,
+      "roadmap_id": "RM-Z2P",
+      "score": 12.75
+    },
+    {
+      "rank": 4,
+      "roadmap_id": "RM-C09",
+      "score": 9.5577
+    },
+    {
+      "rank": 5,
+      "roadmap_id": "RM-C08",
+      "score": 9.5
+    },
+    {
+      "rank": 6,
+      "roadmap_id": "RM-PRIORITY-LARGE-GOAL",
+      "score": 8.9423
+    },
+    {
+      "rank": 7,
+      "roadmap_id": "RM-C27",
+      "score": 8.5577
+    },
+    {
+      "rank": 8,
+      "roadmap_id": "RM-PRIORITY-PLANNER",
+      "score": 8.25
+    },
+    {
+      "rank": 9,
+      "roadmap_id": "RM-PRIORITY-DRIFT-SWEEP",
+      "score": 7.5
+    },
+    {
+      "rank": 10,
+      "roadmap_id": "RM-PRIORITY-MULTIHOST-COUNCIL",
+      "score": 7.5
+    },
+    {
+      "rank": 11,
+      "roadmap_id": "RM-PRIORITY-ORCA-EXT",
+      "score": 6.5
+    },
+    {
+      "rank": 12,
+      "roadmap_id": "RM-PRIORITY-CODE-MUTATION",
+      "score": 6.0
+    },
+    {
+      "rank": 13,
+      "roadmap_id": "RM-PRIORITY-RELEASE-LIFECYCLE",
+      "score": 6.0
+    }
+  ],
+  "NEXT_EXECUTABLE_GOALS": [
+    {
+      "roadmap_id": "RM-PRIORITY-DRIFT-SWEEP",
+      "score": 7.5,
+      "graph_class": "READY_NOW"
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-ORCA-EXT",
+      "score": 6.5,
+      "graph_class": "READY_NOW"
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-CODE-MUTATION",
+      "score": 6.0,
+      "graph_class": "READY_NOW"
+    }
+  ],
+  "BLOCKED_HIGH_VALUE_GOALS": [
+    {
+      "roadmap_id": "RM-PRIORITY-DESIGN",
+      "class": "BLOCKED_BY_DEPENDENCY",
+      "reason": "NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED"
+    },
+    {
+      "roadmap_id": "RM-Z2P",
+      "class": "BLOCKED_BY_DEPENDENCY",
+      "reason": "depends on RM-PRIORITY-LARGE-GOAL (status PLANNED, not terminal)"
+    },
+    {
+      "roadmap_id": "RM-C09",
+      "class": "BLOCKED_BY_EXTERNAL_EVIDENCE",
+      "reason": "EVENT_EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "roadmap_id": "RM-C27",
+      "class": "BLOCKED_BY_EXTERNAL_EVIDENCE",
+      "reason": "LIVE_HOST_EVIDENCE_UNAVAILABLE"
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-MULTIHOST-COUNCIL",
+      "class": "BLOCKED_BY_EXTERNAL_EVIDENCE",
+      "reason": "C09/C27 LIVE_HOST_EVIDENCE_UNAVAILABLE; MULTIHOST_LIVE_COUNCIL = NOT_PROVEN"
+    }
+  ],
+  "OWNER_DEFERRED_ITEMS": [
+    {
+      "roadmap_id": "RM-C08",
+      "defer_reason": "Explicit Owner deferral; superseded in sequencing by lifecycle/foundation goals"
+    },
+    {
+      "roadmap_id": "RM-PRIORITY-LARGE-GOAL",
+      "defer_reason": ""
+    }
+  ],
+  "UNKNOWN_STATUS_ITEMS": [],
+  "RELEVANT_PARTIAL_CAPABILITIES": [],
+  "ROADMAP_COVERAGE_GAPS": [],
+  "NOT_PROVEN_DEPENDENCIES": {
+    "RM-C08": [],
+    "RM-C09": [],
+    "RM-C27": [],
+    "RM-Z2P": [],
+    "RM-PRIORITY-LARGE-GOAL": [],
+    "RM-PRIORITY-CONTEXT": [],
+    "RM-PRIORITY-PLANNER": [],
+    "RM-PRIORITY-DESIGN": [],
+    "RM-PRIORITY-CODE-MUTATION": [],
+    "RM-PRIORITY-ORCA-EXT": [],
+    "RM-PRIORITY-MULTIHOST-COUNCIL": [
+      "MULTIHOST_LIVE_COUNCIL = NOT_PROVEN"
+    ],
+    "RM-PRIORITY-DRIFT-SWEEP": [],
+    "RM-PRIORITY-RELEASE-LIFECYCLE": []
+  },
+  "RECOMMENDED_NEXT_GOAL": "RM-PRIORITY-DRIFT-SWEEP",
+  "SCORE_BREAKDOWN": {
+    "formula": "SCORE = 3.0*owner_value_bucket + 2.0*dependency_necessity + 1.5*safety_maturity + 1.0*evidence_gap + 1.5*architectural_leverage",
+    "weights": {
+      "owner_value": 3.0,
+      "dependency_necessity": 2.0,
+      "safety_maturity": 1.5,
+      "evidence_gap": 1.0,
+      "architectural_leverage": 1.5
+    },
+    "contributions": {
+      "owner_value": 3.0,
+      "dependency_necessity": 0.0,
+      "safety_maturity": 3.0,
+      "evidence_gap": 0.0,
+      "architectural_leverage": 1.5
+    },
+    "total": 7.5
+  },
+  "WHY_THIS_GOAL": [
+    "score 7.5000 highest among READY_NOW items",
+    "owner_value contribution 3.0000 (bucket 1.0) from durable text: Không còn claim lỗi thời: mọi capability evidence được revalidate hoặc đánh dấu UNKNOWN.",
+    "dependency_necessity contribution 0.0000 (normalized factor 0.0000)",
+    "safety_maturity contribution 3.0000 (mutation_risk_class=READ_ONLY)",
+    "evidence_gap contribution 0.0000",
+    "architectural_leverage contribution 1.5000 (family=OBSOLESCENCE_DRIFT)",
+    "graph_class=READY_NOW; project_impact=NONE; promotion_required=NO"
+  ],
+  "WHY_NOT_HIGHER_PRIORITY_ITEMS": [
+    "RM-PRIORITY-CONTEXT: STRATEGIC_PRIORITY #1 but DONE_SHIPPED_VERIFIED (terminal status DONE)",
+    "RM-PRIORITY-DESIGN: STRATEGIC_PRIORITY #2 but BLOCKED_BY_DEPENDENCY (NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED)"
+  ],
+  "REQUIRED_OWNER_DECISION": "Approve or reject the planner-recommended next P2P development Goal.",
+  "EVIDENCE_POINTERS": [
+    "docs/plans/2026-08-10-*; C08 roadmap record",
+    "C09 terminal report",
+    "P2P-C27-terminal-report.md",
+    "FW01 bootstrap (P2P-PROJECT-BOOTSTRAP.md); C16 roadmap-lineage; FW02 selection; Goal Contract template; Pilot lifecycle evidence (C40/C43)",
+    "C12 bounded foreground execution DONE; C15 bounded delegation DONE",
+    "C19 task-targeted retrieval DONE; 35 CONTEXT_AND_KNOWLEDGE entries",
+    "scripts/p2p_roadmap_planner.py VERSION=4 (sha256 00d8bfafd7bfc64b) — fail-closed coverage gate, strict intake/adoption binding, deterministic ranking, hash binding; latest current-main run reports/pla",
+    "C14 PROMOTED_VERIFIED; capability-skill-map composition table",
+    "BOUNDED_DOCUMENTATION_WRITE verified isolated/non-production (Pilot-02); READ_ONLY strongly evidenced",
+    "C17 DONE (bounded parallel foreground); FW06 lease"
+  ],
+  "PLANNER_SELECTION_DOES_NOT_AUTO_EXECUTE": true,
+  "ROADMAP_MANUAL_REENTRY_REQUIRED": "NO — planner reads canonical JSON files directly; no transcription into prompt",
+  "beginner_owner_view_vn": {
+    "P2P muốn làm gì tiếp?": "RM-PRIORITY-DRIFT-SWEEP",
+    "Goal đó là gì?": "Capability drift revalidation sweep (RM-PRIORITY-DRIFT-SWEEP) — dependencies: drift-policy.json; capability-index.json; host access; blockers: không có",
+    "Tại sao (điểm từng yếu tố)?": "score 7.5000 highest among READY_NOW items; owner_value contribution 3.0000 (bucket 1.0) from durable text: Không còn claim lỗi thời: mọi capability evidence được revalidate hoặc đánh dấu UNKNOWN.; dependency_necessity contribution 0.0000 (normalized factor 0.0000)",
+    "Rủi ro đột biến / đụng project?": "KHÔNG mutate dự án — goal này là Capability drift revalidation sweep; project_impact=NONE, mutation_risk_class=READ_ONLY, không chạm Game Truyện / Gia Phả / Logistics ở giai đoạn lập kế hoạch.",
+    "Yêu cầu promotion cho goal này?": "promotion_required=NO",
+    "Việc quan trọng hơn nào chưa làm được ngay?": "RM-PRIORITY-DESIGN (BLOCKED_BY_DEPENDENCY); RM-Z2P (BLOCKED_BY_DEPENDENCY); RM-C09 (BLOCKED_BY_EXTERNAL_EVIDENCE); RM-C27 (BLOCKED_BY_EXTERNAL_EVIDENCE); RM-PRIORITY-MULTIHOST-COUNCIL (BLOCKED_BY_EXTERNAL_EVIDENCE)",
+    "Cái gì đang bị block?": "RM-PRIORITY-DESIGN: NUI 174-faculty provenance still PROVENANCE_NOT_RECOVERED; RM-Z2P: depends on RM-PRIORITY-LARGE-GOAL (status PLANNED, not terminal); RM-C09: EVENT_EVIDENCE_UNAVAILABLE; RM-C27: LIVE_HOST_EVIDENCE_UNAVAILABLE; RM-PRIORITY-MULTIHOST-COUNCIL: C09/C27 LIVE_HOST_EVIDENCE_UNAVAILABLE; MULTIHOST_LIVE_COUNCIL = NOT_PROVEN",
+    "Cái gì Owner đã hoãn?": "RM-C08; RM-PRIORITY-LARGE-GOAL",
+    "Owner cần quyết định gì?": "Approve or reject the planner-recommended next P2P development Goal."
+  }
+}

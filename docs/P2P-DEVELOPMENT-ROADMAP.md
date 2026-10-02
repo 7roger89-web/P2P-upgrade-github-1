@@ -48,13 +48,14 @@ Items are ordered by **Owner value + dependency necessity + safety maturity + ev
 | 1 | ZERO_TO_PROJECT (Intent Compiler) | Owner Intent & Project Formation | Large-Goal completion, context intelligence completeness; no runtime change in definition phase | Highest Owner value (North Star direct path); composes existing FW00–FW06 primitives; bounded first safe Goal |
 | 2 | Large-Goal execution completeness | Large-Goal Autonomous Execution | C08 re-selection, FW06 checkpoint | Unblocks Zero-to-Project continuation semantics; core (C12/C15) already DONE |
 | 3 | Context Intelligence completeness | Context & Retrieval | none | Read-only; lifts every downstream goal; evidence gap is the remaining PARTIAL set of the largest family |
-| 4 | ROADMAP_AWARE_DEVELOPMENT_PLANNER | Owner Intent & Project Formation | none | Standing coverage-gate machinery; read-only; never overrides Owner Gates |
 | 5 | Goal Design / Visual Intelligence integration | Goal Design Intelligence | NUI provenance (partial acceptable) | Beginner visual guidance; C14 foundation already PROMOTED_VERIFIED |
 | 6 | Bounded code mutation | Mutation Capability Ladder | Owner policy + new primitive design; .41 documentation base | Ladder-2 requires its own authority/evidence/rollback; safety-critical |
 | 7 | Orca-style isolated/parallel execution extension | Workspace / Session / Worktree Isolation | C08 re-selection | Bounded candidate comparison; permission envelope never widens |
 | 8 | Adaptive multi-host Council | Role / Team / Council | C09/C27 live-host evidence unblocked | Multi-host certification NOT_PROVEN; cannot rank above blocked evidence |
 | 9 | Capability drift revalidation sweep | Obsolescence / Capability Drift | none | Read-only; expires stale claims; strengthens every other item |
 | 10 | Release / project-installation lifecycle hardening | Release / Install / Project Lifecycle | Owner pin policy | Needed before Zero-to-Project touches authoritative projects; C40/C43 foundation exists |
+
+Completed priority item (no longer future/PLANNED): `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`, priority #4) — **DONE**. Governance-side read-only planner `scripts/p2p_roadmap_planner.py` VERSION=4, verified by charter invariant `MACHINE_READABLE_ROADMAP_VERIFIED`; latest current-main evidence `reports/planner/P2P-PLANNER-RUN-09.json`; never overrides Owner Gates and never auto-executes the goal it recommends. Runtime execution-loop integration remains an open gap — see §7.
 
 Carried historical items: `C08 DEFERRED` (controlled continuation), `C09 BLOCKED / EVENT_EVIDENCE_UNAVAILABLE`, `C27 BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE` — each preserves its original defer/block reason.
 
@@ -72,7 +73,7 @@ Whenever P2P proposes a major new development roadmap or selects the next major 
 
 ## 7. Roadmap reader status (honest)
 
-The current P2P runtime **does not automatically consume this roadmap** when choosing the next development Goal. Goal choice today is governed by the charter §6 heuristic plus explicit Owner instruction. The planned capability `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (item #4 above) would mechanize this. Stated status: `ROADMAP_AWARE_DEVELOPMENT_PLANNER = PLANNED`, not VERIFIED.
+The current P2P runtime **does not automatically consume this roadmap** when choosing the next development Goal; runtime goal choice remains governed by the charter §6 heuristic plus explicit Owner instruction. The governance-side capability `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`) is now **DONE**: `scripts/p2p_roadmap_planner.py` VERSION=4 mechanically consumes `governance/p2p-development-roadmap.json` + `governance/research-adoption-ledger.json` + `docs/p2p-development/capability-ledger/capability-index.json` + the official baseline, with hash binding and a fail-closed coverage gate; it is read-only, never overrides Owner Gates, and never auto-executes the goal it recommends. Latest current-main evidence: `reports/planner/P2P-PLANNER-RUN-09.json`. Stated status: `ROADMAP_AWARE_DEVELOPMENT_PLANNER = DONE` (capability ledger: `VERIFIED_IMPLEMENTED`), with runtime execution-loop integration still an open, disclosed gap.
 
 ---
 
@@ -105,12 +106,13 @@ Tự promote sau khi goal PASS; tác vụ thành agent; 174 faculties thành 174
 | 1 | Zero-to-Project / Intent Compiler | Giá trị Owner cao nhất (North Star trực tiếp); dùng nguyên thuỷ FW00–FW06 sẵn có; không tạo orchestrator cạnh tranh |
 | 2 | Large-Goal completion | Điều kiện tiếp tục của Zero-to-Project; lõi C12/C15 đã DONE |
 | 3 | Context Intelligence completion | Read-only, nâng chất lượng mọi goal sau; evidence gap còn lại của family lớn nhất |
-| 4 | Roadmap-aware Development Planner | Máy hóa coverage gate; read-only; không ghi đè Owner Gate |
 | 5 | Goal Design / Visual Intelligence integration | Hướng dẫn thiết kế cho người mới; C14 đã PROMOTED_VERIFIED |
 | 6 | Bounded code mutation | Mức 2 của thang đột biến; cần authority/evidence/rollback riêng — an toàn trước |
 | 7 | Orca-style parallel candidates | Nâng chất lượng quyết định; phụ thuộc C08 |
 | 8 | Multi-host Council | Bằng chứng host thật đang BLOCKED (C09/C27) — không thể xếp cao hơn |
 | 9 | Drift revalidation sweep | Read-only, làm sạch claim lỗi thời, tăng độ tin cho mọi mục khác |
 | 10 | Release/install lifecycle hardening | Cần thiết trước khi Zero-to-Project chạm dự án chính thức |
+
+`Roadmap-aware Development Planner` (hạng 4) đã **DONE** — không còn là hướng tương lai: `scripts/p2p_roadmap_planner.py` VERSION=4 (read-only, hash binding, coverage gate fail-closed) đã máy hóa coverage gate và không ghi đè Owner Gate; bằng chứng mới nhất `reports/planner/P2P-PLANNER-RUN-09.json` (xem §7). Runtime execution-loop integration vẫn là gap mở, được khai báo trung thực.
 
 Thứ tự này tuân theo nguyên tắc xếp hạng của roadmap: giá trị Owner + sự cần thiết phụ thuộc + độ trưởng thành an toàn + khoảng trống bằng chứng + đòn bẩy kiến trúc — không theo độ mới, không theo thứ tự thời gian.
