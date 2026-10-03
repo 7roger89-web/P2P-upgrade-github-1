@@ -7,14 +7,16 @@ This module owns only these bounded responsibilities:
    duplicate, or invalid requests — no truncation, queue, or rescue candidate);
 3. C15 permission no-widen admission (equal or narrower only);
 4. candidate-bound workspace records composed through FW06's existing lease,
-   worktree, and lifecycle surfaces; and
-5. immutable, bounded execution receipts with deterministic validation.
+   worktree, and lifecycle surfaces;
+5. immutable, bounded execution receipts with deterministic validation; and
+6. one deterministic acceptance-criteria comparator over revalidated receipts.
 
 This is not an executor or a second workspace/lease/state manager. FW06 owns
-workspace, worktree, lease, and lifecycle state. This module adds no checkpoint
-store or recovery path, router, scheduler, queue, comparator, promotion path,
-or background/autonomous execution. Receipt validation does not run candidates
-or mutate authoritative task state. The hard cap never widens C17.
+workspace, worktree, lease, and lifecycle state. ORCA adds no checkpoint store,
+recovery path, router, scheduler, queue, generic scoring/judging system,
+promotion path, or background/autonomous execution. Receipt and comparator
+validation do not run candidates or mutate authoritative task state. The hard
+cap never widens C17. ``REAL_CANDIDATE_MUTATION_RUNTIME=NOT_PROVEN``.
 """
 
 from __future__ import annotations
@@ -48,6 +50,7 @@ ERROR_CANDIDATE_INVALID = "ORCA_CANDIDATE_INVALID"
 ERROR_CANDIDATE_DUPLICATE = "ORCA_CANDIDATE_DUPLICATE"
 ERROR_PARENT_PERMISSION_INVALID = "ORCA_PARENT_PERMISSION_INVALID"
 ERROR_PERMISSION_ENVELOPE_INVALID = "ORCA_PERMISSION_ENVELOPE_INVALID"
+ERROR_PERMISSION_FINGERPRINT_MISMATCH = "ORCA_PERMISSION_FINGERPRINT_MISMATCH"
 ERROR_PERMISSION_SCOPE_MISSING = "ORCA_PERMISSION_SCOPE_MISSING"
 ERROR_PERMISSION_WIDENED = "ORCA_PERMISSION_WIDENED"
 ERROR_SCOPE_WIDENED = "ORCA_SCOPE_WIDENED"
@@ -60,6 +63,7 @@ ERROR_WORKSPACE_BASE_INVALID = "ORCA_WORKSPACE_BASE_INVALID"
 ERROR_WORKSPACE_CAPACITY = "ORCA_WORKSPACE_CAPACITY"
 ERROR_WORKSPACE_LEASE_UNAVAILABLE = "ORCA_WORKSPACE_LEASE_UNAVAILABLE"
 ERROR_WORKSPACE_CREATE_FAILED = "ORCA_WORKSPACE_CREATE_FAILED"
+ERROR_WORKSPACE_PARTIAL_FAILURE = "ORCA_WORKSPACE_PARTIAL_FAILURE"
 ERROR_WORKSPACE_CANDIDATE_MISMATCH = "ORCA_WORKSPACE_CANDIDATE_MISMATCH"
 ERROR_WORKSPACE_BASE_MISMATCH = "ORCA_WORKSPACE_BASE_MISMATCH"
 ERROR_WORKSPACE_BINDING_INVALID = "ORCA_WORKSPACE_BINDING_INVALID"
@@ -243,6 +247,10 @@ def check_candidate_permission(candidate: CandidateSpec, parent_permission: Perm
     if not isinstance(candidate, CandidateSpec):
         raise OrcaCandidateError(ERROR_CANDIDATE_INVALID, "not_a_candidate_spec")
     envelope = candidate.permission
+    if candidate.permission_fingerprint != permission_fingerprint(envelope):
+        raise OrcaPermissionBoundaryError(
+            ERROR_PERMISSION_FINGERPRINT_MISMATCH, candidate.candidate_id
+        )
     if not isinstance(parent_permission, PermissionEnvelope):
         raise OrcaPermissionBoundaryError(ERROR_PARENT_PERMISSION_INVALID, "parent_permission_not_a_permission_envelope")
     if not envelope.scope:
@@ -302,6 +310,104 @@ def plan_candidate_fanout(
 
 class OrcaWorkspaceError(OrcaFanoutError):
     """Raised when an FW06-backed candidate workspace cannot be bound safely."""
+
+
+class OrcaWorkspacePartialFailure(OrcaWorkspaceError):
+    """One bounded failure record for a partially-created candidate batch."""
+
+    def __init__(
+        self,
+        *,
+        created_workspace_ids: Sequence[str],
+        failed_candidate_id: str,
+        failed_candidate_index: int,
+        failure_code: str,
+        lease_id: str,
+        lease_released: bool,
+        marked_workspace_ids: Sequence[str],
+        durable_partial_recorded: bool,
+        containment_error_codes: Sequence[str] = (),
+    ) -> None:
+        self.created_workspace_ids = tuple(created_workspace_ids)
+        self.failed_candidate_id = failed_candidate_id
+        self.failed_candidate_index = failed_candidate_index
+        self.failure_code = failure_code
+        self.lease_id = lease_id
+        self.lease_released = lease_released
+        self.marked_workspace_ids = tuple(marked_workspace_ids)
+        self.durable_partial_recorded = durable_partial_recorded
+        self.containment_error_codes = tuple(containment_error_codes)
+        created = ",".join(self.created_workspace_ids) or "none"
+        marked = ",".join(self.marked_workspace_ids) or "none"
+        detail = (
+            f"created={created};failed={failed_candidate_id};index={failed_candidate_index};"
+            f"cause={failure_code};marked={marked};lease_released={lease_released};"
+            f"durable={durable_partial_recorded}"
+        )
+        super().__init__(ERROR_WORKSPACE_PARTIAL_FAILURE, detail)
+
+
+def _record_partial_workspace_failure(
+    root: str | Path,
+    *,
+    project_id: str,
+    owner_task_id: str,
+    created_workspace_ids: Sequence[str],
+    failed_candidate_id: str,
+    failed_candidate_index: int,
+    failure_code: str,
+    lease_released: bool,
+) -> tuple[tuple[str, ...], bool, tuple[str, ...]]:
+    """Keep ambiguous workspaces and mark them through the existing FW06 ledger."""
+
+    rows = {
+        str(row.get("workspace_id", "")): row
+        for row in fw06.list_all_workspaces(root, project_id)
+    }
+    marker = {
+        "schema": "p2p-orca-partial-workspace-failure/1",
+        "created_workspace_ids": list(created_workspace_ids),
+        "failed_candidate_id": failed_candidate_id,
+        "failed_candidate_index": failed_candidate_index,
+        "failure_code": failure_code,
+        "lease_released": lease_released,
+    }
+    marked: list[str] = []
+    errors: list[str] = []
+    for workspace_id in created_workspace_ids:
+        record = rows.get(workspace_id)
+        if not isinstance(record, Mapping):
+            errors.append("FW06_WORKSPACE_RECORD_MISSING")
+            continue
+        updated = dict(record)
+        updated["status"] = "CONFLICT"
+        reasons = updated.get("protection_reasons")
+        if not isinstance(reasons, (list, tuple)):
+            reasons = []
+        preserved = [reason for reason in reasons if isinstance(reason, str)]
+        if "UNKNOWN" not in preserved:
+            preserved.append("UNKNOWN")
+        updated["protection_reasons"] = preserved
+        updated["orca_partial_failure"] = marker
+        try:
+            fw06.register_workspace(root, updated)
+            marked.append(workspace_id)
+        except Exception as exc:  # fail closed; preserve the original FW06 row
+            errors.append(f"FW06_MARK_{type(exc).__name__.upper()}")
+
+    try:
+        fw06.append_fw06_event(root, "ORCA_CANDIDATE_FANOUT_PARTIAL_FAILURE", {
+            "project_id": project_id,
+            "task_id": owner_task_id,
+            **marker,
+            "marked_workspace_ids": marked,
+        })
+        event_recorded = True
+    except Exception as exc:  # fail closed; the structured exception still reports it
+        errors.append(f"FW06_EVENT_{type(exc).__name__.upper()}")
+        event_recorded = False
+    durable = event_recorded and len(marked) == len(created_workspace_ids)
+    return tuple(marked), durable, tuple(errors)
 
 
 class OrcaReceiptError(OrcaFanoutError):
@@ -415,15 +521,10 @@ def create_candidate_workspace_bindings(
     if not repo.is_dir():
         raise OrcaWorkspaceError(ERROR_WORKSPACE_INPUT_INVALID, "repo_path_NOT_DIRECTORY")
 
-    # Reject a claimed permission fingerprint that does not describe the C15
-    # envelope checked above. Require an immutable commit ID; FW06 resolves it
-    # and records the exact base used for each worktree.
+    # Require an immutable commit ID; FW06 resolves it and records the exact
+    # base used for each worktree. Permission fingerprints were checked during
+    # fanout admission before any workspace side effect.
     for candidate in plan.candidates:
-        if candidate.permission_fingerprint != permission_fingerprint(candidate.permission):
-            raise OrcaWorkspaceError(
-                ERROR_WORKSPACE_PERMISSION_MISMATCH,
-                f"{candidate.candidate_id}_FINGERPRINT_DIFFERS_FROM_C15_ENVELOPE",
-            )
         if not _COMMIT_ID.fullmatch(candidate.base_revision):
             raise OrcaWorkspaceError(
                 ERROR_WORKSPACE_BASE_INVALID, "base_revision_MUST_BE_FULL_COMMIT_ID"
@@ -472,8 +573,13 @@ def create_candidate_workspace_bindings(
         raise OrcaWorkspaceError(ERROR_WORKSPACE_LEASE_UNAVAILABLE, "LEASE_ID_MISSING")
 
     bindings: list[CandidateWorkspaceBinding] = []
+    created_workspace_ids: list[str] = []
+    failed_candidate_id = ""
+    failed_candidate_index = -1
     try:
-        for candidate, workspace_id, worktree_path in workspace_paths:
+        for index, (candidate, workspace_id, worktree_path) in enumerate(workspace_paths):
+            failed_candidate_id = candidate.candidate_id
+            failed_candidate_index = index
             purpose = _workspace_purpose_for(candidate.candidate_id, candidate.spec_ref)
             record = fw06.create_isolated_worktree(
                 fw06_root,
@@ -487,6 +593,7 @@ def create_candidate_workspace_bindings(
                 creator=creator,
                 purpose=purpose,
             )
+            created_workspace_ids.append(workspace_id)
             expected_path = str(worktree_path.resolve())
             expected_record = {
                 "workspace_id": workspace_id,
@@ -498,6 +605,7 @@ def create_candidate_workspace_bindings(
                 "base_revision": candidate.base_revision,
                 "workspace_type": "GIT_WORKTREE",
                 "purpose": purpose,
+                "mutation_policy": "SYNTHETIC_ONLY",
                 "status": "ACTIVE",
                 "lifecycle_state": "ACTIVE",
             }
@@ -520,16 +628,42 @@ def create_candidate_workspace_bindings(
                 purpose=str(record["purpose"]),
             ))
     except Exception as exc:
-        released = fw06.release_lease(fw06_root, lease_id)
-        if not released:
-            raise OrcaWorkspaceError(
-                ERROR_WORKSPACE_LEASE_UNAVAILABLE, "LEASE_RELEASE_FAILED_AFTER_CREATE_ERROR"
-            ) from exc
-        if isinstance(exc, OrcaFanoutError):
-            raise
-        raise OrcaWorkspaceError(
-            ERROR_WORKSPACE_CREATE_FAILED,
-            f"{type(exc).__name__}:PARTIAL_WORKSPACES_{len(bindings)}",
+        failure_code = (
+            exc.code if isinstance(exc, OrcaFanoutError)
+            else f"FW06_{type(exc).__name__.upper()}"
+        )
+        containment_errors: list[str] = []
+        try:
+            lease_released = fw06.release_lease(fw06_root, lease_id) is True
+        except Exception as release_exc:
+            lease_released = False
+            containment_errors.append(f"LEASE_RELEASE_{type(release_exc).__name__.upper()}")
+        try:
+            marked_ids, durable, mark_errors = _record_partial_workspace_failure(
+                fw06_root,
+                project_id=project_id,
+                owner_task_id=owner_task_id,
+                created_workspace_ids=created_workspace_ids,
+                failed_candidate_id=failed_candidate_id,
+                failed_candidate_index=failed_candidate_index,
+                failure_code=failure_code,
+                lease_released=lease_released,
+            )
+            containment_errors.extend(mark_errors)
+        except Exception as mark_exc:
+            marked_ids = ()
+            durable = False
+            containment_errors.append(f"FW06_PARTIAL_MARK_{type(mark_exc).__name__.upper()}")
+        raise OrcaWorkspacePartialFailure(
+            created_workspace_ids=created_workspace_ids,
+            failed_candidate_id=failed_candidate_id,
+            failed_candidate_index=failed_candidate_index,
+            failure_code=failure_code,
+            lease_id=lease_id,
+            lease_released=lease_released,
+            marked_workspace_ids=marked_ids,
+            durable_partial_recorded=durable,
+            containment_error_codes=containment_errors,
         ) from exc
 
     if not fw06.release_lease(fw06_root, lease_id):
@@ -557,10 +691,6 @@ def validate_candidate_workspace(
         raise OrcaWorkspaceError(ERROR_WORKSPACE_CANDIDATE_MISMATCH, "CANDIDATE_ID_DIFFERS_FROM_BINDING")
     if candidate.spec_ref != binding.spec_ref:
         raise OrcaWorkspaceError(ERROR_WORKSPACE_CANDIDATE_MISMATCH, "SPEC_REF_DIFFERS_FROM_BINDING")
-    if candidate.permission_fingerprint != permission_fingerprint(candidate.permission):
-        raise OrcaWorkspaceError(
-            ERROR_WORKSPACE_PERMISSION_MISMATCH, "CANDIDATE_FINGERPRINT_DIFFERS_FROM_C15_ENVELOPE"
-        )
     if (candidate.permission_fingerprint != binding.permission_fingerprint
             or candidate.acceptance_fingerprint != binding.acceptance_fingerprint):
         raise OrcaWorkspaceError(ERROR_WORKSPACE_BINDING_INVALID, "CANDIDATE_FINGERPRINT_DIFFERS_FROM_BINDING")
@@ -585,6 +715,7 @@ def validate_candidate_workspace(
         "base_revision": candidate.base_revision,
         "workspace_type": "GIT_WORKTREE",
         "purpose": _workspace_purpose_for(candidate.candidate_id, candidate.spec_ref),
+        "mutation_policy": "SYNTHETIC_ONLY",
     }
     if any(record.get(key) != value for key, value in expected_record.items()):
         raise OrcaWorkspaceError(ERROR_WORKSPACE_STALE, "FW06_WORKSPACE_RECORD_DIFFERS_FROM_BINDING")
@@ -787,6 +918,170 @@ def validate_candidate_receipt(
     return validated
 
 
+def _bounded_comparison_items(
+    value: Any,
+    *,
+    field: str,
+    max_items: int,
+    max_length: int,
+    allow_empty: bool = False,
+    forbid_absolute: bool = False,
+) -> tuple[str, ...] | None:
+    if (isinstance(value, (str, bytes, bytearray, dict, set, frozenset))
+            or not isinstance(value, Sequence)):
+        return None
+    items = tuple(value)
+    if len(items) > max_items or (not allow_empty and not items):
+        return None
+    try:
+        normalized = tuple(
+            _bounded_text(item, field, limit=max_length, forbid_absolute=forbid_absolute)
+            for item in items
+        )
+    except OrcaCandidateError:
+        return None
+    if len(set(normalized)) != len(normalized):
+        return None
+    return normalized
+
+
+def compare_validated_candidate_receipts(
+    receipts: Sequence[CandidateExecutionReceipt],
+    *,
+    candidate_specs: Mapping[str, CandidateSpec],
+    workspace_bindings: Mapping[str, CandidateWorkspaceBinding],
+    root: str | Path,
+    parent_permission: PermissionEnvelope,
+    required_acceptance_criteria: Sequence[str],
+    required_evidence_refs: Sequence[str],
+    comparison_evidence: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Deterministically select a unique acceptance winner, or abstain.
+
+    Receipt objects are revalidated against their current candidate and FW06
+    binding at the point of comparison. Caller-supplied facts are restricted to
+    explicit acceptance-criterion IDs, completeness flags, and bounded evidence
+    references. References are not dereferenced: this function does not prove
+    their factual truth or introduce an LLM judge, score, or mutation path.
+    """
+
+    def result(verdict: str, selected: str | None, ids: Sequence[str], reason: str,
+               evidence_refs: Sequence[str] = ()) -> dict[str, Any]:
+        return {
+            "verdict": verdict,
+            "selected_candidate_id": selected,
+            "candidate_ids_considered": sorted(set(ids)),
+            "reason_codes": [reason],
+            "evidence_refs_used": sorted(set(evidence_refs)),
+        }
+
+    if (isinstance(receipts, (str, bytes, bytearray, dict, set, frozenset))
+            or not isinstance(receipts, Sequence)
+            or len(receipts) < 1 or len(receipts) > HARD_FANOUT_CAP):
+        return result("ABSTAIN", None, (), "FANOUT_CARDINALITY_INVALID")
+    if any(not isinstance(receipt, CandidateExecutionReceipt) for receipt in receipts):
+        ids = [receipt.candidate_id for receipt in receipts
+               if isinstance(receipt, CandidateExecutionReceipt)]
+        return result("ABSTAIN", None, ids, "RECEIPT_OBJECT_INVALID")
+
+    candidate_ids = [receipt.candidate_id for receipt in receipts]
+    if len(set(candidate_ids)) != len(candidate_ids):
+        return result("ABSTAIN", None, candidate_ids, "DUPLICATE_CANDIDATE_ID")
+    id_set = set(candidate_ids)
+    if (not isinstance(candidate_specs, Mapping)
+            or not isinstance(workspace_bindings, Mapping)
+            or set(candidate_specs) != id_set
+            or set(workspace_bindings) != id_set):
+        return result("ABSTAIN", None, candidate_ids, "VALIDATION_CONTEXT_MISMATCH")
+
+    receipt_by_id = {receipt.candidate_id: receipt for receipt in receipts}
+    try:
+        for candidate_id in sorted(id_set):
+            validate_candidate_receipt(
+                receipt_by_id[candidate_id],
+                candidate_specs[candidate_id],
+                workspace_bindings[candidate_id],
+                root=root,
+                parent_permission=parent_permission,
+            )
+    except Exception:  # any stale or failed validation makes the set ineligible
+        return result("ABSTAIN", None, candidate_ids, "RECEIPT_VALIDATION_FAILED")
+
+    criteria = _bounded_comparison_items(
+        required_acceptance_criteria,
+        field="acceptance_criterion_id",
+        max_items=_MAX_RECEIPT_REFS,
+        max_length=64,
+    )
+    if criteria is None:
+        return result("ABSTAIN", None, candidate_ids, "COMPARISON_CRITERIA_INVALID")
+    required_refs = _bounded_comparison_items(
+        required_evidence_refs,
+        field="comparison_evidence_ref",
+        max_items=_MAX_RECEIPT_REFS,
+        max_length=_MAX_RECEIPT_REF_LENGTH,
+        forbid_absolute=True,
+    )
+    if required_refs is None:
+        return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_MISSING")
+    if any(
+        not set(required_refs).issubset(set(receipt_by_id[candidate_id].evidence_refs))
+        for candidate_id in id_set
+    ):
+        return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_MISSING")
+    if not isinstance(comparison_evidence, Mapping) or set(comparison_evidence) != id_set:
+        return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_MISSING")
+
+    fact_fields = {"satisfied_acceptance_criteria", "evidence_complete", "evidence_refs"}
+    normalized_facts: dict[str, tuple[set[str], tuple[str, ...]]] = {}
+    for candidate_id in sorted(id_set):
+        facts = comparison_evidence[candidate_id]
+        if not isinstance(facts, Mapping) or set(facts) != fact_fields:
+            return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_INVALID")
+        satisfied = _bounded_comparison_items(
+            facts.get("satisfied_acceptance_criteria"),
+            field="acceptance_criterion_id",
+            max_items=_MAX_RECEIPT_REFS,
+            max_length=64,
+            allow_empty=True,
+        )
+        if satisfied is None:
+            return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_INVALID")
+        if not set(satisfied).issubset(set(criteria)):
+            return result("ABSTAIN", None, candidate_ids, "INCOMPARABLE_CRITERIA")
+        if type(facts.get("evidence_complete")) is not bool:
+            return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_INVALID")
+        if facts["evidence_complete"] is not True:
+            return result("ABSTAIN", None, candidate_ids, "EVIDENCE_INCOMPLETE")
+        evidence_refs = _bounded_comparison_items(
+            facts.get("evidence_refs"),
+            field="comparison_evidence_ref",
+            max_items=_MAX_RECEIPT_REFS,
+            max_length=_MAX_RECEIPT_REF_LENGTH,
+            forbid_absolute=True,
+        )
+        if evidence_refs is None:
+            return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_MISSING")
+        if not set(required_refs).issubset(set(evidence_refs)):
+            return result("ABSTAIN", None, candidate_ids, "COMPARISON_EVIDENCE_MISSING")
+        normalized_facts[candidate_id] = (set(satisfied), evidence_refs)
+
+    evidence_used = list(required_refs)
+    passing = [
+        candidate_id for candidate_id in sorted(id_set)
+        if set(criteria).issubset(normalized_facts[candidate_id][0])
+    ]
+    if len(passing) == 1:
+        return result("SELECT_CANDIDATE", passing[0], candidate_ids,
+                      "UNIQUE_ACCEPTANCE_CRITERIA_WINNER", evidence_used)
+    if len(passing) == len(candidate_ids):
+        return result("ABSTAIN", None, candidate_ids,
+                      "ACCEPTANCE_CRITERIA_TIE", evidence_used)
+    reason = "ACCEPTANCE_CRITERIA_NOT_SATISFIED" if len(candidate_ids) == 1 \
+        else "NO_CANDIDATE_MET_REQUIRED_CRITERIA"
+    return result("ABSTAIN", None, candidate_ids, reason, evidence_used)
+
+
 __all__ = [
     "C17_PARALLEL_CEILING",
     "CandidateExecutionReceipt",
@@ -799,6 +1094,7 @@ __all__ = [
     "ERROR_FANOUT_INPUT_INVALID",
     "ERROR_PARENT_PERMISSION_INVALID",
     "ERROR_PERMISSION_ENVELOPE_INVALID",
+    "ERROR_PERMISSION_FINGERPRINT_MISMATCH",
     "ERROR_PERMISSION_SCOPE_MISSING",
     "ERROR_PERMISSION_WIDENED",
     "ERROR_SCOPE_WIDENED",
@@ -821,6 +1117,7 @@ __all__ = [
     "ERROR_WORKSPACE_CREATE_FAILED",
     "ERROR_WORKSPACE_INPUT_INVALID",
     "ERROR_WORKSPACE_LEASE_UNAVAILABLE",
+    "ERROR_WORKSPACE_PARTIAL_FAILURE",
     "ERROR_WORKSPACE_PERMISSION_MISMATCH",
     "ERROR_WORKSPACE_STALE",
     "FanoutPlan",
@@ -834,7 +1131,9 @@ __all__ = [
     "OrcaPermissionBoundaryError",
     "OrcaReceiptError",
     "OrcaWorkspaceError",
+    "OrcaWorkspacePartialFailure",
     "check_candidate_permission",
+    "compare_validated_candidate_receipts",
     "create_candidate_workspace_bindings",
     "permission_fingerprint",
     "plan_candidate_fanout",
