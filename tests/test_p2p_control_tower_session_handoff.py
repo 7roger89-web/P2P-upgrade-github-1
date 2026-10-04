@@ -326,6 +326,40 @@ class ControlTowerSessionHandoffTests(unittest.TestCase):
         self.assertIn(USER_ACTION_BLOCK, prompt)
         self.assertNotIn("previous session transcript", prompt.lower())
 
+    def test_g2_recursive_prompt_prefers_compact_same_workstream_followup_narrative(self):
+        prompt = build_execution_prompt(
+            self.binding("CLAUDE"),
+            "Continue the same bounded workstream from durable references.",
+            canonical_base_sha=BASE_SHA,
+            canonical_base_tree=BASE_TREE,
+        )
+
+        self.assertIn("same-workstream follow-up", prompt)
+        self.assertIn("only new or changed observations", prompt)
+        self.assertIn("still return every required CONTROL_TOWER_RETURN_PACKET field", prompt)
+        self.assertIn("Never compact away actor-own receipts, blockers, proof limitations", prompt)
+        for field_name in (
+            "SESSION_ID",
+            "HOST",
+            "GOAL_ID",
+            "GOAL",
+            "SESSION_STATE",
+            "CANONICAL_BASE_SHA",
+            "CANONICAL_BASE_TREE",
+            "CANONICAL_RELATION",
+            "WORKTREE",
+            "BRANCH",
+            "CHANGES",
+            "TEST_RESULTS",
+            "EVIDENCE",
+            "CANDIDATE_OR_CHECKPOINT_SHA",
+            "TERMINAL_VERDICT",
+            "OWNER_GATE",
+            "BLOCKERS",
+            "NEXT_RECOMMENDED_ACTION",
+        ):
+            self.assertIn(field_name, prompt)
+
     def test_h_authoritative_host_wins_and_only_its_lane_changes(self):
         state = ControlTowerState.empty(["CODEX", "MANUS"])
         before_codex = dict(state.lanes["CODEX"])
