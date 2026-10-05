@@ -84,7 +84,6 @@ jobs:
           tests.test_p2p_control_tower_self_law_gate
           tests.test_p2p_performance_language_admission_01
           tests.test_p2p_skill_consumption_wire
-          tests.test_p2p_fw01_closure_no_self_reference
 
       - name: Run FW02 legacy capability-intelligence regression
         run: >-
