@@ -641,5 +641,55 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 )
 
 
+    def test_supervisor_required_three_outrank_optional_auto_match(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            (
+                "@Scope Reality Check phản biện gắt UI dashboard "
+                "security audit and organize the work"
+            ),
+            host="ARENA",
+            required_skills=(
+                "scope-reality-check",
+                "p2p-scope",
+                "p2p-uiux",
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(
+            handoff["REQUIRED_SKILLS"],
+            ["scope-reality-check", "p2p-scope", "p2p-uiux"],
+        )
+        self.assertEqual(
+            set(handoff["REQUIRED_SKILLS"]),
+            set(handoff["SKILLS_SELECTED"]),
+        )
+        self.assertLessEqual(len(handoff["SKILLS_SELECTED"]), 3)
+
+    def test_supervisor_plain_prose_does_not_fake_required_contract(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Arena must use p2p-scope for this task",
+            host="ARENA",
+        )
+        self.assertNotIn("p2p-scope", handoff["REQUIRED_SKILLS"])
+        self.assertNotIn("p2p-scope", handoff["SKILLS_SELECTED"])
+
+        required = prepare_skill_handoff(
+            REPO_ROOT,
+            "Arena must use p2p-scope for this task",
+            host="ARENA",
+            required_skills=("p2p-scope",),
+        )
+        self.assertEqual(required["SKILL_CHECK"], "PASS")
+        self.assertEqual(required["REQUIRED_SKILLS"], ["p2p-scope"])
+        self.assertIn("p2p-scope", required["SKILLS_SELECTED"])
+        prompt = "\n".join(skill_handoff_prompt_lines(required))
+        self.assertIn("REQUIRED_SKILLS=p2p-scope", prompt)
+        self.assertIn(
+            "Every skill listed in REQUIRED_SKILLS is mandatory", prompt
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
