@@ -361,6 +361,70 @@ def test_actor_law_receipt_and_experience_capsule(tmp_path: Path) -> None:
     assert data["authority"] == "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE"
 
 
+def test_supervisor_real_canonical_operator_bundle_is_bounded(tmp_path: Path) -> None:
+    project = tmp_path / "real-canonical-project"
+    project.mkdir()
+    result = _run(REPO_ROOT, project)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    manifest = json.loads(
+        (
+            project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert len(manifest["skills"]) == 17
+    assert len(manifest["managed_files"]) == 49
+    assert manifest["skills"] == sorted(
+        [
+            "p2p-approval",
+            "p2p-atlas",
+            "p2p-capsule",
+            "p2p-chain",
+            "p2p-download",
+            "p2p-eval",
+            "p2p-explore",
+            "p2p-feedback",
+            "p2p-idea",
+            "p2p-karpathy",
+            "p2p-metrics",
+            "p2p-pxpipe",
+            "p2p-quorum",
+            "p2p-scope",
+            "p2p-teacher",
+            "p2p-uiux",
+            "scope-reality-check",
+        ]
+    )
+    assert "generic-skill" not in manifest["skills"]
+
+
+def test_supervisor_tampered_manifest_path_traversal_fails_closed(
+    tmp_path: Path,
+) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "path-traversal-project"
+    project.mkdir()
+    assert _run(package, project).returncode == 0
+
+    manifest_path = (
+        project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    managed = dict(manifest["managed_files"])
+    first_path, first_hash = next(iter(managed.items()))
+    del managed[first_path]
+    managed["../escape/SKILL.md"] = first_hash
+    manifest["managed_files"] = managed
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    result = _run(package, project)
+    assert result.returncode == 2
+    assert "PORTABLE_SKILL_MANIFEST_PATH_INVALID" in result.stdout
+
+
 if __name__ == "__main__":
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
