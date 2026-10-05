@@ -14,6 +14,15 @@ SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 if str(SYSTEM_ROOT) not in sys.path:
     sys.path.insert(0, str(SYSTEM_ROOT))
 
+from p2p_capabilities.capability_intelligence import (  # noqa: E402
+    compute_execution_requirements,
+)
+from p2p_capabilities.control_tower_handoff import (  # noqa: E402
+    ControlTowerReturnPacket,
+    ControlTowerState,
+    SessionBinding,
+    build_execution_prompt,
+)
 from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
     RECEIPT_SCHEMA,
@@ -145,6 +154,143 @@ class SkillConsumptionWireTests(unittest.TestCase):
         result = validate_consumption_receipt(handoff, receipt)
         self.assertFalse(result["valid"])
         self.assertIn("SKILL_SOURCE_HASH_MISMATCH", result["reason_codes"])
+
+    def test_capability_intelligence_uses_canonical_metadata_selection(self):
+        eligible = skill_eligibility_set(
+            SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"
+        )
+        execution = compute_execution_requirements(
+            {
+                "task_id": "skill-wire",
+                "title": "@Scope Reality Check phản biện gắt kế hoạch này",
+                "purpose": "pressure test before implementation",
+                "scope": (),
+                "permission_needs": ("sandboxed-default",),
+            },
+            REPO_ROOT,
+            installed_skills=tuple(
+                item["capability_id"] for item in eligible
+                if item["eligible"]
+            ),
+        )
+        self.assertIn(
+            "scope-reality-check",
+            execution.skill_selection.selected_skills,
+        )
+
+    def test_arena_execution_prompt_contains_frozen_skill_handoff(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check xé kế hoạch này",
+            host="ARENA",
+        )
+        binding = SessionBinding(
+            session_id="skillwire-arena-01",
+            host="ARENA",
+            goal_id="ISSUE-298",
+            goal="Skill consumption wire",
+        )
+        prompt = build_execution_prompt(
+            binding,
+            "@Scope Reality Check xé kế hoạch này",
+            task_id="skill-wire",
+            arena_prompt_checkpoint={
+                "project": "P2P-upgrade-github-1",
+                "plan_reference": "Issue #298",
+                "already_completed": "metadata selection",
+                "current_checkpoint": "skill handoff frozen",
+                "blocker_or_owner_gate": "NONE_RECORDED",
+                "next_bounded_step": "consume selected skill",
+            },
+            skill_handoff=handoff,
+        )
+        self.assertIn("P2P_SKILL_HANDOFF:", prompt)
+        self.assertIn("SKILL_HOST_MODE=ARENA_EXACT_REPO_READ", prompt)
+        self.assertIn(
+            handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"],
+            prompt,
+        )
+        self.assertIn("SKILL_CONSUMPTION_RECEIPT", prompt)
+
+    def test_control_tower_rejects_missing_or_mismatched_consumption_receipt(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check xé kế hoạch này",
+            host="ARENA",
+        )
+        binding = SessionBinding(
+            session_id="skillwire-state-01",
+            host="ARENA",
+            goal_id="ISSUE-298",
+            goal="Skill consumption wire",
+        )
+        state = ControlTowerState.empty()
+        state.session_records[binding.session_id] = {
+            "BINDING": binding.to_dict(),
+            "SKILL_HANDOFF": handoff,
+        }
+        packet = ControlTowerReturnPacket(
+            binding=binding,
+            session_state="COMPLETED",
+            canonical_base_sha="a" * 40,
+            canonical_base_tree="b" * 40,
+            skill_consumption_receipt=None,
+        )
+        result = state.ingest(
+            packet,
+            current_canonical_base_sha="a" * 40,
+            current_canonical_base_tree="b" * 40,
+            record_event=False,
+        )
+        self.assertEqual(
+            result.control_tower_status, "RECONCILIATION_REQUIRED"
+        )
+        self.assertIn(
+            "SKILL_CONSUMPTION_RECEIPT_MISSING", result.blockers
+        )
+
+    def test_control_tower_accepts_exact_consumption_receipt(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check xé kế hoạch này",
+            host="ARENA",
+        )
+        binding = SessionBinding(
+            session_id="skillwire-state-02",
+            host="ARENA",
+            goal_id="ISSUE-298",
+            goal="Skill consumption wire",
+        )
+        receipt = {
+            "schema": RECEIPT_SCHEMA,
+            "SKILLS_SELECTED": list(handoff["SKILLS_SELECTED"]),
+            "SKILL_SOURCE_HASHES": dict(handoff["SKILL_SOURCE_HASHES"]),
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_CONSUMPTION": "CONSUMED",
+            "SKILL_HOST_MODE": handoff["SKILL_HOST_MODE"],
+            "PERMISSION_WIDENED": "NO",
+        }
+        packet = ControlTowerReturnPacket(
+            binding=binding,
+            session_state="COMPLETED",
+            canonical_base_sha="a" * 40,
+            canonical_base_tree="b" * 40,
+            skill_consumption_receipt=receipt,
+        )
+        roundtrip = ControlTowerReturnPacket.from_mapping(packet.to_dict())
+        self.assertEqual(roundtrip.skill_consumption_receipt, receipt)
+        state = ControlTowerState.empty()
+        state.session_records[binding.session_id] = {
+            "BINDING": binding.to_dict(),
+            "SKILL_HANDOFF": handoff,
+        }
+        result = state.ingest(
+            roundtrip,
+            current_canonical_base_sha="a" * 40,
+            current_canonical_base_tree="b" * 40,
+            record_event=False,
+        )
+        self.assertEqual(result.control_tower_status, "COMPLETED")
 
     def test_current_status_contract_makes_active_skills_eligible_only(self):
         path = SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"

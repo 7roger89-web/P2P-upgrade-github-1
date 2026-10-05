@@ -106,6 +106,7 @@ def select_skills_for_task(
     request_text: str,
     *,
     explicit_requests: Iterable[str] = (),
+    allowed_skill_ids: Iterable[str] | None = None,
     limit: int = MAX_SELECTED_SKILLS,
 ) -> SkillSelection:
     """Select at most three ACTIVE skills using the existing single router.
@@ -116,6 +117,12 @@ def select_skills_for_task(
     """
     project_root = Path(root).resolve()
     manifests = _active_skill_manifests(project_root)
+    if allowed_skill_ids is not None:
+        allowed = {str(value) for value in allowed_skill_ids if str(value)}
+        manifests = tuple(
+            manifest for manifest in manifests
+            if manifest.capability_id in allowed
+        )
     if limit < 1 or limit > MAX_SELECTED_SKILLS:
         raise SkillConsumptionError("SKILL_SELECTION_LIMIT_INVALID")
     explicit = _normalise_explicit(explicit_requests, manifests)
