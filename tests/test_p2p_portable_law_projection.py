@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -301,6 +302,41 @@ def test_check_fails_closed_after_projected_skill_drift(tmp_path: Path) -> None:
     assert "skill_files_ok=False" in check.stdout
 
 
+def test_removed_managed_skill_is_cleaned_only_when_old_hash_matches(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    assert _run(package, project).returncode == 0
+
+    target_skill = project / ".agents" / "skills" / "p2p-eval" / "SKILL.md"
+    original = target_skill.read_text(encoding="utf-8")
+    custom = project / ".agents" / "skills" / "custom-project-skill" / "SKILL.md"
+    custom.parent.mkdir(parents=True, exist_ok=True)
+    custom.write_text("# project-owned skill\n", encoding="utf-8")
+
+    shutil.rmtree(package / ".agents" / "skills" / "p2p-eval")
+    target_skill.write_text(original + "\nPROJECT EDIT\n", encoding="utf-8")
+
+    blocked = _run(package, project)
+    assert blocked.returncode == 2
+    assert "PORTABLE_STALE_SKILL_MODIFIED" in blocked.stdout
+    assert target_skill.is_file()
+    assert custom.is_file()
+
+    target_skill.write_text(original, encoding="utf-8")
+    repaired = _run(package, project)
+    assert repaired.returncode == 0, repaired.stdout + repaired.stderr
+    assert not target_skill.exists()
+    assert custom.is_file()
+
+    manifest = json.loads(
+        (
+            project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "p2p-eval" not in manifest["skills"]
+
+
 def test_actor_law_receipt_and_experience_capsule(tmp_path: Path) -> None:
     package = _package(tmp_path)
     project = tmp_path / "project_receipt"
@@ -337,6 +373,7 @@ if __name__ == "__main__":
         test_check_fails_closed_after_projection_drift(base / "6")
         test_check_fails_closed_after_experience_capsule_drift(base / "7")
         test_check_fails_closed_after_projected_skill_drift(base / "7b")
+        test_removed_managed_skill_is_cleaned_only_when_old_hash_matches(base / "7c")
         test_actor_law_receipt_and_experience_capsule(base / "8")
         test_canonical_law_and_release_package_recognize_portable_projection()
     print("ALL PORTABLE LAW PROJECTION TESTS PASS")
