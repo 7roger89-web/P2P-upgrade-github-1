@@ -3172,7 +3172,11 @@ class ControlTower:
                         "SESSION_STATE=ACTIVE; EXECUTION_PROGRESS=NONE_RECORDED"
                     )
         skill_handoff = None
-        if binding.host in {"ARENA", "CODEX"}:
+        skill_registry_available = (
+            self.root / ".p2p" / "system" / "p2p_capabilities"
+            / "capabilities.json"
+        ).is_file()
+        if binding.host in {"ARENA", "CODEX"} and skill_registry_available:
             existing_handoff = (
                 existing.get("SKILL_HANDOFF")
                 if isinstance(existing, Mapping)
@@ -3876,7 +3880,11 @@ class ControlTower:
             else None
         )
         preview_skill_handoff = None
-        if normalized_host in {"ARENA", "CODEX"}:
+        skill_registry_available = (
+            self.root / ".p2p" / "system" / "p2p_capabilities"
+            / "capabilities.json"
+        ).is_file()
+        if normalized_host in {"ARENA", "CODEX"} and skill_registry_available:
             from .skill_consumption import prepare_skill_handoff
             preview_skill_handoff = prepare_skill_handoff(
                 self.root, task.purpose, host=normalized_host
