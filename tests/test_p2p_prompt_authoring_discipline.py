@@ -52,6 +52,7 @@ class PromptAuthoringDisciplineTests(unittest.TestCase):
             "AMBIGUOUS_HIGH_IMPACT",
             "CLARIFICATION_DISCIPLINE",
             "DESTINATION_RESOLUTION",
+            "REQUIRED_SKILL_HANDOFF",
             "CAPABILITY_OVER_FOLKLORE",
             "PROPORTIONAL_PROMPT_COMPLEXITY",
             "NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST",
@@ -75,6 +76,7 @@ class PromptAuthoringDisciplineTests(unittest.TestCase):
             "Do not encode model folklore",
             "Never request private chain-of-thought",
             "return the complete revised prompt",
+            "REQUIRED_SKILLS=<ids>",
         )
         for marker in required:
             self.assertIn(marker, self.install_text)
