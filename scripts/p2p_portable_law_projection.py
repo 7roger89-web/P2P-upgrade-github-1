@@ -169,6 +169,50 @@ def expected_portable_skill_state(package_root: Path) -> tuple[dict[Path, str], 
     return files, _portable_skill_manifest_text(package_root, files)
 
 
+def _validated_managed_skill_path(value: object) -> Path:
+    raw = str(value or "").strip()
+    relative = Path(raw)
+    if not raw or relative.is_absolute() or ".." in relative.parts:
+        raise ValueError(f"PORTABLE_SKILL_MANIFEST_PATH_INVALID:{raw}")
+    if (
+        len(relative.parts) < 4
+        or relative.parts[0] != ".agents"
+        or relative.parts[1] != "skills"
+        or not _is_portable_operator_skill(relative.parts[2])
+    ):
+        raise ValueError(f"PORTABLE_SKILL_MANIFEST_PATH_OUT_OF_SCOPE:{raw}")
+    return relative
+
+
+def _previous_projected_skill_files(project: Path) -> dict[Path, str]:
+    manifest_path = project / PORTABLE_SKILL_MANIFEST_REL
+    if not manifest_path.exists():
+        return {}
+    if manifest_path.is_symlink() or not manifest_path.is_file():
+        raise ValueError(
+            f"PORTABLE_SKILL_MANIFEST_MISSING_OR_INVALID:{manifest_path}"
+        )
+    try:
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError("PORTABLE_SKILL_MANIFEST_INVALID_JSON") from exc
+    if data.get("schema") != PORTABLE_SKILL_SCHEMA:
+        raise ValueError("PORTABLE_SKILL_MANIFEST_SCHEMA_MISMATCH")
+    managed = data.get("managed_files")
+    if not isinstance(managed, dict):
+        raise ValueError("PORTABLE_SKILL_MANIFEST_MANAGED_FILES_INVALID")
+    result: dict[Path, str] = {}
+    for raw_path, raw_sha in managed.items():
+        relative = _validated_managed_skill_path(raw_path)
+        sha = str(raw_sha or "").strip().lower()
+        if len(sha) != 64 or any(ch not in "0123456789abcdef" for ch in sha):
+            raise ValueError(
+                f"PORTABLE_SKILL_MANIFEST_SHA_INVALID:{relative.as_posix()}"
+            )
+        result[relative] = sha
+    return result
+
+
 def _projection_text(package_root: Path) -> str:
     notebook = _read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")
     if LAW_MARKER not in notebook:
@@ -499,6 +543,28 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
             "agents_path": "AGENTS.md",
         }
 
+    previous_managed = _previous_projected_skill_files(project)
+    stale_managed = sorted(
+        set(previous_managed) - set(expected_skills),
+        key=lambda path: path.as_posix(),
+    )
+    for relative in stale_managed:
+        _assert_safe_parent(project, relative)
+        target = project / relative
+        if target.is_symlink():
+            raise ValueError(f"PROJECTION_SYMLINK_NOT_ALLOWED:{target}")
+        if not target.exists():
+            continue
+        if not target.is_file():
+            raise ValueError(f"PROJECTION_PATH_NOT_FILE:{target}")
+        current_text = target.read_text(encoding="utf-8")
+        if _sha256_text(current_text) != previous_managed[relative]:
+            raise ValueError(
+                "PORTABLE_STALE_SKILL_MODIFIED:"
+                + relative.as_posix()
+            )
+        target.unlink()
+
     portable_path.parent.mkdir(parents=True, exist_ok=True)
     portable_path.write_text(expected_projection, encoding="utf-8", newline="\n")
     portable_exp_path.parent.mkdir(parents=True, exist_ok=True)
@@ -520,6 +586,7 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
         "portable_skill_manifest_path": PORTABLE_SKILL_MANIFEST_REL.as_posix(),
         "portable_skill_files_count": len(expected_skills),
+        "stale_skill_files_removed": len(stale_managed),
         "agents_path": "AGENTS.md",
         "source_sha256": _sha256_text(_read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")),
         "experience_source_sha256": json.loads(expected_exp).get("source_content_sha256", ""),
