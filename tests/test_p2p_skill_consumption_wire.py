@@ -394,5 +394,151 @@ class SkillConsumptionWireTests(unittest.TestCase):
         self.assertEqual(scope["provenance_level"], "ACTIVE_DECLARED")
 
 
+    def test_orca_candidates_inherit_one_frozen_selected_skill_handoff(self):
+        from p2p_capabilities.bounded_delegation import PermissionEnvelope
+        from p2p_capabilities import orca_candidate_fanout as orca
+        from p2p_capabilities.skill_consumption import (
+            freeze_skill_handoff_for_orca_candidates,
+            validate_orca_skill_inheritance,
+        )
+
+        parent = PermissionEnvelope(grants=("READ",), scope=("src/a.py",))
+        child = PermissionEnvelope(grants=("READ",), scope=("src/a.py",))
+        common = {
+            "base_revision": "a" * 40,
+            "permission_fingerprint": orca.permission_fingerprint(child),
+            "permission": child,
+        }
+        candidate_a = orca.CandidateSpec(
+            spec_ref="candidate/a",
+            candidate_ordinal=0,
+            acceptance_fingerprint="acceptance-a",
+            **common,
+        )
+        candidate_b = orca.CandidateSpec(
+            spec_ref="candidate/b",
+            candidate_ordinal=1,
+            acceptance_fingerprint="acceptance-b",
+            **common,
+        )
+        plan = orca.plan_candidate_fanout(
+            (candidate_a, candidate_b), parent
+        )
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check phản biện gắt kế hoạch này",
+            host="ARENA",
+        )
+        inheritance = freeze_skill_handoff_for_orca_candidates(
+            handoff, plan.candidate_ids
+        )
+
+        self.assertEqual(
+            [row["candidate_id"] for row in inheritance["CANDIDATE_BINDINGS"]],
+            list(plan.candidate_ids),
+        )
+        self.assertEqual(
+            {
+                row["skill_handoff_fingerprint"]
+                for row in inheritance["CANDIDATE_BINDINGS"]
+            },
+            {inheritance["FROZEN_SKILL_HANDOFF_FINGERPRINT"]},
+        )
+        self.assertEqual(
+            inheritance["FROZEN_SKILL_HANDOFF"]["SKILLS_SELECTED"],
+            handoff["SKILLS_SELECTED"],
+        )
+        self.assertEqual(
+            inheritance["FROZEN_SKILL_HANDOFF"]["SKILL_SOURCE_HASHES"],
+            handoff["SKILL_SOURCE_HASHES"],
+        )
+        self.assertEqual(
+            inheritance["CANDIDATE_SKILL_RESELECTION"], "FORBIDDEN"
+        )
+        self.assertEqual(
+            validate_orca_skill_inheritance(
+                inheritance, handoff, plan.candidate_ids
+            ),
+            {"valid": True, "reason_codes": []},
+        )
+
+    def test_orca_candidate_skill_swap_or_hash_tamper_fails_closed(self):
+        from copy import deepcopy
+        from p2p_capabilities.bounded_delegation import PermissionEnvelope
+        from p2p_capabilities import orca_candidate_fanout as orca
+        from p2p_capabilities.skill_consumption import (
+            SkillConsumptionError,
+            freeze_skill_handoff_for_orca_candidates,
+            validate_orca_skill_inheritance,
+        )
+
+        parent = PermissionEnvelope(grants=("READ",), scope=("src/a.py",))
+        child = PermissionEnvelope(grants=("READ",), scope=("src/a.py",))
+        common = {
+            "base_revision": "b" * 40,
+            "permission_fingerprint": orca.permission_fingerprint(child),
+            "permission": child,
+        }
+        candidates = (
+            orca.CandidateSpec(
+                spec_ref="candidate/a",
+                candidate_ordinal=0,
+                acceptance_fingerprint="acceptance-a",
+                **common,
+            ),
+            orca.CandidateSpec(
+                spec_ref="candidate/b",
+                candidate_ordinal=1,
+                acceptance_fingerprint="acceptance-b",
+                **common,
+            ),
+        )
+        plan = orca.plan_candidate_fanout(candidates, parent)
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check xé kế hoạch này",
+            host="ARENA",
+        )
+        inheritance = freeze_skill_handoff_for_orca_candidates(
+            handoff, plan.candidate_ids
+        )
+
+        swapped = deepcopy(inheritance)
+        swapped["CANDIDATE_BINDINGS"][1][
+            "skill_handoff_fingerprint"
+        ] = "0" * 64
+        swap_result = validate_orca_skill_inheritance(
+            swapped, handoff, plan.candidate_ids
+        )
+        self.assertFalse(swap_result["valid"])
+        self.assertIn(
+            "ORCA_CANDIDATE_SKILL_BINDING_MISMATCH",
+            swap_result["reason_codes"],
+        )
+
+        tampered = deepcopy(inheritance)
+        selected = handoff["SKILLS_SELECTED"][0]
+        tampered["FROZEN_SKILL_HANDOFF"][
+            "SKILL_SOURCE_HASHES"
+        ][selected] = "f" * 64
+        tamper_result = validate_orca_skill_inheritance(
+            tampered, handoff, plan.candidate_ids
+        )
+        self.assertFalse(tamper_result["valid"])
+        self.assertIn(
+            "FROZEN_SKILL_HANDOFF_MISMATCH",
+            tamper_result["reason_codes"],
+        )
+
+        with self.assertRaisesRegex(
+            SkillConsumptionError,
+            "ORCA_CANDIDATE_FANOUT_CAP_EXCEEDED",
+        ):
+            freeze_skill_handoff_for_orca_candidates(
+                handoff,
+                (*plan.candidate_ids, "third-candidate"),
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
