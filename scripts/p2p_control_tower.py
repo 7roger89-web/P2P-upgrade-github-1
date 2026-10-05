@@ -878,6 +878,14 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--branch", default=UNKNOWN)
     start.add_argument("--acceptance-criterion", action="append", default=[])
     start.add_argument(
+        "--required-skill",
+        action="append",
+        default=[],
+        help=(
+            "prompt-declared skill ID that the executor must consume; repeat up to three times"
+        ),
+    )
+    start.add_argument(
         "--low-risk-mechanical",
         action="store_true",
         help=(
@@ -1035,6 +1043,7 @@ def main(argv: list[str] | None = None) -> int:
                 worktree=args.worktree,
                 branch=args.branch,
                 acceptance_criteria=criteria,
+                required_skills=tuple(args.required_skill),
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
