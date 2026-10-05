@@ -249,9 +249,11 @@ def select_skills_for_task(
             reason_codes = tuple(item.get("reason_codes") or ())
             reason = reason_codes[0] if reason_codes else "NO_MATCH"
             reasons.append(f"{manifest.capability_id}:{reason}")
-    canonical_ids = {manifest.capability_id for manifest in manifests}
     for record in repo_metadata:
-        if record.skill_id in repo_explicit and record.skill_id not in canonical_ids:
+        if record.skill_id in repo_explicit:
+            # Explicit repo invocation is a deterministic user request.  When
+            # the same ID is also canonical the later ranking deduplicates it;
+            # when it is not admitted, it remains explicit-only.
             candidates.append((4, 0, record.skill_id))
 
     candidates.sort(key=lambda value: (-value[0], -value[1], value[2]))
