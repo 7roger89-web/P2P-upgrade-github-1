@@ -41,6 +41,17 @@ def _package(tmp_path: Path) -> Path:
     (eval_agents / "openai.yaml").write_text(
         "interface:\n  display_name: P2P Eval\n", encoding="utf-8"
     )
+
+    p2p_support = skills_root / "p2p"
+    (p2p_support / "references").mkdir(parents=True, exist_ok=True)
+    (p2p_support / "scripts").mkdir(parents=True, exist_ok=True)
+    for name in ("codex-adaptation.md", "modes.md", "rag-safety.md"):
+        (p2p_support / "references" / name).write_text(
+            f"# {name}\n", encoding="utf-8"
+        )
+    (p2p_support / "scripts" / "p2p_state.py").write_text(
+        "# portable state helper fixture\n", encoding="utf-8"
+    )
     return root
 
 
@@ -93,6 +104,15 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
         "p2p-scope",
         "scope-reality-check",
     ]
+    assert "p2p" not in skill_data["skills"]
+    for support_path in (
+        ".agents/skills/p2p/references/codex-adaptation.md",
+        ".agents/skills/p2p/references/modes.md",
+        ".agents/skills/p2p/references/rag-safety.md",
+        ".agents/skills/p2p/scripts/p2p_state.py",
+    ):
+        assert support_path in skill_data["managed_files"]
+        assert (project / support_path).is_file()
     assert (project / ".agents" / "skills" / "p2p-scope" / "SKILL.md").is_file()
     assert (
         project
@@ -245,6 +265,27 @@ Keep me.
 
     assert "This is a project-specific note without portable-law markers." in agents
     assert agents.count("<!-- BEGIN P2P PORTABLE LAW -->") == 1
+
+def test_check_reports_manifest_payload_hash_drift(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    assert _run(package, project).returncode == 0
+
+    manifest = project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    data["managed_files"][".agents/skills/p2p-scope/SKILL.md"] = "0" * 64
+    manifest.write_text(
+        json.dumps(data, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    check = _run(package, project, "--check")
+
+    assert check.returncode == 2
+    assert "skill_payload_ok=False" in check.stdout
+    assert "SHA256_MISMATCH:.agents/skills/p2p-scope/SKILL.md" in check.stdout
+
 
 def test_check_fails_closed_after_projection_drift(tmp_path: Path) -> None:
     package = _package(tmp_path)
