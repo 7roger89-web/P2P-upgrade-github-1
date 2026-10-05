@@ -191,6 +191,60 @@ def _normalise_explicit(
                 result.add(by_lower[alias])
     return result
 
+def _skill_alias(value: object) -> str:
+    return (
+        str(value or "").strip().lower().lstrip("@$")
+        .replace("_", "-").replace(" ", "-")
+    )
+
+
+def _resolve_required_skill_ids(
+    root: Path,
+    required_skills: Iterable[str],
+) -> tuple[str, ...]:
+    """Resolve prompt-declared required skills to exact repo skill IDs.
+
+    This validates existing metadata only; it does not create a second router.
+    Every required skill must resolve before executor handoff.
+    """
+    raw_items = tuple(required_skills)
+    if not raw_items:
+        return ()
+    if len(raw_items) > MAX_SELECTED_SKILLS:
+        raise SkillConsumptionError("REQUIRED_SKILL_SET_LIMIT_EXCEEDED")
+
+    aliases: dict[str, set[str]] = {}
+    for manifest in _active_skill_manifests(root):
+        aliases.setdefault(_skill_alias(manifest.capability_id), set()).add(
+            manifest.capability_id
+        )
+    for record in _repo_skill_metadata(root):
+        for alias in (record.skill_id, record.declared_name):
+            key = _skill_alias(alias)
+            if key:
+                aliases.setdefault(key, set()).add(record.skill_id)
+
+    resolved: list[str] = []
+    for raw in raw_items:
+        key = _skill_alias(raw)
+        if not key:
+            raise SkillConsumptionError("REQUIRED_SKILL_EMPTY")
+        matches = aliases.get(key, set())
+        if not matches:
+            raise SkillConsumptionError(
+                f"REQUIRED_SKILL_NOT_FOUND:{str(raw).strip()}"
+            )
+        if len(matches) != 1:
+            raise SkillConsumptionError(
+                f"REQUIRED_SKILL_AMBIGUOUS:{str(raw).strip()}"
+            )
+        skill_id = next(iter(matches))
+        if skill_id not in resolved:
+            resolved.append(skill_id)
+    if len(resolved) > MAX_SELECTED_SKILLS:
+        raise SkillConsumptionError("REQUIRED_SKILL_SET_LIMIT_EXCEEDED")
+    return tuple(resolved)
+
 
 def select_skills_for_task(
     root: str | Path,
@@ -402,17 +456,73 @@ def prepare_skill_handoff(
     *,
     host: str,
     explicit_requests: Iterable[str] = (),
+    required_skills: Iterable[str] = (),
 ) -> dict[str, Any]:
-    """Freeze one deterministic source-bound skill handoff for an executor."""
+    """Freeze one deterministic source-bound skill handoff for an executor.
+
+    required_skills is a prompt-writer contract: every named skill must
+    resolve, fit the bounded set, load exactly, and appear in the executor
+    handoff. Narrative prose alone never satisfies this requirement.
+    """
+    project_root = Path(root).resolve()
     host_name = str(host or "").strip().upper()
     mode = HOST_MODES.get(host_name)
+    try:
+        required_ids = _resolve_required_skill_ids(
+            project_root, required_skills
+        )
+    except SkillConsumptionError as exc:
+        return {
+            "schema": HANDOFF_SCHEMA,
+            "SKILL_CHECK": "BLOCKED",
+            "REQUIRED_SKILLS": [],
+            "SKILLS_CONSIDERED_METADATA_COUNT": 0,
+            "SKILLS_SELECTED": [],
+            "SKILL_LOAD_STAGE": "DISCOVERY",
+            "SKILL_SOURCE_HASHES": {},
+            "SKILL_SOURCE_PATHS": {},
+            "SKILL_CONSUMPTION": "BLOCKED",
+            "SKILL_HOST_MODE": mode or "UNSUPPORTED",
+            "MATERIAL_ALTERNATIVES_REJECTED": [],
+            "REJECTION_REASON": [str(exc)],
+            "PERMISSION_WIDENED": "NO",
+            "SINGLE_ROUTER_REUSED": "YES",
+        }
+    combined_explicit = tuple(explicit_requests) + required_ids
     selection = select_skills_for_task(
-        root, request_text, explicit_requests=explicit_requests
+        project_root,
+        request_text,
+        explicit_requests=combined_explicit,
     )
+    missing_required = tuple(
+        skill_id for skill_id in required_ids
+        if skill_id not in selection.selected
+    )
+    if missing_required:
+        return {
+            "schema": HANDOFF_SCHEMA,
+            "SKILL_CHECK": "BLOCKED",
+            "REQUIRED_SKILLS": list(required_ids),
+            "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
+            "SKILLS_SELECTED": list(selection.selected),
+            "SKILL_LOAD_STAGE": "MATCH",
+            "SKILL_SOURCE_HASHES": {},
+            "SKILL_SOURCE_PATHS": {},
+            "SKILL_CONSUMPTION": "BLOCKED",
+            "SKILL_HOST_MODE": mode or "UNSUPPORTED",
+            "MATERIAL_ALTERNATIVES_REJECTED": list(selection.rejected),
+            "REJECTION_REASON": [
+                f"REQUIRED_SKILL_NOT_SELECTED:{skill_id}"
+                for skill_id in missing_required
+            ],
+            "PERMISSION_WIDENED": "NO",
+            "SINGLE_ROUTER_REUSED": "YES",
+        }
     if mode is None:
         return {
             "schema": HANDOFF_SCHEMA,
             "SKILL_CHECK": "BLOCKED",
+            "REQUIRED_SKILLS": list(required_ids),
             "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
             "SKILLS_SELECTED": list(selection.selected),
             "SKILL_LOAD_STAGE": "MATCH" if selection.selected else "DISCOVERY",
@@ -429,6 +539,7 @@ def prepare_skill_handoff(
         return {
             "schema": HANDOFF_SCHEMA,
             "SKILL_CHECK": "NO_MATCH",
+            "REQUIRED_SKILLS": list(required_ids),
             "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
             "SKILLS_SELECTED": [],
             "SKILL_LOAD_STAGE": "DISCOVERY",
@@ -447,6 +558,7 @@ def prepare_skill_handoff(
         return {
             "schema": HANDOFF_SCHEMA,
             "SKILL_CHECK": "BLOCKED",
+            "REQUIRED_SKILLS": list(required_ids),
             "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
             "SKILLS_SELECTED": list(selection.selected),
             "SKILL_LOAD_STAGE": "MATCH",
@@ -462,6 +574,7 @@ def prepare_skill_handoff(
     return {
         "schema": HANDOFF_SCHEMA,
         "SKILL_CHECK": "PASS",
+        "REQUIRED_SKILLS": list(required_ids),
         "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
         "SKILLS_SELECTED": [item.capability_id for item in loaded],
         "SKILL_LOAD_STAGE": "LOAD",
@@ -503,8 +616,13 @@ def _frozen_skill_handoff_payload(
         raise SkillConsumptionError("SKILL_SINGLE_ROUTER_INVARIANT_REQUIRED")
 
     selected = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
+    required = tuple(str(v) for v in (handoff.get("REQUIRED_SKILLS") or ()))
     if len(selected) != len(set(selected)):
         raise SkillConsumptionError("SKILL_SELECTED_SET_DUPLICATE")
+    if len(required) != len(set(required)):
+        raise SkillConsumptionError("REQUIRED_SKILL_SET_DUPLICATE")
+    if any(skill_id not in selected for skill_id in required):
+        raise SkillConsumptionError("REQUIRED_SKILL_SET_NOT_SELECTED")
     hashes = {
         str(k): str(v).lower()
         for k, v in dict(handoff.get("SKILL_SOURCE_HASHES") or {}).items()
@@ -530,6 +648,7 @@ def _frozen_skill_handoff_payload(
     return {
         "schema": HANDOFF_SCHEMA,
         "SKILL_CHECK": check,
+        "REQUIRED_SKILLS": list(required),
         "SKILLS_SELECTED": list(selected),
         "SKILL_LOAD_STAGE": str(
             handoff.get("SKILL_LOAD_STAGE") or "DISCOVERY"
@@ -636,9 +755,11 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
     selected = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
     hashes = handoff.get("SKILL_SOURCE_HASHES") or {}
     paths = handoff.get("SKILL_SOURCE_PATHS") or {}
+    required = tuple(str(v) for v in (handoff.get("REQUIRED_SKILLS") or ()))
     lines = [
         "P2P_SKILL_HANDOFF:",
         f"SKILL_CHECK={check}",
+        "REQUIRED_SKILLS=" + (",".join(required) if required else "NONE"),
         "SKILLS_SELECTED=" + (",".join(selected) if selected else "NONE"),
         f"SKILL_LOAD_STAGE={handoff.get('SKILL_LOAD_STAGE', 'DISCOVERY')}",
         f"SKILL_HOST_MODE={handoff.get('SKILL_HOST_MODE', 'UNSUPPORTED')}",
@@ -646,6 +767,7 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
     ]
     if check == "PASS":
         lines.extend((
+            "Every skill listed in REQUIRED_SKILLS is mandatory for this executor turn. Read and apply every required skill; omission is a failed handoff.",
             "Before substantive task execution, read ONLY the exact selected SKILL.md entrypoints below.",
             "After selection, deep-load only references/scripts explicitly declared by those selected skills and only when materially required; never load an unselected skill.",
             "Verify each entrypoint SHA-256 equals the frozen expected hash before using it.",
@@ -685,7 +807,10 @@ def validate_consumption_receipt(
         reasons.append("SKILL_CONSUMPTION_RECEIPT_SCHEMA_INVALID")
     expected_check = str(handoff.get("SKILL_CHECK") or "BLOCKED")
     expected_ids = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
+    required_ids = tuple(str(v) for v in (handoff.get("REQUIRED_SKILLS") or ()))
     actual_ids = tuple(str(v) for v in (receipt.get("SKILLS_SELECTED") or ()))
+    if any(skill_id not in expected_ids for skill_id in required_ids):
+        reasons.append("REQUIRED_SKILL_SET_NOT_SELECTED")
     if actual_ids != expected_ids:
         reasons.append("SKILL_SELECTED_SET_MISMATCH")
     if dict(receipt.get("SKILL_SOURCE_HASHES") or {}) != dict(
