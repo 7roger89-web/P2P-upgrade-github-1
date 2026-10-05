@@ -100,20 +100,22 @@ def _repo_skill_metadata(root: Path) -> tuple[RepoSkillMetadata, ...]:
             continue
         declared = directory.name
         try:
-            head = entrypoint.read_text(
-                encoding="utf-8", errors="replace"
-            )[:4096].splitlines()
+            with entrypoint.open(
+                "r", encoding="utf-8", errors="replace"
+            ) as handle:
+                first = handle.readline()
+                if first.strip() == "---":
+                    for index, line in enumerate(handle, start=1):
+                        if line.strip() == "---":
+                            break
+                        if line.lower().startswith("name:"):
+                            value = line.split(":", 1)[1].strip().strip("'\"")
+                            if value:
+                                declared = value
+                        if index >= 64:
+                            break
         except OSError:
             continue
-        if head and head[0].strip() == "---":
-            for line in head[1:]:
-                if line.strip() == "---":
-                    break
-                if line.lower().startswith("name:"):
-                    value = line.split(":", 1)[1].strip().strip("'\"")
-                    if value:
-                        declared = value
-                    break
         records.append(RepoSkillMetadata(
             skill_id=directory.name,
             declared_name=declared,
