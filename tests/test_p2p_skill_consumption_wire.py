@@ -13,6 +13,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 if str(SYSTEM_ROOT) not in sys.path:
     sys.path.insert(0, str(SYSTEM_ROOT))
+SCRIPTS_ROOT = REPO_ROOT / "scripts"
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
 
 from p2p_capabilities.capability_intelligence import (  # noqa: E402
     compute_execution_requirements,
@@ -25,6 +28,7 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     SessionBinding,
     build_execution_prompt,
 )
+import p2p_control_tower as control_tower_cli  # noqa: E402
 from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
     RECEIPT_SCHEMA,
@@ -409,6 +413,44 @@ class SkillConsumptionWireTests(unittest.TestCase):
             source = REPO_ROOT / ".agents" / "skills" / skill_id
             target = root / ".agents" / "skills" / skill_id
             shutil.copytree(source, target)
+
+    def test_prompt_authoring_context_materializes_required_skill_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binding = SessionBinding(
+                session_id="required-skill-authoring-01",
+                host="CLAUDE",
+                goal_id="ISSUE-305",
+                goal="Write an Arena prompt with required skills",
+            )
+            contextual = control_tower_cli._contextual_task_for_session(
+                Path(directory),
+                binding,
+                (
+                    "Write an Arena prompt that must use "
+                    "scope-reality-check and p2p-scope."
+                ),
+            )
+        prompt = build_execution_prompt(binding, contextual)
+        self.assertIn("REQUIRED_SKILL_HANDOFF=", prompt)
+        self.assertIn(
+            "source-bound REQUIRED_SKILLS/path/hash/receipt", prompt
+        )
+
+    def test_control_tower_cli_accepts_repeatable_required_skill_flags(self):
+        args = control_tower_cli.build_parser().parse_args(
+            [
+                "start",
+                "--host", "ARENA",
+                "--goal-id", "ISSUE-305",
+                "--goal", "Use required skills",
+                "--required-skill", "scope-reality-check",
+                "--required-skill", "p2p-scope",
+            ]
+        )
+        self.assertEqual(
+            args.required_skill,
+            ["scope-reality-check", "p2p-scope"],
+        )
 
     def test_prompt_declared_two_required_skills_are_exact_and_visible(self):
         handoff = prepare_skill_handoff(
