@@ -6008,8 +6008,11 @@
           "script_entrypoints": [],
           "network_runtime": false,
           "credentials": false,
-          "install_mode": "REPO_NATIVE"
-        }
+          "install_mode": "REPO_NATIVE",
+          "entrypoint_sha256": "efaf8dfabd61d00bcf2782efec1c08982f554129813b653bdd7e1503f0e83ac2"
+        },
+        "snapshot_sha256": "efaf8dfabd61d00bcf2782efec1c08982f554129813b653bdd7e1503f0e83ac2",
+        "snapshot_scope": "SKILL.md entrypoint bytes; references remain declared deep-load resources"
       },
       "VERSION": "p2p-1",
       "STATUS": "ACTIVE"
