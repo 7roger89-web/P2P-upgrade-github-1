@@ -292,6 +292,33 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         self.assertEqual(result.control_tower_status, "COMPLETED")
 
+    def test_release_and_doctor_ship_scope_reality_check_to_installed_projects(self):
+        package_text = (REPO_ROOT / "scripts" / "package_release.py").read_text(
+            encoding="utf-8"
+        )
+        doctor_text = (REPO_ROOT / "scripts" / "doctor.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('"scope-reality-check"', package_text)
+        self.assertIn('"scope-reality-check"', doctor_text)
+
+    def test_existing_active_ui_skill_loads_through_same_generic_wire(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Cải thiện UI dashboard responsive trên điện thoại",
+            host="ARENA",
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertIn("p2p-uiux", handoff["SKILLS_SELECTED"])
+        self.assertEqual(
+            handoff["SKILL_SOURCE_PATHS"]["p2p-uiux"],
+            ".agents/skills/p2p-uiux/SKILL.md",
+        )
+        self.assertEqual(
+            len(handoff["SKILL_SOURCE_HASHES"]["p2p-uiux"]),
+            64,
+        )
+
     def test_current_status_contract_makes_active_skills_eligible_only(self):
         path = SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"
         records = skill_eligibility_set(path)
