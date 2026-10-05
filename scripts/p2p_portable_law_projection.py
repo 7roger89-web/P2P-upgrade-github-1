@@ -46,6 +46,12 @@ CANONICAL_SKILL_SOURCE = (
 PORTABLE_SKILL_PREFIXES = ("p2p-",)
 PORTABLE_SKILL_EXACT = frozenset({"scope-reality-check"})
 REQUIRED_PORTABLE_SKILLS = frozenset({"p2p-scope", "scope-reality-check"})
+PORTABLE_SKILL_SUPPORT_FILES = (
+    Path(".agents/skills/p2p/references/codex-adaptation.md"),
+    Path(".agents/skills/p2p/references/modes.md"),
+    Path(".agents/skills/p2p/references/rag-safety.md"),
+    Path(".agents/skills/p2p/scripts/p2p_state.py"),
+)
 AGENTS_BEGIN = "<!-- BEGIN P2P PORTABLE LAW -->"
 AGENTS_END = "<!-- END P2P PORTABLE LAW -->"
 LEGACY_PREFLIGHT_HEADING = "## P2P law preflight"
@@ -125,6 +131,23 @@ def _portable_skill_files(package_root: Path) -> dict[Path, str]:
                     f"PORTABLE_SKILL_SOURCE_NOT_UTF8:{source}"
                 ) from exc
             files[relative] = text
+
+    # Project only the shared support files directly referenced by the bounded
+    # operator skills. These are dependencies, not an additional routable skill.
+    for relative in PORTABLE_SKILL_SUPPORT_FILES:
+        source = package_root / relative
+        if source.is_symlink() or not source.is_file():
+            raise ValueError(
+                "PORTABLE_SKILL_SUPPORT_MISSING_OR_INVALID:"
+                + relative.as_posix()
+            )
+        try:
+            text = source.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError(
+                "PORTABLE_SKILL_SUPPORT_NOT_UTF8:" + relative.as_posix()
+            ) from exc
+        files[relative] = text
     return files
 
 
@@ -147,6 +170,7 @@ def _portable_skill_manifest_text(
             if len(relative.parts) >= 4
             and relative.parts[0] == ".agents"
             and relative.parts[1] == "skills"
+            and _is_portable_operator_skill(relative.parts[2])
         }
     )
     payload = {
@@ -174,6 +198,8 @@ def _validated_managed_skill_path(value: object) -> Path:
     relative = Path(raw)
     if not raw or relative.is_absolute() or ".." in relative.parts:
         raise ValueError(f"PORTABLE_SKILL_MANIFEST_PATH_INVALID:{raw}")
+    if relative in PORTABLE_SKILL_SUPPORT_FILES:
+        return relative
     if (
         len(relative.parts) < 4
         or relative.parts[0] != ".agents"
@@ -211,6 +237,49 @@ def _previous_projected_skill_files(project: Path) -> dict[Path, str]:
             )
         result[relative] = sha
     return result
+
+
+def verify_portable_skill_manifest_payload(project: Path) -> dict[str, object]:
+    """Verify manifest entries against the bytes actually present in a target.
+
+    This check is intentionally independent of the canonical package root.  A
+    manifest-level hash proves only the manifest bytes; it does not prove that
+    the projected payload still matches each declared per-file digest.
+    """
+    managed = _previous_projected_skill_files(project)
+    if not managed:
+        return {
+            "ok": False,
+            "checked": 0,
+            "mismatches": ["PORTABLE_SKILL_MANIFEST_MISSING_OR_EMPTY"],
+        }
+
+    mismatches: list[str] = []
+    for relative, expected_sha in sorted(
+        managed.items(), key=lambda item: item[0].as_posix()
+    ):
+        target = project / relative
+        if target.is_symlink() or not target.is_file():
+            mismatches.append(
+                "MISSING_OR_INVALID:" + relative.as_posix()
+            )
+            continue
+        try:
+            actual_sha = _sha256_text(target.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError):
+            mismatches.append("UNREADABLE:" + relative.as_posix())
+            continue
+        if actual_sha != expected_sha:
+            mismatches.append(
+                "SHA256_MISMATCH:"
+                + relative.as_posix()
+                + f":expected={expected_sha}:actual={actual_sha}"
+            )
+    return {
+        "ok": not mismatches,
+        "checked": len(managed),
+        "mismatches": mismatches,
+    }
 
 
 def _projection_text(package_root: Path) -> str:
@@ -509,6 +578,8 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
             and skill_manifest_path.read_text(encoding="utf-8")
             == expected_skill_manifest
         )
+        payload_verification = verify_portable_skill_manifest_payload(project)
+        skill_payload_ok = bool(payload_verification["ok"])
         skill_files_ok = True
         for relative, expected_text in expected_skills.items():
             target = project / relative
@@ -524,13 +595,15 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
             or not agents_ok
             or not exp_ok
             or not skill_manifest_ok
+            or not skill_payload_ok
             or not skill_files_ok
         ):
             raise ValueError(
                 "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING:"
                 f"projection_ok={projection_ok},agents_ok={agents_ok},"
                 f"experience_ok={exp_ok},skill_manifest_ok={skill_manifest_ok},"
-                f"skill_files_ok={skill_files_ok}"
+                f"skill_payload_ok={skill_payload_ok},skill_files_ok={skill_files_ok},"
+                f"skill_payload_mismatches={payload_verification['mismatches']}"
             )
         return {
             "status": "PASS",
@@ -540,6 +613,7 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
             "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
             "portable_skill_manifest_path": PORTABLE_SKILL_MANIFEST_REL.as_posix(),
             "portable_skill_files_count": len(expected_skills),
+            "portable_skill_payload_files_verified": payload_verification["checked"],
             "agents_path": "AGENTS.md",
         }
 
@@ -578,6 +652,12 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(expected_text, encoding="utf-8", newline="\n")
     agents_path.write_text(expected_agents, encoding="utf-8", newline="\n")
+    payload_verification = verify_portable_skill_manifest_payload(project)
+    if not payload_verification["ok"]:
+        raise ValueError(
+            "PORTABLE_SKILL_PAYLOAD_SELF_VERIFY_FAILED:"
+            + ",".join(str(v) for v in payload_verification["mismatches"])
+        )
     return {
         "status": "PASS",
         "mode": "WRITE",
@@ -586,6 +666,7 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
         "portable_skill_manifest_path": PORTABLE_SKILL_MANIFEST_REL.as_posix(),
         "portable_skill_files_count": len(expected_skills),
+        "portable_skill_payload_files_verified": payload_verification["checked"],
         "stale_skill_files_removed": len(stale_managed),
         "agents_path": "AGENTS.md",
         "source_sha256": _sha256_text(_read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")),
