@@ -1074,11 +1074,11 @@ def select_skills_bounded(
                 except ImportError:
                     from skill_consumption import select_skills_for_task
                 current = select_skills_for_task(
-                project_root,
-                task_text,
-                explicit_requests=explicit_skill_requests,
-                allowed_skill_ids=installed_skills,
-            )
+                    project_root,
+                    task_text,
+                    explicit_requests=explicit_skill_requests,
+                    allowed_skill_ids=installed_skills,
+                )
                 return SkillIntelligenceResult(
                     outcome=current.outcome,
                     selected_skills=current.selected,
