@@ -4781,21 +4781,29 @@
         "governance/p2p-development-roadmap.json (RM-PRIORITY-ORCA-EXT)",
         "RA-EXT-011"
       ],
-      "status": "PLANNED",
-      "implementation_refs": [],
+      "origin_type": "IMPLEMENTATION_GOAL",
+      "status": "FOUNDATION_READY",
+      "implementation_refs": [
+        ".p2p/system/p2p_capabilities/orca_candidate_fanout.py"
+      ],
       "evidence_refs": [
         "reports P2P-C17",
-        "FW06 lease modules"
+        "FW06 lease modules",
+        "tests/test_p2p_orca_candidate_fanout.py",
+        "tests/test_p2p_orca_controlled_continuation.py"
       ],
       "dependencies": [
         "C08"
       ],
-      "known_gaps": [],
+      "known_gaps": [
+        "C08_GENERAL_ACCEPTANCE=PARTIAL",
+        "REAL_CANDIDATE_MUTATION_RUNTIME=NOT_PROVEN"
+      ],
       "do_not_duplicate_with": [],
-      "next_condition": "C08 re-selection; design goal with bounded-fanout evidence contract.",
-      "last_reviewed": "2026-08-21T04:27:11Z",
-      "freshness": "from_roadmap_consolidation",
-      "notes": "C17 bounded parallel foreground SHIPPED and FW06 lease semantics SHIPPED; the candidate-compare extension builds on them. Rejected: uncontrolled fanout, background autonomous explosion."
+      "next_condition": "Continue C08 general-acceptance evidence; runtime promotion remains separate.",
+      "last_reviewed": "2026-10-03",
+      "freshness": "from_plan_or_report",
+      "notes": "Foundation only: bounded fanout, isolated FW06 workspaces, validated receipts, deterministic comparison, and synthetic C08 controlled-continuation composition. No real candidate mutation runtime, complete C08 acceptance, promotion, merge, or release is claimed."
     },
     {
       "capability_id": "MULTIHOST_COUNCIL_CERTIFICATION",
