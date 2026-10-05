@@ -319,6 +319,38 @@ class SkillConsumptionWireTests(unittest.TestCase):
             64,
         )
 
+    def test_explicit_repo_native_skill_outside_capability_registry_loads(self):
+        registry = json.loads(
+            (SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json")
+            .read_text(encoding="utf-8")
+        )
+        ids = {
+            item["CAPABILITY_ID"] for item in registry["capabilities"]
+        }
+        self.assertNotIn("p2p-scope", ids)
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "$p2p-scope organize this large task",
+            host="ARENA",
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertIn("p2p-scope", handoff["SKILLS_SELECTED"])
+        self.assertEqual(
+            handoff["SKILL_SOURCE_PATHS"]["p2p-scope"],
+            ".agents/skills/p2p-scope/SKILL.md",
+        )
+        self.assertEqual(
+            len(handoff["SKILL_SOURCE_HASHES"]["p2p-scope"]),
+            64,
+        )
+
+    def test_repo_native_unadmitted_skill_is_never_implicit_auto_route(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Organize this substantial multi-step work with checkpoints",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
     def test_current_status_contract_makes_active_skills_eligible_only(self):
         path = SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"
         records = skill_eligibility_set(path)
