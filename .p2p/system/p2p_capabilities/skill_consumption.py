@@ -9,6 +9,7 @@ are loaded.  Skills never widen task permissions or authority.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,7 @@ except ImportError:  # legacy focused tests import modules from this directory
 
 HANDOFF_SCHEMA = "p2p-skill-handoff/1"
 RECEIPT_SCHEMA = "p2p-skill-consumption-receipt/1"
+FANOUT_INHERITANCE_SCHEMA = "p2p-skill-fanout-inheritance/1"
 MAX_SELECTED_SKILLS = 3
 HOST_MODES = {
     "ARENA": "ARENA_EXACT_REPO_READ",
@@ -478,6 +480,156 @@ def prepare_skill_handoff(
     }
 
 
+
+def _frozen_skill_handoff_payload(
+    handoff: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return the exact immutable subset ORCA candidates are allowed to share.
+
+    Selection has already happened before fanout.  This function never routes,
+    reselects, loads an extra skill, or grants permission; it only normalizes
+    the source-bound handoff that every candidate must reference identically.
+    """
+    if not isinstance(handoff, Mapping):
+        raise SkillConsumptionError("SKILL_HANDOFF_INVALID")
+    if str(handoff.get("schema") or "") != HANDOFF_SCHEMA:
+        raise SkillConsumptionError("SKILL_HANDOFF_SCHEMA_INVALID")
+    check = str(handoff.get("SKILL_CHECK") or "")
+    if check not in ("PASS", "NO_MATCH"):
+        raise SkillConsumptionError("SKILL_HANDOFF_NOT_INHERITABLE")
+    if str(handoff.get("PERMISSION_WIDENED") or "").upper() != "NO":
+        raise SkillConsumptionError("SKILL_PERMISSION_WIDENING_REJECTED")
+    if str(handoff.get("SINGLE_ROUTER_REUSED") or "").upper() != "YES":
+        raise SkillConsumptionError("SKILL_SINGLE_ROUTER_INVARIANT_REQUIRED")
+
+    selected = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
+    if len(selected) != len(set(selected)):
+        raise SkillConsumptionError("SKILL_SELECTED_SET_DUPLICATE")
+    hashes = {
+        str(k): str(v).lower()
+        for k, v in dict(handoff.get("SKILL_SOURCE_HASHES") or {}).items()
+    }
+    paths = {
+        str(k): str(v)
+        for k, v in dict(handoff.get("SKILL_SOURCE_PATHS") or {}).items()
+    }
+    if check == "PASS":
+        if not selected or str(handoff.get("SKILL_LOAD_STAGE") or "") != "LOAD":
+            raise SkillConsumptionError("SKILL_HANDOFF_PASS_STATE_INVALID")
+        if set(hashes) != set(selected) or set(paths) != set(selected):
+            raise SkillConsumptionError("SKILL_HANDOFF_SOURCE_SET_MISMATCH")
+        if any(re.fullmatch(r"[0-9a-f]{64}", digest) is None
+               for digest in hashes.values()):
+            raise SkillConsumptionError("SKILL_HANDOFF_SOURCE_HASH_INVALID")
+        if any(not path or path.startswith(("/", "~")) for path in paths.values()):
+            raise SkillConsumptionError("SKILL_HANDOFF_SOURCE_PATH_INVALID")
+    else:
+        if selected or hashes or paths:
+            raise SkillConsumptionError("SKILL_NO_MATCH_MUST_BE_EMPTY")
+
+    return {
+        "schema": HANDOFF_SCHEMA,
+        "SKILL_CHECK": check,
+        "SKILLS_SELECTED": list(selected),
+        "SKILL_LOAD_STAGE": str(
+            handoff.get("SKILL_LOAD_STAGE") or "DISCOVERY"
+        ),
+        "SKILL_SOURCE_HASHES": hashes,
+        "SKILL_SOURCE_PATHS": paths,
+        "SKILL_HOST_MODE": str(handoff.get("SKILL_HOST_MODE") or ""),
+        "SKILL_CONSUMPTION": str(handoff.get("SKILL_CONSUMPTION") or ""),
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+    }
+
+
+def freeze_skill_handoff_for_orca_candidates(
+    handoff: Mapping[str, Any],
+    candidate_ids: Sequence[str],
+) -> dict[str, Any]:
+    """Bind one pre-fanout skill selection identically to every ORCA candidate.
+
+    Candidates receive only a fingerprint reference to ONE frozen handoff.
+    There is no candidate-local selection surface, so fanout cannot widen or
+    swap the selected set without invalidating the inheritance record.
+    """
+    if isinstance(candidate_ids, (str, bytes, bytearray, dict, set, frozenset)):
+        raise SkillConsumptionError("ORCA_CANDIDATE_IDS_INVALID")
+    ids = tuple(str(value or "").strip() for value in candidate_ids)
+    if not ids or any(not value for value in ids):
+        raise SkillConsumptionError("ORCA_CANDIDATE_IDS_INVALID")
+    if len(ids) != len(set(ids)):
+        raise SkillConsumptionError("ORCA_CANDIDATE_IDS_DUPLICATE")
+    try:
+        from .orca_candidate_fanout import HARD_FANOUT_CAP
+    except ImportError:
+        from orca_candidate_fanout import HARD_FANOUT_CAP
+    if len(ids) > HARD_FANOUT_CAP:
+        raise SkillConsumptionError("ORCA_CANDIDATE_FANOUT_CAP_EXCEEDED")
+
+    frozen = _frozen_skill_handoff_payload(handoff)
+    fingerprint = hashlib.sha256(json.dumps(
+        frozen,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")).hexdigest()
+    return {
+        "schema": FANOUT_INHERITANCE_SCHEMA,
+        "FROZEN_SKILL_HANDOFF": frozen,
+        "FROZEN_SKILL_HANDOFF_FINGERPRINT": fingerprint,
+        "CANDIDATE_BINDINGS": [
+            {
+                "candidate_id": candidate_id,
+                "skill_handoff_fingerprint": fingerprint,
+            }
+            for candidate_id in ids
+        ],
+        "CANDIDATE_SKILL_RESELECTION": "FORBIDDEN",
+        "PERMISSION_WIDENED": "NO",
+    }
+
+
+def validate_orca_skill_inheritance(
+    inheritance: Mapping[str, Any] | None,
+    handoff: Mapping[str, Any],
+    candidate_ids: Sequence[str],
+) -> dict[str, Any]:
+    """Fail closed when any ORCA candidate diverges from the frozen handoff."""
+    try:
+        expected = freeze_skill_handoff_for_orca_candidates(
+            handoff, candidate_ids
+        )
+    except (SkillConsumptionError, TypeError, ValueError) as exc:
+        return {
+            "valid": False,
+            "reason_codes": [f"EXPECTED_INHERITANCE_INVALID:{exc}"],
+        }
+    if not isinstance(inheritance, Mapping):
+        return {
+            "valid": False,
+            "reason_codes": ["SKILL_FANOUT_INHERITANCE_MISSING"],
+        }
+
+    reasons: list[str] = []
+    if inheritance.get("schema") != FANOUT_INHERITANCE_SCHEMA:
+        reasons.append("SKILL_FANOUT_INHERITANCE_SCHEMA_INVALID")
+    if inheritance.get("FROZEN_SKILL_HANDOFF") != expected[
+            "FROZEN_SKILL_HANDOFF"]:
+        reasons.append("FROZEN_SKILL_HANDOFF_MISMATCH")
+    if str(inheritance.get("FROZEN_SKILL_HANDOFF_FINGERPRINT") or "") != (
+            expected["FROZEN_SKILL_HANDOFF_FINGERPRINT"]):
+        reasons.append("FROZEN_SKILL_HANDOFF_FINGERPRINT_MISMATCH")
+    if list(inheritance.get("CANDIDATE_BINDINGS") or []) != expected[
+            "CANDIDATE_BINDINGS"]:
+        reasons.append("ORCA_CANDIDATE_SKILL_BINDING_MISMATCH")
+    if str(inheritance.get("CANDIDATE_SKILL_RESELECTION") or "") != "FORBIDDEN":
+        reasons.append("ORCA_CANDIDATE_RESELECTION_NOT_FORBIDDEN")
+    if str(inheritance.get("PERMISSION_WIDENED") or "UNKNOWN").upper() != "NO":
+        reasons.append("SKILL_PERMISSION_WIDENING_REJECTED")
+    return {"valid": not reasons, "reason_codes": reasons}
+
+
 def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
     """Serialize a frozen handoff without embedding skill bodies in the prompt."""
     check = str(handoff.get("SKILL_CHECK") or "BLOCKED")
@@ -560,9 +712,12 @@ def validate_consumption_receipt(
 
 
 __all__ = [
-    "HANDOFF_SCHEMA", "RECEIPT_SCHEMA", "MAX_SELECTED_SKILLS",
+    "HANDOFF_SCHEMA", "RECEIPT_SCHEMA", "FANOUT_INHERITANCE_SCHEMA",
+    "MAX_SELECTED_SKILLS",
     "HOST_MODES", "SkillConsumptionError", "SkillSelection", "LoadedSkill",
     "RepoSkillMetadata",
     "select_skills_for_task", "load_selected_skills", "prepare_skill_handoff",
+    "freeze_skill_handoff_for_orca_candidates",
+    "validate_orca_skill_inheritance",
     "skill_handoff_prompt_lines", "validate_consumption_receipt",
 ]
