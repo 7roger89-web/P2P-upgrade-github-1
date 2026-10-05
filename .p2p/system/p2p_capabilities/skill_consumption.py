@@ -494,8 +494,9 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
     ]
     if check == "PASS":
         lines.extend((
-            "Before substantive task execution, read ONLY the exact selected SKILL.md paths below.",
-            "Verify each file SHA-256 equals the frozen expected hash before using it.",
+            "Before substantive task execution, read ONLY the exact selected SKILL.md entrypoints below.",
+            "After selection, deep-load only references/scripts explicitly declared by those selected skills and only when materially required; never load an unselected skill.",
+            "Verify each entrypoint SHA-256 equals the frozen expected hash before using it.",
             "On a missing file or hash mismatch, fail closed with SKILL_CONSUMPTION=LOAD_FAILED; do not substitute or widen the selected set.",
             "Supreme Law / Owner / permissions / task contract outrank all skill guidance.",
         ))
