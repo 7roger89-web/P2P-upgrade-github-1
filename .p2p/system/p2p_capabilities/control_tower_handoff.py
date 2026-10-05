@@ -3190,11 +3190,19 @@ class ControlTower:
             if isinstance(existing_handoff, Mapping):
                 skill_handoff = dict(existing_handoff)
                 if required_skill_refs:
+                    normalize_required = lambda value: (
+                        str(value or "").strip().lower().lstrip("@$")
+                        .replace("_", "-").replace(" ", "-")
+                    )
                     existing_required = tuple(
-                        str(value)
+                        normalize_required(value)
                         for value in (skill_handoff.get("REQUIRED_SKILLS") or ())
                     )
-                    if tuple(required_skill_refs) != existing_required:
+                    requested_required = tuple(
+                        normalize_required(value)
+                        for value in required_skill_refs
+                    )
+                    if requested_required != existing_required:
                         raise BindingError(
                             "REQUIRED_SKILLS_CHANGED_FOR_ACTIVE_SESSION"
                         )
