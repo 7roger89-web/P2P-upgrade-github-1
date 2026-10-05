@@ -624,7 +624,7 @@ def _render_context_block(
         if _PROMPT_TASK.search(task):
             _append_if_fits(
                 parts,
-                "PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.",
+                "PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; REQUIRED_SKILL_HANDOFF=named mandatory skills must become source-bound REQUIRED_SKILLS/path/hash/receipt, never prose-only; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.",
                 max_chars,
             )
         return "\n".join(parts)
@@ -639,7 +639,7 @@ def _render_context_block(
     if _PROMPT_TASK.search(task):
         _append_if_fits(
             parts,
-            "PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.",
+            "PROMPT_AUTHORING_DISCIPLINE_V1=classify PROMPT_INPUT_MATURITY as READY_PROMPT|PARTIAL_DRAFT|CLEAR_SIMPLE_REQUEST|AMBIGUOUS_HIGH_IMPACT; CLARIFICATION_DISCIPLINE=no re-ask/interview loop; DESTINATION_RESOLUTION from durable state; REQUIRED_SKILL_HANDOFF=named mandatory skills must become source-bound REQUIRED_SKILLS/path/hash/receipt, never prose-only; CAPABILITY_OVER_FOLKLORE; PROPORTIONAL_PROMPT_COMPLEXITY; NO_PRIVATE_CHAIN_OF_THOUGHT_REQUEST; REVISION_CONTINUITY; OUTPUT_SURFACE_FIDELITY; PROMPT_AUTHORING_STOP.",
             max_chars,
         )
 
@@ -878,6 +878,14 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--branch", default=UNKNOWN)
     start.add_argument("--acceptance-criterion", action="append", default=[])
     start.add_argument(
+        "--required-skill",
+        action="append",
+        default=[],
+        help=(
+            "prompt-declared skill ID that the executor must consume; repeat up to three times"
+        ),
+    )
+    start.add_argument(
         "--low-risk-mechanical",
         action="store_true",
         help=(
@@ -1035,6 +1043,7 @@ def main(argv: list[str] | None = None) -> int:
                 worktree=args.worktree,
                 branch=args.branch,
                 acceptance_criteria=criteria,
+                required_skills=tuple(args.required_skill),
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,

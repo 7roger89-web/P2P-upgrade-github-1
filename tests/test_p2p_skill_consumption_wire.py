@@ -13,16 +13,22 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 if str(SYSTEM_ROOT) not in sys.path:
     sys.path.insert(0, str(SYSTEM_ROOT))
+SCRIPTS_ROOT = REPO_ROOT / "scripts"
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
 
 from p2p_capabilities.capability_intelligence import (  # noqa: E402
     compute_execution_requirements,
 )
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
+    BindingError,
+    ControlTower,
     ControlTowerReturnPacket,
     ControlTowerState,
     SessionBinding,
     build_execution_prompt,
 )
+import p2p_control_tower as control_tower_cli  # noqa: E402
 from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
     RECEIPT_SCHEMA,
@@ -392,6 +398,247 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         self.assertTrue(scope["eligible"])
         self.assertEqual(scope["provenance_level"], "ACTIVE_DECLARED")
+
+    def _copy_minimal_required_skill_root(self, root: Path) -> None:
+        registry_target = (
+            root / ".p2p" / "system" / "p2p_capabilities"
+            / "capabilities.json"
+        )
+        registry_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(
+            SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json",
+            registry_target,
+        )
+        for skill_id in ("scope-reality-check", "p2p-scope"):
+            source = REPO_ROOT / ".agents" / "skills" / skill_id
+            target = root / ".agents" / "skills" / skill_id
+            shutil.copytree(source, target)
+
+    def test_prompt_authoring_context_materializes_required_skill_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            binding = SessionBinding(
+                session_id="required-skill-authoring-01",
+                host="CLAUDE",
+                goal_id="ISSUE-305",
+                goal="Write an Arena prompt with required skills",
+            )
+            contextual = control_tower_cli._contextual_task_for_session(
+                Path(directory),
+                binding,
+                (
+                    "Write an Arena prompt that must use "
+                    "scope-reality-check and p2p-scope."
+                ),
+            )
+        prompt = build_execution_prompt(binding, contextual)
+        self.assertIn("REQUIRED_SKILL_HANDOFF=", prompt)
+        self.assertIn(
+            "source-bound REQUIRED_SKILLS/path/hash/receipt", prompt
+        )
+
+    def test_control_tower_cli_accepts_repeatable_required_skill_flags(self):
+        args = control_tower_cli.build_parser().parse_args(
+            [
+                "start",
+                "--host", "ARENA",
+                "--goal-id", "ISSUE-305",
+                "--goal", "Use required skills",
+                "--required-skill", "scope-reality-check",
+                "--required-skill", "p2p-scope",
+            ]
+        )
+        self.assertEqual(
+            args.required_skill,
+            ["scope-reality-check", "p2p-scope"],
+        )
+
+    def test_prompt_declared_two_required_skills_are_exact_and_visible(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Pressure-test and organize this bounded plan",
+            host="ARENA",
+            required_skills=("Scope Reality Check", "p2p-scope"),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(
+            handoff["REQUIRED_SKILLS"],
+            ["scope-reality-check", "p2p-scope"],
+        )
+        self.assertTrue(
+            set(handoff["REQUIRED_SKILLS"]).issubset(
+                set(handoff["SKILLS_SELECTED"])
+            )
+        )
+        for skill_id in handoff["REQUIRED_SKILLS"]:
+            self.assertIn(skill_id, handoff["SKILL_SOURCE_PATHS"])
+            self.assertEqual(
+                len(handoff["SKILL_SOURCE_HASHES"][skill_id]), 64
+            )
+        lines = "\n".join(skill_handoff_prompt_lines(handoff))
+        self.assertIn(
+            "REQUIRED_SKILLS=scope-reality-check,p2p-scope", lines
+        )
+        self.assertIn(
+            "Every skill listed in REQUIRED_SKILLS is mandatory", lines
+        )
+
+    def test_unknown_required_skill_fails_closed(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Do the task",
+            host="ARENA",
+            required_skills=("definitely-not-a-real-skill",),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "REQUIRED_SKILL_NOT_FOUND:definitely-not-a-real-skill",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_more_than_three_required_skills_fails_closed(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Do the task",
+            host="ARENA",
+            required_skills=("one", "two", "three", "four"),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "REQUIRED_SKILL_SET_LIMIT_EXCEEDED",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_required_repo_native_unadmitted_skill_is_supported(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Organize this work",
+            host="ARENA",
+            required_skills=("p2p-scope",),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(handoff["REQUIRED_SKILLS"], ["p2p-scope"])
+        self.assertIn("p2p-scope", handoff["SKILLS_SELECTED"])
+        self.assertEqual(
+            handoff["SKILL_SOURCE_PATHS"]["p2p-scope"],
+            ".agents/skills/p2p-scope/SKILL.md",
+        )
+
+    def test_receipt_missing_one_required_skill_fails_reconciliation(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Pressure-test and organize this plan",
+            host="ARENA",
+            required_skills=("scope-reality-check", "p2p-scope"),
+        )
+        first = handoff["REQUIRED_SKILLS"][0]
+        receipt = {
+            "schema": RECEIPT_SCHEMA,
+            "SKILLS_SELECTED": [first],
+            "SKILL_SOURCE_HASHES": {
+                first: handoff["SKILL_SOURCE_HASHES"][first]
+            },
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_CONSUMPTION": "CONSUMED",
+            "SKILL_HOST_MODE": handoff["SKILL_HOST_MODE"],
+            "PERMISSION_WIDENED": "NO",
+        }
+        result = validate_consumption_receipt(handoff, receipt)
+        self.assertFalse(result["valid"])
+        self.assertIn("SKILL_SELECTED_SET_MISMATCH", result["reason_codes"])
+
+    def test_control_tower_prompt_enforces_two_required_skills(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="required-skills-01",
+                host="CODEX",
+                goal_id="ISSUE-305",
+                goal="Prompt-declared required skills",
+            )
+            result = tower.start_session(
+                binding,
+                task_id="issue-305-test",
+                task_prompt="Pressure-test and organize this plan",
+                required_skills=(
+                    "scope-reality-check",
+                    "p2p-scope",
+                ),
+            )
+            prompt = result["recommendation"]["PROMPT"]
+            self.assertIn(
+                "REQUIRED_SKILLS=scope-reality-check,p2p-scope", prompt
+            )
+            self.assertIn(
+                ".agents/skills/scope-reality-check/SKILL.md", prompt
+            )
+            self.assertIn(
+                ".agents/skills/p2p-scope/SKILL.md", prompt
+            )
+            self.assertEqual(
+                result["recommendation"]["REQUIRED_SKILLS"],
+                ["scope-reality-check", "p2p-scope"],
+            )
+
+    def test_active_session_same_required_aliases_remains_idempotent(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="required-skills-alias-01",
+                host="CODEX",
+                goal_id="ISSUE-305",
+                goal="Prompt-declared required skills",
+            )
+            first = tower.start_session(
+                binding,
+                task_id="issue-305-test",
+                task_prompt="Pressure-test and organize this plan",
+                required_skills=("Scope Reality Check", "p2p-scope"),
+            )
+            second = tower.start_session(
+                binding,
+                task_id="issue-305-test",
+                task_prompt="Pressure-test and organize this plan",
+                required_skills=("scope-reality-check", "p2p-scope"),
+            )
+            self.assertTrue(second["idempotent"])
+            self.assertEqual(
+                first["recommendation"]["REQUIRED_SKILLS"],
+                second["recommendation"]["REQUIRED_SKILLS"],
+            )
+    def test_active_session_cannot_swap_required_skill_set(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="required-skills-02",
+                host="CODEX",
+                goal_id="ISSUE-305",
+                goal="Prompt-declared required skills",
+            )
+            tower.start_session(
+                binding,
+                task_id="issue-305-test",
+                task_prompt="Pressure-test and organize this plan",
+                required_skills=(
+                    "scope-reality-check",
+                    "p2p-scope",
+                ),
+            )
+            with self.assertRaisesRegex(
+                BindingError,
+                "REQUIRED_SKILLS_CHANGED_FOR_ACTIVE_SESSION",
+            ):
+                tower.start_session(
+                    binding,
+                    task_id="issue-305-test",
+                    task_prompt="Pressure-test and organize this plan",
+                    required_skills=("scope-reality-check",),
+                )
 
 
 if __name__ == "__main__":
