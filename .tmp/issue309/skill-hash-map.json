@@ -1,0 +1,20 @@
+{
+  "schema": "issue309-skill-hash-map/1",
+  "managed_files": {
+    ".agents/skills/p2p-approval/SKILL.md": "741a924723d9aff7f990870133b2ee31371c7bfae5f09be48aa2a451bed63f05",
+    ".agents/skills/p2p-approval/agents/openai.yaml": "308ca7a2f778384f07bb2dd74ce4c99e27ab6f1528e978961cf571de9070cbbe",
+    ".agents/skills/p2p-atlas/SKILL.md": "241241576ff44e7d19a09cfa7c532826040977a172463b6be5aa9503355b2f1d",
+    ".agents/skills/p2p-atlas/agents/openai.yaml": "afc329681965204342a23bae90bee930ef99e7b5411355e2d1964b01651bd91a",
+    ".agents/skills/p2p-capsule/SKILL.md": "3d4a727ff5d3a4f94ecc7a57f0dbec9e2e521876fcda542d17291cfcfaa78330",
+    ".agents/skills/p2p-capsule/agents/openai.yaml": "6397fa3a10c4684108e3f920406bbc5a07ba7392cb722e26b5f98a86c1e089dd",
+    ".agents/skills/p2p-chain/SKILL.md": "3ab805a4cf7c1080d80f71c108e64ec79f5e6038a0d4cac02f1a2ebf10f34e7c",
+    ".agents/skills/p2p-chain/agents/openai.yaml": "5be4dbf6c399acaffa4cf23efc2e852c6ee10cbbed41911767e8c0a0581597f5",
+    ".agents/skills/p2p-download/SKILL.md": "d3dd09b55604fc45321cdd2a1248f8cbfe8165a81beb019211a85590472374ea",
+    ".agents/skills/p2p-download/agents/openai.yaml": "f73ec670c4e01acfba3613a048c132f6d663a76503f3b9eb274f12ebeb2807bd",
+    ".agents/skills/p2p-eval/SKILL.md": "5e6fb323d313453b5ef2edeed6964f49580f318e4a538427819ccef27f57f31c",
+    ".agents/skills/p2p-eval/agents/openai.yaml": "95ea16848f3b335bd246e51efcf38eaa6a6558b4799552616a00633995c9c539",
+    ".agents/skills/p2p-explore/SKILL.md": "62843878a14544a8ec4b2a40fb90bda3bbb9363562b0434b558b96c1bbf4c049",
+    ".agents/skills/p2p-explore/agents/openai.yaml": "82a77b746f015a13ec50d8ac26de211e5b5b0948cfa944aacdf1421666efb5a2",
+    ".agents/skills/p2p-feedback/SKILL.md": "08947eb7d4d9753140441d821e6c3f280f66505854e0f8f664855ac2e6e70621"
+  }
+}
