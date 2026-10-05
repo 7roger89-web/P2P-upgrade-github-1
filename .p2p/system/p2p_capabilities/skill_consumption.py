@@ -13,8 +13,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from .model import CapabilityManifest, load_registry
-from .routing import classify_capabilities
+try:  # package import in normal P2P runtime
+    from .model import CapabilityManifest, load_registry
+    from .routing import classify_capabilities
+except ImportError:  # legacy focused tests import modules from this directory
+    from model import CapabilityManifest, load_registry
+    from routing import classify_capabilities
 
 
 HANDOFF_SCHEMA = "p2p-skill-handoff/1"
