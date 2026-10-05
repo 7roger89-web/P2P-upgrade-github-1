@@ -539,6 +539,34 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 ["scope-reality-check", "p2p-scope"],
             )
 
+    def test_active_session_same_required_aliases_remains_idempotent(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="required-skills-alias-01",
+                host="CODEX",
+                goal_id="ISSUE-305",
+                goal="Prompt-declared required skills",
+            )
+            first = tower.start_session(
+                binding,
+                task_id="issue-305-test",
+                task_prompt="Pressure-test and organize this plan",
+                required_skills=("Scope Reality Check", "p2p-scope"),
+            )
+            second = tower.start_session(
+                binding,
+                task_id="issue-305-test",
+                task_prompt="Pressure-test and organize this plan",
+                required_skills=("scope-reality-check", "p2p-scope"),
+            )
+            self.assertTrue(second["idempotent"])
+            self.assertEqual(
+                first["recommendation"]["REQUIRED_SKILLS"],
+                second["recommendation"]["REQUIRED_SKILLS"],
+            )
     def test_active_session_cannot_swap_required_skill_set(self):
         with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
             root = Path(raw)
