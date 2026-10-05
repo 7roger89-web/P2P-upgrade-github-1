@@ -9,6 +9,7 @@ are loaded.  Skills never widen task permissions or authority.
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -73,6 +74,88 @@ class LoadedSkill:
         return result
 
 
+@dataclass(frozen=True)
+class RepoSkillMetadata:
+    """Minimal metadata for repo-native skills that lack capability admission."""
+
+    skill_id: str
+    declared_name: str
+    relative_path: str
+
+
+def _repo_skill_metadata(root: Path) -> tuple[RepoSkillMetadata, ...]:
+    """Discover top-level project skills without loading their instruction body.
+
+    Repo-native skills outside the canonical capability registry are explicit-
+    invocation-only.  Reading the YAML frontmatter name mirrors native skill
+    discovery while avoiding implicit authority or a second persisted registry.
+    """
+    skills_dir = root / ".agents" / "skills"
+    if not skills_dir.is_dir():
+        return ()
+    records: list[RepoSkillMetadata] = []
+    for directory in sorted(skills_dir.iterdir(), key=lambda p: p.name.lower()):
+        entrypoint = directory / "SKILL.md"
+        if not directory.is_dir() or not entrypoint.is_file():
+            continue
+        declared = directory.name
+        try:
+            head = entrypoint.read_text(
+                encoding="utf-8", errors="replace"
+            )[:4096].splitlines()
+        except OSError:
+            continue
+        if head and head[0].strip() == "---":
+            for line in head[1:]:
+                if line.strip() == "---":
+                    break
+                if line.lower().startswith("name:"):
+                    value = line.split(":", 1)[1].strip().strip("'\"")
+                    if value:
+                        declared = value
+                    break
+        records.append(RepoSkillMetadata(
+            skill_id=directory.name,
+            declared_name=declared,
+            relative_path=entrypoint.relative_to(root).as_posix(),
+        ))
+    return tuple(records)
+
+
+def _explicit_repo_skill_ids(
+    request_text: str,
+    explicit_requests: Iterable[str],
+    records: Sequence[RepoSkillMetadata],
+) -> set[str]:
+    """Resolve only explicit $skill/@skill requests for repo-native metadata."""
+    requested = {
+        str(value or "").strip().lower().lstrip("@$").replace("_", "-")
+        for value in explicit_requests
+        if str(value or "").strip()
+    }
+    text = str(request_text or "").lower()
+    selected: set[str] = set()
+    for record in records:
+        aliases = {
+            record.skill_id.lower(),
+            record.declared_name.lower(),
+            record.skill_id.lower().replace("_", "-"),
+            record.declared_name.lower().replace("_", "-"),
+        }
+        aliases = {alias for alias in aliases if alias}
+        if requested & aliases:
+            selected.add(record.skill_id)
+            continue
+        for alias in aliases:
+            pattern = r"(?<![a-z0-9_-])[$@]" + re.escape(alias) + (
+                r"(?=$|[\s,;:.!?()\[\]{}])"
+            )
+            if re.search(pattern, text):
+                selected.add(record.skill_id)
+                break
+    return selected
+
+
 def _registry_path(root: Path) -> Path:
     return root / ".p2p" / "system" / "p2p_capabilities" / "capabilities.json"
 
@@ -113,13 +196,15 @@ def select_skills_for_task(
     allowed_skill_ids: Iterable[str] | None = None,
     limit: int = MAX_SELECTED_SKILLS,
 ) -> SkillSelection:
-    """Select at most three ACTIVE skills using the existing single router.
+    """Select at most three skills without creating a second router.
 
-    Discovery reads canonical manifest metadata only.  USER_REQUESTED skills
-    may be selected by an explicit capability request or by their deliberately
-    explicit hard-challenge trigger phrases.  No SKILL.md is read here.
+    Canonical ACTIVE skills use the existing P2P router. Repo-native skills
+    that have no capability admission are discoverable by frontmatter metadata
+    but are explicit-invocation-only ($skill/@skill). Their instruction bodies
+    are not loaded until selection.
     """
     project_root = Path(root).resolve()
+    repo_metadata = _repo_skill_metadata(project_root)
     manifests = _active_skill_manifests(project_root)
     if allowed_skill_ids is not None:
         allowed = {str(value) for value in allowed_skill_ids if str(value)}
@@ -130,6 +215,9 @@ def select_skills_for_task(
     if limit < 1 or limit > MAX_SELECTED_SKILLS:
         raise SkillConsumptionError("SKILL_SELECTION_LIMIT_INVALID")
     explicit = _normalise_explicit(explicit_requests, manifests)
+    repo_explicit = _explicit_repo_skill_ids(
+        request_text, explicit_requests, repo_metadata
+    )
     route = classify_capabilities(str(request_text or ""), manifests)
     manifest_by_id = {m.capability_id: m for m in manifests}
     result_by_id = {
@@ -159,9 +247,23 @@ def select_skills_for_task(
             reason_codes = tuple(item.get("reason_codes") or ())
             reason = reason_codes[0] if reason_codes else "NO_MATCH"
             reasons.append(f"{manifest.capability_id}:{reason}")
+    canonical_ids = {manifest.capability_id for manifest in manifests}
+    for record in repo_metadata:
+        if record.skill_id in repo_explicit and record.skill_id not in canonical_ids:
+            candidates.append((4, 0, record.skill_id))
+
     candidates.sort(key=lambda value: (-value[0], -value[1], value[2]))
-    selected = tuple(value[2] for value in candidates[:limit])
-    for _, _, capability_id in candidates[limit:]:
+    selected_list: list[str] = []
+    overflow: list[str] = []
+    for _, _, skill_id in candidates:
+        if skill_id in selected_list:
+            continue
+        if len(selected_list) < limit:
+            selected_list.append(skill_id)
+        else:
+            overflow.append(skill_id)
+    selected = tuple(selected_list)
+    for capability_id in overflow:
         rejected.append(capability_id)
         reasons.append(f"{capability_id}:BOUNDED_SET_LIMIT")
     if not selected:
@@ -178,7 +280,13 @@ def select_skills_for_task(
     }
     return SkillSelection(
         outcome=outcome,
-        considered_metadata_count=len(manifests),
+        considered_metadata_count=(
+            len(manifests)
+            + sum(
+                1 for record in repo_metadata
+                if record.skill_id not in {m.capability_id for m in manifests}
+            )
+        ),
         selected=selected,
         rejected=tuple(dict.fromkeys(rejected)),
         rejection_reasons=tuple(dict.fromkeys(reasons)),
@@ -237,12 +345,21 @@ def load_selected_skills(
         manifest.capability_id: manifest
         for manifest in _active_skill_manifests(project_root)
     }
+    repo_skills = {
+        record.skill_id: record
+        for record in _repo_skill_metadata(project_root)
+    }
     loaded: list[LoadedSkill] = []
     for capability_id in selected_ids:
-        manifest = manifests.get(str(capability_id))
-        if manifest is None:
-            raise SkillConsumptionError(f"SKILL_NOT_ACTIVE:{capability_id}")
-        relative = _entrypoint_for(project_root, manifest)
+        skill_id = str(capability_id)
+        manifest = manifests.get(skill_id)
+        repo_record = repo_skills.get(skill_id)
+        if manifest is not None:
+            relative = _entrypoint_for(project_root, manifest)
+        elif repo_record is not None:
+            relative = repo_record.relative_path
+        else:
+            raise SkillConsumptionError(f"SKILL_ENTRYPOINT_UNKNOWN:{capability_id}")
         path = _safe_repo_path(project_root, relative)
         raw = path.read_bytes()
         try:
@@ -252,7 +369,10 @@ def load_selected_skills(
                 f"SKILL_ENTRYPOINT_NOT_UTF8:{capability_id}"
             ) from exc
         actual = hashlib.sha256(raw).hexdigest()
-        provenance = manifest.raw.get("UPSTREAM_PROVENANCE")
+        provenance = (
+            manifest.raw.get("UPSTREAM_PROVENANCE")
+            if manifest is not None else {}
+        )
         provenance = provenance if isinstance(provenance, Mapping) else {}
         integration = provenance.get("integration")
         integration = integration if isinstance(integration, Mapping) else {}
@@ -437,6 +557,7 @@ def validate_consumption_receipt(
 __all__ = [
     "HANDOFF_SCHEMA", "RECEIPT_SCHEMA", "MAX_SELECTED_SKILLS",
     "HOST_MODES", "SkillConsumptionError", "SkillSelection", "LoadedSkill",
+    "RepoSkillMetadata",
     "select_skills_for_task", "load_selected_skills", "prepare_skill_handoff",
     "skill_handoff_prompt_lines", "validate_consumption_receipt",
 ]
