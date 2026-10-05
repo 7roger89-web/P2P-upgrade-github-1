@@ -58,7 +58,7 @@ ADOPTION_EXCLUDED_STATES = {"DEFERRED", "REJECTED", "SUPERSEDED"}
 STATUS_VOCAB = {
     "READY_NOW", "BLOCKED_BY_DEPENDENCY", "BLOCKED_BY_EXTERNAL_EVIDENCE",
     "OWNER_DEFERRED", "NOT_YET_SAFE", "SUPERSEDED", "DONE", "SHIPPED",
-    "VERIFIED", "PLANNED", "PARTIAL", "DEFERRED", "REJECTED", "UNKNOWN",
+    "VERIFIED", "PLANNED", "PARTIAL", "ACTIVE_UNPROMOTED", "DEFERRED", "REJECTED", "UNKNOWN",
 }
 DEP_GRAPH_CLASSES = {
     "READY_NOW", "BLOCKED_BY_DEPENDENCY", "BLOCKED_BY_EXTERNAL_EVIDENCE",
@@ -172,6 +172,9 @@ def build_input_model(repo, override_owner_value):
         "INTAKE_CONTRACT": intake_contract,
         "CURRENT_EVIDENCE": {i["roadmap_id"]: i.get("current_evidence", "") for i in roadmap["items"]},
         "DEPENDENCIES": {i["roadmap_id"]: i.get("dependencies", []) for i in roadmap["items"]},
+        "OWNER_RESELECTION_DEPENDENCIES": {
+            i["roadmap_id"]: i.get("owner_reselection_dependencies", []) for i in roadmap["items"]
+        },
         "BLOCKERS": {i["roadmap_id"]: i.get("blockers", []) for i in roadmap["items"]},
         "STATUS": {i["roadmap_id"]: i.get("status") for i in roadmap["items"]},
         "PRIORITY": {i["roadmap_id"]: i.get("priority") for i in roadmap["items"]},
@@ -551,8 +554,40 @@ def classify_dependencies(inp):
             why = "(terminal) " + why
         return cls, why
 
+    owner_reselection_map = inp.get("OWNER_RESELECTION_DEPENDENCIES", {})
+
+    def classify_owner_reselection_gate(rid):
+        if not isinstance(owner_reselection_map, dict):
+            return "UNKNOWN", "owner-reselection dependency map is malformed"
+        dependencies = owner_reselection_map.get(rid, [])
+        if (not isinstance(dependencies, list)
+                or any(not isinstance(dep, str) or not dep.strip() for dep in dependencies)
+                or len(set(dependencies)) != len(dependencies)):
+            return "UNKNOWN", "owner-reselection dependencies are malformed"
+        for dependency_id in dependencies:
+            if dependency_id not in status:
+                return "UNKNOWN", f"unknown owner-reselection dependency {dependency_id}"
+            dependency_status = status[dependency_id]
+            if dependency_status == "DEFERRED":
+                return "OWNER_DEFERRED", f"owner re-selection unresolved: {dependency_id} is DEFERRED"
+            if dependency_status == "ACTIVE_UNPROMOTED" or dependency_status in TERMINAL_STATUSES:
+                continue
+            return (
+                "BLOCKED_BY_DEPENDENCY",
+                f"owner re-selection gate unresolved: {dependency_id} status {dependency_status}",
+            )
+        return None, None
+
     graph = {}
     for rid in ids:
+        owner_gate_class, owner_gate_reason = classify_owner_reselection_gate(rid)
+        if owner_gate_class is not None:
+            graph[rid] = {
+                "class": owner_gate_class,
+                "reason": owner_gate_reason,
+                "status": status[rid],
+            }
+            continue
         st = status[rid]
         if st in TERMINAL_STATUSES:
             cls, why = "DONE_SHIPPED_VERIFIED", f"terminal status {st}"
@@ -564,7 +599,7 @@ def classify_dependencies(inp):
             cls, why = classify_blocked(rid, terminal=(st == "BLOCKED_TERMINAL"))
         elif st == "PARTIAL":
             cls, why = "READY_NOW", "partial evidence progress; no blocker; continuation candidate"
-        elif st != "PLANNED":
+        elif st not in ("PLANNED", "ACTIVE_UNPROMOTED"):
             cls, why = "UNKNOWN", f"status {st} not in deterministic vocab"
         else:
             blockers = [str(b) for b in inp["BLOCKERS"].get(rid, [])]
@@ -581,7 +616,10 @@ def classify_dependencies(inp):
                 if dep_class and dep_class not in ("DONE_SHIPPED_VERIFIED", "UNKNOWN"):
                     cls, why = dep_class, dep_why
                 else:
-                    cls, why = "READY_NOW", inp.get("PROJECT_IMPACT", {}).get(rid, "") or "no blockers"
+                    if st == "ACTIVE_UNPROMOTED":
+                        cls, why = "READY_NOW", "active unpromoted; no blocker or unresolved gate; continuation candidate"
+                    else:
+                        cls, why = "READY_NOW", inp.get("PROJECT_IMPACT", {}).get(rid, "") or "no blockers"
         graph[rid] = {"class": cls, "reason": why, "status": st}
     return graph
 
