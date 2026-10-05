@@ -41,24 +41,24 @@ Items are ordered by **Owner value + dependency necessity + safety maturity + ev
 | Obsolescence / Capability Drift | SHIPPED | drift-policy.json; P2P-CAPABILITY-DRIFT-SWEEP-01 |
 | Release / Install / Project Lifecycle | SHIPPED | C40, C43 |
 
-## 4. Future roadmap items (priority-ordered, PLANNED)
+## 4. Future roadmap items (priority-ordered; current statuses in the canonical JSON)
 
 | # | Item | Family | Dependencies / blockers | Priority rationale |
 | --- | --- | --- | --- | --- |
 | 1 | ZERO_TO_PROJECT (Intent Compiler) | Owner Intent & Project Formation | Large-Goal completion, context intelligence completeness; no runtime change in definition phase | Highest Owner value (North Star direct path); composes existing FW00–FW06 primitives; bounded first safe Goal |
-| 2 | Large-Goal execution completeness | Large-Goal Autonomous Execution | C08 re-selection, FW06 checkpoint | Unblocks Zero-to-Project continuation semantics; core (C12/C15) already DONE |
+| 2 | Large-Goal execution completeness | Large-Goal Autonomous Execution | C08 general acceptance (ordinary completion dependency), FW06 checkpoint | Unblocks Zero-to-Project continuation semantics; core (C12/C15) already DONE |
 | 3 | Context Intelligence completeness | Context & Retrieval | none | Read-only; lifts every downstream goal; evidence gap is the remaining PARTIAL set of the largest family |
 | 5 | Goal Design / Visual Intelligence integration | Goal Design Intelligence | NUI provenance (partial acceptable) | Beginner visual guidance; C14 foundation already PROMOTED_VERIFIED |
 | 6 | Bounded code mutation | Mutation Capability Ladder | Owner policy + new primitive design; .41 documentation base | Ladder-2 requires its own authority/evidence/rollback; safety-critical |
-| 7 | Orca-style isolated/parallel execution extension | Workspace / Session / Worktree Isolation | C08 re-selection | Bounded candidate comparison; permission envelope never widens |
+| 7 | Orca-style isolated/parallel execution extension | Workspace / Session / Worktree Isolation | Owner-reselection gate cleared by Issue #295; C08 general acceptance remains PARTIAL | Bounded candidate comparison; permission envelope never widens |
 | 8 | Adaptive multi-host Council | Role / Team / Council | C09/C27 live-host evidence unblocked | Multi-host certification NOT_PROVEN; cannot rank above blocked evidence |
 | 10 | Release / project-installation lifecycle hardening | Release / Install / Project Lifecycle | Owner pin policy | Needed before Zero-to-Project touches authoritative projects; C40/C43 foundation exists |
 
 Completed priority item (no longer future/PLANNED): `RM-PRIORITY-DRIFT-SWEEP` (`Capability drift revalidation sweep`, priority #9) — **DONE**. Read-only full-index sweep executed 2026-10-02 (issue #293): all 191 capability records classified `VERIFIED_AT_EVIDENCE_TIME` (186) or `UNKNOWN_NOT_PROBED` (5), stale current-eligibility claims expired with history preserved, no live probe run and no credential requested; `scripts/p2p_capability_drift_sweep.py`, `docs/p2p-development/capability-ledger/capability-drift-sweep.json`, `docs/p2p-development/reports/P2P-CAPABILITY-DRIFT-SWEEP-01-REPORT.md`. Re-runs on demand; never scheduled, never mutates capability statuses.
 
-Completed priority item (no longer future/PLANNED): `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`, priority #4) — **DONE**. Governance-side read-only planner `scripts/p2p_roadmap_planner.py` VERSION=4, verified by charter invariant `MACHINE_READABLE_ROADMAP_VERIFIED`; latest current-main evidence `reports/planner/P2P-PLANNER-RUN-09.json`; never overrides Owner Gates and never auto-executes the goal it recommends. Runtime execution-loop integration remains an open gap — see §7.
+Completed priority item (no longer future/PLANNED): `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`, priority #4) — **DONE**. Governance-side read-only planner `scripts/p2p_roadmap_planner.py` VERSION=4, verified by charter invariant `MACHINE_READABLE_ROADMAP_VERIFIED`; latest canonical-run evidence `reports/planner/P2P-PLANNER-RUN-11.json`; never overrides Owner Gates and never auto-executes the goal it recommends. Runtime execution-loop integration remains an open gap — see §7.
 
-Carried historical items: `C08 DEFERRED` (controlled continuation), `C09 BLOCKED / EVENT_EVIDENCE_UNAVAILABLE`, `C27 BLOCKED / LIVE_HOST_EVIDENCE_UNAVAILABLE` — each preserves its original defer/block reason.
+Carried C-line history: C08 was `DEFERRED`; that historical development-control lineage is unchanged. The future-roadmap record is now `ACTIVE_UNPROMOTED` after explicit Owner re-selection in Issue #295 comment 5965625023 (`C08_GENERAL_ACCEPTANCE=PARTIAL`, `C08_PROMOTION_STATUS=UNPROMOTED`). C09 and C27 remain blocked by their recorded live-evidence blockers.
 
 ## 5. Mutation capability ladder (proven vs planned)
 
@@ -74,7 +74,7 @@ Whenever P2P proposes a major new development roadmap or selects the next major 
 
 ## 7. Roadmap reader status (honest)
 
-The current P2P runtime **does not automatically consume this roadmap** when choosing the next development Goal; runtime goal choice remains governed by the charter §6 heuristic plus explicit Owner instruction. The governance-side capability `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`) is now **DONE**: `scripts/p2p_roadmap_planner.py` VERSION=4 mechanically consumes `governance/p2p-development-roadmap.json` + `governance/research-adoption-ledger.json` + `docs/p2p-development/capability-ledger/capability-index.json` + the official baseline, with hash binding and a fail-closed coverage gate; it is read-only, never overrides Owner Gates, and never auto-executes the goal it recommends. Latest current-main evidence: `reports/planner/P2P-PLANNER-RUN-09.json`. Stated status: `ROADMAP_AWARE_DEVELOPMENT_PLANNER = DONE` (capability ledger: `VERIFIED_IMPLEMENTED`), with runtime execution-loop integration still an open, disclosed gap.
+The current P2P runtime **does not automatically consume this roadmap** when choosing the next development Goal; runtime goal choice remains governed by the charter §6 heuristic plus explicit Owner instruction. The governance-side capability `ROADMAP_AWARE_DEVELOPMENT_PLANNER` (`RM-PRIORITY-PLANNER`) is now **DONE**: `scripts/p2p_roadmap_planner.py` VERSION=4 mechanically consumes `governance/p2p-development-roadmap.json` + `governance/research-adoption-ledger.json` + `docs/p2p-development/capability-ledger/capability-index.json` + the official baseline, with hash binding and a fail-closed coverage gate; it is read-only, never overrides Owner Gates, and never auto-executes the goal it recommends. Latest canonical-run evidence: `reports/planner/P2P-PLANNER-RUN-11.json`. Stated status: `ROADMAP_AWARE_DEVELOPMENT_PLANNER = DONE` (capability ledger: `VERIFIED_IMPLEMENTED`), with runtime execution-loop integration still an open, disclosed gap.
 
 ---
 
@@ -90,7 +90,7 @@ Ba mảnh còn thiếu theo thứ tự phụ thuộc: (1) **completion của Lar
 
 ## Tính năng nào đã chọn nhưng chưa làm?
 
-`C08` continuation có kiểm soát (chủ động DEFERRED theo Owner); Zero-to-Project; Large-Goal completion; context-intelligence completeness; design intelligence composition; bounded code mutation; Orca-style parallel candidates; multi-host Council; release/install lifecycle hardening.
+`C08` continuation có kiểm soát đang `ACTIVE_UNPROMOTED` sau khi Owner reselected qua Issue #295 (general acceptance `PARTIAL`, chưa promotion); Zero-to-Project; Large-Goal completion; context-intelligence completeness; design intelligence composition; bounded code mutation; Orca-style parallel candidates; multi-host Council; release/install lifecycle hardening.
 
 ## Tính năng nào đã làm một phần?
 
@@ -109,12 +109,12 @@ Tự promote sau khi goal PASS; tác vụ thành agent; 174 faculties thành 174
 | 3 | Context Intelligence completion | Read-only, nâng chất lượng mọi goal sau; evidence gap còn lại của family lớn nhất |
 | 5 | Goal Design / Visual Intelligence integration | Hướng dẫn thiết kế cho người mới; C14 đã PROMOTED_VERIFIED |
 | 6 | Bounded code mutation | Mức 2 của thang đột biến; cần authority/evidence/rollback riêng — an toàn trước |
-| 7 | Orca-style parallel candidates | Nâng chất lượng quyết định; phụ thuộc C08 |
+| 7 | Orca-style parallel candidates | Owner-reselection gate đã cleared qua Issue #295; C08 general acceptance vẫn PARTIAL |
 | 8 | Multi-host Council | Bằng chứng host thật đang BLOCKED (C09/C27) — không thể xếp cao hơn |
 | 10 | Release/install lifecycle hardening | Cần thiết trước khi Zero-to-Project chạm dự án chính thức |
 
 `Drift revalidation sweep` (hạng 9) đã **DONE** ngày 2026-10-02 — không còn là hướng tương lai: `scripts/p2p_capability_drift_sweep.py` + `docs/p2p-development/capability-ledger/capability-drift-sweep.json` (191/191 record phân loại; claim lỗi thời được expire nhưng giữ nguyên lịch sử; không probe live, không xin credential; chỉ chạy khi được yêu cầu).
 
-`Roadmap-aware Development Planner` (hạng 4) đã **DONE** — không còn là hướng tương lai: `scripts/p2p_roadmap_planner.py` VERSION=4 (read-only, hash binding, coverage gate fail-closed) đã máy hóa coverage gate và không ghi đè Owner Gate; bằng chứng mới nhất `reports/planner/P2P-PLANNER-RUN-09.json` (xem §7). Runtime execution-loop integration vẫn là gap mở, được khai báo trung thực.
+`Roadmap-aware Development Planner` (hạng 4) đã **DONE** — không còn là hướng tương lai: `scripts/p2p_roadmap_planner.py` VERSION=4 (read-only, hash binding, coverage gate fail-closed) đã máy hóa coverage gate và không ghi đè Owner Gate; bằng chứng mới nhất `reports/planner/P2P-PLANNER-RUN-11.json` (xem §7). Runtime execution-loop integration vẫn là gap mở, được khai báo trung thực.
 
 Thứ tự này tuân theo nguyên tắc xếp hạng của roadmap: giá trị Owner + sự cần thiết phụ thuộc + độ trưởng thành an toàn + khoảng trống bằng chứng + đòn bẩy kiến trúc — không theo độ mới, không theo thứ tự thời gian.

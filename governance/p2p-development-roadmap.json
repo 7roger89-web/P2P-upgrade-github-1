@@ -6,6 +6,7 @@
   "authority": "This JSON is the canonical machine-readable roadmap for future P2P development planning. It extends governance/development-control.json (C-line roadmap) and docs/p2p-development/framework/master-roadmap.md (FW-line). On conflict with development-control.json, development-control.json wins for C-line status; this file is authoritative for future planned items and family organization.",
   "status_vocabulary": [
     "ACTIVE",
+    "ACTIVE_UNPROMOTED",
     "BLOCKED",
     "DEFERRED",
     "DONE",
@@ -316,12 +317,10 @@
       "title": "Controlled continuation",
       "family": "RESILIENCE_RECOVERY_FAILOVER",
       "owner_value": "Resume interrupted work without full restart \u2014 beginner impact: less manual state rebuild.",
-      "status": "DEFERRED",
+      "status": "ACTIVE_UNPROMOTED",
       "priority": null,
       "dependencies": [],
-      "blockers": [
-        "Owner re-selection \u2014 was explicitly DEFERRED"
-      ],
+      "blockers": [],
       "source_research_ids": [
         "RA-EXT-006",
         "RA-EXT-018"
@@ -329,13 +328,24 @@
       "canonical_capability_ids": [
         "C08"
       ],
-      "current_evidence": "docs/plans/2026-08-10-*; C08 roadmap record",
-      "target_evidence": "C08 contract with checkpoint/resume acceptance bar",
+      "current_evidence": "C12/FW06 controlled-resume behavior; tests/test_p2p_orca_controlled_continuation.py (synthetic ORCA composition proof); Owner re-selection recorded in Issue #295 comment 5965625023.",
+      "target_evidence": "Complete C08 contract with checkpoint/resume acceptance bar; full general acceptance remains incomplete.",
       "mutation_risk_class": "READ_ONLY",
       "project_impact": "NONE",
       "promotion_required": "YES for any runtime change",
-      "next_safe_when": "Owner re-selects",
-      "defer_reason": "Explicit Owner deferral; superseded in sequencing by lifecycle/foundation goals"
+      "general_acceptance_status": "PARTIAL",
+      "promotion_status": "UNPROMOTED",
+      "owner_reselection_history": [
+        {
+          "prior_status": "DEFERRED",
+          "prior_blocker": "Owner re-selection \u2014 was explicitly DEFERRED",
+          "reselected_status": "ACTIVE_UNPROMOTED",
+          "authority": "Owner",
+          "evidence_ref": "Issue #295 comment 5965625023"
+        }
+      ],
+      "next_safe_when": "Continue C08 controlled-continuation acceptance work; promotion remains separate and unapproved.",
+      "defer_reason": ""
     },
     {
       "roadmap_id": "RM-C09",
@@ -612,12 +622,15 @@
       "title": "Orca-style isolated/parallel execution extension",
       "family": "WORKSPACE_SESSION_ISOLATION",
       "owner_value": "So s\u00e1nh nhi\u1ec1u gi\u1ea3i ph\u00e1p \u1ee9ng vi\u00ean \u0111\u1ed9c l\u1eadp tr\u00ean worktree c\u00f4 l\u1eadp \u2014 ch\u1ea5t l\u01b0\u1ee3ng quy\u1ebft \u0111\u1ecbnh t\u1ed1t h\u01a1n.",
-      "status": "PLANNED",
+      "status": "PARTIAL",
       "priority": 7,
       "dependencies": [
         "FW06 lease semantics",
         "C17 bounded parallel",
         "output compare/evaluate in VERIFICATION family"
+      ],
+      "owner_reselection_dependencies": [
+        "RM-C08"
       ],
       "blockers": [],
       "source_research_ids": [
@@ -626,12 +639,12 @@
       "canonical_capability_ids": [
         "C17"
       ],
-      "current_evidence": "C17 DONE (bounded parallel foreground); FW06 lease",
-      "target_evidence": "bounded candidate-fanout with compare/evaluate verdicts on isolated worktrees; permission envelope never widens",
+      "current_evidence": "C17 bounded parallel; FW06 candidate workspaces; ORCA receipt/comparator tests; tests/test_p2p_orca_controlled_continuation.py (synthetic C08 composition proof).",
+      "target_evidence": "Complete C08 general acceptance and bounded candidate-fanout compare/evaluate evidence on isolated worktrees; permission envelope never widens.",
       "mutation_risk_class": "READ_ONLY then per-candidate BOUNDED_DOCUMENTATION_WRITE",
       "project_impact": "NONE",
       "promotion_required": "YES for runtime changes",
-      "next_safe_when": "after RM-C08 re-selection",
+      "next_safe_when": "Owner re-selection is recorded; continue bounded ORCA/C08 acceptance evidence. Promotion remains separate.",
       "defer_reason": ""
     },
     {
