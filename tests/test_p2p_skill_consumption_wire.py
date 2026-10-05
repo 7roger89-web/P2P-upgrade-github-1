@@ -100,6 +100,35 @@ class SkillConsumptionWireTests(unittest.TestCase):
             self.assertEqual(handoff["SKILLS_SELECTED"], [])
             self.assertEqual(handoff["SKILL_CONSUMPTION"], "NO_SKILL_NEEDED")
 
+    def test_tampered_scope_entrypoint_fails_closed_against_pinned_hash(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-skill-tamper-") as raw:
+            root = Path(raw)
+            registry_target = (
+                root / ".p2p" / "system" / "p2p_capabilities"
+                / "capabilities.json"
+            )
+            registry_target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(
+                SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json",
+                registry_target,
+            )
+            skill_target = (
+                root / ".agents" / "skills" / "scope-reality-check"
+                / "SKILL.md"
+            )
+            skill_target.parent.mkdir(parents=True, exist_ok=True)
+            skill_target.write_text(
+                (REPO_ROOT / ".agents" / "skills" / "scope-reality-check"
+                 / "SKILL.md").read_text(encoding="utf-8")
+                + "\nTAMPERED\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                ValueError,
+                "SKILL_ENTRYPOINT_HASH_MISMATCH:scope-reality-check",
+            ):
+                load_selected_skills(root, ("scope-reality-check",))
+
     def test_arena_handoff_binds_exact_path_hash_and_permission_boundary(self):
         handoff = prepare_skill_handoff(
             REPO_ROOT,
