@@ -2669,6 +2669,9 @@ def _session_recommendation(
         recommendation["SKILL_HANDOFF"] = _safe_json(
             dict(skill_handoff), path="skill_handoff"
         )
+        recommendation["REQUIRED_SKILLS"] = list(
+            skill_handoff.get("REQUIRED_SKILLS") or ()
+        )
     if canary_directive is not None:
         recommendation["CANARY"] = canary_directive.to_dict()
         recommendation["FAST_CANARY_REQUIRED"] = "YES"
@@ -3091,6 +3094,7 @@ class ControlTower:
         canonical_base_sha: str = UNKNOWN,
         canonical_base_tree: str = UNKNOWN,
         acceptance_criteria: Sequence[str] = (),
+        required_skills: Sequence[str] = (),
         expected_law_sha: str | None = None,
         expected_experience_ids: Sequence[str] = (),
         canary_directive: CanaryDirective | None = None,
@@ -3105,6 +3109,7 @@ class ControlTower:
         canonical_base_sha = _hash_or_unknown(canonical_base_sha, "canonical_base_sha")
         canonical_base_tree = _hash_or_unknown(canonical_base_tree, "canonical_base_tree")
         criteria = _refs(acceptance_criteria, "acceptance_criteria", max_length=4096)
+        required_skill_refs = _refs(required_skills, "required_skills", max_length=256)
         state, orphan_returns = self._replay()
         existing = state.session_records.get(binding.session_id)
         if existing is not None:
@@ -3184,12 +3189,22 @@ class ControlTower:
             )
             if isinstance(existing_handoff, Mapping):
                 skill_handoff = dict(existing_handoff)
+                if required_skill_refs:
+                    existing_required = tuple(
+                        str(value)
+                        for value in (skill_handoff.get("REQUIRED_SKILLS") or ())
+                    )
+                    if tuple(required_skill_refs) != existing_required:
+                        raise BindingError(
+                            "REQUIRED_SKILLS_CHANGED_FOR_ACTIVE_SESSION"
+                        )
             else:
                 from .skill_consumption import prepare_skill_handoff
                 skill_handoff = prepare_skill_handoff(
                     self.root,
                     prompt_task,
                     host=binding.host,
+                    required_skills=required_skill_refs,
                 )
             if skill_handoff.get("SKILL_CHECK") == "BLOCKED":
                 reasons = ",".join(
