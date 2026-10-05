@@ -15,6 +15,21 @@
     ".agents/skills/p2p-eval/agents/openai.yaml": "95ea16848f3b335bd246e51efcf38eaa6a6558b4799552616a00633995c9c539",
     ".agents/skills/p2p-explore/SKILL.md": "62843878a14544a8ec4b2a40fb90bda3bbb9363562b0434b558b96c1bbf4c049",
     ".agents/skills/p2p-explore/agents/openai.yaml": "82a77b746f015a13ec50d8ac26de211e5b5b0948cfa944aacdf1421666efb5a2",
-    ".agents/skills/p2p-feedback/SKILL.md": "08947eb7d4d9753140441d821e6c3f280f66505854e0f8f664855ac2e6e70621"
+    ".agents/skills/p2p-feedback/SKILL.md": "08947eb7d4d9753140441d821e6c3f280f66505854e0f8f664855ac2e6e70621",
+    ".agents/skills/p2p-feedback/agents/openai.yaml": "e8825217bf1948163fe1e18c9516f8bc2bf1c0bd3bac8f2f426fd0d496bd5c8f",
+    ".agents/skills/p2p-idea/SKILL.md": "ecae2a5fe84d13a4de791dbaf3bd728c6f26c3bad9fe2b479fe0ee4f919a081e",
+    ".agents/skills/p2p-idea/agents/openai.yaml": "6c2a587cfa886aaaee7a6ac387368fe2a627a820e6623fc21457b22a904f2b61",
+    ".agents/skills/p2p-idea/assets/icon.svg": "e9301497fa98ef56aaca7ede0857b9a18dc06c34040f0679c609a6bf49b1d38b",
+    ".agents/skills/p2p-idea/references/idea-compass.md": "630ef877dbca4fbd6d0139aa20ead6d01af197b8a26430d6e0226e2833f4404e",
+    ".agents/skills/p2p-karpathy/SKILL.md": "319dc2616dd642bb39b23bc8665d3be607a43d916bf55663f4dbeadc49f30599",
+    ".agents/skills/p2p-karpathy/agents/openai.yaml": "801af0f55587dfdc45be4a0f8b1eb29c0b05f92e4f5964c0a32bcd572fa3cfd0",
+    ".agents/skills/p2p-metrics/SKILL.md": "e076d0e9e1c372e35f34b27ebcf0d5d74edf9de3107d38bc318d78fb03145ebd",
+    ".agents/skills/p2p-metrics/agents/openai.yaml": "9e5ae6d56c6a43d3568e5be3c5f3d236ee55c74cde42af9e33bf32b3d2373198",
+    ".agents/skills/p2p-pxpipe/SKILL.md": "b75dcb70f205308002182a235e3b53809e78332830c3cf1c99bf95015eb39f32",
+    ".agents/skills/p2p-pxpipe/agents/openai.yaml": "e616c1ffb59780c7ec74146ca3dbfbdc6ace3ede1f933fb0b24396f14e4adef2",
+    ".agents/skills/p2p-quorum/SKILL.md": "5ae2b0ee126e72797f59c05e12271e3e3ddb2f46dd509bb824621c35d9e78a8d",
+    ".agents/skills/p2p-quorum/agents/openai.yaml": "ddc9f4f34f13b18898f4b5dd7566e9461aab9ba52e26b354fef894c2c7f46757",
+    ".agents/skills/p2p-quorum/assets/codex-agents/p2p-anon.toml": "80b8b3783fe4051c24d82cb0d3642b7a8006e8f92205e6bf966e81e2e7b08563",
+    ".agents/skills/p2p-quorum/assets/codex-agents/p2p-architecton.toml": "9b695783e4d3211dcc79ee35d9a24e9088b4d1fbe0d3ff8775c6e4176c06523e"
   }
 }
