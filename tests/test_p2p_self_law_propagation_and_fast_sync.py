@@ -22,6 +22,15 @@ def _package(tmp_path: Path, law_body: str = "LAW v1") -> Path:
         encoding="utf-8",
     )
     (root / "VERSION").write_text("9.9.9-test\n", encoding="utf-8")
+
+    skills_root = root / ".agents" / "skills"
+    for name in ("p2p-scope", "scope-reality-check", "generic-skill"):
+        skill_dir = skills_root / name
+        skill_dir.mkdir(parents=True, exist_ok=True)
+        (skill_dir / "SKILL.md").write_text(
+            f"---\nname: {name}\n---\n\n# {name}\n",
+            encoding="utf-8",
+        )
     return root
 
 
@@ -75,6 +84,9 @@ def test_portable_agents_block_contains_actor_separation():
     assert "TARGET_REPO_AUTH != CANONICAL_CROSS_REPO_REACHABILITY" in block
     assert "do not probe canonical solely" in block
     assert "P2P_LAW_SOURCE=<actual source>" in block
+    assert "### Repo-native required skill handoff" in block
+    assert "REQUIRED_SKILLS=<ids>" in block
+    assert "p2p-skill-consumption-receipt/1" in block
     print("portable block actor separation: PASS")
 
 
@@ -146,6 +158,53 @@ def test_batch_write_updates_only_stale(tmp_path: Path):
 
 
 
+def test_batch_check_and_write_track_projected_skill_drift(tmp_path: Path):
+    package = _package(tmp_path, law_body="LAW v1")
+    project = tmp_path / "skill-project"
+    project.mkdir()
+    assert _run_proj(package, project).returncode == 0
+
+    source_skill = package / ".agents" / "skills" / "p2p-scope" / "SKILL.md"
+    source_skill.write_text(
+        source_skill.read_text(encoding="utf-8") + "\nSOURCE v2\n",
+        encoding="utf-8",
+    )
+
+    check = _run_sync(
+        "--project",
+        str(project),
+        "--package-root",
+        str(package),
+        "--check",
+    )
+    assert check.returncode == 1
+    assert "STALE" in check.stdout
+
+    write = _run_sync(
+        "--project",
+        str(project),
+        "--package-root",
+        str(package),
+        "--write",
+    )
+    assert write.returncode == 0
+    assert "CHANGED=1" in write.stdout
+    projected = project / ".agents" / "skills" / "p2p-scope" / "SKILL.md"
+    assert projected.read_text(encoding="utf-8") == source_skill.read_text(
+        encoding="utf-8"
+    )
+
+    second = _run_sync(
+        "--project",
+        str(project),
+        "--package-root",
+        str(package),
+        "--write",
+    )
+    assert "CHANGED=0" in second.stdout
+    print("batch skill drift check/write/idempotence: PASS")
+
+
 def test_batch_write_migrates_legacy_preflight(tmp_path: Path):
     package = _package(tmp_path, law_body="LAW v1")
     project = tmp_path / "legacy-project"
@@ -204,6 +263,22 @@ def test_dirty_and_unsafe_blocked(tmp_path: Path):
     assert "BLOCKED" in result.stdout
     print("dirty BLOCKED: PASS")
 
+    # dirty projected skill
+    subprocess.run(
+        ["git", "-C", str(proj_c), "checkout", "--", "AGENTS.md"],
+        capture_output=True,
+    )
+    projected_skill = proj_c / ".agents" / "skills" / "p2p-scope" / "SKILL.md"
+    projected_skill.write_text(
+        projected_skill.read_text(encoding="utf-8") + "\nDIRTY SKILL\n",
+        encoding="utf-8",
+    )
+    result_skill = _run_sync(
+        "--project", str(proj_c), "--package-root", str(package), "--write"
+    )
+    assert "BLOCKED" in result_skill.stdout
+    print("dirty projected skill BLOCKED: PASS")
+
     # symlink unsafe
     proj_d = ws / "projD"
     proj_d.mkdir()
@@ -238,6 +313,7 @@ if __name__ == "__main__":
         test_projector_idempotent_and_preserves_content(tmp_path / "t1")
         test_batch_check_detects_current_stale(tmp_path / "t2")
         test_batch_write_updates_only_stale(tmp_path / "t3")
+        test_batch_check_and_write_track_projected_skill_drift(tmp_path / "t3a")
         test_batch_write_migrates_legacy_preflight(tmp_path / "t3b")
         test_dirty_and_unsafe_blocked(tmp_path / "t4")
         test_no_new_authority_or_registry()

@@ -565,6 +565,15 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
             ".p2p/system/p2p_capabilities/control_tower_handoff.py",
             "tests/test_p2p_skill_consumption_wire.py",
+            # Issue #309 extends the EXISTING portable-law projector and
+            # managed-project sync wrapper so repo-scoped executors can read a
+            # bounded source-bound operator-skill projection from the target
+            # repository. No second router, registry, daemon, scheduler, or
+            # background sync service is introduced.
+            "scripts/p2p_portable_law_projection.py",
+            "scripts/p2p_sync_managed_projects.py",
+            "tests/test_p2p_portable_law_projection.py",
+            "tests/test_p2p_self_law_propagation_and_fast_sync.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -654,10 +663,23 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
                 ".p2p/system/p2p_capabilities/control_tower_handoff.py",
                 "tests/test_p2p_skill_consumption_wire.py",
+                # Issue #309: existing foreground projector/sync surfaces.
+                "scripts/p2p_portable_law_projection.py",
+                "scripts/p2p_sync_managed_projects.py",
+                "tests/test_p2p_portable_law_projection.py",
+                "tests/test_p2p_self_law_propagation_and_fast_sync.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
-            if not is_vendored_bytes and any(
-                fragment in lowered for fragment in forbidden_fragments
+            issue_309_existing_transport_surfaces = {
+                "scripts/p2p_portable_law_projection.py",
+                "scripts/p2p_sync_managed_projects.py",
+                "tests/test_p2p_portable_law_projection.py",
+                "tests/test_p2p_self_law_propagation_and_fast_sync.py",
+            }
+            if (
+                path not in issue_309_existing_transport_surfaces
+                and not is_vendored_bytes
+                and any(fragment in lowered for fragment in forbidden_fragments)
             ):
                 if "skill-manifest" not in lowered and "RESEARCH-ADOPTION-LEDGER" not in path:
                     violations.append(f"parallel-architecture smell: {path}")
@@ -712,6 +734,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                     # router, registry, daemon, scheduler, execution path,
                     # network probe service, or second state store.
                     "scripts/p2p_capability_drift_sweep.py",
+                    # Issue #309 modifies two EXISTING foreground transport
+                    # scripts. Neither is a new executor/router/service.
+                    "scripts/p2p_portable_law_projection.py",
+                    "scripts/p2p_sync_managed_projects.py",
                 },
                 f"new script surface: {path}",
             )

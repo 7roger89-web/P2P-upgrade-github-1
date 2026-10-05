@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -21,6 +22,25 @@ def _package(tmp_path: Path) -> Path:
         encoding="utf-8",
     )
     (root / "VERSION").write_text("9.9.9-test\n", encoding="utf-8")
+
+    skills_root = root / ".agents" / "skills"
+    for name in ("p2p-scope", "p2p-eval", "scope-reality-check", "generic-skill"):
+        skill_dir = skills_root / name
+        skill_dir.mkdir(parents=True, exist_ok=True)
+        (skill_dir / "SKILL.md").write_text(
+            f"---\nname: {name}\n---\n\n# {name}\n",
+            encoding="utf-8",
+        )
+    scope_ref = skills_root / "scope-reality-check" / "references"
+    scope_ref.mkdir(parents=True, exist_ok=True)
+    (scope_ref / "evidence-rules.md").write_text(
+        "# Evidence rules\n", encoding="utf-8"
+    )
+    eval_agents = skills_root / "p2p-eval" / "agents"
+    eval_agents.mkdir(parents=True, exist_ok=True)
+    (eval_agents / "openai.yaml").write_text(
+        "interface:\n  display_name: P2P Eval\n", encoding="utf-8"
+    )
     return root
 
 
@@ -62,6 +82,31 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "p2p-portable-experience-capsule/1" in capsule_text
     assert "NON_AUTHORITATIVE_VERIFIED_EXPERIENCE" in capsule_text
 
+    skill_manifest = project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+    assert skill_manifest.is_file()
+    skill_data = json.loads(skill_manifest.read_text(encoding="utf-8"))
+    assert skill_data["schema"] == "p2p-portable-skill-projection/1"
+    assert skill_data["routing_authority"] is False
+    assert skill_data["permission_effect"] == "NONE"
+    assert skill_data["skills"] == [
+        "p2p-eval",
+        "p2p-scope",
+        "scope-reality-check",
+    ]
+    assert (project / ".agents" / "skills" / "p2p-scope" / "SKILL.md").is_file()
+    assert (
+        project
+        / ".agents"
+        / "skills"
+        / "scope-reality-check"
+        / "references"
+        / "evidence-rules.md"
+    ).is_file()
+    assert (
+        project / ".agents" / "skills" / "p2p-eval" / "agents" / "openai.yaml"
+    ).is_file()
+    assert not (project / ".agents" / "skills" / "generic-skill").exists()
+
     agents = (project / "AGENTS.md").read_text(encoding="utf-8")
     assert "<!-- BEGIN P2P PORTABLE LAW -->" in agents
     assert ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md" in agents
@@ -80,6 +125,9 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "executor self-report are never P2P acceptance authority" in agents
     assert "Never introduce a fixed retry-count hard stop" in agents
     assert "do not assume Codex CLI has Claude Code's evaluator semantics" in agents
+    assert "### Repo-native required skill handoff" in agents
+    assert "REQUIRED_SKILLS=<ids>" in agents
+    assert "p2p-skill-consumption-receipt/1" in agents
 
 
 def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None:
@@ -92,6 +140,12 @@ def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None
     first_agents = (project / "AGENTS.md").read_bytes()
     first_projection = (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()
     first_capsule = (project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json").read_bytes()
+    first_skill_manifest = (
+        project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+    ).read_bytes()
+    first_skill = (
+        project / ".agents" / "skills" / "scope-reality-check" / "SKILL.md"
+    ).read_bytes()
 
     second = _run(package, project)
     assert second.returncode == 0
@@ -99,6 +153,12 @@ def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None
     assert (project / "AGENTS.md").read_bytes() == first_agents
     assert (project / ".p2p" / "portable" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes() == first_projection
     assert (project / ".p2p" / "portable" / "P2P-EXPERIENCE-CAPSULE.json").read_bytes() == first_capsule
+    assert (
+        project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+    ).read_bytes() == first_skill_manifest
+    assert (
+        project / ".agents" / "skills" / "scope-reality-check" / "SKILL.md"
+    ).read_bytes() == first_skill
 
 
 def test_projection_preserves_existing_agents_and_is_checkable(tmp_path: Path) -> None:
@@ -227,6 +287,56 @@ def test_check_fails_closed_after_experience_capsule_drift(tmp_path: Path) -> No
     assert "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING" in check.stdout
 
 
+def test_check_fails_closed_after_projected_skill_drift(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    assert _run(package, project).returncode == 0
+
+    skill = project / ".agents" / "skills" / "p2p-scope" / "SKILL.md"
+    skill.write_text(skill.read_text(encoding="utf-8") + "\nDRIFT\n", encoding="utf-8")
+
+    check = _run(package, project, "--check")
+
+    assert check.returncode == 2
+    assert "skill_files_ok=False" in check.stdout
+
+
+def test_removed_managed_skill_is_cleaned_only_when_old_hash_matches(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+    assert _run(package, project).returncode == 0
+
+    target_skill = project / ".agents" / "skills" / "p2p-eval" / "SKILL.md"
+    original = target_skill.read_text(encoding="utf-8")
+    custom = project / ".agents" / "skills" / "custom-project-skill" / "SKILL.md"
+    custom.parent.mkdir(parents=True, exist_ok=True)
+    custom.write_text("# project-owned skill\n", encoding="utf-8")
+
+    shutil.rmtree(package / ".agents" / "skills" / "p2p-eval")
+    target_skill.write_text(original + "\nPROJECT EDIT\n", encoding="utf-8")
+
+    blocked = _run(package, project)
+    assert blocked.returncode == 2
+    assert "PORTABLE_STALE_SKILL_MODIFIED" in blocked.stdout
+    assert target_skill.is_file()
+    assert custom.is_file()
+
+    target_skill.write_text(original, encoding="utf-8")
+    repaired = _run(package, project)
+    assert repaired.returncode == 0, repaired.stdout + repaired.stderr
+    assert not target_skill.exists()
+    assert custom.is_file()
+
+    manifest = json.loads(
+        (
+            project / ".p2p" / "portable" / "P2P-SKILL-PROJECTION.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "p2p-eval" not in manifest["skills"]
+
+
 def test_actor_law_receipt_and_experience_capsule(tmp_path: Path) -> None:
     package = _package(tmp_path)
     project = tmp_path / "project_receipt"
@@ -262,6 +372,8 @@ if __name__ == "__main__":
         test_projection_preserves_unrecognized_similar_project_section(base / "5")
         test_check_fails_closed_after_projection_drift(base / "6")
         test_check_fails_closed_after_experience_capsule_drift(base / "7")
+        test_check_fails_closed_after_projected_skill_drift(base / "7b")
+        test_removed_managed_skill_is_cleaned_only_when_old_hash_matches(base / "7c")
         test_actor_law_receipt_and_experience_capsule(base / "8")
         test_canonical_law_and_release_package_recognize_portable_projection()
     print("ALL PORTABLE LAW PROJECTION TESTS PASS")
