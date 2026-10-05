@@ -3,6 +3,6 @@ interface:
   short_description: Phản biện gắt có bằng chứng rồi cắt scope về thứ đáng ship.
 policy:
   products:
-  - chatgpt
-  - codex
+  - CHAT
+  - CODEX
   allow_implicit_invocation: false
