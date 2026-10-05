@@ -1363,6 +1363,7 @@ class ControlTowerReturnPacket:
     law_check: Mapping[str, Any] | None = None
     learning_reconciliation: Mapping[str, Any] | None = None
     experience_check: Mapping[str, Any] | None = None
+    skill_consumption_receipt: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.binding, SessionBinding):
@@ -1408,6 +1409,19 @@ class ControlTowerReturnPacket:
         elif not isinstance(manifest, ControlTowerAttachmentManifest):
             raise ControlTowerHandoffError("ATTACHMENT_MANIFEST_REQUIRED")
         object.__setattr__(self, "attachment_manifest", manifest)
+        if self.skill_consumption_receipt is not None:
+            if not isinstance(self.skill_consumption_receipt, Mapping):
+                raise ControlTowerHandoffError(
+                    "SKILL_CONSUMPTION_RECEIPT_MUST_BE_OBJECT"
+                )
+            object.__setattr__(
+                self,
+                "skill_consumption_receipt",
+                _safe_json(
+                    self.skill_consumption_receipt,
+                    path="skill_consumption_receipt",
+                ),
+            )
 
     @property
     def mapped_lifecycle_state(self) -> str:
@@ -1445,6 +1459,11 @@ class ControlTowerReturnPacket:
             result["LEARNING_RECONCILIATION"] = _safe_json(self.learning_reconciliation, path="learning_reconciliation")
         if self.experience_check is not None:
             result["EXPERIENCE_CHECK"] = _safe_json(self.experience_check, path="experience_check")
+        if self.skill_consumption_receipt is not None:
+            result["SKILL_CONSUMPTION_RECEIPT"] = _safe_json(
+                self.skill_consumption_receipt,
+                path="skill_consumption_receipt",
+            )
         return result
 
     @classmethod
@@ -1489,6 +1508,7 @@ class ControlTowerReturnPacket:
             law_check=value.get("LAW_CHECK"),
             learning_reconciliation=value.get("LEARNING_RECONCILIATION"),
             experience_check=value.get("EXPERIENCE_CHECK"),
+            skill_consumption_receipt=value.get("SKILL_CONSUMPTION_RECEIPT"),
         )
 
     def fingerprint(self) -> str:
@@ -2116,6 +2136,24 @@ class ControlTowerState:
             blockers.extend(receipt_blockers)
             next_action = "Resolve actor-own LAW_CHECK and EXPERIENCE_CHECK receipts before reconciliation."
 
+        expected_skill_handoff = session_rec.get("SKILL_HANDOFF")
+        if isinstance(expected_skill_handoff, Mapping):
+            from .skill_consumption import validate_consumption_receipt
+            skill_receipt_result = validate_consumption_receipt(
+                expected_skill_handoff,
+                packet.skill_consumption_receipt,
+            )
+            if not skill_receipt_result.get("valid"):
+                status = "RECONCILIATION_REQUIRED"
+                blockers.extend(
+                    str(code)
+                    for code in skill_receipt_result.get("reason_codes", ())
+                )
+                next_action = (
+                    "Reconcile the executor skill-consumption receipt against "
+                    "the frozen session skill handoff before terminal close."
+                )
+
         # Ingest-level enforcement of LEARNING_RECONCILIATION (Blocker 5)
         # Every terminal substantive task must provide LEARNING_RECONCILIATION=NONE or CANDIDATE
         # (no keyword heuristics)
@@ -2586,6 +2624,7 @@ def _session_recommendation(
     arena_prompt_checkpoint: Mapping[str, str] | None = None,
     chat_mode: str = "NEW_CHAT",
     chat_title_override: str | None = None,
+    skill_handoff: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     project_identity = (
         arena_prompt_checkpoint.get("project")
@@ -2613,6 +2652,7 @@ def _session_recommendation(
         arena_prompt_checkpoint=arena_prompt_checkpoint,
         chat_mode=chat_mode,
         chat_title_override=chat_title,
+        skill_handoff=skill_handoff,
     )
     recommendation = {
         "CHAT_NAME": chat_title or f"{binding.host} — {binding.goal_id} — {binding.goal}",
@@ -2625,6 +2665,10 @@ def _session_recommendation(
     }
     if chat_title is not None:
         recommendation["CHAT_TITLE"] = chat_title
+    if isinstance(skill_handoff, Mapping):
+        recommendation["SKILL_HANDOFF"] = _safe_json(
+            dict(skill_handoff), path="skill_handoff"
+        )
     if canary_directive is not None:
         recommendation["CANARY"] = canary_directive.to_dict()
         recommendation["FAST_CANARY_REQUIRED"] = "YES"
@@ -2715,6 +2759,10 @@ class ControlTower:
                         "EXPECTED_LAW_SHA": event.get("EXPECTED_LAW_SHA"),
                         "EXPECTED_EXPERIENCE_IDS": event.get("EXPECTED_EXPERIENCE_IDS", []),
                         "ACCEPTANCE_CRITERIA": list(event.get("ACCEPTANCE_CRITERIA") or []),
+                        "SKILL_HANDOFF": _safe_json(
+                            event.get("SKILL_HANDOFF"),
+                            path="skill_handoff",
+                        ) if isinstance(event.get("SKILL_HANDOFF"), Mapping) else None,
                         "CANARY": _canary_record(event.get("CANARY")),
                     }
                 )
@@ -3123,6 +3171,35 @@ class ControlTower:
                         f"SESSION_ID={binding.session_id}; TASK_ID={effective_task_id}; "
                         "SESSION_STATE=ACTIVE; EXECUTION_PROGRESS=NONE_RECORDED"
                     )
+        skill_handoff = None
+        skill_registry_available = (
+            self.root / ".p2p" / "system" / "p2p_capabilities"
+            / "capabilities.json"
+        ).is_file()
+        if binding.host in {"ARENA", "CODEX"} and skill_registry_available:
+            existing_handoff = (
+                existing.get("SKILL_HANDOFF")
+                if isinstance(existing, Mapping)
+                else None
+            )
+            if isinstance(existing_handoff, Mapping):
+                skill_handoff = dict(existing_handoff)
+            else:
+                from .skill_consumption import prepare_skill_handoff
+                skill_handoff = prepare_skill_handoff(
+                    self.root,
+                    prompt_task,
+                    host=binding.host,
+                )
+            if skill_handoff.get("SKILL_CHECK") == "BLOCKED":
+                reasons = ",".join(
+                    str(v)
+                    for v in skill_handoff.get("REJECTION_REASON", ())
+                )
+                raise BindingError(
+                    "SKILL_HANDOFF_BLOCKED:" + (reasons or "UNKNOWN")
+                )
+
         arena_checkpoint = None
         if binding.host == "ARENA":
             arena_checkpoint = _load_arena_prompt_checkpoint(
@@ -3150,6 +3227,7 @@ class ControlTower:
                     arena_prompt_checkpoint=arena_checkpoint,
                     chat_mode=chat_mode,
                     chat_title_override=chat_title_override,
+                    skill_handoff=skill_handoff,
                 )
                 if isinstance(existing_continuation, Mapping):
                     existing_grade = existing.get("CANARY_GRADE") if isinstance(existing, Mapping) else None
@@ -3187,6 +3265,7 @@ class ControlTower:
             canary_directive=effective_directive,
             arena_prompt_checkpoint=arena_checkpoint,
             chat_mode=chat_mode,
+            skill_handoff=skill_handoff,
         )
         event = {
             "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
@@ -3202,6 +3281,9 @@ class ControlTower:
             "EXPECTED_LAW_SHA": expected_law_sha,
             "EXPECTED_EXPERIENCE_IDS": list(expected_experience_ids),
             "ACCEPTANCE_CRITERIA": list(criteria),
+            "SKILL_HANDOFF": _safe_json(
+                skill_handoff, path="skill_handoff"
+            ) if isinstance(skill_handoff, Mapping) else None,
             "CANARY": canary_directive.to_dict() if canary_directive is not None else None,
             "PACKET_IS_CANONICAL_TRUTH": "NO",
             "PROMOTED": False,
@@ -3574,6 +3656,11 @@ class ControlTower:
             else None
         )
         chat_title_override = stored_title if isinstance(stored_title, str) else None
+        skill_handoff = (
+            dict(record.get("SKILL_HANDOFF"))
+            if isinstance(record.get("SKILL_HANDOFF"), Mapping)
+            else None
+        )
         arena_checkpoint = None
         if binding.host == "ARENA":
             arena_checkpoint = _load_arena_prompt_checkpoint(
@@ -3603,6 +3690,7 @@ class ControlTower:
                         arena_prompt_checkpoint=arena_checkpoint,
                         chat_mode="SAME_CHAT",
                         chat_title_override=chat_title_override,
+                        skill_handoff=skill_handoff,
                     )
                     recommendation.update(
                         {"CANARY_REPEAT": "NO", "CONTINUATION_MODE": "RESUME_ORIGINAL_TASK_IN_SAME_SESSION"}
@@ -3629,6 +3717,7 @@ class ControlTower:
             arena_prompt_checkpoint=arena_checkpoint,
             chat_mode="SAME_CHAT" if binding.host == "ARENA" else "NEW_CHAT",
             chat_title_override=chat_title_override,
+            skill_handoff=skill_handoff,
         )
         recommendation["CANARY_REPEAT"] = "NO"
         recommendation["CONTINUATION_MODE"] = "RESUME_ORIGINAL_TASK_IN_SAME_SESSION"
@@ -3749,6 +3838,11 @@ class ControlTower:
                         acceptance_criteria=task.acceptance_requirements,
                         task_id=task.task_id,
                         arena_prompt_checkpoint=arena_checkpoint,
+                        skill_handoff=(
+                            dict(record.get("SKILL_HANDOFF"))
+                            if isinstance(record.get("SKILL_HANDOFF"), Mapping)
+                            else None
+                        ),
                     )
                 return {
                     "status": "PASS",
@@ -3785,6 +3879,24 @@ class ControlTower:
             if normalized_host == "ARENA"
             else None
         )
+        preview_skill_handoff = None
+        skill_registry_available = (
+            self.root / ".p2p" / "system" / "p2p_capabilities"
+            / "capabilities.json"
+        ).is_file()
+        if normalized_host in {"ARENA", "CODEX"} and skill_registry_available:
+            from .skill_consumption import prepare_skill_handoff
+            preview_skill_handoff = prepare_skill_handoff(
+                self.root, task.purpose, host=normalized_host
+            )
+            if preview_skill_handoff.get("SKILL_CHECK") == "BLOCKED":
+                return {
+                    "status": "BLOCKED",
+                    "reason": "SKILL_HANDOFF_BLOCKED",
+                    "task_id": task.task_id,
+                    "automatic_start": False,
+                    "recommendation": None,
+                }
         recommendation = _session_recommendation(
             binding,
             task_prompt=task.purpose,
@@ -3793,6 +3905,7 @@ class ControlTower:
             acceptance_criteria=task.acceptance_requirements,
             task_id=task.task_id,
             arena_prompt_checkpoint=arena_checkpoint,
+            skill_handoff=preview_skill_handoff,
         )
         return {
             "status": "PASS",
@@ -3872,6 +3985,7 @@ def build_execution_prompt(
     arena_prompt_checkpoint: Mapping[str, str] | None = None,
     chat_mode: str = "NEW_CHAT",
     chat_title_override: str | None = None,
+    skill_handoff: Mapping[str, Any] | None = None,
 ) -> str:
     """Build a self-contained recursive prompt for one compatible host.
 
@@ -3920,6 +4034,11 @@ def build_execution_prompt(
             key: _checkpoint_text(raw_context[key], key)
             for key in required_context_fields
         }
+    skill_lines: tuple[str, ...] = ()
+    if isinstance(skill_handoff, Mapping):
+        from .skill_consumption import skill_handoff_prompt_lines
+        skill_lines = skill_handoff_prompt_lines(skill_handoff)
+
     if canary_turn:
         # ONE first-turn return contract: the canary evidence packet, then STOP.
         # The terminal CONTROL_TOWER_RETURN_PACKET contract belongs to the
@@ -3989,6 +4108,8 @@ def build_execution_prompt(
             "SUPREME_LAW_CAPSULE:",
             SUPREME_LAW_CAPSULE,
             "",
+            *skill_lines,
+            *(("",) if skill_lines else ()),
             "SESSION_RULES:",
             "- Use the explicit HOST above as authoritative; never infer a host from narrative prose.",
             "- Do not inherit chat history, prior session state, or implicit context.",

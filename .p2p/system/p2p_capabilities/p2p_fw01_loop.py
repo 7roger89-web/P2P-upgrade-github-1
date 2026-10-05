@@ -364,6 +364,7 @@ class Fw01Loop:
             root / ".p2p" / ACTIVATION_LEDGER_NAME)
         self.attempt_log = AttemptLog()
         self.iteration = 0
+        self._activated_skills: tuple[str, ...] = ()
         self.trace_ledger = root / ".p2p" / DECISION_LEDGER_NAME
 
     # ---- per-iteration surfaces --------------------------------------------
@@ -423,6 +424,7 @@ class Fw01Loop:
         revalidation -> inner step -> checkpoint -> decision trace -> guard
         record -> next gate. Fresh process safety: all inputs re-derived
         from durable state, never from in-memory history."""
+        self._activated_skills = ()
         cause = self.guard.stop_cause()
         if cause:
             self.state.checkpoint(
@@ -508,11 +510,9 @@ class Fw01Loop:
 
         rec = self.loop.task_record(task_id)
 
-        # Skill eligibility (read-only; activation receipt only on use).
+        # Skill eligibility is metadata-only.  Actual activation is recorded
+        # only after FW02 deterministically selects the bounded set.
         eligible = self.eligible_skills()
-        activated = [s["capability_id"] for s in eligible
-                     if str(s["capability_id"])
-                     in list(rec.get("skills", ())) or True][:0]
 
         # Role / team + target via existing machinery.
         # FW02 PLANNING phase (information only; NO authority):
@@ -754,6 +754,27 @@ class Fw01Loop:
         except Exception:
             _fw02 = None
         if _fw02 is not None:
+            self._activated_skills = tuple(
+                str(value) for value in _fw02.skill_selection.selected_skills
+            )
+            existing_activation_keys = {
+                (
+                    str(item.get("goal_id", "")),
+                    str(item.get("task_id", "")),
+                    str(item.get("capability_id", "")),
+                )
+                for item in self.receipts.load()
+                if isinstance(item, Mapping)
+            }
+            for capability_id in self._activated_skills:
+                key = (str(self.loop.goal_id), str(task_id), capability_id)
+                if key not in existing_activation_keys:
+                    self.receipts.append(
+                        str(self.loop.goal_id),
+                        str(task_id),
+                        capability_id,
+                        "capability-intelligence:selected",
+                    )
             self._trace(task_id, {"mutation_class": "READ_ONLY",
                           "permission": "",
                           "verification": "REQUIRED"},
@@ -1180,7 +1201,7 @@ class Fw01Loop:
                 why_now="goal IN_PROGRESS, dependencies satisfied",
                 dependencies_satisfied=True,
                 risk_class=str(rec.get("mutation_class", "READ_ONLY")),
-                skills_activated=(),
+                skills_activated=self._activated_skills,
                 role_selected=self.select_role_team(
                     dict(rec, task_id=task_id))["role_class"],
                 team_selected=(),

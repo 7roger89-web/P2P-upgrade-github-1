@@ -555,6 +555,16 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/P2P-DEVELOPMENT-ROADMAP.md",
             "docs/p2p-development/current-roadmap.md",
             "reports/planner/P2P-PLANNER-RUN-10.json",
+            # Issue #298 skill-consumption wire. Reuses the existing canonical
+            # capability registry + single router; adds one bounded
+            # consumption module and exact source-bound host receipts.
+            ".agents/skills/scope-reality-check/",
+            ".p2p/system/p2p_capabilities/skill_consumption.py",
+            ".p2p/system/p2p_capabilities/capability_intelligence.py",
+            ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
+            ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+            ".p2p/system/p2p_capabilities/control_tower_handoff.py",
+            "tests/test_p2p_skill_consumption_wire.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -636,6 +646,14 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # deterministic read-only audit helper plus its focused test.
                 "scripts/p2p_capability_drift_sweep.py",
                 "tests/test_p2p_capability_drift_sweep.py",
+                # Issue #298: one bounded consumption seam plus modifications
+                # to existing selection/eligibility/FW01/Control Tower paths.
+                ".p2p/system/p2p_capabilities/skill_consumption.py",
+                ".p2p/system/p2p_capabilities/capability_intelligence.py",
+                ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
+                ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+                ".p2p/system/p2p_capabilities/control_tower_handoff.py",
+                "tests/test_p2p_skill_consumption_wire.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             if not is_vendored_bytes and any(
@@ -657,6 +675,13 @@ class NoParallelArchitectureTests(unittest.TestCase):
             # instead of adding a parallel capability module.
             ".p2p/system/p2p_capabilities/control_tower_handoff.py",
             ".p2p/system/p2p_capabilities/owner_goal.py",
+            # Issue #298: bounded skill-consumption composition seam. It calls
+            # the existing router and canonical registry; it is not a router,
+            # registry, scheduler, daemon, or second state store.
+            ".p2p/system/p2p_capabilities/skill_consumption.py",
+            ".p2p/system/p2p_capabilities/capability_intelligence.py",
+            ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
+            ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
         }
         for path in self.changed:
             self.assertFalse(

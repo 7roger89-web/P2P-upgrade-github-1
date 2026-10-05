@@ -5933,6 +5933,89 @@
       },
       "VERSION": "pinned-c1c8a8c",
       "STATUS": "ACTIVE"
+    },
+    {
+      "CAPABILITY_ID": "scope-reality-check",
+      "TYPE": "SKILL",
+      "DESCRIPTION": "Explicit hard reality-check workflow that pressure-tests a plan or architecture against decisive evidence, exposes concrete failure modes, and reconstructs the smallest useful version worth shipping next. Use only when the Owner explicitly asks for a hard critique, red-team, roast, or equivalent challenge.",
+      "TRIGGERS": [
+        "@scope reality check",
+        "$scope-reality-check",
+        "scope reality check",
+        "phản biện gắt",
+        "tạt nước lạnh",
+        "xé kế hoạch",
+        "xé kiến trúc",
+        "red-team",
+        "red team",
+        "roast this",
+        "tear this apart",
+        "brutally honest",
+        "tao có đang ngáo",
+        "có đang ngáo không"
+      ],
+      "NEGATIVE_TRIGGERS": [],
+      "INVOCATION_CLASS": "USER_REQUESTED",
+      "CANONICAL_QUORUM_MEMBER": false,
+      "OPTIONAL_SPECIALIST": false,
+      "AUTHORITY": [
+        "evidence-bound-plan-critique",
+        "scope-reconstruction",
+        "recommendation-only"
+      ],
+      "PROHIBITED_ACTIONS": [
+        "widen-permissions",
+        "grant-owner-authority",
+        "override-supreme-law",
+        "invent-evidence",
+        "auto-deploy-or-promote"
+      ],
+      "REQUIRES": [
+        "existing-p2p-router"
+      ],
+      "CONTEXT_POINTERS": [
+        ".agents/skills/scope-reality-check/SKILL.md",
+        ".agents/skills/scope-reality-check/references/evidence-rules.md",
+        ".agents/skills/scope-reality-check/references/evals.md"
+      ],
+      "APPROVAL_BOUNDARY": [
+        "skill-guidance-cannot-change-authority-or-permissions"
+      ],
+      "EVIDENCE_CONTRACT": [
+        "actual-user-claim-preserved",
+        "decisive-reality-anchors",
+        "fact-inference-separation",
+        "smaller-shippable-reconstruction",
+        "clear-next-action"
+      ],
+      "TRUST_LEVEL": "PURE_DATA",
+      "UPSTREAM_PROVENANCE": {
+        "mode": "P2P_REPO_LOCAL",
+        "source_path": ".agents/skills/scope-reality-check",
+        "license": {
+          "kind": "PROJECT_INTERNAL",
+          "scope": "P2P repository skill bundle"
+        },
+        "integration": {
+          "entrypoint": "SKILL.md",
+          "load_mode": "ON_DEMAND",
+          "selection_mode": "USER_REQUESTED_ONLY",
+          "references": [
+            "references/evidence-rules.md",
+            "references/evals.md"
+          ],
+          "assets": [],
+          "script_entrypoints": [],
+          "network_runtime": false,
+          "credentials": false,
+          "install_mode": "REPO_NATIVE",
+          "entrypoint_sha256": "e2b894509e4c8987d5d509edb98a06ee85ad98ebae088b88edde6efe40bd7688"
+        },
+        "snapshot_sha256": "e2b894509e4c8987d5d509edb98a06ee85ad98ebae088b88edde6efe40bd7688",
+        "snapshot_scope": "SKILL.md entrypoint bytes; references remain declared deep-load resources"
+      },
+      "VERSION": "p2p-1",
+      "STATUS": "ACTIVE"
     }
   ]
 }

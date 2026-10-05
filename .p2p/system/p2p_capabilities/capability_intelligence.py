@@ -1034,6 +1034,10 @@ def select_skills_bounded(
     requirements: Sequence[CapabilityRequirement],
     project_profile: ProjectProfile,
     installed_skills: tuple[str, ...],
+    *,
+    task_text: str = "",
+    project_root: Path | None = None,
+    explicit_skill_requests: tuple[str, ...] = (),
 ) -> SkillIntelligenceResult:
     """Bounded skill selection: TASK REQUIREMENT x SKILL CAPABILITY x
     PROJECT CONTEXT x EVIDENCE x ELIGIBILITY x EXPECTED UTILITY.
@@ -1042,7 +1046,57 @@ def select_skills_bounded(
       alone — skill capability mapping drives relevance).
     - Never preload all skills; at most a BOUNDED_SKILL_SET (cap: 3).
     - Non-UI tasks never select UI-design skills.
+    - Current P2P projects consume canonical capability metadata through the
+      existing single router.  The five-entry mapping below remains only as a
+      compatibility fallback for isolated legacy fixtures with no registry.
     """
+    if project_root is not None:
+        registry_path = (
+            Path(project_root) / ".p2p" / "system" / "p2p_capabilities"
+            / "capabilities.json"
+        )
+        if registry_path.is_file():
+            # Historical isolated FW02 fixtures used a tiny
+            # {"framework","targets","skills"} stub, not the canonical
+            # capability manifest. Preserve that exact legacy shape only;
+            # malformed current manifests still fail closed in load_registry.
+            _registry_payload = json.loads(
+                registry_path.read_text(encoding="utf-8")
+            )
+            _legacy_fixture_registry = (
+                isinstance(_registry_payload, Mapping)
+                and "capabilities" not in _registry_payload
+                and "skills" in _registry_payload
+            )
+            if not _legacy_fixture_registry:
+                try:
+                    from .skill_consumption import select_skills_for_task
+                except ImportError:
+                    from skill_consumption import select_skills_for_task
+                current = select_skills_for_task(
+                    project_root,
+                    task_text,
+                    explicit_requests=explicit_skill_requests,
+                    allowed_skill_ids=installed_skills,
+                )
+                return SkillIntelligenceResult(
+                    outcome=current.outcome,
+                    selected_skills=current.selected,
+                    rejected_skills=current.rejected,
+                    rejection_reasons=current.rejection_reasons,
+                    expected_utility=(
+                        "NONE" if current.outcome == "NO_SKILL_NEEDED"
+                        else "MATERIAL"
+                    ),
+                    evidence_pointers=(
+                        ".p2p/system/p2p_capabilities/capabilities.json",
+                        *tuple(
+                            f"selected-skill:{skill}"
+                            for skill in current.selected
+                        ),
+                    ),
+                )
+
     wanted: dict[str, tuple[str, ...]] = {}
     for req in requirements:
         if req.is_required():
@@ -1544,7 +1598,21 @@ def compute_execution_requirements(
             evidence_pointers=("task_record.required_capabilities",)))
     requirements = _narrow_harness_requirements(task_record, requirements)
     coverage = evaluate_coverage(requirements, inv)
-    skill_sel = select_skills_bounded(requirements, profile, installed_skills)
+    _explicit_skills = task_record.get("skills", ()) or ()
+    if isinstance(_explicit_skills, str):
+        _explicit_skills = (_explicit_skills,)
+    _task_text = " ".join(
+        str(task_record.get(key, "") or "")
+        for key in ("title", "purpose", "description", "request", "prompt")
+    ).strip()
+    skill_sel = select_skills_bounded(
+        requirements,
+        profile,
+        installed_skills,
+        task_text=_task_text,
+        project_root=project_root,
+        explicit_skill_requests=tuple(str(v) for v in _explicit_skills),
+    )
     ctx = required_context_items(
         requirements, inv, project_root,
         task_scope=tuple(str(p) for p in (task_record.get("scope", ()) or ())))

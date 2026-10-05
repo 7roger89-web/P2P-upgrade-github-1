@@ -2,11 +2,13 @@
 
 NO adaptive skill selection, NO learned ranking, NO provider preference.
 Eligibility is a deterministic, evidence-driven filter over the canonical
-capability registry:
+capability registry.  The current manifest contract uses TYPE=SKILL plus
+STATUS; legacy READINESS/READINESS_STATE fields remain supported for older
+fixtures only:
 
-    SKILL_ELIGIBLE = canonical capability metadata
-                     AND required readiness states
-                     AND (evidence contract present OR evidence NOT_REQUIRED)
+    SKILL_ELIGIBLE = TYPE=SKILL
+                     AND STATUS=ACTIVE (or legacy implemented readiness)
+                     AND evidence contract present
 
 The loop consumes this read-only eligibility set; selection remains the
 Owner-governed goal/task plan. An activation receipt is written once per
@@ -60,24 +62,47 @@ def readiness_level(state: Any) -> str:
 def skill_eligibility_set(registry_path: Path,
                           capability_ids: Iterable[str] | None = None
                           ) -> list[dict[str, Any]]:
-    """Deterministic eligibility set. capability_ids=None => full registry.
-    Order is stable (registry order), never influence-ranked."""
-    items = _load_registry(registry_path)
+    """Return deterministic eligibility for canonical SKILL records only.
+
+    Current manifests use STATUS (ACTIVE/DISCOVERED/DEFERRED/RETIRED).
+    Legacy readiness fields are honored only when explicitly present so older
+    fixtures keep their historical behavior.  Presence alone never implies
+    eligibility and non-SKILL capabilities are never returned as skills.
+    """
+    items = [
+        item for item in _load_registry(registry_path)
+        if str(item.get("TYPE") or "") == "SKILL"
+    ]
     if capability_ids is not None:
         wanted = set(str(i) for i in capability_ids)
         items = [i for i in items if str(i["CAPABILITY_ID"]) in wanted]
     result: list[dict[str, Any]] = []
     for item in items:
         cap_id = str(item["CAPABILITY_ID"])
-        state = str(item.get("READINESS_STATE") or item.get("READINESS") or "UNKNOWN")
-        level = readiness_level(state)
+        legacy_state = item.get("READINESS_STATE") or item.get("READINESS")
+        status = str(item.get("STATUS") or "UNKNOWN")
         contract = item.get("EVIDENCE_CONTRACT")
         has_contract = bool(contract)
-        eligible = (level in ("IMPLEMENTED_VERIFIED", "FOUNDATION_READY")
-                    and has_contract)
+        if legacy_state is not None:
+            state = str(legacy_state)
+            level = readiness_level(state)
+            eligible = (
+                level in ("IMPLEMENTED_VERIFIED", "FOUNDATION_READY")
+                and has_contract
+            )
+        else:
+            state = status
+            level = {
+                "ACTIVE": "ACTIVE_DECLARED",
+                "DISCOVERED": "DISCOVERED_ONLY",
+                "DEFERRED": "DEFERRED",
+                "RETIRED": "RETIRED",
+            }.get(status, "NOT_IMPLEMENTED")
+            eligible = status == "ACTIVE" and has_contract
         result.append({
             "schema": SKILL_ELIGIBILITY_SCHEMA,
             "capability_id": cap_id,
+            "status": status,
             "readiness_state": state,
             "provenance_level": level,
             "evidence_contract_present": has_contract,

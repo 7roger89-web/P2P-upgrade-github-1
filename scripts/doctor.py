@@ -54,6 +54,7 @@ EXPECTED_SKILLS = {
     "p2p-pxpipe",
     "p2p-quorum",
     "p2p-scope",
+    "scope-reality-check",
     "p2p-teacher",
     "pxpipe",
     "rag-grounding",
