@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-"""Project P2P Supreme Law into a Git-tracked project for remote executors.
+"""Project P2P remote-executor context into a Git-tracked project.
 
-This helper does not install the P2P runtime and does not mutate Git state.
-It only writes two project files that are safe to commit:
+This helper does not install the P2P runtime and does not mutate Git history.
+It writes only deterministic, Git-trackable transport surfaces:
 
 - .p2p/portable/P2P-OPERATIONS-NOTEBOOK.md
-- AGENTS.md (a small managed entrypoint block)
+- .p2p/portable/P2P-EXPERIENCE-CAPSULE.json
+- .p2p/portable/P2P-SKILL-PROJECTION.json
+- AGENTS.md (one small managed entrypoint block)
+- a bounded repo-native operator-skill projection under .agents/skills/
 
-The canonical notebook remains the authority whenever it is reachable.  The
-portable copy is transport for remote/fresh-clone executors that cannot read
-the private P2P source repository.
+The canonical notebook and canonical skill sources remain authoritative
+whenever reachable.  Portable copies exist only so repo-scoped remote
+executors can establish law context and consume explicitly required P2P
+operator skills without cross-repository access.
 """
 
 from __future__ import annotations
@@ -34,6 +38,14 @@ CANONICAL_EXPERIENCE_SOURCE = (
     "7roger89-web/P2P-upgrade-github-1@main:"
     ".p2p/system/p2p_capabilities/shared_experience_catalog.json"
 )
+PORTABLE_SKILL_SCHEMA = "p2p-portable-skill-projection/1"
+PORTABLE_SKILL_MANIFEST_REL = Path(".p2p/portable/P2P-SKILL-PROJECTION.json")
+CANONICAL_SKILL_SOURCE = (
+    "7roger89-web/P2P-upgrade-github-1@main:.agents/skills"
+)
+PORTABLE_SKILL_PREFIXES = ("p2p-",)
+PORTABLE_SKILL_EXACT = frozenset({"scope-reality-check"})
+REQUIRED_PORTABLE_SKILLS = frozenset({"p2p-scope", "scope-reality-check"})
 AGENTS_BEGIN = "<!-- BEGIN P2P PORTABLE LAW -->"
 AGENTS_END = "<!-- END P2P PORTABLE LAW -->"
 LEGACY_PREFLIGHT_HEADING = "## P2P law preflight"
@@ -68,6 +80,95 @@ def _assert_safe_parent(project: Path, relative: Path) -> None:
             raise ValueError(f"PROJECTION_PARENT_NOT_DIRECTORY:{current}")
 
 
+def _is_portable_operator_skill(name: str) -> bool:
+    return name in PORTABLE_SKILL_EXACT or any(
+        name.startswith(prefix) for prefix in PORTABLE_SKILL_PREFIXES
+    )
+
+
+def _portable_skill_files(package_root: Path) -> dict[Path, str]:
+    """Return canonical text files for the bounded repo-native operator skills."""
+    skills_root = package_root / ".agents" / "skills"
+    if skills_root.is_symlink() or not skills_root.is_dir():
+        raise ValueError(f"PORTABLE_SKILL_SOURCE_ROOT_MISSING_OR_INVALID:{skills_root}")
+
+    selected_dirs: list[Path] = []
+    for entry in sorted(skills_root.iterdir(), key=lambda item: item.name):
+        if entry.is_symlink() or not entry.is_dir():
+            continue
+        if not _is_portable_operator_skill(entry.name):
+            continue
+        skill_md = entry / "SKILL.md"
+        if skill_md.is_symlink() or not skill_md.is_file():
+            raise ValueError(f"PORTABLE_SKILL_ENTRYPOINT_MISSING:{entry.name}")
+        selected_dirs.append(entry)
+
+    selected_names = {entry.name for entry in selected_dirs}
+    missing = sorted(REQUIRED_PORTABLE_SKILLS - selected_names)
+    if missing:
+        raise ValueError("PORTABLE_REQUIRED_SKILLS_MISSING:" + ",".join(missing))
+
+    files: dict[Path, str] = {}
+    for skill_dir in selected_dirs:
+        for source in sorted(skill_dir.rglob("*")):
+            if source.is_symlink():
+                raise ValueError(f"PORTABLE_SKILL_SOURCE_SYMLINK:{source}")
+            if source.is_dir():
+                continue
+            if not source.is_file():
+                raise ValueError(f"PORTABLE_SKILL_SOURCE_INVALID:{source}")
+            relative = source.relative_to(package_root)
+            try:
+                text = source.read_text(encoding="utf-8")
+            except UnicodeDecodeError as exc:
+                raise ValueError(
+                    f"PORTABLE_SKILL_SOURCE_NOT_UTF8:{source}"
+                ) from exc
+            files[relative] = text
+    return files
+
+
+def _portable_skill_manifest_text(
+    package_root: Path,
+    files: dict[Path, str] | None = None,
+) -> str:
+    projected = files if files is not None else _portable_skill_files(package_root)
+    version = _read_required(package_root / "VERSION", "PACKAGE_VERSION").strip()
+    managed_files = {
+        relative.as_posix(): _sha256_text(text)
+        for relative, text in sorted(
+            projected.items(), key=lambda item: item[0].as_posix()
+        )
+    }
+    skill_ids = sorted(
+        {
+            relative.parts[2]
+            for relative in projected
+            if len(relative.parts) >= 4
+            and relative.parts[0] == ".agents"
+            and relative.parts[1] == "skills"
+        }
+    )
+    payload = {
+        "schema": PORTABLE_SKILL_SCHEMA,
+        "generated": True,
+        "canonical_source": CANONICAL_SKILL_SOURCE,
+        "package_version": version,
+        "authority": "NON_AUTHORITATIVE_SKILL_TRANSPORT",
+        "routing_authority": False,
+        "permission_effect": "NONE",
+        "selection_rule": "canonical p2p-* operator skills plus scope-reality-check",
+        "skills": skill_ids,
+        "managed_files": managed_files,
+    }
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
+
+
+def expected_portable_skill_state(package_root: Path) -> tuple[dict[Path, str], str]:
+    files = _portable_skill_files(package_root)
+    return files, _portable_skill_manifest_text(package_root, files)
+
+
 def _projection_text(package_root: Path) -> str:
     notebook = _read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")
     if LAW_MARKER not in notebook:
@@ -76,6 +177,8 @@ def _projection_text(package_root: Path) -> str:
     source_sha256 = _sha256_text(notebook)
     capsule_text = _experience_capsule_text(package_root)
     capsule_sha256 = _sha256_text(capsule_text)
+    _, skill_manifest_text = expected_portable_skill_state(package_root)
+    skill_manifest_sha256 = _sha256_text(skill_manifest_text)
     header = (
         "<!--\n"
         "P2P_PORTABLE_LAW_PROJECTION=YES\n"
@@ -83,6 +186,7 @@ def _projection_text(package_root: Path) -> str:
         f"CANONICAL_SOURCE={CANONICAL_SOURCE}\n"
         f"SOURCE_CONTENT_SHA256={source_sha256}\n"
         f"PORTABLE_EXPERIENCE_CONTENT_SHA256={capsule_sha256}\n"
+        f"PORTABLE_SKILL_MANIFEST_SHA256={skill_manifest_sha256}\n"
         f"PACKAGE_VERSION={version}\n"
         "PROJECTION_DO_NOT_EDIT=YES\n"
         "CANONICAL_WINS_WHEN_REACHABLE=YES\n"
@@ -189,6 +293,16 @@ def _agents_block() -> str:
             "- `ROUTINE_SUCCESS` => emit `LEARNING_RECONCILIATION=NONE`; do not manufacture memory.",
             "- `REPEATED_OR_MATERIAL_FAILURE` / `CLEARLY_REUSABLE_CORRECTION` => emit `LEARNING_RECONCILIATION=CANDIDATE` with evidence and trigger conditions, or provide an explicit evidence-based reason why no reusable lesson exists.",
             "- Lifecycle: `CANDIDATE -> VERIFIED -> ACTIVE -> SUPERSEDED | QUARANTINED`. No executor self-promotion into Supreme Law, shared authority, capability, or skill.",
+            "",
+            "### Repo-native required skill handoff",
+            "",
+            "- This managed repository carries a bounded canonical operator-skill projection under `.agents/skills/`: every canonical `p2p-*` skill plus `scope-reality-check`. It is transport, not a second router or authority.",
+            f"- Source-bound projection metadata lives at `{PORTABLE_SKILL_MANIFEST_REL.as_posix()}`. Do not treat an unlisted or hash-mismatched file as a current projected skill.",
+            "- When an execution prompt serializes `REQUIRED_SKILLS=<ids>`, every required skill is mandatory for that turn. Read each exact repo-local `SKILL.md` before substantive task execution and apply each required skill.",
+            "- The prompt/handoff must bind exact selected skill IDs to repo-local source paths and SHA-256 hashes. Missing file, unknown required skill, or hash mismatch => `SKILL_CONSUMPTION=LOAD_FAILED` and stop; do not silently substitute another skill.",
+            "- Do not preload unselected skills. Deep-load references/assets only from selected skills and only when materially required.",
+            "- Required skill guidance cannot widen Owner authority, permissions, mutation authority, release/deploy/promotion authority, or task scope.",
+            "- Return one exact `p2p-skill-consumption-receipt/1` covering the complete frozen selected set. A receipt missing one required skill is not acceptance evidence.",
             "",
             "### Mandatory prompt serialization contract",
             "",
@@ -309,6 +423,7 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
 
     _assert_safe_parent(project, PORTABLE_REL)
     _assert_safe_parent(project, PORTABLE_EXPERIENCE_REL)
+    _assert_safe_parent(project, PORTABLE_SKILL_MANIFEST_REL)
     portable_path = project / PORTABLE_REL
     if portable_path.is_symlink():
         raise ValueError(f"PROJECTION_SYMLINK_NOT_ALLOWED:{portable_path}")
@@ -321,6 +436,23 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
     if portable_exp_path.exists() and not portable_exp_path.is_file():
         raise ValueError(f"PROJECTION_PATH_NOT_FILE:{portable_exp_path}")
 
+    skill_manifest_path = project / PORTABLE_SKILL_MANIFEST_REL
+    if skill_manifest_path.is_symlink():
+        raise ValueError(f"PROJECTION_SYMLINK_NOT_ALLOWED:{skill_manifest_path}")
+    if skill_manifest_path.exists() and not skill_manifest_path.is_file():
+        raise ValueError(f"PROJECTION_PATH_NOT_FILE:{skill_manifest_path}")
+
+    expected_skills, expected_skill_manifest = expected_portable_skill_state(
+        package_root
+    )
+    for relative in expected_skills:
+        _assert_safe_parent(project, relative)
+        target = project / relative
+        if target.is_symlink():
+            raise ValueError(f"PROJECTION_SYMLINK_NOT_ALLOWED:{target}")
+        if target.exists() and not target.is_file():
+            raise ValueError(f"PROJECTION_PATH_NOT_FILE:{target}")
+
     expected_projection, expected_agents, expected_exp = expected_project_state(package_root, project)
     agents_path = project / "AGENTS.md"
 
@@ -328,10 +460,33 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         projection_ok = portable_path.is_file() and portable_path.read_text(encoding="utf-8") == expected_projection
         agents_ok = agents_path.is_file() and agents_path.read_text(encoding="utf-8") == expected_agents
         exp_ok = portable_exp_path.is_file() and portable_exp_path.read_text(encoding="utf-8") == expected_exp
-        if not projection_ok or not agents_ok or not exp_ok:
+        skill_manifest_ok = (
+            skill_manifest_path.is_file()
+            and skill_manifest_path.read_text(encoding="utf-8")
+            == expected_skill_manifest
+        )
+        skill_files_ok = True
+        for relative, expected_text in expected_skills.items():
+            target = project / relative
+            try:
+                if not target.is_file() or target.read_text(encoding="utf-8") != expected_text:
+                    skill_files_ok = False
+                    break
+            except (OSError, UnicodeError):
+                skill_files_ok = False
+                break
+        if (
+            not projection_ok
+            or not agents_ok
+            or not exp_ok
+            or not skill_manifest_ok
+            or not skill_files_ok
+        ):
             raise ValueError(
                 "PORTABLE_LAW_PROJECTION_STALE_OR_MISSING:"
-                f"projection_ok={projection_ok},agents_ok={agents_ok},experience_ok={exp_ok}"
+                f"projection_ok={projection_ok},agents_ok={agents_ok},"
+                f"experience_ok={exp_ok},skill_manifest_ok={skill_manifest_ok},"
+                f"skill_files_ok={skill_files_ok}"
             )
         return {
             "status": "PASS",
@@ -339,6 +494,8 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
             "schema": SCHEMA,
             "portable_path": PORTABLE_REL.as_posix(),
             "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
+            "portable_skill_manifest_path": PORTABLE_SKILL_MANIFEST_REL.as_posix(),
+            "portable_skill_files_count": len(expected_skills),
             "agents_path": "AGENTS.md",
         }
 
@@ -346,6 +503,14 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
     portable_path.write_text(expected_projection, encoding="utf-8", newline="\n")
     portable_exp_path.parent.mkdir(parents=True, exist_ok=True)
     portable_exp_path.write_text(expected_exp, encoding="utf-8", newline="\n")
+    skill_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    skill_manifest_path.write_text(
+        expected_skill_manifest, encoding="utf-8", newline="\n"
+    )
+    for relative, expected_text in expected_skills.items():
+        target = project / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(expected_text, encoding="utf-8", newline="\n")
     agents_path.write_text(expected_agents, encoding="utf-8", newline="\n")
     return {
         "status": "PASS",
@@ -353,9 +518,12 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         "schema": SCHEMA,
         "portable_path": PORTABLE_REL.as_posix(),
         "portable_experience_path": PORTABLE_EXPERIENCE_REL.as_posix(),
+        "portable_skill_manifest_path": PORTABLE_SKILL_MANIFEST_REL.as_posix(),
+        "portable_skill_files_count": len(expected_skills),
         "agents_path": "AGENTS.md",
         "source_sha256": _sha256_text(_read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")),
         "experience_source_sha256": json.loads(expected_exp).get("source_content_sha256", ""),
+        "skill_manifest_sha256": _sha256_text(expected_skill_manifest),
     }
 
 
