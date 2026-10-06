@@ -355,15 +355,18 @@ class SkillConsumptionWireTests(unittest.TestCase):
             64,
         )
 
-    def test_explicit_repo_native_skill_outside_capability_registry_loads(self):
+    def test_p2p_scope_is_active_model_routable_and_explicit_still_loads(self):
         registry = json.loads(
             (SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json")
             .read_text(encoding="utf-8")
         )
-        ids = {
-            item["CAPABILITY_ID"] for item in registry["capabilities"]
-        }
-        self.assertNotIn("p2p-scope", ids)
+        record = next(
+            item for item in registry["capabilities"]
+            if item["CAPABILITY_ID"] == "p2p-scope"
+        )
+        self.assertEqual(record["TYPE"], "SKILL")
+        self.assertEqual(record["STATUS"], "ACTIVE")
+        self.assertEqual(record["INVOCATION_CLASS"], "MODEL_ROUTABLE")
         handoff = prepare_skill_handoff(
             REPO_ROOT,
             "$p2p-scope organize this large task",
@@ -376,14 +379,88 @@ class SkillConsumptionWireTests(unittest.TestCase):
             ".agents/skills/p2p-scope/SKILL.md",
         )
         self.assertEqual(
-            len(handoff["SKILL_SOURCE_HASHES"]["p2p-scope"]),
-            64,
+            handoff["SKILL_SOURCE_HASHES"]["p2p-scope"],
+            "64a59449c5ace7dd49512f8c68b97f0e2f7748fac73aeaa268eb1dbe90e2bc5a",
         )
 
-    def test_repo_native_unadmitted_skill_is_never_implicit_auto_route(self):
+    def test_natural_language_large_work_auto_routes_p2p_scope(self):
         selection = select_skills_for_task(
             REPO_ROOT,
             "Organize this substantial multi-step work with checkpoints",
+        )
+        self.assertIn("p2p-scope", selection.selected)
+        self.assertNotIn("scope-reality-check", selection.selected)
+        self.assertTrue(selection.route["single_router"])
+
+    def test_owner_big_goal_language_auto_routes_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Continue this big goal end-to-end to completion",
+        )
+        self.assertIn("p2p-scope", selection.selected)
+        self.assertNotIn("scope-reality-check", selection.selected)
+        self.assertTrue(selection.route["single_router"])
+
+    def test_vietnamese_large_goal_auto_routes_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Chia nhỏ goal lớn này thành nhiều bước và mốc kiểm tra rõ ràng",
+        )
+        self.assertIn("p2p-scope", selection.selected)
+        self.assertTrue(selection.route["single_router"])
+
+    def test_natural_language_scope_request_materializes_arena_handoff(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "Organize this substantial multi-step work with checkpoints",
+            host="ARENA",
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertIn("p2p-scope", handoff["SKILLS_SELECTED"])
+        self.assertEqual(
+            handoff["SKILL_SOURCE_PATHS"]["p2p-scope"],
+            ".agents/skills/p2p-scope/SKILL.md",
+        )
+        self.assertEqual(
+            handoff["SKILL_SOURCE_HASHES"]["p2p-scope"],
+            "64a59449c5ace7dd49512f8c68b97f0e2f7748fac73aeaa268eb1dbe90e2bc5a",
+        )
+        self.assertEqual(
+            handoff["SKILL_HOST_MODE"], "ARENA_EXACT_REPO_READ"
+        )
+
+    def test_trivial_mechanical_work_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Rename local variable x to y",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_single_dependency_maintenance_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Update dependency requests from 2.31.0 to 2.32.0",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_single_checkpoint_mention_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Rename checkpoint variable to checkpoint_id",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_small_text_decomposition_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Chia nhỏ đoạn văn này thành 3 ý",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_small_english_breakdown_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Break this down into two bullet points",
         )
         self.assertNotIn("p2p-scope", selection.selected)
 
@@ -509,7 +586,7 @@ class SkillConsumptionWireTests(unittest.TestCase):
             handoff["REJECTION_REASON"],
         )
 
-    def test_required_repo_native_unadmitted_skill_is_supported(self):
+    def test_required_p2p_scope_skill_is_supported_after_admission(self):
         handoff = prepare_skill_handoff(
             REPO_ROOT,
             "Organize this work",
