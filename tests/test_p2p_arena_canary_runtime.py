@@ -436,8 +436,8 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertNotIn("CHAT_TITLE", codex)
         self.assertEqual("CODEX — P2P-CT01-CANARY — " + BLIND_TEST_TASK, codex["CHAT_NAME"])
 
-        # Digest captured from the pre-repair non-Arena serializer; the Arena-only
-        # routing/checkpoint change must not alter its bytes.
+        # Digest captured after the shared terminal-contract repair in Issue #272.
+        # Future Arena-only routing/checkpoint changes must not alter these bytes.
         non_arena = SessionBinding(
             session_id="non-arena-byte-stable",
             host="CODEX",
@@ -446,7 +446,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         )
         non_arena_prompt = build_execution_prompt(non_arena, "Perform one focused serialization repair.")
         self.assertEqual(
-            "150b5c88d75c693a2efeabc175c223187a08a8b9627160848a7ee9ead0107653",
+            "2c4eb0dfc62a8c60439c8f70ca8f928524f8c26fb3c8c6604ca413f3c52db505",
             hashlib.sha256(non_arena_prompt.encode("utf-8")).hexdigest(),
         )
 
