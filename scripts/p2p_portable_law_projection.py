@@ -528,6 +528,15 @@ def expected_experience_capsule(package_root: Path) -> str:
     return _experience_capsule_text(package_root)
 
 
+def _write_text_if_changed(path: Path, expected: str) -> bool:
+    """Write one generated UTF-8 text artifact only when its content changed."""
+    if path.is_file() and path.read_text(encoding="utf-8") == expected:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(expected, encoding="utf-8", newline="\n")
+    return True
+
+
 def project_law(package_root: Path, project: Path, *, check: bool = False) -> dict[str, object]:
     package_root = package_root.resolve()
     project = project.resolve()
@@ -622,6 +631,7 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         set(previous_managed) - set(expected_skills),
         key=lambda path: path.as_posix(),
     )
+    changed_files: list[str] = []
     for relative in stale_managed:
         _assert_safe_parent(project, relative)
         target = project / relative
@@ -638,20 +648,22 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
                 + relative.as_posix()
             )
         target.unlink()
+        changed_files.append(relative.as_posix())
 
-    portable_path.parent.mkdir(parents=True, exist_ok=True)
-    portable_path.write_text(expected_projection, encoding="utf-8", newline="\n")
-    portable_exp_path.parent.mkdir(parents=True, exist_ok=True)
-    portable_exp_path.write_text(expected_exp, encoding="utf-8", newline="\n")
-    skill_manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    skill_manifest_path.write_text(
-        expected_skill_manifest, encoding="utf-8", newline="\n"
-    )
+    # Component-aware write: verify the complete projection, mutate only stale bytes.
     for relative, expected_text in expected_skills.items():
         target = project / relative
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(expected_text, encoding="utf-8", newline="\n")
-    agents_path.write_text(expected_agents, encoding="utf-8", newline="\n")
+        if _write_text_if_changed(target, expected_text):
+            changed_files.append(relative.as_posix())
+    if _write_text_if_changed(skill_manifest_path, expected_skill_manifest):
+        changed_files.append(PORTABLE_SKILL_MANIFEST_REL.as_posix())
+    if _write_text_if_changed(portable_exp_path, expected_exp):
+        changed_files.append(PORTABLE_EXPERIENCE_REL.as_posix())
+    if _write_text_if_changed(portable_path, expected_projection):
+        changed_files.append(PORTABLE_REL.as_posix())
+    if _write_text_if_changed(agents_path, expected_agents):
+        changed_files.append("AGENTS.md")
+
     payload_verification = verify_portable_skill_manifest_payload(project)
     if not payload_verification["ok"]:
         raise ValueError(
@@ -668,6 +680,8 @@ def project_law(package_root: Path, project: Path, *, check: bool = False) -> di
         "portable_skill_files_count": len(expected_skills),
         "portable_skill_payload_files_verified": payload_verification["checked"],
         "stale_skill_files_removed": len(stale_managed),
+        "changed_file_count": len(set(changed_files)),
+        "changed_files": sorted(set(changed_files)),
         "agents_path": "AGENTS.md",
         "source_sha256": _sha256_text(_read_required(package_root / SOURCE_REL, "SOURCE_NOTEBOOK")),
         "experience_source_sha256": json.loads(expected_exp).get("source_content_sha256", ""),

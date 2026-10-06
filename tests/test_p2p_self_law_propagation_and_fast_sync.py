@@ -31,6 +31,17 @@ def _package(tmp_path: Path, law_body: str = "LAW v1") -> Path:
             f"---\nname: {name}\n---\n\n# {name}\n",
             encoding="utf-8",
         )
+
+    p2p_support = skills_root / "p2p"
+    (p2p_support / "references").mkdir(parents=True, exist_ok=True)
+    (p2p_support / "scripts").mkdir(parents=True, exist_ok=True)
+    for name in ("codex-adaptation.md", "modes.md", "rag-safety.md"):
+        (p2p_support / "references" / name).write_text(
+            f"# {name}\n", encoding="utf-8"
+        )
+    (p2p_support / "scripts" / "p2p_state.py").write_text(
+        "# portable state helper fixture\n", encoding="utf-8"
+    )
     return root
 
 
@@ -155,6 +166,52 @@ def test_batch_write_updates_only_stale(tmp_path: Path):
     result2 = _run_sync("--project", str(proj_a), "--project", str(proj_b), "--package-root", str(package), "--write")
     assert "CHANGED=0" in result2.stdout
     print("batch --write updates only stale and second is no-op: PASS")
+
+
+def test_workspace_write_requires_full_fleet_opt_in(tmp_path: Path):
+    package = _package(tmp_path, law_body="LAW v1")
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    project = ws / "projA"
+    project.mkdir()
+    assert _run_proj(package, project).returncode == 0
+
+    (package / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md").write_text(
+        "# P2P_OPERATIONS_NOTEBOOK\n\n## P2P_SUPREME_OPERATING_LAW_V1\n\nLAW v2\n",
+        encoding="utf-8",
+    )
+
+    blocked = _run_sync(
+        "--workspace",
+        str(ws),
+        "--package-root",
+        str(package),
+        "--write",
+    )
+    assert blocked.returncode == 2
+    assert "FULL_FLEET_WRITE_REQUIRES_EXPLICIT_OPT_IN" in blocked.stderr
+
+    still_stale = _run_sync(
+        "--project",
+        str(project),
+        "--package-root",
+        str(package),
+        "--check",
+    )
+    assert still_stale.returncode == 1
+    assert "STALE" in still_stale.stdout
+
+    allowed = _run_sync(
+        "--workspace",
+        str(ws),
+        "--package-root",
+        str(package),
+        "--write",
+        "--full-fleet",
+    )
+    assert allowed.returncode == 0
+    assert "CHANGED=1" in allowed.stdout
+    print("workspace mutation requires explicit full-fleet opt-in: PASS")
 
 
 
@@ -313,6 +370,7 @@ if __name__ == "__main__":
         test_projector_idempotent_and_preserves_content(tmp_path / "t1")
         test_batch_check_detects_current_stale(tmp_path / "t2")
         test_batch_write_updates_only_stale(tmp_path / "t3")
+        test_workspace_write_requires_full_fleet_opt_in(tmp_path / "t3fleet")
         test_batch_check_and_write_track_projected_skill_drift(tmp_path / "t3a")
         test_batch_write_migrates_legacy_preflight(tmp_path / "t3b")
         test_dirty_and_unsafe_blocked(tmp_path / "t4")
