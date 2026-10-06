@@ -574,6 +574,13 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "scripts/p2p_sync_managed_projects.py",
             "tests/test_p2p_portable_law_projection.py",
             "tests/test_p2p_self_law_propagation_and_fast_sync.py",
+            # Owner-directed Anvien retirement: bounded policy/install surfaces
+            # only. No replacement router/index/daemon/provider is introduced.
+            ".p2p/system/AGENTS.md",
+            ".p2p/system/CLAUDE.md",
+            ".p2p/system/.claude/skills/.claude-skill-manifest.json",
+            "docs/p2p-development/P2P-AGENTS-INSTALL.md",
+            "scripts/check_instruction_contract.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -738,6 +745,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                     # scripts. Neither is a new executor/router/service.
                     "scripts/p2p_portable_law_projection.py",
                     "scripts/p2p_sync_managed_projects.py",
+                    # Owner-directed Anvien retirement updates the EXISTING
+                    # static instruction contract checker; no new executable
+                    # capability/runtime path is created.
+                    "scripts/check_instruction_contract.py",
                 },
                 f"new script surface: {path}",
             )
