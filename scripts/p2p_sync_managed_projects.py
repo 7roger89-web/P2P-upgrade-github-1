@@ -8,7 +8,8 @@ bounded repo-native operator-skill projection.
 - Recognizes P2P-managed repos from existing durable markers (AGENTS.md
   P2P block and/or .p2p/portable), not a new registry/database.
 - --check: read-only CURRENT|STALE|BLOCKED per project.
-- --write: update only stale managed law/experience/skill projection files.
+- --write: JIT-refresh explicit --project targets; workspace writes require --full-fleet.
+- The underlying projector verifies the complete projection but writes only stale generated artifacts.
 - Refuses symlink/unsafe paths via existing projector safety.
 - Skips/BLOCKs dirty/conflicting managed surfaces rather than overwrite owner work.
 - Emits human + JSON summary, idempotent second write = zero changes.
@@ -311,12 +312,31 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--check", action="store_true", help="Read-only check (default)")
     group.add_argument("--write", action="store_true", help="Update stale projections")
     parser.add_argument("--json", action="store_true", help="Emit JSON summary to stdout")
+    parser.add_argument(
+        "--full-fleet",
+        action="store_true",
+        help="Explicitly allow mutating all P2P-managed repos discovered by --workspace",
+    )
     args = parser.parse_args(argv)
 
-    # Default to check if neither specified
+    # Default to check if neither specified.
     mode_check = not args.write
     if args.check and args.write:
         parser.error("--check and --write are mutually exclusive")
+    if args.write and args.workspace and not args.full_fleet:
+        print(
+            "FULL_FLEET_WRITE_REQUIRES_EXPLICIT_OPT_IN:"
+            "use --full-fleet with --workspace writes or --project <target> for JIT refresh",
+            file=sys.stderr,
+        )
+        return 2
+    if args.full_fleet and (not args.write or not args.workspace):
+        print(
+            "FULL_FLEET_REQUIRES_WORKSPACE_WRITE:"
+            "--full-fleet is valid only with --workspace ... --write",
+            file=sys.stderr,
+        )
+        return 2
 
     package_root = args.package_root.resolve()
     if not package_root.is_dir():

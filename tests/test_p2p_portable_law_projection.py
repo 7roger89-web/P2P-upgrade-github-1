@@ -183,6 +183,32 @@ def test_projection_is_byte_idempotent_for_empty_project(tmp_path: Path) -> None
     ).read_bytes() == first_skill
 
 
+def test_law_only_refresh_writes_only_portable_law_component(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    project = tmp_path / "project"
+    project.mkdir()
+
+    first = _run(package, project)
+    assert first.returncode == 0, first.stderr + first.stdout
+    skill_path = project / ".agents" / "skills" / "p2p-scope" / "SKILL.md"
+    skill_before = skill_path.read_bytes()
+
+    source = package / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md"
+    source.write_text(
+        "# P2P_OPERATIONS_NOTEBOOK\n\n## P2P_SUPREME_OPERATING_LAW_V1\n\nLAW v2\n",
+        encoding="utf-8",
+    )
+
+    refreshed = _run(package, project)
+    assert refreshed.returncode == 0, refreshed.stderr + refreshed.stdout
+    receipt = json.loads(refreshed.stdout)
+    assert receipt["changed_file_count"] == 1
+    assert receipt["changed_files"] == [
+        ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md"
+    ]
+    assert skill_path.read_bytes() == skill_before
+
+
 def test_projection_preserves_existing_agents_and_is_checkable(tmp_path: Path) -> None:
     package = _package(tmp_path)
     project = tmp_path / "project"
@@ -410,6 +436,7 @@ if __name__ == "__main__":
         base = Path(tmp)
         test_writes_git_trackable_portable_projection_without_runtime_install(base / "1")
         test_projection_is_byte_idempotent_for_empty_project(base / "2")
+        test_law_only_refresh_writes_only_portable_law_component(base / "2b")
         test_projection_preserves_existing_agents_and_is_checkable(base / "3")
         test_projection_migrates_recognized_legacy_preflight_without_touching_project_rules(base / "4")
         test_projection_preserves_unrecognized_similar_project_section(base / "5")
