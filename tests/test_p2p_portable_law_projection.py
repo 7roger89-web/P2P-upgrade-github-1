@@ -132,6 +132,8 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md" in agents
     assert "TASK_BRANCH != LAW_AUTHORITY" in agents
     assert "LAW_CHECK=PASS" in agents
+    assert "ANVIEN_ENABLED=NO" in agents
+    assert "ANVIEN_REQUIRED=NO" in agents
     assert "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE" in agents
     assert "LEARNING_RECONCILIATION=" in agents
     assert "### Native long-running goal bridge" in agents

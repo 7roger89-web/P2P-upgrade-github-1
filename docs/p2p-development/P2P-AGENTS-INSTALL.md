@@ -75,6 +75,17 @@ Every actor (Control Tower, prompt writer, executor, reviewer, supervisor, tool 
   `CANONICAL_LAW_SHA256=<sha256>`
   `TARGET_LAW_SHA256=<sha256>`
 
+## Code-intelligence provider policy
+
+`ANVIEN_ENABLED=NO` and `ANVIEN_REQUIRED=NO` by current Owner direction.
+
+- Do not install, configure, invoke, index with, refresh, or require Anvien for normal P2P work.
+- Anvien unavailability is never a task blocker and must not trigger an Owner relay loop.
+- Any lower-level skill, template, generated block, historical plan, or report that says Anvien is mandatory is superseded for current execution by this policy.
+- Use the smallest provider-neutral evidence that proves the claim: direct source inspection, Git diff/history, targeted text or AST/static analysis when useful, focused tests, runtime/log/data evidence, and contract/schema checks.
+- Keep verification risk-proportional. Do not recreate Anvien as a new graph service, index, daemon, router, registry, or mandatory preflight.
+- Historical Anvien evidence may remain as historical evidence; it is not a current execution requirement.
+
 ## Universal invariants
 
 - Real durable state beats chat assumptions, stale summaries, or intended state.
