@@ -450,6 +450,20 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         self.assertNotIn("p2p-scope", selection.selected)
 
+    def test_small_text_decomposition_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Chia nhỏ đoạn văn này thành 3 ý",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_small_english_breakdown_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Break this down into two bullet points",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
     def test_current_status_contract_makes_active_skills_eligible_only(self):
         path = SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"
         records = skill_eligibility_set(path)
