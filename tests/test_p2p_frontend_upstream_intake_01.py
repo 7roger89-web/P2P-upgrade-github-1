@@ -565,6 +565,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
             ".p2p/system/p2p_capabilities/control_tower_handoff.py",
             "tests/test_p2p_skill_consumption_wire.py",
+            # Issue #308 extends the EXISTING read-only Quality Intelligence
+            # post-execution surface. No new evaluator service/store/router.
+            ".p2p/system/p2p_capabilities/quality_intelligence.py",
             # Issue #309 extends the EXISTING portable-law projector and
             # managed-project sync wrapper so repo-scoped executors can read a
             # bounded source-bound operator-skill projection from the target
@@ -670,6 +673,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
                 ".p2p/system/p2p_capabilities/control_tower_handoff.py",
                 "tests/test_p2p_skill_consumption_wire.py",
+                # Issue #308: existing read-only post-execution Quality
+                # Intelligence surface; no new runtime authority.
+                ".p2p/system/p2p_capabilities/quality_intelligence.py",
                 # Issue #309: existing foreground projector/sync surfaces.
                 "scripts/p2p_portable_law_projection.py",
                 "scripts/p2p_sync_managed_projects.py",
@@ -714,6 +720,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/capability_intelligence.py",
             ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
             ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+            # Issue #308 modifies the EXISTING read-only Quality Intelligence
+            # module instead of creating a second evaluator/learning system.
+            ".p2p/system/p2p_capabilities/quality_intelligence.py",
         }
         for path in self.changed:
             self.assertFalse(
