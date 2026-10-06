@@ -102,6 +102,8 @@ def main() -> int:
             "Chúng ta đang giải capability chính hay đang tối ưu hạ tầng phụ trước capability?",
             "slice nhỏ hơn nhưng vẫn kiểm chứng độc lập",
             "Before delegating to another model or executor",
+            "ANVIEN_ENABLED=NO",
+            "ANVIEN_REQUIRED=NO",
         ],
         "P2P-AGENTS-INSTALL.md",
     )
