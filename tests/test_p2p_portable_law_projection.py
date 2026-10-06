@@ -137,10 +137,16 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE" in agents
     assert "LEARNING_RECONCILIATION=" in agents
     assert "### Native long-running goal bridge" in agents
-    assert ".p2p/system/p2p_capabilities/native_goal_bridge.py" in agents
+    assert ".p2p/system/p2p_capabilities/native_goal_gate.py" in agents
     assert ".p2p/system/p2p_capabilities/native_goal_activation.py" in agents
-    assert "ACTIVATE_NATIVE_GOAL" in agents
-    assert "NORMAL_P2P_PATH" in agents
+    assert ".p2p/system/p2p_capabilities/native_goal_receipt.py" in agents
+    assert "READY_TO_INVOKE" in agents
+    assert "invocation is NOT yet proven" in agents
+    assert "A generated `/goal ...` string or an assistant message containing it is not a host invocation" in agents
+    assert "Never launch a nested Claude/Codex process" in agents
+    assert "existing `.p2p/state/execution-ledger.jsonl`" in agents
+    assert "v2.1.139+" in agents
+    assert "codex features enable goals" in agents
     assert "Goal status must be `APPROVED` or `IN_PROGRESS`" in agents
     assert ".p2p/system/p2p_capabilities/worktree_evidence.py" in agents
     assert "committed-after-baseline" in agents
