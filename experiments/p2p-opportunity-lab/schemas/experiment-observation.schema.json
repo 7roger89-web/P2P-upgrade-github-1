@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p://opportunity-lab/experiment-observation/1",
+  "title": "P2P Concierge Validation Observation",
+  "type": "object",
+  "required": ["participant_id", "status", "observed_at"],
+  "properties": {
+    "participant_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["CONTACTED", "OPTED_IN", "SUBMITTED", "COMPLETED", "REPEAT_REQUEST", "DECLINED", "NO_RESPONSE", "TRUST_ISSUE", "WTP_SIGNAL", "PAID"]},
+    "observed_at": {"type": "string", "minLength": 1},
+    "source": {"type": "string"},
+    "elapsed_minutes": {"type": ["number", "null"], "minimum": 0},
+    "field_errors_found": {"type": ["integer", "null"], "minimum": 0},
+    "uncertain_fields": {"type": ["integer", "null"], "minimum": 0},
+    "missed_surcharges": {"type": ["integer", "null"], "minimum": 0},
+    "repeat_requested": {"type": "boolean"},
+    "wtp_amount": {"type": ["number", "null"], "minimum": 0},
+    "wtp_currency": {"type": ["string", "null"]},
+    "note": {"type": "string"}
+  },
+  "additionalProperties": true
+}

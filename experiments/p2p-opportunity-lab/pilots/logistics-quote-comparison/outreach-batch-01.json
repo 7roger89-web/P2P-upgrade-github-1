@@ -1,0 +1,52 @@
+{
+  "batch_id": "LOGISTICS_QUOTE_VALIDATION_OUTREACH_01",
+  "authorized_at": "2026-09-16T09:27:00+07:00",
+  "authorization": "OWNER_APPROVED_EXTERNAL_CONTACT_FOR_FIRST_3_PROSPECTS",
+  "scope": {
+    "max_prospects": 3,
+    "channel": "public reply on original Reddit thread",
+    "purpose": "invite an opt-in one-off concierge validation test using anonymized freight quote/ratecard data",
+    "no_sales_pitch": true,
+    "no_private_contact_enrichment": true,
+    "no_file_request_in_public": true,
+    "no_spend": true
+  },
+  "delivery_state": "READY_BUT_NOT_SENT",
+  "delivery_blocker": "No authenticated Reddit write/action surface is available in the current ChatGPT tool session. Web access is read-only and plugin discovery found no Reddit messaging/posting connector.",
+  "reply_watch": {
+    "status": "ACTIVE",
+    "cadence": "every 6 hours",
+    "notify_on": ["NEW_DIRECT_REPLY", "CLEAR_OPT_IN"],
+    "silent_when_none": true,
+    "matching_strategy": "match distinctive outreach opening text on the three source threads; no Reddit username assumption",
+    "precondition": "the authorized public outreach comment must actually exist before any direct reply can be observed"
+  },
+  "market_gate_effect": "NONE_UNTIL_REAL_USER_BEHAVIOR_OR_PAYMENT_WTP_IS_OBSERVED",
+  "prospects": [
+    {
+      "rank": 1,
+      "display_name": "Remote-Class8414",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1s7ub8u/shipping_line_ocean_freight_ratecards/",
+      "public_reply": "Your March post is almost exactly the workflow I’m trying to validate. I’m not selling a product — I’m testing whether quote/ratecard normalization is actually useful in a real forwarding workflow. If you’re still doing this manually, would you be open to a one-off test on an anonymized ratecard batch? I’d return the normalized fields, surcharges and anything ambiguous so you can tell me where it breaks. If yes, just say so here — no need to post any files publicly.",
+      "status": "READY_TO_SEND"
+    },
+    {
+      "rank": 2,
+      "display_name": "3d1th8",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1rkex5u/is_anyone_else_losing_their_mind_comparing/",
+      "public_reply": "Your post about spending around two hours a day turning 3–5 WhatsApp/PDF/Excel carrier quotes into one comparison table is exactly the pain I’m trying to validate. This isn’t a sales pitch — I want to test the workflow once and see if it genuinely saves time. Would you be open to a one-off test with an anonymized real quote batch? I’d send back a traceable comparison and you can tell me what’s wrong or missing. If yes, just reply here; please don’t post any files publicly.",
+      "status": "READY_TO_SEND"
+    },
+    {
+      "rank": 3,
+      "display_name": "Negative-Fox3868",
+      "source_url": "https://www.reddit.com/r/freightforwarding/comments/1sr1ovp/carrier_forwarder_rates_hassle/",
+      "public_reply": "You described the exact RFQ/rate-sheet workflow I’m researching: opening multiple carrier sheets, finding routes and surcharges, then comparing them manually. I’m testing a small concierge workflow rather than pitching finished software. If this is still a pain for you, would you be open to a one-off test using an anonymized real quote set? I’d return a traceable normalization/comparison and you can tear it apart. If yes, just reply here — no need to share files publicly.",
+      "status": "READY_TO_SEND"
+    }
+  ],
+  "community_risk_note": "r/freightforwarding publicly enforces No Promoting and users have complained about unsolicited sales/DM behavior. Outreach is therefore research-first, public, low-volume and opt-in before any data exchange.",
+  "sent_count": 0,
+  "reply_count": 0,
+  "opt_in_count": 0
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p://opportunity-lab/comparison-context/1",
+  "title": "P2P Concierge Comparison Context",
+  "type": "object",
+  "properties": {
+    "containers": {"type": "number", "minimum": 0},
+    "shipments": {"type": "number", "minimum": 0},
+    "bl_count": {"type": "number", "minimum": 0},
+    "weight_kg": {"type": "number", "minimum": 0},
+    "cbm": {"type": "number", "minimum": 0},
+    "as_of_date": {"type": "string", "format": "date"},
+    "route": {
+      "type": "object",
+      "required": ["origin", "destination"],
+      "properties": {
+        "origin": {"type": "string", "minLength": 1},
+        "destination": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "currency": {"type": "string", "pattern": "^[A-Za-z]{3}$"},
+    "equipment_requirements": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "integer", "minimum": 1}
+    },
+    "fx_rates": {
+      "type": "array",
+      "description": "Explicit direct FX rates only. No inverse or triangulated conversion is inferred.",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "rate", "source_ref", "as_of_date"],
+        "properties": {
+          "from": {"type": "string", "pattern": "^[A-Za-z]{3}$"},
+          "to": {"type": "string", "pattern": "^[A-Za-z]{3}$"},
+          "rate": {
+            "oneOf": [
+              {"type": "number", "exclusiveMinimum": 0},
+              {"type": "string", "pattern": "^(?:0*[1-9][0-9]*(?:\\.[0-9]+)?|0*\\.[0-9]*[1-9][0-9]*)$"}
+            ]
+          },
+          "source_ref": {"type": "string", "minLength": 1},
+          "as_of_date": {"type": "string", "format": "date"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "comparison_target": {
+      "type": "object",
+      "required": ["route", "equipment", "currency"],
+      "properties": {
+        "route": {
+          "type": "object",
+          "required": ["origin", "destination"],
+          "properties": {
+            "origin": {"type": "string", "minLength": 1},
+            "destination": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "equipment": {"type": "string", "minLength": 1},
+        "currency": {"type": "string", "pattern": "^[A-Za-z]{3}$"}
+      },
+      "additionalProperties": false
+    },
+    "coverage_resolutions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "required": ["status", "source_ref"],
+          "properties": {
+            "status": {"enum": ["INCLUDED", "NOT_APPLICABLE"]},
+            "source_ref": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "portfolio_coverage_resolutions": {
+      "type": "object",
+      "description": "Evidence-backed resolutions for missing charge coverage in multi-equipment provider portfolios. Shape: quote_set_id -> equipment/SHARED bucket -> scoped charge code -> resolution.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["status", "source_ref"],
+            "properties": {
+              "status": {"enum": ["INCLUDED", "NOT_APPLICABLE"]},
+              "source_ref": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "location_aliases": {
+      "type": "object",
+      "description": "Explicit evidence-backed aliases only. Missing source_ref means the engine must not merge the location names.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["canonical", "source_ref"],
+        "properties": {
+          "canonical": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
