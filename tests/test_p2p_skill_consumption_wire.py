@@ -389,6 +389,16 @@ class SkillConsumptionWireTests(unittest.TestCase):
             "Organize this substantial multi-step work with checkpoints",
         )
         self.assertIn("p2p-scope", selection.selected)
+        self.assertNotIn("scope-reality-check", selection.selected)
+        self.assertTrue(selection.route["single_router"])
+
+    def test_owner_big_goal_language_auto_routes_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Continue this big goal end-to-end to completion",
+        )
+        self.assertIn("p2p-scope", selection.selected)
+        self.assertNotIn("scope-reality-check", selection.selected)
         self.assertTrue(selection.route["single_router"])
 
     def test_vietnamese_large_goal_auto_routes_p2p_scope(self):
@@ -423,6 +433,20 @@ class SkillConsumptionWireTests(unittest.TestCase):
         selection = select_skills_for_task(
             REPO_ROOT,
             "Rename local variable x to y",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_single_dependency_maintenance_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Update dependency requests from 2.31.0 to 2.32.0",
+        )
+        self.assertNotIn("p2p-scope", selection.selected)
+
+    def test_single_checkpoint_mention_does_not_auto_route_p2p_scope(self):
+        selection = select_skills_for_task(
+            REPO_ROOT,
+            "Rename checkpoint variable to checkpoint_id",
         )
         self.assertNotIn("p2p-scope", selection.selected)
 
