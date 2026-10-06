@@ -675,6 +675,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 "scripts/p2p_sync_managed_projects.py",
                 "tests/test_p2p_portable_law_projection.py",
                 "tests/test_p2p_self_law_propagation_and_fast_sync.py",
+                # Owner-directed Anvien retirement updates the EXISTING
+                # static instruction contract checker; no runtime is added.
+                "scripts/check_instruction_contract.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             issue_309_existing_transport_surfaces = {
