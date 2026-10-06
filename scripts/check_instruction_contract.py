@@ -146,8 +146,8 @@ def main() -> int:
         "install.sh",
     )
 
-    if '"managedBy": "anvien"' not in manifest:
-        fail(errors, "skill mirror ownership is no longer explicitly managed by Anvien")
+    if '"managedBy": "p2p"' not in manifest:
+        fail(errors, "skill mirror ownership is not explicitly managed by P2P")
 
     # Package transport: the release must actually ship the thin instruction
     # source that both installers read from the package (B1 guard).
@@ -187,7 +187,7 @@ def main() -> int:
     print("INSTALLER_SOURCE=docs/p2p-development/P2P-AGENTS-INSTALL.md")
     print("PACKAGE_TRANSPORT=PASS")
     print("CANONICAL_LAW_ALIGNMENT=PASS")
-    print("SKILL_MIRROR_OWNERSHIP=ANVIEN_MANAGED")
+    print("SKILL_MIRROR_OWNERSHIP=P2P_MANAGED")
     return 0
 
 
