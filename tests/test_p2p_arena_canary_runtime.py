@@ -184,7 +184,7 @@ def canary_evidence_response(
 
 
 def terminal_return_packet(binding: SessionBinding, *, session_state: str = "COMPLETED") -> str:
-    """A full marked CONTROL_TOWER_RETURN_PACKET for the same binding."""
+    """A conforming full terminal packet for the same binding."""
 
     packet = create_return_packet(
         binding,
@@ -200,6 +200,20 @@ def terminal_return_packet(binding: SessionBinding, *, session_state: str = "COM
         candidate_or_checkpoint_sha="c" * 40,
         blockers=(),
         next_recommended_action="Request independent exact-head review.",
+        law_check={
+            "status": "PASS",
+            "source": "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+            "source_sha256": EXPECTED_CANONICAL_LAW_SHA,
+        },
+        experience_check={
+            "decision": "UNAVAILABLE",
+            "ids": [],
+            "reason": "fixture has no active experience expectation",
+        },
+        learning_reconciliation={
+            "type": "NONE",
+            "reason": "routine fixture success",
+        },
     )
     return packet.to_marked_text()
 
@@ -1129,6 +1143,14 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertNotIn(FIRST_TURN_RETURN_CONTRACT_LINE, prompt)
         self.assertIn(handoff.PACKET_BEGIN, prompt)
         self.assertIn("Finish with one structured CONTROL_TOWER_RETURN_PACKET.", prompt)
+        self.assertIn(
+            '"schema":"p2p-control-tower-return-packet/1"',
+            prompt,
+        )
+        self.assertIn('"CONTROL_TOWER_RETURN_PACKET":true', prompt)
+        self.assertIn("LAW_CHECK", prompt)
+        self.assertIn("EXPERIENCE_CHECK", prompt)
+        self.assertIn("LEARNING_RECONCILIATION", prompt)
 
         # Idempotent replay of the Owner decision.
         again = self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
