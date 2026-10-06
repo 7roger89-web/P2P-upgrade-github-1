@@ -22,17 +22,14 @@ Use:
 python scripts/p2p_portable_law_projection.py <TARGET_PROJECT_ROOT>
 ```
 
-The projector writes one deterministic Git-trackable transport bundle:
+The projector writes only two Git-trackable project artifacts:
 
 ```text
 AGENTS.md
 .p2p/portable/P2P-OPERATIONS-NOTEBOOK.md
-.p2p/portable/P2P-EXPERIENCE-CAPSULE.json
-.p2p/portable/P2P-SKILL-PROJECTION.json
-.agents/skills/<bounded projected operator skills and required shared support>
 ```
 
-It deliberately does **not** write `.p2p/system`, runtime state, approvals, gates, credentials, Git commits, deployment configuration, a second router, or a second authority.
+It deliberately does **not** write `.p2p/system`, runtime code, state, approvals, gates, credentials, Git commits, or deployment configuration.
 
 The portable notebook contains the full source notebook plus generated provenance metadata including the source content SHA-256 and package version. The `AGENTS.md` block tells remote executors where to read it when canonical cross-repository access is unavailable.
 
@@ -67,46 +64,6 @@ projection path, and `P2P_LAW_SOURCE=` marker. This prevents a stale
 "probe canonical first" instruction from running before the current managed
 block. Similar project-specific sections that do not carry all of those P2P
 markers are preserved.
-
-### Refresh policy: JIT by default
-
-A canonical law, experience, or skill change does **not** require an immediate
-fleet-wide mutation. The default operational path is just-in-time refresh of
-the target repository immediately before a repo-scoped handoff that needs its
-portable projection:
-
-```text
-python scripts/p2p_sync_managed_projects.py \
-  --project <TARGET_PROJECT_ROOT> \
-  --write
-```
-
-Read-only fleet surveying remains available without mutation:
-
-```text
-python scripts/p2p_sync_managed_projects.py \
-  --workspace <WORKSPACE_ROOT> \
-  --check
-```
-
-A workspace-wide write is exceptional and must be explicitly opted into:
-
-```text
-python scripts/p2p_sync_managed_projects.py \
-  --workspace <WORKSPACE_ROOT> \
-  --write \
-  --full-fleet
-```
-
-The projector is component-aware at write time: it still computes and verifies
-the complete expected transport bundle, including skill payload hashes, but it
-rewrites only generated artifacts whose content is stale. A law-only change
-therefore does not rewrite unchanged skill payloads merely to prove that they
-remain current.
-
-Use full-fleet writes only for changes that genuinely require immediate
-cross-project propagation, such as an incompatible bootstrap or security
-boundary change, or when the Owner explicitly requests fleet convergence.
 
 ### GitHub-only / repo-scoped workflow
 
