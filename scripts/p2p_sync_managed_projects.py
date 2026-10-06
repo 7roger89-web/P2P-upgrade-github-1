@@ -187,6 +187,10 @@ def _check_project(package_root: Path, project: Path) -> dict:
         )
     except (OSError, UnicodeError):
         skill_manifest_ok = False
+    payload_verification = projector.verify_portable_skill_manifest_payload(
+        project_resolved
+    )
+    skill_payload_ok = bool(payload_verification["ok"])
     skill_files_ok = True
     for relative, expected_text in expected_skills.items():
         target = project_resolved / relative
@@ -197,7 +201,7 @@ def _check_project(package_root: Path, project: Path) -> dict:
         except (OSError, UnicodeError):
             skill_files_ok = False
             break
-    skills_ok = skill_manifest_ok and skill_files_ok
+    skills_ok = skill_manifest_ok and skill_payload_ok and skill_files_ok
 
     if proj_ok and agents_ok and exp_ok and skills_ok:
         return {
@@ -209,6 +213,8 @@ def _check_project(package_root: Path, project: Path) -> dict:
             "experience_ok": exp_ok,
             "skills_ok": skills_ok,
             "skill_manifest_ok": skill_manifest_ok,
+            "skill_payload_ok": skill_payload_ok,
+            "skill_payload_mismatches": payload_verification["mismatches"],
             "skill_files_ok": skill_files_ok,
             "projected_skill_files": len(expected_skills),
         }
@@ -222,6 +228,8 @@ def _check_project(package_root: Path, project: Path) -> dict:
             "experience_ok": exp_ok,
             "skills_ok": skills_ok,
             "skill_manifest_ok": skill_manifest_ok,
+            "skill_payload_ok": skill_payload_ok,
+            "skill_payload_mismatches": payload_verification["mismatches"],
             "skill_files_ok": skill_files_ok,
             "projected_skill_files": len(expected_skills),
         }
