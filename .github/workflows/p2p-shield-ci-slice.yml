@@ -71,6 +71,7 @@ jobs:
           tests.test_p2p_self_law_propagation_and_fast_sync
           tests.test_p2p_github_connector_capsule
           tests.test_p2p_control_tower_session_handoff
+          tests.test_p2p_arena_canary_runtime
           tests.test_p2p_code_intelligence_bridge
           tests.test_p2p_github_research_appendix
           tests.test_p2p_native_code_impact

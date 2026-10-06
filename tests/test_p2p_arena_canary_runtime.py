@@ -184,7 +184,7 @@ def canary_evidence_response(
 
 
 def terminal_return_packet(binding: SessionBinding, *, session_state: str = "COMPLETED") -> str:
-    """A full marked CONTROL_TOWER_RETURN_PACKET for the same binding."""
+    """A conforming full terminal packet for the same binding."""
 
     packet = create_return_packet(
         binding,
@@ -200,6 +200,20 @@ def terminal_return_packet(binding: SessionBinding, *, session_state: str = "COM
         candidate_or_checkpoint_sha="c" * 40,
         blockers=(),
         next_recommended_action="Request independent exact-head review.",
+        law_check={
+            "status": "PASS",
+            "source": "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+            "source_sha256": EXPECTED_CANONICAL_LAW_SHA,
+        },
+        experience_check={
+            "decision": "UNAVAILABLE",
+            "ids": [],
+            "reason": "fixture has no active experience expectation",
+        },
+        learning_reconciliation={
+            "type": "NONE",
+            "reason": "routine fixture success",
+        },
     )
     return packet.to_marked_text()
 
@@ -422,8 +436,8 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertNotIn("CHAT_TITLE", codex)
         self.assertEqual("CODEX — P2P-CT01-CANARY — " + BLIND_TEST_TASK, codex["CHAT_NAME"])
 
-        # Digest captured from the pre-repair non-Arena serializer; the Arena-only
-        # routing/checkpoint change must not alter its bytes.
+        # Digest captured after the shared terminal-contract repair in Issue #272.
+        # Future Arena-only routing/checkpoint changes must not alter these bytes.
         non_arena = SessionBinding(
             session_id="non-arena-byte-stable",
             host="CODEX",
@@ -432,7 +446,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         )
         non_arena_prompt = build_execution_prompt(non_arena, "Perform one focused serialization repair.")
         self.assertEqual(
-            "150b5c88d75c693a2efeabc175c223187a08a8b9627160848a7ee9ead0107653",
+            "2c4eb0dfc62a8c60439c8f70ca8f928524f8c26fb3c8c6604ca413f3c52db505",
             hashlib.sha256(non_arena_prompt.encode("utf-8")).hexdigest(),
         )
 
@@ -1129,6 +1143,14 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertNotIn(FIRST_TURN_RETURN_CONTRACT_LINE, prompt)
         self.assertIn(handoff.PACKET_BEGIN, prompt)
         self.assertIn("Finish with one structured CONTROL_TOWER_RETURN_PACKET.", prompt)
+        self.assertIn(
+            '"schema":"p2p-control-tower-return-packet/1"',
+            prompt,
+        )
+        self.assertIn('"CONTROL_TOWER_RETURN_PACKET":true', prompt)
+        self.assertIn("LAW_CHECK", prompt)
+        self.assertIn("EXPERIENCE_CHECK", prompt)
+        self.assertIn("LEARNING_RECONCILIATION", prompt)
 
         # Idempotent replay of the Owner decision.
         again = self.tower().continue_canary_session(binding.session_id, owner_continuation="YES")
