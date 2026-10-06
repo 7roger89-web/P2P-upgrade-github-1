@@ -90,6 +90,18 @@ jobs:
           PYTHONPATH=".p2p/system/p2p_capabilities"
           python3 .p2p/system/p2p_capabilities/tests/test_capability_intelligence.py
 
+      - name: Run Quality Intelligence regression
+        env:
+          PYTHONPATH: .p2p/system
+        run: |
+          set -euo pipefail
+          mkdir -p .p2p/state
+          trap 'rm -rf .p2p/state' EXIT
+          python3 -m unittest discover \
+            -s .p2p/system/p2p_capabilities/tests \
+            -p test_quality_intelligence.py \
+            -v
+
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
         env:

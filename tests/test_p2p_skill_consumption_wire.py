@@ -38,6 +38,7 @@ from p2p_capabilities.skill_consumption import (  # noqa: E402
     skill_handoff_prompt_lines,
     validate_consumption_receipt,
 )
+from p2p_capabilities import quality_intelligence as qi  # noqa: E402
 
 
 class SkillConsumptionWireTests(unittest.TestCase):
@@ -639,6 +640,317 @@ class SkillConsumptionWireTests(unittest.TestCase):
                     task_prompt="Pressure-test and organize this plan",
                     required_skills=("scope-reality-check",),
                 )
+
+
+class SkillEffectivenessEvidenceTests(unittest.TestCase):
+    """Issue #308: consumption proof is not effectiveness proof."""
+
+    TASK_REF = "issue-308-proof"
+    TASK_FP = "task-fingerprint-v1"
+    ACCEPTANCE_FP = "acceptance-fingerprint-v1"
+    SOURCE_REV = "source-revision-v1"
+    PROJECT_REV = "project-revision-v1"
+    EVAL_ID = "deterministic-quality-v1"
+
+    def _handoff(self, two_skills=False):
+        required = (
+            ("scope-reality-check", "p2p-scope")
+            if two_skills else ("scope-reality-check",)
+        )
+        return prepare_skill_handoff(
+            REPO_ROOT,
+            "Pressure-test and organize this bounded task",
+            host="ARENA",
+            required_skills=required,
+        )
+
+    def _receipt(self, handoff, tamper_hash=False):
+        hashes = dict(handoff["SKILL_SOURCE_HASHES"])
+        if tamper_hash:
+            first = handoff["SKILLS_SELECTED"][0]
+            hashes[first] = "0" * 64
+        return {
+            "schema": RECEIPT_SCHEMA,
+            "SKILLS_SELECTED": list(handoff["SKILLS_SELECTED"]),
+            "SKILL_SOURCE_HASHES": hashes,
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_CONSUMPTION": "CONSUMED",
+            "SKILL_HOST_MODE": handoff["SKILL_HOST_MODE"],
+            "PERMISSION_WIDENED": "NO",
+        }
+
+    def _quality(self, evidence_id, **overrides):
+        record = {
+            "task_ref": self.TASK_REF,
+            "task_fingerprint": self.TASK_FP,
+            "acceptance_fingerprint": self.ACCEPTANCE_FP,
+            "source_revision": self.SOURCE_REV,
+            "project_revision": self.PROJECT_REV,
+            "eval_contract_id": self.EVAL_ID,
+            "evaluator_id": "deterministic-evaluator",
+            "evidence_id": evidence_id,
+            "deterministic": True,
+            "current": True,
+        }
+        record.update(overrides)
+        return record
+
+    def _comparison(self, result="BETTER", **overrides):
+        record = {
+            "result": result,
+            "eval_contract_id": self.EVAL_ID,
+            "comparator_id": "deterministic-comparator",
+            "evidence_id": "comparison-evidence",
+            "baseline_evidence_id": "baseline-evidence",
+            "assisted_evidence_id": "assisted-evidence",
+            "deterministic": True,
+            "current": True,
+        }
+        record.update(overrides)
+        return record
+
+    def _assessment(
+            self,
+            *,
+            handoff=None,
+            receipt=None,
+            baseline=None,
+            assisted=None,
+            comparison=None,
+            ):
+        handoff = handoff or self._handoff()
+        receipt = receipt or self._receipt(handoff)
+        validation = validate_consumption_receipt(handoff, receipt)
+        if baseline is None:
+            baseline = self._quality("baseline-evidence")
+        if assisted is None:
+            assisted = self._quality("assisted-evidence")
+        if comparison is None:
+            comparison = self._comparison()
+        return qi.assess_skill_effectiveness(
+            task_ref=self.TASK_REF,
+            task_fingerprint=self.TASK_FP,
+            acceptance_fingerprint=self.ACCEPTANCE_FP,
+            source_revision=self.SOURCE_REV,
+            project_revision=self.PROJECT_REV,
+            skill_handoff=handoff,
+            consumption_validation=validation,
+            baseline_quality=baseline,
+            assisted_quality=assisted,
+            comparison=comparison,
+        )
+
+    def test_better_deterministic_pair_supports_effectiveness(self):
+        result = self._assessment()
+        self.assertEqual(
+            result["effectiveness_status"], "EFFECTIVE_SUPPORTED"
+        )
+        self.assertEqual(
+            result["attribution_level"], "SKILL_EFFECTIVENESS"
+        )
+        self.assertTrue(result["effectiveness_claim_supported"])
+
+    def test_same_deterministic_pair_supports_neutral(self):
+        result = self._assessment(comparison=self._comparison("SAME"))
+        self.assertEqual(
+            result["effectiveness_status"], "NEUTRAL_SUPPORTED"
+        )
+
+    def test_worse_deterministic_pair_supports_harmed(self):
+        result = self._assessment(comparison=self._comparison("WORSE"))
+        self.assertEqual(
+            result["effectiveness_status"], "HARMED_SUPPORTED"
+        )
+
+    def test_consumed_without_baseline_is_consumption_only(self):
+        handoff = self._handoff()
+        validation = validate_consumption_receipt(
+            handoff, self._receipt(handoff)
+        )
+        result = qi.assess_skill_effectiveness(
+            task_ref=self.TASK_REF,
+            task_fingerprint=self.TASK_FP,
+            acceptance_fingerprint=self.ACCEPTANCE_FP,
+            source_revision=self.SOURCE_REV,
+            project_revision=self.PROJECT_REV,
+            skill_handoff=handoff,
+            consumption_validation=validation,
+            baseline_quality=None,
+            assisted_quality=self._quality("assisted-evidence"),
+            comparison=None,
+        )
+        self.assertEqual(
+            result["effectiveness_status"], "CONSUMPTION_ONLY"
+        )
+        self.assertFalse(result["effectiveness_claim_supported"])
+
+    def test_self_report_only_cannot_prove_effectiveness(self):
+        assisted = self._quality(
+            "assisted-evidence",
+            evidence_kind="EXECUTOR_SELF_REPORT",
+        )
+        result = self._assessment(assisted=assisted)
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertIn(
+            "SELF_REPORT_NOT_EFFECTIVENESS_EVIDENCE",
+            result["reason_codes"],
+        )
+
+    def test_frozen_hash_mismatch_is_inconclusive(self):
+        handoff = self._handoff()
+        result = self._assessment(
+            handoff=handoff,
+            receipt=self._receipt(handoff, tamper_hash=True),
+        )
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertIn(
+            "SKILL_SOURCE_HASH_MISMATCH", result["reason_codes"]
+        )
+
+    def test_stale_source_bound_evidence_is_inconclusive(self):
+        baseline = self._quality("baseline-evidence", current=False)
+        result = self._assessment(baseline=baseline)
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertIn("STALE_EVIDENCE", result["reason_codes"])
+
+    def test_acceptance_or_eval_mismatch_is_inconclusive(self):
+        assisted = self._quality(
+            "assisted-evidence",
+            acceptance_fingerprint="different-acceptance",
+            eval_contract_id="different-eval",
+        )
+        result = self._assessment(assisted=assisted)
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertTrue(
+            any(
+                code.endswith("ACCEPTANCE_FINGERPRINT_MISMATCH")
+                for code in result["reason_codes"]
+            )
+        )
+        self.assertIn("EVAL_CONTRACT_MISMATCH", result["reason_codes"])
+
+    def test_multi_skill_run_is_set_level_only(self):
+        handoff = self._handoff(two_skills=True)
+        result = self._assessment(
+            handoff=handoff,
+            receipt=self._receipt(handoff),
+        )
+        self.assertEqual(
+            result["effectiveness_status"], "EFFECTIVE_SUPPORTED"
+        )
+        self.assertEqual(result["attribution_level"], "SET_EFFECTIVENESS")
+        self.assertIsNone(result["per_skill_attribution"])
+
+    def test_learning_bridge_reuses_existing_candidate_policy(self):
+        assessment = self._assessment()
+        observation = qi.skill_effectiveness_learning_observation(
+            assessment
+        )
+        self.assertTrue(observation["eligible"])
+        self.assertFalse(observation["auto_promote"])
+        self.assertEqual(
+            observation["candidate_kwargs"]["observation_count"], 1
+        )
+
+        old_store = qi.LEARNING_STORE_PATH
+        with tempfile.TemporaryDirectory(
+                prefix="p2p-effectiveness-learning-") as raw:
+            try:
+                qi.LEARNING_STORE_PATH = (
+                    Path(raw) / "learning_candidates.jsonl"
+                )
+                candidate = qi.add_learning_candidate(
+                    **observation["candidate_kwargs"]
+                )
+                policy = qi.learning_promotion_policy(candidate)
+            finally:
+                qi.LEARNING_STORE_PATH = old_store
+        self.assertEqual(candidate["state"], "CANDIDATE")
+        self.assertFalse(policy["auto_promoted"])
+
+    def test_assessment_is_read_only_and_does_not_mutate_inputs(self):
+        handoff = self._handoff()
+        receipt = self._receipt(handoff)
+        baseline = self._quality("baseline-evidence")
+        assisted = self._quality("assisted-evidence")
+        comparison = self._comparison()
+        before = json.dumps(
+            {
+                "handoff": handoff,
+                "receipt": receipt,
+                "baseline": baseline,
+                "assisted": assisted,
+                "comparison": comparison,
+            },
+            sort_keys=True,
+        )
+        result = self._assessment(
+            handoff=handoff,
+            receipt=receipt,
+            baseline=baseline,
+            assisted=assisted,
+            comparison=comparison,
+        )
+        after = json.dumps(
+            {
+                "handoff": handoff,
+                "receipt": receipt,
+                "baseline": baseline,
+                "assisted": assisted,
+                "comparison": comparison,
+            },
+            sort_keys=True,
+        )
+        self.assertEqual(before, after)
+        self.assertTrue(result["read_only"])
+        self.assertEqual(result["mutation_effects"], ())
+
+    def test_same_evidence_id_cannot_form_comparison_pair(self):
+        baseline = self._quality("same-evidence")
+        assisted = self._quality("same-evidence")
+        result = self._assessment(
+            baseline=baseline,
+            assisted=assisted,
+            comparison=self._comparison(
+                baseline_evidence_id="same-evidence",
+                assisted_evidence_id="same-evidence",
+            ),
+        )
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertFalse(result["effectiveness_claim_supported"])
+        self.assertIn(
+            "EVIDENCE_PAIR_NOT_DISTINCT",
+            result["reason_codes"],
+        )
+
+    def test_same_evidence_object_cannot_form_comparison_pair(self):
+        observation = self._quality("shared-observation")
+        result = self._assessment(
+            baseline=observation,
+            assisted=observation,
+            comparison=self._comparison(
+                baseline_evidence_id="shared-observation",
+                assisted_evidence_id="shared-observation",
+            ),
+        )
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertFalse(result["effectiveness_claim_supported"])
+        self.assertIn(
+            "EVIDENCE_PAIR_NOT_DISTINCT",
+            result["reason_codes"],
+        )
+
+    def test_comparator_must_bind_exact_evidence_pair(self):
+        result = self._assessment(
+            comparison=self._comparison(
+                baseline_evidence_id="other-baseline"
+            )
+        )
+        self.assertEqual(result["effectiveness_status"], "INCONCLUSIVE")
+        self.assertIn(
+            "BASELINE_EVIDENCE_BINDING_MISMATCH",
+            result["reason_codes"],
+        )
 
 
 if __name__ == "__main__":

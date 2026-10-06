@@ -812,6 +812,278 @@ def verify_independence(executor_identity: str,
 
 
 # ---------------------------------------------------------------------------
+# Skill effectiveness — post-execution comparative evidence only
+# ---------------------------------------------------------------------------
+
+SKILL_EFFECTIVENESS_SCHEMA = "p2p-skill-effectiveness/1"
+SKILL_EFFECTIVENESS_STATES = (
+    "CONSUMPTION_ONLY",
+    "EFFECTIVE_SUPPORTED",
+    "NEUTRAL_SUPPORTED",
+    "HARMED_SUPPORTED",
+    "INCONCLUSIVE",
+)
+_SKILL_EFFECTIVENESS_RESULT_TO_STATUS = {
+    "BETTER": "EFFECTIVE_SUPPORTED",
+    "SAME": "NEUTRAL_SUPPORTED",
+    "WORSE": "HARMED_SUPPORTED",
+}
+_SKILL_EFFECTIVENESS_SELF_REPORT_KINDS = {
+    "SELF_REPORT",
+    "MODEL_SELF_REPORT",
+    "EXECUTOR_SELF_REPORT",
+}
+
+
+def assess_skill_effectiveness(
+        *,
+        task_ref: str,
+        task_fingerprint: str,
+        acceptance_fingerprint: str,
+        source_revision: str,
+        project_revision: str,
+        skill_handoff: Mapping[str, Any],
+        consumption_validation: Mapping[str, Any],
+        baseline_quality: Optional[Mapping[str, Any]] = None,
+        assisted_quality: Optional[Mapping[str, Any]] = None,
+        comparison: Optional[Mapping[str, Any]] = None,
+        ) -> Dict[str, Any]:
+    """Assess whether a frozen consumed skill set changed bounded task quality.
+
+    This surface is deliberately read-only. Receipt semantics remain owned by
+    skill_consumption.validate_consumption_receipt; callers pass that
+    validator's result instead of re-implementing consumption checks here.
+
+    Comparative support is admitted only when baseline, assisted observation,
+    and comparator are current, deterministic, source/task/acceptance bound,
+    and tied to the exact evidence pair. Multi-skill runs are set-level only.
+    """
+
+    selected = tuple(
+        str(value) for value in (skill_handoff.get("SKILLS_SELECTED") or ())
+    )
+    skill_hashes = {
+        str(key): str(value)
+        for key, value in dict(
+            skill_handoff.get("SKILL_SOURCE_HASHES") or {}
+        ).items()
+    }
+    attribution_level = (
+        "SKILL_EFFECTIVENESS"
+        if len(selected) == 1
+        else "SET_EFFECTIVENESS"
+    )
+    reasons: List[str] = []
+
+    def finish(status: str) -> Dict[str, Any]:
+        evidence_ids = tuple(
+            str(record.get("evidence_id"))
+            for record in (baseline_quality, assisted_quality, comparison)
+            if isinstance(record, Mapping) and record.get("evidence_id")
+        )
+        supported = status in _SKILL_EFFECTIVENESS_RESULT_TO_STATUS.values()
+        per_skill = None
+        if len(selected) == 1 and supported:
+            per_skill = {selected[0]: status}
+        return {
+            "schema": SKILL_EFFECTIVENESS_SCHEMA,
+            "task_ref": str(task_ref),
+            "effectiveness_status": status,
+            "effectiveness_claim_supported": supported,
+            "attribution_level": attribution_level,
+            "skills_selected": selected,
+            "skill_source_hashes": skill_hashes,
+            "per_skill_attribution": per_skill,
+            "reason_codes": tuple(dict.fromkeys(reasons)),
+            "comparison_bindings": {
+                "task_fingerprint": str(task_fingerprint),
+                "acceptance_fingerprint": str(acceptance_fingerprint),
+                "source_revision": str(source_revision),
+                "project_revision": str(project_revision),
+                "eval_contract_id": str(
+                    (comparison or {}).get("eval_contract_id") or ""
+                ),
+                "evidence_ids": evidence_ids,
+            },
+            "read_only": True,
+            "mutation_effects": (),
+            "note": "SKILL_CONSUMED != SKILL_EFFECTIVE",
+        }
+
+    required_bindings = {
+        "task_ref": str(task_ref),
+        "task_fingerprint": str(task_fingerprint),
+        "acceptance_fingerprint": str(acceptance_fingerprint),
+        "source_revision": str(source_revision),
+        "project_revision": str(project_revision),
+    }
+    if not all(required_bindings.values()):
+        reasons.append("ASSESSMENT_BINDING_MISSING")
+        return finish("INCONCLUSIVE")
+
+    if not selected:
+        reasons.append("NO_SKILL_SELECTED")
+        return finish("INCONCLUSIVE")
+    if len(selected) > 3:
+        reasons.append("SELECTED_SKILL_SET_OUT_OF_BOUNDS")
+        return finish("INCONCLUSIVE")
+    if any(
+        not re.fullmatch(r"[0-9a-fA-F]{64}", skill_hashes.get(skill_id, ""))
+        for skill_id in selected
+    ):
+        reasons.append("SKILL_SOURCE_HASH_BINDING_MISSING")
+        return finish("INCONCLUSIVE")
+
+    if not isinstance(consumption_validation, Mapping) \
+            or not bool(consumption_validation.get("valid")):
+        reasons.append("CONSUMPTION_RECEIPT_INVALID")
+        if isinstance(consumption_validation, Mapping):
+            reasons.extend(
+                str(value)
+                for value in (
+                    consumption_validation.get("reason_codes") or ()
+                )
+            )
+        return finish("INCONCLUSIVE")
+
+    for record in (baseline_quality, assisted_quality, comparison):
+        if not isinstance(record, Mapping):
+            continue
+        if str(record.get("evidence_kind") or "").upper() \
+                in _SKILL_EFFECTIVENESS_SELF_REPORT_KINDS:
+            reasons.append("SELF_REPORT_NOT_EFFECTIVENESS_EVIDENCE")
+            return finish("INCONCLUSIVE")
+
+    if baseline_quality is None:
+        reasons.append("NO_COMPARABLE_BASELINE")
+        return finish("CONSUMPTION_ONLY")
+
+    if not isinstance(baseline_quality, Mapping) \
+            or not isinstance(assisted_quality, Mapping) \
+            or not isinstance(comparison, Mapping):
+        reasons.append("COMPARISON_EVIDENCE_INCOMPLETE")
+        return finish("INCONCLUSIVE")
+
+    baseline_evidence_id = str(baseline_quality.get("evidence_id") or "")
+    assisted_evidence_id = str(assisted_quality.get("evidence_id") or "")
+    if baseline_quality is assisted_quality or (
+            baseline_evidence_id
+            and assisted_evidence_id
+            and baseline_evidence_id == assisted_evidence_id
+            ):
+        reasons.append("EVIDENCE_PAIR_NOT_DISTINCT")
+        return finish("INCONCLUSIVE")
+
+    expected_observation_bindings = {
+        "task_ref": str(task_ref),
+        "task_fingerprint": str(task_fingerprint),
+        "acceptance_fingerprint": str(acceptance_fingerprint),
+        "source_revision": str(source_revision),
+        "project_revision": str(project_revision),
+    }
+    eval_contract_ids: List[str] = []
+    for label, record in (
+            ("BASELINE", baseline_quality),
+            ("ASSISTED", assisted_quality),
+            ):
+        for key, expected in expected_observation_bindings.items():
+            if str(record.get(key) or "") != expected:
+                reasons.append(f"{label}_{key.upper()}_MISMATCH")
+        if record.get("current") is not True:
+            reasons.append("STALE_EVIDENCE")
+        if record.get("deterministic") is not True:
+            reasons.append("NON_DETERMINISTIC_EVIDENCE")
+        if not str(record.get("evaluator_id") or ""):
+            reasons.append(f"{label}_EVALUATOR_ID_MISSING")
+        if not str(record.get("evidence_id") or ""):
+            reasons.append(f"{label}_EVIDENCE_ID_MISSING")
+        eval_contract_id = str(record.get("eval_contract_id") or "")
+        if not eval_contract_id:
+            reasons.append(f"{label}_EVAL_CONTRACT_MISSING")
+        eval_contract_ids.append(eval_contract_id)
+
+    if len(set(eval_contract_ids)) != 1:
+        reasons.append("EVAL_CONTRACT_MISMATCH")
+
+    comparison_eval = str(comparison.get("eval_contract_id") or "")
+    if not comparison_eval or comparison_eval != eval_contract_ids[0]:
+        reasons.append("COMPARISON_EVAL_CONTRACT_MISMATCH")
+    if comparison.get("current") is not True:
+        reasons.append("STALE_EVIDENCE")
+    if comparison.get("deterministic") is not True:
+        reasons.append("NON_DETERMINISTIC_COMPARISON")
+    if not str(comparison.get("comparator_id") or ""):
+        reasons.append("COMPARATOR_ID_MISSING")
+    if not str(comparison.get("evidence_id") or ""):
+        reasons.append("COMPARISON_EVIDENCE_ID_MISSING")
+    if str(comparison.get("baseline_evidence_id") or "") != str(
+            baseline_quality.get("evidence_id") or ""):
+        reasons.append("BASELINE_EVIDENCE_BINDING_MISMATCH")
+    if str(comparison.get("assisted_evidence_id") or "") != str(
+            assisted_quality.get("evidence_id") or ""):
+        reasons.append("ASSISTED_EVIDENCE_BINDING_MISMATCH")
+
+    comparison_result = str(comparison.get("result") or "").upper()
+    if comparison_result not in _SKILL_EFFECTIVENESS_RESULT_TO_STATUS:
+        reasons.append("COMPARISON_RESULT_UNSUPPORTED")
+
+    if reasons:
+        return finish("INCONCLUSIVE")
+    return finish(
+        _SKILL_EFFECTIVENESS_RESULT_TO_STATUS[comparison_result]
+    )
+
+
+def skill_effectiveness_learning_observation(
+        assessment: Mapping[str, Any],
+        ) -> Dict[str, Any]:
+    """Prepare one bounded observation for the existing learning machinery.
+
+    This function does not write a store and never promotes anything. A caller
+    that deliberately wants a durable candidate passes candidate_kwargs to
+    add_learning_candidate and remains subject to learning_promotion_policy /
+    governed acceptance.
+    """
+
+    status = str(assessment.get("effectiveness_status") or "")
+    selected = tuple(
+        str(value) for value in (assessment.get("skills_selected") or ())
+    )
+    supported = status in _SKILL_EFFECTIVENESS_RESULT_TO_STATUS.values()
+    if not supported:
+        return {
+            "eligible": False,
+            "reason": "EFFECTIVENESS_NOT_SUPPORTED",
+            "auto_promote": False,
+        }
+
+    bindings = assessment.get("comparison_bindings")
+    if not isinstance(bindings, Mapping):
+        bindings = {}
+    subject = "skill-effectiveness:" + "+".join(selected)
+    return {
+        "eligible": True,
+        "candidate_kwargs": {
+            "subject": subject,
+            "proposed_learning": (
+                f"{status} for "
+                f"{assessment.get('attribution_level')} under comparable "
+                "deterministic evidence"
+            ),
+            "evidence_pointers": tuple(
+                str(value)
+                for value in (bindings.get("evidence_ids") or ())
+            ),
+            "scope": "PROJECT_SCOPED",
+            "observation_count": 1,
+            "confidence_class": "MODERATE",
+            "promotion_requirement": "OWNER_CONFIRMATION",
+        },
+        "auto_promote": False,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Learning candidates — evidence, not chat memory
 # ---------------------------------------------------------------------------
 
