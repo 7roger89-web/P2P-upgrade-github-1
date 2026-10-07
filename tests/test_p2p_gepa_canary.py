@@ -89,6 +89,13 @@ def suite(*, baseline: float = 0.5, candidate: float = 0.5):
 
 
 class P2PGepaCanaryTests(unittest.TestCase):
+    def test_too_few_cases_requires_evidence(self):
+        value = suite()
+        value["cases"] = value["cases"][:1]
+        result = gepa.evaluate(value)
+        self.assertEqual(result["verdict"], "EVIDENCE_REQUIRED")
+        self.assertEqual(result["reason_codes"], ["INSUFFICIENT_CASES"])
+
     def test_missing_trials_requires_evidence(self):
         value = suite()
         value["cases"][0]["p2p_runs"] = []
