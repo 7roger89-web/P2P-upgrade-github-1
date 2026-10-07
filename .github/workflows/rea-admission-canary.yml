@@ -1,0 +1,114 @@
+name: REA admission canary
+
+on:
+  push:
+    branches:
+      - canary/rea-admission-01-20261007
+    paths:
+      - 'experiments/rea-admission-canary/**'
+      - '.github/workflows/rea-admission-canary.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 24.11
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.11.0'
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build source-owned fixture
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p experiments/rea-admission-canary/out
+          gcc -O0 -fno-inline -fno-omit-frame-pointer -fno-pie -no-pie -Wl,--build-id=none \
+            experiments/rea-admission-canary/canary.c \
+            -o experiments/rea-admission-canary/out/canary
+          experiments/rea-admission-canary/out/canary 5 | tee experiments/rea-admission-canary/out/runtime.txt
+          sha256sum experiments/rea-admission-canary/out/canary | tee experiments/rea-admission-canary/out/binary.sha256
+          nm -C experiments/rea-admission-canary/out/canary > experiments/rea-admission-canary/out/nm.txt
+          objdump -d -M intel experiments/rea-admission-canary/out/canary > experiments/rea-admission-canary/out/objdump.txt
+          strings -a experiments/rea-admission-canary/out/canary > experiments/rea-admission-canary/out/strings.txt
+
+      - name: Download pinned Ghidra 12.1.4
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd /tmp
+          curl -L --fail --retry 3 --retry-delay 2 \
+            -o ghidra.zip \
+            https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.4_build/ghidra_12.1.4_PUBLIC_20260921.zip
+          echo "ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db  ghidra.zip" | sha256sum -c -
+          unzip -q ghidra.zip
+          test -x /tmp/ghidra_12.1.4_PUBLIC/support/analyzeHeadless
+
+      - name: REA environment and provider receipts
+        shell: bash
+        env:
+          GHIDRA_INSTALL_DIR: /tmp/ghidra_12.1.4_PUBLIC
+        run: |
+          set -o pipefail
+          OUT=experiments/rea-admission-canary/out
+          node --version | tee "$OUT/node-version.txt"
+          java -version 2> "$OUT/java-version.txt"
+          (time npx -y rea-agents@4.1.0 doctor --json) > "$OUT/rea-doctor.json" 2> "$OUT/rea-doctor.time"
+          (time npx -y rea-agents@4.1.0 providers --json) > "$OUT/rea-providers.json" 2> "$OUT/rea-providers.time"
+
+      - name: REA native analysis
+        shell: bash
+        env:
+          GHIDRA_INSTALL_DIR: /tmp/ghidra_12.1.4_PUBLIC
+        run: |
+          set -o pipefail
+          BIN="$GITHUB_WORKSPACE/experiments/rea-admission-canary/out/canary"
+          OUT="$GITHUB_WORKSPACE/experiments/rea-admission-canary/out"
+          set +e
+          (time npx -y rea-agents@4.1.0 analyze "$BIN" --provider ghidra --json) > "$OUT/rea-analyze.json" 2> "$OUT/rea-analyze.time"
+          echo $? > "$OUT/rea-analyze.exit"
+          (time npx -y rea-agents@4.1.0 function "$BIN" feature_gate --provider ghidra --json) > "$OUT/rea-feature-gate.json" 2> "$OUT/rea-feature-gate.time"
+          echo $? > "$OUT/rea-feature-gate.exit"
+          (time npx -y rea-agents@4.1.0 function "$BIN" score_record --provider ghidra --json) > "$OUT/rea-score-record.json" 2> "$OUT/rea-score-record.time"
+          echo $? > "$OUT/rea-score-record.exit"
+          (time npx -y rea-agents@4.1.0 search "$BIN" P2P_REA_CANARY_OK --kind strings --provider ghidra --json) > "$OUT/rea-string-search.json" 2> "$OUT/rea-string-search.time"
+          echo $? > "$OUT/rea-string-search.exit"
+          set -e
+          printf 'KONG_STATUS=NOT_RUN\nREASON=requires LLM/API credential-cost authority absent from this bounded no-secret canary\n' > "$OUT/kong-status.txt"
+
+      - name: Compact canary report
+        if: always()
+        shell: bash
+        run: |
+          set -euxo pipefail
+          OUT=experiments/rea-admission-canary/out
+          {
+            echo "REA_VERSION=4.1.0"
+            echo "GHIDRA_VERSION=12.1.4"
+            echo "FIXTURE_RUNTIME=$(cat "$OUT/runtime.txt" 2>/dev/null || echo NOT_RUN)"
+            echo "REA_ANALYZE_EXIT=$(cat "$OUT/rea-analyze.exit" 2>/dev/null || echo NOT_RUN)"
+            echo "REA_FEATURE_GATE_EXIT=$(cat "$OUT/rea-feature-gate.exit" 2>/dev/null || echo NOT_RUN)"
+            echo "REA_SCORE_RECORD_EXIT=$(cat "$OUT/rea-score-record.exit" 2>/dev/null || echo NOT_RUN)"
+            echo "REA_STRING_SEARCH_EXIT=$(cat "$OUT/rea-string-search.exit" 2>/dev/null || echo NOT_RUN)"
+            echo "KONG_STATUS=NOT_RUN"
+          } | tee "$OUT/summary.txt"
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rea-admission-canary-evidence
+          path: experiments/rea-admission-canary/out/
+          if-no-files-found: error
+          retention-days: 7

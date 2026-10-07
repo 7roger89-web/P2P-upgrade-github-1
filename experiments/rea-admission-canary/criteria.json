@@ -1,0 +1,23 @@
+{
+  "schema": "p2p-rea-admission-canary/1",
+  "target": "source-owned benign native ELF fixture",
+  "frozen_before_run": true,
+  "ground_truth": {
+    "string": "P2P_REA_CANARY_OK",
+    "functions": ["score_record", "feature_gate", "main"],
+    "feature_gate_mode": 7,
+    "score_multiplier": 7,
+    "score_addend": 3,
+    "score_xor": 42,
+    "feature_gate_addend": 11,
+    "feature_gate_calls": ["score_record"]
+  },
+  "promotion_criteria": {
+    "rea_runnable_with_pinned_ghidra": true,
+    "must_recover_function_dossier": ["score_record", "feature_gate"],
+    "must_expose_evidence_or_limitations": true,
+    "must_not_claim_original_source": true,
+    "comparison": ["correctness", "evidence_quality", "unknown_handling", "wall_time", "setup_burden"],
+    "kong": "NOT_RUN unless no new API credential/cost is required"
+  }
+}
