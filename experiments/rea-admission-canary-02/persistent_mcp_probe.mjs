@@ -17,7 +17,16 @@ await mkdir(dirname(outPath), { recursive: true });
 
 const norm = (value) => {
   const s = String(value).trim().toLowerCase();
-  return "0x" + BigInt(s.startsWith("0x") ? s : "0x" + s).toString(16);
+  const hex = s.startsWith("0x") ? s : "0x" + s;
+  if (!/^0x[0-9a-f]+$/u.test(hex)) {
+    throw new Error("not a flat hexadecimal address: " + s);
+  }
+  return "0x" + BigInt(hex).toString(16);
+};
+const flatNorm = (value) => {
+  const s = String(value ?? "").trim().toLowerCase();
+  if (!/^0x[0-9a-f]+$/u.test(s)) return null;
+  return "0x" + BigInt(s).toString(16);
 };
 const scoreAddress = norm(scoreArg);
 const featureAddress = norm(featureArg);
@@ -93,7 +102,8 @@ function dossierFacts(dossier) {
 }
 
 function hasCallee(dossier, address) {
-  return (dossier?.callees ?? []).some((item) => norm(item.address) === norm(address));
+  const wanted = norm(address);
+  return (dossier?.callees ?? []).some((item) => flatNorm(item.address) === wanted);
 }
 
 const selectedNames = [
@@ -183,8 +193,8 @@ const score = dossierFacts(coldScore.value);
 const feature = dossierFacts(coldFeature.value);
 const scorePseudo = score.pseudocode;
 const featurePseudo = feature.pseudocode;
-const atScore = procedures.find((item) => norm(item.address) === scoreAddress);
-const atFeature = procedures.find((item) => norm(item.address) === featureAddress);
+const atScore = procedures.find((item) => flatNorm(item.address) === scoreAddress);
+const atFeature = procedures.find((item) => flatNorm(item.address) === featureAddress);
 assert.ok(atScore, "stripped procedure inventory omitted score address");
 assert.ok(atFeature, "stripped procedure inventory omitted feature address");
 
