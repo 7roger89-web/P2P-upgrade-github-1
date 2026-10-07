@@ -5,10 +5,12 @@ import { performance } from "node:perf_hooks";
 import { Client } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 
-const [targetArg, scoreArg, featureArg, outArg, entryArg, snapshotArg] = process.argv.slice(2);
+const [targetArg, scoreArg, featureArg, outArg, entryArg, snapshotArg, oneShotScoreArg, oneShotFeatureArg] = process.argv.slice(2);
 if (!targetArg || !scoreArg || !featureArg || !outArg || !entryArg || !snapshotArg) {
-  throw new Error("usage: persistent_mcp_probe.mjs <target> <score-addr> <feature-addr> <out-json> <rea-entry> <snapshot>");
+  throw new Error("usage: persistent_mcp_probe.mjs <target> <score-addr> <feature-addr> <out-json> <rea-entry> <snapshot> [oneshot-score-seconds] [oneshot-feature-seconds]");
 }
+const oneShotScoreMs = Number(oneShotScoreArg) * 1000;
+const oneShotFeatureMs = Number(oneShotFeatureArg) * 1000;
 const targetPath = resolve(targetArg);
 const outPath = resolve(outArg);
 const entrypoint = resolve(entryArg);
@@ -226,11 +228,22 @@ const fullSchemaBytes = Buffer.byteLength(JSON.stringify(fullTools), "utf8");
 const selectedSchemaBytes = Buffer.byteLength(JSON.stringify(selectedTools), "utf8");
 const schemaRatio = fullSchemaBytes === 0 ? null : selectedSchemaBytes / fullSchemaBytes;
 
-const coldTotal = coldScore.ms + coldFeature.ms;
+const coldFunctionTotal = coldScore.ms + coldFeature.ms;
 const warmTotal = warmScore.ms + warmFeature.ms;
-const snapshotTotal = snapshotScore.ms + snapshotFeature.ms;
+const coldSessionAnalysisTotal =
+  globalThis.__firstTimings.open_ms +
+  globalThis.__firstTimings.list_procedures_ms +
+  globalThis.__firstTimings.binary_session_ms +
+  coldFunctionTotal;
+const snapshotFunctionTotal = snapshotScore.ms + snapshotFeature.ms;
+const snapshotAnalysisTotal =
+  snapshotOpen.ms + snapshotSession.ms + snapshotFunctionTotal;
+const oneShotTotal =
+  Number.isFinite(oneShotScoreMs) && Number.isFinite(oneShotFeatureMs)
+    ? oneShotScoreMs + oneShotFeatureMs
+    : null;
 const reduction = (baseline, candidate) =>
-  baseline <= 0 ? null : ((baseline - candidate) / baseline) * 100;
+  baseline === null || baseline <= 0 ? null : ((baseline - candidate) / baseline) * 100;
 
 const report = {
   schema: "p2p-rea-admission-canary-02-result/1",
@@ -252,17 +265,25 @@ const report = {
   },
   persistent: {
     timings_ms: globalThis.__firstTimings,
-    cold_function_total_ms: coldTotal,
+    cold_function_total_ms: coldFunctionTotal,
+    cold_session_analysis_total_ms: coldSessionAnalysisTotal,
     warm_function_total_ms: warmTotal,
-    warm_reduction_pct: reduction(coldTotal, warmTotal),
+    warm_reduction_vs_cold_session_pct: reduction(coldSessionAnalysisTotal, warmTotal),
+    one_shot_score_ms: Number.isFinite(oneShotScoreMs) ? oneShotScoreMs : null,
+    one_shot_feature_ms: Number.isFinite(oneShotFeatureMs) ? oneShotFeatureMs : null,
+    one_shot_total_ms: oneShotTotal,
+    warm_reduction_vs_one_shot_pct: reduction(oneShotTotal, warmTotal),
   },
   snapshot: {
     size_bytes: snapshotStat.size,
     connect_ms: second.connect_ms,
     open_ms: snapshotOpen.ms,
     binary_session_ms: snapshotSession.ms,
-    function_total_ms: snapshotTotal,
-    reduction_vs_cold_pct: reduction(coldTotal, snapshotTotal),
+    score_ms: snapshotScore.ms,
+    feature_ms: snapshotFeature.ms,
+    function_total_ms: snapshotFunctionTotal,
+    analysis_total_ms: snapshotAnalysisTotal,
+    reduction_vs_cold_session_pct: reduction(coldSessionAnalysisTotal, snapshotAnalysisTotal),
   },
   correctness: {
     ground_truth_pass: groundTruthPass,
@@ -279,8 +300,8 @@ const report = {
     feature_pseudocode: featurePseudo,
   },
   decision_inputs: {
-    persistent_material_improvement: warmTotal <= 0.5 * coldTotal,
-    snapshot_material_improvement: snapshotTotal <= 0.5 * coldTotal,
+    persistent_material_improvement: warmTotal <= 0.5 * coldSessionAnalysisTotal,
+    snapshot_material_improvement: snapshotAnalysisTotal <= 0.5 * coldSessionAnalysisTotal,
     selected_tool_surface_materially_smaller:
       missingSelectedTools.length === 0 && schemaRatio !== null && schemaRatio <= 0.25,
     actual_agent_token_measurement: "BLOCKED_NOT_RUN_NO_AUTHORIZED_AGENT_RUNTIME_OR_CREDENTIAL",
