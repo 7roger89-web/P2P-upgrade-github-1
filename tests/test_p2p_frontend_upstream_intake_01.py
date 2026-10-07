@@ -769,6 +769,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
                     # static instruction contract checker; no new executable
                     # capability/runtime path is created.
                     "scripts/check_instruction_contract.py",
+                    # PR #321: bounded evidence-only canary over existing p2p_eval.
+                    "scripts/p2p_gepa_canary.py",
                 },
                 f"new script surface: {path}",
             )
