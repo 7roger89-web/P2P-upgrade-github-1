@@ -107,7 +107,9 @@ jobs:
           cd /tmp/p2p-rea-canary-02
           node persistent_mcp_probe.mjs \
             "$BIN" "$SCORE_HEX" "$FEATURE_HEX" \
-            "$OUT/persistent-result.json" "$REA" "$SNAP" | tee "$OUT/persistent-result.stdout.json"
+            "$OUT/persistent-result.json" "$REA" "$SNAP" \
+            "$(cat "$OUT/oneshot-score.seconds")" "$(cat "$OUT/oneshot-feature.seconds")" \
+            | tee "$OUT/persistent-result.stdout.json"
 
       - name: Frozen acceptance summary
         if: always()
