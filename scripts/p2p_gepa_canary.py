@@ -66,6 +66,14 @@ def evaluate(value: object) -> dict[str, Any]:
 
     minimum_trials = int(value["policy"]["minimum_trials_per_variant"])
     cases = value["cases"]
+    if len(cases) < int(value["policy"]["minimum_cases"]):
+        return {
+            "schema": SCHEMA,
+            "verdict": "EVIDENCE_REQUIRED",
+            "reason_codes": ["INSUFFICIENT_CASES"],
+            "observed_dimensions": {},
+            "not_observed_dimensions": [name for name, _ in OPTIONAL_DIMENSIONS],
+        }
     evidence_gaps: list[str] = []
     hard_reject: list[str] = []
     quality_baseline: list[float] = []
