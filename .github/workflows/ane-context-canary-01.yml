@@ -1,0 +1,176 @@
+name: ANE Context Canary 01
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  stage-a-real-repo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout canary control files
+        uses: actions/checkout@v4
+        with:
+          path: control
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout frozen P2P target
+        uses: actions/checkout@v4
+        with:
+          path: target
+          ref: 6ef4520781350db6f1c870e4cbbfeeaaa4e9c403
+
+      - name: Checkout pinned ANE candidate
+        uses: actions/checkout@v4
+        with:
+          repository: ericlam2k/ane-context-harness
+          ref: 26d6fbb7a86fd47e1a3184dc4dc03d3867ac5835
+          path: ane-src
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned ANE candidate
+        run: python -m pip install -e "./ane-src[test]"
+
+      - name: Run focused upstream deterministic checks
+        working-directory: ane-src
+        run: |
+          python -m pytest -q             tests/performance/test_benchmark.py             tests/unit/test_structural.py             tests/unit/test_selector.py
+
+      - name: Reproduce upstream token-savings measurement
+        working-directory: ane-src
+        run: |
+          PYTHONPATH=src python scripts/measure_token_savings.py             | tee "$RUNNER_TEMP/upstream-token-savings.txt"
+
+      - name: Index frozen P2P target
+        run: |
+          ane-harness index             --repo target             --repo-id p2p-ane-canary             --force-rebuild             > "$RUNNER_TEMP/index.json"
+
+      - name: Measure five frozen P2P tasks
+        run: |
+          ane-harness update             --repo-id p2p-ane-canary             --budget 2000             --tasks-file control/experiments/ane-context-canary-01/tasks.jsonl             --quiet             > "$RUNNER_TEMP/update.json"
+
+      - name: Verify predeclared evidence anchors and Stage A gate
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+          import subprocess
+          import sys
+
+          tasks_path = pathlib.Path(
+              "control/experiments/ane-context-canary-01/tasks.jsonl"
+          )
+          tasks = [
+              json.loads(line)
+              for line in tasks_path.read_text(encoding="utf-8").splitlines()
+              if line.strip()
+          ]
+          update = json.loads(
+              pathlib.Path("/tmp/update-placeholder").read_text()
+          ) if False else json.loads(
+              pathlib.Path(__import__("os").environ["RUNNER_TEMP"], "update.json")
+              .read_text(encoding="utf-8")
+          )
+
+          rows = []
+          for item in tasks:
+              proc = subprocess.run(
+                  [
+                      "ane-harness", "select",
+                      "--repo-id", "p2p-ane-canary",
+                      "--task", item["task"],
+                      "--budget", "2000",
+                      "--quiet",
+                  ],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              payload = json.loads(proc.stdout)
+              paths = sorted({e["path"] for e in payload.get("evidence", [])})
+              rows.append(
+                  {
+                      "id": item["id"],
+                      "anchor": item["anchor"],
+                      "anchor_present": item["anchor"] in paths,
+                      "selected_paths": paths,
+                      "candidate_tokens": payload["metrics"]["candidate_tokens"],
+                      "selected_tokens": payload["metrics"]["selected_tokens"],
+                      "reduction_percent": payload["metrics"]["reduction_percent"],
+                  }
+              )
+
+          anchor_pass = sum(1 for row in rows if row["anchor_present"])
+          median_reduction = float(update["reduction_percent_median"])
+          stage_a_pass = (
+              len(rows) == 5
+              and anchor_pass == 5
+              and median_reduction >= 20.0
+          )
+
+          result = {
+              "schema": "p2p-ane-context-canary-01-stage-a/1",
+              "candidate_revision":
+                  "26d6fbb7a86fd47e1a3184dc4dc03d3867ac5835",
+              "target_revision":
+                  "6ef4520781350db6f1c870e4cbbfeeaaa4e9c403",
+              "task_count": len(rows),
+              "budget": 2000,
+              "local_context_reduction_median_percent": median_reduction,
+              "before_tokens_total": update["before_tokens_total"],
+              "after_tokens_total": update["after_tokens_total"],
+              "anchor_pass": anchor_pass,
+              "anchor_total": len(rows),
+              "stage_a_pass": stage_a_pass,
+              "real_agent_token_claim_authorized": False,
+              "stage_b_status": "BLOCKED_EXTERNAL_HOST_OFFLINE",
+              "rows": rows,
+          }
+
+          out_dir = pathlib.Path("canary-results")
+          out_dir.mkdir(exist_ok=True)
+          (out_dir / "stage-a-results.json").write_text(
+              json.dumps(result, indent=2), encoding="utf-8"
+          )
+          (out_dir / "update.json").write_text(
+              json.dumps(update, indent=2), encoding="utf-8"
+          )
+
+          summary = pathlib.Path(
+              __import__("os").environ["GITHUB_STEP_SUMMARY"]
+          )
+          with summary.open("a", encoding="utf-8") as fh:
+              fh.write("# ANE Context Canary 01 — Stage A\n\n")
+              fh.write(
+                  f"- median local reduction: {median_reduction:.2f}%\n"
+              )
+              fh.write(f"- anchors: {anchor_pass}/{len(rows)}\n")
+              fh.write(f"- Stage A PASS: {stage_a_pass}\n")
+              fh.write(
+                  "- Stage B actual-agent token claim: NOT RUN / host offline\n"
+              )
+
+          print(json.dumps(result, indent=2))
+          if not stage_a_pass:
+              sys.exit(1)
+          PY
+
+      - name: Preserve canary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ane-context-canary-01
+          path: |
+            canary-results/
+            ane-src/benchmarks/reports/token-savings.json
+            ${{ runner.temp }}/index.json
+            ${{ runner.temp }}/upstream-token-savings.txt
+          if-no-files-found: warn
