@@ -584,6 +584,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/.claude/skills/.claude-skill-manifest.json",
             "docs/p2p-development/P2P-AGENTS-INSTALL.md",
             "scripts/check_instruction_contract.py",
+            # PR #321 bounded GEPA canary: one evidence-only evaluator over the
+            # existing project-eval schema plus focused tests. It runs no model,
+            # adds no router/registry/daemon/store, and cannot admit a capability.
+            "scripts/p2p_gepa_canary.py",
+            "tests/test_p2p_gepa_canary.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -684,6 +689,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # Owner-directed Anvien retirement updates the EXISTING
                 # static instruction contract checker; no runtime is added.
                 "scripts/check_instruction_contract.py",
+                # PR #321: bounded evidence-only GEPA canary helper + tests.
+                "scripts/p2p_gepa_canary.py",
+                "tests/test_p2p_gepa_canary.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             issue_309_existing_transport_surfaces = {
