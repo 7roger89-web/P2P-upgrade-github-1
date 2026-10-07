@@ -267,9 +267,16 @@ NARROW_5_UNCACHED_INPUT_REDUCTION=46.85_PERCENT
 NARROW_5_TOTAL_INPUT_REDUCTION=8.47_PERCENT
 
 GLOBAL_FULL_SURFACE_REQUIRED=NO
+SCHEMA_TRIMMING_ALONE=INSUFFICIENT
 TOOL_COUNT_ALONE_IS_TOKEN_OPTIMIZATION=FALSE
 RESULT_CARDINALITY_MATTERS=YES
+TOKEN_SAVING_CLAIM=NOT_PROVEN
+TOKEN_MATERIALITY_THRESHOLD=20_PERCENT_REDUCTION
+ANY_BOUNDED_VARIANT_MET_TOKEN_THRESHOLD=NO
 CURRENT_HOST_NO_REA_BASELINE=BLOCKED_BY_CODEX_SANDBOX_HELPER
+NO_REA_BASELINE=CONFOUNDED
+MATERIALLY_BETTER_THAN_CURRENT_PATH=UNKNOWN
+CURRENT_PATH_SUPERIORITY=UNKNOWN
 ```
 
 ## Reality correction
@@ -293,8 +300,10 @@ The architectural optimization target is therefore not “fewest tools.” It is
 ```text
 CAN_RUN=YES
 WORKS_FOR_TARGET_TASK=YES
-MATERIALLY_BETTER_THAN_NO_REA_ON_THIS_HOST=YES_FOR_CAPABILITY
+NO_REA_BASELINE=CONFOUNDED
+MATERIALLY_BETTER_THAN_CURRENT_PATH=UNKNOWN
 MATERIALLY_BETTER_THAN_FULL_REA_ON_TOTAL_TOKENS=NOT_PROVEN
+TOKEN_SAVING_CLAIM=NOT_PROVEN
 WORTH_COMPLEXITY=PARTIAL
 READY_FOR_PRODUCT_CONTROL=NO
 DECISION=OBSERVE_ONLY
@@ -302,11 +311,24 @@ DECISION=OBSERVE_ONLY
 
 Why not ADMIT yet:
 
-1. REA clearly rescued a task the current host's ordinary local-tool path could not execute, but that baseline was blocked by a Codex Windows sandbox installation defect, not by intrinsic inability.
+1. REA completed the task while the NO_REA run did not, but the NO_REA baseline was blocked by a Codex Windows sandbox installation defect. Therefore current-path superiority remains UNKNOWN; this run does not prove REA is materially better than a functioning non-REA path.
 2. Every REA variant solved the task correctly.
 3. The frozen >=20% total-input-token criterion failed for every bounded projection.
 4. The best result came from narrowing evidence flow, not just tool schemas.
 5. One fixture is insufficient to lock a universal reverse-tool projection.
+
+## Terminal admission contract
+
+```text
+CANARY03_EVIDENCE_VERIFIED=YES
+TOKEN_MATERIALITY_THRESHOLD=20_PERCENT_REDUCTION
+ANY_BOUNDED_VARIANT_MET_TOKEN_THRESHOLD=NO
+SCHEMA_ONLY_TOKEN_SAVING=FALSIFIED
+TOKEN_SAVING_CLAIM=NOT_PROVEN
+MATERIALLY_BETTER_THAN_CURRENT_PATH=UNKNOWN
+CURRENT_PATH_SUPERIORITY=UNKNOWN
+DECISION=OBSERVE_ONLY
+```
 
 ## Smallest worthwhile next action
 
