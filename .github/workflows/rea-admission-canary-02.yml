@@ -1,0 +1,129 @@
+name: REA admission canary 02 persistent MCP
+
+on:
+  push:
+    branches:
+      - canary/rea-admission-02-persistent-20261007
+    paths:
+      - 'experiments/rea-admission-canary-02/**'
+      - '.github/workflows/rea-admission-canary-02.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 24.11
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.11.0'
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build debug oracle and stripped target
+        shell: bash
+        run: |
+          set -euxo pipefail
+          OUT="$GITHUB_WORKSPACE/experiments/rea-admission-canary-02/out"
+          mkdir -p "$OUT"
+          gcc -O0 -g -fno-inline -fno-omit-frame-pointer -fno-pie -no-pie -Wl,--build-id=none \
+            experiments/rea-admission-canary/canary.c \
+            -o "$OUT/canary.debug"
+          cp "$OUT/canary.debug" "$OUT/canary.stripped"
+          SCORE_HEX="$(nm -n "$OUT/canary.debug" | awk '$3=="score_record"{print $1}')"
+          FEATURE_HEX="$(nm -n "$OUT/canary.debug" | awk '$3=="feature_gate"{print $1}')"
+          MAIN_HEX="$(nm -n "$OUT/canary.debug" | awk '$3=="main"{print $1}')"
+          test -n "$SCORE_HEX"
+          test -n "$FEATURE_HEX"
+          test -n "$MAIN_HEX"
+          printf 'SCORE_HEX=%s\nFEATURE_HEX=%s\nMAIN_HEX=%s\n' "$SCORE_HEX" "$FEATURE_HEX" "$MAIN_HEX" | tee "$OUT/ground-truth-addresses.env"
+          strip --strip-all "$OUT/canary.stripped"
+          if nm -C "$OUT/canary.stripped" 2>&1 | grep -Eq 'score_record|feature_gate'; then
+            echo "source symbols survived strip" >&2
+            exit 1
+          fi
+          "$OUT/canary.stripped" 5 | tee "$OUT/runtime.txt"
+          sha256sum "$OUT/canary.debug" "$OUT/canary.stripped" | tee "$OUT/binaries.sha256"
+
+      - name: Download pinned Ghidra 12.1.4
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd /tmp
+          curl -L --fail --retry 3 --retry-delay 2 \
+            -o ghidra.zip \
+            https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.4_build/ghidra_12.1.4_PUBLIC_20260921.zip
+          echo "ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db  ghidra.zip" | sha256sum -c -
+          unzip -q ghidra.zip
+          test -x /tmp/ghidra_12.1.4_PUBLIC/support/analyzeHeadless
+
+      - name: Install pinned REA package locally
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf /tmp/p2p-rea-canary-02
+          mkdir -p /tmp/p2p-rea-canary-02
+          npm install --prefix /tmp/p2p-rea-canary-02 --no-audit --no-fund rea-agents@4.1.0
+          node /tmp/p2p-rea-canary-02/node_modules/rea-agents/scripts/rea.mjs --version
+          cp experiments/rea-admission-canary-02/persistent_mcp_probe.mjs /tmp/p2p-rea-canary-02/persistent_mcp_probe.mjs
+
+      - name: One-shot stripped baseline
+        shell: bash
+        env:
+          GHIDRA_INSTALL_DIR: /tmp/ghidra_12.1.4_PUBLIC
+        run: |
+          set -euxo pipefail
+          OUT="$GITHUB_WORKSPACE/experiments/rea-admission-canary-02/out"
+          source "$OUT/ground-truth-addresses.env"
+          BIN="$OUT/canary.stripped"
+          REA=/tmp/p2p-rea-canary-02/node_modules/rea-agents/scripts/rea.mjs
+          /usr/bin/time -f '%e' -o "$OUT/oneshot-score.seconds" \
+            node "$REA" function "$BIN" "0x$SCORE_HEX" --provider ghidra --json > "$OUT/oneshot-score.json"
+          /usr/bin/time -f '%e' -o "$OUT/oneshot-feature.seconds" \
+            node "$REA" function "$BIN" "0x$FEATURE_HEX" --provider ghidra --json > "$OUT/oneshot-feature.json"
+          printf 'ONESHOT_SCORE_SECONDS=%s\nONESHOT_FEATURE_SECONDS=%s\n' \
+            "$(cat "$OUT/oneshot-score.seconds")" "$(cat "$OUT/oneshot-feature.seconds")"
+
+      - name: Persistent MCP plus snapshot probe
+        shell: bash
+        env:
+          GHIDRA_INSTALL_DIR: /tmp/ghidra_12.1.4_PUBLIC
+        run: |
+          set -euxo pipefail
+          OUT="$GITHUB_WORKSPACE/experiments/rea-admission-canary-02/out"
+          source "$OUT/ground-truth-addresses.env"
+          BIN="$OUT/canary.stripped"
+          REA=/tmp/p2p-rea-canary-02/node_modules/rea-agents/scripts/rea.mjs
+          SNAP="$OUT/analysis.snapshot.json"
+          cd /tmp/p2p-rea-canary-02
+          node persistent_mcp_probe.mjs \
+            "$BIN" "$SCORE_HEX" "$FEATURE_HEX" \
+            "$OUT/persistent-result.json" "$REA" "$SNAP" | tee "$OUT/persistent-result.stdout.json"
+
+      - name: Frozen acceptance summary
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          OUT="$GITHUB_WORKSPACE/experiments/rea-admission-canary-02/out"
+          echo "=== FIXTURE ==="
+          cat "$OUT/runtime.txt" 2>/dev/null || true
+          cat "$OUT/binaries.sha256" 2>/dev/null || true
+          cat "$OUT/ground-truth-addresses.env" 2>/dev/null || true
+          echo "=== ONE SHOT ==="
+          printf 'score_seconds='; cat "$OUT/oneshot-score.seconds" 2>/dev/null || echo NOT_RUN
+          printf 'feature_seconds='; cat "$OUT/oneshot-feature.seconds" 2>/dev/null || echo NOT_RUN
+          echo "=== PERSISTENT RESULT ==="
+          cat "$OUT/persistent-result.json" 2>/dev/null || true
+          echo "=== AGENT TOKEN BOUNDARY ==="
+          echo "AGENT_TOKEN_MEASUREMENT=BLOCKED_NOT_RUN_NO_AUTHORIZED_AGENT_RUNTIME_OR_CREDENTIAL"
+          echo "OFFLINE_SCHEMA_BYTES_ARE_MODEL_TOKENS=FALSE"

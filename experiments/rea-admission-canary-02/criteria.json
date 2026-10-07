@@ -1,0 +1,55 @@
+{
+  "schema": "p2p-rea-admission-canary/2",
+  "candidate": {
+    "package": "rea-agents",
+    "version": "4.1.0",
+    "upstream_release_commit": "9622b4b4cf0b2eb92305afd52fd67e932d57c753",
+    "provider": "ghidra",
+    "provider_version": "12.1.4"
+  },
+  "target": "source-owned benign stripped ELF fixture",
+  "frozen_before_run": true,
+  "claim": "Persistent REA MCP or exact snapshot reuse can reduce repeated native-analysis overhead while preserving evidence quality on a stripped source-owned binary; P2P should expose only the smallest reverse-tool subset rather than the whole MCP catalog.",
+  "ground_truth": {
+    "functions": ["score_record", "feature_gate", "main"],
+    "feature_gate_mode": 7,
+    "score_multiplier": 7,
+    "score_addend": 3,
+    "score_xor": 42,
+    "feature_gate_addend": 11,
+    "feature_gate_calls": ["score_record"],
+    "source_symbols_must_be_absent_from_stripped_binary": true
+  },
+  "performance_classification": {
+    "material_improvement": "repeated_total_ms <= 0.50 * cold_total_ms",
+    "moderate_improvement": "repeated_total_ms <= 0.80 * cold_total_ms",
+    "no_material_improvement": "otherwise"
+  },
+  "tool_surface": {
+    "selected_tools": [
+      "open_binary",
+      "close_binary",
+      "binary_session",
+      "list_procedures",
+      "analyze_function",
+      "get_call_graph",
+      "search_strings",
+      "procedure_info"
+    ],
+    "selected_schema_pass": "selected_schema_bytes <= 0.25 * full_schema_bytes"
+  },
+  "agent_token_measurement": {
+    "required_for_final_token_claim": true,
+    "run_only_if_authorized_agent_runtime_and_credentials_already_exist": true,
+    "otherwise": "BLOCKED_NOT_RUN",
+    "offline_schema_bytes_are_not_model_tokens": true
+  },
+  "promotion_criteria": {
+    "stripped_ground_truth_recovered": true,
+    "evidence_limitations_preserved": true,
+    "persistent_or_snapshot_reuse_materially_reduces_repeated_cost": true,
+    "selected_tool_surface_is_materially_smaller": true,
+    "actual_agent_token_cost_measured_before_any_token-saving claim": true,
+    "ready_for_product_control": false
+  }
+}
