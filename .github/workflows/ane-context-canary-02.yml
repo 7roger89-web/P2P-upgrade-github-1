@@ -1,0 +1,140 @@
+name: ANE Context Canary 02
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  config-only-real-repo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANE_HARNESS_CONFIG: ${{ github.workspace }}/control/experiments/ane-context-canary-02/ane-config.yaml
+    steps:
+      - name: Checkout canary control files
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: control
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout frozen P2P target
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: target
+          ref: 6ef4520781350db6f1c870e4cbbfeeaaa4e9c403
+
+      - name: Checkout pinned ANE candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: ericlam2k/ane-context-harness
+          ref: 26d6fbb7a86fd47e1a3184dc4dc03d3867ac5835
+          path: ane-src
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned ANE candidate
+        run: python -m pip install -e "./ane-src[test]"
+
+      - name: Run focused upstream checks unchanged
+        working-directory: ane-src
+        run: |
+          python -m pytest -q             tests/performance/test_benchmark.py             tests/unit/test_structural.py             tests/unit/test_selector.py
+
+      - name: Index frozen P2P target with config-only exclusions
+        run: |
+          ane-harness index             --repo target             --repo-id p2p-ane-canary-02             --force-rebuild
+
+      - name: Verify exact frozen tasks and hard acceptance
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+          import statistics
+          import subprocess
+          import sys
+
+          tasks = [
+              json.loads(line)
+              for line in pathlib.Path(
+                  "control/experiments/ane-context-canary-02/tasks.jsonl"
+              ).read_text(encoding="utf-8").splitlines()
+              if line.strip()
+          ]
+
+          rows = []
+          for item in tasks:
+              proc = subprocess.run(
+                  [
+                      "ane-harness", "select",
+                      "--repo-id", "p2p-ane-canary-02",
+                      "--task", item["task"],
+                      "--budget", "2000",
+                      "--quiet",
+                  ],
+                  check=True,
+                  capture_output=True,
+                  text=True,
+              )
+              payload = json.loads(proc.stdout)
+              paths = sorted({e["path"] for e in payload.get("evidence", [])})
+              metrics = payload["metrics"]
+              rows.append({
+                  "id": item["id"],
+                  "anchor": item["anchor"],
+                  "anchor_present": item["anchor"] in paths,
+                  "candidate_tokens": metrics["candidate_tokens"],
+                  "selected_tokens": metrics["selected_tokens"],
+                  "reduction_percent": metrics["reduction_percent"],
+                  "budget_ok": metrics["selected_tokens"] <= 2000,
+                  "selected_path_count": len(paths),
+              })
+
+          median_reduction = statistics.median(
+              row["reduction_percent"] for row in rows
+          )
+          anchors_ok = sum(1 for row in rows if row["anchor_present"])
+          budgets_ok = sum(1 for row in rows if row["budget_ok"])
+          stage_pass = (
+              len(rows) == 5
+              and anchors_ok == 5
+              and budgets_ok == 5
+              and median_reduction >= 20.0
+          )
+          result = {
+              "schema": "p2p-ane-context-canary-02/1",
+              "candidate_revision":
+                  "26d6fbb7a86fd47e1a3184dc4dc03d3867ac5835",
+              "target_revision":
+                  "6ef4520781350db6f1c870e4cbbfeeaaa4e9c403",
+              "config_only": True,
+              "frozen_budget": 2000,
+              "tasks": len(rows),
+              "anchors_ok": anchors_ok,
+              "budgets_ok": budgets_ok,
+              "median_reduction_percent": median_reduction,
+              "stage_pass": stage_pass,
+              "real_agent_claim_authorized": False,
+              "rows": rows,
+          }
+          print(json.dumps(result, indent=2))
+          with open(
+              __import__("os").environ["GITHUB_STEP_SUMMARY"],
+              "a",
+              encoding="utf-8",
+          ) as fh:
+              fh.write("# ANE Context Canary 02\n\n")
+              fh.write(f"- anchors: {anchors_ok}/5\n")
+              fh.write(f"- packs <= 2000: {budgets_ok}/5\n")
+              fh.write(
+                  f"- median local reduction: {median_reduction:.2f}%\n"
+              )
+              fh.write(f"- PASS: {stage_pass}\n")
+          if not stage_pass:
+              sys.exit(1)
+          PY
