@@ -872,6 +872,25 @@ def _load_host_discovery_record(
     return dict(raw)
 
 
+def _load_host_attestation(
+    path_value: str | None,
+) -> Mapping[str, Any] | None:
+    if not path_value:
+        return None
+    path = Path(path_value).expanduser().resolve()
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise BindingError(
+            f"HOST_ATTESTATION_INVALID_JSON:{path}"
+        ) from exc
+    if not isinstance(raw, Mapping):
+        raise BindingError("HOST_ATTESTATION_MUST_BE_OBJECT")
+    if str(raw.get("schema") or "") != "p2p-host-attestation/1":
+        raise BindingError("HOST_ATTESTATION_SCHEMA_INVALID")
+    return dict(raw)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
@@ -900,6 +919,13 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "existing p2p-host-discovery-record/1 JSON evidence record; required for "
             "source-bound skill handoff on non-native repo-read-capable hosts"
+        ),
+    )
+    start.add_argument(
+        "--host-attestation-file",
+        help=(
+            "existing replay-ledger-bound p2p-host-attestation/1 for the "
+            "same non-native executor and exact repo-read contract"
         ),
     )
     start.add_argument("--acceptance-criterion", action="append", default=[])
@@ -959,6 +985,13 @@ def build_parser() -> argparse.ArgumentParser:
             "non-native repo-read-capable executor"
         ),
     )
+    next_session.add_argument(
+        "--host-attestation-file",
+        help=(
+            "existing replay-ledger-bound p2p-host-attestation/1 for the "
+            "same non-native executor and exact repo-read contract"
+        ),
+    )
     next_session.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
     return parser
 
@@ -973,6 +1006,7 @@ def _start_next_with_context(
     branch: str,
     law_receipt: Mapping[str, Any],
     host_discovery_record: Mapping[str, Any] | None = None,
+    host_attestation: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     planned = tower.recommend_next_session(
         host,
@@ -980,6 +1014,7 @@ def _start_next_with_context(
         worktree=worktree,
         branch=branch,
         host_discovery_record=host_discovery_record,
+        host_attestation=host_attestation,
     )
     if planned.get("status") != "PASS":
         return planned
@@ -990,6 +1025,7 @@ def _start_next_with_context(
             worktree=worktree,
             branch=branch,
             host_discovery_record=host_discovery_record,
+            host_attestation=host_attestation,
         )
     binding_mapping = planned.get("binding")
     recommendation = planned.get("recommendation")
@@ -1019,6 +1055,7 @@ def _start_next_with_context(
         branch=branch,
         acceptance_criteria=criteria,
         host_discovery_record=host_discovery_record,
+        host_attestation=host_attestation,
         expected_law_sha=expected_law_sha,
         expected_experience_ids=expected_exp_ids,
         canary_directive=directive,
@@ -1074,6 +1111,9 @@ def main(argv: list[str] | None = None) -> int:
             host_discovery_record = _load_host_discovery_record(
                 args.host_discovery_record_file
             )
+            host_attestation = _load_host_attestation(
+                args.host_attestation_file
+            )
             result = tower.start_session(
                 binding,
                 task_id=args.task_id,
@@ -1085,6 +1125,7 @@ def main(argv: list[str] | None = None) -> int:
                 acceptance_criteria=criteria,
                 required_skills=tuple(args.required_skill),
                 host_discovery_record=host_discovery_record,
+                host_attestation=host_attestation,
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
@@ -1116,6 +1157,9 @@ def main(argv: list[str] | None = None) -> int:
                 law_receipt=law_receipt,
                 host_discovery_record=_load_host_discovery_record(
                     args.host_discovery_record_file
+                ),
+                host_attestation=_load_host_attestation(
+                    args.host_attestation_file
                 ),
             )
         else:  # pragma: no cover - argparse constrains this branch.
