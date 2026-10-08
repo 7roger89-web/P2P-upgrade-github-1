@@ -20,8 +20,10 @@ from urllib.parse import urlsplit
 
 try:  # package import in normal P2P runtime
     from .host_attestation import (
-        HostAttestationError,
         HostAttestationRecord,
+        canonical_attestation_replay_conflict,
+        canonical_attestation_self_observed,
+        canonical_machine_identity,
         verify_all_attestation_sources,
     )
     from .host_executor import HostCapabilityProfile, HostExecutorContractError
@@ -30,8 +32,10 @@ try:  # package import in normal P2P runtime
     from .routing import classify_capabilities
 except ImportError:  # legacy focused tests import modules from this directory
     from host_attestation import (
-        HostAttestationError,
         HostAttestationRecord,
+        canonical_attestation_replay_conflict,
+        canonical_attestation_self_observed,
+        canonical_machine_identity,
         verify_all_attestation_sources,
     )
     from host_executor import HostCapabilityProfile, HostExecutorContractError
@@ -51,7 +55,9 @@ HOST_MODES = {
 GENERIC_REPO_READ_MODE = "GENERIC_EXACT_REPO_READ"
 GENERIC_REPO_READ_EVIDENCE_MAX_AGE_SECONDS = 3600
 GENERIC_REPO_READ_MAX_FUTURE_SKEW_SECONDS = 300
-TRUSTED_REPO_READ_PROVENANCE_KINDS = frozenset({
+STRUCTURED_REPO_READ_DECLARATION_KINDS = frozenset({
+    # These labels describe the caller's declared observation source only.
+    # They are never sufficient actor proof on their own.
     "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ",
     "VERIFIED_LOCAL_REPO_EXACT_READ",
 })
@@ -260,12 +266,43 @@ def _coerce_host_attestation(
         return None
     if isinstance(value, HostAttestationRecord):
         return value
-    if not isinstance(value, Mapping):
-        raise SkillConsumptionError("HOST_ATTESTATION_INVALID")
-    try:
-        return HostAttestationRecord.from_mapping(value)
-    except (HostAttestationError, TypeError, ValueError) as exc:
-        raise SkillConsumptionError(f"HOST_ATTESTATION_INVALID:{exc}") from exc
+    # A JSON/mapping supplied by the same caller that supplied C21 is still
+    # a declaration.  It cannot become actor-observation evidence merely by
+    # matching the schema/fingerprint fields.  Only an in-process C36 record
+    # emitted by the existing runtime producer is eligible for this boundary.
+    if isinstance(value, Mapping):
+        raise SkillConsumptionError(
+            "HOST_ATTESTATION_TRUSTED_OBJECT_REQUIRED"
+        )
+    raise SkillConsumptionError("HOST_ATTESTATION_INVALID")
+
+
+def _latest_registered_adapter(
+    root: Path,
+    adapter_id: str,
+) -> dict[str, Any] | None:
+    """Read the existing adapter registry; latest record for the ID wins."""
+    candidates = (
+        root / ".p2p" / "system" / ".p2p" / "state" / "adapter_registry.json",
+        root / ".p2p" / "state" / "adapter_registry.json",
+    )
+    latest: dict[str, Any] | None = None
+    for path in candidates:
+        if not path.is_file():
+            continue
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, TypeError, ValueError):
+            continue
+        if not isinstance(raw, list):
+            continue
+        for item in raw:
+            if (
+                isinstance(item, Mapping)
+                and str(item.get("adapter_id") or "") == adapter_id
+            ):
+                latest = dict(item)
+    return latest
 
 
 def _attestation_ledger_entries(root: Path) -> list[dict[str, Any]]:
@@ -320,9 +357,27 @@ def _validate_actor_attestation(
     provenance_evidence: Mapping[str, str],
     host_attestation: HostAttestationRecord | Mapping[str, Any] | None,
 ) -> str | None:
-    attestation = _coerce_host_attestation(host_attestation)
+    try:
+        attestation = _coerce_host_attestation(host_attestation)
+    except SkillConsumptionError as exc:
+        return str(exc)
     if attestation is None:
         return "HOST_ATTESTATION_REQUIRED"
+
+    # C36 is useful only as an existing producer boundary, not as a second
+    # caller-authored JSON assertion.  Require the canonical producer's
+    # runtime/ledger observations and bind them to the current runtime.
+    if type(attestation.attestation_ledger_self_observed) is not bool:
+        return "HOST_ATTESTATION_LEDGER_OBSERVATION_INVALID"
+    if type(attestation.attestation_replay_conflict) is not bool:
+        return "HOST_ATTESTATION_REPLAY_OBSERVATION_INVALID"
+    if not attestation.attestation_ledger_self_observed:
+        return "HOST_ATTESTATION_NOT_CANONICAL_EMISSION"
+    if attestation.attestation_replay_conflict:
+        return "HOST_ATTESTATION_REPLAY_CONFLICT"
+    if attestation.host_execution_identity != canonical_machine_identity():
+        return "HOST_ATTESTATION_RUNTIME_IDENTITY_MISMATCH"
+
     expected_adapter_id = f"p2p-skill-host:{host_name.lower()}"
     if attestation.host_kind != "generic-real":
         return "HOST_ATTESTATION_HOST_KIND_MISMATCH"
@@ -330,11 +385,35 @@ def _validate_actor_attestation(
         return "HOST_ATTESTATION_ADAPTER_MISMATCH"
     if not attestation.host_execution_identity:
         return "HOST_ATTESTATION_IDENTITY_MISSING"
+
+    adapter = _latest_registered_adapter(root, expected_adapter_id)
+    if adapter is None:
+        return "HOST_ATTESTATION_ADAPTER_UNREGISTERED"
+    if adapter.get("live_certified") is not True:
+        return "HOST_ATTESTATION_ADAPTER_NOT_LIVE_CERTIFIED"
+    auth_state = str(adapter.get("current_auth_state") or "").strip().upper()
+    if auth_state in {
+        "", "UNKNOWN", "NO_CREDENTIALS", "BLOCKED", "UNAVAILABLE", "REVOKED"
+    }:
+        return "HOST_ATTESTATION_ADAPTER_AUTH_UNAVAILABLE"
+
     profile = record.profile
-    if profile.provider and attestation.provider != profile.provider:
+    if profile.adapter_class != expected_adapter_id:
+        return "HOST_ATTESTATION_ADAPTER_PROFILE_MISMATCH"
+    if not profile.provider:
+        return "HOST_ATTESTATION_PROVIDER_REQUIRED"
+    if not profile.model:
+        return "HOST_ATTESTATION_MODEL_REQUIRED"
+    if attestation.provider != profile.provider:
         return "HOST_ATTESTATION_PROVIDER_MISMATCH"
-    if profile.model and attestation.model != profile.model:
+    if attestation.model != profile.model:
         return "HOST_ATTESTATION_MODEL_MISMATCH"
+    if str(adapter.get("provider") or "") != attestation.provider:
+        return "HOST_ATTESTATION_REGISTERED_PROVIDER_MISMATCH"
+    if str(adapter.get("model") or "") != attestation.model:
+        return "HOST_ATTESTATION_REGISTERED_MODEL_MISMATCH"
+    if str(adapter.get("harness") or "") != attestation.harness:
+        return "HOST_ATTESTATION_REGISTERED_HARNESS_MISMATCH"
 
     age, age_reason = _attestation_age_seconds(attestation.attested_at)
     if age_reason is not None:
@@ -354,9 +433,7 @@ def _validate_actor_attestation(
     if attestation.source_snapshot_digest != provenance_evidence["probe_sha256"]:
         return "HOST_ATTESTATION_SOURCE_DIGEST_MISMATCH"
 
-    probe = (
-        root / provenance_evidence["probe_path"]
-    ).resolve()
+    probe = (root / provenance_evidence["probe_path"]).resolve()
     expected_pointer = f"file:{probe}"
     if tuple(attestation.attestation_evidence_pointers) != (expected_pointer,):
         return "HOST_ATTESTATION_EVIDENCE_POINTER_MISMATCH"
@@ -366,6 +443,20 @@ def _validate_actor_attestation(
     )
     if not verified_sources.get("all_sources_present"):
         return "HOST_ATTESTATION_SOURCE_UNVERIFIED"
+
+    ledger_path = (
+        root / ".p2p" / "state" / "canonical_attestation_ledger.jsonl"
+    )
+    if not canonical_attestation_self_observed(
+        attestation.attestation_fingerprint,
+        ledger_path=ledger_path,
+    ):
+        return "HOST_ATTESTATION_LEDGER_MISSING"
+    if canonical_attestation_replay_conflict(
+        attestation.attestation_fingerprint,
+        ledger_path=ledger_path,
+    ):
+        return "HOST_ATTESTATION_REPLAY_CONFLICT"
 
     matching_entries = [
         entry
@@ -391,7 +482,6 @@ def _validate_actor_attestation(
     if any(entry.get(key) != value for key, value in expected_ledger.items()):
         return "HOST_ATTESTATION_LEDGER_BINDING_MISMATCH"
     return None
-
 
 def _validate_repo_read_provenance(
     root: Path,
@@ -421,7 +511,7 @@ def _validate_repo_read_provenance(
         probe_path,
         probe_sha256,
     ) = match.groups()
-    if kind not in TRUSTED_REPO_READ_PROVENANCE_KINDS:
+    if kind not in STRUCTURED_REPO_READ_DECLARATION_KINDS:
         return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED", None
     if provenance_repo.strip().lower() != expected_repo:
         return "HOST_DISCOVERY_PROVENANCE_REPO_MISMATCH", None
