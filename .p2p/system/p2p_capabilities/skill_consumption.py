@@ -496,15 +496,6 @@ def _resolve_skill_host_mode(
     )
     if provenance_reason is not None or provenance_evidence is None:
         return None, provenance_reason or "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
-    attestation_reason = _validate_actor_attestation(
-        root,
-        host_name=host_name,
-        record=record,
-        provenance_evidence=provenance_evidence,
-        host_attestation=host_attestation,
-    )
-    if attestation_reason is not None:
-        return None, attestation_reason
     if not record.execution_transport_available:
         return None, "HOST_EXECUTION_TRANSPORT_UNAVAILABLE"
 
@@ -522,6 +513,15 @@ def _resolve_skill_host_mode(
         return None, f"HOST_ENVIRONMENT_NOT_REPO_BOUND:{profile.environment}"
     if record.environment_binding != profile.environment:
         return None, "HOST_ENVIRONMENT_BINDING_MISMATCH"
+    attestation_reason = _validate_actor_attestation(
+        root,
+        host_name=host_name,
+        record=record,
+        provenance_evidence=provenance_evidence,
+        host_attestation=host_attestation,
+    )
+    if attestation_reason is not None:
+        return None, attestation_reason
     return GENERIC_REPO_READ_MODE, None
 
 
