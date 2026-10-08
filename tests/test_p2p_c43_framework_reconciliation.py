@@ -140,9 +140,34 @@ class C43BoundaryTests(unittest.TestCase):
         self.assertEqual(plane["cpt01_r2"]["blocker"], "EXTERNAL_HOST_CAPABILITY_LIMITATION")
         self.assertTrue(plane["cpt01_r2"]["historical"])
         self.assertFalse(plane["promotion"]["allowed"])
-        self.assertEqual(plane["next_safe_goals"], ["FRAMEWORK-03_REAL_THIRD_PROJECT_PILOT"])
+        self.assertEqual(
+            plane["next_safe_goals"],
+            ["FRAMEWORK-03_COUNCIL_FULL_CERTIFICATION_WHEN_LIVE_SUBAGENT_HOST_AVAILABLE"],
+        )
         self.assertEqual(plane["closure"]["rf01"], "INDEPENDENTLY_VERIFIED")
         self.assertEqual(plane["closure"]["aerg"], "CURRENT_GITHUB_CI_VERIFIED")
+        fw03 = plane["closure"]["framework_03"]
+        self.assertEqual(fw03["status"], "IN_PROGRESS")
+        self.assertEqual(fw03["third_project_pilot"]["status"], "PASS")
+        self.assertEqual(
+            fw03["third_project_pilot"]["target_repository"],
+            "7roger89-web/child-learning-lab",
+        )
+        self.assertEqual(
+            fw03["third_project_pilot"]["skill_consumption_v1_receipt"],
+            "NOT_CLAIMED_PRE_CONTRACT_PRODUCT_EXECUTION",
+        )
+        self.assertEqual(
+            fw03["council_full_certification"]["status"],
+            "NOT_PROVEN",
+        )
+        self.assertFalse(
+            fw03["council_full_certification"]["current_lineage_full_council_live_proven"]
+        )
+        self.assertEqual(
+            fw03["council_full_certification"]["current_host_quorum_status"],
+            "UNAVAILABLE_IN_THIS_HOST",
+        )
 
     def test_current_lineage_reconciliation_has_no_historical_promotion_target(self):
         control = json.loads(
