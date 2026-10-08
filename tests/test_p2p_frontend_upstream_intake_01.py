@@ -588,6 +588,12 @@ class NoParallelArchitectureTests(unittest.TestCase):
             # These are policy/test surfaces, not a second router or registry.
             "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
             "tests/test_p2p_prompt_serialization_contract.py",
+            # Issue #331 reconciles the existing canonical governance record
+            # and its two historical-boundary regressions only. This is not a
+            # new governance plane, router, registry, daemon, or scheduler.
+            "governance/development-control.json",
+            "tests/test_p2p_c43_framework_reconciliation.py",
+            "tests/test_p2p_execution_target.py",
             "scripts/check_instruction_contract.py",
         )
         forbidden_fragments = (
@@ -689,6 +695,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # Issue #327 adds regression coverage to the existing
                 # prompt-serialization contract; no executable capability is added.
                 "tests/test_p2p_prompt_serialization_contract.py",
+                # Issue #331 updates only regressions for the existing
+                # governance/development-plane reconciliation state.
+                "tests/test_p2p_c43_framework_reconciliation.py",
+                "tests/test_p2p_execution_target.py",
                 # Owner-directed Anvien retirement updates the EXISTING
                 # static instruction contract checker; no runtime is added.
                 "scripts/check_instruction_contract.py",
