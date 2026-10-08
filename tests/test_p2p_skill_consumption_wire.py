@@ -1616,6 +1616,82 @@ class PromptOnlyGenericSkillHandoffTests(unittest.TestCase):
                 host="CLAUDE",
             )
 
+    def test_exported_builder_rejects_tampered_repository_revision_and_host(self):
+        from p2p_capabilities.skill_consumption import (
+            SkillConsumptionError,
+            build_prompt_only_delegated_prompt,
+        )
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+            delivery_capability=PROMPT_ONLY_CAPABILITY,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PREPARED")
+        wrong_repo = dict(handoff)
+        wrong_repo["REPOSITORY"] = "another-owner/another-repo"
+        with self.assertRaisesRegex(
+            SkillConsumptionError, "PROMPT_ONLY_REPOSITORY_MISMATCH"
+        ):
+            build_prompt_only_delegated_prompt(
+                REPO_ROOT,
+                wrong_repo,
+                request_text=self.PRESSURE_REQUEST,
+                host="CLAUDE",
+            )
+        wrong_revision = dict(handoff)
+        wrong_revision["REVISION"] = "0" * 40
+        with self.assertRaisesRegex(
+            SkillConsumptionError, "PROMPT_ONLY_REVISION_MISMATCH"
+        ):
+            build_prompt_only_delegated_prompt(
+                REPO_ROOT,
+                wrong_revision,
+                request_text=self.PRESSURE_REQUEST,
+                host="CLAUDE",
+            )
+        with self.assertRaisesRegex(
+            SkillConsumptionError, "PROMPT_ONLY_DESTINATION_HOST_MISMATCH"
+        ):
+            build_prompt_only_delegated_prompt(
+                REPO_ROOT,
+                handoff,
+                request_text=self.PRESSURE_REQUEST,
+                host="GROK",
+            )
+
+    def test_project_internal_inline_content_is_blocked_without_disclosure_authority(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+            allow_inline_skill_content=True,
+        )
+        self.assertEqual(package["status"], "BLOCKED")
+        self.assertIsNone(package["prompt"])
+        self.assertTrue(
+            any(
+                str(code).startswith(
+                    "INLINE_SKILL_DISCLOSURE_FORBIDDEN:scope-reality-check:PROJECT_INTERNAL"
+                )
+                for code in package["skill_handoff"]["REJECTION_REASON"]
+            )
+        )
+        path_hash = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+        )
+        self.assertEqual(path_hash["status"], "PREPARED")
+        self.assertIn(
+            ".agents/skills/scope-reality-check/SKILL.md",
+            path_hash["prompt"],
+        )
+        self.assertNotIn("BEGIN_INLINE_SKILL=", path_hash["prompt"])
+
     def test_forged_receipt_is_not_trusted_external_actor_evidence(self):
         package = prepare_prompt_only_skill_handoff(
             REPO_ROOT,

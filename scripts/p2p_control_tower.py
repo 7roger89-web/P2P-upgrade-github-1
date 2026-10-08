@@ -988,8 +988,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--allow-inline-skill-content",
         action="store_true",
         help=(
-            "bounded fallback: embed exact selected SKILL.md bodies when "
-            "confidentiality rules and prompt budget permit; never truncates"
+            "bounded fallback: embed exact selected SKILL.md bodies only when "
+            "the source license is shareable; PROJECT_INTERNAL and PURE_DATA "
+            "alone fail closed. Never truncates"
         ),
     )
     prepare_prompt.add_argument(

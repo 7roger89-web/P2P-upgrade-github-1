@@ -45,7 +45,16 @@ PROMPT_ONLY_CAPABILITY = "PROMPT_ONLY"
 PROMPT_ONLY_MAX_PROMPT_CHARS = 32000
 GENERIC_REPO_READ_EVIDENCE_MAX_AGE_SECONDS = 3600
 GENERIC_REPO_READ_MAX_FUTURE_SKEW_SECONDS = 300
-INLINE_PERMITTED_TRUST_LEVELS = frozenset({"PURE_DATA", "PUBLIC"})
+INLINE_PERMITTED_TRUST_LEVELS = frozenset({"PUBLIC"})
+INLINE_SHAREABLE_LICENSE_KINDS = frozenset({
+    "MIT",
+    "APACHE-2.0",
+    "BSD-2-CLAUSE",
+    "BSD-3-CLAUSE",
+    "CC0",
+    "PUBLIC",
+    "UNLICENSE",
+})
 STRUCTURED_REPO_READ_DECLARATION_KINDS = frozenset({
     # These labels describe caller-declared source observations only.
     # They are never actor-authentication proof by themselves.
@@ -1342,6 +1351,7 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
 
 
 def _inline_skill_forbidden_reason(root: Path, skill_id: str) -> str | None:
+    """PURE_DATA is not permission to share PROJECT_INTERNAL skill bodies."""
     manifests = {
         manifest.capability_id: manifest
         for manifest in _active_skill_manifests(root)
@@ -1350,10 +1360,18 @@ def _inline_skill_forbidden_reason(root: Path, skill_id: str) -> str | None:
     if manifest is None:
         return f"INLINE_SKILL_MANIFEST_REQUIRED:{skill_id}"
     trust = str(manifest.raw.get("TRUST_LEVEL") or "").strip().upper()
-    if trust not in INLINE_PERMITTED_TRUST_LEVELS:
-        return f"INLINE_SKILL_TRUST_LEVEL_FORBIDDEN:{skill_id}:{trust or 'MISSING'}"
     provenance = manifest.raw.get("UPSTREAM_PROVENANCE")
     provenance = provenance if isinstance(provenance, Mapping) else {}
+    license_info = provenance.get("license")
+    license_info = license_info if isinstance(license_info, Mapping) else {}
+    license_kind = str(license_info.get("kind") or "").strip().upper()
+    if license_kind not in INLINE_SHAREABLE_LICENSE_KINDS:
+        return (
+            f"INLINE_SKILL_DISCLOSURE_FORBIDDEN:{skill_id}:"
+            f"{license_kind or 'MISSING'}"
+        )
+    if trust not in INLINE_PERMITTED_TRUST_LEVELS:
+        return f"INLINE_SKILL_TRUST_LEVEL_FORBIDDEN:{skill_id}:{trust or 'MISSING'}"
     integration = provenance.get("integration")
     integration = integration if isinstance(integration, Mapping) else {}
     if integration.get("credentials") is True:
@@ -1381,13 +1399,27 @@ def build_prompt_only_delegated_prompt(
         raise SkillConsumptionError("PROMPT_ONLY_HOST_MODE_REQUIRED")
     if str(handoff.get("EXECUTION_AUTHORIZED") or "NO").upper() != "NO":
         raise SkillConsumptionError("PROMPT_ONLY_MUST_NOT_AUTHORIZE_EXECUTION")
-    repo = str(handoff.get("REPOSITORY") or _canonical_repo_binding(project_root) or "")
-    revision = str(handoff.get("REVISION") or _current_repo_revision(project_root) or "")
+    actual_repo = _canonical_repo_binding(project_root)
+    actual_revision = _current_repo_revision(project_root)
+    claimed_repo = str(handoff.get("REPOSITORY") or "").strip().lower()
+    claimed_revision = str(handoff.get("REVISION") or "").strip().lower()
+    requested_host = _host_token(host)
+    frozen_host = _host_token(handoff.get("DESTINATION_HOST") or "")
     if check == "PREPARED":
-        if not repo:
+        if actual_repo is None:
             raise SkillConsumptionError("HOST_CANONICAL_REPO_BINDING_UNAVAILABLE")
-        if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        if actual_revision is None:
             raise SkillConsumptionError("HOST_CANONICAL_REPO_REVISION_UNAVAILABLE")
+        if claimed_repo and claimed_repo != actual_repo:
+            raise SkillConsumptionError("PROMPT_ONLY_REPOSITORY_MISMATCH")
+        if claimed_revision and claimed_revision != actual_revision:
+            raise SkillConsumptionError("PROMPT_ONLY_REVISION_MISMATCH")
+        if not requested_host:
+            raise SkillConsumptionError("HOST_REQUIRED")
+        if not frozen_host:
+            raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_REQUIRED")
+        if frozen_host != requested_host:
+            raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_MISMATCH")
         selected = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
         loaded = load_selected_skills(project_root, selected)
         binding_error = _source_binding_error(loaded, project_root)
@@ -1406,10 +1438,18 @@ def build_prompt_only_delegated_prompt(
                 raise SkillConsumptionError(
                     f"SKILL_ENTRYPOINT_HASH_MISMATCH:{item.capability_id}"
                 )
+        repo = actual_repo
+        revision = actual_revision
+        host_name = requested_host
+        source_validation = "PASS"
+    else:
+        repo = actual_repo or claimed_repo or "UNKNOWN"
+        revision = actual_revision or claimed_revision or "UNKNOWN"
+        host_name = requested_host or frozen_host
+        source_validation = "NO_MATCH"
     budget = PROMPT_ONLY_MAX_PROMPT_CHARS if max_prompt_chars is None else int(max_prompt_chars)
     if budget < 1:
         raise SkillConsumptionError("PROMPT_ONLY_BUDGET_INVALID")
-    host_name = _host_token(host) or str(handoff.get("DESTINATION_HOST") or "")
     lines = [
         "P2P_DELEGATED_WORK_PROMPT:",
         "OPERATION=PREPARE",
@@ -1417,9 +1457,9 @@ def build_prompt_only_delegated_prompt(
         "EXECUTION_AUTHORIZED=NO",
         "AUTOMATIC_START=NO",
         f"DESTINATION_HOST={host_name}",
-        f"REPOSITORY={repo or 'UNKNOWN'}",
-        f"REVISION={revision or 'UNKNOWN'}",
-        f"SOURCE_VALIDATION={handoff.get('SOURCE_VALIDATION', check)}",
+        f"REPOSITORY={repo}",
+        f"REVISION={revision}",
+        f"SOURCE_VALIDATION={source_validation}",
         f"RECIPIENT_CONSUMPTION={handoff.get('RECIPIENT_CONSUMPTION', 'UNVERIFIED')}",
         "EXTERNAL_ACTOR_READ=NOT_VERIFIED",
         "",
