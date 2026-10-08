@@ -16,13 +16,24 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
+from urllib.parse import urlsplit
 
 try:  # package import in normal P2P runtime
+    from .host_attestation import (
+        HostAttestationError,
+        HostAttestationRecord,
+        verify_all_attestation_sources,
+    )
     from .host_executor import HostCapabilityProfile, HostExecutorContractError
     from .host_selection import AVAILABLE, DISCOVERY_SCHEMA, HostDiscoveryRecord
     from .model import CapabilityManifest, load_registry
     from .routing import classify_capabilities
 except ImportError:  # legacy focused tests import modules from this directory
+    from host_attestation import (
+        HostAttestationError,
+        HostAttestationRecord,
+        verify_all_attestation_sources,
+    )
     from host_executor import HostCapabilityProfile, HostExecutorContractError
     from host_selection import AVAILABLE, DISCOVERY_SCHEMA, HostDiscoveryRecord
     from model import CapabilityManifest, load_registry
@@ -82,22 +93,37 @@ def _run_git(root: Path, *args: str) -> str | None:
 def _normalize_github_repo(value: str | None) -> str | None:
     if not value:
         return None
-    normalized = value.strip().replace("\\", "/")
-    lowered = normalized.lower()
-    if lowered.startswith("git@github.com:"):
-        slug = normalized.split(":", 1)[1]
-    elif "github.com/" in lowered:
-        index = lowered.find("github.com/") + len("github.com/")
-        slug = normalized[index:]
+    raw = value.strip()
+    slug: str | None = None
+    scp_match = re.fullmatch(
+        r"git@github\.com:([^/\s]+)/([^/\s]+?)(?:\.git)?/?",
+        raw,
+        flags=re.IGNORECASE,
+    )
+    if scp_match is not None:
+        slug = f"{scp_match.group(1)}/{scp_match.group(2)}"
     else:
+        try:
+            parsed = urlsplit(raw)
+        except ValueError:
+            return None
+        if parsed.scheme.lower() not in {"https", "ssh"}:
+            return None
+        if (parsed.hostname or "").lower() != "github.com":
+            return None
+        parts = [part for part in parsed.path.strip("/").split("/") if part]
+        if len(parts) != 2:
+            return None
+        repo_name = parts[1][:-4] if parts[1].lower().endswith(".git") else parts[1]
+        slug = f"{parts[0]}/{repo_name}"
+    owner, repo_name = slug.split("/", 1)
+    if not owner or not repo_name:
         return None
-    slug = slug.split("?", 1)[0].split("#", 1)[0].strip("/")
-    if slug.lower().endswith(".git"):
-        slug = slug[:-4]
-    parts = slug.split("/")
-    if len(parts) < 2:
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", owner):
         return None
-    return "/".join(parts[:2]).lower()
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", repo_name):
+        return None
+    return f"{owner}/{repo_name}".lower()
 
 
 def _canonical_repo_binding(root: Path) -> str | None:
@@ -214,16 +240,169 @@ def _evidence_age_seconds(observed_at: str) -> tuple[int | None, str | None]:
     return max(0, int(delta)), None
 
 
+def _attestation_age_seconds(attested_at: str) -> tuple[int | None, str | None]:
+    try:
+        observed = datetime.fromisoformat(attested_at.replace("Z", "+00:00"))
+    except ValueError:
+        return None, "HOST_ATTESTATION_TIMESTAMP_INVALID"
+    if observed.tzinfo is None:
+        return None, "HOST_ATTESTATION_TIMESTAMP_TIMEZONE_REQUIRED"
+    delta = (datetime.now(timezone.utc) - observed.astimezone(timezone.utc)).total_seconds()
+    if delta < -GENERIC_REPO_READ_MAX_FUTURE_SKEW_SECONDS:
+        return None, "HOST_ATTESTATION_FROM_FUTURE"
+    return max(0, int(delta)), None
+
+
+def _coerce_host_attestation(
+    value: HostAttestationRecord | Mapping[str, Any] | None,
+) -> HostAttestationRecord | None:
+    if value is None:
+        return None
+    if isinstance(value, HostAttestationRecord):
+        return value
+    if not isinstance(value, Mapping):
+        raise SkillConsumptionError("HOST_ATTESTATION_INVALID")
+    try:
+        return HostAttestationRecord.from_mapping(value)
+    except (HostAttestationError, TypeError, ValueError) as exc:
+        raise SkillConsumptionError(f"HOST_ATTESTATION_INVALID:{exc}") from exc
+
+
+def _attestation_ledger_entries(root: Path) -> list[dict[str, Any]]:
+    path = root / ".p2p" / "state" / "canonical_attestation_ledger.jsonl"
+    if not path.is_file():
+        return []
+    result: list[dict[str, Any]] = []
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError):
+        return []
+    for line in lines:
+        try:
+            value = json.loads(line)
+        except (TypeError, ValueError):
+            continue
+        if isinstance(value, Mapping):
+            result.append(dict(value))
+    return result
+
+
+def _generic_attestation_contract_digest(
+    *,
+    host_name: str,
+    repo: str,
+    revision: str,
+    probe_path: str,
+    probe_sha256: str,
+) -> str:
+    payload = {
+        "purpose": "GENERIC_EXACT_REPO_READ",
+        "host": host_name,
+        "repo": repo,
+        "revision": revision,
+        "probe": probe_path,
+        "probe_sha256": probe_sha256,
+    }
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _validate_actor_attestation(
+    root: Path,
+    *,
+    host_name: str,
+    record: HostDiscoveryRecord,
+    provenance_evidence: Mapping[str, str],
+    host_attestation: HostAttestationRecord | Mapping[str, Any] | None,
+) -> str | None:
+    attestation = _coerce_host_attestation(host_attestation)
+    if attestation is None:
+        return "HOST_ATTESTATION_REQUIRED"
+    expected_adapter_id = f"p2p-skill-host:{host_name.lower()}"
+    if attestation.host_kind != "generic-real":
+        return "HOST_ATTESTATION_HOST_KIND_MISMATCH"
+    if attestation.adapter_id != expected_adapter_id:
+        return "HOST_ATTESTATION_ADAPTER_MISMATCH"
+    if not attestation.host_execution_identity:
+        return "HOST_ATTESTATION_IDENTITY_MISSING"
+    profile = record.profile
+    if profile.provider and attestation.provider != profile.provider:
+        return "HOST_ATTESTATION_PROVIDER_MISMATCH"
+    if profile.model and attestation.model != profile.model:
+        return "HOST_ATTESTATION_MODEL_MISMATCH"
+
+    age, age_reason = _attestation_age_seconds(attestation.attested_at)
+    if age_reason is not None:
+        return age_reason
+    if age is None or age > GENERIC_REPO_READ_EVIDENCE_MAX_AGE_SECONDS:
+        return f"HOST_ATTESTATION_STALE:{age}"
+
+    expected_contract_digest = _generic_attestation_contract_digest(
+        host_name=host_name,
+        repo=provenance_evidence["repo"],
+        revision=provenance_evidence["revision"],
+        probe_path=provenance_evidence["probe_path"],
+        probe_sha256=provenance_evidence["probe_sha256"],
+    )
+    if attestation.execution_contract_digest != expected_contract_digest:
+        return "HOST_ATTESTATION_CONTRACT_MISMATCH"
+    if attestation.source_snapshot_digest != provenance_evidence["probe_sha256"]:
+        return "HOST_ATTESTATION_SOURCE_DIGEST_MISMATCH"
+
+    probe = (
+        root / provenance_evidence["probe_path"]
+    ).resolve()
+    expected_pointer = f"file:{probe}"
+    if tuple(attestation.attestation_evidence_pointers) != (expected_pointer,):
+        return "HOST_ATTESTATION_EVIDENCE_POINTER_MISMATCH"
+    verified_sources = verify_all_attestation_sources(
+        attestation,
+        expect_digest=True,
+    )
+    if not verified_sources.get("all_sources_present"):
+        return "HOST_ATTESTATION_SOURCE_UNVERIFIED"
+
+    matching_entries = [
+        entry
+        for entry in _attestation_ledger_entries(root)
+        if entry.get("attestation_fingerprint")
+        == attestation.attestation_fingerprint
+    ]
+    if len(matching_entries) != 1:
+        return (
+            "HOST_ATTESTATION_LEDGER_MISSING"
+            if not matching_entries
+            else "HOST_ATTESTATION_REPLAY_CONFLICT"
+        )
+    entry = matching_entries[0]
+    expected_ledger = {
+        "run_id": attestation.run_id,
+        "dispatch_id": attestation.dispatch_id,
+        "execution_contract_digest": attestation.execution_contract_digest,
+        "adapter_id": attestation.adapter_id,
+        "host_execution_identity": attestation.host_execution_identity,
+        "attested_at": attestation.attested_at,
+    }
+    if any(entry.get(key) != value for key, value in expected_ledger.items()):
+        return "HOST_ATTESTATION_LEDGER_BINDING_MISMATCH"
+    return None
+
+
 def _validate_repo_read_provenance(
     root: Path,
     record: HostDiscoveryRecord,
-) -> str | None:
+) -> tuple[str | None, dict[str, str] | None]:
     expected_repo = _canonical_repo_binding(root)
     expected_revision = _current_repo_revision(root)
     if expected_repo is None:
-        return "HOST_CANONICAL_REPO_BINDING_UNAVAILABLE"
+        return "HOST_CANONICAL_REPO_BINDING_UNAVAILABLE", None
     if expected_revision is None:
-        return "HOST_CANONICAL_REPO_REVISION_UNAVAILABLE"
+        return "HOST_CANONICAL_REPO_REVISION_UNAVAILABLE", None
 
     match = re.fullmatch(
         (
@@ -234,7 +413,7 @@ def _validate_repo_read_provenance(
         record.provenance.strip(),
     )
     if match is None:
-        return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
+        return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED", None
     (
         kind,
         provenance_repo,
@@ -243,15 +422,15 @@ def _validate_repo_read_provenance(
         probe_sha256,
     ) = match.groups()
     if kind not in TRUSTED_REPO_READ_PROVENANCE_KINDS:
-        return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
+        return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED", None
     if provenance_repo.strip().lower() != expected_repo:
-        return "HOST_DISCOVERY_PROVENANCE_REPO_MISMATCH"
+        return "HOST_DISCOVERY_PROVENANCE_REPO_MISMATCH", None
     if provenance_revision.lower() != expected_revision:
-        return "HOST_DISCOVERY_PROVENANCE_REVISION_MISMATCH"
+        return "HOST_DISCOVERY_PROVENANCE_REVISION_MISMATCH", None
     if not record.project_binding:
-        return "HOST_PROJECT_BINDING_REQUIRED"
+        return "HOST_PROJECT_BINDING_REQUIRED", None
     if record.project_binding.strip().lower() != expected_repo:
-        return "HOST_PROJECT_BINDING_MISMATCH"
+        return "HOST_PROJECT_BINDING_MISMATCH", None
 
     normalized_probe = probe_path.strip().replace("\\", "/")
     if (
@@ -266,24 +445,30 @@ def _validate_repo_read_provenance(
             == ".p2p/system/p2p_capabilities/capabilities.json"
         )
     ):
-        return "HOST_DISCOVERY_PROBE_PATH_INVALID"
+        return "HOST_DISCOVERY_PROBE_PATH_INVALID", None
     candidate = (root / normalized_probe).resolve()
     try:
         candidate.relative_to(root)
     except ValueError:
-        return "HOST_DISCOVERY_PROBE_PATH_INVALID"
+        return "HOST_DISCOVERY_PROBE_PATH_INVALID", None
     if not candidate.is_file():
-        return "HOST_DISCOVERY_PROBE_UNREADABLE"
+        return "HOST_DISCOVERY_PROBE_UNREADABLE", None
     actual_probe_sha256 = hashlib.sha256(candidate.read_bytes()).hexdigest()
     if actual_probe_sha256 != probe_sha256.lower():
-        return "HOST_DISCOVERY_PROBE_HASH_MISMATCH"
-    return None
+        return "HOST_DISCOVERY_PROBE_HASH_MISMATCH", None
+    return None, {
+        "repo": expected_repo,
+        "revision": expected_revision,
+        "probe_path": normalized_probe,
+        "probe_sha256": actual_probe_sha256,
+    }
 
 
 def _resolve_skill_host_mode(
     root: Path,
     host_name: str,
     host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None,
+    host_attestation: HostAttestationRecord | Mapping[str, Any] | None = None,
 ) -> tuple[str | None, str | None]:
     """Resolve generic skill transport only from current source-bound evidence."""
     native = HOST_MODES.get(host_name)
@@ -306,9 +491,20 @@ def _resolve_skill_host_mode(
 
     if record.availability != AVAILABLE:
         return None, f"HOST_AVAILABILITY_{record.availability or 'UNKNOWN'}"
-    provenance_reason = _validate_repo_read_provenance(root, record)
-    if provenance_reason is not None:
-        return None, provenance_reason
+    provenance_reason, provenance_evidence = _validate_repo_read_provenance(
+        root, record
+    )
+    if provenance_reason is not None or provenance_evidence is None:
+        return None, provenance_reason or "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
+    attestation_reason = _validate_actor_attestation(
+        root,
+        host_name=host_name,
+        record=record,
+        provenance_evidence=provenance_evidence,
+        host_attestation=host_attestation,
+    )
+    if attestation_reason is not None:
+        return None, attestation_reason
     if not record.execution_transport_available:
         return None, "HOST_EXECUTION_TRANSPORT_UNAVAILABLE"
 
@@ -335,6 +531,7 @@ def validate_cached_skill_handoff_host_evidence(
     host: str,
     skill_handoff: Mapping[str, Any],
     host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None,
+    host_attestation: HostAttestationRecord | Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Revalidate generic host evidence before reissuing an active-session prompt."""
     mode = str(skill_handoff.get("SKILL_HOST_MODE") or "")
@@ -345,6 +542,7 @@ def validate_cached_skill_handoff_host_evidence(
             Path(root).resolve(),
             _host_token(host),
             host_discovery_record,
+            host_attestation,
         )
     except SkillConsumptionError as exc:
         resolved_mode, reason = None, str(exc)
@@ -774,6 +972,7 @@ def prepare_skill_handoff(
     explicit_requests: Iterable[str] = (),
     required_skills: Iterable[str] = (),
     host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None = None,
+    host_attestation: HostAttestationRecord | Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Freeze one deterministic source-bound skill handoff for an executor.
 
@@ -854,7 +1053,10 @@ def prepare_skill_handoff(
         }
     try:
         mode, host_reason = _resolve_skill_host_mode(
-            project_root, host_name, host_discovery_record
+            project_root,
+            host_name,
+            host_discovery_record,
+            host_attestation,
         )
     except SkillConsumptionError as exc:
         mode, host_reason = None, str(exc)
