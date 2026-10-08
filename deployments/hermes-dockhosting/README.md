@@ -102,9 +102,11 @@ variables only.
 When this secret is absent, the NotebookLM plugin stays disabled and the
 existing Hermes/Telegram runtime is unchanged. When present, Hermes enables the
 read-only `notebooklm_domain_search` tool. It auto-routes staff questions to
-the configured HS, Hóa chất, Bộ KH&CN, and Bộ TT&TT notebooks and retrieves
-ranked source passages; it does not create/delete notebook content or use shared
-NotebookLM chat history.
+the configured HS, Hóa chất, Bộ KH&CN, Bộ TT&TT, and Bộ Y tế notebooks and
+retrieves ranked source passages; it does not create/delete notebook content or
+use shared NotebookLM chat history. The tool then automatically calls the
+verified-only VNLAW API and returns that evidence in a separate
+`vnlaw_cross_check` lane.
 
 The connector is intentionally pinned to `notebooklm-py==0.8.2`. It uses
 undocumented Google NotebookLM APIs, so upstream changes can break the
@@ -117,12 +119,27 @@ Notebook matching uses the known titles by default. Exact IDs or alternate
 titles can be supplied without code changes:
 
 ```text
-NOTEBOOKLM_NOTEBOOKS_JSON={"HS":"...","CHEMICAL":"...","BKHCN":"...","BTTTT":"..."}
-NOTEBOOKLM_NOTEBOOK_TITLES_JSON={"HS":"Tra mã HS","CHEMICAL":"Hóa chất","BKHCN":"Bộ khoa học công nghệ","BTTTT":"Bộ Thông Tin truyền thông"}
+NOTEBOOKLM_NOTEBOOKS_JSON={"HS":"...","CHEMICAL":"...","BKHCN":"...","BTTTT":"...","YTE":"..."}
+NOTEBOOKLM_NOTEBOOK_TITLES_JSON={"HS":"Tra mã HS","CHEMICAL":"Hóa chất","BKHCN":"Bộ khoa học công nghệ","BTTTT":"Bộ Thông Tin truyền thông","YTE":"Y TẾ"}
 ```
 
-NotebookLM is an operational research layer, not final legal authority. Binding
-legal conclusions must still be checked against VNLAW / official sources.
+NotebookLM is an operational research layer, not final legal authority. VNLAW
+is the verification lane and remains bounded to its verified corpus. A
+`NO_VERIFIED_EVIDENCE` result means only that VNLAW could not verify the claim
+inside that corpus; it must never be rendered as proof that the product is
+unregulated.
+
+VNLAW cross-check runtime configuration:
+
+```text
+VNLAW_API_TOKEN=<copy the existing VNLAW Railway service token; secret>
+# Optional override; this HTTPS endpoint is the built-in default:
+VNLAW_API_URL=https://vnlaw-production.up.railway.app
+```
+
+Keep `VNLAW_API_TOKEN` only in DockHosting environment variables. The bridge
+always calls `POST /verified-query` with `scope=verified`; it never calls the
+discovery lane.
 
 Do not commit real tokens or API keys to GitHub.
 
