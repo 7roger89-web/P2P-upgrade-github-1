@@ -32,8 +32,7 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     build_execution_prompt,
 )
 from p2p_capabilities.host_attestation import (  # noqa: E402
-    make_host_attestation,
-    record_attestation_use,
+    make_canonical_host_attestation,
 )
 from p2p_capabilities.host_executor import (  # noqa: E402
     HostCapabilityProfile,
@@ -227,6 +226,9 @@ class SkillConsumptionWireTests(unittest.TestCase):
         project_binding: str | None = None,
         observed_at: str | None = None,
         execution_transport_available: bool = True,
+        adapter_class: str | None = None,
+        provider: str | None = None,
+        model: str | None = None,
     ) -> dict:
         repo_binding = _canonical_repo_binding(root)
         revision = _current_repo_revision(root)
@@ -236,7 +238,7 @@ class SkillConsumptionWireTests(unittest.TestCase):
         probe_sha256 = hashlib.sha256(
             (root / probe_path).read_bytes()
         ).hexdigest()
-        trusted_provenance = (
+        declared_provenance = (
             provenance
             if provenance is not None
             else (
@@ -245,17 +247,26 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 f"|probe={probe_path}|sha256={probe_sha256}"
             )
         )
+        host_token = (
+            host_label.strip().upper()
+            .replace("-", "_").replace(" ", "_")
+        )
         profile = HostCapabilityProfile(
-            adapter_class="GenericExternalAI",
+            adapter_class=(
+                adapter_class
+                or f"p2p-skill-host:{host_token.lower()}"
+            ),
             host_label=host_label,
             environment=environment,
             capabilities={"can_read_files": read_state},
+            provider=provider or f"provider-{host_token.lower()}",
+            model=model or f"model-{host_token.lower()}",
         )
         values = {
             "host_id": host_label,
             "profile": profile,
             "availability": availability,
-            "provenance": trusted_provenance,
+            "provenance": declared_provenance,
             "project_binding": project_binding or repo_binding,
             "environment_binding": environment,
             "execution_transport_available": execution_transport_available,
@@ -264,17 +275,53 @@ class SkillConsumptionWireTests(unittest.TestCase):
             values["observed_at"] = observed_at
         return HostDiscoveryRecord(**values).to_dict()
 
+    def _write_live_adapter_registration(
+        self,
+        root: Path,
+        host_label: str,
+        *,
+        provider: str,
+        model: str,
+        harness: str = "focused-test-host",
+    ) -> str:
+        host_token = (
+            host_label.strip().upper()
+            .replace("-", "_").replace(" ", "_")
+        )
+        adapter_id = f"p2p-skill-host:{host_token.lower()}"
+        registry = (
+            root / ".p2p" / "system" / ".p2p" / "state"
+            / "adapter_registry.json"
+        )
+        registry.parent.mkdir(parents=True, exist_ok=True)
+        registry.write_text(
+            json.dumps(
+                [
+                    {
+                        "adapter_id": adapter_id,
+                        "provider": provider,
+                        "model": model,
+                        "harness": harness,
+                        "live_certified": True,
+                        "current_auth_state": "READ",
+                        "attestation_summary": "focused trusted producer fixture",
+                    }
+                ],
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return adapter_id
+
     def _generic_repo_read_attestation(
         self,
-        host_label: str = "CLAUDE",
+        host_label: str,
         *,
-        root: Path = REPO_ROOT,
-        record: dict | None = None,
-        record_in_ledger: bool = True,
-    ) -> dict:
-        record = record or self._generic_repo_read_record(
-            host_label, root=root
-        )
+        root: Path,
+        record: dict,
+        harness: str = "focused-test-host",
+    ):
         repo_binding = _canonical_repo_binding(root)
         revision = _current_repo_revision(root)
         self.assertIsNotNone(repo_binding)
@@ -295,41 +342,67 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         counter = getattr(self, "_host_attestation_counter", 0) + 1
         self._host_attestation_counter = counter
-        attestation = make_host_attestation(
-            host_kind="generic-real",
+        profile = record["profile"]
+        ledger = (
+            root / ".p2p" / "state"
+            / "canonical_attestation_ledger.jsonl"
+        )
+        return make_canonical_host_attestation(
             adapter_id=f"p2p-skill-host:{host_token.lower()}",
-            harness="focused-test-host",
-            provider="unknown",
-            model="unknown",
-            host_execution_identity=(
-                f"fixture-{host_token.lower()}-{counter}"
-            ),
             run_id=f"skill-wire-run-{counter}",
             dispatch_id=f"skill-wire-dispatch-{counter}",
             execution_contract_digest=contract_digest,
+            project_root=str(root),
+            provider=str(profile["provider"]),
+            model=str(profile["model"]),
+            harness=harness,
             source_snapshot_digest=probe_sha256,
             attestation_evidence_pointers=(f"file:{probe}",),
             attested_at=str(record["observed_at"]),
+            ledger_path=ledger,
         )
-        if record_in_ledger:
-            ledger = (
-                root / ".p2p" / "state"
-                / "canonical_attestation_ledger.jsonl"
-            )
-            previous = (
-                ledger.read_bytes() if ledger.is_file() else None
-            )
 
-            def _restore_ledger() -> None:
-                if previous is None:
-                    ledger.unlink(missing_ok=True)
-                else:
-                    ledger.parent.mkdir(parents=True, exist_ok=True)
-                    ledger.write_bytes(previous)
-
-            self.addCleanup(_restore_ledger)
-            record_attestation_use(attestation, path=ledger)
-        return attestation.to_dict()
+    def _trusted_generic_evidence(
+        self,
+        root: Path,
+        *,
+        host_label: str = "CHATGPT",
+        provider: str = "openai",
+        model: str = "chatgpt-test-model",
+        provenance_kind: str = "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ",
+    ):
+        repo_binding = _canonical_repo_binding(root)
+        revision = _current_repo_revision(root)
+        self.assertIsNotNone(repo_binding)
+        self.assertIsNotNone(revision)
+        probe_path = ".agents/skills/scope-reality-check/SKILL.md"
+        probe_sha256 = hashlib.sha256(
+            (root / probe_path).read_bytes()
+        ).hexdigest()
+        provenance = (
+            f"{provenance_kind}|repo={repo_binding}|revision={revision}"
+            f"|probe={probe_path}|sha256={probe_sha256}"
+        )
+        adapter_id = self._write_live_adapter_registration(
+            root,
+            host_label,
+            provider=provider,
+            model=model,
+        )
+        record = self._generic_repo_read_record(
+            host_label,
+            root=root,
+            provenance=provenance,
+            adapter_class=adapter_id,
+            provider=provider,
+            model=model,
+        )
+        attestation = self._generic_repo_read_attestation(
+            host_label,
+            root=root,
+            record=record,
+        )
+        return record, attestation
 
     def _initialize_ready_task(
         self,
