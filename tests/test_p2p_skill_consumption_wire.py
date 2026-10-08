@@ -432,34 +432,58 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         TaskStateStore(root).initialize(plan, at=now)
 
-    def test_generic_repo_read_host_uses_capability_based_skill_mode(self):
-        record = self._generic_repo_read_record()
-        attestation = self._generic_repo_read_attestation(
-            record=record
-        )
-        handoff = prepare_skill_handoff(
-            REPO_ROOT,
-            "@Scope Reality Check red-team this architecture",
-            host="CLAUDE",
-            host_discovery_record=record,
-            host_attestation=attestation,
-        )
-        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
-        self.assertEqual(
-            handoff["SKILL_HOST_MODE"], "GENERIC_EXACT_REPO_READ"
-        )
-        self.assertEqual(handoff["PERMISSION_WIDENED"], "NO")
-        self.assertEqual(
-            handoff["SKILL_SOURCE_PATHS"]["scope-reality-check"],
-            ".agents/skills/scope-reality-check/SKILL.md",
-        )
-        self.assertEqual(
-            len(handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"]),
-            64,
-        )
+    def test_chatgpt_generic_contract_passes_when_canonical_evidence_exists(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-chatgpt-trusted-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-chatgpt-trusted.git",
+            )
+            record, attestation = self._trusted_generic_evidence(root)
+            handoff = prepare_skill_handoff(
+                root,
+                "@Scope Reality Check red-team this architecture",
+                host="CHATGPT",
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+            self.assertEqual(
+                handoff["SKILL_HOST_MODE"], "GENERIC_EXACT_REPO_READ"
+            )
+            self.assertEqual(handoff["PERMISSION_WIDENED"], "NO")
+            self.assertEqual(
+                handoff["SKILL_SOURCE_PATHS"]["scope-reality-check"],
+                ".agents/skills/scope-reality-check/SKILL.md",
+            )
+            self.assertEqual(
+                len(handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"]),
+                64,
+            )
 
-    def test_generic_host_rejects_valid_looking_discovery_without_actor_attestation(self):
-        record = self._generic_repo_read_record("CLAUDE")
+    def test_forged_claude_record_copied_from_authenticated_read_values_is_blocked(self):
+        repo_binding = _canonical_repo_binding(REPO_ROOT)
+        revision = _current_repo_revision(REPO_ROOT)
+        self.assertIsNotNone(repo_binding)
+        self.assertIsNotNone(revision)
+        probe_path = ".agents/skills/scope-reality-check/SKILL.md"
+        probe_sha256 = hashlib.sha256(
+            (REPO_ROOT / probe_path).read_bytes()
+        ).hexdigest()
+        # These are real checkout values with an authenticated-connector label,
+        # but the asserted CLAUDE actor has no actor-bound producer observation.
+        record = self._generic_repo_read_record(
+            "CLAUDE",
+            provenance=(
+                "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ"
+                f"|repo={repo_binding}|revision={revision}"
+                f"|probe={probe_path}|sha256={probe_sha256}"
+            ),
+            adapter_class="p2p-skill-host:claude",
+            provider="anthropic",
+            model="claude-unverified",
+        )
         handoff = prepare_skill_handoff(
             REPO_ROOT,
             "@Scope Reality Check red-team this architecture",
@@ -472,44 +496,78 @@ class SkillConsumptionWireTests(unittest.TestCase):
             handoff["REJECTION_REASON"],
         )
 
-    def test_generic_host_rejects_unledgered_actor_attestation(self):
-        record = self._generic_repo_read_record("CLAUDE")
-        attestation = self._generic_repo_read_attestation(
-            "CLAUDE",
-            record=record,
-            record_in_ledger=False,
-        )
-        handoff = prepare_skill_handoff(
-            REPO_ROOT,
-            "@Scope Reality Check red-team this architecture",
-            host="CLAUDE",
-            host_discovery_record=record,
-            host_attestation=attestation,
-        )
-        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
-        self.assertIn(
-            "HOST_ATTESTATION_LEDGER_MISSING",
-            handoff["REJECTION_REASON"],
-        )
-
-    def test_github_origin_parser_rejects_lookalike_domain(self):
-        self.assertIsNone(
-            _normalize_github_repo(
-                "https://notgithub.com/owner/repo.git"
+    def test_caller_authored_attestation_json_cannot_unlock_generic_mode(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-json-proof-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(root)
+            record, attestation = self._trusted_generic_evidence(root)
+            handoff = prepare_skill_handoff(
+                root,
+                "@Scope Reality Check red-team this architecture",
+                host="CHATGPT",
+                host_discovery_record=record,
+                host_attestation=attestation.to_dict(),
             )
+            self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+            self.assertIn(
+                "HOST_ATTESTATION_TRUSTED_OBJECT_REQUIRED",
+                handoff["REJECTION_REASON"],
+            )
+
+    def test_canonical_attestation_without_live_registered_adapter_is_blocked(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-unregistered-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(root)
+            record = self._generic_repo_read_record(
+                "CHATGPT",
+                root=root,
+                adapter_class="p2p-skill-host:chatgpt",
+                provider="openai",
+                model="chatgpt-test-model",
+            )
+            attestation = self._generic_repo_read_attestation(
+                "CHATGPT",
+                root=root,
+                record=record,
+            )
+            handoff = prepare_skill_handoff(
+                root,
+                "@Scope Reality Check red-team this architecture",
+                host="CHATGPT",
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+            self.assertIn(
+                "HOST_ATTESTATION_ADAPTER_UNREGISTERED",
+                handoff["REJECTION_REASON"],
+            )
+
+    def test_github_origin_parser_accepts_only_exact_github_host(self):
+        accepted = {
+            "https://github.com/Owner/Repo.git": "owner/repo",
+            "git@github.com:Owner/Repo.git": "owner/repo",
+            "ssh://git@github.com/Owner/Repo.git": "owner/repo",
+        }
+        for origin, expected in accepted.items():
+            with self.subTest(origin=origin):
+                self.assertEqual(_normalize_github_repo(origin), expected)
+
+        rejected = (
+            "https://notgithub.com/owner/repo.git",
+            "https://github.com.evil.example/owner/repo.git",
+            "https://github.com@evil.example/owner/repo.git",
+            "https://gitlab.com/owner/repo.git",
+            "ftp://github.com/owner/repo.git",
+            "https://github.com/owner",
+            "https://github.com/owner/repo/extra",
+            "git@notgithub.com:owner/repo.git",
         )
-        self.assertEqual(
-            _normalize_github_repo(
-                "https://github.com/Owner/Repo.git"
-            ),
-            "owner/repo",
-        )
-        self.assertEqual(
-            _normalize_github_repo(
-                "git@github.com:Owner/Repo.git"
-            ),
-            "owner/repo",
-        )
+        for origin in rejected:
+            with self.subTest(origin=origin):
+                self.assertIsNone(_normalize_github_repo(origin))
 
     def test_generic_host_with_selected_skill_requires_discovery_evidence(self):
         handoff = prepare_skill_handoff(
