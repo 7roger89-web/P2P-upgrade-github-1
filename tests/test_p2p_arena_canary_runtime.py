@@ -403,10 +403,35 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertIn(BLIND_TEST_TASK, prompt)
         # The original task is preserved for continuation, not dropped.
         self.assertIn("ORIGINAL_REAL_TASK", prompt)
-        self.assertIn("LAW_CHECK=PASS | SOURCE=<actual law source read>", prompt)
+        self.assertIn("LAW_CHECK=PASS | SOURCE=<actual source>", prompt)
+        self.assertIn("INLINE_SUPREME_LAW_CAPSULE allowed", prompt)
+        self.assertIn("Inline capsule => PASS with that canonical SHA256", prompt)
         self.assertIn("EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>", prompt)
         self.assertIn("EXPERIENCE_CHECK=NO_MATCH", prompt)
         self.assertIn("EXPERIENCE_CHECK=UNAVAILABLE", prompt)
+
+    def test_t02_inline_capsule_actor_receipt_can_grade_green_with_canonical_provenance_sha(self) -> None:
+        prompt = self.start_cli(session_id="inline-law-fallback")["recommendation"]["PROMPT"]
+        self.assertIn("P2P_LAW_SOURCE=<actual source; INLINE_SUPREME_LAW_CAPSULE allowed>", prompt)
+        self.assertIn(
+            "SOURCE_SHA256=<canonical SHA256 from CONTROL_TOWER_SELF_LAW_RECEIPT>",
+            prompt,
+        )
+
+        binding = self.start_canary("inline-law-fallback-ingest")
+        response = canary_evidence_response(
+            law_source="INLINE_SUPREME_LAW_CAPSULE",
+            law_check=(
+                "LAW_CHECK=PASS | SOURCE=INLINE_SUPREME_LAW_CAPSULE | SOURCE_SHA256="
+                + EXPECTED_CANONICAL_LAW_SHA
+            ),
+            check_result="PASS",
+            errors="NONE",
+            recovery="NONE",
+        )
+        result = self.ingest_canary(binding, response)
+        self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
+        self.assertEqual([], self.ledger_events()[-1]["ACTOR_RECEIPT_BLOCKERS"])
 
     def test_t02b_arena_generated_prompt_title_and_recommendation_metadata_match(self) -> None:
         result = self.start_cli(session_id="title-proof")
