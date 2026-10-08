@@ -31,6 +31,10 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     SessionBinding,
     build_execution_prompt,
 )
+from p2p_capabilities.host_attestation import (  # noqa: E402
+    make_host_attestation,
+    record_attestation_use,
+)
 from p2p_capabilities.host_executor import (  # noqa: E402
     HostCapabilityProfile,
     SUPPORTED,
@@ -39,12 +43,15 @@ from p2p_capabilities.host_selection import (  # noqa: E402
     AVAILABLE,
     HostDiscoveryRecord,
 )
+from p2p_capabilities.task_state import TaskPlan, TaskStateStore  # noqa: E402
 import p2p_control_tower as control_tower_cli  # noqa: E402
 from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
     RECEIPT_SCHEMA,
     _canonical_repo_binding,
     _current_repo_revision,
+    _generic_attestation_contract_digest,
+    _normalize_github_repo,
     load_selected_skills,
     prepare_skill_handoff,
     select_skills_for_task,
@@ -257,12 +264,112 @@ class SkillConsumptionWireTests(unittest.TestCase):
             values["observed_at"] = observed_at
         return HostDiscoveryRecord(**values).to_dict()
 
+    def _generic_repo_read_attestation(
+        self,
+        host_label: str = "CLAUDE",
+        *,
+        root: Path = REPO_ROOT,
+        record: dict | None = None,
+        record_in_ledger: bool = True,
+    ) -> dict:
+        record = record or self._generic_repo_read_record(
+            host_label, root=root
+        )
+        repo_binding = _canonical_repo_binding(root)
+        revision = _current_repo_revision(root)
+        self.assertIsNotNone(repo_binding)
+        self.assertIsNotNone(revision)
+        probe_path = ".agents/skills/scope-reality-check/SKILL.md"
+        probe = (root / probe_path).resolve()
+        probe_sha256 = hashlib.sha256(probe.read_bytes()).hexdigest()
+        host_token = (
+            host_label.strip().upper()
+            .replace("-", "_").replace(" ", "_")
+        )
+        contract_digest = _generic_attestation_contract_digest(
+            host_name=host_token,
+            repo=repo_binding,
+            revision=revision,
+            probe_path=probe_path,
+            probe_sha256=probe_sha256,
+        )
+        counter = getattr(self, "_host_attestation_counter", 0) + 1
+        self._host_attestation_counter = counter
+        attestation = make_host_attestation(
+            host_kind="generic-real",
+            adapter_id=f"p2p-skill-host:{host_token.lower()}",
+            harness="focused-test-host",
+            provider="unknown",
+            model="unknown",
+            host_execution_identity=(
+                f"fixture-{host_token.lower()}-{counter}"
+            ),
+            run_id=f"skill-wire-run-{counter}",
+            dispatch_id=f"skill-wire-dispatch-{counter}",
+            execution_contract_digest=contract_digest,
+            source_snapshot_digest=probe_sha256,
+            attestation_evidence_pointers=(f"file:{probe}",),
+            attested_at=str(record["observed_at"]),
+        )
+        if record_in_ledger:
+            ledger = (
+                root / ".p2p" / "state"
+                / "canonical_attestation_ledger.jsonl"
+            )
+            previous = (
+                ledger.read_bytes() if ledger.is_file() else None
+            )
+
+            def _restore_ledger() -> None:
+                if previous is None:
+                    ledger.unlink(missing_ok=True)
+                else:
+                    ledger.parent.mkdir(parents=True, exist_ok=True)
+                    ledger.write_bytes(previous)
+
+            self.addCleanup(_restore_ledger)
+            record_attestation_use(attestation, path=ledger)
+        return attestation.to_dict()
+
+    def _initialize_ready_task(
+        self,
+        root: Path,
+        *,
+        task_id: str = "issue-333-ready",
+    ) -> None:
+        now = "2026-10-08T07:00:00+00:00"
+        plan = TaskPlan.from_goal(
+            {
+                "goal_id": "ISSUE-333",
+                "scope": ["generic repo-read skill handoff"],
+                "out_of_scope": ["release", "deploy", "promotion"],
+            },
+            [
+                {
+                    "task_id": task_id,
+                    "title": "Generic repo-read handoff",
+                    "purpose": "Pressure-test this plan",
+                    "status": "READY",
+                    "scope": ["generic repo-read skill handoff"],
+                    "acceptance_requirements": ["Skill handoff is bounded."],
+                    "required_evidence": ["focused-proof"],
+                }
+            ],
+            now=now,
+        )
+        TaskStateStore(root).initialize(plan, at=now)
+
     def test_generic_repo_read_host_uses_capability_based_skill_mode(self):
+        record = self._generic_repo_read_record()
+        attestation = self._generic_repo_read_attestation(
+            record=record
+        )
         handoff = prepare_skill_handoff(
             REPO_ROOT,
             "@Scope Reality Check red-team this architecture",
             host="CLAUDE",
-            host_discovery_record=self._generic_repo_read_record(),
+            host_discovery_record=record,
+            host_attestation=attestation,
         )
         self.assertEqual(handoff["SKILL_CHECK"], "PASS")
         self.assertEqual(
@@ -276,6 +383,59 @@ class SkillConsumptionWireTests(unittest.TestCase):
         self.assertEqual(
             len(handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"]),
             64,
+        )
+
+    def test_generic_host_rejects_valid_looking_discovery_without_actor_attestation(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_ATTESTATION_REQUIRED",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_unledgered_actor_attestation(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        attestation = self._generic_repo_read_attestation(
+            "CLAUDE",
+            record=record,
+            record_in_ledger=False,
+        )
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+            host_attestation=attestation,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_ATTESTATION_LEDGER_MISSING",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_github_origin_parser_rejects_lookalike_domain(self):
+        self.assertIsNone(
+            _normalize_github_repo(
+                "https://notgithub.com/owner/repo.git"
+            )
+        )
+        self.assertEqual(
+            _normalize_github_repo(
+                "https://github.com/Owner/Repo.git"
+            ),
+            "owner/repo",
+        )
+        self.assertEqual(
+            _normalize_github_repo(
+                "git@github.com:Owner/Repo.git"
+            ),
+            "owner/repo",
         )
 
     def test_generic_host_with_selected_skill_requires_discovery_evidence(self):
@@ -946,6 +1106,21 @@ class SkillConsumptionWireTests(unittest.TestCase):
             "host-discovery.json",
         )
 
+    def test_control_tower_cli_accepts_existing_host_attestation_file(self):
+        args = control_tower_cli.build_parser().parse_args(
+            [
+                "start",
+                "--host", "CLAUDE",
+                "--goal-id", "ISSUE-333",
+                "--goal", "Use repo-native skills",
+                "--host-attestation-file", "host-attestation.json",
+            ]
+        )
+        self.assertEqual(
+            args.host_attestation_file,
+            "host-attestation.json",
+        )
+
     def test_control_tower_cli_loads_existing_host_discovery_record(self):
         with tempfile.TemporaryDirectory(prefix="p2p-host-discovery-") as raw:
             record_path = Path(raw) / "host-discovery.json"
@@ -1109,12 +1284,16 @@ class SkillConsumptionWireTests(unittest.TestCase):
             record = self._generic_repo_read_record(
                 "CLAUDE", root=root
             )
+            attestation = self._generic_repo_read_attestation(
+                "CLAUDE", root=root, record=record
+            )
             result = tower.start_session(
                 binding,
                 task_id="issue-333-test",
                 task_prompt="Pressure-test this plan",
                 required_skills=("scope-reality-check",),
                 host_discovery_record=record,
+                host_attestation=attestation,
             )
             handoff = result["recommendation"]["SKILL_HANDOFF"]
             prompt = result["recommendation"]["PROMPT"]
@@ -1148,12 +1327,16 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 goal="Generic active session evidence freshness",
             )
             fresh = self._generic_repo_read_record("CLAUDE", root=root)
+            fresh_attestation = self._generic_repo_read_attestation(
+                "CLAUDE", root=root, record=fresh
+            )
             first = tower.start_session(
                 binding,
                 task_id="issue-333-active",
                 task_prompt="Pressure-test this plan",
                 required_skills=("scope-reality-check",),
                 host_discovery_record=fresh,
+                host_attestation=fresh_attestation,
             )
             self.assertEqual(
                 first["recommendation"]["SKILL_HANDOFF"]["SKILL_HOST_MODE"],
@@ -1176,6 +1359,115 @@ class SkillConsumptionWireTests(unittest.TestCase):
                     required_skills=("scope-reality-check",),
                     host_discovery_record=stale,
                 )
+
+    def test_recommend_next_session_blocks_cached_generic_prompt_without_current_evidence(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-next-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-generic-next.git",
+            )
+            self._initialize_ready_task(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-next-01",
+                host="CLAUDE",
+                goal_id="ISSUE-333",
+                goal="Generic cached prompt evidence",
+            )
+            record = self._generic_repo_read_record("CLAUDE", root=root)
+            attestation = self._generic_repo_read_attestation(
+                "CLAUDE", root=root, record=record
+            )
+            tower.start_session(
+                binding,
+                task_id="issue-333-ready",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            result = tower.recommend_next_session("CLAUDE")
+            self.assertEqual(result["status"], "BLOCKED")
+            self.assertIn(
+                "HOST_DISCOVERY_RECORD_REQUIRED",
+                result["reason"],
+            )
+
+    def test_recommend_next_session_blocks_cross_host_cached_prompt(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-cross-host-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-generic-cross-host.git",
+            )
+            self._initialize_ready_task(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-cross-host-01",
+                host="CLAUDE",
+                goal_id="ISSUE-333",
+                goal="Generic cached prompt host binding",
+            )
+            record = self._generic_repo_read_record("CLAUDE", root=root)
+            attestation = self._generic_repo_read_attestation(
+                "CLAUDE", root=root, record=record
+            )
+            tower.start_session(
+                binding,
+                task_id="issue-333-ready",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            result = tower.recommend_next_session("GROK")
+            self.assertEqual(result["status"], "BLOCKED")
+            self.assertEqual(
+                result["reason"],
+                "ACTIVE_SESSION_HOST_MISMATCH",
+            )
+
+    def test_recommend_next_session_revalidates_cached_generic_prompt_even_if_registry_disappears(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-registry-gap-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-generic-registry-gap.git",
+            )
+            self._initialize_ready_task(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-registry-gap-01",
+                host="CLAUDE",
+                goal_id="ISSUE-333",
+                goal="Generic cached prompt registry gap",
+            )
+            record = self._generic_repo_read_record("CLAUDE", root=root)
+            attestation = self._generic_repo_read_attestation(
+                "CLAUDE", root=root, record=record
+            )
+            tower.start_session(
+                binding,
+                task_id="issue-333-ready",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            (
+                root / ".p2p" / "system" / "p2p_capabilities"
+                / "capabilities.json"
+            ).unlink()
+            result = tower.recommend_next_session("CLAUDE")
+            self.assertEqual(result["status"], "BLOCKED")
+            self.assertIn(
+                "HOST_DISCOVERY_RECORD_REQUIRED",
+                result["reason"],
+            )
 
     def test_active_session_same_required_aliases_remains_idempotent(self):
         with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
