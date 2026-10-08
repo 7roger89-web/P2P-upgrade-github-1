@@ -853,6 +853,25 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
         print(json.dumps(canary_grade, ensure_ascii=False, sort_keys=True, indent=2))
 
 
+def _load_host_discovery_record(
+    path_value: str | None,
+) -> Mapping[str, Any] | None:
+    if not path_value:
+        return None
+    path = Path(path_value).expanduser().resolve()
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise BindingError(
+            f"HOST_DISCOVERY_RECORD_INVALID_JSON:{path}"
+        ) from exc
+    if not isinstance(raw, Mapping):
+        raise BindingError("HOST_DISCOVERY_RECORD_MUST_BE_OBJECT")
+    if str(raw.get("schema") or "") != "p2p-host-discovery-record/1":
+        raise BindingError("HOST_DISCOVERY_RECORD_SCHEMA_INVALID")
+    return dict(raw)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
@@ -876,6 +895,13 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--canonical-base-tree", default=UNKNOWN)
     start.add_argument("--worktree", default=UNKNOWN)
     start.add_argument("--branch", default=UNKNOWN)
+    start.add_argument(
+        "--host-discovery-record-file",
+        help=(
+            "existing p2p-host-discovery-record/1 JSON evidence record; required for "
+            "source-bound skill handoff on non-native repo-read-capable hosts"
+        ),
+    )
     start.add_argument("--acceptance-criterion", action="append", default=[])
     start.add_argument(
         "--required-skill",
@@ -926,6 +952,13 @@ def build_parser() -> argparse.ArgumentParser:
     next_session.add_argument("--session-id")
     next_session.add_argument("--worktree", default=UNKNOWN)
     next_session.add_argument("--branch", default=UNKNOWN)
+    next_session.add_argument(
+        "--host-discovery-record-file",
+        help=(
+            "existing p2p-host-discovery-record/1 JSON evidence record for a "
+            "non-native repo-read-capable executor"
+        ),
+    )
     next_session.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
     return parser
 
@@ -939,12 +972,14 @@ def _start_next_with_context(
     worktree: str,
     branch: str,
     law_receipt: Mapping[str, Any],
+    host_discovery_record: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     planned = tower.recommend_next_session(
         host,
         session_id=session_id,
         worktree=worktree,
         branch=branch,
+        host_discovery_record=host_discovery_record,
     )
     if planned.get("status") != "PASS":
         return planned
@@ -954,6 +989,7 @@ def _start_next_with_context(
             session_id=session_id,
             worktree=worktree,
             branch=branch,
+            host_discovery_record=host_discovery_record,
         )
     binding_mapping = planned.get("binding")
     recommendation = planned.get("recommendation")
@@ -982,6 +1018,7 @@ def _start_next_with_context(
         worktree=worktree,
         branch=branch,
         acceptance_criteria=criteria,
+        host_discovery_record=host_discovery_record,
         expected_law_sha=expected_law_sha,
         expected_experience_ids=expected_exp_ids,
         canary_directive=directive,
@@ -1034,6 +1071,9 @@ def main(argv: list[str] | None = None) -> int:
                 law_receipt=law_receipt,
                 low_risk_mechanical=args.low_risk_mechanical,
             )
+            host_discovery_record = _load_host_discovery_record(
+                args.host_discovery_record_file
+            )
             result = tower.start_session(
                 binding,
                 task_id=args.task_id,
@@ -1044,6 +1084,7 @@ def main(argv: list[str] | None = None) -> int:
                 branch=args.branch,
                 acceptance_criteria=criteria,
                 required_skills=tuple(args.required_skill),
+                host_discovery_record=host_discovery_record,
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
@@ -1073,6 +1114,9 @@ def main(argv: list[str] | None = None) -> int:
                 worktree=args.worktree,
                 branch=args.branch,
                 law_receipt=law_receipt,
+                host_discovery_record=_load_host_discovery_record(
+                    args.host_discovery_record_file
+                ),
             )
         else:  # pragma: no cover - argparse constrains this branch.
             raise BindingError(f"UNSUPPORTED_COMMAND:{args.command}")
