@@ -106,8 +106,8 @@ FRAMEWORK-03 có hai vế độc lập và không được nhập nhằng:
 2. **Current-lineage Council Full Certification — NOT_PROVEN.**
    - Historical single-host live Council 8/8 vẫn chỉ là historical evidence.
    - `CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE`.
-   - Current ChatGPT host không expose 8 thread/subagent độc lập; theo P2P QUORUM:
-     `QUORUM_STATUS=UNAVAILABLE_IN_THIS_HOST`.
+   - Reconciliation host quan sát ngày 2026-10-08 không expose 8 thread/subagent độc lập; theo P2P QUORUM:
+     `QUORUM_STATUS=UNAVAILABLE_IN_THIS_HOST` tại evidence time.
    - Không mô phỏng tám vai trong một response và không dùng research-agent khác loại
      làm giả Council receipt.
    - Next condition: chạy trên live host có 8 worker độc lập + per-role receipts.
