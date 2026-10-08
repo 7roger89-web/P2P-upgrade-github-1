@@ -115,6 +115,14 @@ jobs:
             -p 'test_aerg*.py' \
             -v
 
+      - name: Run governance reconciliation regressions
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v \
+            tests.test_p2p_c43_framework_reconciliation.C43BoundaryTests \
+            tests.test_p2p_execution_target.ClosureAnchorTests
+          python3 scripts/p2p_development_control.py validate
+
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
         env:
