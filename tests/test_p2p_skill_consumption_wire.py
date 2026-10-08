@@ -1237,20 +1237,17 @@ class SkillConsumptionWireTests(unittest.TestCase):
             "host-discovery.json",
         )
 
-    def test_control_tower_cli_accepts_existing_host_attestation_file(self):
-        args = control_tower_cli.build_parser().parse_args(
-            [
-                "start",
-                "--host", "CLAUDE",
-                "--goal-id", "ISSUE-333",
-                "--goal", "Use repo-native skills",
-                "--host-attestation-file", "host-attestation.json",
-            ]
-        )
-        self.assertEqual(
-            args.host_attestation_file,
-            "host-attestation.json",
-        )
+    def test_control_tower_cli_does_not_accept_attestation_json_as_trust_input(self):
+        with self.assertRaises(SystemExit):
+            control_tower_cli.build_parser().parse_args(
+                [
+                    "start",
+                    "--host", "CLAUDE",
+                    "--goal-id", "ISSUE-333",
+                    "--goal", "Use repo-native skills",
+                    "--host-attestation-file", "host-attestation.json",
+                ]
+            )
 
     def test_control_tower_cli_loads_existing_host_discovery_record(self):
         with tempfile.TemporaryDirectory(prefix="p2p-host-discovery-") as raw:
@@ -1408,16 +1405,11 @@ class SkillConsumptionWireTests(unittest.TestCase):
             tower = ControlTower(root)
             binding = SessionBinding(
                 session_id="generic-skill-host-01",
-                host="CLAUDE",
+                host="CHATGPT",
                 goal_id="ISSUE-333",
                 goal="Generic repo-read skill handoff",
             )
-            record = self._generic_repo_read_record(
-                "CLAUDE", root=root
-            )
-            attestation = self._generic_repo_read_attestation(
-                "CLAUDE", root=root, record=record
-            )
+            record, attestation = self._trusted_generic_evidence(root)
             result = tower.start_session(
                 binding,
                 task_id="issue-333-test",
@@ -1453,14 +1445,11 @@ class SkillConsumptionWireTests(unittest.TestCase):
             tower = ControlTower(root)
             binding = SessionBinding(
                 session_id="generic-active-01",
-                host="CLAUDE",
+                host="CHATGPT",
                 goal_id="ISSUE-333",
                 goal="Generic active session evidence freshness",
             )
-            fresh = self._generic_repo_read_record("CLAUDE", root=root)
-            fresh_attestation = self._generic_repo_read_attestation(
-                "CLAUDE", root=root, record=fresh
-            )
+            fresh, fresh_attestation = self._trusted_generic_evidence(root)
             first = tower.start_session(
                 binding,
                 task_id="issue-333-active",
@@ -1474,9 +1463,13 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 "GENERIC_EXACT_REPO_READ",
             )
             stale = self._generic_repo_read_record(
-                "CLAUDE",
+                "CHATGPT",
                 root=root,
                 observed_at="2000-01-01T00:00:00+00:00",
+                provenance=fresh["provenance"],
+                adapter_class=fresh["profile"]["adapter_class"],
+                provider=fresh["profile"]["provider"],
+                model=fresh["profile"]["model"],
             )
             with self.assertRaisesRegex(
                 BindingError,
@@ -1489,6 +1482,7 @@ class SkillConsumptionWireTests(unittest.TestCase):
                     task_prompt="Pressure-test this plan",
                     required_skills=("scope-reality-check",),
                     host_discovery_record=stale,
+                    host_attestation=fresh_attestation,
                 )
 
     def test_recommend_next_session_blocks_cached_generic_prompt_without_current_evidence(self):
@@ -1503,14 +1497,11 @@ class SkillConsumptionWireTests(unittest.TestCase):
             tower = ControlTower(root)
             binding = SessionBinding(
                 session_id="generic-next-01",
-                host="CLAUDE",
+                host="CHATGPT",
                 goal_id="ISSUE-333",
                 goal="Generic cached prompt evidence",
             )
-            record = self._generic_repo_read_record("CLAUDE", root=root)
-            attestation = self._generic_repo_read_attestation(
-                "CLAUDE", root=root, record=record
-            )
+            record, attestation = self._trusted_generic_evidence(root)
             tower.start_session(
                 binding,
                 task_id="issue-333-ready",
@@ -1519,10 +1510,55 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 host_discovery_record=record,
                 host_attestation=attestation,
             )
-            result = tower.recommend_next_session("CLAUDE")
+            result = tower.recommend_next_session("CHATGPT")
             self.assertEqual(result["status"], "BLOCKED")
             self.assertIn(
                 "HOST_DISCOVERY_RECORD_REQUIRED",
+                result["reason"],
+            )
+
+    def test_recommend_next_session_blocks_cached_generic_prompt_with_stale_evidence(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-stale-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-generic-stale.git",
+            )
+            self._initialize_ready_task(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-stale-01",
+                host="CHATGPT",
+                goal_id="ISSUE-333",
+                goal="Generic cached prompt stale evidence",
+            )
+            record, attestation = self._trusted_generic_evidence(root)
+            tower.start_session(
+                binding,
+                task_id="issue-333-ready",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            stale = self._generic_repo_read_record(
+                "CHATGPT",
+                root=root,
+                observed_at="2000-01-01T00:00:00+00:00",
+                provenance=record["provenance"],
+                adapter_class=record["profile"]["adapter_class"],
+                provider=record["profile"]["provider"],
+                model=record["profile"]["model"],
+            )
+            result = tower.recommend_next_session(
+                "CHATGPT",
+                host_discovery_record=stale,
+                host_attestation=attestation,
+            )
+            self.assertEqual(result["status"], "BLOCKED")
+            self.assertIn(
+                "HOST_DISCOVERY_EVIDENCE_STALE",
                 result["reason"],
             )
 
@@ -1538,14 +1574,11 @@ class SkillConsumptionWireTests(unittest.TestCase):
             tower = ControlTower(root)
             binding = SessionBinding(
                 session_id="generic-cross-host-01",
-                host="CLAUDE",
+                host="CHATGPT",
                 goal_id="ISSUE-333",
                 goal="Generic cached prompt host binding",
             )
-            record = self._generic_repo_read_record("CLAUDE", root=root)
-            attestation = self._generic_repo_read_attestation(
-                "CLAUDE", root=root, record=record
-            )
+            record, attestation = self._trusted_generic_evidence(root)
             tower.start_session(
                 binding,
                 task_id="issue-333-ready",
@@ -1561,6 +1594,43 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 "ACTIVE_SESSION_HOST_MISMATCH",
             )
 
+    def test_recommend_next_session_allows_fresh_matching_generic_evidence(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-fresh-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-generic-fresh.git",
+            )
+            self._initialize_ready_task(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-fresh-01",
+                host="CHATGPT",
+                goal_id="ISSUE-333",
+                goal="Generic cached prompt fresh evidence",
+            )
+            record, attestation = self._trusted_generic_evidence(root)
+            tower.start_session(
+                binding,
+                task_id="issue-333-ready",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            result = tower.recommend_next_session(
+                "CHATGPT",
+                host_discovery_record=record,
+                host_attestation=attestation,
+            )
+            self.assertEqual(result["status"], "PASS")
+            self.assertTrue(result["idempotent"])
+            self.assertEqual(
+                result["recommendation"]["SKILL_HANDOFF"]["SKILL_HOST_MODE"],
+                "GENERIC_EXACT_REPO_READ",
+            )
+
     def test_recommend_next_session_revalidates_cached_generic_prompt_even_if_registry_disappears(self):
         with tempfile.TemporaryDirectory(prefix="p2p-generic-registry-gap-") as raw:
             root = Path(raw)
@@ -1573,14 +1643,11 @@ class SkillConsumptionWireTests(unittest.TestCase):
             tower = ControlTower(root)
             binding = SessionBinding(
                 session_id="generic-registry-gap-01",
-                host="CLAUDE",
+                host="CHATGPT",
                 goal_id="ISSUE-333",
                 goal="Generic cached prompt registry gap",
             )
-            record = self._generic_repo_read_record("CLAUDE", root=root)
-            attestation = self._generic_repo_read_attestation(
-                "CLAUDE", root=root, record=record
-            )
+            record, attestation = self._trusted_generic_evidence(root)
             tower.start_session(
                 binding,
                 task_id="issue-333-ready",
@@ -1593,7 +1660,7 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 root / ".p2p" / "system" / "p2p_capabilities"
                 / "capabilities.json"
             ).unlink()
-            result = tower.recommend_next_session("CLAUDE")
+            result = tower.recommend_next_session("CHATGPT")
             self.assertEqual(result["status"], "BLOCKED")
             self.assertIn(
                 "HOST_DISCOVERY_RECORD_REQUIRED",
