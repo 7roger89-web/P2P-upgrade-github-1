@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -223,12 +225,17 @@ class SkillConsumptionWireTests(unittest.TestCase):
         revision = _current_repo_revision(root)
         self.assertIsNotNone(repo_binding)
         self.assertIsNotNone(revision)
+        probe_path = ".agents/skills/scope-reality-check/SKILL.md"
+        probe_sha256 = hashlib.sha256(
+            (root / probe_path).read_bytes()
+        ).hexdigest()
         trusted_provenance = (
             provenance
             if provenance is not None
             else (
                 "VERIFIED_LOCAL_REPO_EXACT_READ"
                 f"|repo={repo_binding}|revision={revision}"
+                f"|probe={probe_path}|sha256={probe_sha256}"
             )
         )
         profile = HostCapabilityProfile(
@@ -330,19 +337,18 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
 
     def test_generic_host_rejects_allowlisted_provenance_for_wrong_repo(self):
-        revision = _current_repo_revision(REPO_ROOT)
-        self.assertIsNotNone(revision)
+        record = self._generic_repo_read_record("CLAUDE")
+        expected_repo = _canonical_repo_binding(REPO_ROOT)
+        self.assertIsNotNone(expected_repo)
+        record["provenance"] = record["provenance"].replace(
+            f"repo={expected_repo}",
+            "repo=other-owner/p2p-upgrade-github-1",
+        )
         handoff = prepare_skill_handoff(
             REPO_ROOT,
             "@Scope Reality Check red-team this architecture",
             host="CLAUDE",
-            host_discovery_record=self._generic_repo_read_record(
-                "CLAUDE",
-                provenance=(
-                    "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ"
-                    f"|repo=other-owner/p2p-upgrade-github-1|revision={revision}"
-                ),
-            ),
+            host_discovery_record=record,
         )
         self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
         self.assertIn(
@@ -351,23 +357,41 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
 
     def test_generic_host_rejects_allowlisted_provenance_for_wrong_revision(self):
-        repo_binding = _canonical_repo_binding(REPO_ROOT)
-        self.assertIsNotNone(repo_binding)
+        record = self._generic_repo_read_record("CLAUDE")
+        revision = _current_repo_revision(REPO_ROOT)
+        self.assertIsNotNone(revision)
+        record["provenance"] = record["provenance"].replace(
+            f"revision={revision}",
+            f"revision={'0' * 40}",
+        )
         handoff = prepare_skill_handoff(
             REPO_ROOT,
             "@Scope Reality Check red-team this architecture",
             host="CLAUDE",
-            host_discovery_record=self._generic_repo_read_record(
-                "CLAUDE",
-                provenance=(
-                    "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ"
-                    f"|repo={repo_binding}|revision={'0' * 40}"
-                ),
-            ),
+            host_discovery_record=record,
         )
         self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
         self.assertIn(
             "HOST_DISCOVERY_PROVENANCE_REVISION_MISMATCH",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_wrong_repo_read_probe_hash(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record["provenance"] = re.sub(
+            r"sha256=[0-9a-f]{64}$",
+            "sha256=" + ("0" * 64),
+            record["provenance"],
+        )
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_PROBE_HASH_MISMATCH",
             handoff["REJECTION_REASON"],
         )
 
