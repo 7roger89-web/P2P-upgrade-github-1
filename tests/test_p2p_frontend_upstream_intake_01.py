@@ -594,6 +594,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "governance/development-control.json",
             "tests/test_p2p_c43_framework_reconciliation.py",
             "tests/test_p2p_execution_target.py",
+            # Issue #335 reconciles existing FW03 roadmap/evidence truth only.
+            # Exact Markdown surfaces are admitted; no docs-wide wildcard.
+            "docs/p2p-development/framework/master-roadmap.md",
+            "docs/p2p-development/reports/P2P-FRAMEWORK-03-progress-report.md",
             "scripts/check_instruction_contract.py",
         )
         forbidden_fragments = (
