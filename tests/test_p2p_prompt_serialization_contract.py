@@ -90,3 +90,30 @@ def test_projector_keeps_full_notebook_and_source_content_sha():
     assert "RULE 14 — OVER_ENGINEERING_CHECK" in projection
     assert "Không bị over engineering chứ?" in projection
     assert text.lstrip("\ufeff") in projection
+
+
+def test_prompt_writer_skill_routing_is_inherited_across_prompt_surfaces():
+    root = Path(__file__).resolve().parents[1]
+    projector = _load_projector()
+    block = projector._agents_block()
+    notebook = (root / "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md").read_text(
+        encoding="utf-8"
+    )
+    agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+    install = (root / "docs/p2p-development/P2P-AGENTS-INSTALL.md").read_text(
+        encoding="utf-8"
+    )
+
+    required = (
+        "PROMPT_WRITER_SKILL_ROUTING_V1",
+        "SKILL_CHECK=NO_MATCH",
+        "p2p-skill-consumption-receipt/1",
+    )
+    for surface in (notebook, agents, install, block):
+        for marker in required:
+            assert marker in surface
+
+    assert "MAX_SELECTED_SKILLS=3" in notebook
+    assert "TARGET_REPO_SKILL_DISCOVERY" in notebook
+    assert "smallest relevant set (max 3)" in block
+    assert "A downstream `@skill` token alone is not consumption evidence." in block
