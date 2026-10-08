@@ -481,7 +481,6 @@ def make_canonical_host_attestation(
         harness: str = "manus-fw00-fw06-candidate",
         attested_at: str = "",
         host_metadata: str = "",
-        source_snapshot_digest: str = "",
         attestation_evidence_pointers: Optional[Tuple[str, ...]] = None,
         ledger_path: Optional[Path] = None,
 ) -> HostAttestationRecord:
@@ -505,7 +504,7 @@ def make_canonical_host_attestation(
         dispatch_id=dispatch_id,
         execution_contract_digest=execution_contract_digest,
         host_metadata=host_metadata,
-        source_snapshot_digest=source_snapshot_digest,
+        source_snapshot_digest="",
         attestation_evidence_pointers=pointers,
         attested_at=stamped_at,
     )
