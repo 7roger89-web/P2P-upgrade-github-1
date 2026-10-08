@@ -39,6 +39,9 @@ def test_projected_agents_serialize_law_and_oe_gates():
         "OE_VERDICT=DO_IT|SKIP_IT|DEFER_UNTIL_NEEDED",
         "NEW_CHAT",
         "SAME_CHAT",
+        "PROMPT_WRITER_SKILL_ROUTING_V1",
+        "SKILL_CHECK=NO_MATCH",
+        "p2p-skill-consumption-receipt/1",
     )
     for marker in required:
         assert marker in block
