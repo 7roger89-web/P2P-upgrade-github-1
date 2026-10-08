@@ -172,7 +172,7 @@
       "reason": "No fresh current-main promotion candidate exists. Historical .74 remains sealed/unpromoted; any future promotion requires a fresh current-main candidate and separate Owner gate."
     },
     "next_safe_goals": [
-      "FRAMEWORK-03_REAL_THIRD_PROJECT_PILOT"
+      "FRAMEWORK-03_COUNCIL_FULL_CERTIFICATION_WHEN_LIVE_SUBAGENT_HOST_AVAILABLE"
     ],
     "required_report_disclaimer": "Official artifact baseline remains .19. Sealed .74 is preserved as historical unpromoted evidence, not a current promotion target. Current main may continue product development; any future release/promotion requires a fresh candidate, independent evidence, and a separate Owner gate.",
     "closure": {
@@ -186,7 +186,44 @@
         "reports/supervisor/rp_supervisor_260824_115808_by_gpt-5-codex_p2p-c43-framework-reconciliation.md",
         "reports/supervisor/rp_supervisor_260824_211646_by_gpt-5-codex_aerg-qi-fw01-supervisor-review.md",
         "PR_330_SUPERVISOR_RECEIPT_6053379457"
-      ]
+      ],
+      "framework_03": {
+        "status": "IN_PROGRESS",
+        "third_project_pilot": {
+          "status": "PASS",
+          "target_repository": "7roger89-web/child-learning-lab",
+          "target_stack": "JavaScript/browser",
+          "product_task": "Companion Interaction Pilot V0.2",
+          "product_issue": 35,
+          "implementation_pr": 36,
+          "implementation_merge_commit": "5a89ecba7e0f6fc142f9d5fa278e7f853e3d8472",
+          "supervised_head": "a0fb67aefbcf75e0b3666a82efac8953296da79c",
+          "supervisor_receipt_comment": 5979999065,
+          "durable_state_reconciliation_pr": 41,
+          "stable_identity_correction_pr": 43,
+          "evidence_anchor": "7a6e534e342d2b5ae329c8c1a4f5ed21a772d842",
+          "target_law_source_sha256": "11ce33bb9c514d32ad3aec3eb7d8b40f0d0290b1dbe79eaa15751ef34668bd4b",
+          "child_engagement_pass": "NOT_CLAIMED",
+          "child_speakback_pass": "NOT_CLAIMED",
+          "skill_consumption_v1_receipt": "NOT_CLAIMED_PRE_CONTRACT_PRODUCT_EXECUTION"
+        },
+        "council_full_certification": {
+          "status": "NOT_PROVEN",
+          "current_lineage_full_council_live_proven": false,
+          "historical_single_host_live_council_8_of_8": true,
+          "multihost_live_council": "NOT_PROVEN",
+          "current_host_quorum_status": "UNAVAILABLE_IN_THIS_HOST",
+          "reason": "Current ChatGPT host exposes no eight independent subagent/thread workers; P2P QUORUM forbids simulating eight roles in one model response.",
+          "next_condition": "Run on a compatible live host that exposes eight independent subagent/thread workers and preserve per-role source-bound receipts."
+        },
+        "runtime_machinery": {
+          "status": "PRESENT_HISTORICAL_IMPLEMENTATION",
+          "implementation_commit": "93963d38a1b1d8248728b5f858e633bc5ebfe6ef",
+          "module": ".p2p/system/p2p_capabilities/team_intelligence.py",
+          "tests": ".p2p/system/p2p_capabilities/tests/test_fw03_team_intelligence.py",
+          "runtime_changed_by_this_reconciliation": false
+        }
+      }
     }
   },
   "candidate_records": [
@@ -1096,6 +1133,28 @@
         "SEALED_74_HASH_UNCHANGED",
         "PROMOTION_ALLOWED_FALSE",
         "NO_RELEASE_DEPLOY_PROMOTION"
+      ]
+    },
+    {
+      "change_id": "FRAMEWORK-03-THIRD-PROJECT-PILOT-016",
+      "changed_at": "2026-10-08T06:52:00Z",
+      "changed_by": "p2p-issue-335-fw03-third-project-pilot-truth",
+      "what_changed": "Recorded the real third-project pilot as PASS while preserving current-lineage Council Full Certification as NOT_PROVEN.",
+      "why": "child-learning-lab has merged source-bound technical pilot evidence and independent Supervisor PASS; current host cannot provide eight independent QUORUM workers, so Council proof must remain fail-closed.",
+      "evidence_refs": [
+        "P2P-ISSUE-335",
+        "child-learning-lab#35",
+        "child-learning-lab#36",
+        "child-learning-lab#41",
+        "child-learning-lab#43",
+        "child-learning-lab#issuecomment-5979999065",
+        "P2P-COMMIT-93963d38a1b1d8248728b5f858e633bc5ebfe6ef"
+      ],
+      "protected_truth": [
+        "THIRD_PROJECT_PILOT_PASS",
+        "CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN_FALSE",
+        "NO_SYNTHETIC_QUORUM",
+        "NO_PROMOTION_RELEASE_DEPLOY"
       ]
     }
   ]
