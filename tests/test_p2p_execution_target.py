@@ -669,10 +669,12 @@ class ClosureAnchorTests(unittest.TestCase):
         gov = json.loads(GOV_PATH.read_text())
         current = gov["current_development"]
         self.assertEqual(current["development_goal"], "P2P-CANONICAL-LINEAGE-REPAIR-01")
-        self.assertEqual(current["status"], "ACTIVE_UNPROMOTED")
+        self.assertEqual(current["status"], "RECONCILED_NO_ACTIVE_PROMOTION_CANDIDATE")
+        self.assertEqual(current["source_version_status"], "LINEAGE_RECONCILED")
         binding = current["candidate_identity_binding"]
-        self.assertEqual(binding["candidate_version"], "8.4.7-C-codex.72")
-        self.assertEqual(binding["status"], "BOUND_AT_MINT_STAGE")
+        self.assertEqual(binding["candidate_version"], "8.4.7-C-codex.74")
+        self.assertEqual(binding["status"], "HISTORICAL_SEALED_UNPROMOTED_REFERENCE")
+        self.assertFalse(binding["current_promotion_target"])
         self.assertEqual(gov["official_baseline"]["version"], "8.4.7-C-codex.19")
 
     def test_et60_research_provenance_durable(self):
