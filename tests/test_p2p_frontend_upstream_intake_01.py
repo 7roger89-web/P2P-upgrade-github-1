@@ -583,6 +583,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/CLAUDE.md",
             ".p2p/system/.claude/skills/.claude-skill-manifest.json",
             "docs/p2p-development/P2P-AGENTS-INSTALL.md",
+            # Issue #327 prompt-writer skill routing extends the existing
+            # Supreme-Law / prompt-serialization / portable-projection path.
+            # These are policy/test surfaces, not a second router or registry.
+            "docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md",
+            "tests/test_p2p_prompt_serialization_contract.py",
             "scripts/check_instruction_contract.py",
         )
         forbidden_fragments = (
@@ -681,6 +686,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 "scripts/p2p_sync_managed_projects.py",
                 "tests/test_p2p_portable_law_projection.py",
                 "tests/test_p2p_self_law_propagation_and_fast_sync.py",
+                # Issue #327 adds regression coverage to the existing
+                # prompt-serialization contract; no executable capability is added.
+                "tests/test_p2p_prompt_serialization_contract.py",
                 # Owner-directed Anvien retirement updates the EXISTING
                 # static instruction contract checker; no runtime is added.
                 "scripts/check_instruction_contract.py",
