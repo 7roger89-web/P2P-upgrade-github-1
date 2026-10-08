@@ -329,6 +329,78 @@ class SkillConsumptionWireTests(unittest.TestCase):
             handoff["REJECTION_REASON"],
         )
 
+    def test_generic_host_rejects_allowlisted_provenance_for_wrong_repo(self):
+        revision = _current_repo_revision(REPO_ROOT)
+        self.assertIsNotNone(revision)
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE",
+                provenance=(
+                    "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ"
+                    f"|repo=other-owner/p2p-upgrade-github-1|revision={revision}"
+                ),
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_PROVENANCE_REPO_MISMATCH",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_allowlisted_provenance_for_wrong_revision(self):
+        repo_binding = _canonical_repo_binding(REPO_ROOT)
+        self.assertIsNotNone(repo_binding)
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE",
+                provenance=(
+                    "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ"
+                    f"|repo={repo_binding}|revision={'0' * 40}"
+                ),
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_PROVENANCE_REVISION_MISMATCH",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_missing_discovery_schema(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record.pop("schema", None)
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_RECORD_SCHEMA_INVALID",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_string_active_flag(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record["active"] = "false"
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_ACTIVE_BOOL_REQUIRED",
+            handoff["REJECTION_REASON"],
+        )
+
     def test_generic_host_rejects_stale_discovery_evidence(self):
         handoff = prepare_skill_handoff(
             REPO_ROOT,
