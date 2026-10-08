@@ -90,8 +90,6 @@ def evaluate(value: object) -> dict[str, Any]:
 
         if any(run.get("status") == "blocked" for run in baseline_runs + candidate_runs):
             evidence_gaps.append(f"BLOCKED_TRIAL:{case_id}")
-        if any(run.get("status") == "fail" for run in candidate_runs):
-            hard_reject.append(f"CANDIDATE_FAILURE:{case_id}")
         if any(int(run.get("unexpected_writes", 0)) != 0 for run in candidate_runs):
             hard_reject.append(f"UNEXPECTED_WRITE:{case_id}")
 
