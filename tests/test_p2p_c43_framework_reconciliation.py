@@ -165,7 +165,7 @@ class C43BoundaryTests(unittest.TestCase):
             fw03["council_full_certification"]["current_lineage_full_council_live_proven"]
         )
         self.assertEqual(
-            fw03["council_full_certification"]["current_host_quorum_status"],
+            fw03["council_full_certification"]["observed_host_quorum_status_at_evidence_time"],
             "UNAVAILABLE_IN_THIS_HOST",
         )
 
