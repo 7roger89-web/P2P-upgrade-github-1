@@ -1,0 +1,21 @@
+privacy:
+  redact_secrets: false
+  fail_closed_for_cloud: false
+  never_read:
+    - "**/.git/**"
+    - "**/.env*"
+    - "**/.EnvLocal"
+    - "**/.aws/**"
+    - "**/.ssh/**"
+    - "**/*.pem"
+    - ".agents/**"
+    - ".claude/**"
+    - ".p2p/system/.agents/**"
+    - ".p2p/system/.claude/**"
+
+authority:
+  authoritative_paths: []
+
+limits:
+  default_output_token_budget: 12000
+  max_output_token_budget: 30000
