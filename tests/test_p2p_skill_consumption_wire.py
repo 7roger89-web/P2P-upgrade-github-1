@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -28,10 +29,20 @@ from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     SessionBinding,
     build_execution_prompt,
 )
+from p2p_capabilities.host_executor import (  # noqa: E402
+    HostCapabilityProfile,
+    SUPPORTED,
+)
+from p2p_capabilities.host_selection import (  # noqa: E402
+    AVAILABLE,
+    HostDiscoveryRecord,
+)
 import p2p_control_tower as control_tower_cli  # noqa: E402
 from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
     RECEIPT_SCHEMA,
+    _canonical_repo_binding,
+    _current_repo_revision,
     load_selected_skills,
     prepare_skill_handoff,
     select_skills_for_task,
@@ -166,6 +177,300 @@ class SkillConsumptionWireTests(unittest.TestCase):
         self.assertEqual(handoff["SKILL_CHECK"], "PASS")
         self.assertEqual(
             handoff["SKILL_HOST_MODE"], "CODEX_NATIVE_PROJECT_SKILL"
+        )
+
+    def _git(self, root: Path, *args: str) -> str:
+        result = subprocess.run(
+            ["git", "-C", str(root), *args],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(
+            result.returncode,
+            0,
+            msg=f"git {' '.join(args)} failed: {result.stderr}",
+        )
+        return result.stdout.strip()
+
+    def _init_fixture_git(
+        self,
+        root: Path,
+        *,
+        remote: str = "https://github.com/fixture-owner/p2p-generic-skill-host.git",
+    ) -> None:
+        self._git(root, "init")
+        self._git(root, "config", "user.email", "fixture@example.com")
+        self._git(root, "config", "user.name", "P2P Fixture")
+        self._git(root, "remote", "add", "origin", remote)
+        self._git(root, "add", "-A")
+        self._git(root, "commit", "-m", "fixture")
+
+    def _generic_repo_read_record(
+        self,
+        host_label: str = "CLAUDE",
+        *,
+        root: Path = REPO_ROOT,
+        read_state: str = SUPPORTED,
+        environment: str = "REMOTE_REPOSITORY",
+        availability: str = AVAILABLE,
+        provenance: str | None = None,
+        project_binding: str | None = None,
+        observed_at: str | None = None,
+        execution_transport_available: bool = True,
+    ) -> dict:
+        repo_binding = _canonical_repo_binding(root)
+        revision = _current_repo_revision(root)
+        self.assertIsNotNone(repo_binding)
+        self.assertIsNotNone(revision)
+        trusted_provenance = (
+            provenance
+            if provenance is not None
+            else (
+                "VERIFIED_LOCAL_REPO_EXACT_READ"
+                f"|repo={repo_binding}|revision={revision}"
+            )
+        )
+        profile = HostCapabilityProfile(
+            adapter_class="GenericExternalAI",
+            host_label=host_label,
+            environment=environment,
+            capabilities={"can_read_files": read_state},
+        )
+        values = {
+            "host_id": host_label,
+            "profile": profile,
+            "availability": availability,
+            "provenance": trusted_provenance,
+            "project_binding": project_binding or repo_binding,
+            "environment_binding": environment,
+            "execution_transport_available": execution_transport_available,
+        }
+        if observed_at is not None:
+            values["observed_at"] = observed_at
+        return HostDiscoveryRecord(**values).to_dict()
+
+    def test_generic_repo_read_host_uses_capability_based_skill_mode(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(
+            handoff["SKILL_HOST_MODE"], "GENERIC_EXACT_REPO_READ"
+        )
+        self.assertEqual(handoff["PERMISSION_WIDENED"], "NO")
+        self.assertEqual(
+            handoff["SKILL_SOURCE_PATHS"]["scope-reality-check"],
+            ".agents/skills/scope-reality-check/SKILL.md",
+        )
+        self.assertEqual(
+            len(handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"]),
+            64,
+        )
+
+    def test_generic_host_with_selected_skill_requires_discovery_evidence(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertEqual(handoff["SKILL_HOST_MODE"], "UNSUPPORTED")
+        self.assertIn(
+            "HOST_DISCOVERY_RECORD_REQUIRED",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_fails_closed_without_supported_file_read(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="GROK",
+            host_discovery_record=self._generic_repo_read_record(
+                "GROK", read_state="UNKNOWN"
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_FILE_READ_CAPABILITY_UNKNOWN",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_non_repo_bound_environment(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="MANUS",
+            host_discovery_record=self._generic_repo_read_record(
+                "MANUS", environment="CLOUD_SANDBOX"
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_ENVIRONMENT_NOT_REPO_BOUND:CLOUD_SANDBOX",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_declarative_only_discovery_provenance(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE", provenance="UNVERIFIED_SELF_CLAIM"
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_PROVENANCE_UNVERIFIED",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_stale_discovery_evidence(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE", observed_at="2000-01-01T00:00:00+00:00"
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertTrue(
+            any(
+                reason.startswith("HOST_DISCOVERY_EVIDENCE_STALE:")
+                for reason in handoff["REJECTION_REASON"]
+            )
+        )
+
+    def test_generic_host_rejects_wrong_project_binding(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE",
+                project_binding="evil-owner/p2p-upgrade-github-1",
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_PROJECT_BINDING_MISMATCH",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_requires_available_execution_transport(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE", execution_transport_available=False
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_EXECUTION_TRANSPORT_UNAVAILABLE",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_string_false_transport(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record["execution_transport_available"] = "false"
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_EXECUTION_TRANSPORT_BOOL_REQUIRED",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_mismatched_host_id_and_profile_label(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record["host_id"] = "GROK"
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_IDENTITY_MISMATCH",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_far_future_observation(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE",
+                observed_at="2099-01-01T00:00:00+00:00",
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_EVIDENCE_FROM_FUTURE",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_unparseable_observation(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(
+                "CLAUDE",
+                observed_at="not-a-timestamp",
+            ),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_DISCOVERY_OBSERVED_AT_INVALID",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_generic_host_rejects_same_basename_wrong_repository(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record["project_binding"] = "other-owner/p2p-upgrade-github-1"
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_PROJECT_BINDING_MISMATCH",
+            handoff["REJECTION_REASON"],
+        )
+
+    def test_supervisor_combined_negative_control_is_blocked(self):
+        record = self._generic_repo_read_record("CLAUDE")
+        record["host_id"] = "GROK"
+        record["provenance"] = "UNVERIFIED_SELF_CLAIM"
+        record["observed_at"] = "2099-01-01T00:00:00Z"
+        record["project_binding"] = "other-owner/p2p-upgrade-github-1"
+        record["execution_transport_available"] = "false"
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            "@Scope Reality Check red-team this architecture",
+            host="CLAUDE",
+            host_discovery_record=record,
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertNotEqual(
+            handoff["SKILL_HOST_MODE"],
+            "GENERIC_EXACT_REPO_READ",
         )
 
     def test_receipt_requires_exact_frozen_hashes_and_no_permission_widening(self):
@@ -530,6 +835,40 @@ class SkillConsumptionWireTests(unittest.TestCase):
             ["scope-reality-check", "p2p-scope"],
         )
 
+    def test_control_tower_cli_accepts_existing_host_discovery_record_file(self):
+        args = control_tower_cli.build_parser().parse_args(
+            [
+                "start",
+                "--host", "CLAUDE",
+                "--goal-id", "ISSUE-333",
+                "--goal", "Use repo-native skills",
+                "--host-discovery-record-file", "host-discovery.json",
+            ]
+        )
+        self.assertEqual(
+            args.host_discovery_record_file,
+            "host-discovery.json",
+        )
+
+    def test_control_tower_cli_loads_existing_host_discovery_record(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-host-discovery-") as raw:
+            record_path = Path(raw) / "host-discovery.json"
+            record_path.write_text(
+                json.dumps(self._generic_repo_read_record("CLAUDE")),
+                encoding="utf-8",
+            )
+            loaded = control_tower_cli._load_host_discovery_record(
+                str(record_path)
+            )
+        self.assertIsNotNone(loaded)
+        self.assertEqual(loaded["schema"], "p2p-host-discovery-record/1")
+        self.assertEqual(loaded["host_id"], "CLAUDE")
+        self.assertEqual(
+            loaded["profile"]["capabilities"]["can_read_files"],
+            "SUPPORTED",
+        )
+        self.assertEqual(loaded["availability"], "KNOWN_AVAILABLE")
+
     def test_prompt_declared_two_required_skills_are_exact_and_visible(self):
         handoff = prepare_skill_handoff(
             REPO_ROOT,
@@ -658,6 +997,89 @@ class SkillConsumptionWireTests(unittest.TestCase):
                 result["recommendation"]["REQUIRED_SKILLS"],
                 ["scope-reality-check", "p2p-scope"],
             )
+
+    def test_control_tower_generic_host_serializes_source_bound_skill_handoff(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-skill-host-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(root)
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-skill-host-01",
+                host="CLAUDE",
+                goal_id="ISSUE-333",
+                goal="Generic repo-read skill handoff",
+            )
+            record = self._generic_repo_read_record(
+                "CLAUDE", root=root
+            )
+            result = tower.start_session(
+                binding,
+                task_id="issue-333-test",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=record,
+            )
+            handoff = result["recommendation"]["SKILL_HANDOFF"]
+            prompt = result["recommendation"]["PROMPT"]
+            self.assertEqual(
+                handoff["SKILL_HOST_MODE"], "GENERIC_EXACT_REPO_READ"
+            )
+            self.assertIn(
+                "SKILL_HOST_MODE=GENERIC_EXACT_REPO_READ", prompt
+            )
+            self.assertIn(
+                ".agents/skills/scope-reality-check/SKILL.md", prompt
+            )
+            self.assertIn(
+                handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"],
+                prompt,
+            )
+
+    def test_active_generic_session_revalidates_host_evidence(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-generic-active-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(
+                root,
+                remote="https://github.com/fixture-owner/p2p-generic-active.git",
+            )
+            tower = ControlTower(root)
+            binding = SessionBinding(
+                session_id="generic-active-01",
+                host="CLAUDE",
+                goal_id="ISSUE-333",
+                goal="Generic active session evidence freshness",
+            )
+            fresh = self._generic_repo_read_record("CLAUDE", root=root)
+            first = tower.start_session(
+                binding,
+                task_id="issue-333-active",
+                task_prompt="Pressure-test this plan",
+                required_skills=("scope-reality-check",),
+                host_discovery_record=fresh,
+            )
+            self.assertEqual(
+                first["recommendation"]["SKILL_HANDOFF"]["SKILL_HOST_MODE"],
+                "GENERIC_EXACT_REPO_READ",
+            )
+            stale = self._generic_repo_read_record(
+                "CLAUDE",
+                root=root,
+                observed_at="2000-01-01T00:00:00+00:00",
+            )
+            with self.assertRaisesRegex(
+                BindingError,
+                "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
+                "HOST_DISCOVERY_EVIDENCE_STALE",
+            ):
+                tower.start_session(
+                    binding,
+                    task_id="issue-333-active",
+                    task_prompt="Pressure-test this plan",
+                    required_skills=("scope-reality-check",),
+                    host_discovery_record=stale,
+                )
 
     def test_active_session_same_required_aliases_remains_idempotent(self):
         with tempfile.TemporaryDirectory(prefix="p2p-required-skills-") as raw:
