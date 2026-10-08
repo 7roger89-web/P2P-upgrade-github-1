@@ -24,41 +24,31 @@ File chuẩn tắc tổng hợp hai dòng thời gian: dòng goal C01–C43 đã
 | FRAMEWORK-00 | **Product Memory Foundation** — reconciliation C43, product architecture, master roadmap, research intake ledger, capability & skill map, governance sync, validation, closure, terminal report | IN_PROGRESS (goal này) |
 | FRAMEWORK-01 | **Autonomous Project Operating Loop** (DONE — PASS / AUTONOMOUS_PROJECT_OPERATING_LOOP_READY; FW01_V2_DEFAULT_BRANCH_DURABILITY_COMPLETE; v1 eb396dc1 + v2 2a42e815 released) | DONE |
 | FRAMEWORK-02 | **Project & Capability Intelligence** — DONE, PASS / PROJECT_CAPABILITY_INTELLIGENCE_READY; lớp trí tuệ năng lực trong FW01 (task → năng lực bắt buộc → nguồn đa dạng → coverage fail-closed → decision trace), shadow eval GT+GP PASS, không orchestrator cạnh tranh | DONE |
-| FRAMEWORK-03 | Pilot mở rộng (dự án thứ 3 hoặc ngôn ngữ/framework khác) + **Council Full Certification** — future live proof target; current-lineage `LIVE_COUNCIL_8_OF_8` remains `NOT_PROVEN` | NOT_STARTED |
+| FRAMEWORK-03 | Pilot mở rộng + **Council Full Certification** — third-project pilot đã PASS trên `child-learning-lab`; current-lineage `LIVE_COUNCIL_8_OF_8` vẫn `NOT_PROVEN` | IN_PROGRESS — PILOT_PASS / COUNCIL_NOT_PROVEN |
 | FRAMEWORK-04 | Release gates tái kiểm tra + re-promotion sau thay đổi runtime | NOT_STARTED |
 | FRAMEWORK-05 | Quality & Evidence learning layer (học từ bằng chứng các pilot để cải thiện validation) | NOT_STARTED |
 | FRAMEWORK-06 | Review tổng thể sản phẩm + beginner experience audit trước giai đoạn phát hành rộng | NOT_STARTED |
 
-## RF01 — README-first development plane (noncanonical)
+## RF01 — README-first development plane (historical/reconciled)
 
-RF01 is the active development-plane continuation on sealed `.74`, not a new
-C-line and not a promotion/release goal. Its outcome is a compact README
-orientation projection plus a deterministic managed-block updater and a
-coherent product-development framework in the existing charter, architecture,
-roadmap, and development-control surfaces.
+RF01 không còn là development-plane đang hoạt động. Fresh governance hiện ghi
+`CLOSED_VERIFIED_NO_PROMOTION`: RF01 đã được independent verification, C43
+reconciliation đã đóng, và AERG đã có current GitHub-runner fail-closed evidence.
 
-The product fast loop is Owner Outcome → Minimum Product Truth → Product/UX
-Synthesis → Interactive Prototype → Owner Review → Visual/Product Reference
-Lock → Implementation → Targeted Tests → Human Outcome Test. The separate
-assurance/release loop is Risk-Proportional Hardening → Independent Verification
-→ Release. The state sequence is IDEA → PROTOTYPE → OWNER TRUTH →
-IMPLEMENTATION → SYSTEM TRUTH → VERIFICATION → RELEASE TRUTH.
+Authority vẫn giữ nguyên:
+- `.19` là official promoted artifact baseline;
+- `.74` là sealed/unpromoted historical reference, không còn là current promotion target;
+- promotion vẫn `allowed=false`; mọi promotion tương lai cần fresh current-main candidate,
+  independent evidence và Owner gate riêng.
 
-After RF01, the next safe reconciliation work is **C43 reconciliation** and
-**AERG reconciliation**. Later candidates are read-only OXP v1, Owner Decision
-Inbox, Human Outcome Acceptance, Product Fast Loop tooling, Visual/Product
-Reference Lock, design-reference retrieval, skill-hygiene benchmarking, Work
-Queue/Lane Registry, Handoff/Integration queue, verifier expansion, time loops,
-and adaptive scheduling. These are roadmap candidates only; RF01 does not build
-unbounded orchestration, generic memory/vector infrastructure, auto-approval,
-background dependencies, or hardcoded vendor routing.
+Product fast loop / assurance loop của RF01 vẫn là framework đã được bảo tồn, nhưng
+không còn là "next goal". Sau reconciliation, product lane hợp lệ chuyển sang
+FRAMEWORK-03. Third-project pilot của FRAMEWORK-03 đã PASS trên
+`7roger89-web/child-learning-lab`; phần Council Full Certification của current
+lineage vẫn `NOT_PROVEN`.
 
-The host limitation remains explicit: `.19` is the official canonical baseline,
-`.74` is sealed and UNPROMOTED, and CPT01-R2 is blocked by
-`EXTERNAL_HOST_CAPABILITY_LIMITATION`. Stop after RF01; do not begin C43 in the
-same goal.
-
-Required report disclaimer: `Implemented against sealed .74 NONCANONICAL DEVELOPMENT BASE. Official canonical baseline remains .19. Release/promotion authority remains deferred due to external GitHub private repository host-protection limitation.`
+Required report boundary: không được dùng RF01 history, sealed `.74`, hoặc
+historical Council proof để suy diễn promotion/release/current Council certification.
 
 ## FRAMEWORK-01 — Định nghĩa mục tiêu tiếp theo (dừng trước thực thi)
 
@@ -95,6 +85,39 @@ Acceptance bar (20 mục, §36): đã chứng minh cơ học toàn bộ.
 
 Stop rule: terminal report → STOP; việc thực thi FRAMEWORK-03 chỉ bắt đầu khi
 Owner ra lệnh "chạy FRAMEWORK-03".
+
+## FRAMEWORK-03 — trạng thái hiện tại
+
+FRAMEWORK-03 có hai vế độc lập và không được nhập nhằng:
+
+1. **Real third-project pilot — PASS.**
+   - Target: `7roger89-web/child-learning-lab` (JavaScript/browser).
+   - Product task: Issue #35 / PR #36, Companion Interaction Pilot V0.2.
+   - Repaired head `a0fb67a...` được independent Supervisor PASS tại comment
+     `5979999065`.
+   - Durable project truth được reconciliation qua PR #41 và stable-identity
+     correction qua PR #43; evidence anchor `7a6e534e...`.
+   - Boundary giữ nguyên: `CHILD_ENGAGEMENT_PASS=NOT_CLAIMED`,
+     `CHILD_SPEAKBACK_PASS=NOT_CLAIMED`, next product gate ở target project là
+     real-child observation.
+   - Pilot này **không** được dùng để claim V1 skill-consumption receipt: product
+     execution gốc diễn ra trước contract receipt hiện hành.
+
+2. **Current-lineage Council Full Certification — NOT_PROVEN.**
+   - Historical single-host live Council 8/8 vẫn chỉ là historical evidence.
+   - `CURRENT_LINEAGE_FULL_COUNCIL_LIVE_PROVEN=FALSE`.
+   - Current ChatGPT host không expose 8 thread/subagent độc lập; theo P2P QUORUM:
+     `QUORUM_STATUS=UNAVAILABLE_IN_THIS_HOST`.
+   - Không mô phỏng tám vai trong một response và không dùng research-agent khác loại
+     làm giả Council receipt.
+   - Next condition: chạy trên live host có 8 worker độc lập + per-role receipts.
+
+FW03 runtime machinery không được tạo trong slice này: `team_intelligence.py` và
+FW01 integration đã tồn tại từ historical implementation commit `93963d38...`.
+Slice hiện tại chỉ reconciliation truth/evidence; không sửa runtime, không mint
+candidate, không promotion/release/deploy và không bắt đầu FRAMEWORK-04.
+
+Progress report: `docs/p2p-development/reports/P2P-FRAMEWORK-03-progress-report.md`.
 
 ## Stop rule
 
