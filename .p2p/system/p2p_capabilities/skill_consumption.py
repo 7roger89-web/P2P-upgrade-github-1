@@ -226,7 +226,7 @@ def _validate_repo_read_provenance(
         return "HOST_CANONICAL_REPO_REVISION_UNAVAILABLE"
 
     match = re.fullmatch(
-        r"([A-Z0-9_]+)\\|repo=([^|]+)\\|revision=([0-9a-fA-F]{40})",
+        r"([A-Z0-9_]+)\|repo=([^|]+)\|revision=([0-9a-fA-F]{40})",
         record.provenance.strip(),
     )
     if match is None:
