@@ -129,16 +129,33 @@ class C43RecordDiagnosticTests(unittest.TestCase):
 
 
 class C43BoundaryTests(unittest.TestCase):
-    def test_rf01_orientation_unchanged(self):
+    def test_development_plane_reconciled_without_promotion(self):
         control = json.loads(
             (REPO_ROOT / "governance/development-control.json").read_text(encoding="utf-8")
         )
         plane = control["development_plane"]
         self.assertEqual(plane["goal_id"], "RF01")
-        self.assertEqual(plane["status"], "ACTIVE_NONCANONICAL_NO_PROMOTION")
+        self.assertEqual(plane["status"], "CLOSED_VERIFIED_NO_PROMOTION")
         self.assertEqual(plane["official_canonical_baseline"]["version"], "8.4.7-C-codex.19")
         self.assertEqual(plane["cpt01_r2"]["blocker"], "EXTERNAL_HOST_CAPABILITY_LIMITATION")
+        self.assertTrue(plane["cpt01_r2"]["historical"])
         self.assertFalse(plane["promotion"]["allowed"])
+        self.assertEqual(plane["next_safe_goals"], ["FRAMEWORK-03_REAL_THIRD_PROJECT_PILOT"])
+        self.assertEqual(plane["closure"]["rf01"], "INDEPENDENTLY_VERIFIED")
+        self.assertEqual(plane["closure"]["aerg"], "CURRENT_GITHUB_CI_VERIFIED")
+
+    def test_current_lineage_reconciliation_has_no_historical_promotion_target(self):
+        control = json.loads(
+            (REPO_ROOT / "governance/development-control.json").read_text(encoding="utf-8")
+        )
+        current = control["current_development"]
+        self.assertEqual(current["development_goal"], "P2P-CANONICAL-LINEAGE-REPAIR-01")
+        self.assertEqual(current["status"], "RECONCILED_NO_ACTIVE_PROMOTION_CANDIDATE")
+        self.assertEqual(current["source_version_status"], "LINEAGE_RECONCILED")
+        binding = current["candidate_identity_binding"]
+        self.assertEqual(binding["status"], "HISTORICAL_SEALED_UNPROMOTED_REFERENCE")
+        self.assertFalse(binding["current_promotion_target"])
+        self.assertIn("fresh candidate minted from current main", current["owner_action_required"])
 
     def test_sealed_c74_boundary_unchanged(self):
         control = json.loads(
