@@ -72,9 +72,12 @@ from p2p_capabilities.task_state import (  # noqa: E402
 
 BASE_SHA = "a" * 40
 BASE_TREE = "b" * 40
-EXPECTED_CANONICAL_LAW_SHA = hashlib.sha256(
-    (REPO_ROOT / "docs" / "p2p-development" / "P2P-OPERATIONS-NOTEBOOK.md").read_bytes()
-).hexdigest()
+# Bind canary fixtures to the same canonical-main law receipt that the
+# Control Tower runtime uses. A task branch may edit the future law, but
+# TASK_BRANCH != LAW_AUTHORITY until that change lands on canonical main.
+EXPECTED_CANONICAL_LAW_SHA = str(
+    control_tower._establish_control_tower_law_context(REPO_ROOT)["content_sha256"]
+)
 LEDGER_RELATIVE = Path(".p2p") / "state" / "execution-ledger.jsonl"
 
 # The real bounded task shape observed in the 2026-09-24 blind test.

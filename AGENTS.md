@@ -80,6 +80,34 @@ return fields. Never repeat large canonical policies in an executor prompt.
 - When acceptance evidence is sufficient, stop (`STOP_WHEN_EVIDENCE_SUFFICIENT`);
   do not begin optional hardening or follow-on work.
 
+## Prompt-writer repo-skill routing
+
+`PROMPT_WRITER_SKILL_ROUTING_V1=YES` applies whenever ChatGPT, Control Tower,
+or another P2P prompt writer delegates repository work to Arena, Codex, Manus,
+Claude, Grok, or another supported AI executor.
+
+- Before writing the delegated operational prompt, inspect the **target repo's**
+  supported skill discovery surfaces: `.p2p/portable/P2P-SKILL-PROJECTION.json`
+  when present and `.agents/skills/*/SKILL.md` metadata/frontmatter as needed.
+  Reuse the existing Skill Consumption Wire when available; do not create a
+  second router.
+- Select the smallest relevant set, maximum 3. Explicit Owner `@skill`,
+  `$skill`, or `REQUIRED_SKILLS` wins when it resolves validly. Do not
+  preload all skill bodies.
+- For every selected skill, resolve the exact repo-local `SKILL.md` path and
+  SHA-256 before issuing the prompt. Serialize the selected/required set,
+  source paths/hashes, destination host mode, and require the executor to read
+  and apply each selected skill plus return
+  `p2p-skill-consumption-receipt/1`.
+- No relevant match => serialize `SKILL_CHECK=NO_MATCH` and continue normally.
+  Unknown/missing/ambiguous/hash-mismatched **required** skill => fail closed
+  before delegation; never silently substitute or drop it.
+- A downstream `@skill` string alone is not consumption evidence. Source-bound
+  handoff + exact executor receipt is the proof boundary.
+- Skill routing cannot widen permissions, Owner authority, task scope, mutation,
+  release/deploy/promotion, or acceptance authority. Do not add a vector DB,
+  daemon, background scanner, registry, or preload-all mechanism for this rule.
+
 ## Executor-aware resource policy
 
 Resource tactics are executor-specific. `MIN_BURN` is a Codex/Astra policy,

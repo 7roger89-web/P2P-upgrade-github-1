@@ -148,6 +148,10 @@ def test_writes_git_trackable_portable_projection_without_runtime_install(tmp_pa
     assert "Never introduce a fixed retry-count hard stop" in agents
     assert "do not assume Codex CLI has Claude Code's evaluator semantics" in agents
     assert "### Repo-native required skill handoff" in agents
+    assert "PROMPT_WRITER_SKILL_ROUTING_V1=YES" in agents
+    assert "SKILL_CHECK=NO_MATCH" in agents
+    assert "smallest relevant set (max 3)" in agents
+    assert "A downstream `@skill` token alone is not consumption evidence." in agents
     assert "REQUIRED_SKILLS=<ids>" in agents
     assert "p2p-skill-consumption-receipt/1" in agents
 
@@ -337,6 +341,9 @@ def test_canonical_law_and_release_package_recognize_portable_projection() -> No
     assert ".p2p/portable/P2P-OPERATIONS-NOTEBOOK.md" in notebook
     assert "P2P_PORTABLE_LAW_PROJECTION=YES" in notebook
     assert "generated portable project projection" in notebook
+    assert "PROMPT_WRITER_SKILL_ROUTING_V1=YES" in notebook
+    assert "TARGET_REPO_SKILL_DISCOVERY" in notebook
+    assert "MAX_SELECTED_SKILLS=3" in notebook
     assert '"docs/p2p-development/P2P-PORTABLE-LAW-PROJECTION.md"' in package_release
     assert '"scripts/p2p_portable_law_projection.py"' in package_release
 
