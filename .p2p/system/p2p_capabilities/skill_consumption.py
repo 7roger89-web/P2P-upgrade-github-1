@@ -226,12 +226,22 @@ def _validate_repo_read_provenance(
         return "HOST_CANONICAL_REPO_REVISION_UNAVAILABLE"
 
     match = re.fullmatch(
-        r"([A-Z0-9_]+)\|repo=([^|]+)\|revision=([0-9a-fA-F]{40})",
+        (
+            r"([A-Z0-9_]+)\\|repo=([^|]+)"
+            r"\\|revision=([0-9a-fA-F]{40})"
+            r"\\|probe=([^|]+)\\|sha256=([0-9a-fA-F]{64})"
+        ),
         record.provenance.strip(),
     )
     if match is None:
         return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
-    kind, provenance_repo, provenance_revision = match.groups()
+    (
+        kind,
+        provenance_repo,
+        provenance_revision,
+        probe_path,
+        probe_sha256,
+    ) = match.groups()
     if kind not in TRUSTED_REPO_READ_PROVENANCE_KINDS:
         return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
     if provenance_repo.strip().lower() != expected_repo:
@@ -242,6 +252,31 @@ def _validate_repo_read_provenance(
         return "HOST_PROJECT_BINDING_REQUIRED"
     if record.project_binding.strip().lower() != expected_repo:
         return "HOST_PROJECT_BINDING_MISMATCH"
+
+    normalized_probe = probe_path.strip().replace("\\", "/")
+    if (
+        normalized_probe.startswith(("/", "~"))
+        or ".." in Path(normalized_probe).parts
+        or not (
+            (
+                normalized_probe.startswith(".agents/skills/")
+                and normalized_probe.endswith("/SKILL.md")
+            )
+            or normalized_probe
+            == ".p2p/system/p2p_capabilities/capabilities.json"
+        )
+    ):
+        return "HOST_DISCOVERY_PROBE_PATH_INVALID"
+    candidate = (root / normalized_probe).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return "HOST_DISCOVERY_PROBE_PATH_INVALID"
+    if not candidate.is_file():
+        return "HOST_DISCOVERY_PROBE_UNREADABLE"
+    actual_probe_sha256 = hashlib.sha256(candidate.read_bytes()).hexdigest()
+    if actual_probe_sha256 != probe_sha256.lower():
+        return "HOST_DISCOVERY_PROBE_HASH_MISMATCH"
     return None
 
 
