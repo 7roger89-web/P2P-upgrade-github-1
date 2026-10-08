@@ -1439,7 +1439,13 @@ class SkillConsumptionWireTests(unittest.TestCase):
 
 
 class PromptOnlyGenericSkillHandoffTests(unittest.TestCase):
-    """Issue #333 narrower slice: PROMPT_ONLY is not GENERIC_EXACT_REPO_READ."""
+    """Issue #333 narrower slice: PROMPT_ONLY is not GENERIC_EXACT_REPO_READ.
+
+    Proposed acceptance change (NOT approved, NOT original-issue completion):
+    allow source-bound generic prompt preparation without actor-read attestation,
+    while keeping GENERIC_EXACT_REPO_READ and automatic generic execution BLOCKED.
+    MERGE=NO until this delta is explicitly approved and independently validated.
+    """
 
     PRESSURE_REQUEST = (
         "@Scope Reality Check red-team this architecture before implementation"
