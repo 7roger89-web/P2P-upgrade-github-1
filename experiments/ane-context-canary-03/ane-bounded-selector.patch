@@ -1,0 +1,95 @@
+diff --git a/src/ane_context_harness/retrieval/selector.py b/src/ane_context_harness/retrieval/selector.py
+--- a/src/ane_context_harness/retrieval/selector.py
++++ b/src/ane_context_harness/retrieval/selector.py
+@@ -25,6 +25,7 @@ CATEGORY_ORDER = {
+ }
+ 
+ _PER_FILE_FRACTION = 0.25  # per-file maximum allocation of budget
++_NAMED_SYMBOL_MANDATORY_MAX_CHUNKS = 8
+ 
+ 
+ def _terms(text: str) -> set:
+@@ -91,10 +92,23 @@ def select_evidence(chunks: list, scores: list, task: str, token_budget: int,
+     # sort chunks by final score desc for candidate ordering
+     order = sorted(range(len(chunks)), key=lambda i: (-scores[i].final_score, i))
+ 
++    # A single broad task word such as "context" or "capability" can match
++    # hundreds of symbols in a large repository.  Such a match remains useful
++    # for ranking, but it must not silently turn the whole corpus mandatory.
++    from .structural import matched_symbol_terms
++    matched_terms_by_idx = {}
++    symbol_term_fanout = {}
++    for i, c in enumerate(chunks):
++        matched = matched_symbol_terms(c, task_terms)
++        matched_terms_by_idx[i] = matched
++        for term in matched:
++            symbol_term_fanout[term] = symbol_term_fanout.get(term, 0) + 1
++
+     # mandatory flags
+     explicit_set = set(p.replace("\\", "/") for p in explicit_paths)
+     mandatory_idx = set()
+     authority_fired: set = set()
++    broad_symbol_terms: set = set()
+     for i, c in enumerate(chunks):
+         norm = c.path.replace("\\", "/")
+         if norm in explicit_set or norm.endswith(tuple(explicit_set)):
+@@ -111,9 +125,15 @@ def select_evidence(chunks: list, scores: list, task: str, token_budget: int,
+                 score_by_id[c.chunk_id].selection_reasons.append("authority")
+         # symbol directly named in task — own symbol for symbol-scoped chunks,
+         # full file symbol list for file-level chunks (metadata.file_symbols);
+-        # micro/generic terms (to/is/for/test) never trigger retention
+-        from .structural import matched_symbol_terms
+-        if matched_symbol_terms(c, task_terms):
++        # micro/generic terms (to/is/for/test) never trigger retention.  Also
++        # suppress unconditional retention when the same task term fans out
++        # across too many chunks; broad matches still contribute normal symbol
++        # and lexical ranking.
++        matched = matched_terms_by_idx.get(i, set())
++        bounded = {
++            term for term in matched
++            if symbol_term_fanout.get(term, 0) <= _NAMED_SYMBOL_MANDATORY_MAX_CHUNKS
++        }
++        broad_symbol_terms.update(matched - bounded)
++        if bounded:
+             mandatory_idx.add(i)
+             score_by_id[c.chunk_id].mandatory = True
+             if "named_symbol" not in score_by_id[c.chunk_id].selection_reasons:
+@@ -182,6 +202,11 @@ def select_evidence(chunks: list, scores: list, task: str, token_budget: int,
+         "budget_exceeded": used_tokens > token_budget,
+         "per_file_tokens": per_file_tokens,
+         "authority_flags": sorted(authority_fired),
++        "named_symbol_mandatory_max_chunks": _NAMED_SYMBOL_MANDATORY_MAX_CHUNKS,
++        "named_symbol_term_fanout": {
++            term: symbol_term_fanout[term] for term in sorted(symbol_term_fanout)
++        },
++        "named_symbol_broad_terms": sorted(broad_symbol_terms),
+     }
+     return final_chunks, diagnostics
+ 
+diff --git a/src/ane_context_harness/pipeline.py b/src/ane_context_harness/pipeline.py
+--- a/src/ane_context_harness/pipeline.py
++++ b/src/ane_context_harness/pipeline.py
+@@ -342,6 +342,20 @@ class Pipeline:
+                            "compaction": compaction}
+ 
+         sel_tokens = sum(tokens_mod.count(e["content"]) for e in pkg.evidence)
++        # A user-supplied budget is an actual output boundary for ordinary
++        # retrieval.  Explicit paths and developer-crowned authority remain
++        # deliberate overrides, and full-context mode is intentionally uncut.
++        hard_pin_override = any(
++            {"explicit_path", "authority"}
++            & set(e.get("selection_reasons") or [])
++            for e in pkg.evidence
++        )
++        if (
++            not request.options.get("full_context")
++            and sel_tokens > max_budget
++            and not hard_pin_override
++        ):
++            raise ValueError(
++                f"context pack exceeded hard token budget: selected={sel_tokens} "
++                f"budget={max_budget}"
++            )
+         reduction = ((cand_tokens - sel_tokens) / cand_tokens * 100.0) if cand_tokens else 0.0
+         # Required-coverage floor: mandatory (required-evidence) chunks are
+         # always retained; the token budget governs discretionary chunks only.
