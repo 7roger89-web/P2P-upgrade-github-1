@@ -46,15 +46,21 @@ from p2p_capabilities.task_state import TaskPlan, TaskStateStore  # noqa: E402
 import p2p_control_tower as control_tower_cli  # noqa: E402
 from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
+    GENERIC_PROMPT_ONLY_MODE,
+    GENERIC_REPO_READ_MODE,
+    PROMPT_ONLY_CAPABILITY,
     RECEIPT_SCHEMA,
     _canonical_repo_binding,
     _current_repo_revision,
     _normalize_github_repo,
     load_selected_skills,
+    prepare_prompt_only_skill_handoff,
     prepare_skill_handoff,
     select_skills_for_task,
     skill_handoff_prompt_lines,
+    validate_cached_skill_handoff_host_evidence,
     validate_consumption_receipt,
+    validate_prompt_only_receipt,
 )
 from p2p_capabilities import quality_intelligence as qi  # noqa: E402
 
@@ -1430,6 +1436,377 @@ class SkillConsumptionWireTests(unittest.TestCase):
                     task_prompt="Pressure-test and organize this plan",
                     required_skills=("scope-reality-check",),
                 )
+
+
+class PromptOnlyGenericSkillHandoffTests(unittest.TestCase):
+    """Issue #333 narrower slice: PROMPT_ONLY is not GENERIC_EXACT_REPO_READ."""
+
+    PRESSURE_REQUEST = (
+        "@Scope Reality Check red-team this architecture before implementation"
+    )
+    DEBUG_REQUEST = "Why does this local unit test fail on line 42?"
+
+    def _git(self, root: Path, *args: str) -> str:
+        return SkillConsumptionWireTests._git(self, root, *args)
+
+    def _init_fixture_git(self, root: Path, **kwargs) -> None:
+        return SkillConsumptionWireTests._init_fixture_git(self, root, **kwargs)
+
+    def _generic_repo_read_record(self, *args, **kwargs):
+        return SkillConsumptionWireTests._generic_repo_read_record(
+            self, *args, **kwargs
+        )
+
+    def _copy_minimal_required_skill_root(self, root: Path) -> None:
+        return SkillConsumptionWireTests._copy_minimal_required_skill_root(
+            self, root
+        )
+
+    def test_prompt_only_prepares_scope_reality_check_without_actor_read(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+        )
+        handoff = package["skill_handoff"]
+        self.assertEqual(package["status"], "PREPARED")
+        self.assertFalse(package["execution_authorized"])
+        self.assertFalse(package["automatic_start"])
+        self.assertEqual(package["external_actor_read"], "NOT_VERIFIED")
+        self.assertEqual(handoff["SKILL_CHECK"], "PREPARED")
+        self.assertNotEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(handoff["SKILL_HOST_MODE"], GENERIC_PROMPT_ONLY_MODE)
+        self.assertNotEqual(handoff["SKILL_HOST_MODE"], GENERIC_REPO_READ_MODE)
+        self.assertEqual(handoff["SOURCE_VALIDATION"], "PASS")
+        self.assertEqual(handoff["RECIPIENT_CONSUMPTION"], "UNVERIFIED")
+        self.assertEqual(handoff["EXECUTION_AUTHORIZED"], "NO")
+        self.assertIn("scope-reality-check", handoff["SKILLS_SELECTED"])
+        self.assertEqual(
+            handoff["SKILL_SOURCE_PATHS"]["scope-reality-check"],
+            ".agents/skills/scope-reality-check/SKILL.md",
+        )
+        self.assertRegex(
+            handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"],
+            r"^[0-9a-f]{64}$",
+        )
+        prompt = package["prompt"]
+        self.assertIsInstance(prompt, str)
+        self.assertIn("OPERATION=PREPARE", prompt)
+        self.assertIn("EXECUTION_AUTHORIZED=NO", prompt)
+        self.assertIn("DESTINATION_HOST=CLAUDE", prompt)
+        self.assertIn("SOURCE_VALIDATION=PASS", prompt)
+        self.assertIn("RECIPIENT_CONSUMPTION=UNVERIFIED", prompt)
+        self.assertIn(".agents/skills/scope-reality-check/SKILL.md", prompt)
+        self.assertIn(
+            handoff["SKILL_SOURCE_HASHES"]["scope-reality-check"], prompt
+        )
+        self.assertIn(handoff["REPOSITORY"], prompt)
+        self.assertIn(handoff["REVISION"], prompt)
+        self.assertIn("p2p-skill-consumption-receipt/1", prompt)
+
+    def test_ordinary_debug_request_does_not_implicitly_load_scope_skill(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.DEBUG_REQUEST,
+            host="CLAUDE",
+        )
+        self.assertEqual(package["status"], "NO_MATCH")
+        self.assertEqual(package["skill_handoff"]["SKILL_CHECK"], "NO_MATCH")
+        self.assertNotIn(
+            "scope-reality-check",
+            package["skill_handoff"]["SKILLS_SELECTED"],
+        )
+        self.assertIn("Do not preload unrelated skills", package["prompt"])
+
+    def test_default_generic_prepare_still_requires_actor_observation(self):
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            host_discovery_record=self._generic_repo_read_record(),
+        )
+        self.assertEqual(handoff["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "HOST_TRUSTED_REPO_READ_OBSERVATION_UNAVAILABLE",
+            handoff["REJECTION_REASON"],
+        )
+        self.assertNotEqual(handoff["SKILL_HOST_MODE"], GENERIC_PROMPT_ONLY_MODE)
+
+    def test_missing_required_skill_blocks_prompt_only(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.DEBUG_REQUEST,
+            host="GROK",
+            required_skills=("not-a-real-skill",),
+        )
+        self.assertEqual(package["status"], "BLOCKED")
+        self.assertTrue(
+            any(
+                str(code).startswith("REQUIRED_SKILL_NOT_FOUND")
+                for code in package["skill_handoff"]["REJECTION_REASON"]
+            )
+        )
+        self.assertIsNone(package["prompt"])
+
+    def test_wrong_hash_and_path_block_source_validation(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-prompt-only-hash-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(root)
+            skill_path = root / ".agents" / "skills" / "scope-reality-check" / "SKILL.md"
+            original = skill_path.read_text(encoding="utf-8")
+            skill_path.write_text(original + "\n# tampered\n", encoding="utf-8")
+            package = prepare_prompt_only_skill_handoff(
+                root,
+                self.PRESSURE_REQUEST,
+                host="CLAUDE",
+                required_skills=("scope-reality-check",),
+            )
+            self.assertEqual(package["status"], "BLOCKED")
+            self.assertTrue(
+                any(
+                    "SKILL_ENTRYPOINT_HASH_MISMATCH" in str(code)
+                    for code in package["skill_handoff"]["REJECTION_REASON"]
+                )
+            )
+
+    def test_malformed_source_binding_is_rejected(self):
+        from p2p_capabilities.skill_consumption import (
+            SkillConsumptionError,
+            build_prompt_only_delegated_prompt,
+        )
+        handoff = prepare_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+            delivery_capability=PROMPT_ONLY_CAPABILITY,
+        )
+        tampered = dict(handoff)
+        tampered["SKILL_SOURCE_PATHS"] = {
+            "scope-reality-check": "/etc/passwd",
+        }
+        with self.assertRaisesRegex(
+            SkillConsumptionError, "SKILL_SOURCE_PATH_INVALID"
+        ):
+            build_prompt_only_delegated_prompt(
+                REPO_ROOT,
+                tampered,
+                request_text=self.PRESSURE_REQUEST,
+                host="CLAUDE",
+            )
+        wrong_hash = dict(handoff)
+        wrong_hash["SKILL_SOURCE_HASHES"] = {
+            "scope-reality-check": "0" * 64,
+        }
+        with self.assertRaisesRegex(
+            SkillConsumptionError, "SKILL_ENTRYPOINT_HASH_MISMATCH"
+        ):
+            build_prompt_only_delegated_prompt(
+                REPO_ROOT,
+                wrong_hash,
+                request_text=self.PRESSURE_REQUEST,
+                host="CLAUDE",
+            )
+
+    def test_forged_receipt_is_not_trusted_external_actor_evidence(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+        )
+        handoff = package["skill_handoff"]
+        forged = {
+            "schema": RECEIPT_SCHEMA,
+            "SKILLS_SELECTED": list(handoff["SKILLS_SELECTED"]),
+            "SKILL_SOURCE_HASHES": {
+                key: "0" * 64 for key in handoff["SKILL_SOURCE_HASHES"]
+            },
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_CONSUMPTION": "CONSUMED",
+            "SKILL_HOST_MODE": GENERIC_PROMPT_ONLY_MODE,
+            "PERMISSION_WIDENED": "NO",
+        }
+        structural = validate_prompt_only_receipt(handoff, forged)
+        self.assertFalse(structural["structurally_valid"])
+        self.assertIn("SKILL_SOURCE_HASH_MISMATCH", structural["reason_codes"])
+        self.assertFalse(structural["trusted_external_actor"])
+        execution = validate_consumption_receipt(handoff, forged)
+        self.assertFalse(execution["valid"])
+        self.assertFalse(execution["trusted_external_actor"])
+        self.assertIn(
+            "GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION",
+            execution["reason_codes"],
+        )
+
+    def test_matching_self_report_still_does_not_authorize_execution(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+        )
+        handoff = package["skill_handoff"]
+        receipt = {
+            "schema": RECEIPT_SCHEMA,
+            "SKILLS_SELECTED": list(handoff["SKILLS_SELECTED"]),
+            "SKILL_SOURCE_HASHES": dict(handoff["SKILL_SOURCE_HASHES"]),
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_CONSUMPTION": "CONSUMED",
+            "SKILL_HOST_MODE": GENERIC_PROMPT_ONLY_MODE,
+            "PERMISSION_WIDENED": "NO",
+        }
+        structural = validate_prompt_only_receipt(handoff, receipt)
+        self.assertTrue(structural["structurally_valid"])
+        self.assertEqual(structural["external_actor_read"], "SELF_REPORTED")
+        self.assertFalse(structural["trusted_external_actor"])
+        execution = validate_consumption_receipt(handoff, receipt)
+        self.assertFalse(execution["valid"])
+        self.assertFalse(execution["execution_authorized"])
+
+    def test_missing_receipt_fails_downstream_reconciliation(self):
+        package = prepare_prompt_only_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CLAUDE",
+            required_skills=("scope-reality-check",),
+        )
+        missing = validate_consumption_receipt(package["skill_handoff"], None)
+        self.assertFalse(missing["valid"])
+        self.assertIn("SKILL_CONSUMPTION_RECEIPT_MISSING", missing["reason_codes"])
+        binding = SessionBinding(
+            session_id="prompt-only-recon-01",
+            host="CLAUDE",
+            goal_id="ISSUE-333",
+            goal="Prompt-only must not close execution",
+        )
+        state = ControlTowerState.empty()
+        state.session_records[binding.session_id] = {
+            "BINDING": binding.to_dict(),
+            "SKILL_HANDOFF": package["skill_handoff"],
+        }
+        packet = ControlTowerReturnPacket(
+            binding=binding,
+            session_state="COMPLETED",
+            canonical_base_sha="a" * 40,
+            canonical_base_tree="b" * 40,
+            skill_consumption_receipt={
+                "schema": RECEIPT_SCHEMA,
+                "SKILLS_SELECTED": list(
+                    package["skill_handoff"]["SKILLS_SELECTED"]
+                ),
+                "SKILL_SOURCE_HASHES": dict(
+                    package["skill_handoff"]["SKILL_SOURCE_HASHES"]
+                ),
+                "SKILL_LOAD_STAGE": "LOAD",
+                "SKILL_CONSUMPTION": "CONSUMED",
+                "SKILL_HOST_MODE": GENERIC_PROMPT_ONLY_MODE,
+                "PERMISSION_WIDENED": "NO",
+            },
+        )
+        result = state.ingest(
+            packet,
+            current_canonical_base_sha="a" * 40,
+            current_canonical_base_tree="b" * 40,
+            record_event=False,
+        )
+        self.assertEqual(result.control_tower_status, "RECONCILIATION_REQUIRED")
+        self.assertIn(
+            "GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION",
+            result.blockers,
+        )
+
+    def test_prompt_only_does_not_start_or_reuse_as_active_session(self):
+        with tempfile.TemporaryDirectory(prefix="p2p-prompt-only-session-") as raw:
+            root = Path(raw)
+            self._copy_minimal_required_skill_root(root)
+            self._init_fixture_git(root)
+            tower = ControlTower(root)
+            prepared = tower.prepare_prompt_only(
+                "CLAUDE",
+                self.PRESSURE_REQUEST,
+                required_skills=("scope-reality-check",),
+            )
+            self.assertEqual(prepared["status"], "PREPARED")
+            self.assertFalse(prepared["session_started"])
+            self.assertFalse(tower.ledger_path.is_file())
+            binding = SessionBinding(
+                session_id="prompt-only-must-not-start",
+                host="CLAUDE",
+                goal_id="ISSUE-333",
+                goal="Must not promote prepared prompt to session",
+            )
+            with self.assertRaisesRegex(
+                BindingError,
+                "HOST_TRUSTED_REPO_READ_OBSERVATION_UNAVAILABLE",
+            ):
+                tower.start_session(
+                    binding,
+                    task_id="issue-333-prompt-only",
+                    task_prompt=self.PRESSURE_REQUEST,
+                    required_skills=("scope-reality-check",),
+                    host_discovery_record=self._generic_repo_read_record(
+                        root=root
+                    ),
+                )
+            cached = validate_cached_skill_handoff_host_evidence(
+                root,
+                host="CLAUDE",
+                skill_handoff=prepared["skill_handoff"],
+                host_discovery_record=self._generic_repo_read_record(root=root),
+            )
+            self.assertFalse(cached["valid"])
+            self.assertEqual(
+                cached["reason"],
+                "GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION",
+            )
+
+    def test_prompt_only_does_not_change_arena_or_codex(self):
+        arena = prepare_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="ARENA",
+        )
+        self.assertEqual(arena["SKILL_CHECK"], "PASS")
+        self.assertEqual(arena["SKILL_HOST_MODE"], "ARENA_EXACT_REPO_READ")
+        self.assertNotIn("EXECUTION_AUTHORIZED", arena)
+        blocked_native = prepare_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="ARENA",
+            delivery_capability=PROMPT_ONLY_CAPABILITY,
+        )
+        self.assertEqual(blocked_native["SKILL_CHECK"], "BLOCKED")
+        self.assertIn(
+            "PROMPT_ONLY_NATIVE_HOST_FORBIDDEN",
+            blocked_native["REJECTION_REASON"],
+        )
+        codex = prepare_skill_handoff(
+            REPO_ROOT,
+            self.PRESSURE_REQUEST,
+            host="CODEX",
+        )
+        self.assertEqual(codex["SKILL_CHECK"], "PASS")
+        self.assertEqual(codex["SKILL_HOST_MODE"], "CODEX_NATIVE_PROJECT_SKILL")
+
+    def test_cli_prepare_prompt_only_does_not_register_a_session(self):
+        parser = control_tower_cli.build_parser()
+        args = parser.parse_args(
+            [
+                "prepare-prompt-only",
+                "--host",
+                "CLAUDE",
+                "--task",
+                self.PRESSURE_REQUEST,
+                "--required-skill",
+                "scope-reality-check",
+            ]
+        )
+        self.assertEqual(args.command, "prepare-prompt-only")
+        self.assertEqual(args.host, "CLAUDE")
+        self.assertEqual(args.required_skill, ["scope-reality-check"])
 
 
 class SkillEffectivenessEvidenceTests(unittest.TestCase):

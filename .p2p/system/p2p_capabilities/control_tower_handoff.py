@@ -2139,6 +2139,18 @@ class ControlTowerState:
         expected_skill_handoff = session_rec.get("SKILL_HANDOFF")
         if isinstance(expected_skill_handoff, Mapping):
             from .skill_consumption import validate_consumption_receipt
+            if (
+                str(expected_skill_handoff.get("SKILL_HOST_MODE") or "")
+                == "GENERIC_PROMPT_ONLY"
+                or str(expected_skill_handoff.get("SKILL_CHECK") or "")
+                == "PREPARED"
+            ):
+                status = "RECONCILIATION_REQUIRED"
+                blockers.append("GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION")
+                next_action = (
+                    "A PROMPT_ONLY handoff cannot close an execution session; "
+                    "self-reported receipts are not trusted external-actor evidence."
+                )
             skill_receipt_result = validate_consumption_receipt(
                 expected_skill_handoff,
                 packet.skill_consumption_receipt,
@@ -3236,6 +3248,14 @@ class ControlTower:
                 raise BindingError(
                     "SKILL_HANDOFF_BLOCKED:" + (reasons or "UNKNOWN")
                 )
+            if (
+                str(skill_handoff.get("SKILL_CHECK") or "") == "PREPARED"
+                or str(skill_handoff.get("SKILL_HOST_MODE") or "")
+                == "GENERIC_PROMPT_ONLY"
+            ):
+                raise BindingError(
+                    "GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION"
+                )
 
         arena_checkpoint = None
         if binding.host == "ARENA":
@@ -3966,6 +3986,18 @@ class ControlTower:
                     "automatic_start": False,
                     "recommendation": None,
                 }
+            if (
+                str(preview_skill_handoff.get("SKILL_CHECK") or "") == "PREPARED"
+                or str(preview_skill_handoff.get("SKILL_HOST_MODE") or "")
+                == "GENERIC_PROMPT_ONLY"
+            ):
+                return {
+                    "status": "BLOCKED",
+                    "reason": "GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION",
+                    "task_id": task.task_id,
+                    "automatic_start": False,
+                    "recommendation": None,
+                }
         recommendation = _session_recommendation(
             binding,
             task_prompt=task.purpose,
@@ -3986,6 +4018,32 @@ class ControlTower:
             "recommendation": recommendation,
             "automatic_start": False,
         }
+
+    def prepare_prompt_only(
+        self,
+        host: str,
+        request_text: str,
+        *,
+        required_skills: Sequence[str] = (),
+        allow_inline_skill_content: bool = False,
+        max_prompt_chars: int | None = None,
+    ) -> dict[str, Any]:
+        """Prepare a copyable generic skill prompt without starting a session."""
+        from .skill_consumption import prepare_prompt_only_skill_handoff
+
+        required_skill_refs = _refs(required_skills, "required_skills", max_length=256)
+        package = prepare_prompt_only_skill_handoff(
+            self.root,
+            request_text,
+            host=host,
+            required_skills=required_skill_refs,
+            allow_inline_skill_content=allow_inline_skill_content,
+            max_prompt_chars=max_prompt_chars,
+        )
+        package["automatic_start"] = False
+        package["execution_authorized"] = False
+        package["session_started"] = False
+        return package
 
     def start_next_session(
         self,

@@ -843,6 +843,10 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
         print(recommendation.get("CHAT_NAME", UNKNOWN))
         print("\nREADY-TO-PASTE PROMPT")
         print(recommendation.get("PROMPT", ""))
+    prompt = result.get("prompt")
+    if isinstance(prompt, str) and not isinstance(recommendation, dict):
+        print("\nREADY-TO-PASTE PROMPT")
+        print(prompt)
     reconciliation = result.get("reconciliation")
     if reconciliation is not None:
         print("\nINGEST RECONCILIATION")
@@ -960,6 +964,41 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     next_session.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
+
+    prepare_prompt = sub.add_parser(
+        "prepare-prompt-only",
+        help=(
+            "prepare one copyable source-bound generic prompt without starting "
+            "a session or authorizing execution"
+        ),
+    )
+    prepare_prompt.add_argument("--host", required=True)
+    prepare_prompt.add_argument(
+        "--task",
+        required=True,
+        help="delegated work request text used for bounded skill selection",
+    )
+    prepare_prompt.add_argument(
+        "--required-skill",
+        action="append",
+        default=[],
+        help="prompt-declared skill ID; repeat up to three times",
+    )
+    prepare_prompt.add_argument(
+        "--allow-inline-skill-content",
+        action="store_true",
+        help=(
+            "bounded fallback: embed exact selected SKILL.md bodies when "
+            "confidentiality rules and prompt budget permit; never truncates"
+        ),
+    )
+    prepare_prompt.add_argument(
+        "--max-prompt-chars",
+        type=int,
+        default=None,
+        help="fail closed when the prepared prompt would exceed this budget",
+    )
+    prepare_prompt.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
     return parser
 
 
@@ -1117,6 +1156,14 @@ def main(argv: list[str] | None = None) -> int:
                 host_discovery_record=_load_host_discovery_record(
                     args.host_discovery_record_file
                 ),
+            )
+        elif args.command == "prepare-prompt-only":
+            result = tower.prepare_prompt_only(
+                args.host,
+                args.task,
+                required_skills=tuple(args.required_skill),
+                allow_inline_skill_content=args.allow_inline_skill_content,
+                max_prompt_chars=args.max_prompt_chars,
             )
         else:  # pragma: no cover - argparse constrains this branch.
             raise BindingError(f"UNSUPPORTED_COMMAND:{args.command}")
