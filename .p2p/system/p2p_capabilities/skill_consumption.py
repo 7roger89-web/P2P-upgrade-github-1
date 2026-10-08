@@ -11,14 +11,20 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 try:  # package import in normal P2P runtime
+    from .host_executor import HostCapabilityProfile, HostExecutorContractError
+    from .host_selection import AVAILABLE, DISCOVERY_SCHEMA, HostDiscoveryRecord
     from .model import CapabilityManifest, load_registry
     from .routing import classify_capabilities
 except ImportError:  # legacy focused tests import modules from this directory
+    from host_executor import HostCapabilityProfile, HostExecutorContractError
+    from host_selection import AVAILABLE, DISCOVERY_SCHEMA, HostDiscoveryRecord
     from model import CapabilityManifest, load_registry
     from routing import classify_capabilities
 
@@ -31,11 +37,286 @@ HOST_MODES = {
     "ARENA": "ARENA_EXACT_REPO_READ",
     "CODEX": "CODEX_NATIVE_PROJECT_SKILL",
 }
+GENERIC_REPO_READ_MODE = "GENERIC_EXACT_REPO_READ"
+GENERIC_REPO_READ_EVIDENCE_MAX_AGE_SECONDS = 3600
+GENERIC_REPO_READ_MAX_FUTURE_SKEW_SECONDS = 300
+TRUSTED_REPO_READ_PROVENANCE_KINDS = frozenset({
+    "AUTHENTICATED_GITHUB_CONNECTOR_EXACT_READ",
+    "VERIFIED_LOCAL_REPO_EXACT_READ",
+})
+REPO_BOUND_ENVIRONMENTS = frozenset({
+    "LOCAL_PROJECT",
+    "REMOTE_COPY",
+    "REMOTE_REPOSITORY",
+})
 _CLASS_RANK = {"PRIMARY": 3, "SECONDARY": 2, "SUPPORTING": 1}
 
 
 class SkillConsumptionError(ValueError):
     pass
+
+
+def _host_token(value: object) -> str:
+    return (
+        str(value or "").strip().upper()
+        .replace("-", "_").replace(" ", "_")
+    )
+
+
+def _run_git(root: Path, *args: str) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), *args],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=8,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode:
+        return None
+    return result.stdout.strip()
+
+
+def _normalize_github_repo(value: str | None) -> str | None:
+    if not value:
+        return None
+    normalized = value.strip().replace("\\", "/")
+    lowered = normalized.lower()
+    if lowered.startswith("git@github.com:"):
+        slug = normalized.split(":", 1)[1]
+    elif "github.com/" in lowered:
+        index = lowered.find("github.com/") + len("github.com/")
+        slug = normalized[index:]
+    else:
+        return None
+    slug = slug.split("?", 1)[0].split("#", 1)[0].strip("/")
+    if slug.lower().endswith(".git"):
+        slug = slug[:-4]
+    parts = slug.split("/")
+    if len(parts) < 2:
+        return None
+    return "/".join(parts[:2]).lower()
+
+
+def _canonical_repo_binding(root: Path) -> str | None:
+    origin = _run_git(root, "remote", "get-url", "origin")
+    return _normalize_github_repo(origin)
+
+
+def _current_repo_revision(root: Path) -> str | None:
+    revision = (_run_git(root, "rev-parse", "HEAD") or "").lower()
+    return revision if re.fullmatch(r"[0-9a-f]{40}", revision) else None
+
+
+def _strict_optional_text(value: object, field: str) -> str | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise SkillConsumptionError(f"{field}_INVALID")
+    return value.strip()
+
+
+def _coerce_host_discovery_record(
+    value: HostDiscoveryRecord | Mapping[str, Any] | None,
+) -> HostDiscoveryRecord | None:
+    if value is None:
+        return None
+    if isinstance(value, HostDiscoveryRecord):
+        record = value
+    else:
+        if not isinstance(value, Mapping):
+            raise SkillConsumptionError("HOST_DISCOVERY_RECORD_INVALID")
+        if value.get("schema") != DISCOVERY_SCHEMA:
+            raise SkillConsumptionError("HOST_DISCOVERY_RECORD_SCHEMA_INVALID")
+        raw_profile = value.get("profile")
+        if not isinstance(raw_profile, Mapping):
+            raise SkillConsumptionError("HOST_DISCOVERY_PROFILE_REQUIRED")
+        if not isinstance(value.get("host_id"), str):
+            raise SkillConsumptionError("HOST_DISCOVERY_HOST_ID_INVALID")
+        if not isinstance(value.get("availability"), str):
+            raise SkillConsumptionError("HOST_DISCOVERY_AVAILABILITY_INVALID")
+        if not isinstance(value.get("observed_at"), str):
+            raise SkillConsumptionError("HOST_DISCOVERY_OBSERVED_AT_INVALID")
+        if not isinstance(value.get("provenance"), str):
+            raise SkillConsumptionError("HOST_DISCOVERY_PROVENANCE_INVALID")
+        if not isinstance(value.get("profile_version", "1"), str):
+            raise SkillConsumptionError("HOST_DISCOVERY_PROFILE_VERSION_INVALID")
+        if type(value.get("active", False)) is not bool:
+            raise SkillConsumptionError("HOST_DISCOVERY_ACTIVE_BOOL_REQUIRED")
+        if type(value.get("execution_transport_available", False)) is not bool:
+            raise SkillConsumptionError(
+                "HOST_DISCOVERY_EXECUTION_TRANSPORT_BOOL_REQUIRED"
+            )
+        burden = value.get("reconciliation_burden", 0)
+        if type(burden) is not int or burden < 0:
+            raise SkillConsumptionError(
+                "HOST_DISCOVERY_RECONCILIATION_BURDEN_INVALID"
+            )
+        environment_binding = _strict_optional_text(
+            value.get("environment_binding"), "HOST_DISCOVERY_ENVIRONMENT_BINDING"
+        )
+        project_binding = _strict_optional_text(
+            value.get("project_binding"), "HOST_DISCOVERY_PROJECT_BINDING"
+        )
+        try:
+            profile = HostCapabilityProfile.from_mapping(raw_profile)
+            record = HostDiscoveryRecord(
+                host_id=value["host_id"].strip(),
+                profile=profile,
+                availability=value["availability"].strip(),
+                observed_at=value["observed_at"].strip(),
+                provenance=value["provenance"].strip(),
+                environment_binding=environment_binding,
+                project_binding=project_binding,
+                profile_version=value.get("profile_version", "1").strip(),
+                active=value.get("active", False),
+                reconciliation_burden=burden,
+                execution_transport_available=value.get(
+                    "execution_transport_available", False
+                ),
+            )
+        except (HostExecutorContractError, TypeError, ValueError) as exc:
+            raise SkillConsumptionError(
+                f"HOST_DISCOVERY_RECORD_INVALID:{exc}"
+            ) from exc
+
+    if not isinstance(record.host_id, str) or not record.host_id.strip():
+        raise SkillConsumptionError("HOST_DISCOVERY_HOST_ID_INVALID")
+    if not isinstance(record.provenance, str) or not record.provenance.strip():
+        raise SkillConsumptionError("HOST_DISCOVERY_PROVENANCE_INVALID")
+    if not isinstance(record.observed_at, str) or not record.observed_at.strip():
+        raise SkillConsumptionError("HOST_DISCOVERY_OBSERVED_AT_INVALID")
+    if type(record.active) is not bool:
+        raise SkillConsumptionError("HOST_DISCOVERY_ACTIVE_BOOL_REQUIRED")
+    if type(record.execution_transport_available) is not bool:
+        raise SkillConsumptionError(
+            "HOST_DISCOVERY_EXECUTION_TRANSPORT_BOOL_REQUIRED"
+        )
+    if type(record.reconciliation_burden) is not int:
+        raise SkillConsumptionError(
+            "HOST_DISCOVERY_RECONCILIATION_BURDEN_INVALID"
+        )
+    return record
+
+
+def _evidence_age_seconds(observed_at: str) -> tuple[int | None, str | None]:
+    try:
+        observed = datetime.fromisoformat(observed_at.replace("Z", "+00:00"))
+    except ValueError:
+        return None, "HOST_DISCOVERY_OBSERVED_AT_INVALID"
+    if observed.tzinfo is None:
+        return None, "HOST_DISCOVERY_OBSERVED_AT_TIMEZONE_REQUIRED"
+    delta = (datetime.now(timezone.utc) - observed.astimezone(timezone.utc)).total_seconds()
+    if delta < -GENERIC_REPO_READ_MAX_FUTURE_SKEW_SECONDS:
+        return None, "HOST_DISCOVERY_EVIDENCE_FROM_FUTURE"
+    return max(0, int(delta)), None
+
+
+def _validate_repo_read_provenance(
+    root: Path,
+    record: HostDiscoveryRecord,
+) -> str | None:
+    expected_repo = _canonical_repo_binding(root)
+    expected_revision = _current_repo_revision(root)
+    if expected_repo is None:
+        return "HOST_CANONICAL_REPO_BINDING_UNAVAILABLE"
+    if expected_revision is None:
+        return "HOST_CANONICAL_REPO_REVISION_UNAVAILABLE"
+
+    match = re.fullmatch(
+        r"([A-Z0-9_]+)\\|repo=([^|]+)\\|revision=([0-9a-fA-F]{40})",
+        record.provenance.strip(),
+    )
+    if match is None:
+        return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
+    kind, provenance_repo, provenance_revision = match.groups()
+    if kind not in TRUSTED_REPO_READ_PROVENANCE_KINDS:
+        return "HOST_DISCOVERY_PROVENANCE_UNVERIFIED"
+    if provenance_repo.strip().lower() != expected_repo:
+        return "HOST_DISCOVERY_PROVENANCE_REPO_MISMATCH"
+    if provenance_revision.lower() != expected_revision:
+        return "HOST_DISCOVERY_PROVENANCE_REVISION_MISMATCH"
+    if not record.project_binding:
+        return "HOST_PROJECT_BINDING_REQUIRED"
+    if record.project_binding.strip().lower() != expected_repo:
+        return "HOST_PROJECT_BINDING_MISMATCH"
+    return None
+
+
+def _resolve_skill_host_mode(
+    root: Path,
+    host_name: str,
+    host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None,
+) -> tuple[str | None, str | None]:
+    """Resolve generic skill transport only from current source-bound evidence."""
+    native = HOST_MODES.get(host_name)
+    if native is not None:
+        return native, None
+
+    record = _coerce_host_discovery_record(host_discovery_record)
+    if record is None:
+        return None, "HOST_DISCOVERY_RECORD_REQUIRED"
+
+    profile_label = record.profile.host_label
+    if not isinstance(profile_label, str) or not profile_label.strip():
+        return None, "HOST_DISCOVERY_PROFILE_HOST_LABEL_REQUIRED"
+    record_host = _host_token(record.host_id)
+    profile_host = _host_token(profile_label)
+    if record_host != profile_host:
+        return None, "HOST_DISCOVERY_IDENTITY_MISMATCH"
+    if record_host != host_name:
+        return None, "HOST_DISCOVERY_RECORD_HOST_MISMATCH"
+
+    if record.availability != AVAILABLE:
+        return None, f"HOST_AVAILABILITY_{record.availability or 'UNKNOWN'}"
+    provenance_reason = _validate_repo_read_provenance(root, record)
+    if provenance_reason is not None:
+        return None, provenance_reason
+    if not record.execution_transport_available:
+        return None, "HOST_EXECUTION_TRANSPORT_UNAVAILABLE"
+
+    age, age_reason = _evidence_age_seconds(record.observed_at)
+    if age_reason is not None:
+        return None, age_reason
+    if age is None or age > GENERIC_REPO_READ_EVIDENCE_MAX_AGE_SECONDS:
+        return None, f"HOST_DISCOVERY_EVIDENCE_STALE:{age}"
+
+    profile = record.profile
+    read_state = profile.state("can_read_files")
+    if read_state != "SUPPORTED":
+        return None, f"HOST_FILE_READ_CAPABILITY_{read_state}"
+    if profile.environment not in REPO_BOUND_ENVIRONMENTS:
+        return None, f"HOST_ENVIRONMENT_NOT_REPO_BOUND:{profile.environment}"
+    if record.environment_binding != profile.environment:
+        return None, "HOST_ENVIRONMENT_BINDING_MISMATCH"
+    return GENERIC_REPO_READ_MODE, None
+
+
+def validate_cached_skill_handoff_host_evidence(
+    root: str | Path,
+    *,
+    host: str,
+    skill_handoff: Mapping[str, Any],
+    host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Revalidate generic host evidence before reissuing an active-session prompt."""
+    mode = str(skill_handoff.get("SKILL_HOST_MODE") or "")
+    if mode != GENERIC_REPO_READ_MODE:
+        return {"valid": True, "reason": None}
+    try:
+        resolved_mode, reason = _resolve_skill_host_mode(
+            Path(root).resolve(),
+            _host_token(host),
+            host_discovery_record,
+        )
+    except SkillConsumptionError as exc:
+        resolved_mode, reason = None, str(exc)
+    return {
+        "valid": resolved_mode == GENERIC_REPO_READ_MODE,
+        "reason": reason,
+    }
 
 
 @dataclass(frozen=True)
@@ -457,6 +738,7 @@ def prepare_skill_handoff(
     host: str,
     explicit_requests: Iterable[str] = (),
     required_skills: Iterable[str] = (),
+    host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Freeze one deterministic source-bound skill handoff for an executor.
 
@@ -465,8 +747,8 @@ def prepare_skill_handoff(
     handoff. Narrative prose alone never satisfies this requirement.
     """
     project_root = Path(root).resolve()
-    host_name = str(host or "").strip().upper()
-    mode = HOST_MODES.get(host_name)
+    host_name = _host_token(host)
+    native_mode = HOST_MODES.get(host_name)
     try:
         required_ids = _resolve_required_skill_ids(
             project_root, required_skills
@@ -482,7 +764,7 @@ def prepare_skill_handoff(
             "SKILL_SOURCE_HASHES": {},
             "SKILL_SOURCE_PATHS": {},
             "SKILL_CONSUMPTION": "BLOCKED",
-            "SKILL_HOST_MODE": mode or "UNSUPPORTED",
+            "SKILL_HOST_MODE": native_mode or "UNRESOLVED",
             "MATERIAL_ALTERNATIVES_REJECTED": [],
             "REJECTION_REASON": [str(exc)],
             "PERMISSION_WIDENED": "NO",
@@ -509,29 +791,12 @@ def prepare_skill_handoff(
             "SKILL_SOURCE_HASHES": {},
             "SKILL_SOURCE_PATHS": {},
             "SKILL_CONSUMPTION": "BLOCKED",
-            "SKILL_HOST_MODE": mode or "UNSUPPORTED",
+            "SKILL_HOST_MODE": native_mode or "UNRESOLVED",
             "MATERIAL_ALTERNATIVES_REJECTED": list(selection.rejected),
             "REJECTION_REASON": [
                 f"REQUIRED_SKILL_NOT_SELECTED:{skill_id}"
                 for skill_id in missing_required
             ],
-            "PERMISSION_WIDENED": "NO",
-            "SINGLE_ROUTER_REUSED": "YES",
-        }
-    if mode is None:
-        return {
-            "schema": HANDOFF_SCHEMA,
-            "SKILL_CHECK": "BLOCKED",
-            "REQUIRED_SKILLS": list(required_ids),
-            "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
-            "SKILLS_SELECTED": list(selection.selected),
-            "SKILL_LOAD_STAGE": "MATCH" if selection.selected else "DISCOVERY",
-            "SKILL_SOURCE_HASHES": {},
-            "SKILL_SOURCE_PATHS": {},
-            "SKILL_CONSUMPTION": "BLOCKED",
-            "SKILL_HOST_MODE": "UNSUPPORTED",
-            "MATERIAL_ALTERNATIVES_REJECTED": list(selection.rejected),
-            "REJECTION_REASON": ["HOST_NOT_SUPPORTED_V1"],
             "PERMISSION_WIDENED": "NO",
             "SINGLE_ROUTER_REUSED": "YES",
         }
@@ -546,9 +811,32 @@ def prepare_skill_handoff(
             "SKILL_SOURCE_HASHES": {},
             "SKILL_SOURCE_PATHS": {},
             "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
-            "SKILL_HOST_MODE": mode,
+            "SKILL_HOST_MODE": native_mode or "NOT_REQUIRED",
             "MATERIAL_ALTERNATIVES_REJECTED": list(selection.rejected),
             "REJECTION_REASON": list(selection.rejection_reasons),
+            "PERMISSION_WIDENED": "NO",
+            "SINGLE_ROUTER_REUSED": "YES",
+        }
+    try:
+        mode, host_reason = _resolve_skill_host_mode(
+            project_root, host_name, host_discovery_record
+        )
+    except SkillConsumptionError as exc:
+        mode, host_reason = None, str(exc)
+    if mode is None:
+        return {
+            "schema": HANDOFF_SCHEMA,
+            "SKILL_CHECK": "BLOCKED",
+            "REQUIRED_SKILLS": list(required_ids),
+            "SKILLS_CONSIDERED_METADATA_COUNT": selection.considered_metadata_count,
+            "SKILLS_SELECTED": list(selection.selected),
+            "SKILL_LOAD_STAGE": "MATCH",
+            "SKILL_SOURCE_HASHES": {},
+            "SKILL_SOURCE_PATHS": {},
+            "SKILL_CONSUMPTION": "BLOCKED",
+            "SKILL_HOST_MODE": "UNSUPPORTED",
+            "MATERIAL_ALTERNATIVES_REJECTED": list(selection.rejected),
+            "REJECTION_REASON": [host_reason or "HOST_NOT_SUPPORTED_V1"],
             "PERMISSION_WIDENED": "NO",
             "SINGLE_ROUTER_REUSED": "YES",
         }
