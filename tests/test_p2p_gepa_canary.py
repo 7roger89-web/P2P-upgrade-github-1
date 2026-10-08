@@ -116,6 +116,25 @@ class P2PGepaCanaryTests(unittest.TestCase):
         self.assertEqual(result["verdict"], "REJECT")
         self.assertEqual(result["reason_codes"], ["NO_MATERIAL_IMPROVEMENT"])
 
+    def test_shared_failure_can_continue_when_policy_allows_and_pareto_improves(self):
+        value = suite(baseline=1.0, candidate=1.0)
+        for run_item in value["cases"][0]["baseline_runs"]:
+            run_item["score"] = 0.5
+            run_item["status"] = "fail"
+        for run_item in value["cases"][0]["p2p_runs"]:
+            run_item["score"] = 0.5
+            run_item["status"] = "fail"
+        for case in value["cases"]:
+            for run_item in case["baseline_runs"]:
+                run_item["token_proxy"] = 2830
+            for run_item in case["p2p_runs"]:
+                run_item["token_proxy"] = 2327
+        result = gepa.evaluate(value)
+        self.assertEqual(result["verdict"], "CONTINUE_CANARY")
+        self.assertEqual(result["reason_codes"], ["PARETO_IMPROVEMENT:token_proxy"])
+        self.assertEqual(result["observed_dimensions"]["quality"]["baseline"], 0.9)
+        self.assertEqual(result["observed_dimensions"]["quality"]["candidate"], 0.9)
+
     def test_clear_non_regressing_quality_improvement_continues_canary(self):
         result = gepa.evaluate(suite(baseline=0.5, candidate=0.9))
         self.assertEqual(result["verdict"], "CONTINUE_CANARY")
