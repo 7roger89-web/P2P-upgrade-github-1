@@ -431,7 +431,7 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         )
         result = self.ingest_canary(binding, response)
         self.assertEqual("GREEN", result["canary_grade"]["CLASSIFICATION"])
-        self.assertEqual([], result["snapshot"]["ACTIVE_EXECUTION"][0]["ACTOR_RECEIPT_BLOCKERS"])
+        self.assertEqual([], self.ledger_events()[-1]["ACTOR_RECEIPT_BLOCKERS"])
 
     def test_t02b_arena_generated_prompt_title_and_recommendation_metadata_match(self) -> None:
         result = self.start_cli(session_id="title-proof")
