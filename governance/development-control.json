@@ -212,9 +212,11 @@
           "current_lineage_full_council_live_proven": false,
           "historical_single_host_live_council_8_of_8": true,
           "multihost_live_council": "NOT_PROVEN",
-          "current_host_quorum_status": "UNAVAILABLE_IN_THIS_HOST",
           "reason": "Current ChatGPT host exposes no eight independent subagent/thread workers; P2P QUORUM forbids simulating eight roles in one model response.",
-          "next_condition": "Run on a compatible live host that exposes eight independent subagent/thread workers and preserve per-role source-bound receipts."
+          "next_condition": "Run on a compatible live host that exposes eight independent subagent/thread workers and preserve per-role source-bound receipts.",
+          "observed_host_quorum_status_at_evidence_time": "UNAVAILABLE_IN_THIS_HOST",
+          "observed_host": "CHATGPT_WEB_NO_P2P_SUBAGENT_THREAD_SURFACE",
+          "observed_at": "2026-10-08"
         },
         "runtime_machinery": {
           "status": "PRESENT_HISTORICAL_IMPLEMENTATION",
