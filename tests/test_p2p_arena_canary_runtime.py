@@ -403,7 +403,9 @@ class ArenaCanaryRuntimeTests(unittest.TestCase):
         self.assertIn(BLIND_TEST_TASK, prompt)
         # The original task is preserved for continuation, not dropped.
         self.assertIn("ORIGINAL_REAL_TASK", prompt)
-        self.assertIn("LAW_CHECK=PASS | SOURCE=<actual source>", prompt)\n        self.assertIn("INLINE_SUPREME_LAW_CAPSULE allowed", prompt)\n        self.assertIn("Inline capsule => PASS with that canonical SHA256", prompt)
+        self.assertIn("LAW_CHECK=PASS | SOURCE=<actual source>", prompt)
+        self.assertIn("INLINE_SUPREME_LAW_CAPSULE allowed", prompt)
+        self.assertIn("Inline capsule => PASS with that canonical SHA256", prompt)
         self.assertIn("EXPERIENCE_CHECK=USE_ACTIVE_EXPERIENCE | IDS=<experience_id,...>", prompt)
         self.assertIn("EXPERIENCE_CHECK=NO_MATCH", prompt)
         self.assertIn("EXPERIENCE_CHECK=UNAVAILABLE", prompt)
