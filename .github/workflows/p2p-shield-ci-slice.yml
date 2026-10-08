@@ -103,6 +103,18 @@ jobs:
             -p test_quality_intelligence.py \
             -v
 
+      - name: Run AERG QI FW01 fail-closed regression
+        env:
+          PYTHONPATH: .p2p/system
+        run: |
+          set -euo pipefail
+          mkdir -p .p2p/state .tmp
+          trap 'rm -rf .p2p/state .tmp/aerg_qi_fw01_*' EXIT
+          python3 -m unittest discover \
+            -s .p2p/system/p2p_capabilities/tests \
+            -p 'test_aerg*.py' \
+            -v
+
       - name: Measure native code impact on exact PR worktree
         if: github.event_name == 'pull_request'
         env:
