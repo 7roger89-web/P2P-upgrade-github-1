@@ -227,9 +227,9 @@ def _validate_repo_read_provenance(
 
     match = re.fullmatch(
         (
-            r"([A-Z0-9_]+)\\|repo=([^|]+)"
-            r"\\|revision=([0-9a-fA-F]{40})"
-            r"\\|probe=([^|]+)\\|sha256=([0-9a-fA-F]{64})"
+            r"([A-Z0-9_]+)\|repo=([^|]+)"
+            r"\|revision=([0-9a-fA-F]{40})"
+            r"\|probe=([^|]+)\|sha256=([0-9a-fA-F]{64})"
         ),
         record.provenance.strip(),
     )
