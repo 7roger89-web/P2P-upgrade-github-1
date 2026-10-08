@@ -1,0 +1,5 @@
+{"id":"ane-p2p-01","task":"Find the canonical DOMAIN_CAPABILITY_ADMISSION_V1 rules and explain which gate decides whether a new capability may influence real work.","anchor":"docs/p2p-development/P2P-OPERATIONS-NOTEBOOK.md"}
+{"id":"ane-p2p-02","task":"Find the implementation that generates the portable P2P law projection for repo-scoped executors and identify how freshness provenance is written.","anchor":"scripts/p2p_portable_law_projection.py"}
+{"id":"ane-p2p-03","task":"Find the tests that verify active experience retrieval and lifecycle behavior for P2P learned experience.","anchor":"tests/test_p2p_experience_evolution.py"}
+{"id":"ane-p2p-04","task":"Find the tests for task-targeted context retrieval and context envelope behavior in P2P.","anchor":"tests/test_p2p_task_targeted_context.py"}
+{"id":"ane-p2p-05","task":"Find the tests for adaptive orchestration policy and explain how orchestration decisions are verified.","anchor":"tests/test_p2p_adaptive_orchestration.py"}
