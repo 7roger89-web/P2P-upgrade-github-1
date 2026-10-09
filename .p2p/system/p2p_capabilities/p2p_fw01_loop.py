@@ -400,8 +400,20 @@ class Fw01Loop:
         else:
             role_class = ("SMALL_REVIEW_SET" if len(team) > 1
                           else "SINGLE_ROLE")
+        # P2P-340-P0: evidence-bound pass-through of the FW03-verified
+        # provided_capabilities. The composition gate below consumes this
+        # field; dropping it unconditionally blocks every dispatch
+        # (COMPOSITION_CAPABILITY_BLOCKED) even when FW03 proved the
+        # selected composition provides the required capabilities.
+        # Only values already present on the task record travel here --
+        # nothing is invented, and no user-declared field is read or
+        # promoted into a permission grant.
+        _provided = task_record.get("provided_capabilities", ())
+        _provided = tuple(dict.fromkeys(
+            str(c) for c in (_provided or ())))
         return {"task_id": task_id, "role_class": role_class,
-                "team": team, "participant_count": len(team)}
+                "team": team, "participant_count": len(team),
+                "provided_capabilities": _provided}
 
     def pre_dispatch_revalidation(self, contract: Mapping[str, Any],
                                   task_record: Mapping[str, Any]) -> str | None:

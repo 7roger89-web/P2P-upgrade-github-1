@@ -131,10 +131,11 @@ class TestLoopCompositionGate(unittest.TestCase):
         self.assertTrue(ok)
 
     def test_selector_advertising_no_capabilities_keeps_unknown(self):
-        """The real selector never advertises provided_capabilities today.
-        When that is the case the honest composition verdict is UNKNOWN —
-        never upgraded to COMPLETE (spec §9). The loop gate therefore
-        blocks until meaningful composition evidence exists."""
+        """The selector advertises provided_capabilities only when the
+        FW03-verified decision placed them on the task record (P2P-340-P0
+        handoff). When that is not the case the honest composition verdict
+        is UNKNOWN — never upgraded to COMPLETE (spec §9). The loop gate
+        therefore blocks until meaningful composition evidence exists."""
         er = self._er()
         role_team = {"task_id": "t-loop-gate", "team": ["role_backend"]}
         comp = ci.CompositionCapabilityEvidence(
@@ -168,6 +169,36 @@ class TestLoopCompositionGate(unittest.TestCase):
         self.assertEqual(trace_label,
                          "COMPOSITION_CAPABILITY_COVERAGE_BLOCKED")
         self.assertIn("code_search", list(missing))
+
+
+class TestSelectRoleTeamHandoff(unittest.TestCase):
+    """P2P-340-P0: the real select_role_team propagates the FW03-verified
+    provided_capabilities from the task record to the composition gate.
+    Evidence-bound only: nothing is invented, and an absent field stays
+    () (fail-closed); role_class/team outputs are unchanged
+    (pass-through proof)."""
+
+    def test_propagates_fw03_verified_provided_capabilities(self):
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)  # select_role_team uses no state
+        rec = {"task_id": "t-prop", "team": ("role_dev",),
+               "provided_capabilities": ("test_runner", "code_search",
+                                         "test_runner")}
+        out = Fw01Loop.select_role_team(loop, rec)
+        self.assertEqual(out["provided_capabilities"],
+                         ("test_runner", "code_search"))
+        self.assertEqual(out["role_class"], "SINGLE_ROLE")
+        self.assertEqual(out["team"], ["role_dev"])
+        self.assertEqual(out["participant_count"], 1)
+
+    def test_absent_evidence_stays_empty_fail_closed(self):
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)
+        out = Fw01Loop.select_role_team(
+            loop, {"task_id": "t-prop2", "team": ("a", "b")})
+        self.assertEqual(out["provided_capabilities"], ())
+        self.assertEqual(out["role_class"], "SMALL_REVIEW_SET")
+        self.assertEqual(out["team"], ["a", "b"])
 
 
 class TestOrderingInvariant(unittest.TestCase):
