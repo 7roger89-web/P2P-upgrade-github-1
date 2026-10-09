@@ -362,17 +362,66 @@ def validate_cached_skill_handoff_host_evidence(
     root: str | Path,
     *,
     host: str,
-    skill_handoff: Mapping[str, Any],
+    skill_handoff: Any,
     host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None,
 ) -> dict[str, Any]:
-    """Revalidate generic host evidence before reissuing an active-session prompt."""
-    mode = str(skill_handoff.get("SKILL_HOST_MODE") or "")
-    if mode != GENERIC_REPO_READ_MODE:
+    """Revalidate generic host evidence before reissuing an active-session prompt.
+
+    FAIL-CLOSED: never trust a cached SKILL_HOST_MODE declaration to skip
+    generic evidence.  A cached handoff that is missing, has the wrong type,
+    is empty, or declares NOT_REQUIRED while skill metadata is still cached
+    must not bypass external repo-read validation.
+    """
+    if not isinstance(skill_handoff, Mapping):
+        return {"valid": False, "reason": "SKILL_HANDOFF_INVALID"}
+    check = str(skill_handoff.get("SKILL_CHECK") or "").upper()
+    raw_selected = skill_handoff.get("SKILLS_SELECTED")
+    if isinstance(raw_selected, (list, tuple)):
+        selected_list = [str(x).strip() for x in raw_selected if str(x).strip()]
+    elif raw_selected is None:
+        selected_list = []
+    else:
+        return {"valid": False, "reason": "SKILL_HANDOFF_SELECTED_TYPE_INVALID"}
+    host_token = _host_token(host)
+    # Native hosts (ARENA/CODEX) never need generic repo-read evidence.
+    # Keep their valid path but still require a structurally sane handoff.
+    if host_token in HOST_MODES:
+        if check in ("PASS", "NO_MATCH", "BLOCKED"):
+            return {"valid": True, "reason": None}
+        # Empty or unknown check with no selected is not a valid declaration
+        # -> fail closed even for native hosts when cached data is tampered.
+        return {"valid": False, "reason": "SKILL_HANDOFF_CHECK_INVALID"}
+    # Generic hosts: explicit NO_MATCH with no selected is the only no-skill
+    # shape that may skip generic evidence.  Everything else requires a
+    # fresh actor-bound repo-read observation.
+    if check == "NO_MATCH" and not selected_list:
+        # Validate that this is a well-formed no-skill handoff, not an empty
+        # dict or tampered object.
+        if skill_handoff.get("schema") != HANDOFF_SCHEMA:
+            return {"valid": False, "reason": "SKILL_HANDOFF_SCHEMA_INVALID"}
         return {"valid": True, "reason": None}
+    if check == "PASS" and selected_list:
+        mode = str(skill_handoff.get("SKILL_HOST_MODE") or "")
+        if mode != GENERIC_REPO_READ_MODE:
+            return {"valid": False, "reason": "SKILL_HANDOFF_MODE_MISMATCH_FOR_SELECTED_SKILLS"}
+    elif not check and not selected_list:
+        return {"valid": False, "reason": "SKILL_HANDOFF_CHECK_INVALID"}
+    elif check == "PASS" and not selected_list:
+        return {"valid": False, "reason": "SKILL_HANDOFF_PASS_WITHOUT_SELECTED"}
+    else:
+        # Any other shape that still claims a generic skill (e.g. NOT_REQUIRED
+        # with required skills, or missing mode) must not be trusted to skip.
+        # Fall through to evidence check which will fail closed when no
+        # trusted observation is supplied, but also explicitly mark mode
+        # mismatch when a skill is indicated without GENERIC mode.
+        mode = str(skill_handoff.get("SKILL_HOST_MODE") or "")
+        has_skill_signal = bool(selected_list) or bool(skill_handoff.get("REQUIRED_SKILLS")) or check == "PASS"
+        if has_skill_signal and mode != GENERIC_REPO_READ_MODE:
+            return {"valid": False, "reason": "SKILL_HANDOFF_GENERIC_MODE_REQUIRED"}
     try:
         resolved_mode, reason = _resolve_skill_host_mode(
             Path(root).resolve(),
-            _host_token(host),
+            host_token,
             host_discovery_record,
         )
     except SkillConsumptionError as exc:

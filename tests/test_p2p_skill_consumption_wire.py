@@ -1743,5 +1743,228 @@ class SkillEffectivenessEvidenceTests(unittest.TestCase):
         )
 
 
+class F01CachedPromptSecurityTests(unittest.TestCase):
+    """F01: cached generic prompt must not be returned when session handoff is invalid."""
+
+    def _seed_with_handoff_variant(self, root: Path, tower: ControlTower, variant: str):
+        skill_path = ".agents/skills/scope-reality-check/SKILL.md"
+        skill_hash = hashlib.sha256((root / skill_path).read_bytes()).hexdigest()
+        handoff = {
+            "schema": "p2p-skill-handoff/1",
+            "SKILL_CHECK": "PASS",
+            "REQUIRED_SKILLS": ["scope-reality-check"],
+            "SKILLS_CONSIDERED_METADATA_COUNT": 1,
+            "SKILLS_SELECTED": ["scope-reality-check"],
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_SOURCE_HASHES": {"scope-reality-check": skill_hash},
+            "SKILL_SOURCE_PATHS": {"scope-reality-check": skill_path},
+            "SKILL_CONSUMPTION": "EXPECTED",
+            "SKILL_HOST_MODE": "GENERIC_EXACT_REPO_READ",
+            "MATERIAL_ALTERNATIVES_REJECTED": [],
+            "REJECTION_REASON": [],
+            "PERMISSION_WIDENED": "NO",
+            "SINGLE_ROUTER_REUSED": "YES",
+        }
+        binding = SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+        base_event = {
+            "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
+            "event_type": "CONTROL_TOWER_SESSION_STARTED",
+            "CONTROL_TOWER_SESSION_STARTED": True,
+            "SESSION_BINDING": binding.to_dict(),
+            "TASK_ID": "issue-333-ready",
+            "WORKTREE": "fixture-worktree",
+            "BRANCH": "fixture-branch",
+            "CANONICAL_BASE_SHA": "UNKNOWN",
+            "CANONICAL_BASE_TREE": "UNKNOWN",
+            "RECOMMENDED_NEW_CHAT": {
+                "PROMPT": "LEGACY GENERIC CACHED PROMPT — MUST NOT LEAK",
+                "SKILL_HANDOFF": handoff,
+                "REQUIRED_SKILLS": ["scope-reality-check"],
+            },
+            "EXPECTED_LAW_SHA": None,
+            "EXPECTED_EXPERIENCE_IDS": [],
+            "ACCEPTANCE_CRITERIA": ["Skill handoff is bounded."],
+            "CANARY": None,
+            "PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PROMOTED": False,
+            "PROTECTED_ACTION_EXECUTED": False,
+        }
+        if variant == "missing":
+            # omit SKILL_HANDOFF entirely
+            pass
+        elif variant == "none":
+            base_event["SKILL_HANDOFF"] = None
+        elif variant == "empty_list":
+            base_event["SKILL_HANDOFF"] = []
+        elif variant == "string":
+            base_event["SKILL_HANDOFF"] = "INVALID_STRING_HANDOFF"
+        elif variant == "empty_object":
+            base_event["SKILL_HANDOFF"] = {}
+        elif variant == "not_required":
+            base_event["SKILL_HANDOFF"] = {
+                "schema": "p2p-skill-handoff/1",
+                "SKILL_CHECK": "PASS",
+                "SKILL_HOST_MODE": "NOT_REQUIRED",
+                "SKILLS_SELECTED": ["scope-reality-check"],
+                "SKILL_SOURCE_HASHES": {"scope-reality-check": "a"*64},
+                "SKILL_SOURCE_PATHS": {"scope-reality-check": ".agents/skills/scope-reality-check/SKILL.md"},
+                "REQUIRED_SKILLS": ["scope-reality-check"],
+                "SKILLS_CONSIDERED_METADATA_COUNT": 1,
+                "SKILL_LOAD_STAGE": "LOAD",
+                "SKILL_CONSUMPTION": "EXPECTED",
+                "MATERIAL_ALTERNATIVES_REJECTED": [],
+                "REJECTION_REASON": [],
+                "PERMISSION_WIDENED": "NO",
+                "SINGLE_ROUTER_REUSED": "YES",
+            }
+        else:
+            raise ValueError(variant)
+        if variant != "missing":
+            # already set above for non-missing; for missing we leave absent
+            pass
+        else:
+            # ensure no SKILL_HANDOFF key
+            base_event.pop("SKILL_HANDOFF", None)
+            # For missing we need to set explicitly no handoff; base_event already without
+            # So do nothing, but we must not add
+            pass
+        # For variants where we set SKILL_HANDOFF, it's already in base_event
+        # For missing, we already popped
+        _append_existing_execution_event(tower.ledger_path, base_event)
+        return binding
+
+    def _copy_root(self, root: Path):
+        registry_target = root / ".p2p" / "system" / "p2p_capabilities" / "capabilities.json"
+        registry_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json", registry_target)
+        for skill_id in ("scope-reality-check", "p2p-scope"):
+            shutil.copytree(REPO_ROOT / ".agents" / "skills" / skill_id, root / ".agents" / "skills" / skill_id)
+
+    def _init_git(self, root: Path):
+        subprocess.run(["git","-C",str(root),"init"], capture_output=True, check=True)
+        subprocess.run(["git","-C",str(root),"config","user.email","fixture@example.com"], capture_output=True, check=True)
+        subprocess.run(["git","-C",str(root),"config","user.name","P2P Fixture"], capture_output=True, check=True)
+        subprocess.run(["git","-C",str(root),"remote","add","origin","https://github.com/fixture-owner/p2p-generic-skill-host.git"], capture_output=True, check=True)
+        subprocess.run(["git","-C",str(root),"add","-A"], capture_output=True, check=True)
+        subprocess.run(["git","-C",str(root),"commit","-m","fixture"], capture_output=True, check=True)
+
+    def _init_ready(self, root: Path):
+        now = "2026-10-08T07:00:00+00:00"
+        plan = TaskPlan.from_goal(
+            {"goal_id": "ISSUE-333", "scope": ["generic repo-read skill handoff"], "out_of_scope": ["release"]},
+            [{"task_id": "issue-333-ready", "title": "Generic repo-read handoff", "purpose": "Pressure-test this plan", "status": "READY", "scope": ["generic repo-read skill handoff"], "acceptance_requirements": ["Skill handoff is bounded."], "required_evidence": ["focused-proof"]}],
+            now=now,
+        )
+        TaskStateStore(root).initialize(plan, at=now)
+
+    def _assert_blocked(self, result: dict):
+        self.assertEqual(result.get("status"), "BLOCKED")
+        self.assertIsNone(result.get("recommendation"))
+        self.assertIn("SKILL_HANDOFF_HOST_EVIDENCE_STALE", result.get("reason",""))
+
+    def test_f01_missing_field_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "missing")
+            r1=tower.recommend_next_session("CLAUDE")
+            r2=next_safe_session(root,"CLAUDE")
+            self._assert_blocked(r1); self._assert_blocked(r2)
+            self.assertNotIn("LEGACY GENERIC CACHED PROMPT", str(r1.get("recommendation")))
+
+    def test_f01_none_value_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "none")
+            self._assert_blocked(tower.recommend_next_session("CLAUDE"))
+            self._assert_blocked(next_safe_session(root,"CLAUDE"))
+
+    def test_f01_empty_list_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "empty_list")
+            self._assert_blocked(tower.recommend_next_session("CLAUDE"))
+            self._assert_blocked(next_safe_session(root,"CLAUDE"))
+
+    def test_f01_string_wrong_type_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "string")
+            self._assert_blocked(tower.recommend_next_session("CLAUDE"))
+            self._assert_blocked(next_safe_session(root,"CLAUDE"))
+
+    def test_f01_empty_object_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "empty_object")
+            self._assert_blocked(tower.recommend_next_session("CLAUDE"))
+            self._assert_blocked(next_safe_session(root,"CLAUDE"))
+
+    def test_f01_not_required_mode_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "not_required")
+            r=tower.recommend_next_session("CLAUDE")
+            self._assert_blocked(r)
+            self._assert_blocked(next_safe_session(root,"CLAUDE"))
+            self.assertIn("MODE_MISMATCH", r.get("reason",""))
+
+    def test_f01_control_host_mismatch_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "none")
+            # Re-seed with valid handoff for host mismatch test
+            # Use valid seed then try different host
+            # Create new root with valid handoff
+            with tempfile.TemporaryDirectory() as raw2:
+                root2=Path(raw2); self._copy_root(root2); self._init_git(root2); self._init_ready(root2)
+                tower2=ControlTower(root2)
+                skill_path=".agents/skills/scope-reality-check/SKILL.md"
+                skill_hash=hashlib.sha256((root2/skill_path).read_bytes()).hexdigest()
+                handoff={"schema":"p2p-skill-handoff/1","SKILL_CHECK":"PASS","REQUIRED_SKILLS":["scope-reality-check"],"SKILLS_CONSIDERED_METADATA_COUNT":1,"SKILLS_SELECTED":["scope-reality-check"],"SKILL_LOAD_STAGE":"LOAD","SKILL_SOURCE_HASHES":{"scope-reality-check":skill_hash},"SKILL_SOURCE_PATHS":{"scope-reality-check":skill_path},"SKILL_CONSUMPTION":"EXPECTED","SKILL_HOST_MODE":"GENERIC_EXACT_REPO_READ","MATERIAL_ALTERNATIVES_REJECTED":[],"REJECTION_REASON":[],"PERMISSION_WIDENED":"NO","SINGLE_ROUTER_REUSED":"YES"}
+                binding=SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+                event={"schema":CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,"event_type":"CONTROL_TOWER_SESSION_STARTED","CONTROL_TOWER_SESSION_STARTED":True,"SESSION_BINDING":binding.to_dict(),"TASK_ID":"issue-333-ready","WORKTREE":"fixture-worktree","BRANCH":"fixture-branch","CANONICAL_BASE_SHA":"UNKNOWN","CANONICAL_BASE_TREE":"UNKNOWN","RECOMMENDED_NEW_CHAT":{"PROMPT":"LEGACY GENERIC CACHED PROMPT — MUST NOT LEAK","SKILL_HANDOFF":handoff,"REQUIRED_SKILLS":["scope-reality-check"]},"EXPECTED_LAW_SHA":None,"EXPECTED_EXPERIENCE_IDS":[],"ACCEPTANCE_CRITERIA":["Skill handoff is bounded."],"SKILL_HANDOFF":handoff,"CANARY":None,"PACKET_IS_CANONICAL_TRUTH":"NO","PROMOTED":False,"PROTECTED_ACTION_EXECUTED":False}
+                _append_existing_execution_event(tower2.ledger_path, event)
+                res=tower2.recommend_next_session("GROK")
+                self.assertEqual(res.get("status"), "BLOCKED")
+                self.assertEqual(res.get("reason"), "ACTIVE_SESSION_HOST_MISMATCH")
+                self.assertIsNone(res.get("recommendation"))
+
+    def test_f01_control_valid_generic_but_missing_evidence_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            skill_path=".agents/skills/scope-reality-check/SKILL.md"
+            skill_hash=hashlib.sha256((root/skill_path).read_bytes()).hexdigest()
+            handoff={"schema":"p2p-skill-handoff/1","SKILL_CHECK":"PASS","REQUIRED_SKILLS":["scope-reality-check"],"SKILLS_CONSIDERED_METADATA_COUNT":1,"SKILLS_SELECTED":["scope-reality-check"],"SKILL_LOAD_STAGE":"LOAD","SKILL_SOURCE_HASHES":{"scope-reality-check":skill_hash},"SKILL_SOURCE_PATHS":{"scope-reality-check":skill_path},"SKILL_CONSUMPTION":"EXPECTED","SKILL_HOST_MODE":"GENERIC_EXACT_REPO_READ","MATERIAL_ALTERNATIVES_REJECTED":[],"REJECTION_REASON":[],"PERMISSION_WIDENED":"NO","SINGLE_ROUTER_REUSED":"YES"}
+            binding=SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+            event={"schema":CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,"event_type":"CONTROL_TOWER_SESSION_STARTED","CONTROL_TOWER_SESSION_STARTED":True,"SESSION_BINDING":binding.to_dict(),"TASK_ID":"issue-333-ready","WORKTREE":"fixture-worktree","BRANCH":"fixture-branch","CANONICAL_BASE_SHA":"UNKNOWN","CANONICAL_BASE_TREE":"UNKNOWN","RECOMMENDED_NEW_CHAT":{"PROMPT":"LEGACY GENERIC CACHED PROMPT — MUST NOT LEAK","SKILL_HANDOFF":handoff,"REQUIRED_SKILLS":["scope-reality-check"]},"EXPECTED_LAW_SHA":None,"EXPECTED_EXPERIENCE_IDS":[],"ACCEPTANCE_CRITERIA":["Skill handoff is bounded."],"SKILL_HANDOFF":handoff,"CANARY":None,"PACKET_IS_CANONICAL_TRUTH":"NO","PROMOTED":False,"PROTECTED_ACTION_EXECUTED":False}
+            _append_existing_execution_event(tower.ledger_path, event)
+            res=tower.recommend_next_session("CLAUDE")
+            self.assertEqual(res.get("status"), "BLOCKED")
+            self.assertIn("HOST_DISCOVERY_RECORD_REQUIRED", res.get("reason",""))
+            self.assertIsNone(res.get("recommendation"))
+            # also with fresh discovery but no trusted observation, still blocked (B1)
+            from p2p_capabilities.host_executor import HostCapabilityProfile, SUPPORTED
+            from p2p_capabilities.host_selection import HostDiscoveryRecord, AVAILABLE
+            from p2p_capabilities.skill_consumption import _canonical_repo_binding, _current_repo_revision
+            repo_binding=_canonical_repo_binding(root)
+            rev=_current_repo_revision(root)
+            sha=hashlib.sha256((root/skill_path).read_bytes()).hexdigest()
+            prov=f"VERIFIED_LOCAL_REPO_EXACT_READ|repo={repo_binding}|revision={rev}|probe={skill_path}|sha256={sha}"
+            profile=HostCapabilityProfile(adapter_class="GenericExternalAI", host_label="CLAUDE", environment="REMOTE_REPOSITORY", capabilities={"can_read_files":SUPPORTED})
+            rec=HostDiscoveryRecord(host_id="CLAUDE", profile=profile, availability=AVAILABLE, provenance=prov, project_binding=repo_binding, environment_binding="REMOTE_REPOSITORY", execution_transport_available=True).to_dict()
+            res2=tower.recommend_next_session("CLAUDE", host_discovery_record=rec)
+            self.assertEqual(res2.get("status"), "BLOCKED")
+            self.assertIn("HOST_TRUSTED_REPO_READ_OBSERVATION_UNAVAILABLE", res2.get("reason",""))
+
+    def test_f01_start_session_also_blocks_tampered_handoff(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root); self._seed_with_handoff_variant(root, tower, "empty_object")
+            binding=SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+            with self.assertRaisesRegex(Exception, "SKILL_HANDOFF_HOST_EVIDENCE_STALE"):
+                tower.start_session(binding, task_id="issue-333-ready", task_prompt="Pressure-test this plan")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

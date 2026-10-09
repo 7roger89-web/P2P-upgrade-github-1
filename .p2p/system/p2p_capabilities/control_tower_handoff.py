@@ -3188,37 +3188,74 @@ class ControlTower:
                 if isinstance(existing, Mapping)
                 else None
             )
-            if isinstance(existing_handoff, Mapping):
-                skill_handoff = dict(existing_handoff)
-                from .skill_consumption import validate_cached_skill_handoff_host_evidence
-                host_evidence = validate_cached_skill_handoff_host_evidence(
-                    self.root,
-                    host=binding.host,
-                    skill_handoff=skill_handoff,
-                    host_discovery_record=host_discovery_record,
-                )
-                if not host_evidence.get("valid"):
+            # F01: detect generic cached prompt to fail-closed on tampered handoff
+            is_generic_cached_start = False
+            if isinstance(existing, Mapping):
+                rec = existing.get("RECOMMENDED_NEW_CHAT")
+                if isinstance(rec, Mapping):
+                    rh = rec.get("SKILL_HANDOFF")
+                    if isinstance(rh, Mapping):
+                        rh_mode = str(rh.get("SKILL_HOST_MODE") or "")
+                        rh_check = str(rh.get("SKILL_CHECK") or "").upper()
+                        rh_selected = rh.get("SKILLS_SELECTED") or ()
+                        rh_required = rh.get("REQUIRED_SKILLS") or ()
+                        if rh_mode == "GENERIC_EXACT_REPO_READ":
+                            is_generic_cached_start = True
+                        elif rh_check == "PASS" and (rh_selected or rh_required):
+                            is_generic_cached_start = True
+                        elif rh_required:
+                            is_generic_cached_start = True
+                    if rec.get("REQUIRED_SKILLS"):
+                        is_generic_cached_start = True
+                if isinstance(existing_handoff, Mapping) and str(existing_handoff.get("SKILL_HOST_MODE") or "") == "GENERIC_EXACT_REPO_READ":
+                    is_generic_cached_start = True
+            should_validate_start = is_generic_cached_start or isinstance(existing_handoff, Mapping)
+            if is_generic_cached_start and not isinstance(existing_handoff, Mapping):
+                should_validate_start = True
+            if should_validate_start:
+                if isinstance(existing_handoff, Mapping):
+                    skill_handoff = dict(existing_handoff)
+                    from .skill_consumption import validate_cached_skill_handoff_host_evidence
+                    host_evidence = validate_cached_skill_handoff_host_evidence(
+                        self.root,
+                        host=binding.host,
+                        skill_handoff=skill_handoff,
+                        host_discovery_record=host_discovery_record,
+                    )
+                    if not host_evidence.get("valid"):
+                        raise BindingError(
+                            "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
+                            + str(host_evidence.get("reason") or "UNKNOWN")
+                        )
+                    if required_skill_refs:
+                        normalize_required = lambda value: (
+                            str(value or "").strip().lower().lstrip("@$")
+                            .replace("_", "-").replace(" ", "-")
+                        )
+                        existing_required = tuple(
+                            normalize_required(value)
+                            for value in (skill_handoff.get("REQUIRED_SKILLS") or ())
+                        )
+                        requested_required = tuple(
+                            normalize_required(value)
+                            for value in required_skill_refs
+                        )
+                        if requested_required != existing_required:
+                            raise BindingError(
+                                "REQUIRED_SKILLS_CHANGED_FOR_ACTIVE_SESSION"
+                            )
+                else:
+                    from .skill_consumption import validate_cached_skill_handoff_host_evidence
+                    host_evidence = validate_cached_skill_handoff_host_evidence(
+                        self.root,
+                        host=binding.host,
+                        skill_handoff=existing_handoff,
+                        host_discovery_record=host_discovery_record,
+                    )
                     raise BindingError(
                         "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
                         + str(host_evidence.get("reason") or "UNKNOWN")
                     )
-                if required_skill_refs:
-                    normalize_required = lambda value: (
-                        str(value or "").strip().lower().lstrip("@$")
-                        .replace("_", "-").replace(" ", "-")
-                    )
-                    existing_required = tuple(
-                        normalize_required(value)
-                        for value in (skill_handoff.get("REQUIRED_SKILLS") or ())
-                    )
-                    requested_required = tuple(
-                        normalize_required(value)
-                        for value in required_skill_refs
-                    )
-                    if requested_required != existing_required:
-                        raise BindingError(
-                            "REQUIRED_SKILLS_CHANGED_FOR_ACTIVE_SESSION"
-                        )
             else:
                 from .skill_consumption import prepare_skill_handoff
                 skill_handoff = prepare_skill_handoff(
@@ -3868,7 +3905,32 @@ class ControlTower:
                         "recommendation": None,
                     }
                 existing_handoff = record.get("SKILL_HANDOFF")
-                if isinstance(existing_handoff, Mapping):
+                # F01: never trust cached SKILL_HOST_MODE to skip validation.
+                # If the cached RECOMMENDED_NEW_CHAT still carries a generic
+                # skill prompt, any missing/wrong-type/empty/NOT_REQUIRED
+                # session handoff must be treated as stale and BLOCKED.
+                is_generic_cached = False
+                if isinstance(recommendation, Mapping):
+                    rh = recommendation.get("SKILL_HANDOFF")
+                    if isinstance(rh, Mapping):
+                        rh_mode = str(rh.get("SKILL_HOST_MODE") or "")
+                        rh_check = str(rh.get("SKILL_CHECK") or "").upper()
+                        rh_selected = rh.get("SKILLS_SELECTED") or ()
+                        rh_required = rh.get("REQUIRED_SKILLS") or ()
+                        if rh_mode == "GENERIC_EXACT_REPO_READ":
+                            is_generic_cached = True
+                        elif rh_check == "PASS" and (rh_selected or rh_required):
+                            is_generic_cached = True
+                        elif rh_required:
+                            is_generic_cached = True
+                    if recommendation.get("REQUIRED_SKILLS"):
+                        is_generic_cached = True
+                if isinstance(existing_handoff, Mapping) and str(existing_handoff.get("SKILL_HOST_MODE") or "") == "GENERIC_EXACT_REPO_READ":
+                    is_generic_cached = True
+                should_validate = is_generic_cached or isinstance(existing_handoff, Mapping)
+                if is_generic_cached and not isinstance(existing_handoff, Mapping):
+                    should_validate = True
+                if should_validate:
                     from .skill_consumption import validate_cached_skill_handoff_host_evidence
                     host_evidence = validate_cached_skill_handoff_host_evidence(
                         self.root,
