@@ -1249,12 +1249,12 @@
         "upstream_tag": "gpt-image-2-style-library-v1.0.4",
         "upstream_tag_commit": "e1d07c98fe8c01aa1f6567b5f6d7987e517688fa",
         "upstream_tag_binding": "OBSERVED_TAG_DOES_NOT_EQUAL_PIN",
-        "snapshot_sha256": "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482",
+        "snapshot_sha256": "de9598c1e2a06a3de14b405d28abcb496e058d34d4e876342ad22f8f50761ecb",
         "source_files": [
           {
             "upstream_path": "agents/skills/gpt-image-2-style-library/SKILL.md",
             "snapshot_path": "SKILL.md",
-            "sha256": "8c628df135c27ef4b7f7a085cdd60868eee2180c21401a89a140b321148f0b2e",
+            "sha256": "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9",
             "canonical_sha256": "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9",
             "role": "entrypoint",
             "status": "VENDORED"
@@ -1262,7 +1262,7 @@
           {
             "upstream_path": "agents/skills/gpt-image-2-style-library/agents/openai.yaml",
             "snapshot_path": "agents/openai.yaml",
-            "sha256": "592f53bfba40639571e45e534245615a453f866822b649cc993578eec442431a",
+            "sha256": "936761c14357498549796a193cd9243d4366b0a9db39c83492d85dba15abeae3",
             "canonical_sha256": "936761c14357498549796a193cd9243d4366b0a9db39c83492d85dba15abeae3",
             "role": "host-metadata",
             "status": "VENDORED"
@@ -1270,7 +1270,7 @@
           {
             "upstream_path": "agents/skills/gpt-image-2-style-library/references/style-library.md",
             "snapshot_path": "references/style-library.md",
-            "sha256": "c98f3d9a178670235dd6e37f0bb8ed07eb8d4bb77c56e7e300d44a4f6d50f8bc",
+            "sha256": "4d90087cf1dacf7114d063aa56d3d4a03e0097e52914a0bbce4df77907404dd7",
             "canonical_sha256": "4d90087cf1dacf7114d063aa56d3d4a03e0097e52914a0bbce4df77907404dd7",
             "role": "explicit-reference",
             "status": "VENDORED"
@@ -1278,7 +1278,7 @@
           {
             "upstream_path": "LICENSE",
             "snapshot_path": "LICENSE",
-            "sha256": "70e109c69f4c92ca03a7d37ac045b4f5584e442004b5eb8b93329e7a1eec7c16",
+            "sha256": "27a75c48bac29eb78f43c19f75c4e175974c8f1046d848d5562eae1ead2f1176",
             "canonical_sha256": "27a75c48bac29eb78f43c19f75c4e175974c8f1046d848d5562eae1ead2f1176",
             "role": "license",
             "status": "VENDORED"
@@ -1286,7 +1286,7 @@
           {
             "upstream_path": "docs/disclaimer.md",
             "snapshot_path": "docs/disclaimer.md",
-            "sha256": "acb1e6b8f0bfa58ff5964ce749a65af20269a8f57bb9d3b4aa849ba55e161e43",
+            "sha256": "01483f1b50442bd378de9e8221b14bfdd4231008bbac70750521190a1a59c90e",
             "canonical_sha256": "01483f1b50442bd378de9e8221b14bfdd4231008bbac70750521190a1a59c90e",
             "role": "rights-disclaimer",
             "status": "VENDORED"
