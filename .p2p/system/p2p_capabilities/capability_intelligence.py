@@ -574,7 +574,7 @@ _TASK_CAPABILITY_HINTS: tuple[tuple[str, str, str], ...] = (
     (r"screen|ui|design", "design_intelligence_nui", ""),
     (r"accessibility|elderly|usability", "design_intelligence_nui", ""),
     (r"mobile|responsive", "design_intelligence_nui", ""),
-    (r"fix", "diff_analysis", ""),
+    (r"\bfix(?:es|ed|ing)?\b", "diff_analysis", ""),
     (r"refactor", "static_checks", ""),
     (r"security|auth", "permission_profile_verification", "security-scope"),
     (r"model|provider", "provider_neutral_binding", ""),
