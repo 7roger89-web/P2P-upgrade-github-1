@@ -19,6 +19,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
 
 from p2p_capabilities.capability_intelligence import (  # noqa: E402
     compute_execution_requirements,
+    infer_required_capabilities,
 )
 from p2p_capabilities.control_tower_handoff import (  # noqa: E402
     BindingError,
@@ -1027,6 +1028,60 @@ class SkillEffectivenessEvidenceTests(unittest.TestCase):
         self.assertIn(
             "BASELINE_EVIDENCE_BINDING_MISMATCH",
             result["reason_codes"],
+        )
+
+
+# Issue #217: "fixture" and "prefix" must not invent a repair/diff requirement.
+# These tests target the real FW02 required-capability inference function.
+class TestFixSignalWordBoundary(unittest.TestCase):
+    @staticmethod
+    def _requirements(title: str, *, required: tuple[str, ...] = ()):
+        task = {
+            "task_id": "FW02-FIX-WORD-BOUNDARY",
+            "title": title,
+            "purpose": "Review task metadata",
+            "scope": ("docs/fixture-proof.md",),
+            "required_capabilities": required,
+        }
+        return {
+            item.capability_id: item
+            for item in infer_required_capabilities(task)
+        }
+
+    def test_fixture_prefix_and_other_substrings_do_not_require_diff(self):
+        for title in (
+            "Review fixture-proof metadata",
+            "Review prefix-contract metadata",
+            "Review suffix-only metadata",
+            "Review affix-name metadata",
+        ):
+            with self.subTest(title=title):
+                self.assertNotIn("diff_analysis", self._requirements(title))
+
+    def test_real_fix_forms_still_require_diff(self):
+        for title in (
+            "Fix broken behavior",
+            "Fixing broken behavior",
+            "Fixed broken behavior",
+            "This fixes broken behavior",
+        ):
+            with self.subTest(title=title):
+                requirement = self._requirements(title)["diff_analysis"]
+                self.assertEqual(requirement.required_or_optional, "REQUIRED")
+                self.assertTrue(any(
+                    pointer.startswith("task_signal:")
+                    for pointer in requirement.evidence_pointers
+                ))
+
+    def test_explicit_diff_analysis_remains_required(self):
+        requirement = self._requirements(
+            "Review fixture-proof metadata",
+            required=("diff_analysis",),
+        )["diff_analysis"]
+        self.assertEqual(requirement.required_or_optional, "REQUIRED")
+        self.assertIn(
+            "task_record.required_capabilities",
+            requirement.evidence_pointers,
         )
 
 
