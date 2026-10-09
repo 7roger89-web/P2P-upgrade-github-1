@@ -1,0 +1,365 @@
+{
+  "experiment": "P2P-340-P1-SKILL-ECONOMY",
+  "tracking_issue": 62,
+  "big_goal_issue": 340,
+  "base_main": "3434f2e702913d5bc08cd61a94b14038f16e2553",
+  "selected_repo_skill": "p2p-eval",
+  "owner_declared_skill_sha256": "c9bdea750d2fa389a9ef0c9767cbaa245c5275462a3b5a8846afa3f52d858f64",
+  "e1_selection_economy": {
+    "A_tiny_typo_edit": {
+      "task": "Sửa lỗi chính tả trong README.md: 'recieve' thành 'receive'",
+      "with_selector": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 12,
+        "selection_wall_ms": 33.183,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 304,
+        "hash_check": {}
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 8.741,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      },
+      "context_bytes_delta": 0
+    },
+    "B_small_local_implementation": {
+      "task": "Viết một hàm Python mới trong scripts/ đọc file JSON và tính tổng các số nguyên, kèm test đơn vị tập trung",
+      "with_selector": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 12,
+        "selection_wall_ms": 10.218,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 304,
+        "hash_check": {}
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 7.474,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      },
+      "context_bytes_delta": 0
+    },
+    "C_existing_plan_correction": {
+      "task": "Cập nhật kế hoạch hiện có trong docs/plans/ cho phù hợp với thay đổi gần đây của dự án",
+      "with_selector": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 12,
+        "selection_wall_ms": 7.493,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 304,
+        "hash_check": {}
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 8.417,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      },
+      "context_bytes_delta": 0
+    },
+    "D_new_multi_module_plan": {
+      "task": "Lập kế hoạch xây dựng module mới quản lý ví người dùng cho app, nhiều module liên quan",
+      "with_selector": {
+        "SKILL_CHECK": "PASS",
+        "SKILL_CONSUMPTION": "EXPECTED",
+        "SKILLS_SELECTED": [
+          "p2p-uiux"
+        ],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "LOAD",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 11,
+        "selection_wall_ms": 14.667,
+        "skill_body_bytes": 9497,
+        "prompt_lines_bytes": 1133,
+        "hash_check": {
+          "p2p-uiux": {
+            "frozen_sha256": "98f26873e48cc87e34d132478f73672a80d20b3a8e1a2256bdcdab4d6107e7b2",
+            "actual_sha256": "98f26873e48cc87e34d132478f73672a80d20b3a8e1a2256bdcdab4d6107e7b2",
+            "match": true
+          }
+        }
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 6.227,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      },
+      "context_bytes_delta": 9497
+    },
+    "E_large_refactor_architecture": {
+      "task": "Đề xuất và lập kế hoạch refactor toàn bộ hệ thống capability routing theo hướng kiến trúc mới",
+      "with_selector": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 12,
+        "selection_wall_ms": 7.318,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 304,
+        "hash_check": {}
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 5.963,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      },
+      "context_bytes_delta": 0
+    },
+    "D2_large_product_goal_vi": {
+      "task": "Lập kế hoạch tổng thể xây dựng sản phẩm mới quản lý ví người dùng cho app, nhiều module và nhiều bên liên quan",
+      "with_selector": {
+        "SKILL_CHECK": "PASS",
+        "SKILL_CONSUMPTION": "EXPECTED",
+        "SKILLS_SELECTED": [
+          "p2p-uiux"
+        ],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "LOAD",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 11,
+        "selection_wall_ms": 16.423,
+        "skill_body_bytes": 9497,
+        "prompt_lines_bytes": 1133,
+        "hash_check": {
+          "p2p-uiux": {
+            "frozen_sha256": "98f26873e48cc87e34d132478f73672a80d20b3a8e1a2256bdcdab4d6107e7b2",
+            "actual_sha256": "98f26873e48cc87e34d132478f73672a80d20b3a8e1a2256bdcdab4d6107e7b2",
+            "match": true
+          }
+        }
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 5.822,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      }
+    },
+    "E_large_refactor_architecture_en": {
+      "task": "Refactor the entire capability routing system and propose a new architecture for it",
+      "with_selector": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 12,
+        "selection_wall_ms": 7.692,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 304,
+        "hash_check": {}
+      },
+      "without_skill_forced_no_match": {
+        "SKILL_CHECK": "NO_MATCH",
+        "SKILL_CONSUMPTION": "NO_SKILL_NEEDED",
+        "SKILLS_SELECTED": [],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 68,
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 0,
+        "selection_wall_ms": 6.381,
+        "skill_body_bytes": 0,
+        "prompt_lines_bytes": 0,
+        "hash_check": {}
+      }
+    },
+    "B_explicit_coder": {
+      "task": "Viết một hàm Python mới trong scripts/ đọc file JSON và tính tổng các số nguyên, kèm test đơn vị tập trung",
+      "with_selector": {
+        "SKILL_CHECK": "PASS",
+        "SKILL_CONSUMPTION": "EXPECTED",
+        "SKILLS_SELECTED": [
+          "coder"
+        ],
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 77,
+        "SKILL_LOAD_STAGE": "LOAD",
+        "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "REJECTION_REASON_COUNT": 12,
+        "selection_wall_ms": 13.93,
+        "skill_body_bytes": 16369,
+        "prompt_lines_bytes": 1124,
+        "hash_check": {
+          "coder": {
+            "frozen_sha256": "f209c2ec606d63c73277a3d29c38212251548a518325361c3cc7564c8075c65a",
+            "actual_sha256": "f209c2ec606d63c73277a3d29c38212251548a518325361c3cc7564c8075c65a",
+            "match": true
+          }
+        }
+      },
+      "note": "repo-native skill via explicit @coder request only"
+    }
+  },
+  "e2_consumption": {
+    "handoff": {
+      "SKILL_CHECK": "PASS",
+      "SKILL_CONSUMPTION": "EXPECTED",
+      "SKILLS_SELECTED": [
+        "p2p-eval"
+      ],
+      "SKILL_SOURCE_PATHS": {
+        "p2p-eval": ".agents/skills/p2p-eval/SKILL.md"
+      },
+      "SKILL_SOURCE_HASHES": {
+        "p2p-eval": "c9bdea750d2fa389a9ef0c9767cbaa245c5275462a3b5a8846afa3f52d858f64"
+      },
+      "SKILL_HOST_MODE": "ARENA_EXACT_REPO_READ",
+      "PERMISSION_WIDENED": "NO",
+      "SINGLE_ROUTER_REUSED": "YES",
+      "SKILLS_CONSIDERED_METADATA_COUNT": 77
+    },
+    "skill_was_actually_read": true,
+    "on_disk_skill_sha256": "c9bdea750d2fa389a9ef0c9767cbaa245c5275462a3b5a8846afa3f52d858f64",
+    "owner_hash_matches_disk": true,
+    "frozen_hash_matches_disk": true,
+    "receipt_validation": {
+      "valid": true,
+      "reason_codes": []
+    },
+    "tampered_receipt_validation": {
+      "valid": false,
+      "reason_codes": [
+        "SKILL_NOT_CONSUMED"
+      ]
+    },
+    "effectiveness_assessment_without_baseline": {
+      "effectiveness_status": "CONSUMPTION_ONLY",
+      "effectiveness_claim_supported": false,
+      "note": "SKILL_CONSUMED != SKILL_EFFECTIVE"
+    }
+  },
+  "e3_adversarial": {
+    "unknown_required_skill": {
+      "SKILL_CHECK": "BLOCKED",
+      "SKILL_LOAD_STAGE": "DISCOVERY",
+      "REJECTION_REASON": [
+        "REQUIRED_SKILL_NOT_FOUND:skill-khong-ton-tai-xyz"
+      ],
+      "no_skill_body_loaded": true
+    },
+    "oversized_required_set": {
+      "SKILL_CHECK": "BLOCKED",
+      "REJECTION_REASON": [
+        "REQUIRED_SKILL_SET_LIMIT_EXCEEDED"
+      ]
+    },
+    "unsupported_host": {
+      "SKILL_CHECK": "BLOCKED",
+      "SKILL_HOST_MODE": "UNSUPPORTED",
+      "REJECTION_REASON": [
+        "HOST_NOT_SUPPORTED_V1"
+      ]
+    }
+  }
+}

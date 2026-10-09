@@ -35,7 +35,7 @@ VENDOR_ROOTS = {
 EXPECTED_VENDOR_HASHES = {
     "creative.copywriting": "7c196e4f52cb0b077266fd1b521b0b14dc327c875dbb650136d0eb11a3dd6136",
     "media.whiteboard_animation": "87130ca5be2e2963789912200173a16abf16dd2221f30926abd18a8050843798",
-    "visual.gpt_image_2_style_library": "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482",
+    "visual.gpt_image_2_style_library": "de9598c1e2a06a3de14b405d28abcb496e058d34d4e876342ad22f8f50761ecb",
 }
 
 

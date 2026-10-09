@@ -599,6 +599,19 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/p2p-development/framework/master-roadmap.md",
             "docs/p2p-development/reports/P2P-FRAMEWORK-03-progress-report.md",
             "scripts/check_instruction_contract.py",
+            # PR #341 (Issue #340 P1 / Issue #62 skill-economy): repairs stale
+            # snapshot provenance hashes for the EXISTING vendor skill
+            # visual.gpt_image_2_style_library in the EXISTING canonical
+            # registry (metadata-only, no runtime change), syncs the stale
+            # hardcoded hash expectations of two EXISTING vendor test files,
+            # adds one focused regression test for snapshot integrity, and
+            # records the bounded experiment evidence. No router, registry,
+            # daemon, scheduler, installer, or second state store is created.
+            "tests/test_p2p_host_skill_projection.py",
+            "tests/test_p2p_visual_vendor_integration.py",
+            "tests/test_p2p_vendor_snapshot_integrity.py",
+            "evidence/P2P-340-P1-SKILL-ECONOMY-01-report.md",
+            "evidence/p2p-340-p1-skill-economy-01-experiment.json",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -706,6 +719,12 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # Owner-directed Anvien retirement updates the EXISTING
                 # static instruction contract checker; no runtime is added.
                 "scripts/check_instruction_contract.py",
+                # PR #341 (Issue #340 P1 / Issue #62): existing vendor test
+                # files with corrected hash expectations plus one new focused
+                # regression test. Test-only surfaces; no runtime authority.
+                "tests/test_p2p_host_skill_projection.py",
+                "tests/test_p2p_visual_vendor_integration.py",
+                "tests/test_p2p_vendor_snapshot_integrity.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             issue_309_existing_transport_surfaces = {

@@ -15,7 +15,7 @@ SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 REGISTRY_PATH = SYSTEM_ROOT / "p2p_capabilities" / "capabilities.json"
 CAPABILITY_ID = "visual.gpt_image_2_style_library"
 VENDOR_ROOT = REPO_ROOT / ".p2p" / "vendor" / "skill" / "gpt-image-2-style-library-9a7b2e9"
-EXPECTED_SNAPSHOT_HASH = "29121408bbfdd4994ec4738b6ee181c80ba123cb7554c297e8a07091faddc482"
+EXPECTED_SNAPSHOT_HASH = "de9598c1e2a06a3de14b405d28abcb496e058d34d4e876342ad22f8f50761ecb"
 EXPECTED_FILES = (
     "LICENSE",
     "SKILL.md",
@@ -24,11 +24,11 @@ EXPECTED_FILES = (
     "references/style-library.md",
 )
 EXPECTED_SOURCE_HASHES = {
-    "SKILL.md": "8c628df135c27ef4b7f7a085cdd60868eee2180c21401a89a140b321148f0b2e",
-    "agents/openai.yaml": "592f53bfba40639571e45e534245615a453f866822b649cc993578eec442431a",
-    "references/style-library.md": "c98f3d9a178670235dd6e37f0bb8ed07eb8d4bb77c56e7e300d44a4f6d50f8bc",
-    "LICENSE": "70e109c69f4c92ca03a7d37ac045b4f5584e442004b5eb8b93329e7a1eec7c16",
-    "docs/disclaimer.md": "acb1e6b8f0bfa58ff5964ce749a65af20269a8f57bb9d3b4aa849ba55e161e43",
+    "SKILL.md": "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9",
+    "agents/openai.yaml": "936761c14357498549796a193cd9243d4366b0a9db39c83492d85dba15abeae3",
+    "references/style-library.md": "4d90087cf1dacf7114d063aa56d3d4a03e0097e52914a0bbce4df77907404dd7",
+    "LICENSE": "27a75c48bac29eb78f43c19f75c4e175974c8f1046d848d5562eae1ead2f1176",
+    "docs/disclaimer.md": "01483f1b50442bd378de9e8221b14bfdd4231008bbac70750521190a1a59c90e",
 }
 EXPECTED_CANONICAL_SOURCE_HASHES = {
     "SKILL.md": "98519a3bfd28c5ab5630771a536f18fbe3627123cd7dd7a8801fa5da166a60f9",
