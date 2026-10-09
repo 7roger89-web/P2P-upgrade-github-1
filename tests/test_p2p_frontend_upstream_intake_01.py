@@ -751,6 +751,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/capability_intelligence.py",
             ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
             ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+            # Issue #340: this EXISTING internal regression test is modified,
+            # not introduced as a new executable capability module. The
+            # separate change-surface guard already allows this exact path;
+            # unrelated capability modules remain forbidden.
+            ".p2p/system/p2p_capabilities/tests/test_composition_gate_loop.py",
             # Issue #308 modifies the EXISTING read-only Quality Intelligence
             # module instead of creating a second evaluator/learning system.
             ".p2p/system/p2p_capabilities/quality_intelligence.py",
