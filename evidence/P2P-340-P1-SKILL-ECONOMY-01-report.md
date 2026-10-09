@@ -161,7 +161,28 @@ Không đụng vào `capability_intelligence.py` (PR #339 đang mở). Không t�
    sạch (đã stash kiểm chứng), do lịch sử git squash + thiếu `jsonschema` + drift ledger thuộc
    workstream khác.
 
-## 8. Bước tiếp theo
+## 8. Sửa CI Shield trên PR #341 (bổ sung sau khi Supervisor báo lỗi)
+
+Shield run `37873231260` FAIL tại
+`NoParallelArchitectureTests.test_change_set_contains_only_allowed_surfaces`
+vì guard kiến trúc cũ chưa cho phép 5 đường dẫn hợp lệ của PR này
+(2 file evidence + 3 file test; `capabilities.json` đã được allow sẵn).
+
+Sửa đúng phạm vi, không nới wildcard, không xóa test, không skip CI:
+- `tests/test_p2p_frontend_upstream_intake_01.py`: thêm đúng 5 path vào
+  `allowed_prefixes` và 3 test file vào allowlist `.py` với comment giải thích
+  scope PR #341 (sửa metadata registry + sync expectation test + 1 test mới +
+  evidence; không tạo router/registry/daemon/scheduler/state store mới).
+- `.github/workflows/p2p-shield-ci-slice.yml`: thêm
+  `tests.test_p2p_vendor_snapshot_integrity` vào bước "Run focused Shield
+  contract tests" để 4 regression test mới được chạy trong CI, không chỉ nằm
+  trong repo.
+- Kiểm chứng guard vẫn fail-closed: file lạ `rogue_unapproved_surface.py`
+  vẫn bị báo `unexpected surface` (đã xóa ngay sau kiểm chứng).
+- Local Shield-equivalent: 334 tests OK (đúng danh sách workflow + module mới),
+  `test_capability_intelligence` 26 OK, wire 51 OK, integrity 4 OK.
+
+## 9. Bước tiếp theo
 
 1. Owner/Supervisor review draft PR (exact-head test, focused suite như mục 6).
 2. Mở issue riêng (hoặc dùng #277) cho: stale count/routing assertions, mengto/majid stale
@@ -170,7 +191,7 @@ Không đụng vào `capability_intelligence.py` (PR #339 đang mở). Không t�
    2 trial cô lập mỗi variant cho ≥5 case theo schema v2 — cần môi trường có thể lặp trial
    (ngân sách/host phù hợp), hiện tại PILOT_ONLY.
 
-## 9. ReturnPacket
+## 10. ReturnPacket
 
 ```text
 TASK=P2P-340-P1-SKILL-ECONOMY
