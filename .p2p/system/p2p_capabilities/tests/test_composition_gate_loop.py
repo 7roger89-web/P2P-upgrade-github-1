@@ -131,10 +131,11 @@ class TestLoopCompositionGate(unittest.TestCase):
         self.assertTrue(ok)
 
     def test_selector_advertising_no_capabilities_keeps_unknown(self):
-        """The real selector never advertises provided_capabilities today.
-        When that is the case the honest composition verdict is UNKNOWN —
-        never upgraded to COMPLETE (spec §9). The loop gate therefore
-        blocks until meaningful composition evidence exists."""
+        """The selector advertises provided_capabilities only when the
+        FW03-verified decision placed them on the task record (P2P-340-P0
+        handoff). When that is not the case the honest composition verdict
+        is UNKNOWN — never upgraded to COMPLETE (spec §9). The loop gate
+        therefore blocks until meaningful composition evidence exists."""
         er = self._er()
         role_team = {"task_id": "t-loop-gate", "team": ["role_backend"]}
         comp = ci.CompositionCapabilityEvidence(
@@ -168,6 +169,75 @@ class TestLoopCompositionGate(unittest.TestCase):
         self.assertEqual(trace_label,
                          "COMPOSITION_CAPABILITY_COVERAGE_BLOCKED")
         self.assertIn("code_search", list(missing))
+
+
+class TestSelectRoleTeamHandoff(unittest.TestCase):
+    """P2P-340-P0-FINAL: the real select_role_team propagates provided_capabilities
+    ONLY from the verified FW03 decision sub-record (provenance-bound).
+
+    A bare provided_capabilities key on the input task record is
+    self-declared data and must never become capability evidence: without
+    a valid FW03 decision the field stays () and the composition gate keeps
+    its fail-closed UNKNOWN state. role_class/team outputs are unchanged
+    (pass-through proof)."""
+
+    def test_propagates_only_from_fw03_decision(self):
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)  # select_role_team uses no state
+        rec = {"task_id": "t-prop", "team": ("role_dev",),
+               "fw03_decision": {
+                   "schema": "p2p-team-intelligence/1",
+                   "team_mode": "SINGLE_ROLE",
+                   "provided_capabilities": ("test_runner", "code_search",
+                                             "test_runner")}}
+        out = Fw01Loop.select_role_team(loop, rec)
+        self.assertEqual(out["provided_capabilities"],
+                         ("test_runner", "code_search"))
+        self.assertEqual(out["role_class"], "SINGLE_ROLE")
+        self.assertEqual(out["team"], ["role_dev"])
+        self.assertEqual(out["participant_count"], 1)
+
+    def test_self_declared_flat_key_ignored_without_fw03_decision(self):
+        """Negative: a task record self-declaring provided_capabilities
+        while FW03 produced no decision must NOT promote that data into
+        capability evidence (fail-closed)."""
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)
+        rec = {"task_id": "t-evil", "team": ("role_dev",),
+               "provided_capabilities": ("owner_gate_authority",
+                                         "diff_analysis")}
+        out = Fw01Loop.select_role_team(loop, rec)
+        self.assertEqual(out["provided_capabilities"], ())
+        self.assertEqual(out["role_class"], "SINGLE_ROLE")
+
+    def test_flat_key_not_merged_with_fw03_decision(self):
+        """Even alongside a valid FW03 decision, a self-declared flat key
+        must not leak into the evidence set."""
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)
+        rec = {"task_id": "t-mix", "team": ("role_dev",),
+               "provided_capabilities": ("owner_gate_authority",),
+               "fw03_decision": {"schema": "p2p-team-intelligence/1",
+                                 "provided_capabilities": ["code_search"]}}
+        out = Fw01Loop.select_role_team(loop, rec)
+        self.assertEqual(out["provided_capabilities"], ("code_search",))
+
+    def test_malformed_fw03_decision_fail_closed(self):
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)
+        out = Fw01Loop.select_role_team(
+            loop, {"task_id": "t-bad", "team": ("role_dev",),
+                   "fw03_decision": "not-a-decision"})
+        self.assertEqual(out["provided_capabilities"], ())
+
+    def test_absent_evidence_stays_empty_fail_closed(self):
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = Fw01Loop.__new__(Fw01Loop)
+        out = Fw01Loop.select_role_team(
+            loop, {"task_id": "t-prop2", "team": ("a", "b")})
+        self.assertEqual(out["provided_capabilities"], ())
+        self.assertEqual(out["role_class"], "SMALL_REVIEW_SET")
+        self.assertEqual(out["team"], ["a", "b"])
 
 
 class TestOrderingInvariant(unittest.TestCase):
@@ -214,6 +284,118 @@ class TestOrderingInvariant(unittest.TestCase):
         self.assertIn("READ_ONLY", seg)
         self.assertNotIn("select_role_team(", seg)
         self.assertNotIn("select_team", seg)
+
+
+class TestFw03ProvenanceHardening(unittest.TestCase):
+    """P2P-340-P0 B2: a forged nested fw03_decision planted in the input
+    task record must never reach select_role_team — not even when FW03
+    itself errors. Only a TeamDecision produced in the current dispatch
+    may populate the evidence fields."""
+
+    def _make_loop(self, forged):
+        import tempfile
+        from p2p_capabilities.autopilot_state import GoalPlan
+        from p2p_capabilities.p2p_fw01_loop import build_fw01_loop
+        root = Path(tempfile.mkdtemp(prefix="fw03prov-"))
+        ws = str(root / "workspace")
+        Path(ws).mkdir(parents=True, exist_ok=True)
+        plan = GoalPlan(
+            goal_id="g-fw03prov", goal_version="v1", title="t",
+            purpose="p", owner_approval_ref="o", scope=("workspace",),
+            non_scope=("production",), plan_task_ids=("T1",))
+        rec = {"task_id": "T1", "goal_id": "g-fw03prov",
+               "title": "Task T1", "purpose": "safe probe",
+               "status": "READY", "dependencies": (),
+               "scope": ("workspace",), "workspace": ws,
+               "execution_target": "fake-1",
+               "expected_output": ("T1.out",), "verify_spec": ("default",),
+               "acceptance_requirements": ("file exists",),
+               "required_evidence": ("fixture-evidence-T1-1",),
+               "permission_needs": ("sandboxed-default",),
+               "last_preflight": {"status": "PASS"},
+               "required_capabilities": (), "team": ("role_dev",)}
+        if forged:
+            rec["fw03_decision"] = {
+                "schema": "p2p-team-intelligence/1",
+                "team_mode": "SMALL_TEAM",
+                "provided_capabilities": ["owner_gate_authority"]}
+
+        class _Backend:
+            def execute(self, contract):
+                return {"status": "PASS", "outcome": "PASS",
+                        "evidence": "e"}
+
+        class _Verifier:
+            def verify(self, result, spec=()):
+                return {"status": "VERIFIED", "verdict": "VERIFIED",
+                        "bindings": {}, "evidence_ref": "e"}
+
+        loop = build_fw01_loop(
+            root, goal_plan=plan, task_records={"T1": rec},
+            backend=_Backend(), verifier=_Verifier(),
+            execution_targets=("fake-1",))
+        self.addCleanup(__import__("shutil").rmtree, root,
+                        ignore_errors=True)
+        return loop
+
+    def test_forged_nested_fw03_decision_with_fw03_error_stays_blocked(self):
+        """B2 negative: forged nested fw03_decision + forced FW03 error.
+        The forged evidence must be stripped before select_role_team;
+        every call sees no fw03_decision and returns ()."""
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        from p2p_capabilities import team_intelligence as ti
+        loop = self._make_loop(forged=True)
+        seen = []
+        orig_sel = Fw01Loop.select_role_team
+
+        def spy(self, task_record):
+            out = orig_sel(self, task_record)
+            seen.append(("fw03_decision" in task_record,
+                         out["provided_capabilities"]))
+            return out
+
+        orig_btd = ti.build_team_decision
+
+        def _boom(*a, **k):
+            raise RuntimeError("forced FW03 error")
+
+        Fw01Loop.select_role_team = spy
+        ti.build_team_decision = _boom
+        try:
+            loop.step()
+        finally:
+            ti.build_team_decision = orig_btd
+            Fw01Loop.select_role_team = orig_sel
+        self.assertTrue(seen, "select_role_team was never called")
+        for has_fw03, provided in seen:
+            self.assertFalse(
+                has_fw03,
+                "forged fw03_decision reached select_role_team")
+            self.assertEqual(
+                provided, (),
+                "forged capabilities were promoted to evidence")
+
+    def test_genuine_fw03_decision_still_flows(self):
+        """Positive control: with a working FW03, the dispatch-path call
+        still receives the genuinely produced decision."""
+        from p2p_capabilities.p2p_fw01_loop import Fw01Loop
+        loop = self._make_loop(forged=False)
+        seen = []
+        orig_sel = Fw01Loop.select_role_team
+
+        def spy(self, task_record):
+            out = orig_sel(self, task_record)
+            seen.append("fw03_decision" in task_record)
+            return out
+
+        Fw01Loop.select_role_team = spy
+        try:
+            loop.step()
+        finally:
+            Fw01Loop.select_role_team = orig_sel
+        self.assertTrue(seen, "select_role_team was never called")
+        self.assertIn(True, seen,
+                      "genuine FW03 decision no longer reaches the gate")
 
 
 if __name__ == "__main__":

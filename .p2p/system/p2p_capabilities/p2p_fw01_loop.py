@@ -400,8 +400,28 @@ class Fw01Loop:
         else:
             role_class = ("SMALL_REVIEW_SET" if len(team) > 1
                           else "SINGLE_ROLE")
+        # P2P-340-P0-FINAL B2: provenance-bound pass-through. provided_capabilities
+        # are accepted ONLY from a verified FW03 decision sub-record carrying
+        # the genuine TeamDecision schema (written by the dispatch path above
+        # from TeamDecision.to_dict(); input-supplied nested records are
+        # stripped in step() before select_role_team ever sees them).
+        # A bare provided_capabilities key on the input task record is
+        # self-declared data and MUST NOT become capability evidence:
+        # when FW03 produced no decision or errored, the gate keeps the
+        # fail-closed UNKNOWN state instead of honoring forged provenance.
+        _provided: tuple = ()
+        try:
+            _fw03_d2 = task_record.get("fw03_decision")
+            if (isinstance(_fw03_d2, dict)
+                    and _fw03_d2.get("schema") == "p2p-team-intelligence/1"):
+                _raw = _fw03_d2.get("provided_capabilities", ())
+                _provided = tuple(dict.fromkeys(
+                    str(c) for c in (_raw or ())))
+        except Exception:
+            _provided = ()
         return {"task_id": task_id, "role_class": role_class,
-                "team": team, "participant_count": len(team)}
+                "team": team, "participant_count": len(team),
+                "provided_capabilities": _provided}
 
     def pre_dispatch_revalidation(self, contract: Mapping[str, Any],
                                   task_record: Mapping[str, Any]) -> str | None:
@@ -551,6 +571,16 @@ class Fw01Loop:
         except Exception:
             _fw02_handoff = None
         _rec_with_handoff = dict(rec, task_id=task_id)
+        # P2P-340-P0 B2: provenance hygiene — FW03 evidence must originate
+        # from a TeamDecision produced in THIS dispatch. A caller-supplied
+        # nested fw03_decision (or flat provided_capabilities) is
+        # self-declared input: strip it here so a failed FW03 hook cannot
+        # leave forged evidence behind for select_role_team. Only a
+        # genuinely current decision written below may repopulate these
+        # fields; otherwise the composition gate keeps its fail-closed
+        # UNKNOWN state.
+        _rec_with_handoff.pop("fw03_decision", None)
+        _rec_with_handoff.pop("provided_capabilities", None)
         if _fw02_handoff is not None:
             _rec_with_handoff["capability_requirements"] = _fw02_handoff
         # P2P-FRAMEWORK-03 — adaptive team & council intelligence.
