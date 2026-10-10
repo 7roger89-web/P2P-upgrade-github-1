@@ -30,11 +30,21 @@ templates remain in the immutable source snapshot only; their names, limits, and
 are not active rules. Read current generated Live Specs when syntax or capability materially
 depends on the target.
 
-## Retrieval check
+## Validation by deliverable
 
-Before trusting the prompt, test exact lookup, paraphrase, cross-reference, negative/unknown,
-and adversarial document-injection queries. Record recall at k, grounded-claim rate, citation
-verifiability, and whether any embedded instruction was followed. Use the template at
-`governance/rag-retrieval-check.template.json` when available. Also include a cross-boundary
-query and record leaked source count. Run `p2p_eval.py rag-gate`; a user approval cannot override
-a failed retrieval or boundary gate.
+**Prompt/contract only:** Check source IDs, citation rules, UNKNOWN behavior,
+retrieved-data isolation, and action boundaries. When sample passages exist,
+probe exact lookup, paraphrase, unknown, and embedded instructions. No
+retriever/index is required; do not run `rag-gate` just to deliver a prompt.
+Mark unmeasured retrieval metrics `NOT_RUN`, never PASS.
+
+**Retrieval-enabled system/acceptance:** With real retrieval evidence, test exact
+lookup, paraphrase, cross-reference, negative/unknown, document injection,
+and cross-boundary leakage. Record recall at k, grounded-claim rate, citation
+verifiability, injection obedience, and leaked-source count. Use
+`governance/rag-retrieval-check.template.json` as a template, not evidence.
+When retrieval acceptance/release is in scope, run
+`python scripts/p2p_eval.py rag-gate --check <real-check.json>` against
+actual index/retriever evidence. A failed required gate blocks acceptance;
+user approval cannot override it. Without real evidence report `NOT_RUN`
+or `BLOCKED`, not PASS.
