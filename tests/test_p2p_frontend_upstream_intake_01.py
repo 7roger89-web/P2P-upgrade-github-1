@@ -647,6 +647,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
             if not path.startswith(allowed_prefixes):
                 violations.append(f"unexpected surface: {path}")
                 continue
+            if path == "governance/runtime-manifest.lock.json":
+                # This existing hash-only integrity lock contains "manifest"
+                # in its name but creates no new architecture surface.
+                continue
             lowered = path.lower()
             is_vendored_bytes = any(
                 path == root + leaf
