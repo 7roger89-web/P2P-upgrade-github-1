@@ -134,12 +134,16 @@ jobs:
 
           transcript = Path("b1-copilot-session.md").read_text(encoding="utf-8", errors="replace")
           required = (
+              "$ git rev-parse HEAD",
+              "**view the file at ",
               ".agents/skills/scope-reality-check/SKILL.md",
-              "git rev-parse HEAD",
-              "sha256sum .agents/skills/scope-reality-check/SKILL.md",
+              "$ sha256sum .agents/skills/scope-reality-check/SKILL.md",
+              "Deconstruction without reconstruction is incomplete.",
+              expected_head,
+              expected_sha,
           )
           for marker in required:
-              assert marker in transcript, f"missing tool-trace marker: {marker}"
+              assert marker in transcript, f"missing real tool-trace marker: {marker}"
 
           print("B1_REAL_EXTERNAL_ACTOR_READ=PASS")
           print(f"B1_ACTOR=GITHUB_COPILOT_CLI_ACTIONS")
@@ -158,9 +162,9 @@ jobs:
             echo "- Actor: GitHub Copilot CLI running on a GitHub-hosted Actions runner"
             echo "- Arena: NO"
             echo "- Codex: NO"
-            echo "- Repository: `$GITHUB_REPOSITORY`"
-            echo "- Exact head: `$GITHUB_SHA`"
-            echo "- Skill: `.agents/skills/scope-reality-check/SKILL.md`"
+            printf '%s\n' "- Repository: $GITHUB_REPOSITORY"
+            printf '%s\n' "- Exact head: $GITHUB_SHA"
+            printf '%s\n' "- Skill: .agents/skills/scope-reality-check/SKILL.md"
             echo "- Result: external agent tool trace + exact SHA-256 + source-bound consumption receipt validated against the checkout"
             echo "- Mutation: NONE"
           } >> "$GITHUB_STEP_SUMMARY"
