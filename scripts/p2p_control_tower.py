@@ -996,12 +996,18 @@ def _start_next_with_context(
     worktree: str,
     branch: str,
     law_receipt: Mapping[str, Any],
+    host_discovery_record: Mapping[str, Any] | None,
+    generic_read_evidence: Mapping[str, Any] | None,
+    generic_read_oidc_token: str | None,
 ) -> dict[str, Any]:
     planned = tower.recommend_next_session(
         host,
         session_id=session_id,
         worktree=worktree,
         branch=branch,
+        host_discovery_record=host_discovery_record,
+        generic_read_evidence=generic_read_evidence,
+        generic_read_oidc_token=generic_read_oidc_token,
     )
     if planned.get("status") != "PASS":
         return planned
@@ -1011,6 +1017,9 @@ def _start_next_with_context(
             session_id=session_id,
             worktree=worktree,
             branch=branch,
+            host_discovery_record=host_discovery_record,
+            generic_read_evidence=generic_read_evidence,
+            generic_read_oidc_token=generic_read_oidc_token,
         )
     binding_mapping = planned.get("binding")
     recommendation = planned.get("recommendation")
@@ -1039,6 +1048,9 @@ def _start_next_with_context(
         worktree=worktree,
         branch=branch,
         acceptance_criteria=criteria,
+        host_discovery_record=host_discovery_record,
+        generic_read_evidence=generic_read_evidence,
+        generic_read_oidc_token=generic_read_oidc_token,
         expected_law_sha=expected_law_sha,
         expected_experience_ids=expected_exp_ids,
         canary_directive=directive,
