@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
   copilot-requests: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
 
 jobs:
   b1-real-generic-read:
@@ -151,6 +154,133 @@ jobs:
           print(f"B1_SKILL_SHA256={expected_sha}")
           print("B1_SKILL_CONSUMPTION=CONSUMED")
           print("B1_HOST_MODE=GENERIC_EXACT_REPO_READ")
+          PY
+
+      - name: Build canonical B1 evidence subject
+        id: evidence
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          result_path = Path("b1-copilot-result.json")
+          transcript_path = Path("b1-copilot-session.md")
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+
+          def digest(path: Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          subject = {
+              "schema": "p2p-generic-repo-read-evidence/1",
+              "actor": "GITHUB_COPILOT_CLI_ACTIONS",
+              "actor_runtime": "GitHub Copilot CLI",
+              "arena": False,
+              "codex": False,
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "revision": os.environ["EXPECTED_HEAD"],
+              "workflow_ref": os.environ["GITHUB_WORKFLOW_REF"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "runner_environment": "github-hosted",
+              "skill_path": ".agents/skills/scope-reality-check/SKILL.md",
+              "skill_sha256": os.environ["EXPECTED_SKILL_SHA"],
+              "result_sha256": digest(result_path),
+              "transcript_sha256": digest(transcript_path),
+              "skill_applied": result["skill_applied"],
+              "applied_result": result["applied_result"],
+              "skill_consumption_receipt": result["SKILL_CONSUMPTION_RECEIPT"],
+              "tool_trace_markers": [
+                  "$ git rev-parse HEAD",
+                  "view the file at .agents/skills/scope-reality-check/SKILL.md",
+                  "$ sha256sum .agents/skills/scope-reality-check/SKILL.md",
+              ],
+              "permission_widened": "NO",
+          }
+          Path("b1-evidence.json").write_text(
+              json.dumps(subject, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          predicate = {
+              "schema": "p2p-generic-repo-read-attestation-predicate/1",
+              "actor": subject["actor"],
+              "repository": subject["repository"],
+              "revision": subject["revision"],
+              "skill_sha256": subject["skill_sha256"],
+              "run_id": subject["run_id"],
+              "evidence_schema": subject["schema"],
+          }
+          Path("b1-attestation-predicate.json").write_text(
+              json.dumps(predicate, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          print("B1_EVIDENCE_SHA256=" + digest(Path("b1-evidence.json")))
+          print("B1_TRANSCRIPT_SHA256=" + subject["transcript_sha256"])
+          PY
+
+      - name: Create GitHub-signed B1 evidence attestation
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: b1-evidence.json
+          predicate-type: https://p2p.dev/predicates/generic-repo-read/v1
+          predicate-path: b1-attestation-predicate.json
+
+      - name: Verify signed B1 evidence against exact workflow and source
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          PREDICATE_TYPE: https://p2p.dev/predicates/generic-repo-read/v1
+          SIGNER_WORKFLOW: 7roger89-web/P2P-upgrade-github-1/.github/workflows/p2p-b1-real-generic-read-canary.yml
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh attestation verify b1-evidence.json             -R "$GITHUB_REPOSITORY"             --predicate-type "$PREDICATE_TYPE"             --signer-workflow "$SIGNER_WORKFLOW"             --source-digest "$EXPECTED_HEAD"             --deny-self-hosted-runners             --format json             > b1-attestation-verification.json
+
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          data = json.loads(Path("b1-attestation-verification.json").read_text(encoding="utf-8"))
+          assert isinstance(data, list) and data, "no verified attestation"
+          expected_digest = hashlib.sha256(Path("b1-evidence.json").read_bytes()).hexdigest()
+          expected_type = os.environ["PREDICATE_TYPE"]
+          expected_head = os.environ["EXPECTED_HEAD"]
+          matched = False
+          for item in data:
+              vr = item.get("verificationResult") or {}
+              statement = vr.get("statement") or {}
+              if statement.get("predicateType") != expected_type:
+                  continue
+              subjects = statement.get("subject") or []
+              if not any(
+                  isinstance(subject, dict)
+                  and (subject.get("digest") or {}).get("sha256") == expected_digest
+                  for subject in subjects
+              ):
+                  continue
+              certificate = ((vr.get("signature") or {}).get("certificate") or {})
+              source_digest = (
+                  certificate.get("SourceRepositoryDigest")
+                  or certificate.get("sourceRepositoryDigest")
+                  or ""
+              )
+              # gh --source-digest already enforces this cryptographically.
+              if source_digest and expected_head not in str(source_digest):
+                  continue
+              matched = True
+              break
+          assert matched, "verified attestation did not bind expected subject/predicate"
+          print("B1_GITHUB_ATTESTATION_VERIFY=PASS")
+          print("B1_GITHUB_ATTESTATION_SUBJECT_SHA256=" + expected_digest)
+          print("B1_GITHUB_ATTESTATION_SOURCE_HEAD=" + expected_head)
           PY
 
       - name: Emit bounded canary evidence summary
