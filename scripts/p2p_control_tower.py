@@ -1077,6 +1077,25 @@ def main(argv: list[str] | None = None) -> int:
             current_canonical_base_sha=args.current_canonical_base_sha,
             current_canonical_base_tree=args.current_canonical_base_tree,
         )
+        host_discovery_record = _load_json_object_file(
+            getattr(args, "host_discovery_record_file", None),
+            field="HOST_DISCOVERY_RECORD",
+            expected_schema="p2p-host-discovery-record/1",
+        )
+        generic_read_evidence = _load_json_object_file(
+            getattr(args, "generic_read_evidence_file", None),
+            field="GENERIC_READ_EVIDENCE",
+            expected_schema="p2p-generic-repo-read-evidence/1",
+        )
+        generic_read_oidc_token = os.environ.get("P2P_GENERIC_READ_OIDC_JWT")
+        if generic_read_oidc_token is not None:
+            generic_read_oidc_token = generic_read_oidc_token.strip()
+            if (
+                not generic_read_oidc_token
+                or len(generic_read_oidc_token) > 32768
+                or generic_read_oidc_token.count(".") != 2
+            ):
+                raise BindingError("GENERIC_READ_OIDC_JWT_FORMAT_INVALID")
         if args.command == "start":
             binding = SessionBinding(
                 session_id=args.session_id or new_session_id(args.host, args.goal_id, args.task_id),
@@ -1113,6 +1132,9 @@ def main(argv: list[str] | None = None) -> int:
                 branch=args.branch,
                 acceptance_criteria=criteria,
                 required_skills=tuple(args.required_skill),
+                host_discovery_record=host_discovery_record,
+                generic_read_evidence=generic_read_evidence,
+                generic_read_oidc_token=generic_read_oidc_token,
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
@@ -1150,6 +1172,9 @@ def main(argv: list[str] | None = None) -> int:
                 worktree=args.worktree,
                 branch=args.branch,
                 law_receipt=law_receipt,
+                host_discovery_record=host_discovery_record,
+                generic_read_evidence=generic_read_evidence,
+                generic_read_oidc_token=generic_read_oidc_token,
             )
         else:  # pragma: no cover - argparse constrains this branch.
             raise BindingError(f"UNSUPPORTED_COMMAND:{args.command}")
