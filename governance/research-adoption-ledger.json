@@ -3690,7 +3690,6 @@
       "canonical_capability_ids": [],
       "status": "RESEARCHED",
       "evidence_pointers": [
-        "docs/p2p-development/research/P2P-DEEPGEMM-INTAKE-01.md",
         "https://github.com/deepseek-ai/DeepGEMM/tree/057ca5964aae0879ff2e0eb71ee05a3cb0ba3df7",
         "https://github.com/deepseek-ai/DeepGEMM/blob/main/README.md",
         "https://github.com/deepseek-ai/DeepGEMM/blob/main/LICENSE",
@@ -3707,7 +3706,7 @@
       "roadmap_slot": "future self-hosted GPU provider acceleration candidate; no roadmap item created",
       "owner_decision_status": "OWNER_SELECTED_READ_COMPLETE_PILOT_DEFERRED_UNTIL_REAL_GPU_LANE",
       "last_reviewed_at": "2026-10-12T08:23:00+00:00",
-      "notes": "OE_VERDICT=DO_IT for one bounded READ-stage record. DIRECT_RUNTIME_INTEGRATION=SKIP_IT. PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED. The 2026-10-06 forum post is treated as a community claim, not authority. No claim is made that DeepGEMM is ineffective; the decision is that its correct integration layer is a compatible serving backend, not P2P core, and target-domain value remains unmeasured."
+      "notes": "OE_VERDICT=DO_IT for one bounded READ-stage record. DIRECT_RUNTIME_INTEGRATION=SKIP_IT. PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED. The 2026-10-06 forum post is treated as a community claim, not authority. No claim is made that DeepGEMM is ineffective; the decision is that its correct integration layer is a compatible serving backend, not P2P core, and target-domain value remains unmeasured. CI surface reconciliation: standalone research note removed after the existing no-parallel-surface contract rejected the new path; authoritative JSON ledger plus existing human projection remain the durable record."
     }
   ],
   "rejected_register_summary": {
