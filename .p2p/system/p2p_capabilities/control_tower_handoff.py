@@ -3188,30 +3188,21 @@ class ControlTower:
                 if isinstance(existing, Mapping)
                 else None
             )
-            # F01: detect generic cached prompt to fail-closed on tampered handoff
-            is_generic_cached_start = False
-            if isinstance(existing, Mapping):
-                rec = existing.get("RECOMMENDED_NEW_CHAT")
-                if isinstance(rec, Mapping):
-                    rh = rec.get("SKILL_HANDOFF")
-                    if isinstance(rh, Mapping):
-                        rh_mode = str(rh.get("SKILL_HOST_MODE") or "")
-                        rh_check = str(rh.get("SKILL_CHECK") or "").upper()
-                        rh_selected = rh.get("SKILLS_SELECTED") or ()
-                        rh_required = rh.get("REQUIRED_SKILLS") or ()
-                        if rh_mode == "GENERIC_EXACT_REPO_READ":
-                            is_generic_cached_start = True
-                        elif rh_check == "PASS" and (rh_selected or rh_required):
-                            is_generic_cached_start = True
-                        elif rh_required:
-                            is_generic_cached_start = True
-                    if rec.get("REQUIRED_SKILLS"):
-                        is_generic_cached_start = True
-                if isinstance(existing_handoff, Mapping) and str(existing_handoff.get("SKILL_HOST_MODE") or "") == "GENERIC_EXACT_REPO_READ":
-                    is_generic_cached_start = True
-            should_validate_start = is_generic_cached_start or isinstance(existing_handoff, Mapping)
-            if is_generic_cached_start and not isinstance(existing_handoff, Mapping):
-                should_validate_start = True
+            # F01 + F01-RESIDUAL-01: one canonical bounded gate decides whether
+            # this ACTIVE cached session may be re-served.  Cached metadata is
+            # never allowed to select whether validation runs.
+            from .skill_consumption import cached_session_handoff_is_reusable
+            reusable_start, stale_reason = cached_session_handoff_is_reusable(
+                existing,
+                existing_handoff,
+            )
+            if not reusable_start:
+                raise BindingError(
+                    "SKILL_HANDOFF_HOST_EVIDENCE_STALE:" + stale_reason
+                )
+            should_validate_start = isinstance(existing, Mapping) and isinstance(
+                existing.get("RECOMMENDED_NEW_CHAT"), Mapping
+            )
             if should_validate_start:
                 if isinstance(existing_handoff, Mapping):
                     skill_handoff = dict(existing_handoff)
@@ -3905,50 +3896,44 @@ class ControlTower:
                         "recommendation": None,
                     }
                 existing_handoff = record.get("SKILL_HANDOFF")
-                # F01: never trust cached SKILL_HOST_MODE to skip validation.
-                # If the cached RECOMMENDED_NEW_CHAT still carries a generic
-                # skill prompt, any missing/wrong-type/empty/NOT_REQUIRED
-                # session handoff must be treated as stale and BLOCKED.
-                is_generic_cached = False
-                if isinstance(recommendation, Mapping):
-                    rh = recommendation.get("SKILL_HANDOFF")
-                    if isinstance(rh, Mapping):
-                        rh_mode = str(rh.get("SKILL_HOST_MODE") or "")
-                        rh_check = str(rh.get("SKILL_CHECK") or "").upper()
-                        rh_selected = rh.get("SKILLS_SELECTED") or ()
-                        rh_required = rh.get("REQUIRED_SKILLS") or ()
-                        if rh_mode == "GENERIC_EXACT_REPO_READ":
-                            is_generic_cached = True
-                        elif rh_check == "PASS" and (rh_selected or rh_required):
-                            is_generic_cached = True
-                        elif rh_required:
-                            is_generic_cached = True
-                    if recommendation.get("REQUIRED_SKILLS"):
-                        is_generic_cached = True
-                if isinstance(existing_handoff, Mapping) and str(existing_handoff.get("SKILL_HOST_MODE") or "") == "GENERIC_EXACT_REPO_READ":
-                    is_generic_cached = True
-                should_validate = is_generic_cached or isinstance(existing_handoff, Mapping)
-                if is_generic_cached and not isinstance(existing_handoff, Mapping):
-                    should_validate = True
-                if should_validate:
-                    from .skill_consumption import validate_cached_skill_handoff_host_evidence
-                    host_evidence = validate_cached_skill_handoff_host_evidence(
-                        self.root,
-                        host=normalized_host,
-                        skill_handoff=existing_handoff,
-                        host_discovery_record=host_discovery_record,
-                    )
-                    if not host_evidence.get("valid"):
-                        return {
-                            "status": "BLOCKED",
-                            "reason": (
-                                "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
-                                + str(host_evidence.get("reason") or "UNKNOWN")
-                            ),
-                            "task_id": task.task_id,
-                            "automatic_start": False,
-                            "recommendation": None,
-                        }
+                # F01 + F01-RESIDUAL-01: one canonical bounded gate.  The cached
+                # recommendation below is what this call returns, so a cached
+                # session may only be re-served when its session handoff is
+                # structurally real and consistent with that recommendation.
+                from .skill_consumption import cached_session_handoff_is_reusable
+                reusable, stale_reason = cached_session_handoff_is_reusable(
+                    record,
+                    existing_handoff,
+                )
+                if not reusable:
+                    return {
+                        "status": "BLOCKED",
+                        "reason": (
+                            "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
+                            + stale_reason
+                        ),
+                        "task_id": task.task_id,
+                        "automatic_start": False,
+                        "recommendation": None,
+                    }
+                from .skill_consumption import validate_cached_skill_handoff_host_evidence
+                host_evidence = validate_cached_skill_handoff_host_evidence(
+                    self.root,
+                    host=normalized_host,
+                    skill_handoff=existing_handoff,
+                    host_discovery_record=host_discovery_record,
+                )
+                if not host_evidence.get("valid"):
+                    return {
+                        "status": "BLOCKED",
+                        "reason": (
+                            "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
+                            + str(host_evidence.get("reason") or "UNKNOWN")
+                        ),
+                        "task_id": task.task_id,
+                        "automatic_start": False,
+                        "recommendation": None,
+                    }
                 if normalized_host == "ARENA":
                     arena_checkpoint = _arena_prompt_checkpoint(
                         existing_session,

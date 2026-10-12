@@ -1965,6 +1965,222 @@ class F01CachedPromptSecurityTests(unittest.TestCase):
             with self.assertRaisesRegex(Exception, "SKILL_HANDOFF_HOST_EVIDENCE_STALE"):
                 tower.start_session(binding, task_id="issue-333-ready", task_prompt="Pressure-test this plan")
 
+    # --- F01-RESIDUAL-01: shape-switch family -------------------------------
+    # A cached PROMPT is the authoritative material that gets returned.  Its
+    # structured metadata may be deleted, emptied or reshaped; that must never
+    # become an authority to skip cached-host validation.
+
+    def _realistic_generic_prompt(self, root: Path) -> tuple[str, dict]:
+        """Return (prompt, handoff) for the repo's own deterministic serializer."""
+        skill_path = ".agents/skills/scope-reality-check/SKILL.md"
+        skill_hash = hashlib.sha256((root / skill_path).read_bytes()).hexdigest()
+        handoff = {
+            "schema": "p2p-skill-handoff/1",
+            "SKILL_CHECK": "PASS",
+            "REQUIRED_SKILLS": ["scope-reality-check"],
+            "SKILLS_CONSIDERED_METADATA_COUNT": 1,
+            "SKILLS_SELECTED": ["scope-reality-check"],
+            "SKILL_LOAD_STAGE": "LOAD",
+            "SKILL_SOURCE_HASHES": {"scope-reality-check": skill_hash},
+            "SKILL_SOURCE_PATHS": {"scope-reality-check": skill_path},
+            "SKILL_CONSUMPTION": "EXPECTED",
+            "SKILL_HOST_MODE": "GENERIC_EXACT_REPO_READ",
+            "MATERIAL_ALTERNATIVES_REJECTED": [],
+            "REJECTION_REASON": [],
+            "PERMISSION_WIDENED": "NO",
+            "SINGLE_ROUTER_REUSED": "YES",
+        }
+        binding = SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+        prompt = build_execution_prompt(binding, "Legacy generic cached prompt", task_id="issue-333-ready", skill_handoff=handoff)
+        self.assertIn("P2P_SKILL_HANDOFF:", prompt)
+        self.assertIn("SKILL_HOST_MODE=GENERIC_EXACT_REPO_READ", prompt)
+        return prompt, handoff
+
+    def _seed_residual_variant(self, root: Path, tower: ControlTower, variant: str):
+        """Seed an ACTIVE session whose cached PROMPT still carries the generic
+        skill block, with the structured metadata stripped or reshaped."""
+        prompt, handoff = self._realistic_generic_prompt(root)
+        binding = SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+        recommendation = {"PROMPT": prompt}
+        if variant == "r2":
+            recommendation["SKILL_HANDOFF"] = {}
+        elif variant == "r3":
+            # misleading non-authoritative leftover the detector never inspected
+            recommendation["SKILLS_SELECTED"] = ["scope-reality-check"]
+        elif variant != "r1":
+            raise ValueError(variant)
+        event = {
+            "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
+            "event_type": "CONTROL_TOWER_SESSION_STARTED",
+            "CONTROL_TOWER_SESSION_STARTED": True,
+            "SESSION_BINDING": binding.to_dict(),
+            "TASK_ID": "issue-333-ready",
+            "WORKTREE": "fixture-worktree",
+            "BRANCH": "fixture-branch",
+            "CANONICAL_BASE_SHA": "UNKNOWN",
+            "CANONICAL_BASE_TREE": "UNKNOWN",
+            "RECOMMENDED_NEW_CHAT": recommendation,
+            "EXPECTED_LAW_SHA": None,
+            "EXPECTED_EXPERIENCE_IDS": [],
+            "ACCEPTANCE_CRITERIA": ["Skill handoff is bounded."],
+            "CANARY": None,
+            "PACKET_IS_CANONICAL_TRUTH": "NO",
+            "PROMOTED": False,
+            "PROTECTED_ACTION_EXECUTED": False,
+        }
+        _append_existing_execution_event(tower.ledger_path, event)
+        return binding, prompt, handoff
+
+    def _assert_residual_blocked(self, tower: ControlTower, root: Path, binding: SessionBinding):
+        r1 = tower.recommend_next_session("CLAUDE")
+        self.assertEqual(r1.get("status"), "BLOCKED")
+        self.assertIsNone(r1.get("recommendation"))
+        self.assertIn("SKILL_HANDOFF_HOST_EVIDENCE_STALE", r1.get("reason", ""))
+        r2 = next_safe_session(root, "CLAUDE")
+        self.assertEqual(r2.get("status"), "BLOCKED")
+        self.assertIsNone(r2.get("recommendation"))
+        self.assertIn("SKILL_HANDOFF_HOST_EVIDENCE_STALE", r2.get("reason", ""))
+        # the authoritative cached prompt must not reach any caller
+        self.assertNotIn("P2P_SKILL_HANDOFF:", str(r1.get("recommendation")))
+        self.assertNotIn("P2P_SKILL_HANDOFF:", str(r2.get("recommendation")))
+        with self.assertRaisesRegex(Exception, "SKILL_HANDOFF_HOST_EVIDENCE_STALE"):
+            tower.start_session(binding, task_id="issue-333-ready", task_prompt="Legacy generic cached prompt")
+
+    def test_f01_residual_r1_recommendation_handoff_removed_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            binding, _prompt, _handoff = self._seed_residual_variant(root, tower, "r1")
+            self._assert_residual_blocked(tower, root, binding)
+
+    def test_f01_residual_r2_recommendation_handoff_emptied_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            binding, _prompt, _handoff = self._seed_residual_variant(root, tower, "r2")
+            self._assert_residual_blocked(tower, root, binding)
+
+    def test_f01_residual_r3_misleading_leftover_metadata_is_blocked(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            binding, _prompt, _handoff = self._seed_residual_variant(root, tower, "r3")
+            self._assert_residual_blocked(tower, root, binding)
+
+    def test_f01_residual_r4_start_session_cannot_regenerate_and_return_cached_prompt(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            binding, prompt, _handoff = self._seed_residual_variant(root, tower, "r1")
+            with self.assertRaises(BindingError) as raised:
+                tower.start_session(binding, task_id="issue-333-ready", task_prompt="Legacy generic cached prompt")
+            self.assertIn("SKILL_HANDOFF_HOST_EVIDENCE_STALE", str(raised.exception))
+            # no PASS packet carrying the stale generic prompt may be produced
+            self.assertNotIn("P2P_SKILL_HANDOFF:", prompt[:0])
+
+    def test_f01_residual_cached_generic_prompt_with_no_match_handoff_is_blocked(self):
+        """A generic skill-bearing cached prompt may not ride on a NO_MATCH handoff."""
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            prompt, _handoff = self._realistic_generic_prompt(root)
+            binding = SessionBinding(session_id="legacy-generic-active-01", host="CLAUDE", goal_id="ISSUE-333", goal="Legacy generic cached prompt")
+            honest_no_match = {
+                "schema": "p2p-skill-handoff/1",
+                "SKILL_CHECK": "NO_MATCH",
+                "REQUIRED_SKILLS": [],
+                "SKILLS_SELECTED": [],
+                "SKILLS_CONSIDERED_METADATA_COUNT": 1,
+                "SKILL_LOAD_STAGE": "NO_SKILL",
+                "SKILL_CONSUMPTION": "NOT_EXPECTED",
+                "SKILL_HOST_MODE": "",
+                "MATERIAL_ALTERNATIVES_REJECTED": [],
+                "REJECTION_REASON": [],
+                "PERMISSION_WIDENED": "NO",
+                "SINGLE_ROUTER_REUSED": "YES",
+            }
+            event = {
+                "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
+                "event_type": "CONTROL_TOWER_SESSION_STARTED",
+                "CONTROL_TOWER_SESSION_STARTED": True,
+                "SESSION_BINDING": binding.to_dict(),
+                "TASK_ID": "issue-333-ready",
+                "WORKTREE": "fixture-worktree",
+                "BRANCH": "fixture-branch",
+                "CANONICAL_BASE_SHA": "UNKNOWN",
+                "CANONICAL_BASE_TREE": "UNKNOWN",
+                "RECOMMENDED_NEW_CHAT": {"PROMPT": prompt},
+                "EXPECTED_LAW_SHA": None,
+                "EXPECTED_EXPERIENCE_IDS": [],
+                "ACCEPTANCE_CRITERIA": ["Skill handoff is bounded."],
+                "SKILL_HANDOFF": honest_no_match,
+                "CANARY": None,
+                "PACKET_IS_CANONICAL_TRUTH": "NO",
+                "PROMOTED": False,
+                "PROTECTED_ACTION_EXECUTED": False,
+            }
+            _append_existing_execution_event(tower.ledger_path, event)
+            res = tower.recommend_next_session("CLAUDE")
+            self.assertEqual(res.get("status"), "BLOCKED")
+            self.assertIsNone(res.get("recommendation"))
+            self.assertIn("SKILL_HANDOFF_HOST_EVIDENCE_STALE", res.get("reason", ""))
+
+    def test_f01_residual_ordinary_cached_prompt_is_not_false_positive(self):
+        """Ordinary prose, even prose quoting the markers, stays reusable."""
+        with tempfile.TemporaryDirectory() as raw:
+            root=Path(raw); self._copy_root(root); self._init_git(root); self._init_ready(root)
+            tower=ControlTower(root)
+            binding = SessionBinding(session_id="ordinary-cached-01", host="CLAUDE", goal_id="ISSUE-333", goal="Ordinary cached session")
+            honest_no_match = {
+                "schema": "p2p-skill-handoff/1",
+                "SKILL_CHECK": "NO_MATCH",
+                "REQUIRED_SKILLS": [],
+                "SKILLS_SELECTED": [],
+                "SKILLS_CONSIDERED_METADATA_COUNT": 1,
+                "SKILL_LOAD_STAGE": "NO_SKILL",
+                "SKILL_CONSUMPTION": "NOT_EXPECTED",
+                "SKILL_HOST_MODE": "",
+                "MATERIAL_ALTERNATIVES_REJECTED": [],
+                "REJECTION_REASON": [],
+                "PERMISSION_WIDENED": "NO",
+                "SINGLE_ROUTER_REUSED": "YES",
+            }
+            # free prose that merely discusses the reserved marker words
+            prose_prompt = (
+                "Write the release notes.\n"
+                "P2P_SKILL_HANDOFF:\n"
+                "\n"
+                "The marker above is documentation only; this prompt selects no skill.\n"
+                "SKILL_HOST_MODE=GENERIC_EXACT_REPO_READ is mentioned as an example.\n"
+            )
+            event = {
+                "schema": CONTROL_TOWER_SESSION_START_EVENT_SCHEMA,
+                "event_type": "CONTROL_TOWER_SESSION_STARTED",
+                "CONTROL_TOWER_SESSION_STARTED": True,
+                "SESSION_BINDING": binding.to_dict(),
+                "TASK_ID": "issue-333-ready",
+                "WORKTREE": "fixture-worktree",
+                "BRANCH": "fixture-branch",
+                "CANONICAL_BASE_SHA": "UNKNOWN",
+                "CANONICAL_BASE_TREE": "UNKNOWN",
+                "RECOMMENDED_NEW_CHAT": {"PROMPT": prose_prompt},
+                "EXPECTED_LAW_SHA": None,
+                "EXPECTED_EXPERIENCE_IDS": [],
+                "ACCEPTANCE_CRITERIA": ["Skill handoff is bounded."],
+                "SKILL_HANDOFF": honest_no_match,
+                "CANARY": None,
+                "PACKET_IS_CANONICAL_TRUTH": "NO",
+                "PROMOTED": False,
+                "PROTECTED_ACTION_EXECUTED": False,
+            }
+            _append_existing_execution_event(tower.ledger_path, event)
+            res = tower.recommend_next_session("CLAUDE")
+            self.assertEqual(res.get("status"), "PASS")
+            self.assertIsNotNone(res.get("recommendation"))
+            self.assertEqual(next_safe_session(root, "CLAUDE").get("status"), "PASS")
+            started = tower.start_session(binding, task_id="issue-333-ready", task_prompt="Write the release notes.")
+            self.assertEqual(started.get("status"), "PASS")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

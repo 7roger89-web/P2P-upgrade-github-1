@@ -358,6 +358,88 @@ def _resolve_skill_host_mode(
     return None, "HOST_TRUSTED_REPO_READ_OBSERVATION_UNAVAILABLE"
 
 
+GENERIC_HANDOFF_BLOCK_MARKER = "P2P_SKILL_HANDOFF:"
+GENERIC_HANDOFF_MODE_MARKER = "SKILL_HOST_MODE=" + GENERIC_REPO_READ_MODE
+# The serialized handoff block is emitted by ``skill_handoff_prompt_lines``; it is
+# short and deterministic, so the scan stays bounded.
+GENERIC_HANDOFF_BLOCK_MAX_LINES = 40
+
+
+def cached_prompt_carries_generic_handoff(prompt: object) -> bool:
+    """True when a serialized prompt still carries the reserved generic
+    repo-read skill-handoff block emitted by ``skill_handoff_prompt_lines``.
+
+    Only deterministic block markers are inspected: the ``P2P_SKILL_HANDOFF:``
+    header opens the block and parsing stops at the first blank line.  Free
+    prose written anywhere else, including prose that merely quotes the marker
+    words, cannot by itself classify an ordinary prompt as a skill handoff.
+    """
+
+    if not isinstance(prompt, str) or not prompt:
+        return False
+    lines = prompt.splitlines()
+    for index, line in enumerate(lines):
+        if line.strip() != GENERIC_HANDOFF_BLOCK_MARKER:
+            continue
+        for offset in range(1, GENERIC_HANDOFF_BLOCK_MAX_LINES + 1):
+            if index + offset >= len(lines):
+                break
+            block_line = lines[index + offset].strip()
+            if not block_line:
+                break
+            if block_line == GENERIC_HANDOFF_MODE_MARKER:
+                return True
+        # Only the first reserved block is authoritative.
+        break
+    return False
+
+
+def cached_session_handoff_is_reusable(
+    existing_record: Mapping[str, Any] | None,
+    skill_handoff: Any,
+) -> tuple[bool, str]:
+    """Bounded F01 gate for re-serving an ACTIVE cached session.
+
+    Returns ``(True, "")`` when the caller may continue to
+    :func:`validate_cached_skill_handoff_host_evidence`, otherwise
+    ``(False, reason)`` and the cached recommendation must not be returned.
+
+    The gate never reads cached metadata to decide whether validation may be
+    skipped:
+
+    * a cached ACTIVE session that still carries a ``RECOMMENDED_NEW_CHAT``
+      must carry a structurally real ``SKILL_HANDOFF`` mapping;
+    * when the cached ``PROMPT`` itself still carries the reserved generic
+      repo-read block, the session handoff must be a generic ``PASS`` handoff
+      that matches that prompt.
+
+    ``TAMPERED_METADATA != AUTHORITY_TO_SKIP_VALIDATION``: deleting, emptying or
+    reshaping cached metadata can only move a record from "reusable" to
+    "blocked", never the other way round.
+    """
+
+    if not isinstance(existing_record, Mapping):
+        # No cached session: a fresh session may still prepare its own handoff.
+        return True, ""
+    cached_recommendation = existing_record.get("RECOMMENDED_NEW_CHAT")
+    if not isinstance(cached_recommendation, Mapping):
+        # No cached recommendation to re-serve: a new one will be generated.
+        return True, ""
+    if not isinstance(skill_handoff, Mapping):
+        return (
+            False,
+            "SKILL_HANDOFF_INVALID"
+            if skill_handoff is not None
+            else "SKILL_HANDOFF_MISSING",
+        )
+    if cached_prompt_carries_generic_handoff(cached_recommendation.get("PROMPT")):
+        if str(skill_handoff.get("SKILL_HOST_MODE") or "") != GENERIC_REPO_READ_MODE:
+            return False, "SKILL_HANDOFF_PROMPT_GENERIC_MODE_MISMATCH"
+        if str(skill_handoff.get("SKILL_CHECK") or "").upper() != "PASS":
+            return False, "SKILL_HANDOFF_PROMPT_GENERIC_CHECK_MISMATCH"
+    return True, ""
+
+
 def validate_cached_skill_handoff_host_evidence(
     root: str | Path,
     *,
