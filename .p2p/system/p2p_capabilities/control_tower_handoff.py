@@ -3098,6 +3098,9 @@ class ControlTower:
         expected_law_sha: str | None = None,
         expected_experience_ids: Sequence[str] = (),
         canary_directive: CanaryDirective | None = None,
+        host_discovery_record: Mapping[str, Any] | None = None,
+        trusted_repo_read_evidence: bytes | None = None,
+        trusted_repo_read_oidc_token: str | None = None,
     ) -> dict[str, Any]:
         if not isinstance(binding, SessionBinding):
             raise BindingError("SESSION_BINDING_REQUIRED")
@@ -3181,12 +3184,22 @@ class ControlTower:
             self.root / ".p2p" / "system" / "p2p_capabilities"
             / "capabilities.json"
         ).is_file()
+        existing_handoff = (
+            existing.get("SKILL_HANDOFF")
+            if isinstance(existing, Mapping)
+            and isinstance(existing.get("SKILL_HANDOFF"), Mapping)
+            else None
+        )
+        trust_inputs_present = any((
+            host_discovery_record is not None,
+            trusted_repo_read_evidence is not None,
+            trusted_repo_read_oidc_token is not None,
+        ))
         if binding.host in {"ARENA", "CODEX"} and skill_registry_available:
-            existing_handoff = (
-                existing.get("SKILL_HANDOFF")
-                if isinstance(existing, Mapping)
-                else None
-            )
+            if trust_inputs_present:
+                raise BindingError(
+                    "GENERIC_REPO_READ_TRUST_EVIDENCE_NATIVE_HOST_FORBIDDEN"
+                )
             if isinstance(existing_handoff, Mapping):
                 skill_handoff = dict(existing_handoff)
                 if required_skill_refs:
@@ -3196,7 +3209,9 @@ class ControlTower:
                     )
                     existing_required = tuple(
                         normalize_required(value)
-                        for value in (skill_handoff.get("REQUIRED_SKILLS") or ())
+                        for value in (
+                            skill_handoff.get("REQUIRED_SKILLS") or ()
+                        )
                     )
                     requested_required = tuple(
                         normalize_required(value)
@@ -3222,6 +3237,82 @@ class ControlTower:
                 raise BindingError(
                     "SKILL_HANDOFF_BLOCKED:" + (reasons or "UNKNOWN")
                 )
+        elif skill_registry_available:
+            from .skill_consumption import (
+                GENERIC_REPO_READ_MODE,
+                SkillConsumptionError,
+                authorize_prompt_only_skill_handoff,
+                prepare_prompt_only_skill_handoff,
+            )
+            effective_required = required_skill_refs
+            if (
+                not effective_required
+                and isinstance(existing_handoff, Mapping)
+            ):
+                effective_required = tuple(
+                    str(value)
+                    for value in (
+                        existing_handoff.get("REQUIRED_SKILLS") or ()
+                    )
+                )
+            package = prepare_prompt_only_skill_handoff(
+                self.root,
+                prompt_task,
+                host=binding.host,
+                required_skills=effective_required,
+            )
+            candidate = package.get("skill_handoff")
+            if not isinstance(candidate, Mapping):
+                raise BindingError("GENERIC_SKILL_HANDOFF_INVALID")
+            status = str(candidate.get("SKILL_CHECK") or "BLOCKED")
+            if status == "BLOCKED":
+                reasons = ",".join(
+                    str(v)
+                    for v in candidate.get("REJECTION_REASON", ())
+                )
+                raise BindingError(
+                    "SKILL_HANDOFF_BLOCKED:" + (reasons or "UNKNOWN")
+                )
+            if status == "PREPARED":
+                if (
+                    host_discovery_record is None
+                    or trusted_repo_read_evidence is None
+                    or trusted_repo_read_oidc_token is None
+                ):
+                    raise BindingError(
+                        "GENERIC_REPO_READ_TRUST_EVIDENCE_REQUIRED"
+                    )
+                try:
+                    skill_handoff = authorize_prompt_only_skill_handoff(
+                        self.root,
+                        candidate,
+                        request_text=prompt_task,
+                        host=binding.host,
+                        host_discovery_record=host_discovery_record,
+                        trusted_evidence_bytes=trusted_repo_read_evidence,
+                        trusted_oidc_token=trusted_repo_read_oidc_token,
+                    )
+                except SkillConsumptionError as exc:
+                    raise BindingError(
+                        "SKILL_HANDOFF_BLOCKED:" + str(exc)
+                    ) from exc
+                if (
+                    skill_handoff.get("SKILL_CHECK") != "PASS"
+                    or skill_handoff.get("SKILL_HOST_MODE")
+                    != GENERIC_REPO_READ_MODE
+                    or str(
+                        skill_handoff.get("EXECUTION_AUTHORIZED") or ""
+                    ).upper() != "YES"
+                ):
+                    raise BindingError(
+                        "GENERIC_REPO_READ_AUTHORIZATION_INVALID"
+                    )
+            elif status == "NO_MATCH":
+                skill_handoff = dict(candidate)
+            else:
+                raise BindingError(
+                    "GENERIC_SKILL_HANDOFF_STATUS_INVALID"
+                )
 
         arena_checkpoint = None
         if binding.host == "ARENA":
@@ -3236,7 +3327,15 @@ class ControlTower:
 
         if existing is not None:
             recommendation = existing.get("RECOMMENDED_NEW_CHAT")
-            if binding.host == "ARENA" or not isinstance(recommendation, Mapping):
+            if (
+                binding.host == "ARENA"
+                or (
+                    isinstance(skill_handoff, Mapping)
+                    and str(skill_handoff.get("SKILL_HOST_MODE") or "")
+                    == "GENERIC_EXACT_REPO_READ"
+                )
+                or not isinstance(recommendation, Mapping)
+            ):
                 recommendation = _session_recommendation(
                     binding,
                     task_prompt=prompt_task,
@@ -3843,6 +3942,19 @@ class ControlTower:
             existing_binding = record.get("BINDING")
             recommendation = record.get("RECOMMENDED_NEW_CHAT")
             if isinstance(existing_binding, Mapping) and isinstance(recommendation, Mapping):
+                cached_handoff = record.get("SKILL_HANDOFF")
+                if (
+                    isinstance(cached_handoff, Mapping)
+                    and str(cached_handoff.get("SKILL_HOST_MODE") or "")
+                    == "GENERIC_EXACT_REPO_READ"
+                ):
+                    return {
+                        "status": "BLOCKED",
+                        "reason": "GENERIC_REPO_READ_FRESH_TRUST_EVIDENCE_REQUIRED",
+                        "task_id": task.task_id,
+                        "automatic_start": False,
+                        "recommendation": None,
+                    }
                 if normalized_host == "ARENA":
                     existing_session = SessionBinding.from_mapping(existing_binding)
                     arena_checkpoint = _arena_prompt_checkpoint(
@@ -3920,6 +4032,40 @@ class ControlTower:
                     "automatic_start": False,
                     "recommendation": None,
                 }
+        elif skill_registry_available:
+            from .skill_consumption import prepare_prompt_only_skill_handoff
+            package = prepare_prompt_only_skill_handoff(
+                self.root,
+                task.purpose,
+                host=normalized_host,
+            )
+            candidate = package.get("skill_handoff")
+            if not isinstance(candidate, Mapping):
+                return {
+                    "status": "BLOCKED",
+                    "reason": "GENERIC_SKILL_HANDOFF_INVALID",
+                    "task_id": task.task_id,
+                    "automatic_start": False,
+                    "recommendation": None,
+                }
+            if candidate.get("SKILL_CHECK") == "BLOCKED":
+                return {
+                    "status": "BLOCKED",
+                    "reason": "SKILL_HANDOFF_BLOCKED",
+                    "task_id": task.task_id,
+                    "automatic_start": False,
+                    "recommendation": None,
+                }
+            if candidate.get("SKILL_CHECK") == "PREPARED":
+                return {
+                    "status": "BLOCKED",
+                    "reason": "GENERIC_REPO_READ_TRUST_EVIDENCE_REQUIRED",
+                    "task_id": task.task_id,
+                    "automatic_start": False,
+                    "recommendation": None,
+                    "prompt_only": package,
+                }
+            preview_skill_handoff = dict(candidate)
         recommendation = _session_recommendation(
             binding,
             task_prompt=task.purpose,
@@ -3951,7 +4097,12 @@ class ControlTower:
         max_prompt_chars: int | None = None,
     ) -> dict[str, Any]:
         """Prepare a copyable generic skill prompt without starting a session."""
-        from .skill_consumption import prepare_prompt_only_skill_handoff
+        from .skill_consumption import (
+            TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH,
+            prepare_prompt_only_skill_handoff,
+            prompt_only_handoff_fingerprint,
+            prompt_only_task_sha256,
+        )
 
         required_skill_refs = _refs(
             required_skills, "required_skills", max_length=256
@@ -3964,6 +4115,24 @@ class ControlTower:
             allow_inline_skill_content=allow_inline_skill_content,
             max_prompt_chars=max_prompt_chars,
         )
+        handoff = package.get("skill_handoff")
+        if (
+            package.get("status") == "PREPARED"
+            and isinstance(handoff, Mapping)
+        ):
+            package["task_sha256"] = prompt_only_task_sha256(
+                request_text
+            )
+            package[
+                "handoff_fingerprint"
+            ] = prompt_only_handoff_fingerprint(
+                handoff,
+                request_text=request_text,
+                host=host,
+            )
+            package[
+                "trusted_evidence_workflow_path"
+            ] = TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH
         package["automatic_start"] = False
         package["execution_authorized"] = False
         package["session_started"] = False

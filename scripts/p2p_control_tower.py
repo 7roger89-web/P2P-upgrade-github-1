@@ -129,6 +129,80 @@ def _root(args: argparse.Namespace) -> Path:
     return Path(args.root).expanduser().resolve() if args.root else _default_root()
 
 
+def _read_bounded_bytes(
+    value: str,
+    *,
+    field_name: str,
+    max_bytes: int,
+) -> bytes:
+    path = Path(value).expanduser().resolve()
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise BindingError(
+            f"{field_name.upper()}_UNREADABLE:{path}"
+        ) from exc
+    if not raw or len(raw) > max_bytes:
+        raise BindingError(
+            f"{field_name.upper()}_SIZE_INVALID"
+        )
+    return raw
+
+
+def _load_generic_trust_inputs(
+    args: argparse.Namespace,
+) -> tuple[Mapping[str, Any] | None, bytes | None, str | None]:
+    values = (
+        getattr(args, "host_discovery_record_file", None),
+        getattr(args, "trusted_repo_read_evidence_file", None),
+        getattr(args, "trusted_repo_read_oidc_token_file", None),
+    )
+    if not any(values):
+        return None, None, None
+    if not all(values):
+        raise BindingError(
+            "GENERIC_REPO_READ_TRUST_FILE_SET_INCOMPLETE"
+        )
+    discovery_raw = _read_bounded_bytes(
+        values[0],
+        field_name="host_discovery_record_file",
+        max_bytes=128 * 1024,
+    )
+    try:
+        discovery = json.loads(
+            discovery_raw.decode("utf-8")
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise BindingError(
+            "HOST_DISCOVERY_RECORD_FILE_INVALID"
+        ) from exc
+    if not isinstance(discovery, Mapping):
+        raise BindingError(
+            "HOST_DISCOVERY_RECORD_FILE_INVALID"
+        )
+    evidence = _read_bounded_bytes(
+        values[1],
+        field_name="trusted_repo_read_evidence_file",
+        max_bytes=128 * 1024,
+    )
+    token_raw = _read_bounded_bytes(
+        values[2],
+        field_name="trusted_repo_read_oidc_token_file",
+        max_bytes=32 * 1024,
+    )
+    try:
+        token = token_raw.decode("utf-8").strip()
+    except UnicodeDecodeError as exc:
+        raise BindingError(
+            "TRUSTED_REPO_READ_OIDC_TOKEN_NOT_UTF8"
+        ) from exc
+    if not token:
+        raise BindingError(
+            "TRUSTED_REPO_READ_OIDC_TOKEN_EMPTY"
+        )
+    return discovery, evidence, token
+
+
 def _sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
@@ -890,6 +964,27 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     start.add_argument(
+        "--host-discovery-record-file",
+        help=(
+            "current p2p-host-discovery-record/1 for a generic host; "
+            "required with trusted repo-read evidence"
+        ),
+    )
+    start.add_argument(
+        "--trusted-repo-read-evidence-file",
+        help=(
+            "canonical p2p-generic-repo-read-evidence/1 bytes produced "
+            "after the external actor read the frozen skill handoff"
+        ),
+    )
+    start.add_argument(
+        "--trusted-repo-read-oidc-token-file",
+        help=(
+            "GitHub Actions OIDC JWT whose audience binds the exact "
+            "trusted repo-read evidence bytes"
+        ),
+    )
+    start.add_argument(
         "--low-risk-mechanical",
         action="store_true",
         help=(
@@ -1066,6 +1161,11 @@ def main(argv: list[str] | None = None) -> int:
                 law_receipt=law_receipt,
                 low_risk_mechanical=args.low_risk_mechanical,
             )
+            (
+                host_discovery_record,
+                trusted_repo_read_evidence,
+                trusted_repo_read_oidc_token,
+            ) = _load_generic_trust_inputs(args)
             result = tower.start_session(
                 binding,
                 task_id=args.task_id,
@@ -1079,6 +1179,9 @@ def main(argv: list[str] | None = None) -> int:
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
+                host_discovery_record=host_discovery_record,
+                trusted_repo_read_evidence=trusted_repo_read_evidence,
+                trusted_repo_read_oidc_token=trusted_repo_read_oidc_token,
             )
         elif args.command == "prepare-prompt-only":
             result = tower.prepare_prompt_only(
