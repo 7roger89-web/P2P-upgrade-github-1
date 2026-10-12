@@ -4097,7 +4097,12 @@ class ControlTower:
         max_prompt_chars: int | None = None,
     ) -> dict[str, Any]:
         """Prepare a copyable generic skill prompt without starting a session."""
-        from .skill_consumption import prepare_prompt_only_skill_handoff
+        from .skill_consumption import (
+            TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH,
+            prepare_prompt_only_skill_handoff,
+            prompt_only_handoff_fingerprint,
+            prompt_only_task_sha256,
+        )
 
         required_skill_refs = _refs(
             required_skills, "required_skills", max_length=256
@@ -4110,6 +4115,24 @@ class ControlTower:
             allow_inline_skill_content=allow_inline_skill_content,
             max_prompt_chars=max_prompt_chars,
         )
+        handoff = package.get("skill_handoff")
+        if (
+            package.get("status") == "PREPARED"
+            and isinstance(handoff, Mapping)
+        ):
+            package["task_sha256"] = prompt_only_task_sha256(
+                request_text
+            )
+            package[
+                "handoff_fingerprint"
+            ] = prompt_only_handoff_fingerprint(
+                handoff,
+                request_text=request_text,
+                host=host,
+            )
+            package[
+                "trusted_evidence_workflow_path"
+            ] = TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH
         package["automatic_start"] = False
         package["execution_authorized"] = False
         package["session_started"] = False
