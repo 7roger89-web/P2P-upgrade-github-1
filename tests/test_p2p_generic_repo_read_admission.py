@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import sys
+import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,7 +13,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
 if str(SYSTEM_ROOT) not in sys.path:
     sys.path.insert(0, str(SYSTEM_ROOT))
+SCRIPTS_ROOT = REPO_ROOT / "scripts"
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
 
+import p2p_control_tower as control_tower_cli  # noqa: E402
 from p2p_capabilities.skill_consumption import prepare_skill_handoff  # noqa: E402
 
 
@@ -120,6 +126,30 @@ class GenericRepoReadAdmissionTests(unittest.TestCase):
         self.assertEqual(
             handoff["SKILL_HOST_MODE"], "ARENA_EXACT_REPO_READ"
         )
+
+    def test_cli_accepts_explicit_generic_evidence_files(self):
+        args = control_tower_cli.build_parser().parse_args([
+            "start",
+            "--host", self.HOST,
+            "--goal-id", "g1",
+            "--goal", "bounded task",
+            "--host-discovery-record-file", "host.json",
+            "--generic-read-evidence-file", "evidence.json",
+        ])
+        self.assertEqual(args.host_discovery_record_file, "host.json")
+        self.assertEqual(args.generic_read_evidence_file, "evidence.json")
+
+    def test_cli_loads_existing_discovery_record_object(self):
+        record = self._record()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "host.json"
+            path.write_text(json.dumps(record), encoding="utf-8")
+            loaded = control_tower_cli._load_json_object_file(
+                str(path),
+                field="HOST_DISCOVERY_RECORD",
+                expected_schema="p2p-host-discovery-record/1",
+            )
+        self.assertEqual(loaded["host_id"], self.HOST)
 
     def test_generic_no_match_never_claims_repo_read_mode(self):
         handoff = prepare_skill_handoff(
