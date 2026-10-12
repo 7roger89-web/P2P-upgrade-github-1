@@ -173,5 +173,72 @@ class GenericRepoReadEvidenceTests(unittest.TestCase):
         self.assertEqual(result["reason"], "GITHUB_OIDC_TOKEN_REQUIRED")
 
 
+    def test_wrong_repository_is_rejected(self):
+        forged = dict(self.evidence)
+        forged["repository"] = "other-owner/other-repo"
+        result = self._verify(evidence=forged)
+        self.assertFalse(result["valid"])
+        self.assertEqual(
+            result["reason"], "GENERIC_READ_EVIDENCE_REPO_MISMATCH"
+        )
+
+    def test_wrong_revision_is_rejected(self):
+        forged = dict(self.evidence)
+        forged["revision"] = "0" * 40
+        result = self._verify(evidence=forged)
+        self.assertFalse(result["valid"])
+        self.assertEqual(
+            result["reason"], "GENERIC_READ_EVIDENCE_REVISION_MISMATCH"
+        )
+
+    def test_wrong_actor_is_rejected(self):
+        forged = dict(self.evidence)
+        forged["actor"] = "OTHER_EXTERNAL_ACTOR"
+        result = self._verify(evidence=forged)
+        self.assertFalse(result["valid"])
+        self.assertEqual(
+            result["reason"], "GENERIC_READ_EVIDENCE_ACTOR_MISMATCH"
+        )
+
+    def test_wrong_probe_path_is_rejected(self):
+        forged = dict(self.evidence)
+        forged["probe_path"] = ".agents/skills/other/SKILL.md"
+        result = self._verify(evidence=forged)
+        self.assertFalse(result["valid"])
+        self.assertEqual(
+            result["reason"], "GENERIC_READ_EVIDENCE_PROBE_PATH_MISMATCH"
+        )
+
+    def test_malformed_schema_is_rejected(self):
+        forged = dict(self.evidence)
+        forged["schema"] = "p2p-generic-repo-read-evidence/999"
+        result = self._verify(evidence=forged)
+        self.assertFalse(result["valid"])
+        self.assertEqual(
+            result["reason"], "GENERIC_READ_EVIDENCE_SCHEMA_INVALID"
+        )
+
+    def test_non_push_event_is_rejected(self):
+        result = self._verify(
+            token=self._token(self._claims(event_name="pull_request"))
+        )
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["reason"], "GITHUB_OIDC_EVENT_NOT_ALLOWED")
+
+    def test_non_branch_ref_is_rejected(self):
+        result = self._verify(
+            token=self._token(self._claims(ref="refs/pull/348/merge"))
+        )
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["reason"], "GITHUB_OIDC_REF_NOT_BRANCH")
+
+    def test_run_id_mismatch_is_rejected(self):
+        result = self._verify(
+            token=self._token(self._claims(run_id="99999999999"))
+        )
+        self.assertFalse(result["valid"])
+        self.assertEqual(result["reason"], "GITHUB_OIDC_RUN_ID_MISMATCH")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
