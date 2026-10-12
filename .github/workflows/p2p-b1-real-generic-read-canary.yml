@@ -1,0 +1,166 @@
+name: P2P B1 real generic external AI read canary
+
+on:
+  push:
+    branches:
+      - canary/b1-copilot-generic-read
+
+permissions:
+  contents: read
+  copilot-requests: write
+
+jobs:
+  b1-real-generic-read:
+    name: B1 GitHub Copilot CLI exact repo-skill read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact canary head
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Bind exact repository and skill source
+        id: bind
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -f .agents/skills/scope-reality-check/SKILL.md
+          SKILL_SHA="$(sha256sum .agents/skills/scope-reality-check/SKILL.md | awk '{print $1}')"
+          printf 'repo_head=%s\n' "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+          printf 'skill_sha=%s\n' "$SKILL_SHA" >> "$GITHUB_OUTPUT"
+          printf 'CANARY_REPO=%s\nCANARY_HEAD=%s\nCANARY_SKILL_SHA256=%s\n' "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$SKILL_SHA"
+
+      - name: Install GitHub Copilot CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          COPILOT_VERSION="$(npm view @github/copilot version)"
+          echo "COPILOT_NPM_VERSION=$COPILOT_VERSION"
+          npm install -g "@github/copilot@$COPILOT_VERSION"
+          copilot --version
+
+      - name: Run real non-Arena non-Codex read-and-apply actor
+        id: actor
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/b1-prompt.txt <<'PROMPT'
+          You are the B1 canary actor GITHUB_COPILOT_CLI_ACTIONS. You are NOT Arena and NOT Codex.
+          Work only from the checked-out repository; do not use prior knowledge for the required skill content.
+
+          Before answering, you MUST actually:
+          1. use a shell tool to run: git rev-parse HEAD
+          2. use the READ tool to read exactly: .agents/skills/scope-reality-check/SKILL.md
+          3. use a shell tool to run: sha256sum .agents/skills/scope-reality-check/SKILL.md
+          4. apply the exact skill you just read to this bounded claim:
+             "The generic external AI skill handoff may authorize this actor because this runtime proves exact target-repo read capability and actor-bound execution evidence."
+
+          Do not modify any repository file. Do not fetch the skill from the web.
+          Return ONLY one raw JSON object, no markdown fences and no prose outside JSON, with this exact shape:
+          {
+            "actor":"GITHUB_COPILOT_CLI_ACTIONS",
+            "arena":false,
+            "codex":false,
+            "repo_head":"<actual git rev-parse HEAD>",
+            "skill_path":".agents/skills/scope-reality-check/SKILL.md",
+            "skill_sha256":"<actual sha256sum>",
+            "skill_applied":true,
+            "applied_result":{
+              "calibration":"CLEARLY_UNREALISTIC|AGGRESSIVE_BUT_PLAUSIBLE|ACTUALLY_REALISTIC",
+              "reality_anchor":"<short source-grounded statement>",
+              "verdict":"<short verdict about the claim>"
+            },
+            "SKILL_CONSUMPTION_RECEIPT":{
+              "schema":"p2p-skill-consumption-receipt/1",
+              "SKILLS_SELECTED":["scope-reality-check"],
+              "SKILL_SOURCE_HASHES":{"scope-reality-check":"<same actual sha256sum>"},
+              "SKILL_SOURCE_PATHS":{"scope-reality-check":".agents/skills/scope-reality-check/SKILL.md"},
+              "SKILL_LOAD_STAGE":"LOAD",
+              "SKILL_CONSUMPTION":"CONSUMED",
+              "SKILL_HOST_MODE":"GENERIC_EXACT_REPO_READ",
+              "PERMISSION_WIDENED":"NO"
+            }
+          }
+          PROMPT
+
+          copilot -p "$(cat /tmp/b1-prompt.txt)"             -s             --no-ask-user             --no-custom-instructions             --no-remote             --no-remote-export             --allow-tool='read, shell(git:*), shell(sha256sum:*)'             --share=./b1-copilot-session.md             > b1-copilot-result.json
+
+          echo '--- B1 COPILOT RESULT ---'
+          cat b1-copilot-result.json
+          echo '--- B1 COPILOT SESSION TRANSCRIPT ---'
+          cat b1-copilot-session.md
+
+      - name: Independently validate actor receipt against checkout
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          raw = Path("b1-copilot-result.json").read_text(encoding="utf-8").strip()
+          data = json.loads(raw)
+          expected_head = os.environ["EXPECTED_HEAD"]
+          expected_sha = os.environ["EXPECTED_SKILL_SHA"]
+
+          assert data["actor"] == "GITHUB_COPILOT_CLI_ACTIONS"
+          assert data["arena"] is False
+          assert data["codex"] is False
+          assert data["repo_head"] == expected_head
+          assert data["skill_path"] == ".agents/skills/scope-reality-check/SKILL.md"
+          assert data["skill_sha256"] == expected_sha
+          assert data["skill_applied"] is True
+
+          receipt = data["SKILL_CONSUMPTION_RECEIPT"]
+          assert receipt["schema"] == "p2p-skill-consumption-receipt/1"
+          assert receipt["SKILLS_SELECTED"] == ["scope-reality-check"]
+          assert receipt["SKILL_SOURCE_HASHES"] == {"scope-reality-check": expected_sha}
+          assert receipt["SKILL_SOURCE_PATHS"] == {"scope-reality-check": ".agents/skills/scope-reality-check/SKILL.md"}
+          assert receipt["SKILL_LOAD_STAGE"] == "LOAD"
+          assert receipt["SKILL_CONSUMPTION"] == "CONSUMED"
+          assert receipt["SKILL_HOST_MODE"] == "GENERIC_EXACT_REPO_READ"
+          assert receipt["PERMISSION_WIDENED"] == "NO"
+
+          transcript = Path("b1-copilot-session.md").read_text(encoding="utf-8", errors="replace")
+          required = (
+              ".agents/skills/scope-reality-check/SKILL.md",
+              "git rev-parse HEAD",
+              "sha256sum .agents/skills/scope-reality-check/SKILL.md",
+          )
+          for marker in required:
+              assert marker in transcript, f"missing tool-trace marker: {marker}"
+
+          print("B1_REAL_EXTERNAL_ACTOR_READ=PASS")
+          print(f"B1_ACTOR=GITHUB_COPILOT_CLI_ACTIONS")
+          print(f"B1_HEAD={expected_head}")
+          print(f"B1_SKILL_SHA256={expected_sha}")
+          print("B1_SKILL_CONSUMPTION=CONSUMED")
+          print("B1_HOST_MODE=GENERIC_EXACT_REPO_READ")
+          PY
+
+      - name: Emit bounded canary evidence summary
+        shell: bash
+        run: |
+          {
+            echo "## P2P Issue #333 B1 — real generic external AI read canary"
+            echo
+            echo "- Actor: GitHub Copilot CLI running on a GitHub-hosted Actions runner"
+            echo "- Arena: NO"
+            echo "- Codex: NO"
+            echo "- Repository: `$GITHUB_REPOSITORY`"
+            echo "- Exact head: `$GITHUB_SHA`"
+            echo "- Skill: `.agents/skills/scope-reality-check/SKILL.md`"
+            echo "- Result: external agent tool trace + exact SHA-256 + source-bound consumption receipt validated against the checkout"
+            echo "- Mutation: NONE"
+          } >> "$GITHUB_STEP_SUMMARY"
