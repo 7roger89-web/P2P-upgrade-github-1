@@ -3941,6 +3941,34 @@ class ControlTower:
             "automatic_start": False,
         }
 
+    def prepare_prompt_only(
+        self,
+        host: str,
+        request_text: str,
+        *,
+        required_skills: Sequence[str] = (),
+        allow_inline_skill_content: bool = False,
+        max_prompt_chars: int | None = None,
+    ) -> dict[str, Any]:
+        """Prepare a copyable generic skill prompt without starting a session."""
+        from .skill_consumption import prepare_prompt_only_skill_handoff
+
+        required_skill_refs = _refs(
+            required_skills, "required_skills", max_length=256
+        )
+        package = prepare_prompt_only_skill_handoff(
+            self.root,
+            request_text,
+            host=host,
+            required_skills=required_skill_refs,
+            allow_inline_skill_content=allow_inline_skill_content,
+            max_prompt_chars=max_prompt_chars,
+        )
+        package["automatic_start"] = False
+        package["execution_authorized"] = False
+        package["session_started"] = False
+        return package
+
     def start_next_session(
         self,
         host: str,
