@@ -231,3 +231,10 @@ E2E REPORT (compact)
   Residual unverified surfaces: §13 items 1-3 (production residual none)
   STATUS=PARTIAL_BY_PROCESS_ARTIFACT_ONLY (source technically cleared; head-move + new-head Shield pending Owner/Control Tower)
 ```
+
+
+## 13. PR branch integration checkpoint
+
+- The two required compliance artifacts were integrated onto PR #344's actual head branch by a lease-bound, non-force ref update after independent verification that the bridge commit was a direct child of the reviewed source head.
+- No production source was changed by the integration step; the PR remains limited to the original four production paths plus these two evidence artifacts.
+- Exact-head Shield must still be established on the resulting PR head before final acceptance; historical run `38192877757` is not substituted for that requirement.
