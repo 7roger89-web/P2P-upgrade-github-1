@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - feat/issue-333-signed-generic-read-admission
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
