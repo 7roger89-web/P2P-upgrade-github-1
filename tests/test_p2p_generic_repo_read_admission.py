@@ -6,6 +6,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -18,6 +19,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_ROOT))
 
 import p2p_control_tower as control_tower_cli  # noqa: E402
+from p2p_capabilities import skill_consumption as skill_consumption  # noqa: E402
 from p2p_capabilities.skill_consumption import prepare_skill_handoff  # noqa: E402
 
 
@@ -159,6 +161,79 @@ class GenericRepoReadAdmissionTests(unittest.TestCase):
         )
         self.assertEqual(handoff["SKILL_CHECK"], "NO_MATCH")
         self.assertEqual(handoff["SKILL_HOST_MODE"], "NOT_REQUIRED")
+
+
+    def test_verified_external_evidence_enables_source_bound_generic_handoff(self):
+        record = self._record()
+        evidence = {"schema": "p2p-generic-repo-read-evidence/1"}
+        with mock.patch.object(
+            skill_consumption,
+            "verify_generic_repo_read_evidence",
+            return_value={"valid": True, "reason": None},
+        ):
+            handoff = prepare_skill_handoff(
+                REPO_ROOT,
+                "execute the bounded implementation plan",
+                host=self.HOST,
+                required_skills=("p2p-scope",),
+                host_discovery_record=record,
+                generic_read_evidence=evidence,
+                generic_read_oidc_token="header.payload.signature",
+            )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(
+            handoff["SKILL_HOST_MODE"], "GENERIC_EXACT_REPO_READ"
+        )
+        self.assertEqual(handoff["SKILL_CONSUMPTION"], "EXPECTED")
+        self.assertEqual(handoff["SKILLS_SELECTED"], ["p2p-scope"])
+        self.assertEqual(
+            list(handoff["SKILL_SOURCE_PATHS"]), ["p2p-scope"]
+        )
+        self.assertRegex(
+            handoff["SKILL_SOURCE_HASHES"]["p2p-scope"], r"^[0-9a-f]{64}$"
+        )
+
+    def test_cached_generic_handoff_revalidates_external_evidence(self):
+        record = self._record()
+        evidence = {"schema": "p2p-generic-repo-read-evidence/1"}
+        with mock.patch.object(
+            skill_consumption,
+            "verify_generic_repo_read_evidence",
+            return_value={"valid": True, "reason": None},
+        ):
+            handoff = prepare_skill_handoff(
+                REPO_ROOT,
+                "execute the bounded implementation plan",
+                host=self.HOST,
+                required_skills=("p2p-scope",),
+                host_discovery_record=record,
+                generic_read_evidence=evidence,
+                generic_read_oidc_token="header.payload.signature",
+            )
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+
+        with mock.patch.object(
+            skill_consumption,
+            "verify_generic_repo_read_evidence",
+            return_value={
+                "valid": False,
+                "reason": "GITHUB_OIDC_EVIDENCE_STALE",
+            },
+        ):
+            validation = (
+                skill_consumption.validate_cached_skill_handoff_host_evidence(
+                    REPO_ROOT,
+                    host=self.HOST,
+                    skill_handoff=handoff,
+                    host_discovery_record=record,
+                    generic_read_evidence=evidence,
+                    generic_read_oidc_token="header.payload.signature",
+                )
+            )
+        self.assertFalse(validation["valid"])
+        self.assertEqual(
+            validation["reason"], "GITHUB_OIDC_EVIDENCE_STALE"
+        )
 
 
 if __name__ == "__main__":
