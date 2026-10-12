@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: `2026-10-12`
-- Status: `active`
+- Status: `ready-for-supervisor`
 - Plan: `docs/plans/2026-10-12-p2p-generic-read-admission/2026-10-12-p2p-generic-read-admission-plan.md`
 - Evidence: `docs/plans/2026-10-12-p2p-generic-read-admission/2026-10-12-p2p-generic-read-admission-evidence.md`
 - Benchmark: `docs/plans/2026-10-12-p2p-generic-read-admission/2026-10-12-p2p-generic-read-admission-benchmark.md`
@@ -56,9 +56,9 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
 
 ## Acceptance Criteria
 
-- Real GitHub Copilot CLI canary yields signed evidence and `gh attestation verify` PASS on exact canary head.
+- Real GitHub Copilot CLI canary yields actor-bound evidence and GitHub OIDC cryptographic verification PASS on exact branch head.
 - Positive generic selected-skill path returns `GENERIC_EXACT_REPO_READ` with exact skill path/hash only when C21 + signed evidence both validate.
-- Negative controls block forged subject, wrong repo/head/host/skill/hash/signer, stale evidence, self-hosted provenance, missing `gh`, malformed evidence and C21-only input.
+- Negative controls block forged subject, wrong repo/head/host/skill/hash/signer, stale evidence, self-hosted provenance, missing/invalid OIDC token or verifier network, malformed evidence and C21-only input.
 - Arena/Codex regression tests pass.
 - Shield focused suite passes on exact PR head.
 - Independent Supervisor reviews exact final head before merge.
@@ -77,12 +77,12 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
 - Phase Boundary:
   - In scope: one canary workflow and exact-run evidence.
   - Out of scope: runtime admission code.
-  - Dependencies: GitHub Actions, Copilot CLI, GitHub artifact attestations.
+  - Dependencies: GitHub Actions, Copilot CLI, GitHub Actions OIDC.
 - Ordered Slice List:
   - P1-A: Run signed Copilot read/apply canary.
   - P1-B: Verify signer/source/subject constraints independently.
 
-- [ ] P1-A: Run signed Copilot read/apply canary.
+- [x] P1-A: Run signed Copilot read/apply canary.
   - Goal: prove actual tool read + skill application and sign the resulting evidence subject.
   - Scope Boundary:
     - Editable: `.github/workflows/p2p-b1-real-generic-read-canary.yml`
@@ -93,8 +93,8 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
   - Pre-flight Questions: UI/DB/Docker/Playwright = N/A; behavior target is the GitHub Actions run; external side effect is one attestation write.
   - Work Steps:
     1. Run Copilot CLI with read-only tool allowlist, validate exact HEAD/path/hash and tool transcript.
-    2. Build canonical evidence subject and sign it with pinned `actions/attest`; verify with `gh attestation verify` pinned to repo/workflow/source digest and GitHub-hosted runner.
-  - Implementation Gate: official GitHub docs support `actions/attest@v4` and `gh attestation verify` constraints.
+    2. Build a canonical evidence subject; bind its SHA-256 into the GitHub Actions OIDC audience; verify RS256 using GitHub discovery/JWKS plus exact repo/workflow/source/run/ref and GitHub-hosted-runner claims.
+  - Implementation Gate: GitHub Actions OIDC is available to this private repository with `id-token: write`; Artifact Attestations were experimentally rejected for this user-owned private repo and are not used.
   - Acceptance: exact run success with `B1_REAL_EXTERNAL_ACTOR_READ=PASS` and signed-evidence verification PASS.
   - Evidence Targets: E1-P1A-RUN1, E1-P1A-ATTEST1.
   - Actual-status Update: external proof becomes bound-correct for one actor.
@@ -111,7 +111,7 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
   - P2-A: Add verifier-backed evidence validation.
   - P2-B: Wire CLI/Control Tower and cached-session revalidation.
 
-- [ ] P2-A: Add verifier-backed evidence validation.
+- [x] P2-A: Add verifier-backed evidence validation.
   - Goal: replace B1 unconditional fail-closed only for a signed, current, source-bound evidence subject.
   - Scope Boundary:
     - Editable: existing skill-consumption invariant family plus one small evidence verifier helper if SRP requires it.
@@ -120,14 +120,14 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
     - Out of scope: provider adapters.
   - Work Steps:
     1. Validate evidence schema/field types/freshness and exact actor/repo/head/skill/hash/receipt binding.
-    2. Invoke trusted GitHub attestation verification; missing verifier or any mismatch blocks.
+    2. Verify the GitHub OIDC signature and exact claims; discovery/JWKS/network failure or any mismatch blocks.
   - Implementation Gate: P1 signed canary PASS.
   - Acceptance: positive fixture + real signed evidence admitted; forged/missing variants block.
   - Evidence Targets: E2-P2A-SRC1, E2-P2A-TEST1.
   - Actual-status Update: generic selected-skill lane partial -> bound-correct.
   - Commit Boundary: commit after focused tests pass.
 
-- [ ] P2-B: Wire CLI/Control Tower and cached-session revalidation.
+- [x] P2-B: Wire CLI/Control Tower and cached-session revalidation.
   - Goal: make existing start/next paths consume the same evidence without bypass.
   - Scope Boundary: edit only existing CLI/Control Tower argument plumbing and tests.
   - Work Steps:
@@ -144,9 +144,9 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
   - Implementation Gate: all planned slices pass.
   - Acceptance: Supervisor PASS or explicit blocker; Writer does not self-merge.
 
-- [ ] Pn-B: Remove dead work created during this plan.
+- [x] Pn-B: Remove dead work created during this plan.
   - Goal: final diff contains no abandoned attestation experiment or stale helper.
-  - Acceptance: no obsolete workflow/evidence path remains.
+  - Acceptance: the abandoned `actions/attest` path and PR-event canary trigger are removed; the final canary is exact-branch-push only.
 
 - [ ] Pn-C: Close plan.
   - Goal: final exact-head Shield, coder report, notes log and handoff.
@@ -156,3 +156,13 @@ Current `main` ships the safe `GENERIC_PROMPT_ONLY` slice. The old generic execu
 
 - A GitHub signature proves workflow provenance, not arbitrary truth in a caller-controlled predicate; admission must pin the trusted workflow/source and validate the evidence subject produced by that workflow.
 - Network/API availability for attestation verification is an irreducible runtime dependency; unavailable verification must BLOCK rather than fall back to self-report.
+
+
+## Current closure checkpoint
+
+- Source/runtime verification head: `6020a3c7fbbda46ccc572678916ab828faa25dac`.
+- Exact-head B1 canary `38235241033`: SUCCESS; real external read PASS; GitHub OIDC verification PASS; production generic admission gate PASS.
+- OIDC evidence SHA-256: `7db1aeda5f42c3d6e386b53fd41befb04d08c2bb9137725747764a2e8d9dfd93`.
+- Exact-head Shield `38235247660`: SUCCESS; focused 366 PASS; FW02 26 PASS; QI 44 PASS; AERG 32 PASS; governance 6 PASS; Slice/CI acceptance PASS.
+- Current-workflow diagnostic remains `FAIL / 22 findings`, equal to the known baseline shape and not claimed clean.
+- Next gate: fresh CI on this closure-artifact commit, then independent Supervisor. Writer does not merge.

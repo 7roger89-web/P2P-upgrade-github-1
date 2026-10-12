@@ -560,6 +560,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "tests/test_p2p_generic_repo_read_evidence.py",
             "tests/test_p2p_generic_repo_read_admission.py",
             "docs/plans/2026-10-12-p2p-generic-read-admission/",
+            "reports/coder/rp_coder_261012_171000_by_gpt-5-6-sol_issue-333-signed-generic-read-admission.md",
+            "docs/notes_decisions_log/notes_decisions_log_20261012.md",
             # Issue #298 skill-consumption wire. Reuses the existing canonical
             # capability registry + single router; adds one bounded
             # consumption module and exact source-bound host receipts.

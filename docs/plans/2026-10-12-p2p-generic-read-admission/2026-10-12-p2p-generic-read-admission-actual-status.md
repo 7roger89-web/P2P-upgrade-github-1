@@ -2,7 +2,7 @@
 
 Title: P2P Generic Repo-Read Admission
 Date: 2026-10-12
-Status: P0 Complete
+Status: Ready for Supervisor
 Companion plan: `docs/plans/2026-10-12-p2p-generic-read-admission/2026-10-12-p2p-generic-read-admission-plan.md`
 Companion evidence: `docs/plans/2026-10-12-p2p-generic-read-admission/2026-10-12-p2p-generic-read-admission-evidence.md`
 Companion benchmark: `docs/plans/2026-10-12-p2p-generic-read-admission/2026-10-12-p2p-generic-read-admission-benchmark.md`
@@ -36,16 +36,17 @@ Out of scope:
 |---|---|---|---|---|---|
 | `GENERIC_PROMPT_ONLY` | merged on main, PREPARE-only, non-authorizing | preserve | correct | E0-P0A-SRC1..4 | preserve-only |
 | Native ARENA/CODEX | existing source-bound modes | unchanged | correct | E0-P0A-SRC1..4 | preserve-only |
-| Real external actor read | Copilot CLI live tool trace + receipt proven in run 38213449144 | signed/verifiable producer evidence | partial | E0-P0A-CANARY1 | P1 |
-| Generic execution admission | no trusted signed-evidence path on main | C21 + verified signed evidence required | missing | E0-P0A-SRC1..4 | P2 |
+| Real external actor read | Copilot CLI exact tool trace + GitHub OIDC binding proven | independently verifiable producer evidence | bound-correct | E1-P1A-RUN1, E1-P1B-OIDC1 | preserve |
+| Generic execution admission | C21 + verified GitHub OIDC evidence on candidate | same | bound-correct candidate | E2-P2B-LIVE1 | Supervisor |
 | C21-only authorization | insufficient actor proof | remain blocked alone | correct fail-closed | E0-P0A-ISSUE1 | preserve negative |
-| Issue #333 | OPEN | acceptance complete after signed canary + runtime + Shield + Supervisor | partial | E0-P0A-ISSUE1 | continue bounded scope |
+| Issue #333 | OPEN | close only after independent acceptance/merge | partial | E3-CLOSE1 | Supervisor |
 
 ## Status Refresh Log
 
 | Refresh | Date | Repo Basis | Changed Scope | Status Changes | Evidence | Next Phase Update |
 |---|---|---|---|---|---|---|
 | R0 | 2026-10-12 | main `db9d39798ddb80990757c65ddf2eb95f9f734fd6` | Issue #333 | baseline classification | E0-P0A-* | run P1 signed canary before runtime admission |
+| R1 | 2026-10-12 | candidate `6020a3c7fbbda46ccc572678916ab828faa25dac` | P1/P2 | external proof partial -> bound-correct; admission missing -> bound-correct candidate | E1-P1*, E2-P2* | fresh closure CI then Supervisor |
 
 ## Phase Touch Map
 
@@ -99,3 +100,14 @@ Forbidden next action: treat self-authored receipt/C21 provenance as authorizati
 - [x] P0 complete. Next phase can proceed unchanged.
 
 Decision note: Run signed P1 canary first; runtime admission remains blocked until that proof passes.
+
+
+## Latest verified candidate state
+
+- B1 canary: `38235241033` SUCCESS on `6020a3c7fbbda46ccc572678916ab828faa25dac`.
+- Real actor read: PASS.
+- GitHub OIDC verification: PASS; evidence SHA-256 `7db1aeda5f42c3d6e386b53fd41befb04d08c2bb9137725747764a2e8d9dfd93`.
+- Production generic admission gate: PASS.
+- Shield: `38235247660` SUCCESS on the same head; 366 focused PASS; diagnostic baseline `FAIL / 22 findings`.
+- C21-only remains fail-closed; cached generic handoff revalidates signed evidence.
+- Final status: `READY_FOR_SUPERVISOR` after fresh closure-artifact CI.
