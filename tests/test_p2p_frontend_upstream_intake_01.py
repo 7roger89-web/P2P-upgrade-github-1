@@ -690,6 +690,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # deterministic read-only audit helper plus its focused test.
                 "scripts/p2p_capability_drift_sweep.py",
                 "tests/test_p2p_capability_drift_sweep.py",
+                # Issue #333 bounded signed generic read evidence.
+                ".p2p/system/p2p_capabilities/generic_repo_read_evidence.py",
+                "tests/test_p2p_generic_repo_read_evidence.py",
+                "tests/test_p2p_generic_repo_read_admission.py",
                 # Issue #298: one bounded consumption seam plus modifications
                 # to existing selection/eligibility/FW01/Control Tower paths.
                 ".p2p/system/p2p_capabilities/skill_consumption.py",
