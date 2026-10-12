@@ -1646,6 +1646,31 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
             "OPERATION=PREPARE",
             "This is source-validated delegated work, not proven recipient consumption and not execution authorization.",
         ))
+    elif (
+        check == "PASS"
+        and str(handoff.get("SKILL_HOST_MODE") or "")
+        == GENERIC_REPO_READ_MODE
+    ):
+        if (
+            str(handoff.get("EXECUTION_AUTHORIZED") or "").upper() != "YES"
+            or str(handoff.get("RECIPIENT_CONSUMPTION") or "").upper()
+            != "VERIFIED"
+            or str(handoff.get("TRUST_EVIDENCE_CLASS") or "")
+            != "GITHUB_OIDC_BOUND_EXTERNAL_REPO_READ"
+        ):
+            raise SkillConsumptionError(
+                "GENERIC_REPO_READ_TRUST_BINDING_INVALID"
+            )
+        lines.extend((
+            f"SOURCE_VALIDATION={handoff.get('SOURCE_VALIDATION', 'PASS')}",
+            "RECIPIENT_CONSUMPTION=VERIFIED",
+            "EXECUTION_AUTHORIZED=YES",
+            "OPERATION=EXECUTE",
+            "TRUST_EVIDENCE_CLASS=GITHUB_OIDC_BOUND_EXTERNAL_REPO_READ",
+            f"TRUST_EVIDENCE_SHA256={handoff.get('TRUST_EVIDENCE_SHA256', '')}",
+            f"TRUST_EVIDENCE_RUN_ID={handoff.get('TRUST_EVIDENCE_RUN_ID', '')}",
+            "Authorization is limited to this exact task, repository revision, host, and frozen skill handoff.",
+        ))
     if check in {"PASS", "PREPARED"}:
         lines.extend((
             "Every skill listed in REQUIRED_SKILLS is mandatory for this executor turn. Read and apply every required skill; omission is a failed handoff.",
@@ -1899,7 +1924,7 @@ def build_prompt_only_delegated_prompt(
 
 
 TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH = (
-    ".github/workflows/p2p-generic-repo-read-evidence.yml"
+    ".github/workflows/p2p-shield-ci-slice.yml"
 )
 GENERIC_DISCOVERY_MAX_AGE_SECONDS = 3600
 GENERIC_DISCOVERY_MAX_FUTURE_SKEW_SECONDS = 300
