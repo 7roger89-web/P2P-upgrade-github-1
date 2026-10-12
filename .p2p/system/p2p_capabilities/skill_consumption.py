@@ -11,9 +11,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
+from urllib.parse import urlsplit
 
 try:  # package import in normal P2P runtime
     from .model import CapabilityManifest, load_registry
@@ -31,6 +33,22 @@ HOST_MODES = {
     "ARENA": "ARENA_EXACT_REPO_READ",
     "CODEX": "CODEX_NATIVE_PROJECT_SKILL",
 }
+# PROMPT_ONLY is a PREPARE-only delivery capability for generic hosts. It is
+# distinct from any exact repo-read transport and never grants execution
+# authority, recipient-read evidence, or automatic session start.
+GENERIC_PROMPT_ONLY_MODE = "GENERIC_PROMPT_ONLY"
+PROMPT_ONLY_CAPABILITY = "PROMPT_ONLY"
+PROMPT_ONLY_MAX_PROMPT_CHARS = 32000
+INLINE_PERMITTED_TRUST_LEVELS = frozenset({"PUBLIC"})
+INLINE_SHAREABLE_LICENSE_KINDS = frozenset({
+    "MIT",
+    "APACHE-2.0",
+    "BSD-2-CLAUSE",
+    "BSD-3-CLAUSE",
+    "CC0",
+    "PUBLIC",
+    "UNLICENSE",
+})
 _CLASS_RANK = {"PRIMARY": 3, "SECONDARY": 2, "SUPPORTING": 1}
 
 
@@ -354,6 +372,107 @@ def select_skills_for_task(
     )
 
 
+# PROMPT_ONLY serializes host, skill and receipt identity as line-based
+# KEY=VALUE records. Any control/line-separator character in those values would
+# let a caller forge an extra control field, so they are rejected before
+# normalization (_host_token strips edges and would silently hide a trailing CR/LF).
+_CONTROL_OR_LINE_BREAK_RE = re.compile(r"[\x00-\x1f\x7f\x85\u2028\u2029]")
+_DESTINATION_HOST_TOKEN_RE = re.compile(r"[A-Z0-9][A-Z0-9_]{0,63}")
+_SKILL_ID_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.\-]{0,127}")
+_REPOSITORY_TOKEN_RE = re.compile(r"[a-z0-9_.\-]+/[a-z0-9_.\-]+")
+
+
+def _host_token(value: object) -> str:
+    return (
+        str(value or "").strip().upper()
+        .replace("-", "_").replace(" ", "_")
+    )
+
+
+def _destination_host_token(value: object) -> str:
+    """Strict PROMPT_ONLY destination identity. Empty -> "" (caller decides)."""
+    if value is None:
+        return ""
+    if not isinstance(value, str):
+        raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_INVALID")
+    if _CONTROL_OR_LINE_BREAK_RE.search(value):
+        raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_INVALID")
+    token = _host_token(value)
+    if not token:
+        return ""
+    if not _DESTINATION_HOST_TOKEN_RE.fullmatch(token):
+        raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_INVALID")
+    return token
+
+
+def _run_git(root: Path, *args: str) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), *args],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=8,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode:
+        return None
+    return result.stdout.strip()
+
+
+def _normalize_github_repo(value: str | None) -> str | None:
+    """Normalize only canonical GitHub HTTPS/SSH repository origins."""
+    if not value:
+        return None
+    raw = value.strip()
+    scp_match = re.fullmatch(
+        r"git@github\.com:([^/\s]+)/([^/\s]+?)(?:\.git)?/?",
+        raw,
+        flags=re.IGNORECASE,
+    )
+    if scp_match is not None:
+        owner = scp_match.group(1)
+        repo_name = scp_match.group(2)
+    else:
+        try:
+            parsed = urlsplit(raw)
+        except ValueError:
+            return None
+        if parsed.scheme.lower() not in {"https", "ssh"}:
+            return None
+        if (parsed.hostname or "").lower() != "github.com":
+            return None
+        if parsed.username not in {None, "", "git"}:
+            return None
+        if parsed.password is not None or parsed.query or parsed.fragment:
+            return None
+        parts = [part for part in parsed.path.strip("/").split("/") if part]
+        if len(parts) != 2:
+            return None
+        owner, repo_name = parts
+        if repo_name.lower().endswith(".git"):
+            repo_name = repo_name[:-4]
+    if not owner or not repo_name:
+        return None
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", owner):
+        return None
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", repo_name):
+        return None
+    return f"{owner}/{repo_name}".lower()
+
+
+def _canonical_repo_binding(root: Path) -> str | None:
+    origin = _run_git(root, "remote", "get-url", "origin")
+    return _normalize_github_repo(origin)
+
+
+def _current_repo_revision(root: Path) -> str | None:
+    revision = (_run_git(root, "rev-parse", "HEAD") or "").lower()
+    return revision if re.fullmatch(r"[0-9a-f]{40}", revision) else None
+
+
+
 def _safe_repo_path(root: Path, relative: str) -> Path:
     value = str(relative or "").strip().replace("\\", "/")
     if not value or value.startswith(("/", "~")):
@@ -457,14 +576,37 @@ def prepare_skill_handoff(
     host: str,
     explicit_requests: Iterable[str] = (),
     required_skills: Iterable[str] = (),
+    delivery_capability: str | None = None,
 ) -> dict[str, Any]:
     """Freeze one deterministic source-bound skill handoff for an executor.
 
     required_skills is a prompt-writer contract: every named skill must
     resolve, fit the bounded set, load exactly, and appear in the executor
     handoff. Narrative prose alone never satisfies this requirement.
+
+    delivery_capability=PROMPT_ONLY is a non-authorizing PREPARE path for
+    generic hosts. It source-verifies selected skills and never grants
+    execution authority or recipient-read evidence.
     """
     project_root = Path(root).resolve()
+    requested_capability = str(delivery_capability or "").strip().upper()
+    if requested_capability == PROMPT_ONLY_CAPABILITY:
+        return _prepare_prompt_only_handoff(
+            project_root,
+            request_text,
+            host=host,
+            explicit_requests=explicit_requests,
+            required_skills=required_skills,
+        )
+    if requested_capability:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            SKILL_HOST_MODE="UNRESOLVED",
+            DELIVERY_CAPABILITY=requested_capability,
+            REJECTION_REASON=[
+                f"DELIVERY_CAPABILITY_UNSUPPORTED:{requested_capability}"
+            ],
+        )
     host_name = str(host or "").strip().upper()
     mode = HOST_MODES.get(host_name)
     try:
@@ -765,7 +907,15 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
         f"SKILL_HOST_MODE={handoff.get('SKILL_HOST_MODE', 'UNSUPPORTED')}",
         "SKILL_PERMISSION_WIDENED=NO",
     ]
-    if check == "PASS":
+    if check == "PREPARED":
+        lines.extend((
+            f"SOURCE_VALIDATION={handoff.get('SOURCE_VALIDATION', 'PASS')}",
+            f"RECIPIENT_CONSUMPTION={handoff.get('RECIPIENT_CONSUMPTION', 'UNVERIFIED')}",
+            "EXECUTION_AUTHORIZED=NO",
+            "OPERATION=PREPARE",
+            "This is source-validated delegated work, not proven recipient consumption and not execution authorization.",
+        ))
+    if check in {"PASS", "PREPARED"}:
         lines.extend((
             "Every skill listed in REQUIRED_SKILLS is mandatory for this executor turn. Read and apply every required skill; omission is a failed handoff.",
             "Before substantive task execution, read ONLY the exact selected SKILL.md entrypoints below.",
@@ -783,6 +933,11 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
         lines.extend((
             "Terminal return must include SKILL_CONSUMPTION_RECEIPT with exact selected ids, hashes, LOAD stage, host mode, CONSUMED, and PERMISSION_WIDENED=NO.",
         ))
+        if check == "PREPARED":
+            lines.append(
+                "A returned receipt is self-reported. It is not trusted external-actor "
+                "read evidence and does not authorize automatic execution."
+            )
     elif check == "NO_MATCH":
         lines.append(
             "No relevant eligible skill was selected. Do not preload unrelated skills. "
@@ -795,13 +950,560 @@ def skill_handoff_prompt_lines(handoff: Mapping[str, Any]) -> tuple[str, ...]:
     return tuple(lines)
 
 
+def _prompt_only_envelope(check: str, **fields: Any) -> dict[str, Any]:
+    """Fail-closed PROMPT_ONLY handoff envelope. Defaults never grant execution."""
+    payload: dict[str, Any] = {
+        "schema": HANDOFF_SCHEMA,
+        "SKILL_CHECK": check,
+        "REQUIRED_SKILLS": [],
+        "SKILLS_CONSIDERED_METADATA_COUNT": 0,
+        "SKILLS_SELECTED": [],
+        "SKILL_LOAD_STAGE": "DISCOVERY",
+        "SKILL_SOURCE_HASHES": {},
+        "SKILL_SOURCE_PATHS": {},
+        "SKILL_CONSUMPTION": "BLOCKED",
+        "SKILL_HOST_MODE": GENERIC_PROMPT_ONLY_MODE,
+        "MATERIAL_ALTERNATIVES_REJECTED": [],
+        "REJECTION_REASON": [],
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "SOURCE_VALIDATION": "BLOCKED",
+        "RECIPIENT_CONSUMPTION": "NOT_ATTESTED",
+        "EXECUTION_AUTHORIZED": "NO",
+        "OPERATION": "PREPARE",
+        "DELIVERY_CAPABILITY": PROMPT_ONLY_CAPABILITY,
+    }
+    payload.update(fields)
+    return payload
+
+
+def _prepare_prompt_only_handoff(
+    project_root: Path,
+    request_text: str,
+    *,
+    host: str,
+    explicit_requests: Iterable[str],
+    required_skills: Iterable[str],
+) -> dict[str, Any]:
+    """Source-verify selected skills for a copyable generic prompt.
+
+    Never starts an executor, never means GENERIC_EXACT_REPO_READ, and never
+    marks the recipient as having read the skill. The result is PREPARED at
+    most; recipient consumption stays UNVERIFIED until trusted evidence exists.
+    """
+    try:
+        host_token = _destination_host_token(host)
+    except SkillConsumptionError as exc:
+        return _prompt_only_envelope("BLOCKED", REJECTION_REASON=[str(exc)])
+    if not host_token:
+        return _prompt_only_envelope(
+            "BLOCKED", REJECTION_REASON=["HOST_REQUIRED"]
+        )
+    if host_token in HOST_MODES:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            SKILL_HOST_MODE=HOST_MODES[host_token],
+            REJECTION_REASON=["PROMPT_ONLY_NATIVE_HOST_FORBIDDEN"],
+        )
+    try:
+        required_ids = _resolve_required_skill_ids(project_root, required_skills)
+    except SkillConsumptionError as exc:
+        return _prompt_only_envelope("BLOCKED", REJECTION_REASON=[str(exc)])
+    selection = select_skills_for_task(
+        project_root,
+        request_text,
+        explicit_requests=tuple(explicit_requests) + required_ids,
+    )
+    missing_required = tuple(
+        skill_id for skill_id in required_ids
+        if skill_id not in selection.selected
+    )
+    if missing_required:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            REQUIRED_SKILLS=list(required_ids),
+            SKILLS_CONSIDERED_METADATA_COUNT=selection.considered_metadata_count,
+            SKILLS_SELECTED=list(selection.selected),
+            SKILL_LOAD_STAGE="MATCH",
+            MATERIAL_ALTERNATIVES_REJECTED=list(selection.rejected),
+            REJECTION_REASON=[
+                f"REQUIRED_SKILL_NOT_SELECTED:{skill_id}"
+                for skill_id in missing_required
+            ],
+        )
+    if not selection.selected:
+        # Honest NO_MATCH: no skill is pretended to be selected or loaded.
+        return _prompt_only_envelope(
+            "NO_MATCH",
+            REQUIRED_SKILLS=list(required_ids),
+            SKILLS_CONSIDERED_METADATA_COUNT=selection.considered_metadata_count,
+            SKILL_CONSUMPTION="NO_SKILL_NEEDED",
+            MATERIAL_ALTERNATIVES_REJECTED=list(selection.rejected),
+            REJECTION_REASON=list(selection.rejection_reasons),
+            SOURCE_VALIDATION="NO_MATCH",
+            RECIPIENT_CONSUMPTION="NOT_REQUIRED",
+        )
+    repo_binding = _canonical_repo_binding(project_root)
+    if repo_binding is None:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            SKILL_LOAD_STAGE="MATCH",
+            SKILLS_SELECTED=list(selection.selected),
+            REJECTION_REASON=["HOST_CANONICAL_REPO_BINDING_UNAVAILABLE"],
+        )
+    revision = _current_repo_revision(project_root)
+    if revision is None:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            SKILL_LOAD_STAGE="MATCH",
+            SKILLS_SELECTED=list(selection.selected),
+            REJECTION_REASON=["HOST_CANONICAL_REPO_REVISION_UNAVAILABLE"],
+        )
+    try:
+        loaded = load_selected_skills(project_root, selection.selected)
+    except SkillConsumptionError as exc:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            SKILL_LOAD_STAGE="MATCH",
+            SKILLS_SELECTED=list(selection.selected),
+            SKILL_CONSUMPTION="LOAD_FAILED",
+            SOURCE_VALIDATION="BLOCKED",
+            REJECTION_REASON=[str(exc)],
+        )
+    binding_error = _source_binding_error(loaded, project_root)
+    if binding_error is not None:
+        return _prompt_only_envelope(
+            "BLOCKED",
+            SKILL_LOAD_STAGE="MATCH",
+            SKILLS_SELECTED=list(selection.selected),
+            SKILL_CONSUMPTION="LOAD_FAILED",
+            SOURCE_VALIDATION="BLOCKED",
+            REJECTION_REASON=[binding_error],
+        )
+    return _prompt_only_envelope(
+        "PREPARED",
+        REQUIRED_SKILLS=list(required_ids),
+        SKILLS_CONSIDERED_METADATA_COUNT=selection.considered_metadata_count,
+        SKILLS_SELECTED=[item.capability_id for item in loaded],
+        SKILL_LOAD_STAGE="LOAD",
+        SKILL_SOURCE_HASHES={item.capability_id: item.sha256 for item in loaded},
+        SKILL_SOURCE_PATHS={
+            item.capability_id: item.relative_path for item in loaded
+        },
+        SKILL_CONSUMPTION="EXPECTED_AFTER_RECIPIENT_READ",
+        MATERIAL_ALTERNATIVES_REJECTED=list(selection.rejected),
+        REJECTION_REASON=list(selection.rejection_reasons),
+        SOURCE_VALIDATION="PASS",
+        RECIPIENT_CONSUMPTION="UNVERIFIED",
+        REPOSITORY=repo_binding,
+        REVISION=revision,
+        DESTINATION_HOST=host_token,
+    )
+
+
+def _source_binding_error(
+    loaded: Sequence[LoadedSkill],
+    root: Path,
+) -> str | None:
+    """Fail closed on malformed exact path/hash source bindings."""
+    for item in loaded:
+        path = str(item.relative_path or "").replace("\\", "/")
+        if (
+            not path
+            or path.startswith(("/", "~"))
+            or ".." in Path(path).parts
+            or not path.endswith("/SKILL.md")
+        ):
+            return f"SKILL_SOURCE_PATH_INVALID:{item.capability_id}"
+        try:
+            candidate = _safe_repo_path(root, path)
+        except SkillConsumptionError:
+            return f"SKILL_SOURCE_PATH_INVALID:{item.capability_id}"
+        if not candidate.is_file():
+            return f"SKILL_ENTRYPOINT_MISSING:{item.capability_id}"
+        actual = hashlib.sha256(candidate.read_bytes()).hexdigest()
+        if not re.fullmatch(r"[0-9a-f]{64}", item.sha256 or ""):
+            return f"SKILL_SOURCE_HASH_INVALID:{item.capability_id}"
+        if actual != item.sha256:
+            return f"SKILL_ENTRYPOINT_HASH_MISMATCH:{item.capability_id}"
+    return None
+
+
+def _inline_skill_forbidden_reason(root: Path, skill_id: str) -> str | None:
+    """PURE_DATA is not permission to share PROJECT_INTERNAL skill bodies."""
+    manifests = {
+        manifest.capability_id: manifest
+        for manifest in _active_skill_manifests(root)
+    }
+    manifest = manifests.get(skill_id)
+    if manifest is None:
+        return f"INLINE_SKILL_MANIFEST_REQUIRED:{skill_id}"
+    trust = str(manifest.raw.get("TRUST_LEVEL") or "").strip().upper()
+    provenance = manifest.raw.get("UPSTREAM_PROVENANCE")
+    provenance = provenance if isinstance(provenance, Mapping) else {}
+    license_info = provenance.get("license")
+    license_info = license_info if isinstance(license_info, Mapping) else {}
+    license_kind = str(license_info.get("kind") or "").strip().upper()
+    if license_kind not in INLINE_SHAREABLE_LICENSE_KINDS:
+        return (
+            f"INLINE_SKILL_DISCLOSURE_FORBIDDEN:{skill_id}:"
+            f"{license_kind or 'MISSING'}"
+        )
+    if trust not in INLINE_PERMITTED_TRUST_LEVELS:
+        return f"INLINE_SKILL_TRUST_LEVEL_FORBIDDEN:{skill_id}:{trust or 'MISSING'}"
+    integration = provenance.get("integration")
+    integration = integration if isinstance(integration, Mapping) else {}
+    if integration.get("credentials") is True:
+        return f"INLINE_SKILL_CREDENTIALS_FORBIDDEN:{skill_id}"
+    if integration.get("network_runtime") is True:
+        return f"INLINE_SKILL_NETWORK_RUNTIME_FORBIDDEN:{skill_id}"
+    return None
+
+
+def _validate_prompt_only_frozen_selection(
+    handoff: Mapping[str, Any],
+    check: str,
+) -> None:
+    """Fail closed unless the frozen PROMPT_ONLY selection is internally coherent.
+
+    PREPARED: 1-3 unique selected skills; every REQUIRED skill is selected;
+    exact path/hash key sets; LOAD stage; source validated; recipient unverified.
+    NO_MATCH: empty selected/required sets, empty path/hash mappings, DISCOVERY.
+    Runs before any skill file is read, so tampered handoffs never reach disk I/O.
+    """
+    selected_raw = handoff.get("SKILLS_SELECTED")
+    required_raw = handoff.get("REQUIRED_SKILLS")
+    hashes = handoff.get("SKILL_SOURCE_HASHES")
+    paths = handoff.get("SKILL_SOURCE_PATHS")
+    for value in (selected_raw, required_raw):
+        if value is not None and not isinstance(value, (list, tuple)):
+            raise SkillConsumptionError("PROMPT_ONLY_SELECTED_SET_INVALID")
+    for value in (hashes, paths):
+        if value is not None and not isinstance(value, Mapping):
+            raise SkillConsumptionError("PROMPT_ONLY_SOURCE_MAPPING_INVALID")
+    selected = tuple(selected_raw or ())
+    required = tuple(required_raw or ())
+    for skill_id in selected + required:
+        if not isinstance(skill_id, str) or not _SKILL_ID_TOKEN_RE.fullmatch(skill_id):
+            raise SkillConsumptionError("PROMPT_ONLY_SKILL_ID_INVALID")
+    incoherent = SkillConsumptionError("PROMPT_ONLY_LOAD_STATE_INCOHERENT")
+    if check == "NO_MATCH":
+        if selected or required:
+            raise SkillConsumptionError("PROMPT_ONLY_NO_MATCH_NOT_EMPTY")
+        if dict(hashes or {}) or dict(paths or {}):
+            raise SkillConsumptionError("PROMPT_ONLY_NO_MATCH_NOT_EMPTY")
+        if (
+            handoff.get("SKILL_LOAD_STAGE") != "DISCOVERY"
+            or handoff.get("SKILL_CONSUMPTION") != "NO_SKILL_NEEDED"
+            or handoff.get("SOURCE_VALIDATION") != "NO_MATCH"
+            or handoff.get("RECIPIENT_CONSUMPTION") != "NOT_REQUIRED"
+        ):
+            raise incoherent
+        return
+    if not selected:
+        raise SkillConsumptionError("PROMPT_ONLY_SELECTED_SET_EMPTY")
+    if len(selected) > MAX_SELECTED_SKILLS or len(required) > MAX_SELECTED_SKILLS:
+        raise SkillConsumptionError("PROMPT_ONLY_SELECTED_SET_LIMIT_EXCEEDED")
+    if len(set(selected)) != len(selected) or len(set(required)) != len(required):
+        raise SkillConsumptionError("PROMPT_ONLY_SELECTED_SET_DUPLICATE")
+    for skill_id in required:
+        if skill_id not in selected:
+            raise SkillConsumptionError(
+                f"PROMPT_ONLY_REQUIRED_NOT_SELECTED:{skill_id}"
+            )
+    dict_hashes = dict(hashes or {})
+    dict_paths = dict(paths or {})
+    if set(dict_hashes) != set(selected) or set(dict_paths) != set(selected):
+        raise SkillConsumptionError("SKILL_HANDOFF_SOURCE_SET_MISMATCH")
+    for skill_id in selected:
+        digest = dict_hashes.get(skill_id)
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise SkillConsumptionError(f"SKILL_SOURCE_HASH_INVALID:{skill_id}")
+        if not isinstance(dict_paths.get(skill_id), str):
+            raise SkillConsumptionError(f"SKILL_SOURCE_PATH_INVALID:{skill_id}")
+    if (
+        handoff.get("SKILL_LOAD_STAGE") != "LOAD"
+        or handoff.get("SKILL_CONSUMPTION") != "EXPECTED_AFTER_RECIPIENT_READ"
+        or handoff.get("SOURCE_VALIDATION") != "PASS"
+        or handoff.get("RECIPIENT_CONSUMPTION") != "UNVERIFIED"
+    ):
+        raise incoherent
+
+
+def build_prompt_only_delegated_prompt(
+    root: str | Path,
+    handoff: Mapping[str, Any],
+    *,
+    request_text: str,
+    host: str,
+    allow_inline_skill_content: bool = False,
+    max_prompt_chars: int | None = None,
+) -> str:
+    """Build one copyable delegated-work prompt. Never starts an executor."""
+    project_root = Path(root).resolve()
+    check = str(handoff.get("SKILL_CHECK") or "BLOCKED")
+    if check not in {"PREPARED", "NO_MATCH"}:
+        raise SkillConsumptionError("PROMPT_ONLY_HANDOFF_NOT_PREPARED")
+    if str(handoff.get("SKILL_HOST_MODE") or "") != GENERIC_PROMPT_ONLY_MODE:
+        raise SkillConsumptionError("PROMPT_ONLY_HOST_MODE_REQUIRED")
+    if str(handoff.get("EXECUTION_AUTHORIZED") or "NO").upper() != "NO":
+        raise SkillConsumptionError("PROMPT_ONLY_MUST_NOT_AUTHORIZE_EXECUTION")
+    _validate_prompt_only_frozen_selection(handoff, check)
+    actual_repo = _canonical_repo_binding(project_root)
+    actual_revision = _current_repo_revision(project_root)
+    claimed_repo = str(handoff.get("REPOSITORY") or "").strip().lower()
+    claimed_revision = str(handoff.get("REVISION") or "").strip().lower()
+    if claimed_repo and not _REPOSITORY_TOKEN_RE.fullmatch(claimed_repo):
+        raise SkillConsumptionError("PROMPT_ONLY_REPOSITORY_INVALID")
+    if claimed_revision and not re.fullmatch(r"[0-9a-f]{40}", claimed_revision):
+        raise SkillConsumptionError("PROMPT_ONLY_REVISION_INVALID")
+    requested_host = _destination_host_token(host)
+    frozen_host = _destination_host_token(handoff.get("DESTINATION_HOST") or "")
+    if check == "PREPARED":
+        if actual_repo is None:
+            raise SkillConsumptionError("HOST_CANONICAL_REPO_BINDING_UNAVAILABLE")
+        if actual_revision is None:
+            raise SkillConsumptionError("HOST_CANONICAL_REPO_REVISION_UNAVAILABLE")
+        if claimed_repo and claimed_repo != actual_repo:
+            raise SkillConsumptionError("PROMPT_ONLY_REPOSITORY_MISMATCH")
+        if claimed_revision and claimed_revision != actual_revision:
+            raise SkillConsumptionError("PROMPT_ONLY_REVISION_MISMATCH")
+        if not requested_host:
+            raise SkillConsumptionError("HOST_REQUIRED")
+        if not frozen_host:
+            raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_REQUIRED")
+        if frozen_host != requested_host:
+            raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_MISMATCH")
+        selected = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
+        loaded = load_selected_skills(project_root, selected)
+        binding_error = _source_binding_error(loaded, project_root)
+        if binding_error is not None:
+            raise SkillConsumptionError(binding_error)
+        expected_hashes = dict(handoff.get("SKILL_SOURCE_HASHES") or {})
+        expected_paths = dict(handoff.get("SKILL_SOURCE_PATHS") or {})
+        if set(expected_hashes) != set(selected) or set(expected_paths) != set(selected):
+            raise SkillConsumptionError("SKILL_HANDOFF_SOURCE_SET_MISMATCH")
+        for item in loaded:
+            if item.relative_path != expected_paths.get(item.capability_id):
+                raise SkillConsumptionError(
+                    f"SKILL_SOURCE_PATH_INVALID:{item.capability_id}"
+                )
+            if item.sha256 != expected_hashes.get(item.capability_id):
+                raise SkillConsumptionError(
+                    f"SKILL_ENTRYPOINT_HASH_MISMATCH:{item.capability_id}"
+                )
+        repo = actual_repo
+        revision = actual_revision
+        host_name = requested_host
+        source_validation = "PASS"
+    else:
+        repo = actual_repo or claimed_repo or "UNKNOWN"
+        revision = actual_revision or claimed_revision or "UNKNOWN"
+        host_name = requested_host or frozen_host
+        source_validation = "NO_MATCH"
+    budget = PROMPT_ONLY_MAX_PROMPT_CHARS if max_prompt_chars is None else int(max_prompt_chars)
+    if budget < 1:
+        raise SkillConsumptionError("PROMPT_ONLY_BUDGET_INVALID")
+    lines = [
+        "P2P_DELEGATED_WORK_PROMPT:",
+        "OPERATION=PREPARE",
+        "DELIVERY_CAPABILITY=PROMPT_ONLY",
+        "EXECUTION_AUTHORIZED=NO",
+        "AUTOMATIC_START=NO",
+        f"DESTINATION_HOST={host_name}",
+        f"REPOSITORY={repo}",
+        f"REVISION={revision}",
+        f"SOURCE_VALIDATION={source_validation}",
+        f"RECIPIENT_CONSUMPTION={handoff.get('RECIPIENT_CONSUMPTION', 'UNVERIFIED')}",
+        "EXTERNAL_ACTOR_READ=NOT_VERIFIED",
+        "",
+        "TASK:",
+        str(request_text or "").strip(),
+        "",
+        *skill_handoff_prompt_lines(handoff),
+        "",
+        "Return schema p2p-skill-consumption-receipt/1 after reading the exact selected skills.",
+        "Do not treat this prompt as an authorized Control Tower execution session.",
+    ]
+    inline_block: list[str] = []
+    if allow_inline_skill_content and check == "PREPARED":
+        selected = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
+        loaded = load_selected_skills(project_root, selected)
+        binding_error = _source_binding_error(loaded, project_root)
+        if binding_error is not None:
+            raise SkillConsumptionError(binding_error)
+        expected_hashes = dict(handoff.get("SKILL_SOURCE_HASHES") or {})
+        expected_paths = dict(handoff.get("SKILL_SOURCE_PATHS") or {})
+        for item in loaded:
+            forbidden = _inline_skill_forbidden_reason(project_root, item.capability_id)
+            if forbidden is not None:
+                raise SkillConsumptionError(forbidden)
+            if item.sha256 != expected_hashes.get(item.capability_id):
+                raise SkillConsumptionError(
+                    f"SKILL_ENTRYPOINT_HASH_MISMATCH:{item.capability_id}"
+                )
+            if item.relative_path != expected_paths.get(item.capability_id):
+                raise SkillConsumptionError(
+                    f"SKILL_SOURCE_PATH_INVALID:{item.capability_id}"
+                )
+            inline_block.extend((
+                f"BEGIN_INLINE_SKILL={item.capability_id}|SHA256={item.sha256}",
+                item.content,
+                f"END_INLINE_SKILL={item.capability_id}",
+            ))
+        lines.extend(("", "INLINE_SKILL_CONTENT=EXACT_SELECTED_ONLY", *inline_block))
+    prompt = "\n".join(lines)
+    if len(prompt) > budget:
+        raise SkillConsumptionError("INLINE_SKILL_CONTENT_EXCEEDS_PROMPT_BUDGET")
+    if "\x00" in prompt:
+        raise SkillConsumptionError("PROMPT_ONLY_CONTENT_INVALID")
+    return prompt
+
+
+def prepare_prompt_only_skill_handoff(
+    root: str | Path,
+    request_text: str,
+    *,
+    host: str,
+    explicit_requests: Iterable[str] = (),
+    required_skills: Iterable[str] = (),
+    allow_inline_skill_content: bool = False,
+    max_prompt_chars: int | None = None,
+) -> dict[str, Any]:
+    """Prepare one copyable generic prompt. Does not start or authorize execution."""
+    handoff = prepare_skill_handoff(
+        root,
+        request_text,
+        host=host,
+        explicit_requests=explicit_requests,
+        required_skills=required_skills,
+        delivery_capability=PROMPT_ONLY_CAPABILITY,
+    )
+    check = str(handoff.get("SKILL_CHECK") or "BLOCKED")
+    prompt = None
+    if check in {"PREPARED", "NO_MATCH"}:
+        try:
+            prompt = build_prompt_only_delegated_prompt(
+                root,
+                handoff,
+                request_text=request_text,
+                host=host,
+                allow_inline_skill_content=allow_inline_skill_content,
+                max_prompt_chars=max_prompt_chars,
+            )
+        except SkillConsumptionError as exc:
+            check = "BLOCKED"
+            handoff = {
+                **dict(handoff),
+                "SKILL_CHECK": "BLOCKED",
+                "SKILL_CONSUMPTION": "BLOCKED",
+                "SOURCE_VALIDATION": "BLOCKED",
+                "RECIPIENT_CONSUMPTION": "NOT_ATTESTED",
+                "EXECUTION_AUTHORIZED": "NO",
+                "REJECTION_REASON": [
+                    *list(handoff.get("REJECTION_REASON") or ()),
+                    str(exc),
+                ],
+            }
+            prompt = None
+    status = {
+        "PREPARED": "PREPARED",
+        "NO_MATCH": "NO_MATCH",
+        "BLOCKED": "BLOCKED",
+    }.get(check, "BLOCKED")
+    recipient = str(handoff.get("RECIPIENT_CONSUMPTION") or "NOT_ATTESTED")
+    source = str(handoff.get("SOURCE_VALIDATION") or status)
+    return {
+        "status": status,
+        "operation": "PREPARE",
+        "execution_authorized": False,
+        "automatic_start": False,
+        "delivery_capability": PROMPT_ONLY_CAPABILITY,
+        "skill_handoff": handoff,
+        "prompt": prompt,
+        "source_validation": source,
+        "recipient_consumption": recipient,
+        "external_actor_read": "NOT_VERIFIED",
+    }
+
+
+def validate_prompt_only_receipt(
+    handoff: Mapping[str, Any],
+    receipt: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Structurally check a prompt-only receipt without granting trust or execution."""
+    base = {
+        "trusted_external_actor": False,
+        "execution_authorized": False,
+        "evidence_class": "SELF_REPORTED",
+        "external_actor_read": "NOT_VERIFIED",
+    }
+    if str(handoff.get("SKILL_HOST_MODE") or "") != GENERIC_PROMPT_ONLY_MODE:
+        return {
+            "structurally_valid": False,
+            "reason_codes": ["PROMPT_ONLY_HANDOFF_REQUIRED"],
+            **base,
+            "evidence_class": "UNTRUSTED",
+        }
+    if not isinstance(receipt, Mapping):
+        return {
+            "structurally_valid": False,
+            "reason_codes": ["SKILL_CONSUMPTION_RECEIPT_MISSING"],
+            **base,
+        }
+    reasons: list[str] = []
+    if receipt.get("schema") not in (None, RECEIPT_SCHEMA):
+        reasons.append("SKILL_CONSUMPTION_RECEIPT_SCHEMA_INVALID")
+    expected_check = str(handoff.get("SKILL_CHECK") or "BLOCKED")
+    expected_ids = tuple(str(v) for v in (handoff.get("SKILLS_SELECTED") or ()))
+    actual_ids = tuple(str(v) for v in (receipt.get("SKILLS_SELECTED") or ()))
+    if actual_ids != expected_ids:
+        reasons.append("SKILL_SELECTED_SET_MISMATCH")
+    if dict(receipt.get("SKILL_SOURCE_HASHES") or {}) != dict(
+        handoff.get("SKILL_SOURCE_HASHES") or {}
+    ):
+        reasons.append("SKILL_SOURCE_HASH_MISMATCH")
+    if str(receipt.get("SKILL_HOST_MODE") or "") != GENERIC_PROMPT_ONLY_MODE:
+        reasons.append("SKILL_HOST_MODE_MISMATCH")
+    if str(receipt.get("PERMISSION_WIDENED") or "UNKNOWN").upper() != "NO":
+        reasons.append("SKILL_PERMISSION_WIDENING_REJECTED")
+    if expected_check == "PREPARED":
+        if str(receipt.get("SKILL_LOAD_STAGE") or "") != "LOAD":
+            reasons.append("SKILL_LOAD_STAGE_MISMATCH")
+        if str(receipt.get("SKILL_CONSUMPTION") or "") != "CONSUMED":
+            reasons.append("SKILL_NOT_CONSUMED")
+    elif expected_check == "NO_MATCH":
+        if str(receipt.get("SKILL_CONSUMPTION") or "") != "NO_SKILL_NEEDED":
+            reasons.append("SKILL_NO_MATCH_RECEIPT_INVALID")
+    else:
+        reasons.append("PROMPT_ONLY_HANDOFF_NOT_PREPARED")
+    structurally_valid = not reasons
+    return {
+        "structurally_valid": structurally_valid,
+        "reason_codes": reasons,
+        **base,
+        "external_actor_read": (
+            "SELF_REPORTED" if structurally_valid else "NOT_VERIFIED"
+        ),
+    }
+
+
 def validate_consumption_receipt(
     handoff: Mapping[str, Any],
     receipt: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     """Validate executor self-report against the frozen source-bound handoff."""
+    untrusted = {
+        "evidence_class": "UNTRUSTED",
+        "trusted_external_actor": False,
+        "execution_authorized": False,
+    }
     if not isinstance(receipt, Mapping):
-        return {"valid": False, "reason_codes": ["SKILL_CONSUMPTION_RECEIPT_MISSING"]}
+        return {
+            "valid": False,
+            "reason_codes": ["SKILL_CONSUMPTION_RECEIPT_MISSING"],
+            **untrusted,
+        }
     reasons: list[str] = []
     if receipt.get("schema") not in (None, RECEIPT_SCHEMA):
         reasons.append("SKILL_CONSUMPTION_RECEIPT_SCHEMA_INVALID")
@@ -823,26 +1525,50 @@ def validate_consumption_receipt(
         reasons.append("SKILL_HOST_MODE_MISMATCH")
     if str(receipt.get("PERMISSION_WIDENED") or "UNKNOWN").upper() != "NO":
         reasons.append("SKILL_PERMISSION_WIDENING_REJECTED")
+    prompt_only = (
+        str(handoff.get("SKILL_HOST_MODE") or "") == GENERIC_PROMPT_ONLY_MODE
+        or expected_check == "PREPARED"
+    )
     if expected_check == "PASS":
         if str(receipt.get("SKILL_LOAD_STAGE") or "") != "LOAD":
             reasons.append("SKILL_LOAD_STAGE_MISMATCH")
         if str(receipt.get("SKILL_CONSUMPTION") or "") != "CONSUMED":
             reasons.append("SKILL_NOT_CONSUMED")
-    elif expected_check == "NO_MATCH":
+    elif expected_check == "NO_MATCH" and not prompt_only:
         if str(receipt.get("SKILL_CONSUMPTION") or "") != "NO_SKILL_NEEDED":
             reasons.append("SKILL_NO_MATCH_RECEIPT_INVALID")
+    elif prompt_only:
+        reasons.append("GENERIC_PROMPT_ONLY_NOT_EXECUTION_AUTHORIZATION")
     else:
         reasons.append("SKILL_HANDOFF_WAS_BLOCKED")
-    return {"valid": not reasons, "reason_codes": reasons}
+    mode = str(handoff.get("SKILL_HOST_MODE") or "")
+    evidence_class = "UNTRUSTED"
+    if expected_check == "PASS" and not reasons:
+        if mode in HOST_MODES.values():
+            evidence_class = "NATIVE_HOST_SELF_REPORT"
+        else:
+            evidence_class = "SELF_REPORTED"
+    elif prompt_only:
+        evidence_class = "SELF_REPORTED"
+    return {
+        "valid": not reasons,
+        "reason_codes": reasons,
+        "evidence_class": evidence_class,
+        "trusted_external_actor": False,
+        "execution_authorized": False,
+    }
 
 
 __all__ = [
     "HANDOFF_SCHEMA", "RECEIPT_SCHEMA", "FANOUT_INHERITANCE_SCHEMA",
     "MAX_SELECTED_SKILLS",
-    "HOST_MODES", "SkillConsumptionError", "SkillSelection", "LoadedSkill",
+    "HOST_MODES", "GENERIC_PROMPT_ONLY_MODE", "PROMPT_ONLY_CAPABILITY",
+    "SkillConsumptionError", "SkillSelection", "LoadedSkill",
     "RepoSkillMetadata",
     "select_skills_for_task", "load_selected_skills", "prepare_skill_handoff",
+    "prepare_prompt_only_skill_handoff", "build_prompt_only_delegated_prompt",
     "freeze_skill_handoff_for_orca_candidates",
     "validate_orca_skill_inheritance",
     "skill_handoff_prompt_lines", "validate_consumption_receipt",
+    "validate_prompt_only_receipt",
 ]
