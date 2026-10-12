@@ -1262,6 +1262,8 @@ class PromptOnlyCleanExtractionTests(unittest.TestCase):
         self.assertEqual(args.required_skill, ["scope-reality-check"])
 
 
+from tests.test_p2p_generic_repo_read_admission import GenericRepoReadAdmissionTests  # noqa: E402,F401
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
