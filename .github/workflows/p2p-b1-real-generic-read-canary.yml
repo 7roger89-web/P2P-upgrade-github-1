@@ -396,6 +396,36 @@ jobs:
           assert handoff["PERMISSION_WIDENED"] == "NO", handoff
           print("B1_PRODUCTION_GENERIC_ADMISSION=PASS")
           print("B1_PRODUCTION_SELECTED_SKILL=p2p-scope")
+
+          from p2p_capabilities.control_tower_handoff import (
+              ControlTower,
+              SessionBinding,
+          )
+          tower = ControlTower(Path("."))
+          binding = SessionBinding(
+              session_id="issue333-b1-signed-canary",
+              host="GITHUB_COPILOT_CLI_ACTIONS",
+              goal_id="issue333-b1",
+              goal="Verify signed generic repo-read handoff.",
+          )
+          started = tower.start_session(
+              binding,
+              task_id="issue333-b1",
+              task_prompt="execute the bounded implementation plan",
+              required_skills=("p2p-scope",),
+              host_discovery_record=discovery,
+              generic_read_evidence=evidence,
+              generic_read_oidc_token=oidc,
+          )
+          assert started["status"] == "PASS", started
+          prompt = (started.get("recommendation") or {}).get("PROMPT") or ""
+          assert "SKILL_HOST_MODE=GENERIC_EXACT_REPO_READ" in prompt
+          assert (
+              "SKILL_SOURCE=p2p-scope|PATH=.agents/skills/p2p-scope/SKILL.md|SHA256="
+              in prompt
+          )
+          assert "SKILL_PERMISSION_WIDENED=NO" in prompt
+          print("B1_CONTROL_TOWER_GENERIC_HANDOFF=PASS")
           PY
 
       - name: Emit canary summary
