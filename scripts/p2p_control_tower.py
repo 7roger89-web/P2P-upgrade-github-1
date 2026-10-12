@@ -917,6 +917,8 @@ def build_parser() -> argparse.ArgumentParser:
             "without it a NEW Arena session fails closed into FAST_CANARY"
         ),
     )
+    start.add_argument("--host-discovery-record-file")
+    start.add_argument("--generic-read-evidence-file")
     start.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
 
     prompt_only = sub.add_parser(
@@ -978,6 +980,8 @@ def build_parser() -> argparse.ArgumentParser:
     next_session.add_argument("--session-id")
     next_session.add_argument("--worktree", default=UNKNOWN)
     next_session.add_argument("--branch", default=UNKNOWN)
+    next_session.add_argument("--host-discovery-record-file")
+    next_session.add_argument("--generic-read-evidence-file")
     next_session.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
     return parser
 
