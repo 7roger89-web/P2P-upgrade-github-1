@@ -180,6 +180,8 @@ jobs:
               "run_id": os.environ["GITHUB_RUN_ID"],
               "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
               "runner_environment": "github-hosted",
+              "probe_path": result["skill_path"],
+              "probe_sha256": os.environ["EXPECTED_SKILL_SHA"],
               "skill_path": result["skill_path"],
               "skill_sha256": os.environ["EXPECTED_SKILL_SHA"],
               "result_sha256": sha(result_path),
