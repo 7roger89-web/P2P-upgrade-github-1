@@ -9,8 +9,6 @@ permissions:
   contents: read
   copilot-requests: write
   id-token: write
-  attestations: write
-  artifact-metadata: write
 
 jobs:
   b1-real-generic-read:
@@ -207,80 +205,127 @@ jobs:
               json.dumps(subject, sort_keys=True, separators=(",", ":")) + "\n",
               encoding="utf-8",
           )
-          predicate = {
-              "schema": "p2p-generic-repo-read-attestation-predicate/1",
-              "actor": subject["actor"],
-              "repository": subject["repository"],
-              "revision": subject["revision"],
-              "skill_sha256": subject["skill_sha256"],
-              "run_id": subject["run_id"],
-              "evidence_schema": subject["schema"],
-          }
-          Path("b1-attestation-predicate.json").write_text(
-              json.dumps(predicate, sort_keys=True, separators=(",", ":")) + "\n",
-              encoding="utf-8",
-          )
           print("B1_EVIDENCE_SHA256=" + digest(Path("b1-evidence.json")))
           print("B1_TRANSCRIPT_SHA256=" + subject["transcript_sha256"])
           PY
 
-      - name: Create GitHub-signed B1 evidence attestation
-        id: attest
-        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
-        with:
-          subject-path: b1-evidence.json
-          predicate-type: https://p2p.dev/predicates/generic-repo-read/v1
-          predicate-path: b1-attestation-predicate.json
-
-      - name: Verify signed B1 evidence against exact workflow and source
-        env:
-          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
-          PREDICATE_TYPE: https://p2p.dev/predicates/generic-repo-read/v1
-          SIGNER_WORKFLOW: 7roger89-web/P2P-upgrade-github-1/.github/workflows/p2p-b1-real-generic-read-canary.yml
+      - name: Mint GitHub-signed OIDC binding for B1 evidence
+        id: oidc
         shell: bash
         run: |
           set -euo pipefail
-          gh attestation verify b1-evidence.json             -R "$GITHUB_REPOSITORY"             --predicate-type "$PREDICATE_TYPE"             --signer-workflow "$SIGNER_WORKFLOW"             --source-digest "$EXPECTED_HEAD"             --deny-self-hosted-runners             --format json             > b1-attestation-verification.json
-
           python3 - <<'PY'
           import hashlib
           import json
           import os
+          import urllib.parse
+          import urllib.request
           from pathlib import Path
 
-          data = json.loads(Path("b1-attestation-verification.json").read_text(encoding="utf-8"))
-          assert isinstance(data, list) and data, "no verified attestation"
-          expected_digest = hashlib.sha256(Path("b1-evidence.json").read_bytes()).hexdigest()
-          expected_type = os.environ["PREDICATE_TYPE"]
-          expected_head = os.environ["EXPECTED_HEAD"]
-          matched = False
-          for item in data:
-              vr = item.get("verificationResult") or {}
-              statement = vr.get("statement") or {}
-              if statement.get("predicateType") != expected_type:
-                  continue
-              subjects = statement.get("subject") or []
-              if not any(
-                  isinstance(subject, dict)
-                  and (subject.get("digest") or {}).get("sha256") == expected_digest
-                  for subject in subjects
-              ):
-                  continue
-              certificate = ((vr.get("signature") or {}).get("certificate") or {})
-              source_digest = (
-                  certificate.get("SourceRepositoryDigest")
-                  or certificate.get("sourceRepositoryDigest")
-                  or ""
-              )
-              # gh --source-digest already enforces this cryptographically.
-              if source_digest and expected_head not in str(source_digest):
-                  continue
-              matched = True
-              break
-          assert matched, "verified attestation did not bind expected subject/predicate"
-          print("B1_GITHUB_ATTESTATION_VERIFY=PASS")
-          print("B1_GITHUB_ATTESTATION_SUBJECT_SHA256=" + expected_digest)
-          print("B1_GITHUB_ATTESTATION_SOURCE_HEAD=" + expected_head)
+          evidence = Path("b1-evidence.json")
+          digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
+          audience = "p2p-generic-repo-read:" + digest
+          base = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+          separator = "&" if "?" in base else "?"
+          url = base + separator + "audience=" + urllib.parse.quote(audience, safe="")
+          request = urllib.request.Request(
+              url,
+              headers={
+                  "Authorization": "bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"],
+                  "Accept": "application/json",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+          token = str(payload.get("value") or "")
+          assert token.count(".") == 2, "OIDC token missing"
+          Path("b1-evidence-oidc.jwt").write_text(token + "\n", encoding="utf-8")
+          Path("b1-evidence-audience.txt").write_text(audience + "\n", encoding="utf-8")
+          print("B1_OIDC_MINT=PASS")
+          print("B1_OIDC_AUDIENCE=" + audience)
+          PY
+
+      - name: Cryptographically verify GitHub OIDC evidence binding
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64
+          import hashlib
+          import hmac
+          import json
+          import os
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          def b64url(value: str) -> bytes:
+              return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+
+          token = Path("b1-evidence-oidc.jwt").read_text(encoding="utf-8").strip()
+          h64, p64, s64 = token.split(".")
+          header = json.loads(b64url(h64))
+          claims = json.loads(b64url(p64))
+          assert header.get("alg") == "RS256", header
+          kid = str(header.get("kid") or "")
+          assert kid, "OIDC kid missing"
+
+          with urllib.request.urlopen(
+              "https://token.actions.githubusercontent.com/.well-known/openid-configuration",
+              timeout=30,
+          ) as response:
+              discovery = json.load(response)
+          with urllib.request.urlopen(discovery["jwks_uri"], timeout=30) as response:
+              jwks = json.load(response)
+          key = next((item for item in jwks.get("keys", []) if item.get("kid") == kid), None)
+          assert key is not None, "OIDC signing key not found"
+          assert key.get("kty") == "RSA", key
+
+          n = int.from_bytes(b64url(key["n"]), "big")
+          e = int.from_bytes(b64url(key["e"]), "big")
+          signature = b64url(s64)
+          signed = (h64 + "." + p64).encode("ascii")
+          digest = hashlib.sha256(signed).digest()
+          digest_info = bytes.fromhex("3031300d060960864801650304020105000420") + digest
+          key_bytes = (n.bit_length() + 7) // 8
+          decoded = pow(int.from_bytes(signature, "big"), e, n).to_bytes(key_bytes, "big")
+          padding_len = key_bytes - len(digest_info) - 3
+          assert padding_len >= 8
+          expected = b"\x00\x01" + (b"\xff" * padding_len) + b"\x00" + digest_info
+          assert hmac.compare_digest(decoded, expected), "OIDC signature invalid"
+
+          evidence_digest = hashlib.sha256(Path("b1-evidence.json").read_bytes()).hexdigest()
+          expected_aud = "p2p-generic-repo-read:" + evidence_digest
+          now = int(time.time())
+          assert claims.get("iss") == "https://token.actions.githubusercontent.com"
+          aud = claims.get("aud")
+          assert aud == expected_aud or (
+              isinstance(aud, list) and expected_aud in aud
+          ), (aud, expected_aud)
+          assert claims.get("repository") == os.environ["GITHUB_REPOSITORY"]
+          assert str(claims.get("run_id")) == os.environ["GITHUB_RUN_ID"]
+          assert str(claims.get("run_attempt")) == os.environ["GITHUB_RUN_ATTEMPT"]
+          assert claims.get("workflow_sha") == os.environ["EXPECTED_HEAD"]
+          assert claims.get("runner_environment") == "github-hosted"
+          assert int(claims.get("nbf", 0)) <= now + 60
+          assert int(claims.get("iat", 0)) <= now + 60
+          assert int(claims.get("exp", 0)) >= now - 60
+
+          evidence = json.loads(Path("b1-evidence.json").read_text(encoding="utf-8"))
+          assert evidence["repository"] == claims["repository"]
+          assert evidence["revision"] == os.environ["EXPECTED_HEAD"]
+          assert evidence["run_id"] == claims["run_id"]
+          assert evidence["skill_sha256"] == os.environ["EXPECTED_SKILL_SHA"]
+
+          print("B1_GITHUB_OIDC_VERIFY=PASS")
+          print("B1_GITHUB_OIDC_EVIDENCE_SHA256=" + evidence_digest)
+          print("B1_GITHUB_OIDC_WORKFLOW_SHA=" + str(claims.get("workflow_sha")))
+          print("B1_GITHUB_OIDC_RUN_ID=" + str(claims.get("run_id")))
+          print("B1_GITHUB_OIDC_RUNNER_ENVIRONMENT=" + str(claims.get("runner_environment")))
+          print("B1_GITHUB_OIDC_JTI=" + str(claims.get("jti")))
           PY
 
       - name: Emit bounded canary evidence summary
