@@ -245,6 +245,35 @@ claim of original-source recovery.
 `PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED`.
 
 
+
+### 4.12 DeepGEMM GPU-kernel intake 2026-10-12 (RA-EXT-106)
+
+Fresh READ-stage intake of `deepseek-ai/DeepGEMM` at upstream
+`057ca5964aae0879ff2e0eb71ee05a3cb0ba3df7` (MIT). The upstream repository is
+real, active and performance-focused, but the viral claim that installing it
+can cut hosted GPT/Claude token bills by about 98% is not supported by the
+inspected first-party material. DeepGEMM accelerates compatible self-hosted GPU
+matrix kernels; it does not control hosted API pricing.
+
+The architecture boundary matters more than the headline. Current P2P local
+provider work does not own CUDA GEMM kernels, while vLLM and SGLang already
+carry DeepGEMM integration/benchmark seams at the serving layer. P2P therefore
+does not vendor or install DeepGEMM in core.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-106 | deepseek-ai/DeepGEMM @ `057ca596` | RESEARCHED | real CUDA kernel library; provider-native acceleration; same-workload A/B only after measured need | `OBSERVE_ONLY`; direct P2P runtime integration rejected; pilot deferred until an authorized self-hosted NVIDIA serving lane and task-specific bottleneck exist |
+
+Re-entry requires a compatible provider/runtime, a real acceptance target,
+measured miss, credible GEMM bottleneck/provider seam, and Owner authorization
+for any GPU spend. The later pilot must compare the same model/workload with
+DeepGEMM off/on, preserve correctness parity, measure latency/throughput/cost
+proxy, and keep a simple rollback.
+
+`OE_VERDICT=DO_IT` for the bounded durable intake record.
+`DIRECT_RUNTIME_INTEGRATION=SKIP_IT`.
+`PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED`.
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
