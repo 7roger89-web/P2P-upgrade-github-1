@@ -37,6 +37,7 @@ from p2p_capabilities.p2p_skill_eligibility import skill_eligibility_set  # noqa
 from p2p_capabilities.host_executor import SUPPORTED, HostCapabilityProfile  # noqa: E402
 from p2p_capabilities.host_selection import AVAILABLE, HostDiscoveryRecord  # noqa: E402
 import p2p_capabilities.skill_consumption as skill_consumption_mod  # noqa: E402
+import p2p_capabilities.control_tower_handoff as control_tower_mod  # noqa: E402
 from p2p_capabilities.skill_consumption import (  # noqa: E402
     GENERIC_REPO_READ_MODE,
     PROMPT_ONLY_CAPABILITY,
@@ -54,6 +55,7 @@ from p2p_capabilities.skill_consumption import (  # noqa: E402
     skill_handoff_prompt_lines,
     validate_consumption_receipt,
 )
+from p2p_capabilities.task_state import TaskPlan  # noqa: E402
 from p2p_capabilities import quality_intelligence as qi  # noqa: E402
 
 
@@ -1759,6 +1761,225 @@ class GenericRepoReadOidcTests(unittest.TestCase):
             ],
             "UNVERIFIED",
         )
+
+
+    def test_authorized_generic_prompt_lines_require_trust_markers(self):
+        handoff = self._authorize()
+        lines = "\n".join(skill_handoff_prompt_lines(handoff))
+        self.assertIn("SKILL_CHECK=PASS", lines)
+        self.assertIn(
+            "SKILL_HOST_MODE=GENERIC_EXACT_REPO_READ",
+            lines,
+        )
+        self.assertIn("EXECUTION_AUTHORIZED=YES", lines)
+        self.assertIn(
+            "TRUST_EVIDENCE_CLASS=GITHUB_OIDC_BOUND_EXTERNAL_REPO_READ",
+            lines,
+        )
+        forged = dict(handoff)
+        forged["TRUST_EVIDENCE_CLASS"] = "SELF_REPORTED"
+        with self.assertRaisesRegex(
+            SkillConsumptionError,
+            "GENERIC_REPO_READ_TRUST_BINDING_INVALID",
+        ):
+            skill_handoff_prompt_lines(forged)
+
+    def test_control_tower_generic_selected_skill_requires_trust(self):
+        binding = SessionBinding(
+            session_id="issue333-generic-no-trust",
+            host=OIDC_TEST_HOST,
+            goal_id="ISSUE-333",
+            goal=OIDC_TEST_TASK,
+        )
+        tower = ControlTower(REPO_ROOT)
+        with self.assertRaisesRegex(
+            BindingError,
+            "GENERIC_REPO_READ_TRUST_EVIDENCE_REQUIRED",
+        ):
+            tower.start_session(
+                binding,
+                task_id="issue333-b1",
+                task_prompt=OIDC_TEST_TASK,
+                required_skills=("scope-reality-check",),
+            )
+
+    def test_control_tower_verified_generic_handoff_reaches_execution_prompt(self):
+        raw = self._raw()
+        token = _oidc_test_sign(self._claims(raw))
+        binding = SessionBinding(
+            session_id="issue333-generic-trusted",
+            host=OIDC_TEST_HOST,
+            goal_id="ISSUE-333",
+            goal=OIDC_TEST_TASK,
+        )
+        with patch.object(
+            skill_consumption_mod,
+            "_trusted_fetch_json",
+            side_effect=self._provider,
+        ), patch.object(
+            skill_consumption_mod.time,
+            "time",
+            return_value=OIDC_TEST_NOW,
+        ), patch.object(
+            control_tower_mod,
+            "_append_existing_execution_event",
+        ), patch.object(
+            ControlTower,
+            "snapshot",
+            return_value={"fixture": "PASS"},
+        ):
+            result = ControlTower(REPO_ROOT).start_session(
+                binding,
+                task_id="issue333-b1",
+                task_prompt=OIDC_TEST_TASK,
+                required_skills=("scope-reality-check",),
+                host_discovery_record=self.discovery,
+                trusted_repo_read_evidence=raw,
+                trusted_repo_read_oidc_token=token,
+            )
+        self.assertEqual(result["status"], "PASS")
+        handoff = result["recommendation"]["SKILL_HANDOFF"]
+        self.assertEqual(handoff["SKILL_CHECK"], "PASS")
+        self.assertEqual(
+            handoff["SKILL_HOST_MODE"],
+            GENERIC_REPO_READ_MODE,
+        )
+        self.assertEqual(handoff["EXECUTION_AUTHORIZED"], "YES")
+        self.assertEqual(
+            handoff["RECIPIENT_CONSUMPTION"],
+            "VERIFIED",
+        )
+        prompt = result["recommendation"]["PROMPT"]
+        self.assertIn("EXECUTION_AUTHORIZED=YES", prompt)
+        self.assertIn(
+            "TRUST_EVIDENCE_CLASS=GITHUB_OIDC_BOUND_EXTERNAL_REPO_READ",
+            prompt,
+        )
+        self.assertIn(
+            self.hashes["scope-reality-check"],
+            prompt,
+        )
+
+    def test_native_control_tower_host_rejects_generic_trust_inputs(self):
+        binding = SessionBinding(
+            session_id="issue333-native-trust-reject",
+            host="ARENA",
+            goal_id="ISSUE-333",
+            goal=OIDC_TEST_TASK,
+        )
+        with self.assertRaisesRegex(
+            BindingError,
+            "GENERIC_REPO_READ_TRUST_EVIDENCE_NATIVE_HOST_FORBIDDEN",
+        ):
+            ControlTower(REPO_ROOT).start_session(
+                binding,
+                task_id="issue333-native",
+                task_prompt=OIDC_TEST_TASK,
+                host_discovery_record=self.discovery,
+                trusted_repo_read_evidence=b"{}",
+                trusted_repo_read_oidc_token="a.b.c",
+            )
+
+    def test_cached_generic_recommendation_requires_fresh_trust(self):
+        now = "2026-10-12T00:00:00+00:00"
+        plan = TaskPlan.from_goal(
+            {
+                "goal_id": "issue333-cache",
+                "scope": ["generic trusted read"],
+                "out_of_scope": ["deployment"],
+            },
+            [{
+                "task_id": "issue333-cache-task",
+                "title": "Use trusted generic read",
+                "purpose": OIDC_TEST_TASK,
+                "status": "READY",
+                "scope": ["generic trusted read"],
+                "acceptance_requirements": ["fresh trust required"],
+                "required_evidence": ["oidc-proof"],
+            }],
+            now=now,
+        )
+        task = next(iter(plan.tasks.values()))
+        binding = SessionBinding(
+            session_id="issue333-cache-session",
+            host=OIDC_TEST_HOST,
+            goal_id=plan.goal_id,
+            goal=task.purpose,
+        )
+        authorized = self._authorize()
+        state = ControlTowerState.empty()
+        state.session_records[binding.session_id] = {
+            "SESSION_STATE": "ACTIVE",
+            "TASK_ID": task.task_id,
+            "BINDING": binding.to_dict(),
+            "RECOMMENDED_NEW_CHAT": {
+                "PROMPT": "stale cached generic prompt",
+                "HOST": binding.host,
+            },
+            "SKILL_HANDOFF": authorized,
+        }
+        with patch(
+            "p2p_capabilities.task_state.TaskStateStore.load",
+            return_value=plan,
+        ), patch.object(
+            ControlTower,
+            "_replay",
+            return_value=(state, []),
+        ):
+            result = ControlTower(REPO_ROOT).recommend_next_session(
+                OIDC_TEST_HOST
+            )
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(
+            result["reason"],
+            "GENERIC_REPO_READ_FRESH_TRUST_EVIDENCE_REQUIRED",
+        )
+        self.assertIsNone(result["recommendation"])
+
+    def test_cli_generic_trust_file_set_is_bounded_and_all_or_none(self):
+        args = control_tower_cli.build_parser().parse_args([
+            "start",
+            "--host", OIDC_TEST_HOST,
+            "--goal-id", "ISSUE-333",
+            "--goal", OIDC_TEST_TASK,
+            "--host-discovery-record-file", "discovery.json",
+            "--trusted-repo-read-evidence-file", "evidence.json",
+            "--trusted-repo-read-oidc-token-file", "evidence.jwt",
+        ])
+        self.assertEqual(
+            args.host_discovery_record_file,
+            "discovery.json",
+        )
+        with tempfile.TemporaryDirectory() as raw_dir:
+            root = Path(raw_dir)
+            discovery_path = root / "discovery.json"
+            evidence_path = root / "evidence.json"
+            token_path = root / "evidence.jwt"
+            discovery_path.write_text(
+                json.dumps(self.discovery),
+                encoding="utf-8",
+            )
+            evidence_bytes = self._raw()
+            evidence_path.write_bytes(evidence_bytes)
+            token_path.write_text(
+                _oidc_test_sign(self._claims(evidence_bytes)),
+                encoding="utf-8",
+            )
+            args.host_discovery_record_file = str(discovery_path)
+            args.trusted_repo_read_evidence_file = str(evidence_path)
+            args.trusted_repo_read_oidc_token_file = str(token_path)
+            discovery, evidence, token = (
+                control_tower_cli._load_generic_trust_inputs(args)
+            )
+            self.assertEqual(discovery["host_id"], OIDC_TEST_HOST)
+            self.assertEqual(evidence, evidence_bytes)
+            self.assertEqual(token.count("."), 2)
+            args.trusted_repo_read_oidc_token_file = None
+            with self.assertRaisesRegex(
+                BindingError,
+                "GENERIC_REPO_READ_TRUST_FILE_SET_INCOMPLETE",
+            ):
+                control_tower_cli._load_generic_trust_inputs(args)
 
 
 if __name__ == "__main__":
