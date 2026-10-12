@@ -599,6 +599,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/p2p-development/framework/master-roadmap.md",
             "docs/p2p-development/reports/P2P-FRAMEWORK-03-progress-report.md",
             "scripts/check_instruction_contract.py",
+            # Issue #340 P0 FW01 composition-handoff repair: bounded fix in
+            # the existing FW01 loop plus its focused regression tests in
+            # the existing internal test file. No new module, router,
+            # registry, daemon, or state store is introduced.
+            ".p2p/system/p2p_capabilities/tests/test_composition_gate_loop.py",
         )
         forbidden_fragments = (
             "router", "registry", "daemon", "sync", "installer", "package_manager",
@@ -706,6 +711,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # Owner-directed Anvien retirement updates the EXISTING
                 # static instruction contract checker; no runtime is added.
                 "scripts/check_instruction_contract.py",
+                # Issue #340 P0 FW01 composition-handoff repair: focused
+                # regression tests for the existing composition gate in the
+                # existing internal test file; no new test surface.
+                ".p2p/system/p2p_capabilities/tests/test_composition_gate_loop.py",
             }:
                 violations.append(f"unexpected python surface: {path}")
             issue_309_existing_transport_surfaces = {
@@ -742,6 +751,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".p2p/system/p2p_capabilities/capability_intelligence.py",
             ".p2p/system/p2p_capabilities/p2p_skill_eligibility.py",
             ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
+            # Issue #340: this EXISTING internal regression test is modified,
+            # not introduced as a new executable capability module. The
+            # separate change-surface guard already allows this exact path;
+            # unrelated capability modules remain forbidden.
+            ".p2p/system/p2p_capabilities/tests/test_composition_gate_loop.py",
             # Issue #308 modifies the EXISTING read-only Quality Intelligence
             # module instead of creating a second evaluator/learning system.
             ".p2p/system/p2p_capabilities/quality_intelligence.py",
