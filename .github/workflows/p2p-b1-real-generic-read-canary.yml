@@ -336,6 +336,68 @@ jobs:
           print("B1_GITHUB_OIDC_RUNNER_ENVIRONMENT=" + str(claims.get("runner_environment")))
           PY
 
+      - name: Verify production generic admission gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          sys.path.insert(0, str(Path(".p2p/system").resolve()))
+          from p2p_capabilities.skill_consumption import prepare_skill_handoff
+
+          evidence = json.loads(Path("b1-evidence.json").read_text(encoding="utf-8"))
+          probe_path = evidence["probe_path"]
+          probe_sha = hashlib.sha256(Path(probe_path).read_bytes()).hexdigest()
+          repo = os.environ["GITHUB_REPOSITORY"].lower()
+          revision = os.environ["GITHUB_SHA"]
+          discovery = {
+              "schema": "p2p-host-discovery-record/1",
+              "host_id": "GITHUB_COPILOT_CLI_ACTIONS",
+              "profile": {
+                  "schema": "p2p-host-executor-contract/1",
+                  "adapter_class": "GitHubCopilotCLI",
+                  "host_label": "GITHUB_COPILOT_CLI_ACTIONS",
+                  "environment": "REMOTE_REPOSITORY",
+                  "capabilities": {"can_read_files": "SUPPORTED"},
+              },
+              "availability": "KNOWN_AVAILABLE",
+              "observed_at": datetime.now(timezone.utc).isoformat(),
+              "provenance": (
+                  "GITHUB_ACTIONS_OIDC_EXACT_READ"
+                  + f"|repo={repo}|revision={revision}"
+                  + f"|probe={probe_path}|sha256={probe_sha}"
+              ),
+              "environment_binding": "REMOTE_REPOSITORY",
+              "project_binding": repo,
+              "profile_version": "1",
+              "active": True,
+              "reconciliation_burden": 0,
+              "execution_transport_available": True,
+          }
+          oidc = Path("b1-evidence-oidc.jwt").read_text(encoding="utf-8").strip()
+          handoff = prepare_skill_handoff(
+              Path("."),
+              "execute the bounded implementation plan",
+              host="GITHUB_COPILOT_CLI_ACTIONS",
+              required_skills=("p2p-scope",),
+              host_discovery_record=discovery,
+              generic_read_evidence=evidence,
+              generic_read_oidc_token=oidc,
+          )
+          assert handoff["SKILL_CHECK"] == "PASS", handoff
+          assert handoff["SKILL_HOST_MODE"] == "GENERIC_EXACT_REPO_READ", handoff
+          assert "p2p-scope" in handoff["SKILLS_SELECTED"], handoff
+          assert handoff["PERMISSION_WIDENED"] == "NO", handoff
+          print("B1_PRODUCTION_GENERIC_ADMISSION=PASS")
+          print("B1_PRODUCTION_SELECTED_SKILL=p2p-scope")
+          PY
+
       - name: Emit canary summary
         shell: bash
         run: |
