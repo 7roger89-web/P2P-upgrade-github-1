@@ -1263,6 +1263,7 @@ class PromptOnlyCleanExtractionTests(unittest.TestCase):
 
 
 from tests.test_p2p_generic_repo_read_admission import GenericRepoReadAdmissionTests  # noqa: E402,F401
+from tests.test_p2p_generic_repo_read_evidence import GenericRepoReadEvidenceTests  # noqa: E402,F401
 
 
 if __name__ == "__main__":
