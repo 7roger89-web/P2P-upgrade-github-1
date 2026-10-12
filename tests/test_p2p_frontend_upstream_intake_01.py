@@ -753,6 +753,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
             # instead of adding a parallel capability module.
             ".p2p/system/p2p_capabilities/control_tower_handoff.py",
             ".p2p/system/p2p_capabilities/owner_goal.py",
+            # Issue #333: bounded signed repo-read evidence verifier.
+            ".p2p/system/p2p_capabilities/generic_repo_read_evidence.py",
             # Issue #298: bounded skill-consumption composition seam. It calls
             # the existing router and canonical registry; it is not a router,
             # registry, scheduler, daemon, or second state store.
