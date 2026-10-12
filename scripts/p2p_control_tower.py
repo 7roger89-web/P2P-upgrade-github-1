@@ -826,6 +826,26 @@ def _extract_task_text(prompt: str) -> str:
     return task
 
 
+def _load_json_object_file(
+    path_value: str | None,
+    *,
+    field: str,
+    expected_schema: str,
+) -> Mapping[str, Any] | None:
+    if not path_value:
+        return None
+    path = Path(path_value).expanduser().resolve()
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise BindingError(f"{field}_INVALID:{path}") from exc
+    if not isinstance(value, Mapping):
+        raise BindingError(f"{field}_MUST_BE_OBJECT")
+    if value.get("schema") != expected_schema:
+        raise BindingError(f"{field}_SCHEMA_INVALID")
+    return dict(value)
+
+
 def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
     if as_json:
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
