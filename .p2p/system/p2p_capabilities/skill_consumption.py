@@ -13,15 +13,30 @@ import json
 import re
 import subprocess
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 try:  # package import in normal P2P runtime
+    from .host_executor import SUPPORTED, HostCapabilityProfile, HostExecutorContractError
+    from .host_selection import AVAILABLE, DISCOVERY_SCHEMA, HostDiscoveryRecord
     from .model import CapabilityManifest, load_registry
     from .routing import classify_capabilities
+    from .trusted_repo_read_evidence import (
+        GENERIC_REPO_READ_MODE,
+        TrustedRepoReadEvidenceError,
+        verify_github_oidc_repo_read_evidence,
+    )
 except ImportError:  # legacy focused tests import modules from this directory
+    from host_executor import SUPPORTED, HostCapabilityProfile, HostExecutorContractError
+    from host_selection import AVAILABLE, DISCOVERY_SCHEMA, HostDiscoveryRecord
     from model import CapabilityManifest, load_registry
     from routing import classify_capabilities
+    from trusted_repo_read_evidence import (
+        GENERIC_REPO_READ_MODE,
+        TrustedRepoReadEvidenceError,
+        verify_github_oidc_repo_read_evidence,
+    )
 
 
 HANDOFF_SCHEMA = "p2p-skill-handoff/1"
@@ -1152,6 +1167,269 @@ def build_prompt_only_delegated_prompt(
     return prompt
 
 
+TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH = (
+    ".github/workflows/p2p-generic-repo-read-evidence.yml"
+)
+GENERIC_DISCOVERY_MAX_AGE_SECONDS = 3600
+GENERIC_DISCOVERY_MAX_FUTURE_SKEW_SECONDS = 300
+
+
+def prompt_only_task_sha256(request_text: str) -> str:
+    task = str(request_text or "").strip()
+    if not task:
+        raise SkillConsumptionError("PROMPT_ONLY_TASK_REQUIRED")
+    return hashlib.sha256(task.encode("utf-8")).hexdigest()
+
+
+def prompt_only_handoff_fingerprint(
+    handoff: Mapping[str, Any],
+    *,
+    request_text: str,
+    host: str,
+) -> str:
+    """Bind the exact PREPARED handoff to one bounded task and host."""
+    check = str(handoff.get("SKILL_CHECK") or "")
+    if check != "PREPARED":
+        raise SkillConsumptionError("PROMPT_ONLY_HANDOFF_NOT_PREPARED")
+    _validate_prompt_only_frozen_selection(handoff, check)
+    host_name = _destination_host_token(host)
+    if not host_name or host_name != _destination_host_token(
+        handoff.get("DESTINATION_HOST") or ""
+    ):
+        raise SkillConsumptionError("PROMPT_ONLY_DESTINATION_HOST_MISMATCH")
+    payload = {
+        "schema": str(handoff.get("schema") or ""),
+        "SKILL_CHECK": check,
+        "REQUIRED_SKILLS": list(handoff.get("REQUIRED_SKILLS") or ()),
+        "SKILLS_SELECTED": list(handoff.get("SKILLS_SELECTED") or ()),
+        "SKILL_LOAD_STAGE": str(handoff.get("SKILL_LOAD_STAGE") or ""),
+        "SKILL_SOURCE_HASHES": dict(handoff.get("SKILL_SOURCE_HASHES") or {}),
+        "SKILL_SOURCE_PATHS": dict(handoff.get("SKILL_SOURCE_PATHS") or {}),
+        "SKILL_HOST_MODE": str(handoff.get("SKILL_HOST_MODE") or ""),
+        "SKILL_CONSUMPTION": str(handoff.get("SKILL_CONSUMPTION") or ""),
+        "PERMISSION_WIDENED": str(handoff.get("PERMISSION_WIDENED") or ""),
+        "SOURCE_VALIDATION": str(handoff.get("SOURCE_VALIDATION") or ""),
+        "RECIPIENT_CONSUMPTION": str(
+            handoff.get("RECIPIENT_CONSUMPTION") or ""
+        ),
+        "EXECUTION_AUTHORIZED": str(
+            handoff.get("EXECUTION_AUTHORIZED") or ""
+        ),
+        "OPERATION": str(handoff.get("OPERATION") or ""),
+        "DELIVERY_CAPABILITY": str(
+            handoff.get("DELIVERY_CAPABILITY") or ""
+        ),
+        "DESTINATION_HOST": host_name,
+        "REPOSITORY": str(handoff.get("REPOSITORY") or "").lower(),
+        "REVISION": str(handoff.get("REVISION") or "").lower(),
+        "TASK_SHA256": prompt_only_task_sha256(request_text),
+    }
+    return hashlib.sha256(json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")).hexdigest()
+
+
+def _coerce_generic_host_discovery_record(
+    value: HostDiscoveryRecord | Mapping[str, Any] | None,
+) -> HostDiscoveryRecord:
+    if isinstance(value, HostDiscoveryRecord):
+        record = value
+    else:
+        if not isinstance(value, Mapping):
+            raise SkillConsumptionError("HOST_DISCOVERY_RECORD_REQUIRED")
+        if value.get("schema") != DISCOVERY_SCHEMA:
+            raise SkillConsumptionError("HOST_DISCOVERY_RECORD_SCHEMA_INVALID")
+        profile_raw = value.get("profile")
+        if not isinstance(profile_raw, Mapping):
+            raise SkillConsumptionError("HOST_DISCOVERY_PROFILE_INVALID")
+        active = value.get("active")
+        transport = value.get("execution_transport_available")
+        if not isinstance(active, bool):
+            raise SkillConsumptionError("HOST_DISCOVERY_ACTIVE_TYPE_INVALID")
+        if not isinstance(transport, bool):
+            raise SkillConsumptionError("HOST_DISCOVERY_TRANSPORT_TYPE_INVALID")
+        try:
+            profile = HostCapabilityProfile.from_mapping(profile_raw)
+            record = HostDiscoveryRecord(
+                host_id=str(value.get("host_id") or ""),
+                profile=profile,
+                availability=str(value.get("availability") or ""),
+                observed_at=str(value.get("observed_at") or ""),
+                provenance=str(value.get("provenance") or ""),
+                environment_binding=value.get("environment_binding"),
+                project_binding=value.get("project_binding"),
+                profile_version=str(value.get("profile_version") or "1"),
+                active=active,
+                reconciliation_burden=int(
+                    value.get("reconciliation_burden") or 0
+                ),
+                execution_transport_available=transport,
+            )
+        except (HostExecutorContractError, ValueError, TypeError) as exc:
+            raise SkillConsumptionError(
+                f"HOST_DISCOVERY_RECORD_INVALID:{exc}"
+            ) from exc
+    if not isinstance(record.active, bool):
+        raise SkillConsumptionError("HOST_DISCOVERY_ACTIVE_TYPE_INVALID")
+    if not isinstance(record.execution_transport_available, bool):
+        raise SkillConsumptionError("HOST_DISCOVERY_TRANSPORT_TYPE_INVALID")
+    return record
+
+
+def _validate_generic_host_discovery_record(
+    root: Path,
+    host: str,
+    value: HostDiscoveryRecord | Mapping[str, Any] | None,
+) -> HostDiscoveryRecord:
+    record = _coerce_generic_host_discovery_record(value)
+    host_name = _destination_host_token(host)
+    record_host = _destination_host_token(record.host_id)
+    profile_host = _destination_host_token(record.profile.host_label or "")
+    if not host_name or record_host != host_name or profile_host != host_name:
+        raise SkillConsumptionError("HOST_DISCOVERY_RECORD_HOST_MISMATCH")
+    if record.availability != AVAILABLE:
+        raise SkillConsumptionError("HOST_DISCOVERY_HOST_NOT_AVAILABLE")
+    if record.active is not True:
+        raise SkillConsumptionError("HOST_DISCOVERY_RECORD_INACTIVE")
+    if record.execution_transport_available is not True:
+        raise SkillConsumptionError("HOST_DISCOVERY_TRANSPORT_UNAVAILABLE")
+    if record.profile.state("can_read_files") != SUPPORTED:
+        raise SkillConsumptionError("HOST_DISCOVERY_REPO_READ_UNSUPPORTED")
+    if record.profile.environment not in {
+        "REMOTE_REPOSITORY",
+        "CLOUD_SANDBOX",
+    }:
+        raise SkillConsumptionError(
+            "HOST_DISCOVERY_ENVIRONMENT_NOT_REPO_BOUND"
+        )
+    if record.environment_binding != record.profile.environment:
+        raise SkillConsumptionError("HOST_DISCOVERY_ENVIRONMENT_MISMATCH")
+    repository = _canonical_repo_binding(root)
+    if repository is None:
+        raise SkillConsumptionError(
+            "HOST_CANONICAL_REPO_BINDING_UNAVAILABLE"
+        )
+    if str(record.project_binding or "").strip().lower() != repository:
+        raise SkillConsumptionError("HOST_DISCOVERY_PROJECT_MISMATCH")
+    if str(record.provenance or "").strip().upper() == "DECLARED_PROFILE":
+        raise SkillConsumptionError("HOST_DISCOVERY_DECLARATIVE_ONLY")
+    try:
+        observed = datetime.fromisoformat(
+            str(record.observed_at).replace("Z", "+00:00")
+        )
+    except ValueError as exc:
+        raise SkillConsumptionError(
+            "HOST_DISCOVERY_TIMESTAMP_INVALID"
+        ) from exc
+    if observed.tzinfo is None:
+        raise SkillConsumptionError(
+            "HOST_DISCOVERY_TIMESTAMP_TIMEZONE_REQUIRED"
+        )
+    age = (
+        datetime.now(timezone.utc)
+        - observed.astimezone(timezone.utc)
+    ).total_seconds()
+    if age < -GENERIC_DISCOVERY_MAX_FUTURE_SKEW_SECONDS:
+        raise SkillConsumptionError(
+            "HOST_DISCOVERY_EVIDENCE_FROM_FUTURE"
+        )
+    if age > GENERIC_DISCOVERY_MAX_AGE_SECONDS:
+        raise SkillConsumptionError("HOST_DISCOVERY_EVIDENCE_STALE")
+    return record
+
+
+def authorize_prompt_only_skill_handoff(
+    root: str | Path,
+    handoff: Mapping[str, Any],
+    *,
+    request_text: str,
+    host: str,
+    host_discovery_record: HostDiscoveryRecord | Mapping[str, Any] | None,
+    trusted_evidence_bytes: bytes,
+    trusted_oidc_token: str,
+) -> dict[str, Any]:
+    """Upgrade one exact PREPARED handoff after trusted external read proof."""
+    project_root = Path(root).resolve()
+    build_prompt_only_delegated_prompt(
+        project_root,
+        handoff,
+        request_text=request_text,
+        host=host,
+        allow_inline_skill_content=False,
+    )
+    repository = _canonical_repo_binding(project_root)
+    revision = _current_repo_revision(project_root)
+    if repository is None:
+        raise SkillConsumptionError(
+            "HOST_CANONICAL_REPO_BINDING_UNAVAILABLE"
+        )
+    if revision is None:
+        raise SkillConsumptionError(
+            "HOST_CANONICAL_REPO_REVISION_UNAVAILABLE"
+        )
+    host_name = _destination_host_token(host)
+    if host_name in HOST_MODES:
+        raise SkillConsumptionError(
+            "GENERIC_REPO_READ_NATIVE_HOST_FORBIDDEN"
+        )
+    _validate_generic_host_discovery_record(
+        project_root,
+        host_name,
+        host_discovery_record,
+    )
+    task_sha = prompt_only_task_sha256(request_text)
+    handoff_fingerprint = prompt_only_handoff_fingerprint(
+        handoff,
+        request_text=request_text,
+        host=host_name,
+    )
+    try:
+        trust = verify_github_oidc_repo_read_evidence(
+            trusted_evidence_bytes,
+            trusted_oidc_token,
+            expected_repository=repository,
+            expected_revision=revision,
+            expected_workflow_path=(
+                TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH
+            ),
+            expected_host=host_name,
+            expected_task_sha256=task_sha,
+            expected_handoff_fingerprint=handoff_fingerprint,
+            expected_skill_paths=dict(
+                handoff.get("SKILL_SOURCE_PATHS") or {}
+            ),
+            expected_skill_hashes=dict(
+                handoff.get("SKILL_SOURCE_HASHES") or {}
+            ),
+        )
+    except TrustedRepoReadEvidenceError as exc:
+        raise SkillConsumptionError(str(exc)) from exc
+
+    authorized = dict(handoff)
+    authorized.update({
+        "SKILL_CHECK": "PASS",
+        "SKILL_HOST_MODE": GENERIC_REPO_READ_MODE,
+        "SKILL_CONSUMPTION": "CONSUMED",
+        "SOURCE_VALIDATION": "PASS",
+        "RECIPIENT_CONSUMPTION": "VERIFIED",
+        "EXECUTION_AUTHORIZED": "YES",
+        "OPERATION": "EXECUTE",
+        "DELIVERY_CAPABILITY": GENERIC_REPO_READ_MODE,
+        "PERMISSION_WIDENED": "NO",
+        "SINGLE_ROUTER_REUSED": "YES",
+        "TRUST_EVIDENCE_CLASS": trust["evidence_class"],
+        "TRUST_EVIDENCE_SHA256": trust["evidence_sha256"],
+        "TRUST_EVIDENCE_RUN_ID": trust["run_id"],
+        "TRUST_EVIDENCE_JTI": trust["jti"],
+        "TASK_SHA256": task_sha,
+        "PROMPT_ONLY_HANDOFF_FINGERPRINT": handoff_fingerprint,
+    })
+    return authorized
+
+
 def prepare_prompt_only_skill_handoff(
     root: str | Path,
     request_text: str,
@@ -1371,11 +1649,15 @@ def validate_consumption_receipt(
 __all__ = [
     "HANDOFF_SCHEMA", "RECEIPT_SCHEMA", "FANOUT_INHERITANCE_SCHEMA",
     "MAX_SELECTED_SKILLS",
-    "HOST_MODES", "GENERIC_PROMPT_ONLY_MODE", "PROMPT_ONLY_CAPABILITY",
-    "PROMPT_ONLY_MAX_PROMPT_CHARS", "SkillConsumptionError", "SkillSelection", "LoadedSkill",
+    "HOST_MODES", "GENERIC_PROMPT_ONLY_MODE", "GENERIC_REPO_READ_MODE",
+    "PROMPT_ONLY_CAPABILITY", "PROMPT_ONLY_MAX_PROMPT_CHARS",
+    "TRUSTED_GENERIC_REPO_READ_WORKFLOW_PATH", "SkillConsumptionError",
+    "SkillSelection", "LoadedSkill",
     "RepoSkillMetadata",
     "select_skills_for_task", "load_selected_skills", "prepare_skill_handoff",
     "prepare_prompt_only_skill_handoff", "build_prompt_only_delegated_prompt",
+    "prompt_only_task_sha256", "prompt_only_handoff_fingerprint",
+    "authorize_prompt_only_skill_handoff",
     "freeze_skill_handoff_for_orca_candidates",
     "validate_orca_skill_inheritance",
     "skill_handoff_prompt_lines", "validate_consumption_receipt",
