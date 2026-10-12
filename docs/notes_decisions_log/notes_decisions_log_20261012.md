@@ -11,3 +11,5 @@
 - Decision: generic admission requires current C21 + verified GitHub-signed actor-read evidence. C21-only/self-report remains insufficient; native ARENA/CODEX and PROMPT_ONLY remain unchanged.
 - Reality correction: `actions/attest` was unavailable for this user-owned private repo; final design uses GitHub Actions OIDC JWT verification.
 - Status: closure artifacts queued for fresh exact-head CI, then independent Supervisor. No merge/release/deploy/promotion in Writer role.
+
+- Final CI trigger: this notes-only commit exists solely to force GitHub to emit a pull-request synchronize event after the Git Data batch closure; no runtime or admission behavior changes in this commit.
