@@ -555,6 +555,11 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/P2P-DEVELOPMENT-ROADMAP.md",
             "docs/p2p-development/current-roadmap.md",
             "reports/planner/P2P-PLANNER-RUN-10.json",
+            ".github/workflows/p2p-b1-real-generic-read-canary.yml",
+            ".p2p/system/p2p_capabilities/generic_repo_read_evidence.py",
+            "tests/test_p2p_generic_repo_read_evidence.py",
+            "tests/test_p2p_generic_repo_read_admission.py",
+            "docs/plans/2026-10-12-p2p-generic-read-admission/",
             # Issue #298 skill-consumption wire. Reuses the existing canonical
             # capability registry + single router; adds one bounded
             # consumption module and exact source-bound host receipts.
