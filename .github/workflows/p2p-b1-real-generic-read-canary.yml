@@ -36,7 +36,7 @@ jobs:
 
       - name: Install pinned GitHub Copilot CLI
         shell: bash
-        run: |
+        run: | # zizmor: ignore[adhoc-packages] pinned Copilot CLI is the external actor under test; no action/lockfile equivalent exists for this bounded canary.
           set -euo pipefail
           npm install -g '@github/copilot@1.0.95'
           copilot --version
