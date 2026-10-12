@@ -843,6 +843,10 @@ def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
         print(recommendation.get("CHAT_NAME", UNKNOWN))
         print("\nREADY-TO-PASTE PROMPT")
         print(recommendation.get("PROMPT", ""))
+    prompt = result.get("prompt")
+    if isinstance(prompt, str) and not isinstance(recommendation, dict):
+        print("\nREADY-TO-PASTE PROMPT")
+        print(prompt)
     reconciliation = result.get("reconciliation")
     if reconciliation is not None:
         print("\nINGEST RECONCILIATION")
@@ -894,6 +898,34 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     start.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
+
+    prompt_only = sub.add_parser(
+        "prepare-prompt-only",
+        help=(
+            "prepare a source-bound generic delegated-work prompt without "
+            "starting an executor session"
+        ),
+    )
+    prompt_only.add_argument("--host", required=True)
+    prompt_only.add_argument("--task", required=True)
+    prompt_only.add_argument(
+        "--required-skill",
+        action="append",
+        default=[],
+        help="required repo-native skill ID; repeat up to three times",
+    )
+    prompt_only.add_argument(
+        "--allow-inline-skill-content",
+        action="store_true",
+        help=(
+            "inline only skill bodies explicitly marked PUBLIC with a "
+            "shareable license; project-internal content remains blocked"
+        ),
+    )
+    prompt_only.add_argument("--max-prompt-chars", type=int)
+    prompt_only.add_argument(
+        "--json", action="store_true", dest="as_json", default=argparse.SUPPRESS
+    )
 
     snapshot = sub.add_parser("snapshot", help="show the reconciled Control Tower projection")
     snapshot.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
@@ -1047,6 +1079,14 @@ def main(argv: list[str] | None = None) -> int:
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
+            )
+        elif args.command == "prepare-prompt-only":
+            result = tower.prepare_prompt_only(
+                args.host,
+                args.task,
+                required_skills=tuple(args.required_skill),
+                allow_inline_skill_content=args.allow_inline_skill_content,
+                max_prompt_chars=args.max_prompt_chars,
             )
         elif args.command == "snapshot":
             result = {"status": "PASS", "snapshot": tower.snapshot()}
