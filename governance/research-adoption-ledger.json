@@ -3660,6 +3660,53 @@
       "owner_decision_status": "OWNER_SELECTED_READ_COMPLETE_PILOT_DEFERRED_UNTIL_REAL_BINARY",
       "last_reviewed_at": "2026-10-01T00:00:00+00:00",
       "notes": "OE_VERDICT=DO_IT for the bounded READ-stage intake only. PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED. No runtime execution, dependency install, vendoring, model/API call, adapter implementation, release, deployment or promotion is claimed."
+    },
+    {
+      "research_id": "RA-EXT-106",
+      "source_name": "deepseek-ai/DeepGEMM — provider-side GPU kernel acceleration candidate",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/deepseek-ai/DeepGEMM",
+      "source_version_or_commit": "main@057ca5964aae0879ff2e0eb71ee05a3cb0ba3df7 observed 2026-10-12; latest public-release commit dated 2026-09-30",
+      "provenance_status": "PUBLIC_REPOSITORY_FRESH_READ; README_AND_LICENSE_INSPECTED; VLLM_AND_SGLANG_INTEGRATION_SEAMS_INSPECTED; NO_LOCAL_GPU_EXECUTION; NO_P2P_INSTALL_OR_VENDOR",
+      "research_summary": "DeepGEMM is a real MIT-licensed CUDA tensor-core kernel library for LLM GEMM/MoE/indexer primitives and remains actively maintained. The viral 'up to 98% token cost savings / $50 -> $1.6 for GPT Astra or Opus' framing is not supported by the upstream material inspected: DeepGEMM can improve compatible self-hosted GPU compute efficiency, but it cannot change hosted API token pricing. Current P2P local-provider surfaces do not own CUDA GEMM kernels, while serving stacks such as vLLM and SGLang already integrate/benchmark DeepGEMM at the correct provider layer. Direct P2P-core integration is therefore rejected; preserve a provider-native future pilot only when a real self-hosted NVIDIA lane and measured performance need exist.",
+      "selected_ideas": [
+        "treat DeepGEMM as provider-side acceleration, not as an agent/router/token-pricing capability",
+        "prefer serving-stack-native DeepGEMM integration (for example vLLM/SGLang) over vendoring CUDA kernels into P2P core",
+        "same-workload A/B only after a task-specific latency/throughput/cost target exists",
+        "require correctness parity and explicit rollback alongside performance gain",
+        "use upstream TFLOPS as context only; target-workload evidence decides admission",
+        "keep GPU spend behind the existing Owner Gate"
+      ],
+      "rejected_ideas": [
+        "98% hosted API token-bill reduction inferred from GEMM speed",
+        "plugging DeepGEMM into GPT/Claude hosted APIs from the P2P client side",
+        "vendoring DeepGEMM, CUDA, PyTorch or CUTLASS into P2P core without a measured target need",
+        "new GPU daemon/service/router/benchmark platform or registry",
+        "generic upstream benchmark promoted to P2P cost proof",
+        "GPU spend or production runtime change before existing Owner authorization"
+      ],
+      "p2p_translation": "READ stage COMPLETE under DOMAIN_CAPABILITY_ADMISSION_V1. DECISION=OBSERVE_ONLY for future provider-native acceleration; DIRECT_P2P_RUNTIME_INTEGRATION=REJECT. Re-enter only when P2P owns/uses an authorized self-hosted NVIDIA serving lane with a real DeepGEMM seam, a task-specific performance acceptance target is missed, and a bounded same-workload comparison can be run. No runtime dependency, provider, capability ID, router, daemon, release, deployment or promotion is added.",
+      "capability_family": "EXECUTION_AND_ORCHESTRATION",
+      "canonical_capability_ids": [],
+      "status": "RESEARCHED",
+      "evidence_pointers": [
+        "https://github.com/deepseek-ai/DeepGEMM/tree/057ca5964aae0879ff2e0eb71ee05a3cb0ba3df7",
+        "https://github.com/deepseek-ai/DeepGEMM/blob/main/README.md",
+        "https://github.com/deepseek-ai/DeepGEMM/blob/main/LICENSE",
+        "https://github.com/vllm-project/vllm/blob/main/cmake/external_projects/deepgemm.cmake",
+        "https://github.com/sgl-project/sglang/blob/main/benchmark/kernels/deepseek/benchmark_deepgemm_fp8_gemm.py",
+        "P2P_SUPREME_OPERATING_LAW_V1 RULE 19 / DOMAIN_CAPABILITY_ADMISSION_V1"
+      ],
+      "dependencies": [
+        "DOMAIN_CAPABILITY_ADMISSION_V1",
+        "RULE 19 — REALITY_FIRST_CAPABILITY_PROBE",
+        "RULE 11 Owner Gates for paid GPU spend / infrastructure commitment",
+        "future self-hosted serving backend with a real DeepGEMM integration seam"
+      ],
+      "roadmap_slot": "future self-hosted GPU provider acceleration candidate; no roadmap item created",
+      "owner_decision_status": "OWNER_SELECTED_READ_COMPLETE_PILOT_DEFERRED_UNTIL_REAL_GPU_LANE",
+      "last_reviewed_at": "2026-10-12T08:23:00+00:00",
+      "notes": "OE_VERDICT=DO_IT for one bounded READ-stage record. DIRECT_RUNTIME_INTEGRATION=SKIP_IT. PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED. The 2026-10-06 forum post is treated as a community claim, not authority. No claim is made that DeepGEMM is ineffective; the decision is that its correct integration layer is a compatible serving backend, not P2P core, and target-domain value remains unmeasured. CI surface reconciliation: standalone research note removed after the existing no-parallel-surface contract rejected the new path; authoritative JSON ledger plus existing human projection remain the durable record."
     }
   ],
   "rejected_register_summary": {
@@ -3688,7 +3735,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-10-01T00:00:00+00:00",
+  "last_reviewed": "2026-10-12T08:23:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]
