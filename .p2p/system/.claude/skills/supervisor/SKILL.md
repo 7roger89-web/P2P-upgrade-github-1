@@ -1,6 +1,6 @@
 ---
 name: supervisor
-description: Use whenever reviewing completion claims, fixes, diffs, reports, screenshots, or artifacts for acceptance; verify repo/project reality with Anvien evidence. Always use this skill before accepting any agent output, closing any task, or merging any result.
+description: Independently review completion claims, PRs, fixes, diffs, reports, screenshots, or artifacts when the user requests an acceptance verdict or the active task contract requires independent review. Verify current source/project evidence and return PASS or REJECT. Do not trigger on routine work by default.
 ---
 
 # Supervisor Review
@@ -60,7 +60,7 @@ Do not continue a previous PASS/REJECT by inertia.
 2. Reconstruct the claim being asked for acceptance.
 3. Identify the authority that decides whether the claim is correct.
 4. Determine what repo/project reality must be checked.
-5. Gather current evidence from source, runtime, tests, docs, repo authority, Anvien, logs, data, or other relevant tools.
+5. Gather current evidence from source, Git, runtime, focused tests, docs, contracts, logs, and data.
 6. Verify the affected invariant is closed, not only the visible symptom.
 7. Decide PASS or REJECT from the evidence.
 8. Write the review report.
@@ -109,7 +109,7 @@ If source inspection is required but unavailable, REJECT.
 - State the real claim and authority before judging.
 - Verify the full claim against repo/project reality before PASS.
 - Inspect source before trusting build/test/report output when code reality matters.
-- Use Anvien when codebase topology, impact, contracts, dependencies, or affected flows matter.
+- Use current permitted source/Git/test evidence for codebase topology, impact, and contracts when needed.
 - Review the affected invariant, not only the visible symptom or changed lines.
 - Include direct evidence, preferably file/line evidence when source is involved.
 - Give exactly one verdict: PASS or REJECT.
@@ -122,8 +122,8 @@ If source inspection is required but unavailable, REJECT.
 - Never trust a claim, report, result, or completion statement by itself.
 - Never review only the surface artifact.
 - Never assume the current claim matches a previously seen pattern; verify against the actual artifact and repo/project state.
-- Never use Anvien or any tool as a fixed command checklist.
-- Never treat Anvien or any tool output as the verdict by itself.
+- Never use any tool as a fixed command checklist.
+- Never treat any tool output as the verdict by itself.
 - Never approve from tests alone when source/runtime reality still needs inspection.
 - Never ignore unresolved same-scope reports, blocker notes, or review findings.
 - Never claim PASS from missing, stale, indirect, partial, or narrower evidence.
@@ -136,15 +136,15 @@ If source inspection is required but unavailable, REJECT.
 
 Gather evidence from the strongest source needed for the review problem.
 
-Use Anvien when codebase evidence is needed to locate behavior, map affected files/symbols/routes/tools/contracts, inspect dependencies or impact, find sibling surfaces, or prove whether the claim covers the full invariant.
+Use direct source/Git, focused tests, runtime logs/data, contracts, and schemas as needed. Specialized code-intelligence providers are optional only when enabled by current project policy; a disabled provider is not a review blocker.
 
-Start from: what do I need to prove? Then pick the tool that answers that. Do not open Anvien, grep, or run tests by default; use them when the review question requires it.
+Start from the claim and select only tools needed to prove it. Do not run broad scans or tests by default.
 
 Evidence must be:
 
 - current for the reviewed repo/project state;
 - specific to the full claim;
-- traceable to source, runtime, command output, data, docs, authority, or Anvien result;
+- traceable to source, runtime, commands, data, docs, or project authority;
 - strong enough to prove acceptance, not just suggest confidence.
 
 Missing, stale, indirect, partial, or narrower evidence cannot support PASS.
@@ -155,7 +155,7 @@ Before writing PASS, REJECT, or any statement implying completion:
 
 1. Identify what evidence would prove the verdict.
 2. Gather the strongest available evidence fresh for the current repo/project state.
-3. Read the actual source, command output, runtime result, report, data, or Anvien result.
+3. Read the actual source, command output, runtime result, report, or data.
 4. Check whether the evidence proves the full claim, not a narrower claim.
 5. State the verdict only after the evidence supports it.
 

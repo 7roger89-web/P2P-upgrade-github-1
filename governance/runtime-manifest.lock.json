@@ -2,7 +2,7 @@
   "schema_version": "p2p-codex-runtime-manifest-lock/1",
   "root_mode": "package",
   "protected_files": {
-    ".agents/skills/.agents-skill-manifest.json": "64ddeceef2eb95a762fe9c327516caa8147c3b2559a3dbe8b80d3e06cefd321b",
+    ".agents/skills/.agents-skill-manifest.json": "b53adb4f1c5e23a6116381182ea27751c5527368e197564e536f0d423f0580d3",
     ".agents/skills/Architect-review/Hardening_loop/architect-review-hardening-loop.md": "4320ec420899b324268eb5384d7f6cd6921acc9b66857f8bd07701331bdda74e",
     ".agents/skills/Architect-review/Phase-Jobs/architect-review-phase-jobs.md": "364967d6ff8acdb9b503385d9682aa0143a3c01a66a1e0e77ee1709f51843a55",
     ".agents/skills/Architect-review/SKILL.md": "2d980c11c9264dea64be210ac22252eb2c03a14b91d98dc2beec72dd17aefef1",
@@ -559,7 +559,7 @@
     ".agents/skills/pxpipe/scripts/lib-resolve.mjs": "961436dbbd1f5f9d15fd189d1f2ee6c9ebe8da60ed695a0b47c4fe878fd46874",
     ".agents/skills/pxpipe/scripts/measure.mjs": "49072d4458f64bfd286f4f4d88eb5086941cae0b0036216b9a703a1ffc45de3c",
     ".agents/skills/qa/SKILL.md": "127d002025d43f903371efa8a1c22afa2f44171fc643151dd781042253fcbdf0",
-    ".agents/skills/rag-grounding/SKILL.md": "60aa2f1e1854463c62fc1508eed8a0f767e15b0fdbad73382b59d29930234825",
+    ".agents/skills/rag-grounding/SKILL.md": "020401f3523e5e7f722eb875291dd557c3a89f0aa13705b69f703919ae452e19",
     ".agents/skills/rag-grounding/agents/openai.yaml": "6611b096e3e8acbb3b6bd0063850e1993a555143add80e03c8fa0be1191e6924",
     ".agents/skills/rag-grounding/references/model_templates.md": "9ece5638563d7446fb22a5e7ddd1b0a563ac5d8faed8fb6c0199b61d5c47e2c7",
     ".agents/skills/rag-grounding/references/model_templates_source.txt": "0389e383ffa9620edb74b0ea623ce18018e0fb51f79404a86575b122de352c57",
@@ -595,7 +595,7 @@
     ".agents/skills/skill-creator/references/skill-md-template.md": "d573f1bbdd64aa632f9a0d01856f8618267e9cb96d0e04938013aa3cc8d33422",
     ".agents/skills/spec-architecture-discussion/SKILL.md": "cc5c9785c635f961bdd39a207f9b216a9b26053c19683c6fd8a82ea37cf286ab",
     ".agents/skills/spec-architecture-discussion/agents/openai.yaml": "b58a973800282b22c407de8e5404fd63d72105d142b542f1a81c9edd1ea18545",
-    ".agents/skills/supervisor/SKILL.md": "f26aca98d380108107fe2972cb9598e67f1d45100056ca843a2a983e408b41b1",
+    ".agents/skills/supervisor/SKILL.md": "c44811ca060c5a53beb98a2b2437ec967a263368cd74a6bebcbcf43c55039b42",
     ".agents/skills/threejs/SKILL.md": "6951503b185fd2f52bb993aa47fc2c1678c2c78285eb55e74e0c862e5fedd859",
     ".agents/skills/threejs/references/00-fundamentals.md": "b4fb7db57919c57af6dd237513ed68a8fd9db000befada77e4cf44838be890f9",
     ".agents/skills/threejs/references/01-getting-started.md": "bd572f13cbfe5a65db046aaa1e62984bcb5358bdc7772ecd60a1118dccae4bd4",
@@ -1175,6 +1175,6 @@
     "CODEX_AGENTS_CONFIG_SECTION": "337aa973c961e96011a90673291e3a3f05004dff201f9bfeb608898659a53990",
     "P2P_INSTRUCTIONS_BLOCK": "0a7a5951d856af78796167fd308da0b9c4da18947f8ab088e8a59b90c3d5c5a3"
   },
-  "generated_at": "2026-08-28T12:57:43+07:00",
-  "reason": "P2P-VISUAL-01B sparse vendor candidate technical lock"
+  "generated_at": "2026-10-10T14:20:53.019Z",
+  "reason": "Skill contract audit: hash-bound source and managed-manifest refresh"
 }

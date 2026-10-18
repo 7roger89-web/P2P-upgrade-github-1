@@ -492,11 +492,17 @@ class NoParallelArchitectureTests(unittest.TestCase):
             ".agents/skills/",
             ".claude/skills/",
             ".p2p/system/.agents/skills/",
+            # Skill-contract audit: the existing installed Claude supervisor mirror is
+            # updated byte-for-byte; admit only this exact existing file, not a new root.
+            ".p2p/system/.claude/skills/supervisor/SKILL.md",
             "AGENTS.md",
             "CLAUDE.md",
             "scripts/package_release.py",
             "scripts/doctor.py",
             "governance/research-adoption-ledger.json",
+            # Exact existing integrity-lock update is necessary when protected
+            # skill bytes change. Keep broader governance mutations prohibited.
+            "governance/runtime-manifest.lock.json",
             "docs/RESEARCH-ADOPTION-LEDGER.md",
             "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
             "tests/test_p2p_frontend_upstream_intake_01.py",
@@ -640,6 +646,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 continue
             if not path.startswith(allowed_prefixes):
                 violations.append(f"unexpected surface: {path}")
+                continue
+            if path == "governance/runtime-manifest.lock.json":
+                # This existing hash-only integrity lock contains "manifest"
+                # in its name but creates no new architecture surface.
                 continue
             lowered = path.lower()
             is_vendored_bytes = any(
