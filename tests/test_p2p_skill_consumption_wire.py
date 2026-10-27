@@ -384,7 +384,7 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         self.assertEqual(
             handoff["SKILL_SOURCE_HASHES"]["p2p-scope"],
-            "64a59449c5ace7dd49512f8c68b97f0e2f7748fac73aeaa268eb1dbe90e2bc5a",
+            "c72adf151719e4dbe10a3d05f88bc318838291c51908e645761af3b30771686b",
         )
 
     def test_natural_language_large_work_auto_routes_p2p_scope(self):
@@ -427,7 +427,7 @@ class SkillConsumptionWireTests(unittest.TestCase):
         )
         self.assertEqual(
             handoff["SKILL_SOURCE_HASHES"]["p2p-scope"],
-            "64a59449c5ace7dd49512f8c68b97f0e2f7748fac73aeaa268eb1dbe90e2bc5a",
+            "c72adf151719e4dbe10a3d05f88bc318838291c51908e645761af3b30771686b",
         )
         self.assertEqual(
             handoff["SKILL_HOST_MODE"], "ARENA_EXACT_REPO_READ"
