@@ -274,6 +274,28 @@ proxy, and keep a simple rollback.
 `DIRECT_RUNTIME_INTEGRATION=SKIP_IT`.
 `PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED`.
 
+### 4.13 Qiushi evidence-bounded blocker pilot 2026-10-27 (RA-EXT-107)
+
+This is a derived projection of canonical JSON record `RA-EXT-107`. The
+Owner selected a small behavioral trial, not wholesale adoption of
+`HughYau/qiushi-skill` (MIT, upstream `5ace7173`).
+
+Existing P2P already distinguishes FACT, INFERENCE, and UNKNOWN in its main
+skill and source-grounding contract; that capability is **not reimplemented**.
+The only new candidate is conditional, source-backed causal blocker triage in
+the existing SCOPE route when two or more material blockers obscure the next
+action. Independent blockers must not be forced into a fabricated single
+"principal contradiction"; straightforward tasks bypass the triage entirely.
+
+| ID | Source | Status | Selection | Translation |
+| --- | --- | --- | --- | --- |
+| RA-EXT-107 | HughYau/qiushi-skill @ `5ace7173` | SELECTED | conditional causal blocker choice; smallest falsifiable check; reuse P2P evidence labels | draft-only scope-skill pilot; no new skill/router/hook/runtime dependency; same-case behavioral A/B **NOT_RUN** |
+
+Do not promote, release, or assert measured gains without comparing the
+existing baseline and pilot on identical repo-review, debugging, and
+architecture-prioritization cases. Record unsupported claims, blocker selection,
+unnecessary steps, and actual tokens only where measurable.
+
 ## 5. Rejected / non-adopted register (preserved)
 
 The following patterns are permanently registered as rejected and appear in charter §7 and the capability ledger with status `REJECTED` and preserved rationale:
