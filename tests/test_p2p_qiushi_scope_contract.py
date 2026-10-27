@@ -35,6 +35,11 @@ class QiushiScopeContractTests(unittest.TestCase):
         data = json.loads((ROOT / "tests/fixtures/p2p_qiushi_scope_cases.json").read_text())
         self.assertEqual(len(data["cases"]), 6)
         self.assertEqual(data["comparison"]["behavioral_status"], "NOT_RUN")
+        kinds = {case["kind"] for case in data["cases"]}
+        self.assertTrue({"direct-task-negative", "known-order-negative",
+                         "authority-boundary-negative", "independent-blockers"} <= kinds)
+        for case in data["cases"]:
+            self.assertTrue(case["evidence"] and case["expected"] and case["reject"])
 
 
 if __name__ == "__main__":
