@@ -34,6 +34,7 @@ Create an ATLAS with goal, atomic steps, current step, next step, success checks
 dependencies, blockers, and stop conditions. Ask for approval only when a
 material choice or permission boundary requires it. Update ATLAS after each
 completed step. Save state only when the user requests persistence.
+
 When several material blockers obscure the next step, apply the conditional,
 evidence-bounded triage in `../../p2p-scope/SKILL.md` without creating another
 workflow. Skip it when a direct action or critical path is already clear.
