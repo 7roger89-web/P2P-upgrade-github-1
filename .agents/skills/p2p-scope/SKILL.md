@@ -3,7 +3,7 @@ name: p2p-scope
 description: >-
   Apply P2P SCOPE.HELM to decompose a large task into atomic steps, checkpoints, blockers,
   and stop conditions. Use when the user invokes $p2p-scope or asks to organize
-  substantial multi-step work.
+  substantial multi-step work, including choosing between competing material blockers.
 ---
 
 Read `../p2p/references/codex-adaptation.md` before applying any Claude-edition
@@ -25,4 +25,25 @@ working after PASS. Use the host plan mechanism when available. Do not add
 subagents unless the workflow's adaptive selection or an explicit user request
 justifies them.
 
-When **two or more material blockers** genuinely compete for the next action, perform one bounded bottleneck check: distinguish source-backed `FACT` from `INFERENCE` and `UNKNOWN`; ask which blocker, if resolved, would *causally* unlock another blocker or the acceptance condition; choose that blocker only when current evidence supports the dependency, then perform the smallest reversible check of that hypothesis. If blockers are independent or evidence is insufficient, say so and order work by verified dependencies, impact, and reversibility. Skip this check for direct tasks or an already-clear critical path. Do not invent a "principal contradiction", force a new output template, or add another review/coordination layer.
+## Competing-blocker triage (conditional)
+
+Activate only when two or more material blockers compete for the next action
+and the dependency order is not already proven. Skip direct tasks, a single
+blocker, or an already-clear critical path. Reuse existing Goal and evidence
+labels; do not create another tracker.
+
+1. Anchor the blocked mandatory acceptance condition. Separate verified
+   `FACT` (current source or runtime evidence), testable `INFERENCE`, and
+   `UNKNOWN`. An old report or simultaneous symptoms are not a causal link.
+2. Ask whether resolving blocker A would actually unblock B or acceptance.
+   Require observable dependency evidence. If that link is uncertain, make one
+   small, reversible read-only check that could falsify the hypothesis.
+3. When a prerequisite is proven, prefer it. For independent blockers, choose
+   by mandatory impact, dependencies, risk, and reversibility; never fabricate
+   a single principal cause. Existing permissions and Owner Gates still apply.
+4. Give one smallest next check or correction, its expected evidence, and the
+   condition that would disprove it. On contradiction, update priorities.
+   Stop at verified acceptance or a genuine BLOCKED state.
+
+Only include this reasoning in existing SCOPE/ATLAS output when it changes NEXT.
+No extra form, mandatory template, agent, router, or review workflow.
