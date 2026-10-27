@@ -3721,7 +3721,7 @@
         "When 2+ material blockers genuinely compete, prefer the source-backed blocker whose resolution causally unlocks another blocker or acceptance.",
         "Where causal precedence is unknown or blockers are independent, do not force a fictional single principal contradiction.",
         "Choose one smallest reversible/falsifiable next check, and skip the extra analysis for direct tasks.",
-        "Compare baseline vs pilot on the same three cases: repo review, debugging, and architecture prioritization; measure unsupported claims, wrong blocker choice, gratuitous steps and token use."
+        "Run a controlled same-model baseline-versus-candidate comparison on six frozen cases (three realistic and three negative controls); score unsupported claims, blocker choice, avoidable steps, authority errors, and observed token use."
       ],
       "rejected_ideas": [
         "Vendoring or installing the qiushi-skill plugin, automatic SessionStart hooks, or injecting method text every session.",
@@ -3738,7 +3738,9 @@
         "https://github.com/HughYau/qiushi-skill/blob/5ace7173b2d71fa7848c56a29f74b39d611c6cb3/skills/contradiction-analysis/SKILL.md",
         ".agents/skills/p2p/SKILL.md",
         ".agents/skills/p2p-scope/SKILL.md",
-        ".agents/skills/p2p/references/modes.md"
+        ".agents/skills/p2p/references/modes.md",
+        "tests/fixtures/p2p_qiushi_scope_cases.json",
+        "tests/test_p2p_qiushi_scope_contract.py"
       ],
       "dependencies": [
         "P2P_SUPREME_OPERATING_LAW_V1",
@@ -3748,7 +3750,7 @@
       "roadmap_slot": "minor quality pilot in existing scope route; no new roadmap goal or capability ID",
       "owner_decision_status": "OWNER_SELECTED_BOUNDED_PILOT",
       "last_reviewed_at": "2026-10-27T00:00:00+00:00",
-      "notes": "OE_GATE: SIMPLER_PATH=YES (reuse existing skill); MATERIAL_PROGRESS=YES (specific blocker-choice instruction); NECESSITY=YES only for ambiguous competing blockers; CORE_BEFORE_SUPPORT=YES; SMALLER_VERIFIABLE_SLICE=YES. Status SELECTED; not merged, not behavior-verified, no installation or hooks."
+      "notes": "OE_GATE: SIMPLER_PATH=YES (reuse existing skill); MATERIAL_PROGRESS=YES (specific blocker-choice instruction); NECESSITY=YES only for ambiguous competing blockers; CORE_BEFORE_SUPPORT=YES; SMALLER_VERIFIABLE_SLICE=YES. Status SELECTED; not merged, not behavior-verified, no installation or hooks. Frozen six-case fixture and focused static contract test added on Draft PR #349; independent model behavioral A/B still NOT_RUN. Static text assertions are not model behavior certification."
     }
   ],
   "rejected_register_summary": {
