@@ -293,7 +293,7 @@ action. Independent blockers must not be forced into a fabricated single
 
 Do not promote, release, or assert measured gains without comparing the
 existing baseline and pilot on identical repo-review, debugging, and
-architecture-prioritization cases. Record unsupported claims, blocker selection,
+architecture-prioritization cases plus three frozen negative controls. Record unsupported claims, blocker selection,
 unnecessary steps, and actual tokens only where measurable.
 
 ## 5. Rejected / non-adopted register (preserved)
