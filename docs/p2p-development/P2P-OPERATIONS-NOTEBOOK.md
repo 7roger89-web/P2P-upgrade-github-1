@@ -381,6 +381,20 @@ NO_MATCH => SKILL_CHECK=NO_MATCH
 MAX_SELECTED_SKILLS=3
 ```
 
+**Karpathy coding-skill default (Owner-directed).** For P2P-managed tasks
+that implement, fix, or refactor code, select and actually read the verified
+repo-local `.agents/skills/p2p-karpathy/SKILL.md` **before code edits** when
+available. This applies to direct executors as well as delegated prompts.
+Treat `p2p-karpathy` as one of the existing maximum three selected skills,
+paired with at most two necessary specialist skills; reuse the normal
+source-path/SHA-256 consumption receipt and routing, with no new preflight,
+registry, or second authority. Explicit higher-priority Owner skill selections
+and mandatory security/task contracts win if three slots conflict; record the
+reason if `p2p-karpathy` is displaced. When it is explicitly required, a
+missing, unreadable, or hash-mismatched file blocks execution under the
+existing fail-closed rule. Do not force this coding skill on documentation-only,
+research-only, or read-only review work unless explicitly requested.
+
 Before ChatGPT, Control Tower, or any other P2P prompt writer emits an
 operational prompt that delegates repository work to Arena, Codex, Manus,
 Claude, Grok, or another supported AI executor, the prompt writer must perform
