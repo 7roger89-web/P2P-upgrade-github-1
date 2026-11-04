@@ -4,7 +4,7 @@ description: >-
   Read-only internal knowledge search over selected Google NotebookLM notebooks
   for Trường Thành Logistics Support/Sale. Routes questions to HS, Hóa chất,
   Bộ KH&CN, Bộ TT&TT, and Bộ Y tế notebooks, returns ranked source passages and source
-  titles, and never creates/deletes notebook content or chat history. Uses the
+  titles, automatically cross-checks them against verified-only VNLAW, and never creates/deletes notebook content or chat history. Uses the
   pinned unofficial notebooklm-py connector; NotebookLM results are operational
   research, not final legal authority.
 author: 7roger89-web

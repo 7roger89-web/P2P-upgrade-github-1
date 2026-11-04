@@ -38,6 +38,8 @@ import re
 import unicodedata
 from typing import Any, Optional
 
+from . import vnlaw_bridge as _vnlaw_bridge
+
 TOOLSET = "notebooklm_knowledge"
 AUTH_ENV = "NOTEBOOKLM_AUTH_JSON"
 IDS_ENV = "NOTEBOOKLM_NOTEBOOKS_JSON"
@@ -204,11 +206,13 @@ NOTEBOOKLM_SEARCH_SCHEMA = _schema(
     "If domains is omitted, the tool deterministically routes the Vietnamese "
     "question to up to three matching notebooks. It returns ranked source "
     "passages and source titles from NotebookLM; it does NOT create or modify "
-    "notebooks and does NOT use NotebookLM chat history. Ground any answer only "
-    "in the returned passages. NotebookLM is an operational research layer, NOT "
-    "final legal authority; do not claim a binding legal conclusion solely from "
-    "this tool. If status is NEEDS_MORE_DETAIL, ask the user for product facts "
-    "instead of guessing.",
+    "notebooks and does NOT use NotebookLM chat history. After retrieval it "
+    "automatically cross-checks the question against the verified-only VNLAW "
+    "API and returns that result separately under vnlaw_cross_check. Ground "
+    "operational research only in NotebookLM passages; treat legal claims as "
+    "verified only when the VNLAW section actually contains matching verified "
+    "authority evidence. If status is NEEDS_MORE_DETAIL, ask the user for "
+    "product facts instead of guessing.",
     {
         "question": {
             "type": "string",
@@ -228,6 +232,13 @@ NOTEBOOKLM_SEARCH_SCHEMA = _schema(
         "limit_per_domain": {
             "type": "integer",
             "description": "Ranked passages per domain (default 4, max 6).",
+        },
+        "as_of_date": {
+            "type": "string",
+            "description": (
+                "Optional legal cross-check date YYYY-MM-DD. "
+                "Defaults to today's date in Vietnam."
+            ),
         },
     },
     required=("question",),
@@ -408,6 +419,7 @@ async def _search_async(
     question: str,
     domains: tuple[str, ...],
     limit_per_domain: int,
+    as_of_date: str | None,
 ) -> dict:
     try:
         from notebooklm import NotebookLMClient
@@ -459,6 +471,19 @@ async def _search_async(
                 }
             )
 
+    source_titles: list[str] = []
+    for domain_result in domain_results:
+        for passage in domain_result["passages"]:
+            title = str(passage.get("source_title") or "").strip()
+            if title and title not in source_titles:
+                source_titles.append(title)
+
+    vnlaw_cross_check = await _vnlaw_bridge.cross_check(
+        question,
+        as_of_date=as_of_date,
+        source_titles=source_titles,
+    )
+
     return {
         "status": "OK" if any(x["passages"] for x in domain_results) else "NOT_FOUND",
         "query": question,
@@ -467,10 +492,12 @@ async def _search_async(
         "provider": "NotebookLM via notebooklm-py 0.8.2 (unofficial)",
         "mode": "READ_ONLY_RANKED_PASSAGE_SEARCH",
         "legal_authority": False,
+        "vnlaw_cross_check": vnlaw_cross_check,
         "notice": (
-            "NotebookLM is an operational research source. Ground summaries only "
-            "in returned passages and verify binding legal conclusions against "
-            "VNLAW / official sources."
+            "NotebookLM is operational research. The separate VNLAW section is "
+            "the only legal-verification layer in this result; NO_VERIFIED_EVIDENCE "
+            "means VNLAW could not verify the claim in its bounded corpus, not that "
+            "the claim is legally false."
         ),
         "queried_at": _dt.datetime.now(_dt.timezone.utc).isoformat(),
     }
@@ -525,6 +552,7 @@ async def handle_notebooklm_search(args: Optional[dict], **_kwargs: Any) -> str:
                 question,
                 domains,
                 limit_per_domain,
+                args.get("as_of_date"),
             )
         )
     except _BadRequest as exc:

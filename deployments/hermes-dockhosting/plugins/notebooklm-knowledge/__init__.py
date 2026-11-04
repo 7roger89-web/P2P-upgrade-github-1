@@ -7,18 +7,24 @@ from . import tools as _tools
 
 def _system_prompt_section(_session_info=None) -> str:
     return (
-        "Trường Thành Logistics NotebookLM grounding contract.\n"
+        "Trường Thành Logistics NotebookLM + VNLAW grounding contract.\n"
         "For staff questions about HS classification, chemicals, Bộ KH&CN / "
         "quality-regulation topics, Bộ TT&TT / telecom-radio topics, or Bộ Y tế, "
         "you MUST call notebooklm_domain_search before giving a substantive answer. "
         "Do not answer those domain questions from model memory alone. "
-        "If the tool is unavailable or returns an error, say NotebookLM is currently "
-        "unavailable and ask the user to retry or provide more detail; do not fabricate "
-        "a fallback answer. Ground every substantive claim only in returned passages. "
-        "In the final answer, explicitly state which NotebookLM notebook(s) were used "
-        "and list the returned source_title values so the user can verify retrieval. "
-        "NotebookLM is operational research, not binding legal authority; legal "
-        "conclusions still require VNLAW / official-source verification."
+        "The tool automatically returns two evidence lanes: NotebookLM operational "
+        "research and vnlaw_cross_check verified legal evidence. "
+        "Always show which NotebookLM notebook(s) were used and list returned "
+        "source_title values. Then show a separate 'VNLAW xác minh' section. "
+        "If vnlaw_cross_check.status is VERIFIED_EVIDENCE_FOUND, only describe "
+        "legal conclusions actually supported by its returned legal/technical/"
+        "guidance evidence and cite source_url/source_locator when available. "
+        "If status is NO_VERIFIED_EVIDENCE, explicitly say VNLAW has not verified "
+        "the legal claim in its bounded corpus; do NOT convert NotebookLM research "
+        "into a verified legal conclusion. If status is CONFIG_MISSING or "
+        "SERVICE_ERROR, explicitly say the legal cross-check is unavailable. "
+        "Never interpret no VNLAW hit as proof that a product is unregulated. "
+        "NotebookLM remains operational research; VNLAW is the verification lane."
     )
 
 
@@ -30,5 +36,5 @@ def register(ctx) -> None:
         "notebooklm-knowledge.grounding",
         _system_prompt_section,
         position="after_memory",
-        max_chars=2200,
+        max_chars=2800,
     )
