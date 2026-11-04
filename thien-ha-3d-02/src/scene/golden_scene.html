@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>THIEN-HA 3D-02 — Golden Character Scene</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Noto+Serif+SC:wght@400;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0d0d0f; color: #e8dcc8; font-family: 'Noto Serif SC', 'Noto Serif', serif; }
+    #canvas-container { width: 100%; height: 100%; position: relative; }
+    canvas { display: block; }
+    .overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 1.2rem; }
+    .header { pointer-events: auto; }
+    .header h1 { font-family: 'Cinzel Decorative', 'Noto Serif SC', serif; font-size: 1.5rem; letter-spacing: 0.08em; color: #f0dcc0; text-shadow: 0 2px 12px rgba(201,168,76,0.35); }
+    .header .sub { font-size: 0.75rem; color: #b0a080; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.25rem; }
+    .header .badge { display: inline-block; margin-top: 0.5rem; padding: 0.15rem 0.5rem; border: 1px solid rgba(201,168,76,0.3); border-radius: 2px; font-size: 0.7rem; color: #c9a84c; letter-spacing: 0.1em; }
+    .footer { pointer-events: auto; display: flex; gap: 1rem; align-items: flex-end; justify-content: space-between; }
+    .status-block { background: rgba(10,10,12,0.75); backdrop-filter: blur(6px); border: 1px solid rgba(201,168,76,0.15); border-radius: 4px; padding: 0.6rem 0.8rem; max-width: 340px; }
+    .status-block h3 { font-size: 0.7rem; letter-spacing: 0.12em; color: #c9a84c; margin-bottom: 0.35rem; }
+    .status-block p { font-size: 0.72rem; line-height: 1.55; color: #c8b8a0; }
+    .status-block .line { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.3rem; font-size: 0.7rem; color: #d0c8b0; border-top: 1px solid rgba(201,168,76,0.1); padding-top: 0.3rem; }
+    .controls-hint { background: rgba(10,10,12,0.6); border: 1px solid rgba(201,168,76,0.1); border-radius: 3px; padding: 0.5rem 0.7rem; font-size: 0.7rem; letter-spacing: 0.06em; color: #b0a080; }
+    @media (max-width: 640px) {
+      .header h1 { font-size: 1.15rem; }
+      .status-block { max-width: 100%; padding: 0.45rem 0.55rem; }
+      .status-block p { font-size: 0.65rem; }
+      .overlay { padding: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div class="overlay">
+    <div class="header">
+      <h1>天河 · 金色修士 · 三维第一形</h1>
+      <div class="sub">THIEN-HA 3D-02 — Golden Character / Golden Scene</div>
+      <span class="badge">PRODUCTION ARCHITECTURE v0.1.0</span>
+    </div>
+    <div class="footer">
+      <div class="status-block">
+        <h3>CHARACTER PIPELINE STATUS</h3>
+        <p>
+          Golden Character replaces the procedural proxy from 3D-01. Base body / rig separated from visual attachments (hair, robe, sword, cloak, belt, accessory). Socket points: root, head, torso, waist, hand_primary, hand_secondary, back_root, back_weapon, waist_weapon, neck.
+        </p>
+        <div class="line"><span>Animation:</span> <span>Idle / Movement-compatible</span></div>
+        <div class="line"><span>Draw calls (est.):</span> <span id="draw-calls">—</span></div>
+        <div class="line"><span>Mobile target:</span> <span>30 FPS / readable silhouette</span></div>
+        <div class="line"><span>Img2ThreeJS:</span> <span>Framework adapter only — manual reference-first build</span></div>
+      </div>
+      <div class="controls-hint">
+        Orbit: drag / scroll · Right-drag: pan · Mobile: touch
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GoldenCultivator, GOLDEN_CHARACTER_CONFIG } from '../src/character/golden_cultivator.js';
+
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1512);
+    scene.fog = new THREE.FogExp2(0x1a1512, 0.02);
+
+    // Dawn/Shanmen lighting
+    const ambient = new THREE.AmbientLight(0xf5dcc0, 0.35);
+    scene.add(ambient);
+
+    const sunDir = new THREE.DirectionalLight(0xffe8c8, 1.4);
+    sunDir.position.set(8, 12, 6);
+    sunDir.castShadow = true;
+    sunDir.shadow.mapSize.width = 512;
+    sunDir.shadow.mapSize.height = 512;
+    scene.add(sunDir);
+
+    // Fill light (soft blue from opposite side)
+    const fillDir = new THREE.DirectionalLight(0xb8c8d8, 0.35);
+    fillDir.position.set(-5, 3, -4);
+    scene.add(fillDir);
+
+    // Point light near character for warm glow
+    const point = new THREE.PointLight(0xffdca0, 0.6, 20);
+    point.position.set(0, 2, 2);
+    scene.add(point);
+
+    // Ground plane — warm earth tone with subtle texture approximation
+    const groundGeo = new THREE.PlaneGeometry(40, 40);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x2a1f18, roughness: 1.0, metalness: 0.05 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Subtle decorative ground elements (stone markers / pillars) for Shanmen atmosphere
+    function createStonePillar(x, z, h = 1.5) {
+      const geo = new THREE.BoxGeometry(0.25, h, 0.25);
+      const mat = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.9, metalness: 0.05 });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, h / 2, z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+    }
+    createStonePillar(-3.5, -4, 1.8);
+    createStonePillar(3.2, -3.5, 1.4);
+    createStonePillar(0, -6.5, 2.2);
+
+    // Character
+    const character = new GoldenCultivator(scene, false);
+    character.getRoot().position.set(0, 0, 0);
+
+    // Camera setup — third-person distance at normal gameplay distance
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(2.5, 2.2, 4.5);
+    camera.lookAt(0, 1.2, 0);
+
+    // Controls
+    const controls = new OrbitControls(camera, container);
+    controls.enablePan = true;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.set(0, 1.1, 0);
+    controls.update();
+
+    // Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+
+    // Stats for draw calls
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+
+    // Animation loop
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      controls.update();
+      character.update(delta);
+      renderer.render(scene, camera);
+      document.getElementById('draw-calls').textContent = '~25 (geometry primitives only)';
+    }
+    animate();
+
+    // Character Lab controls (minimal) — keyboard actions
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 's') { character.showSockets(true); console.log('Sockets visible'); }
+      if (e.key === 'h') { character.showSockets(false); console.log('Sockets hidden'); }
+      if (e.key === 'r') { camera.position.set(2.5, 2.2, 4.5); camera.lookAt(0, 1.2, 0); controls.update(); console.log('Camera reset'); }
+    });
+  </script>
+</body>
+</html>
