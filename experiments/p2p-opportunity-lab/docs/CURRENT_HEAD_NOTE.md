@@ -1,0 +1,1 @@
+The branch head is the authority for this experimental staging lane. PR #180 body may lag during active implementation; `PROJECT_STATE.md`, pilot `VALIDATION_STATUS.md`, and exact branch head are the durable execution state. Do not infer capability readiness from an older PR body alone.

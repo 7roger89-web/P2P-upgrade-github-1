@@ -1,0 +1,144 @@
+{
+  "context": {
+    "containers": 2,
+    "shipments": 1,
+    "bl_count": 1,
+    "weight_kg": 0,
+    "cbm": 0,
+    "as_of_date": "2026-09-16",
+    "fx_rates": [
+      {
+        "from": "CNY",
+        "to": "USD",
+        "rate": "0.14",
+        "source_ref": "fx:2026-09-16:cny-usd",
+        "as_of_date": "2026-09-16"
+      }
+    ],
+    "location_aliases": {
+      "CNSHA": {
+        "canonical": "SHANGHAI",
+        "source_ref": "loc:unlocode:cnsha"
+      }
+    }
+  },
+  "quotes": [
+    {
+      "quote_id": "VAL-A",
+      "provider": "Forwarder A",
+      "currency": "USD",
+      "route": {"origin": "Shanghai", "destination": "Hai Phong"},
+      "equipment": "40HC",
+      "valid_from": "2026-09-01",
+      "valid_to": "2026-09-30",
+      "charges": [
+        {
+          "line_id": "A-FRT",
+          "name": "Ocean Freight",
+          "amount": 900,
+          "basis": "PER_CONTAINER",
+          "scope": "MAIN",
+          "source_ref": "a:p1:r1"
+        },
+        {
+          "line_id": "A-THC",
+          "name": "THC",
+          "amount": 700,
+          "currency": "CNY",
+          "basis": "PER_SHIPMENT",
+          "scope": "MAIN",
+          "source_ref": "a:p1:r2"
+        },
+        {
+          "line_id": "A-BAF",
+          "name": "BAF",
+          "percentage_rate": 5,
+          "percentage_of_line_ids": ["A-FRT"],
+          "basis": "PER_SHIPMENT",
+          "scope": "MAIN",
+          "source_ref": "a:p1:r3"
+        },
+        {
+          "line_id": "A-DOC",
+          "name": "Documentation Fee",
+          "amount": 40,
+          "basis": "PER_BL",
+          "scope": "MAIN",
+          "source_ref": "a:p1:r4"
+        },
+        {
+          "line_id": "A-INS",
+          "name": "Insurance",
+          "amount": 500,
+          "currency": "CNY",
+          "basis": "PER_SHIPMENT",
+          "scope": "OTHER",
+          "optional": true,
+          "selected": false,
+          "source_ref": "a:p1:r5"
+        }
+      ]
+    },
+    {
+      "quote_id": "VAL-B",
+      "provider": "Forwarder B",
+      "currency": "USD",
+      "route": {"origin": "CNSHA", "destination": "Hai Phong"},
+      "equipment": "40HQ",
+      "valid_from": "2026-09-01",
+      "valid_to": "2026-09-30",
+      "charges": [
+        {
+          "line_id": "B-ALLIN",
+          "name": "All-in Freight",
+          "amount": 950,
+          "basis": "PER_CONTAINER",
+          "scope": "MAIN",
+          "source_ref": "b:p1:r1",
+          "bundle_includes": ["Freight", "THC"],
+          "bundle_primary_code": "Freight"
+        },
+        {
+          "line_id": "B-BAF",
+          "name": "BAF",
+          "included": true,
+          "basis": "INCLUDED",
+          "scope": "MAIN",
+          "source_ref": "b:p1:r2"
+        },
+        {
+          "line_id": "B-DOC",
+          "name": "DOC",
+          "amount": 40,
+          "basis": "PER_BL",
+          "scope": "MAIN",
+          "source_ref": "b:p1:r3"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "ranking": [
+      {"quote_id": "VAL-B", "total": "1940"},
+      {"quote_id": "VAL-A", "total": "2028"}
+    ],
+    "required_charge_codes": [
+      "MAIN::BAF",
+      "MAIN::DOC",
+      "MAIN::FREIGHT",
+      "MAIN::THC"
+    ],
+    "fx_applied": true,
+    "fx_quote_id": "VAL-A",
+    "fx_from": "CNY",
+    "fx_to": "USD",
+    "fx_converted_amount": "98.00",
+    "percentage_quote_id": "VAL-A",
+    "percentage_line_id": "A-BAF",
+    "percentage_base_total": "1800",
+    "percentage_resolved_total": "90",
+    "aliased_quote_id": "VAL-B",
+    "aliased_origin_raw": "CNSHA",
+    "aliased_origin_canonical": "SHANGHAI"
+  }
+}

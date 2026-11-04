@@ -1,0 +1,97 @@
+# Validation test matrix
+
+Current committed regression inventory:
+
+- market gate: 5 tests;
+- prospect bridge: 5 tests;
+- concierge engine: 20 tests;
+- route-alias provenance: 2 tests;
+- conditional commercial terms: 3 tests;
+- charge semantics guard: 9 tests;
+- multi-equipment FCL portfolio semantics: 10 tests;
+- percentage surcharge resolver: 5 core tests + 2 optional-percentage delegation tests;
+- explicit FX resolver: 6 tests;
+- atomic validated pipeline: 2 percentage integration contracts + 2 FX-first integration contracts;
+- validated FCL portfolio pipeline: 3 percentage integration contracts + 2 FX-first integration contracts;
+- experiment tracker: 5 tests;
+- legacy synthetic quote fixture: 1 deterministic core-engine fixture test;
+- validated golden quote fixture: 2 top-level tests (end-to-end evidence/ranking + input-order invariance);
+- dirty quote adversarial lane: 4 top-level validated-pipeline tests;
+- dirty commercial/validity adversarial lane: 4 top-level validated-pipeline tests;
+- quote identity integrity: 2 tests (core + validated entrypoint duplicate-ID refusal);
+- design-partner shortlist fixture: 4 tests exercising 6 evidence-backed candidates against qualification/stage/score/no-money-signal invariants.
+
+**Exact collected total: 98 tests.**
+
+Coverage regressions prove that a quote cannot win by silently omitting charges; unresolved omissions block ranking, and a missing charge is resolved only by evidenced `INCLUDED` or `NOT_APPLICABLE` status.
+
+Validity regressions prove that expired/not-yet-valid quotes are excluded when an explicit comparison date is supplied; malformed quote dates are excluded and a malformed comparison date fails loudly.
+
+Minimum-charge regressions prove that `rate × quantity` is floored by an evidenced `minimum_amount`, the floor is not applied when usage pricing already exceeds it, and invalid negative minimums are rejected.
+
+Conditional-term regressions prove that unresolved `subject to` / conditional commercial terms block ranking, an evidenced resolution restores rankability, and merely claiming a term is resolved without a resolution source does not.
+
+Comparison-group regressions prove that a first-position outlier cannot become the baseline, ambiguous equal groups require an explicit target, equivalent equipment aliases normalize together, and materially different equipment remains separate.
+
+Route-alias regressions require an explicit alias plus non-empty source evidence before routes may be merged. Applied aliases are exposed through `route_alias_audit`.
+
+Charge-semantics regressions cover scoped charge identity, duplicate blocking, all-in bundle expansion, bundle/component double-count blocking, and explicit optional/add-on selection.
+
+Multi-equipment FCL regressions cover required-equipment completeness, canonical equipment aliases, shared-charge single application, apples-to-apples charge coverage, evidenced coverage resolutions, bundle coverage, conditions, and validity at equipment-offer level.
+
+Percentage-surcharge contracts cover named bases, quantity-adjusted bases, multiple bases, missing-base refusal, percentage-on-percentage refusal, and delegation of unselected/ambiguous optional percentage lines to the downstream optional-service guard.
+
+FX contracts cover direct evidenced conversion, minimum-amount conversion, missing-rate refusal, missing-source refusal, future-rate refusal, and skipping unnecessary FX for an explicitly unselected optional add-on.
+
+Top-level atomic pipeline order is:
+
+`FX -> percentage -> charge semantics -> core comparison`
+
+Top-level FCL portfolio pipeline applies the same order independently to every required equipment offer and shared provider bucket.
+
+## Validated golden fixture
+
+`pilots/logistics-quote-comparison/fixtures/synthetic-validated-quote-set-02.json` is the top-level integration fixture. It exercises evidenced `CNY -> USD` conversion, `BAF = 5% of FREIGHT`, an evidenced all-in bundle, optional exclusion, evidence-backed `CNSHA -> SHANGHAI` aliasing, `40HQ -> 40HC` normalization, scoped coverage and final ranking.
+
+Expected deterministic ranking is `VAL-B USD 1940 < VAL-A USD 2028`. A companion adversarial golden test reverses quote order and every charge-line order; ranking, required coverage, FX application and core evidence resolutions must remain identical.
+
+## Dirty quote adversarial contracts
+
+`tests/test_dirty_quote_adversarial.py` proves at the top-level entrypoint that:
+
+- deleting a required `DOC` charge cannot manufacture a false cheapest quote;
+- alias-equivalent duplicate freight is blocked as `DUPLICATE_PRICED_CHARGE`;
+- conflicting evidenced direct FX rates are rejected as `AMBIGUOUS_FX_RATE` rather than arbitrarily selected;
+- missing provenance on a named percentage base blocks dependent surcharge resolution.
+
+## Dirty commercial and validity contracts
+
+`tests/test_dirty_commercial_adversarial.py` proves that:
+
+- expired quotes are excluded as `EXPIRED`;
+- malformed validity dates are excluded as `INVALID_VALIDITY_DATE` rather than guessed;
+- unresolved `subject to` terms make a quote incomplete;
+- `resolved=true` without a non-empty `resolution_source_ref` does not manufacture a resolution.
+
+## Identity integrity contracts
+
+`tests/test_identity_integrity.py` protects quote identity before downstream evidence lookup and grouping.
+
+- the core engine rejects duplicate non-empty `quote_id` values before normalization/group selection;
+- the top-level validated pipeline performs the same uniqueness check before FX or percentage resolution.
+
+Duplicate quote IDs fail loudly with `ValueError`; they are not allowed to share coverage resolutions, audits, exclusions or ranking identity. Existing percentage semantics already reject duplicate non-empty `line_id` values, so the identity slice adds no redundant second implementation for line IDs.
+
+These adversarial lanes intentionally reward refusal when evidence is incomplete, contradictory, stale, malformed, conditionally unresolved or ambiguously identified. A safe `no decision` is preferable to a fabricated winner.
+
+## Focused CI acceptance surface
+
+Workflow: `.github/workflows/p2p-opportunity-lab-focused.yml`.
+
+The workflow intentionally uses only the Python standard library test runner:
+
+`python -m unittest discover -s tests -p 'test_*.py' -v`
+
+No external pytest installation is required. Every substantive branch mutation must obtain fresh exact-head focused-CI evidence plus P2P Shield evidence before the new head inherits PASS status. Exact accepted head/run IDs are maintained in PR #180 and Issue #181 rather than committed here, avoiding a self-referential commit loop.
+
+Synthetic, shortlist, and regression fixtures are not market evidence; they protect deterministic behavior before real participant data arrives.

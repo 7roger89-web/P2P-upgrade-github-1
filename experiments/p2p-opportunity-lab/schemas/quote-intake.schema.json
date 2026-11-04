@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p://opportunity-lab/quote-intake/1",
+  "title": "P2P Concierge Quote Intake",
+  "type": "object",
+  "required": ["participant_id", "quote_id", "source_type", "redaction_confirmed", "currency", "route", "equipment", "charges"],
+  "properties": {
+    "participant_id": {"type": "string", "minLength": 1},
+    "quote_id": {"type": "string", "minLength": 1},
+    "provider": {"type": "string"},
+    "source_type": {"enum": ["PDF", "XLSX", "IMAGE", "EMAIL_TEXT", "WHATSAPP_TEXT", "OTHER"]},
+    "source_name": {"type": "string"},
+    "redaction_confirmed": {"const": true},
+    "currency": {"type": "string", "pattern": "^[A-Za-z]{3}$"},
+    "route": {
+      "type": "object",
+      "required": ["origin", "destination"],
+      "properties": {
+        "origin": {"type": "string", "minLength": 1},
+        "destination": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "equipment": {"type": "string", "minLength": 1},
+    "valid_from": {"type": ["string", "null"]},
+    "valid_to": {"type": ["string", "null"]},
+    "charges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "basis", "source_ref"],
+        "properties": {
+          "line_id": {"type": "string", "minLength": 1},
+          "name": {"type": "string", "minLength": 1},
+          "amount": {"type": ["number", "string", "null"]},
+          "minimum_amount": {"type": ["number", "string", "null"]},
+          "currency": {"type": ["string", "null"]},
+          "basis": {"enum": ["PER_SHIPMENT", "PER_CONTAINER", "PER_BL", "PER_KG", "PER_CBM", "INCLUDED", "UNKNOWN"]},
+          "scope": {"enum": ["UNSPECIFIED", "ORIGIN", "MAIN", "DESTINATION", "OTHER"]},
+          "bundle_includes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "bundle_primary_code": {"type": "string", "minLength": 1},
+          "percentage_rate": {"type": ["number", "string", "null"]},
+          "percentage_of_line_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "optional": {"type": "boolean"},
+          "selected": {"type": "boolean"},
+          "included": {"type": "boolean"},
+          "uncertain": {"type": "boolean"},
+          "source_ref": {"type": "string", "minLength": 1},
+          "note": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "source_ref"],
+        "properties": {
+          "text": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1},
+          "resolved": {"type": "boolean"},
+          "resolution_source_ref": {"type": "string"},
+          "resolution_note": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

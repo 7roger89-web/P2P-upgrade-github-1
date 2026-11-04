@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p://opportunity-lab/opportunity-packet/1",
+  "title": "P2P Opportunity Packet",
+  "type": "object",
+  "required": ["problem", "target_user", "hypothesis", "evidence", "experiment"],
+  "properties": {
+    "problem": {"type": "string", "minLength": 1},
+    "target_user": {"type": "string", "minLength": 1},
+    "hypothesis": {"type": "string", "minLength": 1},
+    "evidence": {"$ref": "evidence-ledger.schema.json"},
+    "contradicting_evidence": {"type": "array"},
+    "unknowns": {"type": "array", "items": {"type": "string"}},
+    "experiment": {
+      "type": "object",
+      "properties": {
+        "status": {"enum": ["NOT_STARTED", "DESIGNED", "RUNNING", "COMPLETED"]},
+        "source_class": {"enum": ["OBSERVED", "USER_SAID", "INFERRED", "ASSUMED"]},
+        "success_threshold": {"type": "string"},
+        "failure_threshold": {"type": "string"},
+        "success_threshold_reached": {"type": "boolean"},
+        "failure_threshold_reached": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "decision": {"enum": ["KILL", "RESEARCH_MORE", "VALIDATE", "BUILD"]},
+    "owner_action_required": {"type": "string"}
+  },
+  "additionalProperties": true
+}

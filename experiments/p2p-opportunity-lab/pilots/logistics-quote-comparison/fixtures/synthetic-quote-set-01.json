@@ -1,0 +1,56 @@
+{
+  "context": {
+    "containers": 2,
+    "shipments": 1,
+    "bl_count": 1,
+    "weight_kg": 0,
+    "cbm": 0
+  },
+  "quotes": [
+    {
+      "quote_id": "SYN-A",
+      "provider": "Carrier A",
+      "currency": "USD",
+      "route": {"origin": "Shanghai", "destination": "Hai Phong"},
+      "equipment": "40HC",
+      "charges": [
+        {"name": "Ocean Freight", "amount": 950, "basis": "PER_CONTAINER", "source_ref": "a:p1:r1"},
+        {"name": "Terminal Handling Charge", "amount": 120, "basis": "PER_SHIPMENT", "source_ref": "a:p1:r2"},
+        {"name": "Documentation Fee", "amount": 40, "basis": "PER_BL", "source_ref": "a:p1:r3"},
+        {"name": "PSS", "included": true, "basis": "INCLUDED", "source_ref": "a:p1:r4"}
+      ]
+    },
+    {
+      "quote_id": "SYN-B",
+      "provider": "Carrier B",
+      "currency": "USD",
+      "route": {"origin": "Shanghai", "destination": "Hai Phong"},
+      "equipment": "40HC",
+      "charges": [
+        {"name": "Sea Freight", "amount": 900, "basis": "PER_CONTAINER", "source_ref": "b:p2:r1"},
+        {"name": "THC", "included": true, "basis": "INCLUDED", "source_ref": "b:p2:r2"},
+        {"name": "DOC", "amount": 50, "basis": "PER_BL", "source_ref": "b:p2:r3"},
+        {"name": "PSS", "amount": 80, "basis": "PER_CONTAINER", "source_ref": "b:p2:r4"}
+      ]
+    },
+    {
+      "quote_id": "SYN-C",
+      "provider": "Carrier C",
+      "currency": "CNY",
+      "route": {"origin": "Shanghai", "destination": "Hai Phong"},
+      "equipment": "40HC",
+      "charges": [
+        {"name": "Freight", "amount": 6400, "basis": "PER_CONTAINER", "source_ref": "c:p1:r1"}
+      ]
+    }
+  ],
+  "expected": {
+    "ranking": [
+      {"quote_id": "SYN-B", "total": "2010"},
+      {"quote_id": "SYN-A", "total": "2060"}
+    ],
+    "excluded": {"quote_id": "SYN-C", "reason": "CURRENCY_MISMATCH"},
+    "required_charge_codes": ["DOC", "FREIGHT", "PSS", "THC"],
+    "fx_applied": false
+  }
+}

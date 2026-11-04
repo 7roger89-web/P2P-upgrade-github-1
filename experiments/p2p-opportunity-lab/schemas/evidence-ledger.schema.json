@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "p2p://opportunity-lab/evidence-ledger/1",
+  "title": "P2P Opportunity Evidence Ledger",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["class", "signal", "source"],
+    "properties": {
+      "class": {"enum": ["OBSERVED", "USER_SAID", "INFERRED", "ASSUMED"]},
+      "signal": {"type": "string", "minLength": 1},
+      "source": {"type": "string", "minLength": 1},
+      "direction": {"enum": ["SUPPORTS", "CONTRADICTS", "NEUTRAL"]},
+      "severity": {"enum": ["LOW", "MEDIUM", "HIGH", "FATAL"]},
+      "resolved": {"type": "boolean"},
+      "note": {"type": "string"}
+    },
+    "additionalProperties": true
+  }
+}
