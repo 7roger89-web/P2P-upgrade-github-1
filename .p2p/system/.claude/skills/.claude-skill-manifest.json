@@ -812,12 +812,12 @@
     "supervisor": {
       "installPath": "supervisor",
       "sourceRoot": "skills/supervisor",
-      "hash": "sha256:e60650a88de487986a58c00d92c2d1980d17afcc3634f59849261cce4aed2236",
+      "hash": "sha256:a0a5c746fc79d1b07dea6eab239b3b779cd3efb136e5ca3777201f1cd718c285",
       "managed": true,
       "entryCount": 1,
       "fileCount": 1,
       "files": {
-        "SKILL.md": "sha256:f26aca98d380108107fe2972cb9598e67f1d45100056ca843a2a983e408b41b1"
+        "SKILL.md": "sha256:c44811ca060c5a53beb98a2b2437ec967a263368cd74a6bebcbcf43c55039b42"
       }
     },
     "threejs": {
