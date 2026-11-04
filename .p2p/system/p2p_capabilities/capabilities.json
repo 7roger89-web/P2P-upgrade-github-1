@@ -383,9 +383,9 @@
           "network_runtime": false,
           "credentials": false,
           "install_mode": "REPO_NATIVE",
-          "entrypoint_sha256": "64a59449c5ace7dd49512f8c68b97f0e2f7748fac73aeaa268eb1dbe90e2bc5a"
+          "entrypoint_sha256": "c72adf151719e4dbe10a3d05f88bc318838291c51908e645761af3b30771686b"
         },
-        "snapshot_sha256": "64a59449c5ace7dd49512f8c68b97f0e2f7748fac73aeaa268eb1dbe90e2bc5a",
+        "snapshot_sha256": "c72adf151719e4dbe10a3d05f88bc318838291c51908e645761af3b30771686b",
         "snapshot_scope": "SKILL.md entrypoint bytes; shared p2p references remain declared deep-load resources"
       },
       "VERSION": "p2p-1",

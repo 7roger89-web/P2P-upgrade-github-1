@@ -497,6 +497,9 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "scripts/package_release.py",
             "scripts/doctor.py",
             "governance/research-adoption-ledger.json",
+            # PR #349 bounded case fixture and focused source-only regression.
+            "tests/fixtures/p2p_qiushi_scope_cases.json",
+            "tests/test_p2p_qiushi_scope_contract.py",
             "docs/RESEARCH-ADOPTION-LEDGER.md",
             "docs/p2p-development/research/P2P-FRONTEND-UPSTREAM-INTAKE-01.md",
             "tests/test_p2p_frontend_upstream_intake_01.py",
@@ -693,6 +696,7 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 ".p2p/system/p2p_capabilities/p2p_fw01_loop.py",
                 ".p2p/system/p2p_capabilities/control_tower_handoff.py",
                 "tests/test_p2p_skill_consumption_wire.py",
+                "tests/test_p2p_qiushi_scope_contract.py",
                 # Issue #308: existing read-only post-execution Quality
                 # Intelligence surface; no new runtime authority.
                 ".p2p/system/p2p_capabilities/quality_intelligence.py",

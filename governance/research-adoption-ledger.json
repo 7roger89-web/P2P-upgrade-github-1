@@ -3707,6 +3707,50 @@
       "owner_decision_status": "OWNER_SELECTED_READ_COMPLETE_PILOT_DEFERRED_UNTIL_REAL_GPU_LANE",
       "last_reviewed_at": "2026-10-12T08:23:00+00:00",
       "notes": "OE_VERDICT=DO_IT for one bounded READ-stage record. DIRECT_RUNTIME_INTEGRATION=SKIP_IT. PILOT_OE_VERDICT=DEFER_UNTIL_NEEDED. The 2026-10-06 forum post is treated as a community claim, not authority. No claim is made that DeepGEMM is ineffective; the decision is that its correct integration layer is a compatible serving backend, not P2P core, and target-domain value remains unmeasured. CI surface reconciliation: standalone research note removed after the existing no-parallel-surface contract rejected the new path; authoritative JSON ledger plus existing human projection remain the durable record."
+    },
+    {
+      "research_id": "RA-EXT-107",
+      "source_name": "HughYau/qiushi-skill — evidence-bounded principal-blocker triage method",
+      "source_type": "GITHUB_REPOSITORY",
+      "source_reference": "https://github.com/HughYau/qiushi-skill",
+      "source_version_or_commit": "main@5ace7173b2d71fa7848c56a29f74b39d611c6cb3; package.json 2.0.0 (MIT), inspected 2026-10-27",
+      "provenance_status": "UPSTREAM_PRIMARY_SKILLS_READ; P2P_SCOPE_AND_DISPATCHER_FRESH_READ; BEHAVIORAL_A_B_NOT_RUN",
+      "research_summary": "Qiushi investigation-first and contradiction-analysis advocate observed evidence, fact/inference/unknown separation, and finding the causally primary blocker. P2P already implements FACT/INFERENCE/UNKNOWN labels in .agents/skills/p2p/SKILL.md, grounded UNKNOWN in rag-grounding, and anti-overengineering in Supreme Law. The missing narrow guidance is how the existing scope route chooses its immediate next check when multiple material blockers compete. This is a selected instructions-only pilot, not proof of behavioral uplift.",
+      "selected_ideas": [
+        "Reuse existing P2P FACT / INFERENCE / UNKNOWN contract without creating another evidence ledger.",
+        "When 2+ material blockers genuinely compete, prefer the source-backed blocker whose resolution causally unlocks another blocker or acceptance.",
+        "Where causal precedence is unknown or blockers are independent, do not force a fictional single principal contradiction.",
+        "Choose one smallest reversible/falsifiable next check, and skip the extra analysis for direct tasks.",
+        "Run a controlled same-model baseline-versus-candidate comparison on six frozen cases (three realistic and three negative controls); score unsupported claims, blocker choice, avoidable steps, authority errors, and observed token use."
+      ],
+      "rejected_ideas": [
+        "Vendoring or installing the qiushi-skill plugin, automatic SessionStart hooks, or injecting method text every session.",
+        "New P2P skill, router, reviewer role, registry, workflow framework, or mandatory template.",
+        "Replacing P2P Supreme Law or changing platform instruction precedence.",
+        "Claiming measured productivity, quality, or token improvements before independent same-case A/B."
+      ],
+      "p2p_translation": "SELECTED FOR BOUNDED DRAFT PILOT ONLY: extend the existing p2p-scope guidance with conditional evidence-backed causal blocker triage and link the existing p2p scope mode to it. No new capability identity, runtime dependency, additional agent, router, permission, release, deployment, or production effect. The pilot is not SHIPPED or VERIFIED until behavioral A/B and normal PR review pass.",
+      "capability_family": "QUALITY_AND_EVIDENCE",
+      "canonical_capability_ids": [],
+      "status": "SELECTED",
+      "evidence_pointers": [
+        "https://github.com/HughYau/qiushi-skill/blob/5ace7173b2d71fa7848c56a29f74b39d611c6cb3/skills/investigation-first/SKILL.md",
+        "https://github.com/HughYau/qiushi-skill/blob/5ace7173b2d71fa7848c56a29f74b39d611c6cb3/skills/contradiction-analysis/SKILL.md",
+        ".agents/skills/p2p/SKILL.md",
+        ".agents/skills/p2p-scope/SKILL.md",
+        ".agents/skills/p2p/references/modes.md",
+        "tests/fixtures/p2p_qiushi_scope_cases.json",
+        "tests/test_p2p_qiushi_scope_contract.py"
+      ],
+      "dependencies": [
+        "P2P_SUPREME_OPERATING_LAW_V1",
+        "existing P2P SCOPE.HELM",
+        "behavioral A/B evaluation before runtime acceptance"
+      ],
+      "roadmap_slot": "minor quality pilot in existing scope route; no new roadmap goal or capability ID",
+      "owner_decision_status": "OWNER_SELECTED_BOUNDED_PILOT",
+      "last_reviewed_at": "2026-10-27T00:00:00+00:00",
+      "notes": "OE_GATE: SIMPLER_PATH=YES (reuse existing skill); MATERIAL_PROGRESS=YES (specific blocker-choice instruction); NECESSITY=YES only for ambiguous competing blockers; CORE_BEFORE_SUPPORT=YES; SMALLER_VERIFIABLE_SLICE=YES. Status SELECTED; not merged, not behavior-verified, no installation or hooks. Frozen six-case fixture and focused static contract test added on Draft PR #349; independent model behavioral A/B still NOT_RUN. Static text assertions are not model behavior certification."
     }
   ],
   "rejected_register_summary": {
@@ -3735,7 +3779,7 @@
       "ai_self_report_as_evidence"
     ]
   },
-  "last_reviewed": "2026-10-12T08:23:00+00:00",
+  "last_reviewed": "2026-10-27T00:00:00+00:00",
   "notes": [
     "Human projection: docs/RESEARCH-ADOPTION-LEDGER.md. On conflict this JSON wins."
   ]
