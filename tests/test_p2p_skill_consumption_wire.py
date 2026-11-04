@@ -7,7 +7,9 @@ import shutil
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SYSTEM_ROOT = REPO_ROOT / ".p2p" / "system"
@@ -1259,6 +1261,9 @@ class PromptOnlyCleanExtractionTests(unittest.TestCase):
         self.assertEqual(args.host, "CLAUDE")
         self.assertEqual(args.required_skill, ["scope-reality-check"])
 
+
+from tests.test_p2p_generic_repo_read_admission import GenericRepoReadAdmissionTests  # noqa: E402,F401
+from tests.test_p2p_generic_repo_read_evidence import GenericRepoReadEvidenceTests  # noqa: E402,F401
 
 
 if __name__ == "__main__":

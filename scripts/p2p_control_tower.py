@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -826,6 +827,26 @@ def _extract_task_text(prompt: str) -> str:
     return task
 
 
+def _load_json_object_file(
+    path_value: str | None,
+    *,
+    field: str,
+    expected_schema: str,
+) -> Mapping[str, Any] | None:
+    if not path_value:
+        return None
+    path = Path(path_value).expanduser().resolve()
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise BindingError(f"{field}_INVALID:{path}") from exc
+    if not isinstance(value, Mapping):
+        raise BindingError(f"{field}_MUST_BE_OBJECT")
+    if value.get("schema") != expected_schema:
+        raise BindingError(f"{field}_SCHEMA_INVALID")
+    return dict(value)
+
+
 def _print_result(result: dict[str, Any], *, as_json: bool) -> None:
     if as_json:
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))
@@ -897,6 +918,8 @@ def build_parser() -> argparse.ArgumentParser:
             "without it a NEW Arena session fails closed into FAST_CANARY"
         ),
     )
+    start.add_argument("--host-discovery-record-file")
+    start.add_argument("--generic-read-evidence-file")
     start.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
 
     prompt_only = sub.add_parser(
@@ -958,6 +981,8 @@ def build_parser() -> argparse.ArgumentParser:
     next_session.add_argument("--session-id")
     next_session.add_argument("--worktree", default=UNKNOWN)
     next_session.add_argument("--branch", default=UNKNOWN)
+    next_session.add_argument("--host-discovery-record-file")
+    next_session.add_argument("--generic-read-evidence-file")
     next_session.add_argument("--json", action="store_true", dest="as_json", default=argparse.SUPPRESS)
     return parser
 
@@ -971,12 +996,18 @@ def _start_next_with_context(
     worktree: str,
     branch: str,
     law_receipt: Mapping[str, Any],
+    host_discovery_record: Mapping[str, Any] | None,
+    generic_read_evidence: Mapping[str, Any] | None,
+    generic_read_oidc_token: str | None,
 ) -> dict[str, Any]:
     planned = tower.recommend_next_session(
         host,
         session_id=session_id,
         worktree=worktree,
         branch=branch,
+        host_discovery_record=host_discovery_record,
+        generic_read_evidence=generic_read_evidence,
+        generic_read_oidc_token=generic_read_oidc_token,
     )
     if planned.get("status") != "PASS":
         return planned
@@ -986,6 +1017,9 @@ def _start_next_with_context(
             session_id=session_id,
             worktree=worktree,
             branch=branch,
+            host_discovery_record=host_discovery_record,
+            generic_read_evidence=generic_read_evidence,
+            generic_read_oidc_token=generic_read_oidc_token,
         )
     binding_mapping = planned.get("binding")
     recommendation = planned.get("recommendation")
@@ -1014,6 +1048,9 @@ def _start_next_with_context(
         worktree=worktree,
         branch=branch,
         acceptance_criteria=criteria,
+        host_discovery_record=host_discovery_record,
+        generic_read_evidence=generic_read_evidence,
+        generic_read_oidc_token=generic_read_oidc_token,
         expected_law_sha=expected_law_sha,
         expected_experience_ids=expected_exp_ids,
         canary_directive=directive,
@@ -1040,6 +1077,25 @@ def main(argv: list[str] | None = None) -> int:
             current_canonical_base_sha=args.current_canonical_base_sha,
             current_canonical_base_tree=args.current_canonical_base_tree,
         )
+        host_discovery_record = _load_json_object_file(
+            getattr(args, "host_discovery_record_file", None),
+            field="HOST_DISCOVERY_RECORD",
+            expected_schema="p2p-host-discovery-record/1",
+        )
+        generic_read_evidence = _load_json_object_file(
+            getattr(args, "generic_read_evidence_file", None),
+            field="GENERIC_READ_EVIDENCE",
+            expected_schema="p2p-generic-repo-read-evidence/1",
+        )
+        generic_read_oidc_token = os.environ.get("P2P_GENERIC_READ_OIDC_JWT")
+        if generic_read_oidc_token is not None:
+            generic_read_oidc_token = generic_read_oidc_token.strip()
+            if (
+                not generic_read_oidc_token
+                or len(generic_read_oidc_token) > 32768
+                or generic_read_oidc_token.count(".") != 2
+            ):
+                raise BindingError("GENERIC_READ_OIDC_JWT_FORMAT_INVALID")
         if args.command == "start":
             binding = SessionBinding(
                 session_id=args.session_id or new_session_id(args.host, args.goal_id, args.task_id),
@@ -1076,6 +1132,9 @@ def main(argv: list[str] | None = None) -> int:
                 branch=args.branch,
                 acceptance_criteria=criteria,
                 required_skills=tuple(args.required_skill),
+                host_discovery_record=host_discovery_record,
+                generic_read_evidence=generic_read_evidence,
+                generic_read_oidc_token=generic_read_oidc_token,
                 expected_law_sha=expected_law_sha,
                 expected_experience_ids=expected_exp_ids,
                 canary_directive=directive,
@@ -1113,6 +1172,9 @@ def main(argv: list[str] | None = None) -> int:
                 worktree=args.worktree,
                 branch=args.branch,
                 law_receipt=law_receipt,
+                host_discovery_record=host_discovery_record,
+                generic_read_evidence=generic_read_evidence,
+                generic_read_oidc_token=generic_read_oidc_token,
             )
         else:  # pragma: no cover - argparse constrains this branch.
             raise BindingError(f"UNSUPPORTED_COMMAND:{args.command}")

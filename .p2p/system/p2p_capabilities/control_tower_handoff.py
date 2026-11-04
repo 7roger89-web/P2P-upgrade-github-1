@@ -3095,6 +3095,9 @@ class ControlTower:
         canonical_base_tree: str = UNKNOWN,
         acceptance_criteria: Sequence[str] = (),
         required_skills: Sequence[str] = (),
+        host_discovery_record: Mapping[str, Any] | None = None,
+        generic_read_evidence: Mapping[str, Any] | None = None,
+        generic_read_oidc_token: str | None = None,
         expected_law_sha: str | None = None,
         expected_experience_ids: Sequence[str] = (),
         canary_directive: CanaryDirective | None = None,
@@ -3181,7 +3184,7 @@ class ControlTower:
             self.root / ".p2p" / "system" / "p2p_capabilities"
             / "capabilities.json"
         ).is_file()
-        if binding.host in {"ARENA", "CODEX"} and skill_registry_available:
+        if skill_registry_available:
             existing_handoff = (
                 existing.get("SKILL_HANDOFF")
                 if isinstance(existing, Mapping)
@@ -3206,6 +3209,23 @@ class ControlTower:
                         raise BindingError(
                             "REQUIRED_SKILLS_CHANGED_FOR_ACTIVE_SESSION"
                         )
+                if binding.host not in {"ARENA", "CODEX"}:
+                    from .skill_consumption import (
+                        validate_cached_skill_handoff_host_evidence,
+                    )
+                    validation = validate_cached_skill_handoff_host_evidence(
+                        self.root,
+                        host=binding.host,
+                        skill_handoff=skill_handoff,
+                        host_discovery_record=host_discovery_record,
+                        generic_read_evidence=generic_read_evidence,
+                        generic_read_oidc_token=generic_read_oidc_token,
+                    )
+                    if not validation.get("valid"):
+                        raise BindingError(
+                            "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
+                            + str(validation.get("reason") or "UNKNOWN")
+                        )
             else:
                 from .skill_consumption import prepare_skill_handoff
                 skill_handoff = prepare_skill_handoff(
@@ -3213,6 +3233,9 @@ class ControlTower:
                     prompt_task,
                     host=binding.host,
                     required_skills=required_skill_refs,
+                    host_discovery_record=host_discovery_record,
+                    generic_read_evidence=generic_read_evidence,
+                    generic_read_oidc_token=generic_read_oidc_token,
                 )
             if skill_handoff.get("SKILL_CHECK") == "BLOCKED":
                 reasons = ",".join(
@@ -3787,6 +3810,9 @@ class ControlTower:
         session_id: str | None = None,
         worktree: str = UNKNOWN,
         branch: str = UNKNOWN,
+        host_discovery_record: Mapping[str, Any] | None = None,
+        generic_read_evidence: Mapping[str, Any] | None = None,
+        generic_read_oidc_token: str | None = None,
     ) -> dict[str, Any]:
         """Derive one safe task-state session without starting a host."""
 
@@ -3843,6 +3869,37 @@ class ControlTower:
             existing_binding = record.get("BINDING")
             recommendation = record.get("RECOMMENDED_NEW_CHAT")
             if isinstance(existing_binding, Mapping) and isinstance(recommendation, Mapping):
+                recorded_host = normalize_host(str(existing_binding.get("HOST") or ""))
+                if recorded_host != normalized_host:
+                    return {
+                        "status": "BLOCKED",
+                        "reason": "ACTIVE_SESSION_HOST_MISMATCH",
+                        "task_id": task.task_id,
+                        "automatic_start": False,
+                        "recommendation": None,
+                    }
+                existing_handoff = record.get("SKILL_HANDOFF")
+                if normalized_host not in {"ARENA", "CODEX"} and isinstance(existing_handoff, Mapping):
+                    from .skill_consumption import (
+                        validate_cached_skill_handoff_host_evidence,
+                    )
+                    validation = validate_cached_skill_handoff_host_evidence(
+                        self.root,
+                        host=normalized_host,
+                        skill_handoff=existing_handoff,
+                        host_discovery_record=host_discovery_record,
+                        generic_read_evidence=generic_read_evidence,
+                        generic_read_oidc_token=generic_read_oidc_token,
+                    )
+                    if not validation.get("valid"):
+                        return {
+                            "status": "BLOCKED",
+                            "reason": "SKILL_HANDOFF_HOST_EVIDENCE_STALE:"
+                            + str(validation.get("reason") or "UNKNOWN"),
+                            "task_id": task.task_id,
+                            "automatic_start": False,
+                            "recommendation": None,
+                        }
                 if normalized_host == "ARENA":
                     existing_session = SessionBinding.from_mapping(existing_binding)
                     arena_checkpoint = _arena_prompt_checkpoint(
@@ -3907,15 +3964,26 @@ class ControlTower:
             self.root / ".p2p" / "system" / "p2p_capabilities"
             / "capabilities.json"
         ).is_file()
-        if normalized_host in {"ARENA", "CODEX"} and skill_registry_available:
+        if skill_registry_available:
             from .skill_consumption import prepare_skill_handoff
             preview_skill_handoff = prepare_skill_handoff(
-                self.root, task.purpose, host=normalized_host
+                self.root,
+                task.purpose,
+                host=normalized_host,
+                host_discovery_record=host_discovery_record,
+                generic_read_evidence=generic_read_evidence,
+                generic_read_oidc_token=generic_read_oidc_token,
             )
             if preview_skill_handoff.get("SKILL_CHECK") == "BLOCKED":
                 return {
                     "status": "BLOCKED",
-                    "reason": "SKILL_HANDOFF_BLOCKED",
+                    "reason": "SKILL_HANDOFF_BLOCKED:"
+                    + ",".join(
+                        str(v)
+                        for v in preview_skill_handoff.get(
+                            "REJECTION_REASON", ()
+                        )
+                    ),
                     "task_id": task.task_id,
                     "automatic_start": False,
                     "recommendation": None,
@@ -3976,12 +4044,18 @@ class ControlTower:
         session_id: str | None = None,
         worktree: str = UNKNOWN,
         branch: str = UNKNOWN,
+        host_discovery_record: Mapping[str, Any] | None = None,
+        generic_read_evidence: Mapping[str, Any] | None = None,
+        generic_read_oidc_token: str | None = None,
     ) -> dict[str, Any]:
         result = self.recommend_next_session(
             host,
             session_id=session_id,
             worktree=worktree,
             branch=branch,
+            host_discovery_record=host_discovery_record,
+            generic_read_evidence=generic_read_evidence,
+            generic_read_oidc_token=generic_read_oidc_token,
         )
         if result.get("status") != "PASS":
             return result
@@ -3994,6 +4068,9 @@ class ControlTower:
             worktree=worktree,
             branch=branch,
             acceptance_criteria=tuple(result.get("acceptance_criteria") or ()),
+            host_discovery_record=host_discovery_record,
+            generic_read_evidence=generic_read_evidence,
+            generic_read_oidc_token=generic_read_oidc_token,
         )
         started.update(
             {
@@ -4012,12 +4089,18 @@ def next_safe_session(
     session_id: str | None = None,
     worktree: str = UNKNOWN,
     branch: str = UNKNOWN,
+    host_discovery_record: Mapping[str, Any] | None = None,
+    generic_read_evidence: Mapping[str, Any] | None = None,
+    generic_read_oidc_token: str | None = None,
 ) -> dict[str, Any]:
     return ControlTower(root).recommend_next_session(
         host,
         session_id=session_id,
         worktree=worktree,
         branch=branch,
+        host_discovery_record=host_discovery_record,
+        generic_read_evidence=generic_read_evidence,
+        generic_read_oidc_token=generic_read_oidc_token,
     )
 
 

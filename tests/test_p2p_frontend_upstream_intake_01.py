@@ -555,6 +555,13 @@ class NoParallelArchitectureTests(unittest.TestCase):
             "docs/P2P-DEVELOPMENT-ROADMAP.md",
             "docs/p2p-development/current-roadmap.md",
             "reports/planner/P2P-PLANNER-RUN-10.json",
+            ".github/workflows/p2p-b1-real-generic-read-canary.yml",
+            ".p2p/system/p2p_capabilities/generic_repo_read_evidence.py",
+            "tests/test_p2p_generic_repo_read_evidence.py",
+            "tests/test_p2p_generic_repo_read_admission.py",
+            "docs/plans/2026-10-12-p2p-generic-read-admission/",
+            "reports/coder/rp_coder_261012_171000_by_gpt-5-6-sol_issue-333-signed-generic-read-admission.md",
+            "docs/notes_decisions_log/notes_decisions_log_20261012.md",
             # Issue #298 skill-consumption wire. Reuses the existing canonical
             # capability registry + single router; adds one bounded
             # consumption module and exact source-bound host receipts.
@@ -685,6 +692,10 @@ class NoParallelArchitectureTests(unittest.TestCase):
                 # deterministic read-only audit helper plus its focused test.
                 "scripts/p2p_capability_drift_sweep.py",
                 "tests/test_p2p_capability_drift_sweep.py",
+                # Issue #333 bounded signed generic read evidence.
+                ".p2p/system/p2p_capabilities/generic_repo_read_evidence.py",
+                "tests/test_p2p_generic_repo_read_evidence.py",
+                "tests/test_p2p_generic_repo_read_admission.py",
                 # Issue #298: one bounded consumption seam plus modifications
                 # to existing selection/eligibility/FW01/Control Tower paths.
                 ".p2p/system/p2p_capabilities/skill_consumption.py",
@@ -744,6 +755,8 @@ class NoParallelArchitectureTests(unittest.TestCase):
             # instead of adding a parallel capability module.
             ".p2p/system/p2p_capabilities/control_tower_handoff.py",
             ".p2p/system/p2p_capabilities/owner_goal.py",
+            # Issue #333: bounded signed repo-read evidence verifier.
+            ".p2p/system/p2p_capabilities/generic_repo_read_evidence.py",
             # Issue #298: bounded skill-consumption composition seam. It calls
             # the existing router and canonical registry; it is not a router,
             # registry, scheduler, daemon, or second state store.

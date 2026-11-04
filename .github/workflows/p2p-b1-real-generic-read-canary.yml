@@ -1,0 +1,441 @@
+name: P2P B1 signed generic repo-read canary
+
+on:
+  push:
+    branches:
+      - feat/issue-333-signed-generic-read-admission
+
+permissions:
+  contents: read
+  copilot-requests: write
+  id-token: write
+
+jobs:
+  b1-signed-generic-read:
+    name: B1 signed Copilot exact repo-skill read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact canary head
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Bind exact repository and skill source
+        id: bind
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -f .agents/skills/scope-reality-check/SKILL.md
+          SKILL_SHA="$(sha256sum .agents/skills/scope-reality-check/SKILL.md | awk '{print $1}')"
+          printf 'repo_head=%s\n' "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+          printf 'skill_sha=%s\n' "$SKILL_SHA" >> "$GITHUB_OUTPUT"
+          printf 'CANARY_REPO=%s\nCANARY_HEAD=%s\nCANARY_SKILL_SHA256=%s\n' "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$SKILL_SHA"
+
+      - name: Install pinned GitHub Copilot CLI
+        shell: bash
+        run: | # zizmor: ignore[adhoc-packages] pinned Copilot CLI is the external actor under test; no action/lockfile equivalent exists for this bounded canary.
+          set -euo pipefail
+          npm install -g '@github/copilot@1.0.95'
+          copilot --version
+
+      - name: Run real non-Arena non-Codex read-and-apply actor
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/b1-prompt.txt <<'PROMPT'
+          You are the B1 canary actor GITHUB_COPILOT_CLI_ACTIONS. You are NOT Arena and NOT Codex.
+          Work only from the checked-out repository.
+
+          Before answering, you MUST actually:
+          1. use a shell tool to run: git rev-parse HEAD
+          2. use the READ tool to read exactly: .agents/skills/scope-reality-check/SKILL.md
+          3. use a shell tool to run: sha256sum .agents/skills/scope-reality-check/SKILL.md
+          4. apply the exact skill you just read to this bounded claim:
+             "A generic external executor may be admitted only when its exact repo/skill read is bound to independently verifiable evidence; self-authored receipt JSON alone is insufficient."
+
+          Do not modify any repository file. Do not fetch the skill from the web.
+          Return ONLY one raw JSON object, no markdown fences and no prose outside JSON:
+          {
+            "actor":"GITHUB_COPILOT_CLI_ACTIONS",
+            "arena":false,
+            "codex":false,
+            "repo_head":"<actual git rev-parse HEAD>",
+            "skill_path":".agents/skills/scope-reality-check/SKILL.md",
+            "skill_sha256":"<actual sha256sum>",
+            "skill_applied":true,
+            "applied_result":{
+              "calibration":"CLEARLY_UNREALISTIC|AGGRESSIVE_BUT_PLAUSIBLE|ACTUALLY_REALISTIC",
+              "reality_anchor":"<short statement grounded in the loaded skill>",
+              "verdict":"<short verdict>"
+            },
+            "SKILL_CONSUMPTION_RECEIPT":{
+              "schema":"p2p-skill-consumption-receipt/1",
+              "SKILLS_SELECTED":["scope-reality-check"],
+              "SKILL_SOURCE_HASHES":{"scope-reality-check":"<same actual sha256sum>"},
+              "SKILL_SOURCE_PATHS":{"scope-reality-check":".agents/skills/scope-reality-check/SKILL.md"},
+              "SKILL_LOAD_STAGE":"LOAD",
+              "SKILL_CONSUMPTION":"CONSUMED",
+              "SKILL_HOST_MODE":"GENERIC_EXACT_REPO_READ",
+              "PERMISSION_WIDENED":"NO"
+            }
+          }
+          PROMPT
+
+          copilot -p "$(cat /tmp/b1-prompt.txt)"             -s             --no-ask-user             --no-custom-instructions             --no-remote             --no-remote-export             --allow-tool='read, shell(git:*), shell(sha256sum:*)'             --share=./b1-copilot-session.md             > b1-copilot-result.json
+
+          cat b1-copilot-result.json
+          cat b1-copilot-session.md
+
+      - name: Independently validate actor result and real tool trace
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          result = json.loads(Path("b1-copilot-result.json").read_text(encoding="utf-8"))
+          expected_head = os.environ["EXPECTED_HEAD"]
+          expected_sha = os.environ["EXPECTED_SKILL_SHA"]
+
+          assert result["actor"] == "GITHUB_COPILOT_CLI_ACTIONS"
+          assert result["arena"] is False
+          assert result["codex"] is False
+          assert result["repo_head"] == expected_head
+          assert result["skill_path"] == ".agents/skills/scope-reality-check/SKILL.md"
+          assert result["skill_sha256"] == expected_sha
+          assert result["skill_applied"] is True
+
+          receipt = result["SKILL_CONSUMPTION_RECEIPT"]
+          assert receipt == {
+              "schema": "p2p-skill-consumption-receipt/1",
+              "SKILLS_SELECTED": ["scope-reality-check"],
+              "SKILL_SOURCE_HASHES": {"scope-reality-check": expected_sha},
+              "SKILL_SOURCE_PATHS": {"scope-reality-check": ".agents/skills/scope-reality-check/SKILL.md"},
+              "SKILL_LOAD_STAGE": "LOAD",
+              "SKILL_CONSUMPTION": "CONSUMED",
+              "SKILL_HOST_MODE": "GENERIC_EXACT_REPO_READ",
+              "PERMISSION_WIDENED": "NO",
+          }
+
+          transcript = Path("b1-copilot-session.md").read_text(encoding="utf-8", errors="replace")
+          markers = (
+              "$ git rev-parse HEAD",
+              "**view the file at ",
+              ".agents/skills/scope-reality-check/SKILL.md",
+              "$ sha256sum .agents/skills/scope-reality-check/SKILL.md",
+              "Deconstruction without reconstruction is incomplete.",
+              expected_head,
+              expected_sha,
+          )
+          for marker in markers:
+              assert marker in transcript, f"missing real tool-trace marker: {marker}"
+
+          print("B1_REAL_EXTERNAL_ACTOR_READ=PASS")
+          print("B1_ACTOR=GITHUB_COPILOT_CLI_ACTIONS")
+          print("B1_HEAD=" + expected_head)
+          print("B1_SKILL_SHA256=" + expected_sha)
+          print("B1_SKILL_CONSUMPTION=CONSUMED")
+          print("B1_HOST_MODE=GENERIC_EXACT_REPO_READ")
+          PY
+
+      - name: Build canonical signed evidence subject
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          result_path = Path("b1-copilot-result.json")
+          transcript_path = Path("b1-copilot-session.md")
+          result = json.loads(result_path.read_text(encoding="utf-8"))
+
+          def sha(path: Path) -> str:
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          evidence = {
+              "schema": "p2p-generic-repo-read-evidence/1",
+              "actor": result["actor"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "revision": os.environ["EXPECTED_HEAD"],
+              "workflow_ref": os.environ["GITHUB_WORKFLOW_REF"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": int(os.environ["GITHUB_RUN_ATTEMPT"]),
+              "runner_environment": "github-hosted",
+              "probe_path": result["skill_path"],
+              "probe_sha256": os.environ["EXPECTED_SKILL_SHA"],
+              "skill_path": result["skill_path"],
+              "skill_sha256": os.environ["EXPECTED_SKILL_SHA"],
+              "result_sha256": sha(result_path),
+              "transcript_sha256": sha(transcript_path),
+              "skill_applied": result["skill_applied"],
+              "applied_result": result["applied_result"],
+              "skill_consumption_receipt": result["SKILL_CONSUMPTION_RECEIPT"],
+              "permission_widened": "NO",
+          }
+          Path("b1-evidence.json").write_text(
+              json.dumps(evidence, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          print("B1_EVIDENCE_SHA256=" + sha(Path("b1-evidence.json")))
+          print("B1_TRANSCRIPT_SHA256=" + evidence["transcript_sha256"])
+          PY
+
+      - name: Mint GitHub OIDC binding for evidence digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          evidence = Path("b1-evidence.json")
+          digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
+          audience = "p2p-generic-repo-read:" + digest
+          base = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+          separator = "&" if "?" in base else "?"
+          url = base + separator + "audience=" + urllib.parse.quote(audience, safe="")
+          request = urllib.request.Request(
+              url,
+              headers={
+                  "Authorization": "bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"],
+                  "Accept": "application/json",
+              },
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              payload = json.load(response)
+          token = str(payload.get("value") or "")
+          assert token.count(".") == 2, "OIDC token missing"
+          Path("b1-evidence-oidc.jwt").write_text(token + "\n", encoding="utf-8")
+          print("B1_OIDC_MINT=PASS")
+          print("B1_OIDC_AUDIENCE=" + audience)
+          PY
+
+      - name: Cryptographically verify GitHub OIDC evidence binding
+        env:
+          EXPECTED_HEAD: ${{ steps.bind.outputs.repo_head }}
+          EXPECTED_SKILL_SHA: ${{ steps.bind.outputs.skill_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64
+          import hashlib
+          import hmac
+          import json
+          import os
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          def b64url(value: str) -> bytes:
+              return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+
+          token = Path("b1-evidence-oidc.jwt").read_text(encoding="utf-8").strip()
+          h64, p64, s64 = token.split(".")
+          header = json.loads(b64url(h64))
+          claims = json.loads(b64url(p64))
+          assert header.get("alg") == "RS256", header
+          kid = str(header.get("kid") or "")
+          assert kid, "OIDC kid missing"
+
+          with urllib.request.urlopen(
+              "https://token.actions.githubusercontent.com/.well-known/openid-configuration",
+              timeout=30,
+          ) as response:
+              discovery = json.load(response)
+          with urllib.request.urlopen(discovery["jwks_uri"], timeout=30) as response:
+              jwks = json.load(response)
+          key = next((item for item in jwks.get("keys", []) if item.get("kid") == kid), None)
+          assert key is not None, "OIDC signing key not found"
+          assert key.get("kty") == "RSA", key
+
+          n = int.from_bytes(b64url(key["n"]), "big")
+          e = int.from_bytes(b64url(key["e"]), "big")
+          signature = b64url(s64)
+          signed = (h64 + "." + p64).encode("ascii")
+          digest = hashlib.sha256(signed).digest()
+          digest_info = bytes.fromhex("3031300d060960864801650304020105000420") + digest
+          key_bytes = (n.bit_length() + 7) // 8
+          decoded = pow(int.from_bytes(signature, "big"), e, n).to_bytes(key_bytes, "big")
+          padding_len = key_bytes - len(digest_info) - 3
+          assert padding_len >= 8
+          expected = b"\x00\x01" + (b"\xff" * padding_len) + b"\x00" + digest_info
+          assert hmac.compare_digest(decoded, expected), "OIDC signature invalid"
+
+          evidence_digest = hashlib.sha256(Path("b1-evidence.json").read_bytes()).hexdigest()
+          expected_aud = "p2p-generic-repo-read:" + evidence_digest
+          now = int(time.time())
+          assert claims.get("iss") == "https://token.actions.githubusercontent.com"
+          aud = claims.get("aud")
+          assert aud == expected_aud or (isinstance(aud, list) and expected_aud in aud)
+          assert claims.get("repository") == os.environ["GITHUB_REPOSITORY"]
+          assert str(claims.get("run_id")) == os.environ["GITHUB_RUN_ID"]
+          assert str(claims.get("run_attempt")) == os.environ["GITHUB_RUN_ATTEMPT"]
+          assert claims.get("workflow_sha") == os.environ["EXPECTED_HEAD"]
+          assert claims.get("workflow_ref") == os.environ["GITHUB_WORKFLOW_REF"]
+          assert claims.get("ref") == os.environ["GITHUB_REF"]
+          assert claims.get("runner_environment") == "github-hosted"
+          assert int(claims.get("nbf", 0)) <= now + 60
+          assert int(claims.get("iat", 0)) <= now + 60
+          assert int(claims.get("exp", 0)) >= now - 60
+
+          evidence = json.loads(Path("b1-evidence.json").read_text(encoding="utf-8"))
+          assert evidence["repository"] == claims["repository"]
+          assert evidence["revision"] == os.environ["EXPECTED_HEAD"]
+          assert evidence["run_id"] == claims["run_id"]
+          assert evidence["workflow_ref"] == claims["workflow_ref"]
+          assert evidence["runner_environment"] == claims["runner_environment"]
+          assert evidence["skill_sha256"] == os.environ["EXPECTED_SKILL_SHA"]
+
+          safe_claims = {
+              "iss": claims["iss"],
+              "aud": claims["aud"],
+              "repository": claims["repository"],
+              "run_id": claims["run_id"],
+              "run_attempt": claims["run_attempt"],
+              "workflow_ref": claims["workflow_ref"],
+              "workflow_sha": claims["workflow_sha"],
+              "ref": claims["ref"],
+              "event_name": claims.get("event_name"),
+              "runner_environment": claims["runner_environment"],
+              "jti": claims.get("jti"),
+              "iat": claims.get("iat"),
+              "exp": claims.get("exp"),
+          }
+          Path("b1-oidc-verified-claims.json").write_text(
+              json.dumps(safe_claims, sort_keys=True, separators=(",", ":")) + "\n",
+              encoding="utf-8",
+          )
+          print("B1_GITHUB_OIDC_VERIFY=PASS")
+          print("B1_GITHUB_OIDC_EVIDENCE_SHA256=" + evidence_digest)
+          print("B1_GITHUB_OIDC_WORKFLOW_SHA=" + str(claims.get("workflow_sha")))
+          print("B1_GITHUB_OIDC_RUN_ID=" + str(claims.get("run_id")))
+          print("B1_GITHUB_OIDC_RUNNER_ENVIRONMENT=" + str(claims.get("runner_environment")))
+          PY
+
+      - name: Verify production generic admission gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          sys.path.insert(0, str(Path(".p2p/system").resolve()))
+          from p2p_capabilities.skill_consumption import prepare_skill_handoff
+
+          evidence = json.loads(Path("b1-evidence.json").read_text(encoding="utf-8"))
+          probe_path = evidence["probe_path"]
+          probe_sha = hashlib.sha256(Path(probe_path).read_bytes()).hexdigest()
+          repo = os.environ["GITHUB_REPOSITORY"].lower()
+          revision = os.environ["GITHUB_SHA"]
+          discovery = {
+              "schema": "p2p-host-discovery-record/1",
+              "host_id": "GITHUB_COPILOT_CLI_ACTIONS",
+              "profile": {
+                  "schema": "p2p-host-executor-contract/1",
+                  "adapter_class": "GitHubCopilotCLI",
+                  "host_label": "GITHUB_COPILOT_CLI_ACTIONS",
+                  "environment": "REMOTE_REPOSITORY",
+                  "capabilities": {"can_read_files": "SUPPORTED"},
+              },
+              "availability": "KNOWN_AVAILABLE",
+              "observed_at": datetime.now(timezone.utc).isoformat(),
+              "provenance": (
+                  "GITHUB_ACTIONS_OIDC_EXACT_READ"
+                  + f"|repo={repo}|revision={revision}"
+                  + f"|probe={probe_path}|sha256={probe_sha}"
+              ),
+              "environment_binding": "REMOTE_REPOSITORY",
+              "project_binding": repo,
+              "profile_version": "1",
+              "active": True,
+              "reconciliation_burden": 0,
+              "execution_transport_available": True,
+          }
+          oidc = Path("b1-evidence-oidc.jwt").read_text(encoding="utf-8").strip()
+          handoff = prepare_skill_handoff(
+              Path("."),
+              "execute the bounded implementation plan",
+              host="GITHUB_COPILOT_CLI_ACTIONS",
+              required_skills=("p2p-scope",),
+              host_discovery_record=discovery,
+              generic_read_evidence=evidence,
+              generic_read_oidc_token=oidc,
+          )
+          assert handoff["SKILL_CHECK"] == "PASS", handoff
+          assert handoff["SKILL_HOST_MODE"] == "GENERIC_EXACT_REPO_READ", handoff
+          assert "p2p-scope" in handoff["SKILLS_SELECTED"], handoff
+          assert handoff["PERMISSION_WIDENED"] == "NO", handoff
+          print("B1_PRODUCTION_GENERIC_ADMISSION=PASS")
+          print("B1_PRODUCTION_SELECTED_SKILL=p2p-scope")
+
+          from p2p_capabilities.control_tower_handoff import (
+              ControlTower,
+              SessionBinding,
+          )
+          tower = ControlTower(Path("."))
+          binding = SessionBinding(
+              session_id="issue333-b1-signed-canary",
+              host="GITHUB_COPILOT_CLI_ACTIONS",
+              goal_id="issue333-b1",
+              goal="Verify signed generic repo-read handoff.",
+          )
+          started = tower.start_session(
+              binding,
+              task_id="issue333-b1",
+              task_prompt="execute the bounded implementation plan",
+              required_skills=("p2p-scope",),
+              host_discovery_record=discovery,
+              generic_read_evidence=evidence,
+              generic_read_oidc_token=oidc,
+          )
+          assert started["status"] == "PASS", started
+          prompt = (started.get("recommendation") or {}).get("PROMPT") or ""
+          assert "SKILL_HOST_MODE=GENERIC_EXACT_REPO_READ" in prompt
+          assert (
+              "SKILL_SOURCE=p2p-scope|PATH=.agents/skills/p2p-scope/SKILL.md|SHA256="
+              in prompt
+          )
+          assert "SKILL_PERMISSION_WIDENED=NO" in prompt
+          print("B1_CONTROL_TOWER_GENERIC_HANDOFF=PASS")
+          PY
+
+      - name: Emit canary summary
+        shell: bash
+        run: |
+          {
+            echo "## P2P Issue #333 B1 signed canary"
+            echo
+            echo "- Actor: GITHUB_COPILOT_CLI_ACTIONS"
+            echo "- Arena: NO"
+            echo "- Codex: NO"
+            echo "- Repository: $GITHUB_REPOSITORY"
+            echo "- Exact head: $GITHUB_SHA"
+            echo "- GitHub OIDC signed evidence: VERIFIED"
+            echo "- Product mutation: NONE"
+          } >> "$GITHUB_STEP_SUMMARY"
