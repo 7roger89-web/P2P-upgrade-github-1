@@ -1,0 +1,64 @@
+# CloudDesk pilot — systemd unit for the NO-DOCKER path.
+#
+# This is the exact shape that was empirically validated in the Arena pilot
+# (dedicated non-root user + venv-installed pinned upstream package + one
+# workspace + Landlock enabled by the kernel). Use it on a plain Linux VPS where
+# Docker is unavailable or unwanted; use docker-compose.yml where it is.
+#
+# Install:
+#   sudo useradd --system --home /nonexistent --shell /usr/sbin/nologin clouddesk
+#   sudo install -d -m 0755 /srv/clouddesk /srv/clouddesk/workspace /srv/clouddesk/runtime
+#   sudo python3 -m venv /srv/clouddesk/venv
+#   sudo /srv/clouddesk/venv/bin/pip install "coding-tools-mcp==0.3.0"
+#   sudo chown -R clouddesk:clouddesk /srv/clouddesk/workspace /srv/clouddesk/runtime
+#   sudo install -d -m 0750 -o root -g clouddesk /etc/clouddesk
+#   sudo install -m 0640 -o root -g clouddesk clouddesk.env /etc/clouddesk/clouddesk.env
+#   sudo install -m 0644 clouddesk-mcp.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now clouddesk-mcp
+
+[Unit]
+Description=CloudDesk pilot — upstream coding-tools-mcp coding runtime (one workspace)
+Documentation=https://github.com/xyTom/coding-tools-mcp
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=clouddesk
+Group=clouddesk
+
+# Credentials and non-secret configuration live in a root-owned, group-readable
+# env file. The MCP process itself is never root.
+EnvironmentFile=/etc/clouddesk/clouddesk.env
+
+ExecStart=/srv/clouddesk/venv/bin/coding-tools-mcp
+
+Restart=on-failure
+RestartSec=3
+
+# --- hardening -------------------------------------------------------------
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=true
+# Only the two directories the runtime legitimately needs are writable.
+ReadWritePaths=/srv/clouddesk/workspace /srv/clouddesk/runtime
+# Landlock needs no extra capability; it is an unprivileged LSM. Do not add
+# CapabilityBoundingSet grants that would weaken the boundary.
+CapabilityBoundingSet=
+SystemCallFilter=@system-service
+SystemCallArchitectures=native
+UMask=0077
+
+# Loopback bind only; the reverse proxy is the public surface.
+# CODING_TOOLS_MCP_HOST=127.0.0.1 comes from the env file.
+
+[Install]
+WantedBy=multi-user.target

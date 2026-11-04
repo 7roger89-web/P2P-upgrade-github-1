@@ -1,0 +1,49 @@
+# CloudDesk pilot runtime image — THIN wrapper, no vendored upstream source.
+#
+# Installs the pinned, published upstream artifact from PyPI. Nothing is copied
+# from the upstream repository into this image.
+#
+# Upstream also publishes a toolchain-rich sandbox image
+# (ghcr.io/xytom/coding-tools-mcp-sandbox:latest, built by its own
+# .github/workflows/docker-image.yml) and ships its own multi-language
+# Dockerfile. Use those instead when the workspace needs Rust/Go/JDK/Maven
+# toolchains. This minimal image is for the bounded P2P coding pilot, where the
+# workspace only needs Python + git.
+FROM python:3.12-slim-bookworm
+
+ARG CODING_TOOLS_MCP_VERSION=0.3.0
+
+# git is required by the git_status / git_diff / git_log / git_show / git_blame
+# tools; ca-certificates is required for HTTPS remotes.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && python -m pip install --no-cache-dir "coding-tools-mcp==${CODING_TOOLS_MCP_VERSION}" \
+    && mkdir -p /workspace /runtime
+
+# Never run the MCP process as root.
+RUN useradd --system --home /runtime --shell /usr/sbin/nologin clouddesk \
+    && chown -R clouddesk:clouddesk /workspace /runtime
+
+# Health probe used by docker-compose. Copied as a file (not an inline shell
+# one-liner) so the port comes from the container's own environment and so the
+# probe can be validated directly against a running server.
+COPY healthcheck.py /opt/clouddesk/healthcheck.py
+RUN chmod 0755 /opt/clouddesk/healthcheck.py
+
+USER clouddesk
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HOME=/runtime \
+    TMPDIR=/runtime/tmp \
+    CODING_TOOLS_MCP_WORKSPACE=/workspace \
+    CODING_TOOLS_MCP_HOST=0.0.0.0 \
+    CODING_TOOLS_MCP_PORT=8765 \
+    CODING_TOOLS_MCP_TELEMETRY=off
+
+EXPOSE 8765
+# The upstream server installs a SIGTERM handler specifically so it can act as
+# PID 1 in a container; `init: true` in compose additionally reaps zombies from
+# exec_command child processes.
+ENTRYPOINT ["coding-tools-mcp"]

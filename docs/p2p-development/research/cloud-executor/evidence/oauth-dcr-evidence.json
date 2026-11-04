@@ -1,0 +1,320 @@
+{
+  "task_id": "P2P_CLOUD_EXECUTOR_PILOT_01",
+  "probe": "oauth2.1-pkce-rfc7591-dcr",
+  "generated_utc": "2026-09-17T09:23:50Z",
+  "base_url": "http://127.0.0.1:8767",
+  "redirect_uri": "http://127.0.0.1:8767/callback",
+  "discovery": {
+    "protected_resource": {
+      "authorization_servers": [
+        "http://127.0.0.1:8767"
+      ],
+      "bearer_methods_supported": [
+        "header"
+      ],
+      "resource": "http://127.0.0.1:8767"
+    },
+    "authorization_server": {
+      "authorization_endpoint": "http://127.0.0.1:8767/oauth/authorize",
+      "code_challenge_methods_supported": [
+        "S256"
+      ],
+      "grant_types_supported": [
+        "authorization_code"
+      ],
+      "issuer": "http://127.0.0.1:8767",
+      "registration_endpoint": "http://127.0.0.1:8767/oauth/register",
+      "response_types_supported": [
+        "code"
+      ],
+      "token_endpoint": "http://127.0.0.1:8767/oauth/token",
+      "token_endpoint_auth_methods_supported": [
+        "client_secret_basic",
+        "client_secret_post",
+        "none"
+      ]
+    }
+  },
+  "registered_client_id": "la_wG7hKxd5JtgYZVo8tC9NNLBeOyFSn",
+  "groups": {
+    "O1 DISCOVERY": {
+      "verdict": "PASS",
+      "PASS": 5,
+      "FAIL": 0
+    },
+    "O2 ANONYMOUS CHALLENGE": {
+      "verdict": "PASS",
+      "PASS": 2,
+      "FAIL": 0
+    },
+    "O3 DYNAMIC CLIENT REGISTRATION (RFC 7591)": {
+      "verdict": "PASS",
+      "PASS": 2,
+      "FAIL": 0
+    },
+    "O4 AUTHORIZATION CODE + PKCE S256": {
+      "verdict": "PASS",
+      "PASS": 4,
+      "FAIL": 0
+    },
+    "O5 OAUTH NEGATIVE CASES": {
+      "verdict": "PASS",
+      "PASS": 2,
+      "FAIL": 0
+    },
+    "O6 AUTHENTICATED MCP CALL": {
+      "verdict": "PASS",
+      "PASS": 3,
+      "FAIL": 0
+    }
+  },
+  "checks": [
+    {
+      "group": "O1 DISCOVERY",
+      "check": "RFC 9728 protected-resource metadata published",
+      "status": "PASS",
+      "expected": "200 + resource + authorization_servers",
+      "observed": {
+        "http_status": 200,
+        "resource": "http://127.0.0.1:8767",
+        "authorization_servers": [
+          "http://127.0.0.1:8767"
+        ],
+        "bearer_methods": [
+          "header"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O1 DISCOVERY",
+      "check": "RFC 8414 authorization-server metadata published",
+      "status": "PASS",
+      "expected": "200 + issuer/authorization_endpoint/token_endpoint",
+      "observed": {
+        "http_status": 200,
+        "issuer": "http://127.0.0.1:8767",
+        "authorization_endpoint": "http://127.0.0.1:8767/oauth/authorize",
+        "token_endpoint": "http://127.0.0.1:8767/oauth/token"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O1 DISCOVERY",
+      "check": "RFC 7591 dynamic client registration endpoint advertised",
+      "status": "PASS",
+      "expected": "registration_endpoint present",
+      "observed": {
+        "registration_endpoint": "http://127.0.0.1:8767/oauth/register"
+      },
+      "note": "this is the endpoint regular ChatGPT Web needs; a server without it cannot be self-registered by ChatGPT",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O1 DISCOVERY",
+      "check": "PKCE S256 advertised",
+      "status": "PASS",
+      "expected": "code_challenge_methods_supported includes S256",
+      "observed": {
+        "methods": [
+          "S256"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O1 DISCOVERY",
+      "check": "public client auth method 'none' supported",
+      "status": "PASS",
+      "expected": "token_endpoint_auth_methods_supported includes none",
+      "observed": {
+        "methods": [
+          "client_secret_basic",
+          "client_secret_post",
+          "none"
+        ]
+      },
+      "note": "ChatGPT presents no client secret; only a public client ('none') or private_key_jwt works",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O2 ANONYMOUS CHALLENGE",
+      "check": "anonymous MCP request rejected",
+      "status": "PASS",
+      "expected": "401",
+      "observed": {
+        "http_status": 401
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O2 ANONYMOUS CHALLENGE",
+      "check": "401 carries a WWW-Authenticate resource_metadata pointer",
+      "status": "PASS",
+      "expected": "Bearer realm + resource_metadata URL",
+      "observed": {
+        "www_authenticate": "Bearer realm=\"coding-tools-mcp\", resource_metadata=\"http://127.0.0.1:8767/.well-known/oauth-protected-resource\""
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O3 DYNAMIC CLIENT REGISTRATION (RFC 7591)",
+      "check": "public client self-registers with no pre-shared credential",
+      "status": "PASS",
+      "expected": "201 + client_id",
+      "observed": {
+        "http_status": 201,
+        "client_id": "la_wG7hKxd5JtgYZVo8tC9NNLBeOyFSn",
+        "token_endpoint_auth_method": "none"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O3 DYNAMIC CLIENT REGISTRATION (RFC 7591)",
+      "check": "registration without redirect_uris is refused",
+      "status": "PASS",
+      "expected": "400 invalid_client_metadata",
+      "observed": {
+        "http_status": 400,
+        "error": "invalid_client_metadata"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O4 AUTHORIZATION CODE + PKCE S256",
+      "check": "authorize endpoint renders an operator consent/login page",
+      "status": "PASS",
+      "expected": "200 + HTML form posting to /oauth/authorize",
+      "observed": {
+        "http_status": 200,
+        "form_action": "/oauth/authorize",
+        "form_method": "POST",
+        "hidden_fields": [
+          "client_id",
+          "code_challenge",
+          "code_challenge_method",
+          "redirect_uri",
+          "resource",
+          "state"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O4 AUTHORIZATION CODE + PKCE S256",
+      "check": "correct password yields a single-use authorization code on the registered redirect_uri",
+      "status": "PASS",
+      "expected": "302 + Location on redirect_uri with code and matching state",
+      "observed": {
+        "http_status": 302,
+        "redirect_host": "127.0.0.1:8767",
+        "code_present": true,
+        "state_matches": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O4 AUTHORIZATION CODE + PKCE S256",
+      "check": "wrong password does not yield a code",
+      "status": "PASS",
+      "expected": "no 302 with a code (login page re-rendered or error)",
+      "observed": {
+        "http_status": 401,
+        "contains_error": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O4 AUTHORIZATION CODE + PKCE S256",
+      "check": "token exchange with the correct PKCE verifier succeeds for a public client",
+      "status": "PASS",
+      "expected": "200 + access_token (no client_secret presented)",
+      "observed": {
+        "http_status": 200,
+        "token_type": "Bearer",
+        "expires_in": 86400,
+        "access_token_present": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O5 OAUTH NEGATIVE CASES",
+      "check": "authorization code is single-use",
+      "status": "PASS",
+      "expected": "replay refused",
+      "observed": {
+        "http_status": 400,
+        "error": "invalid_grant"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O5 OAUTH NEGATIVE CASES",
+      "check": "token exchange with a WRONG PKCE verifier is refused",
+      "status": "PASS",
+      "expected": "400 invalid_grant",
+      "observed": {
+        "http_status": 400,
+        "error": "invalid_grant",
+        "code2_issued": true
+      },
+      "note": "proves PKCE is actually enforced, not merely advertised",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O6 AUTHENTICATED MCP CALL",
+      "check": "MCP initialize succeeds with the OAuth access token",
+      "status": "PASS",
+      "expected": "200 + serverInfo",
+      "observed": {
+        "http_status": 200,
+        "serverInfo": {
+          "name": "coding-tools-mcp",
+          "title": "Coding Tools MCP",
+          "version": "0.3.0"
+        }
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O6 AUTHENTICATED MCP CALL",
+      "check": "tools/list works over the OAuth token",
+      "status": "PASS",
+      "expected": "coding tool catalog returned",
+      "observed": {
+        "http_status": 200,
+        "tool_count": 18
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "group": "O6 AUTHENTICATED MCP CALL",
+      "check": "forged bearer token rejected",
+      "status": "PASS",
+      "expected": "401",
+      "observed": {
+        "http_status": 401
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    }
+  ],
+  "totals": {
+    "pass": 18,
+    "fail": 0
+  }
+}

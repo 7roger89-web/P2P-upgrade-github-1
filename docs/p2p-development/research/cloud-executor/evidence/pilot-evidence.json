@@ -1,0 +1,1073 @@
+{
+  "task_id": "P2P_CLOUD_EXECUTOR_PILOT_01",
+  "generated_utc": "2026-09-17T09:23:43Z",
+  "upstream": "xyTom/coding-tools-mcp",
+  "upstream_package_version": "0.3.0",
+  "base_url": "http://127.0.0.1:8765",
+  "safe_mode_url": "http://127.0.0.1:8766",
+  "public_url": null,
+  "server_info": {
+    "annotation_override": null,
+    "auth_enabled": true,
+    "cache_dir": "/srv/clouddesk-pilot/runtime/tmp/coding-tools-mcp/7e91a48dae0dc64a/8xcTAuAfSabV8Sxw/cache",
+    "dangerously_skip_all_permissions": false,
+    "endpoint_path": "/mcp",
+    "exec_policy": {
+      "global_tmp_write": "tmp-prefix",
+      "inline_script": "allowed",
+      "secret_env_filter": "enabled",
+      "shell_expansion": "allowed"
+    },
+    "home": "/srv/clouddesk-pilot/runtime/tmp/coding-tools-mcp/7e91a48dae0dc64a/8xcTAuAfSabV8Sxw/home",
+    "landlock": {
+      "abi_version": 2,
+      "available": true,
+      "enabled": true
+    },
+    "network_allowed": true,
+    "ok": true,
+    "output_retention": {
+      "buffer_bytes_per_stream": 524288,
+      "head_bytes_per_stream": 65536
+    },
+    "permission_mode": "trusted",
+    "project_context": {
+      "nested_instruction_files": [],
+      "root_instruction_files": [],
+      "warnings": []
+    },
+    "runtime_dir": "/srv/clouddesk-pilot/runtime/tmp/coding-tools-mcp/7e91a48dae0dc64a/8xcTAuAfSabV8Sxw",
+    "server": "coding-tools-mcp",
+    "shell_env_exclude": [],
+    "shell_env_include_only": [],
+    "shell_env_inherit": "core",
+    "supported_protocol_versions": [
+      "2026-07-28",
+      "2025-11-25",
+      "2025-06-18"
+    ],
+    "title": "Coding Tools MCP",
+    "tmpdir": "/srv/clouddesk-pilot/runtime/tmp/coding-tools-mcp/7e91a48dae0dc64a/8xcTAuAfSabV8Sxw/tmp",
+    "tool_count": 18,
+    "tools": [
+      "server_info",
+      "check_exec_environment",
+      "read_file",
+      "list_dir",
+      "list_files",
+      "search_text",
+      "apply_patch",
+      "exec_command",
+      "write_stdin",
+      "kill_command",
+      "read_output",
+      "git_status",
+      "git_diff",
+      "git_log",
+      "git_show",
+      "git_blame",
+      "request_permissions",
+      "view_image"
+    ],
+    "version": "0.3.0",
+    "workspace": "/srv/clouddesk-pilot/workspace"
+  },
+  "advertised_tools": [
+    "server_info",
+    "check_exec_environment",
+    "read_file",
+    "list_dir",
+    "list_files",
+    "search_text",
+    "apply_patch",
+    "exec_command",
+    "write_stdin",
+    "kill_command",
+    "read_output",
+    "git_status",
+    "git_diff",
+    "git_log",
+    "git_show",
+    "git_blame",
+    "request_permissions",
+    "view_image"
+  ],
+  "groups": {
+    "T01": {
+      "verdict": "PASS",
+      "PASS": 5,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T02": {
+      "verdict": "PASS",
+      "PASS": 11,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T03": {
+      "verdict": "PASS",
+      "PASS": 4,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T04": {
+      "verdict": "PASS",
+      "PASS": 3,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T05": {
+      "verdict": "PASS",
+      "PASS": 5,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T06": {
+      "verdict": "PASS",
+      "PASS": 6,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T07": {
+      "verdict": "PASS",
+      "PASS": 1,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T08": {
+      "verdict": "PASS",
+      "PASS": 3,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T09": {
+      "verdict": "PASS",
+      "PASS": 5,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T10": {
+      "verdict": "PASS",
+      "PASS": 8,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T11": {
+      "verdict": "PASS",
+      "PASS": 4,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T12": {
+      "verdict": "PASS",
+      "PASS": 4,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T13": {
+      "verdict": "PASS",
+      "PASS": 5,
+      "FAIL": 0,
+      "NOT_RUN": 0
+    },
+    "T14": {
+      "verdict": "NOT_RUN",
+      "PASS": 0,
+      "FAIL": 0,
+      "NOT_RUN": 1
+    }
+  },
+  "checks": [
+    {
+      "test": "T01",
+      "check": "initialize handshake",
+      "status": "PASS",
+      "expected": "protocolVersion 2025-11-25 + serverInfo",
+      "observed": {
+        "protocolVersion": "2025-11-25",
+        "serverInfo": {
+          "name": "coding-tools-mcp",
+          "title": "Coding Tools MCP",
+          "version": "0.3.0"
+        }
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T01",
+      "check": "CatDesk-baseline tool surface present",
+      "status": "PASS",
+      "expected": "read/search/edit/exec/long-job/git tools advertised",
+      "observed": {
+        "tool_count": 18,
+        "missing": []
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T01",
+      "check": "workspace root is ONE configured directory",
+      "status": "PASS",
+      "expected": "absolute workspace path reported",
+      "observed": {
+        "workspace": "/srv/clouddesk-pilot/workspace",
+        "permission_mode": "trusted"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T01",
+      "check": "auth enabled on the served endpoint",
+      "status": "PASS",
+      "expected": "auth_enabled true",
+      "observed": {
+        "auth_enabled": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T01",
+      "check": "server-owned runtime HOME/TMPDIR (not the real user HOME)",
+      "status": "PASS",
+      "expected": "home/tmpdir/cache_dir under a server runtime dir",
+      "observed": {
+        "home": "/srv/clouddesk-pilot/runtime/tmp/coding-tools-mcp/7e91a48dae0dc64a/8xcTAuAfSabV8Sxw/home",
+        "tmpdir": "/srv/clouddesk-pilot/runtime/tmp/coding-tools-mcp/7e91a48dae0dc64a/8xcTAuAfSabV8Sxw/tmp"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "allowed read inside workspace",
+      "status": "PASS",
+      "expected": "file content returned",
+      "observed": {
+        "bytes": 65
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "escape via ../ rejected",
+      "status": "PASS",
+      "expected": "PATH_OUTSIDE_WORKSPACE",
+      "observed": {
+        "code": "PATH_OUTSIDE_WORKSPACE",
+        "category": "security"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "escape via absolute path rejected",
+      "status": "PASS",
+      "expected": "ABSOLUTE_PATH_DENIED",
+      "observed": {
+        "code": "ABSOLUTE_PATH_DENIED",
+        "category": "security"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "escape via NUL byte rejected",
+      "status": "PASS",
+      "expected": "INVALID_ARGUMENT",
+      "observed": {
+        "code": "INVALID_ARGUMENT"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "unknown tool argument rejected by strict input schema",
+      "status": "PASS",
+      "expected": "JSON-RPC -32602 INVALID_ARGUMENT",
+      "observed": {
+        "code": "INVALID_ARGUMENT",
+        "jsonrpc_code": -32602,
+        "message": "arguments.ref is not a recognized argument."
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "escape via symlink read rejected",
+      "status": "PASS",
+      "expected": "SYMLINK_ESCAPE / PATH_OUTSIDE_WORKSPACE",
+      "observed": {
+        "code": "SYMLINK_ESCAPE",
+        "message": "Path escapes the configured workspace."
+      },
+      "note": "hostile symlink fixture pre-created out-of-band inside the workspace",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "escape via symlinked directory rejected",
+      "status": "PASS",
+      "expected": "SYMLINK_ESCAPE / PATH_OUTSIDE_WORKSPACE",
+      "observed": {
+        "code": "PATH_OUTSIDE_WORKSPACE"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "write through symlink rejected",
+      "status": "PASS",
+      "expected": "SYMLINK_ESCAPE",
+      "observed": {
+        "code": "SYMLINK_ESCAPE",
+        "message": "Path escapes the configured workspace."
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "exec_command with literal outside path refused by policy layer",
+      "status": "PASS",
+      "expected": "PERMISSION_REQUIRED / filesystem_escape",
+      "observed": {
+        "code": "PERMISSION_REQUIRED",
+        "permission": "filesystem_escape",
+        "message": "Command path escapes the workspace and is blocked."
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "exec_command outside read blocked by KERNEL Landlock (runtime-assembled path)",
+      "status": "PASS",
+      "expected": "Permission denied / LANDLOCK_READ_ROOT_BLOCKED",
+      "observed": {
+        "exit_code": 1,
+        "stderr": "cat: /etc/passwd: Permission denied\n",
+        "diagnostics": [
+          "LANDLOCK_READ_ROOT_BLOCKED"
+        ],
+        "stdout_empty": true
+      },
+      "note": "landlock={\"abi_version\": 2, \"available\": true, \"enabled\": true}",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T02",
+      "check": "exec_command outside write blocked by KERNEL Landlock",
+      "status": "PASS",
+      "expected": "no WROTE_OUTSIDE + Permission denied / LANDLOCK diagnostic",
+      "observed": {
+        "exit_code": 1,
+        "stderr": "touch: cannot touch '/srv/clouddesk-landlock-write-probe': Permission denied\n",
+        "diagnostics": []
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T03",
+      "check": "list_files enumerates workspace",
+      "status": "PASS",
+      "expected": "seeded files listed",
+      "observed": {
+        "count": 6,
+        "sample": [
+          "notes/README.md",
+          "src/__init__.py",
+          "src/calc.py",
+          "tests/__init__.py",
+          "tests/test_calc.py",
+          "untouched/sentinel.txt"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T03",
+      "check": "read_file returns exact content",
+      "status": "PASS",
+      "expected": "needle present verbatim",
+      "observed": {
+        "len": 65
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T03",
+      "check": "search_text finds exact string",
+      "status": "PASS",
+      "expected": ">=1 hit in notes/README.md",
+      "observed": {
+        "hit_count": 1
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T03",
+      "check": "search_text returns empty for absent string",
+      "status": "PASS",
+      "expected": "0 hits",
+      "observed": {
+        "hit_count": 0
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T04",
+      "check": "controlled single-file edit",
+      "status": "PASS",
+      "expected": "no tool error + 1 addition",
+      "observed": {
+        "ok": true,
+        "summary": "M notes/README.md",
+        "affected": [
+          {
+            "operation": "update",
+            "path": "notes/README.md"
+          }
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T04",
+      "check": "edit read back",
+      "status": "PASS",
+      "expected": "new line present",
+      "observed": {
+        "len": 91
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T04",
+      "check": "unrelated file unchanged by the edit",
+      "status": "PASS",
+      "expected": "sentinel sha256 identical",
+      "observed": {
+        "sha256_before": "4350f90397acb819",
+        "sha256_after": "4350f90397acb819"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T05",
+      "check": "multi-file patch in one envelope",
+      "status": "PASS",
+      "expected": "no tool error",
+      "observed": {
+        "ok": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T05",
+      "check": "both files of the multi-file patch landed",
+      "status": "PASS",
+      "expected": "alpha-one + beta-one",
+      "observed": {
+        "a": "alpha-one",
+        "b": "beta-one"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T05",
+      "check": "multi-file patch with one bad hunk is refused",
+      "status": "PASS",
+      "expected": "PATCH_CONTEXT_NOT_FOUND",
+      "observed": {
+        "code": "PATCH_CONTEXT_NOT_FOUND"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T05",
+      "check": "rollback: first file of the failed envelope unchanged",
+      "status": "PASS",
+      "expected": "still alpha-one",
+      "observed": {
+        "content": "alpha-one"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T05",
+      "check": "dry_run patch does not mutate",
+      "status": "PASS",
+      "expected": "still alpha-one",
+      "observed": {
+        "error": null
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T06",
+      "check": "harmless command exit code / stdout / stderr captured",
+      "status": "PASS",
+      "expected": "exit_code 0, both streams present",
+      "observed": {
+        "exit_code": 0,
+        "stdout": "clouddesk-stdout",
+        "stderr": "clouddesk-stderr"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T06",
+      "check": "command runs with workspace-bound cwd",
+      "status": "PASS",
+      "expected": "pwd == workspace root",
+      "observed": {
+        "cwd_probe": "/srv/clouddesk-pilot/workspace"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T06",
+      "check": "nonzero exit code surfaced faithfully",
+      "status": "PASS",
+      "expected": "exit_code 7",
+      "observed": {
+        "exit_code": 7
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T06",
+      "check": "exec environment reports secret filtering",
+      "status": "PASS",
+      "expected": "check_exec_environment returns structured report",
+      "observed": {
+        "keys": [
+          "cache_dir",
+          "global_tmp_write",
+          "home",
+          "landlock_abi",
+          "landlock_enabled",
+          "network_allowed",
+          "ok",
+          "permission_mode",
+          "runtime_dir",
+          "tmpdir",
+          "warnings",
+          "workspace"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T06",
+      "check": "command yields a durable id before its deadline",
+      "status": "PASS",
+      "expected": "status running + command_id",
+      "observed": {
+        "status": "running",
+        "command_id": "p2yUFoixLwUyRPRuvUmmzW2e"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T06",
+      "check": "command deadline enforced (timeout_ms) even after the call returned",
+      "status": "PASS",
+      "expected": "timed_out true / killed status / non-zero exit",
+      "observed": {
+        "status": "timeout",
+        "timed_out": true,
+        "signal": "SIGTERM",
+        "exit_code": -15
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T07",
+      "check": "deliberate failing test detected",
+      "status": "PASS",
+      "expected": "nonzero exit code + failure evidence in output",
+      "observed": {
+        "exit_code": 1,
+        "tail": "ast):\n  File \"/srv/clouddesk-pilot/workspace/tests/test_calc.py\", line 8, in test_add\n    self.assertEqual(add(2, 3), 5)\nAssertionError: -1 != 5\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nFAILED (failures=1)"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T08",
+      "check": "repair patch targets only the bug",
+      "status": "PASS",
+      "expected": "no tool error",
+      "observed": {
+        "ok": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T08",
+      "check": "retest after repair passes",
+      "status": "PASS",
+      "expected": "exit_code 0 + OK",
+      "observed": {
+        "exit_code": 0,
+        "tail": "d) ... ok\ntest_mul (tests.test_calc.CalcTest.test_mul) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T08",
+      "check": "repair changed only src/calc.py (test file untouched)",
+      "status": "PASS",
+      "expected": "test file sha256 identical",
+      "observed": {
+        "sha_before": "698c17afd3df2c87",
+        "sha_after": "698c17afd3df2c87"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T09",
+      "check": "bounded background job yields a durable command_id",
+      "status": "PASS",
+      "expected": "status running + command_id + next_action",
+      "observed": {
+        "status": "running",
+        "command_id": "FE6ztzMw8AnLpZvXNyUOAf87",
+        "next_action": {
+          "arguments": {
+            "chars": "",
+            "command_id": "FE6ztzMw8AnLpZvXNyUOAf87",
+            "yield_time_ms": 10000
+          },
+          "tool": "write_stdin"
+        },
+        "stdout_so_far": "tick-1|tick-2|"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T09",
+      "check": "output continues across separate calls",
+      "status": "PASS",
+      "expected": "two distinct non-empty increments, second advances past first",
+      "observed": {
+        "poll1": "tick-3|",
+        "poll2": "tick-4|",
+        "status1": "running",
+        "status2": "running"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T09",
+      "check": "job still alive before termination",
+      "status": "PASS",
+      "expected": "status running",
+      "observed": {
+        "status": "running"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T09",
+      "check": "job terminated cleanly on request",
+      "status": "PASS",
+      "expected": "kill_command accepted and job leaves running state",
+      "observed": {
+        "status": "terminated",
+        "signal": "SIGTERM",
+        "exit_code": -15,
+        "repeat_kill_error": null
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T09",
+      "check": "terminated job no longer reports running",
+      "status": "PASS",
+      "expected": "status != running",
+      "observed": {
+        "status": "terminated",
+        "signal": "SIGTERM",
+        "exit_code": -15,
+        "error": null
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git_status returns working-tree state",
+      "status": "PASS",
+      "expected": "no tool error + entries present",
+      "observed": {
+        "entry_count": 6,
+        "sample": [
+          {
+            "index_status": "?",
+            "original_path": null,
+            "path": "hostile/",
+            "worktree_status": "?"
+          },
+          {
+            "index_status": "?",
+            "original_path": null,
+            "path": "multi/",
+            "worktree_status": "?"
+          },
+          {
+            "index_status": "?",
+            "original_path": null,
+            "path": "notes/",
+            "worktree_status": "?"
+          }
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git commit through exec_command succeeds",
+      "status": "PASS",
+      "expected": "exit 0 + COMMITTED",
+      "observed": {
+        "exit_code": 0,
+        "stdout": "COMMITTED",
+        "stderr": ""
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git_log returns commit history",
+      "status": "PASS",
+      "expected": "no tool error + >=1 commit",
+      "observed": {
+        "commit_count": 1,
+        "subject": "clouddesk pilot: seeded workspace",
+        "keys": [
+          "commits",
+          "is_repo",
+          "max_count",
+          "ok",
+          "path",
+          "ref",
+          "skip",
+          "truncated"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git_show resolves HEAD",
+      "status": "PASS",
+      "expected": "no tool error + commit metadata for HEAD",
+      "observed": {
+        "keys": [
+          "content",
+          "files",
+          "is_repo",
+          "ok",
+          "output_bytes",
+          "output_lines",
+          "rev",
+          "truncated",
+          "truncated_by",
+          "warnings"
+        ],
+        "subject": ""
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git_blame attributes lines",
+      "status": "PASS",
+      "expected": "no tool error",
+      "observed": {
+        "keys": [
+          "end_line",
+          "is_repo",
+          "lines",
+          "max_lines",
+          "ok",
+          "path",
+          "rev",
+          "start_line"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "modify a tracked file",
+      "status": "PASS",
+      "expected": "no tool error",
+      "observed": {
+        "summary": "M notes/README.md"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git_diff returns unified diff of the change",
+      "status": "PASS",
+      "expected": "diff names the file and the added line",
+      "observed": {
+        "diff_bytes": 224,
+        "files": [
+          {
+            "binary": false,
+            "path": "notes/README.md",
+            "status": "modified"
+          }
+        ],
+        "diff_head": "diff --git a/notes/README.md b/notes/README.md|index 2db411b..4b94f56 100644|--- a/notes/README.md|+++ b/notes/README.md"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T10",
+      "check": "git_status reflects the new modification",
+      "status": "PASS",
+      "expected": "modified entry for the file",
+      "observed": {
+        "entries": [
+          {
+            "index_status": " ",
+            "original_path": null,
+            "path": "notes/README.md",
+            "worktree_status": "M"
+          }
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T11",
+      "check": "missing credential rejected",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "http_status": 401,
+        "www_authenticate_present": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T11",
+      "check": "invalid credential rejected",
+      "status": "PASS",
+      "expected": "HTTP 401",
+      "observed": {
+        "http_status": 401
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T11",
+      "check": "valid credential accepted",
+      "status": "PASS",
+      "expected": "HTTP 200 + initialize result",
+      "observed": {
+        "http_status": 200
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T11",
+      "check": "public server card discoverable without credentials",
+      "status": "PASS",
+      "expected": "HTTP 200",
+      "observed": {
+        "http_status": 200
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T12",
+      "check": "verbose command output is bounded",
+      "status": "PASS",
+      "expected": "truncated / dropped-bytes metadata present",
+      "observed": {
+        "stdout_bytes": 13999,
+        "truncated": true,
+        "truncated_by": "lines",
+        "dropped_bytes": 830143,
+        "omitted_bytes": 830143
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T12",
+      "check": "bounded output is pageable by absolute byte offset",
+      "status": "PASS",
+      "expected": "two distinct pages, next_offset advances",
+      "observed": {
+        "page1_bytes": 256,
+        "page2_bytes": 256,
+        "next_offset": 256,
+        "page2_offset": 256
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T12",
+      "check": "bounding accounting is explicit (head + rolling tail, evicted gap)",
+      "status": "PASS",
+      "expected": "head_retained_bytes / evicted_gap_bytes / total_stream_bytes reported",
+      "observed": {
+        "head_retained_bytes": 65536,
+        "evicted_gap_bytes": 764607,
+        "total_stream_bytes": 1288895,
+        "stream_dropped_bytes": 830143,
+        "warning": "stdout output between the retained head and the rolling tail was evicted; redirect large output to a file (cmd > out.log 2>&1) to keep everything"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T12",
+      "check": "read_file honours line bound",
+      "status": "PASS",
+      "expected": "<=2 lines returned",
+      "observed": {
+        "lines": null
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T13",
+      "check": "second instance runs in safe mode",
+      "status": "PASS",
+      "expected": "permission_mode safe",
+      "observed": {
+        "permission_mode": "safe"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T13",
+      "check": "safe mode gates a network-looking command",
+      "status": "PASS",
+      "expected": "permission-required / denied",
+      "observed": {
+        "code": "PERMISSION_REQUIRED",
+        "category": "permission",
+        "keys": [
+          "diagnostics",
+          "error",
+          "ok",
+          "permission_request",
+          "status"
+        ]
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T13",
+      "check": "safe mode gates an inline script",
+      "status": "PASS",
+      "expected": "permission-required",
+      "observed": {
+        "code": "PERMISSION_REQUIRED",
+        "category": "permission"
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T13",
+      "check": "safe mode gates a destructive command",
+      "status": "PASS",
+      "expected": "denied / permission-required",
+      "observed": {
+        "code": "PERMISSION_REQUIRED",
+        "category": "permission",
+        "exit_code": null
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T13",
+      "check": "safe mode still allows ordinary workspace reads",
+      "status": "PASS",
+      "expected": "no tool error",
+      "observed": {
+        "ok": true
+      },
+      "note": "",
+      "evidence_level": "EMPIRICALLY_TESTED"
+    },
+    {
+      "test": "T14",
+      "check": "public HTTPS transport probe",
+      "status": "NOT_RUN",
+      "expected": "-",
+      "observed": null,
+      "note": "--public-url not supplied",
+      "evidence_level": "NOT_VERIFIED"
+    }
+  ],
+  "totals": {
+    "pass": 64,
+    "fail": 0
+  }
+}
